@@ -82,6 +82,65 @@ class TestAdminAPI(TestCase):
             assert response.text == 'false'
             self.assertEquals(response.status_code, 200)
 
+
+    def test_cannot_find_without_access(self):
+        if ENVIRONMENT in ["LOCAL"]:
+            # We must pass a properly signed JWT to access the API
+
+            # Insert a user via API
+            query_url = self.api_url + "/rpc/add_tribal_access_email"
+            response = requests.post(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                         "content-profile": TestAdminAPI.admin_api_version,
+                         "content-type": "application/json",
+                         "prefer": "params=single-object",
+                         # We can force a UUID locally that would not work when using api.data.gov,
+                         # because api.data.gov sets/overwrites this.
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
+                timeout=10,
+                json={'email': 'test.user@fac.gsa.gov'}
+            )
+            assert response.text == 'true'
+            self.assertEquals(response.status_code, 200)
+
+            # With the right permissions, I can check if things are present
+            # via the associated view.
+            query_url = self.api_url + "/tribal_access"
+            response = requests.get(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                         "accept-profile": TestAdminAPI.admin_api_version,
+                         "x-api-user-id": "not-a-user-id"
+                         },
+                timeout=10
+            )
+            found = False
+            objects = response.json()
+            for o in objects:
+                if "test.user@fac.gsa.gov" in o["email"]:
+                    found = True
+            assert objects == []
+            assert found == False
+
+            # Now, remove the user, and find them absent.
+            query_url = self.api_url + "/rpc/remove_tribal_access_email"
+            response = requests.post(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                         "content-profile": TestAdminAPI.admin_api_version,
+                         "content-type": "application/json",
+                         "prefer": "params=single-object",
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
+                timeout=10,
+                json={'email': 'test.user@fac.gsa.gov'}
+            )
+            assert response.text == 'true'
+            self.assertEquals(response.status_code, 200)
+
+
     def test_find_gsa_users_in_table(self):
         if ENVIRONMENT in ["LOCAL"]:
             # We must pass a properly signed JWT to access the API
