@@ -1,23 +1,16 @@
 from psycopg2._psycopg import connection
 from config import settings
 import logging
-import os
 
 logger = logging.getLogger(__name__)
 
 # These are API versions we want live.
-live = {
-    "dissemination": ["api_v1_0_3"],
-    "support": ["admin_api_v1_0_0"]
-}
+live = {"dissemination": ["api_v1_0_3"], "support": ["admin_api_v1_0_0"]}
 
 # These are API versions we have deprecated.
 # They will be removed. It should be safe to leave them
 # here for repeated runs.
-deprecated = {
-    "dissemination": ["api"],
-    "support": []
-    }
+deprecated = {"dissemination": ["api"], "support": []}
 
 
 def get_conn_string():
@@ -87,6 +80,7 @@ def create_functions(location):
 def deprecate_schemas_and_views(location):
     for version in deprecated[location]:
         exec_sql(location, version, "drop.sql")
+
 
 def create_access_tables(location):
     for version in live[location]:

@@ -1,7 +1,6 @@
 import logging
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +14,6 @@ class AdminApiEvent(models.Model):
         (EventType.TRIBAL_ACCESS_EMAIL_ADDED, _("Tribal access granted")),
         (EventType.TRIBAL_ACCESS_EMAIL_REMOVED, _("Trbial access removed")),
     )
-    
     api_key_uuid = models.TextField()
     event = models.CharField(choices=EVENT_TYPES)
     event_data = models.JSONField()
