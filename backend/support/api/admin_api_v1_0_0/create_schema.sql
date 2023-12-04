@@ -29,6 +29,8 @@ begin
         -- This is so we can add and remove people who will have tribal data access
         -- via the administrative API.
         GRANT INSERT, SELECT, DELETE on public.users_userpermission to api_fac_gov;
+        -- We need to be able to look up slugs and turn them into permission IDs.
+        GRANT SELECT on public.users_permission to api_fac_gov;
         -- It also needs to be able to log events.
         GRANT INSERT on public.support_adminapievent to api_fac_gov;
         -- And, it wants to read the UUIDs of administrative keys

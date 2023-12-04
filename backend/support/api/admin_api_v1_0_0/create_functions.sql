@@ -53,16 +53,16 @@ returns boolean
 as $log_admin_api_event$
 DECLARE
     uuid_header text;
-begin
+BEGIN
     SELECT admin_api_v1_0_0.get_api_key_uuid() INTO uuid_header;
 
-    insert into public.support_adminapievent 
+    INSERT INTO public.support_adminapievent 
         (api_key_uuid, event, event_data, "timestamp")
-        values (uuid_header, event, meta, NOW());
+        VALUES (uuid_header, event, meta, NOW());
 
     RAISE INFO 'ADMIN_API % % %', uuid_header, event, meta; 
-    return 1;
-end;
+    RETURN 1;
+END;
 $log_admin_api_event$ LANGUAGE plpgsql;
 
 
@@ -81,16 +81,6 @@ BEGIN
 
     SELECT 
         CASE WHEN EXISTS (
-            SELECT permissions
-            FROM public.support_administrative_key_uuids aku 
-            WHERE aku.permissions like '%' || perm || '%')
-            THEN 1::BOOLEAN
-            ELSE 0::BOOLEAN
-            END 
-        INTO has_permission;
-
-    SELECT 
-        CASE WHEN EXISTS (
             SELECT uuid 
             FROM public.support_administrative_key_uuids aku
             WHERE aku.uuid = uuid_header)
@@ -98,22 +88,32 @@ BEGIN
             ELSE 0::BOOLEAN
             END 
         INTO key_exists;
+
+    SELECT 
+        CASE WHEN EXISTS (
+            SELECT permissions
+            FROM public.support_administrative_key_uuids aku 
+            WHERE aku.uuid = uuid_header
+            AND aku.permissions like '%' || perm || '%')
+            THEN 1::BOOLEAN
+            ELSE 0::BOOLEAN
+            END 
+        INTO has_permission;
     
-    -- This log event is an INSERT that gets called from the view... which is a SELECT-only
-    -- context. As a result, this fails. Not sure what the best fix is. Increase the perms
-    -- on the view, so the insert can happen?
-    -- RAISE INFO 'ADMIN_API has_access_check % % %', uuid_header, key_exists, has_permission;
-    -- PERFORM admin_api_v1_0_0.log_admin_api_event('access_check', 
-    --                                              json_build_object('uuid', uuid_header, 
-    --                                                                'key_exists', key_exists,
-    --                                                                'has_permission', has_permission));
+    -- This log event is an INSERT. When called from a VIEW (a SELECT-only context),
+    -- a call to log_admin_api_event() fails. So, we'll RAISE INFO right here, so we can
+    -- see the resultse of access checks in the log. We might later comment this out if 
+    -- it becomes too noisy.
+    RAISE INFO 'ADMIN_API has_access_check % % %', uuid_header, key_exists, has_permission;
+
     RETURN key_exists AND has_permission;
 END;
 $has_admin_data_access$ LANGUAGE plpgsql;
 
 -- Takes an email address and, if that address is not in the access table,
 -- inserts it. If the address already exists, the insert is skipped.
--- ### Example
+-- 
+-- ### Example from REST client
 -- POST http://localhost:3000/rpc/add_tribal_access_email
 -- authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
 -- content-profile: admin_api_v1_0_0
@@ -127,21 +127,37 @@ $has_admin_data_access$ LANGUAGE plpgsql;
 create or replace function admin_api_v1_0_0.add_tribal_access_email(params JSON) 
 returns BOOLEAN
 as $add_tribal_access_email$
-DECLARE already_exists INTEGER;
+DECLARE 
+    already_exists INTEGER;
+    read_tribal_id INTEGER;
 BEGIN
     -- Are they already in the table?
     SELECT count(up.email) 
         FROM public.users_userpermission as up
         WHERE email = params->>'email' INTO already_exists;
 
+    -- If they are, we're going to exit.
+    IF already_exists <> 0
+    THEN
+        RETURN 0;
+    END IF;
+
+    -- Grab the permission ID that we need for the insert below.
+    -- We want the 'read-tribal' permission, which has a human-readable
+    -- slug. But, we need it's ID, because that is the PK.
+    SELECT up.id INTO read_tribal_id 
+        FROM public.users_permission AS up
+        WHERE up.slug = 'read-tribal';
+
     -- If the API user has insert permissions, and the email passed in 
     -- is not already in the table, then insert them.
     IF (admin_api_v1_0_0.has_admin_data_access('INSERT')
        AND (already_exists = 0))
     THEN
+        -- Can we make the 1 not magic... do a select into.
         INSERT INTO public.users_userpermission
             (email, permission_id, user_id)
-            VALUES (params->>'email', 1, null);
+            VALUES (params->>'email', read_tribal_id, null);
         RETURN admin_api_v1_0_0.log_admin_api_event('tribal-access-email-added', 
                                                     json_build_object('email', params->>'email'));
         PERFORM admin_api_v1_0_0.log_admin_api_event('add_tribal_access', params);
@@ -153,6 +169,8 @@ $add_tribal_access_email$ LANGUAGE plpgsql;
 
 
 -- Adds many email addresses. Calls `add_tribal_access_email` for each address.
+--
+-- ### Example from REST client
 -- POST http://localhost:3000/rpc/add_tribal_access_emails
 -- authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
 -- content-profile: admin_api_v1_0_0
@@ -177,8 +195,11 @@ DECLARE
 BEGIN
     IF admin_api_v1_0_0.has_admin_data_access('INSERT')
     THEN 
+        -- This is a FOR loop over a JSON array in plPgSQL
         FOR em IN (SELECT json_array_elements_text((params->>'emails')::JSON) ele)
         LOOP
+            -- PERFORM is how to execute code that does not return anything.
+            -- If a SELECT was used here, the SQL compiler would complain.
             PERFORM admin_api_v1_0_0.add_tribal_access_email(json_build_object('email', em.ele)::JSON);
         END LOOP;
         RETURN 1;
@@ -188,7 +209,8 @@ END;
 $add_tribal_access_emails$ LANGUAGE plpgsql;
 
 -- Removes the email. Will remove multiple rows. That shouldn't happen, but still.
--- ### Example
+--
+-- ### Example from REST client
 -- POST http://localhost:3000/rpc/remove_tribal_access_email
 -- authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
 -- content-profile: admin_api_v1_0_0
@@ -208,11 +230,14 @@ BEGIN
 
     IF admin_api_v1_0_0.has_admin_data_access('DELETE')
     THEN 
-        -- RAISE INFO 'ADMIN API REMOVE ACCESS %', params->>'email';
+        -- Delete rows where the email address matches
         DELETE FROM public.users_userpermission as up
             WHERE up.email = params->>'email';
+        -- This is the Postgres way to find out how many rows
+        -- were affected by a DELETE.
         GET DIAGNOSTICS affected_rows = ROW_COUNT;
-        IF affected_rows <> 0
+        -- If that is greater than zero, we were successful.
+        IF affected_rows > 0
         THEN
             RETURN admin_api_v1_0_0.log_admin_api_event('tribal-access-email-removed', 
                                                         json_build_object('email', params->>'email'));
@@ -220,12 +245,15 @@ BEGIN
             RETURN 0;
         END IF;
     ELSE
+        -- If we did not have permission, consider it a failure.
         RETURN 0;
     END IF;
 end;
 $add_tribal_access_email$ LANGUAGE plpgsql;
 
 -- Removes many email addresses. Calls `remove_tribal_access_email` for each address.
+-- 
+-- ### Example from REST client
 -- POST http://localhost:3000/rpc/remove_tribal_access_emails
 -- authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
 -- content-profile: admin_api_v1_0_0
