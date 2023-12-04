@@ -1,8 +1,0 @@
-[minio]
-endpoint = http://minio:9000
-source_bucket = gsa-fac-private-s3
-destination_bucket = daily-sync-gsa-fac-private-s3
-user = minioadmin
-pass = minioadmin
-prefixes = excel,singleauditchecklist
-
