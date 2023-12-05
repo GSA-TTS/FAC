@@ -7,7 +7,7 @@ from ..workbooklib.excel_creation_utils import get_audits
 
 from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
-    _create_json_from_db_object,
+    create_json_from_db_object,
 )
 import audit.validators
 from django.conf import settings
@@ -155,7 +155,7 @@ def audit_information(audit_header):
 
     results = _get_sp_framework_gaap_results(audit_header)
     agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY)
-    audit_info = _create_json_from_db_object(audit_header, mappings)
+    audit_info = create_json_from_db_object(audit_header, mappings)
     audit_info = {
         key: results.get(key, audit_info.get(key))
         for key in set(audit_info) | set(results)

@@ -8,7 +8,7 @@ from ..sac_general_lib.utils import (
 )
 from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
-    _create_json_from_db_object,
+    create_json_from_db_object,
 )
 import re
 
@@ -169,7 +169,7 @@ def _xform_audit_type(general_information):
 def general_information(audit_header):
     """Generates general information JSON."""
 
-    general_information = _create_json_from_db_object(audit_header, mappings)
+    general_information = create_json_from_db_object(audit_header, mappings)
 
     # List of transformation functions
     transformations = [
