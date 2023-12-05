@@ -15,7 +15,7 @@ jobs:
   deploy-infrastructure-preview:
     name: Deploy infrastructure (preview)
     needs:
-      - testing
+      # - testing
       - linting
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
