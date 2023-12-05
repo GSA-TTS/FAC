@@ -239,8 +239,8 @@ function attachEventHandlers() {
   const btnValidateUEI = document.getElementById('auditee_uei-btn');
   btnValidateUEI.addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById("auditee_uei").value = document
-      .getElementById("auditee_uei")
+    document.getElementById('auditee_uei').value = document
+      .getElementById('auditee_uei')
       .value.toUpperCase();
     validateUEID();
   });
