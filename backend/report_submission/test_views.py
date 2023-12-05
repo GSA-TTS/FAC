@@ -31,7 +31,7 @@ SAMPLE_BASE_SAC_DATA = {
         "ein": "123456789",
         "ein_not_an_ssn_attestation": True,
         "multiple_eins_covered": False,
-        "auditee_uei": "ZQGGHJH74DW7",
+        "auditee_uei": "zQGGHJH74DW7",
         "multiple_ueis_covered": False,
         "secondary_auditors_exist": True,
         "auditee_name": "Auditee McAudited",
@@ -104,7 +104,7 @@ class TestPreliminaryViews(TestCase):
     }
 
     step2_data = {
-        "auditee_uei": "LW4MXE7SKMV1",
+        "auditee_uei": "Lw4MXE7SKMV1",
         "auditee_fiscal_period_start": "01/01/2021",
         "auditee_fiscal_period_end": "12/31/2021",
     }
@@ -188,7 +188,7 @@ class TestPreliminaryViews(TestCase):
         self.assertTemplateUsed(step2_get, "report_submission/step-2.html")
 
         step2_data = {
-            "auditee_uei": "KZV2XNZZN3A8",
+            "auditee_uei": "kZV2XNZZN3A8",
             "auditee_fiscal_period_start": "01/01/2022",
             "auditee_fiscal_period_end": "01/01/2023",
         }
@@ -224,6 +224,8 @@ class TestPreliminaryViews(TestCase):
                 ).strftime("%Y-%m-%d")
                 self.assertEqual(combined_date_formatted, getattr(sac, k))
             # Test everything else normally
+            elif k == "auditee_uei":
+                self.assertEqual(combined[k].upper(), getattr(sac, k))
             else:
                 self.assertEqual(combined[k], getattr(sac, k))
 
@@ -297,7 +299,7 @@ class TestPreliminaryViews(TestCase):
         self.assertTemplateUsed(get_response, "report_submission/step-2.html")
 
         data = {
-            "auditee_uei": "ZQGGHJH74DW7",
+            "auditee_uei": "ZqGGHJH74DW7",
             "auditee_fiscal_period_start": "2023-08-31",
             "auditee_fiscal_period_end": "2023-08-01",
         }
@@ -586,9 +588,15 @@ class GeneralInformationFormViewTests(TestCase):
         updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
         for field in data:
-            if (
-                field != "auditee_fiscal_period_start"
-                and field != "auditee_fiscal_period_end"
+            if field == "auditee_uei":
+                self.assertEqual(
+                    getattr(updated_sac, field),
+                    data[field].upper(),
+                    f"mismatch for field: {field}",
+                )
+            if field not in (
+                "auditee_fiscal_period_start",
+                "auditee_fiscal_period_end",
             ):
                 self.assertEqual(
                     getattr(updated_sac, field),
@@ -661,7 +669,7 @@ class GeneralInformationFormViewTests(TestCase):
             "ein": "123456780",
             "ein_not_an_ssn_attestation": True,
             "multiple_eins_covered": False,
-            "auditee_uei": "ZQGGHJH74DW8",
+            "auditee_uei": "ZQGGhJH74DW8",
             "multiple_ueis_covered": False,
             "secondary_auditors_exist": True,
             "auditee_name": "Auditee McAudited again",
