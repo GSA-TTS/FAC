@@ -12,4 +12,5 @@ module "cg-logshipper" {
   logshipper_instances  = 1
   logshipper_memory     = 1046
   disk_quota            = 512
+  new_relic_id          = cloudfoundry_user_provided_service.credentials.id
 }
