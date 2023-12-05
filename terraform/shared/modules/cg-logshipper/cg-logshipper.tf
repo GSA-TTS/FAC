@@ -16,7 +16,7 @@ module "s3-logshipper-storage" {
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
-  name             = "s3-logshipper-storage"
+  name             = "log-storage"
   recursive_delete = false
   s3_plan_name     = "basic"
 }
@@ -29,12 +29,13 @@ resource "cloudfoundry_route" "logshipper" {
 }
 
 resource "cloudfoundry_user_provided_service" "logshipper_creds" {
-  name  = "logshipper-creds"
+  name  = "cg-logshipper-creds"
   space = data.cloudfoundry_space.apps.id
   credentials = {
     "HTTP_USER" = local.username
     "HTTP_PASS" = local.password
   }
+  tags = ["logshipper-creds"]
 }
 
 resource "cloudfoundry_user_provided_service" "logshipper_new_relic_creds" {
@@ -44,6 +45,7 @@ resource "cloudfoundry_user_provided_service" "logshipper_new_relic_creds" {
     "NEW_RELIC_LICENSE_KEY"   = var.new_relic_license_key
     "NEW_RELIC_LOGS_ENDPOINT" = "https://gov-log-api.newrelic.com/log/v1"
   }
+  tags = ["logshipper-newrelic"]
 }
 
 resource "cloudfoundry_user_provided_service" "logdrain_service" {
@@ -81,23 +83,23 @@ data "external" "logshipperzip" {
 }
 
 resource "cloudfoundry_app" "cg_logshipper_app" {
-  name              = var.name
-  space             = data.cloudfoundry_space.apps.id
-  buildpacks        = ["https://github.com/cloudfoundry/apt-buildpack", "nginx_buildpack"]
-  path              = "${path.module}/${data.external.logshipperzip.result.path}"
-  source_code_hash  = filesha256("${path.module}/${data.external.logshipperzip.result.path}")
-  timeout           = 180
-  disk_quota        = var.disk_quota
-  memory            = var.logshipper_memory
-  instances         = var.logshipper_instances
-  strategy          = "rolling"
+  name             = var.name
+  space            = data.cloudfoundry_space.apps.id
+  buildpacks       = ["https://github.com/cloudfoundry/apt-buildpack", "nginx_buildpack"]
+  path             = "${path.module}/${data.external.logshipperzip.result.path}"
+  source_code_hash = filesha256("${path.module}/${data.external.logshipperzip.result.path}")
+  timeout          = 180
+  disk_quota       = var.disk_quota
+  memory           = var.logshipper_memory
+  instances        = var.logshipper_instances
+  strategy         = "rolling"
 
   provisioner "local-exec" {
     command = "cf curl /v3/apps/${self.id}/sidecars  -d '${local.sidecar_json}'"
   }
 
   service_binding {
-    service_instance = cloudfoundry_user_provided_service.logshipper_new_relic_creds.id
+    service_instance = cloudfoundry_user_provided_service.logshipper_creds.id
   }
 
   service_binding {
