@@ -99,7 +99,7 @@ resource "cloudfoundry_app" "cg_logshipper_app" {
   }
 
   service_binding {
-    service_instance = cloudfoundry_user_provided_service.logshipper_creds.id
+    service_instance = cloudfoundry_user_provided_service.logshipper_new_relic_creds.id
   }
 
   service_binding {
