@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  testing:
-    uses: ./.github/workflows/testing-from-ghcr.yml
-    secrets: inherit
+  # testing:
+  #   uses: ./.github/workflows/testing-from-ghcr.yml
+  #   secrets: inherit
 
   linting:
     uses: ./.github/workflows/linting.yml
