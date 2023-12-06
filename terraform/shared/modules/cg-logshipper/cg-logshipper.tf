@@ -102,7 +102,6 @@ resource "cloudfoundry_app" "cg_logshipper_app" {
   memory            = var.logshipper_memory
   instances         = var.logshipper_instances
   strategy          = "rolling"
-  health_check_type = "process"
 
   provisioner "local-exec" {
     command = "cf curl /v3/apps/${self.id}/sidecars  -d '${local.sidecar_json}'"
