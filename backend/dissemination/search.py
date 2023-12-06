@@ -21,7 +21,7 @@ def search_general(
     if alns:
         split_alns, agency_numbers = _split_alns(alns)
         query.add(_get_aln_match_query(split_alns, agency_numbers), Q.AND)
-    
+
     query.add(_get_names_match_query(names), Q.AND)
     query.add(_get_uei_or_eins_match_query(uei_or_eins), Q.AND)
     query.add(_get_start_date_match_query(start_date), Q.AND)
@@ -36,19 +36,21 @@ def search_general(
     results = General.objects.filter(query).order_by("-fac_accepted_date")
 
     if alns:
-        results = _attach_finding_my_aln_and_finding_all_aln_fields(results, split_alns, agency_numbers)
+        results = _attach_finding_my_aln_and_finding_all_aln_fields(
+            results, split_alns, agency_numbers
+        )
 
     return results
 
 
 def _split_alns(alns):
-    '''
+    """
     Split an ALN query string into two sets.
     Takes: ALN query string
-    Returns: 
+    Returns:
         split_alns: {(federal_agency_prefix, federal_award_extension), ...}
         agency_numbers: {('federal_agency_prefix'), ...}
-    '''
+    """
     split_alns = set()
     agency_numbers = set()
     for aln in alns:
@@ -61,9 +63,9 @@ def _split_alns(alns):
             if len(split_aln) == 2:
                 # The [wrapping] is so the tuple goes into the set as a tuple.
                 # Otherwise, the individual elements go in unpaired.
-                split_alns.update([tuple(split_aln)])  
+                split_alns.update([tuple(split_aln)])
 
-    return split_alns, agency_numbers 
+    return split_alns, agency_numbers
 
 
 def _get_aln_report_ids(split_alns, agency_numbers):
@@ -90,12 +92,14 @@ def _get_aln_report_ids(split_alns, agency_numbers):
         if matching_awards:
             for matching_award in matching_awards:
                 report_ids.update([matching_award.get("report_id")])
-    
+
     return report_ids
 
 
-def _attach_finding_my_aln_and_finding_all_aln_fields(results, split_alns, agency_numbers):
-    '''
+def _attach_finding_my_aln_and_finding_all_aln_fields(
+    results, split_alns, agency_numbers
+):
+    """
     Attach the finding_my_aln and finding_all_aln fields to a results QuerySet.
 
     The process:
@@ -107,13 +111,11 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(results, split_alns, agenc
 
     Takes: The results QuerySet, full of 'General' objects. The ALN query string.
     Returns: The modified results QuerySet, where each 'General' object has two new fields.
-    '''
+    """
     for result in results:
         result.finding_my_aln = False
         result.finding_all_aln = False
-        matching_findings = Finding.objects.filter(
-            report_id=result.report_id
-        )
+        matching_findings = Finding.objects.filter(report_id=result.report_id)
 
         for finding in matching_findings:
             matching_award = FederalAward.objects.get(
@@ -126,7 +128,7 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(results, split_alns, agenc
                 result.finding_my_aln = True
             else:
                 result.finding_all_aln = True
-        
+
     return results
 
 
@@ -145,7 +147,7 @@ def _get_aln_match_query(split_alns, agency_numbers):
     """
     # Search for relevant awards
     report_ids = _get_aln_report_ids(split_alns, agency_numbers)
-    
+
     # Add the report_id's from the award search to the full search params
     alns_match = Q()
     for report_id in report_ids:

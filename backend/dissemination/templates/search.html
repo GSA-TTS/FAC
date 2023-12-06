@@ -53,11 +53,7 @@
                         <div id="audit-year">
                             {% for value, text in form.audit_year.field.choices %}
                                 <div class="usa-checkbox bg-base-lighter">
-                                    <input class="usa-checkbox__input"
-                                           id="audit-year-{{ text }}"
-                                           name="audit_year" type="checkbox"
-                                           value={{ value }}
-                                           {% if text in form.cleaned_data.audit_year %}checked{% endif %} />
+                                    <input class="usa-checkbox__input" id="audit-year-{{ text }}" name="audit_year" type="checkbox" value={{ value }} {% if text in form.cleaned_data.audit_year %}checked{% endif %} />
                                     <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
                                 </div>
                             {% endfor %}
@@ -120,15 +116,17 @@
                                    value="{{ form.cleaned_data.agency_name }}" />
                         </div>
                         <div class="usa-form-group">
-                            <label class="usa-label" for="auditee_state">
-                                State
-                            </label>
-                            <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
+                            <label class="usa-label" for="auditee_state">State</label>
+                            <select class="usa-select"
+                                    id="auditee_state"
+                                    name="auditee_state"
+                                    aria-required="false">
                                 <option value>- Select -</option>
                                 {% for state in state_abbrevs %}
-                                <option value="{{ state }}" {% if form.cleaned_data.auditee_state == state %}selected{% endif %}>
-                                    {{ state }}
-                                </option>
+                                    <option value="{{ state }}"
+                                            {% if form.cleaned_data.auditee_state == state %}selected{% endif %}>
+                                        {{ state }}
+                                    </option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -175,7 +173,7 @@
                                     <th data-sortable scope="col" role="columnheader">Cog or Over</th>
                                     <th scope="col" role="columnheader">View</th>
                                     <th scope="col" role="columnheader">PDF</th>
-                                    {% if results.0.finding_my_aln is not None%}
+                                    {% if results.0.finding_my_aln is not None %}
                                         <th data-sortable scope="col" role="columnheader">Finding my ALN</th>
                                         <th data-sortable scope="col" role="columnheader">Finding all ALN</th>
                                     {% endif %}
@@ -221,7 +219,7 @@
                                                 </svg>
                                             </a>
                                         </td>
-                                        {% if result.finding_my_aln is not None%}
+                                        {% if result.finding_my_aln is not None %}
                                             <td>
                                                 <span class="display-flex flex-column flex-align-center">
                                                     {% if result.finding_my_aln %}
@@ -251,7 +249,7 @@
                             {% if results.has_previous %}
                                 <li class="usa-pagination__item usa-pagination__arrow">
                                     <a class="usa-pagination__link usa-pagination__previous-page"
-                                        aria-label="Previous page">
+                                       aria-label="Previous page">
                                         <svg class="usa-icon" aria-hidden="true" role="img">
                                             {% uswds_sprite "navigate_before" %}
                                         </svg>
@@ -267,14 +265,14 @@
                                 {% else %}
                                     <li class="usa-pagination__item usa-pagination__page-no">
                                         <a class="usa-pagination__button {% if results.number == page_number %}usa-current{% endif %}"
-                                            aria-label="Page {{ page_number }}">{{ page_number }}</a>
+                                           aria-label="Page {{ page_number }}">{{ page_number }}</a>
                                     </li>
                                 {% endif %}
                             {% endfor %}
                             {% if results.has_next %}
                                 <li class="usa-pagination__item usa-pagination__arrow">
                                     <a class="usa-pagination__link usa-pagination__next-page"
-                                        aria-label="Next page">
+                                       aria-label="Next page">
                                         <span class="usa-pagination__link-text">Next</span>
                                         <svg class="usa-icon" aria-hidden="true" role="img">
                                             {% uswds_sprite "navigate_next" %}
