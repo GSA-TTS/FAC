@@ -36,7 +36,7 @@ begin
         -- And, it wants to read the UUIDs of administrative keys
         GRANT SELECT ON public.support_administrative_key_uuids TO api_fac_gov;
         -- The admin API needs to be able to read the tribal access key table. 
-        GRANT SELECT ON tribal_access_api_key_uuids to api_fac_gov;
+        GRANT SELECT ON public.tribal_access_api_key_uuids to api_fac_gov;
     end if;
 end
 $$
