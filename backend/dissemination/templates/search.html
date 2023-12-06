@@ -165,7 +165,7 @@
                         <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                     </p>
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">
-                        <table class="usa-table usa-table--striped">
+                        <table class="usa-table usa-table--striped usa-table--compact">
                             <thead>
                                 <tr>
                                     <th data-sortable scope="col" role="columnheader">Name</th>
@@ -175,6 +175,10 @@
                                     <th data-sortable scope="col" role="columnheader">Cog or Over</th>
                                     <th scope="col" role="columnheader">View</th>
                                     <th scope="col" role="columnheader">PDF</th>
+                                    {% if results.0.finding_my_aln is not None%}
+                                        <th data-sortable scope="col" role="columnheader">Finding my ALN</th>
+                                        <th data-sortable scope="col" role="columnheader">Finding all ALN</th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -217,49 +221,69 @@
                                                 </svg>
                                             </a>
                                         </td>
+                                        {% if result.finding_my_aln is not None%}
+                                            <td>
+                                                <span class="display-flex flex-column flex-align-center">
+                                                    {% if result.finding_my_aln %}
+                                                        Y
+                                                    {% else %}
+                                                        N
+                                                    {% endif %}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="display-flex flex-column flex-align-center">
+                                                    {% if result.finding_all_aln %}
+                                                        Y
+                                                    {% else %}
+                                                        N
+                                                    {% endif %}
+                                                </span>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
-                        <nav aria-label="Pagination" class="usa-pagination">
-                            <ul class="usa-pagination__list">
-                                {% if results.has_previous %}
-                                    <li class="usa-pagination__item usa-pagination__arrow">
-                                        <a class="usa-pagination__link usa-pagination__previous-page"
-                                           aria-label="Previous page">
-                                            <svg class="usa-icon" aria-hidden="true" role="img">
-                                                {% uswds_sprite "navigate_before" %}
-                                            </svg>
-                                            <span class="usa-pagination__link-text">Previous</span></a>
-                                    </li>
-                                {% endif %}
-                                {% for page_number in results.adjusted_elided_pages %}
-                                    {% if page_number == results.paginator.ELLIPSIS %}
-                                        <li class="usa-pagination__item usa-pagination__overflow"
-                                            aria-label="ellipsis indicating non-visible pages">
-                                            <span>…</span>
-                                        </li>
-                                    {% else %}
-                                        <li class="usa-pagination__item usa-pagination__page-no">
-                                            <a class="usa-pagination__button {% if results.number == page_number %}usa-current{% endif %}"
-                                               aria-label="Page {{ page_number }}">{{ page_number }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                                {% if results.has_next %}
-                                    <li class="usa-pagination__item usa-pagination__arrow">
-                                        <a class="usa-pagination__link usa-pagination__next-page"
-                                           aria-label="Next page">
-                                            <span class="usa-pagination__link-text">Next</span>
-                                            <svg class="usa-icon" aria-hidden="true" role="img">
-                                                {% uswds_sprite "navigate_next" %}
-                                            </svg>
-                                        </a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
                     </div>
+                    <nav aria-label="Pagination" class="usa-pagination">
+                        <ul class="usa-pagination__list">
+                            {% if results.has_previous %}
+                                <li class="usa-pagination__item usa-pagination__arrow">
+                                    <a class="usa-pagination__link usa-pagination__previous-page"
+                                        aria-label="Previous page">
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            {% uswds_sprite "navigate_before" %}
+                                        </svg>
+                                        <span class="usa-pagination__link-text">Previous</span></a>
+                                </li>
+                            {% endif %}
+                            {% for page_number in results.adjusted_elided_pages %}
+                                {% if page_number == results.paginator.ELLIPSIS %}
+                                    <li class="usa-pagination__item usa-pagination__overflow"
+                                        aria-label="ellipsis indicating non-visible pages">
+                                        <span>…</span>
+                                    </li>
+                                {% else %}
+                                    <li class="usa-pagination__item usa-pagination__page-no">
+                                        <a class="usa-pagination__button {% if results.number == page_number %}usa-current{% endif %}"
+                                            aria-label="Page {{ page_number }}">{{ page_number }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if results.has_next %}
+                                <li class="usa-pagination__item usa-pagination__arrow">
+                                    <a class="usa-pagination__link usa-pagination__next-page"
+                                        aria-label="Next page">
+                                        <span class="usa-pagination__link-text">Next</span>
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            {% uswds_sprite "navigate_next" %}
+                                        </svg>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
                 {% else %}
                     <div class="search-instructions">
                         <img src="{% static 'img/circle-arrow.svg' %}"
