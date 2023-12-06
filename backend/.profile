@@ -49,7 +49,7 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     echo 'Finished API schema creation' &&
     echo 'Starting migrate' &&
     python manage.py migrate &&
-    python manage.py migrate --database census-to-gsafac-db &&
+    # python manage.py migrate --database census-to-gsafac-db &&
     echo 'Finished migrate' &&
     echo 'Starting API view creation' &&
     python manage.py create_api_views &&

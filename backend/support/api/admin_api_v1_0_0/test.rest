@@ -12,6 +12,7 @@ accept-profile: admin_api_v1_0_0
 GET {{scheme}}://{{api_url}}/singleauditchecklist
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}     
 accept-profile: admin_api_v1_0_0
+x-api-key: {{$processEnv API_GOV_KEY}}   
 
 
 ###
