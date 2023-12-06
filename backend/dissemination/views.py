@@ -6,11 +6,11 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
 
-from audit.file_downloads import get_download_url, get_filename
 from audit.models import SingleAuditChecklist
 
 from config.settings import STATE_ABBREVS
 
+from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import SearchForm
 from dissemination.search import search_general
 from dissemination.mixins import ReportAccessRequiredMixin
