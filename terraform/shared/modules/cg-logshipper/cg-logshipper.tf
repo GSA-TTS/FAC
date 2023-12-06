@@ -28,6 +28,7 @@ module "s3-logshipper-storage" {
   name             = "log-storage"
   recursive_delete = false
   s3_plan_name     = "basic"
+  tags             = ["logshipper-s3"]
 }
 
 resource "cloudfoundry_route" "logshipper" {
