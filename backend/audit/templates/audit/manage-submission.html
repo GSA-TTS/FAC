@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div>
+          {% csrf_token %}
+          <h1 id="manage-submission">Manage Submission: {{ report_id }}</h1>
+          <h3>{{ auditee_name }}</h3>
+            <table class="usa-table margin-top-0">
+              <thead>
+                <tr>
+                  <th>UEI</th>
+                  <th>Fiscal period</th>
+                  <th>Submission status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ auditee_uei }}</td>
+                  <td>{{ period }}</td>
+                  <td>{{ status }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <hr />
+
+            <table class="usa-table margin-top-0">
+              <caption class="text-normal">
+                <p>Listed below are the roles associated with this submission, and the email addresses associated with those roles.</p>
+
+                <p>There can only be one entry each for <strong>Auditee Certifying Official</strong> and <strong>Auditor Certifying Official</strong>, and the same email address cannot be used for both. These may be changed by following the corresponding links below.</p>
+
+                <p><strong>Audit Editor</strong> is the only other role and grants edit access but not certifying authority.</p>
+
+                <p>An asterisk (<strong>*</strong>) following an email address indicates that no user with this email address has logged in thus far.</p>
+              </caption>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Email address</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in entries %}
+                  <tr>
+                    <td>{{ entry.name }}</td>
+                    <td>{{ entry.role }}</td>
+                    <td>{{ entry.email }} {{ entry.never_logged_in_flag}}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+            <hr />
+
+            <p><a href="{{ change_cert_auditee_url }}">Change certifying auditee official</a></p>
+
+            <p><a href="{{ change_cert_auditor_url }}">Change certifying auditor official</a></p>
+
+            <p><a href="{{ progress_url }}">Submission progress</a></p>
+
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}
