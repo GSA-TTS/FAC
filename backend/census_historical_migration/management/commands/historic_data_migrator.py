@@ -1,5 +1,8 @@
 import logging
 import sys
+from backend.census_historical_migration.sac_general_lib.utils import (
+    normalize_year_string,
+)
 from census_historical_migration.historic_data_loader import create_or_get_user
 
 from config.settings import ENVIRONMENT
@@ -18,7 +21,7 @@ class Command(BaseCommand):
         dbkeys_str = options["dbkeys"]
         years_str = options["years"]
         dbkeys = dbkeys_str.split(",")
-        years = years_str.split(",")
+        years = [normalize_year_string(year) for year in years_str.split(",")]
 
         if len(dbkeys) != len(years):
             logger.error(
@@ -27,11 +30,6 @@ class Command(BaseCommand):
                 )
             )
             sys.exit(-1)
-
-        lengths = [len(s) == 2 for s in years]
-        if dbkeys_str and years_str and (not all(lengths)):
-            logger.error("Years must be two digits. Exiting.")
-            sys.exit(-2)
 
         user = create_or_get_user()
 
@@ -53,10 +51,11 @@ class Command(BaseCommand):
                 for pair in defaults:
                     logger.info("Running {}-{} end-to-end".format(pair[0], pair[1]))
                     result = {"success": [], "errors": []}
-                    run_end_to_end(user, str(pair[0]), str(pair[1]), result)
+                    year = normalize_year_string(pair[1])
+                    run_end_to_end(user, str(pair[0]), year, result)
                     logger.info(result)
         else:
             logger.error(
-                "Cannot run end-to-end workbook generation in production. Exiting."
+                "Cannot run end-to-end historic data  migrator in production. Exiting."
             )
             sys.exit(-3)
