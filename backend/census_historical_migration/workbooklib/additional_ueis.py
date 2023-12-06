@@ -1,5 +1,4 @@
 from ..workbooklib.excel_creation_utils import (
-    get_audit_header,
     map_simple_columns,
     generate_dissemination_test_table,
     set_workbook_uei,
@@ -24,28 +23,26 @@ mappings = [
 ]
 
 
-def _get_ueis(dbkey):
-    return Ueis.objects.filter(DBKEY=dbkey)
+def _get_ueis(dbkey, year):
+    return Ueis.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
 
 
-def generate_additional_ueis(dbkey, year, outfile):
+def generate_additional_ueis(audit_header, outfile):
     """
-    Generates additional ueis workbook for a given dbkey.
+    Generates additional ueis workbook for a given audit header.
     """
-    logger.info(f"--- generate additional ueis {dbkey} {year} ---")
+    logger.info(
+        f"--- generate additional ueis {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
+    )
 
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_UEIS])
-    audit_header = get_audit_header(dbkey)
     set_workbook_uei(wb, audit_header.UEI)
-
-    additional_ueis = _get_ueis(dbkey)
+    additional_ueis = _get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, additional_ueis)
     wb.save(outfile)
 
-    # FIXME - MSHD: The logic below will most likely be removed, see comment in federal_awards.py
     table = generate_dissemination_test_table(
-        audit_header, "additional_ueis", dbkey, mappings, additional_ueis
+        audit_header, "additional_ueis", mappings, additional_ueis
     )
-
     table["singletons"]["auditee_uei"] = audit_header.UEI
     return (wb, table)

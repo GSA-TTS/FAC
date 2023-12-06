@@ -48,7 +48,7 @@ def _get_eins(dbkey, year):
 
 def generate_additional_eins(audit_header, outfile):
     """
-    Generates additional eins workbook for a given dbkey and audit year.
+    Generates additional eins workbook for a given audit header.
     """
     logger.info(
         f"--- generate additional eins {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
