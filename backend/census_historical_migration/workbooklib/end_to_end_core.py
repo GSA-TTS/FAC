@@ -273,7 +273,9 @@ def run_end_to_end(user, dbkey, year, result):
     except Exception as exc:
         error_type = type(exc)
 
-        if error_type == ValidationError:
+        if error_type == KeyboardInterrupt:
+            raise exc
+        elif error_type == ValidationError:
             logger.error(f"ValidationError: {exc}")
         elif error_type == DataMigrationError:
             logger.error(f"DataMigrationError: {exc.message}")
