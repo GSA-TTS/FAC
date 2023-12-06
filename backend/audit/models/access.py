@@ -88,6 +88,10 @@ class Access(models.Model):
         )
         return access_deletion_return
 
+    def get_friendly_role(self) -> str | None:
+        """Return the friendly version of the role."""
+        return dict(self.ROLES)[self.role]
+
     class Meta:
         """Constraints for certifying roles"""
 

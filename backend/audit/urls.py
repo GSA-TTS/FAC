@@ -86,6 +86,11 @@ urlpatterns = [
         name="UnlockAfterCertification",
     ),
     path(
+        "manage-submission/<str:report_id>",
+        views.ManageSubmissionView.as_view(),
+        name="ManageSubmission",
+    ),
+    path(
         "manage-submission/auditor-certifying-official/<str:report_id>",
         views.ChangeAuditorCertifyingOfficialView.as_view(),
         name="ChangeAuditorCertifyingOfficial",
