@@ -48,20 +48,18 @@ def _get_eins(dbkey, year):
 
 def generate_additional_eins(audit_header, outfile):
     """
-    Generates additional eins workbook for a given dbkey.
+    Generates additional eins workbook for a given dbkey and audit year.
     """
     logger.info(
         f"--- generate additional eins {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
     )
 
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_EINS])
-
     set_workbook_uei(wb, audit_header.UEI)
-
     addl_eins = _get_eins(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, addl_eins)
     wb.save(outfile)
-    
+
     table = generate_dissemination_test_table(
         audit_header, "additional_eins", mappings, addl_eins
     )

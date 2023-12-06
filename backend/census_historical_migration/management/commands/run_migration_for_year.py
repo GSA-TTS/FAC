@@ -21,7 +21,6 @@ class Command(BaseCommand):
         parser.add_argument("--year", help="4-digit Audit Year")
 
     def handle(self, *args, **options):
-
         year = normalize_year_string(options.get("year"))
-        
+
         load_historic_data_for_year(audit_year=year)

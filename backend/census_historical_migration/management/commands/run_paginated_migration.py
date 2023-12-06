@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         year = normalize_year_string(options.get("year"))
- 
+
         try:
             pages_str = options["pages"]
             pages = list(map(lambda d: int(d), pages_str.split(",")))
