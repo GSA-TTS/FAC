@@ -162,9 +162,6 @@ Keep this timestamp to enter in the issue as the end time.
 
 Note: **do not run** `cf disable-ssh gsa-fac`, as this will require application restarts in order to enable access again. Disabling access at the space level is sufficient.
 
-```
-
-
 ## Troubleshooting
 
 ### Problem: A GitHub Action run says that Terraform cannot be applied because the plan differs from what was approved.
