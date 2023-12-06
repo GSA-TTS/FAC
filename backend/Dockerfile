@@ -2,74 +2,79 @@ FROM python:3.10-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV CERT_PATH /usr/local/share/ca-certificates/zscaler.crt
+ENV CURL_CA_BUNDLE ${CERT_PATH}
+ENV NODE_EXTRA_CA_CERTS ${CERT_PATH}
 
 COPY zscaler_cert.pem /tmp/zscaler.crt
 COPY requirements.txt /tmp/requirements.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt
 
-# && CURL_CA_BUNDLE=/usr/local/share/ca-certificates/zscaler.crt
-RUN if [ "$ENV" = "LOCAL" ] ; then cp /tmp/zscaler.crt /usr/local/share/ca-certificates/zscaler.crt ; update-ca-certificates ; fi
-
-RUN apt-get -y update
-RUN apt-get -y install git
-
-RUN apt-get update \
- && DEBIAN_FRONTEND=noninteractive \
-    apt-get install --no-install-recommends --assume-yes \
-      postgresql-client
+RUN \
+    cp /tmp/zscaler.crt ${CERT_PATH} && \
+    chmod 644 ${CERT_PATH} && \
+    update-ca-certificates
 
 WORKDIR ..
 
 # Dependencies
 RUN \
+    apt-get clean && \
     apt-get update -yq && \
     apt-get install -yqq \
         apt-transport-https \
-        wget \
-        gnupg2 \
+        ca-certificates \
         build-essential \
         curl \
         gcc \
-        ca-certificates \
+        git \
         gnupg \
+        gnupg2 \
         groff \
+        postgresql-client \
+        wget \
         zip \
     ; \
-    # Install zscaler cert for local builds
-    if [ "$ENV" = "LOCAL" ] ; then cp /tmp/zscaler.crt /usr/local/share/ca-certificates/zscaler.crt ; update-ca-certificates ; fi \
     # Updated nodesource install via: https://github.com/nodesource/distributions#ubuntu-versions
-    && mkdir -p /etc/apt/keyrings && \
-    curl -fsSL --cacert /usr/local/share/ca-certificates/zscaler.crt https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     NODE_MAJOR=18 && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
     apt-get update && \
     apt-get install nodejs -y \
     ; \
     # Pip install
-    set -ex && \
+        # Ref: https://help.zscaler.com/zia/adding-custom-certificate-application-specific-trust-store
+        # The only PIP option that seems to work is using pip_system_certs.
+        # Of course, you can't install anything using PIP until pip_system_certs is installed.
+        # So we just add a bunch of trusted sources.
+    pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pip_system_certs && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
     pip install -r /tmp/dev-requirements.txt && \
     rm -rf /root/.cache/ \
     ; \
     # AWS CLI install
-    curl --cacert /usr/local/share/ca-certificates/zscaler.crt "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
+    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
     unzip awscli-bundle.zip && \
     ./awscli-bundle/install -b /usr/local/bin/aws \
     ; \
     # Minio install
-    curl --cacert /usr/local/share/ca-certificates/zscaler.crt "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
+    curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
     chmod +x /usr/local/bin/mc
 
 COPY package.* /src/
 WORKDIR /src/
 
-RUN npm install
-RUN chown -R 1001:123 "/root/.npm"
+RUN \
+    npm install && \
+    chown -R 1001:123 "/root/.npm"
 
 COPY . /src/
 
-RUN npm run build && python manage.py collectstatic
+RUN \
+    npm run build && \
+    python manage.py collectstatic
 
 # ------------------------------------------------------------
 # Dev/testing layer
