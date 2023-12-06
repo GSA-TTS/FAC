@@ -120,6 +120,25 @@ def set_column_widths(worksheet):
 
 
 def gather_report_data(report_ids):
+    """
+    Given a set of report IDs, fetch the disseminated data for each and asssemble into a dictionary with the following shape:
+
+    {
+        general: {
+            field_names: [],
+            entries: [],
+        },
+        federal_award: {
+            field_names: [],
+            entries: [],
+        },
+        ...
+    }
+    """
+
+    # Make report IDs unique
+    report_ids = set(report_ids)
+    
     data = {}
 
     for model in models:
@@ -204,10 +223,7 @@ def persist_workbook(workbook):
 
 
 def generate_summary_report(report_ids):
-    # Make report IDs unique
-    unique_report_ids = set()
-    for rid in report_ids:
-        unique_report_ids.add(rid)
+    
 
     data = gather_report_data(report_ids)
     workbook = create_workbook(data)

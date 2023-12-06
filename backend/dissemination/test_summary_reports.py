@@ -10,7 +10,8 @@ class ExportTests(TestCase):
     def test_generate_summary_report_returns_filename(self):
         general = baker.make(General, _quantity=100)
 
-        filename = generate_summary_report([g.report_id for g in general])
+        report_ids = [g.report_id for g in general]
+        filename = generate_summary_report(report_ids)
 
         self.assertTrue(filename.startswith, "bulk-")
         self.assertTrue(filename.endswith, ".xlsx")
