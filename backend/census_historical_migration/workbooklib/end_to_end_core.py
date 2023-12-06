@@ -38,11 +38,6 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 parser = argparse.ArgumentParser()
 
-# Peewee runs a really noisy DEBUG log.
-pw = logging.getLogger("peewee")
-pw.addHandler(logging.StreamHandler())
-pw.setLevel(logging.INFO)
-
 
 def step_through_certifications(sac):
     sac.transition_to_ready_for_certification()
@@ -53,7 +48,7 @@ def step_through_certifications(sac):
     sac.save()
 
 
-def disseminate(sac, year):
+def disseminate(sac):
     logger.info("Invoking movement of data from Intake to Dissemination")
     for model in [
         AdditionalEin,
@@ -254,7 +249,7 @@ def run_end_to_end(user, dbkey, year, result):
                 result["errors"].append(f"{errors.get('errors')}")
                 return
 
-            disseminate(sac, year)
+            disseminate(sac)
             combined_summary = api_check(json_test_tables)
             logger.info(combined_summary)
 
