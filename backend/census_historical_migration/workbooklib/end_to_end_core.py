@@ -3,7 +3,7 @@ import argparse
 import logging
 import sys
 import math
-from config import settings
+from django.conf import settings
 import os
 import jwt
 import requests

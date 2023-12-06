@@ -2,9 +2,10 @@ import logging
 import sys
 from census_historical_migration.historic_data_loader import create_or_get_user
 
-from config.settings import ENVIRONMENT
 from django.core.management.base import BaseCommand
 from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
+
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,7 @@ class Command(BaseCommand):
             (251020, 22),
         ]
 
-        if ENVIRONMENT in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING"]:
+        if settings.ENVIRONMENT in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING"]:
             if dbkeys_str and years_str:
                 logger.info(
                     f"Generating test reports for DBKEYS: {dbkeys_str} and YEARS: {years_str}"
