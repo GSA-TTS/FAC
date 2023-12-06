@@ -1,5 +1,4 @@
 from ..workbooklib.excel_creation_utils import (
-    get_audit_header,
     map_simple_columns,
     generate_dissemination_test_table,
     set_workbook_uei,
@@ -29,30 +28,30 @@ mappings = [
 ]
 
 
-def _get_findings_texts(dbkey):
-    return FindingsText.objects.filter(DBKEY=dbkey).order_by("SEQ_NUMBER")
+def _get_findings_texts(dbkey, year):
+    return FindingsText.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by(
+        "SEQ_NUMBER"
+    )
 
 
-def generate_findings_text(dbkey, year, outfile):
+def generate_findings_text(audit_header, outfile):
     """
-    Generates a findings text workbook for a given dbkey.
-
-    Note: This function assumes that all the findings text
-    information in the database is related to the same year.
+    Generates a findings text workbook for a given audit header.
     """
-    logger.info(f"--- generate findings text {dbkey} {year} ---")
+    logger.info(
+        f"--- generate findings text {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
+    )
 
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.FINDINGS_TEXT])
-    audit_header = get_audit_header(dbkey)
     set_workbook_uei(wb, audit_header.UEI)
 
-    findings_texts = _get_findings_texts(dbkey)
+    findings_texts = _get_findings_texts(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, findings_texts)
 
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        audit_header, "findings_text", dbkey, mappings, findings_texts
+        audit_header, "findings_text", mappings, findings_texts
     )
     table["singletons"]["auditee_uei"] = audit_header.UEI
 
