@@ -216,7 +216,7 @@ def persist_workbook(workbook):
                 Key=f"{s3_dir}/{filename}",
             )
         except ClientError:
-            logger.warn(f"Unable to put file {filename} in S3!")
+            logger.warn(f"Unable to put summary report file {filename} in S3!")
             raise
 
     return filename
