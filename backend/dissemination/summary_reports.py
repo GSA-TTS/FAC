@@ -146,7 +146,7 @@ def persist_workbook(workbook):
 
     return filename
 
-def export_to_workbook(report_ids):
+def generate_summary_report(report_ids):
     # Make report IDs unique
     unique_report_ids = set()
     for rid in report_ids:
