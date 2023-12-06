@@ -331,7 +331,7 @@ class SearchALNTests(TestCase):
         results = search_general(alns=["00"])
         self.assertEqual(len(results), 1)
         self.assertTrue(
-            results[0].finding_my_aln == True and results[0].finding_all_aln == False
+            results[0].finding_my_aln is True and results[0].finding_all_aln is False
         )
 
     def test_finding_all_aln(self):
@@ -361,7 +361,7 @@ class SearchALNTests(TestCase):
         results = search_general(alns=["11"])
         self.assertEqual(len(results), 1)
         self.assertTrue(
-            results[0].finding_my_aln == False and results[0].finding_all_aln == True
+            results[0].finding_my_aln is False and results[0].finding_all_aln is True
         )
 
     def test_finding_my_aln_and_finding_all_aln(self):
@@ -395,7 +395,7 @@ class SearchALNTests(TestCase):
         results = search_general(alns=["22"])
         self.assertEqual(len(results), 1)
         self.assertTrue(
-            results[0].finding_my_aln == True and results[0].finding_all_aln == True
+            results[0].finding_my_aln is True and results[0].finding_all_aln is True
         )
 
     def test_alns_no_findings(self):
@@ -411,5 +411,5 @@ class SearchALNTests(TestCase):
         results = search_general(alns=["33"])
         self.assertEqual(len(results), 1)
         self.assertTrue(
-            results[0].finding_my_aln == False and results[0].finding_all_aln == False
+            results[0].finding_my_aln is False and results[0].finding_all_aln is False
         )
