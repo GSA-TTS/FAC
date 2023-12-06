@@ -17,10 +17,10 @@ def _make_excel_file(filename, f_obj):
     return file
 
 
-def generate_workbook(workbook_generator, dbkey, year, section):
+def generate_workbook(workbook_generator, audit_header, section):
     """
-    Generates a workbook in memory using the workbook_generator for a specific
-    'dbkey', 'year', and 'section'. Returns the workbook object, its JSON data representation,
+    Generates a workbook in memory using the workbook_generator for a given audit_header
+    and section template name. Returns the workbook object, its JSON data representation,
     the Excel file as a SimpleUploadedFile object, and the filename.
     """
     with MemoryFS() as mem_fs:
@@ -28,11 +28,11 @@ def generate_workbook(workbook_generator, dbkey, year, section):
         filename = (
             get_template_name_for_section(section)
             .replace(".xlsx", "-{}.xlsx")
-            .format(dbkey)
+            .format(audit_header.DBKEY)
         )
         with mem_fs.openbin(filename, mode="w") as outfile:
             # Generate the workbook object along with the API JSON representation
-            wb, json_data = workbook_generator(dbkey, year, outfile)
+            wb, json_data = workbook_generator(audit_header, outfile)
 
         # Re-open the file in read mode to create an Excel file object
         with mem_fs.openbin(filename, mode="r") as outfile:

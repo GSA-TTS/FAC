@@ -222,18 +222,15 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def run_end_to_end(user, dbkey, year, result):
+def run_end_to_end(user, audit_header, result):
     try:
-        entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
-            dbkey=dbkey, year=year, date=datetime.now()
-        )
-        sac = setup_sac(user, entity_id, dbkey)
+        sac = setup_sac(user, audit_header)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
-            print(f"Skipping ACE audit: {dbkey}")
+            print(f"Skipping ACE audit: {audit_header.DBKEY} {audit_header.AUDITYEAR}")
             raise DataMigrationError("Skipping ACE audit")
         else:
-            builder_loader = workbook_builder_loader(user, sac, dbkey, year)
+            builder_loader = workbook_builder_loader(user, sac, audit_header)
             json_test_tables = []
 
             for section, fun in sections_to_handlers.items():
@@ -252,7 +249,6 @@ def run_end_to_end(user, dbkey, year, result):
             disseminate(sac)
             combined_summary = api_check(json_test_tables)
             logger.info(combined_summary)
-
             result["success"].append(f"{sac.report_id} created")
     except Exception as exc:
         tb = traceback.extract_tb(sys.exc_info()[2])

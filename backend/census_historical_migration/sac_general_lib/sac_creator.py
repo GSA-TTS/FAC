@@ -4,7 +4,6 @@ from django.apps import apps
 from django.conf import settings
 
 from ..exception_utils import DataMigrationError
-from ..workbooklib.excel_creation_utils import get_audit_header
 from ..sac_general_lib.general_information import (
     general_information,
 )
@@ -24,11 +23,14 @@ from ..sac_general_lib.report_id_generator import (
 logger = logging.getLogger(__name__)
 
 
-def _create_sac(user, dbkey):
+def setup_sac(user, audit_header):
     """Create a SAC object for the historic data migration."""
+    if user is None:
+        raise DataMigrationError("No user provided to setup sac object")
+    logger.info(f"Creating a SAC object for {user}")
+
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-    audit_header = get_audit_header(dbkey)
-    generated_report_id = xform_dbkey_to_report_id(audit_header, dbkey)
+    generated_report_id = xform_dbkey_to_report_id(audit_header)
 
     try:
         exists = SingleAuditChecklist.objects.get(report_id=generated_report_id)
@@ -70,23 +72,5 @@ def _create_sac(user, dbkey):
     sac.auditor_certification = auditor_certification(audit_header)
     sac.data_source = settings.CENSUS_DATA_SOURCE
     sac.save()
-
     logger.info("Created single audit checklist %s", sac)
-    return sac
-
-
-def setup_sac(user, auditee_name, dbkey):
-    """Create a SAC object for the historic data migration."""
-    if user is None:
-        raise DataMigrationError("No user provided to setup sac object")
-    logger.info(f"Creating a SAC object for {user}, {auditee_name}")
-    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-
-    sac = SingleAuditChecklist.objects.filter(
-        submitted_by=user, general_information__auditee_name=auditee_name
-    ).first()
-
-    logger.info(sac)
-    if sac is None:
-        sac = _create_sac(user, dbkey)
     return sac

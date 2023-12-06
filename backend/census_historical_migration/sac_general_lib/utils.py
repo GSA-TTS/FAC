@@ -52,7 +52,7 @@ def normalize_year_string(year_string):
     try:
         year = int(year_string)
     except ValueError:
-        logger.error("Invalid year string. Audit year must be between 2016 and 2022")
+        logger.error("Invalid year string.")
         sys.exit(-1)
 
     if 16 <= year < 23:

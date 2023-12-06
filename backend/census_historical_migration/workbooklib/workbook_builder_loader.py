@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def workbook_builder_loader(user, sac, dbkey, year):
+def workbook_builder_loader(user, sac, audit_header):
     """
     Returns a nested function '_loader' that, when called with a workbook generator
     and a section, generates a workbook for the section, uploads it to SAC,
@@ -17,7 +17,7 @@ def workbook_builder_loader(user, sac, dbkey, year):
 
     def _loader(workbook_generator, section):
         wb, json_data, excel_file, filename = generate_workbook(
-            workbook_generator, dbkey, year, section
+            workbook_generator, audit_header, section
         )
 
         if user:
