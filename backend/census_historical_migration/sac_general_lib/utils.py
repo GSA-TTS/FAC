@@ -1,9 +1,14 @@
+import logging
 from datetime import datetime
+import sys
+
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
+
+logger = logging.getLogger(__name__)
 
 
 def create_json_from_db_object(gobj, mappings):
@@ -38,3 +43,22 @@ def xform_census_date_to_datetime(date_string):
     dt = datetime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
     # Extract and return the date part
     return dt.date()
+
+
+def normalize_year_string(year_string):
+    """
+    Normalizes a year string to a four-digit year format.
+    """
+    try:
+        year = int(year_string)
+    except ValueError:
+        logger.error("Invalid year string. Audit year must be between 2016 and 2022")
+        sys.exit(-1)
+
+    if 16 <= year < 23:
+        return str(year + 2000)
+    elif 2016 <= year < 2023:
+        return year_string
+    else:
+        logger.error("Invalid year string. Audit year must be between 2016 and 2022")
+        sys.exit(-1)

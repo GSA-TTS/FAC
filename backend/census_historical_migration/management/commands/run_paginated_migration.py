@@ -1,3 +1,4 @@
+from census_historical_migration.sac_general_lib.utils import normalize_year_string
 from ...historic_data_loader import load_historic_data_for_year
 
 from django.core.management.base import BaseCommand
@@ -26,11 +27,8 @@ class Command(BaseCommand):
         parser.add_argument("--pages", type=str, required=False, default="1")
 
     def handle(self, *args, **options):
-        year = options.get("year")
-        if not year:
-            print("Please specify an audit year")
-            return
-
+        year = normalize_year_string(options.get("year"))
+ 
         try:
             pages_str = options["pages"]
             pages = list(map(lambda d: int(d), pages_str.split(",")))

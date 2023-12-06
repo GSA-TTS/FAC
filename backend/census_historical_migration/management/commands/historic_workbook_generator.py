@@ -1,3 +1,4 @@
+from census_historical_migration.sac_general_lib.utils import normalize_year_string
 from census_historical_migration.workbooklib.workbook_builder import (
     generate_workbook,
 )
@@ -44,8 +45,8 @@ class Command(BaseCommand):
                 logger.info(e)
                 logger.info(f"Could not create directory {out_basedir}")
                 sys.exit()
-
-        outdir = os.path.join(out_basedir, f'{options["dbkey"]}-{options["year"]}')
+        year = normalize_year_string(options["year"])
+        outdir = os.path.join(out_basedir, f'{options["dbkey"]}-{year[-2:]}')
 
         if not os.path.exists(outdir):
             try:
@@ -59,7 +60,7 @@ class Command(BaseCommand):
         json_test_tables = []
         for section, fun in sections_to_handlers.items():
             (wb, api_json, _, filename) = generate_workbook(
-                fun, options["dbkey"], options["year"], section
+                fun, options["dbkey"], year, section
             )
             if wb:
                 wb_path = os.path.join(outdir, filename)
