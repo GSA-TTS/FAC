@@ -5,6 +5,7 @@ ENV PYTHONUNBUFFERED 1
 ENV CERT_PATH /usr/local/share/ca-certificates/zscaler.crt
 ENV CURL_CA_BUNDLE ${CERT_PATH}
 ENV NODE_EXTRA_CA_CERTS ${CERT_PATH}
+ARG LOCAL_ARCH
 
 COPY zscaler_cert.pem /tmp/zscaler.crt
 COPY requirements.txt /tmp/requirements.txt
@@ -16,6 +17,13 @@ RUN \
     update-ca-certificates
 
 WORKDIR ..
+
+# Install chromium if arm64 architecture is specified
+RUN \
+    if [ "$LOCAL_ARCH" = "arm64" ] ; then \
+        apt-get update -yq && \
+        apt-get install -yq chromium; \
+    fi
 
 # Dependencies
 RUN \

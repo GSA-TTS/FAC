@@ -50,6 +50,8 @@ services:
     build:
       context: .
       dockerfile: "./${DOCKERFILE:-Dockerfile}"
+      args:
+        LOCAL_ARCH: ${LOCAL_ARCH}
     command: /src/run.sh
     depends_on:
       db:
