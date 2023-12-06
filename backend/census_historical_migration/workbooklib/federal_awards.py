@@ -231,7 +231,7 @@ def _xform_populate_default_loan_balance(loans_at_end, audits):
 # FIXME - MSHD: _xform_populate_default_award_identification_values is currently unused
 # as unrequired data transformation will not be part of the first iteration
 # of the data migration process.
-def _xform_populate_default_award_identification_values(audits, dbkey):
+def _xform_populate_default_award_identification_values(audits, audit_header):
     """
     Automatically fills in default values for empty additional award identifications.
     Iterates over a list of audits and their corresponding additional award identifications.
@@ -240,13 +240,14 @@ def _xform_populate_default_award_identification_values(audits, dbkey):
     """
     addl_award_identifications = [""] * len(audits)
     filtered_audits = Audits.objects.filter(
-        Q(DBKEY=dbkey) & (Q(CFDA__icontains="U") | Q(CFDA__icontains="rd"))
+        Q(DBKEY=audit_header.DBKEY, AUDITYEAR=audit_header.AUDITYEAR)
+        & (Q(CFDA__icontains="U") | Q(CFDA__icontains="rd"))
     ).order_by("ID")
     for audit in filtered_audits:
         if audit.AWARDIDENTIFICATION is None or len(audit.AWARDIDENTIFICATION) < 1:
             addl_award_identifications[
                 get_list_index(audits, audit.ID)
-            ] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
+            ] = f"ADDITIONAL AWARD INFO - DBKEY {audit_header.DBKEY} AUDITYEAR {audit_header.AUDITYEAR}"
         else:
             addl_award_identifications[
                 get_list_index(audits, audit.ID)
