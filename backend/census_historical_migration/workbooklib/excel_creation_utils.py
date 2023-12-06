@@ -136,7 +136,9 @@ def get_audit_header(dbkey, year):
     try:
         audit_header = AuditHeader.objects.get(DBKEY=dbkey, AUDITYEAR=year)
     except AuditHeader.DoesNotExist:
-        raise DataMigrationError(f"No audit header record found for dbkey: {dbkey}")
+        raise DataMigrationError(
+            f"No audit header record found for dbkey: {dbkey} and audit year: {year}"
+        )
     return audit_header
 
 

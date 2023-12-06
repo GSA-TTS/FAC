@@ -57,10 +57,10 @@ mappings = [
 ]
 
 
-def _get_agency_prefixes(dbkey):
-    """Returns the agency prefixes for the given dbkey."""
+def _get_agency_prefixes(dbkey, year):
+    """Returns the agency prefixes for a given dbkey and audit year."""
     agencies = set()
-    audits = get_audits(dbkey)
+    audits = get_audits(dbkey, year)
 
     for audit_detail in audits:
         agencies.add(string_to_string(audit_detail.CFDA_PREFIX))
@@ -154,7 +154,7 @@ def audit_information(audit_header):
     """Generates audit information JSON."""
 
     results = _get_sp_framework_gaap_results(audit_header)
-    agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY)
+    agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY, audit_header.AUDITYEAR)
     audit_info = create_json_from_db_object(audit_header, mappings)
     audit_info = {
         key: results.get(key, audit_info.get(key))
