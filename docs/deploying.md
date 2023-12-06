@@ -148,7 +148,10 @@ source .profile
 set +e
 ```
 
-Once you’re done with whatever you’re doing in production, log out, then, locally, run:
+
+Log what you do while accessing production in the issue.
+
+Once you’re done, log out, then, locally, run:
 
 ```shell
 cf disallow-space-ssh production
