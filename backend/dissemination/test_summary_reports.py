@@ -6,7 +6,7 @@ from dissemination.models import General
 from model_bakery import baker
 
 
-class ExportTests(TestCase):
+class SummaryReportTests(TestCase):
     def test_generate_summary_report_returns_filename(self):
         general = baker.make(General, _quantity=100)
 
