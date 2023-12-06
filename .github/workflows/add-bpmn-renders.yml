@@ -16,7 +16,7 @@ jobs:
   diagrams-up-to-date:
     # Check that the PR is not raised by this workflow (avoiding recursion) and
     # is not from a fork
-    if: startsWith(github.head_ref, 'auto/bpmn-patches') == false && github.event.pull_request.head.repo.full_name == github.repository
+    if: startsWith(github.event.pull_request.head.ref, 'auto/bpmn-patches') == false && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,7 +40,7 @@ jobs:
       - name: Check For Changes
         id: vars
         run: |
-          branchname="bpmn-patches/${{ github.head_ref }}"
+          branchname="bpmn-patches/${{ github.event.pull_request.head.ref }}"
           echo "branchname=${branchname}" >> $GITHUB_OUTPUT
           imagesupdated=$(git status --porcelain | cut -d ' ' -f 2 | wc -l)
           echo "imagesupdated=${imagesupdated}" >> $GITHUB_OUTPUT
@@ -49,12 +49,12 @@ jobs:
         if: steps.vars.outputs.imagesupdated != 0
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: Update BPMN images for ${{ github.head_ref }}
-          title: Update BPMN images for ${{ github.head_ref }}
-          body: This is an auto-generated PR to sync BPMN images with their source on ${{ github.head_ref }}.
+          commit-message: Update BPMN images for ${{ github.event.pull_request.head.ref }}
+          title: Update BPMN images for ${{ github.event.pull_request.head.ref }}
+          body: This is an auto-generated PR to sync BPMN images with their source on ${{ github.event.pull_request.head.ref }}.
           labels: bpmn-to-image, automated pr
           branch: ${{ steps.vars.outputs.branchname }}
-          base: ${{ github.head_ref }}
+          base: ${{ github.event.pull_request.head.ref }}
 
       - name: Update Changes
         if: steps.vars.outputs.imagesupdated != 0
