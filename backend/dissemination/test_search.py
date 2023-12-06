@@ -264,6 +264,7 @@ class SearchGeneralTests(TestCase):
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
 
+class SearchALNTests(TestCase):
     def test_aln_search(self):
         """Given an ALN (or ALNs), search_general should only return records with awards under one of these ALNs."""
         prefix_object = baker.make(
@@ -308,9 +309,12 @@ class SearchGeneralTests(TestCase):
         results = search_general(alns=["12", "98.765"])
         self.assertEqual(len(results), 2)
 
-    def test_finding_my_aln_and_finding_all_aln_fields(self):
-        """Given an ALN (or ALNs), search_general should return records with attached finding_my_aln and finding_all_aln fields."""
-        # Finding my ALN (finding is in searched ALN)
+    def test_finding_my_aln(self):
+        """
+        When making an ALN search, search_general should return records under that ALN. 
+        If the record has findings under that ALN, it should have finding_my_aln == True.
+        """
+        # General record with one award with a finding.
         baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000001")
         baker.make(
             FederalAward,
@@ -323,8 +327,19 @@ class SearchGeneralTests(TestCase):
             Finding, report_id="2022-04-TSTDAT-0000000001", award_reference="2023-0001"
         )
 
-        # Finding all ALN (finding is not in searched ALN)
-        findings_all_aln = baker.make(
+        results = search_general(alns=["00"])
+        self.assertEqual(len(results), 1)
+        self.assertTrue(
+            results[0].finding_my_aln == True and results[0].finding_all_aln == False
+        )
+
+    def test_finding_all_aln(self):
+        """
+        When making an ALN search, search_general should return records under that ALN. 
+        If the record has findings NOT under that ALN, it should have finding_all_aln == True.
+        """
+        # General record with two awards and one finding. Finding 2 is under a different ALN than finding 1.
+        baker.make(
             General, is_public=True, report_id="2022-04-TSTDAT-0000000002"
         )
         baker.make(
@@ -344,8 +359,19 @@ class SearchGeneralTests(TestCase):
             Finding, report_id="2022-04-TSTDAT-0000000002", award_reference="2023-0001"
         )
 
-        # Finding both (one finding in searched ALN, one out)
-        findings_both = baker.make(
+        results = search_general(alns=["11"])
+        self.assertEqual(len(results), 1)
+        self.assertTrue(
+            results[0].finding_my_aln == False and results[0].finding_all_aln == True
+        )
+
+    def test_finding_my_aln_and_finding_all_aln(self):
+        """
+        When making an ALN search, search_general should return records under that ALN. 
+        If the record has findings both under that ALN and NOT under that ALN, it should have finding_my_aln == True and finding_all_aln == True.
+        """
+        # General record with two awards and two findings. Awards are under different ALNs. 
+        baker.make(
             General, is_public=True, report_id="2022-04-TSTDAT-0000000003"
         )
         baker.make(
@@ -369,8 +395,15 @@ class SearchGeneralTests(TestCase):
             Finding, report_id="2022-04-TSTDAT-0000000003", award_reference="2023-0002"
         )
 
-        # No findings
-        findings_none = baker.make(
+        results = search_general(alns=["22"])
+        self.assertEqual(len(results), 1)
+        self.assertTrue(
+            results[0].finding_my_aln == True and results[0].finding_all_aln == True
+        )
+
+    def test_alns_no_findings(self):
+        # General record with one award and no findings.
+        baker.make(
             General, is_public=True, report_id="2022-04-TSTDAT-0000000004"
         )
         baker.make(
@@ -378,24 +411,6 @@ class SearchGeneralTests(TestCase):
             report_id="2022-04-TSTDAT-0000000004",
             federal_agency_prefix="33",
             federal_award_extension="333",
-        )
-
-        results = search_general(alns=["00"])
-        self.assertEqual(len(results), 1)
-        self.assertTrue(
-            results[0].finding_my_aln == True and results[0].finding_all_aln == False
-        )
-
-        results = search_general(alns=["11"])
-        self.assertEqual(len(results), 1)
-        self.assertTrue(
-            results[0].finding_my_aln == False and results[0].finding_all_aln == True
-        )
-
-        results = search_general(alns=["22"])
-        self.assertEqual(len(results), 1)
-        self.assertTrue(
-            results[0].finding_my_aln == True and results[0].finding_all_aln == True
         )
 
         results = search_general(alns=["33"])
