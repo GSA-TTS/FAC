@@ -2,7 +2,6 @@ from ..transforms.xform_string_to_string import (
     string_to_string,
 )
 from ..workbooklib.excel_creation_utils import (
-    get_audit_header,
     map_simple_columns,
     generate_dissemination_test_table,
     set_workbook_uei,
@@ -43,27 +42,28 @@ mappings = [
 ]
 
 
-def _get_eins(dbkey):
-    return Eins.objects.filter(DBKEY=dbkey)
+def _get_eins(dbkey, year):
+    return Eins.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
 
 
-def generate_additional_eins(dbkey, year, outfile):
+def generate_additional_eins(audit_header, outfile):
     """
     Generates additional eins workbook for a given dbkey.
     """
-    logger.info(f"--- generate additional eins {dbkey} {year} ---")
+    logger.info(
+        f"--- generate additional eins {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
+    )
 
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_EINS])
-    audit_header = get_audit_header(dbkey)
 
     set_workbook_uei(wb, audit_header.UEI)
 
-    addl_eins = _get_eins(dbkey)
+    addl_eins = _get_eins(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, addl_eins)
     wb.save(outfile)
-    # FIXME - MSHD: The logic below will most likely be removed, see comment in federal_awards.py
+    
     table = generate_dissemination_test_table(
-        audit_header, "additional_eins", dbkey, mappings, addl_eins
+        audit_header, "additional_eins", mappings, addl_eins
     )
     table["singletons"]["auditee_uei"] = audit_header.UEI
     return (wb, table)
