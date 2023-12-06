@@ -13,4 +13,5 @@ module "cg-logshipper" {
   logshipper_memory     = 1046
   disk_quota            = 512
   new_relic_id          = cloudfoundry_user_provided_service.credentials.id
+  egress_app_id         = module.https-proxy.app_id
 }

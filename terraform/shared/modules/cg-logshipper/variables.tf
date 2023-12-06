@@ -52,3 +52,8 @@ variable "new_relic_id" {
   type        = string
   description = "the full string of the new relic resource id"
 }
+
+variable "egress_app_id" {
+  type        = string
+  description = "the id of the https proxy egress_app"
+}
