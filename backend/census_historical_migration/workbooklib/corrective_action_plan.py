@@ -1,5 +1,4 @@
 from ..workbooklib.excel_creation_utils import (
-    get_audit_header,
     map_simple_columns,
     generate_dissemination_test_table,
     set_workbook_uei,
@@ -30,31 +29,28 @@ mappings = [
 ]
 
 
-def _get_cap_text(dbkey):
-    return CapText.objects.filter(DBKEY=dbkey).order_by("SEQ_NUMBER")
+def _get_cap_text(dbkey, year):
+    return CapText.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by("SEQ_NUMBER")
 
 
-def generate_corrective_action_plan(dbkey, year, outfile):
+def generate_corrective_action_plan(audit_header, outfile):
     """
-    Generates a corrective action plan workbook for a given dbkey.
+    Generates a corrective action plan workbook for a given audit header.
     """
-    logger.info(f"--- generate corrective action plan {dbkey} {year} ---")
+    logger.info(
+        f"--- generate corrective action plan {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
+    )
 
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.CORRECTIVE_ACTION_PLAN]
     )
-    audit_header = get_audit_header(dbkey)
-
     set_workbook_uei(wb, audit_header.UEI)
-
-    captexts = _get_cap_text(dbkey)
-
+    captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, captexts)
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        audit_header, "corrective_action_plans", dbkey, mappings, captexts
+        audit_header, "corrective_action_plans", mappings, captexts
     )
     table["singletons"]["auditee_uei"] = audit_header.UEI
-
     return (wb, table)
