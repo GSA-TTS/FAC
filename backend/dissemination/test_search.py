@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dissemination.models import General
+from dissemination.models import General, FederalAward, Finding
 from dissemination.search import search_general
 
 from model_bakery import baker
@@ -263,3 +263,143 @@ class SearchGeneralTests(TestCase):
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
+
+    def test_aln_search(self):
+        """Given an ALN (or ALNs), search_general should only return records with awards under one of these ALNs."""
+        prefix_object = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000001"
+        )
+        baker.make(
+            FederalAward,
+            report_id="2022-04-TSTDAT-0000000001",
+            federal_agency_prefix="12",
+            federal_award_extension="345",
+        )
+
+        extension_object = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000002"
+        )
+        baker.make(
+            FederalAward,
+            report_id="2022-04-TSTDAT-0000000002",
+            federal_agency_prefix="98",
+            federal_award_extension="765",
+        )
+
+        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000003")
+        baker.make(
+            FederalAward,
+            report_id="2022-04-TSTDAT-0000000003",
+            federal_agency_prefix="00",
+            federal_award_extension="000",
+        )
+
+        # Just a prefix
+        results = search_general(alns=["12"])
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], prefix_object)
+
+        # Prefix + extension
+        results = search_general(alns=["98.765"])
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], extension_object)
+
+        # Both
+        results = search_general(alns=["12", "98.765"])
+        self.assertEqual(len(results), 2)
+
+    def test_finding_my_aln_and_finding_all_aln_fields(self):
+        """Given an ALN (or ALNs), search_general should return records with attached finding_my_aln and finding_all_aln fields."""
+        # Finding my ALN (finding is in searched ALN)
+        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000001")
+        baker.make(
+            FederalAward,
+            report_id="2022-04-TSTDAT-0000000001",
+            award_reference="2023-0001",
+            federal_agency_prefix="00",
+            federal_award_extension="000",
+        )
+        baker.make(
+            Finding, report_id="2022-04-TSTDAT-0000000001", award_reference="2023-0001"
+        )
+
+        # Finding all ALN (finding is not in searched ALN)
+        findings_all_aln = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000002"
+        )
+        baker.make(
+            FederalAward,
+            report_id="2022-04-TSTDAT-0000000002",
+            federal_agency_prefix="11",
+            federal_award_extension="111",
+        )
+        baker.make(
+            FederalAward,
+            report_id="2022-04-TSTDAT-0000000002",
+            award_reference="2023-0001",
+            federal_agency_prefix="99",
+            federal_award_extension="999",
+        )
+        baker.make(
+            Finding, report_id="2022-04-TSTDAT-0000000002", award_reference="2023-0001"
+        )
+
+        # Finding both (one finding in searched ALN, one out)
+        findings_both = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000003"
+        )
+        baker.make(
+            FederalAward,
+            report_id="2022-04-TSTDAT-0000000003",
+            award_reference="2023-0001",
+            federal_agency_prefix="22",
+            federal_award_extension="222",
+        )
+        baker.make(
+            FederalAward,
+            report_id="2022-04-TSTDAT-0000000003",
+            award_reference="2023-0002",
+            federal_agency_prefix="99",
+            federal_award_extension="999",
+        )
+        baker.make(
+            Finding, report_id="2022-04-TSTDAT-0000000003", award_reference="2023-0001"
+        )
+        baker.make(
+            Finding, report_id="2022-04-TSTDAT-0000000003", award_reference="2023-0002"
+        )
+
+        # No findings
+        findings_none = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000004"
+        )
+        baker.make(
+            FederalAward,
+            report_id="2022-04-TSTDAT-0000000004",
+            federal_agency_prefix="33",
+            federal_award_extension="333",
+        )
+
+        results = search_general(alns=["00"])
+        self.assertEqual(len(results), 1)
+        self.assertTrue(
+            results[0].finding_my_aln == True and results[0].finding_all_aln == False
+        )
+
+        results = search_general(alns=["11"])
+        self.assertEqual(len(results), 1)
+        self.assertTrue(
+            results[0].finding_my_aln == False and results[0].finding_all_aln == True
+        )
+
+        results = search_general(alns=["22"])
+        self.assertEqual(len(results), 1)
+        self.assertTrue(
+            results[0].finding_my_aln == True and results[0].finding_all_aln == True
+        )
+
+        results = search_general(alns=["33"])
+        self.assertEqual(len(results), 1)
+        self.assertTrue(
+            results[0].finding_my_aln == False and results[0].finding_all_aln == False
+        )
