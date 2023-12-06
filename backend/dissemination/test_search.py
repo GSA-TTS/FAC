@@ -264,6 +264,7 @@ class SearchGeneralTests(TestCase):
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
 
+
 class SearchALNTests(TestCase):
     def test_aln_search(self):
         """Given an ALN (or ALNs), search_general should only return records with awards under one of these ALNs."""
@@ -311,7 +312,7 @@ class SearchALNTests(TestCase):
 
     def test_finding_my_aln(self):
         """
-        When making an ALN search, search_general should return records under that ALN. 
+        When making an ALN search, search_general should return records under that ALN.
         If the record has findings under that ALN, it should have finding_my_aln == True.
         """
         # General record with one award with a finding.
@@ -335,13 +336,11 @@ class SearchALNTests(TestCase):
 
     def test_finding_all_aln(self):
         """
-        When making an ALN search, search_general should return records under that ALN. 
+        When making an ALN search, search_general should return records under that ALN.
         If the record has findings NOT under that ALN, it should have finding_all_aln == True.
         """
         # General record with two awards and one finding. Finding 2 is under a different ALN than finding 1.
-        baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000002"
-        )
+        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000002")
         baker.make(
             FederalAward,
             report_id="2022-04-TSTDAT-0000000002",
@@ -367,13 +366,11 @@ class SearchALNTests(TestCase):
 
     def test_finding_my_aln_and_finding_all_aln(self):
         """
-        When making an ALN search, search_general should return records under that ALN. 
+        When making an ALN search, search_general should return records under that ALN.
         If the record has findings both under that ALN and NOT under that ALN, it should have finding_my_aln == True and finding_all_aln == True.
         """
-        # General record with two awards and two findings. Awards are under different ALNs. 
-        baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000003"
-        )
+        # General record with two awards and two findings. Awards are under different ALNs.
+        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000003")
         baker.make(
             FederalAward,
             report_id="2022-04-TSTDAT-0000000003",
@@ -403,9 +400,7 @@ class SearchALNTests(TestCase):
 
     def test_alns_no_findings(self):
         # General record with one award and no findings.
-        baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000004"
-        )
+        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000004")
         baker.make(
             FederalAward,
             report_id="2022-04-TSTDAT-0000000004",
