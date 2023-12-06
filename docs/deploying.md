@@ -127,6 +127,41 @@ export LD_LIBRARY_PATH=~/deps/0/python/lib
 ~/deps/0/python/bin/python manage.py {COMMAND WITH ARGS}
 ```
 
+## Production ssh access
+
+Only users with the appropriate cloud.gov access can do this.
+
+Open a [production ssh log issue](https://github.com/GSA-TTS/FAC/issues/new?assignees=&labels=prodssh&projects=GSA-TTS%2F11&template=production-ssh-access.yaml&title=%5BProduction+ssh+access%5D%3A+) to track this.
+
+```shell
+cf target -s production
+cf allow-space-ssh production
+date -u +"%Y-%m-%d %H:%M"
+```
+
+Keep this timestamp to enter in the issue as the start time.
+
+```shell
+cf ssh gsa-fac
+/tmp/lifecycle/shell
+source .profile
+set +e
+```
+
+Once you’re done with whatever you’re doing in production, log out, then, locally, run:
+
+```shell
+cf disallow-space-ssh production
+date -u +"%Y-%m-%d %H:%M"
+```
+
+Keep this timestamp to enter in the issue as the end time.
+
+Note: **do not run** `cf disable-ssh gsa-fac`, as this will require application restarts in order to enable access again. Disabling access at the space level is sufficient.
+
+```
+
+
 ## Troubleshooting
 
 ### Problem: A GitHub Action run says that Terraform cannot be applied because the plan differs from what was approved.
