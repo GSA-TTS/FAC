@@ -30,7 +30,6 @@ $get_jwt_claim$ language plpgsql;
 create or replace function api_v1_0_3.get_header(item text) returns text
 as $get_header$
 begin 
-	-- raise info 'request.header % %', item, getter('request.header', item);
 	return api_v1_0_3.getter('request.header', item);
 end;
 $get_header$ LANGUAGE plpgsql;
@@ -38,9 +37,11 @@ $get_header$ LANGUAGE plpgsql;
 -- https://api-umbrella.readthedocs.io/en/latest/admin/api-backends/http-headers.html
 -- Previously, we were using a role attached to the key.
 -- This now uses an explicit table to determine if a key has tribal data access.
--- What this means is that we must go through a commit/PR process in order to use
--- keys that will have access to tribal data. This should be supported by a 
--- ticketing process.
+-- To obtain access, users should use the API access issue template to initiate an access request. 
+-- For administrative access, which is team-internal only, we will review and approve as appropriate. 
+--   If approved, we will update the table in `create_access_tables`, and move the access throguh a normal PR process. 
+-- For tribal data access (outside of the team), the product owner(s) will move the conversation to the relevant NSAC/KMSALs at the 
+--   agency in question, and additional process (documented elsewhere) will ensue.  
 create or replace function api_v1_0_3.has_tribal_data_access() returns boolean
 as $has_tribal_data_access$
 DECLARE 
@@ -61,13 +62,5 @@ BEGIN
     RETURN key_exists;
 END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
-
-create or replace function api_v1_0_3.has_public_data_access_only() returns boolean
-as $has_public_data_access_only$
-begin 
-    return not api_v1_0_3.has_tribal_data_access();
-end;
-$has_public_data_access_only$ LANGUAGE plpgsql;
-
 
 NOTIFY pgrst, 'reload schema';
