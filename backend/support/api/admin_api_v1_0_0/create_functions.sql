@@ -15,33 +15,22 @@
 
 begin;
 
-create or replace function admin_api_v1_0_0.getter(base text, item text) returns text 
-as $getter$
-begin 
-	return current_setting(concat(base, '.', item), true);
-end;
-$getter$ language plpgsql;
 
-create or replace function admin_api_v1_0_0.get_jwt_claim(item text) returns text 
-as $get_jwt_claim$
-begin 
-	return admin_api_v1_0_0.getter('request.jwt.claim', item);
-end;
-$get_jwt_claim$ language plpgsql;
-
-create or replace function admin_api_v1_0_0.get_header(item text) returns text
-as $get_header$
-begin 
-	return admin_api_v1_0_0.getter('request.header', item);
-end;
+CREATE OR REPLACE FUNCTION admin_api_v1_0_0.get_header(item text) RETURNS text
+    AS $get_header$
+    declare res text;
+   	begin
+    	SELECT (current_setting('request.headers', true)::json)->>item into res;
+    	return res;
+   end;
 $get_header$ LANGUAGE plpgsql;
 
 create or replace function admin_api_v1_0_0.get_api_key_uuid() returns TEXT
 as $gaku$
 declare uuid text;
 begin
-	select admin_api_v1_0_0.get_header('X-Api-User-Id') into uuid;
-    return uuid;
+	select admin_api_v1_0_0.get_header('x-api-user-id') into uuid;
+	return uuid;
 end;
 $gaku$ LANGUAGE plpgsql;
 
@@ -131,42 +120,40 @@ DECLARE
     already_exists INTEGER;
     read_tribal_id INTEGER;
 BEGIN
-    -- Are they already in the table?
-    SELECT count(up.email) 
-        FROM public.users_userpermission as up
-        WHERE email = params->>'email' INTO already_exists;
-
-    -- If they are, we're going to exit.
-    IF already_exists <> 0
+    -- If the API user has insert permissions, give it a go
+    IF admin_api_v1_0_0.has_admin_data_access('INSERT')
     THEN
-        RETURN 0;
-    END IF;
+        -- Are they already in the table?
+        SELECT count(up.email) 
+            FROM public.users_userpermission as up
+            WHERE email = params->>'email' INTO already_exists;
 
-    -- Grab the permission ID that we need for the insert below.
-    -- We want the 'read-tribal' permission, which has a human-readable
-    -- slug. But, we need it's ID, because that is the PK.
-    SELECT up.id INTO read_tribal_id 
-        FROM public.users_permission AS up
-        WHERE up.slug = 'read-tribal';
+        -- If they are, we're going to exit.
+        IF already_exists <> 0
+        THEN
+            RETURN 0;
+        END IF;
 
-    -- If the API user has insert permissions, and the email passed in 
-    -- is not already in the table, then insert them.
-    IF (admin_api_v1_0_0.has_admin_data_access('INSERT')
-       AND (already_exists = 0))
-    THEN
-        -- Can we make the 1 not magic... do a select into.
-        INSERT INTO public.users_userpermission
-            (email, permission_id, user_id)
-            VALUES (params->>'email', read_tribal_id, null);
-        RETURN admin_api_v1_0_0.log_admin_api_event('tribal-access-email-added', 
-                                                    json_build_object('email', params->>'email'));
-        PERFORM admin_api_v1_0_0.log_admin_api_event('add_tribal_access', params);
+        -- Grab the permission ID that we need for the insert below.
+        -- We want the 'read-tribal' permission, which has a human-readable
+        -- slug. But, we need it's ID, because that is the PK.
+        SELECT up.id INTO read_tribal_id 
+            FROM public.users_permission AS up
+            WHERE up.slug = 'read-tribal';
+
+        IF already_exists = 0 
+        THEN
+            -- Can we make the 1 not magic... do a select into.
+            INSERT INTO public.users_userpermission
+                (email, permission_id, user_id)
+                VALUES (params->>'email', read_tribal_id, null);
+            RETURN admin_api_v1_0_0.log_admin_api_event('tribal-access-email-added', 
+                                                        json_build_object('email', params->>'email'));
+        END IF;
     ELSE
         RETURN 0;
     END IF;
 end;
-$add_tribal_access_email$ LANGUAGE plpgsql;
-
 
 -- Adds many email addresses. Calls `add_tribal_access_email` for each address.
 --
