@@ -16,7 +16,7 @@ from ..base_field_maps import (
 )
 from ..workbooklib.templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
-from config import settings
+from django.conf import settings
 from ..models import (
     ELECAUDITS as Audits,
     ELECPASSTHROUGH as Passthrough,

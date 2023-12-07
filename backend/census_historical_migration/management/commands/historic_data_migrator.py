@@ -9,7 +9,7 @@ from census_historical_migration.workbooklib.excel_creation_utils import (
 )
 from census_historical_migration.historic_data_loader import create_or_get_user
 from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
-from config.settings import ENVIRONMENT
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class Command(BaseCommand):
         dbkeys_str = options["dbkeys"]
         years_str = options["years"]
 
-        if ENVIRONMENT in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING"]:
+        if settings.ENVIRONMENT in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING"]:
             self.initiate_migration(dbkeys_str, years_str)
         else:
             logger.error(
