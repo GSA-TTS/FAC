@@ -17,7 +17,7 @@ def search_general(
 ):
     query = Q()
 
-    # Split the query string into useful prefixes and extensions
+    # 'alns' gets processed before the match query function, as they get used again after the main search.
     if alns:
         split_alns, agency_numbers = _split_alns(alns)
         query.add(_get_aln_match_query(split_alns, agency_numbers), Q.AND)
@@ -46,10 +46,8 @@ def search_general(
 def _split_alns(alns):
     """
     Split an ALN query string into two sets.
-    Takes: ALN query string
-    Returns:
-        split_alns: {(federal_agency_prefix, federal_award_extension), ...}
-        agency_numbers: {('federal_agency_prefix'), ...}
+        1. split_alns: {(federal_agency_prefix, federal_award_extension), ...}
+        2. agency_numbers: {('federal_agency_prefix'), ...}
     """
     split_alns = set()
     agency_numbers = set()
@@ -100,7 +98,8 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(
     results, split_alns, agency_numbers
 ):
     """
-    Attach the finding_my_aln and finding_all_aln fields to a results QuerySet.
+    Given the results QuerySet (full of 'General' objects) and an ALN query string,
+    return the modified QuerySet, where each 'General' object has two new fields.
 
     The process:
     1. Get findings that fall under the given reports.
@@ -108,9 +107,6 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(
     3. For each finding/award pair, they are either:
        a. Under one of my ALNs, so we update finding_my_aln to True.
        b. Under any other ALN, so we update finding_all_aln to True.
-
-    Takes: The results QuerySet, full of 'General' objects. The ALN query string.
-    Returns: The modified results QuerySet, where each 'General' object has two new fields.
     """
     for result in results:
         result.finding_my_aln = False
@@ -134,16 +130,7 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(
 
 def _get_aln_match_query(split_alns, agency_numbers):
     """
-    Create the match query for ALNs.
-    Takes: A list of (potential) ALNs.
-    Returns: A query object matching on relevant report_ids found in the FederalAward table.
-
-    # ALNs are a little weird, because they are stored per-award in the FederalAward table. To search on ALNs, we:
-    # 1. Split the given ALNs into a set with their prefix and extention.
-    # 2. Search the FederalAward table for awards with matching federal_agency_prefix and federal_award_extension.
-    #    If there's just a prefix, search on all prefixes.
-    #    If there's a prefix and extention, search on both.
-    # 3. Add the report_ids from the identified awards to the search params.
+    Given split ALNs and agency numbers, return the match query for ALNs.
     """
     # Search for relevant awards
     report_ids = _get_aln_report_ids(split_alns, agency_numbers)
