@@ -1,25 +1,14 @@
-from ..exception_utils import DataMigrationError
-import argparse
-import logging
-import sys
-import math
 from config import settings
-import os
-import jwt
-import requests
-from datetime import datetime
-import traceback
-
+from ..exception_utils import DataMigrationError
 from ..workbooklib.workbook_builder_loader import (
     workbook_builder_loader,
 )
-from ..sac_general_lib.sac_creator import setup_sac
 from ..workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )
 from ..workbooklib.post_upload_utils import _post_upload_pdf
+from ..sac_general_lib.sac_creator import setup_sac
 from audit.intake_to_dissemination import IntakeToDissemination
-
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -32,6 +21,19 @@ from dissemination.models import (
     Passthrough,
     SecondaryAuditor,
 )
+
+from django.core.exceptions import ValidationError
+
+import argparse
+import logging
+import sys
+import math
+import os
+import jwt
+import requests
+from datetime import datetime
+import traceback
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -139,13 +141,13 @@ def _compare_multiline_strings(str1, str2):
 
     # Compare line counts
     if len(lines1) != len(lines2):
-        print("Line count differs.")
+        logger.info("Line count differs.")
         return False
 
     # Compare each line
     for index, (line1, line2) in enumerate(zip(lines1, lines2)):
         if line1 != line2:
-            print(
+            logger.info(
                 f"Difference found on line {index + 1}:\n- {repr(line1)}\n- {repr(line2)}"
             )
             return False
@@ -158,10 +160,10 @@ def get_api_values(endpoint, rid, field):
     res = call_api(api_url, endpoint, rid, field)
 
     if res.status_code == 200:
-        # print(f'{res.status_code} {res.url} {res.json()}')
+        # logger.info(f'{res.status_code} {res.url} {res.json()}')
         return list(map(lambda d: d[field], res.json()))
     else:
-        print(f"{res.status_code} {res.url}")
+        logger.error(f"{res.status_code} {res.url}")
         return []
 
 
@@ -181,25 +183,32 @@ def combine_counts(combined, d):
 
 def api_check(json_test_tables):
     combined_summary = {"endpoints": 0, "correct_rows": 0, "incorrect_rows": 0}
+
     for endo in json_test_tables:
         count(combined_summary, "endpoints")
         endpoint = endo["endpoint"]
         report_id = endo["report_id"]
-        print(f"-------------------- {endpoint} --------------------")
         summary = {}
         equality_results = []
+
+        logger.info(f"-------------------- {endpoint} --------------------")
+
         for row_ndx, row in enumerate(endo["rows"]):
             count(summary, "total_rows")
+
             if False in equality_results:
                 count(combined_summary, "incorrect_rows")
             else:
                 count(combined_summary, "correct_rows")
+
             equality_results = []
+
             for field_ndx, f in enumerate(row["fields"]):
                 # logger.info(f"Checking /{endpoint} {report_id} {f}")
                 # logger.info(f"{get_api_values(endpoint, report_id, f)}")
                 api_values = get_api_values(endpoint, report_id, f)
                 this_api_value = api_values[row_ndx]
+
                 # Check if field_ndx exists in row["values"]
                 if field_ndx < len(row["values"]):
                     this_field_value = row["values"][field_ndx]
@@ -217,13 +226,15 @@ def api_check(json_test_tables):
                     logger.info(
                         f"Field '{f}' with value '{this_api_value}' at index '{field_ndx}' is missing from test tables 'values'."
                     )
+
             if all(equality_results):
                 count(summary, "correct_fields")
             else:
                 count(summary, "incorrect_fields")
-                sys.exit(-1)
+
         logger.info(summary)
         combined_summary = combine_counts(combined_summary, summary)
+
     return combined_summary
 
 
@@ -235,7 +246,7 @@ def run_end_to_end(user, dbkey, year, result):
         sac = setup_sac(user, entity_id, dbkey)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
-            print(f"Skipping ACE audit: {dbkey}")
+            logger.info(f"Skipping ACE audit: {dbkey}")
             raise DataMigrationError("Skipping ACE audit")
         else:
             builder_loader = workbook_builder_loader(user, sac, dbkey, year)
@@ -260,8 +271,21 @@ def run_end_to_end(user, dbkey, year, result):
 
             result["success"].append(f"{sac.report_id} created")
     except Exception as exc:
-        tb = traceback.extract_tb(sys.exc_info()[2])
-        for frame in tb:
-            print(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
+        error_type = type(exc)
+
+        if error_type == KeyboardInterrupt:
+            raise exc
+        elif error_type == ValidationError:
+            logger.error(f"ValidationError: {exc}")
+        elif error_type == DataMigrationError:
+            logger.error(f"DataMigrationError: {exc.message}")
+        else:
+            logger.error(f"Unexpected error type {error_type}: {exc}")
+
+            tb = traceback.extract_tb(sys.exc_info()[2])
+            for frame in tb:
+                logger.error(
+                    f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}"
+                )
 
         result["errors"].append(f"{exc}")
