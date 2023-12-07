@@ -281,8 +281,6 @@ def run_end_to_end(user, dbkey, year, result):
 
         tb = traceback.extract_tb(sys.exc_info()[2])
         for frame in tb:
-            logger.error(
-                f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}"
-            )
+            logger.error(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
 
         result["errors"].append(f"{exc}")
