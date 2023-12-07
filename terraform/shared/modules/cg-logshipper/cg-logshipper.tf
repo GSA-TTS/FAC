@@ -21,7 +21,7 @@ resource "cloudfoundry_network_policy" "logshipper-network-policy" {
 }
 
 module "s3-logshipper-storage" {
-  source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
+  source = "github.com/18f/terraform-cloudgov//s3?ref=v0.7.1"
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
