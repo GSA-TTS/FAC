@@ -28,11 +28,8 @@ def load_historic_data_for_year(audit_year, page_size, pages):
 
         for submission in page.object_list:
             result = {"success": [], "errors": []}
-            try:
-                # Migrate a single submission
-                run_end_to_end(user, submission, result)
-            except Exception as exc:
-                result["errors"].append(f"{exc}")
+            # Migrate a single submission
+            run_end_to_end(user, submission, result)
 
             result_log[(audit_year, submission.DBKEY)] = result
             total_count += 1
