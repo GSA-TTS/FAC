@@ -1,4 +1,4 @@
-from config import settings
+from django.conf import settings
 from ..exception_utils import DataMigrationError
 from ..workbooklib.workbook_builder_loader import (
     workbook_builder_loader,
@@ -40,11 +40,6 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 parser = argparse.ArgumentParser()
 
-# Peewee runs a really noisy DEBUG log.
-pw = logging.getLogger("peewee")
-pw.addHandler(logging.StreamHandler())
-pw.setLevel(logging.INFO)
-
 
 def step_through_certifications(sac):
     sac.transition_to_ready_for_certification()
@@ -55,7 +50,7 @@ def step_through_certifications(sac):
     sac.save()
 
 
-def disseminate(sac, year):
+def disseminate(sac):
     logger.info("Invoking movement of data from Intake to Dissemination")
     for model in [
         AdditionalEin,
@@ -238,18 +233,17 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def run_end_to_end(user, dbkey, year, result):
+def run_end_to_end(user, audit_header, result):
     try:
-        entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
-            dbkey=dbkey, year=year, date=datetime.now()
-        )
-        sac = setup_sac(user, entity_id, dbkey)
+        sac = setup_sac(user, audit_header)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
-            logger.info(f"Skipping ACE audit: {dbkey}")
+            logger.info(
+                f"Skipping ACE audit: {audit_header.DBKEY} {audit_header.AUDITYEAR}"
+            )
             raise DataMigrationError("Skipping ACE audit")
         else:
-            builder_loader = workbook_builder_loader(user, sac, dbkey, year)
+            builder_loader = workbook_builder_loader(user, sac, audit_header)
             json_test_tables = []
 
             for section, fun in sections_to_handlers.items():
@@ -265,10 +259,9 @@ def run_end_to_end(user, dbkey, year, result):
                 result["errors"].append(f"{errors.get('errors')}")
                 return
 
-            disseminate(sac, year)
+            disseminate(sac)
             combined_summary = api_check(json_test_tables)
             logger.info(combined_summary)
-
             result["success"].append(f"{sac.report_id} created")
     except Exception as exc:
         error_type = type(exc)
