@@ -270,17 +270,20 @@ def run_end_to_end(user, dbkey, year, result):
             logger.info(combined_summary)
 
             result["success"].append(f"{sac.report_id} created")
-    except KeyboardInterrupt:
-        raise
-    except ValidationError as exc:
-        logger.error(f"ValidationError: {exc}")
-    except DataMigrationError as exc:
-        logger.error(f"DataMigrationError: {exc.message}")
     except Exception as exc:
-        logger.exception(f"Unexpected error type {type(exc).__name__}: {exc}")
+        error_type = type(exc)
 
-        tb = traceback.extract_tb(sys.exc_info()[2])
-        for frame in tb:
-            logger.error(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
+        if error_type == ValidationError:
+            logger.error(f"ValidationError: {exc}")
+        elif error_type == DataMigrationError:
+            logger.error(f"DataMigrationError: {exc.message}")
+        else:
+            logger.error(f"Unexpected error type {error_type}: {exc}")
+
+            tb = traceback.extract_tb(sys.exc_info()[2])
+            for frame in tb:
+                logger.error(
+                    f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}"
+                )
 
         result["errors"].append(f"{exc}")
