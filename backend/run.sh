@@ -23,8 +23,8 @@ gonogo "setup_env"
 #####
 # MIGRATE HISTORICAL TABLES
 # Migrate the historic tables first.
-# migrate_historic_tables
-# gonogo "migrate_historic_tables"
+migrate_historic_tables
+gonogo "migrate_historic_tables"
 
 #####
 # API TEARDOWN
