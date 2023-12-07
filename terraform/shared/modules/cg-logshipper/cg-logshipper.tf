@@ -28,7 +28,7 @@ module "s3-logshipper-storage" {
   name             = "log-storage"
   recursive_delete = false
   s3_plan_name     = "basic"
-  tags             = ["logshipper-s3"]
+  tags             = ["s3", "logshipper"]
 }
 
 resource "cloudfoundry_route" "logshipper" {
@@ -45,7 +45,7 @@ resource "cloudfoundry_user_provided_service" "logshipper_creds" {
     "HTTP_USER" = local.username
     "HTTP_PASS" = local.password
   }
-  tags = ["logshipper-creds"]
+  tags = ["logshipper"]
 }
 
 resource "cloudfoundry_user_provided_service" "logdrain_service" {
