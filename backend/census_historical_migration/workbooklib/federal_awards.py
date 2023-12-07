@@ -2,7 +2,6 @@ from ..transforms.xform_string_to_string import (
     string_to_string,
 )
 from ..workbooklib.excel_creation_utils import (
-    get_audit_header,
     get_audits,
     get_range_values,
     get_ranges,
@@ -17,7 +16,7 @@ from ..base_field_maps import (
 )
 from ..workbooklib.templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
-from config import settings
+from django.conf import settings
 from ..models import (
     ELECAUDITS as Audits,
     ELECPASSTHROUGH as Passthrough,
@@ -163,7 +162,9 @@ def _get_passthroughs(audits):
 
     for index, audit in enumerate(audits):
         passthroughs = Passthrough.objects.filter(
-            DBKEY=audit.DBKEY, ELECAUDITSID=audit.ELECAUDITSID
+            DBKEY=audit.DBKEY,
+            AUDITYEAR=audit.AUDITYEAR,
+            ELECAUDITSID=audit.ELECAUDITSID,
         ).order_by("ID")
         # This may look like data transformation but it is not exactly the case.
         # In the audit worksheet, users can enter multiple names (or IDs) separated by a pipe '|' in a single cell.
@@ -230,7 +231,7 @@ def _xform_populate_default_loan_balance(loans_at_end, audits):
 # FIXME - MSHD: _xform_populate_default_award_identification_values is currently unused
 # as unrequired data transformation will not be part of the first iteration
 # of the data migration process.
-def _xform_populate_default_award_identification_values(audits, dbkey):
+def _xform_populate_default_award_identification_values(audits, audit_header):
     """
     Automatically fills in default values for empty additional award identifications.
     Iterates over a list of audits and their corresponding additional award identifications.
@@ -239,13 +240,14 @@ def _xform_populate_default_award_identification_values(audits, dbkey):
     """
     addl_award_identifications = [""] * len(audits)
     filtered_audits = Audits.objects.filter(
-        Q(DBKEY=dbkey) & (Q(CFDA__icontains="U") | Q(CFDA__icontains="rd"))
+        Q(DBKEY=audit_header.DBKEY, AUDITYEAR=audit_header.AUDITYEAR)
+        & (Q(CFDA__icontains="U") | Q(CFDA__icontains="rd"))
     ).order_by("ID")
     for audit in filtered_audits:
         if audit.AWARDIDENTIFICATION is None or len(audit.AWARDIDENTIFICATION) < 1:
             addl_award_identifications[
                 get_list_index(audits, audit.ID)
-            ] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
+            ] = f"ADDITIONAL AWARD INFO - DBKEY {audit_header.DBKEY} AUDITYEAR {audit_header.AUDITYEAR}"
         else:
             addl_award_identifications[
                 get_list_index(audits, audit.ID)
@@ -253,25 +255,19 @@ def _xform_populate_default_award_identification_values(audits, dbkey):
     return addl_award_identifications
 
 
-def generate_federal_awards(dbkey, year, outfile):
+def generate_federal_awards(audit_header, outfile):
     """
-    Generates a federal awards workbook for all awards associated with a given dbkey.
-
-    Note: This function assumes that all the audit information in the database
-    is for the same year.
+    Generates a federal awards workbook for all awards associated with a given audit header.
     """
-    logger.info(f"--- generate federal awards {dbkey} {year} ---")
+    logger.info(
+        f"--- generate federal awards {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
+    )
 
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
     )
-
-    audit_header = get_audit_header(dbkey)
-
     set_workbook_uei(wb, audit_header.UEI)
-
-    audits = get_audits(dbkey)
-
+    audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, audits)
 
     (cluster_names, other_cluster_names, state_cluster_names) = _generate_cluster_names(
@@ -315,15 +311,10 @@ def generate_federal_awards(dbkey, year, outfile):
     for audit in audits:
         total += int(audit.AMOUNT)
     set_range(wb, "total_amount_expended", [str(total)])
-
     wb.save(outfile)
 
-    # FIXME - MSHD: The test table and the logic around it do not seem necessary to me.
-    # If there is any chance that the dissemination process allows bogus data to be disseminated,
-    # we should fix the dissemination process instead by reinforcing the validation logic (intake validation and cross-validation).
-    # I will create a ticket for the removal of this logic unless someone comes up with a strong reason to keep it.
     table = generate_dissemination_test_table(
-        audit_header, "federal_awards", dbkey, mappings, audits
+        audit_header, "federal_awards", mappings, audits
     )
     award_counter = 1
     filtered_mappings = [

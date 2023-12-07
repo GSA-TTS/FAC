@@ -1,13 +1,18 @@
-from datetime import date, datetime
-from ..transforms.xform_string_to_date import string_to_date
+import logging
+from datetime import datetime
+import sys
+
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
 
+logger = logging.getLogger(__name__)
 
-def _create_json_from_db_object(gobj, mappings):
+
+def create_json_from_db_object(gobj, mappings):
+    """Constructs a JSON object from a database object using a list of mappings."""
     json_obj = {}
     for mapping in mappings:
         if mapping.in_db is not None:
@@ -25,37 +30,11 @@ def _create_json_from_db_object(gobj, mappings):
             value = string_to_bool(value)
         elif mapping.type is int:
             value = string_to_int(value)
-        elif mapping.type is date:
-            value = string_to_date(value)
         else:
             value = mapping.type(value)
 
         json_obj[mapping.in_form] = value
     return json_obj
-
-
-def _census_date_to_datetime(cd):
-    lookup = {
-        "JAN": 1,
-        "FEB": 2,
-        "MAR": 3,
-        "APR": 4,
-        "MAY": 5,
-        "JUN": 6,
-        "JUL": 7,
-        "AUG": 8,
-        "SEP": 9,
-        "OCT": 10,
-        "NOV": 11,
-        "DEC": 12,
-    }
-    parts = cd.split("-")
-    if len(parts) != 3 or parts[1] not in lookup:
-        raise ValueError("Invalid date format or month abbreviation in census date")
-    day, month_abbr, year = parts
-    month = lookup[month_abbr]
-
-    return date(int(year) + 2000, month, int(day))
 
 
 def xform_census_date_to_datetime(date_string):
@@ -64,3 +43,22 @@ def xform_census_date_to_datetime(date_string):
     dt = datetime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
     # Extract and return the date part
     return dt.date()
+
+
+def normalize_year_string(year_string):
+    """
+    Normalizes a year string to a four-digit year format.
+    """
+    try:
+        year = int(year_string)
+    except ValueError:
+        logger.error("Invalid year string.")
+        sys.exit(-1)
+
+    if 16 <= year < 23:
+        return str(year + 2000)
+    elif 2016 <= year < 2023:
+        return year_string
+    else:
+        logger.error("Invalid year string. Audit year must be between 2016 and 2022")
+        sys.exit(-1)
