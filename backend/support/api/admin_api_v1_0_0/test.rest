@@ -1,6 +1,14 @@
 @api_user_id = 61ba59b2-f545-4c2f-9b24-9655c706a06c
 @scheme = https
 @api_url = api-preview.fac.gov
+
+###
+GET {{scheme}}://{{api_url}}/general?limit=1
+// Have to use the JWT when testing locally.
+authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}  
+x-api-key: {{$processEnv API_GOV_KEY}}
+
+
 ###
 GET {{scheme}}://{{api_url}}/audit_access
 // Have to use the JWT when testing locally.

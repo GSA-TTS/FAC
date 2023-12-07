@@ -1,56 +1,56 @@
 #!/bin/bash
 
-if [[ -n "${ENV}" ]]; then
-  echo "Environment set as: ${ENV}"
-else
-  echo "No environment variable ${ENV} is set!"
-fi;
+# Source everything; everything is now a function.
+# Remember: bash has no idea if a function exists, 
+# so a typo in a function name will fail silently. Similarly,
+# bash has horrible scoping, so use of `local` in functions is 
+# critical for cleanliness in the startup script.
+source tools/util_startup.sh
+# This will choose the correct environment
+# for local envs (LOCAL or TESTING) and cloud.gov
+source tools/setup_env.sh
+source tools/migrate_historic_tables.sh
+source tools/api_teardown.sh
+source tools/migrate_app_tables.sh
+source tools/api_standup.sh
+source tools/seed_cog_baseline.sh
 
-sleep 10
+#####
+# SETUP THE LOCAL ENVIRONMENT
+setup_env
+gonogo "setup_env"
 
-if [[ "${ENV}" == "LOCAL" || "${ENV}" == "TESTING" ]]; then
-    export AWS_PRIVATE_ACCESS_KEY_ID=longtest
-    export AWS_PRIVATE_SECRET_ACCESS_KEY=longtest
-    export AWS_S3_PRIVATE_ENDPOINT="http://minio:9000"
-    mc alias set myminio "${AWS_S3_PRIVATE_ENDPOINT}" minioadmin minioadmin
-    mc mb myminio/gsa-fac-private-s3
-    mc mb myminio/fac-census-to-gsafac-s3
-    mc admin user svcacct add --access-key="${AWS_PRIVATE_ACCESS_KEY_ID}" --secret-key="${AWS_PRIVATE_SECRET_ACCESS_KEY}" myminio minioadmin
-fi;
+#####
+# MIGRATE HISTORICAL TABLES
+# Migrate the historic tables first.
+migrate_historic_tables
+gonogo "migrate_historic_tables"
 
-# Migrate historic data first
-echo 'Starting migration of historic tables' &&
-python manage.py migrate --database census-to-gsafac-db &&
-echo 'Finished migration of historic tables' &&
+#####
+# API TEARDOWN
 # API has to be deprecated/removed before migration, because
 # of tight coupling between schema/views and the dissemination tables
-echo 'Starting API schema deprecation' &&
-python manage.py drop_deprecated_api_schema_and_views &&
-echo 'Finished API schema deprecation' &&
-echo 'Dropping API schema' &&
-python manage.py drop_api_schema &&
-echo 'Finished dropping API schema' &&
-# Migrate the internal models
-echo 'Starting migrate' &&
-python manage.py migrate &&
-echo 'Finished migrate' &&
-# First create non-managed tables
-echo 'Starting create_api_access_tables' &&
-python manage.py create_api_access_tables &&
-echo 'Finished create_api_access_tables' &&
-# Bring the API back, possibly installing a new API
-echo 'Starting API schema creation' &&
-python manage.py create_api_schema &&
-echo 'Finished API schema creation' &&
-echo 'Starting API view creation' &&
-python manage.py create_api_views &&
-echo 'Finished view creation' &&
-# Update the cog/baseline table
-echo 'Starting seed_cog_baseline' &&
-python manage.py seed_cog_baseline &&
-echo 'Finished seed_cog_baseline'
+api_teardown
+gonogo "api_teardown"
 
-# Only continue if all of that worked.
-if [ $? -eq 0 ]; then
-  npm run dev & python manage.py runserver 0.0.0.0:8000
-fi
+#####
+# MIGRATE APP TABLES
+migrate_app_tables
+gonogo "migrate_app_tables"
+
+#####
+# API STANDUP
+# Standup the API, which may depend on migration changes
+api_standup
+gonogo "api_standup"
+
+#####
+# SEED COG/OVER TABLES
+# Setup tables for cog/over assignments
+seed_cog_baseline
+gonogo "seed_cog_baseline"
+
+#####
+# LAUNCH THE APP
+# We will have died long ago if things didn't work.
+npm run dev & python manage.py runserver 0.0.0.0:8000
