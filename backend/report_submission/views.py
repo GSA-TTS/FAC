@@ -65,7 +65,7 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
         formatted_post = {
             "csrfmiddlewaretoken": request.POST.get("csrfmiddlewaretoken"),
-            "auditee_uei": form.cleaned_data["auditee_uei"],
+            "auditee_uei": form.cleaned_data["auditee_uei"].upper(),
             "auditee_address_line_1": request.POST.get("auditee_address_line_1"),
             "auditee_city": request.POST.get("auditee_city"),
             "auditee_state": request.POST.get("auditee_state"),
