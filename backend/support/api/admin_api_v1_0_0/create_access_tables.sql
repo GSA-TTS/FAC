@@ -37,5 +37,11 @@ INSERT INTO support_administrative_key_uuids
         '1e2845a0-c844-4a6f-84ac-f398b58ce7c9',
         'READ',
         '2023-12-08'
+    ),
+    (
+        'daniel.swick@gsa.gov',
+        'b6e08808-ecb2-4b6a-b928-46d4205497ff',
+        'CREATE,READ,DELETE',
+        '2023-12-08'
     )
     ;
