@@ -2,7 +2,6 @@ from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import string_to_string
 from ..models import ELECNOTES as Notes
 from ..workbooklib.excel_creation_utils import (
-    get_audit_header,
     set_range,
     map_simple_columns,
     generate_dissemination_test_table,
@@ -76,13 +75,13 @@ def xform_is_minimis_rate_used(rate_content):
     raise DataMigrationError("Unable to determine if the de minimis rate was used.")
 
 
-def _get_accounting_policies(dbkey):
+def _get_accounting_policies(dbkey, year):
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=1 is the description of significant accounting policies.
-    """Get the accounting policies for a given dbkey."""
+    """Get the accounting policies for a given dbkey and audit year."""
     try:
-        note = Notes.objects.get(DBKEY=dbkey, TYPE_ID="1")
+        note = Notes.objects.get(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="1")
         content = string_to_string(note.CONTENT)
     except Notes.DoesNotExist:
         logger.info(f"No accounting policies found for dbkey: {dbkey}")
@@ -90,13 +89,13 @@ def _get_accounting_policies(dbkey):
     return content
 
 
-def _get_minimis_cost_rate(dbkey):
-    """Get the De Minimis cost rate for a given dbkey."""
+def _get_minimis_cost_rate(dbkey, year):
+    """Get the De Minimis cost rate for a given dbkey and audit year."""
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=2 is the De Minimis cost rate.
     try:
-        note = Notes.objects.get(DBKEY=dbkey, TYPE_ID="2")
+        note = Notes.objects.get(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="2")
         rate = string_to_string(note.CONTENT)
     except Notes.DoesNotExist:
         logger.info(f"De Minimis cost rate not found for dbkey: {dbkey}")
@@ -104,28 +103,32 @@ def _get_minimis_cost_rate(dbkey):
     return rate
 
 
-def _get_notes(dbkey):
-    """Get the notes for a given dbkey."""
+def _get_notes(dbkey, year):
+    """Get the notes for a given dbkey and audit year."""
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=3 is for notes, which have sequence numbers... that must align somewhere.
-    return Notes.objects.filter(DBKEY=dbkey, TYPE_ID="3").order_by("SEQ_NUMBER")
+    return Notes.objects.filter(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="3").order_by(
+        "SEQ_NUMBER"
+    )
 
 
-def generate_notes_to_sefa(dbkey, year, outfile):
+def generate_notes_to_sefa(audit_header, outfile):
     """
-    Generates notes to SEFA workbook for a given dbkey.
+    Generates notes to SEFA workbook for a given audit header.
     """
-    logger.info(f"--- generate notes to sefa {dbkey} {year}---")
+    logger.info(
+        f"--- generate notes to sefa {audit_header.DBKEY} {audit_header.AUDITYEAR}---"
+    )
 
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.NOTES_TO_SEFA])
 
-    audit_header = get_audit_header(dbkey)
     set_workbook_uei(wb, audit_header.UEI)
-
-    notes = _get_notes(dbkey)
-    rate_content = _get_minimis_cost_rate(dbkey)
-    policies_content = _get_accounting_policies(dbkey)
+    notes = _get_notes(audit_header.DBKEY, audit_header.AUDITYEAR)
+    rate_content = _get_minimis_cost_rate(audit_header.DBKEY, audit_header.AUDITYEAR)
+    policies_content = _get_accounting_policies(
+        audit_header.DBKEY, audit_header.AUDITYEAR
+    )
     is_minimis_rate_used = xform_is_minimis_rate_used(rate_content)
 
     set_range(wb, "accounting_policies", [policies_content])
@@ -144,9 +147,8 @@ def generate_notes_to_sefa(dbkey, year, outfile):
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        audit_header, "notes_to_sefa", dbkey, mappings, notes
+        audit_header, "notes_to_sefa", mappings, notes
     )
-
     table["singletons"]["accounting_policies"] = policies_content
     table["singletons"]["is_minimis_rate_used"] = is_minimis_rate_used
     table["singletons"]["rate_explained"] = rate_content
