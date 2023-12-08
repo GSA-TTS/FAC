@@ -22,7 +22,7 @@ class TestAdminAPI(TestCase):
             conn_string = settings.CONNECTION_STRING
         conn = connection(conn_string)
         return conn
-    
+
     def admin_api_events_exist(self):
         # If we did the above, there should be non-zero events in the
         # admin API event log.
