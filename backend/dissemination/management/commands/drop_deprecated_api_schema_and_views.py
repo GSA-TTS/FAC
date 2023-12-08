@@ -8,4 +8,5 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        api_versions.deprecate_schemas_and_views()
+        api_versions.deprecate_schemas_and_views("dissemination")
+        api_versions.deprecate_schemas_and_views("support")
