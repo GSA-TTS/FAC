@@ -22,6 +22,33 @@ class TestAdminAPI(TestCase):
             conn_string = settings.CONNECTION_STRING
         conn = connection(conn_string)
         return conn
+    
+    def admin_api_events_exist(self):
+        # If we did the above, there should be non-zero events in the
+        # admin API event log.
+
+        query_url = self.api_url + "/admin_api_events"
+        response = requests.get(
+            query_url,
+            headers={
+                "authorization": f"Bearer {self.encoded_jwt}",
+                "accept-profile": TestAdminAPI.admin_api_version,
+                "x-api-user-id": TestAdminAPI.api_user_uuid,
+            },
+            timeout=10,
+        )
+        objects = response.json()
+        self.assertGreater(len(objects), 0)
+
+        # And, we should have at least added and removed things.
+        added = False
+        removed = False
+        for o in objects:
+            if "added" in o["event"]:
+                added = True
+            if "removed" in o["event"]:
+                removed = True
+        self.assertEquals(added and removed, True)
 
     # https://stackoverflow.com/questions/2511679/python-number-of-rows-affected-by-cursor-executeselect
     def test_users_exist_in_perms_table(self):
@@ -290,29 +317,4 @@ class TestAdminAPI(TestCase):
                     found += 1
         self.assertEquals(found, 0)
 
-    def test_admin_api_events_exist(self):
-        # If we did the above, there should be non-zero events in the
-        # admin API event log.
-
-        query_url = self.api_url + "/admin_api_events"
-        response = requests.get(
-            query_url,
-            headers={
-                "authorization": f"Bearer {self.encoded_jwt}",
-                "accept-profile": TestAdminAPI.admin_api_version,
-                "x-api-user-id": TestAdminAPI.api_user_uuid,
-            },
-            timeout=10,
-        )
-        objects = response.json()
-        self.assertGreater(len(objects), 0)
-
-        # And, we should have at least added and removed things.
-        added = False
-        removed = False
-        for o in objects:
-            if "added" in o["event"]:
-                added = True
-            if "removed" in o["event"]:
-                removed = True
-        self.assertEquals(added and removed, True)
+        self.admin_api_events_exist()
