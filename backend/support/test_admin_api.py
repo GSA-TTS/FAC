@@ -26,9 +26,7 @@ class TestAdminAPI(TestCase):
     # https://stackoverflow.com/questions/2511679/python-number-of-rows-affected-by-cursor-executeselect
     def test_users_exist_in_perms_table(self):
         with self.get_connection().cursor() as cur:
-            cur.execute(
-                "SELECT count(*) FROM public.support_administrative_key_uuids;"
-            )
+            cur.execute("SELECT count(*) FROM public.support_administrative_key_uuids;")
             (number_of_rows,) = cur.fetchone()
             self.assertGreaterEqual(number_of_rows, 1)
 
