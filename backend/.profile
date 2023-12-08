@@ -25,12 +25,6 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     gonogo "setup_env"
 
     #####
-    # MIGRATE HISTORICAL TABLES
-    # Migrate the historic tables first.
-    migrate_historic_tables
-    gonogo "migrate_historic_tables"
-
-    #####
     # API TEARDOWN
     # API has to be deprecated/removed before migration, because
     # of tight coupling between schema/views and the dissemination tables
