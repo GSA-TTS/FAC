@@ -131,12 +131,14 @@ def set_workbook_uei(workbook, uei):
     set_range(workbook, "auditee_uei", [uei])
 
 
-def get_audit_header(dbkey):
-    """Returns the AuditHeader instance for the given dbkey."""
+def get_audit_header(dbkey, year):
+    """Returns the AuditHeader record for the given dbkey and audit year."""
     try:
-        audit_header = AuditHeader.objects.get(DBKEY=dbkey)
+        audit_header = AuditHeader.objects.get(DBKEY=dbkey, AUDITYEAR=year)
     except AuditHeader.DoesNotExist:
-        raise DataMigrationError(f"No audit header record found for dbkey: {dbkey}")
+        raise DataMigrationError(
+            f"No audit header record found for dbkey: {dbkey} and audit year: {year}"
+        )
     return audit_header
 
 
@@ -176,13 +178,11 @@ def get_template_name_for_section(section):
         raise ValueError(f"Unknown section {section}")
 
 
-def generate_dissemination_test_table(
-    audit_header, api_endpoint, dbkey, mappings, objects
-):
+def generate_dissemination_test_table(audit_header, api_endpoint, mappings, objects):
     """Generates a test table for verifying the API queries results."""
     table = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint
-    table["report_id"] = xform_dbkey_to_report_id(audit_header, dbkey)
+    table["report_id"] = xform_dbkey_to_report_id(audit_header)
 
     for o in objects:
         test_obj = {}
@@ -208,6 +208,6 @@ def generate_dissemination_test_table(
     return table
 
 
-def get_audits(dbkey):
-    """Returns the Audits instances for the given dbkey."""
-    return Audits.objects.filter(DBKEY=dbkey).order_by("ID")
+def get_audits(dbkey, year):
+    """Returns Audits records for the given dbkey and audit year."""
+    return Audits.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by("ID")

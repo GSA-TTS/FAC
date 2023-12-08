@@ -2,7 +2,6 @@ from ..transforms.xform_string_to_string import (
     string_to_string,
 )
 from ..workbooklib.excel_creation_utils import (
-    get_audit_header,
     get_audits,
     map_simple_columns,
     generate_dissemination_test_table,
@@ -114,37 +113,34 @@ def _get_findings_grid(findings_list):
     ]
 
 
-def _get_findings(dbkey):
+def _get_findings(dbkey, year):
     # CFDAs aka ELECAUDITS (or Audits) have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
     # The linkage here is that a given finding will have an elecauditid.
     # Multiple findings will have a given elecauditid. That's how to link them.
-    return Findings.objects.filter(DBKEY=dbkey).order_by("ELECAUDITFINDINGSID")
+    return Findings.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by(
+        "ELECAUDITFINDINGSID"
+    )
 
 
-def generate_findings(dbkey, year, outfile):
+def generate_findings(audit_header, outfile):
     """
-    Generates a federal awards audit findings workbook for all findings associated with a given dbkey.
-
-    Note: This function assumes that all the audit information in the database
-    is for the same year.
+    Generates a federal awards audit findings workbook for all findings associated with a given audit header.
     """
-    logger.info(f"--- generate findings {dbkey} {year} ---")
-
-    audit_header = get_audit_header(dbkey)
+    logger.info(
+        f"--- generate findings {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
+    )
 
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE]
     )
-
     set_workbook_uei(wb, audit_header.UEI)
-
-    audits = get_audits(dbkey)
+    audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
     # For each of them, I need to generate an elec -> award mapping.
     e2a = {}
     for index, audit in enumerate(audits):
         e2a[audit.ELECAUDITSID] = f"AWARD-{index+1:04d}"
 
-    findings = _get_findings(dbkey)
+    findings = _get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
 
     award_references = []
     for find in findings:
@@ -158,9 +154,8 @@ def generate_findings(dbkey, year, outfile):
     set_range(wb, "is_valid", grid, conversion_fun=str)
     wb.save(outfile)
 
-    # FIXME - MSHD: The logic below will be removed, see comment in federal_award.py.
     table = generate_dissemination_test_table(
-        audit_header, "findings", dbkey, mappings, findings
+        audit_header, "findings", mappings, findings
     )
     for obj, ar in zip(table["rows"], award_references):
         obj["fields"].append("award_reference")
