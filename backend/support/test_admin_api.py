@@ -1,4 +1,3 @@
-from config.settings import ENVIRONMENT
 from django.test import TestCase
 from psycopg2._psycopg import connection
 from django.conf import settings
