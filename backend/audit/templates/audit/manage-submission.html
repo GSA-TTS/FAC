@@ -53,11 +53,11 @@
                         <tr>
                             <td>{{ entry.name }}</td>
                             <td>{{ entry.role }}</td>
-                            <td>{{ entry.email }}</td>
                             {% comment %} 
                               Removed the flags for the time being, to reduce initial complexity.
                               <td>{{ entry.email }} {{ entry.never_logged_in_flag }}</td> 
                             {% endcomment %}
+                            <td>{{ entry.email }}</td>
                             <td>
                                 {% if entry.role == 'Auditee Certifying Official' %}
                                     <a href="{{ change_cert_auditee_url }}">Edit</a>
@@ -69,6 +69,10 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% comment %}
+                Uncomment if/when we chose to keep the flags.
+                <p class="font-sans-xs">An asterisk (<strong>*</strong>) following an email address indicates that no user with this email address has logged in thus far.</p>
+            {% endcomment %}
             <a class="usa-button usa-button--outline margin-top-5"
                href="{% url 'audit:SubmissionProgress' report_id %}"
                aria-controls="upload-cancel">Return to checklist</a>
