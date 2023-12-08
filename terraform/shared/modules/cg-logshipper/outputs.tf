@@ -13,3 +13,7 @@ output "syslog_drain_url" {
 output "domain" {
   value = local.domain
 }
+
+output "app_id" {
+  value = local.app_id
+}

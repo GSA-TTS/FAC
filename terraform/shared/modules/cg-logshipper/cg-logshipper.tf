@@ -11,15 +11,6 @@ data "cloudfoundry_space" "apps" {
   name     = var.cf_space_name
 }
 
-resource "cloudfoundry_network_policy" "logshipper-network-policy" {
-  policy {
-    source_app      = cloudfoundry_app.cg_logshipper_app.id
-    destination_app = var.egress_app_id
-    port            = "61443"
-    protocol        = "tcp"
-  }
-}
-
 module "s3-logshipper-storage" {
   source = "github.com/18f/terraform-cloudgov//s3?ref=v0.7.1"
 
@@ -65,6 +56,7 @@ locals {
   password     = random_password.password.result
   syslog_drain = "https://${local.username}:${local.password}@${cloudfoundry_route.logshipper.hostname}.app.cloud.gov/?drain-type=all"
   domain       = cloudfoundry_route.logshipper.endpoint
+  app_id       = cloudfoundry_app.cg_logshipper_app.id
   sidecar_json = jsonencode(
     {
       "name" : "fluentbit",

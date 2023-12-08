@@ -13,5 +13,13 @@ module "cg-logshipper" {
   logshipper_memory     = 1046
   disk_quota            = 512
   new_relic_id          = cloudfoundry_user_provided_service.credentials.id
-  egress_app_id         = module.https-proxy.app_id
+}
+
+resource "cloudfoundry_network_policy" "logshipper-network-policy" {
+  policy {
+    source_app      = module.cg-logshipper.app_id
+    destination_app = module.https-proxy.app_id
+    port            = "61443"
+    protocol        = "tcp"
+  }
 }
