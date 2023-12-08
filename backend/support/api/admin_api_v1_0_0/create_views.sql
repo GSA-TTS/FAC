@@ -19,7 +19,7 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.audit_access AS
         aa.sac_id,
         aa.user_id
     FROM
-        audit_access aa
+        public.audit_access aa
     WHERE
         admin_api_v1_0_0_functions.has_admin_data_access('READ')
     ORDER BY aa.id
@@ -52,7 +52,7 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.singleauditchecklist AS
         sac.oversight_agency,
         sac.submitted_by_id
     from
-        audit_singleauditchecklist sac
+        public.audit_singleauditchecklist sac
     where
         admin_api_v1_0_0_functions.has_admin_data_access('READ')
     order by sac.id
@@ -79,7 +79,7 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.admin_api_events AS
         ae.event,
         ae.event_data
     FROM
-        support_adminapievent ae
+        public.support_adminapievent ae
     WHERE
         admin_api_v1_0_0_functions.has_admin_data_access('READ')
     ORDER BY ae.id

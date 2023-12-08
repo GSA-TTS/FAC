@@ -188,7 +188,7 @@ BEGIN
         LOOP
             -- PERFORM is how to execute code that does not return anything.
             -- If a SELECT was used here, the SQL compiler would complain.
-            PERFORM admin_api_v1_0_0_functions.add_tribal_access_email(json_build_object('email', em.ele)::JSON);
+            PERFORM admin_api_v1_0_0.add_tribal_access_email(json_build_object('email', em.ele)::JSON);
         END LOOP;
         RETURN 1;
     END IF;
@@ -268,7 +268,7 @@ BEGIN
     THEN 
         FOR em IN (SELECT json_array_elements_text((params->>'emails')::JSON) ele)
         LOOP
-            PERFORM admin_api_v1_0_0_functions.remove_tribal_access_email(json_build_object('email', em.ele)::JSON);
+            PERFORM admin_api_v1_0_0.remove_tribal_access_email(json_build_object('email', em.ele)::JSON);
         END LOOP;
         RETURN 1;
     END IF;

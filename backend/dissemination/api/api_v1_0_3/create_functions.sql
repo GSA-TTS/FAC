@@ -14,7 +14,7 @@
 -- To quote the work of Dav Pilkey, "remember this now."
 
 -- We don't grant tribal access (yet)
-create or replace function api_v1_0_3.has_tribal_data_access() returns boolean
+create or replace function api_v1_0_3_functions.has_tribal_data_access() returns boolean
 as $has_tribal_data_access$
 BEGIN
     RETURN 0::BOOLEAN;

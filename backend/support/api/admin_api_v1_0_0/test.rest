@@ -1,4 +1,5 @@
 @api_user_id = 61ba59b2-f545-4c2f-9b24-9655c706a06c
+# @api_user_id = 1e2845a0-c844-4a6f-84ac-f398b58ce7c9
 @scheme = http
 @api_url = localhost:3000
 # @scheme = https
@@ -46,7 +47,7 @@ Prefer: params=single-object
 x-api-key: {{$processEnv API_GOV_KEY}}   
 
 {
-    "email": "darth.vader@deathstar.org"
+    "email": "darth.vader@deathstar.gsa.gov"
 }
 
 ### 
@@ -61,10 +62,10 @@ x-api-key: {{$processEnv API_GOV_KEY}}
 
 {
     "emails": [
-        "darth.vader@deathstar.org",
-        "bob.darth.vader@deathstar.org",
-        "darthy.vader@deathstar.org",
-        "bob@deathstar.org"
+        "darth.vader@deathstar.gsa.gov",
+        "bob.darth.vader@deathstar.gsa.gov",
+        "darthy.vader@deathstar.gsa.gov",
+        "bob@deathstar.gsa.gov"
     ]
 }
 
@@ -79,7 +80,7 @@ Prefer: params=single-object
 x-api-key: {{$processEnv API_GOV_KEY}}   
 
 {
-    "email": "darth.vader@deathstar.org"
+    "email": "darth.vader@deathstar.gsa.gov"
 }
 
 
@@ -95,9 +96,19 @@ x-api-key: {{$processEnv API_GOV_KEY}}
 
 {
     "emails": [
-        "darth.vader@deathstar.org",
-        "bob.darth.vader@deathstar.org",
-        "darthy.vader@deathstar.org",
-        "bob@deathstar.org"
+        "darth.vader@deathstar.gsa.gov",
+        "bob.darth.vader@deathstar.gsa.gov",
+        "darthy.vader@deathstar.gsa.gov",
+        "bob@deathstar.gsa.gov"
     ]
 }
+
+
+###
+// This should list everything using a view.
+GET {{scheme}}://{{api_url}}/admin_api_events
+authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}     
+x-api-user-id: {{api_user_id}}
+accept-profile: admin_api_v1_0_0
+x-api-key: {{$processEnv API_GOV_KEY}}   
+
