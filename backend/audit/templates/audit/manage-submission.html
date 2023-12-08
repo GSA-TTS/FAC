@@ -53,7 +53,11 @@
                         <tr>
                             <td>{{ entry.name }}</td>
                             <td>{{ entry.role }}</td>
-                            <td>{{ entry.email }} {{ entry.never_logged_in_flag }}</td>
+                            <td>{{ entry.email }}</td>
+                            {% comment %} 
+                              Removed the flags for the time being, to reduce initial complexity.
+                              <td>{{ entry.email }} {{ entry.never_logged_in_flag }}</td> 
+                            {% endcomment %}
                             <td>
                                 {% if entry.role == 'Auditee Certifying Official' %}
                                     <a href="{{ change_cert_auditee_url }}">Edit</a>
