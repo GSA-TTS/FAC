@@ -54,7 +54,7 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        accesses = Access.objects.filter(sac=sac)
+        accesses = Access.objects.filter(sac=sac).order_by("role")
         entries = map(_user_entry, accesses)
         period_start = sac.general_information.get("auditee_fiscal_period_start")
         period_end = sac.general_information.get("auditee_fiscal_period_end")
@@ -66,7 +66,7 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             "report_id": report_id,
             "entries": entries,
             "status": sac.get_friendly_status(),
-            "period": f"{period_start}–{period_end}",
+            "period": f"{period_start} to {period_end}",
             "progress_url": _url("SubmissionProgress"),
             "change_cert_auditee_url": _url("ChangeAuditeeCertifyingOfficial"),
             "change_cert_auditor_url": _url("ChangeAuditorCertifyingOfficial"),

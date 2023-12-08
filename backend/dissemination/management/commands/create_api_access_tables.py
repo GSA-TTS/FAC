@@ -4,9 +4,8 @@ from dissemination import api_versions
 
 class Command(BaseCommand):
     help = """
-    Runs sql scripts  to recreate views for the postgrest API.
+    Runs sql scripts  to recreate access tables for the postgrest API.
     """
 
     def handle(self, *args, **kwargs):
-        api_versions.drop_live_schema("dissemination")
-        api_versions.drop_live_schema("support")
+        api_versions.create_access_tables("support")
