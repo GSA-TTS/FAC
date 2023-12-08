@@ -36,9 +36,9 @@ def load_historic_data_for_year(audit_year, page_size, pages):
             result_log[(audit_year, submission.DBKEY)] = result
             total_count += 1
 
-            migration_status = 'SUCCESS'
+            migration_status = "SUCCESS"
             if len(result["errors"]) > 0:
-                migration_status = 'FAILURE'
+                migration_status = "FAILURE"
 
             record_migration_status(audit_year, submission.DBKEY, migration_status)
 
