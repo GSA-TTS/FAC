@@ -1,42 +1,41 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <div class="grid-container margin-top-6">
+    <div class="grid-container margin-top-6 margin-bottom-8">
         <div class="grid-row">
-            <form class="grid-col-8 grid-offset-2"
+            <form class="tablet:grid-col-8 tablet:grid-offset-2"
                   id="auditor-certification-step-2"
                   method="post">
                 {% csrf_token %}
-                <fieldset class="usa-fieldset padding-bottom-2">
-                  <h1 id="auditor-certification">Change {{ friendly_role }}</h1>
-                  <h3>Current {{ friendly_role }}</h3>
-
-                  <p>Name: {{ certifier_name }}</p>
-
-                  <p>Email: <code>{{ email }}</code></p>
-
-                  <hr />
-
-                  {% if errors %}
-                  <ul>
-                    {% for error in errors %}
-                      <li class="usa-error-message">{{ error }}</li>
-                    {% endfor %}
-                  </ul>
-                  {% endif %}
-
-                    <label class="usa-label" for="fullname">Name of new {{ friendly_role }}</label>
-                    <input class="usa-input"
-                           id="name"
-                           name="fullname"
-                           placeholder="[name]" />
-                    <label class="usa-label" for="email">Email address of new {{ friendly_role }}</label>
+                <fieldset class="usa-fieldset">
+                    <h1 id="auditor-certification">Change {{ friendly_role }}</h1>
+                    <p class="font-sans-md">
+                        There may only be one {{ friendly_role }} per single audit submission. By submitting a new official, you will be removing the current official listed below.
+                    </p>
+                    <p>
+                        <strong>Name:</strong>{{ certifier_name }}
+                    </p>
+                    <p>
+                        <strong>Email:</strong>{{ email }}
+                    </p>
+                    <hr />
+                    {% if errors %}
+                        <ul>
+                            {% for error in errors %}<li class="usa-error-message">{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                    <label class="usa-label" for="fullname">New name:</label>
+                    <input class="usa-input" id="name" name="fullname" placeholder="[name]" />
+                    <label class="usa-label" for="email">New email address:</label>
                     <input class="usa-input"
                            id="email"
                            name="email"
                            placeholder="[email address]" />
                 </fieldset>
-                <button class="usa-button margin-bottom-8 margin-top-4" id="continue">Remove {{ email }} from the {{ friendly_role }} role for this submission and replace them with the above user.</button>
+                <button class="usa-button margin-top-5" id="continue">Submit</button>
+                <a class="usa-button usa-button--unstyled margin-left-2"
+                   href="{% url 'audit:ManageSubmission' report_id %}"
+                   aria-controls="upload-cancel">Cancel</a>
             </form>
         </div>
     </div>

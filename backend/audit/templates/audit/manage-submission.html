@@ -1,66 +1,68 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <div class="grid-container margin-top-6">
+    <div class="grid-container margin-top-6 margin-bottom-8">
         <div>
-          {% csrf_token %}
-          <h1 id="manage-submission">Manage Submission: {{ report_id }}</h1>
-          <h3>{{ auditee_name }}</h3>
-            <table class="usa-table margin-top-0">
-              <thead>
-                <tr>
-                  <th>UEI</th>
-                  <th>Fiscal period</th>
-                  <th>Submission status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{{ auditee_uei }}</td>
-                  <td>{{ period }}</td>
-                  <td>{{ status }}</td>
-                </tr>
-              </tbody>
+            {% csrf_token %}
+            <div class="grid-col-12 tablet:grid-col-7">
+                <legend class="usa-legend usa-legend--large font-sans-2xl">Manage user roles</legend>
+                <legend class="usa-legend usa-legend--large text-normal font-sans-xl margin-top-4">
+                    {% if auditee_name %}<p class="margin-0 text-bold">{{ auditee_name }}</p>{% endif %}
+                    <p class="margin-0 text-semibold">
+                        <strong>UEI:</strong> {{ auditee_uei }}
+                    </p>
+                </legend>
+                <div class="font-sans-lg">
+                    <p class="margin-bottom-1 margin-top-2">
+                        <strong>Report ID:&nbsp;</strong>{{ report_id }}
+                    </p>
+                    <p class="margin-y-1">
+                        <strong>Submission status:&nbsp;</strong>{{ status }}
+                    </p>
+                    <p class="margin-y-1">
+                        <strong>Fiscal Year:&nbsp;</strong>{{ period }}
+                    </p>
+                </div>
+            </div>
+            <div class="font-sans-md margin-y-4">
+                <p>The table below lists the individuals with access to this single audit submission.</p>
+                <p>
+                    There may only be one Auditee Certifying Official and one Auditor Certifying Official. These users must have different email addresses. Any substitution for these roles will remove the prior user.
+                </p>
+                <p>
+                    There is no limit to the number of Audit Editors. These users may edit and grant access to the single audit submission but cannot certify it.
+                </p>
+                <p>To change an individual's role, click the "edit" link in the table.</p>
+            </div>
+            <table class="usa-table margin-y-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Email address</th>
+                        <th>Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                        <tr>
+                            <td>{{ entry.name }}</td>
+                            <td>{{ entry.role }}</td>
+                            <td>{{ entry.email }} {{ entry.never_logged_in_flag }}</td>
+                            <td>
+                                {% if entry.role == 'Auditee Certifying Official' %}
+                                    <a href="{{ change_cert_auditee_url }}">Edit</a>
+                                {% elif entry.role == 'Auditor Certifying Official' %}
+                                    <a href="{{ change_cert_auditor_url }}">Edit</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
-
-            <hr />
-
-            <table class="usa-table margin-top-0">
-              <caption class="text-normal">
-                <p>Listed below are the roles associated with this submission, and the email addresses associated with those roles.</p>
-
-                <p>There can only be one entry each for <strong>Auditee Certifying Official</strong> and <strong>Auditor Certifying Official</strong>, and the same email address cannot be used for both. These may be changed by following the corresponding links below.</p>
-
-                <p><strong>Audit Editor</strong> is the only other role and grants edit access but not certifying authority.</p>
-
-                <p>An asterisk (<strong>*</strong>) following an email address indicates that no user with this email address has logged in thus far.</p>
-              </caption>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Role</th>
-                  <th>Email address</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for entry in entries %}
-                  <tr>
-                    <td>{{ entry.name }}</td>
-                    <td>{{ entry.role }}</td>
-                    <td>{{ entry.email }} {{ entry.never_logged_in_flag}}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-
-            <hr />
-
-            <p><a href="{{ change_cert_auditee_url }}">Change certifying auditee official</a></p>
-
-            <p><a href="{{ change_cert_auditor_url }}">Change certifying auditor official</a></p>
-
-            <p><a href="{{ progress_url }}">Submission progress</a></p>
-
+            <a class="usa-button usa-button--outline margin-top-5"
+               href="{% url 'audit:SubmissionProgress' report_id %}"
+               aria-controls="upload-cancel">Return to checklist</a>
         </div>
     </div>
     {% include "audit-metadata.html" %}
