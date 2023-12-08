@@ -16,7 +16,7 @@ deprecated = {"dissemination": ["api"], "support": []}
 def get_conn_string():
     # Default to the production connection string
     conn_string = None
-    if settings.ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
+    if settings.ENVIRONMENT in ["LOCAL", "TESTING"]:
         conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
     else:
         conn_string = settings.CONNECTION_STRING

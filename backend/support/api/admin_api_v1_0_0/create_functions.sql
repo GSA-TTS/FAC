@@ -16,7 +16,7 @@
 begin;
 
 
-CREATE OR REPLACE FUNCTION admin_api_v1_0_0.get_header(item text) RETURNS text
+CREATE OR REPLACE FUNCTION admin_api_v1_0_0_functions.get_header(item text) RETURNS text
     AS $get_header$
     declare res text;
    	begin
@@ -25,11 +25,11 @@ CREATE OR REPLACE FUNCTION admin_api_v1_0_0.get_header(item text) RETURNS text
    end;
 $get_header$ LANGUAGE plpgsql;
 
-create or replace function admin_api_v1_0_0.get_api_key_uuid() returns TEXT
+create or replace function admin_api_v1_0_0_functions.get_api_key_uuid() returns TEXT
 as $gaku$
 declare uuid text;
 begin
-	select admin_api_v1_0_0.get_header('x-api-user-id') into uuid;
+	select admin_api_v1_0_0_functions.get_header('x-api-user-id') into uuid;
 	return uuid;
 end;
 $gaku$ LANGUAGE plpgsql;
@@ -37,13 +37,13 @@ $gaku$ LANGUAGE plpgsql;
 -- log_api_event
 -- Maintain an internal table of administrative API events.
 -- Also RAISE INFO so that NR gets a copy.
-create or replace function admin_api_v1_0_0.log_admin_api_event(event TEXT, meta JSON)
+create or replace function admin_api_v1_0_0_functions.log_admin_api_event(event TEXT, meta JSON)
 returns boolean
 as $log_admin_api_event$
 DECLARE
     uuid_header text;
 BEGIN
-    SELECT admin_api_v1_0_0.get_api_key_uuid() INTO uuid_header;
+    SELECT admin_api_v1_0_0_functions.get_api_key_uuid() INTO uuid_header;
 
     INSERT INTO public.support_adminapievent 
         (api_key_uuid, event, event_data, "timestamp")
@@ -59,14 +59,14 @@ $log_admin_api_event$ LANGUAGE plpgsql;
 -- The permissions (insert, select, delete) allow us to have users who can 
 -- read administrative data in addition to users who can (say) update 
 -- select tables like the tribal access lists.
-create or replace function admin_api_v1_0_0.has_admin_data_access(perm TEXT) returns boolean
+create or replace function admin_api_v1_0_0_functions.has_admin_data_access(perm TEXT) returns boolean
 as $has_admin_data_access$
 DECLARE 
     uuid_header text;
     key_exists boolean;
     has_permission boolean;
 BEGIN
-    SELECT admin_api_v1_0_0.get_api_key_uuid() INTO uuid_header;
+    SELECT admin_api_v1_0_0_functions.get_api_key_uuid() INTO uuid_header;
 
     SELECT 
         CASE WHEN EXISTS (
@@ -121,7 +121,7 @@ DECLARE
     read_tribal_id INTEGER;
 BEGIN
     -- If the API user has insert permissions, give it a go
-    IF admin_api_v1_0_0.has_admin_data_access('INSERT')
+    IF admin_api_v1_0_0_functions.has_admin_data_access('CREATE')
     THEN
         -- Are they already in the table?
         SELECT count(up.email) 
@@ -147,13 +147,14 @@ BEGIN
             INSERT INTO public.users_userpermission
                 (email, permission_id, user_id)
                 VALUES (params->>'email', read_tribal_id, null);
-            RETURN admin_api_v1_0_0.log_admin_api_event('tribal-access-email-added', 
+            RETURN admin_api_v1_0_0_functions.log_admin_api_event('tribal-access-email-added', 
                                                         json_build_object('email', params->>'email'));
         END IF;
     ELSE
         RETURN 0;
     END IF;
 end;
+$add_tribal_access_email$ LANGUAGE plpgsql;
 
 -- Adds many email addresses. Calls `add_tribal_access_email` for each address.
 --
@@ -180,14 +181,14 @@ DECLARE
     ele TEXT;
     em record;
 BEGIN
-    IF admin_api_v1_0_0.has_admin_data_access('INSERT')
+    IF admin_api_v1_0_0_functions.has_admin_data_access('CREATE')
     THEN 
         -- This is a FOR loop over a JSON array in plPgSQL
         FOR em IN (SELECT json_array_elements_text((params->>'emails')::JSON) ele)
         LOOP
             -- PERFORM is how to execute code that does not return anything.
             -- If a SELECT was used here, the SQL compiler would complain.
-            PERFORM admin_api_v1_0_0.add_tribal_access_email(json_build_object('email', em.ele)::JSON);
+            PERFORM admin_api_v1_0_0_functions.add_tribal_access_email(json_build_object('email', em.ele)::JSON);
         END LOOP;
         RETURN 1;
     END IF;
@@ -210,12 +211,12 @@ $add_tribal_access_emails$ LANGUAGE plpgsql;
 -- }
 CREATE OR REPLACE FUNCTION admin_api_v1_0_0.remove_tribal_access_email(params JSON) 
 returns BOOLEAN
-as $add_tribal_access_email$
+as $remove_tribal_access_email$
 DECLARE
       affected_rows INTEGER;
 BEGIN
 
-    IF admin_api_v1_0_0.has_admin_data_access('DELETE')
+    IF admin_api_v1_0_0_functions.has_admin_data_access('DELETE')
     THEN 
         -- Delete rows where the email address matches
         DELETE FROM public.users_userpermission as up
@@ -226,7 +227,7 @@ BEGIN
         -- If that is greater than zero, we were successful.
         IF affected_rows > 0
         THEN
-            RETURN admin_api_v1_0_0.log_admin_api_event('tribal-access-email-removed', 
+            RETURN admin_api_v1_0_0_functions.log_admin_api_event('tribal-access-email-removed', 
                                                         json_build_object('email', params->>'email'));
         ELSE
             RETURN 0;
@@ -236,7 +237,7 @@ BEGIN
         RETURN 0;
     END IF;
 end;
-$add_tribal_access_email$ LANGUAGE plpgsql;
+$remove_tribal_access_email$ LANGUAGE plpgsql;
 
 -- Removes many email addresses. Calls `remove_tribal_access_email` for each address.
 -- 
@@ -263,11 +264,11 @@ DECLARE
     ele TEXT;
     em record;
 BEGIN
-    IF admin_api_v1_0_0.has_admin_data_access('DELETE')
+    IF admin_api_v1_0_0_functions.has_admin_data_access('DELETE')
     THEN 
         FOR em IN (SELECT json_array_elements_text((params->>'emails')::JSON) ele)
         LOOP
-            PERFORM admin_api_v1_0_0.remove_tribal_access_email(json_build_object('email', em.ele)::JSON);
+            PERFORM admin_api_v1_0_0_functions.remove_tribal_access_email(json_build_object('email', em.ele)::JSON);
         END LOOP;
         RETURN 1;
     END IF;

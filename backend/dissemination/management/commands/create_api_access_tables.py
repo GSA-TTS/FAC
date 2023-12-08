@@ -8,5 +8,4 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        api_versions.create_access_tables("dissemination")
         api_versions.create_access_tables("support")

@@ -21,7 +21,7 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.audit_access AS
     FROM
         audit_access aa
     WHERE
-        admin_api_v1_0_0.has_admin_data_access('SELECT')
+        admin_api_v1_0_0_functions.has_admin_data_access('READ')
     ORDER BY aa.id
 ;
 
@@ -54,7 +54,7 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.singleauditchecklist AS
     from
         audit_singleauditchecklist sac
     where
-        admin_api_v1_0_0.has_admin_data_access('SELECT')
+        admin_api_v1_0_0_functions.has_admin_data_access('READ')
     order by sac.id
 ;
 
@@ -68,7 +68,7 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.tribal_access AS
     WHERE
         (uup.permission_id = up.id)
         AND (up.slug = 'read-tribal')
-        AND admin_api_v1_0_0.has_admin_data_access('SELECT')
+        AND admin_api_v1_0_0_functions.has_admin_data_access('READ')
     ORDER BY uup.id
 ;
 
@@ -81,7 +81,7 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.admin_api_events AS
     FROM
         support_adminapievent ae
     WHERE
-        admin_api_v1_0_0.has_admin_data_access('SELECT')
+        admin_api_v1_0_0_functions.has_admin_data_access('READ')
     ORDER BY ae.id
 ;
 
