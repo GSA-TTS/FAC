@@ -1,0 +1,37 @@
+name: Request for administrative API access
+description: Used to record when and why we granted increased permissions on an API.
+title: "[API access]: "
+labels: ["api"]
+projects: ["GSA-TTS/11"]
+assignees:
+  - jadudm
+  - danswick
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A request for elevated API access is recorded for reasons of security and compliance.
+
+        * A request for *tribal data access* will begin a process that requires additional conversation with the agency involved. 
+          Access will only be granted to designated staff at confirmed agency partners.  
+        * A request for *admniistrative API access* will only be granted to members of the GSA FAC team.
+
+  - type: dropdown
+    id: accesstype
+    attributes:
+      label: Access type
+      description: What kind of access is being requested?
+      options:
+        - Administrative API access
+        - Tribal data access API 
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: email
+    attributes:
+      label: Email address
+      description: What is your email address?
+      placeholder: ex. someone@agency.gov
+    validations:
+      required: true
