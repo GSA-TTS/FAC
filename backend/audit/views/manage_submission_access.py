@@ -68,7 +68,7 @@ class ChangeAuditorCertifyingOfficialView(
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         form = ChangeAccessForm(request.POST)
         form.full_clean()
-        url = reverse("audit:SubmissionProgress", kwargs={"report_id": report_id})
+        url = reverse("audit:ManageSubmission", kwargs={"report_id": report_id})
 
         if not self.other_role:
             Access(
