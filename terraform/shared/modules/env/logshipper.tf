@@ -3,15 +3,15 @@ locals {
 }
 
 module "cg-logshipper" {
-  source                = "../cg-logshipper"
-  name                  = local.logshipper_name
-  cf_org_name           = var.cf_org_name   # gsa-tts-oros-fac
-  cf_space_name         = var.cf_space_name # eg prod
-  https_proxy           = module.https-proxy.https_proxy
-  logshipper_instances  = 1
-  logshipper_memory     = 1046
-  disk_quota            = 512
-  new_relic_id          = cloudfoundry_user_provided_service.credentials.id
+  source               = "../cg-logshipper"
+  name                 = local.logshipper_name
+  cf_org_name          = var.cf_org_name   # gsa-tts-oros-fac
+  cf_space_name        = var.cf_space_name # eg prod
+  https_proxy          = module.https-proxy.https_proxy
+  logshipper_instances = 1
+  logshipper_memory    = 1046
+  disk_quota           = 512
+  new_relic_id         = cloudfoundry_user_provided_service.credentials.id
 }
 
 resource "cloudfoundry_network_policy" "logshipper-network-policy" {
