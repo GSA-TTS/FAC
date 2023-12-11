@@ -60,7 +60,7 @@ locals {
   sidecar_json = jsonencode(
     {
       "name" : "fluentbit",
-      "command" : "/home/vcap/deps/0/apt/opt/fluent-bit/bin/fluent-bit -c fluentbit.conf",
+      "command" : "/home/vcap/deps/0/apt/opt/fluent-bit/bin/fluent-bit -Y -c fluentbit.conf",
       "process_types" : ["web"],
     }
   )
