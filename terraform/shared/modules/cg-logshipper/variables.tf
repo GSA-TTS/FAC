@@ -38,11 +38,6 @@ variable "logshipper_instances" {
   default     = 1
 }
 
-variable "new_relic_license_key" {
-  type        = string
-  description = "the license key to use when setting up the New Relic agent"
-}
-
 variable "https_proxy" {
   type        = string
   description = "the full string of the https proxy for use with the logshipper app"
