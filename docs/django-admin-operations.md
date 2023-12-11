@@ -26,7 +26,7 @@ You must have `superuser` access to do this.
 You must have `staff` or `superuser` access to do this.
 
 1.  Get the `report_id` of the submission or the email address in question.
-2.  Go to [https://fac-dev.app.cloud.gov/admin/audit/access/](https://fac-dev.app.cloud.gov/admin/audit/access/).
+2.  Go to [https://app.fac.gov/admin/audit/access/](https://app.fac.gov/admin/audit/access/).
 3.  Enter the `report_id` or email address into the search field at the top of the page and hit enter.
 4.  You should now see only the list of `Access` entries associated with that `report_id` or email address.
 5.  The roles and email addresses are displayed here and are usually all that’s required.
@@ -37,7 +37,7 @@ You must have `staff` or `superuser` access to do this.
 You must have `staff` or `superuser` access to do this.
 
 1.  Get the `report_id` or UEI in question.
-2.  Go to [https://fac-dev.app.cloud.gov/admin/audit/singleauditchecklist/](https://fac-dev.app.cloud.gov/admin/audit/singleauditchecklist/).
+2.  Go to [https://app.fac.gov/admin/audit/singleauditchecklist/](https://app.fac.gov/admin/audit/singleauditchecklist/).
 3.  Enter the `report_id` or UEI into the search field at the top of the page and hit enter.
 4.  You should now see only the list of `SingleAuditChecklist` entries associated with that `report_id` or UEI.
 5.  To see more information about a particular `SingleAuditChecklist`, click the number in the **ID** column.
