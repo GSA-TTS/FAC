@@ -9,6 +9,7 @@ from .pre_certification_review import PreCertificationReview
 from .pre_dissemination_download_view import (
     PredisseminationXlsxDownloadView,
     PredisseminationPdfDownloadView,
+    PredisseminationSummaryReportDownloadView,
 )
 from .submission_progress_view import (  # noqa
     SubmissionProgressView,
@@ -51,8 +52,9 @@ views = [
     MySubmissions,
     no_robots,
     PreCertificationReview,
-    PredisseminationXlsxDownloadView,
     PredisseminationPdfDownloadView,
+    PredisseminationSummaryReportDownloadView,
+    PredisseminationXlsxDownloadView,
     ReadyForCertificationView,
     SingleAuditReportFileHandlerView,
     SubmissionProgressView,

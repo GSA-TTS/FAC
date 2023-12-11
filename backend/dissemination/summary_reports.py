@@ -119,7 +119,7 @@ def set_column_widths(worksheet):
         worksheet.column_dimensions[columns[col - 1]].width = value
 
 
-def gather_report_data(report_ids):
+def gather_report_data_dissemination(report_ids):
     """
     Given a set of report IDs, fetch the disseminated data for each and asssemble into a dictionary with the following shape:
 
@@ -155,6 +155,67 @@ def gather_report_data(report_ids):
                 data[model_name]["entries"].append(
                     [getattr(obj, field_name) for field_name in field_names]
                 )
+    return data
+
+
+def gather_report_data_pre_certification(i2d_data):
+    """
+    Given a sac object dict, asssemble into a dictionary with the following shape:
+
+    {
+        general: {
+            field_names: [],
+            entries: [],
+        },
+        federal_award: {
+            field_names: [],
+            entries: [],
+        },
+        ...
+    }
+    """
+
+    # Map IntakeToDissemination names to the dissemination table names
+    i2d_to_dissemination = {
+        "Generals": General,
+        "SecondaryAuditors": SecondaryAuditor,
+        "FederalAwards": FederalAward,
+        "Findings": Finding,
+        "FindingTexts": FindingText,
+        "Passthroughs": Passthrough,
+        "CapTexts": CapText,
+        "Notes": Note,
+        "AdditionalUEIs": AdditionalUei,
+        "AdditionalEINs": AdditionalEin
+    }
+
+    # Move the IntakeToDissemination data to the new names under dissemination_data
+    dissemination_data = {}
+    for name_i2d, model in i2d_to_dissemination.items():
+        dissemination_data[model.__name__.lower()] = i2d_data.get(name_i2d)
+    
+    data = {}
+
+    # For every model (FederalAward, CapText, etc), create the skeleton object ('field_names' and empty 'entries').
+    # Then, for every object in the dissemination_data (objects of type FederalAward, CapText, etc) create a row (array) for the summary.
+    # Every row is created by looping over the field names and appending the data.
+    # We also strip tzinfo from the dates, because excel doesn't like them.
+    # Once a row is created, append it to the data['modelname']['entries'] array.
+    for model in models:
+        model_name = model.__name__.lower()
+        fields = model._meta.get_fields()
+        field_names = [f.name for f in fields]
+        data[model_name] = {"field_names": field_names, "entries": []}
+
+        for obj in dissemination_data[model_name]:
+            row = []
+            for field_name in field_names:
+                value = getattr(obj, field_name)
+                # Wipe tzinfo
+                if isinstance(value, datetime):
+                    value = value.replace(tzinfo=None)
+                row.append(value)
+            data[model_name]["entries"].append(row)
 
     return data
 
@@ -223,10 +284,16 @@ def persist_workbook(workbook):
 
 
 def generate_summary_report(report_ids):
-    
-
-    data = gather_report_data(report_ids)
+    data = gather_report_data_dissemination(report_ids)
     workbook = create_workbook(data)
     filename = persist_workbook(workbook)
 
-    return filename
+    return f"temp/{filename}"
+
+
+def generate_presubmission_report(i2d_data):
+    data = gather_report_data_pre_certification(i2d_data)
+    workbook = create_workbook(data)
+    filename = persist_workbook(workbook)
+
+    return f"temp/{filename}"

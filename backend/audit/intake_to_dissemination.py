@@ -284,8 +284,6 @@ class IntakeToDissemination(object):
         dates_by_status = self._get_dates_from_sac()
         status = self.single_audit_checklist.STATUS
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
-        auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
-        auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
         if self.mode == IntakeToDissemination.DISSEMINATION:
             submitted_date = self._convert_utc_to_american_samoa_zone(
                 dates_by_status[status.SUBMITTED]
@@ -304,6 +302,8 @@ class IntakeToDissemination(object):
             fac_accepted_date = submitted_date
             auditee_certify_name = None
             auditee_certify_title = None
+            auditor_certified_date = None
+            auditee_certified_date = None
 
         total_amount_expended = self.single_audit_checklist.federal_awards[
             "FederalAwards"

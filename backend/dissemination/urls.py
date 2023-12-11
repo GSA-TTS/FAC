@@ -15,6 +15,11 @@ urlpatterns = [
         views.PdfDownloadView.as_view(),
         name="PdfDownload",
     ),
+    path(
+        "summary-report/xlsx/<str:report_id>",
+        views.SummaryReportDownloadView.as_view(),
+        name="SummaryReportDownload",
+    ),
     path("search/", views.Search.as_view(), name="Search"),
     path("summary/<str:report_id>", views.AuditSummaryView.as_view(), name="Summary"),
 ]

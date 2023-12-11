@@ -115,6 +115,11 @@ urlpatterns = [
         views.PredisseminationPdfDownloadView.as_view(),
         name="PredisseminationPdfDownload",
     ),
+    path(
+        "summary-report/xlsx/<str:report_id>",
+        views.PredisseminationSummaryReportDownloadView.as_view(),
+        name="PredisseminationSummaryReportDownload",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:

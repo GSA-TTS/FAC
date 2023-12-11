@@ -120,6 +120,22 @@
                             </div>
                         {% endif %}
                     </li>
+
+                    {% comment %} Pre-certification review {% endcomment %}
+                    <div class="padding-bottom-3 padding-top-105" id="submit-audit">
+                        <div class="usa-summary-box font-sans-md"
+                             role="region"
+                             aria-labelledby="summary-box-key-information">
+                            <div class="usa-summary-box__body">
+                                <div class="usa-summary-box__text">
+                                    <span class="text-bold">Pre-certification Review</span>
+                                    <p class="margin-0">
+                                        View a <a class="usa-link" href="{% url 'audit:PreCertificationReview' report_id %}">detail-rich summary</a> of your submission so far.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     {% comment %} Auditor Certification {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105"
