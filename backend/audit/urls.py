@@ -100,6 +100,21 @@ urlpatterns = [
         views.ChangeAuditeeCertifyingOfficialView.as_view(),
         name="ChangeAuditeeCertifyingOfficial",
     ),
+    path(
+        "pre-certification-review/<str:report_id>",
+        views.PreCertificationReview.as_view(),
+        name="PreCertificationReview",
+    ),
+    path(
+        "workbook/xlsx/<str:file_type>/<str:report_id>",
+        views.PredisseminationXlsxDownloadView.as_view(),
+        name="PredisseminationXlsxDownload",
+    ),
+    path(
+        "report/pdf/<str:report_id>",
+        views.PredisseminationPdfDownloadView.as_view(),
+        name="PredisseminationPdfDownload",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:

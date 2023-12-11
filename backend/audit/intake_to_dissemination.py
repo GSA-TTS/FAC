@@ -25,12 +25,16 @@ def omit(remove, d) -> dict:
 
 
 class IntakeToDissemination(object):
-    def __init__(self, sac) -> None:
+    DISSEMINATION = "dissemination"
+    PRE_CERTIFICATION_REVIEW = "pre_certification_review"
+
+    def __init__(self, sac, mode=DISSEMINATION) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
         audit_date = sac.general_information["auditee_fiscal_period_end"]
         self.audit_year = int(audit_date.split("-")[0])
         self.loaded_objects: dict[str, list] = {}
+        self.mode = mode
 
     def load_all(self):
         load_methods = {
@@ -282,16 +286,24 @@ class IntakeToDissemination(object):
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
         auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
         auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
-        submitted_date = self._convert_utc_to_american_samoa_zone(
-            dates_by_status[status.SUBMITTED]
-        )
-        fac_accepted_date = submitted_date
-        auditee_certify_name = auditee_certification["auditee_signature"][
-            "auditee_name"
-        ]
-        auditee_certify_title = auditee_certification["auditee_signature"][
-            "auditee_title"
-        ]
+        if self.mode == IntakeToDissemination.DISSEMINATION:
+            submitted_date = self._convert_utc_to_american_samoa_zone(
+                dates_by_status[status.SUBMITTED]
+            )
+            fac_accepted_date = submitted_date
+            auditee_certify_name = auditee_certification["auditee_signature"][
+                "auditee_name"
+            ]
+            auditee_certify_title = auditee_certification["auditee_signature"][
+                "auditee_title"
+            ]
+            auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
+            auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
+        elif self.mode == IntakeToDissemination.PRE_CERTIFICATION_REVIEW:
+            submitted_date = None
+            fac_accepted_date = submitted_date
+            auditee_certify_name = None
+            auditee_certify_title = None
 
         total_amount_expended = self.single_audit_checklist.federal_awards[
             "FederalAwards"

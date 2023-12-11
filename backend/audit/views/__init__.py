@@ -5,6 +5,11 @@ from .manage_submission_access import (
     ChangeAuditorCertifyingOfficialView,
 )
 from .no_robots import no_robots
+from .pre_certification_review import PreCertificationReview
+from .pre_dissemination_download_view import (
+    PredisseminationXlsxDownloadView,
+    PredisseminationPdfDownloadView,
+)
 from .submission_progress_view import (  # noqa
     SubmissionProgressView,
     submission_progress_check,
@@ -13,9 +18,9 @@ from .tribal_data_consent import TribalDataConsent
 from .upload_report_view import UploadReportView
 from .unlock_after_certification import UnlockAfterCertificationView
 from .views import (
-    AuditInfoFormView,
     AuditeeCertificationStep1View,
     AuditeeCertificationStep2View,
+    AuditInfoFormView,
     AuditorCertificationStep1View,
     AuditorCertificationStep2View,
     CertificationView,
@@ -30,9 +35,9 @@ from .views import (
 
 # In case we want to iterate through all the views for some reason:
 views = [
-    AuditInfoFormView,
     AuditeeCertificationStep1View,
     AuditeeCertificationStep2View,
+    AuditInfoFormView,
     AuditorCertificationStep1View,
     AuditorCertificationStep2View,
     CertificationView,
@@ -42,8 +47,12 @@ views = [
     EditSubmission,
     ExcelFileHandlerView,
     Home,
-    MySubmissions,
     ManageSubmissionView,
+    MySubmissions,
+    no_robots,
+    PreCertificationReview,
+    PredisseminationXlsxDownloadView,
+    PredisseminationPdfDownloadView,
     ReadyForCertificationView,
     SingleAuditReportFileHandlerView,
     SubmissionProgressView,
@@ -51,5 +60,4 @@ views = [
     TribalDataConsent,
     UnlockAfterCertificationView,
     UploadReportView,
-    no_robots,
 ]

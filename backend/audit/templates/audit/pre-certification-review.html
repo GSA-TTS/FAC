@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+{% load field_name_to_label %}
+{% load getkey %}
+{% load humanize %}
+{% load sprite_helper %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-col grid-gap">
+            {% comment %} Title & Header {% endcomment %}
+            <div class="grid-row" id="title">
+                <div class="grid-col-12 tablet:grid-col-7">
+                    <legend class="usa-legend usa-legend--large font-sans-2xl">Single audit summary</legend>
+                    <legend class="usa-legend usa-legend--large text-normal font-sans-xl margin-top-4">
+                        <p class="margin-0 text-bold">{{ auditee_name }}</p>
+                        <p class="margin-0 text-semibold">
+                            <strong>UEI:</strong> {{ auditee_uei }}
+                        </p>
+                    </legend>
+                    <div class="font-sans-lg">
+                        <p class="margin-bottom-1 margin-top-2">
+                            <strong>Report ID:&nbsp;</strong>{{ report_id }}
+                        </p>
+                        <p class="margin-y-1">
+                            <strong>Fiscal Year:&nbsp;</strong>{{ general.fy_start_date }} to {{ general.fy_end_date }}
+                        </p>
+                    </div>
+                </div>
+                <div class="grid-col-12 tablet:grid-col-5 tablet:display-flex flex-column tablet:flex-justify-end">
+                    <div class="margin-0 flex-align-self-end margin-top-2">
+                        <a class="usa-button usa-button--outline display-flex font-sans-xl"
+                           href="{% url 'audit:PredisseminationPdfDownload' report_id=report_id %}"
+                           target="_blank">
+                            <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                 aria-hidden="true"
+                                 role="img">
+                                {% uswds_sprite "file_download" %}
+                            </svg>
+                            <p class="margin-0">Single audit report</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% comment %} The grey box of doom {% endcomment %}
+    <div class="bg-base-lighter padding-bottom-10 ">
+        <div class="grid-container margin-top-6">
+            <div id="summary-information" class="margin-top-6 padding-y-3">
+                {% comment %} Auditee {% endcomment %}
+                <h2 class="font-sans-2xl text-semibold margin-bottom-2 margin-top-3">Auditee</h2>
+                <table class="usa-table width-full">
+                    <tbody class="grid-row" id="{{ section_key }}-table__body">
+                        <tr class="grid-row grid-col-12">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Contact Name:&nbsp;</strong>{{ general.auditee_contact_name }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Contact title:&nbsp;</strong>{{ general.auditee_contact_title }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Email:&nbsp;</strong>{{ general.auditee_email }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Phone:&nbsp;</strong>{{ general.auditee_phone }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Address:&nbsp;</strong>{{ general.auditee_address_line_1 }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>City and state:&nbsp;</strong>{{ general.auditee_city }}, {{ general.auditee_state }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Zip code:&nbsp;</strong>{{ general.auditee_zip }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Additional UEIs" %}text-gray-30{% endif %}">
+                                    <span><strong>Additional UEIs?</strong>&nbsp;
+                                        {% if  data|getkey:"Additional UEIs" %}
+                                            Y
+                                        {% else %}
+                                            N
+                                        {% endif %}
+                                    </span>
+                                    {% if not data|getkey:"Additional UEIs" %}
+                                        <span class="display-flex flex-align-center text-gray-30">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 6
+                                        </span>
+                                    {% else %}
+                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
+                                        href="{% url 'audit:PredisseminationXlsxDownload' file_type="AdditionalUeis" report_id=report_id %}"
+                                        target="_blank">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 6
+                                        </a>
+                                    {% endif %}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>EIN:&nbsp;</strong>{{ general.auditee_ein }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Additional EINs" %}text-gray-30{% endif %}">
+                                    <span>
+                                        <strong>Additional EINs?</strong>&nbsp;
+                                        {% if  data|getkey:"Additional EINs" %}
+                                            Y
+                                        {% else %}
+                                            N
+                                        {% endif %}
+                                    </span>
+                                    {% if not data|getkey:"Additional EINs" %}
+                                        <span class="display-flex flex-align-center text-gray-30">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 8
+                                        </span>
+                                    {% else %}
+                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
+                                        href="{% url 'audit:PredisseminationXlsxDownload' file_type="AdditionalEins" report_id=report_id %}"
+                                        target="_blank">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 8
+                                        </a>
+                                    {% endif %}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Certifying name:&nbsp;</strong>{{ general.auditee_certify_name }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Certifying title:&nbsp;</strong>{{ general.auditee_certify_title }}
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                {% comment %} Auditor {% endcomment %}
+                <h2 class="font-sans-2xl text-semibold margin-bottom-2 margin-top-3">Auditor</h2>
+                <table class="usa-table width-full">
+                    <tbody class="grid-row" id="{{ section_key }}-table__body">
+                        <tr class="grid-row grid-col-12">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Contact Name:&nbsp;</strong>{{ general.auditor_contact_name }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Contact title:&nbsp;</strong>{{ general.auditor_contact_title }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Email:&nbsp;</strong>{{ general.auditor_email }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Phone:&nbsp;</strong>{{ general.auditor_phone }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Address:&nbsp;</strong>{{ general.auditor_address_line_1 }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>City and state:&nbsp;</strong>{{ general.auditor_city }}, {{ general.auditor_state }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Zip code:&nbsp;</strong>{{ general.auditor_zip }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Secondary Auditors" %}text-gray-30{% endif %}">
+                                    <span><strong>Secondary Auditors?</strong>&nbsp;
+                                        {% if  data|getkey:"Secondary Auditors" %}
+                                            Y
+                                        {% else %}
+                                            N
+                                        {% endif %}
+                                    </span>
+                                    {% if not data|getkey:"Secondary Auditors" %}
+                                        <span class="display-flex flex-align-center text-gray-30">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 7
+                                        </span>
+                                    {% else %}
+                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
+                                        href="{% url 'audit:PredisseminationXlsxDownload' file_type="SecondaryAuditors" report_id=report_id %}"
+                                        target="_blank">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 7
+                                        </a>
+                                    {% endif %}
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                {% comment %} Summary {% endcomment %}
+                <h2 class="font-sans-2xl text-semibold margin-bottom-2 margin-top-3">Summary</h2>
+                <table class="usa-table width-full">
+                    <tbody class="grid-row" id="{{ section_key }}-table__body">
+                        <tr class="grid-row grid-col-12">
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify">
+                                    <span><strong>Federal awards:</strong>&nbsp;
+                                        {{ data|getkey:"Awards"|length }}
+                                    </span>
+                                    <a class="usa-button usa-button--unstyled display-flex flex-align-center"
+                                       href="{% url 'audit:PredisseminationXlsxDownload' file_type="FederalAwardsExpended" report_id=report_id %}"
+                                       target="_blank">
+                                        <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                             aria-hidden="true"
+                                             role="img">
+                                            {% uswds_sprite "file_download" %}
+                                        </svg>
+                                        Download workbook 1
+                                    </a>
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Notes to SEFA" %}text-gray-30{% endif %}">
+                                    <span><strong>Notes to SEFA:</strong>&nbsp;
+                                        {{ data|getkey:"Notes to SEFA"|length }}
+                                    </span>
+                                    {% if not data|getkey:"Notes to SEFA" %}
+                                        <span class="display-flex flex-align-center text-gray-30">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 2
+                                        </span>
+                                    {% else %}
+                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
+                                        href="{% url 'audit:PredisseminationXlsxDownload' file_type="NotesToSefa" report_id=report_id %}"
+                                        target="_blank">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 2
+                                        </a>
+                                    {% endif%}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Audit Findings" %}text-gray-30{% endif %}">
+                                    <span><strong>Findings:</strong>&nbsp;
+                                        {{ data|getkey:"Audit Findings"|length }}
+                                    </span>
+                                    {% if not data|getkey:"Audit Findings" %}
+                                        <span class="display-flex flex-align-center text-gray-30">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 3
+                                        </span>
+                                    {% else %}
+                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
+                                        href="{% url 'audit:PredisseminationXlsxDownload' file_type="FindingsUniformGuidance" report_id=report_id %}"
+                                        target="_blank">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 3
+                                        </a>
+                                    {% endif %}
+                                </p>
+                            </td>
+                            {% comment %} Findings text - If none, show the gray box with no link. {% endcomment %}
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Audit Findings Text" %}text-gray-30{% endif %}">
+                                    <span><strong>Findings text:</strong>&nbsp;
+                                        {{ data|getkey:"Audit Findings Text"|length }}
+                                    </span>
+                                    {% if not data|getkey:"Audit Findings Text" %}
+                                        <span class="display-flex flex-align-center text-gray-30">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 4
+                                        </span>
+                                    {% else %}
+                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
+                                        href="{% url 'audit:PredisseminationXlsxDownload' file_type="FindingsText" report_id=report_id %}"
+                                        target="_blank">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 4
+                                        </a>
+                                    {% endif %}
+                                </p>
+                            </td>
+                        </tr>
+                        {% comment %} CAP - If none, show the gray box with no link. {% endcomment %}
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Corrective Action Plan" %}text-gray-30{% endif %}">
+                                    <span><strong>CAP:</strong>&nbsp;
+                                        {{ data|getkey:"Corrective Action Plan"|length }}
+                                    </span>
+                                    {% if not data|getkey:"Corrective Action Plan" %}
+                                        <span class="display-flex flex-align-center text-gray-30">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 5
+                                        </span>
+                                    {% else %}
+                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
+                                        href="{% url 'audit:PredisseminationXlsxDownload' file_type="CorrectiveActionPlan" report_id=report_id %}"
+                                        target="_blank">
+                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
+                                                aria-hidden="true"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                            Download workbook 5
+                                        </a>
+                                    {% endif %}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify">
+                                    <strong>Total federal expenditure:&nbsp;</strong>
+                                    <span class="margin-0 display-flex">
+                                        ${{ general.total_amount_expended|intcomma }}
+                                    </span>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <a class="usa-button usa-button--outline margin-top-5"
+               href="{% url 'audit:SubmissionProgress' report_id %}"
+               aria-controls="upload-cancel">Return to checklist</a>
+        </div>
+    </div>
+{% endblock content %}
