@@ -16,8 +16,9 @@ cd "${tmpdir}"
 curl -s -L https://github.com/GSA-TTS/cg-logshipper/archive/"${GITREF}".zip --output "${tmpdir}/logshipper-dist.zip"
 
 # Remove the leading directory; the .zip needs to have the files at the top
-cd "${tmpdir}" 
+cd "${tmpdir}"
 unzip -o "${tmpdir}/logshipper-dist.zip" > /dev/null
+cat "${popdir}/fluentbit_config/fluentbit.conf" > "${tmpdir}/cg-logshipper-main/fluentbit.conf"
 cd "${tmpdir}/cg-logshipper-main" && zip -r -o "${popdir}/logshipper.zip" ./ > /dev/null
 
 # Tell Terraform where to find it
