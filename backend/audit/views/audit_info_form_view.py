@@ -6,6 +6,7 @@ from django.views import generic
 from audit.forms import AuditInfoForm
 from audit.mixins import SingleAuditChecklistAccessRequiredMixin
 from audit.models import SingleAuditChecklist, SubmissionEvent
+from audit.validators import validate_audit_information_json
 from config.settings import (
     AGENCY_NAMES,
     GAAP_RESULTS,
@@ -69,7 +70,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except Exception as e:
-            logger.info("Unexpected error in AuditInfoFormView get.\n", e)
+            logger.info("Unexpected error in AuditInfoFormView get.\n%s", e)
             raise BadRequest()
 
     def post(self, request, *args, **kwargs):
@@ -112,7 +113,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except Exception as e:
-            logger.info("Enexpected error in AuditInfoFormView post.\n", e)
+            logger.info("Enexpected error in AuditInfoFormView post.\n%s", e)
             raise BadRequest()
 
     def _get_context(self, sac, form):

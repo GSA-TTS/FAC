@@ -11,12 +11,6 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-from config.settings import (
-    AGENCY_NAMES,
-    GAAP_RESULTS,
-    SP_FRAMEWORK_BASIS,
-    SP_FRAMEWORK_OPINIONS,
-)
 from audit.fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
 from audit.intakelib import (
@@ -30,7 +24,6 @@ from audit.intakelib import (
     extract_notes_to_sefa,
 )
 from audit.forms import (
-    AuditInfoForm,
     AuditorCertificationStep1Form,
     AuditorCertificationStep2Form,
     AuditeeCertificationStep1Form,
@@ -53,7 +46,6 @@ from audit.intakelib.exceptions import ExcelExtractionError
 from audit.validators import (
     validate_additional_ueis_json,
     validate_additional_eins_json,
-    validate_audit_information_json,
     validate_auditee_certification_json,
     validate_auditor_certification_json,
     validate_corrective_action_plan_json,
