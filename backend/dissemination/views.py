@@ -90,7 +90,7 @@ class Search(View):
                 auditee_state=auditee_state,
                 include_private=include_private,
             )
-            results_count = results.count()
+            results_count = len(results)
             # Reset page to one if the page number surpasses how many pages there actually are
             if page > math.ceil(results_count / limit):
                 page = 1

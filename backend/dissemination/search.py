@@ -99,31 +99,44 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(
 ):
     """
     Given the results QuerySet (full of 'General' objects) and an ALN query string,
-    return the modified QuerySet, where each 'General' object has two new fields.
+    return a list of 'General' objects, where each object has two new fields.
 
     The process:
-    1. Get findings that fall under the given reports.
-    2. For each finding, get the relevant award. This is to access its ALN.
-    3. For each finding/award pair, they are either:
-       a. Under one of my ALNs, so we update finding_my_aln to True.
-       b. Under any other ALN, so we update finding_all_aln to True.
+    1. Convert the QuerySet to a list to make each object easier to edit.
+    2. Get FederalAward objects with findings_count > 0 that fall under the given reports.
+    3. For each FederalAward, it is either
+       a. Under one of my ALNs, so finding_my_aln is True.
+       b. Under any other ALN, so finding_all_aln is True.
+    4. Find the relevant General object (find & access index) to update the values.
     """
-    for result in results:
-        result.finding_my_aln = False
-        result.finding_all_aln = False
-        matching_findings = Finding.objects.filter(report_id=result.report_id)
+    report_ids = list(results.values_list("report_id", flat=True))
+    results = list(results)
 
-        for finding in matching_findings:
-            matching_award = FederalAward.objects.get(
-                report_id=result.report_id, award_reference=finding.award_reference
-            )
-            prefix = matching_award.federal_agency_prefix
-            extension = matching_award.federal_award_extension
+    for x in results:
+        x.finding_my_aln = False
+        x.finding_all_aln = False
 
-            if ((prefix, extension) in split_alns) or (prefix in agency_numbers):
-                result.finding_my_aln = True
-            else:
-                result.finding_all_aln = True
+    awards_with_findings = FederalAward.objects.filter(
+        report_id__in=report_ids, findings_count__gt=0
+    )
+
+    for award in awards_with_findings:
+        prefix = award.federal_agency_prefix
+        extension = award.federal_award_extension
+        # Find the index of the object with a matching report_id.
+        result_index = next(
+            (
+                index
+                for (index, obj) in enumerate(results)
+                if obj.report_id == award.report_id
+            ),
+            None,
+        )
+
+        if ((prefix, extension) in split_alns) or (prefix in agency_numbers):
+            results[result_index].finding_my_aln = True
+        else:
+            results[result_index].finding_all_aln = True
 
     return results
 
