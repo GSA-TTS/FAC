@@ -1,6 +1,6 @@
 from django.db.models import Q
 
-from dissemination.models import General, FederalAward, Finding
+from dissemination.models import General, FederalAward
 
 
 def search_general(
