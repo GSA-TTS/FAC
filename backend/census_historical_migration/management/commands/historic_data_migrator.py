@@ -7,7 +7,10 @@ from census_historical_migration.sac_general_lib.utils import (
 from census_historical_migration.workbooklib.excel_creation_utils import (
     get_audit_header,
 )
-from census_historical_migration.historic_data_loader import create_or_get_user
+from census_historical_migration.historic_data_loader import (
+    create_or_get_user,
+    record_migration_status,
+)
 from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
 from django.conf import settings
 
@@ -51,6 +54,12 @@ class Command(BaseCommand):
 
                 run_end_to_end(user, audit_header, result)
                 logger.info(result)
+
+                migration_status = "SUCCESS"
+                if len(result["errors"]) > 0:
+                    migration_status = "FAILURE"
+
+                record_migration_status(year, dbkey, migration_status)
 
     def handle(self, *args, **options):
         dbkeys_str = options["dbkeys"]
