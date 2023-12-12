@@ -189,18 +189,18 @@ def gather_report_data_pre_certification(i2d_data):
         "AdditionalEINs": AdditionalEin
     }
 
-    # Move the IntakeToDissemination data to the new names under dissemination_data
+    # Move the IntakeToDissemination data to dissemination_data, under the proper naming scheme.
     dissemination_data = {}
     for name_i2d, model in i2d_to_dissemination.items():
         dissemination_data[model.__name__.lower()] = i2d_data.get(name_i2d)
     
     data = {}
 
-    # For every model (FederalAward, CapText, etc), create the skeleton object ('field_names' and empty 'entries').
+    # For every model (FederalAward, CapText, etc), add the skeleton object ('field_names' and empty 'entries') to 'data'.
     # Then, for every object in the dissemination_data (objects of type FederalAward, CapText, etc) create a row (array) for the summary.
     # Every row is created by looping over the field names and appending the data.
     # We also strip tzinfo from the dates, because excel doesn't like them.
-    # Once a row is created, append it to the data['modelname']['entries'] array.
+    # Once a row is created, append it to the data[ModelName]['entries'] array.
     for model in models:
         model_name = model.__name__.lower()
         fields = model._meta.get_fields()
@@ -280,7 +280,7 @@ def persist_workbook(workbook):
             logger.warn(f"Unable to put summary report file {filename} in S3!")
             raise
 
-    return filename
+    return f"temp/{filename}"
 
 
 def generate_summary_report(report_ids):
@@ -288,7 +288,7 @@ def generate_summary_report(report_ids):
     workbook = create_workbook(data)
     filename = persist_workbook(workbook)
 
-    return f"temp/{filename}"
+    return filename
 
 
 def generate_presubmission_report(i2d_data):
@@ -296,4 +296,4 @@ def generate_presubmission_report(i2d_data):
     workbook = create_workbook(data)
     filename = persist_workbook(workbook)
 
-    return f"temp/{filename}"
+    return filename
