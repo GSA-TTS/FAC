@@ -2,12 +2,15 @@ from django.core.management.base import BaseCommand
 import logging
 import sys
 from census_historical_migration.sac_general_lib.utils import (
-    normalize_year_string,
+    normalize_year_string_or_exit,
 )
 from census_historical_migration.workbooklib.excel_creation_utils import (
     get_audit_header,
 )
-from census_historical_migration.historic_data_loader import create_or_get_user
+from census_historical_migration.historic_data_loader import (
+    create_or_get_user,
+    print_results,
+)
 from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
 from django.conf import settings
 
@@ -25,7 +28,9 @@ class Command(BaseCommand):
         dbkeys = dbkeys_str.split(",")
 
         if years_str:
-            years = [normalize_year_string(year) for year in years_str.split(",")]
+            years = [
+                normalize_year_string_or_exit(year) for year in years_str.split(",")
+            ]
             if len(dbkeys) != len(years):
                 logger.error(
                     "Received {} dbkeys and {} years. Must be equal. Exiting.".format(
@@ -40,6 +45,8 @@ class Command(BaseCommand):
             logger.info(
                 f"Generating test reports for DBKEYS: {dbkeys_str} and YEARS: {years_str}"
             )
+            result_log = {}
+            total_count = error_count = 0
             for dbkey, year in zip(dbkeys, years):
                 logger.info("Running {}-{} end-to-end".format(dbkey, year))
                 result = {"success": [], "errors": []}
@@ -50,7 +57,11 @@ class Command(BaseCommand):
                     continue
 
                 run_end_to_end(user, audit_header, result)
-                logger.info(result)
+                result_log[(audit_header.AUDITYEAR, audit_header.DBKEY)] = result
+                total_count += 1
+                if len(result["errors"]) > 0:
+                    error_count += 1
+            print_results(result_log, error_count, total_count)
 
     def handle(self, *args, **options):
         dbkeys_str = options["dbkeys"]

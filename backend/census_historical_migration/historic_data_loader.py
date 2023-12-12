@@ -31,15 +31,19 @@ def load_historic_data_for_year(audit_year, page_size, pages):
             # Migrate a single submission
             run_end_to_end(user, submission, result)
 
-            result_log[(audit_year, submission.DBKEY)] = result
+            result_log[(submission.AUDITYEAR, submission.DBKEY)] = result
             total_count += 1
 
             if len(result["errors"]) > 0:
                 error_count += 1
             if total_count % 5 == 0:
                 print(f"Processed = {total_count}, Errors = {error_count}")
-            if error_count > 5:
-                break
+
+    print_results(result_log, error_count, total_count)
+
+
+def print_results(result_log, error_count, total_count):
+    """Prints the results of the migration"""
 
     print("********* Loader Summary ***************")
 

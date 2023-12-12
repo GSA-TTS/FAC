@@ -3,6 +3,7 @@ from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     generate_dissemination_test_table,
     set_workbook_uei,
+    xform_add_hyphen_to_zip,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
@@ -14,22 +15,6 @@ import openpyxl as pyxl
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-def xform_add_hyphen_to_zip(zip):
-    """
-    Transform a ZIP code string by adding a hyphen. If the ZIP code has 9 digits, inserts a hyphen after the fifth digit.
-    Returns the original ZIP code if it has 5 digits or is malformed.
-    """
-    strzip = string_to_string(zip)
-    if len(strzip) == 5:
-        return strzip
-    elif len(strzip) == 9:
-        # FIXME - MSHD: This is a transformation and might require logging.
-        return f"{strzip[0:5]}-{strzip[5:9]}"
-    else:
-        logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
-        return strzip
 
 
 mappings = [
@@ -89,7 +74,8 @@ def generate_secondary_auditors(audit_header, outfile):
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.SECONDARY_AUDITORS]
     )
-    set_workbook_uei(wb, audit_header.UEI)
+    uei = string_to_string(audit_header.UEI)
+    set_workbook_uei(wb, uei)
     secondary_auditors = _get_secondary_auditors(
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
@@ -99,6 +85,6 @@ def generate_secondary_auditors(audit_header, outfile):
     table = generate_dissemination_test_table(
         audit_header, "secondary_auditors", mappings, secondary_auditors
     )
-    table["singletons"]["auditee_uei"] = audit_header.UEI
+    table["singletons"]["auditee_uei"] = uei
 
     return (wb, table)
