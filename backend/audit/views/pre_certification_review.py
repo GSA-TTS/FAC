@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.views import generic
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,

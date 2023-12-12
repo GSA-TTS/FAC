@@ -145,7 +145,15 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 },
                 "pre_certification_review": {
                     # Enabled once a user is locked for certification (ready_for_certification and beyond).
-                    "enabled": sac.submission_status in ["ready_for_certification", "auditee_certified", "auditor_certified", "certified", "submitted", "disseminated"],
+                    "enabled": sac.submission_status
+                    in [
+                        "ready_for_certification",
+                        "auditee_certified",
+                        "auditor_certified",
+                        "certified",
+                        "submitted",
+                        "disseminated",
+                    ],
                 },
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),

@@ -138,7 +138,7 @@ def gather_report_data_dissemination(report_ids):
 
     # Make report IDs unique
     report_ids = set(report_ids)
-    
+
     data = {}
 
     for model in models:
@@ -186,14 +186,14 @@ def gather_report_data_pre_certification(i2d_data):
         "CapTexts": CapText,
         "Notes": Note,
         "AdditionalUEIs": AdditionalUei,
-        "AdditionalEINs": AdditionalEin
+        "AdditionalEINs": AdditionalEin,
     }
 
     # Move the IntakeToDissemination data to dissemination_data, under the proper naming scheme.
     dissemination_data = {}
     for name_i2d, model in i2d_to_dissemination.items():
         dissemination_data[model.__name__.lower()] = i2d_data.get(name_i2d)
-    
+
     data = {}
 
     # For every model (FederalAward, CapText, etc), add the skeleton object ('field_names' and empty 'entries') to 'data'.
