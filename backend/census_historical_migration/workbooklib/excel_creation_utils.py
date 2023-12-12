@@ -1,3 +1,6 @@
+from ..transforms.xform_string_to_bool import (
+    string_to_bool,
+)
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
@@ -77,15 +80,20 @@ def apply_conversion_function(value, default, conversion_function):
     """
     Helper to apply a conversion function to a value, or use a default value
     """
-    if value:
-        if conversion_function is str:
-            new_value = string_to_string(value)
-        elif conversion_function is int:
-            new_value = string_to_int(value)
-        else:
-            new_value = conversion_function(value)
+    if value is None and default is None:
+        raise ValueError("No value or default provided")
+
+    selected_value = value if value is not None else default
+
+    if conversion_function is str:
+        new_value = string_to_string(selected_value)
+    elif conversion_function is int:
+        new_value = string_to_int(selected_value)
+    elif conversion_function is bool:
+        new_value = string_to_bool(selected_value)
     else:
-        new_value = default or ""
+        new_value = conversion_function(selected_value)
+
     return new_value
 
 

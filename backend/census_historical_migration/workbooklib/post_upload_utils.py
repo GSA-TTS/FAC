@@ -106,31 +106,8 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
     this_sac.save()
 
 
-def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
-    """Upload a workbook for this SAC.
-
-    This should be idempotent if it is called on a SAC that already
-    has a federal awards file uploaded.
-    """
-    ExcelFile = apps.get_model("audit.ExcelFile")
-
-    if (
-        ExcelFile.objects.filter(sac_id=this_sac.id, form_section=section).exists()
-        and get_field_by_section(this_sac, section) is not None
-    ):
-        # there is already an uploaded file and data in the object so
-        # nothing to do here
-        return
-
-    excel_file = ExcelFile(
-        file=xlsx_file,
-        filename=Path("xlsx.xlsx").stem,
-        user=this_user,
-        sac_id=this_sac.id,
-        form_section=section,
-    )
-    excel_file.full_clean()
-    excel_file.save()
+def _post_upload_workbook(this_sac, section, xlsx_file):
+    """Upload a workbook for this SAC."""
 
     audit_data = extract_mapping[section](xlsx_file)
     validator_mapping[section](audit_data)
