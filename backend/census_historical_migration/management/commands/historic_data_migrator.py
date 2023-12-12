@@ -58,15 +58,15 @@ class Command(BaseCommand):
                     continue
 
                 run_end_to_end(user, audit_header, result)
-                result_log[(audit_header.AUDITYEAR, audit_header.DBKEY)] = result
+                result_log[(year, dbkey)] = result
                 total_count += 1
-                if len(result["errors"]) > 0:
+                has_failed = len(result["errors"]) > 0
+                if has_failed:
                     error_count += 1
-                migration_status = "FAILURE" if len(result["errors"]) > 0 else "SUCCESS"
-                record_migration_status(year, dbkey, migration_status)
-            
-            print_results(result_log, error_count, total_count)
 
+                record_migration_status(year, dbkey, has_failed)
+
+            print_results(result_log, error_count, total_count)
 
     def handle(self, *args, **options):
         dbkeys_str = options["dbkeys"]

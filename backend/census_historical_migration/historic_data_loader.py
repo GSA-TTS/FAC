@@ -36,13 +36,11 @@ def load_historic_data_for_year(audit_year, page_size, pages):
             result_log[(submission.AUDITYEAR, submission.DBKEY)] = result
             total_count += 1
 
-            migration_status = "SUCCESS"
-            if len(result["errors"]) > 0:
-                migration_status = "FAILURE"
+            has_failed = len(result["errors"]) > 0
 
-            record_migration_status(audit_year, submission.DBKEY, migration_status)
+            record_migration_status(audit_year, submission.DBKEY, has_failed)
 
-            if len(result["errors"]) > 0:
+            if has_failed:
                 error_count += 1
             if total_count % 5 == 0:
                 print(f"Processed = {total_count}, Errors = {error_count}")
@@ -79,7 +77,8 @@ def create_or_get_user():
     return user
 
 
-def record_migration_status(audit_year, dbkey, status):
+def record_migration_status(audit_year, dbkey, has_failed):
+    status = "FAILURE" if has_failed else "SUCCESS"
     ReportMigrationStatus(
         audit_year=audit_year,
         dbkey=dbkey,
