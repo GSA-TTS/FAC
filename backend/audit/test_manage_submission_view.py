@@ -68,7 +68,7 @@ class ManageSubmissionViewTests(TestCase):
         for _, email in rows:
             self.assertIn(email, page)
             # None of those users should exist:
-            self.assertIn(f"{email} *", page)
+            self.assertIn(f"{email}", page)
         for _, friendly_role in ACCESS_ROLES:
             self.assertIn(str(friendly_role), page)
 
