@@ -16,13 +16,12 @@ source tools/api_standup.sh
 source tools/run_collectstatic.sh
 source tools/seed_cog_baseline.sh
 
+#####
+# SETUP THE CGOV ENVIRONMENT
+setup_env
+gonogo "setup_env"
 
 if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
-
-    #####
-    # SETUP THE CGOV ENVIRONMENT
-    setup_env
-    gonogo "setup_env"
 
     #####
     # API TEARDOWN
