@@ -5,7 +5,7 @@ const previous_page_link = document.querySelectorAll(
   '[aria-label="Previous page"]'
 );
 
-function attachEventHandlers() {
+function attachEventHandlersPagination() {
   // If any pagination links are clicked, set the page form element and submit it for a reload
   pagination_links.forEach((link) => {
     link.addEventListener('click', (e) => {
@@ -61,8 +61,37 @@ function attachEventHandlers() {
   });
 }
 
+/*
+  Get the table headers and their sort buttons.
+  Using the ID of the table headers, attach event handlers to re-submit the form when clicking them.
+  This will reload the page with the associated sort values, so that searches appear to sort across many pages.
+*/
+function attachEventHandlersSorting() {
+  var FORM = document.getElementById('search-form');
+  var table_headers = document.querySelectorAll('th[id]');
+
+  table_headers.forEach((header) => {
+    var button = header.querySelector("button");
+    var current_sort = header.getAttribute('aria-sort')
+
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (current_sort == "ascending"){
+        FORM.elements['sort_by'].value = `-${header.id}`;
+      } else if (current_sort == "descending") {
+        FORM.elements['sort_by'].value = "";
+      } else {
+        FORM.elements['sort_by'].value = header.id;
+      }
+      FORM.submit();
+    });
+  });
+
+}
+
 function init() {
-  attachEventHandlers();
+  attachEventHandlersPagination();
+  attachEventHandlersSorting();
 }
 
 window.onload = init;

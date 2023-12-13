@@ -69,9 +69,10 @@ class Search(View):
                 int(year) for year in form.cleaned_data["audit_year"]
             ]  # Cast strings from HTML to int
             auditee_state = form.cleaned_data["auditee_state"]
+            sort_by=form.cleaned_data["sort_by"]
 
             # TODO: Add a limit choice field to the form
-            limit = form.cleaned_data["limit"] or 30
+            limit = form.cleaned_data["limit"] or 5
             # Changed in the form via pagination links
             page = int(form.cleaned_data["page"] or 1)
 
@@ -89,6 +90,7 @@ class Search(View):
                 audit_years=audit_years,
                 auditee_state=auditee_state,
                 include_private=include_private,
+                sort_by=sort_by,
             )
             results_count = len(results)
             # Reset page to one if the page number surpasses how many pages there actually are
@@ -108,6 +110,9 @@ class Search(View):
                 form.cleaned_data["end_date"] = end_date.strftime("%Y-%m-%d")
         else:
             raise BadRequest("Form data validation error.", form.errors)
+        
+        if sort_by is None:
+            sort_by = 'acceptance_date'
 
         context = context | {
             "form": form,
@@ -116,6 +121,7 @@ class Search(View):
             "results": results,
             "results_count": results_count,
             "page": page,
+            "sort_by": sort_by,
         }
 
         return render(request, "search.html", context)

@@ -17,6 +17,7 @@ def search_general(
     audit_years=None,
     auditee_state=None,
     include_private=False,
+    sort_by=None
 ):
     query = Q()
 
@@ -44,6 +45,9 @@ def search_general(
         query.add(Q(is_public=True), Q.AND)
 
     results = General.objects.filter(query).order_by("-fac_accepted_date")
+
+    if sort_by:
+        results = results.order_by(sort_by)
 
     if alns:
         results = _attach_finding_my_aln_and_finding_all_aln_fields(
@@ -120,33 +124,23 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(
     4. Find the relevant General object (find & access index) to update the values.
     """
     report_ids = list(results.values_list("report_id", flat=True))
-    results = list(results)
-
-    for x in results:
-        x.finding_my_aln = False
-        x.finding_all_aln = False
+    results = results
 
     awards_with_findings = FederalAward.objects.filter(
         report_id__in=report_ids, findings_count__gt=0
     )
 
-    for award in awards_with_findings:
-        prefix = award.federal_agency_prefix
-        extension = award.federal_award_extension
-        # Find the index of the object with a matching report_id.
-        result_index = next(
-            (
-                index
-                for (index, obj) in enumerate(results)
-                if obj.report_id == award.report_id
-            ),
-            None,
-        )
+    for general in results:
+        general.finding_my_aln = False
+        general.finding_all_aln = False
 
-        if ((prefix, extension) in split_alns) or (prefix in agency_numbers):
-            results[result_index].finding_my_aln = True
-        else:
-            results[result_index].finding_all_aln = True
+        for relevant_award in awards_with_findings.filter(report_id=general.report_id):
+            prefix = relevant_award.federal_agency_prefix
+            extension = relevant_award.federal_award_extension
+            if ((prefix, extension) in split_alns) or (prefix in agency_numbers):
+                general.finding_my_aln = True
+            else:
+                general.finding_all_aln = True
 
     return results
 

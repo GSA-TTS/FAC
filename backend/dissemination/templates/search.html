@@ -142,11 +142,18 @@
                     </div>
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
                     <input class="usa-input"
-                           id="page"
-                           name="page"
-                           type="number"
-                           value="{{ page }}"
-                           hidden />
+                        id="page"
+                        name="page"
+                        type="number"
+                        value="{{ page }}"
+                        hidden />
+                    
+                    {% comment %} Hiiden page input for use when clicking a sort button in the table header {% endcomment %}
+                    <input class="usa-input"
+                        id="sort_by"
+                        name="sort_by"
+                        value="{{ sort_by }}"
+                        hidden />
                 </form>
             </div>
             <div class="tablet:grid-col-8 audit-search-results">
@@ -168,7 +175,17 @@
                         <table class="usa-table usa-table--striped usa-table--compact">
                             <thead>
                                 <tr>
-                                    <th data-sortable scope="col" role="columnheader">Name</th>
+                                    <th id="auditee_name" 
+                                        scope="col" 
+                                        role="columnheader"
+                                        {% if sort_by == "auditee_name"  %}
+                                            aria-sort="descending"
+                                        {% elif sort_by == "-auditee_name" %}
+                                            aria-sort="ascending"
+                                        {% endif %}
+                                        data-sortable >
+                                        Name
+                                    </th>
                                     <th data-sortable scope="col" role="columnheader">UEI or EIN</th>
                                     <th data-sortable scope="col" role="columnheader">Acc Date</th>
                                     <th data-sortable scope="col" role="columnheader">AY</th>
@@ -329,6 +346,8 @@
        id="orientation-toggle"
        aria-controls="device-orientation-modal"
        data-open-modal></a>
-    <script src="{% static 'compiled/js/search-results-pagination.js' %}"></script>
     <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>
+    {% if results %}
+        <script src="{% static 'compiled/js/search-results-pagination.js' %}"></script>
+    {% endif %}
 {% endblock content %}
