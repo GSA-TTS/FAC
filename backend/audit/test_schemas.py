@@ -416,7 +416,14 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
         simple_case["gaap_results"] = ["not_gaap"]
         simple_case["is_sp_framework_required"] = random.choice([True, False])
         simple_case["sp_framework_basis"] = random.choices(
-            ["cash_basis", "tax_basis", "contractual_basis", "other_basis"], k=2
+            [
+                "cash_basis",
+                "tax_basis",
+                "regulatory_basis",
+                "contractual_basis",
+                "other_basis",
+            ],
+            k=2,
         )
         simple_case["sp_framework_opinions"] = random.choices(
             [
