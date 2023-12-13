@@ -1,7 +1,10 @@
 from django.db.models import Q
-
+from collections import namedtuple as NT
 from dissemination.models import General, FederalAward
+import logging
 
+logger = logging.getLogger(__name__)
+ALN = NT("ALN", "prefix, program")
 
 def search_general(
     alns=None,
@@ -20,7 +23,14 @@ def search_general(
     # 'alns' gets processed before the match query function, as they get used again after the main search.
     if alns:
         split_alns, agency_numbers = _split_alns(alns)
-        query.add(_get_aln_match_query(split_alns, agency_numbers), Q.AND)
+        query_set = _get_aln_match_query(split_alns, agency_numbers)
+        # If we did a search on ALNs, and got nothing (because it does not exist),
+        # we need to bail out from the entire search early with no results.
+        if not query_set:
+            return []
+        else:
+            # If results came back from our ALN query, add it to the Q() and continue.
+            query.add(query_set, Q.AND)
 
     query.add(_get_names_match_query(names), Q.AND)
     query.add(_get_uei_or_eins_match_query(uei_or_eins), Q.AND)
@@ -61,8 +71,8 @@ def _split_alns(alns):
             if len(split_aln) == 2:
                 # The [wrapping] is so the tuple goes into the set as a tuple.
                 # Otherwise, the individual elements go in unpaired.
-                split_alns.update([tuple(split_aln)])
-
+                # split_alns.update([tuple(split_aln)])
+                split_alns.update([ALN(split_aln[0], split_aln[1])])
     return split_alns, agency_numbers
 
 
@@ -73,9 +83,9 @@ def _get_aln_report_ids(split_alns, agency_numbers):
     """
     report_ids = set()
     # Matching on a specific ALN, such as '12.345'
-    for aln_list in split_alns:
+    for aln in split_alns:
         matching_awards = FederalAward.objects.filter(
-            federal_agency_prefix=aln_list[0], federal_award_extension=aln_list[1]
+            federal_agency_prefix=aln.prefix, federal_award_extension=aln.program
         ).values()
         if matching_awards:
             for matching_award in matching_awards:
