@@ -148,11 +148,18 @@
                         value="{{ page }}"
                         hidden />
                     
-                    {% comment %} Hiiden page input for use when clicking a sort button in the table header {% endcomment %}
+                    {% comment %} Hidden page input for use when clicking a sort button in the table header {% endcomment %}
                     <input class="usa-input"
                         id="order_by"
                         name="order_by"
                         value="{{ order_by }}"
+                        hidden />
+
+                    {% comment %} Hidden page input for sort direction {% endcomment %}
+                    <input class="usa-input"
+                        id="order_direction"
+                        name="order_direction"
+                        value="{{ order_direction }}"
                         hidden />
                 </form>
             </div>
@@ -178,13 +185,27 @@
                                     <th id="auditee_name" 
                                         scope="col" 
                                         role="columnheader"
-                                        {% if order_by == "auditee_name"  %}
+                                        {% if order_direction == "descending"  %}
                                             aria-sort="descending"
-                                        {% elif order_by == "-auditee_name" %}
+                                        {% elif order_direction == "ascending" %}
                                             aria-sort="ascending"
                                         {% endif %}
-                                        data-sortable >
+                                        >
                                         Name
+                                        <button class="usa-table__header__button">
+                                          <svg class="usa-icon usa-icon--size-3"
+                                            aria-hidden="true"
+                                            focusable="false"
+                                            role="img">
+                                            {% if order_direction == "descending"  %}
+                                              {% uswds_sprite "expand_less" %}
+                                            {% elif order_direction == "ascending" %}
+                                              {% uswds_sprite "expand_more" %}
+                                            {% else %}
+                                              {% uswds_sprite "unfold_more" %}
+                                            {% endif %}  
+                                          </svg>
+                                        </button>
                                     </th>
                                     <th data-sortable scope="col" role="columnheader">UEI or EIN</th>
                                     <th data-sortable scope="col" role="columnheader">Acc Date</th>
@@ -194,6 +215,7 @@
                                     <th scope="col" role="columnheader">PDF</th>
                                     {% if results.0.finding_my_aln is not None%}
                                         <th data-sortable scope="col" role="columnheader">Finding my ALN</th>
+                                        
                                         <th data-sortable scope="col" role="columnheader">Finding all ALN</th>
                                     {% endif %}
                                 </tr>

@@ -6,6 +6,16 @@ import logging
 logger = logging.getLogger(__name__)
 ALN = NT("ALN", "prefix, program")
 
+class ORDER_BY():
+    accepted_date = "accepted_date"
+    findings_my_aln = 1
+    findings_all_aln = 2
+    auditee_name = "auditee_name"
+
+class DIRECTION():
+    ascending = "ascending"
+    descending = "descending"
+
 def search_general(
     alns=None,
     names=None,
@@ -17,11 +27,39 @@ def search_general(
     audit_years=None,
     auditee_state=None,
     include_private=False,
-    sort_by=None
+    order_by=ORDER_BY.accepted_date,
+    order_direction=DIRECTION.ascending
 ):
-    query = Q()
+    
+    logger.info(f"{order_by}, {order_direction}")
 
+    query = _initialize_query(include_private)
+    split_alns, agency_numbers = _process_alns(query, alns)
+
+    query.add(_get_names_match_query(names), Q.AND)
+    query.add(_get_uei_or_eins_match_query(uei_or_eins), Q.AND)
+    query.add(_get_start_date_match_query(start_date), Q.AND)
+    query.add(_get_end_date_match_query(end_date), Q.AND)
+    query.add(_get_cog_or_oversight_match_query(agency_name, cog_or_oversight), Q.AND)
+    query.add(_get_audit_years_match_query(audit_years), Q.AND)
+    query.add(_get_auditee_state_match_query(auditee_state), Q.AND)
+
+    results = _run_query(query, alns, split_alns, agency_numbers)
+    results = _sort_results(results, order_direction, order_by)
+
+    return results
+
+def _initialize_query(include_private: bool):
+    query = Q()
+    # Tribal access limiter.
+    if not include_private:
+        query.add(Q(is_public=True), Q.AND)
+    return query
+
+def _process_alns(query, alns):
     # 'alns' gets processed before the match query function, as they get used again after the main search.
+    split_alns = None
+    agency_numbers = None
     if alns:
         split_alns, agency_numbers = _split_alns(alns)
         query_set = _get_aln_match_query(split_alns, agency_numbers)
@@ -32,28 +70,41 @@ def search_general(
         else:
             # If results came back from our ALN query, add it to the Q() and continue.
             query.add(query_set, Q.AND)
+    return split_alns, agency_numbers
 
-    query.add(_get_names_match_query(names), Q.AND)
-    query.add(_get_uei_or_eins_match_query(uei_or_eins), Q.AND)
-    query.add(_get_start_date_match_query(start_date), Q.AND)
-    query.add(_get_end_date_match_query(end_date), Q.AND)
-    query.add(_get_cog_or_oversight_match_query(agency_name, cog_or_oversight), Q.AND)
-    query.add(_get_audit_years_match_query(audit_years), Q.AND)
-    query.add(_get_auditee_state_match_query(auditee_state), Q.AND)
-
-    if not include_private:
-        query.add(Q(is_public=True), Q.AND)
-
-    results = General.objects.filter(query).order_by("-fac_accepted_date")
-
-    if sort_by:
-        results = results.order_by(sort_by)
-
+def _run_query(query, alns, split_alns, agency_numbers):
+    # Default an ordering to accepted date.
+    results = General.objects.filter(query)
+    # This is ignored in the case that we sort by accepted date?
     if alns:
         results = _attach_finding_my_aln_and_finding_all_aln_fields(
             results, split_alns, agency_numbers
         )
+    return results
 
+def _sort_results(results, order_direction, order_by):
+    # Instead of nesting conditions, we'll prep a string
+    # for determining the sort direction.
+    match order_direction:
+        case DIRECTION.ascending:
+            direction = ""
+        case _:
+            direction = "-"
+
+    # Now, apply the sort that we pass in front the front-end.
+    match order_by:
+        case ORDER_BY.auditee_name:
+            logger.info(f"sorting {order_by} in direction -{direction}-")
+            results = results.order_by(f"{direction}auditee_name")
+        case ORDER_BY.accepted_date:
+            results = results.order_by(f"{direction}fac_accepted_date")
+        case ORDER_BY.findings_my_aln:
+            results = results.order_by(f"{direction}findings_my_aln")
+        case ORDER_BY.findings_all_aln:
+            results = results.order_by(f"{direction}findings")
+        case _:
+            results = results.order_by(f"{direction}fac_accepted_date")
+    
     return results
 
 
@@ -124,7 +175,6 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(
     4. Find the relevant General object (find & access index) to update the values.
     """
     report_ids = list(results.values_list("report_id", flat=True))
-    results = results
 
     awards_with_findings = FederalAward.objects.filter(
         report_id__in=report_ids, findings_count__gt=0

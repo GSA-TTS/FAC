@@ -21,4 +21,4 @@ class SearchForm(forms.Form):
     limit = forms.CharField(required=False)
     page = forms.CharField(required=False)
     order_by = forms.CharField(required=False)
-    
+    order_direction = forms.CharField(required=False)

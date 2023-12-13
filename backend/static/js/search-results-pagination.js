@@ -76,12 +76,22 @@ function attachEventHandlersSorting() {
 
     button.addEventListener('click', (e) => {
       e.preventDefault();
+      // console.log(`Coming in with sort direction -${current_sort}-`)
       if (current_sort == "ascending"){
-        FORM.elements['order_by'].value = `-${header.id}`;
-      } else if (current_sort == "descending") {
+        // console.log(`${header.id} in ascending :: ${current_sort}`)
+        // We want to go back to a neutral state.
+        // To do that, we need to wipe both values. 
+        // If we don't, the backend *will* sort on the order_by attribute.
+        FORM.elements['order_direction'].value = "";
         FORM.elements['order_by'].value = "";
-      } else {
+      } else if (current_sort == "descending") {
+        // console.log(`${header.id} in descending :: ${current_sort}`)
         FORM.elements['order_by'].value = header.id;
+        FORM.elements['order_direction'].value = "ascending";
+      } else {
+        // console.log(`${header.id} in shruggies :: ${current_sort}`)
+        FORM.elements['order_by'].value = header.id;
+        FORM.elements['order_direction'].value = "descending";
       }
       FORM.submit();
     });
