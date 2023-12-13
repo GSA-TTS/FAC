@@ -1,4 +1,6 @@
-from census_historical_migration.sac_general_lib.utils import normalize_year_string
+from census_historical_migration.sac_general_lib.utils import (
+    normalize_year_string_or_exit,
+)
 from ...historic_data_loader import load_historic_data_for_year
 
 from django.core.management.base import BaseCommand
@@ -27,7 +29,7 @@ class Command(BaseCommand):
         parser.add_argument("--pages", type=str, required=False, default="1")
 
     def handle(self, *args, **options):
-        year = normalize_year_string(options.get("year"))
+        year = normalize_year_string_or_exit(options.get("year"))
 
         try:
             pages_str = options["pages"]
