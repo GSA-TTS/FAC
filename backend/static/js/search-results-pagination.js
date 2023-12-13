@@ -77,11 +77,11 @@ function attachEventHandlersSorting() {
     button.addEventListener('click', (e) => {
       e.preventDefault();
       if (current_sort == "ascending"){
-        FORM.elements['sort_by'].value = `-${header.id}`;
+        FORM.elements['order_by'].value = `-${header.id}`;
       } else if (current_sort == "descending") {
-        FORM.elements['sort_by'].value = "";
+        FORM.elements['order_by'].value = "";
       } else {
-        FORM.elements['sort_by'].value = header.id;
+        FORM.elements['order_by'].value = header.id;
       }
       FORM.submit();
     });

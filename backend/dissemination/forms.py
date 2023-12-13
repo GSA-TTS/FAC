@@ -20,5 +20,5 @@ class SearchForm(forms.Form):
     # Display params
     limit = forms.CharField(required=False)
     page = forms.CharField(required=False)
-    sort_by = forms.CharField(required=False)
+    order_by = forms.CharField(required=False)
     

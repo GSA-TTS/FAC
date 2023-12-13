@@ -178,9 +178,9 @@
                                     <th id="auditee_name" 
                                         scope="col" 
                                         role="columnheader"
-                                        {% if sort_by == "auditee_name"  %}
+                                        {% if order_by == "auditee_name"  %}
                                             aria-sort="descending"
-                                        {% elif sort_by == "-auditee_name" %}
+                                        {% elif order_by == "-auditee_name" %}
                                             aria-sort="ascending"
                                         {% endif %}
                                         data-sortable >
