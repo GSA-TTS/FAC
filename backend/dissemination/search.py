@@ -56,12 +56,12 @@ def search_general(
     results = General.objects.filter(query)
     # Attach a sort field and direction.
     results = _sort_results(results, order_direction, order_by)
-    # Now, apply a "limit", which is a slice
+    # We can apply a "limit", which is a slice
     # https://docs.djangoproject.com/en/4.2/topics/db/queries/#limiting-querysets
     # results = results[:1000]
 
     # Accessing the results object will run the query.
-    # We want to attach bonus ALN fields after egtting results.
+    # We want to attach bonus ALN fields after getting results.
     # Running order_by on the same queryset will hit the databse again, which will wipe our custom fields.
     # So, if we want to sort by the ALN fields, we need to do it locally and after the _sort_results function.
     if alns:
