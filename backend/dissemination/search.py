@@ -1,10 +1,11 @@
-from django.db.models import Q
+from django.db.models import Q, F
 from collections import namedtuple as NT
 from dissemination.models import General, FederalAward
 import logging
 
 logger = logging.getLogger(__name__)
 ALN = NT("ALN", "prefix, program")
+
 
 class ORDER_BY():
     fac_accepted_date = "fac_accepted_date"
@@ -15,9 +16,11 @@ class ORDER_BY():
     findings_my_aln = "findings_my_aln"
     findings_all_aln = "findings_all_aln"
 
+
 class DIRECTION():
     ascending = "ascending"
     descending = "descending"
+
 
 def search_general(
     alns=None,
@@ -34,9 +37,9 @@ def search_general(
     order_direction=DIRECTION.ascending
 ):
     if not order_by:
-        order_by=ORDER_BY.fac_accepted_date
+        order_by = ORDER_BY.fac_accepted_date
     if not order_direction:
-        order_direction=DIRECTION.ascending
+        order_direction = DIRECTION.ascending
 
     logger.info(f"{order_by}, {order_direction}")
 
@@ -55,21 +58,25 @@ def search_general(
     results = General.objects.filter(query)
     # Attach a sort field and direction.
     results = _sort_results(results, order_direction, order_by)
+    # Now, apply a "limit", which is a slice
+    # https://docs.djangoproject.com/en/4.2/topics/db/queries/#limiting-querysets
+    # results = results[:1000]
 
     # Accessing the results object will run the query.
     # We want to attach bonus ALN fields after egtting results.
     # Running order_by on the same queryset will hit the databse again, which will wipe our custom fields.
     # So, if we want to sort by the ALN fields, we need to do it locally and after the _sort_results function.
     if alns:
-        results = _attach_finding_my_aln_and_finding_all_aln_fields(
+        results = _compositional_attach_finding_my_aln_and_finding_all_aln_fields(
             results, split_alns, agency_numbers
         )
     if order_by == ORDER_BY.findings_my_aln:
-        results = sorted(results, key=lambda obj: obj.finding_my_aln, reverse=bool(order_direction==DIRECTION.descending))
+        results = sorted(results, key=lambda obj: obj.finding_my_aln, reverse=bool(order_direction == DIRECTION.descending))
     elif order_by == ORDER_BY.findings_all_aln:
-        results = sorted(results, key=lambda obj: obj.finding_all_aln, reverse=bool(order_direction==DIRECTION.descending))
+        results = sorted(results, key=lambda obj: obj.finding_all_aln, reverse=bool(order_direction == DIRECTION.descending))
 
     return results
+
 
 def _initialize_query(include_private: bool):
     query = Q()
@@ -77,6 +84,7 @@ def _initialize_query(include_private: bool):
     if not include_private:
         query.add(Q(is_public=True), Q.AND)
     return query
+
 
 def _process_alns(query, alns):
     # 'alns' gets processed before the match query function, as they get used again after the main search.
@@ -93,6 +101,7 @@ def _process_alns(query, alns):
             # If results came back from our ALN query, add it to the Q() and continue.
             query.add(query_set, Q.AND)
     return split_alns, agency_numbers
+
 
 def _sort_results(results, order_direction, order_by):
     # Instead of nesting conditions, we'll prep a string
@@ -120,7 +129,7 @@ def _sort_results(results, order_direction, order_by):
                 results = results.order_by("oversight_agency")
         case _:
             results = results.order_by(f"{direction}fac_accepted_date")
-    
+
     return results
 
 
@@ -175,7 +184,67 @@ def _get_aln_report_ids(split_alns, agency_numbers):
     return report_ids
 
 
-def _attach_finding_my_aln_and_finding_all_aln_fields(
+def _compositional_attach_finding_my_aln_and_finding_all_aln_fields(
+    results, split_alns, agency_numbers
+):
+    """
+    Given the results QuerySet (full of 'General' objects) and an ALN query string,
+    return a list of 'General' objects, where each object has two new fields.
+
+    The process:
+    1. Convert the QuerySet to a list to make each object easier to edit.
+    2. Get FederalAward objects with findings_count > 0 that fall under the given reports.
+    3. For each FederalAward, it is either
+       a. Under one of my ALNs, so finding_my_aln is True.
+       b. Under any other ALN, so finding_all_aln is True.
+    4. Find the relevant General object (find & access index) to update the values.
+    """
+    report_ids = list(results.values_list("report_id", flat=True))
+
+    aln_q = Q()
+    for aln in split_alns:
+        logger.info(f"\tAND {aln.prefix} {aln.program}")
+        aln_q.add(Q(federal_agency_prefix=aln.prefix) &
+                  Q(federal_award_extension=aln.program),
+                  Q.OR)
+    for agency in agency_numbers:
+        logger.info(f"\tAND {agency}")
+        aln_q.add(Q(federal_agency_prefix=agency), Q.OR)
+    
+    not_aln_q = Q()
+    for aln in split_alns:
+        not_aln_q.add(~(Q(federal_agency_prefix=aln.prefix) &
+                        Q(federal_award_extension=aln.program)),
+                       Q.AND)
+    not_aln_q.add(~Q(federal_agency_prefix__in=list(agency_numbers)), Q.AND)
+
+    finding_on_my_alns = FederalAward.objects.filter(
+        aln_q,
+        report_id__in=report_ids,
+        findings_count__gt=0,
+    )
+    logger.info(f"{finding_on_my_alns.query}")
+
+    finding_on_any_aln = FederalAward.objects.filter(
+        not_aln_q,
+        report_id__in=report_ids,
+        findings_count__gt=0,
+    )
+
+    for general in results:
+        general.finding_my_aln = False
+        general.finding_all_aln = False
+        for relevant_award in finding_on_my_alns:
+            if ((relevant_award.report_id == general.report_id)):
+                general.finding_my_aln = True
+        for relevant_award in finding_on_any_aln:
+            if ((relevant_award.report_id == general.report_id)):
+                general.finding_all_aln = True
+
+    return results
+
+
+def _iterative_attach_finding_my_aln_and_finding_all_aln_fields(
     results, split_alns, agency_numbers
 ):
     """
