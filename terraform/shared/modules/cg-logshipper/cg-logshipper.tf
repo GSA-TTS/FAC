@@ -1,7 +1,3 @@
-data "cloudfoundry_domain" "internal" {
-  name = "apps.internal"
-}
-
 data "cloudfoundry_domain" "public" {
   name = "app.cloud.gov"
 }
