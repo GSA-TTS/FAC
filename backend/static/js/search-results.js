@@ -5,8 +5,11 @@ const previous_page_link = document.querySelectorAll(
   '[aria-label="Previous page"]'
 );
 
+/*
+  If any pagination links are clicked, set the page form element and submit it for a reload.
+  If the next or previous page buttons are clicked, set the page form element to be +/- 1 and submit for a reload.
+*/
 function attachEventHandlersPagination() {
-  // If any pagination links are clicked, set the page form element and submit it for a reload
   pagination_links.forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -15,7 +18,6 @@ function attachEventHandlersPagination() {
     });
   });
 
-  // If the next or previous page buttons are clicked, set the page form element to be +/- 1 and submit for a reload
   if (next_page_link[0]) {
     next_page_link[0].addEventListener('click', (e) => {
       e.preventDefault();
@@ -30,9 +32,13 @@ function attachEventHandlersPagination() {
       FORM.submit();
     });
   }
+}
 
-  // The form resets to the default value, which is whatever the user entered on the last form submission, _not_ fully empty fields.
-  // We cannot just loop over every form element, because buttons and hidden inputs should be handled differently.
+/*
+  The standard form behavior resets to the default value, which is whatever the user entered on the last form submission, _not_ fully empty fields.
+  We cannot just loop over every form element, because buttons and hidden inputs should be handled differently.
+*/
+function attachEventHandlersReset(){
   FORM.addEventListener('reset', (e) => {
     e.preventDefault();
     // Empty out textareas
@@ -51,11 +57,14 @@ function attachEventHandlersPagination() {
     start_date.value = '';
     end_date.value = '';
     // Reset Cog/Over dropdown
-    var default_option = document.getElementById('cog_or_oversight--none');
-    default_option.selected = true;
+    var default_cog_over_option = document.getElementById('cog_or_oversight--none');
+    default_cog_over_option.selected = true;
     // Wipe agency name
     var agency_name = document.getElementById('agency-name');
     agency_name.value = '';
+    // Reset state dropdown
+    var default_state_option = document.getElementById('state--none');
+    default_state_option.selected = true;
 
     FORM.reset();
   });
@@ -103,6 +112,7 @@ function attachEventHandlersSorting() {
 
 function init() {
   attachEventHandlersPagination();
+  attachEventHandlersReset();
   attachEventHandlersSorting();
 }
 
