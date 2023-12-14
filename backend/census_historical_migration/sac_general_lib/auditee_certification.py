@@ -7,17 +7,17 @@ from ..sac_general_lib.utils import (
 
 # The following fields represent checkboxes on the auditee certification form.
 # Since all checkboxes must be checked (meaning all fields are set to True),
-# the default value for these fields is set to True. These fields are not disseminated.
+# the default value for these fields is set to `Y`. These fields are not disseminated.
 # They are set to ensure that the record passes validation when saved.
 auditee_certification_mappings = [
-    FormFieldMap("has_no_PII", None, FormFieldInDissem, True, bool),
-    FormFieldMap("has_no_BII", None, FormFieldInDissem, True, bool),
-    FormFieldMap("meets_2CFR_specifications", None, FormFieldInDissem, True, bool),
-    FormFieldMap("is_2CFR_compliant", None, FormFieldInDissem, True, bool),
-    FormFieldMap("is_complete_and_accurate", None, FormFieldInDissem, True, bool),
-    FormFieldMap("has_engaged_auditor", None, FormFieldInDissem, True, bool),
-    FormFieldMap("is_issued_and_signed", None, FormFieldInDissem, True, bool),
-    FormFieldMap("is_FAC_releasable", None, FormFieldInDissem, True, bool),
+    FormFieldMap("has_no_PII", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("has_no_BII", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("meets_2CFR_specifications", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("is_2CFR_compliant", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("is_complete_and_accurate", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("has_engaged_auditor", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("is_issued_and_signed", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("is_FAC_releasable", None, FormFieldInDissem, "Y", bool),
 ]
 
 # auditee_certification_date_signed is not disseminated; it is set to ensure that the record passes validation when saved.

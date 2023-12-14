@@ -100,6 +100,11 @@ urlpatterns = [
         views.ChangeAuditeeCertifyingOfficialView.as_view(),
         name="ChangeAuditeeCertifyingOfficial",
     ),
+    path(
+        "manage-submission/add-editor/<str:report_id>",
+        views.ChangeOrAddRoleView.as_view(),
+        name="ChangeOrAddRoleView",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:

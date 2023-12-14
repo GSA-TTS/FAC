@@ -7,14 +7,14 @@ from ..sac_general_lib.utils import (
 
 # The following fields represent checkboxes on the auditor certification form.
 # Since all checkboxes must be checked (meaning all fields are set to True),
-# the default value for these fields is set to True. These fields are not disseminated.
+# the default value for these fields is set to `Y`. These fields are not disseminated.
 # They are set to ensure that the record passes validation when saved
 auditor_certification_mappings = [
-    FormFieldMap("is_OMB_limited", None, FormFieldInDissem, True, bool),
-    FormFieldMap("is_auditee_responsible", None, FormFieldInDissem, True, bool),
-    FormFieldMap("has_used_auditors_report", None, FormFieldInDissem, True, bool),
-    FormFieldMap("has_no_auditee_procedures", None, FormFieldInDissem, True, bool),
-    FormFieldMap("is_FAC_releasable", None, FormFieldInDissem, True, bool),
+    FormFieldMap("is_OMB_limited", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("is_auditee_responsible", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("has_used_auditors_report", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("has_no_auditee_procedures", None, FormFieldInDissem, "Y", bool),
+    FormFieldMap("is_FAC_releasable", None, FormFieldInDissem, "Y", bool),
 ]
 
 # auditor_certification_date_signed is not disseminated; it is set to ensure that the record passes validation when saved.

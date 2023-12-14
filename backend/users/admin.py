@@ -20,6 +20,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ["email", "can_read_tribal", "last_login", "date_joined"]
     exclude = ["groups", "user_permissions", "password"]
     readonly_fields = ["date_joined", "last_login"]
+    search_fields = ("email", "username")
 
     def can_read_tribal(self, obj):
         return _can_read_tribal(obj)
@@ -28,6 +29,7 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(UserPermission)
 class UserPermissionAdmin(admin.ModelAdmin):
     list_display = ["user", "email", "permission"]
+    search_fields = ("email", "permission", "user")
 
 
 @admin.register(StaffUserLog)

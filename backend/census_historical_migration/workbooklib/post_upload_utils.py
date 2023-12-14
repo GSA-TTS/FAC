@@ -1,8 +1,3 @@
-"""Fixtures for SingleAuditChecklist.
-
-We want to create a variety of SACs in different states of
-completion.
-"""
 import logging
 from pathlib import Path
 
@@ -87,16 +82,16 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
     print(file.__dict__)
     pdf_file = PDFFile(
         file=file,
-        component_page_numbers={  # FIXME - How do we want to handle these values?
-            "financial_statements": 1,
-            "financial_statements_opinion": 2,
-            "schedule_expenditures": 3,
-            "schedule_expenditures_opinion": 4,
-            "uniform_guidance_control": 5,
-            "uniform_guidance_compliance": 6,
-            "GAS_control": 6,
-            "GAS_compliance": 7,
-            "schedule_findings": 8,
+        component_page_numbers={  # FIXME MSHD- see ticket #2912
+            "financial_statements": -1,
+            "financial_statements_opinion": -1,
+            "schedule_expenditures": -1,
+            "schedule_expenditures_opinion": -1,
+            "uniform_guidance_control": -1,
+            "uniform_guidance_compliance": -1,
+            "GAS_control": -1,
+            "GAS_compliance": -1,
+            "schedule_findings": -1,
         },
         filename=Path(pdf_filename).stem,
         user=this_user,
@@ -111,33 +106,10 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
     this_sac.save()
 
 
-def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
-    """Upload a workbook for this SAC.
+def _post_upload_workbook(this_sac, section, xlsx_file):
+    """Upload a workbook for this SAC."""
 
-    This should be idempotent if it is called on a SAC that already
-    has a federal awards file uploaded.
-    """
-    ExcelFile = apps.get_model("audit.ExcelFile")
-
-    if (
-        ExcelFile.objects.filter(sac_id=this_sac.id, form_section=section).exists()
-        and get_field_by_section(this_sac, section) is not None
-    ):
-        # there is already an uploaded file and data in the object so
-        # nothing to do here
-        return
-
-    excel_file = ExcelFile(
-        file=xlsx_file,
-        filename=Path("xlsx.xlsx").stem,
-        user=this_user,
-        sac_id=this_sac.id,
-        form_section=section,
-    )
-    excel_file.full_clean()
-    excel_file.save()
-
-    audit_data = extract_mapping[section](excel_file.file)
+    audit_data = extract_mapping[section](xlsx_file)
     validator_mapping[section](audit_data)
 
     if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:

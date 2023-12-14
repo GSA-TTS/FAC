@@ -122,8 +122,8 @@ def generate_notes_to_sefa(audit_header, outfile):
     )
 
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.NOTES_TO_SEFA])
-
-    set_workbook_uei(wb, audit_header.UEI)
+    uei = string_to_string(audit_header.UEI)
+    set_workbook_uei(wb, uei)
     notes = _get_notes(audit_header.DBKEY, audit_header.AUDITYEAR)
     rate_content = _get_minimis_cost_rate(audit_header.DBKEY, audit_header.AUDITYEAR)
     policies_content = _get_accounting_policies(
@@ -152,6 +152,6 @@ def generate_notes_to_sefa(audit_header, outfile):
     table["singletons"]["accounting_policies"] = policies_content
     table["singletons"]["is_minimis_rate_used"] = is_minimis_rate_used
     table["singletons"]["rate_explained"] = rate_content
-    table["singletons"]["auditee_uei"] = audit_header.UEI
+    table["singletons"]["auditee_uei"] = uei
 
     return (wb, table)

@@ -25,6 +25,94 @@ def _make_user_and_sac(**kwargs):
     return user, sac
 
 
+class ChangeOrAddRoleViewTests(TestCase):
+    """
+    GET and POST tests for adding editors to a submission.
+    """
+
+    role = "editor"
+    view = "audit:ChangeOrAddRoleView"
+
+    def test_basic_get(self):
+        """
+        A user should be able to access this page for a SAC they're associated with.
+        """
+        user, sac = _make_user_and_sac()
+        baker.make(Access, user=user, sac=sac, role="editor")
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
+        sac.save()
+
+        self.client.force_login(user)
+        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("YESIAMAREALUEI", response.content.decode("UTF-8"))
+
+    def test_basic_post(self):
+        """
+        Submitting the form with a new email address should create a new Access.
+        """
+        user = baker.make(User, email="adding_user@example.com")
+        sac = baker.make(SingleAuditChecklist)
+        baker.make(Access, user=user, sac=sac, role="editor")
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
+        sac.save()
+        self.client.force_login(user)
+
+        data = {
+            "fullname": "The New Editor",
+            "email": "neweditoruser@example.gov",
+        }
+
+        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+
+        newaccess = Access.objects.get(
+            sac=sac, fullname=data["fullname"], email=data["email"]
+        )
+        self.assertEqual(self.role, newaccess.role)
+
+    def test_login_required(self):
+        """When an unauthenticated request is made"""
+
+        response = self.client.get(
+            reverse(
+                self.view,
+                kwargs={"report_id": "12345"},
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_bad_report_id_returns_403(self):
+        """
+        When a request is made for a malformed or nonexistent report_id,
+        a 403 error should be returned
+        """
+        user = baker.make(User)
+
+        self.client.force_login(user)
+
+        response = self.client.get(
+            reverse(self.view, kwargs={"report_id": "this is not a report id"})
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_inaccessible_audit_returns_403(self):
+        """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
+        user, sac = _make_user_and_sac()
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse(self.view, kwargs={"report_id": sac.report_id})
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+
 class ChangeAuditorCertifyingOfficialViewTests(TestCase):
     """
     GET and POST tests for changing auditor certifying official.
