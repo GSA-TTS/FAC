@@ -51,7 +51,7 @@ mappings = [
         "state_cluster_name", "STATECLUSTERNAME", WorkbookFieldInDissem, None, str
     ),
     SheetFieldMap(
-        "federal_program_total", "PROGRAMTOTAL", WorkbookFieldInDissem, 0, int
+        "federal_program_total", "PROGRAMTOTAL", WorkbookFieldInDissem, None, int
     ),
     SheetFieldMap(
         "additional_award_identification",
@@ -60,7 +60,7 @@ mappings = [
         None,
         str,
     ),
-    SheetFieldMap("cluster_total", "CLUSTERTOTAL", WorkbookFieldInDissem, 0, int),
+    SheetFieldMap("cluster_total", "CLUSTERTOTAL", WorkbookFieldInDissem, None, int),
     SheetFieldMap("is_guaranteed", "LOANS", "is_loan", None, str),
     # In the intake process, we initially use convert_to_stripped_string to convert IR values into strings,
     # and then apply specific functions like convert_loan_balance_to_integers_or_na to convert particular fields
@@ -78,14 +78,14 @@ mappings = [
         "PASSTHROUGHAMOUNT",
         "passthrough_amount",
         None,
-        if_zero_empty,
+        if_zero_empty,  # FIXME - MSHD: This according to ticket #2912
     ),
     SheetFieldMap("is_major", "MAJORPROGRAM", WorkbookFieldInDissem, None, str),
     SheetFieldMap("audit_report_type", "TYPEREPORT_MP", "audit_report_type", None, str),
     SheetFieldMap(
-        "number_of_audit_findings", "FINDINGSCOUNT", "findings_count", 0, int
+        "number_of_audit_findings", "FINDINGSCOUNT", "findings_count", None, int
     ),
-    SheetFieldMap("amount_expended", "AMOUNT", WorkbookFieldInDissem, 0, int),
+    SheetFieldMap("amount_expended", "AMOUNT", WorkbookFieldInDissem, None, int),
 ]
 
 
@@ -103,8 +103,10 @@ def _generate_cluster_names(
     audits: list[Audits],
 ) -> tuple[list[str], list[str], list[str]]:
     """Reconstructs the cluster names for each audit in the provided list."""
-    # Patch the clusternames. They used to be allowed to enter anything
-    # they wanted.
+    # FIXME - MSHD: For the sake of data migration, we will:
+    # 1. Remove the cluster name validation logic from this code.
+    # 2. Remove cluster name validation from json schema.
+    # 3. Implement cluster name validation in python against the IR and exclude census data from this logic.
     valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
     valid_json = json.load(valid_file)
     cluster_names = []
@@ -144,7 +146,10 @@ def _get_full_cfdas(audits):
     and CFDA_EXT attributes of each audit object, separated by a dot.
     """
     # audit.CFDA is not used here because it does not always match f"{audit.CFDA_PREFIX}.{audit.CFDA_EXT}"
-    return [f"{audit.CFDA_PREFIX}.{audit.CFDA_EXT}" for audit in audits]
+    return [
+        f"{string_to_string(audit.CFDA_PREFIX)}.{string_to_string(audit.CFDA_EXT)}"
+        for audit in audits
+    ]
 
 
 # The functionality of _fix_passthroughs has been split into two separate functions:
@@ -199,9 +204,10 @@ def _xform_populate_default_passthrough_values(
     for index, audit, name, id in zip(
         range(len(audits)), audits, passthrough_names, passthrough_ids
     ):
-        if audit.DIRECT == "N" and name == "":
+        direct = string_to_string(audit.DIRECT)
+        if direct == "N" and name == "":
             passthrough_names[index] = "NO PASSTHROUGH NAME PROVIDED"
-        if audit.DIRECT == "N" and id == "":
+        if direct == "N" and id == "":
             passthrough_ids[index] = "NO PASSTHROUGH ID PROVIDED"
     return (passthrough_names, passthrough_ids)
 
@@ -216,14 +222,16 @@ def _xform_populate_default_loan_balance(loans_at_end, audits):
     If the audit's LOANS attribute is "Y" and the loan balance is empty,
     it fills in a default value indicating that no loan balance was provided."""
     for ndx, audit in zip(range(len(audits)), audits, loans_at_end):
-        if audit.LOANS == "Y":
-            if audit.LOANBALANCE is None:
+        loan = string_to_string(audit.LOANS).upper()
+        balance = string_to_string(audit.LOANBALANCE)
+        if loan == "Y":
+            if not balance:
                 loans_at_end[
                     ndx
                 ] = 1  # FIXME - MSHD: This value requires team approval.
                 # There are cases (dbkeys 148665/150450) with balance = -1.0, how do we handle this?
         else:
-            if audit.LOANBALANCE is not None:
+            if not balance:
                 loans_at_end[ndx] = ""
     return loans_at_end
 
@@ -266,7 +274,8 @@ def generate_federal_awards(audit_header, outfile):
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
     )
-    set_workbook_uei(wb, audit_header.UEI)
+    uei = string_to_string(audit_header.UEI)
+    set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, audits)
 
@@ -364,7 +373,7 @@ def generate_federal_awards(audit_header, outfile):
         award["values"].append(other_cluster_name)
         award_counter += 1
 
-    table["singletons"]["auditee_uei"] = audit_header.UEI
+    table["singletons"]["auditee_uei"] = uei
     table["singletons"]["total_amount_expended"] = total
 
     return (wb, table)

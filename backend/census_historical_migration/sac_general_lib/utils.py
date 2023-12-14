@@ -15,7 +15,7 @@ def create_json_from_db_object(gobj, mappings):
     """Constructs a JSON object from a database object using a list of mappings."""
     json_obj = {}
     for mapping in mappings:
-        if mapping.in_db is not None:
+        if mapping.in_db:
             value = getattr(gobj, mapping.in_db, mapping.default)
         else:
             value = mapping.default
@@ -40,15 +40,26 @@ def create_json_from_db_object(gobj, mappings):
 def xform_census_date_to_datetime(date_string):
     """Convert a census date string from '%m/%d/%Y %H:%M:%S' format to 'YYYY-MM-DD' format."""
     # Parse the string into a datetime object
-    dt = datetime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
+    try:
+        # Parse the string into a datetime object
+        dt = datetime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
+    except ValueError:
+        # Raise a custom exception or a ValueError with a descriptive message
+        raise ValueError(
+            f"Date string '{date_string}' is not in the expected format '%m/%d/%Y %H:%M:%S'"
+        )
+
     # Extract and return the date part
     return dt.date()
 
 
-def normalize_year_string(year_string):
+def normalize_year_string_or_exit(year_string):
     """
-    Normalizes a year string to a four-digit year format.
+    Normalizes a year string to a four-digit year format or exits the program if the year string is invalid.
     """
+    # Do not use this function elsewhere to normilize year strings
+    # or it will quit the program if the year is invalid.
+    # The goal here is to quickly fail django commands if the year is invalid.
     try:
         year = int(year_string)
     except ValueError:
@@ -62,3 +73,8 @@ def normalize_year_string(year_string):
     else:
         logger.error("Invalid year string. Audit year must be between 2016 and 2022")
         sys.exit(-1)
+
+
+def is_single_word(s):
+    """Returns True if the string is a single word, False otherwise."""
+    return len(s.split()) == 1

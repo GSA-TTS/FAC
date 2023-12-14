@@ -29,15 +29,13 @@ class ChangeAccessForm(forms.Form):
     #         )
 
 
-class ChangeAuditorCertifyingOfficialView(
-    SingleAuditChecklistAccessRequiredMixin, generic.View
-):
+class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     """
-    View for changing the auditor certifying official
+    View for adding a new editor; also has logic for changing certifying roles.
     """
 
-    role = "certifying_auditor_contact"
-    other_role = "certifying_auditee_contact"
+    role = "editor"
+    other_role = ""
 
     def get(self, request, *args, **kwargs):
         """
@@ -45,17 +43,23 @@ class ChangeAuditorCertifyingOfficialView(
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        access = Access.objects.get(sac=sac, role=self.role)
         context = {
             "role": self.role,
-            "friendly_role": access.get_friendly_role(),
+            "friendly_role": None,
             "auditee_uei": sac.general_information["auditee_uei"],
             "auditee_name": sac.general_information.get("auditee_name"),
-            "certifier_name": access.fullname,
-            "email": access.email,
+            "certifier_name": None,
+            "email": None,
             "report_id": report_id,
             "errors": [],
         }
+        if self.role != "editor":
+            access = Access.objects.get(sac=sac, role=self.role)
+            context = context | {
+                "friendly_role": access.get_friendly_role(),
+                "certifier_name": access.fullname,
+                "email": access.email,
+            }
 
         return render(request, "audit/manage-submission-change-access.html", context)
 
@@ -114,7 +118,16 @@ class ChangeAuditorCertifyingOfficialView(
         return redirect(url)
 
 
-class ChangeAuditeeCertifyingOfficialView(ChangeAuditorCertifyingOfficialView):
+class ChangeAuditorCertifyingOfficialView(ChangeOrAddRoleView):
+    """
+    View for changing the auditor certifying official
+    """
+
+    role = "certifying_auditor_contact"
+    other_role = "certifying_auditee_contact"
+
+
+class ChangeAuditeeCertifyingOfficialView(ChangeOrAddRoleView):
     """
     View for changing the auditee certifying official
     """

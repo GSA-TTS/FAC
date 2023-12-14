@@ -1,6 +1,7 @@
 from .home import Home
 from .manage_submission import ManageSubmissionView
 from .manage_submission_access import (
+    ChangeOrAddRoleView,
     ChangeAuditeeCertifyingOfficialView,
     ChangeAuditorCertifyingOfficialView,
 )
@@ -36,6 +37,7 @@ views = [
     AuditorCertificationStep1View,
     AuditorCertificationStep2View,
     CertificationView,
+    ChangeOrAddRoleView,
     ChangeAuditeeCertifyingOfficialView,
     ChangeAuditorCertifyingOfficialView,
     CrossValidationView,
