@@ -5,7 +5,6 @@ from .manage_submission_access import (
     ChangeAuditorCertifyingOfficialView,
 )
 from .no_robots import no_robots
-from .pre_certification_review import PreCertificationReview
 from .pre_dissemination_download_view import (
     PredisseminationXlsxDownloadView,
     PredisseminationPdfDownloadView,
@@ -51,7 +50,6 @@ views = [
     ManageSubmissionView,
     MySubmissions,
     no_robots,
-    PreCertificationReview,
     PredisseminationPdfDownloadView,
     PredisseminationSummaryReportDownloadView,
     PredisseminationXlsxDownloadView,

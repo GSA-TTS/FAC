@@ -101,11 +101,6 @@ urlpatterns = [
         name="ChangeAuditeeCertifyingOfficial",
     ),
     path(
-        "pre-certification-review/<str:report_id>",
-        views.PreCertificationReview.as_view(),
-        name="PreCertificationReview",
-    ),
-    path(
         "workbook/xlsx/<str:file_type>/<str:report_id>",
         views.PredisseminationXlsxDownloadView.as_view(),
         name="PredisseminationXlsxDownload",

@@ -81,8 +81,8 @@
                 </fieldset>
                 <div class="grid-row margin-bottom-8 margin-top-10">
                     <button class="usa-button grid-col-5" id="continue">Agree to auditor certification</button>
-                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center"
-                       href="/">Cancel</a>
+                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center" id="cancel-auditor-certification-link" 
+                       href="{% url 'audit:SubmissionProgress' report_id %}">Cancel</a>
                 </div>
             </form>
         </div>
