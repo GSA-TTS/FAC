@@ -42,7 +42,19 @@ def search_general(
         order_direction = DIRECTION.ascending
 
     query = _initialize_query(include_private)
-    split_alns, agency_numbers = _process_alns(query, alns)
+
+    split_alns = None
+    agency_numbers = None
+    if alns:
+        split_alns, agency_numbers = _split_alns(alns)
+        query_set = _get_aln_match_query(split_alns, agency_numbers)
+        # If we did a search on ALNs, and got nothing (because it does not exist),
+        # we need to bail out from the entire search early with no results.
+        if not query_set:
+            return []
+        else:
+            # If results came back from our ALN query, add it to the Q() and continue.
+            query.add(query_set, Q.AND)
 
     query.add(_get_names_match_query(names), Q.AND)
     query.add(_get_uei_or_eins_match_query(uei_or_eins), Q.AND)
@@ -90,23 +102,6 @@ def _initialize_query(include_private: bool):
     if not include_private:
         query.add(Q(is_public=True), Q.AND)
     return query
-
-
-def _process_alns(query, alns):
-    # 'alns' gets processed before the match query function, as they get used again after the main search.
-    split_alns = None
-    agency_numbers = None
-    if alns:
-        split_alns, agency_numbers = _split_alns(alns)
-        query_set = _get_aln_match_query(split_alns, agency_numbers)
-        # If we did a search on ALNs, and got nothing (because it does not exist),
-        # we need to bail out from the entire search early with no results.
-        if not query_set:
-            return []
-        else:
-            # If results came back from our ALN query, add it to the Q() and continue.
-            query.add(query_set, Q.AND)
-    return split_alns, agency_numbers
 
 
 def _sort_results(results, order_direction, order_by):
