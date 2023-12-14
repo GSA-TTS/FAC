@@ -324,7 +324,7 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename, store_files=True):
         },
         filename=Path(pdf_filename).stem,
         user=this_user,
-        sac_id=this_sac.id
+        sac_id=this_sac.id,
     )
 
     # Sometimes, we just want to generate data for testing,
@@ -361,7 +361,7 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file, store_files=T
         sac_id=this_sac.id,
         form_section=section,
     )
-    
+
     # Sometimes, we just want to generate data for testing,
     # not store the artifacts.
     if store_files:
@@ -371,6 +371,14 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file, store_files=T
     audit_data = extract_mapping[section](excel_file.file)
     validator_mapping[section](audit_data)
 
+    this_sac = _post_upload_workbook_assign_data(section, this_sac, audit_data)
+
+    this_sac.save()
+
+    logger.info(f"Created {section} workbook upload for SAC {this_sac.id}")
+
+
+def _post_upload_workbook_assign_data(section, this_sac, audit_data):
     if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
         this_sac.federal_awards = audit_data
     elif section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:
@@ -387,7 +395,4 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file, store_files=T
         this_sac.additional_ueis = audit_data
     elif section == FORM_SECTIONS.ADDITIONAL_EINS:
         this_sac.additional_eins = audit_data
-
-    this_sac.save()
-
-    logger.info(f"Created {section} workbook upload for SAC {this_sac.id}")
+    return this_sac

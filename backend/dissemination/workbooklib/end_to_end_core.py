@@ -42,7 +42,6 @@ pw.addHandler(logging.StreamHandler())
 pw.setLevel(logging.INFO)
 
 
-
 def step_through_certifications(sac):
     class STATUS:
         IN_PROGRESS = "in_progress"
@@ -52,6 +51,7 @@ def step_through_certifications(sac):
         CERTIFIED = "certified"
         SUBMITTED = "submitted"
         DISSEMINATED = "disseminated"
+
     stati = [
         STATUS.IN_PROGRESS,
         STATUS.READY_FOR_CERTIFICATION,
@@ -59,7 +59,7 @@ def step_through_certifications(sac):
         STATUS.AUDITEE_CERTIFIED,
         STATUS.CERTIFIED,
         STATUS.SUBMITTED,
-        STATUS.DISSEMINATED
+        STATUS.DISSEMINATED,
     ]
     for status in stati:
         sac.transition_name.append(status)
@@ -220,7 +220,7 @@ def generate_workbooks(user, email, dbkey, year, store_files=True, run_api_check
         for section, fun in sections.items():
             (_, json, _) = loader(fun, section)
             json_test_tables.append(json)
-    
+
         step_through_certifications(sac)
         errors = sac.validate_cross()
         pprint(errors.get("errors", "No errors found in cross validation"))

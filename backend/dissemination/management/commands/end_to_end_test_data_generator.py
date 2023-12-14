@@ -18,8 +18,12 @@ class Command(BaseCommand):
         )
         parser.add_argument("--dbkeys", type=str, required=False, default="")
         parser.add_argument("--years", type=str, required=False, default="")
-        parser.add_argument("--store", action=argparse.BooleanOptionalAction, default=False)
-        parser.add_argument("--apichecks", action=argparse.BooleanOptionalAction, default=True)
+        parser.add_argument(
+            "--store", action=argparse.BooleanOptionalAction, default=False
+        )
+        parser.add_argument(
+            "--apichecks", action=argparse.BooleanOptionalAction, default=True
+        )
 
     def handle(self, *args, **options):
         dbkeys_str = options["dbkeys"]
@@ -27,7 +31,7 @@ class Command(BaseCommand):
         email_str = options["email"]
         store_files = options["store"]
         run_api_checks = options["apichecks"]
-        
+
         dbkeys = dbkeys_str.split(",")
         years = years_str.split(",")
 
@@ -60,7 +64,13 @@ class Command(BaseCommand):
             else:
                 for pair in defaults:
                     logger.info("Running {}-{} end-to-end".format(pair[0], pair[1]))
-                    run_end_to_end(email_str, str(pair[0]), str(pair[1]), store_files, run_api_checks)
+                    run_end_to_end(
+                        email_str,
+                        str(pair[0]),
+                        str(pair[1]),
+                        store_files,
+                        run_api_checks,
+                    )
         else:
             logger.error(
                 "Cannot run end-to-end workbook generation in production. Exiting."

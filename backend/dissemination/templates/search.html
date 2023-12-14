@@ -2,7 +2,7 @@
 {% load static %}
 {% load sprite_helper %}
 {% block content %}
-    <div class="padding-x-10">
+    <div class="desktop:padding-x-10">
         <div class="grid-row">
             <div class="grid-col-auto audit-search-form">
                 <h3>Filters</h3>
@@ -178,7 +178,7 @@
                         <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                     </p>
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">
-                        <table class="usa-table usa-table--striped usa-table--compact">
+                        <table class="usa-table usa-table--striped usa-table--compact width-full">
                             <thead>
                                 <tr>
                                     {% include "search-table-header.html" with friendly_title="Name" field_name="auditee_name"%}
@@ -343,7 +343,5 @@
        aria-controls="device-orientation-modal"
        data-open-modal></a>
     <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>
-    {% if results %}
-        <script src="{% static 'compiled/js/search-results-pagination.js' %}"></script>
-    {% endif %}
+    <script src="{% static 'compiled/js/search-results-pagination.js' %}"></script>
 {% endblock content %}
