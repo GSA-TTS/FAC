@@ -127,9 +127,11 @@ class Command(BaseCommand):
 
     def load_data(self, file, model_obj, chunk_size):
         dtypes = defaultdict(lambda: str)
+
         print("Starting load data to postgres")
         file.seek(0)
         rows_loaded = 0
+
         for df in pd.read_csv(file, iterator=True, chunksize=chunk_size, dtype=dtypes):
             # Each row is a dictionary. The columns are the
             # correct names for our model. So, this should be a
