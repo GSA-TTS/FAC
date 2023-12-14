@@ -7,10 +7,13 @@ logger = logging.getLogger(__name__)
 ALN = NT("ALN", "prefix, program")
 
 class ORDER_BY():
-    accepted_date = "accepted_date"
-    findings_my_aln = 1
-    findings_all_aln = 2
+    fac_accepted_date = "fac_accepted_date"
     auditee_name = "auditee_name"
+    auditee_uei = "auditee_uei"
+    audit_year = "audit_year"
+    cog_over = "cog_over"
+    findings_my_aln = "findings_my_aln"
+    findings_all_aln = "findings_all_aln"
 
 class DIRECTION():
     ascending = "ascending"
@@ -27,10 +30,14 @@ def search_general(
     audit_years=None,
     auditee_state=None,
     include_private=False,
-    order_by=ORDER_BY.accepted_date,
+    order_by=ORDER_BY.fac_accepted_date,
     order_direction=DIRECTION.ascending
 ):
-    
+    if not order_by:
+        order_by=ORDER_BY.fac_accepted_date
+    if not order_direction:
+        order_direction=DIRECTION.ascending
+
     logger.info(f"{order_by}, {order_direction}")
 
     query = _initialize_query(include_private)
@@ -44,8 +51,23 @@ def search_general(
     query.add(_get_audit_years_match_query(audit_years), Q.AND)
     query.add(_get_auditee_state_match_query(auditee_state), Q.AND)
 
-    results = _run_query(query, alns, split_alns, agency_numbers)
+    # Create the queryset. It's lazy, so it doesn't hit the database yet.
+    results = General.objects.filter(query)
+    # Attach a sort field and direction.
     results = _sort_results(results, order_direction, order_by)
+
+    # Accessing the results object will run the query.
+    # We want to attach bonus ALN fields after egtting results.
+    # Running order_by on the same queryset will hit the databse again, which will wipe our custom fields.
+    # So, if we want to sort by the ALN fields, we need to do it locally and after the _sort_results function.
+    if alns:
+        results = _attach_finding_my_aln_and_finding_all_aln_fields(
+            results, split_alns, agency_numbers
+        )
+    if order_by == ORDER_BY.findings_my_aln:
+        results = sorted(results, key=lambda obj: obj.finding_my_aln, reverse=bool(order_direction==DIRECTION.descending))
+    elif order_by == ORDER_BY.findings_all_aln:
+        results = sorted(results, key=lambda obj: obj.finding_all_aln, reverse=bool(order_direction==DIRECTION.descending))
 
     return results
 
@@ -72,16 +94,6 @@ def _process_alns(query, alns):
             query.add(query_set, Q.AND)
     return split_alns, agency_numbers
 
-def _run_query(query, alns, split_alns, agency_numbers):
-    # Default an ordering to accepted date.
-    results = General.objects.filter(query)
-    # This is ignored in the case that we sort by accepted date?
-    if alns:
-        results = _attach_finding_my_aln_and_finding_all_aln_fields(
-            results, split_alns, agency_numbers
-        )
-    return results
-
 def _sort_results(results, order_direction, order_by):
     # Instead of nesting conditions, we'll prep a string
     # for determining the sort direction.
@@ -94,14 +106,18 @@ def _sort_results(results, order_direction, order_by):
     # Now, apply the sort that we pass in front the front-end.
     match order_by:
         case ORDER_BY.auditee_name:
-            logger.info(f"sorting {order_by} in direction -{direction}-")
             results = results.order_by(f"{direction}auditee_name")
-        case ORDER_BY.accepted_date:
+        case ORDER_BY.auditee_uei:
+            results = results.order_by(f"{direction}auditee_uei")
+        case ORDER_BY.fac_accepted_date:
             results = results.order_by(f"{direction}fac_accepted_date")
-        case ORDER_BY.findings_my_aln:
-            results = results.order_by(f"{direction}findings_my_aln")
-        case ORDER_BY.findings_all_aln:
-            results = results.order_by(f"{direction}findings")
+        case ORDER_BY.audit_year:
+            results = results.order_by(f"{direction}audit_year")
+        case ORDER_BY.cog_over:
+            if (order_direction == DIRECTION.ascending):
+                results = results.order_by("cognizant_agency")
+            else:
+                results = results.order_by("oversight_agency")
         case _:
             results = results.order_by(f"{direction}fac_accepted_date")
     

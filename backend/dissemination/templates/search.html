@@ -140,6 +140,7 @@
                                type="reset"
                                value="Reset Search" />
                     </div>
+
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
                     <input class="usa-input"
                         id="page"
@@ -148,14 +149,12 @@
                         value="{{ page }}"
                         hidden />
                     
-                    {% comment %} Hidden page input for use when clicking a sort button in the table header {% endcomment %}
+                    {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
                     <input class="usa-input"
                         id="order_by"
                         name="order_by"
                         value="{{ order_by }}"
                         hidden />
-
-                    {% comment %} Hidden page input for sort direction {% endcomment %}
                     <input class="usa-input"
                         id="order_direction"
                         name="order_direction"
@@ -182,41 +181,16 @@
                         <table class="usa-table usa-table--striped usa-table--compact">
                             <thead>
                                 <tr>
-                                    <th id="auditee_name" 
-                                        scope="col" 
-                                        role="columnheader"
-                                        {% if order_direction == "descending"  %}
-                                            aria-sort="descending"
-                                        {% elif order_direction == "ascending" %}
-                                            aria-sort="ascending"
-                                        {% endif %}
-                                        >
-                                        Name
-                                        <button class="usa-table__header__button">
-                                          <svg class="usa-icon usa-icon--size-3"
-                                            aria-hidden="true"
-                                            focusable="false"
-                                            role="img">
-                                            {% if order_direction == "descending"  %}
-                                              {% uswds_sprite "expand_less" %}
-                                            {% elif order_direction == "ascending" %}
-                                              {% uswds_sprite "expand_more" %}
-                                            {% else %}
-                                              {% uswds_sprite "unfold_more" %}
-                                            {% endif %}  
-                                          </svg>
-                                        </button>
-                                    </th>
-                                    <th data-sortable scope="col" role="columnheader">UEI or EIN</th>
-                                    <th data-sortable scope="col" role="columnheader">Acc Date</th>
-                                    <th data-sortable scope="col" role="columnheader">AY</th>
-                                    <th data-sortable scope="col" role="columnheader">Cog or Over</th>
+                                    {% include "search-table-header.html" with friendly_title="Name" field_name="auditee_name"%}
+                                    {% include "search-table-header.html" with friendly_title="UEI or EIN" field_name="auditee_uei"%}
+                                    {% include "search-table-header.html" with friendly_title="Acc Date" field_name="fac_accepted_date"%}
+                                    {% include "search-table-header.html" with friendly_title="AY" field_name="audit_year"%}
+                                    {% include "search-table-header.html" with friendly_title="Cog or Over" field_name="cog_over"%}
                                     <th scope="col" role="columnheader">View</th>
                                     <th scope="col" role="columnheader">PDF</th>
                                     {% if results.0.finding_my_aln is not None%}
-                                        <th data-sortable scope="col" role="columnheader">Finding my ALN</th>
-                                        
-                                        <th data-sortable scope="col" role="columnheader">Finding all ALN</th>
+                                        {% include "search-table-header.html" with friendly_title="Finding my ALN" field_name="findings_my_aln"%}
+                                        {% include "search-table-header.html" with friendly_title="Finding all ALN" field_name="findings_all_aln"%}
                                     {% endif %}
                                 </tr>
                             </thead>
