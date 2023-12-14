@@ -38,7 +38,7 @@ function attachEventHandlersPagination() {
   The standard form behavior resets to the default value, which is whatever the user entered on the last form submission, _not_ fully empty fields.
   We cannot just loop over every form element, because buttons and hidden inputs should be handled differently.
 */
-function attachEventHandlersReset(){
+function attachEventHandlersReset() {
   FORM.addEventListener('reset', (e) => {
     e.preventDefault();
     // Empty out textareas
@@ -57,7 +57,9 @@ function attachEventHandlersReset(){
     start_date.value = '';
     end_date.value = '';
     // Reset Cog/Over dropdown
-    var default_cog_over_option = document.getElementById('cog_or_oversight--none');
+    var default_cog_over_option = document.getElementById(
+      'cog_or_oversight--none'
+    );
     default_cog_over_option.selected = true;
     // Wipe agency name
     var agency_name = document.getElementById('agency-name');
