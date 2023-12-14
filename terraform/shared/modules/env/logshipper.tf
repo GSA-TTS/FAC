@@ -1,5 +1,5 @@
 locals {
-  logshipper_name = "cg-logshipper"
+  logshipper_name = "logshipper"
 }
 
 module "cg-logshipper" {
