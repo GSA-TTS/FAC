@@ -2,9 +2,9 @@
 {% load static %}
 {% load sprite_helper %}
 {% block content %}
-    <div class="grid-container">
+    <div class="padding-x-10">
         <div class="grid-row">
-            <div class="tablet:grid-col-4 audit-search-form">
+            <div class="grid-col-auto audit-search-form">
                 <h3>Filters</h3>
                 <form class="usa-form"
                       id="search-form"
@@ -162,7 +162,7 @@
                         hidden />
                 </form>
             </div>
-            <div class="tablet:grid-col-8 audit-search-results">
+            <div class="grid-col audit-search-results">
                 <h2 class="font-sans-2xl">Search single audit reports</h2>
                 {% if results %}
                     <div class="usa-alert usa-alert--info">
