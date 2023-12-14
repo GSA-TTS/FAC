@@ -41,8 +41,6 @@ def search_general(
     if not order_direction:
         order_direction = DIRECTION.ascending
 
-    logger.info(f"{order_by}, {order_direction}")
-
     query = _initialize_query(include_private)
     split_alns, agency_numbers = _process_alns(query, alns)
 
@@ -67,7 +65,7 @@ def search_general(
     # Running order_by on the same queryset will hit the databse again, which will wipe our custom fields.
     # So, if we want to sort by the ALN fields, we need to do it locally and after the _sort_results function.
     if alns:
-        results = _compositional_attach_finding_my_aln_and_finding_all_aln_fields(
+        results = _attach_finding_my_aln_and_finding_all_aln_fields(
             results, split_alns, agency_numbers
         )
     if order_by == ORDER_BY.findings_my_aln:
@@ -192,7 +190,7 @@ def _get_aln_report_ids(split_alns, agency_numbers):
     return report_ids
 
 
-def _compositional_attach_finding_my_aln_and_finding_all_aln_fields(
+def _attach_finding_my_aln_and_finding_all_aln_fields(
     results, split_alns, agency_numbers
 ):
     """
