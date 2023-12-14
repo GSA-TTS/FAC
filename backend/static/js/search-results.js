@@ -65,38 +65,40 @@ function attachEventHandlersPagination() {
   Get the table headers and their sort buttons.
   Using the ID of the table headers, attach event handlers to re-submit the form when clicking them.
   This will reload the page with the associated sort values, so that searches appear to sort across many pages.
+
+  If the sort buttons get clicked, we have one of three states:
+    1. We are not sorting, and we move to sort in descending.
+    2. We are sorting by descending, and we move to sort in ascending.
+    3. We are sorting by ascending, and we move to no sort at all.
+      i. In this case, we wipe both the order_by and order_direction fields. Or, it will maintain the values and sort anyway.
+  In any case, we want to reset the page number to one.
 */
 function attachEventHandlersSorting() {
   var FORM = document.getElementById('search-form');
   var table_headers = document.querySelectorAll('th[id]');
 
   table_headers.forEach((header) => {
-    var button = header.querySelector("button");
-    var current_sort = header.getAttribute('aria-sort')
+    var button = header.querySelector('button');
+    var current_sort = header.getAttribute('aria-sort');
 
     button.addEventListener('click', (e) => {
       e.preventDefault();
-      // console.log(`Coming in with sort direction -${current_sort}-`)
-      if (current_sort == "ascending"){
-        // console.log(`${header.id} in ascending :: ${current_sort}`)
-        // We want to go back to a neutral state.
-        // To do that, we need to wipe both values. 
-        // If we don't, the backend *will* sort on the order_by attribute.
-        FORM.elements['order_direction'].value = "";
-        FORM.elements['order_by'].value = "";
-      } else if (current_sort == "descending") {
-        // console.log(`${header.id} in descending :: ${current_sort}`)
+
+      if (current_sort == 'ascending') {
+        FORM.elements['order_direction'].value = '';
+        FORM.elements['order_by'].value = '';
+      } else if (current_sort == 'descending') {
         FORM.elements['order_by'].value = header.id;
-        FORM.elements['order_direction'].value = "ascending";
+        FORM.elements['order_direction'].value = 'ascending';
       } else {
-        // console.log(`${header.id} in shruggies :: ${current_sort}`)
         FORM.elements['order_by'].value = header.id;
-        FORM.elements['order_direction'].value = "descending";
+        FORM.elements['order_direction'].value = 'descending';
       }
+      FORM.elements['page'].value = 1;
+
       FORM.submit();
     });
   });
-
 }
 
 function init() {
