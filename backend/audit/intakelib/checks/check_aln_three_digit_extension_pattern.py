@@ -1,5 +1,7 @@
 import logging
 import re
+
+from django.conf import settings
 from audit.intakelib.intermediate_representation import (
     get_range_values_by_name,
     get_range_by_name,
@@ -12,6 +14,7 @@ logger = logging.getLogger(__name__)
 REGEX_RD_EXTENSION = r"^RD[0-9]?$"
 REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
 REGEX_U_EXTENSION = r"^U[0-9]{2}$"
+REGEX_GSA_MIGRATION = rf"^{re.escape(settings.GSA_MIGRATION)}$"
 
 
 # DESCRIPTION
@@ -22,7 +25,12 @@ def aln_three_digit_extension(ir):
     extension = get_range_values_by_name(ir, "three_digit_extension")
     errors = []
     # Define regex patterns
-    patterns = [REGEX_RD_EXTENSION, REGEX_THREE_DIGIT_EXTENSION, REGEX_U_EXTENSION]
+    patterns = [
+        REGEX_RD_EXTENSION,
+        REGEX_THREE_DIGIT_EXTENSION,
+        REGEX_U_EXTENSION,
+        REGEX_GSA_MIGRATION,
+    ]
     for index, ext in enumerate(extension):
         # Check if ext does not match any of the regex patterns
         if not any(re.match(pattern, str(ext)) for pattern in patterns):
