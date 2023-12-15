@@ -9,7 +9,10 @@
                   method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset padding-bottom-2">
-                    <legend class="usa-legend usa-legend--large" id="auditee-certification">Auditee certification checklist</legend>
+                    <legend class="usa-legend usa-legend--large" id="auditee-certification">Auditee certification</legend>
+
+                    <p>Download and review the SF-SAC and single audit report below. These files are for review only and can't be edited.</p>
+                    <p>After reviewing, check the box next to each item to confirm your report meets the requirements.</p>
 
                     <div class="usa-button-group margin-top-2">
                         <a class="usa-button display-flex"
@@ -20,7 +23,7 @@
                                  role="img">
                                 {% uswds_sprite "file_download" %}
                             </svg>
-                            <p class="margin-0">SF-SAC</p>
+                            <p class="margin-0">Download SF-SAC</p>
                         </a>
                         
                         <a class="usa-button display-flex margin-top-2 tablet:margin-top-0"
@@ -31,7 +34,7 @@
                                  role="img">
                                 {% uswds_sprite "file_download" %}
                             </svg>
-                            <p class="margin-0">Single audit report</p>
+                            <p class="margin-0">Download single audit report</p>
                         </a>
                     </div>
 
