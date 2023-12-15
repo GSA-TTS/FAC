@@ -457,5 +457,6 @@ class MigrationErrorDetail(models.Model):
     report_migration_status = models.ForeignKey(
         ReportMigrationStatus, on_delete=models.CASCADE
     )
-    error_summary = models.CharField(blank=True, null=True)
-    error_stack = models.TextField()
+    tag = models.TextField(blank=True, null=True)
+    exception_class = models.TextField(blank=True, null=True)
+    detail = models.TextField(blank=True, null=True)
