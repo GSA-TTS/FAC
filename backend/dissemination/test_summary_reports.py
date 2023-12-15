@@ -13,5 +13,5 @@ class SummaryReportTests(TestCase):
         report_ids = [g.report_id for g in general]
         filename = generate_summary_report(report_ids)
 
-        self.assertTrue(filename.startswith, "bulk-")
+        self.assertTrue(filename.startswith, "fac-summary-report-")
         self.assertTrue(filename.endswith, ".xlsx")
