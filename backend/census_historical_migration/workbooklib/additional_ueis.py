@@ -1,3 +1,4 @@
+from ..transforms.xform_string_to_string import string_to_string
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     generate_dissemination_test_table,
@@ -18,7 +19,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    # FIXME: We have no dissemination nodel for this.
     SheetFieldMap("additional_uei", "UEI", WorkbookFieldInDissem, None, str),
 ]
 
@@ -34,9 +34,9 @@ def generate_additional_ueis(audit_header, outfile):
     logger.info(
         f"--- generate additional ueis {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
     )
-
+    uei = string_to_string(audit_header.UEI)
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_UEIS])
-    set_workbook_uei(wb, audit_header.UEI)
+    set_workbook_uei(wb, uei)
     additional_ueis = _get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, additional_ueis)
     wb.save(outfile)
@@ -44,5 +44,5 @@ def generate_additional_ueis(audit_header, outfile):
     table = generate_dissemination_test_table(
         audit_header, "additional_ueis", mappings, additional_ueis
     )
-    table["singletons"]["auditee_uei"] = audit_header.UEI
+    table["singletons"]["auditee_uei"] = uei
     return (wb, table)

@@ -1,5 +1,8 @@
+import json
 import audit.validators
 from datetime import timedelta
+
+from ..workbooklib.excel_creation_utils import xform_add_hyphen_to_zip
 
 from ..transforms.xform_string_to_string import string_to_string
 from ..exception_utils import DataMigrationError
@@ -10,6 +13,7 @@ from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
 )
+from django.conf import settings
 import re
 
 PERIOD_DICT = {"A": "annual", "B": "biennial", "O": "other"}
@@ -21,15 +25,16 @@ AUDIT_TYPE_DICT = {
 
 
 def xform_entity_type(phrase):
-    """Transforms the entity type from Census format to FAC format."""
+    """Transforms the entity type from Census format to FAC format.
+    For context, see ticket #2912.
+    """
     mappings = {
         r"institution\s+of\s+higher\s+education": "higher-ed",
         r"non-?profit": "non-profit",
         r"local\s+government": "local",
         r"state": "state",
         r"unknown": "unknown",
-        r"": "none",
-        # r"": "tribal"   FIXME-MSHD: what is being used for tribal in Census table?
+        r"trib(e|al)": "tribal",
     }
     new_phrase = string_to_string(phrase)
 
@@ -38,7 +43,6 @@ def xform_entity_type(phrase):
         if re.search(pattern, new_phrase, re.IGNORECASE):
             # FIXME-MSHD: This is a transformation that we may want to record
             return value
-    # FIXME-MSHD: We could default to unknown here instead of raising an error ??? team decision
     raise DataMigrationError(
         f"Could not find a match for historic entity type '{phrase}'"
     )
@@ -72,22 +76,24 @@ mappings = [
     FormFieldMap("auditor_country", "CPACOUNTRY", FormFieldInDissem, None, str),
     FormFieldMap("auditor_ein", "AUDITOR_EIN", FormFieldInDissem, None, str),
     FormFieldMap(
-        "auditor_ein_not_an_ssn_attestation", None, None, True, bool
+        "auditor_ein_not_an_ssn_attestation", None, None, "Y", bool
     ),  # Not in DB, not disseminated, needed for validation
     FormFieldMap("auditor_email", "CPAEMAIL", FormFieldInDissem, None, str),
     FormFieldMap("auditor_firm_name", "CPAFIRMNAME", FormFieldInDissem, None, str),
     FormFieldMap("auditor_phone", "CPAPHONE", FormFieldInDissem, None, str),
     FormFieldMap("auditor_state", "CPASTATE", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_zip", "CPAZIPCODE", FormFieldInDissem, None, str),
+    FormFieldMap(
+        "auditor_zip", "CPAZIPCODE", FormFieldInDissem, None, xform_add_hyphen_to_zip
+    ),
     FormFieldMap("ein", "EIN", "auditee_ein", None, str),
     FormFieldMap(
-        "ein_not_an_ssn_attestation", None, None, True, bool
+        "ein_not_an_ssn_attestation", None, None, "Y", bool
     ),  # Not in DB, not disseminated, needed for validation
     FormFieldMap(
-        "is_usa_based", None, None, True, bool
+        "is_usa_based", None, None, "Y", bool
     ),  # Not in DB, not disseminated, needed for validation
     FormFieldMap(
-        "met_spending_threshold", None, None, True, bool
+        "met_spending_threshold", None, None, "Y", bool
     ),  # Not in DB, not disseminated, needed for validation
     FormFieldMap(
         "multiple_eins_covered", "MULTIPLEEINS", None, None, bool
@@ -123,23 +129,48 @@ def _census_audit_type(s):
     return AUDIT_TYPE_DICT[s]
 
 
-def _xform_country(general_information):
+def xform_country(general_information, audit_header):
     """Transforms the country from Census format to FAC format."""
-    general_information["auditor_country"] = (
-        "USA" if general_information.get("auditor_country") == "US" else "non-USA"
-    )
+    auditor_country = general_information.get("auditor_country").upper()
+    if auditor_country in ["US", "USA"]:
+        general_information["auditor_country"] = "USA"
+    elif auditor_country == "":
+        valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/States.json")
+        valid_json = json.load(valid_file)
+        auditor_state = string_to_string(audit_header.CPASTATE).upper()
+        if auditor_state in valid_json["UnitedStatesStateAbbr"]:
+            general_information["auditor_country"] = "USA"
+        else:
+            raise DataMigrationError(
+                f"Unable to determine auditor country. Invalid state: {auditor_state}"
+            )
+    else:
+        raise DataMigrationError(
+            f"Unable to determine auditor country. Unknown code: {auditor_country}"
+        )
+
     return general_information
 
 
-def _xform_auditee_fiscal_period_end(general_information):
+def xform_auditee_fiscal_period_end(general_information):
     """Transforms the fiscal period end from Census format to FAC format."""
-    general_information["auditee_fiscal_period_end"] = xform_census_date_to_datetime(
-        general_information.get("auditee_fiscal_period_end")
-    ).strftime("%Y-%m-%d")
+    if general_information.get("auditee_fiscal_period_end"):
+        general_information[
+            "auditee_fiscal_period_end"
+        ] = xform_census_date_to_datetime(
+            general_information.get("auditee_fiscal_period_end")
+        ).strftime(
+            "%Y-%m-%d"
+        )
+    else:
+        raise DataMigrationError(
+            f"Auditee fiscal period end is empty: {general_information.get('auditee_fiscal_period_end')}"
+        )
+
     return general_information
 
 
-def _xform_auditee_fiscal_period_start(general_information):
+def xform_auditee_fiscal_period_start(general_information):
     """Constructs the fiscal period start from the fiscal period end"""
     fiscal_start_date = xform_census_date_to_datetime(
         general_information.get("auditee_fiscal_period_end")
@@ -150,19 +181,29 @@ def _xform_auditee_fiscal_period_start(general_information):
     return general_information
 
 
-def _xform_audit_period_covered(general_information):
+def xform_audit_period_covered(general_information):
     """Transforms the period covered from Census format to FAC format."""
-    general_information["audit_period_covered"] = _period_covered(
-        general_information.get("audit_period_covered")
-    )
+    if general_information.get("audit_period_covered"):
+        general_information["audit_period_covered"] = _period_covered(
+            general_information.get("audit_period_covered").upper()
+        )
+    else:
+        raise DataMigrationError(
+            f"Audit period covered is empty: {general_information.get('audit_period_covered')}"
+        )
     return general_information
 
 
-def _xform_audit_type(general_information):
+def xform_audit_type(general_information):
     """Transforms the audit type from Census format to FAC format."""
-    general_information["audit_type"] = _census_audit_type(
-        general_information.get("audit_type")
-    )
+    if general_information.get("audit_type"):
+        general_information["audit_type"] = _census_audit_type(
+            general_information.get("audit_type").upper()
+        )
+    else:
+        raise DataMigrationError(
+            f"Audit type is empty: {general_information.get('audit_type')}"
+        )
     return general_information
 
 
@@ -173,16 +214,19 @@ def general_information(audit_header):
 
     # List of transformation functions
     transformations = [
-        _xform_auditee_fiscal_period_start,
-        _xform_auditee_fiscal_period_end,
-        _xform_country,
-        _xform_audit_period_covered,
-        _xform_audit_type,
+        xform_auditee_fiscal_period_start,
+        xform_auditee_fiscal_period_end,
+        xform_country,
+        xform_audit_period_covered,
+        xform_audit_type,
     ]
 
     # Apply transformations
     for transform in transformations:
-        general_information = transform(general_information)
+        if transform == xform_country:
+            general_information = transform(general_information, audit_header)
+        else:
+            general_information = transform(general_information)
 
     # verify that the created object validates against the schema
     audit.validators.validate_general_information_complete_json(general_information)

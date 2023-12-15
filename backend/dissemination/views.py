@@ -70,6 +70,8 @@ class Search(View):
                 int(year) for year in form.cleaned_data["audit_year"]
             ]  # Cast strings from HTML to int
             auditee_state = form.cleaned_data["auditee_state"]
+            order_by = form.cleaned_data["order_by"]
+            order_direction = form.cleaned_data["order_direction"]
 
             # TODO: Add a limit choice field to the form
             limit = form.cleaned_data["limit"] or 30
@@ -90,8 +92,10 @@ class Search(View):
                 audit_years=audit_years,
                 auditee_state=auditee_state,
                 include_private=include_private,
+                order_by=order_by,
+                order_direction=order_direction,
             )
-            results_count = results.count()
+            results_count = len(results)
             # Reset page to one if the page number surpasses how many pages there actually are
             if page > math.ceil(results_count / limit):
                 page = 1
@@ -110,6 +114,9 @@ class Search(View):
         else:
             raise BadRequest("Form data validation error.", form.errors)
 
+        if order_by is None:
+            order_by = "acceptance_date"
+
         context = context | {
             "form": form,
             "state_abbrevs": STATE_ABBREVS,
@@ -117,6 +124,8 @@ class Search(View):
             "results": results,
             "results_count": results_count,
             "page": page,
+            "order_by": order_by,
+            "order_direction": order_direction,
         }
 
         return render(request, "search.html", context)

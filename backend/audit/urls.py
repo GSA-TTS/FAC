@@ -101,6 +101,11 @@ urlpatterns = [
         name="ChangeAuditeeCertifyingOfficial",
     ),
     path(
+        "manage-submission/add-editor/<str:report_id>",
+        views.ChangeOrAddRoleView.as_view(),
+        name="ChangeOrAddRoleView",
+    ),
+    path(
         "workbook/xlsx/<str:file_type>/<str:report_id>",
         views.PredisseminationXlsxDownloadView.as_view(),
         name="PredisseminationXlsxDownload",

@@ -63,7 +63,7 @@ class ExcelCreationTests(TestCase):
 
     def test_set_range_no_default(self):
         """
-        Default to empty string when no value or default given
+        Error when no value or default given
         """
         wb = self.init_named_range("A6")
         ws = wb.active
@@ -71,12 +71,7 @@ class ExcelCreationTests(TestCase):
         ws.cell(row=6, column=1, value="foo")
         self.assertEqual(ws["A6"].value, "foo")
 
-        set_range(
-            wb,
-            self.range_name,
-            [None],
-        )
-        self.assertEqual(ws["A6"].value, "")
+        self.assertRaises(ValueError, set_range, wb, self.range_name, [None])
 
     def test_set_range_conversion(self):
         """
@@ -165,18 +160,19 @@ class TestApplyConversionFunction(TestCase):
         self.assertEqual(apply_conversion_function("123", "default", int), 123)
 
     def test_custom_conversion(self):
-        """Test that a custom conversion function is properly applied"""
+        """Test that custom conversion function is applied when present"""
         self.assertEqual(
             apply_conversion_function("test", "default", lambda x: x.upper()), "TEST"
         )
 
     def test_default_value(self):
         """Test that a default value is returned when the input is None"""
-        self.assertEqual(apply_conversion_function("", "default", str), "default")
+        self.assertEqual(apply_conversion_function(None, "default", str), "default")
 
     def test_none_with_no_default(self):
-        """Test that an empty string is returned when the input is None and no default is provided"""
-        self.assertEqual(apply_conversion_function(None, None, str), "")
+        """Test that an exception is raised when the input is None and no default is provided"""
+        with self.assertRaises(ValueError):
+            apply_conversion_function(None, None, str)
 
 
 class TestGetRanges(TestCase):

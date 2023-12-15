@@ -160,7 +160,11 @@
         aria-describedby="uei-search-result-description">
         <div class="usa-modal__content">
             <div class="usa-modal__main">
-                <img src="/static/img/loader.svg" alt="loading"/>
+
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img" alt="loading">
+                    {% uswds_sprite "loader" %}
+                </svg>
+
                 <h2 class="usa-modal__heading" id="uei-search-result-heading"></h2>
                 <div class="usa-prose" id="uei-search-result-description"></div>
                 <div class="usa-modal__footer">

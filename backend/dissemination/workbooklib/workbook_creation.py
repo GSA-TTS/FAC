@@ -76,7 +76,7 @@ def setup_sac(user, test_name, dbkey):
     return sac
 
 
-def workbook_loader(user, sac, dbkey, year, entity_id):
+def workbook_loader(user, sac, dbkey, year, entity_id, store_files=True):
     def _loader(workbook_generator, section):
         with MemoryFS() as mem_fs:
             filename = filenames[section].format(dbkey)
@@ -86,7 +86,7 @@ def workbook_loader(user, sac, dbkey, year, entity_id):
             outfile = mem_fs.openbin(filename, mode="r")
             excel_file = _make_excel_file(filename, outfile)
             if user:
-                _post_upload_workbook(sac, user, section, excel_file)
+                _post_upload_workbook(sac, user, section, excel_file, store_files)
             outfile.close()
         return (wb, json, filename)
 

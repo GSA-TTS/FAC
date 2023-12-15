@@ -1,3 +1,6 @@
+from ..transforms.xform_string_to_bool import (
+    string_to_bool,
+)
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
@@ -19,7 +22,6 @@ from openpyxl.utils.cell import (
     column_index_from_string,
 )
 
-import sys
 import logging
 
 
@@ -78,15 +80,20 @@ def apply_conversion_function(value, default, conversion_function):
     """
     Helper to apply a conversion function to a value, or use a default value
     """
-    if value:
-        if conversion_function is str:
-            new_value = string_to_string(value)
-        elif conversion_function is int:
-            new_value = string_to_int(value)
-        else:
-            new_value = conversion_function(value)
+    if value is None and default is None:
+        raise ValueError("No value or default provided")
+
+    selected_value = value if value is not None else default
+
+    if conversion_function is str:
+        new_value = string_to_string(selected_value)
+    elif conversion_function is int:
+        new_value = string_to_int(selected_value)
+    elif conversion_function is bool:
+        new_value = string_to_bool(selected_value)
     else:
-        new_value = default or ""
+        new_value = conversion_function(selected_value)
+
     return new_value
 
 
@@ -154,7 +161,9 @@ def map_simple_columns(wb, mappings, values):
                 list(map(lambda m: m.in_sheet, mappings))
             )
         )
-        sys.exit(-1)
+        raise DataMigrationError(
+            "Invaid mappings. You repeated a field in the mappings"
+        )
 
     # Map all the simple ones
     for m in mappings:
@@ -211,3 +220,19 @@ def generate_dissemination_test_table(audit_header, api_endpoint, mappings, obje
 def get_audits(dbkey, year):
     """Returns Audits records for the given dbkey and audit year."""
     return Audits.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by("ID")
+
+
+def xform_add_hyphen_to_zip(zip):
+    """
+    Transform a ZIP code string by adding a hyphen. If the ZIP code has 9 digits, inserts a hyphen after the fifth digit.
+    Returns the original ZIP code if it has 5 digits or is malformed.
+    """
+    strzip = string_to_string(zip)
+    if len(strzip) == 5:
+        return strzip
+    elif len(strzip) == 9:
+        # FIXME - MSHD: This is a transformation and might require logging.
+        return f"{strzip[0:5]}-{strzip[5:9]}"
+    else:
+        # FIXME - MSHD: How do we handle 4-digit and 8-digit ZIP codes?
+        raise DataMigrationError("Zip code is malformed in secondary auditor.")

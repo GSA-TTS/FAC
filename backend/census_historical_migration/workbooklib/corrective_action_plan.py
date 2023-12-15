@@ -1,3 +1,4 @@
+from ..transforms.xform_string_to_string import string_to_string
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     generate_dissemination_test_table,
@@ -41,10 +42,11 @@ def generate_corrective_action_plan(audit_header, outfile):
         f"--- generate corrective action plan {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
     )
 
+    uei = string_to_string(audit_header.UEI)
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.CORRECTIVE_ACTION_PLAN]
     )
-    set_workbook_uei(wb, audit_header.UEI)
+    set_workbook_uei(wb, uei)
     captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, captexts)
     wb.save(outfile)
@@ -52,5 +54,5 @@ def generate_corrective_action_plan(audit_header, outfile):
     table = generate_dissemination_test_table(
         audit_header, "corrective_action_plans", mappings, captexts
     )
-    table["singletons"]["auditee_uei"] = audit_header.UEI
+    table["singletons"]["auditee_uei"] = uei
     return (wb, table)

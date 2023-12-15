@@ -1,6 +1,11 @@
 from django.contrib import admin
-
-from audit.models import SingleAuditChecklist, Access, ExcelFile, SingleAuditReportFile
+from audit.models import (
+    Access,
+    DeletedAccess,
+    ExcelFile,
+    SingleAuditChecklist,
+    SingleAuditReportFile,
+)
 
 
 class SACAdmin(admin.ModelAdmin):
@@ -47,6 +52,24 @@ class AccessAdmin(admin.ModelAdmin):
     search_fields = ("email", "sac__report_id")
 
 
+class DeletedAccessAdmin(admin.ModelAdmin):
+    """
+    Fields we want in the admin view for DeletedAccess; we're not showing user here
+    because it's redundant with email in almost all circumstances.
+    """
+
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    list_display = ("sac", "role", "email")
+    list_filter = ["role"]
+    readonly_fields = ("sac",)
+    search_fields = ("email", "removed_by_email", "sac__report_id")
+
+
 class ExcelFileAdmin(admin.ModelAdmin):
     list_display = ("filename", "user", "date_created")
 
@@ -56,6 +79,7 @@ class AuditReportAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Access, AccessAdmin)
+admin.site.register(DeletedAccess, DeletedAccessAdmin)
 admin.site.register(ExcelFile, ExcelFileAdmin)
 admin.site.register(SingleAuditChecklist, SACAdmin)
 admin.site.register(SingleAuditReportFile, AuditReportAdmin)
