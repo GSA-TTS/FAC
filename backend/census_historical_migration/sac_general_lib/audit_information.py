@@ -30,7 +30,10 @@ mappings = [
         "DOLLARTHRESHOLD",
         FormFieldInDissem,
         None,
-        int,  # FIXME-MSHD: If team approves, we can change this to xform_apply_default_thresholds
+        int,
+        # FIXME-MSHD: It was decided (#2912) to replace int with xform_apply_default_thresholds
+        # but this cannot happen until the `dollar_threshold` is changed to string
+        # in dissemination model and in schema (see note in AuditInformation.schema.json).
     ),
     FormFieldMap(
         "is_going_concern_included", "GOINGCONCERN", FormFieldInDissem, None, bool
@@ -85,7 +88,6 @@ def xform_framework_basis(basis):
     """
     basis = string_to_string(basis)
     if is_single_word(basis):
-        # FIXME-MSHD: Update validation schema to include `regulatory_basis`
         mappings = {
             r"cash": "cash_basis",
             r"contractual": "contractual_basis",
@@ -150,20 +152,6 @@ def xform_build_sp_framework_gaap_results(audit_header):
         sp_framework_gaap_results["sp_framework_basis"].append(basis)
 
     return sp_framework_gaap_results
-
-
-# FIXME-MSHD: Not being used, but we may need it in the future
-def _xform_agencies(audit_info):
-    """Transforms the agencies from Census format to FAC format."""
-
-    new_audit_info = audit_info.copy()
-    # Apply transformation to each key
-    transformed_agencies = [
-        str(i) if len(str(i)) > 1 else f"0{str(i)}" for i in audit_info.get("agencies")
-    ]
-
-    new_audit_info["agencies"] = transformed_agencies
-    return new_audit_info
 
 
 def audit_information(audit_header):

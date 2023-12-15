@@ -31,12 +31,7 @@ def xform_prior_year_findings(value):
     """
     trimmed_value = string_to_string(value)
     if not trimmed_value:
-        # FIXME - MSHD: This is a transformation and might require logging.
-        # Why is this transformation needed? Because users were allowed to leave this empty
-        # but we have decided to enforce that they enter N/A (starting in 2023).
-        # Therefore, we need to transform the empty string to N/A, otherwise the new validation
-        # rule will fail most of the migration.
-        # logger.info(f"Prior year findings is empty. Setting to N/A.")
+        # we must document this transformation #2912
         return "N/A"
 
     return trimmed_value
