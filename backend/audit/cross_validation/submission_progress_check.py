@@ -1,4 +1,5 @@
 from audit.cross_validation.naming import NC, find_section_by_name
+from audit.models.submission_event import SubmissionEvent
 from audit.validators import validate_general_information_complete_json
 from django.core.exceptions import ValidationError
 
@@ -44,7 +45,7 @@ def submission_progress_check(sac, sar=None, crossval=True):
     result = {k: None for k in sac["sf_sac_sections"]}
 
     for key in sac["sf_sac_sections"]:
-        result = result | progress_check(sac["sf_sac_sections"], key)
+        result = result | progress_check(sac, sac["sf_sac_sections"], key)
 
     incomplete_sections = []
     for k in result:
@@ -66,7 +67,7 @@ def submission_progress_check(sac, sar=None, crossval=True):
     ]
 
 
-def progress_check(sections, key):
+def progress_check(sac, sections, key):
     """
     Given the content of sf_sac_sections from sac_validation_shape (plus a
     single_audit_report key) and a key, determine whether that key is required, and
@@ -111,7 +112,7 @@ def progress_check(sections, key):
 
     # The General Information has its own condition, as it can be partially completed.
     if key == "general_information":
-        return general_information_progress_check(progress, general_info)
+        return general_information_progress_check(progress, general_info, sac)
 
     # If it's not required, it's inactive:
     if not conditions[key]:
@@ -119,12 +120,37 @@ def progress_check(sections, key):
 
     # If it is required, it should be present
     if sections.get(key):
-        return {key: progress | {"display": "complete", "completed": True}}
+        completed_by, completed_date = section_completed_metadata(sac, key)
+
+        return {
+            key: progress
+            | {
+                "display": "complete",
+                "completed": True,
+                "completed_by": completed_by,
+                "completed_date": completed_date,
+            }
+        }
 
     return {key: progress | {"display": "incomplete", "completed": False}}
 
 
-def general_information_progress_check(progress, general_info):
+def section_completed_metadata(sac, section_key):
+    try:
+        section = find_section_by_name(section_key)
+        event_type = section.submission_event
+
+        report_id = sac["sf_sac_meta"]["report_id"]
+        event = SubmissionEvent.objects.filter(
+            sac__report_id=report_id, event=event_type
+        ).latest("timestamp")
+
+        return event.user.email, event.timestamp
+    except SubmissionEvent.DoesNotExist:
+        return None, None
+
+
+def general_information_progress_check(progress, general_info, sac):
     """
     Given a base "progress" dictionary and the general_info object from a submission,
     run validations to determine its completeness. Then, return a dictionary with
@@ -138,8 +164,18 @@ def general_information_progress_check(progress, general_info):
         is_general_info_complete = False
 
     if is_general_info_complete:
+        completed_by, completed_date = section_completed_metadata(
+            sac, "general_information"
+        )
+
         return {
-            "general_information": progress | {"display": "complete", "completed": True}
+            "general_information": progress
+            | {
+                "display": "complete",
+                "completed": True,
+                "completed_by": completed_by,
+                "completed_date": completed_date,
+            }
         }
     return {
         "general_information": progress | {"display": "incomplete", "completed": False}
