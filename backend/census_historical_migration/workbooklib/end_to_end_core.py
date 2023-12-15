@@ -8,6 +8,10 @@ from ..workbooklib.workbook_section_handlers import (
 )
 from ..workbooklib.post_upload_utils import _post_upload_pdf
 from ..sac_general_lib.sac_creator import setup_sac
+from ..models import (
+  ReportMigrationStatus,
+  MigrationErrorDetail,
+)
 from audit.intake_to_dissemination import IntakeToDissemination
 from dissemination.models import (
     AdditionalEin,
@@ -21,7 +25,7 @@ from dissemination.models import (
     Passthrough,
     SecondaryAuditor,
 )
-
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 import argparse
@@ -265,13 +269,19 @@ def run_end_to_end(user, audit_header, result):
             result["success"].append(f"{sac.report_id} created")
     except Exception as exc:
         error_type = type(exc)
+        tag = exc.tag
 
         if error_type == ValidationError:
             logger.error(f"ValidationError: {exc}")
+            tag = "schema_validation"
+        elif error_type == DataMigrationError:
+            logger.error(f"CrossValidationError: {exc}")
+            tag = "cross_validation"
         elif error_type == DataMigrationError:
             logger.error(f"DataMigrationError: {exc.message}")
         else:
             logger.error(f"Unexpected error type {error_type}: {exc}")
+            tag = "exception"
 
             tb = traceback.extract_tb(sys.exc_info()[2])
             for frame in tb:
@@ -280,3 +290,43 @@ def run_end_to_end(user, audit_header, result):
                 )
 
         result["errors"].append(f"{exc}")
+
+        status = record_migration_status(
+            audit_header.AUDITYEAR,
+            audit_header.DBKEY,
+            True,
+        )
+        record_migration_error(
+            exc,
+            tag,
+            status.id,
+        )
+    else:
+        status = record_migration_status(
+            audit_header.AUDITYEAR,
+            audit_header.DBKEY,
+            len(result["errors"]) > 0,
+        )
+
+
+def record_migration_status(audit_year, dbkey, has_failed):
+    """Write a migration status to the DB"""
+
+    status = "FAILURE" if has_failed else "SUCCESS"
+    return ReportMigrationStatus(
+        audit_year=audit_year,
+        dbkey=dbkey,
+        run_datetime=timezone.now(),
+        migration_status=status,
+    ).save()
+
+
+def record_migration_error(exception, tag, status_id):
+    """Write a migration error to the DB"""
+
+    ReportMigrationError(
+        tag=tag,
+        exception_class=exception.__name__,
+        detail=exception.message or str(exception),
+        report_migration_status=status_id,
+    ).save()
