@@ -533,3 +533,4 @@ OMB_EXP_DATE = "09/30/2026"
 # APP-level constants
 DOLLAR_THRESHOLD = 750000
 CENSUS_DATA_SOURCE = "CENSUS"
+GSA_MIGRATION = "GSA_MIGRATION" # There is a copy of `GSA_MIGRATION` in Base.libsonnet. If you change it here, change it there too.
