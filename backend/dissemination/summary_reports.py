@@ -2,6 +2,7 @@ from datetime import datetime
 import openpyxl as pyxl
 import io
 import logging
+import uuid
 
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
@@ -106,6 +107,150 @@ columns = [
     "BJ",
 ]
 
+field_name_ordered = {
+    "general": [
+        'report_id', 
+        'audit_year', 
+        'total_amount_expended',
+        'entity_type', 
+        'fy_start_date', 
+        'fy_end_date', 
+        'audit_type', 
+        'audit_period_covered', 
+        'number_months', 
+        'auditee_uei', 
+        'auditee_ein', 
+        # multiple_eins
+        'auditee_name', 
+        'auditee_address_line_1', 
+        'auditee_city', 
+        'auditee_state', 
+        'auditee_zip', 
+        'auditee_contact_name', 
+        'auditee_contact_title', 
+        'auditee_phone', 
+        'auditee_email', 
+        'auditee_certified_date', 
+        'auditee_certify_name', 
+        'auditee_certify_title', 
+        'auditor_ein', 
+        'auditor_firm_name', 
+        'auditor_address_line_1', 
+        'auditor_city', 
+        'auditor_state', 
+        'auditor_zip', 
+        'auditor_country', 
+        'auditor_contact_name', 
+        'auditor_contact_title', 
+        'auditor_phone', 
+        'auditor_email', 
+        'auditor_foreign_address', 
+        'auditor_certified_date', 
+        'cognizant_agency', 
+        'oversight_agency', 
+        'type_audit_code', 
+        'sp_framework_basis', 
+        'is_sp_framework_required', 
+        'is_going_concern_included', 
+        'is_internal_control_deficiency_disclosed', 
+        'is_internal_control_material_weakness_disclosed',
+        'is_material_noncompliance_disclosed', 
+        'gaap_results',                
+        'is_aicpa_audit_guide_included', 
+        'sp_framework_opinions', 
+        'agencies_with_prior_findings', 
+        'dollar_threshold', 
+        'is_low_risk_auditee', 
+        'is_additional_ueis', 
+        'date_created', 
+        'fac_accepted_date', 
+        'ready_for_certification_date', 
+        'submitted_date', 
+        'data_source',
+        'is_public', 
+        ],
+    "federalaward": [
+        'report_id', 
+        'award_reference', 
+        'federal_agency_prefix', 
+        'federal_award_extension', 
+        'findings_count', 
+        'additional_award_identification', 
+        'federal_program_name', 
+        'amount_expended', 
+        'federal_program_total', 
+        'cluster_name', 
+        'state_cluster_name',
+        'other_cluster_name', 
+        'cluster_total', 
+        'is_direct', 
+        'is_passthrough_award', 
+        'passthrough_amount', 
+        'is_major', 
+        'audit_report_type',         
+        'is_loan', 
+        'loan_balance', 
+        ],
+    "finding": [
+        'report_id',
+        'award_reference',
+        'reference_number', 
+        'type_requirement',
+        'is_modified_opinion', 
+        'is_other_findings', 
+        'is_material_weakness', 
+        'is_significant_deficiency', 
+        'is_other_matters', 
+        'is_questioned_costs', 
+        'is_repeat_finding', 
+        'prior_finding_ref_numbers', 
+        ],
+    "findingtext": [
+        'id',
+        'report_id',
+        'finding_ref_number', 
+        'contains_chart_or_table', 
+        'finding_text',
+        ],
+    "note": [
+        'id',
+        'report_id',
+        'note_title', 
+        'is_minimis_rate_used', 
+        'accounting_policies', 
+        'rate_explained', 
+        'content', 
+        'contains_chart_or_table',
+        ],
+    "captext": [
+        'report_id',
+        'finding_ref_number', 
+        'planned_action',
+        'contains_chart_or_table', 
+        ],
+    "additionalein": ['report_id', 'additional_ein'],
+    "additionaluei": ['report_id', 'additional_uei'],
+    "passthrough": [
+        'report_id', 
+        'award_reference', 
+        'passthrough_name',
+        'passthrough_id', 
+        ],
+    "secondaryauditor": [
+        'report_id',
+        'auditor_name', 
+        'auditor_ein', 
+        'address_street', 
+        'address_city', 
+        'address_state', 
+        'address_zipcode', 
+        'contact_name', 
+        'contact_title',
+        'contact_email', 
+        'contact_phone', 
+        ]                               
+
+}
 
 def set_column_widths(worksheet):
     dims = {}
@@ -116,7 +261,23 @@ def set_column_widths(worksheet):
                     (dims.get(cell.column, 0), len(str(cell.value)))
                 )
     for col, value in dims.items():
-        worksheet.column_dimensions[columns[col - 1]].width = value
+        # Pad the column by a bit, so things are not cramped.
+        worksheet.column_dimensions[columns[col - 1]].width = int(value * 1.2)
+
+def protect_sheet(sheet):
+    sheet.protection.sheet = True
+    sheet.protection.password = str(uuid.uuid4())
+    sheet.protection.enable()
+
+def insert_coversheet(workbook):
+    sheet = workbook.create_sheet("Coversheet")
+    sheet.append(["Time created", 
+                  datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")])
+    sheet.append(["Note",
+                  "This file is for review only and can't be edited."
+                  ])
+    set_column_widths(sheet)
+    protect_sheet(sheet)
 
 
 def gather_report_data_dissemination(report_ids):
@@ -144,8 +305,11 @@ def gather_report_data_dissemination(report_ids):
     for model in models:
         model_name = model.__name__.lower()
 
-        fields = model._meta.get_fields()
-        field_names = [f.name for f in fields]
+        # This pulls directly from the model
+        #   fields = model._meta.get_fields()
+        #   field_names = [f.name for f in fields]
+        # This uses the ordered columns above 
+        field_names = field_name_ordered[model_name]
 
         data[model_name] = {"field_names": field_names, "entries": []}
 
@@ -203,10 +367,14 @@ def gather_report_data_pre_certification(i2d_data):
     # Once a row is created, append it to the data[ModelName]['entries'] array.
     for model in models:
         model_name = model.__name__.lower()
-        fields = model._meta.get_fields()
-        field_names = [f.name for f in fields]
+        # This pulls directly from the model
+        #   fields = model._meta.get_fields()
+        #   field_names = [f.name for f in fields]
+        # This uses the ordered columns above 
+        field_names = field_name_ordered[model_name]
         data[model_name] = {"field_names": field_names, "entries": []}
 
+        
         for obj in dissemination_data[model_name]:
             row = []
             for field_name in field_names:
@@ -222,6 +390,8 @@ def gather_report_data_pre_certification(i2d_data):
 
 def create_workbook(data):
     workbook = pyxl.Workbook()
+
+    insert_coversheet(workbook)
 
     for sheet_name in data.keys():
         sheet = workbook.create_sheet(sheet_name)
@@ -241,6 +411,7 @@ def create_workbook(data):
             workbook.defined_names.add(named_range)
 
         set_column_widths(sheet)
+        protect_sheet(sheet)
 
     # remove sheet that is created during workbook construction
     workbook.remove_sheet(workbook.get_sheet_by_name("Sheet"))
@@ -260,7 +431,7 @@ def persist_workbook(workbook):
 
     with MemoryFS() as mem_fs:
         now = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-        filename = f"bulk-{now}.xlsx"
+        filename = f"fac-summary-report-{now}.xlsx"
         s3_dir = "temp"
 
         workbook_write_fp = mem_fs.openbin(filename, mode="w")
@@ -294,6 +465,8 @@ def generate_summary_report(report_ids):
 def generate_presubmission_report(i2d_data):
     data = gather_report_data_pre_certification(i2d_data)
     workbook = create_workbook(data)
+    workbook.security.workbookPassword = str(uuid.uuid4())
+    workbook.security.lockStructure = True
     filename = persist_workbook(workbook)
 
     return filename
