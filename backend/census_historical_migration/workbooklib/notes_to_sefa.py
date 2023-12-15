@@ -1,3 +1,4 @@
+from django.conf import settings
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import string_to_string
 from ..models import ELECNOTES as Notes
@@ -70,8 +71,6 @@ def xform_is_minimis_rate_used(rate_content):
             # FIXME-MSHD: RECORD THIS TRANSFORMATION
             return "Y"
 
-    # I am raising an exception here because we cannot clearly determine if the de minimis rate was used.
-    # return "Both"
     raise DataMigrationError("Unable to determine if the de minimis rate was used.")
 
 
@@ -138,12 +137,13 @@ def generate_notes_to_sefa(audit_header, outfile):
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)
 
-    # Add a Y/N column
-    # def set_range(wb, range_name, values, default=None, conversion_fun=str):
-    # FIXME-MSHD: We do not have a match for contains_chart_or_table in historical data ?
-    # If there is no match in historic data, then this is not a transformation.
-    # Should this be recorded ?
-    set_range(wb, "contains_chart_or_table", map(lambda v: "N", notes), "N", str)
+    set_range(
+        wb,
+        "contains_chart_or_table",
+        map(lambda v: settings.GSA_MIGRATION, notes),
+        "N",
+        str,
+    )
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
