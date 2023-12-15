@@ -6,11 +6,11 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
 
-from audit.file_downloads import get_download_url, get_filename
 from audit.models import SingleAuditChecklist
 
 from config.settings import STATE_ABBREVS
 
+from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import SearchForm
 from dissemination.search import search_general
 from dissemination.mixins import ReportAccessRequiredMixin
@@ -25,6 +25,7 @@ from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
 )
+from dissemination.summary_reports import generate_summary_report
 
 from users.permissions import can_read_tribal
 
@@ -222,3 +223,12 @@ class XlsxDownloadView(ReportAccessRequiredMixin, View):
         filename = get_filename(sac, file_type)
 
         return redirect(get_download_url(filename))
+
+
+class SummaryReportDownloadView(ReportAccessRequiredMixin, View):
+    def get(self, request, report_id):
+        sac = get_object_or_404(General, report_id=report_id)
+        filename = generate_summary_report([sac.report_id])
+        download_url = get_download_url(filename)
+
+        return redirect(download_url)
