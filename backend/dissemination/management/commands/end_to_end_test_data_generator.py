@@ -1,6 +1,7 @@
 import os
 import logging
 import sys
+import argparse
 
 from config.settings import ENVIRONMENT
 from django.core.management.base import BaseCommand
@@ -17,11 +18,20 @@ class Command(BaseCommand):
         )
         parser.add_argument("--dbkeys", type=str, required=False, default="")
         parser.add_argument("--years", type=str, required=False, default="")
+        parser.add_argument(
+            "--store", action=argparse.BooleanOptionalAction, default=False
+        )
+        parser.add_argument(
+            "--apichecks", action=argparse.BooleanOptionalAction, default=True
+        )
 
     def handle(self, *args, **options):
         dbkeys_str = options["dbkeys"]
         years_str = options["years"]
         email_str = options["email"]
+        store_files = options["store"]
+        run_api_checks = options["apichecks"]
+
         dbkeys = dbkeys_str.split(",")
         years = years_str.split(",")
 
@@ -50,11 +60,17 @@ class Command(BaseCommand):
                     f"Generating test reports for DBKEYS: {dbkeys_str} and YEARS: {years_str}"
                 )
                 for dbkey, year in zip(dbkeys, years):
-                    run_end_to_end(email_str, dbkey, year)
+                    run_end_to_end(email_str, dbkey, year, store_files, run_api_checks)
             else:
                 for pair in defaults:
                     logger.info("Running {}-{} end-to-end".format(pair[0], pair[1]))
-                    run_end_to_end(email_str, str(pair[0]), str(pair[1]))
+                    run_end_to_end(
+                        email_str,
+                        str(pair[0]),
+                        str(pair[1]),
+                        store_files,
+                        run_api_checks,
+                    )
         else:
             logger.error(
                 "Cannot run end-to-end workbook generation in production. Exiting."
