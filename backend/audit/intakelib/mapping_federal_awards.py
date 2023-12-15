@@ -35,7 +35,7 @@ from .transforms import run_all_federal_awards_transforms
 logger = logging.getLogger(__name__)
 
 
-def extract_federal_awards(file, is_gsa_migration=True):
+def extract_federal_awards(file, is_gsa_migration=False):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / FEDERAL_AWARDS_TEMPLATE_DEFINITION
     )
