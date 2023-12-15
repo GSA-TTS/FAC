@@ -268,8 +268,8 @@ def protect_sheet(sheet):
     sheet.protection.password = str(uuid.uuid4())
     sheet.protection.enable()
 
-def insert_coversheet(workbook):
-    sheet = workbook.create_sheet("Coversheet")
+def insert_precert_coversheet(workbook):
+    sheet = workbook.create_sheet("Coversheet", 0)
     sheet.append(["Time created", 
                   datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")])
     sheet.append(["Note",
@@ -277,6 +277,12 @@ def insert_coversheet(workbook):
                   ])
     set_column_widths(sheet)
     protect_sheet(sheet)
+
+def insert_dissem_coversheet(workbook):
+    sheet = workbook.create_sheet("Coversheet", 0)
+    sheet.append(["Time created", 
+                  datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")])
+    set_column_widths(sheet)
 
 
 def gather_report_data_dissemination(report_ids):
@@ -390,8 +396,6 @@ def gather_report_data_pre_certification(i2d_data):
 def create_workbook(data, protect_sheets=False):
     workbook = pyxl.Workbook()
 
-    insert_coversheet(workbook)
-
     for sheet_name in data.keys():
         sheet = workbook.create_sheet(sheet_name)
 
@@ -457,6 +461,7 @@ def persist_workbook(workbook):
 def generate_summary_report(report_ids):
     data = gather_report_data_dissemination(report_ids)
     workbook = create_workbook(data)
+    insert_dissem_coversheet(workbook)
     filename = persist_workbook(workbook)
 
     return filename
@@ -465,6 +470,7 @@ def generate_summary_report(report_ids):
 def generate_presubmission_report(i2d_data):
     data = gather_report_data_pre_certification(i2d_data)
     workbook = create_workbook(data, protect_sheets=True)
+    insert_precert_coversheet(workbook)
     workbook.security.workbookPassword = str(uuid.uuid4())
     workbook.security.lockStructure = True
     filename = persist_workbook(workbook)
