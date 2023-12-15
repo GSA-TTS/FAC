@@ -120,7 +120,6 @@ field_name_ordered = {
         'number_months', 
         'auditee_uei', 
         'auditee_ein', 
-        # multiple_eins
         'auditee_name', 
         'auditee_address_line_1', 
         'auditee_city', 
@@ -388,7 +387,7 @@ def gather_report_data_pre_certification(i2d_data):
     return data
 
 
-def create_workbook(data):
+def create_workbook(data, protect_sheets=False):
     workbook = pyxl.Workbook()
 
     insert_coversheet(workbook)
@@ -411,7 +410,8 @@ def create_workbook(data):
             workbook.defined_names.add(named_range)
 
         set_column_widths(sheet)
-        protect_sheet(sheet)
+        if protect_sheets:
+            protect_sheet(sheet)
 
     # remove sheet that is created during workbook construction
     workbook.remove_sheet(workbook.get_sheet_by_name("Sheet"))
@@ -464,7 +464,7 @@ def generate_summary_report(report_ids):
 
 def generate_presubmission_report(i2d_data):
     data = gather_report_data_pre_certification(i2d_data)
-    workbook = create_workbook(data)
+    workbook = create_workbook(data, protect_sheets=True)
     workbook.security.workbookPassword = str(uuid.uuid4())
     workbook.security.lockStructure = True
     filename = persist_workbook(workbook)
