@@ -19,7 +19,7 @@ class TestCheckForGsaMigrationKeyword(SimpleTestCase):
                 "name": "Sheet1",
                 "ranges": [
                     {
-                        "name": random.choice(self.range_names),
+                        "name": random.choice(self.range_names),  # nosec
                         "start_cell": {"column": "A", "row": "1"},
                         "end_cell": {"column": "A", "row": "4"},
                         "values": [
@@ -37,7 +37,7 @@ class TestCheckForGsaMigrationKeyword(SimpleTestCase):
                 "name": "Sheet1",
                 "ranges": [
                     {
-                        "name": random.choice(self.range_names),
+                        "name": random.choice(self.range_names),  # nosec
                         "start_cell": {"column": "A", "row": "1"},
                         "end_cell": {"column": "A", "row": "3"},
                         "values": [

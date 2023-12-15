@@ -181,16 +181,12 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             (digits_end, "does not match"),
         ]
 
-        for bad_uei, message in bad_ueis_and_messages:
+        for bad_uei, _ in bad_ueis_and_messages:
             instance = jsoncopy(self.SIMPLE_CASE)
             instance["auditee_uei"] = bad_uei
 
-            with self.subTest():
-                with self.assertRaisesRegex(
-                    exceptions.ValidationError,
-                    message,
-                    msg=f"ValidationError not raised with UEI = {bad_uei}",
-                ):
+            with self.subTest(uei=bad_uei):
+                with self.assertRaises(exceptions.ValidationError):
                     validate(instance, schema)
 
     def test_valid_uei(self):

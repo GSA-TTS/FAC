@@ -96,8 +96,7 @@
                                           "WIOA CLUSTER",
                                           "CDBG - ENTITLEMENT GRANTS CLUSTER",
                                           "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
-                                          "N/A",
-                                          "GSA_MIGRATION"
+                                          "N/A"
                                        ],
                                        "type": "string"
                                     }
