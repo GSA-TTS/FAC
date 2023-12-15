@@ -15,10 +15,9 @@ def xform_add_hyphen_to_zip(zip):
     if len(strzip) in [4, 8]:
         # FIXME - MSHD: Record this transformation if len == 4.
         strzip = "0" + strzip
-    if len(strzip) == 5:
+    if len(strzip) == 5 or len(strzip) == 9:
         return strzip
-    elif len(strzip) == 9:
-        # FIXME - MSHD: Record this transformation.
-        return f"{strzip[0:5]}-{strzip[5:9]}"
+    # elif len(strzip) == 9:
+    # return f"{strzip[0:5]}-{strzip[5:9]}" FIXME - MSHD: our schema does not allow hyphens in zip codes, why are we doing this ???
     else:
         raise DataMigrationError("Zip code is malformed.")

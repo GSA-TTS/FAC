@@ -134,13 +134,15 @@ def generate_notes_to_sefa(audit_header, outfile):
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
     set_range(wb, "rate_explained", [rate_content])
 
+    contains_chart_or_tables = [settings.GSA_MIGRATION] * len(notes)
+
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)
 
     set_range(
         wb,
         "contains_chart_or_table",
-        map(lambda v: settings.GSA_MIGRATION, notes),
+        contains_chart_or_tables,
         "N",
         str,
     )
@@ -153,5 +155,9 @@ def generate_notes_to_sefa(audit_header, outfile):
     table["singletons"]["is_minimis_rate_used"] = is_minimis_rate_used
     table["singletons"]["rate_explained"] = rate_content
     table["singletons"]["auditee_uei"] = uei
+
+    for obj, ar in zip(table["rows"], contains_chart_or_tables):
+        obj["fields"].append("contains_chart_or_table")
+        obj["values"].append(ar)
 
     return (wb, table)

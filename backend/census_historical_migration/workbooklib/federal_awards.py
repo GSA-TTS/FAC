@@ -284,6 +284,7 @@ def generate_federal_awards(audit_header, outfile):
     ) = xform_constructs_cluster_names(audits)
     set_range(wb, "cluster_name", cluster_names)
     set_range(wb, "other_cluster_name", other_cluster_names)
+    set_range(wb, "state_cluster_name", state_cluster_names)
 
     # We need a `cfda_key` as a magic column for the summation logic to work/be checked.
     full_cfdas = _get_full_cfdas(audits)
@@ -317,22 +318,25 @@ def generate_federal_awards(audit_header, outfile):
     )
 
     # passthrough amount
-    set_range(
-        wb, "subrecipient_amount", xform_populate_default_passthrough_amount(audits)
-    )
+    passthrough_amounts = xform_populate_default_passthrough_amount(audits)
+    set_range(wb, "subrecipient_amount", passthrough_amounts)
 
     # additional award identification
+    additional_award_identifications = (
+        xform_populate_default_award_identification_values(audits)
+    )
     set_range(
         wb,
         "additional_award_identification",
-        xform_populate_default_award_identification_values(audits),
+        additional_award_identifications,
     )
 
     # loan balance at audit period end
+    loan_balances = xform_populate_default_loan_balance(audits)
     set_range(
         wb,
         "loan_balance_at_audit_period_end",
-        xform_populate_default_loan_balance(audits),
+        loan_balances,
     )
 
     # Total amount expended must be calculated and inserted
@@ -354,15 +358,16 @@ def generate_federal_awards(audit_header, outfile):
             "additional_award_identification",
             "federal_agency_prefix",
             "three_digit_extension",
+            "passthrough_name",
+            "passthrough_identifying_number",
+            "subrecipient_amount",
+            "loan_balance_at_audit_period_end",
         ]
     ]
     ranges = get_ranges(filtered_mappings, audits)
     prefixes = get_range_values(ranges, "federal_agency_prefix")
     extensions = get_range_values(ranges, "three_digit_extension")
-    additional_award_identifications = get_range_values(
-        ranges, "additional_award_identification"
-    )
-    # prefix
+
     for (
         award,
         prefix,
@@ -370,6 +375,9 @@ def generate_federal_awards(audit_header, outfile):
         additional_identification,
         cluster_name,
         other_cluster_name,
+        state_cluster_name,
+        passthrough_amount,
+        loan_balance,
     ) in zip(
         table["rows"],
         prefixes,
@@ -377,20 +385,35 @@ def generate_federal_awards(audit_header, outfile):
         additional_award_identifications,
         cluster_names,
         other_cluster_names,
+        state_cluster_names,
+        passthrough_amounts,
+        loan_balances,
     ):
-        award["fields"].append("federal_agency_prefix")
-        award["values"].append(prefix)
-        award["fields"].append("federal_award_extension")
-        award["values"].append(extension)
-        # Sneak in the award number here
-        award["fields"].append("award_reference")
-        award["values"].append(f"AWARD-{award_counter:04}")
-        award["fields"].append("additional_award_identification")
-        award["values"].append(additional_identification)
-        award["fields"].append("cluster_name")
-        award["values"].append(cluster_name)
-        award["fields"].append("other_cluster_name")
-        award["values"].append(other_cluster_name)
+        # Function to update or append field/value
+        def update_or_append_field(field_name, field_value):
+            if field_name in award["fields"]:
+                index = award["fields"].index(field_name)
+                print(
+                    f"Updating {field_name} from {award['values'][index]} to {field_value}"
+                )
+                award["values"][index] = field_value
+            else:
+                award["fields"].append(field_name)
+                award["values"].append(field_value)
+
+        # Update or append new field-value pairs
+        update_or_append_field("federal_agency_prefix", prefix)
+        update_or_append_field("federal_award_extension", extension)
+        update_or_append_field("award_reference", f"AWARD-{award_counter:04}")
+        update_or_append_field(
+            "additional_award_identification", additional_identification
+        )
+        update_or_append_field("cluster_name", cluster_name)
+        update_or_append_field("other_cluster_name", other_cluster_name)
+        update_or_append_field("state_cluster_name", state_cluster_name)
+        update_or_append_field("passthrough_amount", passthrough_amount)
+        update_or_append_field("loan_balance", loan_balance)
+
         award_counter += 1
 
     table["singletons"]["auditee_uei"] = uei

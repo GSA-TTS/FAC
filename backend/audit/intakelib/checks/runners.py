@@ -172,32 +172,34 @@ def run_all_general_checks(ir, section_name, is_data_migration=False):
 
 
 def run_all_federal_awards_checks(ir, is_data_migration=False):
-    run_all_checks(ir, federal_awards_checks, is_data_migration)
+    run_all_checks(ir, federal_awards_checks, is_data_migration=is_data_migration)
 
 
 def run_all_notes_to_sefa_checks(ir, is_data_migration=False):
-    run_all_checks(ir, notes_to_sefa_checks, is_data_migration)
+    run_all_checks(ir, notes_to_sefa_checks, is_data_migration=is_data_migration)
 
 
 def run_all_audit_finding_checks(ir, is_data_migration=False):
-    run_all_checks(ir, audit_findings_checks, is_data_migration)
+    run_all_checks(ir, audit_findings_checks, is_data_migration=is_data_migration)
 
 
 def run_all_additional_eins_checks(ir, is_data_migration=False):
-    run_all_checks(ir, additional_eins_checks, is_data_migration)
+    run_all_checks(ir, additional_eins_checks, is_data_migration=is_data_migration)
 
 
 def run_all_additional_ueis_checks(ir, is_data_migration=False):
-    run_all_checks(ir, additional_ueis_checks, is_data_migration)
+    run_all_checks(ir, additional_ueis_checks, is_data_migration=is_data_migration)
 
 
 def run_all_audit_findings_text_checks(ir, is_data_migration=False):
-    run_all_checks(ir, audit_findings_text_checks, is_data_migration)
+    run_all_checks(ir, audit_findings_text_checks, is_data_migration=is_data_migration)
 
 
 def run_all_corrective_action_plan_checks(ir, is_data_migration=False):
-    run_all_checks(ir, corrective_action_plan_checks, is_data_migration)
+    run_all_checks(
+        ir, corrective_action_plan_checks, is_data_migration=is_data_migration
+    )
 
 
 def run_all_secondary_auditors_checks(ir, is_data_migration=False):
-    run_all_checks(ir, secondary_auditors_checks, is_data_migration)
+    run_all_checks(ir, secondary_auditors_checks, is_data_migration=is_data_migration)

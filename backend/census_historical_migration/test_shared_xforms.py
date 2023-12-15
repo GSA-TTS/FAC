@@ -203,13 +203,13 @@ class TestXformAddHyphenToZip(SimpleTestCase):
         self.assertEqual(xform_add_hyphen_to_zip("12345"), "12345")
 
     def test_nine_digit_zip(self):
-        self.assertEqual(xform_add_hyphen_to_zip("123456789"), "12345-6789")
+        self.assertEqual(xform_add_hyphen_to_zip("123456789"), "123456789")
 
     def test_four_digit_zip(self):
         self.assertEqual(xform_add_hyphen_to_zip("1234"), "01234")
 
     def test_eight_digit_zip(self):
-        self.assertEqual(xform_add_hyphen_to_zip("12345678"), "01234-5678")
+        self.assertEqual(xform_add_hyphen_to_zip("12345678"), "012345678")
 
     def test_malformed_zip(self):
         with self.assertRaises(DataMigrationError):
