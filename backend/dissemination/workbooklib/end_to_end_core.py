@@ -9,6 +9,7 @@ import jwt
 import requests
 from pprint import pprint
 from datetime import datetime, timezone
+from audit.models import SingleAuditChecklist
 
 from dissemination.workbooklib.workbook_creation import (
     sections,
@@ -43,23 +44,14 @@ pw.setLevel(logging.INFO)
 
 
 def step_through_certifications(sac):
-    class STATUS:
-        IN_PROGRESS = "in_progress"
-        READY_FOR_CERTIFICATION = "ready_for_certification"
-        AUDITOR_CERTIFIED = "auditor_certified"
-        AUDITEE_CERTIFIED = "auditee_certified"
-        CERTIFIED = "certified"
-        SUBMITTED = "submitted"
-        DISSEMINATED = "disseminated"
-
     stati = [
-        STATUS.IN_PROGRESS,
-        STATUS.READY_FOR_CERTIFICATION,
-        STATUS.AUDITOR_CERTIFIED,
-        STATUS.AUDITEE_CERTIFIED,
-        STATUS.CERTIFIED,
-        STATUS.SUBMITTED,
-        STATUS.DISSEMINATED,
+        SingleAuditChecklist.STATUS.IN_PROGRESS,
+        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        SingleAuditChecklist.STATUS.CERTIFIED,
+        SingleAuditChecklist.STATUS.SUBMITTED,
+        SingleAuditChecklist.STATUS.DISSEMINATED,
     ]
     for status in stati:
         sac.transition_name.append(status)
