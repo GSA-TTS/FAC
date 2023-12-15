@@ -67,7 +67,7 @@ def get_download_url(filename):
 
         if file_exists(filename):
             # Remove directory information
-            nicer_filename = filename.split('/')[-1]
+            nicer_filename = filename.split("/")[-1]
             response = s3_client.generate_presigned_url(
                 ClientMethod="get_object",
                 Params={
