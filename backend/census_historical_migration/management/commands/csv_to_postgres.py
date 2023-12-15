@@ -9,6 +9,7 @@ from botocore.exceptions import ClientError
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.apps import apps
+from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
@@ -125,10 +126,11 @@ class Command(BaseCommand):
         return None
 
     def load_data(self, file, model_obj, chunk_size):
+        dtypes = defaultdict(lambda: str)
         print("Starting load data to postgres")
         file.seek(0)
         rows_loaded = 0
-        for df in pd.read_csv(file, iterator=True, chunksize=chunk_size):
+        for df in pd.read_csv(file, iterator=True, chunksize=chunk_size, dtype=dtypes):
             # Each row is a dictionary. The columns are the
             # correct names for our model. So, this should be a
             # clean way to load the model from a row.
