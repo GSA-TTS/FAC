@@ -74,15 +74,16 @@
           "is_loan",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
         ],
         "values": [
           "97",
@@ -93,14 +94,15 @@
           "N",
           "Y",
           "N",
+          "",
           "N",
           1,
           2564216,
-          "97",
-          "083",
           "AWARD-0001",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
+          "",
           ""
         ]
       },
@@ -114,16 +116,17 @@
           "is_loan",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "audit_report_type",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
         ],
         "values": [
           "21",
@@ -134,15 +137,16 @@
           "N",
           "N",
           "N",
+          "",
           "Y",
           "U",
           2,
           1458378,
-          "21",
-          "027",
           "AWARD-0002",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
+          "",
           ""
         ]
       },
@@ -156,16 +160,17 @@
           "is_loan",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "audit_report_type",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
         ],
         "values": [
           "97",
@@ -176,15 +181,16 @@
           "N",
           "Y",
           "N",
+          "",
           "Y",
           "U",
           0,
           289749,
-          "97",
-          "044",
           "AWARD-0003",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
+          "",
           ""
         ]
       }
@@ -337,21 +343,25 @@
       {
         "fields": [
           "title",
-          "content"
+          "content",
+          "contains_chart_or_table"
         ],
         "values": [
           "Basis of Presentation",
-          "The accompanying schedule of expenditures of federal awards includes the federal grant activity of the Cosumnes Community Services District (the District) under programs of the federal government for the year ended June 30, 2021. The information in this schedule is presented in accordance with the requirements of Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Because the Schedule presents only a selected portion of the Districts operations, it is not intended to be and does not present the financial position, changes in net position, or cash flows of the District. Therefore, some amounts presented in this schedule may differ from amounts presented in, or used in the preparation of, the basic financial statements."
+          "The accompanying schedule of expenditures of federal awards includes the federal grant activity of the Cosumnes Community Services District (the District) under programs of the federal government for the year ended June 30, 2021. The information in this schedule is presented in accordance with the requirements of Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Because the Schedule presents only a selected portion of the Districts operations, it is not intended to be and does not present the financial position, changes in net position, or cash flows of the District. Therefore, some amounts presented in this schedule may differ from amounts presented in, or used in the preparation of, the basic financial statements.",
+          "GSA_MIGRATION"
         ]
       },
       {
         "fields": [
           "title",
-          "content"
+          "content",
+          "contains_chart_or_table"
         ],
         "values": [
           "Subrecipients",
-          "The District did not have any subrecipients of its federal programs."
+          "The District did not have any subrecipients of its federal programs.",
+          "GSA_MIGRATION"
         ]
       }
     ],

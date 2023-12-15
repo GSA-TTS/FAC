@@ -370,7 +370,7 @@ local SchemaBase = Types.object {
     },
     ClusterNamesNA: Types.string {
       description: 'All cluster names + N/A',
-      enum: ClusterNames.cluster_names + [Const.NA, Const.GSA_MIGRATION],
+      enum: ClusterNames.cluster_names + [Const.NA],
     },
     ClusterNamesNAStateOther: Types.string {
       description: 'All cluster names',
