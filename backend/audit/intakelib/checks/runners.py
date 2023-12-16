@@ -131,36 +131,28 @@ secondary_auditors_checks = general_checks + [
 ]
 
 
-def append_errors(errors, new_errors):
-    """Append errors to the errors list"""
-    if isinstance(new_errors, list) and all(
-        map(lambda v: isinstance(v, tuple), new_errors)
-    ):
-        errors = errors + new_errors
-    elif isinstance(new_errors, tuple):
-        errors.append(new_errors)
-    else:
-        pass
-
-    return errors
-
-
 def run_all_checks(ir, list_of_checks, section_name=None, is_data_migration=False):
     show_ir
     errors = []
     if section_name:
         res = is_right_workbook(section_name)(ir)
-        append_errors(errors, res)
+        if res:
+            errors.append(res)
 
     if not is_data_migration:
         check_for_gsa_migration_keyword(ir)
         res = check_cluster_names(ir)
-        append_errors(errors, res)
+        if res:
+            errors.append(res)
 
     for fun in list_of_checks:
         res = fun(ir)
-        append_errors(errors, res)
-
+        if isinstance(res, list) and all(map(lambda v: isinstance(v, tuple), res)):
+            errors = errors + res
+        elif isinstance(res, tuple):
+            errors.append(res)
+        else:
+            pass
     logger.info(f"Found {len(errors)} errors in the IR passes.")
     if len(errors) > 0:
         logger.info("Raising a validation error.")
