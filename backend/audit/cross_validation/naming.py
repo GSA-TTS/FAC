@@ -1,6 +1,8 @@
 from types import new_class
 from typing import NamedTuple
 
+from audit.models.submission_event import SubmissionEvent
+
 # We need a canonical source of the different versions of each name.
 
 
@@ -17,6 +19,7 @@ class SectionBabelFish(NamedTuple):
     snake_case: str  # Mostly used for the field names in SingleAuditChecklist.
     url_tail: str | None  # Hyphenated version of snake_case, mostly.
     workbook_number: int | None  # Our upload ordering of workbooks.
+    submission_event: str  # The event type we log to the SubmissionEvents table when this section is updated
 
 
 SECTION_NAMES = {
@@ -29,6 +32,7 @@ SECTION_NAMES = {
         snake_case="additional_eins",
         url_tail="additional-eins",
         workbook_number=8,
+        submission_event=SubmissionEvent.EventType.ADDITIONAL_EINS_UPDATED,
     ),
     "additional_ueis": SectionBabelFish(
         all_caps="ADDITIONAL_UEIS",
@@ -39,6 +43,7 @@ SECTION_NAMES = {
         snake_case="additional_ueis",
         url_tail="additional-ueis",
         workbook_number=6,
+        submission_event=SubmissionEvent.EventType.ADDITIONAL_UEIS_UPDATED,
     ),
     "audit_information": SectionBabelFish(
         all_caps="AUDIT_INFORMATION",
@@ -49,6 +54,7 @@ SECTION_NAMES = {
         snake_case="audit_information",
         url_tail="audit-information",
         workbook_number=None,
+        submission_event=SubmissionEvent.EventType.AUDIT_INFORMATION_UPDATED,
     ),
     "corrective_action_plan": SectionBabelFish(
         all_caps="CORRECTIVE_ACTION_PLAN",
@@ -59,6 +65,7 @@ SECTION_NAMES = {
         reverse_url="report_submission:CAP",
         url_tail="cap",
         workbook_number=5,
+        submission_event=SubmissionEvent.EventType.CORRECTIVE_ACTION_PLAN_UPDATED,
     ),
     "federal_awards": SectionBabelFish(
         all_caps="FEDERAL_AWARDS",
@@ -69,6 +76,7 @@ SECTION_NAMES = {
         snake_case="federal_awards",
         url_tail="federal-awards",
         workbook_number=1,
+        submission_event=SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
     ),
     "findings_text": SectionBabelFish(
         all_caps="FINDINGS_TEXT",
@@ -79,6 +87,7 @@ SECTION_NAMES = {
         snake_case="findings_text",
         url_tail="audit-findings-text",
         workbook_number=4,
+        submission_event=SubmissionEvent.EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED,
     ),
     "findings_uniform_guidance": SectionBabelFish(
         all_caps="FINDINGS_UNIFORM_GUIDANCE",
@@ -89,6 +98,7 @@ SECTION_NAMES = {
         snake_case="findings_uniform_guidance",
         url_tail="audit-findings",
         workbook_number=3,
+        submission_event=SubmissionEvent.EventType.FINDINGS_UNIFORM_GUIDANCE_UPDATED,
     ),
     "general_information": SectionBabelFish(
         all_caps="GENERAL_INFORMATION",
@@ -99,6 +109,7 @@ SECTION_NAMES = {
         snake_case="general_information",
         url_tail="general-information",
         workbook_number=None,
+        submission_event=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
     ),
     "notes_to_sefa": SectionBabelFish(
         all_caps="NOTES_TO_SEFA",
@@ -109,6 +120,7 @@ SECTION_NAMES = {
         snake_case="notes_to_sefa",
         url_tail="notes-to-sefa",
         workbook_number=2,
+        submission_event=SubmissionEvent.EventType.NOTES_TO_SEFA_UPDATED,
     ),
     "single_audit_report": SectionBabelFish(
         all_caps="SINGLE_AUDIT_REPORT",
@@ -119,6 +131,7 @@ SECTION_NAMES = {
         snake_case="single_audit_report",
         url_tail="upload-report",
         workbook_number=None,
+        submission_event=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
     ),
     "secondary_auditors": SectionBabelFish(
         all_caps="SECONDARY_AUDITORS",
@@ -129,6 +142,7 @@ SECTION_NAMES = {
         snake_case="secondary_auditors",
         url_tail="secondary-auditors",
         workbook_number=7,
+        submission_event=SubmissionEvent.EventType.SECONDARY_AUDITORS_UPDATED,
     ),
     "tribal_data_consent": SectionBabelFish(
         all_caps="TRIBAL_DATA_CONSENT",
@@ -139,6 +153,7 @@ SECTION_NAMES = {
         snake_case="tribal_data_consent",
         url_tail=None,
         workbook_number=None,
+        submission_event=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
     ),
 }
 
