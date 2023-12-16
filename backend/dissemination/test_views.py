@@ -65,7 +65,7 @@ class PdfDownloadViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    @patch("audit.file_downloads.file_exists")
+    @patch("dissemination.file_downloads.file_exists")
     def test_file_exists_returns_302(self, mock_file_exists):
         mock_file_exists.return_value = True
 
@@ -82,7 +82,7 @@ class PdfDownloadViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(file.filename, response.url)
 
-    @patch("audit.file_downloads.file_exists")
+    @patch("dissemination.file_downloads.file_exists")
     def test_private_returns_403_for_anonymous(self, mock_file_exists):
         mock_file_exists.return_value = True
 
@@ -96,7 +96,7 @@ class PdfDownloadViewTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    @patch("audit.file_downloads.file_exists")
+    @patch("dissemination.file_downloads.file_exists")
     def test_private_returns_403_for_unpermissioned(self, mock_file_exists):
         mock_file_exists.return_value = True
 
@@ -113,7 +113,7 @@ class PdfDownloadViewTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    @patch("audit.file_downloads.file_exists")
+    @patch("dissemination.file_downloads.file_exists")
     def test_private_returns_302_for_permissioned(self, mock_file_exists):
         mock_file_exists.return_value = True
 
@@ -272,7 +272,7 @@ class XlsxDownloadViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    @patch("audit.file_downloads.file_exists")
+    @patch("dissemination.file_downloads.file_exists")
     def test_file_exists_returns_302(self, mock_file_exists):
         mock_file_exists.return_value = True
 
@@ -293,7 +293,7 @@ class XlsxDownloadViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(file.filename, response.url)
 
-    @patch("audit.file_downloads.file_exists")
+    @patch("dissemination.file_downloads.file_exists")
     def test_private_returns_403_for_anonymous(self, mock_file_exists):
         mock_file_exists.return_value = True
 
@@ -311,7 +311,7 @@ class XlsxDownloadViewTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    @patch("audit.file_downloads.file_exists")
+    @patch("dissemination.file_downloads.file_exists")
     def test_private_returns_403_for_unpermissioned(self, mock_file_exists):
         mock_file_exists.return_value = True
 
@@ -332,7 +332,7 @@ class XlsxDownloadViewTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    @patch("audit.file_downloads.file_exists")
+    @patch("dissemination.file_downloads.file_exists")
     def test_private_returns_302_for_permissioned(self, mock_file_exists):
         mock_file_exists.return_value = True
 

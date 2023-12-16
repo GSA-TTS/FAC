@@ -8,7 +8,8 @@ import os
 import jwt
 import requests
 from pprint import pprint
-from datetime import datetime
+from datetime import datetime, timezone
+from audit.models import SingleAuditChecklist
 
 from dissemination.workbooklib.workbook_creation import (
     sections,
@@ -43,11 +44,18 @@ pw.setLevel(logging.INFO)
 
 
 def step_through_certifications(sac):
-    sac.transition_to_ready_for_certification()
-    sac.transition_to_auditor_certified()
-    sac.transition_to_auditee_certified()
-    sac.transition_to_submitted()
-    sac.transition_to_disseminated()
+    stati = [
+        SingleAuditChecklist.STATUS.IN_PROGRESS,
+        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        SingleAuditChecklist.STATUS.CERTIFIED,
+        SingleAuditChecklist.STATUS.SUBMITTED,
+        SingleAuditChecklist.STATUS.DISSEMINATED,
+    ]
+    for status in stati:
+        sac.transition_name.append(status)
+        sac.transition_date.append(datetime.now(timezone.utc))
     sac.save()
 
 
@@ -189,7 +197,7 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def generate_workbooks(user, email, dbkey, year):
+def generate_workbooks(user, email, dbkey, year, store_files=True, run_api_checks=True):
     entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
         dbkey=dbkey, year=year, date=datetime.now()
     )
@@ -197,32 +205,28 @@ def generate_workbooks(user, email, dbkey, year):
     if sac.general_information["audit_type"] == "alternative-compliance-engagement":
         print(f"Skipping ACE audit: {dbkey}")
     else:
-        loader = workbook_loader(user, sac, dbkey, year, entity_id)
+        _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf", store_files)
+
+        loader = workbook_loader(user, sac, dbkey, year, entity_id, store_files)
         json_test_tables = []
         for section, fun in sections.items():
-            # FIXME: Can we conditionally upload the addl' and secondary workbooks?
             (_, json, _) = loader(fun, section)
             json_test_tables.append(json)
-        _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+
         step_through_certifications(sac)
-
-        # shaped_sac = sac_validation_shape(sac)
-        # result = submission_progress_check(shaped_sac, sar=None, crossval=False)
-        # print(result)
-
         errors = sac.validate_cross()
         pprint(errors.get("errors", "No errors found in cross validation"))
 
         disseminate(sac, year)
-        # pprint(json_test_tables)
-        combined_summary = api_check(json_test_tables)
-        logger.info(combined_summary)
+        if run_api_checks:
+            combined_summary = api_check(json_test_tables)
+            logger.info(combined_summary)
 
 
-def run_end_to_end(email, dbkey, year):
+def run_end_to_end(email, dbkey, year, store_files=True, run_api_checks=True):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
         logger.info("No user found for %s, have you logged in once?", email)
         return
-    generate_workbooks(user, email, dbkey, year)
+    generate_workbooks(user, email, dbkey, year, store_files, run_api_checks)

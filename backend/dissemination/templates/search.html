@@ -2,9 +2,9 @@
 {% load static %}
 {% load sprite_helper %}
 {% block content %}
-    <div class="grid-container">
+    <div class="desktop:padding-x-10">
         <div class="grid-row">
-            <div class="tablet:grid-col-4 audit-search-form">
+            <div class="grid-col-auto audit-search-form">
                 <h3>Filters</h3>
                 <form class="usa-form"
                       id="search-form"
@@ -119,12 +119,17 @@
                                    name="agency_name"
                                    value="{{ form.cleaned_data.agency_name }}" />
                         </div>
-                        <div class="usa-form-group">
+                        {% comment %} State {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded="true"
+                                aria-controls="state">State</button>
+                        <div id="state" class="usa-form-group">
                             <label class="usa-label" for="auditee_state">
                                 State
                             </label>
                             <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
-                                <option value>- Select -</option>
+                                <option value id="state--none">- Select -</option>
                                 {% for state in state_abbrevs %}
                                 <option value="{{ state }}" {% if form.cleaned_data.auditee_state == state %}selected{% endif %}>
                                     {{ state }}
@@ -140,23 +145,36 @@
                                type="reset"
                                value="Reset Search" />
                     </div>
+
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
                     <input class="usa-input"
-                           id="page"
-                           name="page"
-                           type="number"
-                           value="{{ page }}"
-                           hidden />
+                        id="page"
+                        name="page"
+                        type="number"
+                        value="{{ page }}"
+                        hidden />
+                    
+                    {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
+                    <input class="usa-input"
+                        id="order_by"
+                        name="order_by"
+                        value="{{ order_by }}"
+                        hidden />
+                    <input class="usa-input"
+                        id="order_direction"
+                        name="order_direction"
+                        value="{{ order_direction }}"
+                        hidden />
                 </form>
             </div>
-            <div class="tablet:grid-col-8 audit-search-results">
+            <div class="grid-col audit-search-results">
                 <h2 class="font-sans-2xl">Search single audit reports</h2>
-                {% if results %}
+                {% if results|length > 0 %}
                     <div class="usa-alert usa-alert--info">
                         <div class="usa-alert__body">
                             <h4 class="usa-alert__heading">Sorting</h4>
                             <p class="usa-alert__text">
-                                Use the arrows at the top of each column to sort results. Sorting only applies to the results shown per page.
+                                Use the arrows at the top of each column to sort results.
                             </p>
                         </div>
                     </div>
@@ -165,19 +183,19 @@
                         <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                     </p>
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">
-                        <table class="usa-table usa-table--striped usa-table--compact">
+                        <table class="usa-table usa-table--striped usa-table--compact width-full">
                             <thead>
                                 <tr>
-                                    <th data-sortable scope="col" role="columnheader">Name</th>
-                                    <th data-sortable scope="col" role="columnheader">UEI or EIN</th>
-                                    <th data-sortable scope="col" role="columnheader">Acc Date</th>
-                                    <th data-sortable scope="col" role="columnheader">AY</th>
-                                    <th data-sortable scope="col" role="columnheader">Cog or Over</th>
+                                    {% include "search-table-header.html" with friendly_title="Name" field_name="auditee_name"%}
+                                    {% include "search-table-header.html" with friendly_title="UEI or EIN" field_name="auditee_uei"%}
+                                    {% include "search-table-header.html" with friendly_title="Acc Date" field_name="fac_accepted_date"%}
+                                    {% include "search-table-header.html" with friendly_title="AY" field_name="audit_year"%}
+                                    {% include "search-table-header.html" with friendly_title="Cog or Over" field_name="cog_over"%}
                                     <th scope="col" role="columnheader">View</th>
                                     <th scope="col" role="columnheader">PDF</th>
                                     {% if results.0.finding_my_aln is not None%}
-                                        <th data-sortable scope="col" role="columnheader">Finding my ALN</th>
-                                        <th data-sortable scope="col" role="columnheader">Finding all ALN</th>
+                                        {% include "search-table-header.html" with friendly_title="Finding my ALN" field_name="findings_my_aln"%}
+                                        {% include "search-table-header.html" with friendly_title="Finding all ALN" field_name="findings_all_aln"%}
                                     {% endif %}
                                 </tr>
                             </thead>
@@ -284,18 +302,34 @@
                             {% endif %}
                         </ul>
                     </nav>
-                {% else %}
-                <div class="usa-alert usa-alert--info">
-                    <div class="usa-alert__body">
-                        <h4 class="usa-alert__heading">Searching the FAC database</h4>
-                        <p class="usa-alert__text">
-                            Learn more about how our search filters work on <a href='https://www.fac.gov/data/resources/' target='_blank'>our Search Resources page</a>.
-                        </p>
+                {% elif results is not None %}
+                    <div class="usa-alert usa-alert--info">
+                        <div class="usa-alert__body">
+                            <h4 class="usa-alert__heading">Searching the FAC database</h4>
+                            <p class="usa-alert__text">
+                                Learn more about how our search filters work on <a href='https://www.fac.gov/data/resources/' target='_blank'>our Search Resources page</a>.
+                            </p>
+                        </div>
                     </div>
-                </div>
                     <div class="search-instructions">
                         <img src="{% static 'img/circle-arrow.svg' %}"
                              alt="an arrow points left, toward the search form" />
+                        <p>
+                            No results found.
+                        </p>
+                    </div>
+                {% else %}
+                    <div class="usa-alert usa-alert--info">
+                        <div class="usa-alert__body">
+                            <h4 class="usa-alert__heading">Searching the FAC database</h4>
+                            <p class="usa-alert__text">
+                                Learn more about how our search filters work on <a href='https://www.fac.gov/data/resources/' target='_blank'>our Search Resources page</a>.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="search-instructions">
+                        <img src="{% static 'img/circle-arrow.svg' %}"
+                            alt="an arrow points left, toward the search form" />
                         <p>
                             Enter your filters and select <em>Search</em> to begin
                         </p>
@@ -329,6 +363,6 @@
        id="orientation-toggle"
        aria-controls="device-orientation-modal"
        data-open-modal></a>
-    <script src="{% static 'compiled/js/search-results-pagination.js' %}"></script>
     <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>
+    <script src="{% static 'compiled/js/search-results.js' %}"></script>
 {% endblock content %}

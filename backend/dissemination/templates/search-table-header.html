@@ -1,0 +1,28 @@
+{% load sprite_helper %}
+<th id="{{ field_name }}"
+    scope="col"
+    role="columnheader"
+    {% if order_by == field_name %}
+    {% if order_direction == "descending" %} aria-sort="descending" {% elif order_direction == "ascending" %} aria-sort="ascending" {% endif %}
+    {% endif %}
+    >
+    <div class="display-flex flex-row flex-justify">
+        <p>
+            {{ friendly_title }}
+        </p>
+        <button class="usa-button usa-button--unstyled">
+            <svg class="usa-icon usa-icon--size-3 text-ink"
+                aria-hidden="true"
+                focusable="false"
+                role="img">
+                {% if order_by == field_name and order_direction == "descending" %}
+                    {% uswds_sprite "expand_less" %}
+                {% elif order_by == field_name and order_direction == "ascending" %}
+                    {% uswds_sprite "expand_more" %}
+                {% else %}
+                    {% uswds_sprite "unfold_more" %}
+                {% endif %}
+            </svg>
+        </button>
+    </div>
+</th>

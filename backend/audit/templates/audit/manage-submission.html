@@ -71,7 +71,7 @@
             </table>
             {% comment %}
                 Uncomment if/when we chose to keep the flags.
-                <p class="font-sans-xs">An asterisk (<strong>*</strong>) following an email address indicates that no user with this email address has logged in thus far.</p>
+                <p class="font-sans-xs">(<strong>*</strong>) Indicates user has not logged in to view this submission.</p>
             {% endcomment %}
             <a class="usa-button usa-button--outline margin-top-5"
                href="{% url 'audit:SubmissionProgress' report_id %}"
