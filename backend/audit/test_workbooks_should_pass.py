@@ -56,7 +56,7 @@ def map_file_to_extractor_validator(filename):
     return (None, None)
 
 
-def process_workbook_set(workbook_set_path, is_gsa_migration=False):
+def process_workbook_set(workbook_set_path, is_gsa_migration=True):
     """Process each workbook set in the given path."""
     for wb_path, _, wb_files in os.walk(workbook_set_path):
         for file in wb_files:
