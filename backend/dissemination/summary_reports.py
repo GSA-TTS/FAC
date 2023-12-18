@@ -317,12 +317,11 @@ def gather_report_data_dissemination(report_ids):
 
         data[model_name] = {"field_names": field_names, "entries": []}
 
-        for report_id in report_ids:
-            objects = model.objects.all().filter(report_id=report_id)
-            for obj in objects:
-                data[model_name]["entries"].append(
-                    [getattr(obj, field_name) for field_name in field_names]
-                )
+        objects = model.objects.all().filter(report_id__in=report_ids)
+        for obj in objects:
+            data[model_name]["entries"].append(
+                [getattr(obj, field_name) for field_name in field_names]
+            )
     return data
 
 
