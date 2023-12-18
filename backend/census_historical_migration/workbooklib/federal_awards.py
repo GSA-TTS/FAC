@@ -1,4 +1,6 @@
 import re
+
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
     string_to_string,
@@ -272,7 +274,7 @@ def generate_federal_awards(audit_header, outfile):
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
     )
-    uei = string_to_string(audit_header.UEI)
+    uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, audits)

@@ -2,7 +2,7 @@ from django.test import SimpleTestCase
 
 from .exception_utils import DataMigrationError
 
-from .transforms.xform_add_hyphen_to_zip import xform_add_hyphen_to_zip
+from .transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 
 from .transforms.xform_string_to_int import (
     string_to_int,
@@ -200,17 +200,23 @@ class TestNormalizeYearString(SimpleTestCase):
 
 class TestXformAddHyphenToZip(SimpleTestCase):
     def test_five_digit_zip(self):
-        self.assertEqual(xform_add_hyphen_to_zip("12345"), "12345")
+        self.assertEqual(xform_remove_hyphen_and_pad_zip("12345"), "12345")
 
     def test_nine_digit_zip(self):
-        self.assertEqual(xform_add_hyphen_to_zip("123456789"), "123456789")
+        self.assertEqual(xform_remove_hyphen_and_pad_zip("123456789"), "123456789")
+
+    def test_hyphenated_zip(self):
+        self.assertEqual(xform_remove_hyphen_and_pad_zip("12345-6789"), "123456789")
+        self.assertEqual(xform_remove_hyphen_and_pad_zip("1234-6789"), "012346789")
 
     def test_four_digit_zip(self):
-        self.assertEqual(xform_add_hyphen_to_zip("1234"), "01234")
+        self.assertEqual(xform_remove_hyphen_and_pad_zip("1234"), "01234")
 
     def test_eight_digit_zip(self):
-        self.assertEqual(xform_add_hyphen_to_zip("12345678"), "012345678")
+        self.assertEqual(xform_remove_hyphen_and_pad_zip("12345678"), "012345678")
 
     def test_malformed_zip(self):
         with self.assertRaises(DataMigrationError):
-            xform_add_hyphen_to_zip("123")
+            xform_remove_hyphen_and_pad_zip("123")
+        with self.assertRaises(DataMigrationError):
+            xform_remove_hyphen_and_pad_zip("1234-678")

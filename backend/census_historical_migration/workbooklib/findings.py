@@ -1,3 +1,4 @@
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
@@ -128,7 +129,7 @@ def generate_findings(audit_header, outfile):
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE]
     )
-    uei = string_to_string(audit_header.UEI)
+    uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
     # For each of them, I need to generate an elec -> award mapping.

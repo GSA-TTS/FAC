@@ -1,7 +1,9 @@
 import json
 import audit.validators
 from datetime import timedelta
-from ..transforms.xform_add_hyphen_to_zip import xform_add_hyphen_to_zip
+
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 from ..transforms.xform_string_to_string import string_to_string
 from ..exception_utils import DataMigrationError
 from ..sac_general_lib.utils import (
@@ -65,7 +67,13 @@ mappings = [
     FormFieldMap("auditee_name", "AUDITEENAME", FormFieldInDissem, None, str),
     FormFieldMap("auditee_phone", "AUDITEEPHONE", FormFieldInDissem, None, str),
     FormFieldMap("auditee_state", "STATE", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_uei", "UEI", FormFieldInDissem, None, str),
+    FormFieldMap(
+        "auditee_uei",
+        "UEI",
+        FormFieldInDissem,
+        None,
+        xform_retrieve_uei,
+    ),
     FormFieldMap("auditee_zip", "ZIPCODE", FormFieldInDissem, None, str),
     FormFieldMap("auditor_address_line_1", "CPASTREET1", FormFieldInDissem, None, str),
     FormFieldMap("auditor_city", "CPACITY", FormFieldInDissem, None, str),
@@ -81,7 +89,11 @@ mappings = [
     FormFieldMap("auditor_phone", "CPAPHONE", FormFieldInDissem, None, str),
     FormFieldMap("auditor_state", "CPASTATE", FormFieldInDissem, None, str),
     FormFieldMap(
-        "auditor_zip", "CPAZIPCODE", FormFieldInDissem, None, xform_add_hyphen_to_zip
+        "auditor_zip",
+        "CPAZIPCODE",
+        FormFieldInDissem,
+        None,
+        xform_remove_hyphen_and_pad_zip,
     ),
     FormFieldMap("ein", "EIN", "auditee_ein", None, str),
     FormFieldMap(
