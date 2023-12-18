@@ -178,10 +178,24 @@
                             </p>
                         </div>
                     </div>
-                    <p class="margin-y-4">
-                        <strong>Results: {{ results_count }}</strong>
-                        <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
-                    </p>
+                    <div class="margin-y-2 grid-row display-flex flex-justify">
+                        <p class="margin-0 flex-align-self-center">
+                            <strong>Results: {{ results_count }}</strong>
+                            <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
+                        </p>
+                        <button class="usa-button display-flex"
+                                formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
+                                form="search-form"
+                                value="Search">
+                             <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                  aria-hidden="true"
+                                  role="img">
+                                 {% uswds_sprite "file_download" %}
+                             </svg>
+                             <p class="margin-0">Export to CSV</p>
+                        </button>
+                    </div>
+                    
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">
                         <table class="usa-table usa-table--striped usa-table--compact width-full">
                             <thead>
