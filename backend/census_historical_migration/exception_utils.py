@@ -4,7 +4,7 @@ class DataMigrationError(Exception):
     def __init__(
         self,
         message="An error occurred during historic data migration",
-        tag="data_migration",
+        tag="",
     ):
         self.message = message
         self.tag = tag

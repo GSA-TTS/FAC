@@ -322,9 +322,10 @@ def handle_exception(exc, audit_header, result):
     exc_type = type(exc)
     if exc_type == DataMigrationValueError:
         logger.error(f"DataMigrationValueError: {message}")
-        tag = "unexpected_value"
+        tag = tag or "unexpected_value"
     elif exc_type == DataMigrationError:
         logger.error(f"DataMigrationError: {message}")
+        tag = tag or "data_migration"
     elif exc_type == ValidationError:
         logger.error(f"ValidationError: {message}")
         tag = "schema_validation"
