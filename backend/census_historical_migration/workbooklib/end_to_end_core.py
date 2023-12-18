@@ -1,4 +1,3 @@
-from django.conf import settings
 from ..exception_utils import (
     DataMigrationError,
     DataMigrationValueError,
@@ -28,6 +27,8 @@ from dissemination.models import (
     Passthrough,
     SecondaryAuditor,
 )
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
