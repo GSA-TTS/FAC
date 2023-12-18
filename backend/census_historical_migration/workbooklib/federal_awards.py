@@ -1,3 +1,6 @@
+import re
+
+from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
@@ -140,16 +143,45 @@ def _generate_cluster_names(
     return (cluster_names, other_cluster_names, state_cluster_names)
 
 
+def _is_valid_prefix(prefix):
+    """
+    Checks if the provided prefix is a valid CFDA prefix.
+    """
+    return re.match(settings.REGEX_ALN_PREFIX, str(prefix))
+
+
+def _is_valid_extension(extension):
+    """
+    Checks if the provided extension is a valid CFDA extension.
+    """
+    # Define regex patterns
+    patterns = [
+        settings.REGEX_RD_EXTENSION,
+        settings.REGEX_THREE_DIGIT_EXTENSION,
+        settings.REGEX_U_EXTENSION,
+    ]
+    return any(re.match(pattern, str(extension)) for pattern in patterns)
+
+
+def xform_replace_invalid_extension(audit):
+    """Replaces invalid ALN extensions with the default value settings.GSA_MIGRATION."""
+    prefix = string_to_string(audit.CFDA_PREFIX)
+    extension = string_to_string(audit.CFDA_EXT)
+    if not _is_valid_prefix(prefix):
+        raise DataMigrationError(f"Invalid ALN prefix: {prefix}")
+    if not _is_valid_extension(extension):
+        extension = settings.GSA_MIGRATION
+
+    return f"{prefix}.{extension}"
+
+
 def _get_full_cfdas(audits):
     """
     This function constructs the full CFDA numbers by concatenating the CFDA_PREFIX
     and CFDA_EXT attributes of each audit object, separated by a dot.
     """
     # audit.CFDA is not used here because it does not always match f"{audit.CFDA_PREFIX}.{audit.CFDA_EXT}"
-    return [
-        f"{string_to_string(audit.CFDA_PREFIX)}.{string_to_string(audit.CFDA_EXT)}"
-        for audit in audits
-    ]
+    return [xform_replace_invalid_extension(audit) for audit in audits]
 
 
 # The functionality of _fix_passthroughs has been split into two separate functions:
