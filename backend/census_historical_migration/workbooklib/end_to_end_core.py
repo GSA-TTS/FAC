@@ -12,8 +12,8 @@ from ..workbooklib.workbook_section_handlers import (
 from ..workbooklib.post_upload_utils import _post_upload_pdf
 from ..sac_general_lib.sac_creator import setup_sac
 from ..models import (
-  ReportMigrationStatus,
-  MigrationErrorDetail,
+    ReportMigrationStatus,
+    MigrationErrorDetail,
 )
 from audit.intake_to_dissemination import IntakeToDissemination
 from dissemination.models import (
@@ -332,9 +332,7 @@ def handle_exception(exc, audit_header, result):
 
         tb = traceback.extract_tb(sys.exc_info()[2])
         for frame in tb:
-            logger.error(
-                f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}"
-            )
+            logger.error(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
 
     result["errors"].append(f"{exc}")
 
