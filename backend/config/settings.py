@@ -533,3 +533,9 @@ OMB_EXP_DATE = "09/30/2026"
 # APP-level constants
 DOLLAR_THRESHOLD = 750000
 CENSUS_DATA_SOURCE = "CENSUS"
+
+# A version of these regexes also exists in Base.libsonnet
+REGEX_ALN_PREFIX = r"^([0-9]{2})$"
+REGEX_RD_EXTENSION = r"^RD[0-9]?$"
+REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
+REGEX_U_EXTENSION = r"^U[0-9]{2}$"
