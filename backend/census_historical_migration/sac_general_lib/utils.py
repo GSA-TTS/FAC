@@ -7,6 +7,7 @@ from ..transforms.xform_string_to_string import (
 )
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
+from ..exception_utils import DataMigrationValueError
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +46,9 @@ def xform_census_date_to_datetime(date_string):
         dt = datetime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
     except ValueError:
         # Raise a custom exception or a ValueError with a descriptive message
-        raise ValueError(
-            f"Date string '{date_string}' is not in the expected format '%m/%d/%Y %H:%M:%S'"
+        raise DataMigrationValueError(
+            f"Date string '{date_string}' is not in the expected format '%m/%d/%Y %H:%M:%S'",
+            "invalid_date",
         )
 
     # Extract and return the date part

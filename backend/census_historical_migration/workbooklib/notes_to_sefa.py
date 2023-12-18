@@ -71,8 +71,10 @@ def xform_is_minimis_rate_used(rate_content):
             return "Y"
 
     # I am raising an exception here because we cannot clearly determine if the de minimis rate was used.
-    # return "Both"
-    raise DataMigrationError("Unable to determine if the de minimis rate was used.")
+    raise DataMigrationError(
+        "Unable to determine if the de minimis rate was used.",
+        "unexpected_minimis_rate_text",
+    )
 
 
 def _get_accounting_policies(dbkey, year):

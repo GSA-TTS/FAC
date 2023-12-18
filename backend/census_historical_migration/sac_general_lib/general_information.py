@@ -44,7 +44,8 @@ def xform_entity_type(phrase):
             # FIXME-MSHD: This is a transformation that we may want to record
             return value
     raise DataMigrationError(
-        f"Could not find a match for historic entity type '{phrase}'"
+        f"Could not find a match for historic entity type '{phrase}'",
+        "invalid_historic_entity_type",
     )
 
 
@@ -142,11 +143,13 @@ def xform_country(general_information, audit_header):
             general_information["auditor_country"] = "USA"
         else:
             raise DataMigrationError(
-                f"Unable to determine auditor country. Invalid state: {auditor_state}"
+                f"Unable to determine auditor country. Invalid state: {auditor_state}",
+                "invalid_state",
             )
     else:
         raise DataMigrationError(
-            f"Unable to determine auditor country. Unknown code: {auditor_country}"
+            f"Unable to determine auditor country. Unknown code: {auditor_country}",
+            "invalid_country",
         )
 
     return general_information
@@ -164,7 +167,8 @@ def xform_auditee_fiscal_period_end(general_information):
         )
     else:
         raise DataMigrationError(
-            f"Auditee fiscal period end is empty: {general_information.get('auditee_fiscal_period_end')}"
+            f"Auditee fiscal period end is empty: {general_information.get('auditee_fiscal_period_end')}",
+            "invalid_auditee_fiscal_period_end",
         )
 
     return general_information
@@ -189,7 +193,8 @@ def xform_audit_period_covered(general_information):
         )
     else:
         raise DataMigrationError(
-            f"Audit period covered is empty: {general_information.get('audit_period_covered')}"
+            f"Audit period covered is empty: {general_information.get('audit_period_covered')}",
+            "invalid_audit_period_covered",
         )
     return general_information
 

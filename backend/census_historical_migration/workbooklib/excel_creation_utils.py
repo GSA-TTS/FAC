@@ -235,4 +235,7 @@ def xform_add_hyphen_to_zip(zip):
         return f"{strzip[0:5]}-{strzip[5:9]}"
     else:
         # FIXME - MSHD: How do we handle 4-digit and 8-digit ZIP codes?
-        raise DataMigrationError("Zip code is malformed in secondary auditor.")
+        raise DataMigrationError(
+            "Zip code is malformed in secondary auditor.",
+            "invalid_zip",
+        )
