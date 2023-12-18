@@ -1,5 +1,8 @@
 from django.conf import settings
-from ..exception_utils import DataMigrationError
+from ..exception_utils import (
+    DataMigrationError,
+    DataMigrationValueError,
+)
 from ..workbooklib.workbook_builder_loader import (
     workbook_builder_loader,
 )
@@ -25,8 +28,8 @@ from dissemination.models import (
     Passthrough,
     SecondaryAuditor,
 )
-from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 import argparse
 import logging
@@ -238,6 +241,7 @@ def api_check(json_test_tables):
 
 
 def run_end_to_end(user, audit_header, result):
+    """Attempts to migrate the given audit"""
     try:
         sac = setup_sac(user, audit_header)
 
@@ -268,41 +272,9 @@ def run_end_to_end(user, audit_header, result):
             logger.info(combined_summary)
             result["success"].append(f"{sac.report_id} created")
     except Exception as exc:
-        error_type = type(exc)
-        tag = exc.tag
-
-        if error_type == ValidationError:
-            logger.error(f"ValidationError: {exc}")
-            tag = "schema_validation"
-        elif error_type == DataMigrationError:
-            logger.error(f"CrossValidationError: {exc}")
-            tag = "cross_validation"
-        elif error_type == DataMigrationError:
-            logger.error(f"DataMigrationError: {exc.message}")
-        else:
-            logger.error(f"Unexpected error type {error_type}: {exc}")
-            tag = "exception"
-
-            tb = traceback.extract_tb(sys.exc_info()[2])
-            for frame in tb:
-                logger.error(
-                    f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}"
-                )
-
-        result["errors"].append(f"{exc}")
-
-        status = record_migration_status(
-            audit_header.AUDITYEAR,
-            audit_header.DBKEY,
-            True,
-        )
-        record_migration_error(
-            exc,
-            tag,
-            status.id,
-        )
+        handle_exception(exc, audit_header, result)
     else:
-        status = record_migration_status(
+        record_migration_status(
             audit_header.AUDITYEAR,
             audit_header.DBKEY,
             len(result["errors"]) > 0,
@@ -311,22 +283,70 @@ def run_end_to_end(user, audit_header, result):
 
 def record_migration_status(audit_year, dbkey, has_failed):
     """Write a migration status to the DB"""
-
     status = "FAILURE" if has_failed else "SUCCESS"
-    return ReportMigrationStatus(
+
+    migration_status = ReportMigrationStatus.objects.create(
         audit_year=audit_year,
         dbkey=dbkey,
         run_datetime=timezone.now(),
         migration_status=status,
-    ).save()
+    )
+    migration_status.save()
+
+    return migration_status
 
 
-def record_migration_error(exception, tag, status_id):
+def record_migration_error(status, tag, exc_type, message):
     """Write a migration error to the DB"""
-
-    ReportMigrationError(
+    MigrationErrorDetail(
+        report_migration_status=status,
         tag=tag,
-        exception_class=exception.__name__,
-        detail=exception.message or str(exception),
-        report_migration_status=status_id,
+        exception_class=exc_type,
+        detail=message,
     ).save()
+
+
+def handle_exception(exc, audit_header, result):
+    """Handles exceptions encountered during run_end_to_end()"""
+    try:
+        tag = exc.tag
+    except Exception:
+        tag = "exception"
+
+    try:
+        message = exc.message
+    except Exception:
+        message = str(exc)
+
+    exc_type = type(exc)
+    if exc_type == DataMigrationValueError:
+        logger.error(f"DataMigrationValueError: {message}")
+        tag = "unexpected_value"
+    elif exc_type == DataMigrationError:
+        logger.error(f"DataMigrationError: {message}")
+    elif exc_type == ValidationError:
+        logger.error(f"ValidationError: {message}")
+        tag = "schema_validation"
+    else:
+        logger.error(f"Unexpected error type {exc_type}: {message}")
+
+        tb = traceback.extract_tb(sys.exc_info()[2])
+        for frame in tb:
+            logger.error(
+                f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}"
+            )
+
+    result["errors"].append(f"{exc}")
+
+    status = record_migration_status(
+        audit_header.AUDITYEAR,
+        audit_header.DBKEY,
+        True,
+    )
+
+    record_migration_error(
+        status,
+        tag,
+        exc_type.__name__,
+        message,
+    )
