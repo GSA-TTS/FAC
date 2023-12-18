@@ -48,7 +48,7 @@ class AccessAdmin(admin.ModelAdmin):
 
     list_display = ("sac", "role", "email")
     list_filter = ["role"]
-    readonly_fields = ("sac",)
+    readonly_fields = ("sac", "user")
     search_fields = ("email", "sac__report_id")
 
 
