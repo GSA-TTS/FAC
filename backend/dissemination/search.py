@@ -39,7 +39,7 @@ def search_general(
     if not order_by:
         order_by = ORDER_BY.fac_accepted_date
     if not order_direction:
-        order_direction = DIRECTION.ascending
+        order_direction = DIRECTION.descending
 
     query = _initialize_query(include_private)
 
