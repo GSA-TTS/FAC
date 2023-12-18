@@ -97,7 +97,7 @@ def clean_form_data(form):
 
 def run_search_general(form_data, include_private):
     """
-    Given cleaned form data and an 'include_private' boolean, run the search. 
+    Given cleaned form data and an 'include_private' boolean, run the search.
     Returns the results QuerySet.
     """
     return search_general(
@@ -149,17 +149,22 @@ class Search(View):
         if form_data.page > math.ceil(results_count / form_data.limit):
             form_data.page = 1
 
+        # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
         paginator = Paginator(object_list=results, per_page=form_data.limit)
-        results = paginator.get_page(form_data.page)  # List of size <limit> objects
+        results = paginator.get_page(form_data.page)
         results.adjusted_elided_pages = paginator.get_elided_page_range(
             form_data.page, on_each_side=1
-        )  # Pagination buttons, adjust ellipses around the current page
+        )
 
         # Reformat these so the date-picker elements in HTML prepopulate
         if form.cleaned_data["start_date"]:
-            form.cleaned_data["start_date"] = form_data.start_date.strftime("%Y-%m-%d")
+            form.cleaned_data["start_date"] = form.cleaned_data["start_date"].strftime(
+                "%Y-%m-%d"
+            )
         if form.cleaned_data["end_date"]:
-            form.cleaned_data["end_date"] = form_data.end_date.strftime("%Y-%m-%d")
+            form.cleaned_data["end_date"] = form.cleaned_data["end_date"].strftime(
+                "%Y-%m-%d"
+            )
 
         context = context | {
             "form": form,
@@ -178,10 +183,10 @@ class Search(View):
 class AuditSummaryView(ReportAccessRequiredMixin, View):
     def get(self, request, report_id):
         """
-        Grab any information about the given report in the dissemination tables.
-        1.  See if this audit is available in the dissemination tables. If not, 404.
-        2.  Grab all relevant info from dissem tables. Some items may not exist if they had no findings.
-        3.  Wrap up the data all nice in a context object for display.
+        Display information about the given report in the dissemination tables.
+        1.  See if this audit is available. If not, 404.
+        2.  Grab all relevant info from the dissemination tables.
+        3.  Wrap the data into a context object for display.
         """
         # Viewable audits __MUST__ be public.
         general = General.objects.filter(report_id=report_id)
@@ -194,7 +199,7 @@ class AuditSummaryView(ReportAccessRequiredMixin, View):
 
         data = self.get_audit_content(report_id)
 
-        # Add entity name and UEI to the context, for the footer bit.
+        # Add entity name and UEI to the context, for the footer.
         context = {
             "report_id": report_id,
             "auditee_name": general_data["auditee_name"],
@@ -245,6 +250,10 @@ class AuditSummaryView(ReportAccessRequiredMixin, View):
 
 class PdfDownloadView(ReportAccessRequiredMixin, View):
     def get(self, request, report_id):
+        """
+        Given a report_id in the URL, find the relevant PDF in S3 and
+        redirect to the download link.
+        """
         # only allow PDF downloads for disseminated submissions
         get_object_or_404(General, report_id=report_id)
 
@@ -256,6 +265,10 @@ class PdfDownloadView(ReportAccessRequiredMixin, View):
 
 class XlsxDownloadView(ReportAccessRequiredMixin, View):
     def get(self, request, report_id, file_type):
+        """
+        Given a report_id and workbook section (file_type) in the URL,
+        find the relevant XLSX file in S3 and redirect to its download link.
+        """
         # only allow xlsx downloads from disseminated submissions
         get_object_or_404(General, report_id=report_id)
 
@@ -267,6 +280,10 @@ class XlsxDownloadView(ReportAccessRequiredMixin, View):
 
 class SingleSummaryReportDownloadView(ReportAccessRequiredMixin, View):
     def get(self, request, report_id):
+        """
+        Given a report_id in the URL, generate the summary report in S3 and
+        redirect to its download link.
+        """
         sac = get_object_or_404(General, report_id=report_id)
         filename = generate_summary_report([sac.report_id])
         download_url = get_download_url(filename)
@@ -276,14 +293,19 @@ class SingleSummaryReportDownloadView(ReportAccessRequiredMixin, View):
 
 class MultipleSummaryReportDownloadView(View):
     def post(self, request):
+        """
+        1. Get the report_ids from a fresh search with the provided search parameters
+        2. Generate a summary report with the report_ids, that goes into S3
+        3. Redirect to the download url of this new report
+        """
         form = SearchForm(request.POST)
 
         cleaned_data = clean_form_data(form)
         include_private = include_private_results(request)
         results = run_search_general(cleaned_data, include_private)
         results = results[:1000]  # Hard limit CSV downloads to 1000 records
-
         report_ids = [result.report_id for result in results]
+
         filename = generate_summary_report(report_ids)
         download_url = get_download_url(filename)
 
