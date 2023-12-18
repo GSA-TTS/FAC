@@ -31,7 +31,18 @@
                 </div>
                 <div class="grid-col-12 tablet:grid-col-5 tablet:display-flex flex-column tablet:flex-justify-end">
                     <div class="margin-0 flex-align-self-end margin-top-2">
-                        <a class="usa-button usa-button--outline display-flex font-sans-xl"
+                        <a class="usa-button display-flex font-sans-xl margin-bottom-2"
+                           href="{% url 'dissemination:SummaryReportDownload' report_id=report_id %}"
+                           target="_blank">
+                            <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                 aria-hidden="true"
+                                 role="img">
+                                {% uswds_sprite "file_download" %}
+                            </svg>
+                            <p class="margin-0">SF-SAC</p>
+                        </a>
+
+                        <a class="usa-button display-flex font-sans-xl"
                            href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
                            target="_blank">
                             <svg class="usa-icon margin-right-1 flex-align-self-center"

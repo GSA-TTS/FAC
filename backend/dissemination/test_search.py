@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dissemination.models import General, FederalAward, Finding
+from dissemination.models import General, FederalAward
 from dissemination.search import search_general
 
 from model_bakery import baker
@@ -323,9 +323,7 @@ class SearchALNTests(TestCase):
             award_reference="2023-0001",
             federal_agency_prefix="00",
             federal_award_extension="000",
-        )
-        baker.make(
-            Finding, report_id="2022-04-TSTDAT-0000000001", award_reference="2023-0001"
+            findings_count=1,
         )
 
         results = search_general(alns=["00"])
@@ -346,6 +344,7 @@ class SearchALNTests(TestCase):
             report_id="2022-04-TSTDAT-0000000002",
             federal_agency_prefix="11",
             federal_award_extension="111",
+            findings_count=0,
         )
         baker.make(
             FederalAward,
@@ -353,9 +352,7 @@ class SearchALNTests(TestCase):
             award_reference="2023-0001",
             federal_agency_prefix="99",
             federal_award_extension="999",
-        )
-        baker.make(
-            Finding, report_id="2022-04-TSTDAT-0000000002", award_reference="2023-0001"
+            findings_count=1,
         )
 
         results = search_general(alns=["11"])
@@ -377,6 +374,7 @@ class SearchALNTests(TestCase):
             award_reference="2023-0001",
             federal_agency_prefix="22",
             federal_award_extension="222",
+            findings_count=1,
         )
         baker.make(
             FederalAward,
@@ -384,12 +382,7 @@ class SearchALNTests(TestCase):
             award_reference="2023-0002",
             federal_agency_prefix="99",
             federal_award_extension="999",
-        )
-        baker.make(
-            Finding, report_id="2022-04-TSTDAT-0000000003", award_reference="2023-0001"
-        )
-        baker.make(
-            Finding, report_id="2022-04-TSTDAT-0000000003", award_reference="2023-0002"
+            findings_count=1,
         )
 
         results = search_general(alns=["22"])
@@ -404,6 +397,7 @@ class SearchALNTests(TestCase):
         baker.make(
             FederalAward,
             report_id="2022-04-TSTDAT-0000000004",
+            findings_count=0,
             federal_agency_prefix="33",
             federal_award_extension="333",
         )
