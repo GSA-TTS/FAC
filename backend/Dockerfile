@@ -2,65 +2,87 @@ FROM python:3.10-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV CERT_PATH /usr/local/share/ca-certificates/zscaler.crt
+ENV CURL_CA_BUNDLE ${CERT_PATH}
+ENV NODE_EXTRA_CA_CERTS ${CERT_PATH}
+ARG LOCAL_ARCH
 
-RUN apt-get -y update
-RUN apt-get -y install git
+COPY zscaler_cert.pem /tmp/zscaler.crt
+COPY requirements.txt /tmp/requirements.txt
+COPY dev-requirements.txt /tmp/dev-requirements.txt
 
-RUN apt-get update \
- && DEBIAN_FRONTEND=noninteractive \
-    apt-get install --no-install-recommends --assume-yes \
-      postgresql-client
-
-# RUN --mount=type=cache,target=/root/.cache \
+RUN \
+    cp /tmp/zscaler.crt ${CERT_PATH} && \
+    chmod 644 ${CERT_PATH} && \
+    update-ca-certificates
 
 WORKDIR ..
 
+# Install chromium if arm64 architecture is specified
 RUN \
-    apt-get update && \
-    apt-get install -yqq apt-transport-https wget gnupg2
+    if [ "$LOCAL_ARCH" = "arm64" ] ; then \
+        apt-get update -yq && \
+        apt-get install -yq chromium; \
+    fi
 
-# Updated nodesource install via: https://github.com/nodesource/distributions#ubuntu-versions
+# Dependencies
 RUN \
+    apt-get clean && \
     apt-get update -yq && \
-    apt install build-essential curl -y && \
-    apt-get install -y gcc ca-certificates gnupg && \
+    apt-get install -yqq \
+        apt-transport-https \
+        ca-certificates \
+        build-essential \
+        curl \
+        gcc \
+        git \
+        gnupg \
+        gnupg2 \
+        groff \
+        postgresql-client \
+        wget \
+        zip \
+    ; \
+    # Updated nodesource install via: https://github.com/nodesource/distributions#ubuntu-versions
     mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     NODE_MAJOR=18 && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
     apt-get update && \
-    apt-get install nodejs -y
-
-COPY requirements.txt /tmp/requirements.txt
-COPY dev-requirements.txt /tmp/dev-requirements.txt
-
-RUN \
-    set -ex && \
+    apt-get install nodejs -y \
+    ; \
+    # Pip install
+        # Ref: https://help.zscaler.com/zia/adding-custom-certificate-application-specific-trust-store
+        # The only PIP option that seems to work is using pip_system_certs.
+        # Of course, you can't install anything using PIP until pip_system_certs is installed.
+        # So we just add a bunch of trusted sources.
+    pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pip_system_certs && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
     pip install -r /tmp/dev-requirements.txt && \
-    rm -rf /root/.cache/
-
-RUN \
-    apt-get install -yqq groff && \
-    apt-get install -yqq zip && \
+    rm -rf /root/.cache/ \
+    ; \
+    # AWS CLI install
     curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
     unzip awscli-bundle.zip && \
-    ./awscli-bundle/install -b /usr/local/bin/aws
-
-RUN \
+    ./awscli-bundle/install -b /usr/local/bin/aws \
+    ; \
+    # Minio install
     curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
     chmod +x /usr/local/bin/mc
 
 COPY package.* /src/
 WORKDIR /src/
 
-RUN npm install
-RUN chown -R 1001:123 "/root/.npm"
+RUN \
+    npm install && \
+    chown -R 1001:123 "/root/.npm"
 
 COPY . /src/
 
-RUN npm run build && python manage.py collectstatic
+RUN \
+    npm run build && \
+    python manage.py collectstatic
 
 # ------------------------------------------------------------
 # Dev/testing layer
