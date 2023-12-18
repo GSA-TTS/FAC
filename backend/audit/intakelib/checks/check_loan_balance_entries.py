@@ -20,7 +20,9 @@ def loan_balance_entry_is_valid(ir):
     errors = []
     for index, balance in enumerate(loan_balance_at_period_end):
         # Check if balance is not a number, empty string, or "N/A"
-        if not (balance in ["N/A", "", settings.GSA_MIGRATION, None] or _is_int(balance)):
+        if not (
+            balance in ["N/A", "", settings.GSA_MIGRATION, None] or _is_int(balance)
+        ):
             errors.append(
                 build_cell_error_tuple(
                     ir,
