@@ -24,8 +24,6 @@ def check_cluster_names(ir):
         except json.decoder.JSONDecodeError:
             raise ValueError("ClusterNames.json file contains invalid JSON.")
 
-        valid_json = json.load(valid_file)
-
         for index, value in enumerate(range_data["values"]):
             if value and value not in valid_json["cluster_names"]:
                 errors.append(
