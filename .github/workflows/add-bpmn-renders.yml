@@ -12,11 +12,14 @@ name: Lint BPMN
 on:
   workflow_call:
 
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
 jobs:
   diagrams-up-to-date:
     # Check that the PR is not raised by this workflow (avoiding recursion) and
     # is not from a fork
-    if: startsWith(github.head_ref, 'auto/bpmn-patches') == false && github.event.pull_request.head.repo.full_name == github.repository
+    if: startsWith(github.event.pull_request.head.ref, 'auto/bpmn-patches') == false && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,7 +43,7 @@ jobs:
       - name: Check For Changes
         id: vars
         run: |
-          branchname="bpmn-patches/${{ github.head_ref }}"
+          branchname="bpmn-patches/${{ env.BRANCH_NAME }}"
           echo "branchname=${branchname}" >> $GITHUB_OUTPUT
           imagesupdated=$(git status --porcelain | cut -d ' ' -f 2 | wc -l)
           echo "imagesupdated=${imagesupdated}" >> $GITHUB_OUTPUT
@@ -49,12 +52,12 @@ jobs:
         if: steps.vars.outputs.imagesupdated != 0
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: Update BPMN images for ${{ github.head_ref }}
-          title: Update BPMN images for ${{ github.head_ref }}
-          body: This is an auto-generated PR to sync BPMN images with their source on ${{ github.head_ref }}.
+          commit-message: Update BPMN images for ${{ env.BRANCH_NAME }}
+          title: Update BPMN images for ${{ env.BRANCH_NAME }}
+          body: This is an auto-generated PR to sync BPMN images with their source on ${{ env.BRANCH_NAME }}.
           labels: bpmn-to-image, automated pr
           branch: ${{ steps.vars.outputs.branchname }}
-          base: ${{ github.head_ref }}
+          base: ${{ env.BRANCH_NAME }}
 
       - name: Update Changes
         if: steps.vars.outputs.imagesupdated != 0
@@ -66,7 +69,7 @@ jobs:
             A PR stops confusion...
             I got ya partner.
 
-            (...merge PR #${{ env.PULL_REQUEST_NUMBER }}...)
+            (...merge PR #${{ github.event.pull_request.number }}...)
 
       - name: Fail if images are not in sync with source
         if: steps.vars.outputs.imagesupdated != 0

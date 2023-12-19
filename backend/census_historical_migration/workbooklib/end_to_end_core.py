@@ -22,6 +22,8 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 
+from audit.models import SingleAuditChecklist
+
 from django.core.exceptions import ValidationError
 
 import argparse
@@ -31,7 +33,7 @@ import math
 import os
 import jwt
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 
 
@@ -42,11 +44,18 @@ parser = argparse.ArgumentParser()
 
 
 def step_through_certifications(sac):
-    sac.transition_to_ready_for_certification()
-    sac.transition_to_auditor_certified()
-    sac.transition_to_auditee_certified()
-    sac.transition_to_submitted()
-    sac.transition_to_disseminated()
+    stati = [
+        SingleAuditChecklist.STATUS.IN_PROGRESS,
+        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        SingleAuditChecklist.STATUS.CERTIFIED,
+        SingleAuditChecklist.STATUS.SUBMITTED,
+        SingleAuditChecklist.STATUS.DISSEMINATED,
+    ]
+    for status in stati:
+        sac.transition_name.append(status)
+        sac.transition_date.append(datetime.now(timezone.utc))
     sac.save()
 
 
