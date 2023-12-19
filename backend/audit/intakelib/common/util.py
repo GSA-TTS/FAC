@@ -73,7 +73,7 @@ def is_yes_or_no_or_gsa_migration(v):
     # in historic data migration to pass validation.
     value = str(v).strip()
 
-    return value == "Y" or value == "N" or value == settings.GSA_MIGRATION
+    return value in ["Y", "N", settings.GSA_MIGRATION]
 
 
 def get_missing_value_errors(ir, range_name, message_key):

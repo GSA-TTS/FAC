@@ -201,15 +201,15 @@ def xform_populate_default_loan_balance(audits):
         loan = string_to_string(audit.LOANS).upper()
         balance = string_to_string(audit.LOANBALANCE)
         if loan == "Y":
-            if not balance:
-                loans_at_end.append(settings.GSA_MIGRATION)  # record transformation
-            else:
+            if balance:
                 loans_at_end.append(balance)
-        else:
-            if not balance:
-                loans_at_end.append("")
             else:
+                loans_at_end.append(settings.GSA_MIGRATION)  # record transformation
+        else:
+            if balance:
                 raise DataMigrationError("Unexpected loan balance.")
+            else:
+                loans_at_end.append("")
 
     return loans_at_end
 
@@ -248,12 +248,12 @@ def xform_populate_default_passthrough_amount(audits):
         passthrough_award = string_to_string(audit.PASSTHROUGHAWARD).upper()
         amount = string_to_string(audit.PASSTHROUGHAMOUNT)
         if passthrough_award == "Y":
-            if not amount:
+            if amount:
+                passthrough_amounts.append(amount)
+            else:
                 # FIXME -MSHD: Is this what we want to do?
                 # Changing to settings.GSA_MIGRATION will require an update to the field type in dissemination model.
                 raise DataMigrationError("Missing passthrough amount.")
-            else:
-                passthrough_amounts.append(amount)
         else:
             if not amount or amount == "0":
                 passthrough_amounts.append("")

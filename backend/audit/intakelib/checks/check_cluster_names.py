@@ -14,7 +14,16 @@ def check_cluster_names(ir):
     range_data = get_range_by_name(ir, "cluster_name")
     errors = []
     if range_data and ("values" in range_data):
-        valid_file = open(f"{settings.SCHEMA_BASE_DIR}/ClusterNames.json")
+        try:
+            with open(f"{settings.SCHEMA_BASE_DIR}/ClusterNames.json") as valid_file:
+                valid_json = json.load(valid_file)
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                f"ClusterNames.json file not found in {settings.SCHEMA_BASE_DIR}/ClusterNames.json."
+            )
+        except json.decoder.JSONDecodeError:
+            raise ValueError("ClusterNames.json file contains invalid JSON.")
+
         valid_json = json.load(valid_file)
 
         for index, value in enumerate(range_data["values"]):
