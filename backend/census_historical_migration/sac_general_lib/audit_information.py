@@ -12,7 +12,6 @@ from ..sac_general_lib.utils import (
     is_single_word,
 )
 import audit.validators
-from django.conf import settings
 
 
 def xform_apply_default_thresholds(value):
