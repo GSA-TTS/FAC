@@ -4,7 +4,7 @@ from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
-from ..workbooklib.excel_creation_utils import (
+from .excel_creation_utils import (
     get_audits,
     get_range_values,
     get_ranges,
@@ -17,7 +17,7 @@ from ..base_field_maps import (
     SheetFieldMap,
     WorkbookFieldInDissem,
 )
-from ..workbooklib.templates import sections_to_template_paths
+from .templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
 from django.conf import settings
 from ..models import (
