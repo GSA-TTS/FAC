@@ -52,14 +52,13 @@ RUN \
     curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
     chmod +x /usr/local/bin/mc
 
-COPY package.* /src/
+COPY package*.json /src/
 WORKDIR /src/
 
 #RUN npm install
-RUN npm install -g npm@9.7.1
 RUN apt-get update
 RUN apt-get install -yqq chromium
-RUN npm i run-p
+RUN npm ci
 RUN chown -R 1001:123 "/root/.npm"
 
 COPY . /src/

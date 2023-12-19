@@ -52,10 +52,10 @@ RUN \
     curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
     chmod +x /usr/local/bin/mc
 
-COPY package.* /src/
+COPY package*.json /src/
 WORKDIR /src/
 
-RUN npm install
+RUN npm ci
 RUN chown -R 1001:123 "/root/.npm"
 
 COPY . /src/
