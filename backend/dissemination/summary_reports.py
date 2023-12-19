@@ -281,6 +281,14 @@ def insert_precert_coversheet(workbook):
 def insert_dissem_coversheet(workbook):
     sheet = workbook.create_sheet("Coversheet", 0)
     sheet.append(["Time created", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")])
+    sheet.append(
+        [
+            "Note",
+            "This file conains up to 1,000 results. If you need to download more than 1,000 submissions, try limiting your search parameters to download in batches. You can also access bulk submission data via the FAC API.",
+        ]
+    )
+    sheet.cell(row=3, column=2).value = "FAC API Link"
+    sheet.cell(row=3, column=2).hyperlink = f"{settings.STATIC_SITE_URL}/developers/"
     set_column_widths(sheet)
 
 
