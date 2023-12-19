@@ -34,7 +34,7 @@ jobs:
             docker:
               - './backend/Dockerfile'
             package:
-              - './backend/package.json'
+              - './backend/package-lock.json'
             staticfiles:
               - './backend/static/**'
 

@@ -121,7 +121,7 @@ Like with Bandit, new code will need to pass all of these to be merged into the 
 We use Cypress to do end-to-end testing of the application. Tests are defined
 in files in [backend/cypress/e2e/](/backend/cypress/e2e). To run these tests:
 - Run the app. Then, from the `FAC/backend` directory:
-- `npm i`
+- `npm ci`
 - [Create a testing login.gov account](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md#testing-behind-logingov)
 - [Set up the fac() alias](https://github.com/GSA-TTS/FAC/blob/main/docs/development.md?plain=1#L125)
 - [Generate a new JWT](https://github.com/GSA-TTS/FAC/blob/main/backend/dissemination/README.md#creating-a-jwt-secret)
