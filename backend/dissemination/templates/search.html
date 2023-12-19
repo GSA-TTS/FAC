@@ -176,6 +176,18 @@
                             <p class="usa-alert__text">
                                 Use the arrows at the top of each column to sort results.
                             </p>
+
+                            <p></p>
+
+                            <h4 class="usa-alert__heading">Bulk download</h4>
+                            <p class="usa-alert__text">
+                                For search results of 1,000 submissions or less, you can download a combined spreadsheet of all data. 
+                                If you need to download more than 1,000 submissions, try limiting your search parameters to download in batches. 
+                                You can also access bulk submission data via the 
+                                <a href="{{ STATIC_SITE_URL }}developers/"
+                                    target="_blank">FAC API</a>
+                                .
+                            </p>
                         </div>
                     </div>
                     <div class="margin-y-2 grid-row display-flex flex-justify">
@@ -183,17 +195,19 @@
                             <strong>Results: {{ results_count }}</strong>
                             <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                         </p>
-                        <button class="usa-button display-flex"
-                                formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
-                                form="search-form"
-                                value="Search">
-                             <svg class="usa-icon margin-right-1 flex-align-self-center"
-                                  aria-hidden="true"
-                                  role="img">
-                                 {% uswds_sprite "file_download" %}
-                             </svg>
-                             <p class="margin-0">Export to XLSX</p>
-                        </button>
+                        {% if results_count <= 1000 %}
+                            <button class="usa-button display-flex"
+                                    formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
+                                    form="search-form"
+                                    value="Search">
+                                <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                    aria-hidden="true"
+                                    role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                                <p class="margin-0">Download all</p>
+                            </button>
+                        {% endif %}
                     </div>
                     
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">

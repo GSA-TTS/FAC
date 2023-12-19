@@ -304,7 +304,7 @@ class MultipleSummaryReportDownloadView(View):
         cleaned_data = clean_form_data(form)
         include_private = include_private_results(request)
         results = run_search_general(cleaned_data, include_private)
-        results = results[:1000]  # Hard limit CSV downloads to 1000 records
+        results = results[:1000]  # Hard limit XLSX downloads to 1000 records
         report_ids = [result.report_id for result in results]
 
         filename = generate_summary_report(report_ids)
