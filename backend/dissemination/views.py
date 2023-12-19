@@ -9,7 +9,7 @@ from django.views.generic import View
 
 from audit.models import SingleAuditChecklist
 
-from config.settings import STATE_ABBREVS
+from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
 
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import SearchForm
@@ -176,6 +176,7 @@ class Search(View):
             "page": page,
             "order_by": form_data.order_by,
             "order_direction": form_data.order_direction,
+            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT
         }
 
         return render(request, "search.html", context)
@@ -304,7 +305,7 @@ class MultipleSummaryReportDownloadView(View):
         cleaned_data = clean_form_data(form)
         include_private = include_private_results(request)
         results = run_search_general(cleaned_data, include_private)
-        results = results[:1000]  # Hard limit XLSX downloads to 1000 records
+        results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX downloads to 1000 records
         report_ids = [result.report_id for result in results]
 
         filename = generate_summary_report(report_ids)

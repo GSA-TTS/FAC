@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 {% load static %}
 {% load sprite_helper %}
 {% block content %}
@@ -178,8 +179,8 @@
                             </p>
                             <h4 class="usa-alert__heading">Bulk download</h4>
                             <p class="usa-alert__text">
-                                For search results of 1,000 submissions or less, you can download a combined spreadsheet of all data. 
-                                If you need to download more than 1,000 submissions, try limiting your search parameters to download in batches. 
+                                For search results of {{ summary_report_download_limit|intcomma }} submissions or less, you can download a combined spreadsheet of all data. 
+                                If you need to download more than {{ summary_report_download_limit|intcomma }} submissions, try limiting your search parameters to download in batches. 
                                 You can also access bulk submission data via the 
                                 <a href="{{ STATIC_SITE_URL }}developers/"
                                     target="_blank">FAC API</a>
@@ -192,7 +193,7 @@
                             <strong>Results: {{ results_count }}</strong>
                             <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                         </p>
-                        {% if results_count <= 1000 %}
+                        {% if results_count <= summary_report_download_limit %}
                             <button class="usa-button display-flex"
                                     formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
                                     form="search-form"
