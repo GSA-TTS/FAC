@@ -70,6 +70,7 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             "progress_url": _url("SubmissionProgress"),
             "change_cert_auditee_url": _url("ChangeAuditeeCertifyingOfficial"),
             "change_cert_auditor_url": _url("ChangeAuditorCertifyingOfficial"),
+            "add_editor_url": _url("ChangeOrAddRoleView"),
         }
 
         return render(request, "audit/manage-submission.html", context)

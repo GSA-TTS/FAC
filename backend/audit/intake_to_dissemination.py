@@ -89,8 +89,8 @@ class IntakeToDissemination(object):
                     finding_text=entry["text_of_finding"],
                 )
                 findings_text_objects.append(finding_text_)
-            self.loaded_objects["FindingTexts"] = findings_text_objects
 
+        self.loaded_objects["FindingTexts"] = findings_text_objects
         return findings_text_objects
 
     def load_findings(self):

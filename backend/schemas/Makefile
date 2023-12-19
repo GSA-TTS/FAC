@@ -1,12 +1,13 @@
 SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
 PYTHON=${SYSTEM_PYTHON}
 
-all:  clean source_data build_xlsx format_jsonnet build_templates build_sections 
-json: format_jsonnet build_templates build_templates
+all:  clean source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json
+json: format_jsonnet build_templates build_templates build_audit_json
 
 
 template_specs = $(wildcard source/excel/templates/*.jsonnet)
 section_specs = $(wildcard source/sections/*.jsonnet)
+audit_specs = $(wildcard source/audit/*.jsonnet)
 
 xlsx = $(wildcard output/excel/xlsx/*-workbook*.xlsx)
 json = $(wildcard output/excel/json/*.json)
@@ -21,6 +22,12 @@ clean:
 	done
 	for f in $(json); do \
 		rm $$f; \
+	done
+
+build_audit_json: 
+	for jsonnet_file in $(audit_specs); do \
+		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
+		jsonnet -o output/audit/"$$base_name.json" "$$jsonnet_file"; \
 	done
 
 build_xlsx: source_data
