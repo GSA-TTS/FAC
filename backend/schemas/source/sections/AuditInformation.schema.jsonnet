@@ -15,16 +15,6 @@ local AuditInformation = Types.object {
       items: Base.Enum.SP_Framework_Opinions,
     },
     dollar_threshold: Types.integer,
-    // FIXME-MSHD: This change what decided for data migration (see ticket #2912)
-    // but it requires an update to the dissemination model field type. Jadud ???
-    // dollar_threshold:{
-    //   oneOf: [
-    //     Types.integer,
-    //     Types.string{
-    //       const: Base.Const.GSA_MIGRATION,
-    //     },
-    //   ],
-    // },
     is_sp_framework_required: Types.boolean,
     is_going_concern_included: Types.boolean,
     is_internal_control_deficiency_disclosed: Types.boolean,

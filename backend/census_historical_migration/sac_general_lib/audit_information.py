@@ -20,7 +20,7 @@ def xform_apply_default_thresholds(value):
     str_value = string_to_string(value)
     if str_value == "":
         # FIXME-MSHD: This is a transformation that we may want to record
-        return settings.DOLLAR_THRESHOLD
+        return -1
     return string_to_int(str_value)
 
 
@@ -30,10 +30,7 @@ mappings = [
         "DOLLARTHRESHOLD",
         FormFieldInDissem,
         None,
-        int,
-        # FIXME-MSHD: It was decided (#2912) to replace int with xform_apply_default_thresholds
-        # but this cannot happen until the `dollar_threshold` is changed to string
-        # in dissemination model and in schema (see note in AuditInformation.schema.json).
+        xform_apply_default_thresholds,
     ),
     FormFieldMap(
         "is_going_concern_included", "GOINGCONCERN", FormFieldInDissem, None, bool
