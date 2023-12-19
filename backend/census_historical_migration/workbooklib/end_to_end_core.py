@@ -44,12 +44,6 @@ parser = argparse.ArgumentParser()
 
 
 def step_through_certifications(sac):
-    # sac.transition_to_ready_for_certification()
-    # sac.transition_to_auditor_certified()
-    # sac.transition_to_auditee_certified()
-    # sac.transition_to_submitted()
-    # sac.transition_to_disseminated()
-    # sac.save()
     stati = [
         SingleAuditChecklist.STATUS.IN_PROGRESS,
         SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
