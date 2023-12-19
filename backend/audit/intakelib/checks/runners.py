@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 import logging
 from .check_cluster_names import check_cluster_names
 from audit.fixtures.excel import FORM_SECTIONS
-from ..checks.check_gsa_migration_keyword import check_for_gsa_migration_keyword
+from .check_gsa_migration_keyword import check_for_gsa_migration_keyword
 
 ############
 # General checks
