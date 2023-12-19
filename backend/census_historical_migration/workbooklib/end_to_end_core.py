@@ -250,7 +250,10 @@ def run_end_to_end(user, audit_header, result):
             logger.info(
                 f"Skipping ACE audit: {audit_header.DBKEY} {audit_header.AUDITYEAR}"
             )
-            raise DataMigrationError("Skipping ACE audit")
+            raise DataMigrationError(
+                "Skipping ACE audit",
+                "skip_ace_audit",
+            )
         else:
             builder_loader = workbook_builder_loader(user, sac, audit_header)
             json_test_tables = []
@@ -327,6 +330,9 @@ def handle_exception(exc, audit_header, result):
         logger.error(f"DataMigrationError: {message}")
         tag = tag or "data_migration"
     elif exc_type == ValidationError:
+        logger.error(f"ValidationError: {message}")
+        tag = "schema_validation"
+    elif exc_type == CrossValidationError:
         logger.error(f"ValidationError: {message}")
         tag = "schema_validation"
     else:

@@ -118,7 +118,10 @@ mappings = [
 def _period_covered(s):
     """Helper to transform the period covered from Census format to FAC format."""
     if s not in PERIOD_DICT:
-        raise DataMigrationError(f"Key '{s}' not found in period coverage mapping")
+        raise DataMigrationError(
+            f"Key '{s}' not found in period coverage mapping",
+            "invalid_period_coverage_key",
+        )
     return PERIOD_DICT[s]
 
 
@@ -126,7 +129,10 @@ def _census_audit_type(s):
     """Helper to transform the audit type from Census format to FAC format."""
 
     if s not in AUDIT_TYPE_DICT:
-        raise DataMigrationError(f"Key '{s}' not found in census audit type mapping")
+        raise DataMigrationError(
+            f"Key '{s}' not found in census audit type mapping",
+            "invalid_census_audit_type_key",
+        )
     return AUDIT_TYPE_DICT[s]
 
 
@@ -207,7 +213,8 @@ def xform_audit_type(general_information):
         )
     else:
         raise DataMigrationError(
-            f"Audit type is empty: {general_information.get('audit_type')}"
+            f"Audit type is empty: {general_information.get('audit_type')}",
+            "invalid_audit_type",
         )
     return general_information
 

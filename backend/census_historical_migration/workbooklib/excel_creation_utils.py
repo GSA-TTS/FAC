@@ -5,7 +5,10 @@ from ..transforms.xform_string_to_string import (
     string_to_string,
 )
 from ..transforms.xform_string_to_int import string_to_int
-from ..exception_utils import DataMigrationError
+from ..exception_utils import (
+  DataMigrationError,
+  DataMigrationValueError,
+)
 from ..base_field_maps import WorkbookFieldInDissem
 from ..workbooklib.templates import sections_to_template_paths
 from ..sac_general_lib.report_id_generator import (
@@ -46,7 +49,10 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
     for cur_sheet_title, cur_coord in dests:
         if sheet_title or coord:
             # `destinations` is meant to be iterated over, but we only expect one value
-            raise ValueError(f"{range_name} has more than one destination")
+            raise DataMigrationValueError(
+                f"{range_name} has more than one destination",
+                "multiple_destinations",
+            )
         else:
             sheet_title, coord = cur_sheet_title, cur_coord
 
@@ -81,7 +87,10 @@ def apply_conversion_function(value, default, conversion_function):
     Helper to apply a conversion function to a value, or use a default value
     """
     if value is None and default is None:
-        raise ValueError("No value or default provided")
+        raise DataMigrationValueError(
+            "No value or default provided",
+            "no_value_or_default",
+        )
 
     selected_value = value if value is not None else default
 
@@ -134,7 +143,10 @@ def get_ranges(mappings, values):
 def set_workbook_uei(workbook, uei):
     """Sets the UEI value in the workbook's designated UEI cell"""
     if not uei:
-        raise DataMigrationError("UEI value is missing or invalid.")
+        raise DataMigrationError(
+            "UEI value is missing or invalid.",
+            "invalid_uei",
+        )
     set_range(workbook, "auditee_uei", [uei])
 
 
@@ -144,7 +156,8 @@ def get_audit_header(dbkey, year):
         audit_header = AuditHeader.objects.get(DBKEY=dbkey, AUDITYEAR=year)
     except AuditHeader.DoesNotExist:
         raise DataMigrationError(
-            f"No audit header record found for dbkey: {dbkey} and audit year: {year}"
+            f"No audit header record found for dbkey: {dbkey} and audit year: {year}",
+            "missing_audit_header",
         )
     return audit_header
 
@@ -162,7 +175,8 @@ def map_simple_columns(wb, mappings, values):
             )
         )
         raise DataMigrationError(
-            "Invaid mappings. You repeated a field in the mappings"
+            "Invalid mappings. You repeated a field in the mappings",
+            "invalid_mappings",
         )
 
     # Map all the simple ones
@@ -184,7 +198,10 @@ def get_template_name_for_section(section):
         template_name = sections_to_template_paths[section].name
         return template_name
     else:
-        raise ValueError(f"Unknown section {section}")
+        raise DataMigrationValueError(
+            f"Unknown section {section}",
+            "invalid_section",
+        )
 
 
 def generate_dissemination_test_table(audit_header, api_endpoint, mappings, objects):
