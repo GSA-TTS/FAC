@@ -210,9 +210,11 @@
                                         <td>{{ result.audit_year }}</td>
                                         <td>
                                             {% if result.oversight_agency %}
-                                                Oversight
+                                                OVER-{{ result.oversight_agency }}
+                                            {% elif  result.cognizant_agency %}
+                                                COG-{{ result.cognizant_agency }}
                                             {% else %}
-                                                Cognizant
+                                                N/A
                                             {% endif %}
                                         </td>
                                         <td>

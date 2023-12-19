@@ -15,6 +15,7 @@ from ..models import (
     MigrationErrorDetail,
 )
 from audit.intake_to_dissemination import IntakeToDissemination
+from audit.models import SingleAuditChecklist
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -30,7 +31,7 @@ from dissemination.models import (
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.utils import timezone
+from django.utils import timezone as django_timezone
 
 import argparse
 import logging
@@ -39,7 +40,7 @@ import math
 import os
 import jwt
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 
 
@@ -50,11 +51,18 @@ parser = argparse.ArgumentParser()
 
 
 def step_through_certifications(sac):
-    sac.transition_to_ready_for_certification()
-    sac.transition_to_auditor_certified()
-    sac.transition_to_auditee_certified()
-    sac.transition_to_submitted()
-    sac.transition_to_disseminated()
+    stati = [
+        SingleAuditChecklist.STATUS.IN_PROGRESS,
+        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        SingleAuditChecklist.STATUS.CERTIFIED,
+        SingleAuditChecklist.STATUS.SUBMITTED,
+        SingleAuditChecklist.STATUS.DISSEMINATED,
+    ]
+    for status in stati:
+        sac.transition_name.append(status)
+        sac.transition_date.append(datetime.now(timezone.utc))
     sac.save()
 
 
@@ -292,7 +300,7 @@ def record_migration_status(audit_year, dbkey, has_failed):
     migration_status = ReportMigrationStatus.objects.create(
         audit_year=audit_year,
         dbkey=dbkey,
-        run_datetime=timezone.now(),
+        run_datetime=django_timezone.now(),
         migration_status=status,
     )
     migration_status.save()
@@ -330,9 +338,6 @@ def handle_exception(exc, audit_header, result):
         logger.error(f"DataMigrationError: {message}")
         tag = tag or "data_migration"
     elif exc_type == ValidationError:
-        logger.error(f"ValidationError: {message}")
-        tag = "schema_validation"
-    elif exc_type == CrossValidationError:
         logger.error(f"ValidationError: {message}")
         tag = "schema_validation"
     else:

@@ -18,6 +18,7 @@ class PermissionAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ["email", "can_read_tribal", "last_login", "date_joined"]
+    list_filter = ["is_staff", "is_superuser"]
     exclude = ["groups", "user_permissions", "password"]
     readonly_fields = ["date_joined", "last_login"]
     search_fields = ("email", "username")
