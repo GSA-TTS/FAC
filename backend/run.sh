@@ -39,6 +39,11 @@ api_standup
 gonogo "api_standup"
 
 #####
+# MIGRATE APP TABLES
+migrate_historic_tables
+gonogo "migrate_historic_tables"
+
+#####
 # SEED COG/OVER TABLES
 # Setup tables for cog/over assignments
 seed_cog_baseline

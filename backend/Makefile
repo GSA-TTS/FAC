@@ -57,9 +57,7 @@ docker-first-run:
 	docker compose build
 	docker compose run web bash -c '\
 		python manage.py makemigrations &&\
-		python manage.py migrate &&\
-		python manage.py migrate --database census-to-gsafac-db \
-		'
+		python manage.py migrate'
 
 docker-load-data:
 	docker compose up -d && docker compose run web ./load_data.sh
@@ -68,7 +66,6 @@ docker-load-data:
 docker-test:
 	docker compose build
 	docker compose run web python manage.py migrate
-	docker compose run web python manage.py migrate --database census-to-gsafac-db
 	docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
 
 # Run Django tests with docker with no coverage and with scoping
@@ -79,7 +76,6 @@ docker-test:
 docker-nctest:
 	docker compose build
 	docker compose run web python manage.py migrate
-	docker compose run web python manage.py migrate --database census-to-gsafac-db
 	docker compose run web python manage.py test --parallel ${fac.test.scope}
 
 docker-lint:
@@ -89,13 +85,11 @@ docker-lint:
 ghcr-first-run:
 	docker compose -f docker-compose-web.yml run web python manage.py makemigrations
 	docker compose -f docker-compose-web.yml run web python manage.py migrate
-	docker compose -f docker-compose-web.yml run web python manage.py migrate --database census-to-gsafac-db
 	docker compose -f docker-compose-web.yml run web python manage.py load_test_data
 
 # Run Django tests with docker
 ghcr-test:
 	docker compose -f docker-compose-web.yml run web python manage.py migrate
-	docker compose -f docker-compose-web.yml run web python manage.py migrate --database census-to-gsafac-db
 	docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
 
 # Run Django tests with docker with no coverage and with scoping
@@ -105,7 +99,6 @@ ghcr-test:
 #     make nctest
 ghcr-nctest:
 	docker compose -f docker-compose-web.yml run web python manage.py migrate
-	docker compose -f docker-compose-web.yml run web python manage.py migrate --database census-to-gsafac-db
 	docker compose -f docker-compose-web.yml run web python manage.py test --parallel ${fac.test.scope}
 
 ghcr-lint:

@@ -171,12 +171,8 @@ DATABASES = {
     "default": env.dj_db_url(
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
-    "census-to-gsafac-db": env.dj_db_url(
-        "DATABASE_URL_CENSUS_TO_GSAFAC_DB",
-        default="postgres://postgres:password@0.0.0.0:5433/backend",
-    ),
 }
-DATABASE_ROUTERS = ["census_historical_migration.routers.DBRouter"]
+
 POSTGREST = {
     "URL": env.str("POSTGREST_URL", "http://api:3000"),
     "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),

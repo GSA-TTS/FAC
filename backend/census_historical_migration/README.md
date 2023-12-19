@@ -65,9 +65,9 @@ docker compose run --rm web python manage.py historic_data_migrator
 
 To migrate dbkeys for a given year with pagination:
 ```
-docker compose run --rm web python manage.py run_paginated_migration
+docker compose run --rm web python manage.py run_paginated_migration \
   --year 2022 \
-  --page_size 1000
+  --page_size 1000 \
   --pages 1,3,4
 ```
 - `batchSize` and `pages` are optional. The script will use default values for these if they aren't provided.
