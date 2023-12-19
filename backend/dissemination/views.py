@@ -146,8 +146,9 @@ class Search(View):
 
         results_count = len(results)
         # Reset page to one if the page number surpasses how many pages there actually are
-        if form_data.page > math.ceil(results_count / form_data.limit):
-            form_data.page = 1
+        page = form_data.page
+        if page > math.ceil(results_count / form_data.limit):
+            page = 1
 
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
         paginator = Paginator(object_list=results, per_page=form_data.limit)
@@ -172,7 +173,7 @@ class Search(View):
             "limit": form_data.limit,
             "results": results,
             "results_count": results_count,
-            "page": form_data.page,
+            "page": page,
             "order_by": form_data.order_by,
             "order_direction": form_data.order_direction,
         }
