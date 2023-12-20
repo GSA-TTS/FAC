@@ -131,5 +131,5 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf restart cg-logshipper
+          command: cf restart logshipper
 
