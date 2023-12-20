@@ -23,6 +23,7 @@ def aln_three_digit_extension(ir):
         settings.REGEX_RD_EXTENSION,
         settings.REGEX_THREE_DIGIT_EXTENSION,
         settings.REGEX_U_EXTENSION,
+        settings.REGEX_GSA_MIGRATION,
     ]
     for index, ext in enumerate(extension):
         # Check if ext does not match any of the regex patterns

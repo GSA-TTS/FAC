@@ -6,6 +6,5 @@ def string_to_string(value):
         return ""
     if not isinstance(value, str):
         raise ValueError(f"Expected string, got {type(value).__name__}")
-    trimmed_value = value.strip()
 
-    return trimmed_value
+    return value.strip()

@@ -2,8 +2,8 @@ import json
 import audit.validators
 from datetime import timedelta
 
-from ..workbooklib.excel_creation_utils import xform_add_hyphen_to_zip
-
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 from ..transforms.xform_string_to_string import string_to_string
 from ..exception_utils import DataMigrationError
 from ..sac_general_lib.utils import (
@@ -67,8 +67,20 @@ mappings = [
     FormFieldMap("auditee_name", "AUDITEENAME", FormFieldInDissem, None, str),
     FormFieldMap("auditee_phone", "AUDITEEPHONE", FormFieldInDissem, None, str),
     FormFieldMap("auditee_state", "STATE", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_uei", "UEI", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_zip", "ZIPCODE", FormFieldInDissem, None, str),
+    FormFieldMap(
+        "auditee_uei",
+        "UEI",
+        FormFieldInDissem,
+        None,
+        xform_retrieve_uei,
+    ),
+    FormFieldMap(
+        "auditee_zip",
+        "ZIPCODE",
+        FormFieldInDissem,
+        None,
+        xform_remove_hyphen_and_pad_zip,
+    ),
     FormFieldMap("auditor_address_line_1", "CPASTREET1", FormFieldInDissem, None, str),
     FormFieldMap("auditor_city", "CPACITY", FormFieldInDissem, None, str),
     FormFieldMap("auditor_contact_name", "CPACONTACT", FormFieldInDissem, None, str),
@@ -83,7 +95,11 @@ mappings = [
     FormFieldMap("auditor_phone", "CPAPHONE", FormFieldInDissem, None, str),
     FormFieldMap("auditor_state", "CPASTATE", FormFieldInDissem, None, str),
     FormFieldMap(
-        "auditor_zip", "CPAZIPCODE", FormFieldInDissem, None, xform_add_hyphen_to_zip
+        "auditor_zip",
+        "CPAZIPCODE",
+        FormFieldInDissem,
+        None,
+        xform_remove_hyphen_and_pad_zip,
     ),
     FormFieldMap("ein", "EIN", "auditee_ein", None, str),
     FormFieldMap(
@@ -135,7 +151,7 @@ def xform_country(general_information, audit_header):
     if auditor_country in ["US", "USA"]:
         general_information["auditor_country"] = "USA"
     elif auditor_country == "":
-        valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/States.json")
+        valid_file = open(f"{settings.SCHEMA_BASE_DIR}/States.json")
         valid_json = json.load(valid_file)
         auditor_state = string_to_string(audit_header.CPASTATE).upper()
         if auditor_state in valid_json["UnitedStatesStateAbbr"]:

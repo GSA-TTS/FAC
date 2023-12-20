@@ -220,19 +220,3 @@ def generate_dissemination_test_table(audit_header, api_endpoint, mappings, obje
 def get_audits(dbkey, year):
     """Returns Audits records for the given dbkey and audit year."""
     return Audits.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by("ID")
-
-
-def xform_add_hyphen_to_zip(zip):
-    """
-    Transform a ZIP code string by adding a hyphen. If the ZIP code has 9 digits, inserts a hyphen after the fifth digit.
-    Returns the original ZIP code if it has 5 digits or is malformed.
-    """
-    strzip = string_to_string(zip)
-    if len(strzip) == 5:
-        return strzip
-    elif len(strzip) == 9:
-        # FIXME - MSHD: This is a transformation and might require logging.
-        return f"{strzip[0:5]}-{strzip[5:9]}"
-    else:
-        # FIXME - MSHD: How do we handle 4-digit and 8-digit ZIP codes?
-        raise DataMigrationError("Zip code is malformed in secondary auditor.")

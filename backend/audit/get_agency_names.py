@@ -1,8 +1,8 @@
 from collections import OrderedDict
+from pathlib import Path
 import csv
 import glob
 import json
-import _jsonnet
 import os
 
 
@@ -32,8 +32,11 @@ def get_agency_names():
 
 
 def get_audit_info_lists(name):
-    sonnet = "./schemas/source/base/GAAP.libsonnet"
-    json_str = _jsonnet.evaluate_file(sonnet)
-    jobj = json.loads(json_str)
+    """
+    Get lists of internal values and friendly strings for the responses to the
+    Audit Information form section.
+    """
+    jsonfile = Path("./schemas/output/audit/audit-info-values.json")
+    jobj = json.loads(jsonfile.read_text(encoding="UTF-8"))
     # Returns a list of dictionaries with the keys 'tag' and 'readable'
     return jobj[name]

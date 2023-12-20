@@ -27,7 +27,7 @@ from .intermediate_representation import (
 logger = logging.getLogger(__name__)
 
 
-def extract_secondary_auditors(file):
+def extract_secondary_auditors(file, is_gsa_migration=False):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
     )
@@ -41,9 +41,9 @@ def extract_secondary_auditors(file):
     )
 
     ir = extract_workbook_as_ir(file)
-    run_all_general_checks(ir, FORM_SECTIONS.SECONDARY_AUDITORS)
+    run_all_general_checks(ir, FORM_SECTIONS.SECONDARY_AUDITORS, is_gsa_migration)
     xform_ir = run_all_secondary_auditors_transforms(ir)
-    run_all_secondary_auditors_checks(xform_ir)
+    run_all_secondary_auditors_checks(xform_ir, is_gsa_migration)
     result = _extract_generic_data(xform_ir, params)
     return result
 
