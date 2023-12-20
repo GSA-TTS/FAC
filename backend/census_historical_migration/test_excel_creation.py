@@ -74,7 +74,9 @@ class ExcelCreationTests(TestCase):
         ws.cell(row=6, column=1, value="foo")
         self.assertEqual(ws["A6"].value, "foo")
 
-        self.assertRaises(DataMigrationValueError, set_range, wb, self.range_name, [None])
+        self.assertRaises(
+            DataMigrationValueError, set_range, wb, self.range_name, [None]
+        )
 
     def test_set_range_conversion(self):
         """
@@ -137,7 +139,9 @@ class ExcelCreationTests(TestCase):
         wb.defined_names.add(defn)
 
         self.assertEqual(len(list(wb.defined_names[self.range_name].destinations)), 2)
-        self.assertRaises(DataMigrationValueError, set_range, wb, self.range_name, ["bar"])
+        self.assertRaises(
+            DataMigrationValueError, set_range, wb, self.range_name, ["bar"]
+        )
 
     def test_set_range_ws_missing(self):
         """
