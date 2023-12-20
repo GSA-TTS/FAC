@@ -9,7 +9,6 @@ source tools/util_startup.sh
 # This will choose the correct environment
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
-source tools/migrate_historic_tables.sh
 source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh

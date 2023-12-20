@@ -9,7 +9,6 @@ source tools/util_startup.sh
 # This will choose the correct environment
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
-source tools/migrate_historic_tables.sh
 source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
@@ -37,11 +36,6 @@ gonogo "migrate_app_tables"
 # Standup the API, which may depend on migration changes
 api_standup
 gonogo "api_standup"
-
-#####
-# MIGRATE APP TABLES
-migrate_historic_tables
-gonogo "migrate_historic_tables"
 
 #####
 # SEED COG/OVER TABLES

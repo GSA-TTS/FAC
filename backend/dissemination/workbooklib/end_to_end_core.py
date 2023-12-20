@@ -10,6 +10,11 @@ import requests
 from pprint import pprint
 from datetime import datetime, timezone
 from audit.models import SingleAuditChecklist
+from datetime import datetime
+from random import randrange
+from datetime import timedelta
+import pytz
+
 
 from dissemination.workbooklib.workbook_creation import (
     sections,
@@ -43,7 +48,23 @@ pw.addHandler(logging.StreamHandler())
 pw.setLevel(logging.INFO)
 
 
+# https://stackoverflow.com/questions/553303/generate-a-random-date-between-two-other-dates
+def random_date(start, end):
+    """
+    This function will return a random datetime between two datetime 
+    objects.
+    """
+    delta = end - start
+    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+    random_second = randrange(int_delta)
+    return start + timedelta(seconds=random_second)
+
 def step_through_certifications(sac):
+    d1 = datetime.strptime('1/1/2017 1:30 PM', '%m/%d/%Y %I:%M %p')
+    d2 = datetime.strptime('10/30/2023 4:50 AM', '%m/%d/%Y %I:%M %p')
+    # https://stackoverflow.com/questions/7065164/how-to-make-a-datetime-object-aware-not-naive
+    date = pytz.utc.localize(random_date(d1, d2))
+
     stati = [
         SingleAuditChecklist.STATUS.IN_PROGRESS,
         SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
@@ -55,7 +76,7 @@ def step_through_certifications(sac):
     ]
     for status in stati:
         sac.transition_name.append(status)
-        sac.transition_date.append(datetime.now(timezone.utc))
+        sac.transition_date.append(date)
     sac.save()
 
 
@@ -77,8 +98,10 @@ def disseminate(sac, year):
 
     if sac.general_information:
         etl = IntakeToDissemination(sac)
-        etl.load_all()
-        etl.save_dissemination_objects()
+        # etl.load_all()
+        # etl.save_dissemination_objects()
+        # sac.assign_cog_over()
+        sac.disseminate()
 
 
 def create_payload(api_url, role="api_fac_gov"):
@@ -226,7 +249,14 @@ def generate_workbooks(user, email, dbkey, year, store_files=True, run_api_check
 def run_end_to_end(email, dbkey, year, store_files=True, run_api_checks=True):
     try:
         user = User.objects.get(email=email)
+        
     except User.DoesNotExist:
-        logger.info("No user found for %s, have you logged in once?", email)
-        return
+        # logger.info("No user found for %s, have you logged in once?", email)
+        logger.info("Creating a user for test data generation.")
+        test_user_email = "test-data-generator@fac.gsa.gov"
+        try:
+            user = User.objects.get(email=test_user_email)
+        except:
+            user = User.objects.create(email=test_user_email)
+        # return
     generate_workbooks(user, email, dbkey, year, store_files, run_api_checks)
