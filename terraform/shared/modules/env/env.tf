@@ -28,12 +28,12 @@ module "s3-private" {
   s3_plan_name     = "basic"
 }
 
-module "s3-c2g" {
+module "fac-census-data-s3" {
   source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
-  name             = "fac-c2g-s3"
+  name             = "fac-census-data-s3"
   recursive_delete = var.recursive_delete
   s3_plan_name     = "basic"
 }
