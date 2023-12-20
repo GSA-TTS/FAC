@@ -20,7 +20,7 @@ This is implemented as a Django app to leverage existing management commands and
 * fac_s3.py - Uploads folders or files to an S3 bucket.
 
 ```bash
-python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_historical_migration/data
+python manage.py fac_s3 gsa-fac-private-s3 --upload --src census_historical_migration/data
 ```
 
 * csv_to_postgres.py - Inserts data into Postgres tables using the contents of the CSV files in the S3 bucket. The first row of each file is assumed to have the column names (we convert to lowercase). The name of the table is determined by examining the name of the file. The sample source files do not have delimters for empty fields at the end of a line - so we assume these are nulls.
@@ -44,20 +44,46 @@ python manage.py csv_to_postgres --clean True
 1.  Download test Census data from https://drive.google.com/drive/folders/1TY-7yWsMd8DsVEXvwrEe_oWW1iR2sGoy into census_historical_migration/data folder.
 NOTE:  Never check in the census_historical_migration/data folder into GitHub.
 
-2.  In the FAC/backend folder, run the following to load CSV files from census_historical_migration/data folder into fac-census-to-gsafac-s3 bucket.
+2.  In the FAC/backend folder, run the following to load CSV files from census_historical_migration/data folder into fac-census-data-s3 bucket.
 ```bash
-docker compose run --rm web python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_historical_migration/data
+docker compose run --rm web python manage.py fac_s3 \
+  fac-census-data-s3 \
+  --upload \
+  --src census_historical_migration/data
 ```
 
-3.  In the FAC/backend folder, run the following to read the CSV files from fac-census-to-gsafac-s3 bucket and load into Postgres.
+3.  In the FAC/backend folder, run the following to read the CSV files from fac-census-data-s3 bucket and load into Postgres.
 ```bash
-docker compose run --rm web python manage.py csv_to_postgres --folder data --chunksize 10000
+docker compose run --rm web python manage.py \
+  csv_to_postgres \
+  --folder data \
+  --chunksize 10000
 ```
 
-### How to run the historic data migrator:
+If you find yourself loading and reloading data, you may want to truncate what is in your local DB in-between.
+
+```
+truncate table 
+	census_historical_migration_elecauditfindings , 
+	census_historical_migration_elecauditheader ,
+	census_historical_migration_elecaudits ,
+	census_historical_migration_eleccaptext ,
+	census_historical_migration_eleccpas ,
+	census_historical_migration_eleceins ,
+	census_historical_migration_elecfindingstext ,
+	census_historical_migration_elecnotes ,
+	census_historical_migration_elecpassthrough ,
+	census_historical_migration_elecueis ,
+	census_historical_migration_migrationerrordetail ,
+	census_historical_migration_reportmigrationstatus 
+	;
+```
+
+### How to run the historic data migrator
+
 To migrate individual dbkeys:
 ```
-docker compose run --rm web python manage.py historic_data_migrator
+docker compose run --rm web python manage.py historic_data_migrator \
   --years 22 \
   --dbkeys 177310
 ```
@@ -67,7 +93,7 @@ To migrate dbkeys for a given year with pagination:
 ```
 docker compose run --rm web python manage.py run_paginated_migration \
   --year 2022 \
-  --page_size 1000 \
+  --page_size 5 \
   --pages 1,3,4
 ```
 - `batchSize` and `pages` are optional. The script will use default values for these if they aren't provided.

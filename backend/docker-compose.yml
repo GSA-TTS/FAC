@@ -18,6 +18,20 @@ services:
       timeout: 5s
       retries: 10
 
+  census-to-gsafac-db:
+    image: "postgres:15"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - census-to-gsafac-data:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   #---------------------------------------------
   # Historic data
   #---------------------------------------------
@@ -40,6 +54,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      census-to-gsafac-db:
+        condition: service_healthy
       minio:
         condition: service_started
       clamav-rest:
@@ -48,6 +64,7 @@ services:
         condition: service_started
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
+      DATABASE_URL_CENSUS_TO_GSAFAC_DB: postgres://postgres@census-to-gsafac-db/postgres
       POSTGREST_URL: http://api:3000
       DJANGO_DEBUG: true
       SAM_API_KEY: ${SAM_API_KEY}
@@ -60,7 +77,7 @@ services:
       AV_SCAN_URL: http://clamav-rest:9000/scan
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
-      ENABLE_DEBUG_TOOLBAR: true
+      ENABLE_DEBUG_TOOLBAR: false
 
     env_file:
       - ".env"
@@ -116,4 +133,5 @@ services:
         condition: service_healthy
 volumes:
   postgres-data:
+  census-to-gsafac-data:
   minio-vol:
