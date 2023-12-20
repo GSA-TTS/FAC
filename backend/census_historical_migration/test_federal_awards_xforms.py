@@ -4,11 +4,14 @@ from django.test import SimpleTestCase
 
 from .exception_utils import DataMigrationError
 from .workbooklib.federal_awards import (
+    is_valid_prefix,
     xform_populate_default_award_identification_values,
     xform_populate_default_loan_balance,
     xform_constructs_cluster_names,
     xform_populate_default_passthrough_amount,
     xform_populate_default_passthrough_values,
+    xform_replace_invalid_extension,
+    is_valid_extension,
 )
 
 
@@ -287,3 +290,42 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
         audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="")]
         with self.assertRaises(DataMigrationError):
             xform_populate_default_passthrough_amount(audits)
+
+
+class TestCFDAFunctions(SimpleTestCase):
+    def test_is_valid_prefix(self):
+        """Test the function with valid and invalid prefixes."""
+        self.assertTrue(is_valid_prefix("01"))
+        self.assertFalse(is_valid_prefix("ABC"))
+        self.assertFalse(is_valid_prefix("123"))
+
+    def test_is_valid_extension(self):
+        """Test the function with valid and invalid extensions."""
+        self.assertTrue(is_valid_extension("RD"))
+        self.assertTrue(is_valid_extension("RD1"))
+        self.assertTrue(is_valid_extension("123A"))
+        self.assertTrue(is_valid_extension("U01"))
+        # Invalid cases
+        self.assertFalse(is_valid_extension("RDABC"))
+        self.assertFalse(is_valid_extension("12345"))
+        self.assertFalse(is_valid_extension("UA123"))
+
+    def test_xform_replace_invalid_extension(self):
+        class MockAudit:
+            def __init__(self, prefix, ext):
+                self.CFDA_PREFIX = prefix
+                self.CFDA_EXT = ext
+
+        # Valid prefix and extension
+        audit = MockAudit("01", "RD1")
+        self.assertEqual(xform_replace_invalid_extension(audit), "01.RD1")
+
+        # Invalid prefix
+        audit = MockAudit("ABC", "RD1")
+        with self.assertRaises(DataMigrationError):
+            xform_replace_invalid_extension(audit)
+
+        # Invalid extension
+        audit = MockAudit("01", "ABC")
+        result = xform_replace_invalid_extension(audit)
+        self.assertEqual(result, f"01.{settings.GSA_MIGRATION}")

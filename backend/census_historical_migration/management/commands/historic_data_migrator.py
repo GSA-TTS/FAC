@@ -9,7 +9,7 @@ from census_historical_migration.workbooklib.excel_creation_utils import (
 )
 from census_historical_migration.historic_data_loader import (
     create_or_get_user,
-    print_results,
+    log_results,
     record_migration_status,
 )
 from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
@@ -66,7 +66,7 @@ class Command(BaseCommand):
 
                 record_migration_status(year, dbkey, has_failed)
 
-            print_results(result_log, error_count, total_count)
+            log_results(result_log, error_count, total_count)
 
     def handle(self, *args, **options):
         dbkeys_str = options["dbkeys"]

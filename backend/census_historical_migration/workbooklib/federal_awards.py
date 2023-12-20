@@ -123,14 +123,14 @@ def xform_constructs_cluster_names(
     return (cluster_names, other_cluster_names, state_cluster_names)
 
 
-def _is_valid_prefix(prefix):
+def is_valid_prefix(prefix):
     """
     Checks if the provided prefix is a valid CFDA prefix.
     """
     return re.match(settings.REGEX_ALN_PREFIX, str(prefix))
 
 
-def _is_valid_extension(extension):
+def is_valid_extension(extension):
     """
     Checks if the provided extension is a valid CFDA extension.
     """
@@ -147,9 +147,9 @@ def xform_replace_invalid_extension(audit):
     """Replaces invalid ALN extensions with the default value settings.GSA_MIGRATION."""
     prefix = string_to_string(audit.CFDA_PREFIX)
     extension = string_to_string(audit.CFDA_EXT)
-    if not _is_valid_prefix(prefix):
+    if not is_valid_prefix(prefix):
         raise DataMigrationError(f"Invalid ALN prefix: {prefix}")
-    if not _is_valid_extension(extension):
+    if not is_valid_extension(extension):
         extension = settings.GSA_MIGRATION
 
     return f"{prefix}.{extension}"
@@ -171,8 +171,8 @@ def _get_passthroughs(audits):
     records matching the DBKEY and ELECAUDITSID of the audit. It then compiles lists of
     passthrough names and IDs, joined by a pipe '|' if multiple are found.
     """
-    passthrough_names = [""] * len(audits)
-    passthrough_ids = [""] * len(audits)
+    passthrough_names = ["" for _ in audits]
+    passthrough_ids = ["" for _ in audits]
 
     for index, audit in enumerate(audits):
         passthroughs = Passthrough.objects.filter(
@@ -424,7 +424,7 @@ def generate_federal_awards(audit_header, outfile):
         def update_or_append_field(field_name, field_value):
             if field_name in award["fields"]:
                 index = award["fields"].index(field_name)
-                print(
+                logger.info(
                     f"Updating {field_name} from {award['values'][index]} to {field_value}"
                 )
                 award["values"][index] = field_value

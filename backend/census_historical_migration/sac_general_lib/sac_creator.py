@@ -4,19 +4,19 @@ from django.apps import apps
 from django.conf import settings
 
 from ..exception_utils import DataMigrationError
-from ..sac_general_lib.general_information import (
+from .general_information import (
     general_information,
 )
-from ..sac_general_lib.audit_information import (
+from .audit_information import (
     audit_information,
 )
-from ..sac_general_lib.auditee_certification import (
+from .auditee_certification import (
     auditee_certification,
 )
-from ..sac_general_lib.auditor_certification import (
+from .auditor_certification import (
     auditor_certification,
 )
-from ..sac_general_lib.report_id_generator import (
+from .report_id_generator import (
     xform_dbkey_to_report_id,
 )
 
@@ -39,10 +39,13 @@ def setup_sac(user, audit_header):
     if exists:
         exists.delete()
 
+    general_info = general_information(audit_header)
+
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
-        general_information=general_information(audit_header),
+        general_information=general_info,
         audit_information=audit_information(audit_header),
+        audit_type=general_info["audit_type"],
     )
 
     sac.report_id = generated_report_id
