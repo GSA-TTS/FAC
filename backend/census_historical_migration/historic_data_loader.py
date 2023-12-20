@@ -1,11 +1,9 @@
 import logging
 from .models import ELECAUDITHEADER as AuditHeader
-from .models import ReportMigrationStatus
 from .workbooklib.end_to_end_core import run_end_to_end
 
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
-from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +37,6 @@ def load_historic_data_for_year(audit_year, page_size, pages):
             total_count += 1
 
             has_failed = len(result["errors"]) > 0
-
-            record_migration_status(audit_year, submission.DBKEY, has_failed)
-
             if has_failed:
                 error_count += 1
             if total_count % 5 == 0:
@@ -77,13 +72,3 @@ def create_or_get_user():
         user.save()
 
     return user
-
-
-def record_migration_status(audit_year, dbkey, has_failed):
-    status = "FAILURE" if has_failed else "SUCCESS"
-    ReportMigrationStatus(
-        audit_year=audit_year,
-        dbkey=dbkey,
-        run_datetime=timezone.now(),
-        migration_status=status,
-    ).save()

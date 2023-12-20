@@ -98,7 +98,8 @@ def xform_framework_basis(basis):
                 return value
 
     raise DataMigrationError(
-        f"Could not find a match for historic framework basis: '{basis}'"
+        f"Could not find a match for historic framework basis: '{basis}'",
+        "invalid_basis",
     )
 
 
@@ -123,7 +124,8 @@ def xform_build_sp_framework_gaap_results(audit_header):
     sp_framework_gaap_data = string_to_string(audit_header.TYPEREPORT_FS).upper()
     if not sp_framework_gaap_data:
         raise DataMigrationError(
-            f"GAAP details are missing for DBKEY: {audit_header.DBKEY}"
+            f"GAAP details are missing for DBKEY: {audit_header.DBKEY}",
+            "missing_gaap",
         )
 
     sp_framework_gaap_results = {}

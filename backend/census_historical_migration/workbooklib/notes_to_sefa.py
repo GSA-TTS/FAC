@@ -73,7 +73,10 @@ def xform_is_minimis_rate_used(rate_content):
             # FIXME-MSHD: RECORD THIS TRANSFORMATION
             return "Y"
 
-    raise DataMigrationError("Unable to determine if the de minimis rate was used.")
+    raise DataMigrationError(
+        "Unable to determine if the de minimis rate was used.",
+        "unexpected_minimis_rate_text",
+    )
 
 
 def _get_accounting_policies(dbkey, year):

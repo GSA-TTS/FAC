@@ -26,7 +26,11 @@ logger = logging.getLogger(__name__)
 def setup_sac(user, audit_header):
     """Create a SAC object for the historic data migration."""
     if user is None:
-        raise DataMigrationError("No user provided to setup sac object")
+        raise DataMigrationError(
+            "No user provided to setup sac object",
+            "invalid_user",
+        )
+
     logger.info(f"Creating a SAC object for {user}")
 
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")

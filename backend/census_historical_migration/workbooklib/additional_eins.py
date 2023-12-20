@@ -13,6 +13,7 @@ from ..base_field_maps import (
 )
 from ..workbooklib.templates import sections_to_template_paths
 from ..models import ELECEINS as Eins
+from ..exception_utils import DataMigrationValueError
 from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
@@ -34,8 +35,9 @@ def xform_remove_trailing_decimal_zero(value):
         if decimal == "0":
             return whole
         else:
-            raise ValueError(
-                f"additional_ein has non zero decimal value: {trimmed_ein}"
+            raise DataMigrationValueError(
+                f"additional_ein has non zero decimal value: {trimmed_ein}",
+                "invalid_ein",
             )
 
     return trimmed_ein

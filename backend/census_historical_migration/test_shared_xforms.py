@@ -18,6 +18,8 @@ from .sac_general_lib.utils import (
     normalize_year_string_or_exit,
 )
 
+from .exception_utils import DataMigrationValueError
+
 
 class TestCreateJsonFromDbObject(SimpleTestCase):
     """Tests for the create_json_from_db_object function."""
@@ -103,29 +105,29 @@ class TestStringToBool(SimpleTestCase):
         self.assertFalse(string_to_bool("  n"))
 
     def test_empty_string(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_bool("")
 
     def test_non_string_input(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_bool(123)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_bool(None)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_bool(["True"])
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_bool(True)
 
     def test_string_length_more_than_one(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_bool("Yes")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_bool("No")
 
     def test_invalid_single_character_string(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_bool("A")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_bool("Z")
 
 
@@ -138,23 +140,23 @@ class TestStringToInt(SimpleTestCase):
         self.assertEqual(string_to_int("   789   "), 789)
 
     def test_invalid_strings(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_int("abc")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_int("123abc")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_int("12.34")
 
     def test_empty_string(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_int("")
 
     def test_non_string_input(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_int(123)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_int(None)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_int([123])
 
 
@@ -168,11 +170,11 @@ class TestStringToString(SimpleTestCase):
         self.assertEqual(string_to_string(None), "")
 
     def test_non_string_input(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_string(123)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_string(True)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             string_to_string([1, 2, 3])
 
     def test_string_with_only_spaces(self):
