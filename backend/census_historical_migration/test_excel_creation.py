@@ -1,4 +1,3 @@
-from django.conf import settings
 from .base_field_maps import (
     SheetFieldMap,
     WorkbookFieldInDissem,
@@ -9,13 +8,17 @@ from .workbooklib.excel_creation_utils import (
     get_ranges,
     set_range,
 )
+from .models import ELECAUDITS as Audits
+from .exception_utils import DataMigrationValueError
+
 from model_bakery import baker
-from random import randint
+from django.conf import settings
 from django.test import TestCase
 from openpyxl import Workbook
 from openpyxl.utils import quote_sheetname, absolute_coordinate
 from openpyxl.workbook.defined_name import DefinedName
-from .models import ELECAUDITS as Audits
+
+from random import randint
 
 
 class ExcelCreationTests(TestCase):
@@ -71,7 +74,9 @@ class ExcelCreationTests(TestCase):
         ws.cell(row=6, column=1, value="foo")
         self.assertEqual(ws["A6"].value, "foo")
 
-        self.assertRaises(ValueError, set_range, wb, self.range_name, [None])
+        self.assertRaises(
+            DataMigrationValueError, set_range, wb, self.range_name, [None]
+        )
 
     def test_set_range_conversion(self):
         """
@@ -134,7 +139,9 @@ class ExcelCreationTests(TestCase):
         wb.defined_names.add(defn)
 
         self.assertEqual(len(list(wb.defined_names[self.range_name].destinations)), 2)
-        self.assertRaises(ValueError, set_range, wb, self.range_name, ["bar"])
+        self.assertRaises(
+            DataMigrationValueError, set_range, wb, self.range_name, ["bar"]
+        )
 
     def test_set_range_ws_missing(self):
         """
@@ -171,7 +178,7 @@ class TestApplyConversionFunction(TestCase):
 
     def test_none_with_no_default(self):
         """Test that an exception is raised when the input is None and no default is provided"""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             apply_conversion_function(None, None, str)
 
 

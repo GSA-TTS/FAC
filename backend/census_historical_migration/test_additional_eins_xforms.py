@@ -1,6 +1,7 @@
 from django.test import SimpleTestCase
 
 from .workbooklib.additional_eins import xform_remove_trailing_decimal_zero
+from .exception_utils import DataMigrationValueError
 
 
 class TestXformRemoveTrailingDecimalZero(SimpleTestCase):
@@ -10,7 +11,7 @@ class TestXformRemoveTrailingDecimalZero(SimpleTestCase):
 
     def test_without_trailing_decimal_zero(self):
         self.assertEqual(xform_remove_trailing_decimal_zero("12345"), "12345")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             xform_remove_trailing_decimal_zero("67890.5")
 
     def test_empty_string(self):
