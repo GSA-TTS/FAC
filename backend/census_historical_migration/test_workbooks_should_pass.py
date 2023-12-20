@@ -14,4 +14,6 @@ class PassingWorkbooks(SimpleTestCase):
         for dirpath, dirnames, _ in os.walk(workbook_sets):
             for workbook_set in dirnames:
                 print("Walking ", workbook_set)
-                process_workbook_set(os.path.join(dirpath, workbook_set))
+                process_workbook_set(
+                    os.path.join(dirpath, workbook_set), is_gsa_migration=True
+                )

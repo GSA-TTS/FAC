@@ -1,9 +1,9 @@
-from ..transforms.xform_string_to_string import string_to_string
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     generate_dissemination_test_table,
     set_workbook_uei,
-    xform_add_hyphen_to_zip,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
@@ -54,7 +54,7 @@ mappings = [
         "CPAZIPCODE",
         "address_zipcode",
         None,
-        xform_add_hyphen_to_zip,
+        xform_remove_hyphen_and_pad_zip,
     ),
 ]
 
@@ -74,7 +74,7 @@ def generate_secondary_auditors(audit_header, outfile):
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.SECONDARY_AUDITORS]
     )
-    uei = string_to_string(audit_header.UEI)
+    uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     secondary_auditors = _get_secondary_auditors(
         audit_header.DBKEY, audit_header.AUDITYEAR

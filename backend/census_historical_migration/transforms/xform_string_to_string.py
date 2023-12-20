@@ -7,11 +7,10 @@ def string_to_string(value):
     is None."""
     if value is None:
         return ""
-    if not isinstance(value, str):
+    elif not isinstance(value, str):
         raise DataMigrationValueError(
             f"Expected string, got {type(value).__name__}",
             "invalid_str_type",
         )
-    trimmed_value = value.strip()
 
-    return trimmed_value
+    return value.strip()

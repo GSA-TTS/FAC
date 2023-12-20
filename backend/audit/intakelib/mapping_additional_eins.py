@@ -31,7 +31,7 @@ from .mapping_meta import meta_mapping
 logger = logging.getLogger(__name__)
 
 
-def extract_additional_eins(file):
+def extract_additional_eins(file, is_gsa_migration=False):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_EINS_TEMPLATE_DEFINITION
     )
@@ -45,9 +45,9 @@ def extract_additional_eins(file):
     )
 
     ir = extract_workbook_as_ir(file)
-    run_all_general_checks(ir, FORM_SECTIONS.ADDITIONAL_EINS)
+    run_all_general_checks(ir, FORM_SECTIONS.ADDITIONAL_EINS, is_gsa_migration)
     xform_ir = run_all_additional_eins_transforms(ir)
-    run_all_additional_eins_checks(xform_ir)
+    run_all_additional_eins_checks(xform_ir, is_gsa_migration)
     result = _extract_generic_data(xform_ir, params)
     return result
 

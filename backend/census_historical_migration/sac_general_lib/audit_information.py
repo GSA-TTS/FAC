@@ -12,7 +12,6 @@ from ..sac_general_lib.utils import (
     is_single_word,
 )
 import audit.validators
-from django.conf import settings
 
 
 def xform_apply_default_thresholds(value):
@@ -20,7 +19,7 @@ def xform_apply_default_thresholds(value):
     str_value = string_to_string(value)
     if str_value == "":
         # FIXME-MSHD: This is a transformation that we may want to record
-        return settings.DOLLAR_THRESHOLD
+        return -1
     return string_to_int(str_value)
 
 
@@ -30,7 +29,7 @@ mappings = [
         "DOLLARTHRESHOLD",
         FormFieldInDissem,
         None,
-        int,  # FIXME-MSHD: If team approves, we can change this to xform_apply_default_thresholds
+        xform_apply_default_thresholds,
     ),
     FormFieldMap(
         "is_going_concern_included", "GOINGCONCERN", FormFieldInDissem, None, bool
@@ -85,7 +84,6 @@ def xform_framework_basis(basis):
     """
     basis = string_to_string(basis)
     if is_single_word(basis):
-        # FIXME-MSHD: Update validation schema to include `regulatory_basis`
         mappings = {
             r"cash": "cash_basis",
             r"contractual": "contractual_basis",
@@ -152,20 +150,6 @@ def xform_build_sp_framework_gaap_results(audit_header):
         sp_framework_gaap_results["sp_framework_basis"].append(basis)
 
     return sp_framework_gaap_results
-
-
-# FIXME-MSHD: Not being used, but we may need it in the future
-def _xform_agencies(audit_info):
-    """Transforms the agencies from Census format to FAC format."""
-
-    new_audit_info = audit_info.copy()
-    # Apply transformation to each key
-    transformed_agencies = [
-        str(i) if len(str(i)) > 1 else f"0{str(i)}" for i in audit_info.get("agencies")
-    ]
-
-    new_audit_info["agencies"] = transformed_agencies
-    return new_audit_info
 
 
 def audit_information(audit_header):

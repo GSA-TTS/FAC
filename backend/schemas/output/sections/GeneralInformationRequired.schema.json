@@ -364,22 +364,30 @@
          ]
       },
       "auditee_uei": {
-         "allOf": [
+         "oneOf": [
             {
-               "maxLength": 12,
-               "minLength": 12
+               "allOf": [
+                  {
+                     "maxLength": 12,
+                     "minLength": 12
+                  },
+                  {
+                     "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
+                  },
+                  {
+                     "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+                  },
+                  {
+                     "pattern": "^(?![0-9]{9})"
+                  }
+               ],
+               "type": "string"
             },
             {
-               "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
-            },
-            {
-               "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
-            },
-            {
-               "pattern": "^(?![0-9]{9})"
+               "const": "GSA_MIGRATION",
+               "type": "string"
             }
-         ],
-         "type": "string"
+         ]
       },
       "auditee_zip": {
          "anyOf": [
@@ -605,40 +613,40 @@
       }
    },
    "required": [
-      "auditee_contact_name",
-      "auditee_email",
-      "auditee_name",
-      "auditee_phone",
-      "auditee_contact_title",
+      "audit_type",
       "auditee_address_line_1",
       "auditee_city",
+      "auditee_contact_name",
+      "auditee_contact_title",
+      "auditee_email",
+      "auditee_fiscal_period_end",
+      "auditee_fiscal_period_start",
+      "auditee_name",
+      "auditee_phone",
       "auditee_state",
-      "ein",
       "auditee_uei",
-      "auditee_zip",
-      "auditor_phone",
-      "auditor_state",
-      "auditor_city",
-      "auditor_contact_title",
-      "auditor_address_line_1",
-      "auditor_zip",
-      "auditor_country",
       "auditor_contact_name",
+      "auditor_contact_title",
+      "auditor_ein",
+      "auditor_ein_not_an_ssn_attestation",
       "auditor_email",
       "auditor_firm_name",
-      "auditor_ein",
-      "auditee_fiscal_period_start",
-      "auditee_fiscal_period_end",
-      "audit_type",
-      "user_provided_organization_type",
-      "audit_period_covered",
+      "auditor_phone",
+      "auditor_state",
+      "auditor_zip",
+      "ein",
+      "ein_not_an_ssn_attestation",
+      "is_usa_based",
+      "met_spending_threshold",
       "multiple_eins_covered",
       "multiple_ueis_covered",
       "secondary_auditors_exist",
-      "met_spending_threshold",
-      "is_usa_based",
-      "ein_not_an_ssn_attestation",
-      "auditor_ein_not_an_ssn_attestation"
+      "user_provided_organization_type",
+      "auditee_zip",
+      "auditor_address_line_1",
+      "auditor_city",
+      "auditor_country",
+      "audit_period_covered"
    ],
    "title": "GeneralInformation",
    "type": "object",

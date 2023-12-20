@@ -21,9 +21,9 @@ map_yorn_field_ranges_to_workbook = {
         "repeat_prior_reference",
         "is_valid",
     ],
-    # FIXME: MSHD - will add the sections below in follow up PRs.
-    # FORM_SECTIONS.FINDINGS_TEXT:["contains_chart_or_table"],
-    # FORM_SECTIONS.CORRECTIVE_ACTION_PLAN:["contains_chart_or_table"]
+    FORM_SECTIONS.FINDINGS_TEXT: ["contains_chart_or_table"],
+    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: ["contains_chart_or_table"],
+    FORM_SECTIONS.NOTES_TO_SEFA: ["contains_chart_or_table"],
 }
 
 

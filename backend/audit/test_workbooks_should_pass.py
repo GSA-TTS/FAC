@@ -56,7 +56,7 @@ def map_file_to_extractor_validator(filename):
     return (None, None)
 
 
-def process_workbook_set(workbook_set_path):
+def process_workbook_set(workbook_set_path, is_gsa_migration=True):
     """Process each workbook set in the given path."""
     for wb_path, _, wb_files in os.walk(workbook_set_path):
         for file in wb_files:
@@ -65,7 +65,7 @@ def process_workbook_set(workbook_set_path):
                 (extractor, validator) = map_file_to_extractor_validator(full_path)
                 if extractor:
                     print(f"Extracting and validating {file}")
-                    ir = extractor(full_path)
+                    ir = extractor(full_path, is_gsa_migration)
                     validator(ir)
                 else:
                     print(f"No extractor found for [{file}]")

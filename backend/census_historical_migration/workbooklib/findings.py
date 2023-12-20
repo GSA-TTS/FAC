@@ -1,3 +1,4 @@
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
@@ -31,12 +32,7 @@ def xform_prior_year_findings(value):
     """
     trimmed_value = string_to_string(value)
     if not trimmed_value:
-        # FIXME - MSHD: This is a transformation and might require logging.
-        # Why is this transformation needed? Because users were allowed to leave this empty
-        # but we have decided to enforce that they enter N/A (starting in 2023).
-        # Therefore, we need to transform the empty string to N/A, otherwise the new validation
-        # rule will fail most of the migration.
-        # logger.info(f"Prior year findings is empty. Setting to N/A.")
+        # we must document this transformation #2912
         return "N/A"
 
     return trimmed_value
@@ -133,7 +129,7 @@ def generate_findings(audit_header, outfile):
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE]
     )
-    uei = string_to_string(audit_header.UEI)
+    uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
     # For each of them, I need to generate an elec -> award mapping.
