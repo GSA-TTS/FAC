@@ -118,7 +118,9 @@ def xform_constructs_cluster_names(
             # MSHD - 12/14/2023: If we want to let these cases through,
             # we must modify state_cluster_names and other_cluster_names
             # methods in check_state_cluster_names.py and check_other_cluster_names.py (intakelib/checks).
-            raise DataMigrationError("Unable to determine cluster name.")
+            raise DataMigrationError(
+                "Unable to determine cluster name.", "invalid_cluster"
+            )
 
     return (cluster_names, other_cluster_names, state_cluster_names)
 
@@ -148,7 +150,7 @@ def xform_replace_invalid_extension(audit):
     prefix = string_to_string(audit.CFDA_PREFIX)
     extension = string_to_string(audit.CFDA_EXT)
     if not is_valid_prefix(prefix):
-        raise DataMigrationError(f"Invalid ALN prefix: {prefix}")
+        raise DataMigrationError(f"Invalid ALN prefix: {prefix}", "invalid_aln_prefix")
     if not is_valid_extension(extension):
         extension = settings.GSA_MIGRATION
 
@@ -236,7 +238,9 @@ def xform_populate_default_loan_balance(audits):
                 loans_at_end.append(settings.GSA_MIGRATION)  # record transformation
         else:
             if balance:
-                raise DataMigrationError("Unexpected loan balance.")
+                raise DataMigrationError(
+                    "Unexpected loan balance.", "unexpected_loan_balance"
+                )
             else:
                 loans_at_end.append("")
 
@@ -282,12 +286,16 @@ def xform_populate_default_passthrough_amount(audits):
             else:
                 # FIXME -MSHD: Is this what we want to do?
                 # Changing to settings.GSA_MIGRATION will require an update to the field type in dissemination model.
-                raise DataMigrationError("Missing passthrough amount.")
+                raise DataMigrationError(
+                    "Missing passthrough amount.", "missing_passthrough_amount"
+                )
         else:
             if not amount or amount == "0":
                 passthrough_amounts.append("")
             else:
-                raise DataMigrationError("Unexpected passthrough amount.")
+                raise DataMigrationError(
+                    "Unexpected passthrough amount.", "unexpected_passthrough_amount"
+                )
 
     return passthrough_amounts
 
