@@ -26,12 +26,13 @@ cat "${popdir}/fluentbit_config/fluentbit.conf" > "${tmpdir}/cg-logshipper-main/
 # be fatal if (for some reason) this is run outside of a git checkout. See blog
 # post about this topic and solution here:
 # https://zerostride.medium.com/building-deterministic-zip-files-with-built-in-commands-741275116a19
-eval "$(git config --global --add safe.directory /github/workspace && \
-  find app -exec touch -t "$(git ls-files -z "${tmpdir}/cg-logshipper-main" | \
-  xargs -0 -n1 -I{} -- git log -1 --date=format:"%Y%m%d%H%M" --format="%ad" {} | \
-  sort -r | head -n 1)" {} + && \
+cd "${popdir}"
+$(git config --global --add safe.directory /github/workspace && \
+  find "${tmpdir}" -exec touch -t `git ls-files -z "${popdir}" | \
+  xargs -0 -I{} -- git log -1 --date=format:"%Y%m%d%H%M" --format="%ad" {} | \
+  sort -r | head -n 1` {} + && \
   git config --global --unset safe.directory /github/workspace
-)"
+)
 
 cd "${tmpdir}/cg-logshipper-main" && zip -r -o "${popdir}/logshipper.zip" ./ > /dev/null
 
