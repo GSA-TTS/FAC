@@ -534,9 +534,15 @@ def validate_pdf_file_integrity(file):
                 "We were unable to process the file you uploaded because it is encrypted."
             )
 
-        all_text = "".join([p.extract_text() for p in reader.pages])
+        text_length = 0
+        for page in reader.pages:
+            page_text = page.extract_text()
+            text_length += len(page_text)
+            # If we find 5000 characters, we're content.
+            if text_length > 5000:
+                break
 
-        if len(all_text) == 0:
+        if text_length == 0:
             raise ValidationError(
                 "We were unable to process the file you uploaded because it contains no readable text."
             )
