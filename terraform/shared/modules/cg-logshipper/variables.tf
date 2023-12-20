@@ -34,7 +34,7 @@ variable "logshipper_memory" {
 
 variable "logshipper_instances" {
   type        = number
-  description = "the number of instances of the cg-logshipper app to run (default: 2)"
+  description = "the number of instances of the cg-logshipper app to run (default: 1)"
   default     = 1
 }
 
