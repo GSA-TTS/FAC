@@ -26,7 +26,7 @@ flowchart TD
 module "cg-logshipper" {
   source                = "<path/to/source>"
   name                  = local.logshipper_name
-  cf_org_name           = var.cf_org_name   # gsa-tts-oros-fac
+  cf_org_name           = var.cf_org_name   # eg gsa-tts-oros-fac
   cf_space_name         = var.cf_space_name # eg prod
   https_proxy           = module.https-proxy.https_proxy
   logshipper_instances  = #
