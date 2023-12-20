@@ -538,8 +538,8 @@ def validate_pdf_file_integrity(file):
         for page in reader.pages:
             page_text = page.extract_text()
             text_length += len(page_text)
-            # If we find 5000 characters, we're content.
-            if text_length > 5000:
+            # If we find any characters, we're content.
+            if text_length > 0:
                 break
 
         if text_length == 0:
