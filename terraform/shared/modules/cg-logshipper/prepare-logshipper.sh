@@ -23,5 +23,5 @@ cd "${tmpdir}/cg-logshipper-main" && zip -r -o "${popdir}/logshipper.zip" ./ > /
 
 # Tell Terraform where to find it
 cat << EOF
-{ "path": "logshipper.zip" }
+{ "path": "logshipper-dist.zip" }
 EOF
