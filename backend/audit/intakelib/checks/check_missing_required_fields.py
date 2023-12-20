@@ -36,21 +36,42 @@ map_required_field_ranges_to_workbook = {
         "prior_references": "check_missing_prior_references",
         "is_valid": "check_missing_is_valid",
     },
-    # FIXME: MSHD - will add the sections below in follow up PRs.
-    # FORM_SECTIONS.ADDITIONAL_EINS:{
-    #     "additional_ein": "check_eins_are_not_empty",
-    # },
-    # FORM_SECTIONS.ADDITIONAL_UEIS:{
-    #     "additional_uei": "check_ueis_are_not_empty",
-    # },
-    # FORM_SECTIONS.NOTES_TO_SEFA:{
-    #     "is_minimis_rate_used": "check_minimis_rate_used_is_not_blank",
-    #     "rate_explained": "check_rate_explained_is_not_blank",
-    #     "accounting_policies": "check_accounting_policies_is_not_blank",
-    # }
-    # FORM_SECTIONS.SECONDARY_AUDITORS:
-    # FORM_SECTIONS.FINDINGS_TEXT:
-    # FORM_SECTIONS.CORRECTIVE_ACTION_PLAN:
+    FORM_SECTIONS.ADDITIONAL_EINS: {
+        "additional_ein": "check_eins_are_not_empty",
+    },
+    FORM_SECTIONS.ADDITIONAL_UEIS: {
+        "additional_uei": "check_ueis_are_not_empty",
+    },
+    FORM_SECTIONS.NOTES_TO_SEFA: {
+        "is_minimis_rate_used": "check_minimis_rate_used_is_not_blank",
+        "rate_explained": "check_rate_explained_is_not_blank",
+        "accounting_policies": "check_accounting_policies_is_not_blank",
+        "note_title": "check_note_title_is_not_blank",
+        "note_content": "check_note_content_is_not_blank",
+        "contains_chart_or_table": "check_contains_chart_or_table_is_not_blank",
+    },
+    FORM_SECTIONS.SECONDARY_AUDITORS: {
+        "secondary_auditor_name": "check_secondary_auditor_name_is_not_blank",
+        "secondary_auditor_ein": "check_secondary_auditor_ein_is_not_blank",
+        "secondary_auditor_address_street": "check_secondary_auditor_address_street_is_not_blank",
+        "secondary_auditor_address_city": "check_secondary_auditor_address_city_is_not_blank",
+        "secondary_auditor_address_state": "check_secondary_auditor_address_state_is_not_blank",
+        "secondary_auditor_address_zipcode": "check_secondary_auditor_address_zipcode_is_not_blank",
+        "secondary_auditor_contact_name": "check_secondary_auditor_contact_name_is_not_blank",
+        "secondary_auditor_contact_title": "check_secondary_auditor_contact_title_is_not_blank",
+        "secondary_auditor_contact_phone": "check_secondary_auditor_contact_phone_is_not_blank",
+        "secondary_auditor_contact_email": "check_secondary_auditor_contact_email_is_not_blank",
+    },
+    FORM_SECTIONS.FINDINGS_TEXT: {
+        "reference_number": "check_missing_reference_numbers",
+        "text_of_finding": "check_missing_text_of_finding",
+        "contains_chart_or_table": "check_contains_chart_or_table_is_not_blank",
+    },
+    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: {
+        "reference_number": "check_missing_reference_numbers",
+        "planned_action": "check_missing_planned_action",
+        "contains_chart_or_table": "check_contains_chart_or_table_is_not_blank",
+    },
 }
 
 

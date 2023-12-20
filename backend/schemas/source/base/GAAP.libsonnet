@@ -34,6 +34,10 @@ local sp_framework_basis = [
     tag: 'contractual_basis',
   },
   {
+    readable: 'Regulatory basis',
+    tag: 'regulatory_basis',
+  },
+  {
     readable: 'Other basis',
     tag: 'other_basis',
   },
