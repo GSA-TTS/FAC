@@ -367,7 +367,7 @@ def gather_report_data_pre_certification(i2d_data):
     # Move the IntakeToDissemination data to dissemination_data, under the proper naming scheme.
     dissemination_data = {}
     for name_i2d, model in i2d_to_dissemination.items():
-        dissemination_data[model.__name__.lower()] = i2d_data.get(name_i2d)
+        dissemination_data[model.__name__.lower()] = i2d_data.get(name_i2d, [])
 
     data = {}
 

@@ -298,7 +298,7 @@ local Parts = {
           Types.integer,
           Types.string { pattern: '[0-9]+' },
           Types.string {
-            const: Base.Const.NA,
+            enum: [Base.Const.NA, Base.Const.GSA_MIGRATION],
           },
         ],
       },

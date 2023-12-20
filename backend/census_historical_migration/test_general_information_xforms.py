@@ -11,9 +11,10 @@ from .sac_general_lib.general_information import (
     xform_country,
     xform_entity_type,
 )
-
-
-from .exception_utils import DataMigrationError
+from .exception_utils import (
+    DataMigrationError,
+    DataMigrationValueError,
+)
 
 
 class TestXformEntityType(SimpleTestCase):
@@ -139,7 +140,7 @@ class TestXformAuditeeFiscalPeriodEnd(SimpleTestCase):
     def test_when_auditee_fiscal_period_end_is_invalid(self):
         """Test that the function raises an exception when the fiscal period end is invalid."""
         self.general_information["auditee_fiscal_period_end"] = "01/31/2021"
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             xform_auditee_fiscal_period_end(self.general_information)
         self.general_information["auditee_fiscal_period_end"] = ""
         with self.assertRaises(DataMigrationError):
@@ -167,10 +168,10 @@ class TestXformAuditeeFiscalPeriodStart(SimpleTestCase):
     def test_when_auditee_fiscal_period_end_is_invalid(self):
         """Test that the function raises an exception when the fiscal period end is invalid."""
         self.general_information["auditee_fiscal_period_end"] = "01/31/2021"
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             xform_auditee_fiscal_period_start(self.general_information)
         self.general_information["auditee_fiscal_period_end"] = ""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(DataMigrationValueError):
             xform_auditee_fiscal_period_start(self.general_information)
 
 

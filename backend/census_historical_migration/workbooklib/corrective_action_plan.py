@@ -1,4 +1,4 @@
-from ..transforms.xform_string_to_string import string_to_string
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     generate_dissemination_test_table,
@@ -42,7 +42,7 @@ def generate_corrective_action_plan(audit_header, outfile):
         f"--- generate corrective action plan {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
     )
 
-    uei = string_to_string(audit_header.UEI)
+    uei = xform_retrieve_uei(audit_header.UEI)
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.CORRECTIVE_ACTION_PLAN]
     )

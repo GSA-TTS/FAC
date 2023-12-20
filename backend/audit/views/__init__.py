@@ -1,3 +1,4 @@
+from .audit_info_form_view import AuditInfoFormView
 from .home import Home
 from .manage_submission import ManageSubmissionView
 from .manage_submission_access import (
@@ -21,7 +22,6 @@ from .unlock_after_certification import UnlockAfterCertificationView
 from .views import (
     AuditeeCertificationStep1View,
     AuditeeCertificationStep2View,
-    AuditInfoFormView,
     AuditorCertificationStep1View,
     AuditorCertificationStep2View,
     CertificationView,
@@ -35,7 +35,8 @@ from .views import (
 )
 
 # In case we want to iterate through all the views for some reason:
-views = [
+views_list = [
+    AuditInfoFormView,
     AuditeeCertificationStep1View,
     AuditeeCertificationStep2View,
     AuditInfoFormView,

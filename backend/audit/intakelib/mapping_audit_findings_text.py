@@ -27,7 +27,7 @@ from .checks import run_all_general_checks, run_all_audit_findings_text_checks
 logger = logging.getLogger(__name__)
 
 
-def extract_audit_findings_text(file):
+def extract_audit_findings_text(file, is_gsa_migration=False):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_TEXT_TEMPLATE_DEFINITION
     )
@@ -41,9 +41,9 @@ def extract_audit_findings_text(file):
     )
 
     ir = extract_workbook_as_ir(file)
-    run_all_general_checks(ir, FORM_SECTIONS.FINDINGS_TEXT)
+    run_all_general_checks(ir, FORM_SECTIONS.FINDINGS_TEXT, is_gsa_migration)
     xform_ir = run_all_audit_findings_text_transforms(ir)
-    run_all_audit_findings_text_checks(xform_ir)
+    run_all_audit_findings_text_checks(xform_ir, is_gsa_migration)
     result = _extract_generic_data(xform_ir, params)
     return result
 

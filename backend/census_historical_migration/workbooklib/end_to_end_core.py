@@ -1,5 +1,7 @@
-from django.conf import settings
-from ..exception_utils import DataMigrationError
+from ..exception_utils import (
+    DataMigrationError,
+    DataMigrationValueError,
+)
 from ..workbooklib.workbook_builder_loader import (
     workbook_builder_loader,
 )
@@ -8,7 +10,12 @@ from ..workbooklib.workbook_section_handlers import (
 )
 from ..workbooklib.post_upload_utils import _post_upload_pdf
 from ..sac_general_lib.sac_creator import setup_sac
+from ..models import (
+    ReportMigrationStatus,
+    MigrationErrorDetail,
+)
 from audit.intake_to_dissemination import IntakeToDissemination
+from audit.models import SingleAuditChecklist
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -22,7 +29,9 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils import timezone as django_timezone
 
 import argparse
 import logging
@@ -31,7 +40,7 @@ import math
 import os
 import jwt
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 
 
@@ -42,11 +51,18 @@ parser = argparse.ArgumentParser()
 
 
 def step_through_certifications(sac):
-    sac.transition_to_ready_for_certification()
-    sac.transition_to_auditor_certified()
-    sac.transition_to_auditee_certified()
-    sac.transition_to_submitted()
-    sac.transition_to_disseminated()
+    stati = [
+        SingleAuditChecklist.STATUS.IN_PROGRESS,
+        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        SingleAuditChecklist.STATUS.CERTIFIED,
+        SingleAuditChecklist.STATUS.SUBMITTED,
+        SingleAuditChecklist.STATUS.DISSEMINATED,
+    ]
+    for status in stati:
+        sac.transition_name.append(status)
+        sac.transition_date.append(datetime.now(timezone.utc))
     sac.save()
 
 
@@ -234,6 +250,7 @@ def api_check(json_test_tables):
 
 
 def run_end_to_end(user, audit_header, result):
+    """Attempts to migrate the given audit"""
     try:
         sac = setup_sac(user, audit_header)
 
@@ -241,7 +258,10 @@ def run_end_to_end(user, audit_header, result):
             logger.info(
                 f"Skipping ACE audit: {audit_header.DBKEY} {audit_header.AUDITYEAR}"
             )
-            raise DataMigrationError("Skipping ACE audit")
+            raise DataMigrationError(
+                "Skipping ACE audit",
+                "skip_ace_audit",
+            )
         else:
             builder_loader = workbook_builder_loader(user, sac, audit_header)
             json_test_tables = []
@@ -264,19 +284,80 @@ def run_end_to_end(user, audit_header, result):
             logger.info(combined_summary)
             result["success"].append(f"{sac.report_id} created")
     except Exception as exc:
-        error_type = type(exc)
+        handle_exception(exc, audit_header, result)
+    else:
+        record_migration_status(
+            audit_header.AUDITYEAR,
+            audit_header.DBKEY,
+            len(result["errors"]) > 0,
+        )
 
-        if error_type == ValidationError:
-            logger.error(f"ValidationError: {exc}")
-        elif error_type == DataMigrationError:
-            logger.error(f"DataMigrationError: {exc.message}")
-        else:
-            logger.error(f"Unexpected error type {error_type}: {exc}")
 
-            tb = traceback.extract_tb(sys.exc_info()[2])
-            for frame in tb:
-                logger.error(
-                    f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}"
-                )
+def record_migration_status(audit_year, dbkey, has_failed):
+    """Write a migration status to the DB"""
+    status = "FAILURE" if has_failed else "SUCCESS"
 
-        result["errors"].append(f"{exc}")
+    migration_status = ReportMigrationStatus.objects.create(
+        audit_year=audit_year,
+        dbkey=dbkey,
+        run_datetime=django_timezone.now(),
+        migration_status=status,
+    )
+    migration_status.save()
+
+    return migration_status
+
+
+def record_migration_error(status, tag, exc_type, message):
+    """Write a migration error to the DB"""
+    MigrationErrorDetail(
+        report_migration_status=status,
+        tag=tag,
+        exception_class=exc_type,
+        detail=message,
+    ).save()
+
+
+def handle_exception(exc, audit_header, result):
+    """Handles exceptions encountered during run_end_to_end()"""
+    try:
+        tag = exc.tag
+    except Exception:
+        tag = "exception"
+
+    try:
+        message = exc.message
+    except Exception:
+        message = str(exc)
+
+    exc_type = type(exc)
+    if exc_type == DataMigrationValueError:
+        logger.error(f"DataMigrationValueError: {message}")
+        tag = tag or "unexpected_value"
+    elif exc_type == DataMigrationError:
+        logger.error(f"DataMigrationError: {message}")
+        tag = tag or "data_migration"
+    elif exc_type == ValidationError:
+        logger.error(f"ValidationError: {message}")
+        tag = "schema_validation"
+    else:
+        logger.error(f"Unexpected error type {exc_type}: {message}")
+
+        tb = traceback.extract_tb(sys.exc_info()[2])
+        for frame in tb:
+            logger.error(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
+
+    result["errors"].append(f"{exc}")
+
+    status = record_migration_status(
+        audit_header.AUDITYEAR,
+        audit_header.DBKEY,
+        True,
+    )
+
+    record_migration_error(
+        status,
+        tag,
+        exc_type.__name__,
+        message,
+    )

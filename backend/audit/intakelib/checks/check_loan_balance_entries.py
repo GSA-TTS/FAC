@@ -1,4 +1,6 @@
 import logging
+
+from django.conf import settings
 from audit.intakelib.intermediate_representation import (
     get_range_values_by_name,
     get_range_by_name,
@@ -18,7 +20,9 @@ def loan_balance_entry_is_valid(ir):
     errors = []
     for index, balance in enumerate(loan_balance_at_period_end):
         # Check if balance is not a number, empty string, or "N/A"
-        if not (balance in ["N/A", "", None] or _is_int(balance)):
+        if not (
+            balance in ["N/A", "", settings.GSA_MIGRATION, None] or _is_int(balance)
+        ):
             errors.append(
                 build_cell_error_tuple(
                     ir,
@@ -34,7 +38,7 @@ def loan_balance_entry_is_valid(ir):
 # check if the given string can be converted to an int
 def _is_int(s):
     try:
-        value = int(s)
-        return value >= 0
+        int(s)
+        return True
     except ValueError:
         return False
