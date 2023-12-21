@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from audit.models import (
@@ -8,7 +8,6 @@ from audit.models import (
     SingleAuditReportFile,
     generate_sac_report_id,
 )
-from config import settings
 from dissemination.models import (
     General,
     FederalAward,
@@ -484,7 +483,7 @@ class SummaryReportDownloadViewTests(TestCase):
         return "some-report-name.xlsx"
 
     def _mock_download_url(self):
-        return f"http://example.com/gsa-fac-private-s3/temp/some-report-name.xlsx"
+        return "http://example.com/gsa-fac-private-s3/temp/some-report-name.xlsx"
 
     @patch("dissemination.summary_reports.persist_workbook")
     def test_bad_search_returns_400(self, mock_persist_workbook):

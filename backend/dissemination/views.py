@@ -313,7 +313,7 @@ class MultipleSummaryReportDownloadView(View):
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:
-                raise Http404(f"Cannot generate summary report. No results found.")
+                raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
 
             filename = generate_summary_report(report_ids)
@@ -323,8 +323,7 @@ class MultipleSummaryReportDownloadView(View):
 
         except Http404 as err:
             logger.info(
-                "No results found for MultipleSummaryReportDownloadView post. Suggest an improper or old form submission. \n%s",
-                err,
+                "No results found for MultipleSummaryReportDownloadView post. Suggests an improper or old form submission."
             )
             raise Http404 from err
         except Exception as err:
