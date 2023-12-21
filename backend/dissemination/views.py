@@ -296,19 +296,27 @@ class SingleSummaryReportDownloadView(ReportAccessRequiredMixin, View):
 class MultipleSummaryReportDownloadView(View):
     def post(self, request):
         """
-        1. Get the report_ids from a fresh search with the provided search parameters
-        2. Generate a summary report with the report_ids, that goes into S3
-        3. Redirect to the download url of this new report
+        1. Run a fresh search with the provided search parameters
+        2. Get the report_id's from the search
+        3. Generate a summary report with the report_ids, which goes into into S3
+        4. Redirect to the download url of this new report
         """
         form = SearchForm(request.POST)
 
-        cleaned_data = clean_form_data(form)
-        include_private = include_private_results(request)
-        results = run_search_general(cleaned_data, include_private)
-        results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX downloads to 1000 records
-        report_ids = [result.report_id for result in results]
+        try:
+            cleaned_data = clean_form_data(form)
+            include_private = include_private_results(request)
+            results = run_search_general(cleaned_data, include_private)
+            results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
+            
+            if results.count() == 0:
+                return
+            report_ids = [result.report_id for result in results]
 
-        filename = generate_summary_report(report_ids)
-        download_url = get_download_url(filename)
+            filename = generate_summary_report(report_ids)
+            download_url = get_download_url(filename)
 
-        return redirect(download_url)
+            return redirect(download_url)
+
+        except Exception as err:
+            return BadRequest(f"Cannot generate summary report. {err}")
