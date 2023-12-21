@@ -52,14 +52,10 @@ jobs:
         run: touch .env
 
       - name: Run Cypress full submission test
-        uses: Wandalen/wretry.action@master
+        uses: cypress-io/github-action@v6
         with:
-          action: cypress-io/github-action@v6
-          with: |
-            working-directory: ./backend
-            spec: cypress/e2e/full-submission.cy.js
-          attempt_limit: 5
-          attempt_delay: 2000
+          working-directory: ./backend
+          spec: cypress/e2e/full-submission.cy.js
 
       - uses: actions/upload-artifact@v3
         # add the line below to store screenshots only on failures
