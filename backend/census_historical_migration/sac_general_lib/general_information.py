@@ -152,17 +152,21 @@ def _census_audit_type(s):
     return AUDIT_TYPE_DICT[s]
 
 
-def xform_country(general_information, audit_header):
+def xform_country(general_information, audit_header, result):
     """Transforms the country from Census format to FAC format."""
     auditor_country = general_information.get("auditor_country").upper()
     if auditor_country in ["US", "USA"]:
+        census_data = general_information["auditor_country"]
         general_information["auditor_country"] = "USA"
+        gsa_fac_data = general_information["auditor_country"]
     elif auditor_country == "":
         valid_file = open(f"{settings.SCHEMA_BASE_DIR}/States.json")
         valid_json = json.load(valid_file)
         auditor_state = string_to_string(audit_header.CPASTATE).upper()
         if auditor_state in valid_json["UnitedStatesStateAbbr"]:
+            census_data = general_information["auditor_country"]
             general_information["auditor_country"] = "USA"
+            gsa_fac_data = general_information["auditor_country"]
         else:
             raise DataMigrationError(
                 f"Unable to determine auditor country. Invalid state: {auditor_state}",
@@ -174,12 +178,15 @@ def xform_country(general_information, audit_header):
             "invalid_country",
         )
 
-    return general_information
+    result = track_transformation(census_data, gsa_fac_data, "xform_country", result)
+
+    return general_information, result
 
 
-def xform_auditee_fiscal_period_end(general_information):
+def xform_auditee_fiscal_period_end(general_information, result):
     """Transforms the fiscal period end from Census format to FAC format."""
     if general_information.get("auditee_fiscal_period_end"):
+        census_data = general_information["auditee_fiscal_period_end"]
         general_information[
             "auditee_fiscal_period_end"
         ] = xform_census_date_to_datetime(
@@ -187,58 +194,92 @@ def xform_auditee_fiscal_period_end(general_information):
         ).strftime(
             "%Y-%m-%d"
         )
+        gsa_fac_data = general_information["auditee_fiscal_period_end"]
+        result = track_transformation(
+            census_data, gsa_fac_data, "xform_auditee_fiscal_period_end", result
+        )
     else:
         raise DataMigrationError(
             f"Auditee fiscal period end is empty: {general_information.get('auditee_fiscal_period_end')}",
             "invalid_auditee_fiscal_period_end",
         )
 
-    return general_information
+    return general_information, result
 
 
-def xform_auditee_fiscal_period_start(general_information):
+def xform_auditee_fiscal_period_start(general_information, result):
     """Constructs the fiscal period start from the fiscal period end"""
+    census_data = general_information["auditee_fiscal_period_start"]
     fiscal_start_date = xform_census_date_to_datetime(
         general_information.get("auditee_fiscal_period_end")
     ) - timedelta(days=365)
     general_information["auditee_fiscal_period_start"] = fiscal_start_date.strftime(
         "%Y-%m-%d"
     )
-    return general_information
+    gsa_fac_data = general_information["auditee_fiscal_period_start"]
+    result = track_transformation(
+        census_data, gsa_fac_data, "xform_auditee_fiscal_period_start", result
+    )
+
+    return general_information, result
 
 
-def xform_audit_period_covered(general_information):
+def xform_audit_period_covered(general_information, result):
     """Transforms the period covered from Census format to FAC format."""
     if general_information.get("audit_period_covered"):
+        census_data = general_information["audit_period_covered"]
         general_information["audit_period_covered"] = _period_covered(
             general_information.get("audit_period_covered").upper()
+        )
+        gsa_fac_data = general_information["audit_period_covered"]
+        result = track_transformation(
+            census_data, gsa_fac_data, "xform_audit_period_covered", result
         )
     else:
         raise DataMigrationError(
             f"Audit period covered is empty: {general_information.get('audit_period_covered')}",
             "invalid_audit_period_covered",
         )
-    return general_information
+    return general_information, result
 
 
-def xform_audit_type(general_information):
+def xform_audit_type(general_information, result):
     """Transforms the audit type from Census format to FAC format."""
     if general_information.get("audit_type"):
+        census_data = general_information["audit_type"]
         general_information["audit_type"] = _census_audit_type(
             general_information.get("audit_type").upper()
+        )
+        gsa_fac_data = general_information["audit_type"]
+        result = track_transformation(
+            census_data, gsa_fac_data, "xform_audit_type", result
         )
     else:
         raise DataMigrationError(
             f"Audit type is empty: {general_information.get('audit_type')}",
             "invalid_audit_type",
         )
-    return general_information
+    return general_information, result
 
 
-def general_information(audit_header):
+def track_transformation(census_data, gsa_fac_data, function, result):
+    result["transformations"].append(
+        {
+            "section": "General",
+            "census_data": census_data,
+            "gsa_fac_data": gsa_fac_data,
+            "transformation_function": function,
+        }
+    )
+    return result
+
+
+def general_information(audit_header, result):
     """Generates general information JSON."""
 
-    general_information = create_json_from_db_object(audit_header, mappings)
+    general_information, result = create_json_from_db_object(
+        audit_header, mappings, result
+    )
 
     # List of transformation functions
     transformations = [
@@ -252,19 +293,13 @@ def general_information(audit_header):
     # Apply transformations
     for transform in transformations:
         if transform == xform_country:
-            general_information = transform(general_information, audit_header)
+            general_information, result = transform(
+                general_information, audit_header, result
+            )
         else:
-            general_information = transform(general_information)
+            general_information, result = transform(general_information, result)
 
     # verify that the created object validates against the schema
     audit.validators.validate_general_information_complete_json(general_information)
 
-    track_general_transformations(general_information, audit_header)
-
-    return general_information
-
-
-def track_general_transformations(general_information, audit_header):
-    # Add all transformation details into results["transformations"]
-    
-    return None
+    return general_information, result

@@ -513,6 +513,7 @@ class MigrationChangeRecord(models.Model):
     dbkey = models.TextField(blank=True, null=True)
     report_id = models.TextField(blank=True, null=True)
     run_datetime = models.DateTimeField(default=timezone.now)
+    section = models.TextField(blank=True, null=True)
     census_data = models.JSONField(blank=True, null=True)
     gsa_fac_data = models.JSONField(blank=True, null=True)
     transformation_function = models.TextField(blank=True, null=True)

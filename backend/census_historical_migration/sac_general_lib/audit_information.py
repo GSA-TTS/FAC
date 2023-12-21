@@ -152,7 +152,7 @@ def xform_build_sp_framework_gaap_results(audit_header):
     return sp_framework_gaap_results
 
 
-def audit_information(audit_header):
+def audit_information(audit_header, result):
     """Generates audit information JSON."""
     results = xform_build_sp_framework_gaap_results(audit_header)
     agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY, audit_header.AUDITYEAR)

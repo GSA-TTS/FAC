@@ -12,7 +12,7 @@ from ..exception_utils import DataMigrationValueError
 logger = logging.getLogger(__name__)
 
 
-def create_json_from_db_object(gobj, mappings):
+def create_json_from_db_object(gobj, mappings, result):
     """Constructs a JSON object from a database object using a list of mappings."""
     json_obj = {}
     for mapping in mappings:
@@ -32,10 +32,22 @@ def create_json_from_db_object(gobj, mappings):
         elif mapping.type is int:
             value = string_to_int(value)
         else:
+            census_data = value
             value = mapping.type(value)
+            gsa_fac_data = value
+            # Track transformation
+            result["transformations"].append(
+                {
+                    "section": "General",
+                    "census_data": census_data,
+                    "gsa_fac_data": gsa_fac_data,
+                    "transformation_function": mapping.type,
+                }
+            )
 
         json_obj[mapping.in_form] = value
-    return json_obj, census_data, gsa_fac_data
+
+    return json_obj, result
 
 
 def xform_census_date_to_datetime(date_string):

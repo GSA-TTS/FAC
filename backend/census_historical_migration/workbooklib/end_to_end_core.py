@@ -253,7 +253,7 @@ def api_check(json_test_tables):
 def run_end_to_end(user, audit_header, result):
     """Attempts to migrate the given audit"""
     try:
-        sac = setup_sac(user, audit_header, result)
+        sac, result = setup_sac(user, audit_header, result)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
             logger.info(
@@ -302,16 +302,15 @@ def run_end_to_end(user, audit_header, result):
 
 def record_migration_transformations(audit_year, dbkey, report_id, transformations):
     for transformation in transformations:
-        (section, census_data, gsa_fac_data, transformation_function) = transformation
         migration_change_record = MigrationChangeRecord.objects.create(
             audit_year=audit_year,
             dbkey=dbkey,
             report_id=report_id,
             run_datetime=django_timezone.now(),
-            section=section,
-            census_data=census_data,
-            gsa_fac_data=gsa_fac_data,
-            transformation_function=transformation_function,
+            section=transformation.section,
+            census_data=transformation.census_data,
+            gsa_fac_data=transformation.gsa_fac_data,
+            transformation_function=transformation.transformation_function,
         )
         migration_change_record.save()
     return None
