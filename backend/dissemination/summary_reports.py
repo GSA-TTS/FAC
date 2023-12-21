@@ -284,11 +284,12 @@ def insert_dissem_coversheet(workbook):
     sheet.append(
         [
             "Note",
-            f"This spreadsheet contains the first {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} results of your search. If you need to download more than {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} submissions, try limiting your search parameters to download in batches. You can also access bulk submission data via the FAC API.",
+            f"This spreadsheet contains the first {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} results of your search. If you need to download more than {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} submissions, try limiting your search parameters to download in batches.",
         ]
     )
-    sheet.cell(row=3, column=2).value = "FAC API Link"
-    sheet.cell(row=3, column=2).hyperlink = f"{settings.STATIC_SITE_URL}/developers/"
+    # Uncomment if we want to link to the FAC API for larger data dumps.
+    # sheet.cell(row=3, column=2).value = "FAC API Link"
+    # sheet.cell(row=3, column=2).hyperlink = f"{settings.STATIC_SITE_URL}/developers/"
     set_column_widths(sheet)
 
 
