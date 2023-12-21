@@ -38,7 +38,7 @@ jobs:
       CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE }}
       DISABLE_AUTH: False
       # useful for debugging but otherwise complete overwhelm
-      DEBUG: cypress:*
+      # DEBUG: cypress:*
     steps:
       - name: Checkout
         uses: actions/checkout@v4
