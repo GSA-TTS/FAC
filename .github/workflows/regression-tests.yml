@@ -38,7 +38,7 @@ jobs:
       CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE }}
       DISABLE_AUTH: False
       # useful for debugging but otherwise complete overwhelm
-      DEBUG: cypress:server:util:process_profiler
+      # DEBUG: cypress:server:util:process_profiler
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,6 +54,7 @@ jobs:
       - name: Run Cypress full submission test
         uses: cypress-io/github-action@v6
         with:
+          browser: chrome
           working-directory: ./backend
           spec: cypress/e2e/full-submission.cy.js
 
