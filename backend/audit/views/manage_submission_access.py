@@ -65,14 +65,12 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             "errors": [],
         }
         if self.role != "editor":
-            access = SimpleNamespace(
-                fullname="UNASSIGNED ROLE", email="UNASSIGNED ROLE", role=self.role
-            )
-
             try:
                 access = Access.objects.get(sac=sac, role=self.role)
             except Access.DoesNotExist:
-                pass
+                access = SimpleNamespace(
+                    fullname="UNASSIGNED ROLE", email="UNASSIGNED ROLE", role=self.role
+                )
 
             context = context | {
                 "friendly_role": _get_friendly_role(access.role),
