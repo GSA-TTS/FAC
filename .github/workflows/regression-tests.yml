@@ -53,6 +53,8 @@ jobs:
           with: |
             working-directory: ./backend
             spec: cypress/e2e/full-submission.cy.js
+          env:
+            DEBUG: 'cypress:*'
           attempt_limit: 5
           attempt_delay: 2000
 
