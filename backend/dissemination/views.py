@@ -1,4 +1,5 @@
 from collections import namedtuple
+import logging
 import math
 
 from django.core.exceptions import BadRequest
@@ -29,6 +30,8 @@ from dissemination.models import (
 from dissemination.summary_reports import generate_summary_report
 
 from users.permissions import can_read_tribal
+
+logger = logging.getLogger(__name__)
 
 
 def include_private_results(request):
@@ -176,7 +179,7 @@ class Search(View):
             "page": page,
             "order_by": form_data.order_by,
             "order_direction": form_data.order_direction,
-            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT
+            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
 
         return render(request, "search.html", context)
@@ -308,9 +311,9 @@ class MultipleSummaryReportDownloadView(View):
             include_private = include_private_results(request)
             results = run_search_general(cleaned_data, include_private)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
-            
-            if results.count() == 0:
-                return
+
+            if len(results) == 0:
+                raise Http404(f"Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
 
             filename = generate_summary_report(report_ids)
@@ -318,5 +321,14 @@ class MultipleSummaryReportDownloadView(View):
 
             return redirect(download_url)
 
+        except Http404 as err:
+            logger.info(
+                "No results found for MultipleSummaryReportDownloadView post. Suggest an improper or old form submission. \n%s",
+                err,
+            )
+            raise Http404 from err
         except Exception as err:
-            return BadRequest(f"Cannot generate summary report. {err}")
+            logger.info(
+                "Enexpected error in MultipleSummaryReportDownloadView post:\n%s", err
+            )
+            raise BadRequest(err)
