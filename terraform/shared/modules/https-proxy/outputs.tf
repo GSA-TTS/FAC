@@ -18,6 +18,10 @@ output "protocol" {
   value = local.protocol
 }
 
+output "app_id" {
+  value = local.app_id
+}
+
 output "port" {
   value = local.port
 }

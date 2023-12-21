@@ -27,7 +27,7 @@ from .transforms import run_all_notes_to_sefa_transforms
 logger = logging.getLogger(__name__)
 
 
-def extract_notes_to_sefa(file):
+def extract_notes_to_sefa(file, is_gsa_migration=False):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
     )
@@ -41,9 +41,9 @@ def extract_notes_to_sefa(file):
     )
 
     ir = extract_workbook_as_ir(file)
-    run_all_general_checks(ir, FORM_SECTIONS.NOTES_TO_SEFA)
+    run_all_general_checks(ir, FORM_SECTIONS.NOTES_TO_SEFA, is_gsa_migration)
     new_ir = run_all_notes_to_sefa_transforms(ir)
-    run_all_notes_to_sefa_checks(new_ir)
+    run_all_notes_to_sefa_checks(new_ir, is_gsa_migration)
     result = _extract_generic_data(new_ir, params)
     return result
 

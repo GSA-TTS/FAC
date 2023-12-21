@@ -1,4 +1,6 @@
 import logging
+
+from django.conf import settings
 from audit.intakelib.intermediate_representation import (
     get_range_values_by_name,
     get_range_by_name,
@@ -40,7 +42,12 @@ def cluster_total_is_correct(ir):
                     if k == uniform_other_cluster_name[idx]
                 ]
             )
-        elif (name is None or str(name).strip() == "" or name == NOT_APPLICABLE) and (
+        elif (
+            name is None
+            or str(name).strip() == ""
+            or name == NOT_APPLICABLE
+            or name == settings.GSA_MIGRATION
+        ) and (
             state_cluster_name[idx] is None
             or str(state_cluster_name[idx]).strip() == ""
         ):

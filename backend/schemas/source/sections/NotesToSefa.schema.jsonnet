@@ -23,7 +23,7 @@ local NotesToSefaEntry = {
   properties: {
     note_title: Types.string,
     note_content: Types.string,
-    contains_chart_or_table: Base.Enum.YorN,
+    contains_chart_or_table: Base.Enum.YorNorGsaMigration,
     seq_number: Types.integer,
   },
   required: ['note_title', 'note_content', 'contains_chart_or_table'],

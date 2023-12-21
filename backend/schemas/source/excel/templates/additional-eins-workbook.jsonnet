@@ -65,7 +65,7 @@ local open_ranges_defns = [
       title_cell: 'A1',
       width: 36,
       format: 'text',
-      help: Help.uei,
+      help: Help.ein,
     },
     SV.StringOfLengthNine,
     'Additional EINs',

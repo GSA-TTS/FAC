@@ -27,7 +27,7 @@ from .transforms import run_all_corrective_action_plan_transforms
 logger = logging.getLogger(__name__)
 
 
-def extract_corrective_action_plan(file):
+def extract_corrective_action_plan(file, is_gsa_migration=False):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / CORRECTIVE_ACTION_TEMPLATE_DEFINITION
     )
@@ -41,9 +41,9 @@ def extract_corrective_action_plan(file):
     )
 
     ir = extract_workbook_as_ir(file)
-    run_all_general_checks(ir, FORM_SECTIONS.CORRECTIVE_ACTION_PLAN)
+    run_all_general_checks(ir, FORM_SECTIONS.CORRECTIVE_ACTION_PLAN, is_gsa_migration)
     xform_ir = run_all_corrective_action_plan_transforms(ir)
-    run_all_corrective_action_plan_checks(xform_ir)
+    run_all_corrective_action_plan_checks(xform_ir, is_gsa_migration)
     result = _extract_generic_data(xform_ir, params)
     return result
 
