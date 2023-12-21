@@ -5,6 +5,7 @@ from audit.models import (
     ExcelFile,
     SingleAuditChecklist,
     SingleAuditReportFile,
+    SubmissionEvent,
 )
 
 
@@ -78,8 +79,13 @@ class AuditReportAdmin(admin.ModelAdmin):
     list_display = ("filename", "user", "date_created", "component_page_numbers")
 
 
+class SubmissionEventAdmin(admin.ModelAdmin):
+    list_display = ("sac", "user", "timestamp", "event")
+
+
 admin.site.register(Access, AccessAdmin)
 admin.site.register(DeletedAccess, DeletedAccessAdmin)
 admin.site.register(ExcelFile, ExcelFileAdmin)
 admin.site.register(SingleAuditChecklist, SACAdmin)
 admin.site.register(SingleAuditReportFile, AuditReportAdmin)
+admin.site.register(SubmissionEvent, SubmissionEventAdmin)

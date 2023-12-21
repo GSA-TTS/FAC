@@ -13,6 +13,7 @@ from .models import (
     LateChangeError,
     SingleAuditChecklist,
     SingleAuditReportFile,
+    SubmissionEvent,
     User,
     generate_sac_report_id,
 )
@@ -194,6 +195,33 @@ class AccessTests(TestCase):
             sac=access_1.sac,
             role="certifying_auditor_contact",
         )
+
+    def test_access_creation_non_unique_emails(self):
+        """
+        If we attempt to create an Access for an email that has
+        multiple User objects associated with it, we should not
+        assign the Access to any specific User object and instead
+        leave the Access unclaimed. This way, the next time the
+        user logs into the FAC, the Access will be claimed by
+        whichever User account is the "active" one.
+        """
+        creator = baker.make(User)
+
+        baker.make(User, email="a@a.com")
+        baker.make(User, email="a@a.com")
+
+        sac = baker.make(SingleAuditChecklist)
+
+        access = Access.objects.create(
+            sac=sac,
+            role="editor",
+            email="a@a.com",
+            event_user=creator,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+        )
+
+        self.assertEqual(access.email, "a@a.com")
+        self.assertIsNone(access.user)
 
 
 class ExcelFileTests(TestCase):

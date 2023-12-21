@@ -34,7 +34,7 @@ $(git config --global --add safe.directory /github/workspace && \
   git config --global --unset safe.directory /github/workspace
 )
 
-cd "${tmpdir}/cg-logshipper-main" && zip -r -o "${popdir}/logshipper.zip" ./ > /dev/null
+cd "${tmpdir}/cg-logshipper-main" && zip -r -o -X "${popdir}/logshipper.zip" ./ > /dev/null
 
 # Tell Terraform where to find it
 cat << EOF

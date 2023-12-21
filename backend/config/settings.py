@@ -535,3 +535,10 @@ CENSUS_DATA_SOURCE = "CENSUS"
 GSA_MIGRATION = "GSA_MIGRATION"  # There is a copy of `GSA_MIGRATION` in Base.libsonnet. If you change it here, change it there too.
 DOLLAR_THRESHOLD = 750000
 SUMMARY_REPORT_DOWNLOAD_LIMIT = 1000
+
+# A version of these regexes also exists in Base.libsonnet
+REGEX_ALN_PREFIX = r"^([0-9]{2})$"
+REGEX_RD_EXTENSION = r"^RD[0-9]?$"
+REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
+REGEX_U_EXTENSION = r"^U[0-9]{2}$"
+GSA_MIGRATION = "GSA_MIGRATION"
