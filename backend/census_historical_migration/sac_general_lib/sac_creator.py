@@ -23,7 +23,7 @@ from ..sac_general_lib.report_id_generator import (
 logger = logging.getLogger(__name__)
 
 
-def setup_sac(user, audit_header):
+def setup_sac(user, audit_header, result):
     """Create a SAC object for the historic data migration."""
     if user is None:
         raise DataMigrationError(
@@ -45,8 +45,8 @@ def setup_sac(user, audit_header):
 
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
-        general_information=general_information(audit_header),
-        audit_information=audit_information(audit_header),
+        general_information=general_information(audit_header, result),
+        audit_information=audit_information(audit_header, result),
     )
 
     sac.report_id = generated_report_id
@@ -72,8 +72,8 @@ def setup_sac(user, audit_header):
         role="certifying_auditor_contact",
     )
 
-    sac.auditee_certification = auditee_certification(audit_header)
-    sac.auditor_certification = auditor_certification(audit_header)
+    sac.auditee_certification = auditee_certification(audit_header, result)
+    sac.auditor_certification = auditor_certification(audit_header, result)
     sac.data_source = settings.CENSUS_DATA_SOURCE
     sac.save()
     logger.info("Created single audit checklist %s", sac)

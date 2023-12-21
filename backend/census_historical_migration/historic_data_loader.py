@@ -27,7 +27,7 @@ def load_historic_data_for_year(audit_year, page_size, pages):
         )
 
         for submission in page.object_list:
-            result = {"success": [], "errors": []}
+            result = {"success": [], "errors": [], "transformations": []}
             # Migrate a single submission
             run_end_to_end(user, submission, result)
 

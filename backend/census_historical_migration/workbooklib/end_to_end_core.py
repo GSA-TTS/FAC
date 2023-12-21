@@ -27,6 +27,7 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
+    MigrationChangeRecord,
 )
 
 from django.conf import settings
@@ -252,7 +253,7 @@ def api_check(json_test_tables):
 def run_end_to_end(user, audit_header, result):
     """Attempts to migrate the given audit"""
     try:
-        sac = setup_sac(user, audit_header)
+        sac = setup_sac(user, audit_header, result)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
             logger.info(
@@ -291,6 +292,29 @@ def run_end_to_end(user, audit_header, result):
             audit_header.DBKEY,
             len(result["errors"]) > 0,
         )
+        record_migration_transformations(
+            audit_header.AUDITYEAR,
+            audit_header.DBKEY,
+            sac.report_id,
+            result["transformations"],
+            )
+
+
+def record_migration_transformations(audit_year, dbkey, report_id, transformations):
+    for transformation in transformations:
+        (section, census_data, gsa_fac_data, transformation_function) = transformation
+        migration_change_record = MigrationChangeRecord.objects.create(
+            audit_year=audit_year,
+            dbkey=dbkey,
+            report_id=report_id,
+            run_datetime=django_timezone.now(),
+            section=section,
+            census_data=census_data,
+            gsa_fac_data=gsa_fac_data,
+            transformation_function=transformation_function,
+        )
+        migration_change_record.save()
+    return None
 
 
 def record_migration_status(audit_year, dbkey, has_failed):

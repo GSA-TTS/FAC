@@ -259,4 +259,12 @@ def general_information(audit_header):
     # verify that the created object validates against the schema
     audit.validators.validate_general_information_complete_json(general_information)
 
+    track_general_transformations(general_information, audit_header)
+
     return general_information
+
+
+def track_general_transformations(general_information, audit_header):
+    # Add all transformation details into results["transformations"]
+    
+    return None

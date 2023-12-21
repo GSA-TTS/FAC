@@ -49,7 +49,7 @@ class Command(BaseCommand):
             total_count = error_count = 0
             for dbkey, year in zip(dbkeys, years):
                 logger.info("Running {}-{} end-to-end".format(dbkey, year))
-                result = {"success": [], "errors": []}
+                result = {"success": [], "errors": [], "transformations": []}
                 try:
                     audit_header = get_audit_header(dbkey, year)
                 except Exception as e:

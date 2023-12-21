@@ -35,7 +35,7 @@ def create_json_from_db_object(gobj, mappings):
             value = mapping.type(value)
 
         json_obj[mapping.in_form] = value
-    return json_obj
+    return json_obj, census_data, gsa_fac_data
 
 
 def xform_census_date_to_datetime(date_string):

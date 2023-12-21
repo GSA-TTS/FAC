@@ -119,6 +119,8 @@ def xform_constructs_cluster_names(
             # we must modify state_cluster_names and other_cluster_names
             # methods in check_state_cluster_names.py and check_other_cluster_names.py (intakelib/checks).
             raise DataMigrationError("Unable to determine cluster name.")
+    
+    # Create Census_data, gsa_fac_data
 
     return (cluster_names, other_cluster_names, state_cluster_names)
 
