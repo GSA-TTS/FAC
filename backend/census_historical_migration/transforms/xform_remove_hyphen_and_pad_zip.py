@@ -26,8 +26,6 @@ def xform_remove_hyphen_and_pad_zip(zip):
         strzip = "0" + strzip
     if len(strzip) == 5 or len(strzip) == 9:
         return strzip
-    # elif len(strzip) == 9:
-    # return f"{strzip[0:5]}-{strzip[5:9]}"
     else:
         raise DataMigrationError(
             "Zip code is malformed.",

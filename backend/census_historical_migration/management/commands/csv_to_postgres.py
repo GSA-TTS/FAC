@@ -12,7 +12,7 @@ from django.apps import apps
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARNING)
+
 census_to_gsafac_models = list(
     apps.get_app_config("census_historical_migration").get_models()
 )
@@ -62,7 +62,7 @@ class Command(BaseCommand):
             return
         folder = options.get("folder")
         if not folder:
-            print("Please specify a folder name")
+            logger.error("Please specify a folder name")
             return
         chunk_size = options.get("chunksize")
         self.process_csv_files(folder, chunk_size)
@@ -87,20 +87,20 @@ class Command(BaseCommand):
     def display_row_counts(self, models):
         for mdl in models:
             row_count = mdl.objects.all().count()
-            print(f"{row_count} in ", mdl)
+            logger.info(f"{row_count} in ", mdl)
 
     def delete_data(self):
         for mdl in census_to_gsafac_models:
-            print("Deleting ", mdl)
+            logger.info("Deleting ", mdl)
             mdl.objects.all().delete()
 
     def sample_data(self):
         for mdl in census_to_gsafac_models:
-            print("Sampling ", mdl)
+            logger.info("Sampling ", mdl)
             rows = mdl.objects.all()[:1]
             for row in rows:
                 for col in mdl._meta.fields:
-                    print(f"{col.name}: {getattr(row, col.name)}")
+                    logger.info(f"{col.name}: {getattr(row, col.name)}")
 
     def list_s3_objects(self, bucket_name, folder):
         return s3_client.list_objects(Bucket=bucket_name, Prefix=folder)["Contents"]
@@ -112,22 +112,22 @@ class Command(BaseCommand):
         except ClientError:
             logger.error("Could not download {}".format(model_obj))
             return None
-        print(f"Obtained {model_obj} from S3")
+        logger.info(f"Obtained {model_obj} from S3")
         return file
 
     def get_model_name(self, name):
-        print("Processing ", name)
+        logger.info("Processing ", name)
         file_name = name.split("/")[-1].split(".")[0]
         for model_name in census_to_gsafac_model_names:
             if file_name.lower().startswith(model_name):
-                print("model_name = ", model_name)
+                logger.info("model_name = ", model_name)
                 return model_name
-        print("Could not find a matching model for ", name)
+        logger.error("Could not find a matching model for ", name)
         return None
 
     def load_data(self, file, model_obj, chunk_size):
         dtypes = defaultdict(lambda: str)
-        print("Starting load data to postgres")
+        logger.info("Starting load data to postgres")
         file.seek(0)
         rows_loaded = 0
         for df in pd.read_csv(file, iterator=True, chunksize=chunk_size, dtype=dtypes):
@@ -139,5 +139,5 @@ class Command(BaseCommand):
                 obj = model_obj(**row)
                 obj.save()
             rows_loaded += df.shape[0]
-            print(f"Loaded {rows_loaded} rows in ", model_obj)
+            logger.info(f"Loaded {rows_loaded} rows in ", model_obj)
         return None

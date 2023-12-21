@@ -1,9 +1,11 @@
+import logging
 from .models import ELECAUDITHEADER as AuditHeader
 from .workbooklib.end_to_end_core import run_end_to_end
 
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -18,11 +20,11 @@ def load_historic_data_for_year(audit_year, page_size, pages):
     )
     paginator = Paginator(submissions_for_year, page_size)
 
-    print(f"{submissions_for_year.count()} submissions found for {audit_year}")
+    logger.info(f"{submissions_for_year.count()} submissions found for {audit_year}")
 
     for page_number in pages:
         page = paginator.page(page_number)
-        print(
+        logger.info(
             f"Processing page {page_number} with {page.object_list.count()} submissions."
         )
 
@@ -38,21 +40,21 @@ def load_historic_data_for_year(audit_year, page_size, pages):
             if has_failed:
                 error_count += 1
             if total_count % 5 == 0:
-                print(f"Processed = {total_count}, Errors = {error_count}")
+                logger.info(f"Processed = {total_count}, Errors = {error_count}")
 
-    print_results(result_log, error_count, total_count)
+    log_results(result_log, error_count, total_count)
 
 
-def print_results(result_log, error_count, total_count):
+def log_results(result_log, error_count, total_count):
     """Prints the results of the migration"""
 
-    print("********* Loader Summary ***************")
+    logger.info("********* Loader Summary ***************")
 
     for k, v in result_log.items():
-        print(k, v)
-        print("-------------------")
+        logger.info(k, v)
+        logger.info("-------------------")
 
-    print(f"{error_count} errors out of {total_count}")
+    logger.info(f"{error_count} errors out of {total_count}")
 
 
 def create_or_get_user():
@@ -65,7 +67,7 @@ def create_or_get_user():
     if users:
         user = users.first()
     else:
-        print("Creating user", user_email, user_name)
+        logger.info("Creating user", user_email, user_name)
         user = User(username=user_name, email=user_email)
         user.save()
 

@@ -1,12 +1,10 @@
 import logging
 import re
+
+from django.conf import settings
 from audit.intakelib.intermediate_representation import (
     get_range_values_by_name,
     get_range_by_name,
-)
-from .check_aln_three_digit_extension_pattern import (
-    REGEX_RD_EXTENSION,
-    REGEX_U_EXTENSION,
 )
 from audit.intakelib.common import get_message, build_cell_error_tuple
 
@@ -19,7 +17,7 @@ def additional_award_identification(ir):
     extension = get_range_values_by_name(ir, "three_digit_extension")
     additional = get_range_values_by_name(ir, "additional_award_identification")
     errors = []
-    patterns = [REGEX_RD_EXTENSION, REGEX_U_EXTENSION]
+    patterns = [settings.REGEX_RD_EXTENSION, settings.REGEX_U_EXTENSION]
     for index, (ext, add) in enumerate(zip(extension, additional)):
         if any(re.match(pattern, ext) for pattern in patterns) and (
             (add is None) or (str(add).strip() == "")
