@@ -286,7 +286,7 @@ def general_information(audit_header, result):
             general_information, census_data, gsa_fac_data = transform(
                 general_information
             )
-        result = track_transformation(census_data, gsa_fac_data, transform, result)
+        result = track_transformation(census_data, gsa_fac_data, transform.__name__, result)
 
     # verify that the created object validates against the schema
     audit.validators.validate_general_information_complete_json(general_information)
