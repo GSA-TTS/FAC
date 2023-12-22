@@ -1,6 +1,6 @@
 import logging
 from .models import ELECAUDITHEADER as AuditHeader
-from .workbooklib.end_to_end_core import run_end_to_end
+from .end_to_end_core import run_end_to_end
 
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
@@ -51,7 +51,7 @@ def log_results(result_log, error_count, total_count):
     logger.info("********* Loader Summary ***************")
 
     for k, v in result_log.items():
-        logger.info(k, v)
+        logger.info(f"{k}, {v}")
         logger.info("-------------------")
 
     logger.info(f"{error_count} errors out of {total_count}")
@@ -67,7 +67,7 @@ def create_or_get_user():
     if users:
         user = users.first()
     else:
-        logger.info("Creating user", user_email, user_name)
+        logger.info("Creating user %s %s", user_email, user_name)
         user = User(username=user_name, email=user_email)
         user.save()
 

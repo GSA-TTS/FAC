@@ -1,5 +1,5 @@
 import re
-
+from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
@@ -11,7 +11,6 @@ from .excel_creation_utils import (
     get_ranges,
     set_workbook_uei,
     map_simple_columns,
-    generate_dissemination_test_table,
     set_range,
 )
 from ..base_field_maps import (
@@ -388,74 +387,72 @@ def generate_federal_awards(audit_header, outfile):
     table = generate_dissemination_test_table(
         audit_header, "federal_awards", mappings, audits
     )
-    award_counter = 1
-    filtered_mappings = [
-        mapping
-        for mapping in mappings
-        if mapping.in_sheet
-        in [
-            "additional_award_identification",
-            "federal_agency_prefix",
-            "three_digit_extension",
-            "passthrough_name",
-            "passthrough_identifying_number",
-            "subrecipient_amount",
-            "loan_balance_at_audit_period_end",
+    if audits:
+        award_counter = 1
+        filtered_mappings = [
+            mapping
+            for mapping in mappings
+            if mapping.in_sheet
+            in [
+                "additional_award_identification",
+                "federal_agency_prefix",
+                "three_digit_extension",
+                "passthrough_name",
+                "passthrough_identifying_number",
+                "subrecipient_amount",
+                "loan_balance_at_audit_period_end",
+            ]
         ]
-    ]
-    ranges = get_ranges(filtered_mappings, audits)
-    prefixes = get_range_values(ranges, "federal_agency_prefix")
-    extensions = get_range_values(ranges, "three_digit_extension")
+        ranges = get_ranges(filtered_mappings, audits)
+        prefixes = get_range_values(ranges, "federal_agency_prefix")
+        extensions = get_range_values(ranges, "three_digit_extension")
 
-    for (
-        award,
-        prefix,
-        extension,
-        additional_identification,
-        cluster_name,
-        other_cluster_name,
-        state_cluster_name,
-        passthrough_amount,
-        loan_balance,
-    ) in zip(
-        table["rows"],
-        prefixes,
-        extensions,
-        additional_award_identifications,
-        cluster_names,
-        other_cluster_names,
-        state_cluster_names,
-        passthrough_amounts,
-        loan_balances,
-    ):
-        # Function to update or append field/value
-        def update_or_append_field(field_name, field_value):
-            if field_name in award["fields"]:
-                index = award["fields"].index(field_name)
-                logger.info(
-                    f"Updating {field_name} from {award['values'][index]} to {field_value}"
-                )
-                award["values"][index] = field_value
-            else:
-                award["fields"].append(field_name)
-                award["values"].append(field_value)
+        for (
+            award,
+            prefix,
+            extension,
+            additional_identification,
+            cluster_name,
+            other_cluster_name,
+            state_cluster_name,
+            passthrough_amount,
+            loan_balance,
+        ) in zip(
+            table["rows"],
+            prefixes,
+            extensions,
+            additional_award_identifications,
+            cluster_names,
+            other_cluster_names,
+            state_cluster_names,
+            passthrough_amounts,
+            loan_balances,
+        ):
+            # Function to update or append field/value
+            def update_or_append_field(field_name, field_value):
+                if field_name in award["fields"]:
+                    index = award["fields"].index(field_name)
+                    logger.info(
+                        f"Updating {field_name} from {award['values'][index]} to {field_value}"
+                    )
+                    award["values"][index] = field_value
+                else:
+                    award["fields"].append(field_name)
+                    award["values"].append(field_value)
 
-        # Update or append new field-value pairs
-        update_or_append_field("federal_agency_prefix", prefix)
-        update_or_append_field("federal_award_extension", extension)
-        update_or_append_field("award_reference", f"AWARD-{award_counter:04}")
-        update_or_append_field(
-            "additional_award_identification", additional_identification
-        )
-        update_or_append_field("cluster_name", cluster_name)
-        update_or_append_field("other_cluster_name", other_cluster_name)
-        update_or_append_field("state_cluster_name", state_cluster_name)
-        update_or_append_field("passthrough_amount", passthrough_amount)
-        update_or_append_field("loan_balance", loan_balance)
+            # Update or append new field-value pairs
+            update_or_append_field("federal_agency_prefix", prefix)
+            update_or_append_field("federal_award_extension", extension)
+            update_or_append_field("award_reference", f"AWARD-{award_counter:04}")
+            update_or_append_field(
+                "additional_award_identification", additional_identification
+            )
+            update_or_append_field("cluster_name", cluster_name)
+            update_or_append_field("other_cluster_name", other_cluster_name)
+            update_or_append_field("state_cluster_name", state_cluster_name)
+            update_or_append_field("passthrough_amount", passthrough_amount)
+            update_or_append_field("loan_balance", loan_balance)
 
-        award_counter += 1
-
-    table["singletons"]["auditee_uei"] = uei
-    table["singletons"]["total_amount_expended"] = total
+            award_counter += 1
 
     return (wb, table)
