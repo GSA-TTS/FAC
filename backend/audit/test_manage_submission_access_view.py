@@ -131,6 +131,7 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         sac.save()
         current_cac = baker.make(Access, sac=sac, role=self.role)
+        current_role = str(current_cac.get_friendly_role())
 
         self.client.force_login(user)
         url = reverse(self.view, kwargs={"report_id": sac.report_id})
@@ -139,6 +140,25 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("YESIAMAREALUEI", response.content.decode("UTF-8"))
         self.assertIn(current_cac.email, response.content.decode("UTF-8"))
+        self.assertIn(current_role, response.content.decode("UTF-8"))
+
+    def test_no_existing_role_get(self):
+        """
+        A user should be able to access this page for a SAC they're associated with
+        even if there's no current assignment for the role.
+        """
+        user, sac = _make_user_and_sac()
+        baker.make(Access, user=user, sac=sac, role="editor")
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
+        sac.save()
+
+        self.client.force_login(user)
+        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("YESIAMAREALUEI", response.content.decode("UTF-8"))
+        self.assertIn("UNASSIGNED ROLE", response.content.decode("UTF-8"))
 
     def test_basic_post(self):
         """
@@ -179,6 +199,41 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
             email=current_cac.email,
         )
         self.assertEqual(self.role, oldaccess.role)
+
+    def test_no_existing_role_post(self):
+        """
+        Submitting the form with a new email address should delete the existing
+        Access, create a DeletedAccess, and create a new Access.
+
+        However, if we have no existing Access, we should still create a new Access.
+        """
+        user = baker.make(User, email="removing_user@example.com")
+        sac = baker.make(SingleAuditChecklist)
+        baker.make(Access, user=user, sac=sac, role="editor")
+        baker.make(
+            Access,
+            sac=sac,
+            role=self.other_role,
+            email="contact@example.com",
+        )
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
+        sac.save()
+
+        self.client.force_login(user)
+
+        data = {
+            "fullname": "The New CAC",
+            "email": "newcacuser@example.com",
+        }
+
+        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+
+        newaccess = Access.objects.get(
+            sac=sac, fullname=data["fullname"], email=data["email"]
+        )
+        self.assertEqual(self.role, newaccess.role)
 
     def test_bad_email_post(self):
         """
