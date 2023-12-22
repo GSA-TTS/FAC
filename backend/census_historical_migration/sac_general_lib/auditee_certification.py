@@ -38,17 +38,17 @@ def _xform_set_certification_date(auditee_certification):
     return auditee_certification
 
 
-def auditee_certification(audit_header):
+def auditee_certification(audit_header, result):
     """Generates auditee certification JSON."""
     certification = {}
-    certification["auditee_certification"] = create_json_from_db_object(
-        audit_header, auditee_certification_mappings
+    certification["auditee_certification"], result = create_json_from_db_object(
+        audit_header, auditee_certification_mappings, result
     )
-    certification["auditee_signature"] = create_json_from_db_object(
-        audit_header, auditee_signature_mappings
+    certification["auditee_signature"], result = create_json_from_db_object(
+        audit_header, auditee_signature_mappings, result
     )
     certification = _xform_set_certification_date(certification)
 
     audit.validators.validate_auditee_certification_json(certification)
 
-    return certification
+    return certification, result
