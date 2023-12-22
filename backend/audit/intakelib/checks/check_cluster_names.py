@@ -4,11 +4,9 @@ import logging
 from django.conf import settings
 from audit.intakelib.intermediate_representation import get_range_by_name
 from audit.intakelib.common import get_message, build_cell_error_tuple
+from .check_cluster_total import NOT_APPLICABLE, OTHER_CLUSTER, STATE_CLUSTER
 
 logger = logging.getLogger(__name__)
-
-STATE_CLUSTER = "STATE CLUSTER"
-OTHER_CLUSTER = "OTHER CLUSTER NOT LISTED ABOVE"
 
 
 def check_cluster_names(ir):
@@ -29,7 +27,8 @@ def check_cluster_names(ir):
 
         for index, value in enumerate(range_data["values"]):
             if value and value not in (
-                valid_json["cluster_names"] + [STATE_CLUSTER, OTHER_CLUSTER]
+                valid_json["cluster_names"]
+                + [STATE_CLUSTER, OTHER_CLUSTER, NOT_APPLICABLE]
             ):
                 errors.append(
                     build_cell_error_tuple(
