@@ -51,7 +51,7 @@ pw.setLevel(logging.INFO)
 # https://stackoverflow.com/questions/553303/generate-a-random-date-between-two-other-dates
 def random_date(start, end):
     """
-    This function will return a random datetime between two datetime 
+    This function will return a random datetime between two datetime
     objects.
     """
     delta = end - start
@@ -59,9 +59,10 @@ def random_date(start, end):
     random_second = randrange(int_delta)
     return start + timedelta(seconds=random_second)
 
+
 def step_through_certifications(sac):
-    d1 = datetime.strptime('1/1/2017 1:30 PM', '%m/%d/%Y %I:%M %p')
-    d2 = datetime.strptime('10/30/2023 4:50 AM', '%m/%d/%Y %I:%M %p')
+    d1 = datetime.strptime("1/1/2017 1:30 PM", "%m/%d/%Y %I:%M %p")
+    d2 = datetime.strptime("10/30/2023 4:50 AM", "%m/%d/%Y %I:%M %p")
     # https://stackoverflow.com/questions/7065164/how-to-make-a-datetime-object-aware-not-naive
     date = pytz.utc.localize(random_date(d1, d2))
 
@@ -249,7 +250,7 @@ def generate_workbooks(user, email, dbkey, year, store_files=True, run_api_check
 def run_end_to_end(email, dbkey, year, store_files=True, run_api_checks=True):
     try:
         user = User.objects.get(email=email)
-        
+
     except User.DoesNotExist:
         # logger.info("No user found for %s, have you logged in once?", email)
         logger.info("Creating a user for test data generation.")
