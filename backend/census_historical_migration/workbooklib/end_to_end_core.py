@@ -307,10 +307,10 @@ def record_migration_transformations(audit_year, dbkey, report_id, transformatio
             dbkey=dbkey,
             report_id=report_id,
             run_datetime=django_timezone.now(),
-            section=transformation.section,
-            census_data=transformation.census_data,
-            gsa_fac_data=transformation.gsa_fac_data,
-            transformation_function=transformation.transformation_function,
+            section=transformation['section'],
+            census_data=transformation['census_data'],
+            gsa_fac_data=transformation['gsa_fac_data'],
+            transformation_function=transformation['transformation_function'],
         )
         migration_change_record.save()
     return None
