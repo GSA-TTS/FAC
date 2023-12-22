@@ -38,7 +38,7 @@ def setup_sac(user, audit_header, result):
     result["transformations"].append(
         {
             "section": "General",
-            "census_data": audit_header["DBKEY"],
+            "census_data": audit_header.DBKEY,
             "gsa_fac_data": generated_report_id,
             "transformation_function": "xform_dbkey_to_report_id",
         }
@@ -82,8 +82,8 @@ def setup_sac(user, audit_header, result):
         role="certifying_auditor_contact",
     )
 
-    sac.auditee_certification = auditee_certification(audit_header)
-    sac.auditor_certification = auditor_certification(audit_header)
+    sac.auditee_certification, result = auditee_certification(audit_header, result)
+    sac.auditor_certification, result = auditor_certification(audit_header, result)
     sac.data_source = settings.CENSUS_DATA_SOURCE
     sac.save()
     logger.info("Created single audit checklist %s", sac)
