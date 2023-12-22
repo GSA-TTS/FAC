@@ -448,3 +448,140 @@ class SummaryViewTests(TestCase):
             response.context["data"]["Notes to SEFA"][0]["accounting_policies"],
             note.accounting_policies,
         )
+
+
+class SummaryReportDownloadViewTests(TestCase):
+    def setUp(self):
+        self.anon_client = Client()
+        self.perm_client = Client()
+
+        self.perm_user = baker.make(User)
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(
+            UserPermission,
+            email=self.perm_user.email,
+            user=self.perm_user,
+            permission=permission,
+        )
+        self.perm_client.force_login(self.perm_user)
+
+    def _make_general(self, is_public=True, **kwargs):
+        """
+        Create a General object in dissemination with the keyword arguments passed in.
+        """
+        general = baker.make(
+            General,
+            is_public=is_public,
+            **kwargs,
+        )
+        return general
+
+    def _summary_report_url(self):
+        return reverse("dissemination:MultipleSummaryReportDownload")
+
+    def _mock_filename(self):
+        return "some-report-name.xlsx"
+
+    def _mock_download_url(self):
+        return "http://example.com/gsa-fac-private-s3/temp/some-report-name.xlsx"
+
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_bad_search_returns_400(self, mock_persist_workbook):
+        """
+        Submitting a form with bad parameters should throw a BadRequest.
+        """
+        response = self.anon_client.post(
+            self._summary_report_url(), {"start_date": "Not a date"}
+        )
+        self.assertEquals(response.status_code, 400)
+
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_empty_results_returns_404(self, mock_persist_workbook):
+        """
+        Searches with no results should return a 404, not an empty excel file.
+        """
+        self._make_general(is_public=False, auditee_uei="123456789012")
+        response = self.anon_client.post(
+            self._summary_report_url(), {"uei_or_ein": "NotTheOther1"}
+        )
+        self.assertEquals(response.status_code, 404)
+
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_no_permissions_returns_404_on_private(self, mock_persist_workbook):
+        """
+        Non-permissioned users cannot access private audits through the summary report post.
+        """
+        self._make_general(is_public=False)
+        response = self.anon_client.post(self._summary_report_url(), {})
+        self.assertEquals(response.status_code, 404)
+
+    @patch("dissemination.views.get_download_url")
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_permissions_returns_file_on_private(
+        self, mock_persist_workbook, mock_get_download_url
+    ):
+        """
+        Permissioned users recieve a file if there are private results.
+        """
+        mock_persist_workbook.return_value = self._mock_filename()
+        mock_get_download_url.return_value = self._mock_download_url()
+
+        self._make_general(is_public=False)
+
+        response = self.perm_client.post(self._summary_report_url(), {})
+        self.assertRedirects(
+            response,
+            self._mock_download_url(),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=False,
+        )
+
+    @patch("dissemination.views.get_download_url")
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_empty_search_params_returns_file(
+        self, mock_persist_workbook, mock_get_download_url
+    ):
+        """
+        File should be generated on empty search parameters ("search all").
+        """
+        mock_persist_workbook.return_value = self._mock_filename()
+        mock_get_download_url.return_value = self._mock_download_url()
+
+        self._make_general(is_public=True)
+
+        response = self.anon_client.post(self._summary_report_url(), {})
+        self.assertRedirects(
+            response,
+            self._mock_download_url(),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=False,
+        )
+
+    @patch("dissemination.views.get_download_url")
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_many_results_returns_file(
+        self, mock_persist_workbook, mock_get_download_url
+    ):
+        """
+        File should still be generated if there are above SUMMARY_REPORT_DOWNLOAD_LIMIT total results.
+        """
+        mock_persist_workbook.return_value = self._mock_filename()
+        mock_get_download_url.return_value = self._mock_download_url()
+
+        for i in range(4):
+            self._make_general(
+                is_public=True,
+                report_id=generate_sac_report_id(end_date="2023-12-31", count=str(i)),
+            )
+
+        with self.settings(SUMMARY_REPORT_DOWNLOAD_LIMIT=2):
+            response = self.anon_client.post(self._summary_report_url(), {})
+            self.assertRedirects(
+                response,
+                self._mock_download_url(),
+                status_code=302,
+                target_status_code=200,
+                fetch_redirect_response=False,
+            )
