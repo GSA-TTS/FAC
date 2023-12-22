@@ -288,7 +288,7 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
     def test_passthrough_award_Y_empty_amount(self):
         """Test for default value when passthrough award Y audit with empty amount."""
         audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="")]
-        expected = ["-9999999999"]
+        expected = [str(settings.GSA_MIGRATION_INT)]
         self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
 
