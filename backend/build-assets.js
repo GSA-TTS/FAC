@@ -7,8 +7,17 @@ const path = require('path');
 const { sassPlugin } = require('esbuild-sass-plugin');
 
 const watch = process.argv.includes('--watch');
-
 const jsPath = glob.sync(path.join('.','static','js','*.js'));
+
+// Basic plugin to watch for build end, then run PostCSS
+const postCssPlugin = {
+  name: 'Trigger PostCSS',
+  setup(build) {
+    build.onEnd(() => {
+      runPostcss('static/compiled/scss/main.css', 'static/compiled/scss/main-post.css');
+    })
+  },
+}
 
 const buildProps = {
   entryPoints: [...jsPath, 'static/scss/main.scss'],
@@ -34,23 +43,12 @@ const buildProps = {
         "./static/compiled/js",
       ],
     }),
+    postCssPlugin
   ]
 }
 
-if (watch) {
-  buildProps.watch = {
-    onRebuild(error, result) {
-      runPostcss('static/compiled/scss/main.css', 'static/compiled/scss/main-post.css');
-
-      if (error) console.error('watch build failed:', error)
-      else console.info('watch build succeeded:', result)
-    },
-  }
-}
-
 const runPostcss = (cssIn, cssOut) => {
-  console.info('Running postcss');
-
+  console.info('Running PostCSS...');
   fs.readFile(cssIn, (err, css) => {
     postcss([autoprefixer])
       .process(css, { from: cssIn, to: cssOut })
@@ -58,18 +56,20 @@ const runPostcss = (cssIn, cssOut) => {
         fs.writeFile(cssOut, result.css, () => true)
         if ( result.map ) {
           fs.writeFile(cssOut + '.map', result.map.toString(), () => true)
+          console.info('✅ PostCSS complete!')
         }
       })
   })
 }
 
-require('esbuild').build(buildProps)
-  .then(() => { 
-    runPostcss('static/compiled/scss/main.css', 'static/compiled/scss/main-post.css');
-    if (watch) {
-      console.info('Watching assets…')
-    } else {
-      console.info('Assets compiled ✅')
-    }
-  })
-  .catch(() => process.exit(1))
+const run = async () => {
+  if (watch) {
+    const ctx = await esbuild.context(buildProps);
+    console.info('Watching assets…')
+    await ctx.watch();
+  } else {
+    esbuild.build(buildProps)
+  }
+}
+
+run();
