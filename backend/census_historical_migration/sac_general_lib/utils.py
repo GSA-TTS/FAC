@@ -41,7 +41,7 @@ def create_json_from_db_object(gobj, mappings, result):
                     "section": "General",
                     "census_data": census_data,
                     "gsa_fac_data": gsa_fac_data,
-                    "transformation_function": mapping.type,
+                    "transformation_function": mapping.type.__name__,
                 }
             )
 
