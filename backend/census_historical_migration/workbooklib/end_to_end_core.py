@@ -1,3 +1,4 @@
+from .post_upload_utils import record_dummy_pdf_object
 from ..exception_utils import (
     DataMigrationError,
     DataMigrationValueError,
@@ -8,7 +9,6 @@ from ..workbooklib.workbook_builder_loader import (
 from ..workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )
-from ..workbooklib.post_upload_utils import _post_upload_pdf
 from ..sac_general_lib.sac_creator import setup_sac
 from ..models import (
     ReportMigrationStatus,
@@ -271,7 +271,8 @@ def run_end_to_end(user, audit_header, result):
                 (_, json, _) = builder_loader(fun, section)
                 json_test_tables.append(json)
 
-            _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+            record_dummy_pdf_object(sac, user)
+
             step_through_certifications(sac)
 
             errors = sac.validate_cross()

@@ -7,6 +7,9 @@ from audit.intakelib.common import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 
+STATE_CLUSTER = "STATE CLUSTER"
+OTHER_CLUSTER = "OTHER CLUSTER NOT LISTED ABOVE"
+
 
 def check_cluster_names(ir):
     """Check that cluster names are valid when present."""
@@ -25,7 +28,9 @@ def check_cluster_names(ir):
             raise ValueError("ClusterNames.json file contains invalid JSON.")
 
         for index, value in enumerate(range_data["values"]):
-            if value and value not in valid_json["cluster_names"]:
+            if value and value not in (
+                valid_json["cluster_names"] + [STATE_CLUSTER, OTHER_CLUSTER]
+            ):
                 errors.append(
                     build_cell_error_tuple(
                         ir,
