@@ -152,7 +152,7 @@ def _census_audit_type(s):
     return AUDIT_TYPE_DICT[s]
 
 
-def xform_country(general_information, audit_header, result):
+def xform_country(general_information, audit_header):
     """Transforms the country from Census format to FAC format."""
     auditor_country = general_information.get("auditor_country").upper()
     if auditor_country in ["US", "USA"]:
@@ -178,12 +178,10 @@ def xform_country(general_information, audit_header, result):
             "invalid_country",
         )
 
-    result = track_transformation(census_data, gsa_fac_data, "xform_country", result)
-
-    return general_information, result
+    return general_information, census_data, gsa_fac_data
 
 
-def xform_auditee_fiscal_period_end(general_information, result):
+def xform_auditee_fiscal_period_end(general_information):
     """Transforms the fiscal period end from Census format to FAC format."""
     if general_information.get("auditee_fiscal_period_end"):
         census_data = general_information["auditee_fiscal_period_end"]
@@ -195,19 +193,16 @@ def xform_auditee_fiscal_period_end(general_information, result):
             "%Y-%m-%d"
         )
         gsa_fac_data = general_information["auditee_fiscal_period_end"]
-        result = track_transformation(
-            census_data, gsa_fac_data, "xform_auditee_fiscal_period_end", result
-        )
     else:
         raise DataMigrationError(
             f"Auditee fiscal period end is empty: {general_information.get('auditee_fiscal_period_end')}",
             "invalid_auditee_fiscal_period_end",
         )
 
-    return general_information, result
+    return general_information, census_data, gsa_fac_data
 
 
-def xform_auditee_fiscal_period_start(general_information, result):
+def xform_auditee_fiscal_period_start(general_information):
     """Constructs the fiscal period start from the fiscal period end"""
     census_data = general_information["auditee_fiscal_period_start"]
     fiscal_start_date = xform_census_date_to_datetime(
@@ -217,14 +212,11 @@ def xform_auditee_fiscal_period_start(general_information, result):
         "%Y-%m-%d"
     )
     gsa_fac_data = general_information["auditee_fiscal_period_start"]
-    result = track_transformation(
-        census_data, gsa_fac_data, "xform_auditee_fiscal_period_start", result
-    )
 
-    return general_information, result
+    return general_information, census_data, gsa_fac_data
 
 
-def xform_audit_period_covered(general_information, result):
+def xform_audit_period_covered(general_information):
     """Transforms the period covered from Census format to FAC format."""
     if general_information.get("audit_period_covered"):
         census_data = general_information["audit_period_covered"]
@@ -232,18 +224,15 @@ def xform_audit_period_covered(general_information, result):
             general_information.get("audit_period_covered").upper()
         )
         gsa_fac_data = general_information["audit_period_covered"]
-        result = track_transformation(
-            census_data, gsa_fac_data, "xform_audit_period_covered", result
-        )
     else:
         raise DataMigrationError(
             f"Audit period covered is empty: {general_information.get('audit_period_covered')}",
             "invalid_audit_period_covered",
         )
-    return general_information, result
+    return general_information, census_data, gsa_fac_data
 
 
-def xform_audit_type(general_information, result):
+def xform_audit_type(general_information):
     """Transforms the audit type from Census format to FAC format."""
     if general_information.get("audit_type"):
         census_data = general_information["audit_type"]
@@ -251,15 +240,12 @@ def xform_audit_type(general_information, result):
             general_information.get("audit_type").upper()
         )
         gsa_fac_data = general_information["audit_type"]
-        result = track_transformation(
-            census_data, gsa_fac_data, "xform_audit_type", result
-        )
     else:
         raise DataMigrationError(
             f"Audit type is empty: {general_information.get('audit_type')}",
             "invalid_audit_type",
         )
-    return general_information, result
+    return general_information, census_data, gsa_fac_data
 
 
 def track_transformation(census_data, gsa_fac_data, function, result):
@@ -293,11 +279,14 @@ def general_information(audit_header, result):
     # Apply transformations
     for transform in transformations:
         if transform == xform_country:
-            general_information, result = transform(
-                general_information, audit_header, result
+            general_information, census_data, gsa_fac_data = transform(
+                general_information, audit_header
             )
         else:
-            general_information, result = transform(general_information, result)
+            general_information, census_data, gsa_fac_data = transform(
+                general_information
+            )
+        result = track_transformation(census_data, gsa_fac_data, transform, result)
 
     # verify that the created object validates against the schema
     audit.validators.validate_general_information_complete_json(general_information)
