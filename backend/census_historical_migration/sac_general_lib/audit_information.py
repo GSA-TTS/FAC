@@ -156,7 +156,7 @@ def audit_information(audit_header, result):
     """Generates audit information JSON."""
     results = xform_build_sp_framework_gaap_results(audit_header)
     agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY, audit_header.AUDITYEAR)
-    audit_info = create_json_from_db_object(audit_header, mappings)
+    audit_info, result = create_json_from_db_object(audit_header, mappings, result)
     audit_info = {
         key: results.get(key, audit_info.get(key))
         for key in set(audit_info) | set(results)
@@ -166,4 +166,4 @@ def audit_information(audit_header, result):
     # Validate against the schema
     audit.validators.validate_audit_information_json(audit_info)
 
-    return audit_info
+    return audit_info, result
