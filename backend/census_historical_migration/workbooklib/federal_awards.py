@@ -285,9 +285,7 @@ def xform_populate_default_passthrough_amount(audits):
             else:
                 # FIXME -MSHD: Is this what we want to do?
                 # Changing to settings.GSA_MIGRATION will require an update to the field type in dissemination model.
-                raise DataMigrationError(
-                    "Missing passthrough amount.", "missing_passthrough_amount"
-                )
+                passthrough_amounts.append(str(settings.GSA_MIGRATION_INT))
         else:
             if not amount or amount == "0":
                 passthrough_amounts.append("")
