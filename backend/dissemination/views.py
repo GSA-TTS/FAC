@@ -132,6 +132,7 @@ class Search(View):
             {
                 "form": form,
                 "state_abbrevs": STATE_ABBREVS,
+                "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
             },
         )
 

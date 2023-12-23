@@ -9,6 +9,7 @@ from audit.intakelib.common import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 
+# A copy of theses constants exists in schema/source/base/Base.libsonnet
 STATE_CLUSTER = "STATE CLUSTER"
 OTHER_CLUSTER = "OTHER CLUSTER NOT LISTED ABOVE"
 NOT_APPLICABLE = "N/A"
