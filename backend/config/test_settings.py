@@ -7,6 +7,7 @@ import boto3
 from census_historical_migration.models import ELECAUDITHEADER as Gen
 from audit.models import SingleAuditChecklist
 
+
 class SettingsTestCase(TestCase):
     databases = {"default"}
 
