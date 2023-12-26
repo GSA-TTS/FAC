@@ -265,9 +265,7 @@ def track_transformation(census_data, gsa_fac_data, function):
 def general_information(audit_header):
     """Generates general information JSON."""
 
-    general_information = create_json_from_db_object(
-        audit_header, mappings
-    )
+    general_information = create_json_from_db_object(audit_header, mappings)
 
     # List of transformation functions
     transformations = [
