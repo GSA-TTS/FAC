@@ -1,3 +1,5 @@
 """Stores the result for the current migration"""
 
-result = {"success": [], "errors": [], "transformations": []}
+DEFAULT_RESULT = {"success": [], "errors": [], "transformations": []}
+
+result = DEFAULT_RESULT
