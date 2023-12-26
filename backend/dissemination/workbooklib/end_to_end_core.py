@@ -8,9 +8,8 @@ import os
 import jwt
 import requests
 from pprint import pprint
-from datetime import datetime, timezone
-from audit.models import SingleAuditChecklist
 from datetime import datetime
+from audit.models import SingleAuditChecklist
 from random import randrange
 from datetime import timedelta
 import pytz
@@ -22,7 +21,6 @@ from dissemination.workbooklib.workbook_creation import (
     setup_sac,
 )
 from dissemination.workbooklib.sac_creation import _post_upload_pdf
-from audit.intake_to_dissemination import IntakeToDissemination
 
 from dissemination.models import (
     AdditionalEin,
@@ -98,10 +96,7 @@ def disseminate(sac, year):
         model.objects.filter(report_id=sac.report_id).delete()
 
     if sac.general_information:
-        etl = IntakeToDissemination(sac)
-        # etl.load_all()
-        # etl.save_dissemination_objects()
-        # sac.assign_cog_over()
+        # etl = IntakeToDissemination(sac)
         sac.disseminate()
 
 
@@ -257,7 +252,7 @@ def run_end_to_end(email, dbkey, year, store_files=True, run_api_checks=True):
         test_user_email = "test-data-generator@fac.gsa.gov"
         try:
             user = User.objects.get(email=test_user_email)
-        except:
+        except Exception:
             user = User.objects.create(email=test_user_email)
         # return
     generate_workbooks(user, email, dbkey, year, store_files, run_api_checks)
