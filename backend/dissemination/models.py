@@ -251,12 +251,10 @@ class General(models.Model):
     auditor_certify_name = models.TextField(
         "Name of Auditor Certifying Official",
         help_text=docs.auditor_certify_name,
-        null=True,
     )
     auditor_certify_title = models.TextField(
         "Title of Auditor Certifying Official",
         help_text=docs.auditor_certify_title,
-        null=True,
     )
     auditee_contact_name = models.TextField(
         "Name of Auditee Contact",
