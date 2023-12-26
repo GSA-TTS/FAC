@@ -7,20 +7,13 @@ import boto3
 from census_historical_migration.models import ELECAUDITHEADER as Gen
 from audit.models import SingleAuditChecklist
 
-CENSUS_DB = [k for k in settings.DATABASES.keys() if "default" != k][0]
-
-
 class SettingsTestCase(TestCase):
-    databases = {"default", CENSUS_DB}
+    databases = {"default"}
 
     def test_models_are_in_appropriate_db(self):
         sacs = SingleAuditChecklist.objects.all()
         self.assertEqual(len(sacs), 0)
-        try:
-            gens = Gen.objects.using("default").all()
-        except Exception:
-            self.assertEqual(1, 1)
-        gens = Gen.objects.using(CENSUS_DB).all()
+        gens = Gen.objects.using("default").all()
         self.assertEqual(len(gens), 0)
 
     def test_private_s3(self):
