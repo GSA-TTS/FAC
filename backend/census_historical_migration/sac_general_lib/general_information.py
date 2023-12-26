@@ -2,6 +2,7 @@ import json
 import audit.validators
 from datetime import timedelta
 
+from ..api_test_helpers import extract_api_data
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 from ..transforms.xform_string_to_string import string_to_string
@@ -240,7 +241,6 @@ def general_information(audit_header):
 
     general_information = create_json_from_db_object(audit_header, mappings)
 
-    # List of transformation functions
     transformations = [
         xform_auditee_fiscal_period_start,
         xform_auditee_fiscal_period_end,
@@ -249,14 +249,14 @@ def general_information(audit_header):
         xform_audit_type,
     ]
 
-    # Apply transformations
     for transform in transformations:
         if transform == xform_country:
             general_information = transform(general_information, audit_header)
         else:
             general_information = transform(general_information)
 
-    # verify that the created object validates against the schema
     audit.validators.validate_general_information_complete_json(general_information)
 
-    return general_information
+    api_data = extract_api_data(mappings, general_information)
+
+    return (general_information, api_data)

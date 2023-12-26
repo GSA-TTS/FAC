@@ -1,10 +1,10 @@
+from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
-    generate_dissemination_test_table,
     set_workbook_uei,
 )
 from ..base_field_maps import (
@@ -55,7 +55,7 @@ mappings = [
 
 
 def _get_eins(dbkey, year):
-    return Eins.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+    return Eins.objects.filter(DBKEY=dbkey, AUDITYEAR=year).exclude(EIN="")
 
 
 def generate_additional_eins(audit_header, outfile):
@@ -75,5 +75,5 @@ def generate_additional_eins(audit_header, outfile):
     table = generate_dissemination_test_table(
         audit_header, "additional_eins", mappings, addl_eins
     )
-    table["singletons"]["auditee_uei"] = uei
+
     return (wb, table)

@@ -1,8 +1,8 @@
+from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
-    generate_dissemination_test_table,
     set_workbook_uei,
 )
 from ..base_field_maps import SheetFieldMap
@@ -85,6 +85,5 @@ def generate_secondary_auditors(audit_header, outfile):
     table = generate_dissemination_test_table(
         audit_header, "secondary_auditors", mappings, secondary_auditors
     )
-    table["singletons"]["auditee_uei"] = uei
 
     return (wb, table)
