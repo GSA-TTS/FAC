@@ -41,6 +41,7 @@ from .xform_rename_additional_notes_sheet import (
 from .xform_add_transform_for_cfda_key import generate_cfda_keys
 from .xform_uniform_cluster_names import regenerate_uniform_cluster_names
 from .xform_reformat_prior_references import reformat_prior_references
+from .xform_reformat_award_references import reformat_award_reference
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +74,7 @@ def run_all_audit_findings_text_transforms(ir):
 
 
 def run_all_audit_findings_transforms(ir):
-    return run_all_transforms(ir, general_transforms)
+    return run_all_transforms(ir, audit_findings_transforms)
 
 
 def run_all_corrective_action_plan_transforms(ir):
@@ -108,5 +109,6 @@ federal_awards_transforms = general_transforms + [
 ]
 
 audit_findings_transforms = general_transforms + [
+    reformat_award_reference,
     reformat_prior_references,
 ]
