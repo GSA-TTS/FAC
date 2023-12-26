@@ -42,6 +42,7 @@ from .xform_add_transform_for_cfda_key import generate_cfda_keys
 from .xform_uniform_cluster_names import regenerate_uniform_cluster_names
 from .xform_reformat_prior_references import reformat_prior_references
 from .xform_reformat_award_references import reformat_award_reference
+from .xform_reformat_agency_prefix import reformat_federal_agency_prefix
 
 logger = logging.getLogger(__name__)
 
@@ -105,6 +106,7 @@ federal_awards_transforms = general_transforms + [
     convert_number_of_findings_to_integers,
     convert_loan_balance_to_integers_or_na,
     regenerate_uniform_cluster_names,
+    reformat_federal_agency_prefix,
     generate_cfda_keys,
 ]
 
