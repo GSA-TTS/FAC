@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
 import logging
+
+from .check_finding_award_references_pattern import award_references_pattern
 from .check_cluster_names import check_cluster_names
 from audit.fixtures.excel import FORM_SECTIONS
 from .check_gsa_migration_keyword import check_for_gsa_migration_keyword
@@ -93,6 +95,7 @@ audit_findings_checks = general_checks + [
     has_all_the_named_ranges(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
     has_all_required_fields(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
     has_invalid_yorn_field(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
+    award_references_pattern,
     prior_references_pattern,
     no_repeat_findings,
     findings_grid_validation,
