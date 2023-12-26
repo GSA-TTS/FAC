@@ -1,7 +1,10 @@
 import json
-import audit.validators
+import re
 from datetime import timedelta
 
+from django.conf import settings
+
+import audit.validators
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 from ..transforms.xform_string_to_string import string_to_string
@@ -13,8 +16,8 @@ from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
 )
-from django.conf import settings
-import re
+from ..migration_result import result
+
 
 PERIOD_DICT = {"A": "annual", "B": "biennial", "O": "other"}
 AUDIT_TYPE_DICT = {
@@ -248,7 +251,7 @@ def xform_audit_type(general_information):
     return general_information, census_data, gsa_fac_data
 
 
-def track_transformation(census_data, gsa_fac_data, function, result):
+def track_transformation(census_data, gsa_fac_data, function):
     result["transformations"].append(
         {
             "section": "General",
@@ -257,14 +260,13 @@ def track_transformation(census_data, gsa_fac_data, function, result):
             "transformation_function": function,
         }
     )
-    return result
 
 
-def general_information(audit_header, result):
+def general_information(audit_header):
     """Generates general information JSON."""
 
-    general_information, result = create_json_from_db_object(
-        audit_header, mappings, result
+    general_information = create_json_from_db_object(
+        audit_header, mappings
     )
 
     # List of transformation functions
@@ -286,9 +288,9 @@ def general_information(audit_header, result):
             general_information, census_data, gsa_fac_data = transform(
                 general_information
             )
-        result = track_transformation(census_data, gsa_fac_data, transform.__name__, result)
+        track_transformation(census_data, gsa_fac_data, transform.__name__)
 
     # verify that the created object validates against the schema
     audit.validators.validate_general_information_complete_json(general_information)
 
-    return general_information, result
+    return general_information

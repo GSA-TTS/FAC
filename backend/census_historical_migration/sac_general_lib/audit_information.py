@@ -2,10 +2,10 @@ import re
 
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
-from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import string_to_string
+from ..exception_utils import DataMigrationError
 from ..workbooklib.excel_creation_utils import get_audits
-
+from ..migration_result import result
 from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
@@ -152,11 +152,11 @@ def xform_build_sp_framework_gaap_results(audit_header):
     return sp_framework_gaap_results
 
 
-def audit_information(audit_header, result):
+def audit_information(audit_header):
     """Generates audit information JSON."""
     results = xform_build_sp_framework_gaap_results(audit_header)
     agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY, audit_header.AUDITYEAR)
-    audit_info, result = create_json_from_db_object(audit_header, mappings, result)
+    audit_info = create_json_from_db_object(audit_header, mappings)
     audit_info = {
         key: results.get(key, audit_info.get(key))
         for key in set(audit_info) | set(results)
@@ -166,4 +166,4 @@ def audit_information(audit_header, result):
     # Validate against the schema
     audit.validators.validate_audit_information_json(audit_info)
 
-    return audit_info, result
+    return audit_info

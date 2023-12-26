@@ -1,9 +1,12 @@
 import audit.validators
-from datetime import date
+from ..migration_result import result
 from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
 )
+
+from datetime import date
+
 
 # The following fields represent checkboxes on the auditor certification form.
 # Since all checkboxes must be checked (meaning all fields are set to True),
@@ -35,17 +38,17 @@ def _xform_set_certification_date(auditor_certification):
     return auditor_certification
 
 
-def auditor_certification(audit_header, result):
+def auditor_certification(audit_header):
     """Generates auditor certification JSON."""
     certification = {}
-    certification["auditor_certification"], result = create_json_from_db_object(
-        audit_header, auditor_certification_mappings, result
+    certification["auditor_certification"] = create_json_from_db_object(
+        audit_header, auditor_certification_mappings
     )
-    certification["auditor_signature"], result = create_json_from_db_object(
-        audit_header, auditor_signature_mappings, result
+    certification["auditor_signature"] = create_json_from_db_object(
+        audit_header, auditor_signature_mappings
     )
     certification = _xform_set_certification_date(certification)
 
     audit.validators.validate_auditor_certification_json(certification)
 
-    return certification, result
+    return certification

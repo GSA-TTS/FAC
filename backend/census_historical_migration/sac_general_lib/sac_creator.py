@@ -19,11 +19,13 @@ from ..sac_general_lib.auditor_certification import (
 from ..sac_general_lib.report_id_generator import (
     xform_dbkey_to_report_id,
 )
+from ..migration_result import result
+
 
 logger = logging.getLogger(__name__)
 
 
-def setup_sac(user, audit_header, result):
+def setup_sac(user, audit_header):
     """Create a SAC object for the historic data migration."""
     if user is None:
         raise DataMigrationError(
@@ -51,8 +53,8 @@ def setup_sac(user, audit_header, result):
     if exists:
         exists.delete()
 
-    general_info, result = general_information(audit_header, result)
-    audit_info, result = audit_information(audit_header, result)
+    general_info = general_information(audit_header)
+    audit_info = audit_information(audit_header)
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
         general_information=general_info,
@@ -82,9 +84,9 @@ def setup_sac(user, audit_header, result):
         role="certifying_auditor_contact",
     )
 
-    sac.auditee_certification, result = auditee_certification(audit_header, result)
-    sac.auditor_certification, result = auditor_certification(audit_header, result)
+    sac.auditee_certification = auditee_certification(audit_header)
+    sac.auditor_certification = auditor_certification(audit_header)
     sac.data_source = settings.CENSUS_DATA_SOURCE
     sac.save()
     logger.info("Created single audit checklist %s", sac)
-    return sac, result
+    return sac

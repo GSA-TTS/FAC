@@ -8,11 +8,12 @@ from ..transforms.xform_string_to_string import (
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
 from ..exception_utils import DataMigrationValueError
+from ..migration_result import result
 
 logger = logging.getLogger(__name__)
 
 
-def create_json_from_db_object(gobj, mappings, result):
+def create_json_from_db_object(gobj, mappings):
     """Constructs a JSON object from a database object using a list of mappings."""
     json_obj = {}
     for mapping in mappings:
@@ -47,7 +48,7 @@ def create_json_from_db_object(gobj, mappings, result):
 
         json_obj[mapping.in_form] = value
 
-    return json_obj, result
+    return json_obj
 
 
 def xform_census_date_to_datetime(date_string):

@@ -29,6 +29,7 @@ from dissemination.models import (
     SecondaryAuditor,
     MigrationChangeRecord,
 )
+from ..migration_result import result
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -250,10 +251,10 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def run_end_to_end(user, audit_header, result):
+def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
     try:
-        sac, result = setup_sac(user, audit_header, result)
+        sac = setup_sac(user, audit_header)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
             logger.info(
@@ -285,7 +286,7 @@ def run_end_to_end(user, audit_header, result):
             logger.info(combined_summary)
             result["success"].append(f"{sac.report_id} created")
     except Exception as exc:
-        handle_exception(exc, audit_header, result)
+        handle_exception(exc, audit_header)
     else:
         record_migration_status(
             audit_header.AUDITYEAR,
@@ -297,7 +298,7 @@ def run_end_to_end(user, audit_header, result):
             audit_header.DBKEY,
             sac.report_id,
             result["transformations"],
-            )
+        )
 
 
 def record_migration_transformations(audit_year, dbkey, report_id, transformations):
@@ -341,7 +342,7 @@ def record_migration_error(status, tag, exc_type, message):
     ).save()
 
 
-def handle_exception(exc, audit_header, result):
+def handle_exception(exc, audit_header):
     """Handles exceptions encountered during run_end_to_end()"""
     try:
         tag = exc.tag
