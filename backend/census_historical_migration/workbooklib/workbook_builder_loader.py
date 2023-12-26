@@ -1,6 +1,6 @@
 from ..workbooklib.workbook_builder import generate_workbook
 from ..workbooklib.post_upload_utils import (
-    _post_upload_workbook,
+    post_upload_workbook,
 )
 
 import logging
@@ -21,7 +21,7 @@ def workbook_builder_loader(user, sac, audit_header):
         )
 
         if user:
-            _post_upload_workbook(sac, section, excel_file)
+            post_upload_workbook(sac, section, excel_file)
         else:
             raise Exception("User must be provided to upload workbook")
 

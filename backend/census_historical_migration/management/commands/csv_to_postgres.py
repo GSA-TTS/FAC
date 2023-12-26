@@ -87,16 +87,16 @@ class Command(BaseCommand):
     def display_row_counts(self, models):
         for mdl in models:
             row_count = mdl.objects.all().count()
-            logger.info(f"{row_count} in ", mdl)
+            logger.info(f"{row_count} in {mdl}")
 
     def delete_data(self):
         for mdl in census_to_gsafac_models:
-            logger.info("Deleting ", mdl)
+            logger.info("Deleting %s", mdl)
             mdl.objects.all().delete()
 
     def sample_data(self):
         for mdl in census_to_gsafac_models:
-            logger.info("Sampling ", mdl)
+            logger.info("Sampling %s", mdl)
             rows = mdl.objects.all()[:1]
             for row in rows:
                 for col in mdl._meta.fields:
@@ -116,11 +116,11 @@ class Command(BaseCommand):
         return file
 
     def get_model_name(self, name):
-        logger.info("Processing ", name)
+        logger.info("Processing %s", name)
         file_name = name.split("/")[-1].split(".")[0]
         for model_name in census_to_gsafac_model_names:
             if file_name.lower().startswith(model_name):
-                logger.info("model_name = ", model_name)
+                logger.info("model_name = %s", model_name)
                 return model_name
         logger.error("Could not find a matching model for ", name)
         return None
@@ -139,5 +139,5 @@ class Command(BaseCommand):
                 obj = model_obj(**row)
                 obj.save()
             rows_loaded += df.shape[0]
-            logger.info(f"Loaded {rows_loaded} rows in ", model_obj)
+            logger.info(f"Loaded {rows_loaded} rows in {model_obj}")
         return None

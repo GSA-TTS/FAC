@@ -3,6 +3,7 @@ import logging
 from django.apps import apps
 from django.conf import settings
 
+from ..api_test_helpers import generate_dissemination_test_table
 from ..exception_utils import DataMigrationError
 from .general_information import (
     general_information,
@@ -43,12 +44,13 @@ def setup_sac(user, audit_header):
     if exists:
         exists.delete()
 
-    general_info = general_information(audit_header)
+    general_info, gen_api_data = general_information(audit_header)
+    audit_info, audit_api_data = audit_information(audit_header)
 
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
         general_information=general_info,
-        audit_information=audit_information(audit_header),
+        audit_information=audit_info,
         audit_type=general_info["audit_type"],
     )
 
@@ -80,4 +82,9 @@ def setup_sac(user, audit_header):
     sac.data_source = settings.CENSUS_DATA_SOURCE
     sac.save()
     logger.info("Created single audit checklist %s", sac)
-    return sac
+
+    table = generate_dissemination_test_table(audit_header, "general")
+    table["singletons"].update(gen_api_data)
+    table["singletons"].update(audit_api_data)
+
+    return (sac, table)

@@ -286,10 +286,10 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
             xform_populate_default_passthrough_amount(audits)
 
     def test_passthrough_award_Y_empty_amount(self):
-        """Test the function raises DataMigrationError when passthrough award Y audit with empty amount."""
+        """Test for default value when passthrough award Y audit with empty amount."""
         audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="")]
-        with self.assertRaises(DataMigrationError):
-            xform_populate_default_passthrough_amount(audits)
+        expected = [str(settings.GSA_MIGRATION_INT)]
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
 
 class TestCFDAFunctions(SimpleTestCase):

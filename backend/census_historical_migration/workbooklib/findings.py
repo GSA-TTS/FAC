@@ -1,3 +1,4 @@
+from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
     string_to_string,
@@ -5,7 +6,6 @@ from ..transforms.xform_string_to_string import (
 from ..workbooklib.excel_creation_utils import (
     get_audits,
     map_simple_columns,
-    generate_dissemination_test_table,
     set_range,
     set_workbook_uei,
 )
@@ -154,8 +154,9 @@ def generate_findings(audit_header, outfile):
     table = generate_dissemination_test_table(
         audit_header, "findings", mappings, findings
     )
-    for obj, ar in zip(table["rows"], award_references):
-        obj["fields"].append("award_reference")
-        obj["values"].append(ar)
+    if findings:
+        for obj, ar in zip(table["rows"], award_references):
+            obj["fields"].append("award_reference")
+            obj["values"].append(ar)
 
     return (wb, table)
