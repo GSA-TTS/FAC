@@ -24,7 +24,7 @@ def cardinality_of_passthrough_names_and_ids(ir):
         if (pass_name and pass_id) and ("|" in pass_name or "|" in pass_id):
             names = pass_name.split("|")
             ids = pass_id.split("|")
-            print(names, ids)
+            # print(names, ids)
             if len(names) != len(ids):
                 errors.append(
                     build_cell_error_tuple(

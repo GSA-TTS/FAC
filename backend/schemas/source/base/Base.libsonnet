@@ -18,6 +18,8 @@ local Const = {
   NULL: 'null',
   STATE_CLUSTER: 'STATE CLUSTER',
   OTHER_CLUSTER: 'OTHER CLUSTER NOT LISTED ABOVE',
+  //A python version of `GSA_MIGRATION` exists in `settings.py`
+  GSA_MIGRATION: 'GSA_MIGRATION',
 };
 
 local Types = {
@@ -66,7 +68,7 @@ local Meta = {
 };
 
 local REGEX_ALN_PREFIX = '^([0-9]{2})$';
-# A python version of these regexes also exists in intakelib
+# A python version of these regexes also exists in settings.py
 local REGEX_RD_EXTENSION = 'RD[0-9]?';
 local REGEX_THREE_DIGIT_EXTENSION = '[0-9]{3}[A-Za-z]{0,1}';
 local REGEX_U_EXTENSION = 'U[0-9]{2}';
@@ -110,6 +112,13 @@ local Enum = {
       Const.N,
     ],
     //title: 'YorN'
+  },
+  YorNorGsaMigration: Types.string {
+    enum: [
+      Const.Y,
+      Const.N,
+      Const.GSA_MIGRATION,
+    ],
   },
   YorNorBoth: Types.string {
     enum: [
@@ -310,7 +319,14 @@ local Compound = {
   EmployerIdentificationNumber: Types.string {
     pattern: '^[0-9]{9}$',
   },
-  UniqueEntityIdentifier: type_uei,
+  UniqueEntityIdentifier: {
+    oneOf: [
+      type_uei,
+      Types.string {
+        const: Const.GSA_MIGRATION,
+      },
+    ],
+  },
   UnitedStatesPhone: Types.string {
     pattern: phone_regex,
   },
@@ -365,7 +381,14 @@ local SchemaBase = Types.object {
       enum: ClusterNames.cluster_names + [Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
     },
     ALNPrefixes: type_aln_prefix,
-    ThreeDigitExtension: type_three_digit_extension,
+    ThreeDigitExtension: {
+      oneOf: [
+        type_three_digit_extension,
+        Types.string {
+          const: Const.GSA_MIGRATION,
+        },
+      ],
+    },
     ComplianceRequirementTypes: {
       description: 'Compliance requirement types',
       enum: ComplianceRequirementTypes.requirement_types,

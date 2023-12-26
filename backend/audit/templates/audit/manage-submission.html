@@ -73,9 +73,12 @@
                 Uncomment if/when we chose to keep the flags.
                 <p class="font-sans-xs">(<strong>*</strong>) Indicates user has not logged in to view this submission.</p>
             {% endcomment %}
-            <a class="usa-button usa-button--outline margin-top-5"
-               href="{% url 'audit:SubmissionProgress' report_id %}"
-               aria-controls="upload-cancel">Return to checklist</a>
+              <a class="usa-button usa-button margin-top-5"
+                 href="{{ add_editor_url }}"
+                 aria-controls="add-editor">Add editor</a>
+              <a class="usa-button usa-button--unstyled margin-left-2"
+                 href="{{ progress_url }}"
+                 aria-controls="return-to-checklist">Return to checklist</a>
         </div>
     </div>
     {% include "audit-metadata.html" %}

@@ -26,3 +26,4 @@ applications:
       - newrelic-creds
       - https-proxy-creds
       - smtp-proxy-creds
+      - fac-logdrain

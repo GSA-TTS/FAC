@@ -1,7 +1,11 @@
+import re
+
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
-from ..workbooklib.excel_creation_utils import (
+from .excel_creation_utils import (
     get_audits,
     get_range_values,
     get_ranges,
@@ -14,27 +18,18 @@ from ..base_field_maps import (
     SheetFieldMap,
     WorkbookFieldInDissem,
 )
-from ..workbooklib.templates import sections_to_template_paths
+from .templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
 from django.conf import settings
 from ..models import (
     ELECAUDITS as Audits,
     ELECPASSTHROUGH as Passthrough,
 )
-from django.db.models import Q
 import openpyxl as pyxl
-import json
 
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-def if_zero_empty(v):
-    if int(v) == 0:
-        return ""
-    else:
-        return int(v)
 
 
 mappings = [
@@ -78,7 +73,7 @@ mappings = [
         "PASSTHROUGHAMOUNT",
         "passthrough_amount",
         None,
-        if_zero_empty,  # FIXME - MSHD: This according to ticket #2912
+        str,
     ),
     SheetFieldMap("is_major", "MAJORPROGRAM", WorkbookFieldInDissem, None, str),
     SheetFieldMap("audit_report_type", "TYPEREPORT_MP", "audit_report_type", None, str),
@@ -89,55 +84,77 @@ mappings = [
 ]
 
 
-def get_list_index(all_items, index):
-    counter = 0
-    for item in list(all_items):
-        if item.ID == index:
-            return counter
-        else:
-            counter += 1
-    return -1
-
-
-def _generate_cluster_names(
+def xform_constructs_cluster_names(
     audits: list[Audits],
 ) -> tuple[list[str], list[str], list[str]]:
     """Reconstructs the cluster names for each audit in the provided list."""
-    # FIXME - MSHD: For the sake of data migration, we will:
-    # 1. Remove the cluster name validation logic from this code.
-    # 2. Remove cluster name validation from json schema.
-    # 3. Implement cluster name validation in python against the IR and exclude census data from this logic.
-    valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
-    valid_json = json.load(valid_file)
+
     cluster_names = []
     state_cluster_names = []
     other_cluster_names = []
+    # FIXME - MSHD: We must record these transformations
     for audit in audits:
         cluster_name = string_to_string(audit.CLUSTERNAME)
         state_cluster_name = string_to_string(audit.STATECLUSTERNAME)
         other_cluster_name = string_to_string(audit.OTHERCLUSTERNAME)
-        if not cluster_name:
-            cluster_names.append("N/A")
-            other_cluster_names.append("")
-            state_cluster_names.append("")
-        elif cluster_name == "STATE CLUSTER":
-            cluster_names.append(cluster_name)
-            state_cluster_names.append(state_cluster_name)
-            other_cluster_names.append("")
+        # Default values for clusters
+        cluster_names.append(cluster_name if cluster_name else settings.GSA_MIGRATION)
+        state_cluster_names.append(state_cluster_name if state_cluster_name else "")
+        other_cluster_names.append(other_cluster_name if other_cluster_name else "")
+
+        # Handling specific cases
+        if cluster_name == "STATE CLUSTER":
+            state_cluster_names[-1] = (
+                state_cluster_name if state_cluster_name else settings.GSA_MIGRATION
+            )
         elif cluster_name == "OTHER CLUSTER NOT LISTED ABOVE":
-            cluster_names.append(cluster_name)
-            other_cluster_names.append(other_cluster_name)
-            state_cluster_names.append("")
-        elif cluster_name in valid_json["cluster_names"]:
-            cluster_names.append(cluster_name)
-            other_cluster_names.append("")
-            state_cluster_names.append("")
-        else:
-            logger.debug(f"Cluster {cluster_name} not in the list. Replacing.")
-            cluster_names.append("OTHER CLUSTER NOT LISTED ABOVE")
-            other_cluster_names.append(f"{cluster_name}")
-            state_cluster_names.append("")
+            other_cluster_names[-1] = (
+                other_cluster_name if other_cluster_name else settings.GSA_MIGRATION
+            )
+        elif not cluster_name and (state_cluster_name or other_cluster_name):
+            # Already handled by default values
+            pass
+        elif cluster_name and (state_cluster_name or other_cluster_name):
+            # MSHD - 12/14/2023: If we want to let these cases through,
+            # we must modify state_cluster_names and other_cluster_names
+            # methods in check_state_cluster_names.py and check_other_cluster_names.py (intakelib/checks).
+            raise DataMigrationError(
+                "Unable to determine cluster name.", "invalid_cluster"
+            )
+
     return (cluster_names, other_cluster_names, state_cluster_names)
+
+
+def is_valid_prefix(prefix):
+    """
+    Checks if the provided prefix is a valid CFDA prefix.
+    """
+    return re.match(settings.REGEX_ALN_PREFIX, str(prefix))
+
+
+def is_valid_extension(extension):
+    """
+    Checks if the provided extension is a valid CFDA extension.
+    """
+    # Define regex patterns
+    patterns = [
+        settings.REGEX_RD_EXTENSION,
+        settings.REGEX_THREE_DIGIT_EXTENSION,
+        settings.REGEX_U_EXTENSION,
+    ]
+    return any(re.match(pattern, str(extension)) for pattern in patterns)
+
+
+def xform_replace_invalid_extension(audit):
+    """Replaces invalid ALN extensions with the default value settings.GSA_MIGRATION."""
+    prefix = string_to_string(audit.CFDA_PREFIX)
+    extension = string_to_string(audit.CFDA_EXT)
+    if not is_valid_prefix(prefix):
+        raise DataMigrationError(f"Invalid ALN prefix: {prefix}", "invalid_aln_prefix")
+    if not is_valid_extension(extension):
+        extension = settings.GSA_MIGRATION
+
+    return f"{prefix}.{extension}"
 
 
 def _get_full_cfdas(audits):
@@ -146,15 +163,9 @@ def _get_full_cfdas(audits):
     and CFDA_EXT attributes of each audit object, separated by a dot.
     """
     # audit.CFDA is not used here because it does not always match f"{audit.CFDA_PREFIX}.{audit.CFDA_EXT}"
-    return [
-        f"{string_to_string(audit.CFDA_PREFIX)}.{string_to_string(audit.CFDA_EXT)}"
-        for audit in audits
-    ]
+    return [xform_replace_invalid_extension(audit) for audit in audits]
 
 
-# The functionality of _fix_passthroughs has been split into two separate functions:
-# _get_passthroughs and _xform_populate_default_passthrough_values. Currently, _get_passthroughs is being
-# used in place of _fix_passthroughs.
 def _get_passthroughs(audits):
     """
     Retrieves the passthrough names and IDs for a given list of audits.
@@ -162,8 +173,8 @@ def _get_passthroughs(audits):
     records matching the DBKEY and ELECAUDITSID of the audit. It then compiles lists of
     passthrough names and IDs, joined by a pipe '|' if multiple are found.
     """
-    passthrough_names = [""] * len(audits)
-    passthrough_ids = [""] * len(audits)
+    passthrough_names = ["" for _ in audits]
+    passthrough_ids = ["" for _ in audits]
 
     for index, audit in enumerate(audits):
         passthroughs = Passthrough.objects.filter(
@@ -189,78 +200,104 @@ def _get_passthroughs(audits):
     return (passthrough_names, passthrough_ids)
 
 
-# FIXME - MSHD: _xform_populate_default_passthrough_values is currently unused as unrequired data transformation
-# will not be part of the first iteration of the data migration process.
-# Only required (MUST) data transformation will be part of the first iteration.
-def _xform_populate_default_passthrough_values(
-    passthrough_names, passthrough_ids, audits
-):
+def xform_populate_default_passthrough_values(audits):
     """
+    Retrieves the passthrough names and IDs for a given list of audits.
     Automatically fills in default values for empty passthrough names and IDs.
     Iterates over a list of audits and their corresponding passthrough names and IDs.
     If the audit's DIRECT attribute is "N" and the passthrough name or ID is empty,
     it fills in a default value indicating that no passthrough name or ID was provided.
     """
+    passthrough_names, passthrough_ids = _get_passthroughs(audits)
     for index, audit, name, id in zip(
         range(len(audits)), audits, passthrough_names, passthrough_ids
     ):
         direct = string_to_string(audit.DIRECT)
         if direct == "N" and name == "":
-            passthrough_names[index] = "NO PASSTHROUGH NAME PROVIDED"
+            passthrough_names[index] = settings.GSA_MIGRATION
         if direct == "N" and id == "":
-            passthrough_ids[index] = "NO PASSTHROUGH ID PROVIDED"
+            passthrough_ids[index] = settings.GSA_MIGRATION
     return (passthrough_names, passthrough_ids)
 
 
-# FIXME - MSHD: _xform_populate_default_loan_balance is currently unused
-# as unrequired data transformation will not be part of the first iteration
-# of the data migration process.
-def _xform_populate_default_loan_balance(loans_at_end, audits):
+def xform_populate_default_loan_balance(audits):
     """
     Automatically fills in default values for empty loan balances.
     Iterates over a list of audits and their corresponding loan balances.
     If the audit's LOANS attribute is "Y" and the loan balance is empty,
     it fills in a default value indicating that no loan balance was provided."""
-    for ndx, audit in zip(range(len(audits)), audits, loans_at_end):
+    loans_at_end = []
+
+    for audit in audits:
         loan = string_to_string(audit.LOANS).upper()
         balance = string_to_string(audit.LOANBALANCE)
         if loan == "Y":
-            if not balance:
-                loans_at_end[
-                    ndx
-                ] = 1  # FIXME - MSHD: This value requires team approval.
-                # There are cases (dbkeys 148665/150450) with balance = -1.0, how do we handle this?
+            if balance:
+                loans_at_end.append(balance)
+            else:
+                loans_at_end.append(settings.GSA_MIGRATION)  # record transformation
         else:
-            if not balance:
-                loans_at_end[ndx] = ""
+            if balance:
+                raise DataMigrationError(
+                    "Unexpected loan balance.", "unexpected_loan_balance"
+                )
+            else:
+                loans_at_end.append("")
+
     return loans_at_end
 
 
-# FIXME - MSHD: _xform_populate_default_award_identification_values is currently unused
-# as unrequired data transformation will not be part of the first iteration
-# of the data migration process.
-def _xform_populate_default_award_identification_values(audits, audit_header):
+def xform_populate_default_award_identification_values(audits):
     """
     Automatically fills in default values for empty additional award identifications.
     Iterates over a list of audits and their corresponding additional award identifications.
     If the audit's CFDA attribute contains "U" or "u" or "rd" or "RD" and the award identification is empty,
     it fills in a default value indicating that no award identification was provided.
     """
-    addl_award_identifications = [""] * len(audits)
-    filtered_audits = Audits.objects.filter(
-        Q(DBKEY=audit_header.DBKEY, AUDITYEAR=audit_header.AUDITYEAR)
-        & (Q(CFDA__icontains="U") | Q(CFDA__icontains="rd"))
-    ).order_by("ID")
-    for audit in filtered_audits:
-        if audit.AWARDIDENTIFICATION is None or len(audit.AWARDIDENTIFICATION) < 1:
-            addl_award_identifications[
-                get_list_index(audits, audit.ID)
-            ] = f"ADDITIONAL AWARD INFO - DBKEY {audit_header.DBKEY} AUDITYEAR {audit_header.AUDITYEAR}"
+    addl_award_identifications = []
+
+    for audit in audits:
+        cfda = string_to_string(audit.CFDA).upper()
+        identification = string_to_string(audit.AWARDIDENTIFICATION)
+
+        if re.search(r"U|RD", cfda) and not identification:
+            addl_award_identifications.append(settings.GSA_MIGRATION)
         else:
-            addl_award_identifications[
-                get_list_index(audits, audit.ID)
-            ] = audit.AWARDIDENTIFICATION
+            addl_award_identifications.append(identification)
+
     return addl_award_identifications
+
+
+def xform_populate_default_passthrough_amount(audits):
+    """
+    Automatically fills in default values for empty passthrough amounts.
+    Iterates over a list of audits and their corresponding passthrough amounts.
+    If the audit's PASSTHROUGHAWARD attribute is "Y" and the passthrough amount is empty,
+    it fills in a default value indicating that no passthrough amount was provided.
+    """
+    passthrough_amounts = []
+
+    for audit in audits:
+        passthrough_award = string_to_string(audit.PASSTHROUGHAWARD).upper()
+        amount = string_to_string(audit.PASSTHROUGHAMOUNT)
+        if passthrough_award == "Y":
+            if amount:
+                passthrough_amounts.append(amount)
+            else:
+                # FIXME -MSHD: Is this what we want to do?
+                # Changing to settings.GSA_MIGRATION will require an update to the field type in dissemination model.
+                raise DataMigrationError(
+                    "Missing passthrough amount.", "missing_passthrough_amount"
+                )
+        else:
+            if not amount or amount == "0":
+                passthrough_amounts.append("")
+            else:
+                raise DataMigrationError(
+                    "Unexpected passthrough amount.", "unexpected_passthrough_amount"
+                )
+
+    return passthrough_amounts
 
 
 def generate_federal_awards(audit_header, outfile):
@@ -274,16 +311,19 @@ def generate_federal_awards(audit_header, outfile):
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
     )
-    uei = string_to_string(audit_header.UEI)
+    uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, audits)
 
-    (cluster_names, other_cluster_names, state_cluster_names) = _generate_cluster_names(
-        audits
-    )
+    (
+        cluster_names,
+        other_cluster_names,
+        state_cluster_names,
+    ) = xform_constructs_cluster_names(audits)
     set_range(wb, "cluster_name", cluster_names)
     set_range(wb, "other_cluster_name", other_cluster_names)
+    set_range(wb, "state_cluster_name", state_cluster_names)
 
     # We need a `cfda_key` as a magic column for the summation logic to work/be checked.
     full_cfdas = _get_full_cfdas(audits)
@@ -303,8 +343,9 @@ def generate_federal_awards(audit_header, outfile):
         conversion_fun=str,
     )
 
-    (passthrough_names, passthrough_ids) = _get_passthroughs(audits)
-
+    (passthrough_names, passthrough_ids) = xform_populate_default_passthrough_values(
+        audits
+    )
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
@@ -313,6 +354,28 @@ def generate_federal_awards(audit_header, outfile):
         wb,
         "award_reference",
         [f"AWARD-{n+1:04}" for n in range(len(audits))],
+    )
+
+    # passthrough amount
+    passthrough_amounts = xform_populate_default_passthrough_amount(audits)
+    set_range(wb, "subrecipient_amount", passthrough_amounts)
+
+    # additional award identification
+    additional_award_identifications = (
+        xform_populate_default_award_identification_values(audits)
+    )
+    set_range(
+        wb,
+        "additional_award_identification",
+        additional_award_identifications,
+    )
+
+    # loan balance at audit period end
+    loan_balances = xform_populate_default_loan_balance(audits)
+    set_range(
+        wb,
+        "loan_balance_at_audit_period_end",
+        loan_balances,
     )
 
     # Total amount expended must be calculated and inserted
@@ -334,15 +397,16 @@ def generate_federal_awards(audit_header, outfile):
             "additional_award_identification",
             "federal_agency_prefix",
             "three_digit_extension",
+            "passthrough_name",
+            "passthrough_identifying_number",
+            "subrecipient_amount",
+            "loan_balance_at_audit_period_end",
         ]
     ]
     ranges = get_ranges(filtered_mappings, audits)
     prefixes = get_range_values(ranges, "federal_agency_prefix")
     extensions = get_range_values(ranges, "three_digit_extension")
-    additional_award_identifications = get_range_values(
-        ranges, "additional_award_identification"
-    )
-    # prefix
+
     for (
         award,
         prefix,
@@ -350,6 +414,9 @@ def generate_federal_awards(audit_header, outfile):
         additional_identification,
         cluster_name,
         other_cluster_name,
+        state_cluster_name,
+        passthrough_amount,
+        loan_balance,
     ) in zip(
         table["rows"],
         prefixes,
@@ -357,20 +424,35 @@ def generate_federal_awards(audit_header, outfile):
         additional_award_identifications,
         cluster_names,
         other_cluster_names,
+        state_cluster_names,
+        passthrough_amounts,
+        loan_balances,
     ):
-        award["fields"].append("federal_agency_prefix")
-        award["values"].append(prefix)
-        award["fields"].append("federal_award_extension")
-        award["values"].append(extension)
-        # Sneak in the award number here
-        award["fields"].append("award_reference")
-        award["values"].append(f"AWARD-{award_counter:04}")
-        award["fields"].append("additional_award_identification")
-        award["values"].append(additional_identification)
-        award["fields"].append("cluster_name")
-        award["values"].append(cluster_name)
-        award["fields"].append("other_cluster_name")
-        award["values"].append(other_cluster_name)
+        # Function to update or append field/value
+        def update_or_append_field(field_name, field_value):
+            if field_name in award["fields"]:
+                index = award["fields"].index(field_name)
+                logger.info(
+                    f"Updating {field_name} from {award['values'][index]} to {field_value}"
+                )
+                award["values"][index] = field_value
+            else:
+                award["fields"].append(field_name)
+                award["values"].append(field_value)
+
+        # Update or append new field-value pairs
+        update_or_append_field("federal_agency_prefix", prefix)
+        update_or_append_field("federal_award_extension", extension)
+        update_or_append_field("award_reference", f"AWARD-{award_counter:04}")
+        update_or_append_field(
+            "additional_award_identification", additional_identification
+        )
+        update_or_append_field("cluster_name", cluster_name)
+        update_or_append_field("other_cluster_name", other_cluster_name)
+        update_or_append_field("state_cluster_name", state_cluster_name)
+        update_or_append_field("passthrough_amount", passthrough_amount)
+        update_or_append_field("loan_balance", loan_balance)
+
         award_counter += 1
 
     table["singletons"]["auditee_uei"] = uei

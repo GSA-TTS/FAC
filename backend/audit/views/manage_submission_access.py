@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from django import forms
 from django.db import transaction
 from django.shortcuts import redirect, render, reverse
@@ -7,9 +8,18 @@ from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import (
+    ACCESS_ROLES,
     Access,
     SingleAuditChecklist,
 )
+
+
+def _get_friendly_role(role):
+    return dict(ACCESS_ROLES)[role]
+
+
+def _create_and_save_access(sac, role, fullname, email):
+    Access(sac=sac, role=role, fullname=fullname, email=email).save()
 
 
 class ChangeAccessForm(forms.Form):
@@ -36,6 +46,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
     role = "editor"
     other_role = ""
+    template = "audit/manage-submission-change-access.html"
 
     def get(self, request, *args, **kwargs):
         """
@@ -54,14 +65,20 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             "errors": [],
         }
         if self.role != "editor":
-            access = Access.objects.get(sac=sac, role=self.role)
+            try:
+                access = Access.objects.get(sac=sac, role=self.role)
+            except Access.DoesNotExist:
+                access = SimpleNamespace(
+                    fullname="UNASSIGNED ROLE", email="UNASSIGNED ROLE", role=self.role
+                )
+
             context = context | {
-                "friendly_role": access.get_friendly_role(),
+                "friendly_role": _get_friendly_role(access.role),
                 "certifier_name": access.fullname,
                 "email": access.email,
             }
 
-        return render(request, "audit/manage-submission-change-access.html", context)
+        return render(request, self.template, context)
 
     def post(self, request, *args, **kwargs):
         """
@@ -73,22 +90,33 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         form = ChangeAccessForm(request.POST)
         form.full_clean()
         url = reverse("audit:ManageSubmission", kwargs={"report_id": report_id})
+        fullname = form.cleaned_data["fullname"]
+        email = form.cleaned_data["email"]
 
+        # Only if we have self.other_role do we need further checks:
         if not self.other_role:
-            Access(
-                sac=sac,
-                role=self.role,
-                fullname=form.cleaned_data["fullname"],
-                email=form.cleaned_data["email"],
-            ).save()
+            _create_and_save_access(sac, self.role, fullname, email)
             return redirect(url)
 
-        access = Access.objects.get(sac=sac, role=self.role)
-        other_access = Access.objects.get(sac=sac, role=self.other_role)
-        if form.cleaned_data["email"] == other_access.email:
+        # We need the existing role assignment, if any, to delete it:
+        try:
+            access = Access.objects.get(sac=sac, role=self.role)
+        except Access.DoesNotExist:
+            access = SimpleNamespace(
+                fullname="UNASSIGNED ROLE", email="UNASSIGNED ROLE", role=self.role
+            )
+
+        # We need the other role assignment, if any, to compare email addresses:
+        try:
+            other_access = Access.objects.get(sac=sac, role=self.other_role)
+            other_access_email = other_access.email
+        except Access.DoesNotExist:
+            other_access_email = None
+
+        if email == other_access_email:
             context = {
                 "role": self.role,
-                "friendly_role": access.get_friendly_role(),
+                "friendly_role": _get_friendly_role(self.role),
                 "auditee_uei": sac.general_information["auditee_uei"],
                 "auditee_name": sac.general_information.get("auditee_name"),
                 "certifier_name": access.fullname,
@@ -98,22 +126,18 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
                     "Cannot use the same email address for both certifying officials."
                 ],
             }
-            return render(
-                request,
-                "audit/manage-submission-change-access.html",
-                context,
-                status=400,
-            )
+            return render(request, self.template, context, status=400)
 
-        with transaction.atomic():
-            access.delete(removing_user=request.user, removal_event="access-change")
-
-            Access(
-                sac=sac,
-                role=self.role,
-                fullname=form.cleaned_data["fullname"],
-                email=form.cleaned_data["email"],
-            ).save()
+        # Only Access, and not SimpleNamespace, has .delete:
+        if hasattr(access, "delete"):
+            with transaction.atomic():
+                access.delete(removing_user=request.user, removal_event="access-change")
+                _create_and_save_access(sac, self.role, fullname, email)
+        # We know that submissions can get into a bad state where no
+        # certifying role(s) exist, so we should support cases where this
+        # happens:
+        else:
+            _create_and_save_access(sac, self.role, fullname, email)
 
         return redirect(url)
 

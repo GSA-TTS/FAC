@@ -2,8 +2,8 @@ import json
 import audit.validators
 from datetime import timedelta
 
-from ..workbooklib.excel_creation_utils import xform_add_hyphen_to_zip
-
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 from ..transforms.xform_string_to_string import string_to_string
 from ..exception_utils import DataMigrationError
 from ..sac_general_lib.utils import (
@@ -44,7 +44,8 @@ def xform_entity_type(phrase):
             # FIXME-MSHD: This is a transformation that we may want to record
             return value
     raise DataMigrationError(
-        f"Could not find a match for historic entity type '{phrase}'"
+        f"Could not find a match for historic entity type '{phrase}'",
+        "invalid_historic_entity_type",
     )
 
 
@@ -67,8 +68,20 @@ mappings = [
     FormFieldMap("auditee_name", "AUDITEENAME", FormFieldInDissem, None, str),
     FormFieldMap("auditee_phone", "AUDITEEPHONE", FormFieldInDissem, None, str),
     FormFieldMap("auditee_state", "STATE", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_uei", "UEI", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_zip", "ZIPCODE", FormFieldInDissem, None, str),
+    FormFieldMap(
+        "auditee_uei",
+        "UEI",
+        FormFieldInDissem,
+        None,
+        xform_retrieve_uei,
+    ),
+    FormFieldMap(
+        "auditee_zip",
+        "ZIPCODE",
+        FormFieldInDissem,
+        None,
+        xform_remove_hyphen_and_pad_zip,
+    ),
     FormFieldMap("auditor_address_line_1", "CPASTREET1", FormFieldInDissem, None, str),
     FormFieldMap("auditor_city", "CPACITY", FormFieldInDissem, None, str),
     FormFieldMap("auditor_contact_name", "CPACONTACT", FormFieldInDissem, None, str),
@@ -83,7 +96,11 @@ mappings = [
     FormFieldMap("auditor_phone", "CPAPHONE", FormFieldInDissem, None, str),
     FormFieldMap("auditor_state", "CPASTATE", FormFieldInDissem, None, str),
     FormFieldMap(
-        "auditor_zip", "CPAZIPCODE", FormFieldInDissem, None, xform_add_hyphen_to_zip
+        "auditor_zip",
+        "CPAZIPCODE",
+        FormFieldInDissem,
+        None,
+        xform_remove_hyphen_and_pad_zip,
     ),
     FormFieldMap("ein", "EIN", "auditee_ein", None, str),
     FormFieldMap(
@@ -117,7 +134,10 @@ mappings = [
 def _period_covered(s):
     """Helper to transform the period covered from Census format to FAC format."""
     if s not in PERIOD_DICT:
-        raise DataMigrationError(f"Key '{s}' not found in period coverage mapping")
+        raise DataMigrationError(
+            f"Key '{s}' not found in period coverage mapping",
+            "invalid_period_coverage_key",
+        )
     return PERIOD_DICT[s]
 
 
@@ -125,7 +145,10 @@ def _census_audit_type(s):
     """Helper to transform the audit type from Census format to FAC format."""
 
     if s not in AUDIT_TYPE_DICT:
-        raise DataMigrationError(f"Key '{s}' not found in census audit type mapping")
+        raise DataMigrationError(
+            f"Key '{s}' not found in census audit type mapping",
+            "invalid_census_audit_type_key",
+        )
     return AUDIT_TYPE_DICT[s]
 
 
@@ -135,18 +158,20 @@ def xform_country(general_information, audit_header):
     if auditor_country in ["US", "USA"]:
         general_information["auditor_country"] = "USA"
     elif auditor_country == "":
-        valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/States.json")
+        valid_file = open(f"{settings.SCHEMA_BASE_DIR}/States.json")
         valid_json = json.load(valid_file)
         auditor_state = string_to_string(audit_header.CPASTATE).upper()
         if auditor_state in valid_json["UnitedStatesStateAbbr"]:
             general_information["auditor_country"] = "USA"
         else:
             raise DataMigrationError(
-                f"Unable to determine auditor country. Invalid state: {auditor_state}"
+                f"Unable to determine auditor country. Invalid state: {auditor_state}",
+                "invalid_state",
             )
     else:
         raise DataMigrationError(
-            f"Unable to determine auditor country. Unknown code: {auditor_country}"
+            f"Unable to determine auditor country. Unknown code: {auditor_country}",
+            "invalid_country",
         )
 
     return general_information
@@ -164,7 +189,8 @@ def xform_auditee_fiscal_period_end(general_information):
         )
     else:
         raise DataMigrationError(
-            f"Auditee fiscal period end is empty: {general_information.get('auditee_fiscal_period_end')}"
+            f"Auditee fiscal period end is empty: {general_information.get('auditee_fiscal_period_end')}",
+            "invalid_auditee_fiscal_period_end",
         )
 
     return general_information
@@ -189,7 +215,8 @@ def xform_audit_period_covered(general_information):
         )
     else:
         raise DataMigrationError(
-            f"Audit period covered is empty: {general_information.get('audit_period_covered')}"
+            f"Audit period covered is empty: {general_information.get('audit_period_covered')}",
+            "invalid_audit_period_covered",
         )
     return general_information
 
@@ -202,7 +229,8 @@ def xform_audit_type(general_information):
         )
     else:
         raise DataMigrationError(
-            f"Audit type is empty: {general_information.get('audit_type')}"
+            f"Audit type is empty: {general_information.get('audit_type')}",
+            "invalid_audit_type",
         )
     return general_information
 

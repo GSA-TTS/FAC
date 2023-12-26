@@ -14,7 +14,6 @@ faker
 fs
 greenlet==2.0.2
 gunicorn
-jsonnet
 jsonpath-ng
 jsonschema
 newrelic

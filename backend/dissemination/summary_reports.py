@@ -281,6 +281,15 @@ def insert_precert_coversheet(workbook):
 def insert_dissem_coversheet(workbook):
     sheet = workbook.create_sheet("Coversheet", 0)
     sheet.append(["Time created", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")])
+    sheet.append(
+        [
+            "Note",
+            f"This spreadsheet contains the first {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} results of your search. If you need to download more than {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} submissions, try limiting your search parameters to download in batches.",
+        ]
+    )
+    # Uncomment if we want to link to the FAC API for larger data dumps.
+    # sheet.cell(row=3, column=2).value = "FAC API Link"
+    # sheet.cell(row=3, column=2).hyperlink = f"{settings.STATIC_SITE_URL}/developers/"
     set_column_widths(sheet)
 
 
@@ -317,12 +326,11 @@ def gather_report_data_dissemination(report_ids):
 
         data[model_name] = {"field_names": field_names, "entries": []}
 
-        for report_id in report_ids:
-            objects = model.objects.all().filter(report_id=report_id)
-            for obj in objects:
-                data[model_name]["entries"].append(
-                    [getattr(obj, field_name) for field_name in field_names]
-                )
+        objects = model.objects.all().filter(report_id__in=report_ids)
+        for obj in objects:
+            data[model_name]["entries"].append(
+                [getattr(obj, field_name) for field_name in field_names]
+            )
     return data
 
 
@@ -360,7 +368,7 @@ def gather_report_data_pre_certification(i2d_data):
     # Move the IntakeToDissemination data to dissemination_data, under the proper naming scheme.
     dissemination_data = {}
     for name_i2d, model in i2d_to_dissemination.items():
-        dissemination_data[model.__name__.lower()] = i2d_data.get(name_i2d)
+        dissemination_data[model.__name__.lower()] = i2d_data.get(name_i2d, [])
 
     data = {}
 

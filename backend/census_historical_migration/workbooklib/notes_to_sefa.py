@@ -1,3 +1,6 @@
+from django.conf import settings
+
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import string_to_string
 from ..models import ELECNOTES as Notes
@@ -70,9 +73,10 @@ def xform_is_minimis_rate_used(rate_content):
             # FIXME-MSHD: RECORD THIS TRANSFORMATION
             return "Y"
 
-    # I am raising an exception here because we cannot clearly determine if the de minimis rate was used.
-    # return "Both"
-    raise DataMigrationError("Unable to determine if the de minimis rate was used.")
+    raise DataMigrationError(
+        "Unable to determine if the de minimis rate was used.",
+        "unexpected_minimis_rate_text",
+    )
 
 
 def _get_accounting_policies(dbkey, year):
@@ -122,7 +126,7 @@ def generate_notes_to_sefa(audit_header, outfile):
     )
 
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.NOTES_TO_SEFA])
-    uei = string_to_string(audit_header.UEI)
+    uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     notes = _get_notes(audit_header.DBKEY, audit_header.AUDITYEAR)
     rate_content = _get_minimis_cost_rate(audit_header.DBKEY, audit_header.AUDITYEAR)
@@ -135,15 +139,18 @@ def generate_notes_to_sefa(audit_header, outfile):
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
     set_range(wb, "rate_explained", [rate_content])
 
+    contains_chart_or_tables = [settings.GSA_MIGRATION] * len(notes)
+
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)
 
-    # Add a Y/N column
-    # def set_range(wb, range_name, values, default=None, conversion_fun=str):
-    # FIXME-MSHD: We do not have a match for contains_chart_or_table in historical data ?
-    # If there is no match in historic data, then this is not a transformation.
-    # Should this be recorded ?
-    set_range(wb, "contains_chart_or_table", map(lambda v: "N", notes), "N", str)
+    set_range(
+        wb,
+        "contains_chart_or_table",
+        contains_chart_or_tables,
+        "N",
+        str,
+    )
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
@@ -153,5 +160,9 @@ def generate_notes_to_sefa(audit_header, outfile):
     table["singletons"]["is_minimis_rate_used"] = is_minimis_rate_used
     table["singletons"]["rate_explained"] = rate_content
     table["singletons"]["auditee_uei"] = uei
+
+    for obj, ar in zip(table["rows"], contains_chart_or_tables):
+        obj["fields"].append("contains_chart_or_table")
+        obj["values"].append(ar)
 
     return (wb, table)

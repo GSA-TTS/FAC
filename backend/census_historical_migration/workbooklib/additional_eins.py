@@ -1,3 +1,4 @@
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
@@ -12,6 +13,7 @@ from ..base_field_maps import (
 )
 from ..workbooklib.templates import sections_to_template_paths
 from ..models import ELECEINS as Eins
+from ..exception_utils import DataMigrationValueError
 from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
@@ -33,8 +35,9 @@ def xform_remove_trailing_decimal_zero(value):
         if decimal == "0":
             return whole
         else:
-            raise ValueError(
-                f"additional_ein has non zero decimal value: {trimmed_ein}"
+            raise DataMigrationValueError(
+                f"additional_ein has non zero decimal value: {trimmed_ein}",
+                "invalid_ein",
             )
 
     return trimmed_ein
@@ -62,7 +65,7 @@ def generate_additional_eins(audit_header, outfile):
     logger.info(
         f"--- generate additional eins {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
     )
-    uei = string_to_string(audit_header.UEI)
+    uei = xform_retrieve_uei(audit_header.UEI)
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_EINS])
     set_workbook_uei(wb, uei)
     addl_eins = _get_eins(audit_header.DBKEY, audit_header.AUDITYEAR)

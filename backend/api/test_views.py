@@ -468,6 +468,42 @@ class AccessAndSubmissionTests(TestCase):
             self.assertTrue(db_addr in submitted_contacts)
             self.assertTrue(form_addr in list(editors))
 
+    def test_blank_contacts(self):
+        """
+        A new SAC is created, but blank info in the data doesn't result in the
+        creation of Access objects with blank name and email fields.
+        """
+        # Add eligibility and Auditee Info data to profile
+        self.user.profile.entry_form_data = (
+            VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
+        )
+        self.user.profile.save()
+
+        access_and_submission_data = VALID_ACCESS_AND_SUBMISSION_DATA.copy()
+        access_and_submission_data["auditee_contacts_email"].append("")
+        access_and_submission_data["auditor_contacts_email"].append("")
+        # access_and_submission_data["auditor_contacts_email"].append("y")
+        access_and_submission_data["auditee_contacts_fullname"].append("")
+        access_and_submission_data["auditor_contacts_fullname"].append("")
+        # access_and_submission_data["auditor_contacts_fullname"].append("Y")
+
+        response = self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, access_and_submission_data, format="json"
+        )
+        data = response.json()
+
+        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
+
+        editors = (
+            Access.objects.filter(sac=sac, role="editor")
+            .values_list("email", flat=True)
+            .order_by("email")
+        )
+        # There should be three editors: the current user, and c@c.com and d@d.com
+        # from VALID_ACCESS_AND_SUBMISSION_DATA, and the appended blank values from
+        # 20 lines up should not end up adding anything.
+        self.assertEqual(3, len(editors))
+
     def test_invalid_eligibility_data(self):
         """
         Handle missing data.

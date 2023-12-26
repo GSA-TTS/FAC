@@ -1720,15 +1720,15 @@
           "loan_balance",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name"
         ],
         "values": [
           "10",
@@ -1740,14 +1740,14 @@
           "9585530.0",
           "Y",
           "N",
+          "",
           "N",
           0,
           10270770,
-          "10",
-          "415",
           "AWARD-0001",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
           ""
         ]
       },
@@ -1762,15 +1762,15 @@
           "loan_balance",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name"
         ],
         "values": [
           "14",
@@ -1782,14 +1782,14 @@
           "970138.0",
           "Y",
           "N",
+          "",
           "N",
           0,
           1172849,
-          "14",
-          "318",
           "AWARD-0002",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
           ""
         ]
       },
@@ -1803,16 +1803,17 @@
           "is_loan",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "audit_report_type",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
         ],
         "values": [
           "21",
@@ -1823,15 +1824,16 @@
           "N",
           "Y",
           "N",
+          "",
           "Y",
           "U",
           0,
           4511491,
-          "21",
-          "011",
           "AWARD-0003",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
+          "",
           ""
         ]
       },
@@ -1846,15 +1848,15 @@
           "loan_balance",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name"
         ],
         "values": [
           "10",
@@ -1866,14 +1868,14 @@
           "1675039.0",
           "N",
           "N",
+          "",
           "N",
           0,
           1743087,
-          "10",
-          "415",
           "AWARD-0004",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
           ""
         ]
       },
@@ -1887,15 +1889,16 @@
           "is_loan",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
         ],
         "values": [
           "10",
@@ -1906,14 +1909,15 @@
           "N",
           "Y",
           "N",
+          "",
           "N",
           0,
           1316263,
-          "10",
-          "427",
           "AWARD-0005",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
+          "",
           ""
         ]
       },
@@ -1928,15 +1932,15 @@
           "loan_balance",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name"
         ],
         "values": [
           "10",
@@ -1948,14 +1952,14 @@
           "866122.0",
           "Y",
           "N",
+          "",
           "N",
           0,
           880287,
-          "10",
-          "447",
           "AWARD-0006",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
           ""
         ]
       },
@@ -1970,16 +1974,16 @@
           "loan_balance",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "audit_report_type",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name"
         ],
         "values": [
           "14",
@@ -1991,15 +1995,15 @@
           "20503643.0",
           "Y",
           "N",
+          "",
           "Y",
           "U",
           0,
           20790997,
-          "14",
-          "155",
           "AWARD-0007",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
           ""
         ]
       },
@@ -2014,15 +2018,15 @@
           "loan_balance",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name"
         ],
         "values": [
           "14",
@@ -2034,14 +2038,14 @@
           "660803.0",
           "Y",
           "N",
+          "",
           "N",
           0,
           660803,
-          "14",
-          "157",
           "AWARD-0008",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
           ""
         ]
       },
@@ -2055,15 +2059,16 @@
           "is_loan",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
         ],
         "values": [
           "14",
@@ -2074,14 +2079,15 @@
           "N",
           "Y",
           "N",
+          "",
           "N",
           0,
           1420514,
-          "14",
-          "191",
           "AWARD-0009",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
+          "",
           ""
         ]
       },
@@ -2095,15 +2101,16 @@
           "is_loan",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
         ],
         "values": [
           "14",
@@ -2114,14 +2121,15 @@
           "N",
           "Y",
           "N",
+          "",
           "N",
           0,
           37757901,
-          "14",
-          "195",
           "AWARD-0010",
           "",
           "SECTION 8 PROJECT-BASED CLUSTER",
+          "",
+          "",
           ""
         ]
       },
@@ -2136,16 +2144,16 @@
           "loan_balance",
           "is_direct",
           "is_passthrough_award",
+          "passthrough_amount",
           "is_major",
           "audit_report_type",
           "findings_count",
           "amount_expended",
-          "federal_agency_prefix",
-          "federal_award_extension",
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name"
+          "other_cluster_name",
+          "state_cluster_name"
         ],
         "values": [
           "14",
@@ -2157,15 +2165,15 @@
           "3048996.0",
           "Y",
           "N",
+          "",
           "Y",
           "U",
           0,
           3065413,
-          "14",
-          "239",
           "AWARD-0011",
           "",
-          "N/A",
+          "GSA_MIGRATION",
+          "",
           ""
         ]
       }
@@ -2196,21 +2204,25 @@
       {
         "fields": [
           "title",
-          "content"
+          "content",
+          "contains_chart_or_table"
         ],
         "values": [
           "Loan/loan guarantee outstanding balances",
-          "Loans outstanding at the beginning of the year are included in the Federal Expenditures presented in the schedule. The balance of the loans outstanding at December 31, 2022 consists of: RURAL RENTAL HOUSING LOANS (10.415) - Balances outstanding at the end of the audit period were 9585530. SECTION 515 MULTI-FAMILY HOUSING PRESERVATION REVOLOVING LOAN FUND DEMONSTRATION PROGRAM (10.415) - Balances outstanding at the end of the audit period were 1675039. THE RURAL DEVELOPMENT (RD) MULTI-FAMILY HOUSING  REVITALIZATION DEMONSTRATION PROGRAM  (MPR) (10.447) - Balances outstanding at the end of the audit period were 866122. MORTGAGE INSURANCE FOR THE PURCHASE OR REFINANCING OF EXISTING MULTIFAMILY HOUSING PROJECTS (14.155) - Balances outstanding at the end of the audit period were 20503643. SUPPORTIVE HOUSING FOR THE ELDERLY (14.157) - Balances outstanding at the end of the audit period were 660803. HOME INVESTMENT PARTNERSHIPS PROGRAM (14.239) - Balances outstanding at the end of the audit period were 3048996. ASSISTED HOUSING STABILITY AND ENERGY AND GREEN RETROFIT INVESTMENTS PROGRAM (RECOVERY ACT FUNDED) (14.318) - Balances outstanding at the end of the audit period were 970138."
+          "Loans outstanding at the beginning of the year are included in the Federal Expenditures presented in the schedule. The balance of the loans outstanding at December 31, 2022 consists of: RURAL RENTAL HOUSING LOANS (10.415) - Balances outstanding at the end of the audit period were 9585530. SECTION 515 MULTI-FAMILY HOUSING PRESERVATION REVOLOVING LOAN FUND DEMONSTRATION PROGRAM (10.415) - Balances outstanding at the end of the audit period were 1675039. THE RURAL DEVELOPMENT (RD) MULTI-FAMILY HOUSING  REVITALIZATION DEMONSTRATION PROGRAM  (MPR) (10.447) - Balances outstanding at the end of the audit period were 866122. MORTGAGE INSURANCE FOR THE PURCHASE OR REFINANCING OF EXISTING MULTIFAMILY HOUSING PROJECTS (14.155) - Balances outstanding at the end of the audit period were 20503643. SUPPORTIVE HOUSING FOR THE ELDERLY (14.157) - Balances outstanding at the end of the audit period were 660803. HOME INVESTMENT PARTNERSHIPS PROGRAM (14.239) - Balances outstanding at the end of the audit period were 3048996. ASSISTED HOUSING STABILITY AND ENERGY AND GREEN RETROFIT INVESTMENTS PROGRAM (RECOVERY ACT FUNDED) (14.318) - Balances outstanding at the end of the audit period were 970138.",
+          "GSA_MIGRATION"
         ]
       },
       {
         "fields": [
           "title",
-          "content"
+          "content",
+          "contains_chart_or_table"
         ],
         "values": [
           "Capital Magnet Fund",
-          "Expenditures reported on the Schedule for the Capital Magnet Fund represent amounts actually spent for qualified items plus amounts committed for future projects."
+          "Expenditures reported on the Schedule for the Capital Magnet Fund represent amounts actually spent for qualified items plus amounts committed for future projects.",
+          "GSA_MIGRATION"
         ]
       }
     ],

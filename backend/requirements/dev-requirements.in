@@ -7,6 +7,7 @@ django-debug-toolbar
 djlint
 faker
 flake8
+jsonnet
 model_bakery
 mypy
 pandas
