@@ -27,4 +27,13 @@ applications:
     routes:
       - route: fac-((env_name)).app.cloud.gov
     instances: ((instances))
-    services: ((services))
+    services: 
+      - fac-db
+      - fac-public-s3
+      - fac-private-s3
+      - fac-key-service
+      - newrelic-creds
+      - https-proxy-creds
+      - smtp-proxy-creds
+      - fac-logdrain
+      - *((additional_services))

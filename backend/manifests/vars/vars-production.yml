@@ -5,12 +5,4 @@ env_name: prod
 service_name: production
 endpoint: app.fac.gov
 instances: 2
-services:
-  - fac-db
-  - fac-public-s3
-  - fac-private-s3
-  - fac-key-service
-  - newrelic-creds
-  - https-proxy-creds
-  - smtp-proxy-creds
-  - fac-logdrain
+additional_services: &additional_services

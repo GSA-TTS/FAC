@@ -5,12 +5,5 @@ env_name: dev
 service_name: dev
 endpoint: fac-dev.app.cloud.gov
 instances: 1
-services:
-  - fac-db
-  - fac-public-s3
-  - fac-private-s3
-  - fac-key-service
-  - newrelic-creds
-  - https-proxy-creds
-  - smtp-proxy-creds
-  - fac-logdrain
+additional_services: &additional_services
+
