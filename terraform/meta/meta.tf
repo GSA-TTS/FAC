@@ -74,7 +74,7 @@ module "s3-historical-migration" {
   # long running processes. We are running this in preview only
   # because all other environments would, with every deploy,
   # interrupt the GH Actions that are long-running.
-  cf_space_name    = "preview"
-  name             = "fac-census-data-s3"
-  s3_plan_name     = "basic"
+  cf_space_name = "preview"
+  name          = "fac-census-data-s3"
+  s3_plan_name  = "basic"
 }
