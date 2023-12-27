@@ -1,6 +1,6 @@
 from .models import ELECAUDITHEADER as AuditHeader
 from .workbooklib.end_to_end_core import run_end_to_end
-import census_historical_migration.migration_result as migration_result
+from .migration_result import result
 
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
@@ -28,15 +28,13 @@ def load_historic_data_for_year(audit_year, page_size, pages):
         )
 
         for submission in page.object_list:
-            migration_result.result = migration_result.DEFAULT_RESULT
-
             # Migrate a single submission
             run_end_to_end(user, submission)
 
-            result_log[(submission.AUDITYEAR, submission.DBKEY)] = migration_result.result
+            result_log[(submission.AUDITYEAR, submission.DBKEY)] = result
             total_count += 1
 
-            has_failed = len(migration_result.result["errors"]) > 0
+            has_failed = len(result["errors"]) > 0
             if has_failed:
                 error_count += 1
             if total_count % 5 == 0:

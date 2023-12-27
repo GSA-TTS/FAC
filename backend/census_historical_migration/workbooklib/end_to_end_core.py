@@ -29,7 +29,7 @@ from dissemination.models import (
     SecondaryAuditor,
     MigrationChangeRecord,
 )
-from ..migration_result import result
+import census_historical_migration.migration_result as migration_result
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -254,6 +254,7 @@ def api_check(json_test_tables):
 def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
     try:
+        migration_result.result = migration_result.DEFAULT_RESULT
         sac = setup_sac(user, audit_header)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
@@ -278,26 +279,26 @@ def run_end_to_end(user, audit_header):
 
             errors = sac.validate_cross()
             if errors.get("errors"):
-                result["errors"].append(f"{errors.get('errors')}")
+                migration_result.result["errors"].append(f"{errors.get('errors')}")
                 return
 
             disseminate(sac)
             combined_summary = api_check(json_test_tables)
             logger.info(combined_summary)
-            result["success"].append(f"{sac.report_id} created")
+            migration_result.result["success"].append(f"{sac.report_id} created")
     except Exception as exc:
         handle_exception(exc, audit_header)
     else:
         record_migration_status(
             audit_header.AUDITYEAR,
             audit_header.DBKEY,
-            len(result["errors"]) > 0,
+            len(migration_result.result["errors"]) > 0,
         )
         record_migration_transformations(
             audit_header.AUDITYEAR,
             audit_header.DBKEY,
             sac.report_id,
-            result["transformations"],
+            migration_result.result["transformations"],
         )
 
 
@@ -371,7 +372,7 @@ def handle_exception(exc, audit_header):
         for frame in tb:
             logger.error(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
 
-    result["errors"].append(f"{exc}")
+    migration_result.result["errors"].append(f"{exc}")
 
     status = record_migration_status(
         audit_header.AUDITYEAR,
