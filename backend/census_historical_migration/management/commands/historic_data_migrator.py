@@ -11,7 +11,7 @@ from census_historical_migration.historic_data_loader import (
     create_or_get_user,
     log_results,
 )
-from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
+from census_historical_migration.end_to_end_core import run_end_to_end
 from django.conf import settings
 
 logger = logging.getLogger(__name__)

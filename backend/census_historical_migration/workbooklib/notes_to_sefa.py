@@ -1,5 +1,5 @@
 from django.conf import settings
-
+from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import string_to_string
@@ -7,7 +7,6 @@ from ..models import ELECNOTES as Notes
 from ..workbooklib.excel_creation_utils import (
     set_range,
     map_simple_columns,
-    generate_dissemination_test_table,
     set_workbook_uei,
 )
 from ..base_field_maps import SheetFieldMap
@@ -156,13 +155,15 @@ def generate_notes_to_sefa(audit_header, outfile):
     table = generate_dissemination_test_table(
         audit_header, "notes_to_sefa", mappings, notes
     )
+    table["singletons"] = dict()
     table["singletons"]["accounting_policies"] = policies_content
     table["singletons"]["is_minimis_rate_used"] = is_minimis_rate_used
     table["singletons"]["rate_explained"] = rate_content
     table["singletons"]["auditee_uei"] = uei
 
-    for obj, ar in zip(table["rows"], contains_chart_or_tables):
-        obj["fields"].append("contains_chart_or_table")
-        obj["values"].append(ar)
+    if notes:
+        for obj, ar in zip(table["rows"], contains_chart_or_tables):
+            obj["fields"].append("contains_chart_or_table")
+            obj["values"].append(ar)
 
     return (wb, table)

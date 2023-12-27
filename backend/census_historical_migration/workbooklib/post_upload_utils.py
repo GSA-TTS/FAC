@@ -83,7 +83,7 @@ def record_dummy_pdf_object(this_sac, this_user):
     this_sac.save()
 
 
-def _post_upload_workbook(this_sac, section, xlsx_file):
+def post_upload_workbook(this_sac, section, xlsx_file):
     """Upload a workbook for this SAC."""
 
     audit_data = extract_mapping[section](xlsx_file, is_gsa_migration=True)
