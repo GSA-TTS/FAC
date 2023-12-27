@@ -5,3 +5,13 @@ env_name: preview
 service_name: preview
 endpoint: fac-preview.app.cloud.gov
 instances: 1
+services:
+  - fac-db
+  - fac-public-s3
+  - fac-private-s3
+  - fac-census-data-s3
+  - fac-key-service
+  - newrelic-creds
+  - https-proxy-creds
+  - smtp-proxy-creds
+  - fac-logdrain
