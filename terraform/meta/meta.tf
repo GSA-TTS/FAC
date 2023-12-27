@@ -69,7 +69,7 @@ module "s3-backups" {
 module "s3-historical-migration" {
   source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
 
-  cf_org_name      = var.cf_org_name
+  cf_org_name = var.cf_org_name
   # This bucket supports the historical data migration which involves
   # long running processes. We are running this in preview only
   # because all other environments would, with every deploy, 
