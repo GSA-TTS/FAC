@@ -252,7 +252,7 @@ def xform_audit_type(general_information):
 
 
 def track_transformation(census_data, gsa_fac_data, function):
-    MigrationResult.result["transformations"].append(
+    MigrationResult.append_transformation(
         {
             "section": "General",
             "census_data": census_data,

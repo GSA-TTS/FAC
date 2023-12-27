@@ -37,7 +37,7 @@ def create_json_from_db_object(gobj, mappings):
             value = mapping.type(value)
             gsa_fac_data = value
             # Track transformation
-            MigrationResult.result["transformations"].append(
+            MigrationResult.append_transformation(
                 {
                     "section": "General",
                     "census_data": census_data,
