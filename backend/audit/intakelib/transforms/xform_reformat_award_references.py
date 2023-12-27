@@ -7,7 +7,7 @@ from audit.intakelib.intermediate_representation import (
 logger = logging.getLogger(__name__)
 
 
-# Tested by has_lowercase_award_reference.py
+# Tested by has_lowercase_award_reference.xlsx
 def reformat_award_reference(ir):
     references = get_range_by_name(ir, "award_reference")
     new_values = list(map(lambda v: v.upper() if v else v, references["values"]))
