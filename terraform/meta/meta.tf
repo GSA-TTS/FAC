@@ -65,3 +65,17 @@ module "s3-backups" {
 #     module.s3-backups
 #   ]
 # }
+
+module "s3-historical-migration" {
+  source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
+
+  cf_org_name      = var.cf_org_name
+  # This bucket supports the historical data migration which involves
+  # long running processes. We are running this in preview only
+  # because all other environments would, with every deploy, 
+  # interrupt the GH Actions that are long-running. 
+  cf_space_name    = "preview"
+  name             = "fac-census-data-s3"
+  recursive_delete = var.recursive_delete
+  s3_plan_name     = "basic"
+}
