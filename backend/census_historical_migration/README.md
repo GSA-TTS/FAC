@@ -20,7 +20,7 @@ This is implemented as a Django app to leverage existing management commands and
 * fac_s3.py - Uploads folders or files to an S3 bucket.
 
 ```bash
-python manage.py fac_s3 gsa-fac-private-s3 --upload --src census_historical_migration/data
+python manage.py fac_s3 fac-census-data-s3 --upload --src census_historical_migration/data
 ```
 
 * csv_to_postgres.py - Inserts data into Postgres tables using the contents of the CSV files in the S3 bucket. The first row of each file is assumed to have the column names (we convert to lowercase). The name of the table is determined by examining the name of the file. The sample source files do not have delimters for empty fields at the end of a line - so we assume these are nulls.
