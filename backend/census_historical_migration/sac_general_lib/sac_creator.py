@@ -19,7 +19,7 @@ from ..sac_general_lib.auditor_certification import (
 from ..sac_general_lib.report_id_generator import (
     xform_dbkey_to_report_id,
 )
-from ..migration_result import result
+from ..migration_result import MigrationResult
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def setup_sac(user, audit_header):
 
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     generated_report_id = xform_dbkey_to_report_id(audit_header)
-    result["transformations"].append(
+    MigrationResult.result["transformations"].append(
         {
             "section": "General",
             "census_data": audit_header.DBKEY,

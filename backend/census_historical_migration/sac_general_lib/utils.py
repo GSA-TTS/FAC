@@ -8,7 +8,7 @@ from ..transforms.xform_string_to_string import (
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
 from ..exception_utils import DataMigrationValueError
-from ..migration_result import result
+from ..migration_result import MigrationResult
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ def create_json_from_db_object(gobj, mappings):
             value = mapping.type(value)
             gsa_fac_data = value
             # Track transformation
-            result["transformations"].append(
+            MigrationResult.result["transformations"].append(
                 {
                     "section": "General",
                     "census_data": census_data,

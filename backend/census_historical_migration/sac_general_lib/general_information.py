@@ -16,7 +16,7 @@ from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
 )
-from ..migration_result import result
+from ..migration_result import MigrationResult
 
 
 PERIOD_DICT = {"A": "annual", "B": "biennial", "O": "other"}
@@ -252,7 +252,7 @@ def xform_audit_type(general_information):
 
 
 def track_transformation(census_data, gsa_fac_data, function):
-    result["transformations"].append(
+    MigrationResult.result["transformations"].append(
         {
             "section": "General",
             "census_data": census_data,

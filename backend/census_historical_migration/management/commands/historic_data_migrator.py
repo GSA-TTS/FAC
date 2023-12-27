@@ -9,7 +9,7 @@ from census_historical_migration.historic_data_loader import (
     print_results,
 )
 from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
-from census_historical_migration.migration_result import result
+from census_historical_migration.migration_result import MigrationResult
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                     continue
 
                 run_end_to_end(user, audit_header)
-                result_log[(year, dbkey)] = result
+                result_log[(year, dbkey)] = MigrationResult.result
                 total_count += 1
 
             print_results(result_log, error_count, total_count)

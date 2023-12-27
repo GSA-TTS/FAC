@@ -5,7 +5,6 @@ from ..transforms.xform_string_to_bool import string_to_bool
 from ..transforms.xform_string_to_string import string_to_string
 from ..exception_utils import DataMigrationError
 from ..workbooklib.excel_creation_utils import get_audits
-from ..migration_result import result
 from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,

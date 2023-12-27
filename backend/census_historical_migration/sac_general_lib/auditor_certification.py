@@ -1,5 +1,4 @@
 import audit.validators
-from ..migration_result import result
 from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
