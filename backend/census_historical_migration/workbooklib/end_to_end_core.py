@@ -280,13 +280,13 @@ def run_end_to_end(user, audit_header):
 
             errors = sac.validate_cross()
             if errors.get("errors"):
-                MigrationResult.result["errors"].append(f"{errors.get('errors')}")
+                MigrationResult.append_error(f"{errors.get('errors')}")
                 return
 
             disseminate(sac)
             combined_summary = api_check(json_test_tables)
             logger.info(combined_summary)
-            MigrationResult.result["success"].append(f"{sac.report_id} created")
+            MigrationResult.append_success(f"{sac.report_id} created")
     except Exception as exc:
         handle_exception(exc, audit_header)
     else:
@@ -373,7 +373,7 @@ def handle_exception(exc, audit_header):
         for frame in tb:
             logger.error(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
 
-    MigrationResult.result["errors"].append(f"{exc}")
+    MigrationResult.append_error(f"{exc}")
 
     status = record_migration_status(
         audit_header.AUDITYEAR,
