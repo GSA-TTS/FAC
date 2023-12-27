@@ -1,6 +1,3 @@
-from django.core.management.base import BaseCommand
-import logging
-import sys
 from census_historical_migration.sac_general_lib.utils import (
     normalize_year_string_or_exit,
 )
@@ -12,7 +9,14 @@ from census_historical_migration.historic_data_loader import (
     print_results,
 )
 from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
+from census_historical_migration.migration_result import MigrationResult
+
+from django.core.management.base import BaseCommand
 from django.conf import settings
+
+import logging
+import sys
+
 
 logger = logging.getLogger(__name__)
 
@@ -49,15 +53,15 @@ class Command(BaseCommand):
             total_count = error_count = 0
             for dbkey, year in zip(dbkeys, years):
                 logger.info("Running {}-{} end-to-end".format(dbkey, year))
-                result = {"success": [], "errors": [], "transformations": []}
+
                 try:
                     audit_header = get_audit_header(dbkey, year)
                 except Exception as e:
                     logger.error(e)
                     continue
 
-                run_end_to_end(user, audit_header, result)
-                result_log[(year, dbkey)] = result
+                run_end_to_end(user, audit_header)
+                result_log[(year, dbkey)] = MigrationResult.result
                 total_count += 1
 
             print_results(result_log, error_count, total_count)

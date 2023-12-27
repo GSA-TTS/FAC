@@ -29,6 +29,7 @@ from dissemination.models import (
     SecondaryAuditor,
     MigrationChangeRecord,
 )
+from census_historical_migration.migration_result import MigrationResult
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -43,6 +44,7 @@ import jwt
 import requests
 from datetime import datetime, timezone
 import traceback
+import copy
 
 
 logger = logging.getLogger(__name__)
@@ -250,10 +252,11 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def run_end_to_end(user, audit_header, result):
+def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
     try:
-        sac, result = setup_sac(user, audit_header, result)
+        MigrationResult.reset()
+        sac = setup_sac(user, audit_header)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
             logger.info(
@@ -277,27 +280,27 @@ def run_end_to_end(user, audit_header, result):
 
             errors = sac.validate_cross()
             if errors.get("errors"):
-                result["errors"].append(f"{errors.get('errors')}")
+                MigrationResult.append_error(f"{errors.get('errors')}")
                 return
 
             disseminate(sac)
             combined_summary = api_check(json_test_tables)
             logger.info(combined_summary)
-            result["success"].append(f"{sac.report_id} created")
+            MigrationResult.append_success(f"{sac.report_id} created")
     except Exception as exc:
-        handle_exception(exc, audit_header, result)
+        handle_exception(exc, audit_header)
     else:
         record_migration_status(
             audit_header.AUDITYEAR,
             audit_header.DBKEY,
-            len(result["errors"]) > 0,
+            len(MigrationResult.result["errors"]) > 0,
         )
         record_migration_transformations(
             audit_header.AUDITYEAR,
             audit_header.DBKEY,
             sac.report_id,
-            result["transformations"],
-            )
+            MigrationResult.result["transformations"],
+        )
 
 
 def record_migration_transformations(audit_year, dbkey, report_id, transformations):
@@ -307,10 +310,10 @@ def record_migration_transformations(audit_year, dbkey, report_id, transformatio
             dbkey=dbkey,
             report_id=report_id,
             run_datetime=django_timezone.now(),
-            section=transformation['section'],
-            census_data=transformation['census_data'],
-            gsa_fac_data=transformation['gsa_fac_data'],
-            transformation_function=transformation['transformation_function'],
+            section=transformation["section"],
+            census_data=transformation["census_data"],
+            gsa_fac_data=transformation["gsa_fac_data"],
+            transformation_function=transformation["transformation_function"],
         )
         migration_change_record.save()
     return None
@@ -341,7 +344,7 @@ def record_migration_error(status, tag, exc_type, message):
     ).save()
 
 
-def handle_exception(exc, audit_header, result):
+def handle_exception(exc, audit_header):
     """Handles exceptions encountered during run_end_to_end()"""
     try:
         tag = exc.tag
@@ -370,7 +373,7 @@ def handle_exception(exc, audit_header, result):
         for frame in tb:
             logger.error(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
 
-    result["errors"].append(f"{exc}")
+    MigrationResult.append_error(f"{exc}")
 
     status = record_migration_status(
         audit_header.AUDITYEAR,
