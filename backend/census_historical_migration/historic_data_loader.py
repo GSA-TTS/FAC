@@ -31,7 +31,9 @@ def load_historic_data_for_year(audit_year, page_size, pages):
             # Migrate a single submission
             run_end_to_end(user, submission)
 
-            result_log[(submission.AUDITYEAR, submission.DBKEY)] = MigrationResult.result
+            result_log[
+                (submission.AUDITYEAR, submission.DBKEY)
+            ] = MigrationResult.result
             total_count += 1
 
             has_failed = len(MigrationResult.result["errors"]) > 0
