@@ -9,11 +9,7 @@ from ..exception_utils import (
     DataMigrationError,
     DataMigrationValueError,
 )
-from ..base_field_maps import WorkbookFieldInDissem
 from ..workbooklib.templates import sections_to_template_paths
-from ..sac_general_lib.report_id_generator import (
-    xform_dbkey_to_report_id,
-)
 from ..models import (
     ELECAUDITS as Audits,
     ELECAUDITHEADER as AuditHeader,
@@ -202,36 +198,6 @@ def get_template_name_for_section(section):
             f"Unknown section {section}",
             "invalid_section",
         )
-
-
-def generate_dissemination_test_table(audit_header, api_endpoint, mappings, objects):
-    """Generates a test table for verifying the API queries results."""
-    table = {"rows": list(), "singletons": dict()}
-    table["endpoint"] = api_endpoint
-    table["report_id"] = xform_dbkey_to_report_id(audit_header)
-
-    for o in objects:
-        test_obj = {}
-        test_obj["fields"] = []
-        test_obj["values"] = []
-        for m in mappings:
-            # What if we only test non-null values?
-            raw_value = getattr(o, m.in_db, None)
-            attribute_value = apply_conversion_function(raw_value, m.default, m.type)
-            if (attribute_value is not None) and (attribute_value != ""):
-                if m.in_dissem == WorkbookFieldInDissem:
-                    # print(f'in_sheet {m.in_sheet} <- {attribute_value}')
-                    test_obj["fields"].append(m.in_sheet)
-                    # The typing must be applied here as well, as in the case of
-                    # type_requirement, it alphabetizes the value...
-                    test_obj["values"].append(m.type(attribute_value))
-                else:
-                    # print(f'in_dissem {m.in_dissem} <- {attribute_value}')
-                    test_obj["fields"].append(m.in_dissem)
-                    test_obj["values"].append(m.type(attribute_value))
-
-        table["rows"].append(test_obj)
-    return table
 
 
 def get_audits(dbkey, year):

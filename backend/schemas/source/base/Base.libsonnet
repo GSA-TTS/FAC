@@ -67,8 +67,8 @@ local Meta = {
   },
 };
 
-local REGEX_ALN_PREFIX = '^([0-9]{2})$';
 # A python version of these regexes also exists in settings.py
+local REGEX_ALN_PREFIX = '^([0-9]{2})$';
 local REGEX_RD_EXTENSION = 'RD[0-9]?';
 local REGEX_THREE_DIGIT_EXTENSION = '[0-9]{3}[A-Za-z]{0,1}';
 local REGEX_U_EXTENSION = 'U[0-9]{2}';
