@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User as DjangoUser
+from django.core.exceptions import MultipleObjectsReturned
 from django.db import models
 from django.db.models import Q
 from .access_roles import ACCESS_ROLES
@@ -28,10 +29,20 @@ class AccessManager(models.Manager):
         event_user = obj_data.pop("event_user", None)
         event_type = obj_data.pop("event_type", None)
 
+        # try to pair this Access with an actual User object if we have one for this email address
         if obj_data["email"]:
             try:
                 acc_user = User.objects.get(email=obj_data["email"])
+            # if we don't have a User for this email, leave it as None (unclaimed Access)
             except User.DoesNotExist:
+                acc_user = None
+            # if we have multiple Users for this email, leave it as None
+            # this typically happens if a user deletes their Login.gov account
+            # and creates a new one using the same email address.
+            # In this case we want to defer assigning this Access to a specific
+            # User until the next time they login to the FAC, because we don't
+            # yet know which of their User accounts is the "active" one
+            except MultipleObjectsReturned:
                 acc_user = None
             if acc_user:
                 obj_data["user"] = acc_user

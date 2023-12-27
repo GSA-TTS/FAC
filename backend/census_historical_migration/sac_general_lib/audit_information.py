@@ -1,5 +1,7 @@
 import re
 
+from django.conf import settings
+from ..api_test_helpers import extract_api_data
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
 from ..transforms.xform_string_to_string import string_to_string
@@ -18,7 +20,7 @@ def xform_apply_default_thresholds(value):
     str_value = string_to_string(value)
     if str_value == "":
         # FIXME-MSHD: This is a transformation that we may want to record
-        return -1
+        return settings.GSA_MIGRATION_INT
     return string_to_int(str_value)
 
 
@@ -162,7 +164,8 @@ def audit_information(audit_header):
     }
     audit_info["agencies"] = list(agencies_prefixes)
 
-    # Validate against the schema
     audit.validators.validate_audit_information_json(audit_info)
 
-    return audit_info
+    api_data = extract_api_data(mappings, audit_info)
+
+    return (audit_info, api_data)

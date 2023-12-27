@@ -1,9 +1,5 @@
 import logging
-from pathlib import Path
-
 from django.apps import apps
-
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 from audit.intakelib import (
     extract_federal_awards,
@@ -59,13 +55,11 @@ validator_mapping = {
     FORM_SECTIONS.NOTES_TO_SEFA: audit.validators.validate_notes_to_sefa_json,
     FORM_SECTIONS.ADDITIONAL_UEIS: audit.validators.validate_additional_ueis_json,
     FORM_SECTIONS.ADDITIONAL_EINS: audit.validators.validate_additional_eins_json,
-    "PDF": audit.validators.validate_single_audit_report_file,
 }
 
 
-def _post_upload_pdf(this_sac, this_user, pdf_filename):
-    """Upload a workbook for this SAC.
-
+def record_dummy_pdf_object(this_sac, this_user):
+    """Create a dummy PDFFile object for this SAC.
     This should be idempotent if it is called on a SAC that already
     has a federal awards file uploaded.
     """
@@ -75,38 +69,21 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
         # there is already an uploaded file and data in the object so
         # nothing to do here
         return
-
-    with open(pdf_filename, "rb") as f:
-        content = f.read()
-    file = SimpleUploadedFile(pdf_filename, content, "application/pdf")
-    print(file.__dict__)
+    # we are not uploading PDF for historic data migration
+    # but we need to create a PDFFile object to pass validation
     pdf_file = PDFFile(
-        file=file,
-        component_page_numbers={  # FIXME MSHD- see ticket #2912
-            "financial_statements": -1,
-            "financial_statements_opinion": -1,
-            "schedule_expenditures": -1,
-            "schedule_expenditures_opinion": -1,
-            "uniform_guidance_control": -1,
-            "uniform_guidance_compliance": -1,
-            "GAS_control": -1,
-            "GAS_compliance": -1,
-            "schedule_findings": -1,
-        },
-        filename=Path(pdf_filename).stem,
+        file=None,
+        component_page_numbers=None,
+        filename=None,
         user=this_user,
         sac_id=this_sac.id,
     )
 
-    validator_mapping["PDF"](pdf_file.file)
-
-    pdf_file.full_clean()
     pdf_file.save()
-
     this_sac.save()
 
 
-def _post_upload_workbook(this_sac, section, xlsx_file):
+def post_upload_workbook(this_sac, section, xlsx_file):
     """Upload a workbook for this SAC."""
 
     audit_data = extract_mapping[section](xlsx_file, is_gsa_migration=True)

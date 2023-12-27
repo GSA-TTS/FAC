@@ -1,16 +1,16 @@
-from ..exception_utils import (
+from .workbooklib.post_upload_utils import record_dummy_pdf_object
+from .exception_utils import (
     DataMigrationError,
     DataMigrationValueError,
 )
-from ..workbooklib.workbook_builder_loader import (
+from .workbooklib.workbook_builder_loader import (
     workbook_builder_loader,
 )
-from ..workbooklib.workbook_section_handlers import (
+from .workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )
-from ..workbooklib.post_upload_utils import _post_upload_pdf
-from ..sac_general_lib.sac_creator import setup_sac
-from ..models import (
+from .sac_general_lib.sac_creator import setup_sac
+from .models import (
     ReportMigrationStatus,
     MigrationErrorDetail,
 )
@@ -54,18 +54,16 @@ parser = argparse.ArgumentParser()
 
 
 def step_through_certifications(sac):
-    stati = [
-        SingleAuditChecklist.STATUS.IN_PROGRESS,
-        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
-        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
-        SingleAuditChecklist.STATUS.CERTIFIED,
-        SingleAuditChecklist.STATUS.SUBMITTED,
-        SingleAuditChecklist.STATUS.DISSEMINATED,
-    ]
-    for status in stati:
-        sac.transition_name.append(status)
-        sac.transition_date.append(datetime.now(timezone.utc))
+    sac.transition_to_ready_for_certification()
+    sac.transition_to_auditor_certified()
+    sac.transition_to_auditee_certified()
+
+    # FIXME-MSHD: We have no method transition_to_certified()
+    sac.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
+    sac.transition_date.append(datetime.now(timezone.utc))
+
+    sac.transition_to_submitted()
+    sac.transition_to_disseminated()
     sac.save()
 
 
@@ -131,20 +129,20 @@ def are_they_both_none_or_empty(a, b):
     return a_val and b_val
 
 
-def check_equality(in_wb, in_json):
+def check_equality(in_wb, in_api):
     # Type requirement is sometimes just 'N'
-    if in_wb in ["Y", "N"] and isinstance(in_json, bool):
-        return (True if in_wb == "Y" else False) == in_json
-    elif just_numbers(in_wb) and just_numbers(in_json):
+    if in_wb in ["Y", "N"] and isinstance(in_api, bool):
+        return (True if in_wb == "Y" else False) == in_api
+    elif just_numbers(in_wb) and just_numbers(in_api):
         return (
-            True if math.isclose(float(in_wb), float(in_json), rel_tol=1e-1) else False
+            True if math.isclose(float(in_wb), float(in_api), rel_tol=1e-1) else False
         )
-    elif isinstance(in_wb, str) and isinstance(in_json, str):
-        return _compare_multiline_strings(in_wb, in_json)
-    elif in_wb is None or in_json is None:
-        return are_they_both_none_or_empty(in_wb, in_json)
+    elif isinstance(in_wb, str) and isinstance(in_api, str):
+        return _compare_multiline_strings(in_wb, in_api)
+    elif in_wb is None or in_api is None:
+        return are_they_both_none_or_empty(in_wb, in_api)
     else:
-        return in_wb == in_json
+        return str(in_wb) == str(in_api)
 
 
 def _compare_multiline_strings(str1, str2):
@@ -195,56 +193,73 @@ def combine_counts(combined, d):
     return combined
 
 
+def process_singletons(endo, summary):
+    """Process the singletons in the JSON test table"""
+    for field, value in endo.get("singletons", {}).items():
+        api_values = get_api_values(endo["endpoint"], endo["report_id"], field)
+        eq = check_equality(value, api_values[0])
+        if eq:
+            count(summary, "correct_fields")
+        else:
+            logger.info(
+                f"Does not match. [eq {eq}] [field {field}] [field val {value}] != [api val {api_values[0]}]"
+            )
+            count(summary, "incorrect_fields")
+
+
+def process_rows(endo, combined_summary, summary):
+    """Process the rows in the JSON test table"""
+    rows = endo.get("rows", [])
+    equality_results = []
+    for row_ndx, row in enumerate(rows):
+        count(summary, "total_rows")
+
+        if False in equality_results:
+            count(combined_summary, "incorrect_rows")
+        else:
+            count(combined_summary, "correct_rows")
+
+        equality_results = []
+
+        for field_ndx, f in enumerate(row["fields"]):
+            # logger.info(f"Checking /{endo["endpoint"]} {endo["report_id"]} {f}")
+            # logger.info(f"{get_api_values(endo["endpoint"], endo["report_id"], f)}")
+            api_values = get_api_values(endo["endpoint"], endo["report_id"], f)
+            this_api_value = api_values[row_ndx]
+            if field_ndx < len(row["values"]):
+                this_field_value = row["values"][field_ndx]
+                eq = check_equality(this_field_value, this_api_value)
+                if not eq:
+                    logger.info(
+                        f"Does not match. [eq {eq}] [field {f}] [field val {this_field_value}] != [api val {this_api_value}]"
+                    )
+                equality_results.append(eq)
+            else:
+                # Log a message if field_ndx does not exist
+                logger.info(
+                    f"Index {field_ndx} out of range for 'values' in row. Max index is {len(row['values']) - 1}"
+                )
+                logger.info(
+                    f"Field '{f}' with value '{this_api_value}' at index '{field_ndx}' is missing from test tables 'values'."
+                )
+
+        if all(equality_results):
+            count(summary, "correct_fields")
+        else:
+            count(summary, "incorrect_fields")
+
+
 def api_check(json_test_tables):
     combined_summary = {"endpoints": 0, "correct_rows": 0, "incorrect_rows": 0}
 
     for endo in json_test_tables:
         count(combined_summary, "endpoints")
         endpoint = endo["endpoint"]
-        report_id = endo["report_id"]
         summary = {}
-        equality_results = []
 
         logger.info(f"-------------------- {endpoint} --------------------")
-
-        for row_ndx, row in enumerate(endo["rows"]):
-            count(summary, "total_rows")
-
-            if False in equality_results:
-                count(combined_summary, "incorrect_rows")
-            else:
-                count(combined_summary, "correct_rows")
-
-            equality_results = []
-
-            for field_ndx, f in enumerate(row["fields"]):
-                # logger.info(f"Checking /{endpoint} {report_id} {f}")
-                # logger.info(f"{get_api_values(endpoint, report_id, f)}")
-                api_values = get_api_values(endpoint, report_id, f)
-                this_api_value = api_values[row_ndx]
-
-                # Check if field_ndx exists in row["values"]
-                if field_ndx < len(row["values"]):
-                    this_field_value = row["values"][field_ndx]
-                    eq = check_equality(this_field_value, this_api_value)
-                    if not eq:
-                        logger.info(
-                            f"Does not match. [eq {eq}] [field {f}] [field val {this_field_value}] != [api val {this_api_value}]"
-                        )
-                    equality_results.append(eq)
-                else:
-                    # Log a message if field_ndx does not exist
-                    logger.info(
-                        f"Index {field_ndx} out of range for 'values' in row. Max index is {len(row['values']) - 1}"
-                    )
-                    logger.info(
-                        f"Field '{f}' with value '{this_api_value}' at index '{field_ndx}' is missing from test tables 'values'."
-                    )
-
-            if all(equality_results):
-                count(summary, "correct_fields")
-            else:
-                count(summary, "incorrect_fields")
+        process_singletons(endo, summary)
+        process_rows(endo, combined_summary, summary)
 
         logger.info(summary)
         combined_summary = combine_counts(combined_summary, summary)
@@ -256,7 +271,7 @@ def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
     try:
         MigrationResult.reset()
-        sac = setup_sac(user, audit_header)
+        sac, gen_api_data = setup_sac(user, audit_header)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
             logger.info(
@@ -275,7 +290,15 @@ def run_end_to_end(user, audit_header):
                 (_, json, _) = builder_loader(fun, section)
                 json_test_tables.append(json)
 
-            _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+            # Append total amount expended to general table checker
+            gen_api_data["singletons"]["total_amount_expended"] = sac.federal_awards[
+                "FederalAwards"
+            ]["total_amount_expended"]
+
+            json_test_tables.append(gen_api_data)
+
+            record_dummy_pdf_object(sac, user)
+
             step_through_certifications(sac)
 
             errors = sac.validate_cross()

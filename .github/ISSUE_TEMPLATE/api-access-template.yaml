@@ -27,6 +27,29 @@ body:
       default: 0
     validations:
       required: true
+  - type: markdown
+    attributes:
+      value: |
+        What kind of key is being requested?
+        
+        A *personal* key is one that will be used by an individual developer 
+        on agency-issued GFE.
+
+        A *system* key is one that will be used to communicate with the FAC
+        as part of a FISMA-Moderate system that has an active ATO. 
+
+  - type: dropdown
+    id: accesstype
+    attributes:
+      label: Key type
+      description: |
+        Is a personal or system key being requested? 
+      options:
+        - Personal key
+        - System key
+      default: 0
+    validations:
+      required: true  
   - type: input
     id: email
     attributes:

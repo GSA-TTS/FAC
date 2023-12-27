@@ -36,6 +36,10 @@ def search_general(
     order_by=ORDER_BY.fac_accepted_date,
     order_direction=DIRECTION.ascending,
 ):
+    """
+    Given any (or no) search fields, build and execute a query on the General table and return the results.
+    Empty searches return everything.
+    """
     if not order_by:
         order_by = ORDER_BY.fac_accepted_date
     if not order_direction:
