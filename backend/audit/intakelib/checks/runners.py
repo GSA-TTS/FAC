@@ -50,6 +50,7 @@ from .check_show_ir import show_ir
 from .check_no_repeat_findings import no_repeat_findings
 from .check_findings_grid_validation import findings_grid_validation
 from .check_finding_prior_references_pattern import prior_references_pattern
+from .check_aln_prefix_pattern import aln_agency_prefix
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +76,7 @@ federal_awards_checks = general_checks + [
     no_major_program_no_type,
     all_unique_award_numbers,
     sequential_award_numbers,
+    aln_agency_prefix,
     aln_three_digit_extension,
     additional_award_identification,
     federal_program_total_is_correct,

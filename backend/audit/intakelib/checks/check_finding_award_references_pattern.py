@@ -11,7 +11,7 @@ from audit.intakelib.common import (
 
 logger = logging.getLogger(__name__)
 
-# A version of these regexes also exists in Base.libsonnet
+# A version of this regex also exists in Base.libsonnet
 AWARD_REFERENCES_REGEX = r"^AWARD-(?!0000)[0-9]{4}$"
 
 
