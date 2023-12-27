@@ -5,3 +5,5 @@ env_name: preview
 service_name: preview
 endpoint: fac-preview.app.cloud.gov
 instances: 1
+additional_services: &additional_services
+  - fac-census-data-s3

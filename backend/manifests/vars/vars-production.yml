@@ -5,3 +5,4 @@ env_name: prod
 service_name: production
 endpoint: app.fac.gov
 instances: 2
+additional_services: &additional_services
