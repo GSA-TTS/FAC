@@ -99,7 +99,7 @@ jobs:
           cf_space: ${{ env.space }}
           cf_manifest: backend/manifests/manifest-preview.yml
           cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
-          command: bin/ops/deploy-preview.sh
+          command: bin/ops/deploy_preview.sh
 
       - name: Deploy fac to cloud.gov
         if: ${{ inputs.environment  != 'preview' }}
