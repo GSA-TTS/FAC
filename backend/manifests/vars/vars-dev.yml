@@ -5,5 +5,3 @@ env_name: dev
 service_name: dev
 endpoint: fac-dev.app.cloud.gov
 instances: 1
-additional_services: &additional_services
-

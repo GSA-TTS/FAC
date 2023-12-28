@@ -5,5 +5,4 @@ env_name: staging
 service_name: staging
 endpoint: fac-staging.app.cloud.gov
 instances: 1
-additional_services: &additional_services
 
