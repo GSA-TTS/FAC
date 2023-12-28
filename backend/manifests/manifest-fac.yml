@@ -1,7 +1,4 @@
 ---
-additional_services: &additional_services |-
-  census-test
-
 applications:
   - name: ((app_name))
     buildpacks:
@@ -21,8 +18,6 @@ applications:
       - route: fac-((env_name)).app.cloud.gov
     instances: ((instances))
     services:
-#      - << : [ *additional_services, *default_services ]
-      - *additional_services
       - fac-db
       - fac-public-s3
       - fac-private-s3
