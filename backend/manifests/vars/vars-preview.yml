@@ -5,9 +5,3 @@ env_name: preview
 service_name: preview
 endpoint: fac-preview.app.cloud.gov
 instances: 1
-additional_services: &additional_services
-  # Flip this back to this bucket
-  # after deploy to `main`. 
-  # - fac-census-data-s3
-  # And then delete this.
-  - census-test

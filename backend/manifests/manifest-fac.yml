@@ -1,13 +1,20 @@
 ---
-default_services:
-    - fac-db
-    - fac-public-s3
-    - fac-private-s3
-    - fac-key-service
-    - newrelic-creds
-    - https-proxy-creds
-    - smtp-proxy-creds
-    - fac-logdrain
+additional_services: &additional_services
+  # Flip this back to this bucket
+  # after deploy to `main`.
+  # - fac-census-data-s3
+  # And then delete this.
+  - census-test
+
+default_services: &default_services
+  - fac-db
+  - fac-public-s3
+  - fac-private-s3
+  - fac-key-service
+  - newrelic-creds
+  - https-proxy-creds
+  - smtp-proxy-creds
+  - fac-logdrain
 
 applications:
   - name: ((app_name))
