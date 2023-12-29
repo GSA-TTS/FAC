@@ -8,6 +8,7 @@ from .util import (
     get_range_start_row,
     get_missing_value_errors,
     invalid_y_or_n_entry,
+    make_named_range_uppercase,
     safe_int_conversion,
     list_contains_non_null_values,
     build_range_error_tuple,

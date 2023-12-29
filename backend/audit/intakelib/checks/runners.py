@@ -6,6 +6,7 @@ from .check_cluster_names import check_cluster_names
 from audit.fixtures.excel import FORM_SECTIONS
 from .check_gsa_migration_keyword import check_for_gsa_migration_keyword
 
+
 ############
 # General checks
 from .check_uei_exists import uei_exists
@@ -43,7 +44,6 @@ from .check_cardinality_of_passthrough_names_and_ids import (
 from .check_has_all_the_named_ranges import has_all_the_named_ranges
 from .check_missing_required_fields import has_all_required_fields
 from .check_y_or_n__fields import has_invalid_yorn_field
-from .check_show_ir import show_ir
 
 ############
 # Audit findings checks
@@ -68,6 +68,7 @@ federal_awards_checks = general_checks + [
     has_all_required_fields(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     has_invalid_yorn_field(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     federal_award_amount_passed_through_optional,
+    check_cluster_names,
     state_cluster_names,
     other_cluster_names,
     passthrough_name_when_no_direct,
@@ -137,18 +138,23 @@ secondary_auditors_checks = general_checks + [
 
 
 def run_all_checks(ir, list_of_checks, section_name=None, is_data_migration=False):
-    show_ir
     errors = []
     if section_name:
         res = is_right_workbook(section_name)(ir)
         if res:
             errors.append(res)
 
-    if not is_data_migration:
+    # If this is a data migration, then there are some checks we do not want to run.
+    #
+    if is_data_migration:
+        if list_of_checks == federal_awards_checks:
+            list_of_checks = list(
+                filter(lambda f: f != check_cluster_names, list_of_checks)
+            )
+    else:
+        # This is not a data migration.
+        # We want to make sure no one put in a GSA_MIGRATION keyword.
         check_for_gsa_migration_keyword(ir)
-        res = check_cluster_names(ir)
-        if res:
-            errors.append(res)
 
     for fun in list_of_checks:
         res = fun(ir)
@@ -165,7 +171,9 @@ def run_all_checks(ir, list_of_checks, section_name=None, is_data_migration=Fals
 
 
 def run_all_general_checks(ir, section_name, is_data_migration=False):
-    run_all_checks(ir, general_checks, section_name, is_data_migration)
+    run_all_checks(
+        ir, general_checks, section_name, is_data_migration=is_data_migration
+    )
 
 
 def run_all_federal_awards_checks(ir, is_data_migration=False):

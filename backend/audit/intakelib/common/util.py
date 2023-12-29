@@ -122,6 +122,25 @@ def get_names_of_all_ranges(data):
     return names
 
 
+def make_named_range_uppercase(ir, range_name, message_key):
+    range_data = get_range_by_name(ir, range_name)
+    errors = []
+    new_values = []
+    if range_data:
+        for index, value in enumerate(range_data["values"]):
+            try:
+                new_values.append(value.upper())
+            except (ValueError, TypeError, AttributeError):
+                logger.info(f"Could not uppercase range {range_name}, {value}")
+                message = get_message(message_key).format(value)
+                error = build_cell_error_tuple(ir, range_data, index, message)
+                errors.append(error)
+        if len(errors) > 0:
+            logger.info("Raising a validation error.")
+            raise ValidationError(errors)
+    return replace_range_by_name(ir, range_name, new_values)
+
+
 def safe_int_conversion(ir, range_name, other_values_allowed=None):
     range_data = get_range_by_name(ir, range_name)
     errors = []
