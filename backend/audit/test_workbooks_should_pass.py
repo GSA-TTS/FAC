@@ -27,10 +27,13 @@ from audit.validators import (
 )
 
 
+# Files should be named <section>-<identifier>, where auto-generated workbooks
+# will have a DBKEY or UEI as the identifier, and manually-generated files should have
+# something descriptive that does not trip one of the below regular expressions.
 def map_file_to_extractor_validator(filename):
     file_mapping = {
-        "additional-eins": (extract_additional_eins, validate_additional_eins_json),
-        "additional-ueis": (extract_additional_ueis, validate_additional_ueis_json),
+        "additional-eins-": (extract_additional_eins, validate_additional_eins_json),
+        "additional-ueis-": (extract_additional_ueis, validate_additional_ueis_json),
         "audit-findings-text-": (
             extract_audit_findings_text,
             validate_findings_text_json,
@@ -39,13 +42,13 @@ def map_file_to_extractor_validator(filename):
             extract_audit_findings,
             validate_findings_uniform_guidance_json,
         ),
-        "corrective-action-plan": (
+        "corrective-action-plan-": (
             extract_corrective_action_plan,
             validate_corrective_action_plan_json,
         ),
-        "federal-awards": (extract_federal_awards, validate_federal_award_json),
-        "notes-to-sefa": (extract_notes_to_sefa, validate_notes_to_sefa_json),
-        "secondary-auditors": (
+        "federal-awards-": (extract_federal_awards, validate_federal_award_json),
+        "notes-to-sefa-": (extract_notes_to_sefa, validate_notes_to_sefa_json),
+        "secondary-auditors-": (
             extract_secondary_auditors,
             validate_secondary_auditors_json,
         ),
@@ -68,7 +71,9 @@ def process_workbook_set(workbook_set_path, is_gsa_migration=True):
                     ir = extractor(full_path, is_gsa_migration)
                     validator(ir)
                 else:
-                    print(f"No extractor found for [{file}]")
+                    msg = f"No extractor found for [{file}]"
+                    print(msg)
+                    raise Exception(msg)
 
 
 class PassingWorkbooks(SimpleTestCase):
@@ -80,13 +85,3 @@ class PassingWorkbooks(SimpleTestCase):
             for workbook_set in dirnames:
                 print("Walking ", workbook_set)
                 process_workbook_set(os.path.join(dirpath, workbook_set))
-
-    # Can't run this when subclased from SimpleTestCase.
-    # Can't write to the database `default`.
-    # However, we have to write real data to test the API.
-    # For now, running the E2E tests and checking that the data is in
-    # the API will have to wait for another day.
-    # def test_workbooks_end_to_end(self):
-    #     run_end_to_end(os.getenv("CYPRESS_LOGIN_TEST_EMAIL_AUDITEE"),
-    #                    "100010",
-    #                    "22")

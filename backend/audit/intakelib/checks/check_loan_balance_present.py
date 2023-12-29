@@ -1,9 +1,12 @@
 import logging
+from django.conf import settings
 from audit.intakelib.intermediate_representation import (
     get_range_values_by_name,
     get_range_by_name,
 )
 from audit.intakelib.common import get_message, build_cell_error_tuple
+from ..common.util import is_int
+from .check_cluster_total import NOT_APPLICABLE
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +35,9 @@ def loan_balance_present(ir):
                     get_message("check_loan_guarantee_empty_when_n"),
                 )
             )
-        elif (guarantee == "Y") and not balance:
+        elif (guarantee == "Y") and not (
+            balance in [NOT_APPLICABLE, settings.GSA_MIGRATION] or is_int(balance)
+        ):
             errors.append(
                 build_cell_error_tuple(
                     ir,
