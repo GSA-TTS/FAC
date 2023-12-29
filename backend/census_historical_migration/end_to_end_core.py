@@ -400,7 +400,6 @@ def handle_exception(exc, audit_header):
     status = record_migration_status(
         audit_header.AUDITYEAR,
         audit_header.DBKEY,
-        True,
     )
 
     record_migration_error(
