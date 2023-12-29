@@ -49,7 +49,6 @@ class Command(BaseCommand):
             logger.info(
                 f"Generating test reports for DBKEYS: {dbkeys_str} and YEARS: {years_str}"
             )
-            result_log = {}
             total_count = error_count = 0
             for dbkey, year in zip(dbkeys, years):
                 logger.info("Running {}-{} end-to-end".format(dbkey, year))
@@ -61,10 +60,10 @@ class Command(BaseCommand):
                     continue
 
                 run_end_to_end(user, audit_header)
-                result_log[(year, dbkey)] = MigrationResult.result
+                MigrationResult.append_summary(year, dbkey)
                 total_count += 1
 
-            log_results(result_log, error_count, total_count)
+            log_results(error_count, total_count)
 
     def handle(self, *args, **options):
         dbkeys_str = options["dbkeys"]

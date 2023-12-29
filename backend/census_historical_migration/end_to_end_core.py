@@ -44,7 +44,6 @@ import jwt
 import requests
 from datetime import datetime, timezone
 import traceback
-import copy
 
 
 logger = logging.getLogger(__name__)
@@ -270,7 +269,6 @@ def api_check(json_test_tables):
 def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
     try:
-        MigrationResult.reset()
         sac, gen_api_data = setup_sac(user, audit_header)
 
         if sac.general_information["audit_type"] == "alternative-compliance-engagement":
@@ -303,6 +301,7 @@ def run_end_to_end(user, audit_header):
 
             errors = sac.validate_cross()
             if errors.get("errors"):
+                # FIXME - MSHD: We should throw an exception here instead and handle it in `handle_exception()`
                 MigrationResult.append_error(f"{errors.get('errors')}")
                 return
 
@@ -316,18 +315,16 @@ def run_end_to_end(user, audit_header):
         record_migration_status(
             audit_header.AUDITYEAR,
             audit_header.DBKEY,
-            len(MigrationResult.result["errors"]) > 0,
         )
         record_migration_transformations(
             audit_header.AUDITYEAR,
             audit_header.DBKEY,
             sac.report_id,
-            MigrationResult.result["transformations"],
         )
 
 
-def record_migration_transformations(audit_year, dbkey, report_id, transformations):
-    for transformation in transformations:
+def record_migration_transformations(audit_year, dbkey, report_id):
+    for transformation in MigrationResult.result["transformations"]:
         migration_change_record = MigrationChangeRecord.objects.create(
             audit_year=audit_year,
             dbkey=dbkey,
@@ -342,9 +339,9 @@ def record_migration_transformations(audit_year, dbkey, report_id, transformatio
     return None
 
 
-def record_migration_status(audit_year, dbkey, has_failed):
+def record_migration_status(audit_year, dbkey):
     """Write a migration status to the DB"""
-    status = "FAILURE" if has_failed else "SUCCESS"
+    status = "FAILURE" if MigrationResult.has_errors() else "SUCCESS"
 
     migration_status = ReportMigrationStatus.objects.create(
         audit_year=audit_year,
