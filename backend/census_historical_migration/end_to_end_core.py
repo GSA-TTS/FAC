@@ -324,18 +324,20 @@ def run_end_to_end(user, audit_header):
 
 
 def record_migration_transformations(audit_year, dbkey, report_id):
-    for transformation in MigrationResult.result["transformations"]:
-        migration_change_record = MigrationChangeRecord.objects.create(
-            audit_year=audit_year,
-            dbkey=dbkey,
-            report_id=report_id,
-            run_datetime=django_timezone.now(),
-            section=transformation["section"],
-            census_data=transformation["census_data"],
-            gsa_fac_data=transformation["gsa_fac_data"],
-            transformation_function=transformation["transformation_function"],
-        )
-        migration_change_record.save()
+    # for transformation in MigrationResult.result["transformations"]:
+    migration_change_record = MigrationChangeRecord.objects.create(
+        audit_year=audit_year,
+        dbkey=dbkey,
+        report_id=report_id,
+        run_datetime=django_timezone.now(),
+        # FIXME - MSHD: We need to fix this. Note that not all reports will have data for all
+        # the sections. We may want to handle this with if statements
+        # section=transformation["section"],
+        # census_data=transformation["census_data"],
+        # gsa_fac_data=transformation["gsa_fac_data"],
+        # transformation_function=transformation["transformation_function"],
+    )
+    migration_change_record.save()
     return None
 
 
