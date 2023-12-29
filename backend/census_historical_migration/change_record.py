@@ -1,6 +1,6 @@
 import copy
 
-from backend.census_historical_migration.base_field_maps import WorkbookFieldInDissem
+from .base_field_maps import WorkbookFieldInDissem
 
 from .workbooklib.excel_creation_utils import apply_conversion_function
 
