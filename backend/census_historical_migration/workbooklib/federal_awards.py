@@ -384,6 +384,7 @@ def generate_federal_awards(audit_header, outfile):
     set_range(wb, "total_amount_expended", [str(total)])
     wb.save(outfile)
 
+    # FIXME -MSHD: we don't have an api test table for passthrough
     table = generate_dissemination_test_table(
         audit_header, "federal_awards", mappings, audits
     )
