@@ -27,25 +27,27 @@ from audit.validators import (
 )
 
 
+# In `should_fail`, we expect directories to be named in such a way as to know
+# what files to map the validators against.
 def map_file_to_extractor_validator(filename):
     file_mapping = {
-        "additional-eins": (extract_additional_eins, validate_additional_eins_json),
-        "additional-ueis": (extract_additional_ueis, validate_additional_ueis_json),
-        "audit-findings-text-": (
+        "additional-eins/": (extract_additional_eins, validate_additional_eins_json),
+        "additional-ueis/": (extract_additional_ueis, validate_additional_ueis_json),
+        "audit-findings-text/": (
             extract_audit_findings_text,
             validate_findings_text_json,
         ),
-        "audit-findings-": (
+        "audit-findings/": (
             extract_audit_findings,
             validate_findings_uniform_guidance_json,
         ),
-        "corrective-action-plan": (
+        "corrective-action-plan/": (
             extract_corrective_action_plan,
             validate_corrective_action_plan_json,
         ),
-        "federal-awards": (extract_federal_awards, validate_federal_award_json),
-        "notes-to-sefa": (extract_notes_to_sefa, validate_notes_to_sefa_json),
-        "secondary-auditors": (
+        "federal-awards/": (extract_federal_awards, validate_federal_award_json),
+        "notes-to-sefa/": (extract_notes_to_sefa, validate_notes_to_sefa_json),
+        "secondary-auditors/": (
             extract_secondary_auditors,
             validate_secondary_auditors_json,
         ),
@@ -76,7 +78,9 @@ class FailingWorkbooks(SimpleTestCase):
                                 full_path
                             )
                             if extractor:
-                                print(f"Expecting failure(s) in {file}")
+                                print(
+                                    f"Expecting failure(s) in {file} via {validator.__name__}"
+                                )
                                 workbook_count += 1
                                 try:
                                     ir = extractor(full_path)
