@@ -12,6 +12,7 @@ RUN apt-get -yq update && \
         apt-transport-https \ 
         build-essential \
         ca-certificates \
+        chromium \
         curl \
         git \
         gcc \
