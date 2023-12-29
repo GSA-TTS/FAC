@@ -131,6 +131,7 @@ def make_named_range_uppercase(ir, range_name, message_key):
             try:
                 new_values.append(value.upper())
             except (ValueError, TypeError, AttributeError):
+                logger.info(f"Could not uppercase range {range_name}, {value}")
                 message = get_message(message_key).format(value)
                 error = build_cell_error_tuple(ir, range_data, index, message)
                 errors.append(error)
