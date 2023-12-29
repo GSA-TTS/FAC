@@ -1,15 +1,12 @@
 import logging
-import boto3
-import os
 import click
-from peewee import Model, SqliteDatabase, TextField, BooleanField
-from types import SimpleNamespace
 from commands.constants import *
 from commands import (
     setup, 
     load, 
     prep, 
-    check
+    check,
+    copy
     )
 
 logger = logging.getLogger(__name__)
@@ -29,4 +26,5 @@ if __name__ == '__main__':
     cli.add_command(load.load)
     cli.add_command(prep.prep)
     cli.add_command(check.check)
+    cli.add_command(copy.copy)
     cli()

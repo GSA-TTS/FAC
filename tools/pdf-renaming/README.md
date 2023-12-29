@@ -1,3 +1,16 @@
+# Sample run
+
+```
+mkdir ${PWD}/RAMDISK
+sudo mount -t tmpfs -o size=128m RAMDISK ${PWD}/RAMDISK
+source configure_environment.bash
+python renaming.py setup run.db
+python renaming.py load run.db ims.json audit.json
+python renaming.py prep run.db
+python renaming.py check run.db --year 2021 --limit 100
+python renaming.py copy run.db --year 2021
+sudo umount ${PWD}/RAMDISK
+```
 # Preparing to run
 
 To start, you need to have some environment variables set up.

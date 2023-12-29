@@ -33,3 +33,5 @@ export CENSUS_AWS_DEFAULT_REGION=$(echo "${CENSUS_S3_CREDENTIALS}" | jq -r '.reg
 
 # Don't leave us in the production environment.
 cf target -s preview
+
+# Set the LOCAL_TEMP_PATH manually.

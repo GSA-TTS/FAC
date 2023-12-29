@@ -242,7 +242,7 @@ class Ims(BaseModel):
     reportid = BareField(column_name='REPORTID', null=True)
     suppression_code = BareField(column_name='SUPPRESSION_CODE', null=True)
     typeaudit_code = BareField(column_name='TYPEAUDIT_CODE', null=True)
-    version = BareField(column_name='VERSION', null=True)
+    version = IntegerField(column_name='VERSION', null=True)
 
     class Meta:
         table_name = 'ims'

@@ -20,3 +20,17 @@ def get_s3_client(env):
         config=Config(signature_version="s3v4"),
     )
     return s3
+
+def s3_copy(d, live_run=False):
+    local_temp = d["local_temp_path"]
+    source_env = d["source_env"]
+    source_file = d["source_file"]
+    destination_env = d["destination_env"]
+    destination_file = d["destination_file"]
+
+    print(f"Copying \n\tFROM {source_file}\n\tTO   {destination_file}")
+    if live_run:
+        census = get_s3_client(source_env)
+        preview = get_s3_client(destination_env)
+
+    
