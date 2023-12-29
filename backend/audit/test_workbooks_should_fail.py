@@ -78,7 +78,9 @@ class FailingWorkbooks(SimpleTestCase):
                                 full_path
                             )
                             if extractor:
-                                print(f"Expecting failure(s) in {file} via {validator.__name__}")
+                                print(
+                                    f"Expecting failure(s) in {file} via {validator.__name__}"
+                                )
                                 workbook_count += 1
                                 try:
                                     ir = extractor(full_path)
