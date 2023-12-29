@@ -20,7 +20,6 @@ from .auditor_certification import (
 from .report_id_generator import (
     xform_dbkey_to_report_id,
 )
-from ..migration_result import MigrationResult
 
 
 logger = logging.getLogger(__name__)
@@ -38,14 +37,6 @@ def setup_sac(user, audit_header):
 
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     generated_report_id = xform_dbkey_to_report_id(audit_header)
-    MigrationResult.result["transformations"].append(
-        {
-            "section": "General",
-            "census_data": audit_header.DBKEY,
-            "gsa_fac_data": generated_report_id,
-            "transformation_function": "xform_dbkey_to_report_id",
-        }
-    )
 
     try:
         exists = SingleAuditChecklist.objects.get(report_id=generated_report_id)
