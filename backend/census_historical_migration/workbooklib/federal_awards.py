@@ -1,24 +1,23 @@
 import re
-
+from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
-from ..workbooklib.excel_creation_utils import (
+from .excel_creation_utils import (
     get_audits,
     get_range_values,
     get_ranges,
     set_workbook_uei,
     map_simple_columns,
-    generate_dissemination_test_table,
     set_range,
 )
 from ..base_field_maps import (
     SheetFieldMap,
     WorkbookFieldInDissem,
 )
-from ..workbooklib.templates import sections_to_template_paths
+from .templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
 from django.conf import settings
 from ..models import (
@@ -118,11 +117,45 @@ def xform_constructs_cluster_names(
             # MSHD - 12/14/2023: If we want to let these cases through,
             # we must modify state_cluster_names and other_cluster_names
             # methods in check_state_cluster_names.py and check_other_cluster_names.py (intakelib/checks).
-            raise DataMigrationError("Unable to determine cluster name.")
+            raise DataMigrationError(
+                "Unable to determine cluster name.", "invalid_cluster"
+            )
 
     # Create Census_data, gsa_fac_data
 
     return (cluster_names, other_cluster_names, state_cluster_names)
+
+
+def is_valid_prefix(prefix):
+    """
+    Checks if the provided prefix is a valid CFDA prefix.
+    """
+    return re.match(settings.REGEX_ALN_PREFIX, str(prefix))
+
+
+def is_valid_extension(extension):
+    """
+    Checks if the provided extension is a valid CFDA extension.
+    """
+    # Define regex patterns
+    patterns = [
+        settings.REGEX_RD_EXTENSION,
+        settings.REGEX_THREE_DIGIT_EXTENSION,
+        settings.REGEX_U_EXTENSION,
+    ]
+    return any(re.match(pattern, str(extension)) for pattern in patterns)
+
+
+def xform_replace_invalid_extension(audit):
+    """Replaces invalid ALN extensions with the default value settings.GSA_MIGRATION."""
+    prefix = string_to_string(audit.CFDA_PREFIX)
+    extension = string_to_string(audit.CFDA_EXT)
+    if not is_valid_prefix(prefix):
+        raise DataMigrationError(f"Invalid ALN prefix: {prefix}", "invalid_aln_prefix")
+    if not is_valid_extension(extension):
+        extension = settings.GSA_MIGRATION
+
+    return f"{prefix}.{extension}"
 
 
 def _get_full_cfdas(audits):
@@ -131,10 +164,7 @@ def _get_full_cfdas(audits):
     and CFDA_EXT attributes of each audit object, separated by a dot.
     """
     # audit.CFDA is not used here because it does not always match f"{audit.CFDA_PREFIX}.{audit.CFDA_EXT}"
-    return [
-        f"{string_to_string(audit.CFDA_PREFIX)}.{string_to_string(audit.CFDA_EXT)}"
-        for audit in audits
-    ]
+    return [xform_replace_invalid_extension(audit) for audit in audits]
 
 
 def _get_passthroughs(audits):
@@ -144,8 +174,8 @@ def _get_passthroughs(audits):
     records matching the DBKEY and ELECAUDITSID of the audit. It then compiles lists of
     passthrough names and IDs, joined by a pipe '|' if multiple are found.
     """
-    passthrough_names = [""] * len(audits)
-    passthrough_ids = [""] * len(audits)
+    passthrough_names = ["" for _ in audits]
+    passthrough_ids = ["" for _ in audits]
 
     for index, audit in enumerate(audits):
         passthroughs = Passthrough.objects.filter(
@@ -209,7 +239,9 @@ def xform_populate_default_loan_balance(audits):
                 loans_at_end.append(settings.GSA_MIGRATION)  # record transformation
         else:
             if balance:
-                raise DataMigrationError("Unexpected loan balance.")
+                raise DataMigrationError(
+                    "Unexpected loan balance.", "unexpected_loan_balance"
+                )
             else:
                 loans_at_end.append("")
 
@@ -255,12 +287,14 @@ def xform_populate_default_passthrough_amount(audits):
             else:
                 # FIXME -MSHD: Is this what we want to do?
                 # Changing to settings.GSA_MIGRATION will require an update to the field type in dissemination model.
-                raise DataMigrationError("Missing passthrough amount.")
+                passthrough_amounts.append(str(settings.GSA_MIGRATION_INT))
         else:
             if not amount or amount == "0":
                 passthrough_amounts.append("")
             else:
-                raise DataMigrationError("Unexpected passthrough amount.")
+                raise DataMigrationError(
+                    "Unexpected passthrough amount.", "unexpected_passthrough_amount"
+                )
 
     return passthrough_amounts
 
@@ -350,77 +384,76 @@ def generate_federal_awards(audit_header, outfile):
     set_range(wb, "total_amount_expended", [str(total)])
     wb.save(outfile)
 
+    # FIXME -MSHD: we don't have an api test table for passthrough
     table = generate_dissemination_test_table(
         audit_header, "federal_awards", mappings, audits
     )
-    award_counter = 1
-    filtered_mappings = [
-        mapping
-        for mapping in mappings
-        if mapping.in_sheet
-        in [
-            "additional_award_identification",
-            "federal_agency_prefix",
-            "three_digit_extension",
-            "passthrough_name",
-            "passthrough_identifying_number",
-            "subrecipient_amount",
-            "loan_balance_at_audit_period_end",
+    if audits:
+        award_counter = 1
+        filtered_mappings = [
+            mapping
+            for mapping in mappings
+            if mapping.in_sheet
+            in [
+                "additional_award_identification",
+                "federal_agency_prefix",
+                "three_digit_extension",
+                "passthrough_name",
+                "passthrough_identifying_number",
+                "subrecipient_amount",
+                "loan_balance_at_audit_period_end",
+            ]
         ]
-    ]
-    ranges = get_ranges(filtered_mappings, audits)
-    prefixes = get_range_values(ranges, "federal_agency_prefix")
-    extensions = get_range_values(ranges, "three_digit_extension")
+        ranges = get_ranges(filtered_mappings, audits)
+        prefixes = get_range_values(ranges, "federal_agency_prefix")
+        extensions = get_range_values(ranges, "three_digit_extension")
 
-    for (
-        award,
-        prefix,
-        extension,
-        additional_identification,
-        cluster_name,
-        other_cluster_name,
-        state_cluster_name,
-        passthrough_amount,
-        loan_balance,
-    ) in zip(
-        table["rows"],
-        prefixes,
-        extensions,
-        additional_award_identifications,
-        cluster_names,
-        other_cluster_names,
-        state_cluster_names,
-        passthrough_amounts,
-        loan_balances,
-    ):
-        # Function to update or append field/value
-        def update_or_append_field(field_name, field_value):
-            if field_name in award["fields"]:
-                index = award["fields"].index(field_name)
-                print(
-                    f"Updating {field_name} from {award['values'][index]} to {field_value}"
-                )
-                award["values"][index] = field_value
-            else:
-                award["fields"].append(field_name)
-                award["values"].append(field_value)
+        for (
+            award,
+            prefix,
+            extension,
+            additional_identification,
+            cluster_name,
+            other_cluster_name,
+            state_cluster_name,
+            passthrough_amount,
+            loan_balance,
+        ) in zip(
+            table["rows"],
+            prefixes,
+            extensions,
+            additional_award_identifications,
+            cluster_names,
+            other_cluster_names,
+            state_cluster_names,
+            passthrough_amounts,
+            loan_balances,
+        ):
+            # Function to update or append field/value
+            def update_or_append_field(field_name, field_value):
+                if field_name in award["fields"]:
+                    index = award["fields"].index(field_name)
+                    logger.info(
+                        f"Updating {field_name} from {award['values'][index]} to {field_value}"
+                    )
+                    award["values"][index] = field_value
+                else:
+                    award["fields"].append(field_name)
+                    award["values"].append(field_value)
 
-        # Update or append new field-value pairs
-        update_or_append_field("federal_agency_prefix", prefix)
-        update_or_append_field("federal_award_extension", extension)
-        update_or_append_field("award_reference", f"AWARD-{award_counter:04}")
-        update_or_append_field(
-            "additional_award_identification", additional_identification
-        )
-        update_or_append_field("cluster_name", cluster_name)
-        update_or_append_field("other_cluster_name", other_cluster_name)
-        update_or_append_field("state_cluster_name", state_cluster_name)
-        update_or_append_field("passthrough_amount", passthrough_amount)
-        update_or_append_field("loan_balance", loan_balance)
+            # Update or append new field-value pairs
+            update_or_append_field("federal_agency_prefix", prefix)
+            update_or_append_field("federal_award_extension", extension)
+            update_or_append_field("award_reference", f"AWARD-{award_counter:04}")
+            update_or_append_field(
+                "additional_award_identification", additional_identification
+            )
+            update_or_append_field("cluster_name", cluster_name)
+            update_or_append_field("other_cluster_name", other_cluster_name)
+            update_or_append_field("state_cluster_name", state_cluster_name)
+            update_or_append_field("passthrough_amount", passthrough_amount)
+            update_or_append_field("loan_balance", loan_balance)
 
-        award_counter += 1
-
-    table["singletons"]["auditee_uei"] = uei
-    table["singletons"]["total_amount_expended"] = total
+            award_counter += 1
 
     return (wb, table)

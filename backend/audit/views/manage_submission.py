@@ -6,9 +6,14 @@ from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import (
+    ACCESS_ROLES,
     Access,
     SingleAuditChecklist,
 )
+
+
+def _get_friendly_role(role):
+    return dict(ACCESS_ROLES)[role]
 
 
 class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View):
@@ -43,7 +48,7 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             return {
                 "name": access.fullname,
                 "email": access.email,
-                "role": access.get_friendly_role(),
+                "role": _get_friendly_role(access.role),
                 "user_exists": bool(access.user),
                 "never_logged_in_flag": "" if bool(access.user) else "*",
             }
@@ -55,10 +60,25 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         accesses = Access.objects.filter(sac=sac).order_by("role")
-        entries = map(_user_entry, accesses)
+        base_entries = list(map(_user_entry, accesses))
         period_start = sac.general_information.get("auditee_fiscal_period_start")
         period_end = sac.general_information.get("auditee_fiscal_period_end")
         _url = partial(_get_url_from_viewname, report_id=report_id)
+
+        # Handle missing certifier roles:
+        entries_to_add = []
+        for role in ("certifying_auditee_contact", "certifying_auditor_contact"):
+            frole = _get_friendly_role(role)
+            if not [row for row in base_entries if row["role"] == frole]:
+                entry = {
+                    "name": "UNASSIGNED ROLE",
+                    "email": "UNASSIGNED ROLE",
+                    "role": frole,
+                    "user_exists": False,
+                    "never_logged_in_flag": "*",
+                }
+                entries_to_add.append(entry)
+        entries = base_entries + entries_to_add
 
         context = {
             "auditee_uei": sac.general_information["auditee_uei"],

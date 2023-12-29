@@ -6,12 +6,12 @@ from census_historical_migration.workbooklib.excel_creation_utils import (
 )
 from census_historical_migration.historic_data_loader import (
     create_or_get_user,
-    print_results,
+    log_results,
 )
-from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
 from census_historical_migration.migration_result import MigrationResult
 
 from django.core.management.base import BaseCommand
+from census_historical_migration.end_to_end_core import run_end_to_end
 from django.conf import settings
 
 import logging
@@ -49,7 +49,6 @@ class Command(BaseCommand):
             logger.info(
                 f"Generating test reports for DBKEYS: {dbkeys_str} and YEARS: {years_str}"
             )
-            result_log = {}
             total_count = error_count = 0
             for dbkey, year in zip(dbkeys, years):
                 logger.info("Running {}-{} end-to-end".format(dbkey, year))
@@ -61,10 +60,10 @@ class Command(BaseCommand):
                     continue
 
                 run_end_to_end(user, audit_header)
-                result_log[(year, dbkey)] = MigrationResult.result
+                MigrationResult.append_summary(year, dbkey)
                 total_count += 1
 
-            print_results(result_log, error_count, total_count)
+            log_results(error_count, total_count)
 
     def handle(self, *args, **options):
         dbkeys_str = options["dbkeys"]

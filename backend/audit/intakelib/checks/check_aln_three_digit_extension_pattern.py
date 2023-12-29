@@ -10,12 +10,6 @@ from audit.intakelib.common import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 
-# A version of these regexes also exists in Base.libsonnet
-REGEX_RD_EXTENSION = r"^RD[0-9]?$"
-REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
-REGEX_U_EXTENSION = r"^U[0-9]{2}$"
-REGEX_GSA_MIGRATION = rf"^{re.escape(settings.GSA_MIGRATION)}$"
-
 
 # DESCRIPTION
 # The three digit extension should follow one of these formats: ###, RD#, or U##, where # represents a number
@@ -26,10 +20,10 @@ def aln_three_digit_extension(ir):
     errors = []
     # Define regex patterns
     patterns = [
-        REGEX_RD_EXTENSION,
-        REGEX_THREE_DIGIT_EXTENSION,
-        REGEX_U_EXTENSION,
-        REGEX_GSA_MIGRATION,
+        settings.REGEX_RD_EXTENSION,
+        settings.REGEX_THREE_DIGIT_EXTENSION,
+        settings.REGEX_U_EXTENSION,
+        rf"^{re.escape(settings.GSA_MIGRATION)}$",
     ]
     for index, ext in enumerate(extension):
         # Check if ext does not match any of the regex patterns

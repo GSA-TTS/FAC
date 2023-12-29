@@ -1,10 +1,9 @@
 import logging
 from audit.intakelib.intermediate_representation import get_range_by_name
 from audit.intakelib.common import get_message, build_cell_error_tuple
+from .check_cluster_total import STATE_CLUSTER
 
 logger = logging.getLogger(__name__)
-
-STATE_CLUSTER = "STATE CLUSTER"
 
 
 def state_cluster_names(ir):

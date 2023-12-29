@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
 import logging
+
+from .check_finding_award_references_pattern import award_references_pattern
 from .check_cluster_names import check_cluster_names
 from audit.fixtures.excel import FORM_SECTIONS
 from .check_gsa_migration_keyword import check_for_gsa_migration_keyword
@@ -48,6 +50,7 @@ from .check_show_ir import show_ir
 from .check_no_repeat_findings import no_repeat_findings
 from .check_findings_grid_validation import findings_grid_validation
 from .check_finding_prior_references_pattern import prior_references_pattern
+from .check_aln_prefix_pattern import aln_agency_prefix
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +76,7 @@ federal_awards_checks = general_checks + [
     no_major_program_no_type,
     all_unique_award_numbers,
     sequential_award_numbers,
+    aln_agency_prefix,
     aln_three_digit_extension,
     additional_award_identification,
     federal_program_total_is_correct,
@@ -93,6 +97,7 @@ audit_findings_checks = general_checks + [
     has_all_the_named_ranges(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
     has_all_required_fields(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
     has_invalid_yorn_field(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
+    award_references_pattern,
     prior_references_pattern,
     no_repeat_findings,
     findings_grid_validation,
