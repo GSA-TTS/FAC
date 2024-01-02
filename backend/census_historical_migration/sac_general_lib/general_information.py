@@ -161,14 +161,14 @@ def xform_country(general_information, audit_header):
     """Transforms the country from Census format to FAC format."""
     auditor_country = general_information.get("auditor_country").upper()
     census_data = [
-        CensusRecord(column="CPACOUNTRY", value=general_information["auditor_country"])
+        CensusRecord(column="CPACOUNTRY", value=general_information["auditor_country"]).to_dict()
     ]
     if auditor_country in ["US", "USA"]:
         general_information["auditor_country"] = "USA"
         gsa_fac_data = [
             GsaFacRecord(
                 field="auditor_country", value=general_information["auditor_country"]
-            )
+            ).to_dict()
         ]
     elif auditor_country == "":
         valid_file = open(f"{settings.SCHEMA_BASE_DIR}/States.json")
@@ -180,7 +180,7 @@ def xform_country(general_information, audit_header):
                 GsaFacRecord(
                     field="auditor_country",
                     value=general_information["auditor_country"],
-                )
+                ).to_dict()
             ]
         else:
             raise DataMigrationError(
@@ -203,7 +203,7 @@ def xform_auditee_fiscal_period_end(general_information):
             CensusRecord(
                 column="FYENDDATE",
                 value=general_information["auditee_fiscal_period_end"],
-            )
+            ).to_dict()
         ]
         general_information[
             "auditee_fiscal_period_end"
@@ -216,7 +216,7 @@ def xform_auditee_fiscal_period_end(general_information):
             GsaFacRecord(
                 field="auditee_fiscal_period_end",
                 value=general_information["auditee_fiscal_period_end"],
-            )
+            ).to_dict()
         ]
     else:
         raise DataMigrationError(
@@ -233,7 +233,7 @@ def xform_auditee_fiscal_period_start(general_information):
         CensusRecord(
             column="FYENDDATE",
             value=general_information["auditee_fiscal_period_start"],
-        )
+        ).to_dict()
     ]
     fiscal_start_date = xform_census_date_to_datetime(
         general_information.get("auditee_fiscal_period_end")
@@ -245,7 +245,7 @@ def xform_auditee_fiscal_period_start(general_information):
         GsaFacRecord(
             field="auditee_fiscal_period_start",
             value=general_information["auditee_fiscal_period_start"],
-        )
+        ).to_dict()
     ]
 
     return general_information, census_data, gsa_fac_data
@@ -258,7 +258,7 @@ def xform_audit_period_covered(general_information):
             CensusRecord(
                 column="PERIODCOVERED",
                 value=general_information["audit_period_covered"],
-            )
+            ).to_dict()
         ]
         general_information["audit_period_covered"] = _period_covered(
             general_information.get("audit_period_covered").upper()
@@ -267,7 +267,7 @@ def xform_audit_period_covered(general_information):
             GsaFacRecord(
                 field="audit_period_covered",
                 value=general_information["audit_period_covered"],
-            )
+            ).to_dict
         ]
     else:
         raise DataMigrationError(
@@ -281,13 +281,13 @@ def xform_audit_type(general_information):
     """Transforms the audit type from Census format to FAC format."""
     if general_information.get("audit_type"):
         census_data = [
-            CensusRecord(column="AUDITTYPE", value=general_information["audit_type"])
+            CensusRecord(column="AUDITTYPE", value=general_information["audit_type"]).to_dict()
         ]
         general_information["audit_type"] = _census_audit_type(
             general_information.get("audit_type").upper()
         )
         gsa_fac_data = [
-            GsaFacRecord(field="audit_type", value=general_information["audit_type"])
+            GsaFacRecord(field="audit_type", value=general_information["audit_type"]).to_dict()
         ]
     else:
         raise DataMigrationError(
