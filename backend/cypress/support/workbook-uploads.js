@@ -14,7 +14,7 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
     }).as('uploadSuccess');
   cy.get(uploadSelector).attachFile(filename);
   // Upload url (POST /audit/excel/workbookname) returns a redirect to "/" on successful upload. So, 302.
-  cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 302);  
+  cy.wait('@uploadSuccess', { timeout: 10000 }).its('response.statusCode').should('eq', 302);  
   /* The following assertion causes unreproducible flake 
    * on CI. Until that flakiness can be resolved, the prior
    * assertion should be suffient to run e2e tests.
