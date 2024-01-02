@@ -34,9 +34,9 @@ def create_json_from_db_object(gobj, mappings):
         elif mapping.type is int:
             value = string_to_int(value)
         else:
-            census_data = [CensusRecord(column=mapping.in_db, value=value)]
+            census_data = [CensusRecord(column=mapping.in_db, value=value).to_dict()]
             value = mapping.type(value)
-            gsa_fac_data = [GsaFacRecord(field=mapping.in_dissem, value=value)]
+            gsa_fac_data = [GsaFacRecord(field=mapping.in_dissem, value=value).to_dict()]
             ChangeRecord.extend_general_changes(
                 [
                     {
