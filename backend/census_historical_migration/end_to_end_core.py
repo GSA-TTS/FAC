@@ -30,6 +30,7 @@ from dissemination.models import (
     MigrationChangeRecord,
 )
 from census_historical_migration.migration_result import MigrationResult
+from .change_record import ChangeRecord
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -337,6 +338,8 @@ def record_migration_transformations(audit_year, dbkey, report_id):
         # gsa_fac_data=transformation["gsa_fac_data"],
         # transformation_function=transformation["transformation_function"],
     )
+    if ChangeRecord.change["general"]:
+        migration_change_record.general = ChangeRecord.change["general"]
     migration_change_record.save()
     return None
 
