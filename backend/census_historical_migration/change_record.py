@@ -30,7 +30,9 @@ class ChangeRecord:
     def extend_finding_changes(data):
         ChangeRecord.change["finding"].extend(data)
 
-    # FIXME-MSHD Add more functions here as needed
+    @staticmethod
+    def extend_note_changes(data):
+        ChangeRecord.change["note"].extend(data)
 
 
 class CensusRecord:
