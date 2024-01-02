@@ -30,6 +30,10 @@ class ChangeRecord:
     def extend_finding_changes(data):
         ChangeRecord.change["finding"].extend(data)
 
+    @staticmethod
+    def extend_general_changes(data):
+        ChangeRecord.change["general"].extend(data)
+
     # FIXME-MSHD Add more functions here as needed
 
 
