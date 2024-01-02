@@ -164,13 +164,13 @@ def xform_build_sp_framework_gaap_results(audit_header):
                 audit_header.SP_FRAMEWORK_REQUIRED,
                 audit_header.TYPEREPORT_SP_FRAMEWORK,
             ],
-        )
+        ).to_dict()
     ]
     gsa_fac_data = [
         GsaFacRecord(
             field="gaap_results",
             value=sp_framework_gaap_results["gaap_results"],
-        )
+        ).to_dict()
     ]
     return sp_framework_gaap_results, census_data, gsa_fac_data, transformations
 
