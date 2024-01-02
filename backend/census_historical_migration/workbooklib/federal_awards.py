@@ -1,4 +1,3 @@
-import re
 from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
@@ -24,9 +23,18 @@ from ..models import (
     ELECAUDITS as Audits,
     ELECPASSTHROUGH as Passthrough,
 )
+from ..change_record import (
+    CensusRecord,
+    ChangeRecord,
+    GsaFacRecord,
+)
+
 import openpyxl as pyxl
 
 import logging
+import re
+import inspect
+
 
 logger = logging.getLogger(__name__)
 
@@ -155,7 +163,24 @@ def xform_replace_invalid_extension(audit):
     if not is_valid_extension(extension):
         extension = settings.GSA_MIGRATION
 
-    return f"{prefix}.{extension}"
+    cfda_key = f"{prefix}.{extension}"
+    census_data = [
+        CensusRecord("CFDA_PREFIX", audit.CFDA_PREFIX).to_dict(),
+        CensusRecord("CFDA_PREFIX", audit.CFDA_EXT).to_dict(),
+    ]
+    gsa_fac_data = GsaFacRecord("cfda_key", cfda_key).to_dict()
+    transformation_function = [
+        inspect.currentframe().f_code.co_name,
+    ]
+    ChangeRecord.extend_finding_changes([
+        {
+            "census_data": census_data,
+            "gsa_fac_data": gsa_fac_data,
+            "transformation_function": transformation_function,
+        }
+    ])
+
+    return cfda_key
 
 
 def _get_full_cfdas(audits):
