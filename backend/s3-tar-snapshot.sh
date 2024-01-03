@@ -31,7 +31,7 @@ unzip s3tar-linux-amd64.zip && rm s3tar-linux-amd64.zip
 # Unset the proxy so that s3tar-tool and aws-cli can function. Without doing this, none of the subsequent commands will work
 unset https_proxy
 
-# Sync the whole media bucket to backup.
-# This provides us with a current backup of all the files individually.
-# If nothing has changed, this runs really quickly.
-/home/vcap/app/bin/aws s3 sync s3://${FAC_MEDIA_BUCKET} s3://${BACKUPS_BUCKET}
+# Create a single tar in the backups bucket
+./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -cvf s3://${BACKUPS_BUCKET}/mediabackups/$date/archive.tar s3://${FAC_MEDIA_BUCKET} --storage-class INTELLIGENT_TIERING
+# List out the contents
+./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -tvf s3://${BACKUPS_BUCKET}/mediabackups/$date/archive.tar
