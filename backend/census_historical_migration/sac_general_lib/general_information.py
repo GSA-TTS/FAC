@@ -1,3 +1,4 @@
+import inspect
 import json
 import re
 from datetime import timedelta
@@ -33,6 +34,7 @@ def xform_entity_type(phrase):
     """Transforms the entity type from Census format to FAC format.
     For context, see ticket #2912.
     """
+    # Transformation recorded.
     mappings = {
         r"institution\s+of\s+higher\s+education": "higher-ed",
         r"non-?profit": "non-profit",
@@ -46,7 +48,13 @@ def xform_entity_type(phrase):
     # Check each pattern in the mappings with case-insensitive search
     for pattern, value in mappings.items():
         if re.search(pattern, new_phrase, re.IGNORECASE):
-            # FIXME-MSHD: This is a transformation that we may want to record
+            track_transformations(
+                "ENTITY_TYPE",
+                phrase,
+                "entity_type",
+                value,
+                inspect.currentframe().f_code.co_name,
+            )
             return value
     raise DataMigrationError(
         f"Could not find a match for historic entity type '{phrase}'",
@@ -60,9 +68,7 @@ mappings = [
     ),
     FormFieldMap("auditee_fiscal_period_end", "FYENDDATE", "fy_end_date", None, str),
     FormFieldMap("audit_period_covered", "PERIODCOVERED", FormFieldInDissem, None, str),
-    FormFieldMap(
-        "audit_type", "AUDITTYPE", FormFieldInDissem, None, str
-    ),  # FIXME: It appears the audit_type attribute is duplicated in the sac object: it exists both in the object and in the general_information section.
+    FormFieldMap("audit_type", "AUDITTYPE", FormFieldInDissem, None, str),
     FormFieldMap("auditee_address_line_1", "STREET1", FormFieldInDissem, None, str),
     FormFieldMap("auditee_city", "CITY", FormFieldInDissem, None, str),
     FormFieldMap(
@@ -159,33 +165,16 @@ def _census_audit_type(s):
 
 def xform_country(general_information, audit_header):
     """Transforms the country from Census format to FAC format."""
+    # Transformation to be documented.
     auditor_country = general_information.get("auditor_country").upper()
-    census_data = [
-        CensusRecord(
-            column="CPACOUNTRY", value=general_information["auditor_country"]
-        ).to_dict()
-    ]
     if auditor_country in ["US", "USA"]:
         general_information["auditor_country"] = "USA"
-        gsa_fac_data = [
-            GsaFacRecord(
-                field="auditor_country", value=general_information["auditor_country"]
-            ).to_dict()
-        ]
-        track_transformation(census_data, gsa_fac_data, "xform_country")
     elif auditor_country == "":
         valid_file = open(f"{settings.SCHEMA_BASE_DIR}/States.json")
         valid_json = json.load(valid_file)
         auditor_state = string_to_string(audit_header.CPASTATE).upper()
         if auditor_state in valid_json["UnitedStatesStateAbbr"]:
             general_information["auditor_country"] = "USA"
-            gsa_fac_data = [
-                GsaFacRecord(
-                    field="auditor_country",
-                    value=general_information["auditor_country"],
-                ).to_dict()
-            ]
-            track_transformation(census_data, gsa_fac_data, "xform_country")
         else:
             raise DataMigrationError(
                 f"Unable to determine auditor country. Invalid state: {auditor_state}",
@@ -202,13 +191,8 @@ def xform_country(general_information, audit_header):
 
 def xform_auditee_fiscal_period_end(general_information):
     """Transforms the fiscal period end from Census format to FAC format."""
+    # Transformation to be documented.
     if general_information.get("auditee_fiscal_period_end"):
-        census_data = [
-            CensusRecord(
-                column="FYENDDATE",
-                value=general_information["auditee_fiscal_period_end"],
-            ).to_dict()
-        ]
         general_information[
             "auditee_fiscal_period_end"
         ] = xform_census_date_to_datetime(
@@ -216,18 +200,9 @@ def xform_auditee_fiscal_period_end(general_information):
         ).strftime(
             "%Y-%m-%d"
         )
-        gsa_fac_data = [
-            GsaFacRecord(
-                field="auditee_fiscal_period_end",
-                value=general_information["auditee_fiscal_period_end"],
-            ).to_dict()
-        ]
-        track_transformation(
-            census_data, gsa_fac_data, "xform_auditee_fiscal_period_end"
-        )
     else:
         raise DataMigrationError(
-            f"Auditee fiscal period end is empty: {general_information.get('auditee_fiscal_period_end')}",
+            "Auditee fiscal period end is empty.",
             "invalid_auditee_fiscal_period_end",
         )
 
@@ -236,48 +211,32 @@ def xform_auditee_fiscal_period_end(general_information):
 
 def xform_auditee_fiscal_period_start(general_information):
     """Constructs the fiscal period start from the fiscal period end"""
-    census_data = [
-        CensusRecord(
-            column="FYENDDATE",
-            value=general_information["auditee_fiscal_period_start"],
-        ).to_dict()
-    ]
+    # Transformation to be documented.
     fiscal_start_date = xform_census_date_to_datetime(
         general_information.get("auditee_fiscal_period_end")
     ) - timedelta(days=365)
     general_information["auditee_fiscal_period_start"] = fiscal_start_date.strftime(
         "%Y-%m-%d"
     )
-    gsa_fac_data = [
-        GsaFacRecord(
-            field="auditee_fiscal_period_start",
-            value=general_information["auditee_fiscal_period_start"],
-        ).to_dict()
-    ]
-    track_transformation(census_data, gsa_fac_data, "xform_auditee_fiscal_period_start")
 
     return general_information
 
 
 def xform_audit_period_covered(general_information):
     """Transforms the period covered from Census format to FAC format."""
+    # Transformation recorded.
     if general_information.get("audit_period_covered"):
-        census_data = [
-            CensusRecord(
-                column="PERIODCOVERED",
-                value=general_information["audit_period_covered"],
-            ).to_dict()
-        ]
+        value_in_db = general_information["audit_period_covered"]
         general_information["audit_period_covered"] = _period_covered(
-            general_information.get("audit_period_covered").upper()
+            value_in_db.upper()
         )
-        gsa_fac_data = [
-            GsaFacRecord(
-                field="audit_period_covered",
-                value=general_information["audit_period_covered"],
-            ).to_dict
-        ]
-        track_transformation(census_data, gsa_fac_data, "xform_audit_period_covered")
+        track_transformations(
+            "PERIODCOVERED",
+            value_in_db,
+            "audit_period_covered",
+            general_information["audit_period_covered"],
+            inspect.currentframe().f_code.co_name,
+        )
     else:
         raise DataMigrationError(
             f"Audit period covered is empty: {general_information.get('audit_period_covered')}",
@@ -288,21 +247,17 @@ def xform_audit_period_covered(general_information):
 
 def xform_audit_type(general_information):
     """Transforms the audit type from Census format to FAC format."""
+    # Transformation recorded.
     if general_information.get("audit_type"):
-        census_data = [
-            CensusRecord(
-                column="AUDITTYPE", value=general_information["audit_type"]
-            ).to_dict()
-        ]
-        general_information["audit_type"] = _census_audit_type(
-            general_information.get("audit_type").upper()
+        value_in_db = general_information["audit_type"]
+        general_information["audit_type"] = _census_audit_type(value_in_db.upper())
+        track_transformations(
+            "AUDITTYPE",
+            value_in_db,
+            "audit_type",
+            general_information["audit_type"],
+            inspect.currentframe().f_code.co_name,
         )
-        gsa_fac_data = [
-            GsaFacRecord(
-                field="audit_type", value=general_information["audit_type"]
-            ).to_dict()
-        ]
-        track_transformation(census_data, gsa_fac_data, "xform_audit_type")
     else:
         raise DataMigrationError(
             f"Audit type is empty: {general_information.get('audit_type')}",
@@ -311,13 +266,19 @@ def xform_audit_type(general_information):
     return general_information
 
 
-def track_transformation(census_data, gsa_fac_data, transformations):
+def track_transformations(
+    census_column, census_value, gsa_field, gsa_value, transformation_functions
+):
+    """Tracks all transformations related to the general information data."""
+    census_data = [CensusRecord(column=census_column, value=census_value).to_dict()]
+    gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
+    function_names = transformation_functions.split(",")
     ChangeRecord.extend_general_changes(
         [
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
-                "transformation_function": transformations,
+                "transformation_function": function_names,
             }
         ]
     )

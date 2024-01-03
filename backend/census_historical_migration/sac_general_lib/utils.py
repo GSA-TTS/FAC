@@ -9,8 +9,6 @@ from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
 from ..exception_utils import DataMigrationValueError
 
-from ..change_record import ChangeRecord, CensusRecord, GsaFacRecord
-
 logger = logging.getLogger(__name__)
 
 
@@ -34,18 +32,7 @@ def create_json_from_db_object(gobj, mappings):
         elif mapping.type is int:
             value = string_to_int(value)
         else:
-            census_data = [CensusRecord(column=mapping.in_db, value=value).to_dict()]
             value = mapping.type(value)
-            gsa_fac_data = [GsaFacRecord(field=mapping.in_dissem, value=value).to_dict()]
-            ChangeRecord.extend_general_changes(
-                [
-                    {
-                        "census_data": census_data,
-                        "gsa_fac_data": gsa_fac_data,
-                        "transformation_function": [mapping.type.__name__],
-                    }
-                ]
-            )
         json_obj[mapping.in_form] = value
 
     return json_obj

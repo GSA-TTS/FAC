@@ -39,7 +39,8 @@ def xform_cleanup_string(s):
     return ""
 
 
-def record_data_transformation(original_value, changed_value, transformation_function):
+def track_data_transformation(original_value, changed_value, transformation_function):
+    """Tracks transformation for minimis rate."""
     census_data = [
         CensusRecord("CONTENT", original_value).to_dict(),
     ]
@@ -59,12 +60,7 @@ def record_data_transformation(original_value, changed_value, transformation_fun
 def xform_is_minimis_rate_used(rate_content):
     """Determines if the de minimis rate was used based on the given text."""
 
-    # WARNING: ANY RESULTS FROM THIS FUNCTION MUST BE RECORDED AS A TRANSFORMATION
-    # We're assign a Y/N question in the collection.
-    # Census just let them type some stuff. This is an
-    # attempt to generate a Y/N value from the content.
-    # This means the data is *not* true to what was intended, but
-    # it *is* good enough for us to use for testing.
+    # Transformation recorded.
 
     # Patterns that indicate the de minimis rate was NOT used
     not_used_patterns = [
@@ -76,7 +72,7 @@ def xform_is_minimis_rate_used(rate_content):
         r"does\s+not\s+use",
         r"has\s+not\s+elected",
         r"has\s+not\s+charged.*not\s+applicable",
-        r"did\s+not\s+charge\s+indirect\s+costs",  # FIXME-MSHD: Is this correct? see dbkey: 251020 year:22
+        r"did\s+not\s+charge\s+indirect\s+costs",
     ]
 
     # Patterns that indicate the de minimis rate WAS used
@@ -86,11 +82,11 @@ def xform_is_minimis_rate_used(rate_content):
     # Check for each pattern in the respective lists
     for pattern in not_used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
-            record_data_transformation(rate_content, "N", function_name)
+            track_data_transformation(rate_content, "N", function_name)
             return "N"
     for pattern in used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
-            record_data_transformation(rate_content, "Y", function_name)
+            track_data_transformation(rate_content, "Y", function_name)
             return "Y"
 
     raise DataMigrationError(
