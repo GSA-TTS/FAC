@@ -167,14 +167,13 @@ def xform_replace_invalid_extension(audit):
 
     cfda_key = f"{prefix}.{extension}"
     census_data = [
-        CensusRecord("CFDA_PREFIX", audit.CFDA_PREFIX).to_dict(),
-        CensusRecord("CFDA_PREFIX", audit.CFDA_EXT).to_dict(),
+        CensusRecord("CFDA_EXT", audit.CFDA_EXT).to_dict(),
     ]
-    gsa_fac_data = GsaFacRecord("cfda_key", cfda_key).to_dict()
+    gsa_fac_data = GsaFacRecord("federal_award_extension", extension).to_dict()
     transformation_function = [
         inspect.currentframe().f_code.co_name,
     ]
-    ChangeRecord.extend_finding_changes([
+    ChangeRecord.extend_federal_awards_changes([
         {
             "census_data": census_data,
             "gsa_fac_data": gsa_fac_data,
