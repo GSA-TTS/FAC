@@ -1,0 +1,15 @@
+---
+name: Production Media Snapshot
+on:
+  #schedule:
+    # Invoke at 9 UTC every monday
+    #- cron: '0 9 * * 1'
+  workflow_dispatch: null
+
+jobs:
+  trivy-scan:
+    uses: ./.github/workflows/tar-s3-media.yml
+    secrets: inherit
+    with:
+      environment: "production"
+
