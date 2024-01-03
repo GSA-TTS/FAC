@@ -53,11 +53,7 @@
                         <tr>
                             <td>{{ entry.name }}</td>
                             <td>{{ entry.role }}</td>
-                            {% comment %} 
-                              Removed the flags for the time being, to reduce initial complexity.
-                              <td>{{ entry.email }} {{ entry.never_logged_in_flag }}</td> 
-                            {% endcomment %}
-                            <td>{{ entry.email }}</td>
+                            <td>{{ entry.email }} {{ entry.never_logged_in_flag }}</td> 
                             <td>
                                 {% if entry.role == 'Auditee Certifying Official' %}
                                     <a href="{{ change_cert_auditee_url }}">Edit</a>
@@ -69,16 +65,13 @@
                     {% endfor %}
                 </tbody>
             </table>
-            {% comment %}
-                Uncomment if/when we chose to keep the flags.
-                <p class="font-sans-xs">(<strong>*</strong>) Indicates user has not logged in to view this submission.</p>
-            {% endcomment %}
-              <a class="usa-button usa-button margin-top-5"
-                 href="{{ add_editor_url }}"
-                 aria-controls="add-editor">Add editor</a>
-              <a class="usa-button usa-button--unstyled margin-left-2"
-                 href="{{ progress_url }}"
-                 aria-controls="return-to-checklist">Return to checklist</a>
+            <p class="font-sans-xs">(<strong>*</strong>) Indicates user has not logged in to view this submission.</p>
+            <a class="usa-button usa-button margin-top-5"
+                href="{{ add_editor_url }}"
+                aria-controls="add-editor">Add editor</a>
+            <a class="usa-button usa-button--unstyled margin-left-2"
+                href="{{ progress_url }}"
+                aria-controls="return-to-checklist">Return to checklist</a>
         </div>
     </div>
     {% include "audit-metadata.html" %}
