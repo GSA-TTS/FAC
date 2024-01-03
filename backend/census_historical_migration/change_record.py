@@ -1,4 +1,5 @@
 import copy
+from typing import Any
 
 from .base_field_maps import WorkbookFieldInDissem
 
@@ -9,7 +10,7 @@ class ChangeRecord:
     """Hold a record of changes for the ongoing report migration"""
 
     # We record changes with respect to dissemination tables.
-    DEFAULT = {
+    DEFAULT: dict[str, Any] = {
         "general": [],
         "finding": [],
         "finding_text": [],

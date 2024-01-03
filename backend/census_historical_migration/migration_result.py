@@ -1,10 +1,11 @@
 import copy
+from typing import Any
 
 
 class MigrationResult:
     """Stores the result for the current migration"""
 
-    DEFAULT_RESULT = {
+    DEFAULT_RESULT: dict[str, Any] = {
         "success": [],
         "errors": [],
         "transformations": [],
