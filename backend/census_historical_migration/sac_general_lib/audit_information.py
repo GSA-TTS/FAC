@@ -153,6 +153,11 @@ def xform_build_sp_framework_gaap_results(audit_header):
         basis = xform_framework_basis(audit_header.SP_FRAMEWORK)
         sp_framework_gaap_results["sp_framework_basis"].append(basis)
 
+    record_transformations(sp_framework_gaap_results, audit_header)
+    return sp_framework_gaap_results
+
+
+def record_transformations(sp_framework_gaap_results, audit_header):
     if sp_framework_gaap_results["gaap_results"]:
         census_data = [
             CensusRecord(
@@ -266,7 +271,6 @@ def xform_build_sp_framework_gaap_results(audit_header):
                 }
             ]
         )
-    return sp_framework_gaap_results
 
 
 def audit_information(audit_header):
