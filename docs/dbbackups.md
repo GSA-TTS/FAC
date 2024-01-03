@@ -56,6 +56,7 @@ cf restart gsa-fac --strategy rolling
 
 Running things by hand:
 [s3-sync](../backend/s3-sync.sh)
+[s3-tar-snapshot](../backend/s3-tar-snapshot.sh)
 
 Tail the logs on the app
 ```sh
