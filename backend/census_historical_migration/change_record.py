@@ -30,6 +30,14 @@ class ChangeRecord:
     def extend_finding_changes(data):
         ChangeRecord.change["finding"].extend(data)
 
+    @staticmethod
+    def extend_note_changes(data):
+        ChangeRecord.change["note"].extend(data)
+    
+    @staticmethod
+    def extend_general_changes(data):
+        ChangeRecord.change["general"].extend(data)
+
     # FIXME-MSHD Add more functions here as needed
 
 
@@ -76,14 +84,14 @@ def retrieve_change_records(mappings, objects):
                     )
 
                     if m.in_dissem == WorkbookFieldInDissem:
-                        change_record["gsa_fac_data"].append(
-                            GsaFacRecord(m.in_sheet, attribute_value).to_dict()
-                        )
+                        change_record["gsa_fac_data"] = GsaFacRecord(
+                            m.in_sheet, attribute_value
+                        ).to_dict()
                         change_record["transformation_function"].append(m.type)
                     else:
-                        change_record["gsa_fac_data"].append(
-                            GsaFacRecord(m.in_dissem, attribute_value).to_dict()
-                        )
+                        change_record["gsa_fac_data"] = GsaFacRecord(
+                            m.in_dissem, attribute_value
+                        ).to_dict()
                         change_record["transformation_function"].append(m.type)
 
                     change_records.append(change_record)

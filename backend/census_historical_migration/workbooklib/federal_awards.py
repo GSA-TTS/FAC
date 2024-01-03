@@ -44,9 +44,6 @@ mappings = [
         "federal_agency_prefix", "CFDA_PREFIX", WorkbookFieldInDissem, None, str
     ),
     SheetFieldMap(
-        "three_digit_extension", "CFDA_EXT", "federal_award_extension", None, str
-    ),
-    SheetFieldMap(
         "program_name", "FEDERALPROGRAMNAME", "federal_program_name", None, str
     ),
     SheetFieldMap(
@@ -139,6 +136,11 @@ def is_valid_prefix(prefix):
     Checks if the provided prefix is a valid CFDA prefix.
     """
     return re.match(settings.REGEX_ALN_PREFIX, str(prefix))
+
+
+def _extract_extensions(full_cfdas):
+    """Extracts the extensions from a list of CFDA keys."""
+    return [s.split(".")[1] for s in full_cfdas if "." in s]
 
 
 def is_valid_extension(extension):
@@ -352,7 +354,8 @@ def generate_federal_awards(audit_header, outfile):
     # We need a `cfda_key` as a magic column for the summation logic to work/be checked.
     full_cfdas = _get_full_cfdas(audits)
     set_range(wb, "cfda_key", full_cfdas, conversion_fun=str)
-
+    extensions = _extract_extensions(full_cfdas)
+    set_range(wb, "three_digit_extension", extensions, conversion_fun=str)
     # We need `uniform_state_cluster_name` and `uniform_other_cluster_name` magic columns for cluster summation logic to work/be checked.
     set_range(
         wb,
@@ -418,20 +421,10 @@ def generate_federal_awards(audit_header, outfile):
         filtered_mappings = [
             mapping
             for mapping in mappings
-            if mapping.in_sheet
-            in [
-                "additional_award_identification",
-                "federal_agency_prefix",
-                "three_digit_extension",
-                "passthrough_name",
-                "passthrough_identifying_number",
-                "subrecipient_amount",
-                "loan_balance_at_audit_period_end",
-            ]
+            if mapping.in_sheet == "federal_agency_prefix"
         ]
         ranges = get_ranges(filtered_mappings, audits)
         prefixes = get_range_values(ranges, "federal_agency_prefix")
-        extensions = get_range_values(ranges, "three_digit_extension")
 
         for (
             award,

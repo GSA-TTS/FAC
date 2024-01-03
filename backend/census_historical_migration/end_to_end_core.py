@@ -30,6 +30,7 @@ from dissemination.models import (
     MigrationChangeRecord,
 )
 from census_historical_migration.migration_result import MigrationResult
+from .change_record import ChangeRecord
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -309,18 +310,17 @@ def run_end_to_end(user, audit_header):
             combined_summary = api_check(json_test_tables)
             logger.info(combined_summary)
             MigrationResult.append_success(f"{sac.report_id} created")
+            record_migration_status(
+                audit_header.AUDITYEAR,
+                audit_header.DBKEY,
+            )
+            record_migration_transformations(
+                audit_header.AUDITYEAR,
+                audit_header.DBKEY,
+                sac.report_id,
+            )
     except Exception as exc:
         handle_exception(exc, audit_header)
-    else:
-        record_migration_status(
-            audit_header.AUDITYEAR,
-            audit_header.DBKEY,
-        )
-        record_migration_transformations(
-            audit_header.AUDITYEAR,
-            audit_header.DBKEY,
-            sac.report_id,
-        )
 
 
 def record_migration_transformations(audit_year, dbkey, report_id):
@@ -337,6 +337,8 @@ def record_migration_transformations(audit_year, dbkey, report_id):
         # gsa_fac_data=transformation["gsa_fac_data"],
         # transformation_function=transformation["transformation_function"],
     )
+    if ChangeRecord.change["general"]:
+        migration_change_record.general = ChangeRecord.change["general"]
     migration_change_record.save()
     return None
 

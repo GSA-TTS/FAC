@@ -1,4 +1,7 @@
+import inspect
 from django.conf import settings
+
+from ..change_record import CensusRecord, ChangeRecord, GsaFacRecord
 from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
@@ -36,6 +39,23 @@ def xform_cleanup_string(s):
     return ""
 
 
+def record_data_transformation(original_value, changed_value, transformation_function):
+    census_data = [
+        CensusRecord("CONTENT", original_value).to_dict(),
+    ]
+    gsa_fac_data = GsaFacRecord("is_minimis_rate_used", changed_value).to_dict()
+
+    ChangeRecord.extend_note_changes(
+        [
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_function": [transformation_function],
+            }
+        ]
+    )
+
+
 def xform_is_minimis_rate_used(rate_content):
     """Determines if the de minimis rate was used based on the given text."""
 
@@ -62,14 +82,15 @@ def xform_is_minimis_rate_used(rate_content):
     # Patterns that indicate the de minimis rate WAS used
     used_patterns = [r"used", r"elected\s+to\s+use", r"uses.*allowed"]
 
+    function_name = inspect.currentframe().f_code.co_name
     # Check for each pattern in the respective lists
     for pattern in not_used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
-            # FIXME-MSHD: RECORD THIS TRANSFORMATION
+            record_data_transformation(rate_content, "N", function_name)
             return "N"
     for pattern in used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
-            # FIXME-MSHD: RECORD THIS TRANSFORMATION
+            record_data_transformation(rate_content, "Y", function_name)
             return "Y"
 
     raise DataMigrationError(
