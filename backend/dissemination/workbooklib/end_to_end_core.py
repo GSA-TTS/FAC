@@ -96,7 +96,6 @@ def disseminate(sac, year):
         model.objects.filter(report_id=sac.report_id).delete()
 
     if sac.general_information:
-        # etl = IntakeToDissemination(sac)
         sac.disseminate()
 
 
@@ -245,14 +244,9 @@ def generate_workbooks(user, email, dbkey, year, store_files=True, run_api_check
 def run_end_to_end(email, dbkey, year, store_files=True, run_api_checks=True):
     try:
         user = User.objects.get(email=email)
-
     except User.DoesNotExist:
-        # logger.info("No user found for %s, have you logged in once?", email)
-        logger.info("Creating a user for test data generation.")
+        logger.info("Retrieve or create test data generation user.")
         test_user_email = "test-data-generator@fac.gsa.gov"
-        try:
-            user = User.objects.get(email=test_user_email)
-        except Exception:
-            user = User.objects.create(email=test_user_email)
-        # return
+        user, created = User.objects.get_or_create(email=test_user_email)
+
     generate_workbooks(user, email, dbkey, year, store_files, run_api_checks)
