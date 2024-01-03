@@ -9,7 +9,6 @@ on:
 
 jobs:
   backup-media:
-    if: ${{ inputs.environment == 'dev' }}
     name: Perform Media Backups
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
