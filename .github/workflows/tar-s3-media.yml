@@ -1,5 +1,5 @@
 ---
-name: Perform Media and Database Backups
+name: Perform a tar snapshot of the media
 on:
   workflow_dispatch:
     inputs:
