@@ -173,13 +173,15 @@ def xform_replace_invalid_extension(audit):
     transformation_function = [
         inspect.currentframe().f_code.co_name,
     ]
-    ChangeRecord.extend_federal_awards_changes([
-        {
-            "census_data": census_data,
-            "gsa_fac_data": gsa_fac_data,
-            "transformation_function": transformation_function,
-        }
-    ])
+    ChangeRecord.extend_federal_awards_changes(
+        [
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_function": transformation_function,
+            }
+        ]
+    )
 
     return cfda_key
 
