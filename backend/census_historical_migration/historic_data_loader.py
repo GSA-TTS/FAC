@@ -1,5 +1,6 @@
 import logging
 from .models import ELECAUDITHEADER as AuditHeader
+from .migration_result import MigrationResult
 from .end_to_end_core import run_end_to_end
 
 from django.contrib.auth import get_user_model
@@ -12,7 +13,6 @@ User = get_user_model()
 
 def load_historic_data_for_year(audit_year, page_size, pages):
     """Iterates over and processes submissions for the given audit year"""
-    result_log = {}
     total_count = error_count = 0
     user = create_or_get_user()
     submissions_for_year = AuditHeader.objects.filter(AUDITYEAR=audit_year).order_by(
@@ -29,32 +29,32 @@ def load_historic_data_for_year(audit_year, page_size, pages):
         )
 
         for submission in page.object_list:
-            result = {"success": [], "errors": []}
             # Migrate a single submission
-            run_end_to_end(user, submission, result)
+            run_end_to_end(user, submission)
 
-            result_log[(submission.AUDITYEAR, submission.DBKEY)] = result
+            MigrationResult.append_summary(submission.AUDITYEAR, submission.DBKEY)
+
             total_count += 1
 
-            has_failed = len(result["errors"]) > 0
-            if has_failed:
+            if MigrationResult.has_errors():
                 error_count += 1
             if total_count % 5 == 0:
                 logger.info(f"Processed = {total_count}, Errors = {error_count}")
 
-    log_results(result_log, error_count, total_count)
+    log_results(error_count, total_count)
 
 
-def log_results(result_log, error_count, total_count):
+def log_results(error_count, total_count):
     """Prints the results of the migration"""
 
     logger.info("********* Loader Summary ***************")
 
-    for k, v in result_log.items():
+    for k, v in MigrationResult.result["summaries"].items():
         logger.info(f"{k}, {v}")
         logger.info("-------------------")
 
     logger.info(f"{error_count} errors out of {total_count}")
+    MigrationResult.reset()
 
 
 def create_or_get_user():

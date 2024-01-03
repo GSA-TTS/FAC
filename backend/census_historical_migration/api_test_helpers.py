@@ -28,10 +28,10 @@ def generate_dissemination_test_table(
                 if (attribute_value is not None) and (attribute_value != ""):
                     if m.in_dissem == WorkbookFieldInDissem:
                         test_obj["fields"].append(m.in_sheet)
-                        test_obj["values"].append(m.type(attribute_value))
+                        test_obj["values"].append(attribute_value)
                     else:
                         test_obj["fields"].append(m.in_dissem)
-                        test_obj["values"].append(m.type(attribute_value))
+                        test_obj["values"].append(attribute_value)
 
             table["rows"].append(test_obj)
     else:

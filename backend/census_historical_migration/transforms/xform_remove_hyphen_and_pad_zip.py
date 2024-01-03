@@ -10,6 +10,7 @@ def xform_remove_hyphen_and_pad_zip(zip):
     - Returns the ZIP code if it has 5 digits or 9 digitis (after padding if needed).
     - Raises an error for other cases.
     """
+    # Transformation to be documented.
     strzip = string_to_string(zip)
     if "-" in strzip:
         parts = strzip.split("-")
@@ -22,7 +23,6 @@ def xform_remove_hyphen_and_pad_zip(zip):
             )
 
     if len(strzip) in [4, 8]:
-        # FIXME - MSHD: Record this transformation.
         strzip = "0" + strzip
     if len(strzip) == 5 or len(strzip) == 9:
         return strzip
