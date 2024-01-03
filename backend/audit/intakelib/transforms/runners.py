@@ -10,6 +10,9 @@ from .xform_all_cluster_total_need_to_be_integers import (
 from .xform_all_federal_program_total_need_to_be_integers import (
     convert_federal_program_total_to_integers,
 )
+from .xform_federal_awards_cluster_name_to_uppercase import (
+    convert_federal_awards_cluster_name_to_uppercase,
+)
 from .xform_total_amount_expended_need_to_be_integers import (
     convert_total_amount_expended_to_integers,
 )
@@ -105,6 +108,7 @@ federal_awards_transforms = general_transforms + [
     convert_total_amount_expended_to_integers,
     convert_number_of_findings_to_integers,
     convert_loan_balance_to_integers_or_na,
+    convert_federal_awards_cluster_name_to_uppercase,
     regenerate_uniform_cluster_names,
     reformat_federal_agency_prefix,
     generate_cfda_keys,
