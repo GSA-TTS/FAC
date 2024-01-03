@@ -338,7 +338,7 @@ def record_migration_transformations(audit_year, dbkey, report_id):
         # transformation_function=transformation["transformation_function"],
     )
     if ChangeRecord.change["general"]:
-    migration_change_record.general = ChangeRecord.change["general"]
+        migration_change_record.general = ChangeRecord.change["general"]
     migration_change_record.save()
     return None
 
