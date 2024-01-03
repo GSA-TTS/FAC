@@ -269,6 +269,7 @@ def api_check(json_test_tables):
 
 def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
+    ChangeRecord.reset()
     try:
         sac, gen_api_data = setup_sac(user, audit_header)
 
@@ -324,23 +325,24 @@ def run_end_to_end(user, audit_header):
 
 
 def record_migration_transformations(audit_year, dbkey, report_id):
-    # for transformation in MigrationResult.result["transformations"]:
-    migration_change_record = MigrationChangeRecord.objects.create(
+    """Record the transformations that were applied to the current report"""
+    migration_change_record, created = MigrationChangeRecord.objects.get_or_create(
         audit_year=audit_year,
         dbkey=dbkey,
         report_id=report_id,
-        run_datetime=django_timezone.now(),
-        # FIXME - MSHD: We need to fix this. Note that not all reports will have data for all
-        # the sections. We may want to handle this with if statements
-        # section=transformation["section"],
-        # census_data=transformation["census_data"],
-        # gsa_fac_data=transformation["gsa_fac_data"],
-        # transformation_function=transformation["transformation_function"],
     )
+    migration_change_record.run_datetime = django_timezone.now()
     if ChangeRecord.change["general"]:
         migration_change_record.general = ChangeRecord.change["general"]
+    if ChangeRecord.change["finding"]:
+        migration_change_record.finding = ChangeRecord.change["finding"]
+    if ChangeRecord.change["note"]:
+        migration_change_record.note = ChangeRecord.change["note"]
+    if ChangeRecord.change["federal_award"]:
+        migration_change_record.federal_award = ChangeRecord.change["federal_award"]
+
     migration_change_record.save()
-    return None
+    ChangeRecord.reset()
 
 
 def record_migration_status(audit_year, dbkey):

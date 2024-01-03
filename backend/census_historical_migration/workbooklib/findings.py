@@ -37,9 +37,10 @@ def xform_prior_year_findings(value):
     """
     Transform the value of prior_references to N/A if empty.
     """
+    # Transformation to be documented.
     trimmed_value = string_to_string(value)
     if not trimmed_value:
-        # we must document this transformation #2912
+        # See ticket #2912
         return "N/A"
 
     return trimmed_value
@@ -87,6 +88,7 @@ mappings = [
 
 def xform_construct_award_references(audits, findings):
     """Construct award references for findings."""
+    # Transformation recorded.
     e2a = {}
     for index, audit in enumerate(audits):
         e2a[audit.ELECAUDITSID] = f"AWARD-{index+1:04d}"
@@ -94,12 +96,10 @@ def xform_construct_award_references(audits, findings):
     change_records = []
     for find in findings:
         award_references.append(e2a[find.ELECAUDITSID])
-        # Record change
+        # Tracking changes
         census_data = [CensusRecord("ELECAUDITSID", find.ELECAUDITSID).to_dict()]
         gsa_fac_data = GsaFacRecord("award_reference", e2a[find.ELECAUDITSID]).to_dict()
-        transformation_function = [
-            inspect.currentframe().f_code.co_name
-        ]  # FIXME - MSHD: I have not tested this yet
+        transformation_function = [inspect.currentframe().f_code.co_name]
         change_records.append(
             {
                 "census_data": census_data,

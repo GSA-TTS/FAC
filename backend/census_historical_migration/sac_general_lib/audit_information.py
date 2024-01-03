@@ -19,9 +19,9 @@ from audit.utils import Util
 
 def xform_apply_default_thresholds(value):
     """Applies default threshold when value is None."""
+    # Transformation to be documented.
     str_value = string_to_string(value)
     if str_value == "":
-        # FIXME-MSHD: This is a transformation that we may want to record
         return settings.GSA_MIGRATION_INT
     return string_to_int(str_value)
 
@@ -85,6 +85,7 @@ def xform_framework_basis(basis):
     """Transforms the framework basis from Census format to FAC format.
     For context, see ticket #2912.
     """
+    # Transformation recorded (see xform_build_sp_framework_gaap_results).
     basis = string_to_string(basis)
     if is_single_word(basis):
         mappings = {
@@ -97,7 +98,6 @@ def xform_framework_basis(basis):
         # Check each pattern in the mappings with case-insensitive search
         for pattern, value in mappings.items():
             if re.search(pattern, basis, re.IGNORECASE):
-                # FIXME-MSHD: This is a transformation that we may want to record
                 return value
 
     raise DataMigrationError(
@@ -110,7 +110,7 @@ def xform_census_keys_to_fac_options(census_keys, fac_options):
     """Maps the census keys to FAC options.
     For context, see ticket #2912.
     """
-
+    # Transformation recorded (see xform_build_sp_framework_gaap_results).
     if "U" in census_keys:
         fac_options.append("unmodified_opinion")
     if "Q" in census_keys:
@@ -123,7 +123,7 @@ def xform_census_keys_to_fac_options(census_keys, fac_options):
 
 def xform_build_sp_framework_gaap_results(audit_header):
     """Returns the SP Framework and GAAP results for a given audit header."""
-
+    # Transformation recorded.
     sp_framework_gaap_data = string_to_string(audit_header.TYPEREPORT_FS).upper()
     if not sp_framework_gaap_data:
         raise DataMigrationError(
@@ -153,11 +153,14 @@ def xform_build_sp_framework_gaap_results(audit_header):
         basis = xform_framework_basis(audit_header.SP_FRAMEWORK)
         sp_framework_gaap_results["sp_framework_basis"].append(basis)
 
-    record_transformations(sp_framework_gaap_results, audit_header)
+    track_transformations(sp_framework_gaap_results, audit_header)
+
     return sp_framework_gaap_results
 
 
-def record_transformations(sp_framework_gaap_results, audit_header):
+def track_transformations(sp_framework_gaap_results, audit_header):
+    """Tracks all transformations related to the special framework data."""
+
     if sp_framework_gaap_results["gaap_results"]:
         census_data = [
             CensusRecord(
@@ -169,7 +172,6 @@ def record_transformations(sp_framework_gaap_results, audit_header):
             field="gaap_results",
             value=Util.json_array_to_str(sp_framework_gaap_results["gaap_results"]),
         ).to_dict()
-
         ChangeRecord.extend_general_changes(
             [
                 {
@@ -182,6 +184,7 @@ def record_transformations(sp_framework_gaap_results, audit_header):
                 }
             ]
         )
+
     if "is_sp_framework_required" in sp_framework_gaap_results:
         census_data = [
             CensusRecord(
@@ -199,7 +202,6 @@ def record_transformations(sp_framework_gaap_results, audit_header):
                 sp_framework_gaap_results["is_sp_framework_required"]
             ),
         ).to_dict()
-
         ChangeRecord.extend_general_changes(
             [
                 {
@@ -211,6 +213,7 @@ def record_transformations(sp_framework_gaap_results, audit_header):
                 }
             ]
         )
+
     if "sp_framework_opinions" in sp_framework_gaap_results:
         census_data = [
             CensusRecord(
@@ -228,7 +231,6 @@ def record_transformations(sp_framework_gaap_results, audit_header):
                 sp_framework_gaap_results["sp_framework_opinions"]
             ),
         ).to_dict()
-
         ChangeRecord.extend_general_changes(
             [
                 {
@@ -241,6 +243,7 @@ def record_transformations(sp_framework_gaap_results, audit_header):
                 }
             ]
         )
+
     if "sp_framework_basis" in sp_framework_gaap_results:
         census_data = [
             CensusRecord(
@@ -258,7 +261,6 @@ def record_transformations(sp_framework_gaap_results, audit_header):
                 sp_framework_gaap_results["sp_framework_basis"]
             ),
         ).to_dict()
-
         ChangeRecord.extend_general_changes(
             [
                 {
