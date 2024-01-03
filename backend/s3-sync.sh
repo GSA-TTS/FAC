@@ -31,24 +31,8 @@ unzip s3tar-linux-amd64.zip && rm s3tar-linux-amd64.zip
 # Unset the proxy so that s3tar-tool and aws-cli can function. Without doing this, none of the subsequent commands will work
 unset https_proxy
 
-# Create a single tar in the source bucket
-./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -cvf s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar s3://${FAC_MEDIA_BUCKET} --storage-class INTELLIGENT_TIERING
+# Create a single tar in the backups bucket
+./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -cvf s3://${BACKUPS_BUCKET}/mediabackups/$date/archive.tar s3://${FAC_MEDIA_BUCKET} --storage-class INTELLIGENT_TIERING
+# List out the contents
+./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -tvf s3://${BACKUPS_BUCKET}/mediabackups/$date/archive.tar
 
-# List contents of source bucket
-/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
-
-# Move the tar to the backups bucket
-/home/vcap/app/bin/aws s3 sync s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/ s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
-# Share the Tar to dest and extract (without including the tar)
-#./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -xvf s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar -C s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
-
-# List contents of destination bucket
-/home/vcap/app/bin/aws s3 ls s3://${BACKUPS_BUCKET}/mediabackups/$date/
-
-# Cleanup the source bucket so older backups don't get added to the tar
-/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar
-/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
-/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/
-
-# List contents of source bucket to ensure everything was deleted properly
-/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/
