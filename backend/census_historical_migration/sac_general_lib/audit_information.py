@@ -14,6 +14,7 @@ from ..sac_general_lib.utils import (
 )
 import audit.validators
 from ..change_record import ChangeRecord, CensusRecord, GsaFacRecord
+from audit.utils import Util
 
 
 def xform_apply_default_thresholds(value):
@@ -130,13 +131,11 @@ def xform_build_sp_framework_gaap_results(audit_header):
             "missing_gaap",
         )
 
-    transformations = []
     sp_framework_gaap_results = {}
     sp_framework_gaap_results["gaap_results"] = []
     xform_census_keys_to_fac_options(
         sp_framework_gaap_data, sp_framework_gaap_results["gaap_results"]
     )
-    transformations.append("xform_census_keys_to_fac_options")
 
     if "S" in sp_framework_gaap_data:
         sp_framework_gaap_results["gaap_results"].append("not_gaap")
@@ -150,49 +149,129 @@ def xform_build_sp_framework_gaap_results(audit_header):
         xform_census_keys_to_fac_options(
             sp_framework_opinions, sp_framework_gaap_results["sp_framework_opinions"]
         )
-        transformations.append("xform_census_keys_to_fac_options")
         sp_framework_gaap_results["sp_framework_basis"] = []
         basis = xform_framework_basis(audit_header.SP_FRAMEWORK)
         sp_framework_gaap_results["sp_framework_basis"].append(basis)
-        transformations.append("xform_framework_basis")
 
-    census_data = [
-        CensusRecord(
-            column=["TYPEREPORT_FS", "SP_FRAMEWORK_REQUIRED", "SP_FRAMEWORK"],
-            value=[
-                audit_header.TYPEREPORT_FS,
-                audit_header.SP_FRAMEWORK_REQUIRED,
-                audit_header.TYPEREPORT_SP_FRAMEWORK,
-            ],
-        ).to_dict()
-    ]
-    gsa_fac_data = [
-        GsaFacRecord(
+    if sp_framework_gaap_results["gaap_results"]:
+        census_data = [
+            CensusRecord(
+                column="TYPEREPORT_FS",
+                value=audit_header.TYPEREPORT_FS,
+            ).to_dict(),
+        ]
+        gsa_fac_data = GsaFacRecord(
             field="gaap_results",
-            value=sp_framework_gaap_results["gaap_results"],
+            value=Util.json_array_to_str(sp_framework_gaap_results["gaap_results"]),
         ).to_dict()
-    ]
-    return sp_framework_gaap_results, census_data, gsa_fac_data, transformations
+
+        ChangeRecord.extend_general_changes(
+            [
+                {
+                    "census_data": census_data,
+                    "gsa_fac_data": gsa_fac_data,
+                    "transformation_function": [
+                        "xform_build_sp_framework_gaap_results",
+                        "xform_census_keys_to_fac_options",
+                    ],
+                }
+            ]
+        )
+    if "is_sp_framework_required" in sp_framework_gaap_results:
+        census_data = [
+            CensusRecord(
+                column="TYPEREPORT_FS",
+                value=audit_header.TYPEREPORT_FS,
+            ).to_dict(),
+            CensusRecord(
+                column="SP_FRAMEWORK_REQUIRED",
+                value=audit_header.SP_FRAMEWORK_REQUIRED,
+            ).to_dict(),
+        ]
+        gsa_fac_data = GsaFacRecord(
+            field="is_sp_framework_required",
+            value=Util.optional_bool(
+                sp_framework_gaap_results["is_sp_framework_required"]
+            ),
+        ).to_dict()
+
+        ChangeRecord.extend_general_changes(
+            [
+                {
+                    "census_data": census_data,
+                    "gsa_fac_data": gsa_fac_data,
+                    "transformation_function": [
+                        "xform_build_sp_framework_gaap_results"
+                    ],
+                }
+            ]
+        )
+    if "sp_framework_opinions" in sp_framework_gaap_results:
+        census_data = [
+            CensusRecord(
+                column="TYPEREPORT_FS",
+                value=audit_header.TYPEREPORT_FS,
+            ).to_dict(),
+            CensusRecord(
+                column="TYPEREPORT_SP_FRAMEWORK",
+                value=audit_header.TYPEREPORT_SP_FRAMEWORK,
+            ).to_dict(),
+        ]
+        gsa_fac_data = GsaFacRecord(
+            field="sp_framework_opinions",
+            value=Util.json_array_to_str(
+                sp_framework_gaap_results["sp_framework_opinions"]
+            ),
+        ).to_dict()
+
+        ChangeRecord.extend_general_changes(
+            [
+                {
+                    "census_data": census_data,
+                    "gsa_fac_data": gsa_fac_data,
+                    "transformation_function": [
+                        "xform_build_sp_framework_gaap_results",
+                        "xform_census_keys_to_fac_options",
+                    ],
+                }
+            ]
+        )
+    if "sp_framework_basis" in sp_framework_gaap_results:
+        census_data = [
+            CensusRecord(
+                column="TYPEREPORT_FS",
+                value=audit_header.TYPEREPORT_FS,
+            ).to_dict(),
+            CensusRecord(
+                column="SP_FRAMEWORK",
+                value=audit_header.SP_FRAMEWORK,
+            ).to_dict(),
+        ]
+        gsa_fac_data = GsaFacRecord(
+            field="sp_framework_basis",
+            value=Util.json_array_to_str(
+                sp_framework_gaap_results["sp_framework_basis"]
+            ),
+        ).to_dict()
+
+        ChangeRecord.extend_general_changes(
+            [
+                {
+                    "census_data": census_data,
+                    "gsa_fac_data": gsa_fac_data,
+                    "transformation_function": [
+                        "xform_build_sp_framework_gaap_results",
+                        "xform_framework_basis",
+                    ],
+                }
+            ]
+        )
+    return sp_framework_gaap_results
 
 
 def audit_information(audit_header):
     """Generates audit information JSON."""
-    (
-        results,
-        census_data,
-        gsa_fac_data,
-        transformations,
-    ) = xform_build_sp_framework_gaap_results(audit_header)
-    ChangeRecord.extend_general_changes(
-        [
-            {
-                "census_data": census_data,
-                "gsa_fac_data": gsa_fac_data,
-                "transformation_function": transformations,
-            }
-        ]
-    )
-
+    results = xform_build_sp_framework_gaap_results(audit_header)
     agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY, audit_header.AUDITYEAR)
     audit_info = create_json_from_db_object(audit_header, mappings)
     audit_info = {
