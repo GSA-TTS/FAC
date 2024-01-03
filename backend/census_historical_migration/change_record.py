@@ -8,6 +8,7 @@ from .workbooklib.excel_creation_utils import apply_conversion_function
 class ChangeRecord:
     """Hold a record of changes for the ongoing report migration"""
 
+    # We record changes with respect to dissemination tables.
     DEFAULT = {
         "general": [],
         "finding": [],
@@ -33,12 +34,10 @@ class ChangeRecord:
     @staticmethod
     def extend_note_changes(data):
         ChangeRecord.change["note"].extend(data)
-    
+
     @staticmethod
     def extend_general_changes(data):
         ChangeRecord.change["general"].extend(data)
-
-    # FIXME-MSHD Add more functions here as needed
 
 
 class CensusRecord:
