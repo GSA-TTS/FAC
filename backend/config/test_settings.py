@@ -43,7 +43,7 @@ class SettingsTestCase(TestCase):
             )
             self.assertIsNotNone(s3_client)
             items = s3_client.list_objects(
-                Bucket=settings.AWS_CENSUS_TO_GSAFAC_BUCKET_NAME,
+                Bucket=settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
             )
             self.assertIsNotNone(items)
         except Exception as e:
