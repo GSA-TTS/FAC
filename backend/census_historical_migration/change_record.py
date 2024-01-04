@@ -91,12 +91,12 @@ def retrieve_change_records(mappings, objects):
                         change_record["gsa_fac_data"] = GsaFacRecord(
                             m.in_sheet, attribute_value
                         ).to_dict()
-                        change_record["transformation_function"].append(m.type)
+                        change_record["transformation_function"].append(m.type.__name__)
                     else:
                         change_record["gsa_fac_data"] = GsaFacRecord(
                             m.in_dissem, attribute_value
                         ).to_dict()
-                        change_record["transformation_function"].append(m.type)
+                        change_record["transformation_function"].append(m.type.__name__)
 
                     change_records.append(change_record)
 
