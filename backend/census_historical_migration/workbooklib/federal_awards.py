@@ -1,4 +1,3 @@
-import re
 from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
@@ -24,9 +23,18 @@ from ..models import (
     ELECAUDITS as Audits,
     ELECPASSTHROUGH as Passthrough,
 )
+from ..change_record import (
+    CensusRecord,
+    ChangeRecord,
+    GsaFacRecord,
+)
+
 import openpyxl as pyxl
 
 import logging
+import re
+import inspect
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +42,6 @@ logger = logging.getLogger(__name__)
 mappings = [
     SheetFieldMap(
         "federal_agency_prefix", "CFDA_PREFIX", WorkbookFieldInDissem, None, str
-    ),
-    SheetFieldMap(
-        "three_digit_extension", "CFDA_EXT", "federal_award_extension", None, str
     ),
     SheetFieldMap(
         "program_name", "FEDERALPROGRAMNAME", "federal_program_name", None, str
@@ -121,6 +126,8 @@ def xform_constructs_cluster_names(
                 "Unable to determine cluster name.", "invalid_cluster"
             )
 
+    # Create Census_data, gsa_fac_data
+
     return (cluster_names, other_cluster_names, state_cluster_names)
 
 
@@ -129,6 +136,11 @@ def is_valid_prefix(prefix):
     Checks if the provided prefix is a valid CFDA prefix.
     """
     return re.match(settings.REGEX_ALN_PREFIX, str(prefix))
+
+
+def _extract_extensions(full_cfdas):
+    """Extracts the extensions from a list of CFDA keys."""
+    return [s.split(".")[1] for s in full_cfdas if "." in s]
 
 
 def is_valid_extension(extension):
@@ -153,7 +165,25 @@ def xform_replace_invalid_extension(audit):
     if not is_valid_extension(extension):
         extension = settings.GSA_MIGRATION
 
-    return f"{prefix}.{extension}"
+    cfda_key = f"{prefix}.{extension}"
+    census_data = [
+        CensusRecord("CFDA_EXT", audit.CFDA_EXT).to_dict(),
+    ]
+    gsa_fac_data = GsaFacRecord("federal_award_extension", extension).to_dict()
+    transformation_function = [
+        inspect.currentframe().f_code.co_name,
+    ]
+    ChangeRecord.extend_federal_awards_changes(
+        [
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_function": transformation_function,
+            }
+        ]
+    )
+
+    return cfda_key
 
 
 def _get_full_cfdas(audits):
@@ -325,7 +355,8 @@ def generate_federal_awards(audit_header, outfile):
     # We need a `cfda_key` as a magic column for the summation logic to work/be checked.
     full_cfdas = _get_full_cfdas(audits)
     set_range(wb, "cfda_key", full_cfdas, conversion_fun=str)
-
+    extensions = _extract_extensions(full_cfdas)
+    set_range(wb, "three_digit_extension", extensions, conversion_fun=str)
     # We need `uniform_state_cluster_name` and `uniform_other_cluster_name` magic columns for cluster summation logic to work/be checked.
     set_range(
         wb,
@@ -382,6 +413,7 @@ def generate_federal_awards(audit_header, outfile):
     set_range(wb, "total_amount_expended", [str(total)])
     wb.save(outfile)
 
+    # FIXME -MSHD: we don't have an api test table for passthrough
     table = generate_dissemination_test_table(
         audit_header, "federal_awards", mappings, audits
     )
@@ -390,20 +422,10 @@ def generate_federal_awards(audit_header, outfile):
         filtered_mappings = [
             mapping
             for mapping in mappings
-            if mapping.in_sheet
-            in [
-                "additional_award_identification",
-                "federal_agency_prefix",
-                "three_digit_extension",
-                "passthrough_name",
-                "passthrough_identifying_number",
-                "subrecipient_amount",
-                "loan_balance_at_audit_period_end",
-            ]
+            if mapping.in_sheet == "federal_agency_prefix"
         ]
         ranges = get_ranges(filtered_mappings, audits)
         prefixes = get_range_values(ranges, "federal_agency_prefix")
-        extensions = get_range_values(ranges, "three_digit_extension")
 
         for (
             award,
