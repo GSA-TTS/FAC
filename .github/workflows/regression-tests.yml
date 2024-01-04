@@ -58,7 +58,7 @@ jobs:
           working-directory: ./backend
           spec: cypress/e2e/full-submission.cy.js
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         # add the line below to store screenshots only on failures
         if: failure()
         with:
