@@ -245,8 +245,6 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
-    # Private CENSUS_TO_GSAFAC bucket
-    AWS_CENSUS_TO_GSAFAC_BUCKET_NAME = "fac-census-data-s3"
 
     AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
         "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"

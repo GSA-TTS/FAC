@@ -23,7 +23,7 @@ s3_client = boto3.client(
     aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
     endpoint_url=settings.AWS_S3_ENDPOINT_URL,
 )
-census_to_gsafac_bucket_name = settings.AWS_CENSUS_TO_GSAFAC_BUCKET_NAME
+census_to_gsafac_bucket_name = settings.AWS_PRIVATE_STORAGE_BUCKET_NAME
 DELIMITER = ","
 
 
@@ -76,11 +76,14 @@ class Command(BaseCommand):
             if model_name:
                 model_index = census_to_gsafac_model_names.index(model_name)
                 model_obj = census_to_gsafac_models[model_index]
-                file = self.get_s3_object(
-                    census_to_gsafac_bucket_name, item["Key"], model_obj
-                )
-                if file:
-                    self.load_data(file, model_obj, chunk_size)
+                try:
+                    file = self.get_s3_object(
+                        census_to_gsafac_bucket_name, item["Key"], model_obj
+                    )
+                    if file:
+                        self.load_data(file, model_obj, chunk_size)
+                except Exception:
+                    logger.info(f"Skipping {model_name}")
 
         self.display_row_counts(census_to_gsafac_models)
 
