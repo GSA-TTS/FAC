@@ -1,9 +1,11 @@
 import audit.validators
-from datetime import date
 from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
 )
+
+from datetime import date
+
 
 # The following fields represent checkboxes on the auditee certification form.
 # Since all checkboxes must be checked (meaning all fields are set to True),

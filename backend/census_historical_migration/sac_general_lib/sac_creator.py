@@ -21,6 +21,7 @@ from .report_id_generator import (
     xform_dbkey_to_report_id,
 )
 
+
 logger = logging.getLogger(__name__)
 
 
