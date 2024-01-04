@@ -33,8 +33,8 @@ def create_json_from_db_object(gobj, mappings):
             value = string_to_int(value)
         else:
             value = mapping.type(value)
-
         json_obj[mapping.in_form] = value
+
     return json_obj
 
 

@@ -1,5 +1,5 @@
 app_name: gsa-fac
-mem_amount: 512M
+mem_amount: 6G
 cf_env_name: PREVIEW
 env_name: preview
 service_name: preview

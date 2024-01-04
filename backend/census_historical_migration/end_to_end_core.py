@@ -27,7 +27,10 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
+    MigrationChangeRecord,
 )
+from census_historical_migration.migration_result import MigrationResult
+from .change_record import ChangeRecord
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -264,8 +267,9 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def run_end_to_end(user, audit_header, result):
+def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
+    ChangeRecord.reset()
     try:
         sac, gen_api_data = setup_sac(user, audit_header)
 
@@ -299,26 +303,51 @@ def run_end_to_end(user, audit_header, result):
 
             errors = sac.validate_cross()
             if errors.get("errors"):
-                result["errors"].append(f"{errors.get('errors')}")
+                # FIXME - MSHD: We should throw an exception here instead and handle it in `handle_exception()`
+                MigrationResult.append_error(f"{errors.get('errors')}")
                 return
 
             disseminate(sac)
             combined_summary = api_check(json_test_tables)
             logger.info(combined_summary)
-            result["success"].append(f"{sac.report_id} created")
+            MigrationResult.append_success(f"{sac.report_id} created")
+            record_migration_status(
+                audit_header.AUDITYEAR,
+                audit_header.DBKEY,
+            )
+            record_migration_transformations(
+                audit_header.AUDITYEAR,
+                audit_header.DBKEY,
+                sac.report_id,
+            )
     except Exception as exc:
-        handle_exception(exc, audit_header, result)
-    else:
-        record_migration_status(
-            audit_header.AUDITYEAR,
-            audit_header.DBKEY,
-            len(result["errors"]) > 0,
-        )
+        handle_exception(exc, audit_header)
 
 
-def record_migration_status(audit_year, dbkey, has_failed):
+def record_migration_transformations(audit_year, dbkey, report_id):
+    """Record the transformations that were applied to the current report"""
+    migration_change_record, created = MigrationChangeRecord.objects.get_or_create(
+        audit_year=audit_year,
+        dbkey=dbkey,
+        report_id=report_id,
+    )
+    migration_change_record.run_datetime = django_timezone.now()
+    if ChangeRecord.change["general"]:
+        migration_change_record.general = ChangeRecord.change["general"]
+    if ChangeRecord.change["finding"]:
+        migration_change_record.finding = ChangeRecord.change["finding"]
+    if ChangeRecord.change["note"]:
+        migration_change_record.note = ChangeRecord.change["note"]
+    if ChangeRecord.change["federal_award"]:
+        migration_change_record.federal_award = ChangeRecord.change["federal_award"]
+
+    migration_change_record.save()
+    ChangeRecord.reset()
+
+
+def record_migration_status(audit_year, dbkey):
     """Write a migration status to the DB"""
-    status = "FAILURE" if has_failed else "SUCCESS"
+    status = "FAILURE" if MigrationResult.has_errors() else "SUCCESS"
 
     migration_status = ReportMigrationStatus.objects.create(
         audit_year=audit_year,
@@ -341,7 +370,7 @@ def record_migration_error(status, tag, exc_type, message):
     ).save()
 
 
-def handle_exception(exc, audit_header, result):
+def handle_exception(exc, audit_header):
     """Handles exceptions encountered during run_end_to_end()"""
     try:
         tag = exc.tag
@@ -370,12 +399,11 @@ def handle_exception(exc, audit_header, result):
         for frame in tb:
             logger.error(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
 
-    result["errors"].append(f"{exc}")
+    MigrationResult.append_error(f"{exc}")
 
     status = record_migration_status(
         audit_header.AUDITYEAR,
         audit_header.DBKEY,
-        True,
     )
 
     record_migration_error(

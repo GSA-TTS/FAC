@@ -1,3 +1,10 @@
+import inspect
+from ..change_record import (
+    CensusRecord,
+    ChangeRecord,
+    GsaFacRecord,
+    retrieve_change_records,
+)
 from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
@@ -30,9 +37,10 @@ def xform_prior_year_findings(value):
     """
     Transform the value of prior_references to N/A if empty.
     """
+    # Transformation to be documented.
     trimmed_value = string_to_string(value)
     if not trimmed_value:
-        # we must document this transformation #2912
+        # See ticket #2912
         return "N/A"
 
     return trimmed_value
@@ -76,6 +84,33 @@ mappings = [
         xform_prior_year_findings,
     ),
 ]
+
+
+def xform_construct_award_references(audits, findings):
+    """Construct award references for findings."""
+    # Transformation recorded.
+    e2a = {}
+    for index, audit in enumerate(audits):
+        e2a[audit.ELECAUDITSID] = f"AWARD-{index+1:04d}"
+    award_references = []
+    change_records = []
+    for find in findings:
+        award_references.append(e2a[find.ELECAUDITSID])
+        # Tracking changes
+        census_data = [CensusRecord("ELECAUDITSID", find.ELECAUDITSID).to_dict()]
+        gsa_fac_data = GsaFacRecord("award_reference", e2a[find.ELECAUDITSID]).to_dict()
+        transformation_function = [inspect.currentframe().f_code.co_name]
+        change_records.append(
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_function": transformation_function,
+            }
+        )
+    if change_records:
+        ChangeRecord.extend_finding_changes(change_records)
+
+    return award_references
 
 
 def _get_findings_grid(findings_list):
@@ -132,16 +167,8 @@ def generate_findings(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
-    # For each of them, I need to generate an elec -> award mapping.
-    e2a = {}
-    for index, audit in enumerate(audits):
-        e2a[audit.ELECAUDITSID] = f"AWARD-{index+1:04d}"
-
     findings = _get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
-
-    award_references = []
-    for find in findings:
-        award_references.append(e2a[find.ELECAUDITSID])
+    award_references = xform_construct_award_references(audits, findings)
 
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
@@ -158,5 +185,11 @@ def generate_findings(audit_header, outfile):
         for obj, ar in zip(table["rows"], award_references):
             obj["fields"].append("award_reference")
             obj["values"].append(ar)
+
+        # MSHD: If table name is needed, we can do this instead
+        # change_records = retrieve_change_records(mappings, findings)
+        # and update the change_records with the table name before we save
+
+        ChangeRecord.extend_finding_changes(retrieve_change_records(mappings, findings))
 
     return (wb, table)
