@@ -29,7 +29,6 @@ def get_agency_names():
     list_of_files = glob.glob("./schemas/source/data/cfda-agencies*.csv")
     latest_file = max(list_of_files, key=os.path.getctime)
 
-
     with open(latest_file, "r", newline="", encoding="UTF-8") as file:
         agencies = csv.reader(file)
         sorted_agencies = sorted(agencies, key=lambda x: x[0])
@@ -42,7 +41,21 @@ def get_audit_info_lists(name):
     """
     Get lists of internal values and friendly strings for the responses to the
     Audit Information form section.
+
+    Filter out anything with historical_only set to true.
+
+    get_audit_info_lists("gaap_results")
+    =>
+    [
+        {
+            "value": "Unmodified opinion",
+            "key": "unmodified_opinion",
+            "property": "UNMODIFIED_OPINION"
+        },
+        …
+    ]
     """
     jsonfile = Path("./schemas/source/audit/audit-info-values.json")
     jobj = json.loads(jsonfile.read_text(encoding="UTF-8"))
-    return jobj[name]
+
+    return [info for info in jobj[name] if not info.get("historical_only") is True]
