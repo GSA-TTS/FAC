@@ -128,7 +128,7 @@ psycopg2-binary==2.9.9
     # via -r requirements/requirements.in
 pycparser==2.21
     # via cffi
-pycryptodome==3.19.0
+pycryptodome==3.19.1
     # via -r requirements/requirements.in
 pycryptodomex==3.19.0
     # via
