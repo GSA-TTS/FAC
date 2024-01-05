@@ -106,6 +106,7 @@ class IntakeToDisseminationTests(TestCase):
             additional_eins=self._fake_additional_eins(),
             audit_information=self._fake_audit_information(),
             auditee_certification=self._fake_auditee_certification(),
+            auditor_certification=self._fake_auditor_certification(),
             tribal_data_consent=self._fake_tribal_data_consent(privacy_flag),
             cognizant_agency=cognizant_agency,
             oversight_agency=oversight_agency,
@@ -182,6 +183,27 @@ class IntakeToDisseminationTests(TestCase):
                 "auditee_name": fake.name(),
                 "auditee_title": fake.job(),
                 "auditee_certification_date_signed": fake.date(),
+            },
+        }
+
+    @staticmethod
+    def _fake_auditor_certification():
+        fake = Faker()
+        return {
+            "auditor_certification": {
+                "has_no_PII": fake.boolean(),
+                "has_no_BII": fake.boolean(),
+                "meets_2CFR_specifications": fake.boolean(),
+                "is_2CFR_compliant": fake.boolean(),
+                "is_complete_and_accurate": fake.boolean(),
+                "has_engaged_auditor": fake.boolean(),
+                "is_issued_and_signed": fake.boolean(),
+                "is_FAC_releasable": fake.boolean(),
+            },
+            "auditor_signature": {
+                "auditor_name": fake.name(),
+                "auditor_title": fake.job(),
+                "auditor_certification_date_signed": fake.date(),
             },
         }
 

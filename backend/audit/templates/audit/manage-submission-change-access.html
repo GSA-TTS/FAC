@@ -13,26 +13,36 @@
                         <p class="font-sans-md">
                             There may only be one {{ friendly_role }} per single audit submission. By submitting a new official, you will be removing the current official listed below.
                         </p>
+                        <p class="font-sans-md">
+                            For the changes to take effect, users must log out and log back in to their account.
+                        </p>
                         <p>
                             <strong>Name: </strong>{{ certifier_name }}
                         </p>
                         <p>
-                            <strong>Email:</strong>{{ email }}
+                            <strong>Email: </strong>{{ email }}
                         </p>
                     {% else %}
                         <h1 id="role-management">Add Audit Editor</h1>
                         <p class="font-sans-md">
                             Enter the name and email address of the new Audit Editor. Audit Editors may make changes to the single audit submission, as well as manage the roles of other users.
                         </p>
+                        <p class="font-sans-md">
+                            For the changes to take effect, users must log out and log back in to their account.
+                        </p>
                     {% endif %}
+                    
                     <hr />
+                    
                     {% if errors %}
                         <ul>
                             {% for error in errors %}<li class="usa-error-message">{{ error }}</li>{% endfor %}
                         </ul>
                     {% endif %}
+                    
                     <label class="usa-label" for="fullname">New name:</label>
                     <input class="usa-input" id="name" name="fullname" placeholder="[name]" />
+                    
                     <label class="usa-label" for="email">New email address:</label>
                     <input class="usa-input"
                            id="email"
