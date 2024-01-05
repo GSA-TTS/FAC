@@ -153,13 +153,16 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "auditor_enabled": sac.submission_status
                     == SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
                     "auditee_certified": bool(sac.auditee_certification),
-                    "auditee_enabled": sac.submission_status == SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                    "auditee_enabled": sac.submission_status
+                    == SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
                 },
                 "submission": {
-                    "completed": sac.submission_status == SingleAuditChecklist.STATUS.SUBMITTED,
+                    "completed": sac.submission_status
+                    == SingleAuditChecklist.STATUS.SUBMITTED,
                     "completed_date": None,
                     "completed_by": None,
-                    "enabled": sac.submission_status == SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                    "enabled": sac.submission_status
+                    == SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
                 },
                 "report_id": report_id,
                 "auditee_name": sac.auditee_name,
