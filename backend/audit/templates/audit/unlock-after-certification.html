@@ -3,13 +3,13 @@
 {% block content %}
     <div class="grid-container margin-top-6">
         <div class="grid-row">
-            {% if submission_status == target_status %}
+            {% if submission_status in target_statuses %}
                 <form class="grid-col-8 grid-offset-2"
                       id="unlock-after-certification"
                       method="post">
                     {% csrf_token %}
                     <fieldset class="usa-fieldset">
-                        <legend class="usa-legend usa-legend--large" id="auditor-certification">Unlock submission</legend>
+                        <legend class="usa-legend usa-legend--large" id="unlock-after-certification">Unlock submission</legend>
                         <h3>
                             {% comment %} &#8209; is a non-breaking hyphen, to avoid splitting "re-validated" across two lines. {% endcomment %}
                             I understand that by unlocking this submission it will need to be re&#8209;validated before certification.
@@ -34,7 +34,7 @@
                     </div>
                 </form>
             {% else %}
-                <p class="margin-bottom-6">This form is only accessible for submissions with a “Ready for Certification” status. This submission is not locked for certification.</p>
+                <p class="margin-bottom-6">This form is only accessible for submissions that have been locked for certification. This submission is not locked for certification.</p>
             {% endif %}
         </div>
     </div>
