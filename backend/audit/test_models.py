@@ -88,6 +88,8 @@ class SingleAuditChecklistTests(TestCase):
             (
                 [
                     SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                    SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                    SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
                 ],
                 SingleAuditChecklist.STATUS.IN_PROGRESS,
                 "transition_to_in_progress_again",
