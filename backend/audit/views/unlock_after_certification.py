@@ -29,13 +29,17 @@ class UnlockAfterCertificationView(
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            target_status = SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+            target_statuses = [
+                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+            ]
             context = {
                 "auditee_uei": sac.auditee_uei,
                 "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
-                "target_status": target_status,
+                "target_statuses": target_statuses,
             }
 
             return render(
