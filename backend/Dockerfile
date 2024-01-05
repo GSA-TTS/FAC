@@ -51,7 +51,7 @@ RUN set -ex && \
 FROM pip AS node
 WORKDIR /src/
 
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | -E bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 COPY package.* /src/
 RUN npm ci && \
