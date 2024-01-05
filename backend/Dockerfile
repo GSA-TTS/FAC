@@ -53,7 +53,7 @@ WORKDIR /src/
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
-COPY package.* /src/
+COPY package*.json /src/
 RUN npm ci && \
     chown -R 1001:123 "/root/.npm"
 
