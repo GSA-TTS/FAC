@@ -123,6 +123,7 @@ database_proxy = DatabaseProxy()  # Create a proxy for our db.
 def setup_database(db_filename):
     database = SqliteDatabase(db_filename)
     database_proxy.initialize(database)
+    Renaming().create_table()
 
 class UnknownField(object):
     def __init__(self, *_, **__): pass
@@ -197,7 +198,7 @@ class Audit(BaseModel):
     multipleeins = BareField(column_name='MULTIPLEEINS', null=True)
     multipleueis = BareField(column_name='MULTIPLEUEIS', null=True)
     multiple_cpas = BareField(column_name='MULTIPLE_CPAS', null=True)
-    numericmonths = BareField(column_name='NUMERICMONTHS', null=True)
+    #numericmonths = BareField(column_name='NUMERICMONTHS', null=True)
     opeid = BareField(column_name='OPEID', null=True)
     oversightagency = BareField(column_name='OVERSIGHTAGENCY', null=True)
     periodcovered = BareField(column_name='PERIODCOVERED', null=True)
@@ -229,7 +230,7 @@ class Audit(BaseModel):
     zipcode = BareField(column_name='ZIPCODE', null=True)
 
     class Meta:
-        table_name = 'audit'
+        table_name = 'ELECAUDITHEADER'
         primary_key = False
 
 class Ims(BaseModel):
@@ -245,7 +246,7 @@ class Ims(BaseModel):
     version = IntegerField(column_name='VERSION', null=True)
 
     class Meta:
-        table_name = 'ims'
+        table_name = 'ELECAUDITHEADER_IMS'
         primary_key = False
 
 
@@ -262,7 +263,7 @@ class Renaming(BaseModel):
     gsa_file_copied = BooleanField(null=True)
     
 def create_table_from_template(table, db_file):
-    if table == "ims":
+    if table == "ELECAUDITHEADER_IMS":
         template = ims_table_template
     else:
         template = audit_table_template

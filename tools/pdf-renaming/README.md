@@ -156,3 +156,55 @@ Having ascertained that
 
 we can now run the renaming process.
 
+## Mangling the data
+
+The actual data is awful.
+
+Using 
+
+ELECAUDITHEADER
+
+and 
+
+ELECAUDITHEADER_IMS
+
+I first
+
+perl -i -pe 's/\}/\)/g' *.csv
+
+the two files, to convert the one } in the file to a ) (which is should be)
+
+then I 
+
+perl -i -pe 's/\|\|/\}/g' *.csv
+
+to convert all || into a }, which gives me a single-character separator.
+
+I then
+
+vd --csv-delimiter "}" ELECAUDITHEADER.csv
+
+to use visidata to delete the last four (null) columns of that file. They break SQLite.
+
+then
+
+vd --csv-delimiter "}" ELECAUDITHEADER.csv -b -o full.db
+
+to convert the file to SQLite.
+
+Then I load it
+
+sqlite3 full.db
+
+> .mode csv
+> .separator }
+> .import ELECAUDITHEADER_IMS.csv ELECAUDITHEADER_IMS
+
+This gives me a DB ready for use.
+
+I then manually create the indexes in ELECAUDITHEADER, so that things go faster.
+
+CREATE INDEX idx_audityear ON ELECAUDITHEADER(AUDITYEAR);
+CREATE INDEX idx_dbkey ON ELECAUDITHEADER(DBKEY);
+CREATE INDEX idx_ay_dbkey ON ELECAUDITHEADER(AUDITYEAR, DBKEY);
+
