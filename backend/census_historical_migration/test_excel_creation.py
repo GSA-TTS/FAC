@@ -4,8 +4,10 @@ from .base_field_maps import (
 )
 from .workbooklib.excel_creation_utils import (
     apply_conversion_function,
+    contains_illegal_characters,
     get_range_values,
     get_ranges,
+    sanitize_for_excel,
     set_range,
 )
 from .models import ELECAUDITS as Audits
@@ -242,3 +244,31 @@ class TestGetRanges(TestCase):
         # Test for an invalid range name
         invalid_range_values = get_range_values(ranges, "non_existent_range")
         self.assertIsNone(invalid_range_values)
+
+
+class TestExcelSanitization(TestCase):
+    def test_contains_illegal_characters(self):
+        """Test that contains_illegal_characters returns expected boolean values"""
+        self.assertTrue(
+            contains_illegal_characters("Some\x01text\x02with\x03control\x04characters")
+        )  # Contains control characters
+        self.assertFalse(
+            contains_illegal_characters("Some text with no control characters")
+        )  # No control characters
+        self.assertFalse(
+            contains_illegal_characters("\nNew Line\n")
+        )  # Newline character is allowed
+
+    def test_sanitize_for_excel(self):
+        """Test that sanitize_for_excel returns expected values"""
+        self.assertEqual(
+            sanitize_for_excel("Some\x01Text\x02With\x03Control\x04Characters"),
+            "SomeTextWithControlCharacters",
+        )  # Control character removed
+        self.assertEqual(
+            sanitize_for_excel("Some text with no control characters"),
+            "Some text with no control characters",
+        )  # No change needed
+        self.assertEqual(
+            sanitize_for_excel("\nNew Line\n"), "\nNew Line\n"
+        )  # Newline preserved

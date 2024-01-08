@@ -3,6 +3,7 @@ from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_workbook_uei,
+    xform_sanitize_for_excel,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -48,6 +49,7 @@ def generate_findings_text(audit_header, outfile):
     set_workbook_uei(wb, uei)
 
     findings_texts = _get_findings_texts(audit_header.DBKEY, audit_header.AUDITYEAR)
+    xform_sanitize_for_excel(findings_texts)
     map_simple_columns(wb, mappings, findings_texts)
 
     wb.save(outfile)

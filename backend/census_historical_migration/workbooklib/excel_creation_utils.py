@@ -203,3 +203,30 @@ def get_template_name_for_section(section):
 def get_audits(dbkey, year):
     """Returns Audits records for the given dbkey and audit year."""
     return Audits.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by("ID")
+
+
+def xform_sanitize_for_excel(texts):
+    """Sanitize finding text for excel when necessary."""
+    for text in texts:
+        if text.TEXT and contains_illegal_characters(text.TEXT):
+            sanitized_value = sanitize_for_excel(text.TEXT)
+            text.TEXT = sanitized_value
+
+
+def contains_illegal_characters(value):
+    """Check if a string contains illegal characters."""
+    for char in value:
+        # Control characters have ordinals less than 32
+        # space character has an ordinal of 32
+        if ord(char) < 32 and char not in "\n\r\t":
+            return True
+    return False
+
+
+def sanitize_for_excel(value):
+    """Remove illegal characters from a string."""
+    # Remove all control characters except newline and tab
+    sanitized_value = "".join(
+        char for char in value if ord(char) >= 32 or char in "\n\r\t"
+    )
+    return sanitized_value
