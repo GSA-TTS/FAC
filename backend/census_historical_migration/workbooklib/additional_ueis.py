@@ -23,7 +23,7 @@ mappings = [
 ]
 
 
-def _get_ueis(dbkey, year):
+def get_ueis(dbkey, year):
     return Ueis.objects.filter(DBKEY=dbkey, AUDITYEAR=year).exclude(UEI="")
 
 
@@ -37,7 +37,7 @@ def generate_additional_ueis(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_UEIS])
     set_workbook_uei(wb, uei)
-    additional_ueis = _get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
+    additional_ueis = get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, additional_ueis)
     wb.save(outfile)
 

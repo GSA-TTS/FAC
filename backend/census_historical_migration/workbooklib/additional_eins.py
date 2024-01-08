@@ -54,7 +54,7 @@ mappings = [
 ]
 
 
-def _get_eins(dbkey, year):
+def get_eins(dbkey, year):
     return Eins.objects.filter(DBKEY=dbkey, AUDITYEAR=year).exclude(EIN="")
 
 
@@ -68,7 +68,7 @@ def generate_additional_eins(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_EINS])
     set_workbook_uei(wb, uei)
-    addl_eins = _get_eins(audit_header.DBKEY, audit_header.AUDITYEAR)
+    addl_eins = get_eins(audit_header.DBKEY, audit_header.AUDITYEAR)
     map_simple_columns(wb, mappings, addl_eins)
     wb.save(outfile)
 

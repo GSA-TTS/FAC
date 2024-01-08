@@ -6,6 +6,8 @@ from datetime import timedelta
 from django.conf import settings
 
 import audit.validators
+from ..workbooklib.additional_ueis import get_ueis
+from ..workbooklib.additional_eins import get_eins
 from ..api_test_helpers import extract_api_data
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
@@ -140,6 +142,24 @@ mappings = [
         "secondary_auditors_exist", "MULTIPLE_CPAS", None, None, bool
     ),  # In DB, not disseminated, needed for validation
 ]
+
+
+def xform_update_multiple_eins_flag(audit_header):
+    """Updates the multiple_eins_covered flag.
+    This updates does not propagate to the database, it only updates the object.
+    """
+    if not string_to_string(audit_header.MULTIPLEEINS):
+        queryset = get_eins(audit_header.DBKEY, audit_header.AUDITYEAR)
+        audit_header.MULTIPLEEINS = "Y" if queryset.exists() else "N"
+
+
+def xform_update_multiple_ueis_flag(audit_header):
+    """Updates the multiple_ueis_covered flag.
+    This updates does not propagate to the database, it only updates the object.
+    """
+    if not string_to_string(audit_header.MULTIPLEUEIS):
+        queryset = get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
+        audit_header.MULTIPLEUEIS = "Y" if queryset.exists() else "N"
 
 
 def _period_covered(s):
@@ -286,9 +306,9 @@ def track_transformations(
 
 def general_information(audit_header):
     """Generates general information JSON."""
-
+    xform_update_multiple_eins_flag(audit_header)
+    xform_update_multiple_ueis_flag(audit_header)
     general_information = create_json_from_db_object(audit_header, mappings)
-
     transformations = [
         xform_auditee_fiscal_period_start,
         xform_auditee_fiscal_period_end,
