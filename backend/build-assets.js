@@ -1,4 +1,3 @@
-const esbuild = require('esbuild');
 const postcss = require('postcss');
 const autoprefixer = require('autoprefixer');
 const fs = require('fs');

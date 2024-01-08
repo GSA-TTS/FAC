@@ -1,7 +1,7 @@
 # Install python dependencies
 install:
 	@pip install -r requirements.txt
-	@npm ci
+	@npm ci --production
 
 # Generate an updated requirements.txt
 compile:
