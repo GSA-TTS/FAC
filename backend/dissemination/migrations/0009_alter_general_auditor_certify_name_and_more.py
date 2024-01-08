@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("dissemination", "0007_general_auditor_certify_name_and_more"),
+        ("dissemination", "0008_general_auditor_certify_name_and_more"),
     ]
 
     operations = [
