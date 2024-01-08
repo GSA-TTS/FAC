@@ -137,7 +137,12 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_by": None,
                 },
                 "pre_submission_validation": {
-                    "completed": sac.submission_status == "ready_for_certification",
+                    "completed": sac.submission_status
+                    in [
+                        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                    ],
                     "completed_date": None,
                     "completed_by": None,
                     # We want the user to always be able to run this check:
@@ -146,15 +151,18 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
                     "auditor_enabled": sac.submission_status
-                    == "ready_for_certification",
+                    == SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
                     "auditee_certified": bool(sac.auditee_certification),
-                    "auditee_enabled": sac.submission_status == "auditor_certified",
+                    "auditee_enabled": sac.submission_status
+                    == SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
                 },
                 "submission": {
-                    "completed": sac.submission_status == "submitted",
+                    "completed": sac.submission_status
+                    == SingleAuditChecklist.STATUS.SUBMITTED,
                     "completed_date": None,
                     "completed_by": None,
-                    "enabled": sac.submission_status == "auditee_certified",
+                    "enabled": sac.submission_status
+                    == SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
                 },
                 "report_id": report_id,
                 "auditee_name": sac.auditee_name,

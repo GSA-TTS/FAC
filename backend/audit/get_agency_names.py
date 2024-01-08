@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from pathlib import Path
 import csv
 import glob
@@ -6,37 +5,57 @@ import json
 import os
 
 
-# Pull in agency names from the most recent cfda-agencies-YYYYMMDD.csv
-# Scraps rows with non-int agency nums and rows with empty agency names.
 def get_agency_names():
-    # Lets build a dictionary of names, mapping the agency number
-    # to the name.
-    _agency_names = dict()
-    agency_names = OrderedDict()
+    """
+    From a CSV of agency data, return a dictionary with the agency codes as
+    keys and the names as values, in order:
+
+        {
+            "00": "None",
+            "01": "African Development Foundation",
+            "02": "Agency for International Development",
+            …
+            "97": "Department of Homeland Security",
+            "98": "Agency for International Development",
+            "99": "Miscellaneous",
+        }
+
+    Pull in agency names from the most recent cfda-agencies-YYYYMMDD.csv
+    Scrap rows with non-numeric agency nums and rows with empty agency names.
+    """
     # Grab all the files, but we'll then sort and grab the latest one.
     # MCJ: We need to figure out how to keep ALNs up-to-date...
     # https://github.com/GSA-TTS/FAC/issues/1555
     list_of_files = glob.glob("./schemas/source/data/cfda-agencies*.csv")
     latest_file = max(list_of_files, key=os.path.getctime)
 
-    with open(latest_file, "r") as file:
-        csvreader = csv.reader(file)
-        csvreader = sorted(csvreader, key=lambda x: x[0])
-        for row in csvreader:
-            if row[0].isnumeric() and row[1] != "":
-                _agency_names[row[0]] = row[1]
-    # Now, create an OrderedDict of all the values
-    agency_names = OrderedDict(sorted(_agency_names.items(), key=lambda tupl: tupl[0]))
+    with open(latest_file, "r", newline="", encoding="UTF-8") as file:
+        agencies = csv.reader(file)
+        sorted_agencies = sorted(agencies, key=lambda x: x[0])
 
-    return agency_names
+    valid_agencies = filter(lambda r: r[0].isnumeric() and r[1] != "", sorted_agencies)
+    return {row[0]: row[1] for row in valid_agencies}
 
 
 def get_audit_info_lists(name):
     """
     Get lists of internal values and friendly strings for the responses to the
     Audit Information form section.
+
+    Filter out anything with historical_only set to true.
+
+    get_audit_info_lists("gaap_results")
+    =>
+    [
+        {
+            "value": "Unmodified opinion",
+            "key": "unmodified_opinion",
+            "property": "UNMODIFIED_OPINION"
+        },
+        …
+    ]
     """
-    jsonfile = Path("./schemas/output/audit/audit-info-values.json")
+    jsonfile = Path("./schemas/source/audit/audit-info-values.json")
     jobj = json.loads(jsonfile.read_text(encoding="UTF-8"))
-    # Returns a list of dictionaries with the keys 'tag' and 'readable'
-    return jobj[name]
+
+    return [info for info in jobj[name] if not info.get("historical_only") is True]
