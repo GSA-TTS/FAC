@@ -271,14 +271,12 @@ def track_transformations(
     census_data = [CensusRecord(column=census_column, value=census_value).to_dict()]
     gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
     function_names = transformation_functions.split(",")
-    ChangeRecord.extend_general_changes(
-        [
-            {
-                "census_data": census_data,
-                "gsa_fac_data": gsa_fac_data,
-                "transformation_function": function_names,
-            }
-        ]
+    ChangeRecord.append_general_changes(
+        {
+            "census_data": census_data,
+            "gsa_fac_data": gsa_fac_data,
+            "transformation_functions": function_names,
+        }
     )
 
 

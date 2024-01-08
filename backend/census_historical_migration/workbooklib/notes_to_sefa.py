@@ -37,19 +37,19 @@ def xform_cleanup_string(s):
     return ""
 
 
-def track_data_transformation(original_value, changed_value, transformation_function):
+def track_data_transformation(original_value, changed_value, transformation_functions):
     """Tracks transformation for minimis rate."""
     census_data = [
         CensusRecord("CONTENT", original_value).to_dict(),
     ]
     gsa_fac_data = GsaFacRecord("is_minimis_rate_used", changed_value).to_dict()
 
-    ChangeRecord.extend_note_changes(
+    ChangeRecord.append_note_changes(
         [
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
-                "transformation_function": [transformation_function],
+                "transformation_functions": [transformation_functions],
             }
         ]
     )

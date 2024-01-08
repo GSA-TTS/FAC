@@ -162,24 +162,14 @@ def xform_replace_invalid_extension(audit):
         extension = settings.GSA_MIGRATION
 
     cfda_key = f"{prefix}.{extension}"
-    census_data = [
-        CensusRecord("CFDA_EXT", audit.CFDA_EXT).to_dict(),
-    ]
-    gsa_fac_data = GsaFacRecord("federal_award_extension", extension).to_dict()
-    transformation_function = [
-        "xform_replace_invalid_extension",
-    ]
-    ChangeRecord.extend_federal_awards_changes(
-        [
-            {
-                "census_data": census_data,
-                "gsa_fac_data": gsa_fac_data,
-                "transformation_function": transformation_function,
-            }
-        ]
-    )
 
-    return cfda_key
+    transformation_record = {
+        "census_data": [CensusRecord("CFDA_EXT", audit.CFDA_EXT).to_dict()],
+        "gsa_fac_data": GsaFacRecord("federal_award_extension", extension).to_dict(),
+        "transformation_functions": ["xform_replace_invalid_extension"],
+    }
+
+    return cfda_key, transformation_record
 
 
 def _get_full_cfdas(audits):
@@ -187,8 +177,15 @@ def _get_full_cfdas(audits):
     This function constructs the full CFDA numbers by concatenating the CFDA_PREFIX
     and CFDA_EXT attributes of each audit object, separated by a dot.
     """
-    # audit.CFDA is not used here because it does not always match f"{audit.CFDA_PREFIX}.{audit.CFDA_EXT}"
-    return [xform_replace_invalid_extension(audit) for audit in audits]
+    cfdas = []
+    transformations = []
+    for audit in audits:
+        full_cfda, transformation = xform_replace_invalid_extension(audit)
+        cfdas.append(full_cfda)
+        transformations.append(transformation)
+    if transformations:
+        ChangeRecord.append_federal_awards_changes(transformations)
+    return cfdas
 
 
 def _get_passthroughs(audits):
@@ -309,8 +306,6 @@ def xform_populate_default_passthrough_amount(audits):
             if amount:
                 passthrough_amounts.append(amount)
             else:
-                # FIXME -MSHD: Is this what we want to do?
-                # Changing to settings.GSA_MIGRATION will require an update to the field type in dissemination model.
                 passthrough_amounts.append(str(settings.GSA_MIGRATION_INT))
         else:
             if not amount or amount == "0":
