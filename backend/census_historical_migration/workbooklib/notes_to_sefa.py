@@ -64,13 +64,10 @@ def xform_is_minimis_rate_used(rate_content):
 
     # Patterns that indicate the de minimis rate was NOT used
     not_used_patterns = [
-        r"did\s+not\s+use",
         r"not\s+to\s+use",
-        r"not\s+use",
-        r"not\s+elected",
-        r"elected\s+not\s+to\s+use",
-        r"does\s+not\s+use",
-        r"has\s+not\s+elected",
+        r"not\s+opt\s+to\s+use",
+        r"not\s+us(e|ed)",
+        r"not\s+elec(t|ted)",
         r"has\s+not\s+charged.*not\s+applicable",
         r"did\s+not\s+charge\s+indirect\s+costs",
     ]

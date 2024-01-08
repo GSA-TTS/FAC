@@ -13,3 +13,7 @@ class DataMigrationError(Exception):
 
 class DataMigrationValueError(DataMigrationError):
     """Exception raised for value errors that occur during historic data migration."""
+
+
+class CrossValidationError(DataMigrationError):
+    """Exception raised for value errors that occur during historic data migration."""
