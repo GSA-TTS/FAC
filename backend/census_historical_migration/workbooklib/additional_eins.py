@@ -1,4 +1,3 @@
-from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
     string_to_string,
@@ -72,8 +71,4 @@ def generate_additional_eins(audit_header, outfile):
     map_simple_columns(wb, mappings, addl_eins)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        audit_header, "additional_eins", mappings, addl_eins
-    )
-
-    return (wb, table)
+    return wb

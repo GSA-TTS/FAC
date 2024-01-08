@@ -42,6 +42,7 @@ def _xform_set_certification_date(auditee_certification):
 
 def auditee_certification(audit_header):
     """Generates auditee certification JSON."""
+    print(vars(audit_header))
     certification = {}
     certification["auditee_certification"] = create_json_from_db_object(
         audit_header, auditee_certification_mappings

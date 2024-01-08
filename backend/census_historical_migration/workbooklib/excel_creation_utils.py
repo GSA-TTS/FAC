@@ -102,40 +102,6 @@ def apply_conversion_function(value, default, conversion_function):
     return new_value
 
 
-def get_range_values(ranges, name):
-    """
-    Helper to get the values linked to a particular range, identified by its name."""
-    for item in ranges:
-        if item["name"] == name:
-            return item["values"]
-    return None
-
-
-def get_ranges(mappings, values):
-    """
-    Helper to get range of values.The method iterates over a collection of mappings, applying a conversion
-    function to constructs a list of dictionaries, each containing a name and a list of
-    transformed values."""
-    ranges = []
-    for mapping in mappings:
-        ranges.append(
-            {
-                "name": mapping.in_sheet,
-                "values": list(
-                    map(
-                        lambda v: apply_conversion_function(
-                            getattr(v, mapping.in_db),
-                            mapping.default,
-                            mapping.type,
-                        ),
-                        values,
-                    )
-                ),
-            }
-        )
-    return ranges
-
-
 def set_workbook_uei(workbook, uei):
     """Sets the UEI value in the workbook's designated UEI cell"""
     if not uei:

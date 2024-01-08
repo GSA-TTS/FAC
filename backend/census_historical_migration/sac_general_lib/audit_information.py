@@ -1,7 +1,6 @@
 import re
 
 from django.conf import settings
-from ..api_test_helpers import extract_api_data
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
 from ..transforms.xform_string_to_string import string_to_string
@@ -288,6 +287,4 @@ def audit_information(audit_header):
 
     audit.validators.validate_audit_information_json(audit_info)
 
-    api_data = extract_api_data(mappings, audit_info)
-
-    return (audit_info, api_data)
+    return audit_info

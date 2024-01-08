@@ -6,7 +6,6 @@ from datetime import timedelta
 from django.conf import settings
 
 import audit.validators
-from ..api_test_helpers import extract_api_data
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 from ..transforms.xform_string_to_string import string_to_string
@@ -305,6 +304,4 @@ def general_information(audit_header):
 
     audit.validators.validate_general_information_complete_json(general_information)
 
-    api_data = extract_api_data(mappings, general_information)
-
-    return (general_information, api_data)
+    return general_information

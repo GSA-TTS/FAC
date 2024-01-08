@@ -1,4 +1,3 @@
-from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
@@ -6,8 +5,6 @@ from ..transforms.xform_string_to_string import (
 )
 from .excel_creation_utils import (
     get_audits,
-    get_range_values,
-    get_ranges,
     set_workbook_uei,
     map_simple_columns,
     set_range,
@@ -413,66 +410,4 @@ def generate_federal_awards(audit_header, outfile):
     set_range(wb, "total_amount_expended", [str(total)])
     wb.save(outfile)
 
-    # FIXME -MSHD: we don't have an api test table for passthrough
-    table = generate_dissemination_test_table(
-        audit_header, "federal_awards", mappings, audits
-    )
-    if audits:
-        award_counter = 1
-        filtered_mappings = [
-            mapping
-            for mapping in mappings
-            if mapping.in_sheet == "federal_agency_prefix"
-        ]
-        ranges = get_ranges(filtered_mappings, audits)
-        prefixes = get_range_values(ranges, "federal_agency_prefix")
-
-        for (
-            award,
-            prefix,
-            extension,
-            additional_identification,
-            cluster_name,
-            other_cluster_name,
-            state_cluster_name,
-            passthrough_amount,
-            loan_balance,
-        ) in zip(
-            table["rows"],
-            prefixes,
-            extensions,
-            additional_award_identifications,
-            cluster_names,
-            other_cluster_names,
-            state_cluster_names,
-            passthrough_amounts,
-            loan_balances,
-        ):
-            # Function to update or append field/value
-            def update_or_append_field(field_name, field_value):
-                if field_name in award["fields"]:
-                    index = award["fields"].index(field_name)
-                    logger.info(
-                        f"Updating {field_name} from {award['values'][index]} to {field_value}"
-                    )
-                    award["values"][index] = field_value
-                else:
-                    award["fields"].append(field_name)
-                    award["values"].append(field_value)
-
-            # Update or append new field-value pairs
-            update_or_append_field("federal_agency_prefix", prefix)
-            update_or_append_field("federal_award_extension", extension)
-            update_or_append_field("award_reference", f"AWARD-{award_counter:04}")
-            update_or_append_field(
-                "additional_award_identification", additional_identification
-            )
-            update_or_append_field("cluster_name", cluster_name)
-            update_or_append_field("other_cluster_name", other_cluster_name)
-            update_or_append_field("state_cluster_name", state_cluster_name)
-            update_or_append_field("passthrough_amount", passthrough_amount)
-            update_or_append_field("loan_balance", loan_balance)
-
-            award_counter += 1
-
-    return (wb, table)
+    return wb
