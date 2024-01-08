@@ -22,7 +22,7 @@ from ..models import (
 )
 from ..change_record import (
     CensusRecord,
-    ChangeRecord,
+    InspectionRecord,
     GsaFacRecord,
 )
 
@@ -184,7 +184,7 @@ def _get_full_cfdas(audits):
         cfdas.append(full_cfda)
         transformations.append(transformation)
     if transformations:
-        ChangeRecord.append_federal_awards_changes(transformations)
+        InspectionRecord.append_federal_awards_changes(transformations)
     return cfdas
 
 

@@ -1,6 +1,6 @@
 from ..change_record import (
     CensusRecord,
-    ChangeRecord,
+    InspectionRecord,
     GsaFacRecord,
 )
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
@@ -105,7 +105,7 @@ def xform_construct_award_references(audits, findings):
             }
         )
     if change_records:
-        ChangeRecord.append_finding_changes(change_records)
+        InspectionRecord.append_finding_changes(change_records)
 
     return award_references
 

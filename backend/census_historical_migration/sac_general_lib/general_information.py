@@ -17,7 +17,7 @@ from ..sac_general_lib.utils import (
     create_json_from_db_object,
 )
 
-from ..change_record import ChangeRecord, CensusRecord, GsaFacRecord
+from ..change_record import InspectionRecord, CensusRecord, GsaFacRecord
 
 
 PERIOD_DICT = {"A": "annual", "B": "biennial", "O": "other"}
@@ -271,7 +271,7 @@ def track_transformations(
     census_data = [CensusRecord(column=census_column, value=census_value).to_dict()]
     gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
     function_names = transformation_functions.split(",")
-    ChangeRecord.append_general_changes(
+    InspectionRecord.append_general_changes(
         {
             "census_data": census_data,
             "gsa_fac_data": gsa_fac_data,

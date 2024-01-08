@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from ..change_record import CensusRecord, ChangeRecord, GsaFacRecord
+from ..change_record import CensusRecord, InspectionRecord, GsaFacRecord
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import string_to_string
@@ -44,7 +44,7 @@ def track_data_transformation(original_value, changed_value, transformation_func
     ]
     gsa_fac_data = GsaFacRecord("is_minimis_rate_used", changed_value).to_dict()
 
-    ChangeRecord.append_note_changes(
+    InspectionRecord.append_note_changes(
         [
             {
                 "census_data": census_data,

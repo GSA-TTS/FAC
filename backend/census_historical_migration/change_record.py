@@ -2,7 +2,7 @@ import copy
 from typing import Any
 
 
-class ChangeRecord:
+class InspectionRecord:
     """Hold a record of changes for the ongoing report migration"""
 
     # It was decided that changes should be recorded as lists of equal size
@@ -27,23 +27,23 @@ class ChangeRecord:
 
     @staticmethod
     def reset():
-        ChangeRecord.change = copy.deepcopy(ChangeRecord.DEFAULT)
+        InspectionRecord.change = copy.deepcopy(InspectionRecord.DEFAULT)
 
     @staticmethod
     def append_finding_changes(data):
-        ChangeRecord.change["finding"].append(data)
+        InspectionRecord.change["finding"].append(data)
 
     @staticmethod
     def append_note_changes(data):
-        ChangeRecord.change["note"].append(data)
+        InspectionRecord.change["note"].append(data)
 
     @staticmethod
     def append_general_changes(data):
-        ChangeRecord.change["general"].append(data)
+        InspectionRecord.change["general"].append(data)
 
     @staticmethod
     def append_federal_awards_changes(data):
-        ChangeRecord.change["federal_award"].append(data)
+        InspectionRecord.change["federal_award"].append(data)
 
 
 class CensusRecord:

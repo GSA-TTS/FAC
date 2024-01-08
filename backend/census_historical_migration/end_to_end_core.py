@@ -30,7 +30,7 @@ from dissemination.models import (
     MigrationChangeRecord,
 )
 from census_historical_migration.migration_result import MigrationResult
-from .change_record import ChangeRecord
+from .change_record import InspectionRecord
 
 from django.core.exceptions import ValidationError
 from django.utils import timezone as django_timezone
@@ -86,7 +86,7 @@ def disseminate(sac):
 
 def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
-    ChangeRecord.reset()
+    InspectionRecord.reset()
     try:
         sac = setup_sac(user, audit_header)
 
@@ -138,17 +138,17 @@ def record_migration_transformations(audit_year, dbkey, report_id):
         report_id=report_id,
     )
     migration_change_record.run_datetime = django_timezone.now()
-    if ChangeRecord.change["general"]:
-        migration_change_record.general = ChangeRecord.change["general"]
-    if ChangeRecord.change["finding"]:
-        migration_change_record.finding = ChangeRecord.change["finding"]
-    if ChangeRecord.change["note"]:
-        migration_change_record.note = ChangeRecord.change["note"]
-    if ChangeRecord.change["federal_award"]:
-        migration_change_record.federal_award = ChangeRecord.change["federal_award"]
+    if InspectionRecord.change["general"]:
+        migration_change_record.general = InspectionRecord.change["general"]
+    if InspectionRecord.change["finding"]:
+        migration_change_record.finding = InspectionRecord.change["finding"]
+    if InspectionRecord.change["note"]:
+        migration_change_record.note = InspectionRecord.change["note"]
+    if InspectionRecord.change["federal_award"]:
+        migration_change_record.federal_award = InspectionRecord.change["federal_award"]
 
     migration_change_record.save()
-    ChangeRecord.reset()
+    InspectionRecord.reset()
 
 
 def record_migration_status(audit_year, dbkey):

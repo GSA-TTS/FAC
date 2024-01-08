@@ -12,7 +12,7 @@ from ..sac_general_lib.utils import (
     is_single_word,
 )
 import audit.validators
-from ..change_record import ChangeRecord, CensusRecord, GsaFacRecord
+from ..change_record import InspectionRecord, CensusRecord, GsaFacRecord
 from audit.utils import Util
 
 
@@ -171,7 +171,7 @@ def track_transformations(sp_framework_gaap_results, audit_header):
             field="gaap_results",
             value=Util.json_array_to_str(sp_framework_gaap_results["gaap_results"]),
         ).to_dict()
-        ChangeRecord.append_general_changes(
+        InspectionRecord.append_general_changes(
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
@@ -199,7 +199,7 @@ def track_transformations(sp_framework_gaap_results, audit_header):
                 sp_framework_gaap_results["is_sp_framework_required"]
             ),
         ).to_dict()
-        ChangeRecord.append_general_changes(
+        InspectionRecord.append_general_changes(
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
@@ -224,7 +224,7 @@ def track_transformations(sp_framework_gaap_results, audit_header):
                 sp_framework_gaap_results["sp_framework_opinions"]
             ),
         ).to_dict()
-        ChangeRecord.append_general_changes(
+        InspectionRecord.append_general_changes(
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
@@ -252,7 +252,7 @@ def track_transformations(sp_framework_gaap_results, audit_header):
                 sp_framework_gaap_results["sp_framework_basis"]
             ),
         ).to_dict()
-        ChangeRecord.append_general_changes(
+        InspectionRecord.append_general_changes(
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
