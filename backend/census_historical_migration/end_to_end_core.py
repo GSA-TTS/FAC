@@ -27,7 +27,7 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
-    MigrationChangeRecord,
+    MigrationInspectionRecord,
 )
 from census_historical_migration.migration_result import MigrationResult
 from .change_record import InspectionRecord
@@ -132,7 +132,7 @@ def run_end_to_end(user, audit_header):
 
 def record_migration_transformations(audit_year, dbkey, report_id):
     """Record the transformations that were applied to the current report"""
-    migration_change_record, created = MigrationChangeRecord.objects.get_or_create(
+    migration_change_record, created = MigrationInspectionRecord.objects.get_or_create(
         audit_year=audit_year,
         dbkey=dbkey,
         report_id=report_id,
