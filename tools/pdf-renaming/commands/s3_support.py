@@ -2,6 +2,7 @@ import boto3
 import os
 import sys
 from botocore.client import Config
+from botocore.client import ClientError
 
 def get_s3_client(env):
     if env == "census":
@@ -34,3 +35,19 @@ def s3_copy(d, live_run=False):
         preview = get_s3_client(destination_env)
 
     
+def s3_check_exists(location, key):
+    if location == "census":
+        s3 = get_s3_client("census")
+        bucket_name = os.getenv("CENSUS_BUCKET_NAME")
+    if location == "preview":
+        s3 = get_s3_client("preview")
+        bucket_name = os.getenv("PREVIEW_BUCKET_NAME")
+
+    try:
+        ho = s3.head_object(
+            Bucket = bucket_name,
+            Key = key
+        )
+        return True
+    except ClientError as ce:
+        return False

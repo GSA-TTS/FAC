@@ -7,7 +7,7 @@ from .tables import (
     setup_database
     )
 from .constants import *
-from .s3_support import s3_copy
+from .s3_support import s3_copy, s3_check_exists
 
 logger = logging.getLogger(__name__)
 
@@ -42,14 +42,19 @@ def copy(db_filename, local_temp_path, limit, year, live_run):
 
     r: Renaming
     for r in q.iterator():
+        dest_file = f"{r.gsa_path}{r.gsa_name}"
         s3_copy({
             "local_temp_path": local_temp_path,
             "source_env": "census",
             "source_file": f"{r.census_path}{r.census_name}", 
             "destination_env": "preview",
-            "destination": f"{r.gsa_path}{r.gsa_name}"
+            "destination": dest_file
             },
             live_run)
         if live_run:
-            r.gsa_file_copied = True
+            is_copied = s3_check_exists("preview", dest_file)
+            # If it doesn't copy, record it.
+            if not is_copied:
+                print(f"Copy failed: {dest_file}")
+            r.gsa_file_copied = is_copied
             r.save()
