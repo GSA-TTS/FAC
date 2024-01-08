@@ -1,4 +1,3 @@
-import inspect
 from ..change_record import (
     CensusRecord,
     ChangeRecord,
@@ -98,7 +97,7 @@ def xform_construct_award_references(audits, findings):
         # Tracking changes
         census_data = [CensusRecord("ELECAUDITSID", find.ELECAUDITSID).to_dict()]
         gsa_fac_data = GsaFacRecord("award_reference", e2a[find.ELECAUDITSID]).to_dict()
-        transformation_function = [inspect.currentframe().f_code.co_name]
+        transformation_function = ["xform_construct_award_references"]
         change_records.append(
             {
                 "census_data": census_data,

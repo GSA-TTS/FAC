@@ -30,7 +30,6 @@ import openpyxl as pyxl
 
 import logging
 import re
-import inspect
 
 
 logger = logging.getLogger(__name__)
@@ -168,7 +167,7 @@ def xform_replace_invalid_extension(audit):
     ]
     gsa_fac_data = GsaFacRecord("federal_award_extension", extension).to_dict()
     transformation_function = [
-        inspect.currentframe().f_code.co_name,
+        "xform_replace_invalid_extension",
     ]
     ChangeRecord.extend_federal_awards_changes(
         [

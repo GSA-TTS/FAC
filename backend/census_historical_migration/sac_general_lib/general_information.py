@@ -1,4 +1,3 @@
-import inspect
 import json
 import re
 from datetime import timedelta
@@ -52,7 +51,7 @@ def xform_entity_type(phrase):
                 phrase,
                 "entity_type",
                 value,
-                inspect.currentframe().f_code.co_name,
+                "xform_entity_type",
             )
             return value
     raise DataMigrationError(
@@ -234,7 +233,7 @@ def xform_audit_period_covered(general_information):
             value_in_db,
             "audit_period_covered",
             general_information["audit_period_covered"],
-            inspect.currentframe().f_code.co_name,
+            "xform_audit_period_covered",
         )
     else:
         raise DataMigrationError(
@@ -255,7 +254,7 @@ def xform_audit_type(general_information):
             value_in_db,
             "audit_type",
             general_information["audit_type"],
-            inspect.currentframe().f_code.co_name,
+            "xform_audit_type",
         )
     else:
         raise DataMigrationError(

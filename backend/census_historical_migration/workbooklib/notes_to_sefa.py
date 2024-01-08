@@ -1,4 +1,3 @@
-import inspect
 from django.conf import settings
 
 from ..change_record import CensusRecord, ChangeRecord, GsaFacRecord
@@ -77,15 +76,14 @@ def xform_is_minimis_rate_used(rate_content):
     # Patterns that indicate the de minimis rate WAS used
     used_patterns = [r"used", r"elected\s+to\s+use", r"uses.*allowed"]
 
-    function_name = inspect.currentframe().f_code.co_name
     # Check for each pattern in the respective lists
     for pattern in not_used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
-            track_data_transformation(rate_content, "N", function_name)
+            track_data_transformation(rate_content, "N", "xform_is_minimis_rate_used")
             return "N"
     for pattern in used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
-            track_data_transformation(rate_content, "Y", function_name)
+            track_data_transformation(rate_content, "Y", "xform_is_minimis_rate_used")
             return "Y"
 
     raise DataMigrationError(
