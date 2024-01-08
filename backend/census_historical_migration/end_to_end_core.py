@@ -132,22 +132,27 @@ def run_end_to_end(user, audit_header):
 
 def record_migration_transformations(audit_year, dbkey, report_id):
     """Record the transformations that were applied to the current report"""
-    migration_change_record, created = MigrationInspectionRecord.objects.get_or_create(
+    (
+        migration_inspection_record,
+        created,
+    ) = MigrationInspectionRecord.objects.get_or_create(
         audit_year=audit_year,
         dbkey=dbkey,
         report_id=report_id,
     )
-    migration_change_record.run_datetime = django_timezone.now()
+    migration_inspection_record.run_datetime = django_timezone.now()
     if InspectionRecord.change["general"]:
-        migration_change_record.general = InspectionRecord.change["general"]
+        migration_inspection_record.general = InspectionRecord.change["general"]
     if InspectionRecord.change["finding"]:
-        migration_change_record.finding = InspectionRecord.change["finding"]
+        migration_inspection_record.finding = InspectionRecord.change["finding"]
     if InspectionRecord.change["note"]:
-        migration_change_record.note = InspectionRecord.change["note"]
+        migration_inspection_record.note = InspectionRecord.change["note"]
     if InspectionRecord.change["federal_award"]:
-        migration_change_record.federal_award = InspectionRecord.change["federal_award"]
+        migration_inspection_record.federal_award = InspectionRecord.change[
+            "federal_award"
+        ]
 
-    migration_change_record.save()
+    migration_inspection_record.save()
     InspectionRecord.reset()
 
 
