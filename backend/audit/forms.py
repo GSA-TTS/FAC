@@ -1,5 +1,10 @@
 from django import forms
-from config.settings import AGENCY_NAMES
+from config.settings import (
+    AGENCY_NAMES,
+    GAAP_RESULTS,
+    SP_FRAMEWORK_BASIS,
+    SP_FRAMEWORK_OPINIONS,
+)
 
 
 class UploadReportForm(forms.Form):
@@ -17,6 +22,10 @@ class UploadReportForm(forms.Form):
     upload_report = forms.FileField()
 
 
+def _kvpair(info):
+    return (info["key"], info["value"])
+
+
 class AuditInfoForm(forms.Form):
     def clean_booleans(self):
         data = self.cleaned_data
@@ -29,53 +38,10 @@ class AuditInfoForm(forms.Form):
         return data
 
     choices_YoN = (("True", "Yes"), ("False", "No"))
-    # These should probably have the lowercase values from Jsonnet:
-    choices_GAAP = (
-        ("unmodified_opinion", "Unmodified opinion"),
-        ("qualified_opinion", "Qualified opinion"),
-        ("adverse_opinion", "Adverse opinion"),
-        ("disclaimer_of_opinion", "Disclaimer of opinion"),
-        (
-            "not_gaap",
-            "Financial statements were not prepared in accordance with GAAP but were prepared in accordance with a special purpose framework.",
-        ),
-    )
-    choices_SP_FRAMEWORK_BASIS = (
-        (
-            "cash_basis",
-            "Cash basis",
-        ),
-        (
-            "tax_basis",
-            "Tax basis",
-        ),
-        (
-            "contractual_basis",
-            "Contractual basis",
-        ),
-        (
-            "other_basis",
-            "Other basis",
-        ),
-    )
-    choices_SP_FRAMEWORK_OPINIONS = (
-        (
-            "unmodified_opinion",
-            "Unmodified opinion",
-        ),
-        (
-            "qualified_opinion",
-            "Qualified opinion",
-        ),
-        (
-            "adverse_opinion",
-            "Adverse opinion",
-        ),
-        (
-            "disclaimer_of_opinion",
-            "Disclaimer of opinion",
-        ),
-    )
+
+    choices_GAAP = [_kvpair(_) for _ in GAAP_RESULTS]
+    choices_SP_FRAMEWORK_BASIS = [_kvpair(_) for _ in SP_FRAMEWORK_BASIS]
+    choices_SP_FRAMEWORK_OPINIONS = [_kvpair(_) for _ in SP_FRAMEWORK_OPINIONS]
 
     choices_agencies = list((i, i) for i in AGENCY_NAMES)
 

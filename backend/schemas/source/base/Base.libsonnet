@@ -222,15 +222,15 @@ local Enum = {
   },
   GAAPResults: Types.string {
     description: 'GAAP Results (Audit Information)',
-    enum: std.map(function(pair) pair.tag, GAAP.gaap_results),
+    enum: std.map(function(pair) pair.key, GAAP.gaap_results),
   },
   SP_Framework_Basis: Types.string {
     description: 'SP Framework Basis (Audit Information)',
-    enum: std.map(function(pair) pair.tag, GAAP.sp_framework_basis),
+    enum: std.map(function(pair) pair.key, GAAP.sp_framework_basis),
   },
   SP_Framework_Opinions: Types.string {
     description: 'SP Framework Opinions (Audit Information)',
-    enum: std.map(function(pair) pair.tag, GAAP.sp_framework_opinions),
+    enum: std.map(function(pair) pair.key, GAAP.sp_framework_opinions),
   },
   UnitedStatesStateAbbr: {
     description: 'US States 2-letter abbreviations',
