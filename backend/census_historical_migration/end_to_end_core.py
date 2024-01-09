@@ -1,3 +1,4 @@
+from .sac_general_lib.utils import xform_census_date_to_utc_time
 from .workbooklib.post_upload_utils import record_dummy_pdf_object
 from .exception_utils import (
     DataMigrationError,
@@ -48,17 +49,39 @@ logging.getLogger().setLevel(logging.INFO)
 parser = argparse.ArgumentParser()
 
 
-def step_through_certifications(sac):
+def step_through_certifications(sac, audit_header):
     sac.transition_to_ready_for_certification()
     sac.transition_to_auditor_certified()
     sac.transition_to_auditee_certified()
 
-    # FIXME-MSHD: We have no method transition_to_certified()
     sac.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
     sac.transition_date.append(datetime.now(timezone.utc))
 
     sac.transition_to_submitted()
     sac.transition_to_disseminated()
+
+    # Patch for transition date
+
+    submitted_date = xform_census_date_to_utc_time(audit_header.FACACCEPTEDDATE)
+    auditor_certified_date = xform_census_date_to_utc_time(audit_header.CPADATESIGNED)
+    auditee_certified_date = xform_census_date_to_utc_time(
+        audit_header.AUDITEEDATESIGNED
+    )
+    patch_dates = []
+
+    # Transition to ready for certification
+    patch_dates.append(submitted_date)
+    # Transition to auditor certified
+    patch_dates.append(auditor_certified_date)
+    # Transition to auditee certified
+    patch_dates.append(auditee_certified_date)
+    # Transition to certified
+    patch_dates.append(submitted_date)
+    # Transition to submitted
+    patch_dates.append(submitted_date)
+    # Transition to disseminated
+    patch_dates.append(datetime.now(timezone.utc))
+    sac.transition_date = patch_dates
     sac.save()
 
 
@@ -106,7 +129,7 @@ def run_end_to_end(user, audit_header):
 
             record_dummy_pdf_object(sac, user)
 
-            step_through_certifications(sac)
+            step_through_certifications(sac, audit_header)
 
             errors = sac.validate_cross()
             if errors.get("errors"):
