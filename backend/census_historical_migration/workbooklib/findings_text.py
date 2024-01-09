@@ -2,6 +2,7 @@ from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_workbook_uei,
+    sort_by_field,
     xform_sanitize_for_excel,
 )
 from ..base_field_maps import (
@@ -30,9 +31,8 @@ mappings = [
 
 
 def _get_findings_texts(dbkey, year):
-    return FindingsText.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by(
-        "SEQ_NUMBER"
-    )
+    results = FindingsText.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+    return sort_by_field(results, "SEQ_NUMBER")
 
 
 def generate_findings_text(audit_header, outfile):

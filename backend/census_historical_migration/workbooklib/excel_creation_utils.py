@@ -168,7 +168,8 @@ def get_template_name_for_section(section):
 
 def get_audits(dbkey, year):
     """Returns Audits records for the given dbkey and audit year."""
-    return Audits.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by("ID")
+    results = Audits.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+    return sort_by_field(results, "CFDASEQNUM")
 
 
 def xform_sanitize_for_excel(texts):
@@ -196,3 +197,10 @@ def sanitize_for_excel(value):
         char for char in value if ord(char) >= 32 or char in "\n\r\t"
     )
     return sanitized_value
+
+
+def sort_by_field(records, sort_field):
+    """
+    Sorts records by a specified field. The values of the field are converted to integers before sorting.
+    """
+    return sorted(records, key=lambda record: int(getattr(record, sort_field)))

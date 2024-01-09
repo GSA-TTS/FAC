@@ -3,6 +3,7 @@ from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_workbook_uei,
+    sort_by_field,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
@@ -59,7 +60,9 @@ mappings = [
 
 
 def _get_secondary_auditors(dbkey, year):
-    return Caps.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+    results = Caps.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+
+    return sort_by_field(results, "ID")
 
 
 def generate_secondary_auditors(audit_header, outfile):

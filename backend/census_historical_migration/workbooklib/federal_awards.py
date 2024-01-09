@@ -8,6 +8,7 @@ from .excel_creation_utils import (
     set_workbook_uei,
     map_simple_columns,
     set_range,
+    sort_by_field,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -92,7 +93,6 @@ def xform_constructs_cluster_names(
     cluster_names = []
     state_cluster_names = []
     other_cluster_names = []
-    # FIXME - MSHD: We must record these transformations
     for audit in audits:
         cluster_name = string_to_string(audit.CLUSTERNAME)
         state_cluster_name = string_to_string(audit.STATECLUSTERNAME)
@@ -203,7 +203,8 @@ def _get_passthroughs(audits):
             DBKEY=audit.DBKEY,
             AUDITYEAR=audit.AUDITYEAR,
             ELECAUDITSID=audit.ELECAUDITSID,
-        ).order_by("ID")
+        )
+        passthroughs = sort_by_field(passthroughs, "ID")
         # This may look like data transformation but it is not exactly the case.
         # In the audit worksheet, users can enter multiple names (or IDs) separated by a pipe '|' in a single cell.
         # We are simply reconstructing this pipe separated data here.

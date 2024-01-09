@@ -9,6 +9,7 @@ from ..workbooklib.excel_creation_utils import (
     set_range,
     map_simple_columns,
     set_workbook_uei,
+    sort_by_field,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
@@ -122,9 +123,9 @@ def _get_notes(dbkey, year):
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=3 is for notes, which have sequence numbers... that must align somewhere.
-    return Notes.objects.filter(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="3").order_by(
-        "SEQ_NUMBER"
-    )
+    results = Notes.objects.filter(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="3")
+
+    return sort_by_field(results, "SEQ_NUMBER")
 
 
 def generate_notes_to_sefa(audit_header, outfile):
