@@ -49,7 +49,7 @@ jobs:
 
       - name: Install npm dependencies
         working-directory: ./backend
-        run: npm install
+        run: npm ci --production
 
       - name: Compile JS/CSS assets
         working-directory: ./backend
