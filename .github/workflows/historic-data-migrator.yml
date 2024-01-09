@@ -11,10 +11,6 @@ on:
           - dev
           - staging
           - preview
-      email:
-        required: false
-        type: string
-        description: Make sure to log-in the env at list once. Email is required when testing in dev; on staging it defaults to CYPRESS_LOGIN_TEST_EMAIL_AUDITEE.
       dbkeys:
         required: false
         type: string
