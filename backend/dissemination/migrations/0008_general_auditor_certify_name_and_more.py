@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("dissemination", "0006_migrationchangerecord"),
+        ("dissemination", "0007_remove_migrationchangerecord_census_data_and_more"),
     ]
 
     operations = [
