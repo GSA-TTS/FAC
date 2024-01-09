@@ -16,27 +16,11 @@ services:
       timeout: 5s
       retries: 10
 
-  census-to-gsafac-db:
-    image: "postgres:15"
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: "trust"
-    volumes:
-      - census-to-gsafac-data:/var/lib/postgresql/data/
-    ports:
-      - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
   web:
     image: ghcr.io/gsa-tts/fac/web-container:latest
     command: /src/run.sh
     depends_on:
       db:
-        condition: service_healthy
-      census-to-gsafac-db:
         condition: service_healthy
       minio:
         condition: service_started
@@ -44,7 +28,6 @@ services:
         condition: service_started
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
-      DATABASE_URL_CENSUS_TO_GSAFAC_DB: postgres://postgres@census-to-gsafac-db/postgres
       POSTGREST_URL: http://api:3000
       DJANGO_DEBUG: true
       SAM_API_KEY: ${SAM_API_KEY}
@@ -100,5 +83,4 @@ services:
 
 volumes:
   postgres-data:
-  census-to-gsafac-data:
   minio-vol:
