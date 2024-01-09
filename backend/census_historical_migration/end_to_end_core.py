@@ -155,10 +155,12 @@ def run_end_to_end(user, audit_header):
 
 def record_migration_transformations(audit_year, dbkey, report_id):
     """Record the transformations that were applied to the current report"""
-    (
-        migration_inspection_record,
-        created,
-    ) = MigrationInspectionRecord.objects.get_or_create(
+
+    MigrationInspectionRecord.objects.filter(
+        audit_year=audit_year, dbkey=dbkey
+    ).delete()
+
+    migration_inspection_record = MigrationInspectionRecord.objects.create(
         audit_year=audit_year,
         dbkey=dbkey,
         report_id=report_id,
@@ -182,6 +184,8 @@ def record_migration_transformations(audit_year, dbkey, report_id):
 def record_migration_status(audit_year, dbkey):
     """Write a migration status to the DB"""
     status = "FAILURE" if MigrationResult.has_errors() else "SUCCESS"
+
+    ReportMigrationStatus.objects.filter(audit_year=audit_year, dbkey=dbkey).delete()
 
     migration_status = ReportMigrationStatus.objects.create(
         audit_year=audit_year,
