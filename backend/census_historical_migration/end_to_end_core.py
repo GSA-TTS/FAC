@@ -1,5 +1,6 @@
 from .workbooklib.post_upload_utils import record_dummy_pdf_object
 from .exception_utils import (
+    CrossValidationError,
     DataMigrationError,
     DataMigrationValueError,
 )
@@ -299,13 +300,14 @@ def run_end_to_end(user, audit_header):
 
             record_dummy_pdf_object(sac, user)
 
-            step_through_certifications(sac)
-
             errors = sac.validate_cross()
+
             if errors.get("errors"):
-                # FIXME - MSHD: We should throw an exception here instead and handle it in `handle_exception()`
-                MigrationResult.append_error(f"{errors.get('errors')}")
-                return
+                raise CrossValidationError(
+                    f"{errors.get('errors')}", "cross_validation"
+                )
+
+            step_through_certifications(sac)
 
             disseminate(sac)
             combined_summary = api_check(json_test_tables)
