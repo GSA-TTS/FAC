@@ -1,5 +1,7 @@
 from .workbooklib.excel_creation_utils import (
     apply_conversion_function,
+    contains_illegal_characters,
+    sanitize_for_excel,
     set_range,
 )
 from .exception_utils import DataMigrationValueError
@@ -168,3 +170,31 @@ class TestApplyConversionFunction(TestCase):
         """Test that an exception is raised when the input is None and no default is provided"""
         with self.assertRaises(DataMigrationValueError):
             apply_conversion_function(None, None, str)
+
+
+class TestExcelSanitization(TestCase):
+    def test_contains_illegal_characters(self):
+        """Test that contains_illegal_characters returns expected boolean values"""
+        self.assertTrue(
+            contains_illegal_characters("Some\x01text\x02with\x03control\x04characters")
+        )  # Contains control characters
+        self.assertFalse(
+            contains_illegal_characters("Some text with no control characters")
+        )  # No control characters
+        self.assertFalse(
+            contains_illegal_characters("\nNew Line\n")
+        )  # Newline character is allowed
+
+    def test_sanitize_for_excel(self):
+        """Test that sanitize_for_excel returns expected values"""
+        self.assertEqual(
+            sanitize_for_excel("Some\x01Text\x02With\x03Control\x04Characters"),
+            "SomeTextWithControlCharacters",
+        )  # Control character removed
+        self.assertEqual(
+            sanitize_for_excel("Some text with no control characters"),
+            "Some text with no control characters",
+        )  # No change needed
+        self.assertEqual(
+            sanitize_for_excel("\nNew Line\n"), "\nNew Line\n"
+        )  # Newline preserved
