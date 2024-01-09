@@ -11,7 +11,6 @@ function setup_local_env {
         # Do nothing if the bucket already exists.
         # https://min.io/docs/minio/linux/reference/minio-mc/mc-mb.html
         mc mb --ignore-existing myminio/gsa-fac-private-s3
-        mc mb --ignore-existing myminio/fac-census-to-gsafac-s3
         mc admin user svcacct add --access-key="${AWS_PRIVATE_ACCESS_KEY_ID}" --secret-key="${AWS_PRIVATE_SECRET_ACCESS_KEY}" myminio minioadmin
         return 0
     fi;

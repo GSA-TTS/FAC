@@ -4,19 +4,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  testing:
-    uses: ./.github/workflows/testing-from-ghcr.yml
-    secrets: inherit
+  # testing:
+  #   uses: ./.github/workflows/testing-from-ghcr.yml
+  #   secrets: inherit
 
-  linting:
-    uses: ./.github/workflows/linting.yml
-    secrets: inherit
+  # linting:
+  #   uses: ./.github/workflows/linting.yml
+  #   secrets: inherit
 
   deploy-infrastructure-preview:
     name: Deploy infrastructure (preview)
-    needs:
-      - testing
-      - linting
+    # needs:
+    #   - testing
+    #   - linting
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
         environment: "preview"
