@@ -11,14 +11,18 @@ on:
           - dev
           - staging
           - preview
-      dbkeys:
+      year:
         required: true
         type: string
-        description: Comma-separated list of report-IDs.
-      years:
+        description: Provide audit year.
+      page_size:
         required: true
         type: string
-        description: Comma-separated list of report years. The list of years needs to be the same length as the list of dbkeys.
+        description: Number of audit reports by page.
+      pages:
+        required: true
+        type: string
+        description: Comma-separated list of pages.
 
 jobs:
   historic-data-migrator:
@@ -39,4 +43,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name historic_data_migrator --command "python manage.py historic_data_migrator --dbkeys ${{ inputs.dbkeys }} --years ${{ inputs.years }}"
+          command: cf run-task gsa-fac -k 1G -m 1G --name historic_data_migrator_with_pagination --command "python manage.py run_paginated_migration --year ${{ inputs.year }} --page_size ${{ inputs.page_size }} --pages ${{ inputs.pages }}"
