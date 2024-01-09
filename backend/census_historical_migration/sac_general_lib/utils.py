@@ -62,7 +62,7 @@ def xform_census_date_to_utc_time(date_string):
         try:
             dt = datetime.strptime(date_string, fmt)
             dt = dt.replace(tzinfo=timezone.utc)
-            return dt.strftime("%Y-%m-%d %H:%M:%S.%f%z")
+            return dt
         except ValueError:
             continue
 
