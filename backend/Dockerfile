@@ -50,20 +50,12 @@ RUN set -ex && \
 ###############################
 FROM pip AS node
 WORKDIR /src/
-ENV NODE_MAJOR 18 
 
-RUN mkdir -p /etc/apt/keyrings
-RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
-# We have to update after adding to the apt sources lists.
-RUN apt-get update
-RUN apt-get install -y nodejs npm 
-COPY package.* /src/
-RUN npm install -g npm@9.7.1
-# To address run-p error.
-RUN npm install -g npm-run-all
-RUN npm install
-RUN chown -R 1001:123 "/root/.npm"
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+COPY package*.json /src/
+RUN npm ci && \
+    chown -R 1001:123 "/root/.npm"
 
 COPY . /src/
 
