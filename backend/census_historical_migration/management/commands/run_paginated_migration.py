@@ -19,7 +19,7 @@ class Command(BaseCommand):
         Usage:
         manage.py run_migration
             --year <audit year>
-            --pageSize <page size>
+            --page_size <page size>
             --pages <comma separated pages>
     """
 
