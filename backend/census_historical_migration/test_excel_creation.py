@@ -3,6 +3,7 @@ from .workbooklib.excel_creation_utils import (
     contains_illegal_characters,
     sanitize_for_excel,
     set_range,
+    sort_by_field,
 )
 from .exception_utils import DataMigrationValueError
 from django.test import TestCase
@@ -198,3 +199,26 @@ class TestExcelSanitization(TestCase):
         self.assertEqual(
             sanitize_for_excel("\nNew Line\n"), "\nNew Line\n"
         )  # Newline preserved
+
+
+class TestSortRecordsByField(TestCase):
+    class MockRecord:
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+
+    def test_empty_list(self):
+        """Test sorting with an empty list."""
+        self.assertEqual(sort_by_field([], "some_field"), [])
+
+    def test_sorting(self):
+        """Test sorting with a non-empty list."""
+        records = [
+            self.MockRecord(seq_number="1"),
+            self.MockRecord(seq_number="10"),
+            self.MockRecord(seq_number="2"),
+        ]
+        sorted_records = sort_by_field(records, "seq_number")
+        self.assertEqual(
+            [record.seq_number for record in sorted_records], ["1", "2", "10"]
+        )

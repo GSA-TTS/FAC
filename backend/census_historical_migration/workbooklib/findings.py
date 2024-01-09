@@ -12,6 +12,7 @@ from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_range,
     set_workbook_uei,
+    sort_by_field,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
@@ -145,9 +146,9 @@ def _get_findings(dbkey, year):
     # CFDAs aka ELECAUDITS (or Audits) have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
     # The linkage here is that a given finding will have an elecauditid.
     # Multiple findings will have a given elecauditid. That's how to link them.
-    return Findings.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by(
-        "ELECAUDITFINDINGSID"
-    )
+    results = Findings.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+
+    return sort_by_field(results, "ELECAUDITFINDINGSID")
 
 
 def generate_findings(audit_header, outfile):

@@ -5,6 +5,7 @@ from ..transforms.xform_string_to_string import (
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_workbook_uei,
+    sort_by_field,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -54,7 +55,9 @@ mappings = [
 
 
 def get_eins(dbkey, year):
-    return Eins.objects.filter(DBKEY=dbkey, AUDITYEAR=year).exclude(EIN="")
+    results = Eins.objects.filter(DBKEY=dbkey, AUDITYEAR=year).exclude(EIN="")
+
+    return sort_by_field(results, "EINSEQNUM")
 
 
 def generate_additional_eins(audit_header, outfile):
