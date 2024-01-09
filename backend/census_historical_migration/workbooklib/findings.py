@@ -1,11 +1,8 @@
-import inspect
 from ..change_record import (
     CensusRecord,
-    ChangeRecord,
+    InspectionRecord,
     GsaFacRecord,
-    retrieve_change_records,
 )
-from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
     string_to_string,
@@ -99,16 +96,16 @@ def xform_construct_award_references(audits, findings):
         # Tracking changes
         census_data = [CensusRecord("ELECAUDITSID", find.ELECAUDITSID).to_dict()]
         gsa_fac_data = GsaFacRecord("award_reference", e2a[find.ELECAUDITSID]).to_dict()
-        transformation_function = [inspect.currentframe().f_code.co_name]
+        transformation_functions = ["xform_construct_award_references"]
         change_records.append(
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
-                "transformation_function": transformation_function,
+                "transformation_functions": transformation_functions,
             }
         )
     if change_records:
-        ChangeRecord.extend_finding_changes(change_records)
+        InspectionRecord.append_finding_changes(change_records)
 
     return award_references
 
@@ -178,18 +175,4 @@ def generate_findings(audit_header, outfile):
     set_range(wb, "is_valid", grid, conversion_fun=str)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        audit_header, "findings", mappings, findings
-    )
-    if findings:
-        for obj, ar in zip(table["rows"], award_references):
-            obj["fields"].append("award_reference")
-            obj["values"].append(ar)
-
-        # MSHD: If table name is needed, we can do this instead
-        # change_records = retrieve_change_records(mappings, findings)
-        # and update the change_records with the table name before we save
-
-        ChangeRecord.extend_finding_changes(retrieve_change_records(mappings, findings))
-
-    return (wb, table)
+    return wb

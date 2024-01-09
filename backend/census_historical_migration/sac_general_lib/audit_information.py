@@ -1,7 +1,6 @@
 import re
 
 from django.conf import settings
-from ..api_test_helpers import extract_api_data
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
 from ..transforms.xform_string_to_string import string_to_string
@@ -13,7 +12,7 @@ from ..sac_general_lib.utils import (
     is_single_word,
 )
 import audit.validators
-from ..change_record import ChangeRecord, CensusRecord, GsaFacRecord
+from ..change_record import InspectionRecord, CensusRecord, GsaFacRecord
 from audit.utils import Util
 
 
@@ -172,17 +171,15 @@ def track_transformations(sp_framework_gaap_results, audit_header):
             field="gaap_results",
             value=Util.json_array_to_str(sp_framework_gaap_results["gaap_results"]),
         ).to_dict()
-        ChangeRecord.extend_general_changes(
-            [
-                {
-                    "census_data": census_data,
-                    "gsa_fac_data": gsa_fac_data,
-                    "transformation_function": [
-                        "xform_build_sp_framework_gaap_results",
-                        "xform_census_keys_to_fac_options",
-                    ],
-                }
-            ]
+        InspectionRecord.append_general_changes(
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_functions": [
+                    "xform_build_sp_framework_gaap_results",
+                    "xform_census_keys_to_fac_options",
+                ],
+            }
         )
 
     if "is_sp_framework_required" in sp_framework_gaap_results:
@@ -202,16 +199,12 @@ def track_transformations(sp_framework_gaap_results, audit_header):
                 sp_framework_gaap_results["is_sp_framework_required"]
             ),
         ).to_dict()
-        ChangeRecord.extend_general_changes(
-            [
-                {
-                    "census_data": census_data,
-                    "gsa_fac_data": gsa_fac_data,
-                    "transformation_function": [
-                        "xform_build_sp_framework_gaap_results"
-                    ],
-                }
-            ]
+        InspectionRecord.append_general_changes(
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_functions": ["xform_build_sp_framework_gaap_results"],
+            }
         )
 
     if "sp_framework_opinions" in sp_framework_gaap_results:
@@ -231,17 +224,15 @@ def track_transformations(sp_framework_gaap_results, audit_header):
                 sp_framework_gaap_results["sp_framework_opinions"]
             ),
         ).to_dict()
-        ChangeRecord.extend_general_changes(
-            [
-                {
-                    "census_data": census_data,
-                    "gsa_fac_data": gsa_fac_data,
-                    "transformation_function": [
-                        "xform_build_sp_framework_gaap_results",
-                        "xform_census_keys_to_fac_options",
-                    ],
-                }
-            ]
+        InspectionRecord.append_general_changes(
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_functions": [
+                    "xform_build_sp_framework_gaap_results",
+                    "xform_census_keys_to_fac_options",
+                ],
+            }
         )
 
     if "sp_framework_basis" in sp_framework_gaap_results:
@@ -261,17 +252,15 @@ def track_transformations(sp_framework_gaap_results, audit_header):
                 sp_framework_gaap_results["sp_framework_basis"]
             ),
         ).to_dict()
-        ChangeRecord.extend_general_changes(
-            [
-                {
-                    "census_data": census_data,
-                    "gsa_fac_data": gsa_fac_data,
-                    "transformation_function": [
-                        "xform_build_sp_framework_gaap_results",
-                        "xform_framework_basis",
-                    ],
-                }
-            ]
+        InspectionRecord.append_general_changes(
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_functions": [
+                    "xform_build_sp_framework_gaap_results",
+                    "xform_framework_basis",
+                ],
+            }
         )
 
 
@@ -288,6 +277,4 @@ def audit_information(audit_header):
 
     audit.validators.validate_audit_information_json(audit_info)
 
-    api_data = extract_api_data(mappings, audit_info)
-
-    return (audit_info, api_data)
+    return audit_info

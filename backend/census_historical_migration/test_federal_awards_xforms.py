@@ -318,7 +318,8 @@ class TestCFDAFunctions(SimpleTestCase):
 
         # Valid prefix and extension
         audit = MockAudit("01", "RD1")
-        self.assertEqual(xform_replace_invalid_extension(audit), "01.RD1")
+        result, _ = xform_replace_invalid_extension(audit)
+        self.assertEqual(result, "01.RD1")
 
         # Invalid prefix
         audit = MockAudit("ABC", "RD1")
@@ -327,5 +328,5 @@ class TestCFDAFunctions(SimpleTestCase):
 
         # Invalid extension
         audit = MockAudit("01", "ABC")
-        result = xform_replace_invalid_extension(audit)
+        result, _ = xform_replace_invalid_extension(audit)
         self.assertEqual(result, f"01.{settings.GSA_MIGRATION}")

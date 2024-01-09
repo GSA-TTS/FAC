@@ -16,7 +16,7 @@ def workbook_builder_loader(user, sac, audit_header):
     """
 
     def _loader(workbook_generator, section):
-        wb, json_data, excel_file, filename = generate_workbook(
+        wb, excel_file, filename = generate_workbook(
             workbook_generator, audit_header, section
         )
 
@@ -25,6 +25,6 @@ def workbook_builder_loader(user, sac, audit_header):
         else:
             raise Exception("User must be provided to upload workbook")
 
-        return wb, json_data, filename
+        return wb, filename
 
     return _loader

@@ -1,8 +1,6 @@
-import inspect
 from django.conf import settings
 
-from ..change_record import CensusRecord, ChangeRecord, GsaFacRecord
-from ..api_test_helpers import generate_dissemination_test_table
+from ..change_record import CensusRecord, InspectionRecord, GsaFacRecord
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import string_to_string
@@ -39,19 +37,19 @@ def xform_cleanup_string(s):
     return ""
 
 
-def track_data_transformation(original_value, changed_value, transformation_function):
+def track_data_transformation(original_value, changed_value, transformation_functions):
     """Tracks transformation for minimis rate."""
     census_data = [
         CensusRecord("CONTENT", original_value).to_dict(),
     ]
     gsa_fac_data = GsaFacRecord("is_minimis_rate_used", changed_value).to_dict()
 
-    ChangeRecord.extend_note_changes(
+    InspectionRecord.append_note_changes(
         [
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
-                "transformation_function": [transformation_function],
+                "transformation_functions": [transformation_functions],
             }
         ]
     )
@@ -75,15 +73,14 @@ def xform_is_minimis_rate_used(rate_content):
     # Patterns that indicate the de minimis rate WAS used
     used_patterns = [r"used", r"elected\s+to\s+use", r"uses.*allowed"]
 
-    function_name = inspect.currentframe().f_code.co_name
     # Check for each pattern in the respective lists
     for pattern in not_used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
-            track_data_transformation(rate_content, "N", function_name)
+            track_data_transformation(rate_content, "N", "xform_is_minimis_rate_used")
             return "N"
     for pattern in used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
-            track_data_transformation(rate_content, "Y", function_name)
+            track_data_transformation(rate_content, "Y", "xform_is_minimis_rate_used")
             return "Y"
 
     raise DataMigrationError(
@@ -166,18 +163,4 @@ def generate_notes_to_sefa(audit_header, outfile):
     )
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        audit_header, "notes_to_sefa", mappings, notes
-    )
-    table["singletons"] = dict()
-    table["singletons"]["accounting_policies"] = policies_content
-    table["singletons"]["is_minimis_rate_used"] = is_minimis_rate_used
-    table["singletons"]["rate_explained"] = rate_content
-    table["singletons"]["auditee_uei"] = uei
-
-    if notes:
-        for obj, ar in zip(table["rows"], contains_chart_or_tables):
-            obj["fields"].append("contains_chart_or_table")
-            obj["values"].append(ar)
-
-    return (wb, table)
+    return wb

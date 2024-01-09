@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
 
 from ..transforms.xform_string_to_string import (
@@ -53,6 +53,21 @@ def xform_census_date_to_datetime(date_string):
 
     # Extract and return the date part
     return dt.date()
+
+
+def xform_census_date_to_utc_time(date_string):
+    """Convert a date string from '%m/%d/%Y %H:%M:%S' format to 'YYYY-MM-DD HH:MM:SS.ffffff±HH' format."""
+    try:
+        dt = datetime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
+        dt = dt.replace(tzinfo=timezone.utc)
+
+    except ValueError:
+        raise DataMigrationValueError(
+            f"Date string '{date_string}' is not in the expected format '%m/%d/%Y %H:%M:%S'",
+            "invalid_date",
+        )
+
+    return dt
 
 
 def normalize_year_string_or_exit(year_string):

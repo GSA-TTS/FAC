@@ -1,4 +1,3 @@
-from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
@@ -53,8 +52,4 @@ def generate_corrective_action_plan(audit_header, outfile):
     map_simple_columns(wb, mappings, captexts)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        audit_header, "corrective_action_plans", mappings, captexts
-    )
-
-    return (wb, table)
+    return wb

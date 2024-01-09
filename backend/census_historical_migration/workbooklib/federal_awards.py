@@ -1,4 +1,3 @@
-from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
@@ -6,8 +5,6 @@ from ..transforms.xform_string_to_string import (
 )
 from .excel_creation_utils import (
     get_audits,
-    get_range_values,
-    get_ranges,
     set_workbook_uei,
     map_simple_columns,
     set_range,
@@ -25,7 +22,7 @@ from ..models import (
 )
 from ..change_record import (
     CensusRecord,
-    ChangeRecord,
+    InspectionRecord,
     GsaFacRecord,
 )
 
@@ -33,7 +30,6 @@ import openpyxl as pyxl
 
 import logging
 import re
-import inspect
 
 
 logger = logging.getLogger(__name__)
@@ -166,24 +162,14 @@ def xform_replace_invalid_extension(audit):
         extension = settings.GSA_MIGRATION
 
     cfda_key = f"{prefix}.{extension}"
-    census_data = [
-        CensusRecord("CFDA_EXT", audit.CFDA_EXT).to_dict(),
-    ]
-    gsa_fac_data = GsaFacRecord("federal_award_extension", extension).to_dict()
-    transformation_function = [
-        inspect.currentframe().f_code.co_name,
-    ]
-    ChangeRecord.extend_federal_awards_changes(
-        [
-            {
-                "census_data": census_data,
-                "gsa_fac_data": gsa_fac_data,
-                "transformation_function": transformation_function,
-            }
-        ]
-    )
 
-    return cfda_key
+    transformation_record = {
+        "census_data": [CensusRecord("CFDA_EXT", audit.CFDA_EXT).to_dict()],
+        "gsa_fac_data": GsaFacRecord("federal_award_extension", extension).to_dict(),
+        "transformation_functions": ["xform_replace_invalid_extension"],
+    }
+
+    return cfda_key, transformation_record
 
 
 def _get_full_cfdas(audits):
@@ -191,8 +177,15 @@ def _get_full_cfdas(audits):
     This function constructs the full CFDA numbers by concatenating the CFDA_PREFIX
     and CFDA_EXT attributes of each audit object, separated by a dot.
     """
-    # audit.CFDA is not used here because it does not always match f"{audit.CFDA_PREFIX}.{audit.CFDA_EXT}"
-    return [xform_replace_invalid_extension(audit) for audit in audits]
+    cfdas = []
+    transformations = []
+    for audit in audits:
+        full_cfda, transformation = xform_replace_invalid_extension(audit)
+        cfdas.append(full_cfda)
+        transformations.append(transformation)
+    if transformations:
+        InspectionRecord.append_federal_awards_changes(transformations)
+    return cfdas
 
 
 def _get_passthroughs(audits):
@@ -313,8 +306,6 @@ def xform_populate_default_passthrough_amount(audits):
             if amount:
                 passthrough_amounts.append(amount)
             else:
-                # FIXME -MSHD: Is this what we want to do?
-                # Changing to settings.GSA_MIGRATION will require an update to the field type in dissemination model.
                 passthrough_amounts.append(str(settings.GSA_MIGRATION_INT))
         else:
             if not amount or amount == "0":
@@ -413,66 +404,4 @@ def generate_federal_awards(audit_header, outfile):
     set_range(wb, "total_amount_expended", [str(total)])
     wb.save(outfile)
 
-    # FIXME -MSHD: we don't have an api test table for passthrough
-    table = generate_dissemination_test_table(
-        audit_header, "federal_awards", mappings, audits
-    )
-    if audits:
-        award_counter = 1
-        filtered_mappings = [
-            mapping
-            for mapping in mappings
-            if mapping.in_sheet == "federal_agency_prefix"
-        ]
-        ranges = get_ranges(filtered_mappings, audits)
-        prefixes = get_range_values(ranges, "federal_agency_prefix")
-
-        for (
-            award,
-            prefix,
-            extension,
-            additional_identification,
-            cluster_name,
-            other_cluster_name,
-            state_cluster_name,
-            passthrough_amount,
-            loan_balance,
-        ) in zip(
-            table["rows"],
-            prefixes,
-            extensions,
-            additional_award_identifications,
-            cluster_names,
-            other_cluster_names,
-            state_cluster_names,
-            passthrough_amounts,
-            loan_balances,
-        ):
-            # Function to update or append field/value
-            def update_or_append_field(field_name, field_value):
-                if field_name in award["fields"]:
-                    index = award["fields"].index(field_name)
-                    logger.info(
-                        f"Updating {field_name} from {award['values'][index]} to {field_value}"
-                    )
-                    award["values"][index] = field_value
-                else:
-                    award["fields"].append(field_name)
-                    award["values"].append(field_value)
-
-            # Update or append new field-value pairs
-            update_or_append_field("federal_agency_prefix", prefix)
-            update_or_append_field("federal_award_extension", extension)
-            update_or_append_field("award_reference", f"AWARD-{award_counter:04}")
-            update_or_append_field(
-                "additional_award_identification", additional_identification
-            )
-            update_or_append_field("cluster_name", cluster_name)
-            update_or_append_field("other_cluster_name", other_cluster_name)
-            update_or_append_field("state_cluster_name", state_cluster_name)
-            update_or_append_field("passthrough_amount", passthrough_amount)
-            update_or_append_field("loan_balance", loan_balance)
-
-            award_counter += 1
-
-    return (wb, table)
+    return wb
