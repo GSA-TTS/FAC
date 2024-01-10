@@ -84,7 +84,7 @@ def setup_sac(user, audit_header):
     sac.auditor_certification = auditor_certification(audit_header)
     sac.data_source = settings.CENSUS_DATA_SOURCE
 
-    if audit_header.ENTITY_TYPE.upper() == "TRIBAL":
+    if general_info["user_provided_organization_type"] == "tribal":
         suppression_code = string_to_string(audit_header.SUPPRESSION_CODE).upper()
         sac.tribal_data_consent = {
             "tribal_authorization_certifying_official_title": settings.GSA_MIGRATION,

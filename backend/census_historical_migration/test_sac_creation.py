@@ -58,11 +58,11 @@ class TestSacTribalConsent(TestCase):
             self.ZIPCODE = "10451"
 
     def _mock_audit_header(self, entity_type, suppression_code=None):
-        """ Returns a mock audit header with all necessary fields """
+        """Returns a mock audit header with all necessary fields"""
         return self.MockAuditHeader(entity_type, suppression_code)
 
     def _test_consent(self, consent, is_public):
-        """ Tests the values found within sac.tribal_data_consent """
+        """Tests the values found within sac.tribal_data_consent"""
         self.assertEqual(
             consent["tribal_authorization_certifying_official_title"],
             settings.GSA_MIGRATION,
@@ -77,7 +77,7 @@ class TestSacTribalConsent(TestCase):
         )
 
     def test_non_tribal(self):
-        """ Only 'tribal' entity types have tribal_data_consent populated """
+        """Only 'tribal' entity types have tribal_data_consent populated"""
         audit_header = self._mock_audit_header("non-profit")
         user = baker.make(User)
         sac, _ = setup_sac(user, audit_header)
@@ -85,7 +85,7 @@ class TestSacTribalConsent(TestCase):
         self.assertIsNone(sac.tribal_data_consent)
 
     def test_tribal_public(self):
-        """ Misc suppression codes makes them public """
+        """Misc suppression codes makes them public"""
         audit_header = self._mock_audit_header("tribal", "foo")
         user = baker.make(User)
         sac, _ = setup_sac(user, audit_header)
@@ -95,7 +95,7 @@ class TestSacTribalConsent(TestCase):
         self._test_consent(consent, True)
 
     def test_tribal_public_no_code(self):
-        """ A missing suppression code makes them public """
+        """A missing suppression code makes them public"""
         audit_header = self._mock_audit_header("tribal", "")
         user = baker.make(User)
         sac, _ = setup_sac(user, audit_header)
@@ -105,7 +105,7 @@ class TestSacTribalConsent(TestCase):
         self._test_consent(consent, True)
 
     def test_tribal_private(self):
-        """ A tribal audit with suppression code 'it' will be private """
+        """A tribal audit with suppression code 'it' will be private"""
         audit_header = self._mock_audit_header("tribal", "it")
         user = baker.make(User)
         sac, _ = setup_sac(user, audit_header)
