@@ -80,7 +80,7 @@ class TestSacTribalConsent(TestCase):
         """Only 'tribal' entity types have tribal_data_consent populated"""
         audit_header = self._mock_audit_header("non-profit")
         user = baker.make(User)
-        sac, _ = setup_sac(user, audit_header)
+        sac = setup_sac(user, audit_header)
 
         self.assertIsNone(sac.tribal_data_consent)
 
@@ -88,7 +88,7 @@ class TestSacTribalConsent(TestCase):
         """Misc suppression codes makes them public"""
         audit_header = self._mock_audit_header("tribal", "foo")
         user = baker.make(User)
-        sac, _ = setup_sac(user, audit_header)
+        sac = setup_sac(user, audit_header)
         consent = sac.tribal_data_consent
 
         self.assertIsNotNone(sac.tribal_data_consent)
@@ -98,7 +98,7 @@ class TestSacTribalConsent(TestCase):
         """A missing suppression code makes them public"""
         audit_header = self._mock_audit_header("tribal", "")
         user = baker.make(User)
-        sac, _ = setup_sac(user, audit_header)
+        sac = setup_sac(user, audit_header)
         consent = sac.tribal_data_consent
 
         self.assertIsNotNone(sac.tribal_data_consent)
@@ -108,7 +108,7 @@ class TestSacTribalConsent(TestCase):
         """A tribal audit with suppression code 'it' will be private"""
         audit_header = self._mock_audit_header("tribal", "it")
         user = baker.make(User)
-        sac, _ = setup_sac(user, audit_header)
+        sac = setup_sac(user, audit_header)
         consent = sac.tribal_data_consent
 
         self.assertIsNotNone(sac.tribal_data_consent)
