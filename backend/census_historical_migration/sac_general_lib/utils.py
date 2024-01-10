@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
 
 from ..transforms.xform_string_to_string import (
@@ -41,18 +41,37 @@ def create_json_from_db_object(gobj, mappings):
 def xform_census_date_to_datetime(date_string):
     """Convert a census date string from '%m/%d/%Y %H:%M:%S' format to 'YYYY-MM-DD' format."""
     # Parse the string into a datetime object
-    try:
-        # Parse the string into a datetime object
-        dt = datetime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
-    except ValueError:
-        # Raise a custom exception or a ValueError with a descriptive message
-        raise DataMigrationValueError(
-            f"Date string '{date_string}' is not in the expected format '%m/%d/%Y %H:%M:%S'",
-            "invalid_date",
-        )
+    formats = ["%m/%d/%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S"]
+    for fmt in formats:
+        try:
+            dt = datetime.strptime(date_string, fmt)
+            return dt.date()
+        except ValueError:
+            continue
+    # Raise a custom exception or a ValueError with a descriptive message
+    raise DataMigrationValueError(
+        f"Date string '{date_string}' is not in the expected formats: '%m/%d/%Y %H:%M:%S' or 'YYYY-MM-DD HH:MM:SS'",
+        "invalid_date",
+    )
 
-    # Extract and return the date part
-    return dt.date()
+
+def xform_census_date_to_utc_time(date_string):
+    """Convert a date string from '%m/%d/%Y %H:%M:%S' format to 'YYYY-MM-DD HH:MM:SS.ffffff±HH' format."""
+    formats = ["%m/%d/%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S"]
+    for fmt in formats:
+        try:
+            dt = datetime.strptime(date_string, fmt)
+            dt = dt.replace(tzinfo=timezone.utc)
+            return dt
+        except ValueError:
+            continue
+
+    raise DataMigrationValueError(
+        f"Date string '{date_string}' is not in the expected formats: '%m/%d/%Y %H:%M:%S' or 'YYYY-MM-DD HH:MM:SS'",
+        "invalid_date",
+    )
+
+    return dt
 
 
 def normalize_year_string_or_exit(year_string):

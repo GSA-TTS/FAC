@@ -32,10 +32,10 @@ def generate_workbook(workbook_generator, audit_header, section):
         )
         with mem_fs.openbin(filename, mode="w") as outfile:
             # Generate the workbook object along with the API JSON representation
-            wb, json_data = workbook_generator(audit_header, outfile)
+            wb = workbook_generator(audit_header, outfile)
 
         # Re-open the file in read mode to create an Excel file object
         with mem_fs.openbin(filename, mode="r") as outfile:
             excel_file = _make_excel_file(filename, outfile)
 
-        return wb, json_data, excel_file, filename
+        return wb, excel_file, filename

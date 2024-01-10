@@ -1,8 +1,8 @@
-from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_workbook_uei,
+    sort_by_field,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -24,7 +24,9 @@ mappings = [
 
 
 def get_ueis(dbkey, year):
-    return Ueis.objects.filter(DBKEY=dbkey, AUDITYEAR=year).exclude(UEI="")
+    results = Ueis.objects.filter(DBKEY=dbkey, AUDITYEAR=year).exclude(UEI="")
+
+    return sort_by_field(results, "SEQNUM")
 
 
 def generate_additional_ueis(audit_header, outfile):
@@ -41,8 +43,4 @@ def generate_additional_ueis(audit_header, outfile):
     map_simple_columns(wb, mappings, additional_ueis)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        audit_header, "additional_ueis", mappings, additional_ueis
-    )
-
-    return (wb, table)
+    return wb
