@@ -8,16 +8,6 @@ module "database" {
   rds_plan_name    = var.database_plan
 }
 
-module "database-c2g" {
-  source = "github.com/18f/terraform-cloudgov//database?ref=v0.5.1"
-
-  cf_org_name      = var.cf_org_name
-  cf_space_name    = var.cf_space_name
-  name             = "fac-c2g-db"
-  recursive_delete = var.recursive_delete
-  rds_plan_name    = var.database_plan
-}
-
 module "s3-public" {
   source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
 
@@ -34,16 +24,6 @@ module "s3-private" {
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
   name             = "fac-private-s3"
-  recursive_delete = var.recursive_delete
-  s3_plan_name     = "basic"
-}
-
-module "s3-c2g" {
-  source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
-
-  cf_org_name      = var.cf_org_name
-  cf_space_name    = var.cf_space_name
-  name             = "fac-c2g-s3"
   recursive_delete = var.recursive_delete
   s3_plan_name     = "basic"
 }

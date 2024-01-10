@@ -1,11 +1,8 @@
-import inspect
 from ..change_record import (
     CensusRecord,
-    ChangeRecord,
+    InspectionRecord,
     GsaFacRecord,
-    retrieve_change_records,
 )
-from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
     string_to_string,
@@ -15,6 +12,7 @@ from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_range,
     set_workbook_uei,
+    sort_by_field,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
@@ -99,16 +97,16 @@ def xform_construct_award_references(audits, findings):
         # Tracking changes
         census_data = [CensusRecord("ELECAUDITSID", find.ELECAUDITSID).to_dict()]
         gsa_fac_data = GsaFacRecord("award_reference", e2a[find.ELECAUDITSID]).to_dict()
-        transformation_function = [inspect.currentframe().f_code.co_name]
+        transformation_functions = ["xform_construct_award_references"]
         change_records.append(
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
-                "transformation_function": transformation_function,
+                "transformation_functions": transformation_functions,
             }
         )
     if change_records:
-        ChangeRecord.extend_finding_changes(change_records)
+        InspectionRecord.append_finding_changes(change_records)
 
     return award_references
 
@@ -148,9 +146,9 @@ def _get_findings(dbkey, year):
     # CFDAs aka ELECAUDITS (or Audits) have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
     # The linkage here is that a given finding will have an elecauditid.
     # Multiple findings will have a given elecauditid. That's how to link them.
-    return Findings.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by(
-        "ELECAUDITFINDINGSID"
-    )
+    results = Findings.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+
+    return sort_by_field(results, "ELECAUDITFINDINGSID")
 
 
 def generate_findings(audit_header, outfile):
@@ -178,18 +176,4 @@ def generate_findings(audit_header, outfile):
     set_range(wb, "is_valid", grid, conversion_fun=str)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        audit_header, "findings", mappings, findings
-    )
-    if findings:
-        for obj, ar in zip(table["rows"], award_references):
-            obj["fields"].append("award_reference")
-            obj["values"].append(ar)
-
-        # MSHD: If table name is needed, we can do this instead
-        # change_records = retrieve_change_records(mappings, findings)
-        # and update the change_records with the table name before we save
-
-        ChangeRecord.extend_finding_changes(retrieve_change_records(mappings, findings))
-
-    return (wb, table)
+    return wb

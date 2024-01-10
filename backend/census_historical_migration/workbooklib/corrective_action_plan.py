@@ -1,8 +1,9 @@
-from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_workbook_uei,
+    sort_by_field,
+    xform_sanitize_for_excel,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -31,7 +32,9 @@ mappings = [
 
 
 def _get_cap_text(dbkey, year):
-    return CapText.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by("SEQ_NUMBER")
+    results = CapText.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+
+    return sort_by_field(results, "SEQ_NUMBER")
 
 
 def generate_corrective_action_plan(audit_header, outfile):
@@ -48,11 +51,8 @@ def generate_corrective_action_plan(audit_header, outfile):
     )
     set_workbook_uei(wb, uei)
     captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
+    xform_sanitize_for_excel(captexts)
     map_simple_columns(wb, mappings, captexts)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        audit_header, "corrective_action_plans", mappings, captexts
-    )
-
-    return (wb, table)
+    return wb

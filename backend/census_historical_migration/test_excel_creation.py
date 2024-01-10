@@ -1,24 +1,15 @@
-from .base_field_maps import (
-    SheetFieldMap,
-    WorkbookFieldInDissem,
-)
 from .workbooklib.excel_creation_utils import (
     apply_conversion_function,
-    get_range_values,
-    get_ranges,
+    contains_illegal_characters,
+    sanitize_for_excel,
     set_range,
+    sort_by_field,
 )
-from .models import ELECAUDITS as Audits
 from .exception_utils import DataMigrationValueError
-
-from model_bakery import baker
-from django.conf import settings
 from django.test import TestCase
 from openpyxl import Workbook
 from openpyxl.utils import quote_sheetname, absolute_coordinate
 from openpyxl.workbook.defined_name import DefinedName
-
-from random import randint
 
 
 class ExcelCreationTests(TestCase):
@@ -182,63 +173,52 @@ class TestApplyConversionFunction(TestCase):
             apply_conversion_function(None, None, str)
 
 
-class TestGetRanges(TestCase):
-    # Because the models used here are not related to the default database,
-    # we need to set 'databases' to include all database aliases. This ensures
-    # that the test case is aware of all the databases defined in the project's
-    # settings and can interact with them accordingly.
-    databases = {db_key for db_key in settings.DATABASES.keys()}
+class TestExcelSanitization(TestCase):
+    def test_contains_illegal_characters(self):
+        """Test that contains_illegal_characters returns expected boolean values"""
+        self.assertTrue(
+            contains_illegal_characters("Some\x01text\x02with\x03control\x04characters")
+        )  # Contains control characters
+        self.assertFalse(
+            contains_illegal_characters("Some text with no control characters")
+        )  # No control characters
+        self.assertFalse(
+            contains_illegal_characters("\nNew Line\n")
+        )  # Newline character is allowed
 
-    def setUp(self):
-        """Set up mock mappings and values"""
-        self.mock_mappings = [
-            SheetFieldMap(
-                "fake_range_name", "AUDITYEAR", WorkbookFieldInDissem, None, str
-            ),
-            SheetFieldMap(
-                "another_fake_range_name", "DBKEY", WorkbookFieldInDissem, None, str
-            ),
-        ]
-
-        # Creating mock instances of the Audits model
-        self.mock_values = baker.make(Audits, _quantity=3)
-        self.random_year = randint(2016, 2022)  # nosec
-        for audit in self.mock_values:
-            audit.AUDITYEAR = str(self.random_year)
-            audit.DBKEY = str(randint(20000, 21000))  # nosec
-
-    def test_get_ranges(self):
-        """Test that the correct values are returned for each mapping"""
-        result = get_ranges(self.mock_mappings, self.mock_values)
-
-        expected = [
-            {
-                "name": "fake_range_name",
-                "values": [str(self.random_year) for _ in range(3)],
-            },
-            {
-                "name": "another_fake_range_name",
-                "values": [audit.DBKEY for audit in self.mock_values],
-            },
-        ]
-
-        self.assertEqual(result, expected)
-
-    def test_get_range_values(self):
-        """Test that get_range_values returns correct values for a given name"""
-        # First, get the ranges
-        ranges = get_ranges(self.mock_mappings, self.mock_values)
-
-        # Test for a valid range name
-        fake_range_values = get_range_values(ranges, "fake_range_name")
-        self.assertEqual(fake_range_values, [str(self.random_year) for _ in range(3)])
-
-        # Test for another valid range name
-        another_range_values = get_range_values(ranges, "another_fake_range_name")
+    def test_sanitize_for_excel(self):
+        """Test that sanitize_for_excel returns expected values"""
         self.assertEqual(
-            another_range_values, [audit.DBKEY for audit in self.mock_values]
-        )
+            sanitize_for_excel("Some\x01Text\x02With\x03Control\x04Characters"),
+            "SomeTextWithControlCharacters",
+        )  # Control character removed
+        self.assertEqual(
+            sanitize_for_excel("Some text with no control characters"),
+            "Some text with no control characters",
+        )  # No change needed
+        self.assertEqual(
+            sanitize_for_excel("\nNew Line\n"), "\nNew Line\n"
+        )  # Newline preserved
 
-        # Test for an invalid range name
-        invalid_range_values = get_range_values(ranges, "non_existent_range")
-        self.assertIsNone(invalid_range_values)
+
+class TestSortRecordsByField(TestCase):
+    class MockRecord:
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+
+    def test_empty_list(self):
+        """Test sorting with an empty list."""
+        self.assertEqual(sort_by_field([], "some_field"), [])
+
+    def test_sorting(self):
+        """Test sorting with a non-empty list."""
+        records = [
+            self.MockRecord(seq_number="1"),
+            self.MockRecord(seq_number="10"),
+            self.MockRecord(seq_number="2"),
+        ]
+        sorted_records = sort_by_field(records, "seq_number")
+        self.assertEqual(
+            [record.seq_number for record in sorted_records], ["1", "2", "10"]
+        )

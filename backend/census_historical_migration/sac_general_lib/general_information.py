@@ -1,4 +1,3 @@
-import inspect
 import json
 import re
 from datetime import timedelta
@@ -6,7 +5,8 @@ from datetime import timedelta
 from django.conf import settings
 
 import audit.validators
-from ..api_test_helpers import extract_api_data
+from ..workbooklib.additional_ueis import get_ueis
+from ..workbooklib.additional_eins import get_eins
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
 from ..transforms.xform_string_to_string import string_to_string
@@ -19,7 +19,7 @@ from ..sac_general_lib.utils import (
     create_json_from_db_object,
 )
 
-from ..change_record import ChangeRecord, CensusRecord, GsaFacRecord
+from ..change_record import InspectionRecord, CensusRecord, GsaFacRecord
 
 
 PERIOD_DICT = {"A": "annual", "B": "biennial", "O": "other"}
@@ -53,7 +53,7 @@ def xform_entity_type(phrase):
                 phrase,
                 "entity_type",
                 value,
-                inspect.currentframe().f_code.co_name,
+                "xform_entity_type",
             )
             return value
     raise DataMigrationError(
@@ -140,6 +140,24 @@ mappings = [
         "secondary_auditors_exist", "MULTIPLE_CPAS", None, None, bool
     ),  # In DB, not disseminated, needed for validation
 ]
+
+
+def xform_update_multiple_eins_flag(audit_header):
+    """Updates the multiple_eins_covered flag.
+    This updates does not propagate to the database, it only updates the object.
+    """
+    if not string_to_string(audit_header.MULTIPLEEINS):
+        queryset = get_eins(audit_header.DBKEY, audit_header.AUDITYEAR)
+        audit_header.MULTIPLEEINS = "Y" if queryset.exists() else "N"
+
+
+def xform_update_multiple_ueis_flag(audit_header):
+    """Updates the multiple_ueis_covered flag.
+    This updates does not propagate to the database, it only updates the object.
+    """
+    if not string_to_string(audit_header.MULTIPLEUEIS):
+        queryset = get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
+        audit_header.MULTIPLEUEIS = "Y" if queryset.exists() else "N"
 
 
 def _period_covered(s):
@@ -235,7 +253,7 @@ def xform_audit_period_covered(general_information):
             value_in_db,
             "audit_period_covered",
             general_information["audit_period_covered"],
-            inspect.currentframe().f_code.co_name,
+            "xform_audit_period_covered",
         )
     else:
         raise DataMigrationError(
@@ -256,7 +274,7 @@ def xform_audit_type(general_information):
             value_in_db,
             "audit_type",
             general_information["audit_type"],
-            inspect.currentframe().f_code.co_name,
+            "xform_audit_type",
         )
     else:
         raise DataMigrationError(
@@ -273,22 +291,20 @@ def track_transformations(
     census_data = [CensusRecord(column=census_column, value=census_value).to_dict()]
     gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
     function_names = transformation_functions.split(",")
-    ChangeRecord.extend_general_changes(
-        [
-            {
-                "census_data": census_data,
-                "gsa_fac_data": gsa_fac_data,
-                "transformation_function": function_names,
-            }
-        ]
+    InspectionRecord.append_general_changes(
+        {
+            "census_data": census_data,
+            "gsa_fac_data": gsa_fac_data,
+            "transformation_functions": function_names,
+        }
     )
 
 
 def general_information(audit_header):
     """Generates general information JSON."""
-
+    xform_update_multiple_eins_flag(audit_header)
+    xform_update_multiple_ueis_flag(audit_header)
     general_information = create_json_from_db_object(audit_header, mappings)
-
     transformations = [
         xform_auditee_fiscal_period_start,
         xform_auditee_fiscal_period_end,
@@ -305,6 +321,4 @@ def general_information(audit_header):
 
     audit.validators.validate_general_information_complete_json(general_information)
 
-    api_data = extract_api_data(mappings, general_information)
-
-    return (general_information, api_data)
+    return general_information

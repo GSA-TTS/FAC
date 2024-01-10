@@ -1,8 +1,9 @@
-from ..api_test_helpers import generate_dissemination_test_table
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_workbook_uei,
+    sort_by_field,
+    xform_sanitize_for_excel,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -30,9 +31,8 @@ mappings = [
 
 
 def _get_findings_texts(dbkey, year):
-    return FindingsText.objects.filter(DBKEY=dbkey, AUDITYEAR=year).order_by(
-        "SEQ_NUMBER"
-    )
+    results = FindingsText.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+    return sort_by_field(results, "SEQ_NUMBER")
 
 
 def generate_findings_text(audit_header, outfile):
@@ -48,12 +48,9 @@ def generate_findings_text(audit_header, outfile):
     set_workbook_uei(wb, uei)
 
     findings_texts = _get_findings_texts(audit_header.DBKEY, audit_header.AUDITYEAR)
+    xform_sanitize_for_excel(findings_texts)
     map_simple_columns(wb, mappings, findings_texts)
 
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        audit_header, "findings_text", mappings, findings_texts
-    )
-
-    return (wb, table)
+    return wb

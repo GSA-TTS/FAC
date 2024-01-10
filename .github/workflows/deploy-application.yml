@@ -89,7 +89,20 @@ jobs:
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 2G -m 2G --name pg_backup --command "./backup_database.sh ${{ env.space }}"
 
+      - name: Deploy Preview to cloud.gov
+        if: ${{ inputs.environment == 'preview' }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          cf_manifest: backend/manifests/manifest-preview.yml
+          cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
+          command: bin/ops/deploy_preview.sh
+
       - name: Deploy fac to cloud.gov
+        if: ${{ inputs.environment  != 'preview' }}
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
