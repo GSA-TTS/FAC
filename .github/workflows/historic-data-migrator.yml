@@ -14,7 +14,7 @@ on:
       dbkeys:
         required: true
         type: string
-        description: Comma-separated list of report-IDs.
+        description: Comma-separated list of dbkeys.
       years:
         required: true
         type: string
