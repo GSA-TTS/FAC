@@ -308,10 +308,18 @@
          "type": "boolean"
       },
       "auditor_email": {
-         "format": "email",
-         "maxLength": 100,
-         "minLength": 1,
-         "type": "string"
+         "oneOf": [
+            {
+               "format": "email",
+               "maxLength": 100,
+               "minLength": 1,
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "auditor_firm_name": {
          "maxLength": 100,

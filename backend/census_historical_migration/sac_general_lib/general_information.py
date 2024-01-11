@@ -284,6 +284,21 @@ def xform_audit_type(general_information):
     return general_information
 
 
+def xform_replace_empty_auditor_email(general_information):
+    """Replaces empty auditor email with GSA Migration keyword"""
+    # Transformation recorded.
+    if not general_information.get("auditor_email"):
+        general_information["auditor_email"] = settings.GSA_MIGRATION
+        track_transformations(
+            "CPAEMAIL",
+            "",
+            "auditor_email",
+            general_information["auditor_email"],
+            "xform_replace_empty_auditor_email",
+        )
+    return general_information
+
+
 def track_transformations(
     census_column, census_value, gsa_field, gsa_value, transformation_functions
 ):
@@ -311,6 +326,7 @@ def general_information(audit_header):
         xform_country,
         xform_audit_period_covered,
         xform_audit_type,
+        xform_replace_empty_auditor_email,
     ]
 
     for transform in transformations:

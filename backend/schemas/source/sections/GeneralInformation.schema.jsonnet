@@ -146,16 +146,18 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
         Base.Compound.EmptyString,
       ],
     },
-    auditor_email: Types.string {
+    auditor_email: {
       oneOf: [
-        {
+        Types.string {
           format: 'email',
+          maxLength: 100,
+        },
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
         },
         Base.Compound.EmptyString,
       ],
-      maxLength: 100,
     },
-
     // Others
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
