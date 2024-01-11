@@ -156,8 +156,8 @@ def xform_update_multiple_ueis_flag(audit_header):
     This updates does not propagate to the database, it only updates the object.
     """
     if not string_to_string(audit_header.MULTIPLEUEIS):
-        queryset = get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
-        audit_header.MULTIPLEUEIS = "Y" if queryset.exists() else "N"
+        ueis = get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
+        audit_header.MULTIPLEUEIS = "Y" if ueis else "N"
 
 
 def _period_covered(s):
