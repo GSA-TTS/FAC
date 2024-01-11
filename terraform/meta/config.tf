@@ -30,7 +30,8 @@ locals {
     "daniel.swick@gsa.gov",
     "alexander.steel@gsa.gov",
     "sudha.kumar@gsa.gov",
-    "purvin.patel@gsa.gov"
+    "purvin.patel@gsa.gov",
+    "philip.dominguez@gsa.gov",
   ]
 
   # All spaces have the same SpaceManagers for now

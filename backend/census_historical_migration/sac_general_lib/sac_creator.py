@@ -19,7 +19,9 @@ from .auditor_certification import (
 from .report_id_generator import (
     xform_dbkey_to_report_id,
 )
-
+from ..transforms.xform_string_to_string import (
+    string_to_string,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +81,15 @@ def setup_sac(user, audit_header):
     sac.auditee_certification = auditee_certification(audit_header)
     sac.auditor_certification = auditor_certification(audit_header)
     sac.data_source = settings.CENSUS_DATA_SOURCE
+
+    if general_info["user_provided_organization_type"] == "tribal":
+        suppression_code = string_to_string(audit_header.SUPPRESSION_CODE).upper()
+        sac.tribal_data_consent = {
+            "tribal_authorization_certifying_official_title": settings.GSA_MIGRATION,
+            "is_tribal_information_authorized_to_be_public": suppression_code != "IT",
+            "tribal_authorization_certifying_official_name": settings.GSA_MIGRATION,
+        }
+
     sac.save()
     logger.info("Created single audit checklist %s", sac)
 
