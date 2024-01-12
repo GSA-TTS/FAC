@@ -128,14 +128,6 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 subcheck[key] = subcheck[key] | value
 
             context = {
-                "single_audit_checklist": {
-                    "created": True,
-                    "created_date": sac.date_created,
-                    "created_by": sac.submitted_by,
-                    "completed": False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
                 "pre_submission_validation": {
                     "completed": sac.submission_status
                     in [
