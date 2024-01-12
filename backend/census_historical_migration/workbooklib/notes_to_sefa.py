@@ -72,7 +72,6 @@ def xform_is_minimis_rate_used(rate_content):
         r"did\s+not\s+charge\s+indirect\s+costs",
         r"did\s+not\s+make\s+an\s+election",
         r"not\s+eligible\s+to\s+use",
-        r"made\s+no\s+inderect\s+cost\s+rate\s+election",
         r"rather\s+than\s+the\s+10%",
         r"no\s+additional\s+indirect\s+costs",
         r"(rate|costs)\s+does\s+not\s+apply",
