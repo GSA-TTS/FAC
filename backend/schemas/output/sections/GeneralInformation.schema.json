@@ -442,17 +442,21 @@
          "type": "boolean"
       },
       "auditor_email": {
-         "maxLength": 100,
          "oneOf": [
             {
-               "format": "email"
+               "format": "email",
+               "maxLength": 100,
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
             },
             {
                "const": "",
                "type": "string"
             }
-         ],
-         "type": "string"
+         ]
       },
       "auditor_firm_name": {
          "maxLength": 100,
