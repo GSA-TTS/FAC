@@ -1,0 +1,61 @@
+{% comment %} 
+The Tribal data release is a section block with some special display cases.
+
+The five display cases are:
+    1. Does not appear at all for non-tribal entities. 
+    2. The auditee certifying official sees the link and can complete it.
+    3. The form is complete. The auditee certifying official can edit it.
+    4. Anyone else with access sees an inactive section, no link.
+    5. The form is complete. Anyone else with access sees that it's done but still can't click a link.
+{% endcomment %}
+{% comment %} 1. Does not appear at all for non-tribal entities. {% endcomment %}
+{% if user_provided_organization_type == "tribal" %}
+    <li class="usa-icon-list__item padding-bottom-105" id="tribal_consent-completed">
+        {% if not is_tribal_data_consent_complete %}
+            {% comment %} 2. The auditee certifying official sees the link and can complete it. {% endcomment %}
+            {% if is_user_auditee_certifier %}
+                {% include './icon-list-icon.html' with completed=False %}
+                <div>
+                    <p class="text-bold margin-0">
+                        <a class="usa-link"
+                            href="{% url 'audit:TribalAuditConsent' report_id %}">Tribal data release</a>
+                    </p>
+                    <p class="margin-0">Auditees must opt in or opt out of making their reporting package publicly available.</p>
+                </div>
+            {% comment %} 4. Anyone else with access sees an inactive section, no link. {% endcomment %}
+            {% else %}
+                {% include './icon-list-icon.html' with completed=False %}
+                <div>
+                    <p class="text-bold margin-0">Tribal data release</p>
+                    <p class="margin-0">
+                        Auditees must opt in or opt out of making their reporting package publicly available.
+                    </p>
+                </div>
+            {% endif %}
+        {% else %}
+        {% comment %} 3. The form is complete. The auditee certifying official can edit it. {% endcomment %}
+            {% if is_user_auditee_certifier %}
+                {% include './icon-list-icon.html' with completed=True %}
+                <div class="text-success-darker">
+                    <p class="text-bold text-underline margin-0">Tribal data release (Complete)</p>
+                    <p class="margin-0">
+                        Auditees must opt in or opt out of making their reporting package publicly available.
+                    </p>
+                    <p class="margin-0">
+                        <a class="usa-link"
+                            href="{% url 'audit:TribalAuditConsent' report_id %}">Edit the Tribal data release form</a>
+                    </p>
+                </div>
+            {% comment %} 5. The form is complete. Anyone else with access sees that it's done but still can't click a link. {% endcomment %}
+            {% else %}
+                {% include './icon-list-icon.html' with completed=True %}
+                <div>
+                    <p class="text-bold margin-0">Tribal data release (Complete)</p>
+                    <p class="margin-0">
+                        Auditees must opt in or opt out of making their reporting package publicly available.
+                    </p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </li>
+{% endif %}

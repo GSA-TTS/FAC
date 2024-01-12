@@ -46,6 +46,11 @@
                         <p class="text-green" id="already-submitted">
                             A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
                         </p>
+                        <a class='usa-link' target="_blank"
+                        href="{% url 'audit:PredisseminationXlsxDownload' file_type="FederalAwardsExpended" report_id=report_id %}"
+                        >
+                            Link to previous download
+                        </a>
                     {% endif %}
                     <div hidden id="info_box" class="grid-row margin-bottom-3 margin-top-3"></div>
                     <button class="usa-button margin-bottom-8" id="continue" disabled="disabled">Return to Report Home</button>
