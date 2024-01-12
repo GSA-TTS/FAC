@@ -30,7 +30,6 @@ class AccessManager(models.Manager):
         event_type = obj_data.pop("event_type", None)
 
         # try to pair this Access with an actual User object if we have one for this email address
-        print(obj_data)
         if obj_data["email"]:
             try:
                 acc_user = User.objects.get(email__iexact=obj_data["email"])
