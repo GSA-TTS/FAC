@@ -32,7 +32,7 @@ class AccessManager(models.Manager):
         # try to pair this Access with an actual User object if we have one for this email address
         if obj_data["email"]:
             try:
-                acc_user = User.objects.get(email=obj_data["email"])
+                acc_user = User.objects.get(email__iexact=obj_data["email"])
             # if we don't have a User for this email, leave it as None (unclaimed Access)
             except User.DoesNotExist:
                 acc_user = None
