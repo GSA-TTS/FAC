@@ -101,12 +101,18 @@ Requires most fields, has consitional checks for conditional fields.
       minLength: 1,
     },
     auditor_phone: Base.Compound.UnitedStatesPhone,
-    auditor_email: Types.string {
-      format: 'email',
-      maxLength: 100,
-      minLength: 1,
+    auditor_email: {
+      oneOf: [
+        Types.string {
+          format: 'email',
+          maxLength: 100,
+          minLength: 1,
+        },
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+      ],
     },
-
     // Others
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,

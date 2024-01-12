@@ -1,5 +1,5 @@
 ---
-name: Historic Data Migration
+name: Historic Data Migration With Pagination
 on:
   workflow_dispatch:
     inputs:

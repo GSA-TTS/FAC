@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.test import SimpleTestCase
 
 from .sac_general_lib.general_information import (
@@ -10,6 +11,7 @@ from .sac_general_lib.general_information import (
     xform_auditee_fiscal_period_start,
     xform_country,
     xform_entity_type,
+    xform_replace_empty_auditor_email,
 )
 from .exception_utils import (
     DataMigrationError,
@@ -211,3 +213,23 @@ class TestXformAuditType(SimpleTestCase):
         general_information = {}
         with self.assertRaises(DataMigrationError):
             xform_audit_type(general_information)
+
+
+class TestXformReplaceEmptyAuditorEmail(SimpleTestCase):
+    def test_empty_auditor_email(self):
+        """Test that an empty auditor_email is replaced with 'GSA_MIGRATION'"""
+        input_data = {"auditor_email": ""}
+        expected_output = {"auditor_email": settings.GSA_MIGRATION}
+        self.assertEqual(xform_replace_empty_auditor_email(input_data), expected_output)
+
+    def test_non_empty_auditor_email(self):
+        """Test that a non-empty auditor_email remains unchanged"""
+        input_data = {"auditor_email": "test@example.com"}
+        expected_output = {"auditor_email": "test@example.com"}
+        self.assertEqual(xform_replace_empty_auditor_email(input_data), expected_output)
+
+    def test_missing_auditor_email(self):
+        """Test that a missing auditor_email key is added and set to 'GSA_MIGRATION'"""
+        input_data = {}
+        expected_output = {"auditor_email": settings.GSA_MIGRATION}
+        self.assertEqual(xform_replace_empty_auditor_email(input_data), expected_output)
