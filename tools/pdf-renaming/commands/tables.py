@@ -126,7 +126,7 @@ def setup_database(db_filename):
     database_proxy.initialize(database)
     Renaming().create_table()
 
-def setup_postgres_database(db_filename):
+def setup_postgres_database():
     database = PostgresqlDatabase('postgres', host='localhost', user='postgres')
     database_proxy.initialize(database)
     Renaming().create_table()

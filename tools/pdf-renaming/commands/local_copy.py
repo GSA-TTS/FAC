@@ -63,13 +63,12 @@ def process_list_of_objects(argd):
     # result_q.put(result_list)
 
 @click.command()
-@click.argument("db_filename")
 @click.option('--destination_path', default="local")
 @click.option('-l', '--limit', default=None)
 @click.option('-y', '--year', default=2022)
 @click.option("-r", "--live_run", default=False)
 @click.option('-p', '--parallel', default=0)
-def local_copy(db_filename, 
+def local_copy( 
         destination_path,
         limit, year, live_run,
         parallel):
@@ -77,7 +76,7 @@ def local_copy(db_filename,
     parallel = int(parallel)
 
     print("Setting up the Postgres DB")    
-    setup_postgres_database(db_filename)
+    setup_postgres_database()
 
     print("Building the lazy query")
     q = (Renaming.select()
