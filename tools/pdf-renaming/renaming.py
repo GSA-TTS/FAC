@@ -6,7 +6,8 @@ from commands import (
     load, 
     prep, 
     check,
-    copy
+    copy,
+    local_copy
     )
 
 logger = logging.getLogger(__name__)
@@ -27,4 +28,5 @@ if __name__ == '__main__':
     cli.add_command(prep.prep)
     cli.add_command(check.check)
     cli.add_command(copy.copy)
+    cli.add_command(local_copy.local_copy)
     cli()

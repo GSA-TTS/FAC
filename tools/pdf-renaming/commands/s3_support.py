@@ -43,6 +43,7 @@ def s3_download(location, destination_path, source_key):
         client.download_file(bucket_name, source_key, os.path.join(destination_path, temp_filename))
         return temp_filename
     except Exception as e:
+        print(f"- Download failed. {e}")
         return False
 
 def s3_upload(location, source_file, destination_key):
@@ -69,16 +70,22 @@ def s3_copy(d, live_run=False):
         # If the download failed, don't continue.
         if not temp_filename:
             return False
-        s3_upload(destination_env, os.path.join(local_temp, temp_filename), destination_file)
-        retval = None
-        if s3_check_exists(destination_env, destination_file):
-            print("- SUCCESS")
-            retval = True
+        if destination_env == "local":
+            print(f"Renaming to {destination_file}")
+            os.rename(os.path.join(local_temp, temp_filename), 
+                    destination_file)
+            return True
         else:
-            print("- UPLOAD FAILED")
-            retval = False
-        os.remove(os.path.join(local_temp, temp_filename))
-        return retval
+            s3_upload(destination_env, os.path.join(local_temp, temp_filename), destination_file)
+            retval = None
+            if s3_check_exists(destination_env, destination_file):
+                print("- SUCCESS")
+                retval = True
+            else:
+                print("- UPLOAD FAILED")
+                retval = False
+            os.remove(os.path.join(local_temp, temp_filename))
+            return retval
 
     
 def s3_check_exists(location, key):
