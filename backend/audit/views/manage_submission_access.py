@@ -19,7 +19,7 @@ def _get_friendly_role(role):
 
 
 def _create_and_save_access(sac, role, fullname, email):
-    Access(sac=sac, role=role, fullname=fullname, email=email).save()
+    Access.objects.create(sac=sac, role=role, fullname=fullname, email=email)
 
 
 class ChangeAccessForm(forms.Form):
