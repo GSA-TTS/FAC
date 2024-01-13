@@ -56,10 +56,10 @@ def check(db_filename, limit, year):
                 Bucket = bucket_name,
                 Key = key
             )
-            r.census_file_exists = True
+            r.census_file_exists = 1
             r.save()
         except ClientError as ce:
-            r.census_file_exists = False
+            r.census_file_exists = 0
             r.save()
     
     print("Done.")

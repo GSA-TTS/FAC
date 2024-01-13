@@ -3,7 +3,8 @@ import argparse
 import re
 import logging
 from peewee import *
-
+from playhouse.sqliteq import SqliteQueueDatabase
+import atexit
 
 logger = logging.getLogger(__name__)
 
@@ -121,9 +122,15 @@ ims_table_template = {
 database_proxy = DatabaseProxy()  # Create a proxy for our db.
 
 def setup_database(db_filename):
-    database = SqliteDatabase(db_filename)
+    database = SqliteQueueDatabase(db_filename)
     database_proxy.initialize(database)
     Renaming().create_table()
+
+def setup_postgres_database(db_filename):
+    database = PostgresqlDatabase('postgres', host='localhost', user='postgres')
+    database_proxy.initialize(database)
+    Renaming().create_table()
+
 
 class UnknownField(object):
     def __init__(self, *_, **__): pass
@@ -257,10 +264,10 @@ class Renaming(BaseModel):
     version = TextField()
     census_path = TextField()
     census_name = TextField()
-    census_file_exists = BooleanField(null=True)
+    census_file_exists = IntegerField(null=True)
     gsa_path = TextField()
     gsa_name = TextField()
-    gsa_file_copied = BooleanField(null=True)
+    gsa_file_copied = IntegerField(null=True)
     
 def create_table_from_template(table, db_file):
     if table == "ELECAUDITHEADER_IMS":
