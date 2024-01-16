@@ -3,6 +3,8 @@ import logging
 from django.apps import apps
 from django.conf import settings
 
+from .cognizant_oversight import cognizant_oversight
+
 from ..exception_utils import DataMigrationError
 from .general_information import (
     general_information,
@@ -80,6 +82,9 @@ def setup_sac(user, audit_header):
 
     sac.auditee_certification = auditee_certification(audit_header)
     sac.auditor_certification = auditor_certification(audit_header)
+    cognizant, oversight = cognizant_oversight(audit_header)
+    sac.cognizant_agency = cognizant
+    sac.oversight_agency = oversight
     sac.data_source = settings.CENSUS_DATA_SOURCE
 
     if general_info["user_provided_organization_type"] == "tribal":
