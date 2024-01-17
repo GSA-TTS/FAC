@@ -37,21 +37,15 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
             "Y",
         )
         self.assertEqual(
-            xform_is_minimis_rate_used(
-                "The Organization utilizes the 10% de minimis"
-            ),
+            xform_is_minimis_rate_used("The Organization utilizes the 10% de minimis"),
             "Y",
         )
         self.assertEqual(
-            xform_is_minimis_rate_used(
-                "Utilize an indirect cost rate"
-            ),
+            xform_is_minimis_rate_used("Utilize an indirect cost rate"),
             "Y",
         )
         self.assertEqual(
-            xform_is_minimis_rate_used(
-                "IADLEST has negotiated an indirect cost rate"
-            ),
+            xform_is_minimis_rate_used("IADLEST has negotiated an indirect cost rate"),
             "Y",
         )
         self.assertEqual(
@@ -112,9 +106,7 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
             "N",
         )
         self.assertEqual(
-            xform_is_minimis_rate_used(
-                "The Symphony did not utilize a 10%"
-            ),
+            xform_is_minimis_rate_used("The Symphony did not utilize a 10%"),
             "N",
         )
         self.assertEqual(
@@ -124,27 +116,19 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
             "N",
         )
         self.assertEqual(
-            xform_is_minimis_rate_used(
-                "10% de minimis rate option was not utilized"
-            ),
+            xform_is_minimis_rate_used("10% de minimis rate option was not utilized"),
             "N",
         )
         self.assertEqual(
-            xform_is_minimis_rate_used(
-                "Did not make this election"
-            ),
+            xform_is_minimis_rate_used("Did not make this election"),
             "N",
         )
         self.assertEqual(
-            xform_is_minimis_rate_used(
-                "Has not made an election"
-            ),
+            xform_is_minimis_rate_used("Has not made an election"),
             "N",
         )
         self.assertEqual(
-            xform_is_minimis_rate_used(
-                "No election has been made"
-            ),
+            xform_is_minimis_rate_used("No election has been made"),
             "N",
         )
 
