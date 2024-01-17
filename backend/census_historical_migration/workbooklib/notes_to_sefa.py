@@ -70,6 +70,8 @@ def xform_is_minimis_rate_used(rate_content):
         r"not\s+applicable",
         r"not\s+utilized",
         r"has\s+elected\s+not",
+        r"no\s+election",
+        r"not\s+(made|make)\s+(this|an)\s+election",
         r"did\s+not\s+charge\s+indirect\s+costs",
         r"did\s+not\s+make\s+an\s+election",
         r"not\s+eligible\s+to\s+use",

@@ -44,7 +44,7 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
         )
         self.assertEqual(
             xform_is_minimis_rate_used(
-                "utilize an indirect cost rate"
+                "Utilize an indirect cost rate"
             ),
             "Y",
         )
@@ -126,6 +126,24 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
         self.assertEqual(
             xform_is_minimis_rate_used(
                 "10% de minimis rate option was not utilized"
+            ),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "Did not make this election"
+            ),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "Has not made an election"
+            ),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "No election has been made"
             ),
             "N",
         )
