@@ -89,6 +89,7 @@ def xform_is_minimis_rate_used(rate_content):
         r"elected\s+to",
         r"is\s+subject\s+to\s+the\s+10-percent",
         r"utilize(d|s)?\s+(a|an|the)\s+(10|ten|indirect)",
+        r"has\s+(a\s+)?(federally\s+)?negotiated\s+(an\s+)?indirect\s+cost\s+rate",
     ]
 
     # Check for each pattern in the respective lists
