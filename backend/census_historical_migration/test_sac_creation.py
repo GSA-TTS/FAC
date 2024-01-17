@@ -56,6 +56,8 @@ class TestSacTribalConsent(TestCase):
             self.TYPEREPORT_SP_FRAMEWORK = "UQAD"
             self.UEI = "ZQGGHJH74DW7"
             self.ZIPCODE = "10451"
+            self.COGAGENCY = "14"
+            self.OVERSIGHTAGENCY = "84"
 
     def _mock_audit_header(self, entity_type, suppression_code=None):
         """Returns a mock audit header with all necessary fields"""
