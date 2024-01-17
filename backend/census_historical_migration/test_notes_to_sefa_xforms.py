@@ -75,6 +75,24 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
             ),
             "N",
         )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "The Project has decided not to utilize the ten percent de minimis"
+            ),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "The Symphony did not utilize a 10%"
+            ),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "The Organization does not utilize an indirect cost rate"
+            ),
+            "N",
+        )
 
     def test_rate_with_multiple_spaces(self):
         """Test that the function returns the correct results when the rate is used and there are multiple spaces between words."""
