@@ -105,6 +105,12 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
             xform_is_minimis_rate_used("No election has been made"),
             "N",
         )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "IntraHealth negotiates and utilizes an indirect cost rate with the federal government and therefore does not utilize the 10% de minimis cost rate option under Uniform Guidance."
+            ),
+            "N",
+        )
 
     def test_rate_with_multiple_spaces(self):
         """Test that the function returns the correct results when the rate is used and there are multiple spaces between words."""
