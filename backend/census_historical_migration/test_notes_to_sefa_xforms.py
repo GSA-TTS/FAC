@@ -36,6 +36,18 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
             ),
             "Y",
         )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "The Organization utilizes the 10% de minimis"
+            ),
+            "Y",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "utilize an indirect cost rate"
+            ),
+            "Y",
+        )
 
     def test_rate_not_used(self):
         """Test that the function returns 'N' when the rate is not used."""
