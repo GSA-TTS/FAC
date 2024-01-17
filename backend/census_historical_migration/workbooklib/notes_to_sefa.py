@@ -68,7 +68,7 @@ def xform_is_minimis_rate_used(rate_content):
         r"not\s+us(e|ed)",
         r"not\s+elec(t|ted)",
         r"not\s+applicable",
-        r"not\s+utilized",
+        r"not\s+(to\s+)?utilize",
         r"has\s+elected\s+not",
         r"no\s+election",
         r"not\s+(made|make)\s+(this|an)\s+election",
@@ -79,7 +79,6 @@ def xform_is_minimis_rate_used(rate_content):
         r"(rate|costs)\s+does\s+not\s+apply",
         r"not\s+based\s+on\s+eligible\s+costs",
         r"no\s+indirect\s+costs?",
-        r"not\s+(to\s+)?utilize(d)?\s+(a|an|the)\s+(10|ten)",
     ]
 
     # Patterns that indicate the de minimis rate WAS used
