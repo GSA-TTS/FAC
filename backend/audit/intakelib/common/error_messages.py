@@ -65,6 +65,7 @@ messages = {
     "check_missing_aln_three_digit_extension": "Missing ALN (CFDA) three digit extension",
     "check_aln_three_digit_extension_invalid": "The three digit extension should follow one of these formats: ###, RD#, or U##, where # represents a number",
     "check_prior_references_invalid": "Prior references must be <b>N/A</b> or a comma-separated list of values in the format <b>20##-###</b>, for example, <b>2019-001, 2019-002</b>",
+    "check_finding_reference_invalid": "Finding references must be in the format <b>20##-###</b> where the first four digits are a year after 2010, for example, <b>2019-001, 2019-002</b>",
     "check_award_references_invalid": "Award references must be of the form <b>AWARD-####</b>, for example, <b>AWARD-0001</b>",
     "check_aln_prefix_invalid": "The federal agency prefix should be a two-digit value, for example, <b>10</b>",
     "check_additional_award_identification_present": "Missing additional award identification",
