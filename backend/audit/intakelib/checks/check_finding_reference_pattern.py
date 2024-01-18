@@ -34,7 +34,7 @@ def finding_reference_pattern(ir):
                     ir,
                     references,
                     index,
-                    get_message("finding_references_invalid"),
+                    get_message("check_finding_reference_invalid"),
                 )
             )
 
