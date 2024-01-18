@@ -1,12 +1,14 @@
 import logging
 
 from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.db.models import F
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
+from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
 from audit.fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
@@ -203,6 +205,10 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         if handler_info is not None:
             setattr(sac, handler_info["field_name"], audit_data)
             sac.save()
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(ExcelFileHandlerView, self).dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         """
