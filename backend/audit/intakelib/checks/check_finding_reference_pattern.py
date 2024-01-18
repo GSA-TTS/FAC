@@ -8,7 +8,6 @@ from audit.intakelib.common import (
     get_message,
     build_cell_error_tuple,
     appears_empty,
-    is_value_marked_na,
 )
 
 logger = logging.getLogger(__name__)
