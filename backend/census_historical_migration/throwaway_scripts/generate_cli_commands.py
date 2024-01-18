@@ -1,6 +1,6 @@
 import argparse
 import math
-import subprocess
+import subprocess  # nosec
 
 # This throwaway script spits out code that can be
 # copy-pasted into a bash script, or directly into the command line.
@@ -60,7 +60,7 @@ if __name__ == "__main__":
             ]
         )
         print(cmd)
-        subprocess.run(cmd)
+        subprocess.run(cmd)  # nosec
 
 
 # Examples

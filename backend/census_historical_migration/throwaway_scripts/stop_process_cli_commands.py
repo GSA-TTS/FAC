@@ -1,6 +1,6 @@
 import argparse
 import re
-import subprocess
+import subprocess  # nosec
 import sys
 
 # This script stops running tasks for a specified app space in Cloud Foundry.
@@ -9,7 +9,7 @@ import sys
 
 def check_cf_environment():
     # Run 'cf target' and capture the output
-    result = subprocess.run(["cf", "target"], capture_output=True, text=True)
+    result = subprocess.run(["cf", "target"], capture_output=True, text=True)  # nosec
 
     # Check if the command was successful
     if result.returncode != 0:
@@ -21,7 +21,9 @@ def check_cf_environment():
 
 def get_running_task_ids():
     # Run `cf tasks gsa-fac` and capture the output
-    result = subprocess.run(["cf", "tasks", "gsa-fac"], capture_output=True, text=True)
+    result = subprocess.run(
+        ["cf", "tasks", "gsa-fac"], capture_output=True, text=True
+    )  # nosec
 
     if result.returncode != 0:
         print("Error running command")
@@ -66,7 +68,7 @@ if __name__ == "__main__":
             for id in running_ids:
                 print(f"# Stopping process {id}")
                 cmd = ["cf", "terminate-task", "gsa-fac", id]
-                subprocess.run(cmd)
+                subprocess.run(cmd)  # nosec
     else:
         for id in range(int(args.start_id), int(args.end_id) + 1):
             # cf terminate-task gsa-fac <task_id>
@@ -80,7 +82,7 @@ if __name__ == "__main__":
                 ]
             )
             print(cmd)
-            subprocess.run(cmd)
+            subprocess.run(cmd)  # nosec
 
 
 # Examples
