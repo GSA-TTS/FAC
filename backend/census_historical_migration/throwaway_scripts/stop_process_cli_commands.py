@@ -73,14 +73,13 @@ if __name__ == "__main__":
         for id in range(int(args.start_id), int(args.end_id) + 1):
             # cf terminate-task gsa-fac <task_id>
             print(f"# Stopping process {id}")
-            cmd = " ".join(
-                [
-                    "cf",
-                    "terminate-task",
-                    "gsa-fac",
-                    f"{id}",
-                ]
-            )
+            cmd = [
+                "cf",
+                "terminate-task",
+                "gsa-fac",
+                f"{id}",
+            ]
+
             print(cmd)
             subprocess.run(cmd)  # nosec
 
