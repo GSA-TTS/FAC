@@ -36,6 +36,10 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
             ),
             "Y",
         )
+        self.assertEqual(
+            xform_is_minimis_rate_used("The Organization utilizes the 10% de minimis"),
+            "Y",
+        )
 
     def test_rate_not_used(self):
         """Test that the function returns 'N' when the rate is not used."""
@@ -72,6 +76,38 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
         self.assertEqual(
             xform_is_minimis_rate_used(
                 "There are no additional indirect costs allocated to the Corporation."
+            ),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "The Project has decided not to utilize the ten percent de minimis"
+            ),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used("The Symphony did not utilize a 10%"),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used("10% de minimis rate option was not utilized"),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used("Did not make this election"),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used("Has not made an election"),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used("No election has been made"),
+            "N",
+        )
+        self.assertEqual(
+            xform_is_minimis_rate_used(
+                "IntraHealth negotiates and utilizes an indirect cost rate with the federal government and therefore does not utilize the 10% de minimis cost rate option under Uniform Guidance."
             ),
             "N",
         )
