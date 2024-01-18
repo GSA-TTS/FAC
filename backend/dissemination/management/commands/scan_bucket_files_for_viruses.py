@@ -85,15 +85,22 @@ def scan_file_in_s3(bucket, object_name):
 def scan_files_at_path_in_s3(bucket, path):
     s3 = get_s3_client()
     objects = s3.list_objects(Bucket=bucket, Prefix=path)
+    good_count, bad_count = 0, 0
+    # TODO: This only works for the first 1,000 objects, so we need to paginate
+    # this whole thing.
     if objects:
-        results = []
         if "Contents" in objects:
             for object_summary in objects["Contents"]:
                 object_name = object_summary["Key"]
                 result = scan_file_in_s3(bucket, object_name)
-                results.append(result)
-            return results
-    return None
+                if not check_scan_ok(result):
+                    logger.error("SCAN revealed potential infection, %s", result)
+                    bad_count = bad_count + 1
+                else:
+                    good_count = good_count + 1
+        return {"good_count": good_count, "bad_count": bad_count}
+    else:
+        logger.error("SCAN NO: No files found for bucket %s and path %s", bucket, path)
 
 
 def is_stringlike(o):
@@ -132,14 +139,8 @@ class Command(BaseCommand):
                 logger.error(f"SCAN FAIL: {object}")
         if path:
             results = scan_files_at_path_in_s3(bucket, path)
-            if results:
-                if all(map(check_scan_ok, results)):
-                    logger.info(f"SCAN OK: COUNT {len(results)}")
-                else:
-                    for r in results:
-                        if is_stringlike(r):
-                            logger.error(f"SCAN FAIL: {r}")
-            else:
-                logger.error(
-                    f"SCAN NO: No files found for bucket {bucket} and path {path}"
-                )
+            logger.info(
+                "SCAN OK: COUNT passed: %s, failed: %s",
+                results["good_count"],
+                results["bad_count"],
+            )
