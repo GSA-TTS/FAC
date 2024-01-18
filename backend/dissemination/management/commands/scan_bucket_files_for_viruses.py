@@ -84,23 +84,26 @@ def scan_file_in_s3(bucket, object_name):
 
 def scan_files_at_path_in_s3(bucket, path):
     s3 = get_s3_client()
-    objects = s3.list_objects(Bucket=bucket, Prefix=path)
+    paginator = s3.get_paginator("list_objects_v2")
+    pages = paginator.paginate(Bucket="bucket", Prefix="prefix")
     good_count, bad_count = 0, 0
-    # TODO: This only works for the first 1,000 objects, so we need to paginate
-    # this whole thing.
-    if objects:
-        if "Contents" in objects:
-            for object_summary in objects["Contents"]:
-                object_name = object_summary["Key"]
-                result = scan_file_in_s3(bucket, object_name)
-                if not check_scan_ok(result):
-                    logger.error("SCAN revealed potential infection, %s", result)
-                    bad_count = bad_count + 1
-                else:
-                    good_count = good_count + 1
+
+    if pages:
+        for page in pages:
+            if "Contents" in page:
+                for object_summary in page["Contents"]:
+                    object_name = object_summary["Key"]
+                    result = scan_file_in_s3(bucket, object_name)
+                    if not check_scan_ok(result):
+                        logger.error("SCAN revealed potential infection, %s", result)
+                        bad_count = bad_count + 1
+                    else:
+                        good_count = good_count + 1
         return {"good_count": good_count, "bad_count": bad_count}
-    else:
-        logger.error("SCAN NO: No files found for bucket %s and path %s", bucket, path)
+
+    logger.error(
+        "SCAN NO PAGES: No pages found for bucket %s and path %s", bucket, path
+    )
 
 
 def is_stringlike(o):
