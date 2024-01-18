@@ -9,7 +9,10 @@ from django.views import View
 
 import api.views
 
+from audit.cross_validation import sac_validation_shape
 from audit.cross_validation.naming import NC, SECTION_NAMES as SN
+from audit.cross_validation.submission_progress_check import section_completed_metadata
+
 from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
 from audit.validators import validate_general_information_json
 
@@ -411,12 +414,20 @@ class UploadPageView(LoginRequiredMixin, View):
             }
             # Using the current URL, append page specific context
             path_name = request.path.split("/")[2]
+
             for item in additional_context[path_name]:
                 context[item] = additional_context[path_name][item]
             try:
                 context["already_submitted"] = getattr(
                     sac, additional_context[path_name]["DB_id"]
                 )
+
+                shaped_sac = sac_validation_shape(sac)
+                completed_metadata = section_completed_metadata(shaped_sac, path_name)
+
+                context["last_uploaded_by"] = completed_metadata[0]
+                context["last_uploaded_at"] = completed_metadata[1]
+
             except Exception:
                 context["already_submitted"] = None
 
