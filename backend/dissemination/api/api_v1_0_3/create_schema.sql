@@ -4,9 +4,13 @@ do
 $$
 begin
     DROP SCHEMA IF EXISTS api_v1_0_3 CASCADE;
+    DROP SCHEMA IF EXISTS api_v1_0_3_functions CASCADE;
 
     if not exists (select schema_name from information_schema.schemata where schema_name = 'api_v1_0_3') then
         create schema api_v1_0_3;
+        create schema api_v1_0_3_functions;
+        
+        grant usage on schema api_v1_0_3_functions to api_fac_gov;
 
         -- Grant access to tables and views
         alter default privileges

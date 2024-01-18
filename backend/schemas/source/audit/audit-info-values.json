@@ -1,0 +1,79 @@
+{
+  "gaap_results": [
+    {
+      "value": "Unmodified opinion",
+      "key": "unmodified_opinion",
+      "property": "UNMODIFIED_OPINION"
+    },
+    {
+      "value": "Qualified opinion",
+      "key": "qualified_opinion",
+      "property": "QUALIFIED_OPINION"
+    },
+    {
+      "value": "Adverse opinion",
+      "key": "adverse_opinion",
+      "property": "ADVERSE_OPINION"
+    },
+    {
+      "value": "Disclaimer of opinion",
+      "key": "disclaimer_of_opinion",
+      "property": "DISCLAIMER_OF_OPINION"
+    },
+    {
+      "value": "Financial statements were not prepared in accordance with GAAP but were prepared in accordance with a special purpose framework.",
+      "key": "not_gaap",
+      "property": "NOT_GAAP"
+    }
+  ],
+  "sp_framework_basis": [
+    {
+      "value": "Cash basis",
+      "key": "cash_basis",
+      "property": "CASH_BASIS"
+    },
+    {
+      "value": "Tax basis",
+      "key": "tax_basis",
+      "property": "TAX_BASIS"
+    },
+    {
+      "value": "Contractual basis",
+      "key": "contractual_basis",
+      "property": "CONTRACTUAL_BASIS"
+    },
+    {
+      "value": "Regulatory basis",
+      "key": "regulatory_basis",
+      "property": "REGULATORY_BASIS",
+      "historical_only": true
+    },
+    {
+      "value": "Other basis",
+      "key": "other_basis",
+      "property": "OTHER_BASIS"
+    }
+  ],
+  "sp_framework_opinions": [
+    {
+      "value": "Unmodified opinion",
+      "key": "unmodified_opinion",
+      "property": "UNMODIFIED_OPINION"
+    },
+    {
+      "value": "Qualified opinion",
+      "key": "qualified_opinion",
+      "property": "QUALIFIED_OPINION"
+    },
+    {
+      "value": "Adverse opinion",
+      "key": "adverse_opinion",
+      "property": "ADVERSE_OPINION"
+    },
+    {
+      "value": "Disclaimer of opinion",
+      "key": "disclaimer_of_opinion",
+      "property": "DISCLAIMER_OF_OPINION"
+    }
+  ]
+}

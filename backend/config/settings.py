@@ -171,10 +171,6 @@ DATABASES = {
     "default": env.dj_db_url(
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
-    "census-to-gsafac-db": env.dj_db_url(
-        "DATABASE_URL_CENSUS_TO_GSAFAC_DB",
-        default="postgres://postgres:password@0.0.0.0/census-to-gsafac-db",
-    ),
 }
 
 POSTGREST = {
@@ -230,6 +226,7 @@ CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 STATIC_URL = "/static/"
 
+
 # Environment specific configurations
 DEBUG = False
 if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
@@ -248,8 +245,6 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
-    # Private CENSUS_TO_GSAFAC bucket
-    AWS_CENSUS_TO_GSAFAC_BUCKET_NAME = "fac-census-to-gsafac-s3"
 
     AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
         "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
@@ -400,15 +395,9 @@ else:
     # Will not be enabled in cloud environments
     DISABLE_AUTH = False
 
-# Remove once all Census data has been migrated
-# Add these as env vars, look at the bucket for values
-AWS_CENSUS_ACCESS_KEY_ID = secret("AWS_CENSUS_ACCESS_KEY_ID", "")
-AWS_CENSUS_SECRET_ACCESS_KEY = secret("AWS_CENSUS_SECRET_ACCESS_KEY", "")
-AWS_CENSUS_STORAGE_BUCKET_NAME = secret("AWS_CENSUS_STORAGE_BUCKET_NAME", "")
-AWS_S3_CENSUS_REGION_NAME = secret("AWS_S3_CENSUS_REGION_NAME", "")
-
 
 ADMIN_URL = "admin/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -534,3 +523,16 @@ STATIC_SITE_URL = "https://fac.gov/"
 # OMB-assigned values. Number doesn't change, date does.
 OMB_NUMBER = "3090-0330"
 OMB_EXP_DATE = "09/30/2026"
+
+# APP-level constants
+CENSUS_DATA_SOURCE = "CENSUS"
+DOLLAR_THRESHOLD = 750000
+SUMMARY_REPORT_DOWNLOAD_LIMIT = 1000
+
+# A version of these regexes also exists in Base.libsonnet
+REGEX_ALN_PREFIX = r"^([0-9]{2})$"
+REGEX_RD_EXTENSION = r"^RD[0-9]?$"
+REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
+REGEX_U_EXTENSION = r"^U[0-9]{2}$"
+GSA_MIGRATION = "GSA_MIGRATION"  # There is a copy of `GSA_MIGRATION` in Base.libsonnet. If you change it here, change it there too.
+GSA_MIGRATION_INT = -999999999

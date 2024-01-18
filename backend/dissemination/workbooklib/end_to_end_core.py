@@ -9,6 +9,11 @@ import jwt
 import requests
 from pprint import pprint
 from datetime import datetime
+from audit.models import SingleAuditChecklist
+from random import randrange
+from datetime import timedelta
+import pytz
+
 
 from dissemination.workbooklib.workbook_creation import (
     sections,
@@ -16,7 +21,6 @@ from dissemination.workbooklib.workbook_creation import (
     setup_sac,
 )
 from dissemination.workbooklib.sac_creation import _post_upload_pdf
-from audit.intake_to_dissemination import IntakeToDissemination
 
 from dissemination.models import (
     AdditionalEin,
@@ -42,12 +46,36 @@ pw.addHandler(logging.StreamHandler())
 pw.setLevel(logging.INFO)
 
 
+# https://stackoverflow.com/questions/553303/generate-a-random-date-between-two-other-dates
+def random_date(start, end):
+    """
+    This function will return a random datetime between two datetime
+    objects.
+    """
+    delta = end - start
+    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+    random_second = randrange(int_delta)  # nosec
+    return start + timedelta(seconds=random_second)
+
+
 def step_through_certifications(sac):
-    sac.transition_to_ready_for_certification()
-    sac.transition_to_auditor_certified()
-    sac.transition_to_auditee_certified()
-    sac.transition_to_submitted()
-    sac.transition_to_disseminated()
+    d1 = datetime.strptime("1/1/2017 1:30 PM", "%m/%d/%Y %I:%M %p")
+    d2 = datetime.strptime("10/30/2023 4:50 AM", "%m/%d/%Y %I:%M %p")
+    # https://stackoverflow.com/questions/7065164/how-to-make-a-datetime-object-aware-not-naive
+    date = pytz.utc.localize(random_date(d1, d2))
+
+    stati = [
+        SingleAuditChecklist.STATUS.IN_PROGRESS,
+        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        SingleAuditChecklist.STATUS.CERTIFIED,
+        SingleAuditChecklist.STATUS.SUBMITTED,
+        SingleAuditChecklist.STATUS.DISSEMINATED,
+    ]
+    for status in stati:
+        sac.transition_name.append(status)
+        sac.transition_date.append(date)
     sac.save()
 
 
@@ -68,9 +96,7 @@ def disseminate(sac, year):
         model.objects.filter(report_id=sac.report_id).delete()
 
     if sac.general_information:
-        etl = IntakeToDissemination(sac)
-        etl.load_all()
-        etl.save_dissemination_objects()
+        sac.disseminate()
 
 
 def create_payload(api_url, role="api_fac_gov"):
@@ -189,7 +215,7 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def generate_workbooks(user, email, dbkey, year):
+def generate_workbooks(user, email, dbkey, year, store_files=True, run_api_checks=True):
     entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
         dbkey=dbkey, year=year, date=datetime.now()
     )
@@ -197,32 +223,30 @@ def generate_workbooks(user, email, dbkey, year):
     if sac.general_information["audit_type"] == "alternative-compliance-engagement":
         print(f"Skipping ACE audit: {dbkey}")
     else:
-        loader = workbook_loader(user, sac, dbkey, year, entity_id)
+        _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf", store_files)
+
+        loader = workbook_loader(user, sac, dbkey, year, entity_id, store_files)
         json_test_tables = []
         for section, fun in sections.items():
-            # FIXME: Can we conditionally upload the addl' and secondary workbooks?
             (_, json, _) = loader(fun, section)
             json_test_tables.append(json)
-        _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+
         step_through_certifications(sac)
-
-        # shaped_sac = sac_validation_shape(sac)
-        # result = submission_progress_check(shaped_sac, sar=None, crossval=False)
-        # print(result)
-
         errors = sac.validate_cross()
         pprint(errors.get("errors", "No errors found in cross validation"))
 
         disseminate(sac, year)
-        # pprint(json_test_tables)
-        combined_summary = api_check(json_test_tables)
-        logger.info(combined_summary)
+        if run_api_checks:
+            combined_summary = api_check(json_test_tables)
+            logger.info(combined_summary)
 
 
-def run_end_to_end(email, dbkey, year):
+def run_end_to_end(email, dbkey, year, store_files=True, run_api_checks=True):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
-        logger.info("No user found for %s, have you logged in once?", email)
-        return
-    generate_workbooks(user, email, dbkey, year)
+        logger.info("Retrieve or create test data generation user.")
+        test_user_email = "test-data-generator@fac.gsa.gov"
+        user, created = User.objects.get_or_create(email=test_user_email)
+
+    generate_workbooks(user, email, dbkey, year, store_files, run_api_checks)

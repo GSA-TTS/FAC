@@ -1,12 +1,15 @@
-from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
-    WorkbookFieldInDissem,
-    set_uei,
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
-    generate_dissemination_test_table,
+    set_workbook_uei,
+    sort_by_field,
 )
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.workbooklib.census_models.census import dynamic_import
+from ..base_field_maps import (
+    SheetFieldMap,
+    WorkbookFieldInDissem,
+)
+from ..workbooklib.templates import sections_to_template_paths
+from ..models import ELECUEIS as Ueis
 from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
@@ -16,27 +19,28 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    # FIXME: We have no dissemination nodel for this.
-    FieldMap("additional_uei", "uei", WorkbookFieldInDissem, None, str),
+    SheetFieldMap("additional_uei", "UEI", WorkbookFieldInDissem, None, str),
 ]
 
 
-def generate_additional_ueis(dbkey, year, outfile):
-    logger.info(f"--- generate additional ueis {dbkey} {year} ---")
-    Gen = dynamic_import("Gen", year)
-    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_UEIS])
-    g = set_uei(Gen, wb, dbkey)
-    if int(year) >= 22:
-        Ueis = dynamic_import("Ueis", year)
-        addl_ueis = Ueis.select().where(Ueis.dbkey == g.dbkey)
-        map_simple_columns(wb, mappings, addl_ueis)
+def get_ueis(dbkey, year):
+    results = Ueis.objects.filter(DBKEY=dbkey, AUDITYEAR=year).exclude(UEI="")
 
-        table = generate_dissemination_test_table(
-            Gen, "additional_ueis", dbkey, mappings, addl_ueis
-        )
-    else:
-        table = {}
-        table["singletons"] = {}
+    return sort_by_field(results, "SEQNUM")
+
+
+def generate_additional_ueis(audit_header, outfile):
+    """
+    Generates additional ueis workbook for a given audit header.
+    """
+    logger.info(
+        f"--- generate additional ueis {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
+    )
+    uei = xform_retrieve_uei(audit_header.UEI)
+    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_UEIS])
+    set_workbook_uei(wb, uei)
+    additional_ueis = get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
+    map_simple_columns(wb, mappings, additional_ueis)
     wb.save(outfile)
-    table["singletons"]["auditee_uei"] = g.uei
-    return (wb, table)
+
+    return wb

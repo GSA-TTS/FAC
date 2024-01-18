@@ -3,8 +3,8 @@
 # This requires: cf bind-service gsa-fac fac-private-s3 -c '{"additional_instances": ["backups"]}'
 
 # Grab AWS cli
-unset https_proxy
-curl -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# awscli.amazonaws.com needs to be added to the proxy allow list
+curl -x $https_proxy -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip && rm awscliv2.zip
 ./aws/install -i ~/usr -b ~/bin
 /home/vcap/app/bin/aws --version
@@ -24,27 +24,14 @@ export BACKUPS_BUCKET="$(echo "$FACBACKUPS"|jq -r '.bucket')"
 date=$(date +%Y%m%d%H%M)
 
 # Grab the s3 tar binary
-curl -L "https://github.com/awslabs/amazon-s3-tar-tool/releases/download/v1.0.14/s3tar-linux-amd64.zip" -o "s3tar-linux-amd64.zip"
+# objects.githubusercontent.com needs to be added to the proxy allow list
+curl -x $https_proxy -L "https://github.com/awslabs/amazon-s3-tar-tool/releases/download/v1.0.14/s3tar-linux-amd64.zip" -o "s3tar-linux-amd64.zip"
 unzip s3tar-linux-amd64.zip && rm s3tar-linux-amd64.zip
 
-# Create a single tar in the source bucket
-./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -cvf s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar s3://${FAC_MEDIA_BUCKET} --storage-class INTELLIGENT_TIERING
+# Unset the proxy so that s3tar-tool and aws-cli can function. Without doing this, none of the subsequent commands will work
+unset https_proxy
 
-# List contents of source bucket
-/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
-
-# Move the tar to the backups bucket
-/home/vcap/app/bin/aws s3 sync s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/ s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
-# Share the Tar to dest and extract (without including the tar)
-#./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -cvf s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar -C s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
-
-# List contents of destination bucket
-/home/vcap/app/bin/aws s3 ls s3://${BACKUPS_BUCKET}/mediabackups/$date/
-
-# Cleanup the source bucket so older backups don't get added to the tar
-/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar
-/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
-/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/
-
-# List contents of source bucket to ensure everything was deleted properly
-/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
+# Sync the whole media bucket to backup.
+# This provides us with a current backup of all the files individually.
+# If nothing has changed, this runs really quickly.
+/home/vcap/app/bin/aws s3 sync s3://${FAC_MEDIA_BUCKET} s3://${BACKUPS_BUCKET}

@@ -41,4 +41,3 @@ data "cloudfoundry_domain" "public" {
 data "cloudfoundry_domain" "private" {
   name = "apps.internal"
 }
-

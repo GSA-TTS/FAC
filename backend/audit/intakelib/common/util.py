@@ -1,3 +1,4 @@
+from django.conf import settings
 from .error_messages import messages
 import logging
 from audit.intakelib.intermediate_representation import (
@@ -66,9 +67,13 @@ def is_value_marked_na(v):
     return value == "N/A"
 
 
-def is_y_or_n(v):
+def is_yes_or_no_or_gsa_migration(v):
+    """Returns true if the value is Y, N, or GSA_MIGRATION."""
+    # `GSA_MIGRATION` was added here to allow `contains_chart_or_table`
+    # in historic data migration to pass validation.
     value = str(v).strip()
-    return value == "Y" or value == "N"
+
+    return value in ["Y", "N", settings.GSA_MIGRATION]
 
 
 def get_missing_value_errors(ir, range_name, message_key):
@@ -94,7 +99,7 @@ def invalid_y_or_n_entry(ir, range_name, message_key):
     errors = []
     if range_data:
         for index, value in enumerate(range_data["values"]):
-            if not is_y_or_n(value):
+            if not is_yes_or_no_or_gsa_migration(value):
                 errors.append(
                     build_cell_error_tuple(
                         ir,
@@ -115,6 +120,25 @@ def get_names_of_all_ranges(data):
                 if "name" in range_item:
                     names.append(range_item["name"])
     return names
+
+
+def make_named_range_uppercase(ir, range_name, message_key):
+    range_data = get_range_by_name(ir, range_name)
+    errors = []
+    new_values = []
+    if range_data:
+        for index, value in enumerate(range_data["values"]):
+            try:
+                new_values.append(value.upper())
+            except (ValueError, TypeError, AttributeError):
+                logger.info(f"Could not uppercase range {range_name}, {value}")
+                message = get_message(message_key).format(value)
+                error = build_cell_error_tuple(ir, range_data, index, message)
+                errors.append(error)
+        if len(errors) > 0:
+            logger.info("Raising a validation error.")
+            raise ValidationError(errors)
+    return replace_range_by_name(ir, range_name, new_values)
 
 
 def safe_int_conversion(ir, range_name, other_values_allowed=None):
@@ -150,3 +174,12 @@ def safe_int_conversion(ir, range_name, other_values_allowed=None):
             raise ValidationError(errors)
     new_ir = replace_range_by_name(ir, range_name, new_values)
     return new_ir
+
+
+# check if the given string can be converted to an int
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except (ValueError, TypeError):
+        return False

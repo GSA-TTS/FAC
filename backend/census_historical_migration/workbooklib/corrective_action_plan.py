@@ -1,12 +1,16 @@
-from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
-    WorkbookFieldInDissem,
-    set_uei,
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
-    generate_dissemination_test_table,
+    set_workbook_uei,
+    sort_by_field,
+    xform_sanitize_for_excel,
 )
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.workbooklib.census_models.census import dynamic_import
+from ..base_field_maps import (
+    SheetFieldMap,
+    WorkbookFieldInDissem,
+)
+from ..workbooklib.templates import sections_to_template_paths
+from ..models import ELECCAPTEXT as CapText
 from audit.fixtures.excel import FORM_SECTIONS
 
 
@@ -16,32 +20,39 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+mappings = [
+    SheetFieldMap(
+        "reference_number", "FINDINGREFNUMS", "finding_ref_number", None, str
+    ),
+    SheetFieldMap("planned_action", "TEXT", WorkbookFieldInDissem, None, str),
+    SheetFieldMap(
+        "contains_chart_or_table", "CHARTSTABLES", WorkbookFieldInDissem, None, str
+    ),
+]
 
-def generate_corrective_action_plan(dbkey, year, outfile):
-    logger.info(f"--- generate corrective action plan {dbkey} {year} ---")
-    Gen = dynamic_import("Gen", year)
-    Captext = dynamic_import("Captext", year)
+
+def _get_cap_text(dbkey, year):
+    results = CapText.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+
+    return sort_by_field(results, "SEQ_NUMBER")
+
+
+def generate_corrective_action_plan(audit_header, outfile):
+    """
+    Generates a corrective action plan workbook for a given audit header.
+    """
+    logger.info(
+        f"--- generate corrective action plan {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
+    )
+
+    uei = xform_retrieve_uei(audit_header.UEI)
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.CORRECTIVE_ACTION_PLAN]
     )
-    mappings = [
-        FieldMap("reference_number", "findingrefnums", "finding_ref_number", None, str),
-        FieldMap("planned_action", "text", WorkbookFieldInDissem, None, str),
-        FieldMap(
-            "contains_chart_or_table", "chartstables", WorkbookFieldInDissem, None, str
-        ),
-    ]
-
-    g = set_uei(Gen, wb, dbkey)
-
-    captexts = Captext.select().where(Captext.dbkey == g.dbkey)
-
+    set_workbook_uei(wb, uei)
+    captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
+    xform_sanitize_for_excel(captexts)
     map_simple_columns(wb, mappings, captexts)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        Gen, "corrective_action_plans", dbkey, mappings, captexts
-    )
-    table["singletons"]["auditee_uei"] = g.uei
-
-    return (wb, table)
+    return wb

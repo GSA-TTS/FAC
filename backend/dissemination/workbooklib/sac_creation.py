@@ -292,7 +292,7 @@ def _make_excel_file(filename, f_obj):
     return file
 
 
-def _post_upload_pdf(this_sac, this_user, pdf_filename):
+def _post_upload_pdf(this_sac, this_user, pdf_filename, store_files=True):
     """Upload a workbook for this SAC.
 
     This should be idempotent if it is called on a SAC that already
@@ -305,12 +305,12 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
         # nothing to do here
         return
 
-    with open(pdf_filename, "rb") as f:
-        content = f.read()
-    file = SimpleUploadedFile(pdf_filename, content, "application/pdf")
-    print(file.__dict__)
+    # with open(pdf_filename, "rb") as f:
+    #     content = f.read()
+    # file = SimpleUploadedFile(pdf_filename, content, "application/pdf")
+    # print(file.__dict__)
     pdf_file = PDFFile(
-        file=file,
+        file=SimpleUploadedFile("pdf.pdf", b"", "application/pdf"),
         component_page_numbers={
             "financial_statements": 1,
             "financial_statements_opinion": 2,
@@ -327,15 +327,18 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
         sac_id=this_sac.id,
     )
 
-    validator_mapping["PDF"](pdf_file.file)
-
-    pdf_file.full_clean()
-    pdf_file.save()
+    # Sometimes, we just want to generate data for testing,
+    # not store the artifacts.
+    # FIXME: We would have to... the save stores data in a table,
+    # but it also creates a file. I'm going to eat having 0-length PDFs for now.
+    if True:
+        # pdf_file.full_clean()
+        pdf_file.save()
 
     this_sac.save()
 
 
-def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
+def _post_upload_workbook(this_sac, this_user, section, xlsx_file, store_files=True):
     """Upload a workbook for this SAC.
 
     This should be idempotent if it is called on a SAC that already
@@ -358,12 +361,24 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
         sac_id=this_sac.id,
         form_section=section,
     )
-    excel_file.full_clean()
-    excel_file.save()
+
+    # Sometimes, we just want to generate data for testing,
+    # not store the artifacts.
+    if store_files:
+        excel_file.full_clean()
+        excel_file.save()
 
     audit_data = extract_mapping[section](excel_file.file)
     validator_mapping[section](audit_data)
 
+    this_sac = _post_upload_workbook_assign_data(section, this_sac, audit_data)
+
+    this_sac.save()
+
+    logger.info(f"Created {section} workbook upload for SAC {this_sac.id}")
+
+
+def _post_upload_workbook_assign_data(section, this_sac, audit_data):
     if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
         this_sac.federal_awards = audit_data
     elif section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:
@@ -380,7 +395,4 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
         this_sac.additional_ueis = audit_data
     elif section == FORM_SECTIONS.ADDITIONAL_EINS:
         this_sac.additional_eins = audit_data
-
-    this_sac.save()
-
-    logger.info(f"Created {section} workbook upload for SAC {this_sac.id}")
+    return this_sac

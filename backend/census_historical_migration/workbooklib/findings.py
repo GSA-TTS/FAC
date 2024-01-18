@@ -1,14 +1,23 @@
-from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
-    set_uei,
-    map_simple_columns,
-    generate_dissemination_test_table,
-    set_range,
+from ..change_record import (
+    CensusRecord,
+    InspectionRecord,
+    GsaFacRecord,
 )
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.workbooklib.census_models.census import dynamic_import
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..transforms.xform_string_to_string import (
+    string_to_string,
+)
+from ..workbooklib.excel_creation_utils import (
+    get_audits,
+    map_simple_columns,
+    set_range,
+    set_workbook_uei,
+    sort_by_field,
+)
+from ..base_field_maps import SheetFieldMap
+from ..workbooklib.templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
-
+from ..models import ELECAUDITFINDINGS as Findings
 import openpyxl as pyxl
 
 import logging
@@ -22,38 +31,84 @@ def sorted_string(s):
     return s_sorted
 
 
+def xform_prior_year_findings(value):
+    """
+    Transform the value of prior_references to N/A if empty.
+    """
+    # Transformation to be documented.
+    trimmed_value = string_to_string(value)
+    if not trimmed_value:
+        # See ticket #2912
+        return "N/A"
+
+    return trimmed_value
+
+
 mappings = [
-    FieldMap(
+    SheetFieldMap(
         "compliance_requirement",
-        "typerequirement",
+        "TYPEREQUIREMENT",
         "type_requirement",
-        "ABC",
-        sorted_string,
+        None,
+        # FIXME - MSHD: I removed sorted_string from here because it is a transformation and
+        # we want to apply transformation in a more controlled way (not by default - except when required).
+        str,
     ),
-    FieldMap("reference_number", "findingsrefnums", "reference_number", None, str),
-    FieldMap("modified_opinion", "modifiedopinion", "is_modified_opinion", None, str),
-    FieldMap("other_matters", "othernoncompliance", "is_other_matters", None, str),
-    FieldMap(
-        "material_weakness", "materialweakness", "is_material_weakness", None, str
+    SheetFieldMap("reference_number", "FINDINGREFNUMS", "reference_number", None, str),
+    SheetFieldMap(
+        "modified_opinion", "MODIFIEDOPINION", "is_modified_opinion", None, str
     ),
-    FieldMap(
+    SheetFieldMap("other_matters", "OTHERNONCOMPLIANCE", "is_other_matters", None, str),
+    SheetFieldMap(
+        "material_weakness", "MATERIALWEAKNESS", "is_material_weakness", None, str
+    ),
+    SheetFieldMap(
         "significant_deficiency",
-        "significantdeficiency",
+        "SIGNIFICANTDEFICIENCY",
         "is_significant_deficiency",
         None,
         str,
     ),
-    FieldMap("other_findings", "otherfindings", "is_other_findings", None, str),
-    FieldMap("questioned_costs", "qcosts", "is_questioned_costs", None, str),
-    FieldMap("repeat_prior_reference", "repeatfinding", "is_repeat_finding", None, str),
-    FieldMap(
+    SheetFieldMap("other_findings", "OTHERFINDINGS", "is_other_findings", None, str),
+    SheetFieldMap("questioned_costs", "QCOSTS", "is_questioned_costs", None, str),
+    SheetFieldMap(
+        "repeat_prior_reference", "REPEATFINDING", "is_repeat_finding", None, str
+    ),
+    SheetFieldMap(
         "prior_references",
-        "priorfindingrefnums",
+        "PRIORFINDINGREFNUMS",
         "prior_finding_ref_numbers",
-        "N/A",
-        str,
+        None,
+        xform_prior_year_findings,
     ),
 ]
+
+
+def xform_construct_award_references(audits, findings):
+    """Construct award references for findings."""
+    # Transformation recorded.
+    e2a = {}
+    for index, audit in enumerate(audits):
+        e2a[audit.ELECAUDITSID] = f"AWARD-{index+1:04d}"
+    award_references = []
+    change_records = []
+    for find in findings:
+        award_references.append(e2a[find.ELECAUDITSID])
+        # Tracking changes
+        census_data = [CensusRecord("ELECAUDITSID", find.ELECAUDITSID).to_dict()]
+        gsa_fac_data = GsaFacRecord("award_reference", e2a[find.ELECAUDITSID]).to_dict()
+        transformation_functions = ["xform_construct_award_references"]
+        change_records.append(
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_functions": transformation_functions,
+            }
+        )
+    if change_records:
+        InspectionRecord.append_finding_changes(change_records)
+
+    return award_references
 
 
 def _get_findings_grid(findings_list):
@@ -71,11 +126,11 @@ def _get_findings_grid(findings_list):
     }
 
     attributes = [
-        "modifiedopinion",
-        "othernoncompliance",
-        "materialweakness",
-        "significantdeficiency",
-        "otherfindings",
+        "MODIFIEDOPINION",
+        "OTHERNONCOMPLIANCE",
+        "MATERIALWEAKNESS",
+        "SIGNIFICANTDEFICIENCY",
+        "OTHERFINDINGS",
     ]
 
     return [
@@ -87,31 +142,31 @@ def _get_findings_grid(findings_list):
     ]
 
 
-def generate_findings(dbkey, year, outfile):
-    logger.info(f"--- generate findings {dbkey} {year} ---")
-    Gen = dynamic_import("Gen", year)
-    Findings = dynamic_import("Findings", year)
-    Cfda = dynamic_import("Cfda", year)
+def _get_findings(dbkey, year):
+    # CFDAs aka ELECAUDITS (or Audits) have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
+    # The linkage here is that a given finding will have an elecauditid.
+    # Multiple findings will have a given elecauditid. That's how to link them.
+    results = Findings.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+
+    return sort_by_field(results, "ELECAUDITFINDINGSID")
+
+
+def generate_findings(audit_header, outfile):
+    """
+    Generates a federal awards audit findings workbook for all findings associated with a given audit header.
+    """
+    logger.info(
+        f"--- generate findings {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
+    )
+
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE]
     )
-    g = set_uei(Gen, wb, dbkey)
-
-    cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)
-    # For each of them, I need to generate an elec -> award mapping.
-    e2a = {}
-    for ndx, cfda in enumerate(cfdas):
-        e2a[cfda.elecauditsid] = f"AWARD-{ndx+1:04d}"
-
-    # CFDAs have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
-    # The linkage here is that a given finding will have an elecauditid.
-    # Multiple findings will have a given elecauditid. That's how to link them.
-    findings = (
-        Findings.select().where(Findings.dbkey == g.dbkey).order_by(Findings.index)
-    )
-    award_references = []
-    for find in findings:
-        award_references.append(e2a[find.elecauditsid])
+    uei = xform_retrieve_uei(audit_header.UEI)
+    set_workbook_uei(wb, uei)
+    audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
+    findings = _get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
+    award_references = xform_construct_award_references(audits, findings)
 
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
@@ -121,11 +176,4 @@ def generate_findings(dbkey, year, outfile):
     set_range(wb, "is_valid", grid, conversion_fun=str)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        Gen, "findings", dbkey, mappings, findings
-    )
-    for obj, ar in zip(table["rows"], award_references):
-        obj["fields"].append("award_reference")
-        obj["values"].append(ar)
-
-    return (wb, table)
+    return wb

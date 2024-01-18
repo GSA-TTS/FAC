@@ -1,14 +1,43 @@
 {% extends "base.html" %}
 {% load static %}
+{% load sprite_helper %}
 {% block content %}
     <div class="grid-container margin-top-6">
         <div class="grid-row">
-            <form class="grid-col-8 grid-offset-2"
+            <form class="tablet:grid-col-8 tablet:grid-offset-2"
                   id="auditor-certification-step-1"
                   method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset padding-bottom-2">
-                    <legend class="usa-legend usa-legend--large" id="auditor-certification">Auditor certification checklist</legend>
+                    <legend class="usa-legend usa-legend--large" id="auditor-certification">Auditor certification</legend>
+
+                    <p>Download and review the SF-SAC and single audit report below. These files are for review only and can't be edited.</p>
+                    <p>After reviewing, check the box next to each item to confirm your report meets the requirements.</p>
+
+                    <div class="usa-button-group margin-top-2">
+                        <a class="usa-button display-flex"
+                           href="{% url 'audit:PredisseminationSummaryReportDownload' report_id=report_id %}"
+                           target="_blank">
+                            <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                 aria-hidden="true"
+                                 role="img">
+                                {% uswds_sprite "file_download" %}
+                            </svg>
+                            <p class="margin-0">Download SF-SAC</p>
+                        </a>
+                        
+                        <a class="usa-button display-flex margin-top-2 tablet:margin-top-0"
+                           href="{% url 'audit:PredisseminationPdfDownload' report_id=report_id %}"
+                           target="_blank">
+                            <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                 aria-hidden="true"
+                                 role="img">
+                                {% uswds_sprite "file_download" %}
+                            </svg>
+                            <p class="margin-0">Download single audit report</p>
+                        </a>
+                    </div>
+
                     <h3>Check the box next to each item confirm your report meets the requirements.</h3>
                     <p class="text-base">You must check all boxes in order to certify your single audit.</p>
                     <div class="usa-checkbox margin-top-4">
@@ -33,7 +62,7 @@
                                value="True"
                                {% if form.cleaned_data.is_auditee_responsible %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="is_auditee_responsible">
-                            The auditee completed the Federal Awards workbook using the audit reporting package as required by the Uniform Guidance.
+                            The information in Part II of this Form SF-SAC is the responsibility of the auditee and is based on information included in the reporting package required by the Uniform Guidance.
                         </label>
                         <span class="usa-error-message">{{ form.errors.is_auditee_responsible|striptags }}</span>
                     </div>
@@ -81,8 +110,8 @@
                 </fieldset>
                 <div class="grid-row margin-bottom-8 margin-top-10">
                     <button class="usa-button grid-col-5" id="continue">Agree to auditor certification</button>
-                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center"
-                       href="/">Cancel</a>
+                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center" id="cancel-auditor-certification-link" 
+                       href="{% url 'audit:SubmissionProgress' report_id %}">Cancel</a>
                 </div>
             </form>
         </div>

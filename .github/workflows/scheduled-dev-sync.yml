@@ -1,0 +1,15 @@
+---
+name: Sync Dev Media Files
+on:
+  schedule:
+    # Invoke every 2 hours
+    - cron: '0 */2 * * *'
+  workflow_dispatch: null
+
+jobs:
+  trivy-scan:
+    uses: ./.github/workflows/sync-s3-media.yml
+    secrets: inherit
+    with:
+      environment: "dev"
+

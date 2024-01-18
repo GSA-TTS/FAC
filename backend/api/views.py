@@ -150,29 +150,32 @@ def access_and_submission_check(user, data):
             serializer.data.get("auditee_contacts_email"),
             serializer.data.get("auditee_contacts_fullname"),
         )
+
         auditor_contacts_info = zip(
             serializer.data.get("auditor_contacts_email"),
             serializer.data.get("auditor_contacts_fullname"),
         )
 
         for email, name in auditee_contacts_info:
-            Access.objects.create(
-                sac=sac,
-                role="editor",
-                fullname=name,
-                email=str(email).lower(),
-                event_user=user,
-                event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
-            )
+            if email:
+                Access.objects.create(
+                    sac=sac,
+                    role="editor",
+                    fullname=name,
+                    email=str(email).lower(),
+                    event_user=user,
+                    event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+                )
         for email, name in auditor_contacts_info:
-            Access.objects.create(
-                sac=sac,
-                role="editor",
-                fullname=name,
-                email=str(email).lower(),
-                event_user=user,
-                event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
-            )
+            if email:
+                Access.objects.create(
+                    sac=sac,
+                    role="editor",
+                    fullname=name,
+                    email=str(email).lower(),
+                    event_user=user,
+                    event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+                )
 
         # Clear entry form data from profile
         user.profile.entry_form_data = {}

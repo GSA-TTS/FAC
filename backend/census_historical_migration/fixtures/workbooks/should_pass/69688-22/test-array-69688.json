@@ -1,0 +1,566 @@
+[
+  {
+    "endpoint": "additional_eins",
+    "report_id": "2022-08-CENSUS-0000069688",
+    "rows": [],
+    "singletons": {
+      "auditee_uei": "LBNNLRDE8793"
+    }
+  },
+  {
+    "endpoint": "additional_ueis",
+    "report_id": "2022-08-CENSUS-0000069688",
+    "rows": [],
+    "singletons": {
+      "auditee_uei": "LBNNLRDE8793"
+    }
+  },
+  {
+    "endpoint": "corrective_action_plans",
+    "report_id": "2022-08-CENSUS-0000069688",
+    "rows": [
+      {
+        "fields": [
+          "finding_ref_number",
+          "planned_action",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-001",
+          "CORRECTIVE ACTION PLAN\r\nManagement will adopt an internal control process that will alert the Health Center when reporting due dates are approaching.",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "planned_action",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-002",
+          "CORRECTIVE ACTION PLAN\r\nManagement has developed the following for consistent adjustments to patient accounts according to the SFDS:\r\n1. Management will work with the electronic payment system contractors to update system parameters for automatic system generated discounts in accordance with the sliding discount schedule. This process began February 28, 2023.\r\n2. Management will implement a monthly audit of a statistically relevant sample of all encounters subjected to the sliding fee adjustment process to test the consistency of the adjustment with the SFDS. This process began February 28, 2023.\r\n3. Management will implement a process to ensure that all reviews and audit corrections are performed by a person other than the person performing the review and all adjustments to patient accounts are reviewed subsequent to processing. Anticipated completion date is June 30, 2023.",
+          "N"
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "LBNNLRDE8793"
+    }
+  },
+  {
+    "endpoint": "federal_awards",
+    "report_id": "2022-08-CENSUS-0000069688",
+    "rows": [
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "federal_award_extension",
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
+        ],
+        "values": [
+          "10",
+          "557",
+          "SPECIAL SUPPLEMENTAL NUTRITION PROGRAM FOR WOMEN, INFANTS, AND CHILDREN",
+          512929,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          512929,
+          "AWARD-0001",
+          "",
+          "GSA_MIGRATION",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "federal_award_extension",
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
+        ],
+        "values": [
+          "93",
+          "224",
+          "CONSOLIDATED HEALTH CENTERS (COMMUNITY HEALTH CENTERS, MIGRANT HEALTH CENTERS, HEALTH CARE FOR THE HOMELESS, AND PUBLIC HOUSING PRIMARY CARE)",
+          5973065,
+          6420692,
+          "N",
+          "Y",
+          "N",
+          "",
+          "Y",
+          "U",
+          2,
+          4485556,
+          "AWARD-0002",
+          "",
+          "HEALTH CENTER PROGRAM CLUSTER",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "federal_award_extension",
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
+        ],
+        "values": [
+          "93",
+          "527",
+          "AFFORDABLE CARE ACT (ACA) GRANTS FOR NEW AND EXPANDED SERVICES UNDER THE HEALTH CENTER PROGRAM",
+          447627,
+          6420692,
+          "N",
+          "Y",
+          "N",
+          "",
+          "Y",
+          "U",
+          0,
+          447627,
+          "AWARD-0003",
+          "",
+          "HEALTH CENTER PROGRAM CLUSTER",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "federal_award_extension",
+          "federal_program_name",
+          "federal_program_total",
+          "additional_award_identification",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended",
+          "award_reference",
+          "cluster_name",
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
+        ],
+        "values": [
+          "93",
+          "224",
+          "COVID-19 - CONSOLIDATED HEALTH CENTERS (COMMUNITY HEALTH CENTERS, MIGRANT HEALTH CENTERS, HEALTH CARE FOR THE HOMELESS, AND PUBLIC HOUSING PRIMARY CARE)",
+          5973065,
+          "COVID-19",
+          6420692,
+          "N",
+          "Y",
+          "N",
+          "",
+          "Y",
+          "U",
+          0,
+          1487509,
+          "AWARD-0004",
+          "HEALTH CENTER PROGRAM CLUSTER",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "federal_award_extension",
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
+        ],
+        "values": [
+          "93",
+          "926",
+          "HEALTHY START INITIATIVE",
+          826156,
+          0,
+          "N",
+          "Y",
+          "N",
+          "",
+          "N",
+          0,
+          826156,
+          "AWARD-0005",
+          "",
+          "GSA_MIGRATION",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "federal_award_extension",
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
+        ],
+        "values": [
+          "93",
+          "889",
+          "NATIONAL BIOTERRORISM HOSPITAL PREPAREDNESS PROGRAM",
+          4996,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          4996,
+          "AWARD-0006",
+          "",
+          "GSA_MIGRATION",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "federal_award_extension",
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
+        ],
+        "values": [
+          "93",
+          "940",
+          "HIV PREVENTION ACTIVITIES_HEALTH DEPARTMENT BASED",
+          20001,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          20001,
+          "AWARD-0007",
+          "",
+          "GSA_MIGRATION",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "federal_award_extension",
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "state_cluster_name",
+          "loan_balance"
+        ],
+        "values": [
+          "93",
+          "217",
+          "FAMILY PLANNING_SERVICES",
+          290916,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          290916,
+          "AWARD-0008",
+          "",
+          "GSA_MIGRATION",
+          "",
+          "",
+          ""
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "LBNNLRDE8793",
+      "total_amount_expended": 8075690
+    }
+  },
+  {
+    "endpoint": "findings_text",
+    "report_id": "2022-08-CENSUS-0000069688",
+    "rows": [
+      {
+        "fields": [
+          "finding_ref_number",
+          "finding_text",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-002",
+          "Health Center Program Cluster\r\nAssistance Listing Number(s) 93.224 and 93.527\r\nU.S. Department of Health and Human Services\r\nAward No. H80CS00438\r\nCriteria or Specific Requirement: Special Tests and Provisions\r\nType of Finding: Significant Deficiency in Internal Control Over Compliance\r\nCondition: The Health Center must prepare and apply a sliding fee discount schedule (SFDS) so that the amounts owed for health center services by eligible participants are adjusted based on the patient\u2019s ability to pay. \r\nQuestioned costs: n/a\r\nContext: The auditor selected a sample of 60 encounters. After the auditor tested selection #49, enough errors had been identified that the auditor stopped testing because the sample results could not support a low assessed level of control risk. The errors were a result of the misapplication of the sliding fee discount. The sliding fee discounts are based on the slide level code. In these instances, the sliding fee discount that was applied was not in accordance with the SFDS. \r\nEffect or Potential Effect: Either the Health Center or the patients may be paying more than required under the contract.\r\nCause: The Health Center applied its SFDS inconsistently to the patients selected for testing. \r\nRecommendation: The Health Center should adopt an internal control procedure that allows them to consistently apply its SFDS to all eligible patients. \r\nRepeat Finding: 2021-001\r\nViews of Responsible Officials: See page 12.",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "finding_text",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-001",
+          "Health Center Program Cluster\r\nAssistance Listing Number(s) 93.224 and 93.527\r\nU.S. Department of Health and Human Services\r\nCriteria or Specific Requirement: Reporting\r\nType of Finding: Significant Deficiency in Internal Control Over Compliance                                            \r\nCondition: The Health Center must timely file its SF-425 Federal Financial Reports for each of its awards.\r\nQuestioned costs: n/a\r\nContext: The auditor found that some of the Health Center\u2019s Forms SF-425 were filed after their respective due dates.\r\nEffect or Potential Effect: Information about the awards is not communicated timely to the awarding agency. \r\nCause: The Health Center had inadequate controls that would prevent them from missing reporting due dates. \r\nRecommendation: The Health Center should adopt an internal control procedure that allows them to consistently file its reports on a timely basis. \r\nRepeat Finding: n/a\r\nViews of Responsible Officials: See page 12.",
+          "N"
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "LBNNLRDE8793"
+    }
+  },
+  {
+    "endpoint": "findings",
+    "report_id": "2022-08-CENSUS-0000069688",
+    "rows": [
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "prior_finding_ref_numbers",
+          "award_reference"
+        ],
+        "values": [
+          "L",
+          "2022-001",
+          "N",
+          "N",
+          "N",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "N/A",
+          "AWARD-0002"
+        ]
+      },
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "prior_finding_ref_numbers",
+          "award_reference"
+        ],
+        "values": [
+          "N",
+          "2022-002",
+          "N",
+          "N",
+          "N",
+          "Y",
+          "N",
+          "N",
+          "Y",
+          "2021-001",
+          "AWARD-0002"
+        ]
+      }
+    ],
+    "singletons": {}
+  },
+  {
+    "endpoint": "notes_to_sefa",
+    "report_id": "2022-08-CENSUS-0000069688",
+    "rows": [
+      {
+        "fields": [
+          "title",
+          "content"
+        ],
+        "values": [
+          "Basis of Presentation",
+          "The accompanying Schedule of Expenditures of Federal Awards (the \"Schedule\") includes the federal award activity of Charles Drew Health Center, Inc. under programs of the federal government for the year ended August 31, 2022. The information in this Schedule is presented in accordance with the requirements of Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Because the Schedule presents only a selected portion of the operations of Charles Drew Health Center, Inc., it is not intended to and does not present the financial position, changes in net assets or cash flows of Charles Drew Health Center, Inc."
+        ]
+      },
+      {
+        "fields": [
+          "title",
+          "content"
+        ],
+        "values": [
+          "Contingencies",
+          "Charles Drew Health Center, Inc. receives funds under various federal grant programs, and such assistance is to be expended in accordance with the provisions of the various grants. Compliance with the grants is subject to audit by various government agencies which may impose sanctions in the event of noncompliance. Management believes that they have complied with all material aspects of the various grant provisions and the results of adjustments, if any, relating to such audits would not have any material financial impacts."
+        ]
+      }
+    ],
+    "singletons": {
+      "accounting_policies": "Expenditures reported on the Schedule are reported on the accrual basis of accounting. Such expenditures are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenditures are not allowable or are limited as to reimbursement. Pass-through entity identifying numbers are presented where available.",
+      "auditee_uei": "LBNNLRDE8793",
+      "is_minimis_rate_used": "Y",
+      "rate_explained": "The auditee used the de minimis cost rate. Charles Drew Health Center, Inc. has elected to use the 10% de minimis indirect cost rate allowed under the Uniform Guidance."
+    }
+  },
+  {
+    "endpoint": "secondary_auditors",
+    "report_id": "2022-08-CENSUS-0000069688",
+    "rows": [
+      {
+        "fields": [
+          "address_city",
+          "contact_name",
+          "auditor_ein",
+          "contact_email",
+          "auditor_name",
+          "contact_phone",
+          "address_state",
+          "address_street",
+          "contact_title",
+          "address_zipcode"
+        ],
+        "values": [
+          "OMAHA",
+          "KATIE BYRD",
+          "470625816",
+          "KBYRD@LUTZ.US",
+          "LUTZ & COMPANY PC",
+          "4024968800",
+          "NE",
+          "13616 CALIFORNIA STREET, SUITE 300",
+          "DIRECTOR",
+          "68154"
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "LBNNLRDE8793"
+    }
+  }
+]

@@ -38,23 +38,25 @@ jobs:
       CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE }}
       DISABLE_AUTH: False
       # useful for debugging but otherwise complete overwhelm
-      # DEBUG: cypress:*
+      # DEBUG: cypress:server:util:process_profiler
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Create .env file
         run: touch .env
 
       - name: Run Cypress full submission test
-        uses: Wandalen/wretry.action@master
+        uses: cypress-io/github-action@v6
         with:
-          action: cypress-io/github-action@v6
-          with: |
-            working-directory: ./backend
-            spec: cypress/e2e/full-submission.cy.js
-          attempt_limit: 5
-          attempt_delay: 2000
+          browser: chrome
+          working-directory: ./backend
+          spec: cypress/e2e/full-submission.cy.js
 
       - uses: actions/upload-artifact@v3
         # add the line below to store screenshots only on failures

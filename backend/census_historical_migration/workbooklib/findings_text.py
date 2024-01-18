@@ -1,12 +1,16 @@
-from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
-    WorkbookFieldInDissem,
-    set_uei,
+from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
-    generate_dissemination_test_table,
+    set_workbook_uei,
+    sort_by_field,
+    xform_sanitize_for_excel,
 )
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.workbooklib.census_models.census import dynamic_import
+from ..base_field_maps import (
+    SheetFieldMap,
+    WorkbookFieldInDissem,
+)
+from ..workbooklib.templates import sections_to_template_paths
+from ..models import ELECFINDINGSTEXT as FindingsText
 from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
@@ -16,28 +20,37 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap("reference_number", "findingrefnums", "finding_ref_number", None, str),
-    FieldMap("text_of_finding", "text", "finding_text", None, str),
-    FieldMap(
-        "contains_chart_or_table", "chartstables", WorkbookFieldInDissem, None, str
+    SheetFieldMap(
+        "reference_number", "FINDINGREFNUMS", "finding_ref_number", None, str
+    ),
+    SheetFieldMap("text_of_finding", "TEXT", "finding_text", None, str),
+    SheetFieldMap(
+        "contains_chart_or_table", "CHARTSTABLES", WorkbookFieldInDissem, None, str
     ),
 ]
 
 
-def generate_findings_text(dbkey, year, outfile):
-    logger.info(f"--- generate findings text {dbkey} {year} ---")
-    Gen = dynamic_import("Gen", year)
-    Findingstext = dynamic_import("Findingstext", year)
-    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.FINDINGS_TEXT])
+def _get_findings_texts(dbkey, year):
+    results = FindingsText.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+    return sort_by_field(results, "SEQ_NUMBER")
 
-    g = set_uei(Gen, wb, dbkey)
 
-    ftexts = Findingstext.select().where(Findingstext.dbkey == g.dbkey)
-    map_simple_columns(wb, mappings, ftexts)
-    wb.save(outfile)
-    table = generate_dissemination_test_table(
-        Gen, "findings_text", dbkey, mappings, ftexts
+def generate_findings_text(audit_header, outfile):
+    """
+    Generates a findings text workbook for a given audit header.
+    """
+    logger.info(
+        f"--- generate findings text {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
     )
-    table["singletons"]["auditee_uei"] = g.uei
 
-    return (wb, table)
+    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.FINDINGS_TEXT])
+    uei = xform_retrieve_uei(audit_header.UEI)
+    set_workbook_uei(wb, uei)
+
+    findings_texts = _get_findings_texts(audit_header.DBKEY, audit_header.AUDITYEAR)
+    xform_sanitize_for_excel(findings_texts)
+    map_simple_columns(wb, mappings, findings_texts)
+
+    wb.save(outfile)
+
+    return wb

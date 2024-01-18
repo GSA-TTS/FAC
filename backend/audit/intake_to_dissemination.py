@@ -25,12 +25,16 @@ def omit(remove, d) -> dict:
 
 
 class IntakeToDissemination(object):
-    def __init__(self, sac) -> None:
+    DISSEMINATION = "dissemination"
+    PRE_CERTIFICATION_REVIEW = "pre_certification_review"
+
+    def __init__(self, sac, mode=DISSEMINATION) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
         audit_date = sac.general_information["auditee_fiscal_period_end"]
         self.audit_year = int(audit_date.split("-")[0])
         self.loaded_objects: dict[str, list] = {}
+        self.mode = mode
 
     def load_all(self):
         load_methods = {
@@ -85,8 +89,8 @@ class IntakeToDissemination(object):
                     finding_text=entry["text_of_finding"],
                 )
                 findings_text_objects.append(finding_text_)
-            self.loaded_objects["FindingTexts"] = findings_text_objects
 
+        self.loaded_objects["FindingTexts"] = findings_text_objects
         return findings_text_objects
 
     def load_findings(self):
@@ -268,11 +272,10 @@ class IntakeToDissemination(object):
         dissemination. This structure is a list with one entry, a
         dissemination.models.General instance.
         """
-
         general_information = self.single_audit_checklist.general_information
         audit_information = self.single_audit_checklist.audit_information
         auditee_certification = self.single_audit_checklist.auditee_certification
-        # auditor_certification = self.single_audit_checklist.auditor_certification or {}
+        auditor_certification = self.single_audit_checklist.auditor_certification or {}
         tribal_data_consent = self.single_audit_checklist.tribal_data_consent or {}
         cognizant_agency = self.single_audit_checklist.cognizant_agency
         oversight_agency = self.single_audit_checklist.oversight_agency
@@ -280,18 +283,34 @@ class IntakeToDissemination(object):
         dates_by_status = self._get_dates_from_sac()
         status = self.single_audit_checklist.STATUS
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
-        auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
-        auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
-        submitted_date = self._convert_utc_to_american_samoa_zone(
-            dates_by_status[status.SUBMITTED]
-        )
-        fac_accepted_date = submitted_date
-        auditee_certify_name = auditee_certification["auditee_signature"][
-            "auditee_name"
-        ]
-        auditee_certify_title = auditee_certification["auditee_signature"][
-            "auditee_title"
-        ]
+        if self.mode == IntakeToDissemination.DISSEMINATION:
+            submitted_date = self._convert_utc_to_american_samoa_zone(
+                dates_by_status[status.SUBMITTED]
+            )
+            fac_accepted_date = submitted_date
+            auditee_certify_name = auditee_certification["auditee_signature"][
+                "auditee_name"
+            ]
+            auditee_certify_title = auditee_certification["auditee_signature"][
+                "auditee_title"
+            ]
+            auditor_certify_name = auditor_certification["auditor_signature"][
+                "auditor_name"
+            ]
+            auditor_certify_title = auditor_certification["auditor_signature"][
+                "auditor_title"
+            ]
+            auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
+            auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
+        elif self.mode == IntakeToDissemination.PRE_CERTIFICATION_REVIEW:
+            submitted_date = None
+            fac_accepted_date = submitted_date
+            auditee_certify_name = None
+            auditee_certify_title = None
+            auditee_certified_date = None
+            auditor_certify_name = None
+            auditor_certify_title = None
+            auditor_certified_date = None
 
         total_amount_expended = self.single_audit_checklist.federal_awards[
             "FederalAwards"
@@ -369,6 +388,8 @@ class IntakeToDissemination(object):
             report_id=self.report_id,
             auditee_certify_name=auditee_certify_name,
             auditee_certify_title=auditee_certify_title,
+            auditor_certify_name=auditor_certify_name,
+            auditor_certify_title=auditor_certify_title,
             cognizant_agency=cognizant_agency,
             oversight_agency=oversight_agency,
             date_created=self.single_audit_checklist.date_created,

@@ -1,26 +1,24 @@
-from collections import namedtuple as NT
-from playhouse.shortcuts import model_to_dict
-import os
-import sys
-import json
-
-from django.core.management.base import BaseCommand
-
-import argparse
-import pprint
-
-from census_historical_migration.workbooklib.workbook_creation import (
+from census_historical_migration.workbooklib.excel_creation_utils import (
+    get_audit_header,
+)
+from census_historical_migration.sac_general_lib.utils import (
+    normalize_year_string_or_exit,
+)
+from census_historical_migration.workbooklib.workbook_builder import (
     generate_workbook,
 )
 from census_historical_migration.workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )
+from django.core.management.base import BaseCommand
 
-from census_historical_migration.workbooklib.census_models.census import (
-    CensusGen22 as Gen,
-)
-
+import os
+import sys
+import json
+import argparse
+import pprint
 import logging
+
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -29,123 +27,6 @@ parser = argparse.ArgumentParser()
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
-
-# This provides a way to map the sheet in the workbook to the
-# column in the DB. It also has a default value and
-# the type of value, so that things can be set correctly
-# before filling in the XLSX workbooks.
-FieldMap = NT("FieldMap", "in_sheet in_db default type")
-
-
-def set_single_cell_range(wb, range_name, value):
-    the_range = wb.defined_names[range_name]
-    # The above returns a generator. Turn it to a list, and grab
-    # the first element of the list. Now, this *tuple* contains a
-    # sheet name and a cell reference... which you need to get rid
-    # of the '$' to use.
-    # https://itecnote.com/tecnote/python-using-excel-named-ranges-in-python-with-openpyxl/
-    tup = list(the_range.destinations)[0]
-    sheet_title = tup[0]
-    cell_ref = tup[1].replace("$", "")
-    ws = wb[sheet_title]
-    ws[cell_ref] = value
-
-
-# A tiny helper to index into workbooks.
-# Assumes a capital letter.
-def col_to_ndx(col):
-    return ord(col) - 65 + 1
-
-
-# Helper to set a range of values.
-# Takes a named range, and then walks down the range,
-# filling in values from the list past in (values).
-def set_range(wb, range_name, values, default=None, type=str):
-    the_range = wb.defined_names[range_name]
-    dest = list(the_range.destinations)[0]
-    sheet_title = dest[0]
-    ws = wb[sheet_title]
-
-    start_cell = dest[1].replace("$", "").split(":")[0]
-    col = col_to_ndx(start_cell[0])
-    start_row = int(start_cell[1])
-
-    for ndx, v in enumerate(values):
-        row = ndx + start_row
-        if v:
-            # This is a very noisy statement, showing everything
-            # written into the workbook.
-            # print(f'{range_name} c[{row}][{col}] <- {v} len({len(v)}) {default}')
-            if v is not None:
-                ws.cell(row=row, column=col, value=type(v))
-            if len(v) == 0 and default is not None:
-                # This is less noisy. Shows up for things like
-                # empty findings counts. 2023 submissions
-                # require that field to be 0, not empty,
-                # if there are no findings.
-                # print('Applying default')
-                ws.cell(row=row, column=col, value=type(default))
-        if not v:
-            if default is not None:
-                ws.cell(row=row, column=col, value=type(default))
-            else:
-                ws.cell(row=row, column=col, value="")
-        else:
-            # Leave it blank if we have no default passed in
-            pass
-
-
-def set_uei(wb, dbkey):
-    g = Gen.select().where(Gen.dbkey == dbkey).get()
-    set_single_cell_range(wb, "auditee_uei", g.uei)
-    return g
-
-
-def map_simple_columns(wb, mappings, values):
-    # Map all the simple ones
-    for m in mappings:
-        set_range(
-            wb,
-            m.in_sheet,
-            map(lambda v: model_to_dict(v)[m.in_db], values),
-            m.default,
-            m.type,
-        )
-
-
-# FIXME: Get the padding/shape right on the report_id
-def dbkey_to_test_report_id(dbkey):
-    g = Gen.select(Gen.audityear, Gen.fyenddate).where(Gen.dbkey == dbkey).get()
-    # month = g.fyenddate.split('-')[1]
-    # 2022JUN0001000003
-    # We start new audits at 1 million.
-    # So, we want 10 digits, and zero-pad for
-    # historic DBKEY report_ids
-    return f"{g.audityear}-TEST-{dbkey.zfill(7)}"
-
-
-def generate_dissemination_test_table(api_endpoint, dbkey, mappings, objects):
-    table = {"rows": list(), "singletons": dict()}
-    table["endpoint"] = api_endpoint
-    table["report_id"] = dbkey_to_test_report_id(dbkey)
-    for o in objects:
-        as_dict = model_to_dict(o)
-        test_obj = {}
-        test_obj["fields"] = []
-        test_obj["values"] = []
-        for m in mappings:
-            # What if we only test non-null values?
-            if ((m.in_db in as_dict) and as_dict[m.in_db] is not None) and (
-                as_dict[m.in_db] != ""
-            ):
-                test_obj["fields"].append(m.in_sheet)
-                test_obj["values"].append(as_dict[m.in_db])
-        table["rows"].append(test_obj)
-    return table
-
-
-def make_file(dir, dbkey, slug):
-    return open(os.path.join(dir, f"{slug}-{dbkey}.xlsx"))
 
 
 class Command(BaseCommand):
@@ -169,8 +50,8 @@ class Command(BaseCommand):
                 logger.info(e)
                 logger.info(f"Could not create directory {out_basedir}")
                 sys.exit()
-
-        outdir = os.path.join(out_basedir, f'{options["dbkey"]}-{options["year"]}')
+        year = normalize_year_string_or_exit(options["year"])
+        outdir = os.path.join(out_basedir, f'{options["dbkey"]}-{year[-2:]}')
 
         if not os.path.exists(outdir):
             try:
@@ -181,11 +62,10 @@ class Command(BaseCommand):
                 logger.info("could not create output directory. exiting.")
                 sys.exit()
 
+        audit_header = get_audit_header(options["dbkey"], year)
         json_test_tables = []
         for section, fun in sections_to_handlers.items():
-            (wb, api_json, _, filename) = generate_workbook(
-                fun, options["dbkey"], options["year"], section
-            )
+            (wb, api_json, _, filename) = generate_workbook(fun, audit_header, section)
             if wb:
                 wb_path = os.path.join(outdir, filename)
                 wb.save(wb_path)

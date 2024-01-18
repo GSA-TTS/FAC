@@ -15,7 +15,10 @@ class SearchForm(forms.Form):
     cog_or_oversight = forms.CharField(required=False)
     agency_name = forms.CharField(required=False)
     audit_year = forms.MultipleChoiceField(choices=AY_choices, required=False)
+    auditee_state = forms.CharField(required=False)
 
     # Display params
     limit = forms.CharField(required=False)
     page = forms.CharField(required=False)
+    order_by = forms.CharField(required=False)
+    order_direction = forms.CharField(required=False)

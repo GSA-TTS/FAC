@@ -1,8 +1,36 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
-from .models import StaffUserLog, UserProfile, StaffUser
+from .models import Permission, StaffUser, StaffUserLog, UserPermission, UserProfile
+from .permissions import can_read_tribal as _can_read_tribal
+
+User = get_user_model()
 
 admin.site.register(UserProfile)
+admin.site.unregister(User)
+
+
+@admin.register(Permission)
+class PermissionAdmin(admin.ModelAdmin):
+    list_display = ["slug", "description"]
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ["email", "can_read_tribal", "last_login", "date_joined"]
+    list_filter = ["is_staff", "is_superuser"]
+    exclude = ["groups", "user_permissions", "password"]
+    readonly_fields = ["date_joined", "last_login"]
+    search_fields = ("email", "username")
+
+    def can_read_tribal(self, obj):
+        return _can_read_tribal(obj)
+
+
+@admin.register(UserPermission)
+class UserPermissionAdmin(admin.ModelAdmin):
+    list_display = ["user", "email", "permission"]
+    search_fields = ("email", "permission", "user")
 
 
 @admin.register(StaffUserLog)

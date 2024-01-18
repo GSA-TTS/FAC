@@ -11,16 +11,12 @@ on:
           - dev
           - staging
           - preview
-      email:
-        required: false
-        type: string
-        description: Make sure to log-in the env at list once. Email is required when testing in dev; on staging it defaults to CYPRESS_LOGIN_TEST_EMAIL_AUDITEE.
       dbkeys:
-        required: false
+        required: true
         type: string
-        description: Comma-separated list of report-IDs.
+        description: Comma-separated list of dbkeys.
       years:
-        required: false
+        required: true
         type: string
         description: Comma-separated list of report years. The list of years needs to be the same length as the list of dbkeys.
 
@@ -43,4 +39,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name historic_data_migrator --command "python manage.py historic_data_migrator --dbkeys ${{ inputs.dbkeys }} --years ${{ inputs.years }} --email ${{ inputs.email }}"
+          command: cf run-task gsa-fac -k 2G -m 2G --name historic_data_migrator --command "python manage.py historic_data_migrator --dbkeys ${{ inputs.dbkeys }} --years ${{ inputs.years }}"

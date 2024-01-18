@@ -30,6 +30,10 @@
   .usa-accordion__button[aria-expanded='false']:hover {
     background-image: url('../img/usa-icons/arrow_drop_up.svg');
   }
+
+  #orientation-toggle {
+    display: none;
+  }
 }
 
 @media (min-width: 30em) {
@@ -41,7 +45,7 @@
 }
 
 .audit-search-results {
-  padding: 1em 0 0 3em;
+  padding: 1em 0 0 2em;
 
   h2 {
     border-bottom: 1px solid #a9aeb1;

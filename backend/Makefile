@@ -1,7 +1,7 @@
 # Install python dependencies
 install:
 	@pip install -r requirements.txt
-	@npm i
+	@npm ci
 
 # Generate an updated requirements.txt
 compile:
@@ -57,8 +57,7 @@ docker-first-run:
 	docker compose build
 	docker compose run web bash -c '\
 		python manage.py makemigrations &&\
-		python manage.py migrate\
-		'
+		python manage.py migrate'
 
 docker-load-data:
 	docker compose up -d && docker compose run web ./load_data.sh

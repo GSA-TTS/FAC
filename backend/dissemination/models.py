@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from . import docs
 
@@ -246,6 +247,14 @@ class General(models.Model):
     auditee_certify_title = models.TextField(
         "Title of Auditee Certifying Official",
         help_text=docs.auditee_certify_title,
+    )
+    auditor_certify_name = models.TextField(
+        "Name of Auditor Certifying Official",
+        help_text=docs.auditor_certify_name,
+    )
+    auditor_certify_title = models.TextField(
+        "Title of Auditor Certifying Official",
+        help_text=docs.auditor_certify_title,
     )
     auditee_contact_name = models.TextField(
         "Name of Auditee Contact",
@@ -505,3 +514,20 @@ class SecondaryAuditor(models.Model):
     report_id = models.TextField(
         REPORT_ID_FK_HELP_TEXT,
     )
+
+
+class MigrationInspectionRecord(models.Model):
+    audit_year = models.TextField(blank=True, null=True)
+    dbkey = models.TextField(blank=True, null=True)
+    report_id = models.TextField(blank=True, null=True)
+    run_datetime = models.DateTimeField(default=timezone.now)
+    finding_text = models.JSONField(blank=True, null=True)
+    additional_uei = models.JSONField(blank=True, null=True)
+    additional_ein = models.JSONField(blank=True, null=True)
+    finding = models.JSONField(blank=True, null=True)
+    federal_award = models.JSONField(blank=True, null=True)
+    cap_text = models.JSONField(blank=True, null=True)
+    note = models.JSONField(blank=True, null=True)
+    passthrough = models.JSONField(blank=True, null=True)
+    general = models.JSONField(blank=True, null=True)
+    secondary_auditor = models.JSONField(blank=True, null=True)

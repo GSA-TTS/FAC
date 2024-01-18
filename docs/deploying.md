@@ -22,7 +22,7 @@ We use [manifests](https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.h
 - [cf-cli](https://docs.cloudfoundry.org/cf-cli/) Cloudfoundry's CLI
   - Mac install of v8 needed for Cloud.gov: `brew install cloudfoundry/tap/cf-cli@8`
 - [cloud.gov dashboard](https://www.cloud.gov)
-- [cloud.gov deploy action](https://github.com/18F/cg-deploy-action)
+- [cloud.gov deploy action](https://github.com/cloud-gov/cg-cli-tools)
 - [application logs](https://logs.fr.cloud.gov/) with search and dashboard
 
 ## Cloud.gov
@@ -126,6 +126,41 @@ cd app
 export LD_LIBRARY_PATH=~/deps/0/python/lib
 ~/deps/0/python/bin/python manage.py {COMMAND WITH ARGS}
 ```
+
+## Production ssh access
+
+Only users with the appropriate cloud.gov access can do this.
+
+Open a [production ssh log issue](https://github.com/GSA-TTS/FAC/issues/new?assignees=&labels=prodssh&projects=GSA-TTS%2F11&template=production-ssh-access.yaml&title=%5BProduction+ssh+access%5D%3A+) to track this.
+
+```shell
+cf target -s production
+cf allow-space-ssh production
+date -u +"%Y-%m-%d %H:%M"
+```
+
+Keep this timestamp to enter in the issue as the start time.
+
+```shell
+cf ssh gsa-fac
+/tmp/lifecycle/shell
+source .profile
+set +e
+```
+
+
+Log what you do while accessing production in the issue.
+
+Once you’re done, log out, then, locally, run:
+
+```shell
+cf disallow-space-ssh production
+date -u +"%Y-%m-%d %H:%M"
+```
+
+Keep this timestamp to enter in the issue as the end time.
+
+Note: **do not run** `cf disable-ssh gsa-fac`, as this will require application restarts in order to enable access again. Disabling access at the space level is sufficient.
 
 ## Troubleshooting
 

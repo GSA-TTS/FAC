@@ -85,6 +85,41 @@ urlpatterns = [
         views.UnlockAfterCertificationView.as_view(),
         name="UnlockAfterCertification",
     ),
+    path(
+        "manage-submission/<str:report_id>",
+        views.ManageSubmissionView.as_view(),
+        name="ManageSubmission",
+    ),
+    path(
+        "manage-submission/auditor-certifying-official/<str:report_id>",
+        views.ChangeAuditorCertifyingOfficialView.as_view(),
+        name="ChangeAuditorCertifyingOfficial",
+    ),
+    path(
+        "manage-submission/auditee-certifying-official/<str:report_id>",
+        views.ChangeAuditeeCertifyingOfficialView.as_view(),
+        name="ChangeAuditeeCertifyingOfficial",
+    ),
+    path(
+        "manage-submission/add-editor/<str:report_id>",
+        views.ChangeOrAddRoleView.as_view(),
+        name="ChangeOrAddRoleView",
+    ),
+    path(
+        "workbook/xlsx/<str:file_type>/<str:report_id>",
+        views.PredisseminationXlsxDownloadView.as_view(),
+        name="PredisseminationXlsxDownload",
+    ),
+    path(
+        "report/pdf/<str:report_id>",
+        views.PredisseminationPdfDownloadView.as_view(),
+        name="PredisseminationPdfDownload",
+    ),
+    path(
+        "summary-report/xlsx/<str:report_id>",
+        views.PredisseminationSummaryReportDownloadView.as_view(),
+        name="PredisseminationSummaryReportDownload",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:
