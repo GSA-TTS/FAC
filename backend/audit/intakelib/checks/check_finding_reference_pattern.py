@@ -23,12 +23,11 @@ FINDING_REFERENCE_REGEX = r"^20[1-9][0-9]-[0-9]{3}(,\s*20[1-9][0-9]-[0-9]{3})*$"
 # TESTED BY
 # has_bad_references.xlsx
 def finding_reference_pattern(ir):
-    references = get_range_by_name(ir, "finding_references")
+    references = get_range_by_name(ir, "reference_number")
     errors = []
     for index, reference in enumerate(references["values"]):
         if (
             not appears_empty(reference)
-            and (not is_value_marked_na(reference))
             and (not re.match(FINDING_REFERENCE_REGEX, str(reference)))
         ):
             errors.append(
