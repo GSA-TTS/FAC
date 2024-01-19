@@ -80,7 +80,7 @@ if __name__ == "__main__":
                 f"{id}",
             ]
 
-            print(cmd)
+            print(" ".join(cmd))
             subprocess.run(cmd)  # nosec
 
 
