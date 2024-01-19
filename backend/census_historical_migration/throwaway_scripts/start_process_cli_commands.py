@@ -1,5 +1,5 @@
 import argparse
-import subprocess
+import subprocess  # nosec
 
 from util import trigger_migration_workflow  # nosec
 
