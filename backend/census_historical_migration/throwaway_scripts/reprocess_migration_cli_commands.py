@@ -8,7 +8,9 @@ import subprocess  # nosec
 # This script is a one-off to reprocess mdata migration for a failed
 # migration attempt associated with a specific error tag.
 
-parser = argparse.ArgumentParser(description="Trigger data migration Github Actions through gh API calls")
+parser = argparse.ArgumentParser(
+    description="Trigger data migration Github Actions through gh API calls"
+)
 parser.add_argument("year", type=int, help="Audit year")
 parser.add_argument("total_records", type=int, help="Total records.")
 parser.add_argument("pages_per_instance", type=int, help="Pages per instance.")
