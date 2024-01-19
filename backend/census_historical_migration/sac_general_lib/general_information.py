@@ -268,7 +268,13 @@ def xform_audit_type(general_information):
     # Transformation recorded.
     if general_information.get("audit_type"):
         value_in_db = general_information["audit_type"]
-        general_information["audit_type"] = _census_audit_type(value_in_db.upper())
+        audit_type = _census_audit_type(value_in_db.upper())
+        if audit_type == AUDIT_TYPE_DICT["A"]:
+            raise DataMigrationError(
+                "Skipping ACE audit",
+                "skip_ace_audit",
+            )
+        general_information["audit_type"] = audit_type
         track_transformations(
             "AUDITTYPE",
             value_in_db,
