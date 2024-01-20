@@ -23,6 +23,7 @@ pandas
 peewee
 psycopg2-binary
 pycryptodome>=3.19.1
+pycryptodomex>=3.19.1
 pydash
 pyjwt
 pypdf
