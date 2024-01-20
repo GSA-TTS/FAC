@@ -40,7 +40,7 @@ dj-database-url==2.1.0
     # via environs
 dj-email-url==1.0.6
     # via environs
-django==4.2.6
+django==5.0.1
     # via
     #   -r requirements/requirements.in
     #   dj-database-url
