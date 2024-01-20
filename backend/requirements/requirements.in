@@ -22,7 +22,7 @@ openpyxl
 pandas
 peewee
 psycopg2-binary
-pycryptodome
+pycryptodome>=3.19.1
 pydash
 pyjwt
 pypdf
