@@ -526,6 +526,8 @@ def validate_single_audit_report_file_extension(file):
 
 def validate_pdf_file_integrity(file):
     """Files must be readable PDFs"""
+    MIN_CHARARACTERS_IN_PDF = 6000
+
     try:
         reader = PdfReader(file)
 
@@ -538,13 +540,13 @@ def validate_pdf_file_integrity(file):
         for page in reader.pages:
             page_text = page.extract_text()
             text_length += len(page_text)
-            # If we find any characters, we're content.
-            if text_length > 0:
+            # If we find enough characters, we're content.
+            if text_length >= MIN_CHARARACTERS_IN_PDF:
                 break
 
-        if text_length == 0:
+        if text_length < MIN_CHARARACTERS_IN_PDF:
             raise ValidationError(
-                "We were unable to process the file you uploaded because it contains no readable text."
+                "We were unable to process the file you uploaded because it contains no readable text or too little text."
             )
 
     except ValidationError:
