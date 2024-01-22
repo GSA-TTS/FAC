@@ -12,6 +12,7 @@ from .sac_general_lib.general_information import (
     xform_country,
     xform_entity_type,
     xform_replace_empty_auditor_email,
+    xform_replace_empty_auditee_email,
 )
 from .exception_utils import (
     DataMigrationError,
@@ -240,3 +241,23 @@ class TestXformReplaceEmptyAuditorEmail(SimpleTestCase):
         input_data = {}
         expected_output = {"auditor_email": settings.GSA_MIGRATION}
         self.assertEqual(xform_replace_empty_auditor_email(input_data), expected_output)
+
+
+class TestXformReplaceEmptyAuditeeEmail(SimpleTestCase):
+    def test_empty_auditee_email(self):
+        """Test that an empty auditee_email is replaced with 'GSA_MIGRATION'"""
+        input_data = {"auditee_email": ""}
+        expected_output = {"auditee_email": settings.GSA_MIGRATION}
+        self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
+
+    def test_non_empty_auditee_email(self):
+        """Test that a non-empty auditee_email remains unchanged"""
+        input_data = {"auditee_email": "test@example.com"}
+        expected_output = {"auditee_email": "test@example.com"}
+        self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
+
+    def test_missing_auditee_email(self):
+        """Test that a missing auditee_email key is added and set to 'GSA_MIGRATION'"""
+        input_data = {}
+        expected_output = {"auditee_email": settings.GSA_MIGRATION}
+        self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
