@@ -241,7 +241,13 @@
       "auditee_email": {
          "oneOf": [
             {
-               "format": "email"
+               "format": "email",
+               "maxLength": 100,
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
             },
             {
                "const": "",
