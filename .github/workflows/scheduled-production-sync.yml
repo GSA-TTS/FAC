@@ -7,7 +7,7 @@ on:
   workflow_dispatch: null
 
 jobs:
-  trivy-scan:
+  production-media-sync:
     uses: ./.github/workflows/sync-s3-media.yml
     secrets: inherit
     with:
