@@ -248,6 +248,10 @@
             {
                "const": "GSA_MIGRATION",
                "type": "string"
+            },
+            {
+               "const": "",
+               "type": "string"
             }
          ],
          "type": "string"
