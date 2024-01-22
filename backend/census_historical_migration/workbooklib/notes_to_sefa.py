@@ -56,7 +56,7 @@ def track_data_transformation(original_value, changed_value, transformation_func
     )
 
 
-def xform_is_minimis_rate_used(rate_content):
+def xform_is_minimis_rate_used(rate_content, index=""):
     """Determines if the de minimis rate was used based on the given text."""
 
     # Transformation recorded.
@@ -92,6 +92,15 @@ def xform_is_minimis_rate_used(rate_content):
         r"utilize(d|s)?\s+(a|an|the)\s+(10|ten)",
     ]
 
+    if index == "1":
+        track_data_transformation(rate_content, "Y", "xform_is_minimis_rate_used")
+        return "Y"
+    elif index == "2":
+        track_data_transformation(rate_content, "N", "xform_is_minimis_rate_used")
+        return "N"
+    elif index == "3":
+        track_data_transformation(rate_content, "Both", "xform_is_minimis_rate_used")
+        return "Both"
     # Check for each pattern in the respective lists
     for pattern in not_used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
@@ -130,10 +139,12 @@ def _get_minimis_cost_rate(dbkey, year):
     try:
         note = Notes.objects.get(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="2")
         rate = string_to_string(note.CONTENT)
+        index = string_to_string(note.NOTE_INDEX)
     except Notes.DoesNotExist:
         logger.info(f"De Minimis cost rate not found for dbkey: {dbkey}")
         rate = ""
-    return rate
+        index = ""
+    return rate, index
 
 
 def _get_notes(dbkey, year):
@@ -158,11 +169,13 @@ def generate_notes_to_sefa(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     notes = _get_notes(audit_header.DBKEY, audit_header.AUDITYEAR)
-    rate_content = _get_minimis_cost_rate(audit_header.DBKEY, audit_header.AUDITYEAR)
+    rate_content, index = _get_minimis_cost_rate(
+        audit_header.DBKEY, audit_header.AUDITYEAR
+    )
     policies_content = _get_accounting_policies(
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
-    is_minimis_rate_used = xform_is_minimis_rate_used(rate_content)
+    is_minimis_rate_used = xform_is_minimis_rate_used(rate_content, index)
 
     set_range(wb, "accounting_policies", [policies_content])
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])

@@ -199,13 +199,20 @@ class TestXformAuditPeriodCovered(SimpleTestCase):
 class TestXformAuditType(SimpleTestCase):
     def test_valid_audit_type(self):
         for key, value in AUDIT_TYPE_DICT.items():
-            with self.subTest(key=key):
-                general_information = {"audit_type": key}
-                result = xform_audit_type(general_information)
-                self.assertEqual(result["audit_type"], value)
+            if value != "alternative-compliance-engagement":
+                with self.subTest(key=key):
+                    general_information = {"audit_type": key}
+                    result = xform_audit_type(general_information)
+                    self.assertEqual(result["audit_type"], value)
 
     def test_invalid_audit_type(self):
         general_information = {"audit_type": "invalid_key"}
+        with self.assertRaises(DataMigrationError):
+            xform_audit_type(general_information)
+
+    def test_ace_audit_type(self):
+        # audit type "alternative-compliance-engagement" is not supported at this time.
+        general_information = {"audit_type": AUDIT_TYPE_DICT["A"]}
         with self.assertRaises(DataMigrationError):
             xform_audit_type(general_information)
 
