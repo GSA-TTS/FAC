@@ -91,8 +91,12 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
     },
     auditee_email: Types.string {
       oneOf: [
-        {
+        Types.string {
           format: 'email',
+          maxLength: 100,
+        },
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
         },
         Base.Compound.EmptyString,
       ],
