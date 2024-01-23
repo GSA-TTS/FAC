@@ -41,11 +41,17 @@ map_section_to_workbook = {
 #
 # If we're missing anything, we need to bail immediately. They have mangled the workbook.
 # We should not accept the submission.
+TEMPLATES = {}
+for section in map_section_to_workbook:
+    template = load_workbook(map_section_to_workbook[section], data_only=True)
+    template_ir = extract_workbook_as_ir(template)
+    template_names = get_names_of_all_ranges(template_ir)
+    TEMPLATES[section] = template_names
+
+
 def has_all_the_named_ranges(section_name):
     def _given_the_ir(ir):
-        template = load_workbook(map_section_to_workbook[section_name], data_only=True)
-        template_ir = extract_workbook_as_ir(template)
-        template_names = get_names_of_all_ranges(template_ir)
+        template_names = TEMPLATES[section_name]
         their_names = get_names_of_all_ranges(ir)
         for tname in template_names:
             if tname not in their_names:
