@@ -30,8 +30,10 @@ After validating, display a button group with some links:
         <p class="margin-0">PDF preview</p>
     </a>
 
-    <a class="usa-button usa-button--outline display-flex font-sans-lg margin-top-2 tablet:margin-top-0"
-       href="{% url 'audit:UnlockAfterCertification' report_id=report_id %}">
-        <p class="margin-0">Unlock</p>
-    </a>
+    {% if not submission.completed %}
+        <a class="usa-button usa-button--outline display-flex font-sans-lg margin-top-2 tablet:margin-top-0"
+        href="{% url 'audit:UnlockAfterCertification' report_id=report_id %}">
+            <p class="margin-0">Unlock</p>
+        </a>
+    {% endif %}
 </div>

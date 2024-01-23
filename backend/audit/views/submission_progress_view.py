@@ -134,6 +134,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                         SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
                         SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
                         SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                        SingleAuditChecklist.STATUS.SUBMITTED,
+                        SingleAuditChecklist.STATUS.DISSEMINATED,
                     ],
                     "completed_date": None,
                     "completed_by": None,
@@ -150,7 +152,10 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 },
                 "submission": {
                     "completed": sac.submission_status
-                    == SingleAuditChecklist.STATUS.SUBMITTED,
+                    in [
+                        SingleAuditChecklist.STATUS.SUBMITTED,
+                        SingleAuditChecklist.STATUS.DISSEMINATED,
+                    ],
                     "completed_date": None,
                     "completed_by": None,
                     "enabled": sac.submission_status
