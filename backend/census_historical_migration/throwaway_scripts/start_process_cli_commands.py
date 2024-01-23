@@ -1,8 +1,8 @@
 import argparse
-import subprocess
-import time  # nosec
+import subprocess  # nosec
+import time
 
-from util import trigger_migration_workflow  # nosec
+from util import trigger_migration_workflow
 
 # This throwaway script spits out code that can be
 # copy-pasted into a bash script, or directly into the command line.
