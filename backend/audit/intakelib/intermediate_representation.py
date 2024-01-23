@@ -239,7 +239,7 @@ def is_cell_or_range_coord(s):
 
 
 def extract_workbook_as_ir(file):
-    workbook = _open_workbook(file, read_only=True)
+    workbook = _open_workbook(file)
     sheets_by_name = {}
     for named_range_name in workbook.defined_names:
         dn = workbook.defined_names[named_range_name]
