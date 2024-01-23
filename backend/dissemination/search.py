@@ -2,10 +2,12 @@ from django.db.models import Q
 from collections import namedtuple as NT
 from dissemination.models import General, FederalAward
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 ALN = NT("ALN", "prefix, program")
 
+DAS_LIMIT=5000
 
 class ORDER_BY:
     fac_accepted_date = "fac_accepted_date"
@@ -21,7 +23,6 @@ class DIRECTION:
     ascending = "ascending"
     descending = "descending"
 
-
 def search_general(
     alns=None,
     names=None,
@@ -36,6 +37,8 @@ def search_general(
     order_by=ORDER_BY.fac_accepted_date,
     order_direction=DIRECTION.ascending,
 ):
+    t0 = time.time()
+
     """
     Given any (or no) search fields, build and execute a query on the General table and return the results.
     Empty searches return everything.
@@ -47,6 +50,9 @@ def search_general(
 
     query = _initialize_query(include_private)
 
+    # results = General.objects.filter(query)
+    # logger.info(f"RESULTS 0: {results.count()}")
+
     split_alns = None
     agency_numbers = None
     if alns:
@@ -55,10 +61,14 @@ def search_general(
         # If we did a search on ALNs, and got nothing (because it does not exist),
         # we need to bail out from the entire search early with no results.
         if not query_set:
+            logger.info("No query_set; returning []")
             return []
         else:
             # If results came back from our ALN query, add it to the Q() and continue.
             query.add(query_set, Q.AND)
+
+    # results = General.objects.filter(query)
+    # logger.info(f"RESULTS 0.5: {results.count()}")
 
     query.add(_get_names_match_query(names), Q.AND)
     query.add(_get_uei_or_eins_match_query(uei_or_eins), Q.AND)
@@ -74,29 +84,39 @@ def search_general(
     results = _sort_results(results, order_direction, order_by)
     # We can apply a "limit", which is a slice
     # https://docs.djangoproject.com/en/4.2/topics/db/queries/#limiting-querysets
-    # results = results[:1000]
+    results = _finalize_query(results)
+
+    t1 = time.time()
+    logger.info(f"SEARCH GENERAL T1: {t1-t0}")
 
     # Accessing the results object will run the query.
     # We want to attach bonus ALN fields after getting results.
     # Running order_by on the same queryset will hit the databse again, which will wipe our custom fields.
     # So, if we want to sort by the ALN fields, we need to do it locally and after the _sort_results function.
+    
     if alns:
         results = _attach_finding_my_aln_and_finding_all_aln_fields(
             results, split_alns, agency_numbers
         )
-    if order_by == ORDER_BY.findings_my_aln:
-        results = sorted(
-            results,
-            key=lambda obj: obj.finding_my_aln,
-            reverse=bool(order_direction == DIRECTION.descending),
-        )
-    elif order_by == ORDER_BY.findings_all_aln:
-        results = sorted(
-            results,
-            key=lambda obj: obj.finding_all_aln,
-            reverse=bool(order_direction == DIRECTION.descending),
-        )
 
+
+    # if order_by == ORDER_BY.findings_my_aln:
+    #     results = sorted(
+    #         results,
+    #         key=lambda obj: obj.finding_my_aln,
+    #         reverse=bool(order_direction == DIRECTION.descending),
+    #     )
+    # elif order_by == ORDER_BY.findings_all_aln:
+    #     results = sorted(
+    #         results,
+    #         key=lambda obj: obj.finding_all_aln,
+    #         reverse=bool(order_direction == DIRECTION.descending),
+    #     )
+
+    t2 = time.time()
+    logger.info(f"SEARCH GENERAL T2: {t2-t1}")
+    logger.info(f"SEARCH GENERAL TOTAL: {t2-t0}")
+    
     return results
 
 
@@ -107,6 +127,8 @@ def _initialize_query(include_private: bool):
         query.add(Q(is_public=True), Q.AND)
     return query
 
+def _finalize_query(query: Q):
+    return query[:DAS_LIMIT]
 
 def _sort_results(results, order_direction, order_by):
     # Instead of nesting conditions, we'll prep a string
@@ -176,15 +198,18 @@ def _get_aln_report_ids(split_alns, agency_numbers):
             for matching_award in matching_awards:
                 # Again, adding in a string requires [] so the individual
                 # characters of the report ID don't go in... we want the whole string.
-                report_ids.update([matching_award.get("report_id")])
+                report_ids.update([matching_award.get("report_id_id")])
     # Matching on a whole agency, such as '12'
     for agency_number in agency_numbers:
+        # logger.info(f"Checking agency number {agency_number}")
         matching_awards = FederalAward.objects.filter(
-            federal_agency_prefix=agency_number
+            federal_agency_prefix=str(agency_number)
         ).values()
+        # logger.info(f"Matching awards for {agency_number}: {matching_awards}")
         if matching_awards:
             for matching_award in matching_awards:
-                report_ids.update([matching_award.get("report_id")])
+                # We have a foreign key now... this needs to be report_id_id...
+                report_ids.update([matching_award.get("report_id_id")])
 
     return report_ids
 
@@ -192,6 +217,7 @@ def _get_aln_report_ids(split_alns, agency_numbers):
 def _attach_finding_my_aln_and_finding_all_aln_fields(
     results, split_alns, agency_numbers
 ):
+    return results
     """
     Given the results QuerySet (full of 'General' objects) and an ALN query string,
     return a list of 'General' objects, where each object has two new fields.
@@ -207,8 +233,12 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(
         b. If a FederalAward in 'finding_all_my_alns' has a report_id under this General, finding_all_aln = True
     4. Return the updated results QuerySet.
     """
-    report_ids = list(results.values_list("report_id", flat=True))
-
+    logger.info(f"_afmafaaf start")
+    t0 = time.time()
+    # report_ids = list(results.values_list("report_id", flat=True))
+    t1 = time.time()
+    logger.info(f"_afmafaaf t1-t0: {t1-t0}")
+    
     aln_q = Q()
     for aln in split_alns:
         aln_q.add(
@@ -229,32 +259,43 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(
             Q.AND,
         )
     not_aln_q.add(~Q(federal_agency_prefix__in=list(agency_numbers)), Q.AND)
+    
+    t1a = time.time()
+    logger.info(f"_afmafaaf t1a-t1: {t1a-t1}")
+    t2 = time.time()    
 
     finding_on_my_alns = FederalAward.objects.filter(
         aln_q,
-        report_id__in=report_ids,
+        report_id__in=results,
         findings_count__gt=0,
     )
     finding_on_any_aln = FederalAward.objects.filter(
         not_aln_q,
-        report_id__in=report_ids,
+        report_id__in=results,
         findings_count__gt=0,
     )
 
-    for general in results:
-        general.finding_my_aln = False
-        general.finding_all_aln = False
-        for relevant_award in finding_on_my_alns:
-            if relevant_award.report_id == general.report_id:
-                general.finding_my_aln = True
-        for relevant_award in finding_on_any_aln:
-            if relevant_award.report_id == general.report_id:
-                general.finding_all_aln = True
+    logger.info(f"_afmafaaf t2-t1: {t2-t1a}")
+    t3 = time.time()    
 
+    # for general in results:
+    #     general.finding_my_aln = False
+    #     general.finding_all_aln = False
+    #     for relevant_award in finding_on_my_alns:
+    #         if relevant_award.report_id == general.report_id:
+    #             general.finding_my_aln = True
+    #     for relevant_award in finding_on_any_aln:
+    #         if relevant_award.report_id == general.report_id:
+    #             general.finding_all_aln = True
+    
+    t4 = time.time()
+    logger.info(f"_afmafaaf t4-t3: {t4-t3}")
+    logger.info(f"_afmafaaf t4-t0: {t4-t0}")
     return results
 
+import itertools
 
-def _get_aln_match_query(split_alns, agency_numbers):
+def _get_aln_match_query(split_alns, agency_numbers, limit=DAS_LIMIT):
     """
     Given split ALNs and agency numbers, return the match query for ALNs.
     """
@@ -263,8 +304,11 @@ def _get_aln_match_query(split_alns, agency_numbers):
 
     # Add the report_id's from the award search to the full search params
     alns_match = Q()
-    for report_id in report_ids:
-        alns_match.add(Q(report_id=report_id), Q.OR)
+    limited_report_ids = set(itertools.islice(report_ids, limit))
+    # for report_id in limited_report_ids:
+    #     alns_match.add(Q(report_id=report_id), Q.OR)
+    alns_match = Q(report_id__in=limited_report_ids)
+
     return alns_match
 
 
