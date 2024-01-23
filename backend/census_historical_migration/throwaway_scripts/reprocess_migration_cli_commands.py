@@ -1,4 +1,5 @@
 import argparse
+import time
 
 from util import (
     trigger_migration_workflow,
@@ -7,6 +8,8 @@ import subprocess  # nosec
 
 # This script is a one-off to reprocess mdata migration for a failed
 # migration attempt associated with a specific error tag.
+# Command is `python generate_cli_commands.py year total_records pages_per_instance instances error_tag`
+# `python generate_cli_commands.py 2022 42000 5 80 invalid_email_error`
 
 parser = argparse.ArgumentParser(
     description="Trigger data migration Github Actions through gh API calls"
@@ -24,7 +27,10 @@ if __name__ == "__main__":
         args, workflow_name="failed-data-migration-reprocessor.yml"
     )
     print(args)
-    for cmd in cmds:
+    for ndx, cmd in enumerate(cmds):
+        print(f"# Instance {ndx + 1}")
+        cmd.append("-f")
         cmd.append(f"error_tag={args.error_tag}")
         print(" ".join(cmd))
         subprocess.run(cmd)  # nosec
+        time.sleep(15)
