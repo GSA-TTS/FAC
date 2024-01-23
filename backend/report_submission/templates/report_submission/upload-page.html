@@ -46,6 +46,9 @@
                         <p class="text-green" id="already-submitted">
                             A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
                         </p>
+                        <p>Last uploaded by {{last_uploaded_by}} at {{last_uploaded_at}} <a class="usa-link display-flex flex-column"
+                            href={{existing_workbook_url}}
+                            target="_blank">Download current workbook</a></p>
                     {% endif %}
                     <div hidden id="info_box" class="grid-row margin-bottom-3 margin-top-3"></div>
                     <button class="usa-button margin-bottom-8" id="continue" disabled="disabled">Return to Report Home</button>

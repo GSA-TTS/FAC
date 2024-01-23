@@ -27,21 +27,26 @@ def load_historic_data_for_year(audit_year, page_size, pages):
         logger.info(
             f"Processing page {page_number} with {page.object_list.count()} submissions."
         )
-
-        for submission in page.object_list:
-            # Migrate a single submission
-            run_end_to_end(user, submission)
-
-            MigrationResult.append_summary(submission.AUDITYEAR, submission.DBKEY)
-
-            total_count += 1
-
-            if MigrationResult.has_errors():
-                error_count += 1
-            if total_count % 5 == 0:
-                logger.info(f"Processed = {total_count}, Errors = {error_count}")
-
+        total_count, error_count = perform_migration(
+            user, page.object_list, total_count, error_count
+        )
     log_results(error_count, total_count)
+
+
+def perform_migration(user, submissions, round_count, total_error_count):
+    total_count = round_count
+    error_count = total_error_count
+    for submission in submissions:
+        # Migrate a single submission
+        run_end_to_end(user, submission)
+        total_count += 1
+        if MigrationResult.has_errors():
+            error_count += 1
+        if total_count % 5 == 0:
+            logger.info(f"Processed = {total_count}, Errors = {error_count}")
+        MigrationResult.append_summary(submission.AUDITYEAR, submission.DBKEY)
+
+    return total_count, error_count
 
 
 def log_results(error_count, total_count):

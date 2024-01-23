@@ -56,6 +56,8 @@ from audit.validators import (
     validate_secondary_auditors_json,
 )
 
+from dissemination.file_downloads import get_download_url, get_filename
+
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )
@@ -204,10 +206,27 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             setattr(sac, handler_info["field_name"], audit_data)
             sac.save()
 
-    # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(ExcelFileHandlerView, self).dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        """
+        Given a report ID and form section, redirect the caller to a download URL for the associated Excel file (if one exists)
+        """
+        try:
+            report_id = kwargs["report_id"]
+            form_section = kwargs["form_section"]
+
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            filename = get_filename(sac, form_section)
+            download_url = get_download_url(filename)
+
+            return redirect(download_url)
+        except SingleAuditChecklist.DoesNotExist as err:
+            logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
+            raise PermissionDenied() from err
 
     def post(self, request, *_args, **kwargs):
         """
@@ -270,11 +289,6 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 class SingleAuditReportFileHandlerView(
     SingleAuditChecklistAccessRequiredMixin, generic.View
 ):
-    # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
-    @method_decorator(csrf_exempt)
-    def dispatch(self, *args, **kwargs):
-        return super(SingleAuditReportFileHandlerView, self).dispatch(*args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         try:
             report_id = kwargs["report_id"]
