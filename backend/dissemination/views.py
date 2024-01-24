@@ -103,20 +103,23 @@ def run_search(form_data, include_private):
     Given cleaned form data and an 'include_private' boolean, run the search.
     Returns the results QuerySet.
     """
-    return search(
-        names=form_data.names,
-        alns=form_data.alns,
-        uei_or_eins=form_data.uei_or_eins,
-        start_date=form_data.start_date,
-        end_date=form_data.end_date,
-        cog_or_oversight=form_data.cog_or_oversight,
-        agency_name=form_data.agency_name,
-        audit_years=form_data.audit_years,
-        auditee_state=form_data.auditee_state,
-        include_private=include_private,
-        order_by=form_data.order_by,
-        order_direction=form_data.order_direction,
-    )
+
+    # As a dictionary, this is easily extensible.
+    search_parameters = {
+        "alns": form_data.alns,
+        "names": form_data.names,
+        "uei_or_eins": form_data.uei_or_eins,
+        "start_date": form_data.start_date,
+        "end_date": form_data.end_date,
+        "cog_or_oversight": form_data.cog_or_oversight,
+        "agency_name": form_data.agency_name,
+        "audit_years": form_data.audit_years,
+        "auditee_state": form_data.auditee_state,
+        "include_private": include_private,
+        "order_by": form_data.order_by,
+        "order_direction": form_data.order_direction
+    }
+    return search(search_parameters)
 
 
 class Search(View):

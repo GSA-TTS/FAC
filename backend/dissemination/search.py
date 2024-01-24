@@ -3,7 +3,13 @@ from collections import namedtuple as NT
 from dissemination.models import General, FederalAward
 import logging
 import time
-from .search_general import search_general
+from .search_general import (
+    report_timing,
+    search_general
+    )
+from .search_alns import (
+    search_alns
+)
 
 logger = logging.getLogger(__name__)
 ALN = NT("ALN", "prefix, program")
@@ -30,112 +36,71 @@ class DIRECTION:
 # Their ORM cookbook looks to be useful reading.
 # https://books.agiliq.com/projects/django-orm-cookbook/en/latest/subquery.html
 
-def search(
-    alns=None,
-    names=None,
-    uei_or_eins=None,
-    start_date=None,
-    end_date=None,
-    cog_or_oversight=None,
-    agency_name=None,
-    audit_years=None,
-    auditee_state=None,
-    include_private=False,
-    order_by=ORDER_BY.fac_accepted_date,
-    order_direction=DIRECTION.ascending,
-):
-    t0 = time.time()
-
+def search(params):
     """
     Given any (or no) search fields, build and execute a query on the General table and return the results.
     Empty searches return everything.
     """
+    ##############
+    # Set defaults for things we definitely want in the params.
+    params = _set_general_defaults(params)
 
-    #############
-    # Set some defaults.
-    if not order_by:
-        order_by = ORDER_BY.fac_accepted_date
-    if not order_direction:
-        order_direction = DIRECTION.descending
+    # Time the whole thing.
+    t0 = time.time()
 
     ##############
     # GENERAL
-    results = search_general(
-        include_private,
-        audit_years,
-        auditee_state,
-        names,
-        uei_or_eins,
-        start_date,
-        end_date,
-        agency_name,
-        cog_or_oversight)
+    results = search_general(params)
 
     ##############
     # Truncate down to the limit
     # This is the stopgap. If we have too many still, we're going
     # to force the issue and truncate the result set.
     # https://docs.djangoproject.com/en/4.2/topics/db/queries/#limiting-querysets
-    # results = results[:DAS_LIMIT]
+    results = results[:DAS_LIMIT]
 
-    ##############################
-    # Now that we have reduced the result set to something
-    # manageable, we can apply ALN operations.
+    results = search_alns(results, params)
 
-
-    if alns:
-        # q_alns = Q(report_id_id__in=results.values_list('report_id', flat=True))
-        q_alns = Q()
-        # Split out the agency numbers
-        split_alns = _split_alns(alns)
-        query_set = _get_aln_match_query(split_alns)
-        # If we did a search on ALNs, and got nothing (because it does not exist),
-        # we need to bail out from the entire search early with no results.
-        if not query_set:
-            logger.info("No query_set; returning []")
-            return []
-        else:
-            # If results came back from our ALN query, add it to the Q() and continue.
-            q_alns.add(query_set, Q.AND)
-        # We want the distinct report_ids for these ALNs
-        distinct_alns = FederalAward.objects.values(
-            'report_id_id'
-        ).annotate(
-            report_id_id_count = Count('report_id_id')
-        ).filter(report_id_id_count=1)
-
-        # And, we want to reduce the results from above by the report_ids
-        # that are in this set.
-        results = results.filter(report_id__in=[ 
-            rec['report_id_id'] 
-            for rec 
-            in distinct_alns
-            ])
-
-    t1 = time.time()
-    logger.info(f"SEARCH GENERAL T1: {t1-t0}")
-
-
-    # if order_by == ORDER_BY.findings_my_aln:
-    #     results = sorted(
-    #         results,
-    #         key=lambda obj: obj.finding_my_aln,
-    #         reverse=bool(order_direction == DIRECTION.descending),
-    #     )
-    # elif order_by == ORDER_BY.findings_all_aln:
-    #     results = sorted(
-    #         results,
-    #         key=lambda obj: obj.finding_all_aln,
-    #         reverse=bool(order_direction == DIRECTION.descending),
-    #     )
-
-    t2 = time.time()
-    logger.info(f"SEARCH GENERAL T2: {t2-t1}")
-    logger.info(f"SEARCH GENERAL TOTAL: {t2-t0}")
+    results = _order_results(results, params)
     
-    return results[:DAS_LIMIT]
+    t1 = time.time()
+    report_timing("search", params, t0, t1)
+    return results
 
+def _set_general_defaults(params):
+    #############
+    # Set some defaults.
 
+    # Let's make sure we have a confirmation that
+    # we default to not sharing data marked as suppressed.
+    if not params.get("include_private"):
+        params["include_private"] = False
+
+    # Set default order direction
+    if not params.get("order_by", None):
+        params["order_by"] = ORDER_BY.fac_accepted_date
+    if not params.get("order_direction", None):
+        params["order_direction"] = DIRECTION.descending
+
+    return params
+
+def _order_results(results, params):
+    t0 = time.time()
+    if params.get("order_by") == ORDER_BY.findings_my_aln:
+        results = sorted(
+            results,
+            key=lambda obj: obj.finding_my_aln,
+            reverse=bool(params.get("order_direction") == DIRECTION.descending),
+        )
+    elif params.get("order_by") == ORDER_BY.findings_all_aln:
+        results = sorted(
+            results,
+            key=lambda obj: obj.finding_all_aln,
+            reverse=bool(params.get("order_direction") == DIRECTION.descending),
+        )
+    t1 = time.time()
+    report_timing("_order_results", params, t0, t1)
+    return results
 
 def _sort_results(results, order_direction, order_by):
     # Instead of nesting conditions, we'll prep a string
