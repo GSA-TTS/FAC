@@ -53,7 +53,7 @@ TEMPLATES = {}
 for section in map_section_to_jsonschema:
     json_path = map_section_to_jsonschema[section]
     json_input = json.loads(json_path.read_text(encoding="utf-8"))
-    
+
     TEMPLATES[section] = json_nr_lookup(json_input, "range_name")
 
 
