@@ -9,6 +9,7 @@ from django.core.files.uploadedfile import TemporaryUploadedFile
 from random import choice, randrange
 from openpyxl import Workbook
 from tempfile import NamedTemporaryFile
+from django.conf import settings
 
 import copy
 import requests
@@ -49,6 +50,7 @@ from .validators import (
     validate_component_page_numbers,
     validate_audit_information_json,
     validate_tribal_data_consent_json,
+    validate_general_information_complete_json,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -935,3 +937,61 @@ class TribalAccessTests(SimpleTestCase):
 
             with self.assertRaises(ValidationError):
                 validate_tribal_data_consent_json(case_copy)
+
+
+class GeneralInformationTests(SimpleTestCase):
+    def test_no_error_standard_case(self):
+        """No error should be raised when is_gsa_migration is not supplied and no emails contain GSA_MIGRATION"""
+        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+            "GeneralInformationCase"
+        ]
+
+        validate_general_information_complete_json(gen_info)
+
+    def test_error_default_is_gsa_migration(self):
+        """An error should be raised when is_gsa_migration is not supplied and an email contains GSA_MIGRATION"""
+        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+            "GeneralInformationCase"
+        ]
+        gen_info["auditee_email"] = settings.GSA_MIGRATION
+
+        with self.assertRaises(ValidationError):
+            validate_general_information_complete_json(gen_info)
+
+    def test_no_error_is_gsa_migration(self):
+        """No error should be raised when is_gsa_migration is True and auditee_email contains GSA_MIGRATION"""
+        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+            "GeneralInformationCase"
+        ]
+        gen_info["auditee_email"] = settings.GSA_MIGRATION
+
+        validate_general_information_complete_json(gen_info, True)
+
+    def test_no_error_is_gsa_migration(self):
+        """No error should be raised when is_gsa_migration is True and auditor_email contains GSA_MIGRATION"""
+        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+            "GeneralInformationCase"
+        ]
+        gen_info["auditor_email"] = settings.GSA_MIGRATION
+
+        validate_general_information_complete_json(gen_info, True)
+
+    def test_error_is_not_gsa_migration(self):
+        """An error should be raised when is_gsa_migration is False and auditee_email contains GSA_MIGRATION"""
+        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+            "GeneralInformationCase"
+        ]
+        gen_info["auditee_email"] = settings.GSA_MIGRATION
+
+        with self.assertRaises(ValidationError):
+            validate_general_information_complete_json(gen_info, False)
+
+    def test_error_is_not_gsa_migration(self):
+        """An error should be raised when is_gsa_migration is False and auditor_email contains GSA_MIGRATION"""
+        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+            "GeneralInformationCase"
+        ]
+        gen_info["auditor_email"] = settings.GSA_MIGRATION
+
+        with self.assertRaises(ValidationError):
+            validate_general_information_complete_json(gen_info, False)
