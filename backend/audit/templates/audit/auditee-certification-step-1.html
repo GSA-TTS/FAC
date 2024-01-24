@@ -10,34 +10,6 @@
                 {% csrf_token %}
                 <fieldset class="usa-fieldset padding-bottom-2">
                     <legend class="usa-legend usa-legend--large" id="auditee-certification">Auditee certification</legend>
-
-                    <p>Download and review the SF-SAC and single audit report below. These files are for review only and can't be edited.</p>
-                    <p>After reviewing, check the box next to each item to confirm your report meets the requirements.</p>
-
-                    <div class="usa-button-group margin-top-2">
-                        <a class="usa-button display-flex"
-                           href="{% url 'audit:PredisseminationSummaryReportDownload' report_id=report_id %}"
-                           target="_blank">
-                            <svg class="usa-icon margin-right-1 flex-align-self-center"
-                                 aria-hidden="true"
-                                 role="img">
-                                {% uswds_sprite "file_download" %}
-                            </svg>
-                            <p class="margin-0">Download SF-SAC</p>
-                        </a>
-                        
-                        <a class="usa-button display-flex margin-top-2 tablet:margin-top-0"
-                           href="{% url 'audit:PredisseminationPdfDownload' report_id=report_id %}"
-                           target="_blank">
-                            <svg class="usa-icon margin-right-1 flex-align-self-center"
-                                 aria-hidden="true"
-                                 role="img">
-                                {% uswds_sprite "file_download" %}
-                            </svg>
-                            <p class="margin-0">Download single audit report</p>
-                        </a>
-                    </div>
-
                     <h3>Check the box next to each item confirm your report meets the requirements.</h3>
                     <p class="text-base">You must check all boxes must be checked in order to certify your single audit.</p>
                     <div class="usa-checkbox margin-top-4">

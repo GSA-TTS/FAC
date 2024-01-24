@@ -1,0 +1,52 @@
+{% comment %} 
+A section block is one of the form or file upload sections under the larger checklist. 
+Section blocks recieve context from a template tag (submission_progress_tags.py).
+
+The three states for a section block:
+    1. Completed - We have information from the user on this section.
+    2. Inactive - The user does not need to complete this section, based on previously provided data.
+    3. Incomplete - The user has yet to provide this data.
+{% endcomment %}
+
+{% load sprite_helper %}
+<li class="usa-icon-list__item padding-bottom-105" id="{{ url_tail }}">
+    
+	{% include './icon-list-icon.html' with completed=completed display=display %}
+    
+	{% comment %} 1. Completed {% endcomment %}
+	{% if completed %}
+        <div class="text-success-darker">
+            <p class="text-bold text-underline margin-0">{{ title }}</p>
+            <p class="margin-0">
+                {{ text }}
+                {% if text_nb %}<strong>{{ text_nb }}</strong>{% endif %}
+            </p>
+
+			{% include './created-by.html' with name=completed_by time=completed_date %}
+
+            <p class="margin-0">
+                <a class="usa-link" href="{% url reverse_url report_id %}">{{ edit_text }}</a>
+            </p>
+        </div>
+	{% comment %} 2. Inactive {% endcomment %}
+    {% elif display == 'inactive' %}
+        <div class="text-disabled-dark">
+            <p class="text-bold margin-0">{{ title }}</p>
+            <p class="margin-0">
+                {{ text }}
+                {% if text_nb %}<strong>{{ text_nb }}</strong>{% endif %}
+            </p>
+        </div>
+	{% comment %} 3. Incomplete {% endcomment %}
+    {% else %}
+        <div>
+            <p class="text-bold margin-0">
+                <a class="usa-link" href="{% url reverse_url report_id %}">{{ title }}</a>
+            </p>
+            <p class="margin-0">
+                {{ text }}
+                {% if text_nb %}<strong>{{ text_nb }}</strong>{% endif %}
+            </p>
+        </div>
+    {% endif %}
+</li>
