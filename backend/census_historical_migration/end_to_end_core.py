@@ -113,44 +113,32 @@ def run_end_to_end(user, audit_header):
     InspectionRecord.reset()
     try:
         sac = setup_sac(user, audit_header)
+        builder_loader = workbook_builder_loader(user, sac, audit_header)
 
-        if sac.general_information["audit_type"] == "alternative-compliance-engagement":
-            logger.info(
-                f"Skipping ACE audit: {audit_header.DBKEY} {audit_header.AUDITYEAR}"
-            )
-            raise DataMigrationError(
-                "Skipping ACE audit",
-                "skip_ace_audit",
-            )
-        else:
-            builder_loader = workbook_builder_loader(user, sac, audit_header)
+        for section, fun in sections_to_handlers.items():
+            builder_loader(fun, section)
 
-            for section, fun in sections_to_handlers.items():
-                builder_loader(fun, section)
+        record_dummy_pdf_object(sac, user)
 
-            record_dummy_pdf_object(sac, user)
+        errors = sac.validate_cross()
 
-            errors = sac.validate_cross()
+        if errors.get("errors"):
+            raise CrossValidationError(f"{errors.get('errors')}", "cross_validation")
 
-            if errors.get("errors"):
-                raise CrossValidationError(
-                    f"{errors.get('errors')}", "cross_validation"
-                )
+        step_through_certifications(sac, audit_header)
 
-            step_through_certifications(sac, audit_header)
+        disseminate(sac)
 
-            disseminate(sac)
-
-            MigrationResult.append_success(f"{sac.report_id} created")
-            record_migration_status(
-                audit_header.AUDITYEAR,
-                audit_header.DBKEY,
-            )
-            record_migration_transformations(
-                audit_header.AUDITYEAR,
-                audit_header.DBKEY,
-                sac.report_id,
-            )
+        MigrationResult.append_success(f"{sac.report_id} created")
+        record_migration_status(
+            audit_header.AUDITYEAR,
+            audit_header.DBKEY,
+        )
+        record_migration_transformations(
+            audit_header.AUDITYEAR,
+            audit_header.DBKEY,
+            sac.report_id,
+        )
     except Exception as exc:
         handle_exception(exc, audit_header)
 

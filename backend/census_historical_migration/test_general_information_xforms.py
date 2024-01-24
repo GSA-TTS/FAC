@@ -12,6 +12,7 @@ from .sac_general_lib.general_information import (
     xform_country,
     xform_entity_type,
     xform_replace_empty_auditor_email,
+    xform_replace_empty_auditee_email,
 )
 from .exception_utils import (
     DataMigrationError,
@@ -199,13 +200,20 @@ class TestXformAuditPeriodCovered(SimpleTestCase):
 class TestXformAuditType(SimpleTestCase):
     def test_valid_audit_type(self):
         for key, value in AUDIT_TYPE_DICT.items():
-            with self.subTest(key=key):
-                general_information = {"audit_type": key}
-                result = xform_audit_type(general_information)
-                self.assertEqual(result["audit_type"], value)
+            if value != "alternative-compliance-engagement":
+                with self.subTest(key=key):
+                    general_information = {"audit_type": key}
+                    result = xform_audit_type(general_information)
+                    self.assertEqual(result["audit_type"], value)
 
     def test_invalid_audit_type(self):
         general_information = {"audit_type": "invalid_key"}
+        with self.assertRaises(DataMigrationError):
+            xform_audit_type(general_information)
+
+    def test_ace_audit_type(self):
+        # audit type "alternative-compliance-engagement" is not supported at this time.
+        general_information = {"audit_type": AUDIT_TYPE_DICT["A"]}
         with self.assertRaises(DataMigrationError):
             xform_audit_type(general_information)
 
@@ -233,3 +241,23 @@ class TestXformReplaceEmptyAuditorEmail(SimpleTestCase):
         input_data = {}
         expected_output = {"auditor_email": settings.GSA_MIGRATION}
         self.assertEqual(xform_replace_empty_auditor_email(input_data), expected_output)
+
+
+class TestXformReplaceEmptyAuditeeEmail(SimpleTestCase):
+    def test_empty_auditee_email(self):
+        """Test that an empty auditee_email is replaced with 'GSA_MIGRATION'"""
+        input_data = {"auditee_email": ""}
+        expected_output = {"auditee_email": settings.GSA_MIGRATION}
+        self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
+
+    def test_non_empty_auditee_email(self):
+        """Test that a non-empty auditee_email remains unchanged"""
+        input_data = {"auditee_email": "test@example.com"}
+        expected_output = {"auditee_email": "test@example.com"}
+        self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
+
+    def test_missing_auditee_email(self):
+        """Test that a missing auditee_email key is added and set to 'GSA_MIGRATION'"""
+        input_data = {}
+        expected_output = {"auditee_email": settings.GSA_MIGRATION}
+        self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)

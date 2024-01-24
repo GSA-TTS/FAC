@@ -222,3 +222,13 @@ class TestSortRecordsByField(TestCase):
         self.assertEqual(
             [record.seq_number for record in sorted_records], ["1", "2", "10"]
         )
+
+    def test_sorting_with_empty_field(self):
+        """Test sorting with empty sort field."""
+        records = [
+            self.MockRecord(other="1", seq_number=""),
+            self.MockRecord(other="10", seq_number=""),
+            self.MockRecord(other="2", seq_number=""),
+        ]
+        sorted_records = sort_by_field(records, "seq_number")
+        self.assertEqual([record.other for record in sorted_records], ["1", "10", "2"])

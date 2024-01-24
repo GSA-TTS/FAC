@@ -184,7 +184,9 @@ def _census_audit_type(s):
 def xform_country(general_information, audit_header):
     """Transforms the country from Census format to FAC format."""
     # Transformation to be documented.
-    auditor_country = general_information.get("auditor_country").upper()
+    auditor_country = string_to_string(
+        general_information.get("auditor_country")
+    ).upper()
     if auditor_country in ["US", "USA"]:
         general_information["auditor_country"] = "USA"
     elif auditor_country == "":
@@ -268,7 +270,13 @@ def xform_audit_type(general_information):
     # Transformation recorded.
     if general_information.get("audit_type"):
         value_in_db = general_information["audit_type"]
-        general_information["audit_type"] = _census_audit_type(value_in_db.upper())
+        audit_type = _census_audit_type(value_in_db.upper())
+        if audit_type == AUDIT_TYPE_DICT["A"]:
+            raise DataMigrationError(
+                "Skipping ACE audit",
+                "skip_ace_audit",
+            )
+        general_information["audit_type"] = audit_type
         track_transformations(
             "AUDITTYPE",
             value_in_db,
@@ -295,6 +303,21 @@ def xform_replace_empty_auditor_email(general_information):
             "auditor_email",
             general_information["auditor_email"],
             "xform_replace_empty_auditor_email",
+        )
+    return general_information
+
+
+def xform_replace_empty_auditee_email(general_information):
+    """Replaces empty auditee email with GSA Migration keyword"""
+    # Transformation recorded.
+    if not general_information.get("auditee_email"):
+        general_information["auditee_email"] = settings.GSA_MIGRATION
+        track_transformations(
+            "AUDITEEEMAIL",
+            "",
+            "auditee_email",
+            general_information["auditee_email"],
+            "xform_replace_empty_auditee_email",
         )
     return general_information
 
@@ -327,6 +350,7 @@ def general_information(audit_header):
         xform_audit_period_covered,
         xform_audit_type,
         xform_replace_empty_auditor_email,
+        xform_replace_empty_auditee_email,
     ]
 
     for transform in transformations:
