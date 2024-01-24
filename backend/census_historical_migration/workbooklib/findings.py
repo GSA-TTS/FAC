@@ -28,17 +28,9 @@ logger = logging.getLogger(__name__)
 def xform_sort_compliance_requirement(findings):
     """Sorts and uppercases the compliance requirement string."""
     # Transformation recorded.
-    is_sort_applied = False
-    change_records = []
     for finding in findings:
-        before_sorting = string_to_string(finding.TYPEREQUIREMENT).upper()
-        after_sorting = "".join(sorted(before_sorting))
-        if before_sorting != after_sorting:
-            is_sort_applied = True
-        finding.TYPEREQUIREMENT = after_sorting
-
-    if change_records and is_sort_applied:
-        InspectionRecord.append_finding_changes(change_records)
+        value = string_to_string(finding.TYPEREQUIREMENT).upper()
+        finding.TYPEREQUIREMENT = "".join(sorted(value))
 
 
 def xform_prior_year_findings(value):
