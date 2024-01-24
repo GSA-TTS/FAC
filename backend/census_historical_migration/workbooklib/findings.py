@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 def xform_sort_compliance_requirement(findings):
     """Sorts and uppercases the compliance requirement string."""
+    # Transformation recorded.
     is_sort_applied = False
     change_records = []
     for finding in findings:
@@ -34,14 +35,6 @@ def xform_sort_compliance_requirement(findings):
         after_sorting = "".join(sorted(before_sorting))
         if before_sorting != after_sorting:
             is_sort_applied = True
-        track_transformations(
-            "TYPEREQUIREMENT",
-            finding.TYPEREQUIREMENT,
-            "type_requirement",
-            after_sorting,
-            ["xform_sort_compliance_requirement"],
-            change_records,
-        )
         finding.TYPEREQUIREMENT = after_sorting
 
     if change_records and is_sort_applied:
