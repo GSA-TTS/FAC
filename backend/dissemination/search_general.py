@@ -50,7 +50,8 @@ def search_general(params):
     r_cogover =  General.objects.filter(q_cogover)
 
     ##############
-    # Intersection    
+    # Intersection   
+    # Intersection on result sets is an &.  
     results = (
         r_audit_year &
         r_start_date &
@@ -75,8 +76,10 @@ def report_timing(tag, params, start, end):
 def _initialize_query(include_private: bool):
     query = Q()
     # Tribal access limiter.
-    if not include_private:
-        query.add(Q(is_public=True), Q.AND)
+    if include_private:
+        query.add(Q(is_public=False), Q.AND)
+    # And, always include the public stuff
+    query.add(Q(is_public=True), Q.AND)
     return query
 
 
