@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Subquery
 from collections import namedtuple as NT
 from dissemination.models import FederalAward
 import time
@@ -15,36 +15,60 @@ def search_alns(results, params):
     t0 = time.time()
     full_alns = _get_full_alns(params)
     agency_numbers = _get_agency_numbers(params)
-    
+    #unique_agency_numbers = list(set(map(lambda aln: aln.prefix, zip(full_alns, agency_numbers))))
+
     logger.info(f"full_alns {full_alns}")
     logger.info(f"agency_numbers {agency_numbers}")
 
-    if full_alns or agency_numbers:
-        report_ids = results.values_list('report_id', flat=True)
-        # We only want to work with the limimted number of report ids.
-        # Otherwise, we have expensive queries in FederalAward
-        # report_ids = report_ids[:params.get("LIMIT")]
-        # Now, filter down FederalAwards to just the set we need for queries
-        q = Q()
-        q.add(Q(federal_agency_prefix__in=map(lambda aln: aln.prefix, agency_numbers)), Q.AND)
-        q.add(Q(report_id_id__in=report_ids), Q.AND)
-        fa_results = FederalAward.objects.filter(q)
-        # How many FAs are we working with?
-        fa_count = fa_results.count()
+    if not (full_alns or agency_numbers):
+        return results
+    else:
+        r_agency_numbers = None
+        if agency_numbers:
+            # Start by building a result set of just the bare agency numbers.
+            # E.g. given 93 and 45, we want all of those FederalAwards
+            q_agency_numbers = Q(federal_agency_prefix__in=map(lambda aln: aln.prefix, agency_numbers))
+            r_agency_numbers = FederalAward.objects.filter(q_agency_numbers)
 
-        # Which report ids have findings?
-        finding_on_my_alns = fa_results.filter(findings_count__gt=0)
-        fama_report_ids = finding_on_my_alns.values_list('report_id_id', flat=True)
-        fama_count = finding_on_my_alns.count()
+        r_full_alns = None
+        if full_alns:
+            # Now, build the OR for the full ALNs
+            # Eg. 84.011 84.012 21.014
+            q_full_alns = Q()
+            for full_aln in full_alns:
+                q_full_alns.add(
+                    Q(federal_agency_prefix=full_aln.prefix)
+                    & Q(federal_award_extension=full_aln.program),
+                    Q.OR,
+                )
+            if q_full_alns != Q():
+                r_full_alns = FederalAward.objects.filter(q_full_alns)
+        
+        r_all_alns = None
+        if r_agency_numbers and r_full_alns:
+            # We need all of these. So, we union them.
+            r_all_alns = r_agency_numbers.union(r_full_alns)
+        elif r_agency_numbers:
+            r_all_alns = r_agency_numbers
+        elif r_full_alns:
+            r_all_alns = r_full_alns
+
+        # all_alns_report_ids = list(set(r_all_alns.values_list('report_id_id', flat=True)))
+        all_alns_count = r_all_alns.count()
+        logger.info(f"search_alns matching FederalAward rows[{all_alns_count}]")
+        results = results.filter(report_id__in=Subquery(r_all_alns.values_list('report_id_id')))
+        # results = results.filter(report_id__in=all_alns_report_ids)
+        logger.info(f"search_alns general rows[{results.count()}]")
         t1 = time.time()
-
         report_timing("search_alns", params, t0, t1)
-        logger.info(f"report_ids[{len(report_ids)}] FederalAwards[{fa_count}] findings_mine[{fama_count}]")
-        results = results.filter(report_id__in=fama_report_ids)
-    return results
+        return results
 
 def _annotate_findings():
-    pass
+    # Which report ids have findings?
+    finding_on_my_alns = fa_results.filter(findings_count__gt=0)
+    fama_report_ids = finding_on_my_alns.values_list('report_id_id', flat=True)
+    fama_count = finding_on_my_alns.count()
+    logger.info(f"report_ids[{len(report_ids)}] FederalAwards[{fa_count}] findings_mine[{fama_count}]")
 
 # https://stackoverflow.com/questions/480214/how-do-i-remove-duplicates-from-a-list-while-preserving-order
 def unique_maintaining_order(seq):

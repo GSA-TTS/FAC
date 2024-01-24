@@ -151,7 +151,9 @@ class Search(View):
         include_private = include_private_results(request)
         results = run_search(form_data, include_private)
 
-        results_count = len(results)
+        results_count = results.count()
+        logger.info(f"search POST results_count[{results_count}]")
+
         # Reset page to one if the page number surpasses how many pages there actually are
         page = form_data.page
         if page > math.ceil(results_count / form_data.limit):
@@ -159,8 +161,8 @@ class Search(View):
 
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
         paginator = Paginator(object_list=results, per_page=form_data.limit)
-        results = paginator.get_page(form_data.page)
-        results.adjusted_elided_pages = paginator.get_elided_page_range(
+        paginator_results = paginator.get_page(form_data.page)
+        paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
             form_data.page, on_each_side=1
         )
 
@@ -178,7 +180,7 @@ class Search(View):
             "form": form,
             "state_abbrevs": STATE_ABBREVS,
             "limit": form_data.limit,
-            "results": results,
+            "results": paginator_results,
             "results_count": results_count,
             "page": page,
             "order_by": form_data.order_by,
@@ -186,6 +188,7 @@ class Search(View):
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
 
+        logger.info("search POST about to render")
         return render(request, "search.html", context)
 
 

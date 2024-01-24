@@ -69,8 +69,8 @@ def search_general(params):
 
 
 def report_timing(tag, params, start, end):
-    readable = int(ceil((end - start) * 10000))
-    logger.info(f"SEARCH_TIMING {hex(id(params))[8:]} {tag} {readable}μs")
+    readable = int(ceil((end - start) * 1000))
+    logger.info(f"SEARCH_TIMING {hex(id(params))[8:]} {tag} {readable}ms")
 
 
 def _initialize_query(include_private: bool):
