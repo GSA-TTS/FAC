@@ -231,7 +231,7 @@ def validate_general_information_json(value):
     return value
 
 
-def validate_general_information_complete_json(value):
+def validate_general_information_complete_json(value, is_data_migration=False):
     """
     Apply JSON Schema for general information completeness and report errors.
     """
@@ -239,6 +239,13 @@ def validate_general_information_complete_json(value):
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     try:
+        if not is_data_migration and settings.GSA_MIGRATION in [
+            value["auditee_email"],
+            value["auditor_email"],
+        ]:
+            raise JSONSchemaValidationError(
+                f"{settings.GSA_MIGRATION} not permitted outside of migrations"
+            )
         validate(value, schema, format_checker=FormatChecker())
     except JSONSchemaValidationError as err:
         raise ValidationError(

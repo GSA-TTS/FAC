@@ -201,7 +201,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
-            validated = validate_general_information_json(general_information)
+            validated = validate_general_information_json(general_information, False)
             sac.general_information = validated
             if general_information.get("audit_type"):
                 sac.audit_type = general_information["audit_type"]
