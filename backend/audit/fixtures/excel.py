@@ -24,7 +24,9 @@ ADDITIONAL_UEIS_JSONSCHEMA = JSONSCHEMA_DIR / "additional-ueis-workbook.json"
 ADDITIONAL_EINS_JSONSCHEMA = JSONSCHEMA_DIR / "additional-eins-workbook.json"
 FEDERAL_AWARDS_JSONSCHEMA = JSONSCHEMA_DIR / "federal-awards-workbook.json"
 FINDINGS_TEXT_JSONSCHEMA = JSONSCHEMA_DIR / "audit-findings-text-workbook.json"
-CORRECTIVE_ACTION_PLAN_JSONSCHEMA = JSONSCHEMA_DIR / "corrective-action-plan-workbook.json"
+CORRECTIVE_ACTION_PLAN_JSONSCHEMA = (
+    JSONSCHEMA_DIR / "corrective-action-plan-workbook.json"
+)
 FINDINGS_UNIFORM_GUIDANCE_JSONSCHEMA = (
     JSONSCHEMA_DIR / "federal-awards-audit-findings-workbook.json"
 )
