@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 def xform_sort_compliance_requirement(findings):
     """Sorts and uppercases the compliance requirement string."""
-    # Transformation recorded.
+    # Transformation to be documented
     for finding in findings:
         value = string_to_string(finding.TYPEREQUIREMENT).upper()
         finding.TYPEREQUIREMENT = "".join(sorted(value))
@@ -37,7 +37,7 @@ def xform_prior_year_findings(value):
     """
     Transform the value of prior_references to N/A if empty.
     """
-    # Transformation to be documented.
+    # Transformation to be documented
     trimmed_value = string_to_string(value)
     if not trimmed_value:
         # See ticket #2912
