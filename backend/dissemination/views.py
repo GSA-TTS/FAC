@@ -14,7 +14,7 @@ from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
 
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import SearchForm
-from dissemination.search import search_general
+from dissemination.search import search
 from dissemination.mixins import ReportAccessRequiredMixin
 from dissemination.models import (
     General,
@@ -98,12 +98,12 @@ def clean_form_data(form):
     return form_data
 
 
-def run_search_general(form_data, include_private):
+def run_search(form_data, include_private):
     """
     Given cleaned form data and an 'include_private' boolean, run the search.
     Returns the results QuerySet.
     """
-    return search_general(
+    return search(
         names=form_data.names,
         alns=form_data.alns,
         uei_or_eins=form_data.uei_or_eins,
@@ -146,7 +146,7 @@ class Search(View):
 
         form_data = clean_form_data(form)
         include_private = include_private_results(request)
-        results = run_search_general(form_data, include_private)
+        results = run_search(form_data, include_private)
 
         results_count = len(results)
         # Reset page to one if the page number surpasses how many pages there actually are
@@ -310,7 +310,7 @@ class MultipleSummaryReportDownloadView(View):
         try:
             cleaned_data = clean_form_data(form)
             include_private = include_private_results(request)
-            results = run_search_general(cleaned_data, include_private)
+            results = run_search(cleaned_data, include_private)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:
