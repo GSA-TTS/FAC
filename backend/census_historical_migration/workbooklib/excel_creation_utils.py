@@ -203,4 +203,4 @@ def sort_by_field(records, sort_field):
     """
     Sorts records by a specified field. The values of the field are converted to integers before sorting.
     """
-    return sorted(records, key=lambda record: int(getattr(record, sort_field)))
+    return sorted(records, key=lambda record: int(getattr(record, sort_field) or 0))

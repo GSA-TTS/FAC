@@ -65,7 +65,8 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
                 eligible_users = [acc.user for acc in eligible_accesses]
 
                 raise CertificationPermissionDenied(
-                    "bad role", eligible_users=eligible_users
+                    "Invalid role. User is not the Auditee Certifying Official.",
+                    eligible_users=eligible_users,
                 )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -93,7 +94,8 @@ class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
                 )
                 eligible_users = [acc.user for acc in eligible_accesses]
                 raise CertificationPermissionDenied(
-                    "bad role", eligible_users=eligible_users
+                    "Invalid role. User is not the Auditor Certifying Official.",
+                    eligible_users=eligible_users,
                 )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")

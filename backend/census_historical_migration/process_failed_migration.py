@@ -36,7 +36,7 @@ def reprocess_failed_reports(audit_year, page_size, pages, error_tag):
     )
 
     for page_number in pages:
-        if page_number < paginator.num_pages:
+        if page_number <= paginator.num_pages:
             page = paginator.page(page_number)
             if page.object_list.count() > 0:
                 dbkey_list = [status.dbkey for status in page.object_list]

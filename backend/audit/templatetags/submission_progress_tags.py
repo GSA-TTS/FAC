@@ -6,7 +6,7 @@ from django import template
 register = template.Library()
 
 
-@register.inclusion_tag("section_block.html")
+@register.inclusion_tag("audit/submission_checklist/section_block.html")
 def section_block(report_id, section_info):
     """
     Returns the context dict that the above template will use.
