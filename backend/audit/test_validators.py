@@ -958,7 +958,7 @@ class GeneralInformationCompleteTests(SimpleTestCase):
         with self.assertRaises(ValidationError):
             validate_general_information_complete_json(gen_info)
 
-    def test_no_error_is_gsa_migration(self):
+    def test_no_error_is_gsa_migration_auditee_email(self):
         """No error should be raised when is_gsa_migration is True and auditee_email contains GSA_MIGRATION"""
         gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
             "GeneralInformationCase"
@@ -967,7 +967,7 @@ class GeneralInformationCompleteTests(SimpleTestCase):
 
         validate_general_information_complete_json(gen_info, True)
 
-    def test_no_error_is_gsa_migration(self):
+    def test_no_error_is_gsa_migration_auditor_email(self):
         """No error should be raised when is_gsa_migration is True and auditor_email contains GSA_MIGRATION"""
         gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
             "GeneralInformationCase"
@@ -976,7 +976,7 @@ class GeneralInformationCompleteTests(SimpleTestCase):
 
         validate_general_information_complete_json(gen_info, True)
 
-    def test_error_is_not_gsa_migration(self):
+    def test_error_is_not_gsa_migration_auditee_email(self):
         """An error should be raised when is_gsa_migration is False and auditee_email contains GSA_MIGRATION"""
         gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
             "GeneralInformationCase"
@@ -986,7 +986,7 @@ class GeneralInformationCompleteTests(SimpleTestCase):
         with self.assertRaises(ValidationError):
             validate_general_information_complete_json(gen_info, False)
 
-    def test_error_is_not_gsa_migration(self):
+    def test_error_is_not_gsa_migration_auditor_email(self):
         """An error should be raised when is_gsa_migration is False and auditor_email contains GSA_MIGRATION"""
         gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
             "GeneralInformationCase"
