@@ -184,7 +184,9 @@ def _census_audit_type(s):
 def xform_country(general_information, audit_header):
     """Transforms the country from Census format to FAC format."""
     # Transformation to be documented.
-    auditor_country = general_information.get("auditor_country").upper()
+    auditor_country = string_to_string(
+        general_information.get("auditor_country")
+    ).upper()
     if auditor_country in ["US", "USA"]:
         general_information["auditor_country"] = "USA"
     elif auditor_country == "":
