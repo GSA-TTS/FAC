@@ -1,9 +1,5 @@
 import json
 from django.core.exceptions import ValidationError
-from openpyxl import load_workbook
-from audit.intakelib.intermediate_representation import (
-    extract_workbook_as_ir,
-)
 from audit.intakelib.common import get_names_of_all_ranges
 from audit.fixtures.excel import FORM_SECTIONS
 from audit.fixtures.excel import (
@@ -31,6 +27,7 @@ map_section_to_jsonschema = {
     FORM_SECTIONS.SECONDARY_AUDITORS: SECONDARY_AUDITORS_JSONSCHEMA,
 }
 
+
 def json_nr_lookup(json_input, lookup_key):
     if isinstance(json_input, dict):
         for k, v in json_input.items():
@@ -42,12 +39,6 @@ def json_nr_lookup(json_input, lookup_key):
         for item in json_input:
             yield from json_nr_lookup(item, lookup_key)
 
-TEMPLATES = {}
-for section in map_section_to_jsonschema:
-    json_path = map_section_to_jsonschema[section]
-    json_input = json.loads(json_path.read_text(encoding="utf-8"))
-    
-    TEMPLATES[section] = json_nr_lookup(json_input, "range_name")
 
 # DESCRIPTION
 # Some workbooks come in mangled. We lose named ranges.
@@ -59,11 +50,11 @@ for section in map_section_to_jsonschema:
 # If we're missing anything, we need to bail immediately. They have mangled the workbook.
 # We should not accept the submission.
 TEMPLATES = {}
-for section in map_section_to_workbook:
-    template = load_workbook(map_section_to_workbook[section], data_only=True)
-    template_ir = extract_workbook_as_ir(template)
-    template_names = get_names_of_all_ranges(template_ir)
-    TEMPLATES[section] = template_names
+for section in map_section_to_jsonschema:
+    json_path = map_section_to_jsonschema[section]
+    json_input = json.loads(json_path.read_text(encoding="utf-8"))
+    
+    TEMPLATES[section] = json_nr_lookup(json_input, "range_name")
 
 
 def has_all_the_named_ranges(section_name):
