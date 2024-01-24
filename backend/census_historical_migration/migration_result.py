@@ -11,6 +11,11 @@ class MigrationResult:
         "summaries": {},
     }
     result = copy.deepcopy(DEFAULT_RESULT)
+    migration_in_progress = False
+
+    @staticmethod
+    def set_migration_in_progress(migration_in_progress):
+        MigrationResult.migration_in_progress = migration_in_progress
 
     @staticmethod
     def reset():

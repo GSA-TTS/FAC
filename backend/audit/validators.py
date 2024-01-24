@@ -1,18 +1,17 @@
 import os
 import json
 import logging
+import requests
+
 from jsonschema import Draft7Validator, FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
-
 from django.core.exceptions import ValidationError
-
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-import requests
 from openpyxl import load_workbook
 from pypdf import PdfReader
 
-
+from census_historical_migration.migration_result import MigrationResult
 from audit.intakelib import (
     additional_ueis_named_ranges,
     additional_eins_named_ranges,
@@ -221,6 +220,7 @@ def validate_general_information_json(value):
     """
     schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformation.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    value["is_gsa_migration"] = MigrationResult.migration_in_progress
 
     try:
         validate(value, schema, format_checker=FormatChecker())
@@ -237,6 +237,7 @@ def validate_general_information_complete_json(value):
     """
     schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationComplete.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    value["is_gsa_migration"] = MigrationResult.migration_in_progress
 
     try:
         validate(value, schema, format_checker=FormatChecker())

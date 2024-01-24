@@ -12,6 +12,7 @@ Requires most fields, has consitional checks for conditional fields.
   additionalProperties: false,
   metamodel_version: '1.7.0',
   properties: {
+    is_gsa_migration: Types.boolean,
     // Audit information
     auditee_fiscal_period_start: {
       format: 'date',
@@ -53,17 +54,9 @@ Requires most fields, has consitional checks for conditional fields.
       minLength: 1,
     },
     auditee_phone: Base.Compound.UnitedStatesPhone,
-    auditee_email: {
-      oneOf: [
-        Types.string {
-          format: 'email',
-          maxLength: 100,
-          minLength: 1,
-        },
-        Types.string {
-          const: Base.Const.GSA_MIGRATION,
-        },
-      ],
+    auditee_email: Types.string {
+      maxLength: 100,
+      minLength: 1,
     },
 
     // Auditor information
@@ -108,17 +101,9 @@ Requires most fields, has consitional checks for conditional fields.
       minLength: 1,
     },
     auditor_phone: Base.Compound.UnitedStatesPhone,
-    auditor_email: {
-      oneOf: [
-        Types.string {
-          format: 'email',
-          maxLength: 100,
-          minLength: 1,
-        },
-        Types.string {
-          const: Base.Const.GSA_MIGRATION,
-        },
-      ],
+    auditor_email: Types.string {
+      maxLength: 100,
+      minLength: 1,
     },
     // Others
     is_usa_based: Types.boolean,
@@ -216,6 +201,43 @@ Requires most fields, has consitional checks for conditional fields.
       properties: {
         auditor_ein_not_an_ssn_attestation: {
           const: true,
+        },
+      },
+    },
+    {
+      'if': {
+        properties: {
+          is_gsa_migration: Types.boolean {
+            const: true,
+          },
+        },
+      },
+      'then': {
+        properties: {
+          auditor_email: {
+            oneOf: [
+              Types.string {
+                format: 'email',
+                maxLength: 100,
+              },
+              Types.string {
+                const: Base.Const.GSA_MIGRATION,
+              },
+              Base.Compound.EmptyString,
+            ],
+          },
+          auditee_email: {
+            oneOf: [
+              Types.string {
+                format: 'email',
+                maxLength: 100,
+              },
+              Types.string {
+                const: Base.Const.GSA_MIGRATION,
+              },
+              Base.Compound.EmptyString,
+            ],
+          },
         },
       },
     },

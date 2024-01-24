@@ -34,6 +34,8 @@ def load_historic_data_for_year(audit_year, page_size, pages):
 
 
 def perform_migration(user, submissions, round_count, total_error_count):
+    MigrationResult.set_migration_in_progress(True)
+
     total_count = round_count
     error_count = total_error_count
     for submission in submissions:

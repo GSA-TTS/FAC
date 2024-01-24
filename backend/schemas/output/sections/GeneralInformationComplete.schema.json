@@ -109,6 +109,54 @@
                "const": true
             }
          }
+      },
+      {
+         "if": {
+            "properties": {
+               "is_gsa_migration": {
+                  "const": true,
+                  "type": "boolean"
+               }
+            }
+         },
+         "then": {
+            "properties": {
+               "auditee_email": {
+                  "oneOf": [
+                     {
+                        "format": "email",
+                        "maxLength": 100,
+                        "type": "string"
+                     },
+                     {
+                        "const": "GSA_MIGRATION",
+                        "type": "string"
+                     },
+                     {
+                        "const": "",
+                        "type": "string"
+                     }
+                  ]
+               },
+               "auditor_email": {
+                  "oneOf": [
+                     {
+                        "format": "email",
+                        "maxLength": 100,
+                        "type": "string"
+                     },
+                     {
+                        "const": "GSA_MIGRATION",
+                        "type": "string"
+                     },
+                     {
+                        "const": "",
+                        "type": "string"
+                     }
+                  ]
+               }
+            }
+         }
       }
    ],
    "metamodel_version": "1.7.0",
@@ -156,18 +204,9 @@
          "type": "string"
       },
       "auditee_email": {
-         "oneOf": [
-            {
-               "format": "email",
-               "maxLength": 100,
-               "minLength": 1,
-               "type": "string"
-            },
-            {
-               "const": "GSA_MIGRATION",
-               "type": "string"
-            }
-         ]
+         "maxLength": 100,
+         "minLength": 1,
+         "type": "string"
       },
       "auditee_fiscal_period_end": {
          "format": "date"
@@ -316,18 +355,9 @@
          "type": "boolean"
       },
       "auditor_email": {
-         "oneOf": [
-            {
-               "format": "email",
-               "maxLength": 100,
-               "minLength": 1,
-               "type": "string"
-            },
-            {
-               "const": "GSA_MIGRATION",
-               "type": "string"
-            }
-         ]
+         "maxLength": 100,
+         "minLength": 1,
+         "type": "string"
       },
       "auditor_firm_name": {
          "maxLength": 100,
@@ -431,6 +461,9 @@
          "type": "string"
       },
       "ein_not_an_ssn_attestation": {
+         "type": "boolean"
+      },
+      "is_gsa_migration": {
          "type": "boolean"
       },
       "is_usa_based": {
