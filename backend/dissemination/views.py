@@ -151,7 +151,7 @@ class Search(View):
         include_private = include_private_results(request)
         results = run_search(form_data, include_private)
 
-        results_count = results.count()
+        results_count = len(results)
         logger.info(f"search POST results_count[{results_count}]")
 
         # Reset page to one if the page number surpasses how many pages there actually are

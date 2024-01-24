@@ -1,30 +1,20 @@
 import logging
 import time
+from .search_constants import (
+    ORDER_BY,
+    DIRECTION,
+    DAS_LIMIT
+)
 from .search_general import (
     report_timing,
     search_general
     )
 from .search_alns import (
-    search_alns
+    search_alns,
+    _annotate_findings
 )
 
 logger = logging.getLogger(__name__)
-
-DAS_LIMIT=1000
-
-class ORDER_BY:
-    fac_accepted_date = "fac_accepted_date"
-    auditee_name = "auditee_name"
-    auditee_uei = "auditee_uei"
-    audit_year = "audit_year"
-    cog_over = "cog_over"
-    findings_my_aln = "findings_my_aln"
-    findings_all_aln = "findings_all_aln"
-
-
-class DIRECTION:
-    ascending = "ascending"
-    descending = "descending"
 
 
 #######################
@@ -55,7 +45,7 @@ def search(params):
     # https://docs.djangoproject.com/en/4.2/topics/db/queries/#limiting-querysets
     results = _sort_results(results, params)
     results = search_alns(results, params)
-
+    
     t1 = time.time()
     report_timing("search", params, t0, t1)
     return results
@@ -112,20 +102,20 @@ def _sort_results(results, params):
     # Now, apply the sort that we pass in front the front-end.
     match params.get("order_by"):
         case ORDER_BY.auditee_name:
-            results = results.order_by(f"{direction}auditee_name")
+            new_results = results.order_by(f"{direction}auditee_name")
         case ORDER_BY.auditee_uei:
-            results = results.order_by(f"{direction}auditee_uei")
+            new_results = results.order_by(f"{direction}auditee_uei")
         case ORDER_BY.fac_accepted_date:
-            results = results.order_by(f"{direction}fac_accepted_date")
+            new_results = results.order_by(f"{direction}fac_accepted_date")
         case ORDER_BY.audit_year:
-            results = results.order_by(f"{direction}audit_year")
+            new_results = results.order_by(f"{direction}audit_year")
         case ORDER_BY.cog_over:
             if params.get("order_direction") == DIRECTION.ascending:
-                results = results.order_by("cognizant_agency")
+                new_results = results.order_by("cognizant_agency")
             else:
-                results = results.order_by("oversight_agency")
+                new_results = results.order_by("oversight_agency")
         case _:
-            results = results.order_by(f"{direction}fac_accepted_date")
+            new_results = results.order_by(f"{direction}fac_accepted_date")
 
-    return results
+    return new_results
 

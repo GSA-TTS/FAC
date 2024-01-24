@@ -5,6 +5,12 @@ import time
 from .search_general import (
     report_timing
     )
+
+from .search_constants import (
+    ORDER_BY,
+    DIRECTION,
+)
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,65 +59,74 @@ def search_alns(results, params):
         elif r_full_alns:
             r_all_alns = r_full_alns
 
-        # all_alns_report_ids = list(set(r_all_alns.values_list('report_id_id', flat=True)))
         all_alns_count = r_all_alns.count()
         logger.info(f"search_alns matching FederalAward rows[{all_alns_count}]")
         results = results.filter(report_id__in=Subquery(r_all_alns.values_list('report_id_id')))
-        # results = results.filter(report_id__in=all_alns_report_ids)
         logger.info(f"search_alns general rows[{results.count()}]")
+        results = _annotate_findings(results, r_all_alns)
+        results = _findings_sort(results, params)
+
         t1 = time.time()
         report_timing("search_alns", params, t0, t1)
         return results
 
-def _annotate_findings():
+def _findings_sort(results, params):
+    if params.get("order_by") == ORDER_BY.findings_my_aln:
+        results = sorted(
+            results,
+            key=lambda obj: obj.finding_my_aln,
+            reverse=bool(params.get("order_direction") == DIRECTION.descending),
+        )
+    elif params.get("order_by") == ORDER_BY.findings_all_aln:
+        results = sorted(
+            results,
+            key=lambda obj: obj.finding_all_aln,
+            reverse=bool(params.get("order_direction") == DIRECTION.descending),
+        )
+    return results
+
+def _annotate_findings(g_results, fa_results):
     # Which report ids have findings?
     finding_on_my_alns = fa_results.filter(findings_count__gt=0)
-    fama_report_ids = finding_on_my_alns.values_list('report_id_id', flat=True)
-    fama_count = finding_on_my_alns.count()
-    logger.info(f"report_ids[{len(report_ids)}] FederalAwards[{fa_count}] findings_mine[{fama_count}]")
+    annotate_on = g_results.filter(report_id__in=Subquery(finding_on_my_alns.values_list('report_id_id')))
 
+    # fama_report_ids = finding_on_my_alns.values_list('report_id_id', flat=True)
+    fama_count = annotate_on.count()
+    logger.info(f"_annotate_findings finding_on_my_alns[{fama_count}]")
+
+    for r in g_results:
+        r.finding_my_aln = False
+
+    for ndx, to_annotate in enumerate(annotate_on):
+        to_annotate.finding_my_aln = True
+        logger.info(f"_annotate_findings to_annotate {ndx} {to_annotate.finding_my_aln}")
+        
+    return g_results
+
+    # finding_on_any_aln = FederalAward.objects.filter(
+    #     not_aln_q,
+    #     report_id__in=results,
+    #     findings_count__gt=0,
+    # )
+
+    for general in results:
+        general.finding_my_aln = False
+        general.finding_all_aln = False
+        for relevant_award in finding_on_my_alns:
+            if relevant_award.report_id == general.report_id:
+                general.finding_my_aln = True
+        # for relevant_award in finding_on_any_aln:
+        #     if relevant_award.report_id == general.report_id:
+        #         general.finding_all_aln = True
+    
+    return results
+    
 # https://stackoverflow.com/questions/480214/how-do-i-remove-duplicates-from-a-list-while-preserving-order
 def unique_maintaining_order(seq):
     seen = set()
     seen_add = seen.add
     return [x for x in seq if not (x in seen or seen_add(x))]
 
-
-def foo():
-    ##############################
-    # Now that we have reduced the result set to something
-    # manageable, we can apply ALN operations.
-    if alns:
-        # q_alns = Q(report_id_id__in=results.values_list('report_id', flat=True))
-        q_alns = Q()
-        # Split out the agency numbers
-        split_alns = _split_alns(alns)
-        query_set = _get_aln_match_query(split_alns)
-        # If we did a search on ALNs, and got nothing (because it does not exist),
-        # we need to bail out from the entire search early with no results.
-        if not query_set:
-            logger.info("No query_set; returning []")
-            return []
-        else:
-            # If results came back from our ALN query, add it to the Q() and continue.
-            q_alns.add(query_set, Q.AND)
-        # We want the distinct report_ids for these ALNs
-        distinct_alns = FederalAward.objects.values(
-            'report_id_id'
-        ).annotate(
-            report_id_id_count = Count('report_id_id')
-        ).filter(report_id_id_count=1)
-
-        # And, we want to reduce the results from above by the report_ids
-        # that are in this set.
-        results = results.filter(report_id__in=[ 
-            rec['report_id_id'] 
-            for rec 
-            in distinct_alns
-            ])
-
-    t1 = time.time()
-    logger.info(f"SEARCH GENERAL T1: {t1-t0}")
 
 
 def _get_agency_numbers(params):
@@ -139,27 +154,6 @@ def _get_full_alns(params):
                 split_alns.update([ALN(split_aln[0], split_aln[1])])
     return split_alns
 
-
-def _split_alns(alns):
-    """
-    Split an ALN query string into two sets.
-        1. split_alns: {(federal_agency_prefix, federal_award_extension), ...}
-        2. agency_numbers: {('federal_agency_prefix'), ...}
-    """
-    split_alns = set()
-    for aln in alns:
-        if len(aln) == 2:
-            # If we don't wrap the `aln` with [], the string
-            # goes in as individual characters. A weirdness of Python sets.
-            split_alns.update([ALN(aln, None)])
-        else:
-            split_aln = aln.split(".")
-            if len(split_aln) == 2:
-                # The [wrapping] is so the tuple goes into the set as a tuple.
-                # Otherwise, the individual elements go in unpaired.
-                # split_alns.update([tuple(split_aln)])
-                split_alns.update([ALN(split_aln[0], split_aln[1])])
-    return split_alns
 
 
 def _get_aln_report_ids(split_alns):
@@ -271,23 +265,4 @@ def _attach_finding_my_aln_and_finding_all_aln_fields(
     logger.info(f"_afmafaaf t4-t3: {t4-t3}")
     logger.info(f"_afmafaaf t4-t0: {t4-t0}")
     return results
-
-import itertools
-
-def _get_aln_match_query(split_alns, limit=1000):
-    """
-    Given split ALNs and agency numbers, return the match query for ALNs.
-    """
-    # Search for relevant awards
-    report_ids = _get_aln_report_ids(split_alns)
-
-    # Add the report_id's from the award search to the full search params
-    alns_match = Q()
-    limited_report_ids = set(itertools.islice(report_ids, limit))
-    # for report_id in limited_report_ids:
-    #     alns_match.add(Q(report_id=report_id), Q.OR)
-    alns_match = Q(report_id__in=limited_report_ids)
-
-    return alns_match
-
 
