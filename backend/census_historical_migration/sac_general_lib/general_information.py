@@ -360,7 +360,7 @@ def general_information(audit_header):
             general_information = transform(general_information)
 
     audit.validators.validate_general_information_complete_json(
-        general_information, True
+        general_information, True,
     )
 
     return general_information
