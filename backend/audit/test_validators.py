@@ -939,7 +939,7 @@ class TribalAccessTests(SimpleTestCase):
                 validate_tribal_data_consent_json(case_copy)
 
 
-class GeneralInformationTests(SimpleTestCase):
+class GeneralInformationCompleteTests(SimpleTestCase):
     def test_no_error_standard_case(self):
         """No error should be raised when is_gsa_migration is not supplied and no emails contain GSA_MIGRATION"""
         gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
