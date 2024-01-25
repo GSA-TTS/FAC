@@ -9,7 +9,6 @@ from django.core.files.uploadedfile import TemporaryUploadedFile
 from random import choice, randrange
 from openpyxl import Workbook
 from tempfile import NamedTemporaryFile
-from django.conf import settings
 
 import copy
 import requests
