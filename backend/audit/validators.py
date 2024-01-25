@@ -219,7 +219,6 @@ def validate_general_information_json(value, is_data_migration=True):
     """
     Apply JSON Schema for general information and report errors.
     """
-    print("validate_general_information_json")
     schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformation.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
