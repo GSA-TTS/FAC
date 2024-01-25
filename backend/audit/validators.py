@@ -215,27 +215,12 @@ def validate_federal_award_json(value):
         raise ValidationError(message=_federal_awards_json_error(errors))
 
 
-def validate_general_information_json(value):
+def validate_general_information_json(value, is_data_migration=True):
     """
     Apply JSON Schema for general information and report errors.
     """
+    print("validate_general_information_json")
     schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformation.schema.json"
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
-
-    try:
-        validate(value, schema, format_checker=FormatChecker())
-    except JSONSchemaValidationError as err:
-        raise ValidationError(
-            _(err.message),
-        ) from err
-    return value
-
-
-def validate_general_information_complete_json(value, is_data_migration=False):
-    """
-    Apply JSON Schema for general information completeness and report errors.
-    """
-    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationComplete.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     try:
@@ -246,6 +231,22 @@ def validate_general_information_complete_json(value, is_data_migration=False):
             raise JSONSchemaValidationError(
                 f"{settings.GSA_MIGRATION} not permitted outside of migrations"
             )
+        validate(value, schema, format_checker=FormatChecker())
+    except JSONSchemaValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
+
+
+def validate_general_information_complete_json(value):
+    """
+    Apply JSON Schema for general information completeness and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationComplete.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
         validate(value, schema, format_checker=FormatChecker())
     except JSONSchemaValidationError as err:
         raise ValidationError(

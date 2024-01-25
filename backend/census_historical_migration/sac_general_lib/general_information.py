@@ -359,8 +359,6 @@ def general_information(audit_header):
         else:
             general_information = transform(general_information)
 
-    audit.validators.validate_general_information_complete_json(
-        general_information, True,
-    )
+    audit.validators.validate_general_information_complete_json(general_information)
 
     return general_information
