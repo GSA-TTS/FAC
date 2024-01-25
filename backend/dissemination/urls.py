@@ -16,6 +16,11 @@ urlpatterns = [
         name="PdfDownload",
     ),
     path(
+        "report/pdf/ota/<str:uuid>",
+        views.OneTimeAccessDownloadView.as_view(),
+        name="OtaPdfDownload",
+    ),
+    path(
         "summary-report/xlsx/<str:report_id>",
         views.SingleSummaryReportDownloadView.as_view(),
         name="SummaryReportDownload",

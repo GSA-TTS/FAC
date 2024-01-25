@@ -1,11 +1,14 @@
 from collections import namedtuple
+from datetime import timedelta
 import logging
 import math
 
-from django.core.exceptions import BadRequest
+from django.conf import settings
+from django.core.exceptions import BadRequest, ValidationError
 from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.generic import View
 
 from audit.models import SingleAuditChecklist
@@ -26,6 +29,7 @@ from dissemination.models import (
     SecondaryAuditor,
     AdditionalEin,
     AdditionalUei,
+    OneTimeAccess,
 )
 from dissemination.summary_reports import generate_summary_report
 
@@ -282,6 +286,48 @@ class XlsxDownloadView(ReportAccessRequiredMixin, View):
         filename = get_filename(sac, file_type)
 
         return redirect(get_download_url(filename))
+
+
+class OneTimeAccessDownloadView(View):
+    def get(self, request, uuid):
+        """
+        Given a one time access UUID:
+        - Clear all expired OneTimeAccess objects from the database
+        - Query for a OneTimeAccess object with a matching UUID
+        - If found
+          - Generate an S3 link to the SingleAuditReport PDF associated with the OneTimeAccess object
+          - Delete the OneTimeAccess object
+          - Redirect to the generated S3 link
+        - If not found
+          - Return 404
+        """
+        try:
+            # delete all expired OTA objects
+            cutoff = timezone.now() - timedelta(
+                seconds=settings.ONE_TIME_ACCESS_TTL_SECS
+            )
+            OneTimeAccess.objects.filter(timestamp__lt=cutoff).delete()
+
+            # try to find matching OTA object
+            ota = OneTimeAccess.objects.get(uuid=uuid)
+
+            # try to find the SingleAuditChecklist associated with this OTA
+            sac = get_object_or_404(SingleAuditChecklist, report_id=ota.report_id)
+
+            # get the filename for the SingleAuditReport for this SAC
+            filename = get_filename(sac, "report")
+            download_url = get_download_url(filename)
+
+            # delete the OTA object
+            ota.delete()
+
+            # redirect the caller to the file download URL
+            return redirect(download_url)
+
+        except OneTimeAccess.DoesNotExist:
+            raise Http404()
+        except ValidationError:
+            raise BadRequest()
 
 
 class SingleSummaryReportDownloadView(ReportAccessRequiredMixin, View):

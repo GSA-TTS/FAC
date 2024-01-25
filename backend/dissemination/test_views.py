@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from audit.models import (
     ExcelFile,
@@ -15,11 +17,15 @@ from dissemination.models import (
     FindingText,
     CapText,
     Note,
+    OneTimeAccess,
 )
 from users.models import Permission, UserPermission
 
 from model_bakery import baker
 from unittest.mock import patch
+
+from datetime import timedelta
+from uuid import uuid4
 
 User = get_user_model()
 
@@ -218,6 +224,131 @@ class SearchViewTests(TestCase):
         # all of the private reports should show up on the page
         for p in private:
             self.assertContains(response, p.report_id)
+
+
+class OneTimeAccessDownloadViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_malformed_uuid_returns_400(self):
+        """
+        Given a malformed UUID
+        When a request is sent to the OTA download url
+        Then the response should be 400
+        """
+        url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": "not-a-uuid"})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_bad_uuid_returns_404(self):
+        """
+        Given a UUID that does not match an existing OTA record
+        When a request is sent to the OTA download url
+        Then the response should be 404
+        """
+        uuid = uuid4()
+        url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": uuid})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_expired_uuid_returns_404(self):
+        """
+        Given a UUID that has expired
+        When a request is sent to the OTA download url
+        Then the response should be 404
+        """
+        uuid = uuid4()
+
+        sac = baker.make(
+            SingleAuditChecklist,
+            report_id=generate_sac_report_id(end_date="2024-01-31"),
+        )
+        baker.make(SingleAuditReportFile, sac=sac)
+        ota = baker.make(OneTimeAccess, uuid=uuid, report_id=sac.report_id)
+
+        # override the OTA timestamp to something that is outside the expiry window
+        timestamp = timezone.now() - timedelta(
+            seconds=(settings.ONE_TIME_ACCESS_TTL_SECS + 5)
+        )
+        ota.timestamp = timestamp
+        ota.save()
+
+        url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": uuid})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_no_sac_returns_404(self):
+        """
+        Given a UUID for an OTA that references a non-existent SAC
+        When a request is sent to the OTA download url
+        Then the response should be 404
+        """
+        uuid = uuid4()
+
+        report_id = generate_sac_report_id(end_date="2024-01-31")
+        baker.make(OneTimeAccess, uuid=uuid, report_id=report_id)
+
+        url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": uuid})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_no_pdf_returns_404(self):
+        """
+        Given a UUID for an OTA that references a SAC with no SingleAuditReport PDF
+        When a request is sent to the OTA download url
+        Then the response should be 404
+        """
+        uuid = uuid4()
+
+        sac = baker.make(
+            SingleAuditChecklist,
+            report_id=generate_sac_report_id(end_date="2024-01-31"),
+        )
+        baker.make(OneTimeAccess, uuid=uuid, report_id=sac.report_id)
+
+        url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": uuid})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    @patch("dissemination.file_downloads.file_exists")
+    def test_good_uuid_returns_redirect(self, mock_file_exists):
+        """
+        Given a UUID that does match an existing OTA record
+        When a request is sent to the OTA download url
+        Then the response should be a 302 redirect to an S3 download url
+        When a second request is sent to the OTA download url
+        Then the response should be 404
+        """
+        mock_file_exists.return_value = True
+        uuid = uuid4()
+
+        sac = baker.make(
+            SingleAuditChecklist,
+            report_id=generate_sac_report_id(end_date="2024-01-31"),
+        )
+        baker.make(SingleAuditReportFile, sac=sac)
+        baker.make(OneTimeAccess, uuid=uuid, report_id=sac.report_id)
+
+        url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": uuid})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(sac.report_id, response.url)
+
+        response_2 = self.client.get(url)
+
+        self.assertEqual(response_2.status_code, 404)
 
 
 class XlsxDownloadViewTests(TestCase):
