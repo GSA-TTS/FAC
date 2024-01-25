@@ -4,7 +4,7 @@ import logging
 import math
 
 from django.conf import settings
-from django.core.exceptions import BadRequest
+from django.core.exceptions import BadRequest, ValidationError
 from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -326,6 +326,8 @@ class OneTimeAccessDownloadView(View):
 
         except OneTimeAccess.DoesNotExist:
             raise Http404()
+        except ValidationError:
+            raise BadRequest()
 
 
 class SingleSummaryReportDownloadView(ReportAccessRequiredMixin, View):

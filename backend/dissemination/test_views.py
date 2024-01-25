@@ -230,17 +230,17 @@ class OneTimeAccessDownloadViewTests(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_malformed_uuid_returns_404(self):
+    def test_malformed_uuid_returns_400(self):
         """
         Given a malformed UUID
         When a request is sent to the OTA download url
-        Then the response should be 404
+        Then the response should be 400
         """
         url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": "not-a-uuid"})
 
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_bad_uuid_returns_404(self):
         """
@@ -320,7 +320,8 @@ class OneTimeAccessDownloadViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_good_uuid_returns_redirect(self):
+    @patch("dissemination.file_downloads.file_exists")
+    def test_good_uuid_returns_redirect(self, mock_file_exists):
         """
         Given a UUID that does match an existing OTA record
         When a request is sent to the OTA download url
@@ -328,6 +329,7 @@ class OneTimeAccessDownloadViewTests(TestCase):
         When a second request is sent to the OTA download url
         Then the response should be 404
         """
+        mock_file_exists.return_value = True
         uuid = uuid4()
 
         sac = baker.make(
