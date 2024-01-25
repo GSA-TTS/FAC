@@ -1,18 +1,8 @@
 import logging
 import time
-from .search_constants import (
-    ORDER_BY,
-    DIRECTION,
-    DAS_LIMIT
-)
-from .search_general import (
-    report_timing,
-    search_general
-    )
-from .search_alns import (
-    search_alns,
-    _annotate_findings
-)
+from .search_constants import ORDER_BY, DIRECTION, DAS_LIMIT
+from .search_general import report_timing, search_general
+from .search_alns import search_alns
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +11,7 @@ logger = logging.getLogger(__name__)
 # https://books.agiliq.com/en/latest/README.html
 # Their ORM cookbook looks to be useful reading.
 # https://books.agiliq.com/projects/django-orm-cookbook/en/latest/subquery.html
+
 
 def search(params):
     """
@@ -45,10 +36,11 @@ def search(params):
     # https://docs.djangoproject.com/en/4.2/topics/db/queries/#limiting-querysets
     results = _sort_results(results, params)
     results = search_alns(results, params)
-    
+
     t1 = time.time()
     report_timing("search", params, t0, t1)
     return results
+
 
 def _set_general_defaults(params):
     #############
@@ -69,10 +61,11 @@ def _set_general_defaults(params):
 
     return params
 
+
 def _sort_results(results, params):
     # Instead of nesting conditions, we'll prep a string
     # for determining the sort direction.
-    
+
     match params.get("order_direction"):
         case DIRECTION.ascending:
             direction = ""
@@ -98,4 +91,3 @@ def _sort_results(results, params):
             new_results = results.order_by(f"{direction}fac_accepted_date")
 
     return new_results
-

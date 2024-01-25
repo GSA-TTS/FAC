@@ -1,5 +1,5 @@
+DAS_LIMIT = 1000
 
-DAS_LIMIT=1000
 
 class ORDER_BY:
     fac_accepted_date = "fac_accepted_date"

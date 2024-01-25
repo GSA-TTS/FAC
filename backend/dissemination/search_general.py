@@ -6,7 +6,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def search_general(params):
+
+def search_general(params={}):
     # Time general reduction
     t0 = time.time()
 
@@ -15,13 +16,13 @@ def search_general(params):
     # This is where tribal/is_public is set by default.
     q_base = _initialize_query(params.get("include_private", False))
     r_base = General.objects.filter(q_base)
-    
+
     ##############
     # Audit years
     # query.add(_get_audit_years_match_query(audit_years), Q.AND)
     q_audit_year = _get_audit_years_match_query(params.get("audit_years", None))
     r_audit_year = General.objects.filter(q_audit_year)
-    
+
     ##############
     # State
     q_state = _get_auditee_state_match_query(params.get("auditee_state", None))
@@ -45,23 +46,25 @@ def search_general(params):
     r_end_date = General.objects.filter(q_end_date)
 
     ##############
-    # Intersection    
-    q_cogover = _get_cog_or_oversight_match_query(params.get("agency_name", None), params.get("cog_or_oversight", None))
-    r_cogover =  General.objects.filter(q_cogover)
+    # Intersection
+    q_cogover = _get_cog_or_oversight_match_query(
+        params.get("agency_name", None), params.get("cog_or_oversight", None)
+    )
+    r_cogover = General.objects.filter(q_cogover)
 
     ##############
-    # Intersection   
-    # Intersection on result sets is an &.  
+    # Intersection
+    # Intersection on result sets is an &.
     results = (
-        r_audit_year &
-        r_start_date &
-        r_end_date &
-        r_state &
-        r_cogover &
-        r_names &
-        r_uei &
-        r_base
-        )
+        r_audit_year
+        & r_start_date
+        & r_end_date
+        & r_state
+        & r_cogover
+        & r_names
+        & r_uei
+        & r_base
+    )
 
     t1 = time.time()
     report_timing("search_general", params, t0, t1)
@@ -77,9 +80,9 @@ def _initialize_query(include_private: bool):
     query = Q()
     # Tribal access limiter.
     if include_private:
-        query.add(Q(is_public=False), Q.AND)
+        query.add(Q(is_public=False), Q.OR)
     # And, always include the public stuff
-    query.add(Q(is_public=True), Q.AND)
+    query.add(Q(is_public=True), Q.OR)
     return query
 
 
@@ -129,6 +132,7 @@ def _get_auditee_state_match_query(auditee_state):
         return Q()
 
     return Q(auditee_state__in=[auditee_state])
+
 
 def _get_names_match_query(names):
     """

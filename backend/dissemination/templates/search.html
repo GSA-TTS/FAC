@@ -202,9 +202,9 @@
                                     {% include "search-table-header.html" with friendly_title="Cog or Over" field_name="cog_over" %}
                                     <th scope="col" role="columnheader">View</th>
                                     <th scope="col" role="columnheader">PDF</th>
-                                    {% if results.0.finding_my_aln is not None%}
+                                    {% if results.0.finding_my_aln is not None %}
                                         {% include "search-table-header.html" with friendly_title="Finding my ALN" field_name="findings_my_aln"%}
-                                        {% include "search-table-header.html" with friendly_title="Finding all ALN" field_name="findings_all_aln"%}
+                                        {% include "search-table-header.html" with friendly_title="Finding other ALN" field_name="findings_all_aln"%}
                                     {% endif %}
                                 </tr>
                             </thead>
