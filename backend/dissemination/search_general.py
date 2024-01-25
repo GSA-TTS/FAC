@@ -80,9 +80,9 @@ def _initialize_query(include_private: bool):
     query = Q()
     # Tribal access limiter.
     if include_private:
-        query.add(Q(is_public=False), Q.AND)
+        query.add(Q(is_public=False), Q.OR)
     # And, always include the public stuff
-    query.add(Q(is_public=True), Q.AND)
+    query.add(Q(is_public=True), Q.OR)
     return query
 
 
