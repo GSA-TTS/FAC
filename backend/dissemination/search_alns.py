@@ -10,6 +10,7 @@ from .search_constants import (
     ORDER_BY,
     DIRECTION,
 )
+from pprint import pprint
 
 import logging
 
@@ -21,7 +22,6 @@ def search_alns(results, params):
     t0 = time.time()
     full_alns = _get_full_alns(params)
     agency_numbers = _get_agency_numbers(params)
-    #unique_agency_numbers = list(set(map(lambda aln: aln.prefix, zip(full_alns, agency_numbers))))
 
     logger.info(f"full_alns {full_alns}")
     logger.info(f"agency_numbers {agency_numbers}")
@@ -59,11 +59,12 @@ def search_alns(results, params):
         elif r_full_alns:
             r_all_alns = r_full_alns
 
+
         all_alns_count = r_all_alns.count()
         logger.info(f"search_alns matching FederalAward rows[{all_alns_count}]")
         results = results.filter(report_id__in=Subquery(r_all_alns.values_list('report_id_id')))
         logger.info(f"search_alns general rows[{results.count()}]")
-        results = _annotate_findings(results, r_all_alns)
+        results = _annotate_findings(results, params, r_all_alns)
         results = _findings_sort(results, params)
 
         t1 = time.time()
@@ -85,49 +86,71 @@ def _findings_sort(results, params):
         )
     return results
 
-def _annotate_findings(g_results, fa_results):
+def _annotate_findings(g_results, params, r_all_alns):
     # Which report ids have findings?
-    finding_on_my_alns = fa_results.filter(findings_count__gt=0)
-    annotate_on = g_results.filter(report_id__in=Subquery(finding_on_my_alns.values_list('report_id_id')))
+    finding_on_my_alns = r_all_alns.filter(findings_count__gt=0)
+    q_my_alns = Q(report_id__in=Subquery(finding_on_my_alns.values_list('report_id_id')))
+    annotate_on_my_alns = g_results.filter(q_my_alns)
+    annotate_on_my_alns_report_ids = set(annotate_on_my_alns.values_list('report_id', flat=True))
+
+    # Get the list of agency numbers from the ALNs
+    # e.g. turn 45.012 93 21.010 into [45, 93, 21]
+    all_agency_numbers = _get_all_agency_numbers(params)
+    logger.info(f"_annotate_findings looking for agency numbers {all_agency_numbers}")
+    # Find all of the FederalAward rows that are NOT from those agencies AND have findings gt 0
+    q_is_one_of_ours = Q()
+    for an in all_agency_numbers:
+        q_is_one_of_ours.add(Q(federal_agency_prefix=an), Q.OR)
+        
+    q_findings_gt_0 = Q(findings_count__gt=0)
+    r_fa_all_gt_0 = FederalAward.objects.filter(q_findings_gt_0)
+    # Fitler out everything where agency number is one of ours
+    r_fa_not_in_all_agency_numbers = r_fa_all_gt_0.filter(~q_is_one_of_ours)
+
+    # Then do a subquery to get the g_results
+    q_all_alns = Q(report_id__in=Subquery(r_fa_not_in_all_agency_numbers.values_list('report_id_id')))
+    annotate_on_all_alns = g_results.filter(q_all_alns)
+    annotate_on_all_alns_report_ids = set(annotate_on_all_alns.values_list('report_id', flat=True))
 
     # fama_report_ids = finding_on_my_alns.values_list('report_id_id', flat=True)
-    fama_count = annotate_on.count()
-    logger.info(f"_annotate_findings finding_on_my_alns[{fama_count}]")
+    my_count = annotate_on_my_alns.count()
+    any_count = annotate_on_all_alns.count()
+    logger.info(f"_annotate_findings my[{my_count}] any[{any_count}]")
+    logger.info(f"my {annotate_on_my_alns_report_ids}")
+    logger.info(f"any {annotate_on_all_alns_report_ids}")
+    time.sleep(3)
 
-    for r in g_results:
+    for ndx, r in enumerate(g_results):
         r.finding_my_aln = False
+        r.finding_all_aln = False
 
-    for ndx, to_annotate in enumerate(annotate_on):
-        to_annotate.finding_my_aln = True
-        logger.info(f"_annotate_findings to_annotate {ndx} {to_annotate.finding_my_aln}")
-        
+        if r.report_id in annotate_on_my_alns_report_ids:
+            r.finding_my_aln = True
+            
+        if r.report_id in annotate_on_all_alns_report_ids:
+            r.finding_all_aln = True
+
+        if r.finding_my_aln and not r.finding_all_aln:
+            logger.info("_annotate_findings ONLY MY ALN")
+            print(f"=================== {ndx} ===================")
+            for f in FederalAward.objects.filter(report_id_id=r.report_id).values("federal_agency_prefix", "federal_award_extension", "report_id_id"):
+                pprint(f)
     return g_results
 
-    # finding_on_any_aln = FederalAward.objects.filter(
-    #     not_aln_q,
-    #     report_id__in=results,
-    #     findings_count__gt=0,
-    # )
-
-    for general in results:
-        general.finding_my_aln = False
-        general.finding_all_aln = False
-        for relevant_award in finding_on_my_alns:
-            if relevant_award.report_id == general.report_id:
-                general.finding_my_aln = True
-        # for relevant_award in finding_on_any_aln:
-        #     if relevant_award.report_id == general.report_id:
-        #         general.finding_all_aln = True
-    
-    return results
-    
 # https://stackoverflow.com/questions/480214/how-do-i-remove-duplicates-from-a-list-while-preserving-order
 def unique_maintaining_order(seq):
     seen = set()
     seen_add = seen.add
     return [x for x in seq if not (x in seen or seen_add(x))]
 
-
+# This takes all alns and extracts a unique set of 
+# the agency numbers from everything.
+# e.g. 92.010 45 21.010 => [92, 45, 21]
+def _get_all_agency_numbers(params):
+    gan = _get_agency_numbers(params)
+    gfa = _get_full_alns(params)
+    combined = [ALN(x.prefix, None) for x in gan.union(gfa)]
+    return set(combined)
 
 def _get_agency_numbers(params):
     alns = params.get("alns", [])
