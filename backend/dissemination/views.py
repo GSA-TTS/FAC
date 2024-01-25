@@ -117,7 +117,7 @@ def run_search(form_data, include_private):
         "auditee_state": form_data.auditee_state,
         "include_private": include_private,
         "order_by": form_data.order_by,
-        "order_direction": form_data.order_direction
+        "order_direction": form_data.order_direction,
     }
     return search(search_parameters)
 
