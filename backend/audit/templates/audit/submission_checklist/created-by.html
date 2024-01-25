@@ -1,23 +1,17 @@
 {% comment %} 
-    <p> for created by time and name.
-    If no name is available, uses email.
-
-    Examples:
+    Output with name and time:
     Completed (formatted time) by (name or email).
-    Completed MMM DD, YYYY at 12:00 AM UST by Joe Smith.
+
+    Output with just time:
+    Completed (formatted time).
 
     Variables: 
-        time (string)
-        name (object)
+        name (string)
+        time (datetime)
 {% endcomment %}
 <p class="text-base margin-0">
-    {% if name %}
-        Completed {{ time|date:"N j, Y g:i A T" }} by
-        {% if name.first_name == '' %}
-            {{ name.email }}.
-        {% else %}
-            {{ name.first_name }} {{ name.last_name }}.
-        {% endif %}
+    {% if name and time %}
+        Completed {{ time|date:"N j, Y g:i A T" }} by {{ name }}.
     {% elif time %}
         Completed {{ time }}.
     {% endif %}

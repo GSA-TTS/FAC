@@ -25,17 +25,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def sorted_string(s):
-    s_sorted = "".join(sorted(s))
-    # print(f's before: {s} after {s_sorted}')
-    return s_sorted
+def xform_sort_compliance_requirement(findings):
+    """Sorts and uppercases the compliance requirement string."""
+    # Transformation to be documented
+    for finding in findings:
+        value = string_to_string(finding.TYPEREQUIREMENT).upper()
+        finding.TYPEREQUIREMENT = "".join(sorted(value))
 
 
 def xform_prior_year_findings(value):
     """
     Transform the value of prior_references to N/A if empty.
     """
-    # Transformation to be documented.
+    # Transformation to be documented
     trimmed_value = string_to_string(value)
     if not trimmed_value:
         # See ticket #2912
@@ -95,20 +97,34 @@ def xform_construct_award_references(audits, findings):
     for find in findings:
         award_references.append(e2a[find.ELECAUDITSID])
         # Tracking changes
-        census_data = [CensusRecord("ELECAUDITSID", find.ELECAUDITSID).to_dict()]
-        gsa_fac_data = GsaFacRecord("award_reference", e2a[find.ELECAUDITSID]).to_dict()
-        transformation_functions = ["xform_construct_award_references"]
-        change_records.append(
-            {
-                "census_data": census_data,
-                "gsa_fac_data": gsa_fac_data,
-                "transformation_functions": transformation_functions,
-            }
+        track_transformations(
+            "ELECAUDITSID",
+            find.ELECAUDITSID,
+            "award_reference",
+            e2a[find.ELECAUDITSID],
+            ["xform_construct_award_references"],
+            change_records,
         )
+
     if change_records:
         InspectionRecord.append_finding_changes(change_records)
 
     return award_references
+
+
+def track_transformations(
+    census_column, census_value, gsa_field, gsa_value, transformation_functions, records
+):
+    """Tracks all transformations."""
+    census_data = [CensusRecord(column=census_column, value=census_value).to_dict()]
+    gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
+    records.append(
+        {
+            "census_data": census_data,
+            "gsa_fac_data": gsa_fac_data,
+            "transformation_functions": transformation_functions,
+        }
+    )
 
 
 def _get_findings_grid(findings_list):
@@ -167,7 +183,7 @@ def generate_findings(audit_header, outfile):
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
     findings = _get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
     award_references = xform_construct_award_references(audits, findings)
-
+    xform_sort_compliance_requirement(findings)
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
 

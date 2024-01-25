@@ -2,6 +2,12 @@
 {% load static %}
 {% load sprite_helper %}
 {% load submission_progress_tags %}
+
+{% comment %} 
+    "The Big One"
+    This is the greater checklist component, which imports all the necessary sub-components. 
+{% endcomment %}
+
 {% block content %}
     <div class="grid-row">
         <div class="grid-container margin-top-6 margin-bottom-6">
@@ -11,115 +17,26 @@
             <div id="submission-checklist-content">
                 <ul class="usa-icon-list usa-icon-list--size-sm tablet:grid-col-11 font-sans-md">
 
-                  {% section_block report_id general_information %}
-                  {% section_block report_id audit_information %}
-                  {% section_block report_id single_audit_report %}
-                  {% section_block report_id federal_awards %}
-                  {% section_block report_id notes_to_sefa %}
-                  {% section_block report_id findings_uniform_guidance %}
-                  {% section_block report_id findings_text %}
-                  {% section_block report_id corrective_action_plan %}
-                  {% section_block report_id additional_ueis %}
-                  {% section_block report_id secondary_auditors %}
-                  {% section_block report_id additional_eins %}
-                    
-                  {% comment %} Key information (certification steps) {% endcomment %}
-                    <div class="padding-bottom-3 padding-top-105" id="submission-checklist-summary">
-                        <div class="usa-summary-box font-sans-md"
-                             role="region"
-                             aria-labelledby="summary-box-key-information">
-                            <div class="usa-summary-box__body">
-                                <div class="usa-summary-box__text">
-                                    <span class="text-bold margin-left-1">Key information</span>
-                                    <ul class="margin-top-0">
-                                        <li>The following steps will remain locked until you have completed all prior steps.</li>
-                                        <li class="text-bold">You cannot re-upload documents after certification by either party.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {% comment %} Tribal data release consent {% endcomment %}
-                    {% comment %} 
-                        Five display cases:
-                        1. Does not appear at all for non-tribal entities. 
-                        2. The auditee certifying official sees the link and can complete it.
-                        3. The form is complete. The auditee certifying official can edit it.
-                        4. Anyone else with access sees an inactive section, no link.
-                        5. The form is complete. Anyone else with access sees that it's done but still can't click a link.
-                    {% endcomment %}
-                    {% comment %} 1. Does not appear at all for non-tribal entities. {% endcomment %}
-                    {% if user_provided_organization_type == "tribal" %}
-                        <li class="usa-icon-list__item padding-bottom-105" id="tribal_consent-completed">
-                            {% if not is_tribal_data_consent_complete %}
-                                {% comment %} 2. The auditee certifying official sees the link and can complete it. {% endcomment %}
-                                {% if is_user_auditee_certifier %}
-                                    {% include './icon-list-icon.html' with completed=False %}
-                                    <div>
-                                        <p class="text-bold margin-0">
-                                            <a class="usa-link"
-                                                href="{% url 'audit:TribalAuditConsent' report_id %}">Tribal data release</a>
-                                        </p>
-                                        <p class="margin-0">Auditees must opt in or opt out of making their reporting package publicly available.</p>
-                                    </div>
-                                {% comment %} 4. Anyone else with access sees an inactive section, no link. {% endcomment %}
-                                {% else %}
-                                    {% include './icon-list-icon.html' with completed=False %}
-                                    <div>
-                                        <p class="text-bold margin-0">Tribal data release</p>
-                                        <p class="margin-0">
-                                            Auditees must opt in or opt out of making their reporting package publicly available.
-                                        </p>
-                                    </div>
-                                {% endif %}
-                            {% else %}
-                            {% comment %} 3. The form is complete. The auditee certifying official can edit it. {% endcomment %}
-                                {% if is_user_auditee_certifier %}
-                                    {% include './icon-list-icon.html' with completed=True %}
-                                    <div class="text-success-darker">
-                                        <p class="text-bold text-underline margin-0">Tribal data release (Complete)</p>
-                                        <p class="margin-0">
-                                            Auditees must opt in or opt out of making their reporting package publicly available.
-                                        </p>
-                                        <p class="margin-0">
-                                            <a class="usa-link"
-                                               href="{% url 'audit:TribalAuditConsent' report_id %}">Edit the Tribal data release form</a>
-                                        </p>
-                                    </div>
-                                {% comment %} 5. The form is complete. Anyone else with access sees that it's done but still can't click a link. {% endcomment %}
-                                {% else %}
-                                    {% include './icon-list-icon.html' with completed=True %}
-                                    <div>
-                                        <p class="text-bold margin-0">Tribal data release (Complete)</p>
-                                        <p class="margin-0">
-                                            Auditees must opt in or opt out of making their reporting package publicly available.
-                                        </p>
-                                    </div>
-                                {% endif %}
-                            {% endif %}
-                        </li>
+                    {% if not pre_submission_validation.completed %}
+                        {% include './key-info-preliminary.html' %}
+                        {% section_block report_id general_information %}
+                        {% section_block report_id audit_information %}
+                        {% section_block report_id single_audit_report %}
+                        {% section_block report_id federal_awards %}
+                        {% section_block report_id notes_to_sefa %}
+                        {% section_block report_id findings_uniform_guidance %}
+                        {% section_block report_id findings_text %}
+                        {% section_block report_id corrective_action_plan %}
+                        {% section_block report_id additional_ueis %}
+                        {% section_block report_id secondary_auditors %}
+                        {% section_block report_id additional_eins %}
+                        {% include './key-info-pre-validation.html' %}
+                        {% include './tribal-data-release.html' %}
+                        {% include './validation.html' %}
+                    {% else %}
+                        {% include './key-info-certification.html' %}
+                        {% include './preview-button-group.html' %}
                     {% endif %}
-                    
-                    {% comment %} Pre-submission validation {% endcomment %}
-                    <li class="usa-icon-list__item padding-bottom-105" id="SF-SAC-completed">
-                        {% if pre_submission_validation.completed %}
-                            {% include './icon-list-icon.html' with completed=pre_submission_validation.completed %}
-                            <div class="text-success-darker">
-                                <p class="text-bold text-underline margin-0">Pre-submission validation (Complete)</p>
-                                <p class="margin-0">Before submitting your audit, use our validation tool to check your workbooks for errors.</p>
-                            </div>
-                        {% else %}
-                            {% include './icon-list-icon.html' with completed=pre_submission_validation.completed %}
-                            <div>
-                                <p class="text-bold margin-0">
-                                    <a class="usa-link"
-                                       href="{% url 'audit:CrossValidation' report_id %}">Pre-submission validation</a>
-                                </p>
-                                <p class="margin-0">Before submitting your audit, use our validation tool to check your workbooks for errors.</p>
-                            </div>
-                        {% endif %}
-                    </li>
                     
                     {% comment %} Auditor Certification {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105"

@@ -1,0 +1,39 @@
+{% load sprite_helper %}
+
+{% comment %} 
+After validating, display a button group with some links:
+    1. The XLSX preview download
+    2. The PDF download
+    3. The unlock page
+{% endcomment %}
+
+<div class="usa-button-group margin-top-3 margin-bottom-5 tablet:margin-left-6">
+    <a class="usa-button display-flex font-sans-lg margin-top-2 tablet:margin-top-0"
+       href="{% url 'audit:PredisseminationSummaryReportDownload' report_id=report_id %}"
+       target="_blank">
+        <svg class="usa-icon margin-right-1 flex-align-self-center"
+             aria-hidden="true"
+             role="img">
+            {% uswds_sprite "file_download" %}
+        </svg>
+        <p class="margin-0">SF-SAC preview</p>
+    </a>
+    
+    <a class="usa-button display-flex font-sans-lg margin-top-2 tablet:margin-top-0"
+       href="{% url 'audit:PredisseminationPdfDownload' report_id=report_id %}"
+       target="_blank">
+        <svg class="usa-icon margin-right-1 flex-align-self-center"
+             aria-hidden="true"
+             role="img">
+            {% uswds_sprite "file_download" %}
+        </svg>
+        <p class="margin-0">PDF preview</p>
+    </a>
+
+    {% if not submission.completed %}
+        <a class="usa-button usa-button--outline display-flex font-sans-lg margin-top-2 tablet:margin-top-0"
+        href="{% url 'audit:UnlockAfterCertification' report_id=report_id %}">
+            <p class="margin-0">Unlock</p>
+        </a>
+    {% endif %}
+</div>
