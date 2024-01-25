@@ -306,7 +306,7 @@ class OneTimeAccessDownloadView(View):
             cutoff = timezone.now() - timedelta(
                 seconds=settings.ONE_TIME_ACCESS_TTL_SECS
             )
-            OneTimeAccess.objects.filter(time_stamp__lt=cutoff).delete()
+            OneTimeAccess.objects.filter(timestamp__lt=cutoff).delete()
 
             # try to find matching OTA object
             ota = OneTimeAccess.objects.get(uuid=uuid)

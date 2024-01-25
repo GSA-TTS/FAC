@@ -274,7 +274,7 @@ class OneTimeAccessDownloadViewTests(TestCase):
         timestamp = timezone.now() - timedelta(
             seconds=(settings.ONE_TIME_ACCESS_TTL_SECS + 5)
         )
-        ota.time_stamp = timestamp
+        ota.timestamp = timestamp
         ota.save()
 
         url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": uuid})
