@@ -29,7 +29,7 @@ def search_alns(results, params):
         r_all_alns = _gather_results_for_all_alns(full_alns, agency_numbers)
         all_alns_count = r_all_alns.count()
         logger.info(f"search_alns matching FederalAward rows[{all_alns_count}]")
-        results = results.filter(report_id__in=Subquery(r_all_alns.values_list('report_id_id')))
+        results = results.filter(report_id__in=Subquery(r_all_alns.values_list('report_id'))) #_id_id
         logger.info(f"search_alns general rows[{results.count()}]")
         results = _annotate_findings(results, params, r_all_alns)
         results = _findings_sort(results, params)
@@ -89,7 +89,7 @@ def _gather_results_for_all_alns(full_alns, agency_numbers):
 def _annotate_findings(g_results, params, r_all_alns):
     # Which report ids have findings?
     finding_on_my_alns = r_all_alns.filter(findings_count__gt=0)
-    q_my_alns = Q(report_id__in=Subquery(finding_on_my_alns.values_list('report_id_id')))
+    q_my_alns = Q(report_id__in=Subquery(finding_on_my_alns.values_list('report_id'))) #_id_id
     annotate_on_my_alns = g_results.filter(q_my_alns)
     annotate_on_my_alns_report_ids = set(annotate_on_my_alns.values_list('report_id', flat=True))
 
@@ -114,7 +114,7 @@ def _annotate_findings(g_results, params, r_all_alns):
     # Get a result set
     r = FederalAward.objects.filter(q)
     # Now, make sure that the report id in this set is one of MY report ids.
-    q_my_aln_rids = Q(report_id_id__in=annotate_on_my_alns_report_ids)
+    q_my_aln_rids = Q(report_id__in=annotate_on_my_alns_report_ids) #_id_id
     q.add(q_my_aln_rids, Q.AND)
     # Fitler out everything where agency number is one of ours
     r = FederalAward.objects.filter(q)
@@ -123,7 +123,7 @@ def _annotate_findings(g_results, params, r_all_alns):
     r_fa_not_in_all_agency_numbers = r.filter(q)
 
     # Then do a subquery to get the g_results
-    q_all_alns = Q(report_id__in=Subquery(r_fa_not_in_all_agency_numbers.values_list('report_id_id')))
+    q_all_alns = Q(report_id__in=Subquery(r_fa_not_in_all_agency_numbers.values_list('report_id'))) #_id_id
     annotate_on_all_alns = g_results.filter(q_all_alns)
     annotate_on_all_alns_report_ids = set(annotate_on_all_alns.values_list('report_id', flat=True))
 

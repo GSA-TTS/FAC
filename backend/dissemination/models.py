@@ -165,10 +165,8 @@ class FederalAward(models.Model):
         help_text=docs.passthrough_amount,
         null=True,
     )
-    report_id = models.ForeignKey(
-        "General", 
-        to_field="report_id",
-        on_delete=models.CASCADE
+    report_id = models.TextField(
+        REPORT_ID_FK_HELP_TEXT,
     )
     state_cluster_name = models.TextField(
         "The name of the state cluster",
