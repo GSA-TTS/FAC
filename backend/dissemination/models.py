@@ -94,6 +94,19 @@ class Finding(models.Model):
 
 class FederalAward(models.Model):
     """Information about the federal award section of the form. References General"""
+    # 20240125 - These are indices that would be used in our ALN search/annotation.
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=["report_id",]),
+    #         # This is possibly redundant with the pairwise index?
+    #         models.Index(fields=["federal_agency_prefix",]),
+    #         models.Index(fields=["federal_agency_prefix", "federal_award_extension"]),
+    #         models.Index(fields=[
+    #             "report_id", 
+    #             "federal_agency_prefix", 
+    #             "findings_count"
+    #             ]),
+    #     ]
 
     additional_award_identification = models.TextField(
         "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
@@ -200,7 +213,8 @@ class Note(models.Model):
     accounting_policies = models.TextField(
         "A description of the significant accounting policies used in preparing the SEFA (2 CFR 200.510(b)(6))",
     )
-    is_minimis_rate_used = models.TextField("'Yes', 'No', or 'Both' (2 CFR 200.414(f))")
+    is_minimis_rate_used = models.TextField(
+        "'Yes', 'No', or 'Both' (2 CFR 200.414(f))")
     rate_explained = models.TextField("Explanation for minimis rate")
     report_id = models.TextField(
         REPORT_ID_FK_HELP_TEXT,
@@ -235,6 +249,13 @@ class Passthrough(models.Model):
 class General(models.Model):
     # Relational fields
     # null = True for these so we can load in phases, may want to tighten validation later
+    # 20240125 - These are indices that would be used in our ALN search/annotation.
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=["report_id",]),
+    #         models.Index(fields=["fac_accepted_date",]),
+
+    #     ]
 
     report_id = models.TextField(
         "G-FAC generated identifier. ",
@@ -264,7 +285,8 @@ class General(models.Model):
         "Auditee Email address",
         help_text=docs.auditee_email,
     )
-    auditee_name = models.TextField("Name of the Auditee", help_text=docs.auditee_name)
+    auditee_name = models.TextField(
+        "Name of the Auditee", help_text=docs.auditee_name)
     auditee_phone = models.TextField(
         "Auditee Phone Number", help_text=docs.auditee_phone
     )
@@ -289,7 +311,8 @@ class General(models.Model):
         "Auditee Zip Code",
         help_text=docs.zip_code,
     )
-    auditor_phone = models.TextField("CPA phone number", help_text=docs.auditor_phone)
+    auditor_phone = models.TextField(
+        "CPA phone number", help_text=docs.auditor_phone)
 
     auditor_state = models.TextField("CPA State", help_text=docs.auditor_state)
     auditor_city = models.TextField("CPA City", help_text=docs.auditor_city)
@@ -305,7 +328,8 @@ class General(models.Model):
         "CPA Zip Code",
         help_text=docs.auditor_zip_code,
     )
-    auditor_country = models.TextField("CPA Country", help_text=docs.auditor_country)
+    auditor_country = models.TextField(
+        "CPA Country", help_text=docs.auditor_country)
     auditor_contact_name = models.TextField(
         "Name of CPA Contact",
         help_text=docs.auditor_contact,
@@ -365,7 +389,8 @@ class General(models.Model):
     # auditee_signature_date = models.DateField(
     #     "The date on which the auditee signed the audit",
     # )
-    fy_end_date = models.DateField("Fiscal Year End Date", help_text=docs.fy_end_date)
+    fy_end_date = models.DateField(
+        "Fiscal Year End Date", help_text=docs.fy_end_date)
     fy_start_date = models.DateField(
         "Fiscal Year Start Date", help_text=docs.fy_start_date
     )
