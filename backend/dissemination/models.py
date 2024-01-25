@@ -516,6 +516,21 @@ class SecondaryAuditor(models.Model):
     )
 
 
+class OneTimeAccess(models.Model):
+    uuid = models.TextField(
+        "UUID4",
+    )
+    time_stamp = models.DateTimeField(
+        auto_now_add=True,
+    )
+    api_key_id = models.TextField(
+        "Api key Id for the user",
+    )
+    report_id = models.TextField(
+        "Report ID for the PDF being requested",
+    )
+
+
 class MigrationInspectionRecord(models.Model):
     audit_year = models.TextField(blank=True, null=True)
     dbkey = models.TextField(blank=True, null=True)

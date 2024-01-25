@@ -536,3 +536,5 @@ REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
 REGEX_U_EXTENSION = r"^U[0-9]{2}$"
 GSA_MIGRATION = "GSA_MIGRATION"  # There is a copy of `GSA_MIGRATION` in Base.libsonnet. If you change it here, change it there too.
 GSA_MIGRATION_INT = -999999999
+
+ONE_TIME_ACCESS_TTL_SECS = 60
