@@ -23,7 +23,7 @@ jobs:
       package: ${{ steps.filter.outputs.package }}
       staticfiles: ${{ steps.filter.outputs.staticfiles }}
     steps:
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |

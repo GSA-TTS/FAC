@@ -11,6 +11,7 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
+    OneTimeAccess,
 )
 
 admin.site.register(AdditionalEin)
@@ -23,3 +24,4 @@ admin.site.register(General)
 admin.site.register(Note)
 admin.site.register(Passthrough)
 admin.site.register(SecondaryAuditor)
+admin.site.register(OneTimeAccess)
