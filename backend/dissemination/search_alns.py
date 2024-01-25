@@ -23,9 +23,6 @@ def search_alns(results, params):
     full_alns = _get_full_alns(params)
     agency_numbers = _get_agency_numbers(params)
 
-    logger.info(f"full_alns {full_alns}")
-    logger.info(f"agency_numbers {agency_numbers}")
-
     if not (full_alns or agency_numbers):
         return results
     else:
@@ -45,7 +42,7 @@ def _findings_sort(results, params):
     if params.get("order_by") == ORDER_BY.findings_my_aln:
         results = sorted(
             results,
-            key=lambda obj: (1 if obj.finding_my_aln else 0) + (1 if obj.finding_all_aln else 0),
+            key=lambda obj: (2 if obj.finding_my_aln else 1) + (1 if obj.finding_all_aln else 0),
             reverse=bool(params.get("order_direction") == DIRECTION.descending),
         )
     elif params.get("order_by") == ORDER_BY.findings_all_aln:
@@ -98,17 +95,32 @@ def _annotate_findings(g_results, params, r_all_alns):
 
     # Get the list of agency numbers from the ALNs
     # e.g. turn 45.012 93 21.010 into [45, 93, 21]
-    all_agency_numbers = _get_all_agency_numbers(params)
+    all_agency_numbers = list(map(lambda a: a.prefix, _get_all_agency_numbers(params)))
     logger.info(f"_annotate_findings looking for agency numbers {all_agency_numbers}")
     # Find all of the FederalAward rows that are NOT from those agencies AND have findings gt 0
-    q_is_one_of_ours = Q()
-    for an in all_agency_numbers:
-        q_is_one_of_ours.add(Q(federal_agency_prefix=an), Q.OR)
-        
+    q = Q()
+    # First, make sure we are dealing with awards that have non-zero findings counts.
     q_findings_gt_0 = Q(findings_count__gt=0)
-    r_fa_all_gt_0 = FederalAward.objects.filter(q_findings_gt_0)
+    q.add(q_findings_gt_0, Q.AND)
+    # And, make sure it is NOT one of ours. That means it is one of the *agencies* that we are 
+    # considering. (This is a bit broader than ALN prefix/suffix).
+    # q_is_one_of_ours = Q()
+    # for an in all_agency_numbers:
+    #     q_is_one_of_ours.add(Q(federal_agency_prefix=an), Q.OR)
+    # ^^ is much slower than the below...
+    q_is_one_of_ours = Q(federal_agency_prefix__in=all_agency_numbers)
+    # Here is where it is NOT one of ours.
+    q.add(~q_is_one_of_ours, Q.AND)
+    # Get a result set
+    r = FederalAward.objects.filter(q)
+    # Now, make sure that the report id in this set is one of MY report ids.
+    q_my_aln_rids = Q(report_id_id__in=annotate_on_my_alns_report_ids)
+    q.add(q_my_aln_rids, Q.AND)
     # Fitler out everything where agency number is one of ours
-    r_fa_not_in_all_agency_numbers = r_fa_all_gt_0.filter(q_is_one_of_ours)
+    r = FederalAward.objects.filter(q)
+    # This gives us a set where we know where there is a finding on an award that is one 
+    # of ours, and the finding is NOT attached to one of our searched-for agencies.
+    r_fa_not_in_all_agency_numbers = r.filter(q)
 
     # Then do a subquery to get the g_results
     q_all_alns = Q(report_id__in=Subquery(r_fa_not_in_all_agency_numbers.values_list('report_id_id')))
@@ -121,7 +133,9 @@ def _annotate_findings(g_results, params, r_all_alns):
     # logger.info(f"my {annotate_on_my_alns_report_ids}")
     # logger.info(f"any {annotate_on_all_alns_report_ids}")
 
-    for ndx, r in enumerate(g_results):
+    only_count = 0
+    both_count = 0
+    for r in g_results:
         r.finding_my_aln = False
         r.finding_all_aln = False
 
@@ -130,12 +144,13 @@ def _annotate_findings(g_results, params, r_all_alns):
             
         if r.report_id in annotate_on_all_alns_report_ids:
             r.finding_all_aln = True
+        
+        if r.finding_my_aln and not r.finding_all_aln:
+            only_count += 1
+        if r.finding_my_aln and r.finding_all_aln:
+            both_count += 1
 
-        # if r.finding_my_aln and not r.finding_all_aln:
-        #     logger.info("_annotate_findings ONLY MY ALN")
-        #     print(f"=================== {ndx} ===================")
-        #     for f in FederalAward.objects.filter(report_id_id=r.report_id).values("federal_agency_prefix", "federal_award_extension", "report_id_id"):
-        #         pprint(f)
+    logger.info(f"_annotate_findings only_count[{only_count}] both_count[{both_count}]")
     return g_results
 
 # https://stackoverflow.com/questions/480214/how-do-i-remove-duplicates-from-a-list-while-preserving-order
@@ -146,7 +161,7 @@ def unique_maintaining_order(seq):
 
 # This takes all alns and extracts a unique set of 
 # the agency numbers from everything.
-# e.g. 92.010 45 21.010 => [92, 45, 21]
+# e.g. 92.010 45 21.010 => [ALN(92), 45, 21]
 def _get_all_agency_numbers(params):
     gan = _get_agency_numbers(params)
     gfa = _get_full_alns(params)
