@@ -34,8 +34,8 @@ gonogo "migrate_app_tables"
 #####
 # API STANDUP
 # Standup the API, which may depend on migration changes
-# api_standup
-# gonogo "api_standup"
+api_standup
+gonogo "api_standup"
 
 #####
 # SEED COG/OVER TABLES

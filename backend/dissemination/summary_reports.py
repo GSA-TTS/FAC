@@ -169,7 +169,7 @@ field_name_ordered = {
         "is_public",
     ],
     "federalaward": [
-        "report_id",  #_id_id
+        "report_id",
         "award_reference",
         "federal_agency_prefix",
         "federal_award_extension",
@@ -325,10 +325,8 @@ def gather_report_data_dissemination(report_ids):
         field_names = field_name_ordered[model_name]
 
         data[model_name] = {"field_names": field_names, "entries": []}
-        if model == FederalAward:
-            objects = model.objects.filter(report_id__in=report_ids)  #_id_id
-        else:
-            objects = model.objects.filter(report_id__in=report_ids)
+
+        objects = model.objects.all().filter(report_id__in=report_ids)
         for obj in objects:
             data[model_name]["entries"].append(
                 [getattr(obj, field_name) for field_name in field_names]

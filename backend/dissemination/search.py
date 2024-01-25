@@ -69,26 +69,6 @@ def _set_general_defaults(params):
 
     return params
 
-def _order_results(results, params):
-    t0 = time.time()
-    if params.get("order_by") == ORDER_BY.findings_my_aln:
-        results = sorted(
-            results,
-            key=lambda obj: obj.finding_my_aln,
-            reverse=bool(params.get("order_direction") == DIRECTION.descending),
-        )
-    elif params.get("order_by") == ORDER_BY.findings_all_aln:
-        results = sorted(
-            results,
-            key=lambda obj: obj.finding_all_aln,
-            reverse=bool(params.get("order_direction") == DIRECTION.descending),
-        )
-    else:
-        results = _sort_results(results, params)
-    t1 = time.time()
-    report_timing("_order_results", params, t0, t1)
-    return results
-
 def _sort_results(results, params):
     # Instead of nesting conditions, we'll prep a string
     # for determining the sort direction.
