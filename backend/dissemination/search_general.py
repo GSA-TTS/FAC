@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def search_general(params):
+def search_general(params={}):
     # Time general reduction
     t0 = time.time()
 

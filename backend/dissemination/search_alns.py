@@ -29,7 +29,7 @@ def search_alns(results, params):
         logger.info(f"search_alns matching FederalAward rows[{all_alns_count}]")
         results = results.filter(
             report_id__in=Subquery(r_all_alns.values_list("report_id"))
-        )  # _id_id
+        )
         logger.info(f"search_alns general rows[{results.count()}]")
         results = _annotate_findings(results, params, r_all_alns)
         results = _findings_sort(results, params)
@@ -84,7 +84,7 @@ def _gather_results_for_all_alns(full_alns, agency_numbers):
     r_all_alns = None
     if r_agency_numbers and r_full_alns:
         # We need all of these. So, we union them.
-        r_all_alns = r_agency_numbers.union(r_full_alns)
+        r_all_alns = r_agency_numbers | r_full_alns
     elif r_agency_numbers:
         r_all_alns = r_agency_numbers
     elif r_full_alns:
@@ -94,53 +94,45 @@ def _gather_results_for_all_alns(full_alns, agency_numbers):
 
 
 def _annotate_findings(g_results, params, r_all_alns):
-    # Which report ids have findings?
-    finding_on_my_alns = r_all_alns.filter(findings_count__gt=0)
+    # ----- The General objects that will recieve 'Y' for finding_my_aln -----
+    r_fa_findings_on_my_alns = r_all_alns.filter(findings_count__gt=0)
     q_my_alns = Q(
-        report_id__in=Subquery(finding_on_my_alns.values_list("report_id"))
-    )  # _id_id
+        report_id__in=Subquery(r_fa_findings_on_my_alns.values_list("report_id"))
+    )
     annotate_on_my_alns = g_results.filter(q_my_alns)
     annotate_on_my_alns_report_ids = set(
         annotate_on_my_alns.values_list("report_id", flat=True)
     )
 
-    # Get the list of agency numbers from the ALNs
-    # e.g. turn 45.012 93 21.010 into [45, 93, 21]
+    # ----- The General objects that will recieve 'Y' for finding_all_aln -----
     all_agency_numbers = list(map(lambda a: a.prefix, _get_all_agency_numbers(params)))
     logger.info(f"_annotate_findings looking for agency numbers {all_agency_numbers}")
-    # Find all of the FederalAward rows that are NOT from those agencies AND have findings gt 0
+    r_all_related_awards_report_ids = set(g_results.values_list("report_id", flat=True))
     q = Q()
-    # First, make sure we are dealing with awards that have non-zero findings counts.
+    # Q (query): All FederalAward's with findings
     q.add(Q(findings_count__gt=0), Q.AND)
-    # And, make sure it is NOT one of ours. That means it is one of the *agencies* that we are
-    # considering. (This is a bit broader than ALN prefix/suffix).
-    # q_is_one_of_ours = Q()
-    # for an in all_agency_numbers:
-    #     q_is_one_of_ours.add(Q(federal_agency_prefix=an), Q.OR)
-    # ^^ is much slower than the below...
+    # Q: All FederalAward's with findings under our ALNs
     q_is_one_of_ours = Q(federal_agency_prefix__in=all_agency_numbers)
-    # Here is where it is NOT one of ours.
+    # Q: All FederalAward's with findings that are NOT under our ALNs
     q.add(~q_is_one_of_ours, Q.AND)
-    # Now, make sure that the report id in this set is one of MY report ids.
-    q_my_aln_rids = Q(report_id__in=annotate_on_my_alns_report_ids)  # _id_id
+    # Q: All FederalAward's with findings that are NOT under our ALNs, but are related to one of our general results
+    q_my_aln_rids = Q(report_id__in=r_all_related_awards_report_ids)
     q.add(q_my_aln_rids, Q.AND)
-    # This gives us a set where we know where there is a finding on an award that is one
-    # of ours, and the finding is NOT attached to one of our searched-for agencies.
+    # R (results): Execute on Q
     r_fa_not_in_all_agency_numbers = FederalAward.objects.filter(q)
-
-    # Then do a subquery to get the g_results
+    # R: Utilize a subquery to get the General objects that match up with the above results
     q_all_alns = Q(
         report_id__in=Subquery(r_fa_not_in_all_agency_numbers.values_list("report_id"))
-    )  # _id_id
+    )
     annotate_on_all_alns = g_results.filter(q_all_alns)
     annotate_on_all_alns_report_ids = set(
         annotate_on_all_alns.values_list("report_id", flat=True)
     )
 
+    # ----- Annotate the General objects with our Y/N fields -----
     my_count = annotate_on_my_alns.count()
     any_count = annotate_on_all_alns.count()
     logger.info(f"_annotate_findings my[{my_count}] any[{any_count}]")
-
     only_count = 0
     both_count = 0
     for r in g_results:
@@ -157,8 +149,8 @@ def _annotate_findings(g_results, params, r_all_alns):
             only_count += 1
         if r.finding_my_aln and r.finding_all_aln:
             both_count += 1
-
     logger.info(f"_annotate_findings only_count[{only_count}] both_count[{both_count}]")
+
     return g_results
 
 
