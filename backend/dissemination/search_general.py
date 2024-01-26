@@ -78,11 +78,14 @@ def report_timing(tag, params, start, end):
 
 def _initialize_query(include_private: bool):
     query = Q()
-    # Tribal access limiter.
+    # Always include the public stuff
     if include_private:
-        query.add(Q(is_public=False), Q.OR)
-    # And, always include the public stuff
-    query.add(Q(is_public=True), Q.OR)
+        # If we are including private, we want everything to come back.
+        # That is the same as the empty query in this context.
+        pass
+    else:
+        # Limit our search to public data.
+        query = Q(is_public=True)
     return query
 
 
