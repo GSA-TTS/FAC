@@ -178,8 +178,8 @@ class SearchViewTests(TestCase):
         self.assertNotContains(response, "Results: ")
 
     def test_anonymous_returns_only_public(self):
-        public = baker.make(General, is_public=True, _quantity=5)
-        private = baker.make(General, is_public=False, _quantity=5)
+        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
+        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
 
         response = self.anon_client.post(self._search_url(), {})
 
@@ -194,8 +194,8 @@ class SearchViewTests(TestCase):
             self.assertNotContains(response, p.report_id)
 
     def test_non_permissioned_returns_only_public(self):
-        public = baker.make(General, is_public=True, _quantity=5)
-        private = baker.make(General, is_public=False, _quantity=5)
+        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
+        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
 
         response = self.auth_client.post(self._search_url(), {})
 
@@ -210,8 +210,8 @@ class SearchViewTests(TestCase):
             self.assertNotContains(response, p.report_id)
 
     def test_permissioned_returns_all(self):
-        public = baker.make(General, is_public=True, _quantity=5)
-        private = baker.make(General, is_public=False, _quantity=5)
+        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
+        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
 
         response = self.perm_client.post(self._search_url(), {})
 
