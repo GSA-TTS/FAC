@@ -38,12 +38,17 @@ def xform_cleanup_string(s):
     return ""
 
 
-def track_data_transformation(original_value, changed_value, transformation_functions):
+def track_data_transformation(
+    original_value,
+    changed_value,
+    transformation_functions,
+    gsa_field="is_minimis_rate_used",
+):
     """Tracks transformation for minimis rate."""
     census_data = [
         CensusRecord("CONTENT", original_value).to_dict(),
     ]
-    gsa_fac_data = GsaFacRecord("is_minimis_rate_used", changed_value).to_dict()
+    gsa_fac_data = GsaFacRecord(gsa_field, changed_value).to_dict()
 
     InspectionRecord.append_note_changes(
         [
@@ -101,6 +106,11 @@ def xform_is_minimis_rate_used(rate_content, index=""):
     elif index == "3":
         track_data_transformation(rate_content, "Both", "xform_is_minimis_rate_used")
         return "Both"
+    if not rate_content:
+        track_data_transformation(
+            rate_content, settings.GSA_MIGRATION, "xform_is_minimis_rate_used"
+        )
+        return settings.GSA_MIGRATION
     # Check for each pattern in the respective lists
     for pattern in not_used_patterns:
         if re.search(pattern, rate_content, re.IGNORECASE):
@@ -157,6 +167,28 @@ def _get_notes(dbkey, year):
     return sort_by_field(results, "SEQ_NUMBER")
 
 
+def xform_missing_notes_records(audit_header, policies_content, rate_content):
+    """Transforms missing notes records for 2016, 2017, and 2018 audits."""
+    if string_to_string(audit_header.AUDITYEAR) in ["2018", "2017", "2016"] and not (
+        policies_content or rate_content
+    ):
+        policies_content = settings.GSA_MIGRATION
+        rate_content = settings.GSA_MIGRATION
+        track_data_transformation(
+            policies_content,
+            settings.GSA_MIGRATION,
+            "xform_missing_notes_records",
+            "accounting_policies",
+        )
+        track_data_transformation(
+            rate_content,
+            settings.GSA_MIGRATION,
+            "xform_missing_notes_records",
+            "rate_explained",
+        )
+    return policies_content, rate_content
+
+
 def generate_notes_to_sefa(audit_header, outfile):
     """
     Generates notes to SEFA workbook for a given audit header.
@@ -176,7 +208,9 @@ def generate_notes_to_sefa(audit_header, outfile):
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
     is_minimis_rate_used = xform_is_minimis_rate_used(rate_content, index)
-
+    policies_content, rate_content = xform_missing_notes_records(
+        audit_header, policies_content, rate_content
+    )
     set_range(wb, "accounting_policies", [policies_content])
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
     set_range(wb, "rate_explained", [rate_content])

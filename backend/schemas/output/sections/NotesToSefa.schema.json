@@ -57,12 +57,20 @@
                ]
             },
             "is_minimis_rate_used": {
-               "enum": [
-                  "Y",
-                  "N",
-                  "Both"
-               ],
-               "type": "string"
+               "oneOf": [
+                  {
+                     "const": "GSA_MIGRATION",
+                     "type": "string"
+                  },
+                  {
+                     "enum": [
+                        "Y",
+                        "N",
+                        "Both"
+                     ],
+                     "type": "string"
+                  }
+               ]
             },
             "notes_to_sefa_entries": {
                "items": {
