@@ -28,12 +28,6 @@ def search(params):
     ##############
     # GENERAL
     results = search_general(params)
-
-    ##############
-    # Truncate down to the limit
-    # This is the stopgap. If we have too many still, we're going
-    # to force the issue and truncate the result set.
-    # https://docs.djangoproject.com/en/4.2/topics/db/queries/#limiting-querysets
     results = _sort_results(results, params)
     results = search_alns(results, params)
 
