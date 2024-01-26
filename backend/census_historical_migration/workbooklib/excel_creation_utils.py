@@ -1,3 +1,4 @@
+from ..change_record import CensusRecord, GsaFacRecord
 from ..transforms.xform_string_to_bool import (
     string_to_bool,
 )
@@ -204,3 +205,18 @@ def sort_by_field(records, sort_field):
     Sorts records by a specified field. The values of the field are converted to integers before sorting.
     """
     return sorted(records, key=lambda record: int(getattr(record, sort_field) or 0))
+
+
+def track_transformations(
+    census_column, census_value, gsa_field, gsa_value, transformation_functions, records
+):
+    """Tracks all transformations."""
+    census_data = [CensusRecord(column=census_column, value=census_value).to_dict()]
+    gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
+    records.append(
+        {
+            "census_data": census_data,
+            "gsa_fac_data": gsa_fac_data,
+            "transformation_functions": transformation_functions,
+        }
+    )

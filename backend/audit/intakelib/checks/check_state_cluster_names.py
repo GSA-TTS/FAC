@@ -1,7 +1,7 @@
 import logging
 from audit.intakelib.intermediate_representation import get_range_by_name
 from audit.intakelib.common import get_message, build_cell_error_tuple
-from .check_cluster_total import STATE_CLUSTER
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ def state_cluster_names(ir):
         cluster_name["values"],
         state_cluster_name["values"],
     ):
-        if cn == STATE_CLUSTER:
+        if cn == settings.STATE_CLUSTER:
             # If they indicated state cluster, then it should be populated.
             if not scn:
                 errors.append(
