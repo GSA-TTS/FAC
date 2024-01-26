@@ -6,7 +6,6 @@ services:
   #---------------------------------------------
   db:
     image: "postgres:15"
-    shm_size: 8g
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
