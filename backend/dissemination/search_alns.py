@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 ALN = NT("ALN", "prefix, program")
 
+
 def search_alns(general_results, params):
     t0 = time.time()
     full_alns = _get_full_alns(params)
@@ -26,9 +27,15 @@ def search_alns(general_results, params):
         r_FAs_matching_alns = _gather_results_for_all_alns(full_alns, agency_numbers)
         all_alns_count = r_FAs_matching_alns.count()
         logger.info(f"search_alns matching FederalAward rows[{all_alns_count}]")
-        r_general_rids_matching_FA_rids = general_results.filter(report_id__in=Subquery(r_FAs_matching_alns.values_list('report_id'))) #_id_id
-        logger.info(f"search_alns general rows[{r_general_rids_matching_FA_rids.count()}]")
-        annotated = _annotate_findings(r_general_rids_matching_FA_rids, params, r_FAs_matching_alns)
+        r_general_rids_matching_FA_rids = general_results.filter(
+            report_id__in=Subquery(r_FAs_matching_alns.values_list("report_id"))
+        )  # _id_id
+        logger.info(
+            f"search_alns general rows[{r_general_rids_matching_FA_rids.count()}]"
+        )
+        annotated = _annotate_findings(
+            r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
+        )
         sorted = _findings_sort(annotated, params)
 
         t1 = time.time()
@@ -89,12 +96,15 @@ def _gather_results_for_all_alns(full_alns, agency_numbers):
 
     return r_all_alns
 
+
 def _annotate_findings(r_generals, params, r_FA_all_alns):
     # Get the list of agency numbers from the ALNs the user searched for.
     # e.g. turn 45.012 93 21.010 into [45, 93, 21]
-    agency_numbers_user_searched_for = list(map(lambda a: a.prefix, _get_all_agency_numbers(params)))
-    
-    ### 
+    agency_numbers_user_searched_for = list(
+        map(lambda a: a.prefix, _get_all_agency_numbers(params))
+    )
+
+    ###
     # 1. I want a set of General.report_ids that match
     #    my General query, and match the ALNs that were searched for.
     # g_results already matches my general query.
@@ -103,15 +113,19 @@ def _annotate_findings(r_generals, params, r_FA_all_alns):
     # We want FAs that are in the set of report_ids found from the general query.
     # q_my_alns = Q(report_id__in=Subquery(finding_on_my_alns.values_list('report_id'))) #_id_id
 
-    q_in_general = Q(report_id__in=Subquery(r_generals.values_list('report_id')))
+    q_in_general = Q(report_id__in=Subquery(r_generals.values_list("report_id")))
     # We have to work with FAs related to the user's query
-    q_FA_the_user_searched_for = Q(federal_agency_prefix__in=agency_numbers_user_searched_for)
+    q_FA_the_user_searched_for = Q(
+        federal_agency_prefix__in=agency_numbers_user_searched_for
+    )
     q = Q()
     q.add(q_in_general, Q.AND)
     q.add(q_FA_the_user_searched_for, Q.AND)
     r_FA_in_our_interest_set = FederalAward.objects.filter(q)
-    report_ids_of_interest = r_FA_in_our_interest_set.values_list('report_id', flat=True) 
-    
+    report_ids_of_interest = r_FA_in_our_interest_set.values_list(
+        "report_id", flat=True
+    )
+
     # logger.info("========================================")
     # logger.info(f"Report IDs of interest: {len(report_ids_of_interest)}")
     # logger.info(f"Looking for agency numbers {agency_numbers_user_searched_for}")
@@ -135,21 +149,25 @@ def _annotate_findings(r_generals, params, r_FA_all_alns):
     q.add(q_must_be_of_interest, Q.AND)
     q.add(q_has_findings, Q.AND)
     interim = FederalAward.objects.filter(q)
-    # logger.info(f"interim[{interim.count()}]: {interim.values_list('report_id', flat=True)}")
-    # It is not an agency the user looked for
+    # To do the "other" column, we only do the agency numbers, not ALNs.
+    # This is because it aligns with a column, and should be "good enough" based
+    # on resolution official conversations.
     q_agency_sought = Q(federal_agency_prefix__in=agency_numbers_user_searched_for)
     r_other_alns = interim.exclude(q_agency_sought)
     # We want to know which report_ids are N/Y, meaning
     # the had findings, but not on an agency the user searched for.
-    report_ids_excluding_user_agencies = r_other_alns.values_list("report_id", flat=True)
+    report_ids_excluding_user_agencies = r_other_alns.values_list(
+        "report_id", flat=True
+    )
     # logger.info(f"report_ids excluding user search [{report_ids_excluding_user_agencies.count()}]")
 
     ############################################################
     # Findings my ALNs
-    r_my_alns = interim.filter(q_agency_sought)
+    # For findings on my ALNs, I need to search for the ALNs that were given.
+    # q_agency_sought = Q(federal_agency_prefix__in=agency_numbers_user_searched_for)
+    r_my_alns = interim.filter(report_id__in=Subquery(r_FA_all_alns.values_list("report_id", flat=True)))
     report_ids_including_user_agencies = r_my_alns.values_list("report_id", flat=True)
     # logger.info(f"report_ids excluding user search [{report_ids_including_user_agencies.count()}]")
-
 
     only_count = 0
     both_count = 0
@@ -159,7 +177,7 @@ def _annotate_findings(r_generals, params, r_FA_all_alns):
 
         if r.report_id in report_ids_including_user_agencies:
             r.finding_my_aln = True
-            
+
         if r.report_id in report_ids_excluding_user_agencies:
             r.finding_all_aln = True
 
@@ -207,4 +225,3 @@ def _get_full_alns(params):
                 # split_alns.update([tuple(split_aln)])
                 split_alns.update([ALN(split_aln[0], split_aln[1])])
     return split_alns
-
