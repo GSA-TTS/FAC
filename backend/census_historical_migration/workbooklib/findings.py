@@ -1,7 +1,5 @@
 from ..change_record import (
-    CensusRecord,
     InspectionRecord,
-    GsaFacRecord,
 )
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
@@ -13,6 +11,7 @@ from ..workbooklib.excel_creation_utils import (
     set_range,
     set_workbook_uei,
     sort_by_field,
+    track_transformations,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
@@ -110,21 +109,6 @@ def xform_construct_award_references(audits, findings):
         InspectionRecord.append_finding_changes(change_records)
 
     return award_references
-
-
-def track_transformations(
-    census_column, census_value, gsa_field, gsa_value, transformation_functions, records
-):
-    """Tracks all transformations."""
-    census_data = [CensusRecord(column=census_column, value=census_value).to_dict()]
-    gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
-    records.append(
-        {
-            "census_data": census_data,
-            "gsa_fac_data": gsa_fac_data,
-            "transformation_functions": transformation_functions,
-        }
-    )
 
 
 def _get_findings_grid(findings_list):
