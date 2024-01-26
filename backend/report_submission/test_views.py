@@ -682,14 +682,14 @@ class GeneralInformationFormViewTests(TestCase):
             "auditee_contact_name": "Updated Designated Representative",
             "auditee_contact_title": "Lord of Windows",
             "auditee_phone": "5558675310",
-            "auditee_email": settings.GSA_MIGRATION, # Not allowed
+            "auditee_email": settings.GSA_MIGRATION,  # Not allowed
             "auditor_firm_name": "Penny Audit Store",
             "auditor_ein": "123456780",
             "auditor_ein_not_an_ssn_attestation": True,
             "auditor_contact_name": "Qualified Robot Accountant",
             "auditor_contact_title": "Just an extraordinary person",
             "auditor_phone": "9876543210",
-            "auditor_email": settings.GSA_MIGRATION, # Not allowed
+            "auditor_email": settings.GSA_MIGRATION,  # Not allowed
         }
 
         response = self.client.post(url, data=data)
