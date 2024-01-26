@@ -50,7 +50,7 @@ class EligibilitySerializer(serializers.Serializer):
 
     def validate(self, data):
         try:
-            validate_general_information_json(data)
+            validate_general_information_json(data, False)
             return data
         except ValidationError as err:
             raise serializers.ValidationError(_(err.message)) from err
@@ -172,7 +172,7 @@ class AuditeeInfoSerializer(serializers.Serializer):
 
     def validate(self, data):
         try:
-            validate_general_information_json(data)
+            validate_general_information_json(data, False)
             return data
         except ValidationError as err:
             raise serializers.ValidationError(_(err.message)) from err

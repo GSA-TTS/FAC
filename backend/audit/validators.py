@@ -215,7 +215,7 @@ def validate_federal_award_json(value):
         raise ValidationError(message=_federal_awards_json_error(errors))
 
 
-def validate_general_information_json(value):
+def validate_general_information_json(value, is_data_migration=True):
     """
     Apply JSON Schema for general information and report errors.
     """
@@ -223,6 +223,13 @@ def validate_general_information_json(value):
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     try:
+        if not is_data_migration and settings.GSA_MIGRATION in [
+            value.get("auditee_email", ""),
+            value.get("auditor_email", ""),
+        ]:
+            raise JSONSchemaValidationError(
+                f"{settings.GSA_MIGRATION} not permitted outside of migrations"
+            )
         validate(value, schema, format_checker=FormatChecker())
     except JSONSchemaValidationError as err:
         raise ValidationError(
