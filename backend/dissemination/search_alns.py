@@ -33,9 +33,14 @@ def search_alns(general_results, params):
         logger.info(
             f"search_alns general rows[{r_general_rids_matching_FA_rids.count()}]"
         )
-        annotated = _annotate_findings(
-            r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
-        )
+        # The MJ/TH approach
+        # annotated = _annotate_findings(
+        #     r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
+        # )
+        
+        # The MJ/JP approach
+        annotated = _annotate_findings_two_electric_boogaloo(r_general_rids_matching_FA_rids, params, r_FAs_matching_alns)
+        
         sorted = _findings_sort(annotated, params)
 
         t1 = time.time()
@@ -188,6 +193,67 @@ def _annotate_findings(r_generals, params, r_FA_all_alns):
 
     # logger.info(f"_annotate_findings only_count[{only_count}] both_count[{both_count}]")
     return r_generals
+
+
+def _annotate_findings_two_electric_boogaloo(g_results, params, r_all_alns):
+    # ----- The General objects that will recieve 'Y' for finding_my_aln -----
+    r_fa_findings_on_my_alns = r_all_alns.filter(findings_count__gt=0)
+    q_my_alns = Q(
+        report_id__in=Subquery(r_fa_findings_on_my_alns.values_list("report_id"))
+    )
+    annotate_on_my_alns = g_results.filter(q_my_alns)
+    annotate_on_my_alns_report_ids = set(
+        annotate_on_my_alns.values_list("report_id", flat=True)
+    )
+
+    # ----- The General objects that will recieve 'Y' for finding_all_aln -----
+    all_agency_numbers = list(map(lambda a: a.prefix, _get_all_agency_numbers(params)))
+    logger.info(f"_annotate_findings looking for agency numbers {all_agency_numbers}")
+    r_all_related_awards_report_ids = set(g_results.values_list("report_id", flat=True))
+    q = Q()
+    # Q (query): All FederalAward's with findings
+    q.add(Q(findings_count__gt=0), Q.AND)
+    # Q: All FederalAward's with findings under our ALNs
+    q_is_one_of_ours = Q(federal_agency_prefix__in=all_agency_numbers)
+    # Q: All FederalAward's with findings that are NOT under our ALNs
+    q.add(~q_is_one_of_ours, Q.AND)
+    # Q: All FederalAward's with findings that are NOT under our ALNs, but are related to one of our general results
+    q_my_aln_rids = Q(report_id__in=r_all_related_awards_report_ids)
+    q.add(q_my_aln_rids, Q.AND)
+    # R (results): Execute on Q
+    r_fa_not_in_all_agency_numbers = FederalAward.objects.filter(q)
+    # R: Utilize a subquery to get the General objects that match up with the above results
+    q_all_alns = Q(
+        report_id__in=Subquery(r_fa_not_in_all_agency_numbers.values_list("report_id"))
+    )
+    annotate_on_all_alns = g_results.filter(q_all_alns)
+    annotate_on_all_alns_report_ids = set(
+        annotate_on_all_alns.values_list("report_id", flat=True)
+    )
+
+    # ----- Annotate the General objects with our Y/N fields -----
+    my_count = annotate_on_my_alns.count()
+    any_count = annotate_on_all_alns.count()
+    logger.info(f"_annotate_findings my[{my_count}] any[{any_count}]")
+    only_count = 0
+    both_count = 0
+    for r in g_results:
+        r.finding_my_aln = False
+        r.finding_all_aln = False
+
+        if r.report_id in annotate_on_my_alns_report_ids:
+            r.finding_my_aln = True
+
+        if r.report_id in annotate_on_all_alns_report_ids:
+            r.finding_all_aln = True
+
+        if r.finding_my_aln and not r.finding_all_aln:
+            only_count += 1
+        if r.finding_my_aln and r.finding_all_aln:
+            both_count += 1
+    logger.info(f"_annotate_findings only_count[{only_count}] both_count[{both_count}]")
+
+    return g_results
 
 
 # This takes all alns and extracts a unique set of
