@@ -296,31 +296,37 @@ def insert_dissem_coversheet(workbook):
     # sheet.cell(row=3, column=2).hyperlink = f"{settings.STATIC_SITE_URL}/developers/"
     set_column_widths(sheet)
 
+
 def _get_attribute_or_data(obj, field_name):
     if field_name.startswith("_"):
         if field_name == "_aln":
             if isinstance(obj, FederalAward):
-                return (getattr(obj, "federal_agency_prefix") 
-                        + "." 
-                        + getattr(obj, "federal_award_extension"))
+                return (
+                    getattr(obj, "federal_agency_prefix")
+                    + "."
+                    + getattr(obj, "federal_award_extension")
+                )
             elif isinstance(obj, Finding):
                 fa = FederalAward.objects.get(
-                        report_id=getattr(obj, "report_id"),
-                        award_reference=getattr(obj, "award_reference")
-                    )
-                return (getattr(fa, "federal_agency_prefix") 
-                        + "." 
-                        + getattr(fa, "federal_award_extension"))
+                    report_id=getattr(obj, "report_id"),
+                    award_reference=getattr(obj, "award_reference"),
+                )
+                return (
+                    getattr(fa, "federal_agency_prefix")
+                    + "."
+                    + getattr(fa, "federal_award_extension")
+                )
         else:
             field_name = field_name[1:]
             if isinstance(obj, Finding):
                 fa = FederalAward.objects.get(
-                        report_id=getattr(obj, "report_id"),
-                        award_reference=getattr(obj, "award_reference")
-                    )
+                    report_id=getattr(obj, "report_id"),
+                    award_reference=getattr(obj, "award_reference"),
+                )
                 return getattr(fa, field_name)
     else:
         return getattr(obj, field_name)
+
 
 def gather_report_data_dissemination(report_ids):
     """
