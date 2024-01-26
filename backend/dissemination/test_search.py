@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from dissemination.models import General, FederalAward
-from dissemination.search import search_general
+from dissemination.search import search_general, search_alns
 
 from model_bakery import baker
 
@@ -38,7 +38,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_name=auditee_name)
 
         results = search_general(
-            names=[auditee_name],
+            {"names": [auditee_name]},
         )
 
         assert_all_results_public(self, results)
@@ -52,7 +52,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditor_firm_name=auditor_firm_name)
 
         results = search_general(
-            names=[auditor_firm_name],
+            {"names": [auditor_firm_name]},
         )
 
         assert_all_results_public(self, results)
@@ -69,9 +69,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_name="city of bronze")
         baker.make(General, is_public=True, auditee_name="bronze city")
 
-        results = search_general(
-            names=names,
-        )
+        results = search_general({"names": names})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
@@ -85,7 +83,7 @@ class SearchGeneralTests(TestCase):
         )
         baker.make(General, is_public=True, auditor_firm_name="not this one")
 
-        results = search_general(names=["UNIVERSITY"])
+        results = search_general({"names": ["UNIVERSITY"]})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
@@ -99,7 +97,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_uei=auditee_uei)
 
         results = search_general(
-            uei_or_eins=[auditee_uei],
+            {"uei_or_eins": [auditee_uei]},
         )
 
         assert_all_results_public(self, results)
@@ -113,7 +111,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_ein=auditee_ein)
 
         results = search_general(
-            uei_or_eins=[auditee_ein],
+            {"uei_or_eins": [auditee_ein]},
         )
 
         assert_all_results_public(self, results)
@@ -134,9 +132,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_uei="not-looking-for-this-uei")
         baker.make(General, is_public=True, auditee_ein="not-looking-for-this-ein")
 
-        results = search_general(
-            uei_or_eins=uei_or_eins,
-        )
+        results = search_general({"uei_or_eins": uei_or_eins})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
@@ -160,8 +156,10 @@ class SearchGeneralTests(TestCase):
         search_end_date = datetime.date(2023, 6, 15)
 
         results = search_general(
-            start_date=search_start_date,
-            end_date=search_end_date,
+            {
+                "start_date": search_start_date,
+                "end_date": search_end_date,
+            }
         )
 
         assert_all_results_public(self, results)
@@ -184,8 +182,10 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="01")
 
         results = search_general(
-            cog_or_oversight="cog",
-            agency_name="01",
+            {
+                "cog_or_oversight": "cog",
+                "agency_name": "01",
+            }
         )
 
         assert_all_results_public(self, results)
@@ -203,8 +203,10 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="02")
 
         results = search_general(
-            cog_or_oversight="oversight",
-            agency_name="01",
+            {
+                "cog_or_oversight": "oversight",
+                "agency_name": "01",
+            }
         )
 
         assert_all_results_public(self, results)
@@ -221,19 +223,25 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, audit_year="2022")
 
         results = search_general(
-            audit_years=[2016],
+            {
+                "audit_years": [2016],
+            }
         )
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
 
         results = search_general(
-            audit_years=[2020],
+            {
+                "audit_years": [2020],
+            }
         )
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
 
         results = search_general(
-            audit_years=[2020, 2021, 2022],
+            {
+                "audit_years": [2020, 2021, 2022],
+            }
         )
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 3)
@@ -252,14 +260,14 @@ class SearchGeneralTests(TestCase):
         )
 
         # there should be on result for AL
-        results = search_general(auditee_state="AL")
+        results = search_general({"auditee_state": "AL"})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], al)
 
         # there should be no results for WI
-        results = search_general(auditee_state="WI")
+        results = search_general({"auditee_state": "WI"})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
@@ -297,18 +305,26 @@ class SearchALNTests(TestCase):
         )
 
         # Just a prefix
-        results = search_general(alns=["12"])
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0], prefix_object)
+        params_prefix = {"alns": ["12"]}
+        results_general_prefix = search_general(params_prefix)
+        results_alns_prefix = search_alns(results_general_prefix, params_prefix)
+        self.assertEqual(len(results_alns_prefix), 1)
+        self.assertEqual(results_alns_prefix[0], prefix_object)
 
         # Prefix + extension
-        results = search_general(alns=["98.765"])
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0], extension_object)
+        params_extention = {"alns": ["98.765"]}
+        results_general_extention = search_general(params_extention)
+        results_alns_extention = search_alns(
+            results_general_extention, params_extention
+        )
+        self.assertEqual(len(results_alns_extention), 1)
+        self.assertEqual(results_alns_extention[0], extension_object)
 
         # Both
-        results = search_general(alns=["12", "98.765"])
-        self.assertEqual(len(results), 2)
+        params_both = {"alns": ["12", "98.765"]}
+        results_general_both = search_general(params_both)
+        results_alns_both = search_alns(results_general_both, params_both)
+        self.assertEqual(len(results_alns_both), 2)
 
     def test_finding_my_aln(self):
         """
@@ -326,10 +342,14 @@ class SearchALNTests(TestCase):
             findings_count=1,
         )
 
-        results = search_general(alns=["00"])
-        self.assertEqual(len(results), 1)
+        params = {"alns": ["00"]}
+        results_general = search_general(params)
+        results_alns = search_alns(results_general, params)
+
+        self.assertEqual(len(results_alns), 1)
         self.assertTrue(
-            results[0].finding_my_aln is True and results[0].finding_all_aln is False
+            results_alns[0].finding_my_aln is True
+            and results_alns[0].finding_all_aln is False
         )
 
     def test_finding_all_aln(self):
@@ -355,10 +375,14 @@ class SearchALNTests(TestCase):
             findings_count=1,
         )
 
-        results = search_general(alns=["11"])
-        self.assertEqual(len(results), 1)
+        params = {"alns": ["11"]}
+        results_general = search_general(params)
+        results_alns = search_alns(results_general, params)
+
+        self.assertEqual(len(results_alns), 1)
         self.assertTrue(
-            results[0].finding_my_aln is False and results[0].finding_all_aln is True
+            results_alns[0].finding_my_aln is False
+            and results_alns[0].finding_all_aln is True
         )
 
     def test_finding_my_aln_and_finding_all_aln(self):
@@ -385,10 +409,14 @@ class SearchALNTests(TestCase):
             findings_count=1,
         )
 
-        results = search_general(alns=["22"])
-        self.assertEqual(len(results), 1)
+        params = {"alns": ["22"]}
+        results_general = search_general(params)
+        results_alns = search_alns(results_general, params)
+
+        self.assertEqual(len(results_alns), 1)
         self.assertTrue(
-            results[0].finding_my_aln is True and results[0].finding_all_aln is True
+            results_alns[0].finding_my_aln is True
+            and results_alns[0].finding_all_aln is True
         )
 
     def test_alns_no_findings(self):
@@ -402,8 +430,12 @@ class SearchALNTests(TestCase):
             federal_award_extension="333",
         )
 
-        results = search_general(alns=["33"])
-        self.assertEqual(len(results), 1)
+        params = {"alns": ["33"]}
+        results_general = search_general(params)
+        results_alns = search_alns(results_general, params)
+
+        self.assertEqual(len(results_alns), 1)
         self.assertTrue(
-            results[0].finding_my_aln is False and results[0].finding_all_aln is False
+            results_alns[0].finding_my_aln is False
+            and results_alns[0].finding_all_aln is False
         )

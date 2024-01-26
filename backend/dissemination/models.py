@@ -95,6 +95,20 @@ class Finding(models.Model):
 class FederalAward(models.Model):
     """Information about the federal award section of the form. References General"""
 
+    # 20240125 - These are indices that would be used in our ALN search/annotation.
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=["report_id",]),
+    #         # This is possibly redundant with the pairwise index?
+    #         models.Index(fields=["federal_agency_prefix",]),
+    #         models.Index(fields=["federal_agency_prefix", "federal_award_extension"]),
+    #         models.Index(fields=[
+    #             "report_id",
+    #             "federal_agency_prefix",
+    #             "findings_count"
+    #             ]),
+    #     ]
+
     additional_award_identification = models.TextField(
         "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
         help_text=docs.award_identification,
@@ -235,6 +249,13 @@ class Passthrough(models.Model):
 class General(models.Model):
     # Relational fields
     # null = True for these so we can load in phases, may want to tighten validation later
+    # 20240125 - These are indices that would be used in our ALN search/annotation.
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=["report_id",]),
+    #         models.Index(fields=["fac_accepted_date",]),
+
+    #     ]
 
     report_id = models.TextField(
         "G-FAC generated identifier. ",

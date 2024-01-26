@@ -3,7 +3,7 @@ from django import forms
 
 class SearchForm(forms.Form):
     AY_choices = (
-        (x, str(x)) for x in range(2016, 2024)
+        (x, str(x)) for x in reversed(range(2019, 2024))
     )  # ((2016, "2016"), (2017, "2017"), ..., (2023, "2023"))
 
     # Query params
