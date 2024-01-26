@@ -148,22 +148,33 @@ class Search(View):
         context = {}
 
         form_data = clean_form_data(form)
+
+        # If no years are checked, check 2023.
+        logger.info(form_data)
+        if len(form_data.audit_years) == 0:
+            form_data = form_data._replace(audit_years=[2023])
+
         include_private = include_private_results(request)
         results = run_search(form_data, include_private)
+        
+        logger.info(f"RESULTS {results}")
 
         results_count = len(results)
         logger.info(f"search POST results_count[{results_count}]")
 
         # Reset page to one if the page number surpasses how many pages there actually are
         page = form_data.page
-        if page > math.ceil(results_count / form_data.limit):
+        ceiling = math.ceil(results_count / form_data.limit)
+        if page > ceiling:
             page = 1
-
+        
+        logger.info(f"results_count: {results_count} form_data.limit: {form_data.limit} page: {page} ceiling: {ceiling}")
+        
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
         paginator = Paginator(object_list=results, per_page=form_data.limit)
-        paginator_results = paginator.get_page(form_data.page)
+        paginator_results = paginator.get_page(page)
         paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
-            form_data.page, on_each_side=1
+            page, on_each_side=1
         )
 
         # Reformat these so the date-picker elements in HTML prepopulate

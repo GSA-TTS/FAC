@@ -164,8 +164,8 @@ def _annotate_findings(r_generals, params, r_FA_all_alns):
     ############################################################
     # Findings my ALNs
     # For findings on my ALNs, I need to search for the ALNs that were given.
-    # q_agency_sought = Q(federal_agency_prefix__in=agency_numbers_user_searched_for)
-    r_my_alns = interim.filter(report_id__in=Subquery(r_FA_all_alns.values_list("report_id", flat=True)))
+    q_agency_sought = Q(federal_agency_prefix__in=agency_numbers_user_searched_for)
+    r_my_alns = interim.filter(q_agency_sought)
     report_ids_including_user_agencies = r_my_alns.values_list("report_id", flat=True)
     # logger.info(f"report_ids excluding user search [{report_ids_including_user_agencies.count()}]")
 
