@@ -224,8 +224,8 @@ def validate_general_information_json(value, is_data_migration=True):
 
     try:
         if not is_data_migration and settings.GSA_MIGRATION in [
-            value["auditee_email"],
-            value["auditor_email"],
+            getattr(value, "auditee_email", ""),
+            getattr(value, "auditor_email", ""),
         ]:
             raise JSONSchemaValidationError(
                 f"{settings.GSA_MIGRATION} not permitted outside of migrations"
