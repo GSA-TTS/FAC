@@ -208,7 +208,7 @@ def xform_missing_cluster_total(
             ["xform_missing_cluster_total"],
             change_records,
         )
-        audit.CLUSTERTOTAL = cluster_total
+        audit.CLUSTERTOTAL = str(cluster_total)
 
     if change_records and is_empty_cluster_total_found:
         InspectionRecord.append_federal_awards_changes(change_records)
