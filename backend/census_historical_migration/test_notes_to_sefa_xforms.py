@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.test import SimpleTestCase
 
 from .exception_utils import DataMigrationError
@@ -140,6 +141,5 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
             )
 
     def test_empty_string(self):
-        """Test that the function raises an exception when the input is an empty string."""
-        with self.assertRaises(DataMigrationError):
-            xform_is_minimis_rate_used("")
+        """Test that the function returns GSA MIGRATION keyword when the input is an empty string."""
+        self.assertEqual(xform_is_minimis_rate_used(""), settings.GSA_MIGRATION)
