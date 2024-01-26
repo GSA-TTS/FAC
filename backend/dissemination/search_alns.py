@@ -34,16 +34,16 @@ def search_alns(general_results, params):
             f"search_alns general rows[{r_general_rids_matching_FA_rids.count()}]"
         )
         # The MJ/TH approach
-        # logger.info("================= MJ/TH =================")
-        # annotated = _annotate_findings(
-        #     r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
-        # )
-
-        # The MJ/JP approach
-        logger.info("================= MJ/JP =================")
-        annotated = _annotate_findings_two_electric_boogaloo(
+        logger.info("================= MJ/TH =================")
+        annotated = _annotate_findings(
             r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
         )
+
+        # The MJ/JP approach
+        # logger.info("================= MJ/JP =================")
+        # annotated = _annotate_findings_two_electric_boogaloo(
+        #     r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
+        # )
 
         sorted = _findings_sort(annotated, params)
 
@@ -113,6 +113,8 @@ def _annotate_findings(r_generals, params, r_FA_all_alns):
         map(lambda a: a.prefix, _get_all_agency_numbers(params))
     )
 
+    logger.info(f"Looking for agency numbers {agency_numbers_user_searched_for}")
+
     ###
     # 1. I want a set of General.report_ids that match
     #    my General query, and match the ALNs that were searched for.
@@ -178,7 +180,10 @@ def _annotate_findings(r_generals, params, r_FA_all_alns):
     report_ids_including_user_agencies = r_my_alns.values_list("report_id", flat=True)
     # logger.info(f"report_ids excluding user search [{report_ids_including_user_agencies.count()}]")
 
-    only_count = 0
+    my_count = 0
+    other_count = 0
+    only_my_count = 0
+    only_other_count = 0
     both_count = 0
     for r in r_generals:
         r.finding_my_aln = False
@@ -186,16 +191,21 @@ def _annotate_findings(r_generals, params, r_FA_all_alns):
 
         if r.report_id in report_ids_including_user_agencies:
             r.finding_my_aln = True
+            my_count += 1
 
         if r.report_id in report_ids_excluding_user_agencies:
             r.finding_all_aln = True
+            other_count += 1
 
         if r.finding_my_aln and not r.finding_all_aln:
-            only_count += 1
+            only_my_count += 1
+        if not r.finding_my_aln and r.finding_all_aln:
+            only_other_count += 1
         if r.finding_my_aln and r.finding_all_aln:
             both_count += 1
 
     # logger.info(f"_annotate_findings only_count[{only_count}] both_count[{both_count}]")
+    logger.info(f"_annotate_findings my[{my_count}] other[{other_count}] \nonly_my_count[{only_my_count}] only_other_count[{only_other_count}] \nboth_count[{both_count}]")
     return r_generals
 
 
@@ -212,7 +222,7 @@ def _annotate_findings_two_electric_boogaloo(g_results, params, r_all_alns):
 
     # ----- The General objects that will recieve 'Y' for finding_all_aln -----
     all_agency_numbers = list(map(lambda a: a.prefix, _get_all_agency_numbers(params)))
-    logger.info(f"_annotate_findings looking for agency numbers {all_agency_numbers}")
+    logger.info(f"Looking for agency numbers {all_agency_numbers}")
     r_all_related_awards_report_ids = set(g_results.values_list("report_id", flat=True))
     q = Q()
     # Q (query): All FederalAward's with findings
@@ -236,10 +246,10 @@ def _annotate_findings_two_electric_boogaloo(g_results, params, r_all_alns):
     )
 
     # ----- Annotate the General objects with our Y/N fields -----
-    my_count = annotate_on_my_alns.count()
-    any_count = annotate_on_all_alns.count()
-    logger.info(f"_annotate_findings my[{my_count}] any[{any_count}]")
-    only_count = 0
+    my_count = 0
+    any_count = 0
+    only_my_count = 0
+    only_other_count = 0
     both_count = 0
     for r in g_results:
         r.finding_my_aln = False
@@ -247,15 +257,19 @@ def _annotate_findings_two_electric_boogaloo(g_results, params, r_all_alns):
 
         if r.report_id in annotate_on_my_alns_report_ids:
             r.finding_my_aln = True
+            my_count += 1
 
         if r.report_id in annotate_on_all_alns_report_ids:
             r.finding_all_aln = True
+            any_count += 1
 
         if r.finding_my_aln and not r.finding_all_aln:
-            only_count += 1
+            only_my_count += 1
+        if not r.finding_my_aln and r.finding_all_aln:
+            only_other_count += 1
         if r.finding_my_aln and r.finding_all_aln:
             both_count += 1
-    logger.info(f"_annotate_findings only_count[{only_count}] both_count[{both_count}]")
+    logger.info(f"_annotate_findings my[{my_count}] other[{any_count}] \nonly_my_count[{only_my_count}] only_other_count[{only_other_count} ]\nboth_count[{both_count}]")
 
     return g_results
 

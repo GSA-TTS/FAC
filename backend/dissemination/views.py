@@ -1,6 +1,7 @@
 from collections import namedtuple
 import logging
 import math
+import time
 
 from django.core.exceptions import BadRequest
 from django.core.paginator import Paginator
@@ -143,6 +144,8 @@ class Search(View):
         """
         When accessing the search page through post, run a search and display the results.
         """
+        time_starting_post = time.time()
+
         form = SearchForm(request.POST)
         results = []
         context = {}
@@ -163,7 +166,6 @@ class Search(View):
         results = run_search(form_data, include_private)
 
         results_count = len(results)
-        logger.info(f"search POST results_count[{results_count}]")
 
         # Reset page to one if the page number surpasses how many pages there actually are
         page = form_data.page
@@ -171,9 +173,7 @@ class Search(View):
         if page > ceiling:
             page = 1
 
-        logger.info(
-            f"results_count: {results_count} form_data.limit: {form_data.limit} page: {page} ceiling: {ceiling}"
-        )
+        logger.info(f"TOTAL: results_count: [{results_count}]")
 
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
         paginator = Paginator(object_list=results, per_page=form_data.limit)
@@ -203,8 +203,8 @@ class Search(View):
             "order_direction": form_data.order_direction,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
-
-        logger.info("search POST about to render")
+        time_beginning_render = time.time()
+        logger.info(f"Total time between post and render {int(math.ceil((time_beginning_render - time_starting_post) * 1000))}ms")
         return render(request, "search.html", context)
 
 
