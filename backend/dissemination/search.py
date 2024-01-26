@@ -37,6 +37,7 @@ def search(params):
     results = _sort_results(results, params)
     results = search_alns(results, params)
 
+
     t1 = time.time()
     report_timing("search", params, t0, t1)
     return results

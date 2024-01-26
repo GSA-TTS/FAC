@@ -204,7 +204,9 @@ class Search(View):
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
         time_beginning_render = time.time()
-        logger.info(f"Total time between post and render {int(math.ceil((time_beginning_render - time_starting_post) * 1000))}ms")
+        logger.info(
+            f"Total time between post and render {int(math.ceil((time_beginning_render - time_starting_post) * 1000))}ms"
+        )
         return render(request, "search.html", context)
 
 
