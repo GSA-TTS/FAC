@@ -152,6 +152,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.static_site_url",
                 "config.context_processors.omb_num_exp_date",
+                "config.context_processors.current_environment",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
