@@ -152,12 +152,16 @@ class Search(View):
         # If no years are checked, check 2023.
         logger.info(form_data)
         if len(form_data.audit_years) == 0:
-            form_data = form_data._replace(audit_years=[2023])  # To search on the correct year
-            form.cleaned_data["audit_year"] = ["2023"] # To include the param into the rendered page
-        
+            form_data = form_data._replace(
+                audit_years=[2023]
+            )  # To search on the correct year
+            form.cleaned_data["audit_year"] = [
+                "2023"
+            ]  # To include the param into the rendered page
+
         include_private = include_private_results(request)
         results = run_search(form_data, include_private)
-        
+
         logger.info(f"RESULTS {results}")
 
         results_count = len(results)
@@ -168,9 +172,11 @@ class Search(View):
         ceiling = math.ceil(results_count / form_data.limit)
         if page > ceiling:
             page = 1
-        
-        logger.info(f"results_count: {results_count} form_data.limit: {form_data.limit} page: {page} ceiling: {ceiling}")
-        
+
+        logger.info(
+            f"results_count: {results_count} form_data.limit: {form_data.limit} page: {page} ceiling: {ceiling}"
+        )
+
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
         paginator = Paginator(object_list=results, per_page=form_data.limit)
         paginator_results = paginator.get_page(page)
