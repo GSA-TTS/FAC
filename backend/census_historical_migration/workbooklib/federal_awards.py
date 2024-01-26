@@ -1,3 +1,5 @@
+from audit.intakelib.checks.check_cluster_total import expected_cluster_total
+from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
@@ -9,6 +11,7 @@ from .excel_creation_utils import (
     map_simple_columns,
     set_range,
     sort_by_field,
+    track_transformations,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -85,6 +88,132 @@ mappings = [
 ]
 
 
+def xform_missing_findings_count(audits):
+    """Default missing findings count to zero."""
+    # Transformation to be documented.
+    for audit in audits:
+        findings_count = string_to_string(audit.FINDINGSCOUNT)
+        if not findings_count:
+            audit.FINDINGSCOUNT = "0"
+
+
+def xform_missing_amount_expended(audits):
+    """Default missing amount expended to zero."""
+    # Transformation recorded.
+    change_records = []
+    is_empty_amount_expended_found = False
+    for audit in audits:
+        amount = string_to_string(audit.AMOUNT)
+        if not amount:
+            is_empty_amount_expended_found = True
+
+        amount = string_to_int(amount) if amount else 0
+
+        track_transformations(
+            "AMOUNT",
+            audit.AMOUNT,
+            "amount_expended",
+            amount,
+            ["xform_missing_amount_expended"],
+            change_records,
+        )
+        audit.AMOUNT = str(amount)
+
+    if change_records and is_empty_amount_expended_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
+def xform_missing_program_total(audits):
+    """Calculates missing program total for each award."""
+    program_totals = {}
+    for audit in audits:
+        cfda_key = (
+            f"{string_to_string(audit.CFDA_PREFIX)}.{string_to_string(audit.CFDA_EXT)}"
+        )
+        amount = string_to_int(audit.AMOUNT) if string_to_string(audit.AMOUNT) else 0
+        if cfda_key in program_totals:
+            program_totals[cfda_key] = program_totals[cfda_key] + amount
+        else:
+            program_totals[cfda_key] = amount
+
+    change_records = []
+    is_empty_program_total_found = False
+
+    for audit in audits:
+        program_total = string_to_string(audit.PROGRAMTOTAL)
+        cfda_key = (
+            f"{string_to_string(audit.CFDA_PREFIX)}.{string_to_string(audit.CFDA_EXT)}"
+        )
+        if not program_total:
+            is_empty_program_total_found = True
+
+        # Only use calculated program_total when program_total is empty
+        program_total = (
+            string_to_int(program_total) if program_total else program_totals[cfda_key]
+        )
+        track_transformations(
+            "PROGRAMTOTAL",
+            audit.PROGRAMTOTAL,
+            "federal_program_total",
+            program_total,
+            ["xform_missing_program_total"],
+            change_records,
+        )
+        audit.PROGRAMTOTAL = str(program_total)
+
+    if change_records and is_empty_program_total_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
+def xform_missing_cluster_total(
+    audits,
+    cluster_names,
+    other_cluster_names,
+    state_cluster_names,
+):
+    """Calculates missing cluster total for each award."""
+    uniform_state_cluster_names = [name.upper() for name in state_cluster_names]
+    uniform_other_cluster_names = [name.upper() for name in other_cluster_names]
+    amounts_expended = [
+        string_to_int(audit.AMOUNT) if string_to_string(audit.AMOUNT) else 0
+        for audit in audits
+    ]
+
+    change_records = []
+    is_empty_cluster_total_found = False
+    for idx, (name, audit) in enumerate(zip(cluster_names, audits)):
+        cluster_total = string_to_string(audit.CLUSTERTOTAL)
+        if not cluster_total:
+            is_empty_cluster_total_found = True
+
+        # Only use calculated cluster_total when cluster_total is empty
+        if cluster_total:
+            cluster_total = string_to_int(cluster_total)
+        else:
+            cluster_total = expected_cluster_total(
+                idx=idx,
+                name=name,
+                uniform_other_cluster_names=uniform_other_cluster_names,
+                uniform_state_cluster_names=uniform_state_cluster_names,
+                state_cluster_names=state_cluster_names,
+                cluster_names=cluster_names,
+                amounts_expended=amounts_expended,
+            )
+
+        track_transformations(
+            "CLUSTERTOTAL",
+            audit.CLUSTERTOTAL,
+            "cluster_total",
+            cluster_total,
+            ["xform_missing_cluster_total"],
+            change_records,
+        )
+        audit.CLUSTERTOTAL = str(cluster_total)
+
+    if change_records and is_empty_cluster_total_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
 def xform_constructs_cluster_names(
     audits: list[Audits],
 ) -> tuple[list[str], list[str], list[str]]:
@@ -103,11 +232,11 @@ def xform_constructs_cluster_names(
         other_cluster_names.append(other_cluster_name if other_cluster_name else "")
 
         # Handling specific cases
-        if cluster_name == "STATE CLUSTER":
+        if cluster_name == settings.STATE_CLUSTER:
             state_cluster_names[-1] = (
                 state_cluster_name if state_cluster_name else settings.GSA_MIGRATION
             )
-        elif cluster_name == "OTHER CLUSTER NOT LISTED ABOVE":
+        elif cluster_name == settings.OTHER_CLUSTER:
             other_cluster_names[-1] = (
                 other_cluster_name if other_cluster_name else settings.GSA_MIGRATION
             )
@@ -333,13 +462,22 @@ def generate_federal_awards(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
-    map_simple_columns(wb, mappings, audits)
 
     (
         cluster_names,
         other_cluster_names,
         state_cluster_names,
     ) = xform_constructs_cluster_names(audits)
+
+    xform_missing_cluster_total(
+        audits, cluster_names, other_cluster_names, state_cluster_names
+    )
+    xform_missing_program_total(audits)
+    xform_missing_findings_count(audits)
+    xform_missing_amount_expended(audits)
+
+    map_simple_columns(wb, mappings, audits)
+
     set_range(wb, "cluster_name", cluster_names)
     set_range(wb, "other_cluster_name", other_cluster_names)
     set_range(wb, "state_cluster_name", state_cluster_names)

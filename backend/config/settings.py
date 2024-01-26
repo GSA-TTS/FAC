@@ -536,5 +536,9 @@ REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
 REGEX_U_EXTENSION = r"^U[0-9]{2}$"
 GSA_MIGRATION = "GSA_MIGRATION"  # There is a copy of `GSA_MIGRATION` in Base.libsonnet. If you change it here, change it there too.
 GSA_MIGRATION_INT = -999999999
+# A copy of theses constants exists in schema/source/base/Base.libsonnet
+STATE_CLUSTER = "STATE CLUSTER"
+OTHER_CLUSTER = "OTHER CLUSTER NOT LISTED ABOVE"
+NOT_APPLICABLE = "N/A"
 
 ONE_TIME_ACCESS_TTL_SECS = 60
