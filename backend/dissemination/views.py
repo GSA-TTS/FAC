@@ -152,8 +152,9 @@ class Search(View):
         # If no years are checked, check 2023.
         logger.info(form_data)
         if len(form_data.audit_years) == 0:
-            form_data = form_data._replace(audit_years=[2023])
-
+            form_data = form_data._replace(audit_years=[2023])  # To search on the correct year
+            form.cleaned_data["audit_year"] = ["2023"] # To include the param into the rendered page
+        
         include_private = include_private_results(request)
         results = run_search(form_data, include_private)
         
