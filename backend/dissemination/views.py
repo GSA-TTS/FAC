@@ -162,8 +162,6 @@ class Search(View):
         include_private = include_private_results(request)
         results = run_search(form_data, include_private)
 
-        logger.info(f"RESULTS {results}")
-
         results_count = len(results)
         logger.info(f"search POST results_count[{results_count}]")
 

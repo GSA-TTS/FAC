@@ -34,11 +34,13 @@ def search_alns(general_results, params):
             f"search_alns general rows[{r_general_rids_matching_FA_rids.count()}]"
         )
         # The MJ/TH approach
+        # logger.info("================= MJ/TH =================")
         # annotated = _annotate_findings(
         #     r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
         # )
 
         # The MJ/JP approach
+        logger.info("================= MJ/JP =================")
         annotated = _annotate_findings_two_electric_boogaloo(
             r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
         )
