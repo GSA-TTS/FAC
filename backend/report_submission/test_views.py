@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
+from django.conf import settings
 from unittest.mock import patch
 from model_bakery import baker
 
@@ -646,6 +647,54 @@ class GeneralInformationFormViewTests(TestCase):
         response = self.client.post(url, data=data)
 
         self.assertContains(response, "Dates should be in the format")
+
+    def test_post_gsa_migration_error(self):
+        """If GSA_MIGRATION is present as an email, the submission should be rejected"""
+        user = baker.make(User)
+
+        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
+        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
+
+        data = {
+            "audit_type": "single-audit",
+            "auditee_fiscal_period_start": "11/01/2021",
+            "auditee_fiscal_period_end": "11/01/2022",
+            "audit_period_covered": "other",
+            "audit_period_other_months": "10",
+            "ein": "123456780",
+            "ein_not_an_ssn_attestation": True,
+            "multiple_eins_covered": True,
+            "auditee_uei": "ZQGGHJH74DW8",
+            "multiple_ueis_covered": True,
+            "secondary_auditors_exist": True,
+            "auditee_name": "Auditee McAudited again",
+            "auditee_address_line_1": "500 feet into left field",
+            "auditee_city": "Chicago",
+            "auditee_state": "IL",
+            "auditee_zip": "60640",
+            "auditee_contact_name": "Updated Designated Representative",
+            "auditee_contact_title": "Lord of Windows",
+            "auditee_phone": "5558675310",
+            "auditee_email": settings.GSA_MIGRATION, # Not allowed
+            "auditor_firm_name": "Penny Audit Store",
+            "auditor_ein": "123456780",
+            "auditor_ein_not_an_ssn_attestation": True,
+            "auditor_contact_name": "Qualified Robot Accountant",
+            "auditor_contact_title": "Just an extraordinary person",
+            "auditor_phone": "9876543210",
+            "auditor_email": settings.GSA_MIGRATION, # Not allowed
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 400)
 
     def test_post_validates_general_information(self):
         """When the general information form is submitted, the data should be validated against the general information schema"""
