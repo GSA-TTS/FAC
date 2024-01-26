@@ -203,7 +203,7 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
-      format: 'text',
+      format: 'dollar',
       help: Help.unknown,
     },
     SV.LoanBalanceValidation,

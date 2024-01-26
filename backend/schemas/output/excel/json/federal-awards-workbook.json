@@ -311,7 +311,7 @@
                }
             },
             {
-               "format": "text",
+               "format": "dollar",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "Please contact support"
