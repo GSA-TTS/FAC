@@ -173,6 +173,7 @@ field_name_ordered = {
         "award_reference",
         "federal_agency_prefix",
         "federal_award_extension",
+        "_aln",
         "findings_count",
         "additional_award_identification",
         "federal_program_name",
@@ -192,6 +193,9 @@ field_name_ordered = {
     ],
     "finding": [
         "report_id",
+        "_federal_agency_prefix",
+        "_federal_award_extension",
+        "_aln",
         "award_reference",
         "reference_number",
         "type_requirement",
@@ -293,6 +297,37 @@ def insert_dissem_coversheet(workbook):
     set_column_widths(sheet)
 
 
+def _get_attribute_or_data(obj, field_name):
+    if field_name.startswith("_"):
+        if field_name == "_aln":
+            if isinstance(obj, FederalAward):
+                return (
+                    getattr(obj, "federal_agency_prefix")
+                    + "."
+                    + getattr(obj, "federal_award_extension")
+                )
+            elif isinstance(obj, Finding):
+                fa = FederalAward.objects.get(
+                    report_id=getattr(obj, "report_id"),
+                    award_reference=getattr(obj, "award_reference"),
+                )
+                return (
+                    getattr(fa, "federal_agency_prefix")
+                    + "."
+                    + getattr(fa, "federal_award_extension")
+                )
+        else:
+            field_name = field_name[1:]
+            if isinstance(obj, Finding):
+                fa = FederalAward.objects.get(
+                    report_id=getattr(obj, "report_id"),
+                    award_reference=getattr(obj, "award_reference"),
+                )
+                return getattr(fa, field_name)
+    else:
+        return getattr(obj, field_name)
+
+
 def gather_report_data_dissemination(report_ids):
     """
     Given a set of report IDs, fetch the disseminated data for each and asssemble into a dictionary with the following shape:
@@ -329,7 +364,7 @@ def gather_report_data_dissemination(report_ids):
         objects = model.objects.all().filter(report_id__in=report_ids)
         for obj in objects:
             data[model_name]["entries"].append(
-                [getattr(obj, field_name) for field_name in field_names]
+                [_get_attribute_or_data(obj, field_name) for field_name in field_names]
             )
     return data
 

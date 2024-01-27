@@ -2,6 +2,7 @@ from collections import namedtuple
 from datetime import timedelta
 import logging
 import math
+import time
 
 from django.conf import settings
 from django.core.exceptions import BadRequest, ValidationError
@@ -17,7 +18,7 @@ from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
 
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import SearchForm
-from dissemination.search import search_general
+from dissemination.search import search
 from dissemination.mixins import ReportAccessRequiredMixin
 from dissemination.models import (
     General,
@@ -102,25 +103,28 @@ def clean_form_data(form):
     return form_data
 
 
-def run_search_general(form_data, include_private):
+def run_search(form_data, include_private):
     """
     Given cleaned form data and an 'include_private' boolean, run the search.
     Returns the results QuerySet.
     """
-    return search_general(
-        names=form_data.names,
-        alns=form_data.alns,
-        uei_or_eins=form_data.uei_or_eins,
-        start_date=form_data.start_date,
-        end_date=form_data.end_date,
-        cog_or_oversight=form_data.cog_or_oversight,
-        agency_name=form_data.agency_name,
-        audit_years=form_data.audit_years,
-        auditee_state=form_data.auditee_state,
-        include_private=include_private,
-        order_by=form_data.order_by,
-        order_direction=form_data.order_direction,
-    )
+
+    # As a dictionary, this is easily extensible.
+    search_parameters = {
+        "alns": form_data.alns,
+        "names": form_data.names,
+        "uei_or_eins": form_data.uei_or_eins,
+        "start_date": form_data.start_date,
+        "end_date": form_data.end_date,
+        "cog_or_oversight": form_data.cog_or_oversight,
+        "agency_name": form_data.agency_name,
+        "audit_years": form_data.audit_years,
+        "auditee_state": form_data.auditee_state,
+        "include_private": include_private,
+        "order_by": form_data.order_by,
+        "order_direction": form_data.order_direction,
+    }
+    return search(search_parameters)
 
 
 class Search(View):
@@ -144,25 +148,42 @@ class Search(View):
         """
         When accessing the search page through post, run a search and display the results.
         """
+        time_starting_post = time.time()
+
         form = SearchForm(request.POST)
         results = []
         context = {}
 
         form_data = clean_form_data(form)
+
+        # If no years are checked, check 2023.
+        logger.info(form_data)
+        if len(form_data.audit_years) == 0:
+            form_data = form_data._replace(
+                audit_years=[2023]
+            )  # To search on the correct year
+            form.cleaned_data["audit_year"] = [
+                "2023"
+            ]  # To include the param into the rendered page
+
         include_private = include_private_results(request)
-        results = run_search_general(form_data, include_private)
+        results = run_search(form_data, include_private)
 
         results_count = len(results)
+
         # Reset page to one if the page number surpasses how many pages there actually are
         page = form_data.page
-        if page > math.ceil(results_count / form_data.limit):
+        ceiling = math.ceil(results_count / form_data.limit)
+        if page > ceiling:
             page = 1
+
+        logger.info(f"TOTAL: results_count: [{results_count}]")
 
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
         paginator = Paginator(object_list=results, per_page=form_data.limit)
-        results = paginator.get_page(form_data.page)
-        results.adjusted_elided_pages = paginator.get_elided_page_range(
-            form_data.page, on_each_side=1
+        paginator_results = paginator.get_page(page)
+        paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
+            page, on_each_side=1
         )
 
         # Reformat these so the date-picker elements in HTML prepopulate
@@ -179,14 +200,17 @@ class Search(View):
             "form": form,
             "state_abbrevs": STATE_ABBREVS,
             "limit": form_data.limit,
-            "results": results,
+            "results": paginator_results,
             "results_count": results_count,
             "page": page,
             "order_by": form_data.order_by,
             "order_direction": form_data.order_direction,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
-
+        time_beginning_render = time.time()
+        logger.info(
+            f"Total time between post and render {int(math.ceil((time_beginning_render - time_starting_post) * 1000))}ms"
+        )
         return render(request, "search.html", context)
 
 
@@ -356,7 +380,7 @@ class MultipleSummaryReportDownloadView(View):
         try:
             cleaned_data = clean_form_data(form)
             include_private = include_private_results(request)
-            results = run_search_general(cleaned_data, include_private)
+            results = run_search(cleaned_data, include_private)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:

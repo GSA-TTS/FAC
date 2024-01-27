@@ -59,6 +59,11 @@ docker-first-run:
 		python manage.py makemigrations &&\
 		python manage.py migrate'
 
+docker-migrate:
+	docker compose run web bash -c '\
+		python manage.py makemigrations &&\
+		python manage.py migrate'
+
 docker-load-data:
 	docker compose up -d && docker compose run web ./load_data.sh
 
