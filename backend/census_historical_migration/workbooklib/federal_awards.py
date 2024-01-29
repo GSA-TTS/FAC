@@ -352,7 +352,7 @@ def _get_passthroughs(audits):
     return (passthrough_names, passthrough_ids)
 
 
-def xform_populate_default_passthrough_values(audits):
+def xform_populate_default_passthrough_names_ids(audits):
     """
     Retrieves the passthrough names and IDs for a given list of audits.
     Automatically fills in default values for empty passthrough names and IDs.
@@ -360,6 +360,7 @@ def xform_populate_default_passthrough_values(audits):
     If the audit's DIRECT attribute is "N" and the passthrough name or ID is empty,
     it fills in a default value indicating that no passthrough name or ID was provided.
     """
+    # Transformation to be documented.
     passthrough_names, passthrough_ids = _get_passthroughs(audits)
     for index, audit, name, id in zip(
         range(len(audits)), audits, passthrough_names, passthrough_ids
@@ -501,7 +502,7 @@ def generate_federal_awards(audit_header, outfile):
         conversion_fun=str,
     )
 
-    (passthrough_names, passthrough_ids) = xform_populate_default_passthrough_values(
+    (passthrough_names, passthrough_ids) = xform_populate_default_passthrough_names_ids(
         audits
     )
     set_range(wb, "passthrough_name", passthrough_names)

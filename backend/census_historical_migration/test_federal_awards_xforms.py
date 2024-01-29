@@ -16,7 +16,7 @@ from .workbooklib.federal_awards import (
     xform_populate_default_loan_balance,
     xform_constructs_cluster_names,
     xform_populate_default_passthrough_amount,
-    xform_populate_default_passthrough_values,
+    xform_populate_default_passthrough_names_ids,
     xform_replace_invalid_extension,
     is_valid_extension,
 )
@@ -211,7 +211,7 @@ class TestXformPopulateDefaultPassthroughValues(SimpleTestCase):
             )
         ]
 
-        names, ids = xform_populate_default_passthrough_values(audits)
+        names, ids = xform_populate_default_passthrough_names_ids(audits)
 
         self.assertEqual(names[0], settings.GSA_MIGRATION)
         self.assertEqual(ids[0], settings.GSA_MIGRATION)
@@ -226,7 +226,7 @@ class TestXformPopulateDefaultPassthroughValues(SimpleTestCase):
             )
         ]
 
-        names, ids = xform_populate_default_passthrough_values(audits)
+        names, ids = xform_populate_default_passthrough_names_ids(audits)
 
         self.assertEqual(names[0], "Name1|Name2")
         self.assertEqual(ids[0], "ID1|ID2")
@@ -241,7 +241,7 @@ class TestXformPopulateDefaultPassthroughValues(SimpleTestCase):
             )
         ]
 
-        names, ids = xform_populate_default_passthrough_values(audits)
+        names, ids = xform_populate_default_passthrough_names_ids(audits)
 
         self.assertEqual(names[0], "")
         self.assertEqual(ids[0], "")
@@ -256,7 +256,7 @@ class TestXformPopulateDefaultPassthroughValues(SimpleTestCase):
             )
         ]
 
-        names, ids = xform_populate_default_passthrough_values(audits)
+        names, ids = xform_populate_default_passthrough_names_ids(audits)
 
         self.assertEqual(names[0], "Name")
         self.assertEqual(ids[0], "ID")
