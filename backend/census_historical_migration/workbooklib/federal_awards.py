@@ -387,14 +387,16 @@ def xform_populate_default_loan_balance(audits):
             if balance:
                 loans_at_end.append(balance)
             else:
-                loans_at_end.append(settings.GSA_MIGRATION)  # record transformation
+                loans_at_end.append(
+                    settings.GSA_MIGRATION
+                )  # transformation to be documented
         else:
-            if balance:
+            if balance and balance != "0":
                 raise DataMigrationError(
                     "Unexpected loan balance.", "unexpected_loan_balance"
                 )
             else:
-                loans_at_end.append("")
+                loans_at_end.append("")  # transformation to be documented
 
     return loans_at_end
 
