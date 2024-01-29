@@ -352,6 +352,30 @@ def _get_passthroughs(audits):
     return (passthrough_names, passthrough_ids)
 
 
+def xform_match_number_passthrough_names_ids(names, ids):
+    """
+    Matches the number of passthrough names and IDs.
+    Iterates over a list of passthrough names and IDs.
+    If the number of passthrough names is greater than the number of passthrough IDs,
+    it fills in the missing passthrough IDs with `NA`.
+    """
+    # Transformation to be documented.
+    for idx, (name, id) in enumerate(zip(names, ids)):
+        passthrough_names = name.split("|")
+        passthrough_ids = id.split("|")
+        length_difference = len(passthrough_names) - len(passthrough_ids)
+        if length_difference > 0:
+            patch = [settings.GSA_MIGRATION for _ in range(length_difference)]
+            if id == "":
+                patch.append(settings.GSA_MIGRATION)
+                ids[idx] = "|".join(patch)
+            else:
+                passthrough_ids.extend(patch)
+                ids[idx] = "|".join(passthrough_ids)
+
+    return names, ids
+
+
 def xform_populate_default_passthrough_names_ids(audits):
     """
     Retrieves the passthrough names and IDs for a given list of audits.
@@ -362,6 +386,9 @@ def xform_populate_default_passthrough_names_ids(audits):
     """
     # Transformation to be documented.
     passthrough_names, passthrough_ids = _get_passthroughs(audits)
+    passthrough_names, passthrough_ids = xform_match_number_passthrough_names_ids(
+        passthrough_names, passthrough_ids
+    )
     for index, audit, name, id in zip(
         range(len(audits)), audits, passthrough_names, passthrough_ids
     ):
