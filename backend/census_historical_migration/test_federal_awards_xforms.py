@@ -142,6 +142,12 @@ class TestXformPopulateDefaultLoanBalance(SimpleTestCase):
         expected = [""]
         self.assertEqual(xform_populate_default_loan_balance(audits), expected)
 
+    def test_no_loan_with_zero_balance(self):
+        """Test the function with no loan and zero balance."""
+        audits = [self.MockAudit(LOANS="N", LOANBALANCE="0")]
+        expected = [""]
+        self.assertEqual(xform_populate_default_loan_balance(audits), expected)
+
     def test_unexpected_loan_balance(self):
         """Test the function raises DataMigrationError when loan balance is unexpected."""
         audits = [self.MockAudit(LOANS="N", LOANBALANCE="100")]
