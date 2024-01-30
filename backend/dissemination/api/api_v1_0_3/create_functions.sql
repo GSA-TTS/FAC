@@ -16,8 +16,22 @@
 -- We don't grant tribal access (yet)
 create or replace function api_v1_0_3_functions.has_tribal_data_access() returns boolean
 as $has_tribal_data_access$
+DECLARE 
+    uuid_header text;
+    key_exists boolean;
 BEGIN
-    RETURN 0::BOOLEAN;
+    SELECT admin_api_v1_0_0_functions.get_api_key_uuid() INTO uuid_header;
+
+    SELECT 
+        CASE WHEN EXISTS (
+            SELECT uuid 
+            FROM public.support_administrative_key_uuids aku
+            WHERE aku.uuid = uuid_header)
+            THEN 1::BOOLEAN
+            ELSE 0::BOOLEAN
+            END 
+        INTO key_exists;
+    RETURN key_exists;
 END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
 

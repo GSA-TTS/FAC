@@ -528,6 +528,17 @@ class OneTimeAccess(models.Model):
         "Report ID for the PDF being requested",
     )
 
+class TribalApiAccessKeyIds(models.Model):
+
+    email = models.TextField(
+        "Email of the user",
+    )
+    key_id = models.TextField(
+        "Key ID for the api access",
+    )
+    date_added = models.DateField(
+        "Added date of the record",
+    )
 
 class MigrationInspectionRecord(models.Model):
     audit_year = models.TextField(blank=True, null=True)

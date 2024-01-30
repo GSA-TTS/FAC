@@ -276,6 +276,133 @@ BEGIN
 END;
 $remove_tribal_access_emails$ LANGUAGE plpgsql;
 
+
+
+
+--The function below add_tribal_api_key_access adds read access to a tribal API for a specified email.
+--It checks if the API user has read permissions.
+--If the email already exists in the database, the function returns false.
+--Otherwise, it adds the email with 'read-tribal' permission, logs the event, and returns true.
+
+CREATE OR REPLACE FUNCTION admin_api_v1_0_0.add_tribal_api_key_access(params JSON) 
+RETURNS BOOLEAN
+AS $add_tribal_api_key_access$
+DECLARE 
+    user_exists BOOLEAN;
+BEGIN
+    -- If the API user has read permissions, give it a go
+    IF admin_api_v1_0_0_functions.has_admin_data_access('READ') THEN
+    -- Check if the user with the given email
+    SELECT EXISTS (
+        SELECT 1 
+        FROM public.dissemination_TribalApiAccessKeyIds
+        WHERE email = params->>'email'
+    )
+    INTO user_exists;
+
+    -- If the user exists, return false (indicating failure)
+    IF user_exists THEN
+        RETURN false;
+    END IF;
+
+    -- If the user does not exist, add a new record
+    INSERT INTO public.dissemination_TribalApiAccessKeyIds (email, key_id, date_added)
+    VALUES (params->>'email', (params->>'key_id')::INTEGER, CURRENT_TIMESTAMP);
+
+    END IF;
+
+    RETURN true; -- Return true to indicate success
+END;
+$add_tribal_api_key_access$ LANGUAGE plpgsql;
+
+-- The function below removes tribal API key access for a specified email.
+-- It checks if the API user has read permissions.
+-- If the email exists in the database with 'read-tribal' permission, it removes the entry, logs the removal event, and returns true.
+-- If the email doesn't exist or the user lacks proper permissions, the function returns false.
+
+CREATE OR REPLACE FUNCTION admin_api_v1_0_0.remove_tribal_api_key_access(params JSON) 
+RETURNS BOOLEAN
+AS $remove_tribal_api_key_access$
+DECLARE 
+    user_exists BOOLEAN;
+BEGIN
+    -- If the API user has read permissions, give it a go
+    -- IF admin_api_v1_0_0_functions.has_admin_data_access('READ') THEN
+        -- Check if the user with the given email exists
+        SELECT EXISTS (
+            SELECT 1 
+            FROM public.dissemination_TribalApiAccessKeyIds
+            WHERE email = params->>'email'
+        )
+        INTO user_exists;
+
+        -- If the user exists, remove the record
+        IF user_exists THEN
+            DELETE FROM public.dissemination_TribalApiAccessKeyIds
+            WHERE email = params->>'email';
+            RETURN true; -- Return true to indicate success
+        ELSE
+            RETURN false; -- Return false to indicate failure
+        END IF;
+    ELSE
+        RETURN false; -- Return false if the API user doesn't have read permissions
+    END IF;
+END;
+$remove_tribal_api_key_access$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION admin_api_v1_0_0.request_file_access(
+    p_report_id VARCHAR(255),
+    p_api_key_id VARCHAR(255)
+) RETURNS JSON LANGUAGE plpgsql AS
+$$
+DECLARE
+    v_access_uuid VARCHAR(200);
+    v_has_permission BOOLEAN;
+    v_key_exists BOOLEAN;
+    v_key_added_date DATE;
+BEGIN
+    
+
+    -- Check if the user has tribal data access permission
+    SELECT api_v1_0_3_functions.has_tribal_data_access() INTO v_has_permission;
+
+    -- Check if the provided API key exists in public.dissemination_TribalApiAccessKeyIds
+    SELECT 
+        EXISTS(
+            SELECT 1
+            FROM public.dissemination_TribalApiAccessKeyIds
+            WHERE key_id = p_api_key_id
+        ) INTO v_key_exists;
+    
+
+    -- Get the added date of the key from public.dissemination_TribalApiAccessKeyIds
+    SELECT date_added
+    INTO v_key_added_date
+    FROM public.dissemination_TribalApiAccessKeyIds
+    WHERE key_id = p_api_key_id;
+    
+
+    -- Check if the key is less than 6 months old
+    IF p_api_key_id IS NOT NULL  AND v_has_permission AND v_key_exists AND v_key_added_date >= CURRENT_DATE - INTERVAL '6 months' THEN
+        -- Generate UUID (using PostgreSQL's gen_random_uuid function)
+        SELECT gen_random_uuid() INTO v_access_uuid;  
+              
+        -- Inserting data into the one_time_access table
+        INSERT INTO public.dissemination_onetimeaccess (uuid, api_key_id, timestamp, report_id)
+        VALUES (v_access_uuid::UUID, p_api_key_id, CURRENT_TIMESTAMP, p_report_id);
+
+        -- Return the UUID to the user
+        RETURN json_build_object('access_uuid', v_access_uuid);
+    ELSE
+        -- Return an error for unauthorized access
+        RETURN json_build_object('error', 'Unauthorized access or key older than 6 months')::JSON;
+    END IF;
+END;
+$$;
+
+
+
 commit;
 
 NOTIFY pgrst, 'reload schema';
