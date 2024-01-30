@@ -65,12 +65,10 @@ class Command(BaseCommand):
         audit_header = get_audit_header(options["dbkey"], year)
         json_test_tables = []
         for section, fun in sections_to_handlers.items():
-            (wb, api_json, _, filename) = generate_workbook(fun, audit_header, section)
+            (wb, _, filename) = generate_workbook(fun, audit_header, section)
             if wb:
                 wb_path = os.path.join(outdir, filename)
                 wb.save(wb_path)
-            if api_json:
-                json_test_tables.append(api_json)
 
         json_path = os.path.join(outdir, f'test-array-{options["dbkey"]}.json')
         logger.info(f"Writing JSON to {json_path}")
