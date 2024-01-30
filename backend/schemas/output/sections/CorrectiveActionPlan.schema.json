@@ -39,7 +39,8 @@
                      "contains_chart_or_table": {
                         "enum": [
                            "Y",
-                           "N"
+                           "N",
+                           "GSA_MIGRATION"
                         ],
                         "type": "string"
                      },

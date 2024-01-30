@@ -142,7 +142,7 @@ def _get_findings_grid(findings_list):
     ]
 
 
-def _get_findings(dbkey, year):
+def get_findings(dbkey, year):
     # CFDAs aka ELECAUDITS (or Audits) have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
     # The linkage here is that a given finding will have an elecauditid.
     # Multiple findings will have a given elecauditid. That's how to link them.
@@ -165,7 +165,7 @@ def generate_findings(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
-    findings = _get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
+    findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
     award_references = xform_construct_award_references(audits, findings)
     xform_sort_compliance_requirement(findings)
     map_simple_columns(wb, mappings, findings)
