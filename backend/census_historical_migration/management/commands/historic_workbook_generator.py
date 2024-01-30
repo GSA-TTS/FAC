@@ -14,7 +14,6 @@ from django.core.management.base import BaseCommand
 
 import os
 import sys
-import json
 import argparse
 import pprint
 import logging
