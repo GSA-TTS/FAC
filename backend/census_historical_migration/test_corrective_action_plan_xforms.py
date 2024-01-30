@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.test import SimpleTestCase
 
-from .workbooklib.corrective_action_plan import xform_add_placeholder_for_missing_references
+from .workbooklib.corrective_action_plan import (
+    xform_add_placeholder_for_missing_references,
+)
 
 
 class TestXformAddPlaceholderForMissingCapText(SimpleTestCase):
