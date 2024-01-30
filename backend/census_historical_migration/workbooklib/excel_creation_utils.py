@@ -220,3 +220,21 @@ def track_transformations(
             "transformation_functions": transformation_functions,
         }
     )
+
+
+def get_reference_numbers_from_findings(findings):
+    """Get all reference numbers from the findings."""
+    references = set()
+    for finding in findings:
+        references.add(string_to_string(finding.FINDINGREFNUMS))
+
+    return references
+
+
+def get_reference_numbers_from_text_records(texts):
+    """Get all reference numbers from the findingstext or captext records."""
+    references = set()
+    for text in texts:
+        references.add(string_to_string(text.FINDINGREFNUMS))
+
+    return references

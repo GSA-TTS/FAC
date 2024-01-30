@@ -25,7 +25,7 @@ local FindingsTextEntry = {
   properties: {
     reference_number: Base.Compound.ReferenceNumber,
     text_of_finding: Types.string,
-    contains_chart_or_table: Base.Enum.YorN,
+    contains_chart_or_table: Base.Enum.YorNorGsaMigration,
   },
   required: ['reference_number', 'text_of_finding', 'contains_chart_or_table'],
   title: 'FindingsTextEntry',

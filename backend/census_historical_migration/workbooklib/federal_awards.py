@@ -352,7 +352,31 @@ def _get_passthroughs(audits):
     return (passthrough_names, passthrough_ids)
 
 
-def xform_populate_default_passthrough_values(audits):
+def xform_match_number_passthrough_names_ids(names, ids):
+    """
+    Matches the number of passthrough names and IDs.
+    Iterates over a list of passthrough names and IDs.
+    If the number of passthrough names is greater than the number of passthrough IDs,
+    it fills in the missing passthrough IDs with `NA`.
+    """
+    # Transformation to be documented.
+    for idx, (name, id) in enumerate(zip(names, ids)):
+        passthrough_names = name.split("|")
+        passthrough_ids = id.split("|")
+        length_difference = len(passthrough_names) - len(passthrough_ids)
+        if length_difference > 0:
+            patch = [settings.GSA_MIGRATION for _ in range(length_difference)]
+            if id == "":
+                patch.append(settings.GSA_MIGRATION)
+                ids[idx] = "|".join(patch)
+            else:
+                passthrough_ids.extend(patch)
+                ids[idx] = "|".join(passthrough_ids)
+
+    return names, ids
+
+
+def xform_populate_default_passthrough_names_ids(audits):
     """
     Retrieves the passthrough names and IDs for a given list of audits.
     Automatically fills in default values for empty passthrough names and IDs.
@@ -360,7 +384,11 @@ def xform_populate_default_passthrough_values(audits):
     If the audit's DIRECT attribute is "N" and the passthrough name or ID is empty,
     it fills in a default value indicating that no passthrough name or ID was provided.
     """
+    # Transformation to be documented.
     passthrough_names, passthrough_ids = _get_passthroughs(audits)
+    passthrough_names, passthrough_ids = xform_match_number_passthrough_names_ids(
+        passthrough_names, passthrough_ids
+    )
     for index, audit, name, id in zip(
         range(len(audits)), audits, passthrough_names, passthrough_ids
     ):
@@ -387,14 +415,16 @@ def xform_populate_default_loan_balance(audits):
             if balance:
                 loans_at_end.append(balance)
             else:
-                loans_at_end.append(settings.GSA_MIGRATION)  # record transformation
+                loans_at_end.append(
+                    settings.GSA_MIGRATION
+                )  # transformation to be documented
         else:
-            if balance:
+            if balance and balance != "0":
                 raise DataMigrationError(
                     "Unexpected loan balance.", "unexpected_loan_balance"
                 )
             else:
-                loans_at_end.append("")
+                loans_at_end.append("")  # transformation to be documented
 
     return loans_at_end
 
@@ -501,7 +531,7 @@ def generate_federal_awards(audit_header, outfile):
         conversion_fun=str,
     )
 
-    (passthrough_names, passthrough_ids) = xform_populate_default_passthrough_values(
+    (passthrough_names, passthrough_ids) = xform_populate_default_passthrough_names_ids(
         audits
     )
     set_range(wb, "passthrough_name", passthrough_names)

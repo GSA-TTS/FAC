@@ -25,7 +25,7 @@ local CorrectiveActionPlanEntry = {
   properties: {
     reference_number: Base.Compound.ReferenceNumber,
     planned_action: Types.string,
-    contains_chart_or_table: Base.Enum.YorN,
+    contains_chart_or_table: Base.Enum.YorNorGsaMigration,
   },
   required: ['reference_number', 'planned_action', 'contains_chart_or_table'],
   title: 'CorrectiveActionPlanEntry',
