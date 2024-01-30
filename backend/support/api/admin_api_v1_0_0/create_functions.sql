@@ -327,7 +327,7 @@ DECLARE
     user_exists BOOLEAN;
 BEGIN
     -- If the API user has read permissions, give it a go
-    -- IF admin_api_v1_0_0_functions.has_admin_data_access('READ') THEN
+    IF admin_api_v1_0_0_functions.has_admin_data_access('READ') THEN
         -- Check if the user with the given email exists
         SELECT EXISTS (
             SELECT 1 
