@@ -52,6 +52,23 @@ def include_private_results(request):
     return True
 
 
+def clean_textarea_input(text_input):
+    """
+    Given a string, return a list of cleaned searchable values.
+    Replace common separators with newlines. Split the lines into a list of strings. Strips the lines of any additional whitespace.
+    """
+    # Chaning .replace() is faster than other, cleaner looking methods such as .translate() and .maketrans()
+    # [',', ':', ';', '-'] -> '\n'
+    text_input = (
+        text_input.replace(",", "\n")
+        .replace(":", "\n")
+        .replace(";", "\n")
+        .replace("-", "\n")
+    )
+    text_input = [x.strip() for x in text_input.splitlines()]
+    return text_input
+
+
 def clean_form_data(form):
     """
     Given a SearchForm, return a namedtuple with its cleaned and formatted data.
@@ -63,8 +80,8 @@ def clean_form_data(form):
     )
 
     if form.is_valid():
-        uei_or_eins = form.cleaned_data["uei_or_ein"].splitlines()
-        alns = form.cleaned_data["aln"].replace(", ", " ").split()
+        uei_or_eins = clean_textarea_input(form.cleaned_data["uei_or_ein"])
+        alns = clean_textarea_input(form.cleaned_data["aln"])
         names = form.cleaned_data["entity_name"].splitlines()
         start_date = form.cleaned_data["start_date"]
         end_date = form.cleaned_data["end_date"]
