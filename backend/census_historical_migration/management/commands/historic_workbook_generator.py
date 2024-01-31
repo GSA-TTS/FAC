@@ -14,7 +14,6 @@ from django.core.management.base import BaseCommand
 
 import os
 import sys
-import json
 import argparse
 import pprint
 import logging
@@ -63,17 +62,8 @@ class Command(BaseCommand):
                 sys.exit()
 
         audit_header = get_audit_header(options["dbkey"], year)
-        json_test_tables = []
         for section, fun in sections_to_handlers.items():
-            (wb, api_json, _, filename) = generate_workbook(fun, audit_header, section)
+            (wb, _, filename) = generate_workbook(fun, audit_header, section)
             if wb:
                 wb_path = os.path.join(outdir, filename)
                 wb.save(wb_path)
-            if api_json:
-                json_test_tables.append(api_json)
-
-        json_path = os.path.join(outdir, f'test-array-{options["dbkey"]}.json')
-        logger.info(f"Writing JSON to {json_path}")
-        with open(json_path, "w") as test_file:
-            jstr = json.dumps(json_test_tables, indent=2, sort_keys=True)
-            test_file.write(jstr)
