@@ -307,7 +307,7 @@ BEGIN
 
     -- If the user does not exist, add a new record
     INSERT INTO public.dissemination_TribalApiAccessKeyIds (email, key_id, date_added)
-    VALUES (params->>'email', (params->>'key_id')::INTEGER, CURRENT_TIMESTAMP);
+    VALUES (params->>'email', params->>'key_id', CURRENT_TIMESTAMP);
 
     END IF;
 
@@ -352,27 +352,24 @@ $remove_tribal_api_key_access$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION admin_api_v1_0_0.request_file_access(
-    p_report_id VARCHAR(255),
-    p_api_key_id VARCHAR(255)
+    p_report_id VARCHAR(255)
 ) RETURNS JSON LANGUAGE plpgsql AS
 $$
 DECLARE
+    v_uuid_header VARCHAR(200);
     v_access_uuid VARCHAR(200);
-    v_has_permission BOOLEAN;
     v_key_exists BOOLEAN;
     v_key_added_date DATE;
 BEGIN
     
-
-    -- Check if the user has tribal data access permission
-    SELECT api_v1_0_3_functions.has_tribal_data_access() INTO v_has_permission;
+    SELECT admin_api_v1_0_0_functions.get_api_key_uuid() INTO v_uuid_header;
 
     -- Check if the provided API key exists in public.dissemination_TribalApiAccessKeyIds
     SELECT 
         EXISTS(
             SELECT 1
             FROM public.dissemination_TribalApiAccessKeyIds
-            WHERE key_id = p_api_key_id
+            WHERE key_id = v_uuid_header
         ) INTO v_key_exists;
     
 
@@ -380,17 +377,17 @@ BEGIN
     SELECT date_added
     INTO v_key_added_date
     FROM public.dissemination_TribalApiAccessKeyIds
-    WHERE key_id = p_api_key_id;
+    WHERE key_id = v_uuid_header;
     
 
     -- Check if the key is less than 6 months old
-    IF p_api_key_id IS NOT NULL  AND v_has_permission AND v_key_exists AND v_key_added_date >= CURRENT_DATE - INTERVAL '6 months' THEN
+    IF v_uuid_header IS NOT NULL AND v_key_exists AND v_key_added_date >= CURRENT_DATE - INTERVAL '6 months' THEN
         -- Generate UUID (using PostgreSQL's gen_random_uuid function)
         SELECT gen_random_uuid() INTO v_access_uuid;  
               
         -- Inserting data into the one_time_access table
         INSERT INTO public.dissemination_onetimeaccess (uuid, api_key_id, timestamp, report_id)
-        VALUES (v_access_uuid::UUID, p_api_key_id, CURRENT_TIMESTAMP, p_report_id);
+        VALUES (v_access_uuid::UUID, v_uuid_header, CURRENT_TIMESTAMP, p_report_id);
 
         -- Return the UUID to the user
         RETURN json_build_object('access_uuid', v_access_uuid);

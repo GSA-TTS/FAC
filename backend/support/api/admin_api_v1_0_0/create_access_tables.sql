@@ -35,7 +35,7 @@ INSERT INTO support_administrative_key_uuids
     (
         'timothy.ballard@gsa.gov',
         '1e2845a0-c844-4a6f-84ac-f398b58ce7c9',
-        'READ',
+        'CREATE,READ,DELETE',
         '2023-12-08'
     ),
     (

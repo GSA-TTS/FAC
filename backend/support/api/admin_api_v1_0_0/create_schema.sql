@@ -41,6 +41,9 @@ begin
         GRANT SELECT ON public.support_administrative_key_uuids TO api_fac_gov;
         -- We want to see data in flight as admins.
         GRANT SELECT ON public.audit_singleauditchecklist TO api_fac_gov;
+
+        GRANT INSERT, SELECT, DELETE on public.dissemination_tribalapiaccesskeyids to api_fac_gov;
+        GRANT INSERT on public.dissemination_onetimeaccess to api_fac_gov;
     end if;
 end
 $$
