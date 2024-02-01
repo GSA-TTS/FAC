@@ -18,6 +18,8 @@ schema_view = get_schema_view(
     renderer_classes=[JSONOpenAPIRenderer],
 )
 
+handler500 = "config.error_handlers.handler500"
+
 urlpatterns = [
     path("api/schema.json", schema_view),
     path(
