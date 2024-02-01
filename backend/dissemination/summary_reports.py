@@ -424,12 +424,12 @@ def gather_report_data_pre_certification(i2d_data):
         for obj in dissemination_data[model_name]:
             row = []
             for field_name in field_names:
-                value = getattr(obj, field_name)
-                # Wipe tzinfo
-                if isinstance(value, datetime):
-                    value = value.replace(tzinfo=None)
-                row.append(value)
-            data[model_name]["entries"].append(row)
+                if not field_name.startswith("_"):
+                    value = getattr(obj, field_name)
+                    # Wipe tzinfo
+                    if isinstance(value, datetime):
+                        value = value.replace(tzinfo=None)
+                    row.append(value)
 
     return data
 
