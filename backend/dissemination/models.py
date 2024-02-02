@@ -7,14 +7,15 @@ from .hist_models import census_2019, census_2022  # noqa: F401
 
 BIGINT_MAX_DIGITS = 25
 
-REPORT_ID_FK_HELP_TEXT = "; foreign key everywhere else"
+REPORT_ID_FK_HELP_TEXT = "GSAFAC generated identifier"
 
 
 class FindingText(models.Model):
     """Specific findings details. References General"""
 
     report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
     )
     finding_ref_number = models.TextField(
         "Finding Reference Number - FK",
@@ -33,14 +34,20 @@ class FindingText(models.Model):
 class AdditionalUei(models.Model):
     """Additional UEIs for this audit."""
 
-    report_id = models.TextField(REPORT_ID_FK_HELP_TEXT)
+    report_id = models.TextField(
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+    )
     additional_uei = models.TextField()
 
 
 class AdditionalEin(models.Model):
     """Additional EINs for this audit."""
 
-    report_id = models.TextField(REPORT_ID_FK_HELP_TEXT)
+    report_id = models.TextField(
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+    )
     additional_ein = models.TextField()
 
 
@@ -83,7 +90,8 @@ class Finding(models.Model):
         help_text=docs.prior_finding_ref_nums,
     )
     report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
     )
     # each element in the list is a FK to Finding
     type_requirement = models.TextField(
@@ -180,7 +188,8 @@ class FederalAward(models.Model):
         null=True,
     )
     report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
     )
     state_cluster_name = models.TextField(
         "The name of the state cluster",
@@ -204,7 +213,8 @@ class CapText(models.Model):
         help_text=docs.text_captext,
     )
     report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
     )
 
 
@@ -217,7 +227,8 @@ class Note(models.Model):
     is_minimis_rate_used = models.TextField("'Yes', 'No', or 'Both' (2 CFR 200.414(f))")
     rate_explained = models.TextField("Explanation for minimis rate")
     report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
     )
     content = models.TextField("Content of the Note", help_text=docs.content)
     note_title = models.TextField("Note title", help_text=docs.title)
@@ -234,7 +245,8 @@ class Passthrough(models.Model):
         "Order that the award line was reported",
     )
     report_id = models.TextField(
-        "G-FAC generated identifier. FK refers to General",
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
     )
     passthrough_id = models.TextField(
         "Identifying Number Assigned by the Pass-through Entity",
@@ -258,7 +270,8 @@ class General(models.Model):
     #     ]
 
     report_id = models.TextField(
-        "G-FAC generated identifier. ",
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
         unique=True,
     )
     auditee_certify_name = models.TextField(
@@ -533,7 +546,8 @@ class SecondaryAuditor(models.Model):
         help_text=docs.auditor_title,
     )
     report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
     )
 
 
@@ -546,7 +560,8 @@ class OneTimeAccess(models.Model):
         "API key Id for the user",
     )
     report_id = models.TextField(
-        "Report ID for the PDF being requested",
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
     )
 
 
