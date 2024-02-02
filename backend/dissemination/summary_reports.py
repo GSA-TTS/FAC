@@ -107,6 +107,10 @@ columns = [
     "BJ",
 ]
 
+# Each field here represents a field from the dissemination models, with the exeption of underscored fields.
+# Underscored fields are generated from other disseminated data, and should be ommitted from the pre-certification reports.
+# These fields are handled in "_get_attribute_or_data()"
+# If one would like to add more fields that require preprocessing (such as "_aln"), ensure that they begin with an underscore.
 field_name_ordered = {
     "general": [
         "report_id",
@@ -413,20 +417,26 @@ def gather_report_data_pre_certification(i2d_data):
     # We also strip tzinfo from the dates, because excel doesn't like them.
     # Once a row is created, append it to the data[ModelName]['entries'] array.
     for model in models:
-        model_name = model.__name__.lower()
-        # This pulls directly from the model
-        #   fields = model._meta.get_fields()
-        #   field_names = [f.name for f in fields]
-        # This uses the ordered columns above
-        field_names = field_name_ordered[model_name]
-        data[model_name] = {"field_names": field_names, "entries": []}
+        model_name = (
+            model.__name__.lower()
+        )  # Sheet/tab name, ex. "federalaward", "finding"
+        field_names = [
+            field_name
+            for field_name in field_name_ordered[model_name]
+            if not field_name.startswith("_")
+        ]  # Column names, omitting "_" fields
+        data[model_name] = {
+            "field_names": field_names,
+            "entries": [],
+        }  # The sheet/tab content, with no rows by default
 
+        # For every instance of a model we have, generate an appropriate row and append it to the sheet/tab.
+        # Ignore underscored fields and wipe timezone information.
         for obj in dissemination_data[model_name]:
             row = []
             for field_name in field_names:
                 if not field_name.startswith("_"):
                     value = getattr(obj, field_name)
-                    # Wipe tzinfo
                     if isinstance(value, datetime):
                         value = value.replace(tzinfo=None)
                     row.append(value)
