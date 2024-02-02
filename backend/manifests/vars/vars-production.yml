@@ -4,4 +4,4 @@ cf_env_name: PRODUCTION
 env_name: prod
 service_name: production
 endpoint: app.fac.gov
-instances: 2
+instances: 4
