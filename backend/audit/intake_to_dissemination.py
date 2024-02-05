@@ -35,6 +35,7 @@ class IntakeToDissemination(object):
         self.audit_year = int(audit_date.split("-")[0])
         self.loaded_objects: dict[str, list] = {}
         self.mode = mode
+        self.errors = []
 
     def load_all(self):
         load_methods = {
@@ -54,9 +55,9 @@ class IntakeToDissemination(object):
                 # Each method writes results into self.loaded_objects
                 load_method()
             except KeyError as key_error:
-                logger.warning(
-                    f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
-                )
+                error = f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
+                logger.warning(error)
+                self.errors.append(error)
         return self.loaded_objects
 
     def get_dissemination_objects(self):
@@ -69,9 +70,9 @@ class IntakeToDissemination(object):
                     model_class = type(object_list[0])
                     model_class.objects.bulk_create(object_list)
             except IntegrityError as e:
-                logging.warning(
-                    f"An error occurred during bulk creation for {key}: {e}"
-                )
+                error = f"An error occurred during bulk creation for {key}: {e}"
+                logger.warning(error)
+                self.errors.append(error)
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text

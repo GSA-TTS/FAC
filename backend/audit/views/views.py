@@ -3,6 +3,7 @@ import logging
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
+from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -720,23 +721,36 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             sac.save(
                 event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
             )
-            disseminated = sac.disseminate()
-            # FIXME: We should now provide a reasonable error to the user.
-            if disseminated is None:
-                sac.transition_to_disseminated()
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.DISSEMINATED,
-                )
 
-            logger.info(
-                "Dissemination errors: %s, report_id: %s", disseminated, report_id
-            )
+            with transaction.atomic():
+                # disseminated is None if there were no errors.
+                disseminated = sac.disseminate()
+                # FIXME: We should now provide a reasonable error to the user.
+                if disseminated is None:
+                    sac.transition_to_disseminated()
+                    sac.save(
+                        event_user=request.user,
+                        event_type=SubmissionEvent.EventType.DISSEMINATED,
+                    )
+
+                logger.info(
+                    "Dissemination errors: %s, report_id: %s", disseminated, report_id
+                )
 
             return redirect(reverse("audit:MySubmissions"))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
+        except IntegrityError:
+            # This is most likely the result of a race condition, where the user hits
+            # the submit button multiple times and the requests get round-robined to
+            # different instances, and the second attempt tries to insert an existing
+            # report_id into the dissemination.General table.
+            # Our assumption is that the first request succeeded (otherwise there
+            # wouldn't be an entry with that report_id to cause the error), and that we
+            # should log this but not report it to the user.
+            logger.info("IntegrityError on disseminating report_id: %s", report_id)
+            return redirect(reverse("audit:MySubmissions"))
 
 
 # 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView

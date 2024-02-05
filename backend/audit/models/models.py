@@ -198,15 +198,19 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         Cognizant/Oversight agency assignment followed by dissemination
         ETL.
         """
-        # try:
-        if not self.cognizant_agency and not self.oversight_agency:
-            self.assign_cog_over()
-        intake_to_dissem = IntakeToDissemination(self)
-        intake_to_dissem.load_all()
-        intake_to_dissem.save_dissemination_objects()
+        try:
+            if not self.cognizant_agency and not self.oversight_agency:
+                self.assign_cog_over()
+            intake_to_dissem = IntakeToDissemination(self)
+            intake_to_dissem.load_all()
+            intake_to_dissem.save_dissemination_objects()
+            if intake_to_dissem.errors:
+                return {"errors": intake_to_dissem.errors}
         # TODO: figure out what exceptions to catch here
-        # except Exception as err:
-        #     return {"error": err}
+        except Exception as err:
+            return {"errors": [err]}
+
+        return None
 
     def assign_cog_over(self):
         """
