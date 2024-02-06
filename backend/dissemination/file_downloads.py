@@ -6,18 +6,30 @@ from django.http import Http404
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 
-from audit.models import ExcelFile, SingleAuditReportFile
+from audit.models import (
+    ExcelFile, 
+    SingleAuditReportFile,
+    SingleAuditChecklist
+    )
 
 logger = logging.getLogger(__name__)
 
 
-def get_filename(sac, file_type):
+def get_filename(report_id, file_type):
+    # .first() returns None if nothing is there.
+    sac = SingleAuditChecklist.objects.filter(report_id=report_id).first()
     if file_type == "report":
         try:
-            file_obj = SingleAuditReportFile.objects.filter(sac=sac).latest(
-                "date_created"
-            )
-            return f"singleauditreport/{file_obj.filename}"
+            if sac:
+                file_obj = SingleAuditReportFile.objects.filter(sac=sac).latest(
+                    "date_created"
+                )
+                return f"singleauditreport/{file_obj.filename}"
+            else:
+                if settings.CENSUS_DATA_SOURCE in report_id:
+                    return f"singleauditreport/{report_id}.pdf"
+                else:
+                    raise Http404()
         except SingleAuditReportFile.DoesNotExist:
             raise Http404()
     else:

@@ -291,8 +291,8 @@ class PdfDownloadView(ReportAccessRequiredMixin, View):
         # only allow PDF downloads for disseminated submissions
         get_object_or_404(General, report_id=report_id)
 
-        sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
-        filename = get_filename(sac, "report")
+        # sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
+        filename = get_filename(report_id, "report")
 
         return redirect(get_download_url(filename))
 
@@ -306,8 +306,8 @@ class XlsxDownloadView(ReportAccessRequiredMixin, View):
         # only allow xlsx downloads from disseminated submissions
         get_object_or_404(General, report_id=report_id)
 
-        sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
-        filename = get_filename(sac, file_type)
+        # sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
+        filename = get_filename(report_id, file_type)
 
         return redirect(get_download_url(filename))
 
@@ -336,10 +336,10 @@ class OneTimeAccessDownloadView(View):
             ota = OneTimeAccess.objects.get(uuid=uuid)
 
             # try to find the SingleAuditChecklist associated with this OTA
-            sac = get_object_or_404(SingleAuditChecklist, report_id=ota.report_id)
+            # sac = get_object_or_404(SingleAuditChecklist, report_id=ota.report_id)
 
             # get the filename for the SingleAuditReport for this SAC
-            filename = get_filename(sac, "report")
+            filename = get_filename(ota.report_id, "report")
             download_url = get_download_url(filename)
 
             # delete the OTA object
