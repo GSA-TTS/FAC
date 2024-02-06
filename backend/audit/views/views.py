@@ -3,8 +3,9 @@ import logging
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.db.models import F
+from django.db.transaction import TransactionManagementError
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -723,25 +724,28 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             )
 
             with transaction.atomic():
-                # disseminated is None if there were no errors.
                 disseminated = sac.disseminate()
-                # FIXME: We should now provide a reasonable error to the user.
-                if disseminated is None:
-                    sac.transition_to_disseminated()
-                    sac.save(
-                        event_user=request.user,
-                        event_type=SubmissionEvent.EventType.DISSEMINATED,
-                    )
 
-                logger.info(
-                    "Dissemination errors: %s, report_id: %s", disseminated, report_id
+            # disseminated is None if there were no errors.
+            if disseminated is None:
+                sac.transition_to_disseminated()
+                sac.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.DISSEMINATED,
                 )
+            else:
+                pass
+                # FIXME: We should now provide a reasonable error to the user.
+
+            logger.info(
+                "Dissemination errors: %s, report_id: %s", disseminated, report_id
+            )
 
             return redirect(reverse("audit:MySubmissions"))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
-        except IntegrityError:
+        except TransactionManagementError:
             # This is most likely the result of a race condition, where the user hits
             # the submit button multiple times and the requests get round-robined to
             # different instances, and the second attempt tries to insert an existing
@@ -749,6 +753,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # Our assumption is that the first request succeeded (otherwise there
             # wouldn't be an entry with that report_id to cause the error), and that we
             # should log this but not report it to the user.
+            # See https://github.com/GSA-TTS/FAC/issues/3347
             logger.info("IntegrityError on disseminating report_id: %s", report_id)
             return redirect(reverse("audit:MySubmissions"))
 

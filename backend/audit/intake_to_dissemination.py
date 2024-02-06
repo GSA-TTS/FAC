@@ -35,7 +35,7 @@ class IntakeToDissemination(object):
         self.audit_year = int(audit_date.split("-")[0])
         self.loaded_objects: dict[str, list] = {}
         self.mode = mode
-        self.errors = []
+        self.errors: list[str] = []
 
     def load_all(self):
         load_methods = {
@@ -55,7 +55,9 @@ class IntakeToDissemination(object):
                 # Each method writes results into self.loaded_objects
                 load_method()
             except KeyError as key_error:
-                error = f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
+                error = (
+                    f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
+                )
                 logger.warning(error)
                 self.errors.append(error)
         return self.loaded_objects

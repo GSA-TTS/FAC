@@ -4,6 +4,7 @@ import json
 import logging
 
 from django.db import models
+from django.db.transaction import TransactionManagementError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
@@ -206,7 +207,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             intake_to_dissem.save_dissemination_objects()
             if intake_to_dissem.errors:
                 return {"errors": intake_to_dissem.errors}
-        # TODO: figure out what exceptions to catch here
+        except TransactionManagementError as err:
+            # We want to re-raise this to catch at the view level because we
+            # think it's due to a race condition where the user's submission
+            # has been disseminated successfully; see
+            # https://github.com/GSA-TTS/FAC/issues/3347
+            raise err
+        # TODO: figure out what narrower exceptions to catch here
         except Exception as err:
             return {"errors": [err]}
 
