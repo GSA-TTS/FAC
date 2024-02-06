@@ -59,6 +59,7 @@ from audit.validators import (
 )
 
 from dissemination.file_downloads import get_download_url, get_filename
+from dissemination.models import General
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
@@ -755,7 +756,9 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # should log this but not report it to the user.
             # See https://github.com/GSA-TTS/FAC/issues/3347
             logger.info("IntegrityError on disseminating report_id: %s", report_id)
-            return redirect(reverse("audit:MySubmissions"))
+            if General.objects.get(report_id=sac.report_id):
+                return redirect(reverse("audit:MySubmissions"))
+            raise
 
 
 # 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView
