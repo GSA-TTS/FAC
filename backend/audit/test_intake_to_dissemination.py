@@ -1,5 +1,7 @@
 from datetime import datetime, time, timezone, timedelta
 import json
+import logging
+from unittest import mock
 from django.test import TestCase
 from model_bakery import baker
 from faker import Faker
@@ -428,6 +430,15 @@ class IntakeToDisseminationTests(TestCase):
             Util.json_array_to_str(self.sac.audit_information["gaap_results"]),
             general.gaap_results,
         )
+
+    def test_load_general_race_condition_logging(self):
+        self.intake_to_dissemination.load_general()
+        logger = logging.getLogger(self.intake_to_dissemination.__module__)
+        self.intake_to_dissemination.save_dissemination_objects()
+        with mock.patch.object(logger, "warning") as mock_warning:
+            self.intake_to_dissemination.save_dissemination_objects()
+            mock_warning.assert_called()
+        self.assertEquals(1, len(self.intake_to_dissemination.errors))
 
     def test_submitted_date(self):
         """
