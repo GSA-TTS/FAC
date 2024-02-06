@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # These are API versions we want live.
-live = {"dissemination": ["api_v1_0_3"], "support": ["admin_api_v1_0_0"]}
+live = {"dissemination": ["api_v1_1_0"], "support": ["admin_api_v1_1_0"]}
 
 # These are API versions we have deprecated.
 # They will be removed. It should be safe to leave them

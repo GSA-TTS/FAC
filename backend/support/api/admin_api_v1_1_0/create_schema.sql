@@ -3,28 +3,28 @@ begin;
 do
 $$
 begin
-    DROP SCHEMA IF EXISTS admin_api_v1_0_0 CASCADE;
-    DROP SCHEMA IF EXISTS admin_api_v1_0_0_functions CASCADE;
+    DROP SCHEMA IF EXISTS admin_api_v1_1_0 CASCADE;
+    DROP SCHEMA IF EXISTS admin_api_v1_1_0_functions CASCADE;
 
-    if not exists (select schema_name from information_schema.schemata where schema_name = 'admin_api_v1_0_0') then
-        create schema admin_api_v1_0_0;
-        create schema admin_api_v1_0_0_functions;
+    if not exists (select schema_name from information_schema.schemata where schema_name = 'admin_api_v1_1_0') then
+        create schema admin_api_v1_1_0;
+        create schema admin_api_v1_1_0_functions;
 
-        grant usage on schema admin_api_v1_0_0_functions to api_fac_gov;
+        grant usage on schema admin_api_v1_1_0_functions to api_fac_gov;
 
         -- Grant access to tables and views
         alter default privileges
-            in schema admin_api_v1_0_0
+            in schema admin_api_v1_1_0
             grant select
         -- this includes views
         on tables
         to api_fac_gov;
                 
         -- Grant access to sequences, if we have them
-        grant usage on schema admin_api_v1_0_0 to api_fac_gov;
-        grant select, usage on all sequences in schema admin_api_v1_0_0 to api_fac_gov;
+        grant usage on schema admin_api_v1_1_0 to api_fac_gov;
+        grant select, usage on all sequences in schema admin_api_v1_1_0 to api_fac_gov;
         alter default privileges
-            in schema admin_api_v1_0_0
+            in schema admin_api_v1_1_0
             grant select, usage
         on sequences
         to api_fac_gov;

@@ -14,7 +14,7 @@
 -- To quote the work of Dav Pilkey, "remember this now."
 
 -- We don't grant tribal access (yet)
-create or replace function api_v1_0_3_functions.has_tribal_data_access() 
+create or replace function api_v1_1_0_functions.has_tribal_data_access() 
 returns boolean
 as $has_tribal_data_access$
 DECLARE 
@@ -22,7 +22,7 @@ DECLARE
     key_exists boolean;
 BEGIN
 
-    SELECT admin_api_v1_0_0_functions.get_api_key_uuid() INTO uuid_header;
+    SELECT admin_api_v1_1_0_functions.get_api_key_uuid() INTO uuid_header;
     SELECT 
         CASE WHEN EXISTS (
             SELECT key_id 
