@@ -6,11 +6,7 @@ from django.http import Http404
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 
-from audit.models import (
-    ExcelFile, 
-    SingleAuditReportFile,
-    SingleAuditChecklist
-    )
+from audit.models import ExcelFile, SingleAuditReportFile, SingleAuditChecklist
 
 logger = logging.getLogger(__name__)
 
