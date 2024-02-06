@@ -16,7 +16,7 @@ from dissemination.file_downloads import get_filename
 from model_bakery import baker
 
 
-class FileDownloadsTests(TestCase):
+class GetFilenameTests(TestCase):
     def setUp(self):
         pass
 
