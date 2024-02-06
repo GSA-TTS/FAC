@@ -1,13 +1,15 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from unittest.mock import patch
 
-from django.test import Client, TestCase
+from django.test import Client, TestCase, TransactionTestCase
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+
+from faker import Faker
 
 from model_bakery import baker
 
@@ -46,6 +48,7 @@ from audit.models import (
 )
 from audit.cross_validation.naming import SECTION_NAMES as SN
 from audit.views import MySubmissions
+from dissemination.models import FederalAward, General
 
 User = get_user_model()
 
@@ -129,6 +132,20 @@ def _merge_dict_seq(seq):
     return {k: v for d in seq for k, v in d.items()}
 
 
+def _build_auditor_cert_dict(certification: dict, signature: dict) -> dict:
+    return {
+        "auditor_certification": certification,
+        "auditor_signature": signature,
+    }
+
+
+def _build_auditee_cert_dict(certification: dict, signature: dict) -> dict:
+    return {
+        "auditee_certification": certification,
+        "auditee_signature": signature,
+    }
+
+
 def _just_uei(uei, fieldname):
     """
     _just_uei("whatever", "additional_eins") returns:
@@ -151,6 +168,26 @@ def _just_uei_workbooks(uei):
     """
     workbooks = {k: v for k, v in SN.items() if v.workbook_number}
     return {k: _just_uei(uei, k) for k in workbooks}
+
+
+def _fake_audit_information():
+    # TODO: consolidate all fixtures! This is a copy of a fixture from
+    # intake_to_dissemination, which is not ideal.
+    fake = Faker()
+
+    return {
+        "dollar_threshold": 10345.45,
+        "gaap_results": json.dumps([fake.word()]),
+        "is_going_concern_included": "Y" if fake.boolean() else "N",
+        "is_internal_control_deficiency_disclosed": "Y" if fake.boolean() else "N",
+        "is_internal_control_material_weakness_disclosed": "Y"
+        if fake.boolean()
+        else "N",
+        "is_material_noncompliance_disclosed": "Y" if fake.boolean() else "N",
+        "is_aicpa_audit_guide_included": "Y" if fake.boolean() else "N",
+        "is_low_risk_auditee": "Y" if fake.boolean() else "N",
+        "agencies": json.dumps([fake.word()]),
+    }
 
 
 class RootPathTests(TestCase):
@@ -247,15 +284,34 @@ class SubmissionViewTests(TestCase):
         awardsfile = "federal-awards--test0001test--simple-pass.json"
 
         sac_data = just_ueis | {
-            "auditee_certification": _merge_dict_seq(fake_auditee_certification()),
-            "auditor_certification": _merge_dict_seq(fake_auditor_certification()),
-            "audit_information": {"stuff": "whatever"},
+            "auditee_certification": _build_auditee_cert_dict(
+                *fake_auditee_certification()
+            ),
+            "auditor_certification": _build_auditor_cert_dict(
+                *fake_auditor_certification()
+            ),
+            "audit_information": _fake_audit_information(),
             "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
             "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
             "submission_status": STATUSES.AUDITEE_CERTIFIED,
         }
+        sac_data["notes_to_sefa"]["NotesToSefa"]["accounting_policies"] = "Exhaustive"
+        sac_data["notes_to_sefa"]["NotesToSefa"]["is_minimis_rate_used"] = "Y"
+        sac_data["notes_to_sefa"]["NotesToSefa"]["rate_explained"] = "At great length"
         user, sac = _make_user_and_sac(**sac_data)
 
+        required_statuses = (
+            STATUSES.AUDITEE_CERTIFIED,
+            STATUSES.AUDITOR_CERTIFIED,
+            STATUSES.READY_FOR_CERTIFICATION,
+            STATUSES.CERTIFIED,
+        )
+
+        for rs in required_statuses:
+            sac.transition_name.append(rs)
+            sac.transition_date.append(datetime.now(timezone.utc))
+
+        sac.save()
         baker.make(Access, user=user, sac=sac, role="certifying_auditee_contact")
 
         response = _authed_post(
@@ -270,7 +326,7 @@ class SubmissionViewTests(TestCase):
         self.assertEqual(sac_after.submission_status, STATUSES.DISSEMINATED)
 
 
-class SubmissionStatusTests(TestCase):
+class SubmissionStatusTests(TransactionTestCase):
     """
     Tests the expected order of progression for submission_status.
 
@@ -307,9 +363,13 @@ class SubmissionStatusTests(TestCase):
         awardsfile = "federal-awards--test0001test--simple-pass.json"
         just_ueis = _just_uei_workbooks("TEST0001TEST")
         sac_data = just_ueis | {
-            "auditee_certification": _merge_dict_seq(fake_auditee_certification()),
-            "auditor_certification": _merge_dict_seq(fake_auditor_certification()),
-            "audit_information": {"stuff": "whatever"},
+            "auditee_certification": _build_auditee_cert_dict(
+                *fake_auditee_certification()
+            ),
+            "auditor_certification": _build_auditor_cert_dict(
+                *fake_auditor_certification()
+            ),
+            "audit_information": _fake_audit_information(),
             "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
             "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
         }
@@ -357,9 +417,13 @@ class SubmissionStatusTests(TestCase):
         awardsfile = "federal-awards--test0001test--simple-pass.json"
         just_ueis = _just_uei_workbooks("TEST0001TEST")
         sac_data = just_ueis | {
-            "auditee_certification": _merge_dict_seq(fake_auditee_certification()),
-            "auditor_certification": _merge_dict_seq(fake_auditor_certification()),
-            "audit_information": {"stuff": "whatever"},
+            "auditee_certification": _build_auditee_cert_dict(
+                *fake_auditee_certification()
+            ),
+            "auditor_certification": _build_auditor_cert_dict(
+                *fake_auditor_certification()
+            ),
+            "audit_information": _fake_audit_information(),
             "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
             "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
         }
@@ -403,123 +467,206 @@ class SubmissionStatusTests(TestCase):
             SubmissionEvent.EventType.UNLOCKED_AFTER_CERTIFICATION,
         )
 
-        def test_auditor_certification(self):
-            """
-            Test that certifying auditor contacts can provide auditor certification
-            """
-            data_step_1, data_step_2 = fake_auditor_certification()
-            just_ueis = _just_uei_workbooks("TEST0001TEST")
-            sac_data = just_ueis | {
-                "submission_status": STATUSES.READY_FOR_CERTIFICATION
-            }
+    def test_auditor_certification(self):
+        """
+        Test that certifying auditor contacts can provide auditor certification
+        """
+        data_step_1, data_step_2 = fake_auditor_certification()
+        just_ueis = _just_uei_workbooks("TEST0001TEST")
+        sac_data = just_ueis | {"submission_status": STATUSES.READY_FOR_CERTIFICATION}
 
-            user, sac = _make_user_and_sac(**sac_data)
-            baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
+        user, sac = _make_user_and_sac(**sac_data)
+        baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
 
-            kwargs = {"report_id": sac.report_id}
-            _authed_post(
-                self.client,
-                user,
-                "audit:AuditorCertification",
-                kwargs=kwargs,
-                data=data_step_1,
-            )
-            _authed_post(
-                self.client,
-                user,
-                "audit:AuditorCertificationConfirm",
-                kwargs=kwargs,
-                data=data_step_1 | data_step_2,
-            )
+        kwargs = {"report_id": sac.report_id}
+        _authed_post(
+            self.client,
+            user,
+            "audit:AuditorCertification",
+            kwargs=kwargs,
+            data=data_step_1,
+        )
+        _authed_post(
+            self.client,
+            user,
+            "audit:AuditorCertificationConfirm",
+            kwargs=kwargs,
+            data=data_step_1 | data_step_2,
+        )
 
-            updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
-            self.assertEqual(updated_sac.submission_status, STATUSES.AUDITOR_CERTIFIED)
+        self.assertEqual(updated_sac.submission_status, STATUSES.AUDITOR_CERTIFIED)
 
-            submission_events = SubmissionEvent.objects.filter(sac=sac)
-            event_count = len(submission_events)
-            self.assertGreaterEqual(event_count, 1)
-            self.assertEqual(
-                submission_events[event_count - 1].event,
-                SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
-            )
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
+        )
 
-        def test_auditee_certification(self):
-            """
-            Test that certifying auditee contacts can provide auditee certification
-            """
-            data_step_1, data_step_2 = fake_auditee_certification()
-            just_ueis = _just_uei_workbooks("TEST0001TEST")
-            sac_data = just_ueis | {"submission_status": STATUSES.AUDITOR_CERTIFIED}
-            user, sac = _make_user_and_sac(**sac_data)
-            baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+    def test_auditee_certification(self):
+        """
+        Test that certifying auditee contacts can provide auditee certification
+        """
+        data_step_1, data_step_2 = fake_auditee_certification()
+        just_ueis = _just_uei_workbooks("TEST0001TEST")
+        sac_data = just_ueis | {"submission_status": STATUSES.AUDITOR_CERTIFIED}
+        user, sac = _make_user_and_sac(**sac_data)
+        baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
-            kwargs = {"report_id": sac.report_id}
-            _authed_post(
-                self.client,
-                user,
-                "audit:AuditeeCertification",
-                kwargs=kwargs,
-                data=data_step_1,
-            )
-            _authed_post(
-                self.client,
-                user,
-                "audit:AuditeeCertificationConfirm",
-                kwargs=kwargs,
-                data=data_step_1 | data_step_2,
-            )
+        kwargs = {"report_id": sac.report_id}
+        _authed_post(
+            self.client,
+            user,
+            "audit:AuditeeCertification",
+            kwargs=kwargs,
+            data=data_step_1,
+        )
+        _authed_post(
+            self.client,
+            user,
+            "audit:AuditeeCertificationConfirm",
+            kwargs=kwargs,
+            data=data_step_1 | data_step_2,
+        )
 
-            updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
-            self.assertEqual(updated_sac.submission_status, STATUSES.AUDITEE_CERTIFIED)
+        self.assertEqual(updated_sac.submission_status, STATUSES.AUDITEE_CERTIFIED)
 
-            submission_events = SubmissionEvent.objects.filter(sac=sac)
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
 
-            # the most recent event should be AUDITEE_CERTIFICATION_COMPLETED
-            event_count = len(submission_events)
-            self.assertGreaterEqual(event_count, 1)
-            self.assertEqual(
-                submission_events[event_count - 1].event,
-                SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
-            )
+        # the most recent event should be AUDITEE_CERTIFICATION_COMPLETED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+        )
 
-        def test_submission(self):
-            """
-            Test that certifying auditee contacts can perform submission
-            """
-            just_ueis = _just_uei_workbooks("TEST0001TEST")
-            geninfofile = "general-information--test0001test--simple-pass.json"
-            awardsfile = "federal-awards--test0001test--simple-pass.json"
+    def test_submission(self):
+        """
+        Test that certifying auditee contacts can perform submission
+        """
+        just_ueis = _just_uei_workbooks("TEST0001TEST")
+        geninfofile = "general-information--test0001test--simple-pass.json"
+        awardsfile = "federal-awards--test0001test--simple-pass.json"
 
-            sac_data = just_ueis | {
-                "auditee_certification": _merge_dict_seq(fake_auditee_certification()),
-                "auditor_certification": _merge_dict_seq(fake_auditor_certification()),
-                "audit_information": {"stuff": "whatever"},
-                "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
-                "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
-                "submission_status": STATUSES.AUDITEE_CERTIFIED,
-            }
-            user, sac = _make_user_and_sac(**sac_data)
+        sac_data = just_ueis | {
+            "auditee_certification": _build_auditee_cert_dict(
+                *fake_auditee_certification()
+            ),
+            "auditor_certification": _build_auditor_cert_dict(
+                *fake_auditor_certification()
+            ),
+            "audit_information": _fake_audit_information(),
+            "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
+            "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
+            "submission_status": STATUSES.AUDITEE_CERTIFIED,
+        }
+        sac_data["notes_to_sefa"]["NotesToSefa"]["accounting_policies"] = "Exhaustive"
+        sac_data["notes_to_sefa"]["NotesToSefa"]["is_minimis_rate_used"] = "Y"
+        sac_data["notes_to_sefa"]["NotesToSefa"]["rate_explained"] = "At great length"
+        user, sac = _make_user_and_sac(**sac_data)
 
-            baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+        required_statuses = (
+            STATUSES.AUDITEE_CERTIFIED,
+            STATUSES.AUDITOR_CERTIFIED,
+            STATUSES.READY_FOR_CERTIFICATION,
+            STATUSES.CERTIFIED,
+        )
 
-            kwargs = {"report_id": sac.report_id}
-            _authed_post(self.client, user, "audit:Submission", kwargs=kwargs)
+        for rs in required_statuses:
+            sac.transition_name.append(rs)
+            sac.transition_date.append(datetime.now(timezone.utc))
 
-            updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        sac.save()
 
-            self.assertEqual(updated_sac.submission_status, STATUSES.DISSEMINATED)
+        baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
-            submission_events = SubmissionEvent.objects.filter(sac=sac)
+        kwargs = {"report_id": sac.report_id}
+        _authed_post(self.client, user, "audit:Submission", kwargs=kwargs)
 
-            # the most recent event should be SUBMITTED
-            event_count = len(submission_events)
-            self.assertGreaterEqual(event_count, 1)
-            self.assertEqual(
-                submission_events[event_count - 1].event,
-                SubmissionEvent.EventType.DISSEMINATED,
-            )
+        updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+
+        self.assertEqual(updated_sac.submission_status, STATUSES.DISSEMINATED)
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be SUBMITTED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.DISSEMINATED,
+        )
+
+    def test_submission_race_condition(self):
+        """
+        Test that certifying auditee contacts can perform submission
+        """
+        just_ueis = _just_uei_workbooks("TEST0001TEST")
+        geninfofile = "general-information--test0001test--simple-pass.json"
+        awardsfile = "federal-awards--test0001test--simple-pass.json"
+
+        sac_data = just_ueis | {
+            "auditee_certification": _build_auditee_cert_dict(
+                *fake_auditee_certification()
+            ),
+            "auditor_certification": _build_auditor_cert_dict(
+                *fake_auditor_certification()
+            ),
+            "audit_information": _fake_audit_information(),
+            "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
+            "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
+            "submission_status": STATUSES.AUDITEE_CERTIFIED,
+        }
+        sac_data = just_ueis | {
+            "auditee_certification": _build_auditee_cert_dict(
+                *fake_auditee_certification()
+            ),
+            "auditor_certification": _build_auditor_cert_dict(
+                *fake_auditor_certification()
+            ),
+            "audit_information": _fake_audit_information(),
+            "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
+            "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
+            "submission_status": STATUSES.AUDITEE_CERTIFIED,
+        }
+        sac_data["notes_to_sefa"]["NotesToSefa"]["accounting_policies"] = "Exhaustive"
+        sac_data["notes_to_sefa"]["NotesToSefa"]["is_minimis_rate_used"] = "Y"
+        sac_data["notes_to_sefa"]["NotesToSefa"]["rate_explained"] = "At great length"
+        user, sac = _make_user_and_sac(**sac_data)
+
+        required_statuses = (
+            STATUSES.AUDITEE_CERTIFIED,
+            STATUSES.AUDITOR_CERTIFIED,
+            STATUSES.READY_FOR_CERTIFICATION,
+            STATUSES.CERTIFIED,
+        )
+
+        for rs in required_statuses:
+            sac.transition_name.append(rs)
+            sac.transition_date.append(datetime.now(timezone.utc))
+
+        sac.save()
+
+        baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+
+        # For this test, insert a matching report_id into general so that attempts to
+        # disseminate SACs with this report_id will fail:
+        general = baker.make(General, report_id=sac.report_id)
+        general.save()
+
+        kwargs = {"report_id": sac.report_id}
+        _authed_post(self.client, user, "audit:Submission", kwargs=kwargs)
+
+        # The above post should fail on dissemination and put nothing in
+        # dissemination.FederalAward, which, since this is a test context, should
+        # therefore be empty.
+        self.assertEqual(0, FederalAward.objects.count())
 
 
 class MockHttpResponse:
