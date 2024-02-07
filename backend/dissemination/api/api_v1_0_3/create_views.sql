@@ -83,8 +83,8 @@ create view api_v1_0_3.findings as
 create view api_v1_0_3.federal_awards as
     select
         award.report_id,
-        -- gen.auditee_uei,
-        -- gen.audit_year,
+        gen.auditee_uei,
+        gen.audit_year,
         ---
         award.award_reference,
         award.federal_agency_prefix,
