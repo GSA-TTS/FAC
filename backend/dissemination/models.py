@@ -564,8 +564,8 @@ class OneTimeAccess(models.Model):
         help_text=REPORT_ID_FK_HELP_TEXT,
     )
 
-class TribalApiAccessKeyIds(models.Model):
 
+class TribalApiAccessKeyIds(models.Model):
     email = models.TextField(
         "Email of the user",
     )
@@ -575,6 +575,7 @@ class TribalApiAccessKeyIds(models.Model):
     date_added = models.DateField(
         "Added date of the record",
     )
+
 
 class MigrationInspectionRecord(models.Model):
     audit_year = models.TextField(blank=True, null=True)
