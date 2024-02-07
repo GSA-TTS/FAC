@@ -109,7 +109,7 @@
                                 </p>
                             </td>
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
-                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Additional UEIs" %}text-gray-30{% endif %}">
+                                <p class="margin-y-1">
                                     <span><strong>Additional UEIs?</strong>&nbsp;
                                         {% if  data|getkey:"Additional UEIs" %}
                                             Y
@@ -117,27 +117,6 @@
                                             N
                                         {% endif %}
                                     </span>
-                                    {% if not data|getkey:"Additional UEIs" %}
-                                        <span class="display-flex flex-align-center text-gray-30">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 6
-                                        </span>
-                                    {% else %}
-                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        href="{% url 'dissemination:XlsxDownload' file_type="AdditionalUeis" report_id=report_id %}"
-                                        target="_blank">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 6
-                                        </a>
-                                    {% endif %}
                                 </p>
                             </td>
                         </tr>
@@ -148,7 +127,7 @@
                                 </p>
                             </td>
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
-                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Additional EINs" %}text-gray-30{% endif %}">
+                                <p class="margin-y-1">
                                     <span>
                                         <strong>Additional EINs?</strong>&nbsp;
                                         {% if  data|getkey:"Additional EINs" %}
@@ -157,27 +136,6 @@
                                             N
                                         {% endif %}
                                     </span>
-                                    {% if not data|getkey:"Additional EINs" %}
-                                        <span class="display-flex flex-align-center text-gray-30">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 8
-                                        </span>
-                                    {% else %}
-                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        href="{% url 'dissemination:XlsxDownload' file_type="AdditionalEins" report_id=report_id %}"
-                                        target="_blank">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 8
-                                        </a>
-                                    {% endif %}
                                 </p>
                             </td>
                         </tr>
@@ -243,7 +201,7 @@
                                 </p>
                             </td>
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
-                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Secondary Auditors" %}text-gray-30{% endif %}">
+                                <p class="margin-y-1">
                                     <span><strong>Secondary Auditors?</strong>&nbsp;
                                         {% if  data|getkey:"Secondary Auditors" %}
                                             Y
@@ -251,27 +209,6 @@
                                             N
                                         {% endif %}
                                     </span>
-                                    {% if not data|getkey:"Secondary Auditors" %}
-                                        <span class="display-flex flex-align-center text-gray-30">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 7
-                                        </span>
-                                    {% else %}
-                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        href="{% url 'dissemination:XlsxDownload' file_type="SecondaryAuditors" report_id=report_id %}"
-                                        target="_blank">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 7
-                                        </a>
-                                    {% endif %}
                                 </p>
                             </td>
                         </tr>
@@ -284,138 +221,44 @@
                     <tbody class="grid-row" id="{{ section_key }}-table__body">
                         <tr class="grid-row grid-col-12">
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
-                                <p class="margin-y-1 display-flex flex-row flex-justify">
+                                <p class="margin-y-1">
                                     <span><strong>Federal awards:</strong>&nbsp;
                                         {{ data|getkey:"Awards"|length }}
                                     </span>
-                                    <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                       href="{% url 'dissemination:XlsxDownload' file_type="FederalAwardsExpended" report_id=report_id %}"
-                                       target="_blank">
-                                        <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                             aria-hidden="true"
-                                             role="img">
-                                            {% uswds_sprite "file_download" %}
-                                        </svg>
-                                        Download workbook 1
-                                    </a>
                                 </p>
                             </td>
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
-                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Notes to SEFA" %}text-gray-30{% endif %}">
+                                <p class="margin-y-1 {% if not data|getkey:"Notes to SEFA" %}text-gray-30{% endif %}">
                                     <span><strong>Notes to SEFA:</strong>&nbsp;
                                         {{ data|getkey:"Notes to SEFA"|length }}
                                     </span>
-                                    {% if not data|getkey:"Notes to SEFA" %}
-                                        <span class="display-flex flex-align-center text-gray-30">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 2
-                                        </span>
-                                    {% else %}
-                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        href="{% url 'dissemination:XlsxDownload' file_type="NotesToSefa" report_id=report_id %}"
-                                        target="_blank">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 2
-                                        </a>
-                                    {% endif%}
                                 </p>
                             </td>
                         </tr>
                         <tr class="grid-row grid-col-12 margin-top-2">
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
-                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Audit Findings" %}text-gray-30{% endif %}">
+                                <p class="margin-y-1 {% if not data|getkey:"Audit Findings" %}text-gray-30{% endif %}">
                                     <span><strong>Findings:</strong>&nbsp;
                                         {{ data|getkey:"Audit Findings"|length }}
                                     </span>
-                                    {% if not data|getkey:"Audit Findings" %}
-                                        <span class="display-flex flex-align-center text-gray-30">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 3
-                                        </span>
-                                    {% else %}
-                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        href="{% url 'dissemination:XlsxDownload' file_type="FindingsUniformGuidance" report_id=report_id %}"
-                                        target="_blank">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 3
-                                        </a>
-                                    {% endif %}
                                 </p>
                             </td>
                             {% comment %} Findings text - If none, show the gray box with no link. {% endcomment %}
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
-                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Audit Findings Text" %}text-gray-30{% endif %}">
+                                <p class="margin-y-1 {% if not data|getkey:"Audit Findings Text" %}text-gray-30{% endif %}">
                                     <span><strong>Findings text:</strong>&nbsp;
                                         {{ data|getkey:"Audit Findings Text"|length }}
                                     </span>
-                                    {% if not data|getkey:"Audit Findings Text" %}
-                                        <span class="display-flex flex-align-center text-gray-30">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 4
-                                        </span>
-                                    {% else %}
-                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        href="{% url 'dissemination:XlsxDownload' file_type="FindingsText" report_id=report_id %}"
-                                        target="_blank">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 4
-                                        </a>
-                                    {% endif %}
                                 </p>
                             </td>
                         </tr>
                         {% comment %} CAP - If none, show the gray box with no link. {% endcomment %}
                         <tr class="grid-row grid-col-12 margin-top-2">
                             <td class="grid-col-12 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
-                                <p class="margin-y-1 display-flex flex-row flex-justify {% if not data|getkey:"Corrective Action Plan" %}text-gray-30{% endif %}">
+                                <p class="margin-y-1 {% if not data|getkey:"Corrective Action Plan" %}text-gray-30{% endif %}">
                                     <span><strong>CAP:</strong>&nbsp;
                                         {{ data|getkey:"Corrective Action Plan"|length }}
                                     </span>
-                                    {% if not data|getkey:"Corrective Action Plan" %}
-                                        <span class="display-flex flex-align-center text-gray-30">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 5
-                                        </span>
-                                    {% else %}
-                                        <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        href="{% url 'dissemination:XlsxDownload' file_type="CorrectiveActionPlan" report_id=report_id %}"
-                                        target="_blank">
-                                            <svg class="usa-icon usa-icon--size-3 margin-right-05"
-                                                aria-hidden="true"
-                                                role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                            Download workbook 5
-                                        </a>
-                                    {% endif %}
                                 </p>
                             </td>
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
