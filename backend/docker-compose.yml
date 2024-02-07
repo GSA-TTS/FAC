@@ -111,6 +111,8 @@ services:
       # See https://postgrest.org/en/stable/references/api/schemas.html#multiple-schemas for multiple schemas
       PGRST_DB_SCHEMAS: "api_v1_0_3, admin_api_v1_0_0"
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
+      # Enable this to inspect the DB plans for queries via EXPLAIN
+      PGRST_DB_PLAN_ENABLED: ${PGRST_DB_PLAN_ENABLED:-false}
     depends_on:
       db:
         condition: service_healthy

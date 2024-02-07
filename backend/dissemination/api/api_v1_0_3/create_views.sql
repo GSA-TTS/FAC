@@ -16,10 +16,11 @@ create view api_v1_0_3.findings_text as
         dissemination_findingtext ft,
         dissemination_general gen
     where
-        (ft.report_id = gen.report_id
+        ft.report_id = gen.report_id
          and
-         gen.is_public = true)
-        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public = true
+         or 
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by ft.id
 ;
 
@@ -37,10 +38,11 @@ create view api_v1_0_3.additional_ueis as
         dissemination_general gen,
         dissemination_additionaluei uei
     where
-        (gen.report_id = uei.report_id
+        gen.report_id = uei.report_id
          and
-         gen.is_public = true)
-        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public = true
+         or 
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by uei.id
 ;
 
@@ -67,10 +69,11 @@ create view api_v1_0_3.findings as
         dissemination_finding finding,
         dissemination_general gen
     where
-        (finding.report_id = gen.report_id
+        finding.report_id = gen.report_id
          and
-         gen.is_public = true)
-        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public = true
+         or 
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by finding.id
 ;
 
@@ -79,9 +82,9 @@ create view api_v1_0_3.findings as
 ---------------------------------------
 create view api_v1_0_3.federal_awards as
     select
-        gen.report_id,
-        gen.auditee_uei,
-        gen.audit_year,
+        award.report_id,
+        -- gen.auditee_uei,
+        -- gen.audit_year,
         ---
         award.award_reference,
         award.federal_agency_prefix,
@@ -106,10 +109,11 @@ create view api_v1_0_3.federal_awards as
         dissemination_federalaward award,
         dissemination_general gen
     where
-        (award.report_id = gen.report_id
+        award.report_id = gen.report_id
          and
-         gen.is_public = true)
-        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public = true
+         or 
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by award.id
 ;
 
@@ -130,10 +134,11 @@ create view api_v1_0_3.corrective_action_plans as
         dissemination_CAPText ct,
         dissemination_General gen
     where
-        (ct.report_id = gen.report_id
+        ct.report_id = gen.report_id
          and
-         gen.is_public = true)
-        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public = true
+         or 
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by ct.id
 ;
 
@@ -156,10 +161,11 @@ create view api_v1_0_3.notes_to_sefa as
         dissemination_general gen,
         dissemination_note note
     where
-        (note.report_id = gen.report_id
+        note.report_id = gen.report_id
          and
-         gen.is_public = true)
-        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public = true
+         or 
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by note.id
 ;
 
@@ -179,10 +185,11 @@ create view api_v1_0_3.passthrough as
         dissemination_general as gen,
         dissemination_passthrough as pass
     where
-        (gen.report_id = pass.report_id
+        gen.report_id = pass.report_id
         and
-        gen.is_public = true)
-        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public = true
+        or 
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by pass.id
 ;
 
@@ -267,10 +274,11 @@ create view api_v1_0_3.general as
         dissemination_General gen,
         audit_singleauditchecklist aud
     where
-        (aud.report_id = gen.report_id
+        aud.report_id = gen.report_id
         and 
-        gen.is_public = true)
-        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public = true
+         or 
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by gen.id
 ;
 
@@ -297,10 +305,11 @@ create view api_v1_0_3.secondary_auditors as
         dissemination_General gen,
         dissemination_SecondaryAuditor sa
     where
-        (sa.report_id = gen.report_id
+        sa.report_id = gen.report_id
          and
-         gen.is_public=True)
-        or (gen.is_public=false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public=True
+         or 
+        (gen.is_public=false and api_v1_0_3_functions.has_tribal_data_access()))
     order by sa.id
 ;
 
@@ -315,13 +324,13 @@ create view api_v1_0_3.additional_eins as
         dissemination_general gen,
         dissemination_additionalein ein
     where
-        (gen.report_id = ein.report_id
+        gen.report_id = ein.report_id
          and
-         gen.is_public = true)
-        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
+        (gen.is_public = true
+         or 
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by ein.id
 ;
-
 
 commit;
 
