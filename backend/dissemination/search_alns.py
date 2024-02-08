@@ -34,11 +34,12 @@ def search_alns(general_results, params):
             f"search_alns general rows[{r_general_rids_matching_FA_rids.count()}]"
         )
 
-        annotated = _annotate_findings(
-            r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
-        )
-
-        sorted = _findings_sort(annotated, params)
+        # After migrating in historical data, this feature uses too much RAM/CPU.
+        # Disabled until we rework the expensive queries.
+        # annotated = _annotate_findings(
+        #     r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
+        # )
+        # sorted = _findings_sort(annotated, params)
 
         t1 = time.time()
         report_timing("search_alns", params, t0, t1)
