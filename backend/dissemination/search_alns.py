@@ -40,10 +40,11 @@ def search_alns(general_results, params):
         #     r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
         # )
         # sorted = _findings_sort(annotated, params)
+        # return sorted
 
         t1 = time.time()
         report_timing("search_alns", params, t0, t1)
-        return sorted
+        return r_general_rids_matching_FA_rids
 
 
 def _findings_sort(results, params):
