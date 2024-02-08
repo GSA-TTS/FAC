@@ -25,7 +25,7 @@ def loan_balance_present(ir):
     for index, (guarantee, balance) in enumerate(
         zip(is_guaranteed, loan_balance_at_period_end)
     ):
-        if (guarantee == "N") and balance:
+        if (guarantee == "N") and balance is not None:
             errors.append(
                 build_cell_error_tuple(
                     ir,

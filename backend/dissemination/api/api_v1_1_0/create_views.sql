@@ -79,7 +79,7 @@ create view api_v1_1_0.findings as
 ---------------------------------------
 create view api_v1_1_0.federal_awards as
     select
-        gen.report_id,
+        award.report_id,
         gen.auditee_uei,
         gen.audit_year,
         ---
@@ -321,7 +321,6 @@ create view api_v1_1_0.additional_eins as
         or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
     order by ein.id
 ;
-
 
 commit;
 

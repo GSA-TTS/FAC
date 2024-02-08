@@ -221,9 +221,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             report_id = kwargs["report_id"]
             form_section = kwargs["form_section"]
 
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            filename = get_filename(sac, form_section)
+            filename = get_filename(report_id, form_section)
             download_url = get_download_url(filename)
 
             return redirect(download_url)
