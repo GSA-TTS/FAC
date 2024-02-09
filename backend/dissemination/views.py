@@ -34,7 +34,38 @@ from dissemination.summary_reports import generate_summary_report
 
 from users.permissions import can_read_tribal
 
+import newrelic.agent
+
 logger = logging.getLogger(__name__)
+
+
+def _add_search_params_to_newrelic(search_parameters):
+    singles = [
+        "start_date",
+        "end_date",
+        "cog_or_oversight",
+        "agency_name",
+        "auditee_state",
+    ]
+
+    newrelic.agent.add_custom_attributes(
+        [(f"request.search.{k}", str(search_parameters[k])) for k in singles]
+    )
+
+    multis = [
+        "uei_or_eins",
+        "alns",
+        "names",
+    ]
+
+    newrelic.agent.add_custom_attributes(
+        [(f"request.search.{k}", ",".join(search_parameters[k])) for k in multis]
+    )
+
+    newrelic.agent.add_custom_attribute(
+        "request.search.audit_years",
+        ",".join([str(ay) for ay in search_parameters["audit_years"]]),
+    )
 
 
 def include_private_results(request):
@@ -122,6 +153,9 @@ def run_search(form_data, include_private):
         "order_by": form_data.order_by,
         "order_direction": form_data.order_direction,
     }
+
+    _add_search_params_to_newrelic(search_parameters)
+
     return search(search_parameters)
 
 
