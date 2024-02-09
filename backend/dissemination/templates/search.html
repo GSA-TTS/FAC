@@ -212,7 +212,16 @@
                                 {% for result in results %}
                                     <tr>
                                         <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
-                                        <td>{{ result.auditee_uei }}</td>
+                                        {% comment %} Display UEI. If it's "GSA_MIGRATION", use the EIN instead. If no EIN, just show "GSA_MIGRATION". {% endcomment %}
+                                        <td>
+                                            {% if result.auditee_uei != "GSA_MIGRATION" %}
+                                                {{ result.auditee_uei }}
+                                            {% elif result.auditee_ein %}
+                                                {{ result.auditee_ein }}
+                                            {% else %}
+                                                {{ result.auditee_uei }}
+                                            {% endif %}
+                                        </td>
                                         {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
                                         <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}
                                         </td>
