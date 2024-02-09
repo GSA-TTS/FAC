@@ -41,7 +41,8 @@ logger = logging.getLogger(__name__)
 
 def _add_search_params_to_newrelic(search_parameters):
     newrelic.agent.add_custom_attributes([
-        ("request.search.alns", search_parameters["alns"])
+        ("request.search.alns", ",".join(search_parameters["alns"])),
+        ("request.search.names", ",".join(search_parameters["names"])),
     ])
 
 
