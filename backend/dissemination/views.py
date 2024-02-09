@@ -48,9 +48,9 @@ def _add_search_params_to_newrelic(search_parameters):
         "auditee_state",
     ]
 
-    newrelic.agent.add_custom_attributes([
-        (f"request.search.{k}", str(search_parameters[k])) for k in singles
-    ])
+    newrelic.agent.add_custom_attributes(
+        [(f"request.search.{k}", str(search_parameters[k])) for k in singles]
+    )
 
     multis = [
         "uei_or_eins",
@@ -58,11 +58,14 @@ def _add_search_params_to_newrelic(search_parameters):
         "names",
     ]
 
-    newrelic.agent.add_custom_attributes([
-        (f"request.search.{k}", ",".join(search_parameters[k])) for k in multis
-    ])
+    newrelic.agent.add_custom_attributes(
+        [(f"request.search.{k}", ",".join(search_parameters[k])) for k in multis]
+    )
 
-    newrelic.agent.add_custom_attribute("request.search.audit_years", ",".join([str(ay) for ay in search_parameters["audit_years"]]))
+    newrelic.agent.add_custom_attribute(
+        "request.search.audit_years",
+        ",".join([str(ay) for ay in search_parameters["audit_years"]]),
+    )
 
 
 def include_private_results(request):
