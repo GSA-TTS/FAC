@@ -40,9 +40,27 @@ logger = logging.getLogger(__name__)
 
 
 def _add_search_params_to_newrelic(search_parameters):
+    singles = [
+        "start_date",
+        "end_date",
+        "cog_or_oversight",
+        "agency_name",
+        "auditee_state",
+    ]
+
     newrelic.agent.add_custom_attributes([
-        ("request.search.alns", ",".join(search_parameters["alns"])),
-        ("request.search.names", ",".join(search_parameters["names"])),
+        (f"request.search.{k}", str(search_parameters[k])) for k in singles
+    ])
+
+    multis = [
+        "uei_or_eins",
+        "alns",
+        "names",
+        "audit_years",
+    ]
+
+    newrelic.agent.add_custom_attributes([
+        (f"request.search.{k}", ",".join(str(search_parameters[k]))) for k in multis
     ])
 
 
