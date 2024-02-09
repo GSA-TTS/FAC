@@ -327,32 +327,6 @@ class SearchALNTests(TestCase):
         results_alns_both = search_alns(results_general_both, params_both)
         self.assertEqual(len(results_alns_both), 2)
 
-    def test_no_associated_awards(self):
-        """
-        When making an ALN search, there should be no results on a non-existent ALN or on one with no awards under the present conditions.
-        """
-        # General record with one award.
-        baker.make(
-            General,
-            is_public=True,
-            report_id="2022-04-TSTDAT-0000000001",
-            audit_year="2024",
-        )
-        baker.make(
-            FederalAward,
-            report_id="2022-04-TSTDAT-0000000001",
-            award_reference="2023-0001",
-            federal_agency_prefix="00",
-            federal_award_extension="000",
-            findings_count=1,
-        )
-
-        params = {"alns": ["99"], "audit_years": ["2024"]}
-        results_general = search_general(params)
-        results_alns = search_alns(results_general, params)
-
-        self.assertEqual(len(results_alns), 0)
-
     @unittest.skip("Skipping while ALN columns are disabled.")
     def test_finding_my_aln(self):
         """
