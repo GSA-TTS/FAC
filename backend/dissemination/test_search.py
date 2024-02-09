@@ -7,6 +7,7 @@ from model_bakery import baker
 
 import datetime
 import random
+import unittest
 
 
 def assert_all_results_public(cls, results):
@@ -326,6 +327,7 @@ class SearchALNTests(TestCase):
         results_alns_both = search_alns(results_general_both, params_both)
         self.assertEqual(len(results_alns_both), 2)
 
+    @unittest.skip("Skipping while ALN columns are disabled.")
     def test_finding_my_aln(self):
         """
         When making an ALN search, search_general should return records under that ALN.
@@ -352,6 +354,7 @@ class SearchALNTests(TestCase):
             and results_alns[0].finding_all_aln is False
         )
 
+    @unittest.skip("Skipping while ALN columns are disabled.")
     def test_finding_all_aln(self):
         """
         When making an ALN search, search_general should return records under that ALN.
@@ -385,6 +388,7 @@ class SearchALNTests(TestCase):
             and results_alns[0].finding_all_aln is True
         )
 
+    @unittest.skip("Skipping while ALN columns are disabled.")
     def test_finding_my_aln_and_finding_all_aln(self):
         """
         When making an ALN search, search_general should return records under that ALN.
@@ -419,6 +423,7 @@ class SearchALNTests(TestCase):
             and results_alns[0].finding_all_aln is True
         )
 
+    @unittest.skip("Skipping while ALN columns are disabled.")
     def test_alns_no_findings(self):
         # General record with one award and no findings.
         baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000004")
