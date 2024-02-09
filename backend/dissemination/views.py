@@ -34,7 +34,15 @@ from dissemination.summary_reports import generate_summary_report
 
 from users.permissions import can_read_tribal
 
+import newrelic.agent
+
 logger = logging.getLogger(__name__)
+
+
+def _add_search_params_to_newrelic(search_parameters):
+    newrelic.agent.add_custom_attributes([
+        ("request.search.alns", search_parameters["alns"])
+    ])
 
 
 def include_private_results(request):
@@ -122,6 +130,9 @@ def run_search(form_data, include_private):
         "order_by": form_data.order_by,
         "order_direction": form_data.order_direction,
     }
+
+    _add_search_params_to_newrelic(search_parameters)
+
     return search(search_parameters)
 
 
