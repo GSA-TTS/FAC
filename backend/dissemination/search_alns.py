@@ -89,7 +89,7 @@ def _gather_results_for_all_alns(full_alns, agency_numbers):
         if q_full_alns != Q():
             r_full_alns = FederalAward.objects.filter(q_full_alns)
 
-    r_all_alns = None
+    r_all_alns = FederalAward.objects.none()
     if r_agency_numbers and r_full_alns:
         # We need all of these. So, we union them.
         r_all_alns = r_agency_numbers | r_full_alns
