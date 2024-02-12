@@ -43,8 +43,11 @@ locals {
     # https://github.com/orgs/GSA-TTS/teams/fac-admins/members
     # TODO: Automate updates via GitHub's GraphQL API
     "bret.mogilefsky@gsa.gov",
+    "daniel.swick@gsa.gov",
     "jeanmarie.mariadassou@gsa.gov",
+    "matthew.jadud@gsa.gov",
     "tadhg.ohiggins@gsa.gov",
+    "timothy.ballard@gsa.gov",
   ]
 
   internal_asgs = [
