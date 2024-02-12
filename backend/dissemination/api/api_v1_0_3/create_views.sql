@@ -260,6 +260,7 @@ create view api_v1_0_3.general as
         gen.is_public,
         gen.data_source,
         gen.is_aicpa_audit_guide_included,
+        gen.is_additional_ueis,
         CASE EXISTS(SELECT ein.report_id FROM dissemination_additionalein ein WHERE ein.report_id = gen.report_id)
             WHEN FALSE THEN 'No'
             ELSE 'Yes'
