@@ -7,10 +7,6 @@ from django.core.exceptions import PermissionDenied
 
 from .models import Access, SingleAuditChecklist
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 User = get_user_model()
 
 
