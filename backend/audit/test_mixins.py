@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -22,17 +23,32 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
             pass
 
     def test_missing_report_id_raises(self):
+        user = baker.make(User)
         request = RequestFactory().get("/")
+        request.user = user
+
         view = self.ViewStub()
 
         self.assertRaises(KeyError, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
+        user = baker.make(User)
         request = RequestFactory().get("/")
+        request.user = user
+
         view = self.ViewStub()
 
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id="not-a-real-report-id"
+        )
+
+    def test_anonymous_raises(self):
+        request = RequestFactory().get("/")
+        request.user = AnonymousUser()
+
+        view = self.ViewStub()
+        self.assertRaises(
+            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
         )
 
     def test_no_access_raises(self):
@@ -65,17 +81,32 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
             pass
 
     def test_missing_report_id_raises(self):
+        user = baker.make(User)
         request = RequestFactory().get("/")
+        request.user = user
+
         view = self.ViewStub()
 
         self.assertRaises(KeyError, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
+        user = baker.make(User)
         request = RequestFactory().get("/")
+        request.user = user
+
         view = self.ViewStub()
 
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id="not-a-real-report-id"
+        )
+
+    def test_anonymous_raises(self):
+        request = RequestFactory().get("/")
+        request.user = AnonymousUser()
+
+        view = self.ViewStub()
+        self.assertRaises(
+            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
         )
 
     def test_no_access_raises(self):
@@ -137,17 +168,32 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
             pass
 
     def test_missing_report_id_raises(self):
+        user = baker.make(User)
         request = RequestFactory().get("/")
+        request.user = user
+
         view = self.ViewStub()
 
         self.assertRaises(KeyError, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
+        user = baker.make(User)
         request = RequestFactory().get("/")
+        request.user = user
+
         view = self.ViewStub()
 
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id="not-a-real-report-id"
+        )
+
+    def test_anonymous_raises(self):
+        request = RequestFactory().get("/")
+        request.user = AnonymousUser()
+
+        view = self.ViewStub()
+        self.assertRaises(
+            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
         )
 
     def test_no_access_raises(self):
