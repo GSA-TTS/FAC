@@ -18,6 +18,11 @@ module "s3-logshipper-storage" {
   tags             = ["logshipper-s3"]
 }
 
+resource "cloudfoundry_service_key" "logshipper-s3-service-key" {
+  name             = "fac-to-gsa"
+  service_instance = module.s3-logshipper-storage.bucket_id
+}
+
 resource "cloudfoundry_route" "logshipper" {
   space    = data.cloudfoundry_space.apps.id
   domain   = data.cloudfoundry_domain.public.id
