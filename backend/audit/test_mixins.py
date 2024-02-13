@@ -42,6 +42,14 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
             PermissionDenied, view.dispatch, request, report_id="not-a-real-report-id"
         )
 
+    def test_no_user_raises(self):
+        request = RequestFactory().get("/")
+
+        view = self.ViewStub()
+        self.assertRaises(
+            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
+        )
+
     def test_anonymous_raises(self):
         request = RequestFactory().get("/")
         request.user = AnonymousUser()
@@ -98,6 +106,14 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
 
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id="not-a-real-report-id"
+        )
+
+    def test_no_user_raises(self):
+        request = RequestFactory().get("/")
+
+        view = self.ViewStub()
+        self.assertRaises(
+            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
         )
 
     def test_anonymous_raises(self):
@@ -185,6 +201,14 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
 
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id="not-a-real-report-id"
+        )
+
+    def test_no_user_raises(self):
+        request = RequestFactory().get("/")
+
+        view = self.ViewStub()
+        self.assertRaises(
+            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
         )
 
     def test_anonymous_raises(self):
