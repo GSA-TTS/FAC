@@ -7,6 +7,10 @@ from django.core.exceptions import PermissionDenied
 
 from .models import Access, SingleAuditChecklist
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 User = get_user_model()
 
 
@@ -34,6 +38,9 @@ class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
 
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
+            if not request.user.is_authenticated:
+                raise PermissionDenied("You do not have access to this audit.")
+
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
@@ -53,6 +60,9 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         role = "certifying_auditee_contact"
         try:
+            if not request.user.is_authenticated:
+                raise PermissionDenied("You do not have access to this audit.")
+
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
@@ -83,6 +93,9 @@ class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         role = "certifying_auditor_contact"
         try:
+            if not request.user.is_authenticated:
+                raise PermissionDenied("You do not have access to this audit.")
+
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
