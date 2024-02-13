@@ -81,7 +81,7 @@ class AuditReportAdmin(admin.ModelAdmin):
 
 class SubmissionEventAdmin(admin.ModelAdmin):
     list_display = ("sac", "user", "timestamp", "event")
-    search_fields = ["sac__report_id", "user__username"]
+    search_fields = ("sac__report_id", "user__username")
 
 
 admin.site.register(Access, AccessAdmin)
