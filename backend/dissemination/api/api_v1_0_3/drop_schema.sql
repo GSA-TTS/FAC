@@ -1,9 +1,7 @@
 
 begin;
 
-DROP SCHEMA IF EXISTS api_v1_1_0 CASCADE;
-
---We can't drop these due to cascading issues during teardown and setup.
+DROP SCHEMA IF EXISTS api_v1_0_3 CASCADE;
 -- DROP ROLE IF EXISTS authenticator;
 -- DROP ROLE IF EXISTS api_fac_gov;
 

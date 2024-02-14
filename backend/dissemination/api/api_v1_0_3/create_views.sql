@@ -3,7 +3,7 @@ begin;
 ---------------------------------------
 -- finding_text
 ---------------------------------------
-create view api_v1_1_0.findings_text as
+create view api_v1_0_3.findings_text as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -18,14 +18,14 @@ create view api_v1_1_0.findings_text as
         ft.report_id = gen.report_id
          and
         (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by ft.id
 ;
 
 ---------------------------------------
 -- additional_ueis
 ---------------------------------------
-create view api_v1_1_0.additional_ueis as
+create view api_v1_0_3.additional_ueis as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -39,14 +39,14 @@ create view api_v1_1_0.additional_ueis as
         gen.report_id = uei.report_id
          and
         (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by uei.id
 ;
 
 ---------------------------------------
 -- finding
 ---------------------------------------
-create view api_v1_1_0.findings as
+create view api_v1_0_3.findings as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -69,14 +69,14 @@ create view api_v1_1_0.findings as
         finding.report_id = gen.report_id
          and
         (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by finding.id
 ;
 
 ---------------------------------------
 -- federal award
 ---------------------------------------
-create view api_v1_1_0.federal_awards as
+create view api_v1_0_3.federal_awards as
     select
         award.report_id,
         gen.auditee_uei,
@@ -108,7 +108,7 @@ create view api_v1_1_0.federal_awards as
         award.report_id = gen.report_id
          and
         (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by award.id
 ;
 
@@ -116,7 +116,7 @@ create view api_v1_1_0.federal_awards as
 ---------------------------------------
 -- corrective_action_plan
 ---------------------------------------
-create view api_v1_1_0.corrective_action_plans as
+create view api_v1_0_3.corrective_action_plans as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -132,14 +132,14 @@ create view api_v1_1_0.corrective_action_plans as
         ct.report_id = gen.report_id
          and
         (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by ct.id
 ;
 
 ---------------------------------------
 -- notes_to_sefa
 ---------------------------------------
-create view api_v1_1_0.notes_to_sefa as
+create view api_v1_0_3.notes_to_sefa as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -158,14 +158,14 @@ create view api_v1_1_0.notes_to_sefa as
         note.report_id = gen.report_id
          and
         (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by note.id
 ;
 
 ---------------------------------------
 -- passthrough
 ---------------------------------------
-create view api_v1_1_0.passthrough as
+create view api_v1_0_3.passthrough as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -181,7 +181,7 @@ create view api_v1_1_0.passthrough as
         gen.report_id = pass.report_id
         and
         (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by pass.id
 ;
 
@@ -189,7 +189,7 @@ create view api_v1_1_0.passthrough as
 ---------------------------------------
 -- general
 ---------------------------------------
-create view api_v1_1_0.general as
+create view api_v1_0_3.general as
     select
         -- every table starts with report_id, UEI, and year
         gen.report_id,
@@ -267,14 +267,14 @@ create view api_v1_1_0.general as
     where
         gen.is_public = true
          or 
-        (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access())
+        (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access())
     order by gen.id
 ;
 
 ---------------------------------------
 -- auditor (secondary auditor)
 ---------------------------------------
-create view api_v1_1_0.secondary_auditors as
+create view api_v1_0_3.secondary_auditors as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -297,11 +297,11 @@ create view api_v1_1_0.secondary_auditors as
         sa.report_id = gen.report_id
          and
         (gen.is_public=True
-        or (gen.is_public=false and api_v1_1_0_functions.has_tribal_data_access()))
+        or (gen.is_public=false and api_v1_0_3_functions.has_tribal_data_access()))
     order by sa.id
 ;
 
-create view api_v1_1_0.additional_eins as
+create view api_v1_0_3.additional_eins as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -315,7 +315,7 @@ create view api_v1_1_0.additional_eins as
         gen.report_id = ein.report_id
          and
         (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by ein.id
 ;
 

@@ -40,10 +40,7 @@ COMMENT ON SCHEMA api_v1_1_0 IS
 
 -- https://postgrest.org/en/stable/references/api/openapi.html
 -- This is the title
-COMMENT ON SCHEMA api_v1_1_0 IS
-$$v1.0.3
-
-A RESTful API that serves data from the SF-SAC.$$;
+COMMENT ON SCHEMA api_v1_1_0 IS 'A RESTful API that serves data from the SF-SAC.';
 
 commit;
 

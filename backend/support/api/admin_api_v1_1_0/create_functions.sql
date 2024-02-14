@@ -293,21 +293,21 @@ BEGIN
     -- If the API user has read permissions, give it a go
     IF admin_api_v1_1_0_functions.has_admin_data_access('CREATE') THEN
     -- Check if the user with the given email
-    SELECT EXISTS (
-        SELECT 1 
-        FROM public.dissemination_TribalApiAccessKeyIds
-        WHERE email = params->>'email'
-    )
-    INTO user_exists;
+        SELECT EXISTS (
+            SELECT 1 
+            FROM public.dissemination_TribalApiAccessKeyIds
+            WHERE email = params->>'email'
+        )
+        INTO user_exists;
 
-    -- If the user exists, return false (indicating failure)
-    IF user_exists THEN
-        RETURN false;
-    END IF;
+        -- If the user exists, return false (indicating failure)
+        IF user_exists THEN
+            RETURN false;
+        END IF;
 
-    -- If the user does not exist, add a new record
-    INSERT INTO public.dissemination_TribalApiAccessKeyIds (email, key_id, date_added)
-    VALUES (params->>'email', params->>'key_id', CURRENT_TIMESTAMP);
+        -- If the user does not exist, add a new record
+        INSERT INTO public.dissemination_TribalApiAccessKeyIds (email, key_id, date_added)
+        VALUES (params->>'email', params->>'key_id', CURRENT_TIMESTAMP);
 
     END IF;
 
@@ -352,11 +352,11 @@ $remove_tribal_api_key_access$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION admin_api_v1_1_0.request_file_access(
-    p_report_id VARCHAR(255)
+    p_report_id TEXT
 ) RETURNS JSON LANGUAGE plpgsql AS
 $$
 DECLARE
-    v_uuid_header VARCHAR(200);
+    v_uuid_header TEXT;
     v_access_uuid VARCHAR(200);
     v_key_exists BOOLEAN;
     v_key_added_date DATE;

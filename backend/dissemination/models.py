@@ -568,6 +568,7 @@ class OneTimeAccess(models.Model):
 class TribalApiAccessKeyIds(models.Model):
     email = models.TextField(
         "Email of the user",
+        unique=True,
     )
     key_id = models.TextField(
         "Key ID for the api access",
