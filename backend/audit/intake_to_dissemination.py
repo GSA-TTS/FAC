@@ -86,7 +86,7 @@ class IntakeToDissemination(object):
             )
             for entry in findings_text_entries:
                 finding_text_ = FindingText(
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     finding_ref_number=entry["reference_number"],
                     contains_chart_or_table=entry["contains_chart_or_table"],
                     finding_text=entry["text_of_finding"],
@@ -122,7 +122,7 @@ class IntakeToDissemination(object):
                     is_repeat_finding=findings["repeat_prior_reference"],
                     is_significant_deficiency=entry["significant_deficiency"],
                     prior_finding_ref_numbers=findings.get("prior_references", ""),
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     type_requirement=program["compliance_requirement"],
                 )
                 findings_objects.append(finding)
@@ -163,7 +163,7 @@ class IntakeToDissemination(object):
                 passthrough_amount=entry["subrecipients"].get(
                     "subrecipient_amount", None
                 ),
-                report_id=self.single_audit_checklist.report_id,
+                report_id=self.loaded_objects["Generals"][0],
                 state_cluster_name=cluster.get("state_cluster_name", ""),
             )
             federal_awards_objects.append(federal_award)
@@ -184,7 +184,7 @@ class IntakeToDissemination(object):
                     contains_chart_or_table=entry["contains_chart_or_table"],
                     finding_ref_number=entry["reference_number"],
                     planned_action=entry["planned_action"],
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                 )
                 cap_text_objects.append(cap_text)
 
@@ -206,7 +206,7 @@ class IntakeToDissemination(object):
             entries = n2sefa.get("notes_to_sefa_entries", [])
             if len(entries) == 0:
                 note = Note(
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     accounting_policies=accounting_policies,
                     is_minimis_rate_used=is_minimis_rate_used,
                     rate_explained=rate_explained,
@@ -215,7 +215,7 @@ class IntakeToDissemination(object):
             else:
                 for entry in entries:
                     note = Note(
-                        report_id=self.report_id,
+                        report_id=self.loaded_objects["Generals"][0],
                         accounting_policies=accounting_policies,
                         is_minimis_rate_used=is_minimis_rate_used,
                         rate_explained=rate_explained,
@@ -238,7 +238,7 @@ class IntakeToDissemination(object):
             for entity in entities:
                 passthrough = Passthrough(
                     award_reference=entry["award_reference"],
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     passthrough_id=entity.get("passthrough_identifying_number", ""),
                     passthrough_name=entity["passthrough_name"],
                 )
@@ -421,7 +421,6 @@ class IntakeToDissemination(object):
             secondary_auditors_entries = secondary_auditors.get(
                 "SecondaryAuditors", {}
             ).get("secondary_auditors_entries", [])
-
             for secondary_auditor in secondary_auditors_entries:
                 sec_auditor = SecondaryAuditor(
                     address_city=secondary_auditor["secondary_auditor_address_city"],
@@ -438,7 +437,7 @@ class IntakeToDissemination(object):
                     contact_name=secondary_auditor["secondary_auditor_contact_name"],
                     contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
                     contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                    report_id=self.single_audit_checklist.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                 )
                 sec_objs.append(sec_auditor)
 
@@ -455,7 +454,7 @@ class IntakeToDissemination(object):
         ):
             for entry in addls["AdditionalUEIs"]["additional_ueis_entries"]:
                 uei = AdditionalUei(
-                    report_id=self.single_audit_checklist.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     additional_uei=entry["additional_uei"],
                 )
                 uei_objs.append(uei)
@@ -472,7 +471,7 @@ class IntakeToDissemination(object):
         ):
             for entry in addls["AdditionalEINs"]["additional_eins_entries"]:
                 ein = AdditionalEin(
-                    report_id=self.single_audit_checklist.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     additional_ein=entry["additional_ein"],
                 )
                 ein_objs.append(ein)
