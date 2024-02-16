@@ -545,12 +545,12 @@ class SummaryViewTests(TestCase):
         Create a bunch of fake DB data under the same report_id. Then, check a few
         fields in the context for the summary page to verify that the fake data persists.
         """
-        baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
-        award = baker.make(FederalAward, report_id="2022-12-GSAFAC-0000000001")
-        finding = baker.make(Finding, report_id="2022-12-GSAFAC-0000000001")
-        finding_text = baker.make(FindingText, report_id="2022-12-GSAFAC-0000000001")
-        cap_text = baker.make(CapText, report_id="2022-12-GSAFAC-0000000001")
-        note = baker.make(Note, report_id="2022-12-GSAFAC-0000000001")
+        gen = baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
+        award = baker.make(FederalAward, report_id=gen)
+        finding = baker.make(Finding, report_id=gen)
+        finding_text = baker.make(FindingText, report_id=gen)
+        cap_text = baker.make(CapText, report_id=gen)
+        note = baker.make(Note, report_id=gen)
 
         url = reverse(
             "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}

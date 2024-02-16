@@ -493,12 +493,13 @@ class IntakeToDisseminationTests(TestCase):
         self._setup_and_test_privacy_flag(False)
 
     def test_load_federal_award(self):
+        self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.load_federal_award()
         self.intake_to_dissemination.save_dissemination_objects()
         federal_awards = FederalAward.objects.all()
         self.assertEqual(len(federal_awards), 1)
         federal_award = federal_awards.first()
-        self.assertEqual(self.report_id, federal_award.report_id)
+        self.assertEqual(self.report_id, federal_award.report_id.report_id)
         self.assertEqual(
             federal_award.federal_program_total,
             self.sac.federal_awards["FederalAwards"]["federal_awards"][0]["program"][
@@ -507,54 +508,61 @@ class IntakeToDisseminationTests(TestCase):
         )
 
     def test_load_findings(self):
+        self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.load_findings()
         self.intake_to_dissemination.save_dissemination_objects()
         findings = Finding.objects.all()
         self.assertEqual(len(findings), 4)
         finding = findings.first()
-        self.assertEqual(self.report_id, finding.report_id)
+        self.assertEqual(self.report_id, finding.report_id.report_id)
 
     def test_load_passthrough(self):
+        self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.load_passthrough()
         self.intake_to_dissemination.save_dissemination_objects()
         passthroughs = Passthrough.objects.all()
         self.assertEqual(len(passthroughs), 1)
         passthrough = passthroughs.first()
-        self.assertEqual(self.report_id, passthrough.report_id)
+        self.assertEqual(self.report_id, passthrough.report_id.report_id)
 
     def test_load_notes(self):
+        self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.load_notes()
         self.intake_to_dissemination.save_dissemination_objects()
         notes = Note.objects.all()
         self.assertEqual(len(notes), 1)
         note = notes.first()
-        self.assertEqual(self.report_id, note.report_id)
+        self.assertEqual(self.report_id, note.report_id.report_id)
 
     def test_load_finding_texts(self):
+        self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.load_finding_texts()
         self.intake_to_dissemination.save_dissemination_objects()
         finding_texts = FindingText.objects.all()
         self.assertEqual(len(finding_texts), 1)
         finding_text = finding_texts.first()
-        self.assertEqual(self.report_id, finding_text.report_id)
+        self.assertEqual(self.report_id, finding_text.report_id.report_id)
 
     def test_load_captext(self):
+        self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.load_captext()
         self.intake_to_dissemination.save_dissemination_objects()
         cap_texts = CapText.objects.all()
         self.assertEqual(len(cap_texts), 1)
         cap_text = cap_texts.first()
-        self.assertEqual(self.report_id, cap_text.report_id)
+        self.assertEqual(self.report_id, cap_text.report_id.report_id)
 
     def test_load_sec_auditor(self):
+        self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.load_secondary_auditor()
         self.intake_to_dissemination.save_dissemination_objects()
         sec_auditor = SecondaryAuditor.objects.first()
         print(self.sac.report_id)
         print(sec_auditor.report_id)
-        self.assertEquals(self.sac.report_id, sec_auditor.report_id)
+        self.assertEquals(self.sac.report_id, sec_auditor.report_id.report_id)
 
     def test_load_additional_ueis(self):
+        self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.load_additional_ueis()
         self.intake_to_dissemination.save_dissemination_objects()
         dissem_ueis = [obj.additional_uei for obj in AdditionalUei.objects.all()]
@@ -567,6 +575,7 @@ class IntakeToDisseminationTests(TestCase):
         self.assertEqual(set(dissem_ueis), set(intake_ueis))
 
     def test_load_additional_eins(self):
+        self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.load_additional_eins()
         self.intake_to_dissemination.save_dissemination_objects()
         dissem_eins = [obj.additional_ein for obj in AdditionalEin.objects.all()]

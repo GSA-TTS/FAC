@@ -282,7 +282,7 @@ class SearchALNTests(TestCase):
         )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000001",
+            report_id=prefix_object,
             federal_agency_prefix="12",
             federal_award_extension="345",
         )
@@ -292,15 +292,17 @@ class SearchALNTests(TestCase):
         )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000002",
+            report_id=extension_object,
             federal_agency_prefix="98",
             federal_award_extension="765",
         )
 
-        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000003")
+        gen_object = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000003"
+        )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000003",
+            report_id=gen_object,
             federal_agency_prefix="00",
             federal_award_extension="000",
         )
@@ -332,7 +334,7 @@ class SearchALNTests(TestCase):
         When making an ALN search, there should be no results on a non-existent ALN or on one with no awards under the present conditions.
         """
         # General record with one award.
-        baker.make(
+        gen_object = baker.make(
             General,
             is_public=True,
             report_id="2022-04-TSTDAT-0000000001",
@@ -340,7 +342,7 @@ class SearchALNTests(TestCase):
         )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000001",
+            report_id=gen_object,
             award_reference="2023-0001",
             federal_agency_prefix="00",
             federal_award_extension="000",
@@ -360,10 +362,12 @@ class SearchALNTests(TestCase):
         If the record has findings under that ALN, it should have finding_my_aln == True.
         """
         # General record with one award with a finding.
-        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000001")
+        gen_object = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000001"
+        )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000001",
+            report_id=gen_object,
             award_reference="2023-0001",
             federal_agency_prefix="00",
             federal_award_extension="000",
@@ -387,17 +391,19 @@ class SearchALNTests(TestCase):
         If the record has findings NOT under that ALN, it should have finding_all_aln == True.
         """
         # General record with two awards and one finding. Finding 2 is under a different ALN than finding 1.
-        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000002")
+        gen_object = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000002"
+        )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000002",
+            report_id=gen_object,
             federal_agency_prefix="11",
             federal_award_extension="111",
             findings_count=0,
         )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000002",
+            report_id=gen_object,
             award_reference="2023-0001",
             federal_agency_prefix="99",
             federal_award_extension="999",
@@ -421,10 +427,12 @@ class SearchALNTests(TestCase):
         If the record has findings both under that ALN and NOT under that ALN, it should have finding_my_aln == True and finding_all_aln == True.
         """
         # General record with two awards and two findings. Awards are under different ALNs.
-        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000003")
+        gen_object = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000003"
+        )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000003",
+            report_id=gen_object,
             award_reference="2023-0001",
             federal_agency_prefix="22",
             federal_award_extension="222",
@@ -432,7 +440,7 @@ class SearchALNTests(TestCase):
         )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000003",
+            report_id=gen_object,
             award_reference="2023-0002",
             federal_agency_prefix="99",
             federal_award_extension="999",
@@ -452,10 +460,12 @@ class SearchALNTests(TestCase):
     @unittest.skip("Skipping while ALN columns are disabled.")
     def test_alns_no_findings(self):
         # General record with one award and no findings.
-        baker.make(General, is_public=True, report_id="2022-04-TSTDAT-0000000004")
+        gen_object = baker.make(
+            General, is_public=True, report_id="2022-04-TSTDAT-0000000004"
+        )
         baker.make(
             FederalAward,
-            report_id="2022-04-TSTDAT-0000000004",
+            report_id=gen_object,
             findings_count=0,
             federal_agency_prefix="33",
             federal_award_extension="333",
