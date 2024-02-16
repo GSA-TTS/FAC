@@ -79,7 +79,7 @@ def create_functions(location):
 
 def deprecate_schemas_and_views(location):
     for version in deprecated[location]:
-        exec_sql(location, version, "drop.sql")
+        exec_sql(location, version, "drop_schema.sql")
 
 
 def create_access_tables(location):
