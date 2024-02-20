@@ -1,5 +1,4 @@
 from django import forms
-import itertools
 
 
 class SearchForm(forms.Form):
