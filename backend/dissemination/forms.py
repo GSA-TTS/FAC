@@ -89,22 +89,6 @@ class SearchForm(forms.Form):
         )
         text_input = [x.strip() for x in text_input.splitlines()]
         return text_input
-    
-    def clean_aln(self):
-        """
-        Clean up the UEI/EIN field. Replace common separators with a newline.
-        Split on the newlines. Strip all the resulting elements.
-        """
-        text_input = self.cleaned_data["aln"]
-        text_input = (
-            text_input.replace(",", "\n")
-            .replace(":", "\n")
-            .replace(";", "\n")
-            .replace("-", "\n")
-            .replace(" ", "\n")
-        )
-        text_input = [x.strip() for x in text_input.splitlines()]
-        return text_input
 
     def clean_page(self):
         """

@@ -1,5 +1,4 @@
 from django.db.models import Q
-from collections import namedtuple as NT
 import time
 from .search_general import report_timing
 

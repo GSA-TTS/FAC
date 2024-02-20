@@ -1,13 +1,6 @@
-from django.db.models import Q, Subquery
-from collections import namedtuple as NT
-from dissemination.models import Finding
+from django.db.models import Q
 import time
 from .search_general import report_timing
-
-from .search_constants import (
-    ORDER_BY,
-    DIRECTION,
-)
 
 import logging
 
