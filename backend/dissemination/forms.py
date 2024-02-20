@@ -36,11 +36,8 @@ class SearchForm(forms.Form):
     )
 
     major_program_choices = (
-        ("any", "Any"),
-        ("A", "A"),
-        ("D", "D"),
-        ("Q", "Q"),
-        ("U", "U"),
+        (True, "Y"),
+        (False, "N"),
     )
 
     # Query params
