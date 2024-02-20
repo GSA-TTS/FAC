@@ -5,7 +5,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponseRedirect
+from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from urllib.parse import parse_qs, urlencode
 
@@ -71,7 +71,7 @@ def login_callback(request):
         user = authenticate(request=request, **userinfo)
         if user:
             login(request, user)
-            logger.info("Successfully logged in user %s" % user)
+            logger.info(f"user {user} logged in")
             return redirect(request.session.get("next", "/"))
         else:
             raise o_e.BannedUser()
@@ -79,10 +79,14 @@ def login_callback(request):
         return error_page(request, err)
 
 
-def logout(request, next_page=None):
+def logout(request: HttpRequest, next_page=None):
     """Redirect the user to the authentication provider (OP) logout page."""
     try:
-        username = request.user.username
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect("/")
+
+        logger.info(f"user {request.user.username} logging out")
+
         request_args = {
             "client_id": CLIENT.client_id,
             "state": request.session["state"],
@@ -108,7 +112,6 @@ def logout(request, next_page=None):
         # Always remove Django session stuff - even if not logged out from OP.
         # Don't wait for the callback as it may never come.
         auth_logout(request)
-        logger.info("Successfully logged out user %s" % username)
         next_page = getattr(settings, "LOGOUT_REDIRECT_URL", None)
         if next_page:
             request.session["next"] = next_page
