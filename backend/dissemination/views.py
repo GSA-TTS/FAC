@@ -98,6 +98,7 @@ def run_search(form_data, include_private):
         "audit_years": form_data["audit_year"],
         "findings": form_data["findings"],
         "direct_funding": form_data["direct_funding"],
+        "major_program": form_data["major_program"],
         "auditee_state": form_data["auditee_state"],
         "include_private": include_private,
         "order_by": form_data["order_by"],

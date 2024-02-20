@@ -5,6 +5,7 @@ from .searchlib.search_general import report_timing, search_general
 from .searchlib.search_alns import search_alns
 from .searchlib.search_findings import search_findings
 from .searchlib.search_direct_funding import search_direct_funding
+from .searchlib.search_major_program import search_major_program
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ def search(params):
     results = search_alns(results, params)
     results = search_findings(results, params)
     results = search_direct_funding(results, params)
+    results = search_major_program(results, params)
 
     t1 = time.time()
     report_timing("search", params, t0, t1)

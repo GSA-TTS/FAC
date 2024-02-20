@@ -33,7 +33,7 @@
                                             id="audit-year-{{ text }}"
                                             name="audit_year" type="checkbox"
                                             value={{value}}
-                                            {% if text in form_user_input.audit_year %}checked{% endif %} />
+                                            {% if value in form_user_input.audit_year or text in form_user_input.audit_year %}checked{% endif %} />
                                      <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
                                  </div>
                              {% endfor %}
@@ -171,7 +171,25 @@
                               </div>
                           {% endfor %}
                         </div>
-                      </div>
+                        {% comment %} Major program {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.major_program %}"true"{% else %}"false"{% endif %}
+                                aria-controls="majorprogram">Major program</button>
+                        <div id="majorprogram">
+                          {% for value, text in form.major_program.field.choices %}
+                              <div class="usa-checkbox bg-base-lighter">
+                                  <input class="usa-checkbox__input"
+                                          id="major_program-{{ text }}"
+                                          name="major_program" type="checkbox"
+                                          value={{value}}
+                                          {% if value in form_user_input.major_program %}checked{% endif %} />
+                                  <label class="usa-checkbox__label" for="major_program-{{ text }}">{{ text }}</label>
+                              </div>
+                          {% endfor %}
+                        </div>
+                    </div>
+                      
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
