@@ -10,7 +10,7 @@ const already_submitted = document.getElementById(`already-submitted`); // Boole
 const file_input = document.getElementById(`file-input-${view_id}-xlsx`); // <input type="file">
 const info_box = document.getElementById(`info_box`); // <div>
 
-/* 
+/*
   Function definitions
 */
 // Disable/enable "Continue" button
@@ -80,7 +80,7 @@ function display_error_table(data) {
     // <a class="usa-link" href="${row_array[3]["link"]}">Link</a>
   }
 
-  const validationTable = `<p>Error on validation. Check the following cells for errors, and re-upload. 
+  const validationTable = `<p>Error on validation. Check the following cells for errors, and re-upload.
   Common errors include incorrect data types or missing information.</p>
   <table class="usa-table usa-table--striped">
     <thead>
@@ -111,7 +111,7 @@ function attachFileUploadHandler() {
         UPLOAD_URLS[current_url.pathname.split('/')[2]];
       if (!report_submission_url) throw 'No upload URL available.';
       if (!e.target.files[0]) throw 'No file selected.';
-      if (e.target.files[0].name.split('.').pop() !== 'xlsx')
+      if (e.target.files[0].name.split('.').pop().toLowerCase() !== 'xlsx')
         throw 'File type not accepted.';
 
       var body = new FormData();
