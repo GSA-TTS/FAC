@@ -439,6 +439,8 @@ def gather_report_data_pre_certification(i2d_data):
                     value = getattr(obj, field_name)
                     if isinstance(value, datetime):
                         value = value.replace(tzinfo=None)
+                    if isinstance(value, General):
+                        value = value.report_id
                     row.append(value)
             data[model_name]["entries"].append(row)
 
