@@ -1,7 +1,7 @@
 import glob
 import logging
 import requests
-import timeit
+import time
 from io import BytesIO
 
 from django.core.management.base import BaseCommand
@@ -37,11 +37,9 @@ def _scan_file(file, filepath):
         raise ClamAVError(filepath)
 
 
-def scan_file(filepath):
+def scan_file(file, filepath):
     try:
-        with open(filepath, "rb") as fh:
-            file = BytesIO(fh.read())
-            return _scan_file(file, filepath)
+        return _scan_file(file, filepath)
     except Exception as e:
         logger.error(f"SCAN SCAN_FILE {e}")
 
@@ -50,22 +48,36 @@ def scan_files_at_path(path, num_to_scan):
     good_count, bad_count = 0, 0
     filepaths = glob.glob(path + '*')
     num_scanned = 0
+    total_real_time, total_cpu_time = 0, 0
 
     while num_scanned < num_to_scan:
         # Short circuits scans when we have more files than needed
         filepaths_to_scan = filepaths[:num_to_scan-num_scanned]
 
         for filepath in filepaths_to_scan:
-            result = scan_file(filepath)
+            with open(filepath, "rb") as fh:
+                file = BytesIO(fh.read())
+
+            t1 = time.perf_counter(), time.process_time()
+
+            result = scan_file(file, filepath)
+
+            t2 = time.perf_counter(), time.process_time()
+            total_real_time += t2[0] - t1[0]
+            total_cpu_time += t2[1] - t1[1]
 
             if not check_scan_ok(result):
                 logger.error("SCAN revealed potential infection, %s", result)
-                bad_count = bad_count + 1
+                bad_count += 1
             else:
-                good_count = good_count + 1
+                good_count += 1
 
             num_scanned = good_count + bad_count
 
+    logger.info(f" Real time: {total_real_time} seconds")
+    logger.info(f" Real time average: {total_real_time / num_to_scan} seconds")
+    logger.info(f" CPU time: {total_cpu_time} seconds")
+    logger.info(f" CPU time average: {total_cpu_time / num_to_scan} seconds")
     return {"good_count": good_count, "bad_count": bad_count}
 
 
@@ -85,6 +97,14 @@ def check_scan_ok(result):
 
 
 class Command(BaseCommand):
+    help = """
+        Outputs metrics from performing ClamAV file scans
+        Usage:
+        manage.py collect_scan_metrics --path <path pattern> --num_to_scan <int>
+        Example:
+        manage.py collect_scan_metrics --path 'audit/fixtures/*.pdf' --num_to_scan 20
+    """
+
     def add_arguments(self, parser):
         parser.add_argument("--path", type=str, required=True, default=None)
         parser.add_argument("--num_to_scan", type=int, required=False, default=1)
