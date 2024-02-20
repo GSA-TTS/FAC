@@ -27,7 +27,7 @@ def _scan_file(file, filepath):
             settings.AV_SCAN_URL,
             files={"file": file},
             data={"name": filepath},
-            timeout=15,
+            timeout=300,
         )
     except requests.exceptions.ConnectionError:
         logger.error("SCAN Connection error")
@@ -46,9 +46,12 @@ def scan_file(file, filepath):
 
 def scan_files_at_path(path, num_to_scan):
     good_count, bad_count = 0, 0
-    filepaths = glob.glob(path + '*')
     num_scanned = 0
-    total_real_time, total_cpu_time = 0, 0
+    total_real_time = 0
+
+    filepaths = glob.glob(path + '*')
+    if not filepaths:
+        raise Exception(f"No files found at {path}")
 
     while num_scanned < num_to_scan:
         # Short circuits scans when we have more files than needed
@@ -63,8 +66,10 @@ def scan_files_at_path(path, num_to_scan):
             result = scan_file(file, filepath)
 
             t2 = time.perf_counter(), time.process_time()
-            total_real_time += t2[0] - t1[0]
-            total_cpu_time += t2[1] - t1[1]
+            real_time = t2[0] - t1[0]
+            total_real_time += real_time
+
+            logger.info(f"File real time: {real_time}")
 
             if not check_scan_ok(result):
                 logger.error("SCAN revealed potential infection, %s", result)
@@ -76,8 +81,7 @@ def scan_files_at_path(path, num_to_scan):
 
     logger.info(f" Real time: {total_real_time} seconds")
     logger.info(f" Real time average: {total_real_time / num_to_scan} seconds")
-    logger.info(f" CPU time: {total_cpu_time} seconds")
-    logger.info(f" CPU time average: {total_cpu_time / num_to_scan} seconds")
+
     return {"good_count": good_count, "bad_count": bad_count}
 
 
