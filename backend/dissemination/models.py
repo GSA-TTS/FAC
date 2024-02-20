@@ -13,9 +13,12 @@ REPORT_ID_FK_HELP_TEXT = "GSAFAC generated identifier"
 class FindingText(models.Model):
     """Specific findings details. References General"""
 
-    report_id = models.TextField(
-        "Report ID",
+    report_id = models.ForeignKey(
+        "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     finding_ref_number = models.TextField(
         "Finding Reference Number - FK",
@@ -34,9 +37,12 @@ class FindingText(models.Model):
 class AdditionalUei(models.Model):
     """Additional UEIs for this audit."""
 
-    report_id = models.TextField(
-        "Report ID",
+    report_id = models.ForeignKey(
+        "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     additional_uei = models.TextField()
 
@@ -44,9 +50,12 @@ class AdditionalUei(models.Model):
 class AdditionalEin(models.Model):
     """Additional EINs for this audit."""
 
-    report_id = models.TextField(
-        "Report ID",
+    report_id = models.ForeignKey(
+        "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     additional_ein = models.TextField()
 
@@ -89,9 +98,12 @@ class Finding(models.Model):
         "Audit finding reference numbers from the immediate prior audit",
         help_text=docs.prior_finding_ref_nums,
     )
-    report_id = models.TextField(
-        "Report ID",
+    report_id = models.ForeignKey(
+        "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     # each element in the list is a FK to Finding
     type_requirement = models.TextField(
@@ -187,13 +199,16 @@ class FederalAward(models.Model):
         help_text=docs.passthrough_amount,
         null=True,
     )
-    report_id = models.TextField(
-        "Report ID",
-        help_text=REPORT_ID_FK_HELP_TEXT,
-    )
     state_cluster_name = models.TextField(
         "The name of the state cluster",
         help_text=docs.state_cluster_name,
+    )
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
 
 
@@ -212,9 +227,12 @@ class CapText(models.Model):
         "Content of the Corrective Action Plan (CAP)",
         help_text=docs.text_captext,
     )
-    report_id = models.TextField(
-        "Report ID",
+    report_id = models.ForeignKey(
+        "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
 
 
@@ -226,9 +244,12 @@ class Note(models.Model):
     )
     is_minimis_rate_used = models.TextField("'Yes', 'No', or 'Both' (2 CFR 200.414(f))")
     rate_explained = models.TextField("Explanation for minimis rate")
-    report_id = models.TextField(
-        "Report ID",
+    report_id = models.ForeignKey(
+        "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     content = models.TextField("Content of the Note", help_text=docs.content)
     note_title = models.TextField("Note title", help_text=docs.title)
@@ -244,9 +265,12 @@ class Passthrough(models.Model):
     award_reference = models.TextField(
         "Order that the award line was reported",
     )
-    report_id = models.TextField(
-        "Report ID",
+    report_id = models.ForeignKey(
+        "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     passthrough_id = models.TextField(
         "Identifying Number Assigned by the Pass-through Entity",
@@ -545,9 +569,12 @@ class SecondaryAuditor(models.Model):
         "Title of CPA Contact",
         help_text=docs.auditor_title,
     )
-    report_id = models.TextField(
-        "Report ID",
+    report_id = models.ForeignKey(
+        "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
 
 

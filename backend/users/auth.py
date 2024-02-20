@@ -21,7 +21,7 @@ def claim_audit_access(user, all_emails):
         access_invites = Access.objects.filter(email__iexact=email).update(
             user_id=user.id, email=email
         )
-        logger.debug(f"{user.email} granted access to {access_invites} new audits")
+        logger.debug(f"{user.email} granted access to {access_invites} audits")
 
 
 def claim_permissions(user, all_emails):
