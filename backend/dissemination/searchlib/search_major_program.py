@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def search_major_program(general_results, params):
     """
-    Searches on FederalAward columns 'is_major'. Comes in as True/False, to search on Y/N. 
+    Searches on FederalAward columns 'is_major'. Comes in as True/False, to search on Y/N.
     """
     t0 = time.time()
     q = Q()
