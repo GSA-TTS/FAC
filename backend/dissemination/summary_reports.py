@@ -329,7 +329,10 @@ def _get_attribute_or_data(obj, field_name):
                 )
                 return getattr(fa, field_name)
     else:
-        return getattr(obj, field_name)
+        value = getattr(obj, field_name)
+        if isinstance(value, General):
+            value = value.report_id
+        return value
 
 
 def gather_report_data_dissemination(report_ids):
