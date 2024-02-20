@@ -3,6 +3,7 @@ import time
 from .search_constants import ORDER_BY, DIRECTION, DAS_LIMIT
 from .search_general import report_timing, search_general
 from .search_alns import search_alns
+from .search_findings import search_findings
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,7 @@ def search(params):
     results = search_general(params)
     results = _sort_results(results, params)
     results = search_alns(results, params)
+    results = search_findings(results, params)
 
     t1 = time.time()
     report_timing("search", params, t0, t1)

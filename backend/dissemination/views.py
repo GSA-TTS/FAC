@@ -88,7 +88,7 @@ def clean_form_data(form):
     """
     FormData = namedtuple(
         "FormData",
-        "uei_or_eins alns names start_date end_date cog_or_oversight agency_name audit_years auditee_state order_by order_direction limit page",
+        "uei_or_eins alns names start_date end_date cog_or_oversight agency_name audit_years findings auditee_state order_by order_direction limit page",
     )
 
     if form.is_valid():
@@ -102,6 +102,7 @@ def clean_form_data(form):
         audit_years = [
             int(year) for year in form.cleaned_data["audit_year"]
         ]  # Cast strings from HTML to int
+        findings_fields = form.cleaned_data["findings"]
         auditee_state = form.cleaned_data["auditee_state"]
         order_by = form.cleaned_data["order_by"]
         order_direction = form.cleaned_data["order_direction"]
@@ -119,6 +120,7 @@ def clean_form_data(form):
             cog_or_oversight,
             agency_name,
             audit_years,
+            findings_fields,
             auditee_state,
             order_by,
             order_direction,
@@ -148,6 +150,7 @@ def run_search(form_data, include_private):
         "cog_or_oversight": form_data.cog_or_oversight,
         "agency_name": form_data.agency_name,
         "audit_years": form_data.audit_years,
+        "findings": form_data.findings,
         "auditee_state": form_data.auditee_state,
         "include_private": include_private,
         "order_by": form_data.order_by,

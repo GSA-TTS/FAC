@@ -93,6 +93,24 @@
                                 </div>
                             </div>
                         </div>
+                        {% comment %} State {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded="true"
+                                aria-controls="state">State</button>
+                        <div id="state" class="usa-form-group">
+                            <label class="usa-label" for="auditee_state">
+                                State
+                            </label>
+                            <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
+                                <option value id="state--none">- Select -</option>
+                                {% for state in state_abbrevs %}
+                                <option value="{{ state }}" {% if form.cleaned_data.auditee_state == state %}selected{% endif %}>
+                                    {{ state }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         {% comment %} Cog/Over {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
@@ -115,29 +133,28 @@
                             </select>
                             <label class="usa-label" for="agency-name">Federal agency number</label>
                             <input class="usa-input"
-                                   id="agency-name"
-                                   name="agency_name"
-                                   value="{{ form.cleaned_data.agency_name }}" />
+                                  id="agency-name"
+                                  name="agency_name"
+                                  value="{{ form.cleaned_data.agency_name }}" />
                         </div>
-                        {% comment %} State {% endcomment %}
+                        {% comment %} Are there findings? {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded="true"
-                                aria-controls="state">State</button>
-                        <div id="state" class="usa-form-group">
-                            <label class="usa-label" for="auditee_state">
-                                State
-                            </label>
-                            <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
-                                <option value id="state--none">- Select -</option>
-                                {% for state in state_abbrevs %}
-                                <option value="{{ state }}" {% if form.cleaned_data.auditee_state == state %}selected{% endif %}>
-                                    {{ state }}
-                                </option>
-                                {% endfor %}
-                            </select>
+                                aria-controls="auditfindings"> Audit findings </button>
+                        <div id="auditfindings">
+                          {% for value, text in form.findings.field.choices %}
+                              <div class="usa-checkbox bg-base-lighter">
+                                  <input class="usa-checkbox__input"
+                                          id="findings-{{ text }}"
+                                          name="findings" type="checkbox"
+                                          value={{value}}
+                                          {% if text in form.cleaned_data.findings %}checked{% endif %} />
+                                  <label class="usa-checkbox__label" for="findings-{{ text }}">{{ text }}</label>
+                              </div>
+                          {% endfor %}
                         </div>
-                    </div>
+                      </div>
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
