@@ -6,6 +6,9 @@ on:
       environment:
         required: true
         type: string
+  push:
+    branches:
+      - cf-curl-test
 
 jobs:
   cf-curl:
