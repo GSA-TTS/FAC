@@ -6,6 +6,7 @@ on:
       environment:
         required: true
         type: string
+        default: "dev"
   push:
     branches:
       - cf-curl-test
