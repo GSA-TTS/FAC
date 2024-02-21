@@ -26,4 +26,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf curl /v3/apps/$(cf app gsa-fac --guid)/tasks
+          command: cf auth ${{ secrets.CF_USERNAME }} ${{ secrets.CF_PASSWORD }} && cf curl /v3/apps/$(cf app gsa-fac --guid)/tasks
