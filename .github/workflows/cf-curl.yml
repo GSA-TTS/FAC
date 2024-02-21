@@ -2,22 +2,18 @@
 name: Curl the running tasks for status
 on:
   workflow_dispatch:
-    inputs:
-      environment:
-        required: true
-        type: string
-        default: "dev"
   push:
     branches:
       - cf-curl-test
+
+env:
+  SPACE: "dev"
 
 jobs:
   cf-curl:
     name: Curl a specific environment for task status
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    env:
-      space: ${{ inputs.environment }}
+    environment: "dev"
     steps:
       - name: Run CF Curl Command
         uses: cloud-gov/cg-cli-tools@main
@@ -25,5 +21,5 @@ jobs:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
-          cf_space: ${{ env.space }}
-          command: cf auth ${{ secrets.CF_USERNAME }} ${{ secrets.CF_PASSWORD }} && cf curl /v3/apps/$(cf app gsa-fac --guid)/tasks
+          cf_space: ${{ env.SPACE }}
+          command: cf curl /v3/apps/$(cf app gsa-fac --guid)/tasks
