@@ -13,7 +13,7 @@ def search_major_program(general_results, params):
     """
     t0 = time.time()
     q = Q()
-    major_program_fields = params["major_program"]
+    major_program_fields = params.get("major_program", [])
 
     if True in major_program_fields:
         q |= Q(federalaward__is_major="Y")

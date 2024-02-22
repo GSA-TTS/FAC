@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def search_direct_funding(general_results, params):
     t0 = time.time()
     q = Q()
-    direct_funding_fields = params["direct_funding"]
+    direct_funding_fields = params.get("direct_funding", [])
 
     for field in direct_funding_fields:
         match field:

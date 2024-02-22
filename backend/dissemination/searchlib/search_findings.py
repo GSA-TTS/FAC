@@ -10,12 +10,11 @@ logger = logging.getLogger(__name__)
 def search_findings(general_results, params):
     t0 = time.time()
     q = Q()
-    findings_fields = params["findings"]
+    findings_fields = params.get("findings", [])
 
     for field in findings_fields:
         match field:
             case "is_modified_opinion":
-                # Are these booleans in the DB? Or, strings?
                 q |= Q(finding__is_modified_opinion="Y")
             case "is_other_findings":
                 q |= Q(finding__is_other_findings="Y")
