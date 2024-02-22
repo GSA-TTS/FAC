@@ -485,16 +485,16 @@ class SearchALNTests(TestCase):
 class SearchAdvancedFilterTests(TestCase):
     def test_search_findings(self):
         """
-        When making a search on a particular type of finding, search_general should only return records with a finding of that type. 
+        When making a search on a particular type of finding, search_general should only return records with a finding of that type.
         """
         findings_fields = [
-            {"is_modified_opinion": 'Y'},
-            {"is_other_findings": 'Y'},
-            {"is_material_weakness": 'Y'},
-            {"is_significant_deficiency": 'Y'},
-            {"is_other_matters": 'Y'},
-            {"is_questioned_costs": 'Y'},
-            {"is_repeat_finding": 'Y'},
+            {"is_modified_opinion": "Y"},
+            {"is_other_findings": "Y"},
+            {"is_material_weakness": "Y"},
+            {"is_significant_deficiency": "Y"},
+            {"is_other_matters": "Y"},
+            {"is_questioned_costs": "Y"},
+            {"is_repeat_finding": "Y"},
         ]
 
         # For every field, create a General object with an associated Finding with a 'Y' in that field.
@@ -502,14 +502,10 @@ class SearchAdvancedFilterTests(TestCase):
         finding_objects = []
         for field in findings_fields:
             general = baker.make(
-                        General,
-                        is_public=True,
-                    )
-            finding = baker.make(
-                Finding,
-                report_id=general,
-                **field
+                General,
+                is_public=True,
             )
+            finding = baker.make(Finding, report_id=general, **field)
             finding_objects.append(finding)
             gen_objects.append(general)
 
@@ -519,7 +515,13 @@ class SearchAdvancedFilterTests(TestCase):
         self.assertEqual(len(results), 1)
 
         # Three fields returns three appropriate generals
-        params = {"findings": ["is_other_findings", "is_material_weakness", "is_significant_deficiency"]}
+        params = {
+            "findings": [
+                "is_other_findings",
+                "is_material_weakness",
+                "is_significant_deficiency",
+            ]
+        }
         results = search(params)
         self.assertEqual(len(results), 3)
 
@@ -527,30 +529,22 @@ class SearchAdvancedFilterTests(TestCase):
         params = {"findings": ["a_garbage_field"]}
         results = search(params)
         self.assertEqual(len(results), 7)
-    
+
     def test_search_direct_funding(self):
         """
-        When making a search on direct/passthrough funding, search_general should only return records with an award of that type. 
+        When making a search on direct/passthrough funding, search_general should only return records with an award of that type.
         """
         general_direct = baker.make(
-                    General,
-                    is_public=True,
-                )
-        award_direct = baker.make(
-            FederalAward,
-            report_id=general_direct,
-            is_direct="Y"
+            General,
+            is_public=True,
         )
+        baker.make(FederalAward, report_id=general_direct, is_direct="Y")
 
         general_passthrough = baker.make(
-                    General,
-                    is_public=True,
-                )
-        award_passthrough = baker.make(
-            FederalAward,
-            report_id=general_passthrough,
-            is_direct="N"
+            General,
+            is_public=True,
         )
+        baker.make(FederalAward, report_id=general_passthrough, is_direct="N")
 
         params = {"direct_funding": ["direct_funding"]}
         results = search(params)
@@ -566,30 +560,22 @@ class SearchAdvancedFilterTests(TestCase):
         params = {"direct_funding": ["direct_funding", "passthrough_funding"]}
         results = search(params)
         self.assertEqual(len(results), 2)
-    
+
     def test_search_major_program(self):
         """
-        When making a search on major program, search_general should only return records with an award of that type. 
+        When making a search on major program, search_general should only return records with an award of that type.
         """
         general_major = baker.make(
-                    General,
-                    is_public=True,
-                )
-        award_major = baker.make(
-            FederalAward,
-            report_id=general_major,
-            is_major="Y"
+            General,
+            is_public=True,
         )
+        baker.make(FederalAward, report_id=general_major, is_major="Y")
 
         general_non_major = baker.make(
-                    General,
-                    is_public=True,
-                )
-        award_non_major = baker.make(
-            FederalAward,
-            report_id=general_non_major,
-            is_major="N"
+            General,
+            is_public=True,
         )
+        baker.make(FederalAward, report_id=general_non_major, is_major="N")
 
         params = {"major_program": [True]}
         results = search(params)
