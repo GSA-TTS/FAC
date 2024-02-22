@@ -10,13 +10,22 @@ from django.core.management.base import BaseCommand
 logger = logging.getLogger(__name__)
 
 
-def generate_files(wb, ws, num_files, output):
+def generate_files(base_xlsx, num_files, output):
+    logger.info(f"Loading base XLSX {base_xlsx}...")
+
+    wb = openpyxl.load_workbook(base_xlsx)
+    ws = wb.active
+
+    logger.info(f"Creating {num_files} files from {base_xlsx} in {output}")
+
     for i in range(num_files):
         dt = datetime.datetime.now()
         ws['A1'] = dt
         path = os.path.join(output, f"{dt}.xlsx")
         wb.save(path)
         logger.info(f"#{i + 1} Created: {path}")
+
+    logger.info("Done")
 
 
 class Command(BaseCommand):
@@ -52,11 +61,4 @@ class Command(BaseCommand):
             logger.error(f"Given base_xlsx {base_xlsx} does not exist")
             sys.exit()
 
-        logger.info(f"Loading base XLSX {base_xlsx}...")
-
-        wb = openpyxl.load_workbook(base_xlsx)
-        ws = wb.active
-
-        logger.info(f"Creating {num_files} files from {base_xlsx} in {output}")
-
-        generate_files(wb, ws, num_files, output)
+        generate_files(base_xlsx, num_files, output)
