@@ -3,7 +3,9 @@ import logging
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
+from django.db import transaction
 from django.db.models import F
+from django.db.transaction import TransactionManagementError
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -57,6 +59,7 @@ from audit.validators import (
 )
 
 from dissemination.file_downloads import get_download_url, get_filename
+from dissemination.models import General
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
@@ -218,9 +221,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             report_id = kwargs["report_id"]
             form_section = kwargs["form_section"]
 
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            filename = get_filename(sac, form_section)
+            filename = get_filename(report_id, form_section)
             download_url = get_download_url(filename)
 
             return redirect(download_url)
@@ -720,14 +721,20 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             sac.save(
                 event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
             )
-            disseminated = sac.disseminate()
-            # FIXME: We should now provide a reasonable error to the user.
+
+            with transaction.atomic():
+                disseminated = sac.disseminate()
+
+            # disseminated is None if there were no errors.
             if disseminated is None:
                 sac.transition_to_disseminated()
                 sac.save(
                     event_user=request.user,
                     event_type=SubmissionEvent.EventType.DISSEMINATED,
                 )
+            else:
+                pass
+                # FIXME: We should now provide a reasonable error to the user.
 
             logger.info(
                 "Dissemination errors: %s, report_id: %s", disseminated, report_id
@@ -737,6 +744,19 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
+        except TransactionManagementError:
+            # This is most likely the result of a race condition, where the user hits
+            # the submit button multiple times and the requests get round-robined to
+            # different instances, and the second attempt tries to insert an existing
+            # report_id into the dissemination.General table.
+            # Our assumption is that the first request succeeded (otherwise there
+            # wouldn't be an entry with that report_id to cause the error), and that we
+            # should log this but not report it to the user.
+            # See https://github.com/GSA-TTS/FAC/issues/3347
+            logger.info("IntegrityError on disseminating report_id: %s", report_id)
+            if General.objects.get(report_id=sac.report_id):
+                return redirect(reverse("audit:MySubmissions"))
+            raise
 
 
 # 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView

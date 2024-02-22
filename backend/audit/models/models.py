@@ -4,6 +4,7 @@ import json
 import logging
 
 from django.db import models
+from django.db.transaction import TransactionManagementError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
@@ -198,15 +199,25 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         Cognizant/Oversight agency assignment followed by dissemination
         ETL.
         """
-        # try:
-        if not self.cognizant_agency and not self.oversight_agency:
-            self.assign_cog_over()
-        intake_to_dissem = IntakeToDissemination(self)
-        intake_to_dissem.load_all()
-        intake_to_dissem.save_dissemination_objects()
-        # TODO: figure out what exceptions to catch here
-        # except Exception as err:
-        #     return {"error": err}
+        try:
+            if not self.cognizant_agency and not self.oversight_agency:
+                self.assign_cog_over()
+            intake_to_dissem = IntakeToDissemination(self)
+            intake_to_dissem.load_all()
+            intake_to_dissem.save_dissemination_objects()
+            if intake_to_dissem.errors:
+                return {"errors": intake_to_dissem.errors}
+        except TransactionManagementError as err:
+            # We want to re-raise this to catch at the view level because we
+            # think it's due to a race condition where the user's submission
+            # has been disseminated successfully; see
+            # https://github.com/GSA-TTS/FAC/issues/3347
+            raise err
+        # TODO: figure out what narrower exceptions to catch here
+        except Exception as err:
+            return {"errors": [err]}
+
+        return None
 
     def assign_cog_over(self):
         """

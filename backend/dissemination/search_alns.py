@@ -23,26 +23,21 @@ def search_alns(general_results, params):
 
     if not (full_alns or agency_numbers):
         return general_results
-    else:
-        r_FAs_matching_alns = _gather_results_for_all_alns(full_alns, agency_numbers)
-        all_alns_count = r_FAs_matching_alns.count()
-        logger.info(f"search_alns matching FederalAward rows[{all_alns_count}]")
-        r_general_rids_matching_FA_rids = general_results.filter(
-            report_id__in=Subquery(r_FAs_matching_alns.values_list("report_id"))
-        )  # _id_id
-        logger.info(
-            f"search_alns general rows[{r_general_rids_matching_FA_rids.count()}]"
-        )
 
-        annotated = _annotate_findings(
-            r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
-        )
+    awards_filters = _build_aln_q(full_alns, agency_numbers)
+    filtered_general_results = general_results.filter(awards_filters).distinct()
 
-        sorted = _findings_sort(annotated, params)
+    # After migrating in historical data, this feature uses too much RAM/CPU.
+    # Disabled until we rework the expensive queries.
+    # annotated = _annotate_findings(
+    #     r_general_rids_matching_FA_rids, params, r_FAs_matching_alns
+    # )
+    # sorted = _findings_sort(annotated, params)
+    # return sorted
 
-        t1 = time.time()
-        report_timing("search_alns", params, t0, t1)
-        return sorted
+    t1 = time.time()
+    report_timing("search_alns", params, t0, t1)
+    return filtered_general_results
 
 
 def _findings_sort(results, params):
@@ -61,6 +56,24 @@ def _findings_sort(results, params):
             reverse=bool(params.get("order_direction") == DIRECTION.descending),
         )
     return results
+
+
+def _build_aln_q(full_alns, agency_numbers):
+    """Build a filter for the agency numbers and full ALNs."""
+    q = Q()
+    if agency_numbers:
+        # Build a filter for the agency numbers. E.g. given 93 and 45
+        q |= Q(
+            federalaward__federal_agency_prefix__in=[an.prefix for an in agency_numbers]
+        )
+
+    if full_alns:
+        for full_aln in full_alns:
+            q |= Q(federalaward__federal_agency_prefix=full_aln.prefix) & Q(
+                federalaward__federal_award_extension=full_aln.program
+            )
+
+    return q
 
 
 def _gather_results_for_all_alns(full_alns, agency_numbers):
@@ -87,7 +100,7 @@ def _gather_results_for_all_alns(full_alns, agency_numbers):
         if q_full_alns != Q():
             r_full_alns = FederalAward.objects.filter(q_full_alns)
 
-    r_all_alns = None
+    r_all_alns = FederalAward.objects.none()
     if r_agency_numbers and r_full_alns:
         # We need all of these. So, we union them.
         r_all_alns = r_agency_numbers | r_full_alns
