@@ -1,6 +1,9 @@
 from django.core.exceptions import ValidationError
 import logging
 
+from .check_passthrough_names_and_ids_uniqueness import (
+    passthrough_names_and_ids_uniqueness,
+)
 from .check_finding_award_references_pattern import award_references_pattern
 from .check_cluster_names import check_cluster_names
 from audit.fixtures.excel import FORM_SECTIONS
@@ -85,6 +88,7 @@ federal_awards_checks = general_checks + [
     cluster_total_is_correct,
     total_amount_expended_is_correct,
     cardinality_of_passthrough_names_and_ids,
+    passthrough_names_and_ids_uniqueness,
 ]
 
 notes_to_sefa_checks = general_checks + [
