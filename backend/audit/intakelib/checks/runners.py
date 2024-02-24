@@ -9,6 +9,7 @@ from .check_gsa_migration_keyword import check_for_gsa_migration_keyword
 
 ############
 # General checks
+from .check_uei_schema import verify_auditee_uei_schema
 from .check_uei_exists import uei_exists
 from .check_is_a_workbook import is_a_workbook
 from .check_look_for_empty_rows import look_for_empty_rows
@@ -59,6 +60,7 @@ general_checks = [
     is_a_workbook,
     validate_workbook_version,
     uei_exists,
+    verify_auditee_uei_schema,
     look_for_empty_rows,
     start_and_end_rows_of_all_columns_are_same,
 ]
