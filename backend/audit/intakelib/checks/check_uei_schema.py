@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def verify_auditee_uei_schema(ir):
+    """Verify that the auditee UEI schema is valid."""
     uei_range = get_range_by_name(ir, "auditee_uei")
     uei_value = uei_range.get("values")
     with open(f"{settings.OUTPUT_BASE_DIR}/UeiSchema.json") as file:
