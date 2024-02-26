@@ -178,7 +178,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         bucket = options["bucket"]
         object = options["object"]
-        paths = options["path"]
+        paths = options["paths"]
 
         # The bucket name is a "friendly" name.
         # We need to look it up in VCAP_SERVICES if we are not local, and 
@@ -195,11 +195,14 @@ class Command(BaseCommand):
             else:
                 logger.error(f"SCAN FAIL: {object}")
         if paths:
+            all_results = {}
             for path in paths:
                 results = scan_files_at_path_in_s3(bucket, path)
-                logger.info(
-                    "SCAN OK: PATH %s COUNT passed: %s, failed: %s",
-                    path,
-                    results["good_count"],
-                    results["bad_count"],
-                )
+                for key in ["good_count", "bad_count"]:
+                    all_results[key] = results[key] + all_results.get(key, 0)
+            logger.info(
+                "SCAN OK: PATH %s COUNT passed: %s, failed: %s",
+                path,
+                all_results["good_count"],
+                all_results["bad_count"],
+            )
