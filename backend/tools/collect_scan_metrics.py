@@ -6,8 +6,6 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 
-from django.conf import settings
-
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,7 +27,7 @@ def _scan_file(file, filepath):
     try:
         logging.info(f"Scanning {filepath}")
         return requests.post(
-            settings.AV_SCAN_URL,
+            "http://clamav-rest:9000/scan",
             files={"file": file},
             data={"name": filepath},
             timeout=300,
@@ -111,3 +109,6 @@ def main():
     logging.info(f"Total time: {sum(results) / 60} minutes")
     logging.info(f"Max time: {max(results)} seconds")
     logging.info(f"Avg time: {sum(results) / len(results)} seconds")
+
+if __name__ == "__main__":
+    main()
