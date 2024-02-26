@@ -76,8 +76,8 @@ export function testReportIdFoundWithoutTribalAccess(reportId) {
     qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
     expect(response.body).to.have.length(1);
-    const hasAgency = !!(response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency);
-    expect(hasAgency).to.be.true;
+    const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
+    expect(Boolean(hasAgency)).to.be.true;
   });
 }
 
@@ -99,11 +99,8 @@ export function testReportIdFoundWithTribalAccess(reportId) {
     qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
     expect(response.body).to.have.length(1);
-    // Check if the first element of the 'body' array in the 'response' object
-    // has either a 'cognizant_agency' or an 'oversight_agency' property.
-    // Assigns 'true' to 'hasAgency' if either property exists; otherwise, 'false'.
-    const hasAgency = !!(response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency);
-    expect(hasAgency).to.be.true;
+    const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
+    expect(Boolean(hasAgency)).to.be.true;
   });
 
   revokeTribalAccess(tribal_access_email, tribal_access_user_id);
