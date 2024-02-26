@@ -6,12 +6,7 @@ import os
 import sys
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
+logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler()])
 
 
 def generate_files(base_xlsx, num_files, output):
@@ -24,7 +19,7 @@ def generate_files(base_xlsx, num_files, output):
 
     for i in range(num_files):
         dt = datetime.datetime.now()
-        ws['A1'] = dt
+        ws["A1"] = dt
         path = os.path.join(output, f"{dt}.xlsx")
         wb.save(path)
         logging.info(f"#{i + 1} Created: {path}")
@@ -34,12 +29,12 @@ def generate_files(base_xlsx, num_files, output):
 
 def main():
     """
-        Generates unique XLSX files by slightly modifying copies of the given a base file. Used in conjuction with the
-        collect_scan_metrics cmd.
-        Usage:
-        python tools/generate_xlsx_files.py --base_xlsx <xlsx file path> --num_files <int>
-        Example:
-        python tools/generate_xlsx_files.py --base_xlsx 'output/181744-22/federal-awards-workbook-181744.xlsx' --num_files 5
+    Generates unique XLSX files by slightly modifying copies of the given a base file. Used in conjuction with the
+    collect_scan_metrics cmd.
+    Usage:
+    python tools/generate_xlsx_files.py --base_xlsx <xlsx file path> --num_files <int>
+    Example:
+    python tools/generate_xlsx_files.py --base_xlsx 'output/181744-22/federal-awards-workbook-181744.xlsx' --num_files 5
     """
     parser = argparse.ArgumentParser()
 

@@ -7,12 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
+logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler()])
 
 
 class ClamAVError(Exception):
@@ -55,7 +50,7 @@ def scan_file(filepath):
 
 
 def scan_files_at_path(path, num_to_scan, max_workers):
-    filepaths = glob.glob(path + '*')[:num_to_scan]
+    filepaths = glob.glob(path + "*")[:num_to_scan]
     if not filepaths:
         raise Exception(f"No files found at {path}")
 
@@ -80,13 +75,13 @@ def check_scan_ok(result):
 
 def main():
     """
-        Outputs metrics from performing ClamAV file scans. Beware: ClamAV must be restarted
-        between runs of this script (`docker restart backend-clamav-rest-1`) in order to
-        clear the file cache.
-        Usage:
-        python collect_scan_metrics --path <path pattern> --num_to_scan <int> --num_workers <int>
-        Example:
-        python collect_scan_metrics --path 'metrics_files/*.xlsx' --num_to_scan 20 --num_workers 5
+    Outputs metrics from performing ClamAV file scans. Beware: ClamAV must be restarted
+    between runs of this script (`docker restart backend-clamav-rest-1`) in order to
+    clear the file cache.
+    Usage:
+    python collect_scan_metrics --path <path pattern> --num_to_scan <int> --num_workers <int>
+    Example:
+    python collect_scan_metrics --path 'metrics_files/*.xlsx' --num_to_scan 20 --num_workers 5
     """
     parser = argparse.ArgumentParser()
 
