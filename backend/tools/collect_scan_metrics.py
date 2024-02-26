@@ -80,7 +80,9 @@ def check_scan_ok(result):
 
 def main():
     """
-        Outputs metrics from performing ClamAV file scans
+        Outputs metrics from performing ClamAV file scans. Beware: ClamAV must be restarted
+        between runs of this script (`docker restart backend-clamav-rest-1`) in order to
+        clear the file cache.
         Usage:
         python collect_scan_metrics --path <path pattern> --num_to_scan <int> --num_workers <int>
         Example:
