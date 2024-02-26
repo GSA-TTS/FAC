@@ -10,6 +10,7 @@ class SearchForm(forms.Form):
         map(
             lambda a, b: (b, a),
             [
+                "Any findings",
                 "Modified opinion",
                 "Other findings",
                 "Material weakness",
@@ -19,6 +20,7 @@ class SearchForm(forms.Form):
                 "Repeat finding",
             ],
             [
+                "ANY",
                 "is_modified_opinion",
                 "is_other_findings",
                 "is_material_weakness",
