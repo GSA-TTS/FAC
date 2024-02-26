@@ -85,7 +85,7 @@ def scan_file_in_s3(bucket, object_name):
 def scan_files_at_path_in_s3(bucket, path):
     s3 = get_s3_client()
     paginator = s3.get_paginator("list_objects_v2")
-    pages = paginator.paginate(Bucket="bucket", Prefix="prefix")
+    pages = paginator.paginate(Bucket=bucket, Prefix=path)
     good_count, bad_count = 0, 0
 
     if pages:
