@@ -2,41 +2,45 @@ from django import forms
 
 
 class SearchForm(forms.Form):
+    # Multiple choice field mappings
+    findings_field_mapping = {
+        "field_name": [
+            "ANY",
+            "is_modified_opinion",
+            "is_other_findings",
+            "is_material_weakness",
+            "is_significant_deficiency",
+            "is_other_matters",
+            "is_questioned_costs",
+            "is_repeat_finding",
+        ],
+        "fiendly_name": [
+            "Any findings",
+            "Modified opinion",
+            "Other findings",
+            "Material weakness",
+            "Significant deficiency",
+            "Other matters",
+            "Questioned costs",
+            "Repeat finding",
+        ],
+    }
+
+    # Multiple choice field Tuples. "choices" variable in field declaration.
     AY_choices = (("all_years", "All years"),) + tuple(
         (x, str(x)) for x in reversed(range(2016, 2024))
     )
-
     findings_choices = list(
         map(
-            lambda a, b: (b, a),
-            [
-                "Any findings",
-                "Modified opinion",
-                "Other findings",
-                "Material weakness",
-                "Significant deficiency",
-                "Other matters",
-                "Questioned costs",
-                "Repeat finding",
-            ],
-            [
-                "ANY",
-                "is_modified_opinion",
-                "is_other_findings",
-                "is_material_weakness",
-                "is_significant_deficiency",
-                "is_other_matters",
-                "is_questioned_costs",
-                "is_repeat_finding",
-            ],
+            lambda a, b: (a, b),
+            findings_field_mapping["field_name"],
+            findings_field_mapping["fiendly_name"],
         )
     )
-
     direct_funding_choices = (
         ("direct_funding", "Direct funding"),
         ("passthrough_funding", "Passthrough funding"),
     )
-
     major_program_choices = (
         (True, "Y"),
         (False, "N"),
@@ -68,18 +72,23 @@ class SearchForm(forms.Form):
     order_by = forms.CharField(required=False)
     order_direction = forms.CharField(required=False)
 
+    # Variables for cleaning functions
+    text_input_delimiters = [
+        ",",
+        ":",
+        ";",
+        "-",
+        " ",
+    ]
+
     def clean_aln(self):
         """
         Clean up the ALN field. Replace common separators with a newline.
         Split on the newlines. Strip all the resulting elements.
         """
         text_input = self.cleaned_data["aln"]
-        text_input = (
-            text_input.replace(",", "\n")
-            .replace(":", "\n")
-            .replace(";", "\n")
-            .replace("-", "\n")
-        )
+        for delimiter in self.text_input_delimiters:
+            text_input = text_input.replace(delimiter, "\n")
         text_input = [x.strip() for x in text_input.splitlines()]
         return text_input
 
@@ -97,13 +106,8 @@ class SearchForm(forms.Form):
         Split on the newlines. Strip all the resulting elements.
         """
         text_input = self.cleaned_data["uei_or_ein"]
-        text_input = (
-            text_input.replace(",", "\n")
-            .replace(":", "\n")
-            .replace(";", "\n")
-            .replace("-", "\n")
-            .replace(" ", "\n")
-        )
+        for delimiter in self.text_input_delimiters:
+            text_input = text_input.replace(delimiter, "\n")
         text_input = [x.strip() for x in text_input.splitlines()]
         return text_input
 

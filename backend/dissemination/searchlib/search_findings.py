@@ -15,8 +15,6 @@ def search_findings(general_results, params):
     for field in findings_fields:
         match field:
             case "ANY":
-                # FIXME MCJ: Can we just look for findings_count > 0?
-                # Not in the join, apparently... :/ 
                 q |= Q(finding__is_modified_opinion="Y")
                 q |= Q(finding__is_other_findings="Y")
                 q |= Q(finding__is_material_weakness="Y")
