@@ -80,9 +80,9 @@ class Command(BaseCommand):
     help = """
         Outputs metrics from performing ClamAV file scans
         Usage:
-        manage.py collect_scan_metrics --path <path pattern> --num_to_scan <int>
+        manage.py collect_scan_metrics --path <path pattern> --num_to_scan <int> --num_workers <int>
         Example:
-        manage.py collect_scan_metrics --path 'audit/fixtures/*.pdf' --num_to_scan 20
+        manage.py collect_scan_metrics --path 'metrics_files/*.xlsx' --num_to_scan 20 --num_workers 5
     """
 
     def add_arguments(self, parser):
@@ -96,10 +96,14 @@ class Command(BaseCommand):
         num_to_scan = options["num_to_scan"]
         num_workers = options["num_workers"]
 
+        t1 = time.perf_counter(), time.process_time()
         results = scan_files_at_path(path, num_to_scan, num_workers)
+        t2 = time.perf_counter(), time.process_time()
+        real_time = t2[0] - t1[0]
+
         logger.info(f"Num files: {num_to_scan}")
         logger.info(f"Num workers: {num_workers}")
-        logger.info(f"Total time: {sum(results)} seconds")
+        logger.info(f"Real time: {real_time / 60} minutes")
+        logger.info(f"Total time: {sum(results) / 60} minutes")
         logger.info(f"Max time: {max(results)} seconds")
         logger.info(f"Avg time: {sum(results) / len(results)} seconds")
-
