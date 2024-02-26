@@ -84,9 +84,9 @@ def main():
     """
         Outputs metrics from performing ClamAV file scans
         Usage:
-        manage.py collect_scan_metrics --path <path pattern> --num_to_scan <int> --num_workers <int>
+        python collect_scan_metrics --path <path pattern> --num_to_scan <int> --num_workers <int>
         Example:
-        manage.py collect_scan_metrics --path 'metrics_files/*.xlsx' --num_to_scan 20 --num_workers 5
+        python collect_scan_metrics --path 'metrics_files/*.xlsx' --num_to_scan 20 --num_workers 5
     """
     parser = argparse.ArgumentParser()
 
