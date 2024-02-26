@@ -352,7 +352,7 @@ $remove_tribal_api_key_access$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION admin_api_v1_1_0.request_file_access(
-    p_report_id TEXT
+    report_id TEXT
 ) RETURNS JSON LANGUAGE plpgsql AS
 $$
 DECLARE
@@ -387,7 +387,7 @@ BEGIN
               
         -- Inserting data into the one_time_access table
         INSERT INTO public.dissemination_onetimeaccess (uuid, api_key_id, timestamp, report_id)
-        VALUES (v_access_uuid::UUID, v_uuid_header, CURRENT_TIMESTAMP, p_report_id);
+        VALUES (v_access_uuid::UUID, v_uuid_header, CURRENT_TIMESTAMP, report_id);
 
         -- Return the UUID to the user
         RETURN json_build_object('access_uuid', v_access_uuid);
