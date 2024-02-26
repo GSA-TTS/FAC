@@ -1,0 +1,46 @@
+---
+name: Scan S3 Bucket With ClamAV Rest
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  scan-at-rest-excel:
+    name: Perform Scan on S3 Bucket (excel)
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Scan with clamav-rest
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name scan_at_rest --command "python manage.py scan_bucket_files_for_viruses --bucket fac-private-s3 --path excel"
+
+  scan-at-rest-sar:
+    name: Perform Scan on S3 Bucket (singleauditreport)
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Scan with clamav-rest
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name scan_at_rest --command "python manage.py scan_bucket_files_for_viruses --bucket fac-private-s3 --path singleauditreport"

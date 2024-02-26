@@ -1,0 +1,15 @@
+---
+name: Scan Production S3 Files
+on:
+  schedule:
+    # Runs at 05:00 UTC, on day 1 of the month, every 6 months
+    - cron: '0 5 1 */6 *'
+  workflow_dispatch: null
+
+jobs:
+  dev-media-sync:
+    uses: ./.github/workflows/scan-files-at-rest.yml
+    secrets: inherit
+    with:
+      environment: "production"
+
