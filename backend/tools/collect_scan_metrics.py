@@ -112,5 +112,6 @@ def main():
     logging.info(f"Max time: {max(results)} seconds")
     logging.info(f"Avg time: {sum(results) / len(results)} seconds")
 
+
 if __name__ == "__main__":
     main()
