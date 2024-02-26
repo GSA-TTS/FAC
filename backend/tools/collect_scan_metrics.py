@@ -1,16 +1,20 @@
+import argparse
 import glob
 import logging
 import requests
 import time
-from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
 
-from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 
 
 class ClamAVError(Exception):
@@ -23,7 +27,7 @@ class ClamAVError(Exception):
 
 def _scan_file(file, filepath):
     try:
-        logger.info(f"Scanning {filepath}")
+        logging.info(f"Scanning {filepath}")
         return requests.post(
             settings.AV_SCAN_URL,
             files={"file": file},
@@ -31,10 +35,10 @@ def _scan_file(file, filepath):
             timeout=300,
         )
     except requests.exceptions.ConnectionError:
-        logger.error("SCAN Connection error")
+        logging.error("SCAN Connection error")
         raise ClamAVError(filepath)
     except Exception as e:
-        logger.error(f"SCAN EXCEPTION UNKNOWN {filepath} {e}")
+        logging.error(f"SCAN EXCEPTION UNKNOWN {filepath} {e}")
         raise ClamAVError(filepath)
 
 
@@ -49,7 +53,7 @@ def scan_file(filepath):
 
         return t2[0] - t1[0]
     except Exception as e:
-        logger.error(f"SCAN SCAN_FILE {e}")
+        logging.error(f"SCAN SCAN_FILE {e}")
 
 
 def scan_files_at_path(path, num_to_scan, max_workers):
@@ -76,34 +80,34 @@ def check_scan_ok(result):
         return False
 
 
-class Command(BaseCommand):
-    help = """
+def main():
+    """
         Outputs metrics from performing ClamAV file scans
         Usage:
         manage.py collect_scan_metrics --path <path pattern> --num_to_scan <int> --num_workers <int>
         Example:
         manage.py collect_scan_metrics --path 'metrics_files/*.xlsx' --num_to_scan 20 --num_workers 5
     """
+    parser = argparse.ArgumentParser()
 
-    def add_arguments(self, parser):
-        parser.add_argument("--path", type=str, required=True, default=None)
-        parser.add_argument("--num_to_scan", type=int, required=False, default=1)
-        parser.add_argument("--num_workers", type=int, required=False, default=1)
-        pass
+    parser.add_argument("--path", type=str, required=True, default=None)
+    parser.add_argument("--num_to_scan", type=int, required=False, default=1)
+    parser.add_argument("--num_workers", type=int, required=False, default=1)
 
-    def handle(self, *args, **options):
-        path = options["path"]
-        num_to_scan = options["num_to_scan"]
-        num_workers = options["num_workers"]
+    args = parser.parse_args()
 
-        t1 = time.perf_counter(), time.process_time()
-        results = scan_files_at_path(path, num_to_scan, num_workers)
-        t2 = time.perf_counter(), time.process_time()
-        real_time = t2[0] - t1[0]
+    path = args.path
+    num_to_scan = args.num_to_scan
+    num_workers = args.num_workers
 
-        logger.info(f"Num files: {num_to_scan}")
-        logger.info(f"Num workers: {num_workers}")
-        logger.info(f"Real time: {real_time / 60} minutes")
-        logger.info(f"Total time: {sum(results) / 60} minutes")
-        logger.info(f"Max time: {max(results)} seconds")
-        logger.info(f"Avg time: {sum(results) / len(results)} seconds")
+    t1 = time.perf_counter(), time.process_time()
+    results = scan_files_at_path(path, num_to_scan, num_workers)
+    t2 = time.perf_counter(), time.process_time()
+    real_time = t2[0] - t1[0]
+
+    logging.info(f"Num files: {num_to_scan}")
+    logging.info(f"Num workers: {num_workers}")
+    logging.info(f"Real time: {real_time / 60} minutes")
+    logging.info(f"Total time: {sum(results) / 60} minutes")
+    logging.info(f"Max time: {max(results)} seconds")
+    logging.info(f"Avg time: {sum(results) / len(results)} seconds")
