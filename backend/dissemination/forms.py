@@ -30,13 +30,7 @@ class SearchForm(forms.Form):
     AY_choices = (("all_years", "All years"),) + tuple(
         (x, str(x)) for x in reversed(range(2016, 2024))
     )
-    findings_choices = list(
-        map(
-            lambda a, b: (a, b),
-            findings_field_mapping["field_name"],
-            findings_field_mapping["friendly_name"],
-        )
-    )
+    findings_choices = list(zip(*findings_field_mapping.values()))
     direct_funding_choices = (
         ("direct_funding", "Direct funding"),
         ("passthrough_funding", "Passthrough funding"),
