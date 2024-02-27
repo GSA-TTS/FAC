@@ -5,7 +5,7 @@ class SearchForm(forms.Form):
     # Multiple choice field mappings
     findings_field_mapping = {
         "field_name": [
-            "ANY",
+            "all_findings",
             "is_modified_opinion",
             "is_other_findings",
             "is_material_weakness",
