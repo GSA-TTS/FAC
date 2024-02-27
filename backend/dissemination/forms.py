@@ -14,7 +14,7 @@ class SearchForm(forms.Form):
             "is_questioned_costs",
             "is_repeat_finding",
         ],
-        "fiendly_name": [
+        "friendly_name": [
             "Any findings",
             "Modified opinion",
             "Other findings",
@@ -34,7 +34,7 @@ class SearchForm(forms.Form):
         map(
             lambda a, b: (a, b),
             findings_field_mapping["field_name"],
-            findings_field_mapping["fiendly_name"],
+            findings_field_mapping["friendly_name"],
         )
     )
     direct_funding_choices = (

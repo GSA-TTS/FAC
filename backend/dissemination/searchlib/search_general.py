@@ -47,7 +47,7 @@ def search_general(params=None):
     r_end_date = General.objects.filter(q_end_date)
 
     ##############
-    # Intersection
+    # Cog/Over
     q_cogover = _get_cog_or_oversight_match_query(
         params.get("agency_name", None), params.get("cog_or_oversight", None)
     )

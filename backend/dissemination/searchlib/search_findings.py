@@ -15,6 +15,8 @@ def search_findings(general_results, params):
     for field in findings_fields:
         match field:
             case "ANY":
+                # This can be achieved via federalaward__findings_count__gt=0, 
+                # But, it's faster to chain ORs in the Finding table than it is to walk the FederalAward table. 
                 q |= Q(finding__is_modified_opinion="Y")
                 q |= Q(finding__is_other_findings="Y")
                 q |= Q(finding__is_material_weakness="Y")
