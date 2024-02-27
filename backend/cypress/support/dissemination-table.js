@@ -6,6 +6,7 @@ const API_GOV_JWT = Cypress.env('API_GOV_JWT') || '';
 const API_GOV_KEY = Cypress.env('API_GOV_KEY') || '';
 const API_GOV_USER_ID_ADMIN = Cypress.env('API_GOV_USER_ID_ADMIN');
 const API_GOV_URL = Cypress.env('API_GOV_URL');
+const API_VERSION = Cypress.env('API_VERSION');
 const ADMIN_API_VERSION = Cypress.env('ADMIN_API_VERSION');
 
 const requestOptions = {
@@ -95,6 +96,7 @@ export function testReportIdFoundWithTribalAccess(reportId) {
       Authorization: `Bearer ${API_GOV_JWT}`,
       'X-Api-Key': API_GOV_KEY,
       'X-Api-User-Id': tribal_access_user_id,
+      'Accept-Profile': API_VERSION
     },
     qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
@@ -120,6 +122,7 @@ export function testReportIdNotFoundWithTribalAccess(reportId) {
       Authorization: `Bearer ${API_GOV_JWT}`,
       'X-Api-Key': API_GOV_KEY,
       'X-Api-User-Id': tribal_access_user_id,
+      'Accept-Profile': API_VERSION
     },
     qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
