@@ -1,14 +1,5 @@
 locals {
   clam_name = "fac-av-${var.cf_space_name}"
-  module_versions = {
-    clamav = "^8.x", # major version 8
-  }
-}
-
-module "version" {
-  for_each           = local.module_versions
-  source             = "github.com/18f/terraform-cloudgov//semver"
-  version_constraint = each.value
 }
 
 data "docker_registry_image" "clamav" {
