@@ -17,7 +17,7 @@ module "clamav" {
   cf_space_name = var.cf_space_name
   clamav_image  = "ghcr.io/gsa-tts/fac/clamav@${data.docker_registry_image.clamav.sha256_digest}"
   max_file_size = "30M"
-  instances     = 4
+  instances     = var.clamav_instances
 
   proxy_server   = module.https-proxy.domain
   proxy_port     = module.https-proxy.port
