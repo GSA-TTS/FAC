@@ -13,7 +13,7 @@ module "version" {
 }
 
 module "database" {
-  source = "github.com/18f/terraform-cloudgov//database?ref=v${module.version["database"].target_version}"
+  source = ["github.com/18f/terraform-cloudgov//database?ref=v${module.version["database"].target_version}"]
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
@@ -24,7 +24,7 @@ module "database" {
 }
 
 module "s3-public" {
-  source = "github.com/18f/terraform-cloudgov//s3?ref=v${module.version["s3"].target_version}"
+  source = ["github.com/18f/terraform-cloudgov//s3?ref=v${module.version["s3"].target_version}"]
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
@@ -35,7 +35,7 @@ module "s3-public" {
 }
 
 module "s3-private" {
-  source = "github.com/18f/terraform-cloudgov//s3?ref=v${module.version["s3"].target_version}"
+  source = ["github.com/18f/terraform-cloudgov//s3?ref=v${module.version["s3"].target_version}"]
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
