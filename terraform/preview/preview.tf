@@ -10,7 +10,6 @@ module "preview" {
   https_proxy_instances = 1
   smtp_proxy_instances  = 1
   clamav_instances      = 2
-  clamav_memory         = 2048
   recursive_delete      = true
 }
 
