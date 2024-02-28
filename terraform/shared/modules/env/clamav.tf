@@ -1,5 +1,6 @@
 locals {
-  clam_name = "fac-av-${var.cf_space_name}"
+  clam_name      = "fac-av-${var.cf_space_name}"
+  clamav_version = "github.com/18f/terraform-cloudgov//clamav?ref=v${module.version["clamav"].target_version}"
 }
 
 data "docker_registry_image" "clamav" {
@@ -7,7 +8,7 @@ data "docker_registry_image" "clamav" {
 }
 
 module "clamav" {
-  source = ["github.com/18f/terraform-cloudgov//clamav?ref=v${module.version["clamav"].target_version}"]
+  source = local.clamav_version
 
   # This generates eg "fac-av-staging.apps.internal", avoiding collisions with routes for other projects and spaces
   name           = local.clam_name
