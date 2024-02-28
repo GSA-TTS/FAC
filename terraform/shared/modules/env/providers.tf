@@ -17,3 +17,5 @@ terraform {
     }
   }
 }
+
+provider "github" {}
