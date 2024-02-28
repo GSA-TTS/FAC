@@ -1,9 +1,12 @@
 locals {
   module_versions = {
-    database = "^8.0", # major version 8
-    s3       = "^8.0", # major version 8
-    clamav   = "^8.0"  # major version 8
+    database = "^0.8.0",
+    s3       = "^0.8.0",
+    clamav   = "^0.8.0"
   }
+  database_version = "github.com/18f/terraform-cloudgov//database?ref=v${module.version["database"].target_version}"
+  s3_version       = "github.com/18f/terraform-cloudgov//s3?ref=v${module.version["s3"].target_version}"
+  clamav_version   = "github.com/18f/terraform-cloudgov//clamav?ref=v${module.version["clamav"].target_version}"
 }
 
 module "version" {
@@ -13,7 +16,7 @@ module "version" {
 }
 
 module "database" {
-  source = "github.com/18f/terraform-cloudgov//database?ref=v${module.version["database"].target_version}"
+  source = local.database_version
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
@@ -24,7 +27,7 @@ module "database" {
 }
 
 module "s3-public" {
-  source = "github.com/18f/terraform-cloudgov//s3?ref=v${module.version["s3"].target_version}"
+  source = local.s3_version
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
@@ -35,7 +38,7 @@ module "s3-public" {
 }
 
 module "s3-private" {
-  source = "github.com/18f/terraform-cloudgov//s3?ref=v${module.version["s3"].target_version}"
+  source = local.s3_version
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
