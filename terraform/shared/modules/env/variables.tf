@@ -74,6 +74,12 @@ variable "clamav_instances" {
   default     = 1
 }
 
+variable "clamav_memory" {
+  type        = number
+  description = "memory in MB to allocate to clamav app"
+  default     = 3072
+}
+
 variable "new_relic_license_key" {
   type        = string
   description = "the license key to use when setting up the New Relic agent"
