@@ -10,5 +10,10 @@ terraform {
       source  = "kreuzwerker/docker"
       version = "~>3.0.2"
     }
+
+    github = {
+      source  = "hashicorp/github"
+      version = ">= 4.0"
+    }
   }
 }
