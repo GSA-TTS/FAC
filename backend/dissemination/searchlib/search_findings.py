@@ -40,7 +40,7 @@ def search_findings(general_results, params):
                 q |= Q(finding__is_repeat_finding="Y")
             case _:
                 pass
-    filtered_general_results = general_results.filter(q).distinct()
+    filtered_general_results = general_results.filter(q)
 
     t1 = time.time()
     report_timing("search_findings", params, t0, t1)

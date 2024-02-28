@@ -36,6 +36,7 @@ def search(params):
     results = search_findings(results, params)
     results = search_direct_funding(results, params)
     results = search_major_program(results, params)
+    results = results.distinct("report_id", params.get("order_by", "fac_accepted_date"))
 
     t1 = time.time()
     report_timing("search", params, t0, t1)

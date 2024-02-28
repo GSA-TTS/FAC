@@ -21,7 +21,7 @@ def search_direct_funding(general_results, params):
             case _:
                 pass
 
-    filtered_general_results = general_results.filter(q).distinct()
+    filtered_general_results = general_results.filter(q)
 
     t1 = time.time()
     report_timing("search_direct_funding", params, t0, t1)
