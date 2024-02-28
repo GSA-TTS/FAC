@@ -1,8 +1,8 @@
 locals {
   module_versions = {
-    database = "^0.x", # major version 0
-    s3       = "^0.x", # major version 0
-    clamav   = "^0.x"  # major version 0
+    database = "^8.0", # major version 8
+    s3       = "^8.0", # major version 8
+    clamav   = "^8.0"  # major version 8
   }
 }
 
