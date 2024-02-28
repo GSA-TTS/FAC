@@ -47,7 +47,9 @@ function attachEventHandlersReset() {
       input.value = '';
     });
     // Uncheck checkboxes
-    var checkboxes = document.querySelectorAll('[type="checkbox"]');
+    var checkboxes = document.querySelectorAll(
+      '[type="checkbox"], [type="radio"]'
+    );
     Array.from(checkboxes).forEach((checkbox) => {
       checkbox.checked = false;
     });
