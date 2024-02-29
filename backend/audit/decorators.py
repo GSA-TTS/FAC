@@ -7,8 +7,8 @@ import newrelic.agent
 logger = logging.getLogger(__name__)
 
 
-def profile(metric_name):
-    def profile_inner(func):
+def newrelic_timing_metric(metric_name):
+    def inner(func):
         @functools.wraps(func)
         def wrapper_timer(*args, **kwargs):
             start_time = time.perf_counter()
@@ -19,4 +19,4 @@ def profile(metric_name):
             newrelic.agent.record_custom_metric(f"Custom/{metric_name}", run_time)
             return value
         return wrapper_timer
-    return profile_inner
+    return inner

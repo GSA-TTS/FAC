@@ -14,7 +14,7 @@ import requests
 from openpyxl import load_workbook
 from pypdf import PdfReader
 
-from audit.decorators import profile
+from audit.decorators import newrelic_timing_metric
 from audit.intakelib import (
     additional_ueis_named_ranges,
     additional_eins_named_ranges,
@@ -393,7 +393,7 @@ def _scan_file(file):
             "We were unable to complete a security inspection of the file, please try again or contact support for assistance."
         )
 
-@profile("validate_file_infection")
+@newrelic_timing_metric("validate_file_infection")
 def validate_file_infection(file):
     """Files must pass an AV scan"""
     logger.info(f"Attempting to scan file: {file}.")

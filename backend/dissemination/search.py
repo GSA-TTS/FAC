@@ -4,6 +4,8 @@ from .search_constants import ORDER_BY, DIRECTION, DAS_LIMIT
 from .search_general import report_timing, search_general
 from .search_alns import search_alns
 
+from audit.decorators import newrelic_timing_metric
+
 logger = logging.getLogger(__name__)
 
 
@@ -13,6 +15,7 @@ logger = logging.getLogger(__name__)
 # https://books.agiliq.com/projects/django-orm-cookbook/en/latest/subquery.html
 
 
+@newrelic_timing_metric("search")
 def search(params):
     """
     Given any (or no) search fields, build and execute a query on the General table and return the results.
