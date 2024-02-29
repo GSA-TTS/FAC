@@ -13,7 +13,6 @@ import requests
 from openpyxl import load_workbook
 from pypdf import PdfReader
 
-from audit.decorators import newrelic_timing_metric
 from audit.intakelib import (
     additional_ueis_named_ranges,
     additional_eins_named_ranges,
@@ -34,6 +33,7 @@ from audit.fixtures.excel import (
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
 )
+from support.decorators import newrelic_timing_metric
 
 
 logger = logging.getLogger(__name__)
