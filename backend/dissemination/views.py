@@ -336,7 +336,8 @@ class SingleSummaryReportDownloadView(ReportAccessRequiredMixin, View):
         redirect to its download link.
         """
         sac = get_object_or_404(General, report_id=report_id)
-        filename = generate_summary_report([sac.report_id])
+        # filename = generate_summary_report([sac.report_id], can_read_tribal(request.user))
+        filename = generate_summary_report([sac.report_id], True)
         download_url = get_download_url(filename)
 
         return redirect(download_url)
@@ -366,7 +367,8 @@ class MultipleSummaryReportDownloadView(View):
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
 
-            filename = generate_summary_report(report_ids)
+            # filename = generate_summary_report(report_ids, can_read_tribal(request.user))
+            filename = generate_summary_report(report_ids, False)
             download_url = get_download_url(filename)
 
             return redirect(download_url)
