@@ -392,6 +392,7 @@ def _scan_file(file):
             "We were unable to complete a security inspection of the file, please try again or contact support for assistance."
         )
 
+
 @newrelic_timing_metric("validate_file_infection")
 def validate_file_infection(file):
     """Files must pass an AV scan"""

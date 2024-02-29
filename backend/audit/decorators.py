@@ -18,5 +18,7 @@ def newrelic_timing_metric(metric_name):
             logger.info(f"{metric_name} executed in {run_time:.4f} secs")
             newrelic.agent.record_custom_metric(f"Custom/{metric_name}", run_time)
             return value
+
         return wrapper_timer
+
     return inner
