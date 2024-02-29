@@ -1,6 +1,8 @@
 import os
 import json
 import logging
+import time
+
 from jsonschema import Draft7Validator, FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
 
@@ -12,7 +14,7 @@ import requests
 from openpyxl import load_workbook
 from pypdf import PdfReader
 
-
+from audit.decorators import profile
 from audit.intakelib import (
     additional_ueis_named_ranges,
     additional_eins_named_ranges,
@@ -386,12 +388,12 @@ def _scan_file(file):
             data={"name": file.name},
             timeout=15,
         )
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as e:
         raise ValidationError(
             "We were unable to complete a security inspection of the file, please try again or contact support for assistance."
         )
 
-
+@profile("validate_file_infection")
 def validate_file_infection(file):
     """Files must pass an AV scan"""
     logger.info(f"Attempting to scan file: {file}.")
