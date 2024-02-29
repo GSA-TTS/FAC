@@ -12,6 +12,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.generic import View
 
+from audit.decorators import newrelic_timing_metric
+
 from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
 
 from dissemination.file_downloads import get_download_url, get_filename
@@ -176,6 +178,7 @@ class Search(View):
             },
         )
 
+    @newrelic_timing_metric("search")
     def post(self, request, *args, **kwargs):
         """
         When accessing the search page through post, run a search and display the results.
