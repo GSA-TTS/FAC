@@ -33,7 +33,7 @@
                                             id="audit-year-{{ text }}"
                                             name="audit_year" type="checkbox"
                                             value={{value}}
-                                            {% if text in form.cleaned_data.audit_year %}checked{% endif %} />
+                                            {% if value in form_user_input.audit_year or text in form_user_input.audit_year %}checked{% endif %} />
                                      <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
                                  </div>
                              {% endfor %}
@@ -42,37 +42,37 @@
                         <label for="uei-or-ein">
                             <button type="button"
                                     class="usa-accordion__button"
-                                    aria-expanded="true"
+                                    aria-expanded={% if form_user_input.uei_or_ein %}"true"{% else %}"false"{% endif %}
                                     aria-controls="uei-or-ein">UEI or EIN</button>
                         </label>
-                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein">{{form.cleaned_data.uei_or_ein}}</textarea>
+                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>
                         {% comment %} ALN/CFDA {% endcomment %}
                         <label for="aln">
                             <button type="button"
                                     class="usa-accordion__button"
-                                    aria-expanded="true"
+                                    aria-expanded={% if form_user_input.aln %}"true"{% else %}"false"{% endif %}
                                     aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
                         </label>
-                        <textarea class="usa-textarea" id="aln" name="aln">{{form.cleaned_data.aln}}</textarea>
+                        <textarea class="usa-textarea" id="aln" name="aln">{{form_user_input.aln}}</textarea>
                         {% comment %} Name {% endcomment %}
                         <label for="entity-name">
                             <button type="button"
                                     class="usa-accordion__button"
-                                    aria-expanded="true"
+                                    aria-expanded={% if form_user_input.entity_name %}"true"{% else %}"false"{% endif %}
                                     aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
                         </label>
-                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form.cleaned_data.entity_name}}</textarea>
+                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form_user_input.entity_name}}</textarea>
                         {% comment %} Release Date(s) {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
-                                aria-expanded="true"
+                                aria-expanded={% if form_user_input.start_date or form_user_input.end_date %}"true"{% else %}"false"{% endif %}
                                 aria-controls="fac-release-date">FAC acceptance date</button>
                         <div id="fac-release-date">
                             <div class="usa-form-group">
                                 <label class="usa-label" id="start-date-label" for="start-date">Start date</label>
                                 <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
                                 <div class="usa-date-picker"
-                                     data-default-value="{{ form.cleaned_data.start_date }}">
+                                     data-default-value="{{ form_user_input.start_date }}">
                                     <input class="usa-input"
                                            id="start-date"
                                            name="start_date"
@@ -84,7 +84,7 @@
                                 <label class="usa-label" id="end-date-label" for="end-date">End date</label>
                                 <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
                                 <div class="usa-date-picker"
-                                     data-default-value="{{ form.cleaned_data.end_date }}">
+                                     data-default-value="{{ form_user_input.end_date }}">
                                     <input class="usa-input"
                                            id="end-date"
                                            name="end_date"
@@ -93,36 +93,10 @@
                                 </div>
                             </div>
                         </div>
-                        {% comment %} Cog/Over {% endcomment %}
-                        <button type="button"
-                                class="usa-accordion__button"
-                                aria-expanded="true"
-                                aria-controls="cognizant">Cognizant or Oversight</button>
-                        <div id="cognizant">
-                            <label class="usa-label" for="options">Select one</label>
-                            <select class="usa-select" name="cog_or_oversight" id="options">
-                                <option id="cog_or_oversight--none" value>- Select -</option>
-                                <option id="cog_or_oversight--cog"
-                                        value="cog"
-                                        {% if form.cleaned_data.cog_or_oversight == "cog" %}selected{% endif %}>
-                                    Cognizant
-                                </option>
-                                <option id="cog_or_oversight--oversight"
-                                        value="oversight"
-                                        {% if form.cleaned_data.cog_or_oversight == "oversight" %}selected{% endif %}>
-                                    Oversight
-                                </option>
-                            </select>
-                            <label class="usa-label" for="agency-name">Federal agency number</label>
-                            <input class="usa-input"
-                                   id="agency-name"
-                                   name="agency_name"
-                                   value="{{ form.cleaned_data.agency_name }}" />
-                        </div>
                         {% comment %} State {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
-                                aria-expanded="true"
+                                aria-expanded={% if form_user_input.auditee_state %}"true"{% else %}"false"{% endif %}
                                 aria-controls="state">State</button>
                         <div id="state" class="usa-form-group">
                             <label class="usa-label" for="auditee_state">
@@ -131,13 +105,91 @@
                             <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
                                 <option value id="state--none">- Select -</option>
                                 {% for state in state_abbrevs %}
-                                <option value="{{ state }}" {% if form.cleaned_data.auditee_state == state %}selected{% endif %}>
+                                <option value="{{ state }}" {% if form_user_input.auditee_state == state %}selected{% endif %}>
                                     {{ state }}
                                 </option>
                                 {% endfor %}
                             </select>
                         </div>
+                        {% comment %} Cog/Over {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.cog_or_oversight %}"true"{% else %}"false"{% endif %}
+                                aria-controls="cognizant">Cognizant or Oversight</button>
+                        <div id="cognizant">
+                            <label class="usa-label" for="options">Select one</label>
+                            <select class="usa-select" name="cog_or_oversight" id="options">
+                                <option id="cog_or_oversight--none" value>- Select -</option>
+                                <option id="cog_or_oversight--cog"
+                                        value="cog"
+                                        {% if form_user_input.cog_or_oversight == "cog" %}selected{% endif %}>
+                                    Cognizant
+                                </option>
+                                <option id="cog_or_oversight--oversight"
+                                        value="oversight"
+                                        {% if form_user_input.cog_or_oversight == "oversight" %}selected{% endif %}>
+                                    Oversight
+                                </option>
+                            </select>
+                            <label class="usa-label" for="agency-name">Federal agency number</label>
+                            <input class="usa-input"
+                                  id="agency-name"
+                                  name="agency_name"
+                                  value="{{ form_user_input.agency_name }}" />
+                        </div>
+                        {% comment %} Findings {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.findings %}"true"{% else %}"false"{% endif %}
+                                aria-controls="auditfindings">Audit findings</button>
+                        <div id="auditfindings">
+                          {% for value, text in form.findings.field.choices %}
+                              <div class="usa-checkbox bg-base-lighter">
+                                  <input class="usa-checkbox__input"
+                                          id="findings-{{ text }}"
+                                          name="findings" type="checkbox"
+                                          value={{value}}
+                                          {% if value in form_user_input.findings %}checked{% endif %} />
+                                  <label class="usa-checkbox__label" for="findings-{{ text }}">{{ text }}</label>
+                              </div>
+                          {% endfor %}
+                        </div>
+                        {% comment %} Direct funding {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.direct_funding %}"true"{% else %}"false"{% endif %}
+                                aria-controls="fundingdirect">Direct funding</button>
+                        <div id="fundingdirect">
+                          {% for value, text in form.direct_funding.field.choices %}
+                              <div class="usa-checkbox bg-base-lighter">
+                                  <input class="usa-checkbox__input"
+                                          id="direct_funding-{{ text }}"
+                                          name="direct_funding" type="checkbox"
+                                          value={{value}}
+                                          {% if value in form_user_input.direct_funding %}checked{% endif %} />
+                                  <label class="usa-checkbox__label" for="direct_funding-{{ text }}">{{ text }}</label>
+                              </div>
+                          {% endfor %}
+                        </div>
+                        {% comment %} Major program {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.major_program %}"true"{% else %}"false"{% endif %}
+                                aria-controls="majorprogram">Major program</button>
+                        <div id="majorprogram" class="usa-form-group">
+                          {% for value, text in form.major_program.field.choices %}
+                              <div class="usa-radio bg-base-lighter">
+                                  <input class="usa-radio__input"
+                                          id="major_program-{{ text }}"
+                                          name="major_program" type="radio"
+                                          value={{value}}
+                                          {% if value in form_user_input.major_program %}checked{% endif %} />
+                                  <label class="usa-radio__label" for="major_program-{{ text }}">{{ text }}</label>
+                              </div>
+                          {% endfor %}
+                        </div>
                     </div>
+                      
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
