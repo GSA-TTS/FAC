@@ -515,7 +515,7 @@ def persist_workbook(workbook):
     return f"temp/{filename}"
 
 
-def generate_summary_report(report_ids):
+def generate_summary_report(report_ids, include_private=False):
     data = gather_report_data_dissemination(report_ids)
     workbook = create_workbook(data)
     insert_dissem_coversheet(workbook)

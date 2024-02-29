@@ -132,9 +132,9 @@ def clean_form_data(form):
     return form_data
 
 
-def run_search(form_data, include_private):
+def run_search(form_data):
     """
-    Given cleaned form data and an 'include_private' boolean, run the search.
+    Given cleaned form data, run the search.
     Returns the results QuerySet.
     """
 
@@ -149,7 +149,6 @@ def run_search(form_data, include_private):
         "agency_name": form_data.agency_name,
         "audit_years": form_data.audit_years,
         "auditee_state": form_data.auditee_state,
-        "include_private": include_private,
         "order_by": form_data.order_by,
         "order_direction": form_data.order_direction,
     }
@@ -199,7 +198,8 @@ class Search(View):
             ]  # To include the param into the rendered page
 
         include_private = include_private_results(request)
-        results = run_search(form_data, include_private)
+
+        results = run_search(form_data)
 
         results_count = len(results)
 
@@ -233,6 +233,7 @@ class Search(View):
             "state_abbrevs": STATE_ABBREVS,
             "limit": form_data.limit,
             "results": paginator_results,
+            "include_private": include_private,
             "results_count": results_count,
             "page": page,
             "order_by": form_data.order_by,
@@ -246,7 +247,7 @@ class Search(View):
         return render(request, "search.html", context)
 
 
-class AuditSummaryView(ReportAccessRequiredMixin, View):
+class AuditSummaryView(View):
     def get(self, request, report_id):
         """
         Display information about the given report in the dissemination tables.
@@ -265,12 +266,15 @@ class AuditSummaryView(ReportAccessRequiredMixin, View):
 
         data = self.get_audit_content(report_id)
 
+        include_private = include_private_results(request)
+
         # Add entity name and UEI to the context, for the footer.
         context = {
             "report_id": report_id,
             "auditee_name": general_data["auditee_name"],
             "auditee_uei": general_data["auditee_uei"],
             "general": general_data,
+            "include_private": include_private,
             "data": data,
         }
 
@@ -388,7 +392,8 @@ class SingleSummaryReportDownloadView(ReportAccessRequiredMixin, View):
         redirect to its download link.
         """
         sac = get_object_or_404(General, report_id=report_id)
-        filename = generate_summary_report([sac.report_id])
+        include_private = include_private_results(request)
+        filename = generate_summary_report([sac.report_id], include_private)
         download_url = get_download_url(filename)
 
         return redirect(download_url)
@@ -407,14 +412,14 @@ class MultipleSummaryReportDownloadView(View):
         try:
             cleaned_data = clean_form_data(form)
             include_private = include_private_results(request)
-            results = run_search(cleaned_data, include_private)
+            results = run_search(cleaned_data)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
 
-            filename = generate_summary_report(report_ids)
+            filename = generate_summary_report(report_ids, include_private)
             download_url = get_download_url(filename)
 
             return redirect(download_url)

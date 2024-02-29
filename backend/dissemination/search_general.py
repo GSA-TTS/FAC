@@ -14,9 +14,7 @@ def search_general(params=None):
 
     ##############
     # Initialize query.
-    # This is where tribal/is_public is set by default.
-    q_base = _initialize_query(params.get("include_private", False))
-    r_base = General.objects.filter(q_base)
+    r_base = General.objects.all()
 
     ##############
     # Audit years
@@ -75,19 +73,6 @@ def search_general(params=None):
 def report_timing(tag, params, start, end):
     readable = int(ceil((end - start) * 1000))
     logger.info(f"SEARCH_TIMING {hex(id(params))[8:]} {tag} {readable}ms")
-
-
-def _initialize_query(include_private: bool):
-    query = Q()
-    # Always include the public stuff
-    if include_private:
-        # If we are including private, we want everything to come back.
-        # That is the same as the empty query in this context.
-        pass
-    else:
-        # Limit our search to public data.
-        query = Q(is_public=True)
-    return query
 
 
 def _get_uei_or_eins_match_query(uei_or_eins):
