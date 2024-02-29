@@ -1,7 +1,6 @@
 import os
 import json
 import logging
-import time
 
 from jsonschema import Draft7Validator, FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
@@ -388,7 +387,7 @@ def _scan_file(file):
             data={"name": file.name},
             timeout=15,
         )
-    except requests.exceptions.ConnectionError as e:
+    except requests.exceptions.ConnectionError:
         raise ValidationError(
             "We were unable to complete a security inspection of the file, please try again or contact support for assistance."
         )
