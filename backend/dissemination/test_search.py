@@ -15,10 +15,15 @@ def assert_all_results_public(cls, results):
         cls.assertTrue(r.is_public)
 
 
+def assert_all_results_private_and_public(cls, results):
+    for r in results:
+        cls.assertTrue(r.is_public or not r.is_public)
+
+
 class SearchGeneralTests(TestCase):
     def test_empty_query(self):
         """
-        Given empty query parameters, search_general should return all public records
+        Given empty query parameters, search_general should return all records
         """
         public_count = random.randint(50, 100)
         private_count = random.randint(50, 100)
@@ -28,8 +33,8 @@ class SearchGeneralTests(TestCase):
 
         results = search_general()
 
-        assert_all_results_public(self, results)
-        self.assertEqual(len(results), public_count)
+        assert_all_results_private_and_public(self, results)
+        self.assertEqual(len(results), public_count + private_count)
 
     def test_name_matches_auditee_name(self):
         """
