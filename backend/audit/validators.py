@@ -219,9 +219,9 @@ def validate_general_information_json(value, is_data_migration=True):
     """
     Apply JSON Schema for general information and report errors.
     """
-    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformation.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationRequired.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
-
+    validator = Draft7Validator(schema, format_checker=FormatChecker())
     try:
         if not is_data_migration and settings.GSA_MIGRATION in [
             value.get("auditee_email", ""),
@@ -230,7 +230,15 @@ def validate_general_information_json(value, is_data_migration=True):
             raise JSONSchemaValidationError(
                 f"{settings.GSA_MIGRATION} not permitted outside of migrations"
             )
-        validate(value, schema, format_checker=FormatChecker())
+
+        for key, val in value.items():
+            if key in schema["properties"] and val not in [None, "", [], {}]:
+                field_schema = {
+                    "type": "object",
+                    "properties": {key: schema["properties"][key]},
+                }
+                validator.validate({key: val}, field_schema)
+
     except JSONSchemaValidationError as err:
         raise ValidationError(
             _(err.message),
