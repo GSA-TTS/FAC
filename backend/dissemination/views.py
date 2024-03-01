@@ -214,9 +214,9 @@ class AuditSummaryView(View):
         general_data = general.values()[0]
         del general_data["id"]
 
-        data = self.get_audit_content(report_id)
-
         include_private = include_private_results(request)
+        include_private_and_public = include_private or general_data["is_public"]
+        data = self.get_audit_content(report_id, include_private_and_public)
 
         # Add entity name and UEI to the context, for the footer.
         context = {
@@ -230,7 +230,7 @@ class AuditSummaryView(View):
 
         return render(request, "summary.html", context)
 
-    def get_audit_content(self, report_id):
+    def get_audit_content(self, report_id, include_private_and_public):
         """
         Grab everything relevant from the dissemination tables.
         Wrap that data into a dict, and return it.
@@ -248,13 +248,13 @@ class AuditSummaryView(View):
 
         # QuerySet values to an array of dicts
         data["Awards"] = [x for x in awards.values()]
-        if notes_to_sefa.exists():
+        if notes_to_sefa.exists() and include_private_and_public:
             data["Notes to SEFA"] = [x for x in notes_to_sefa.values()]
         if audit_findings.exists():
             data["Audit Findings"] = [x for x in audit_findings.values()]
-        if audit_findings_text.exists():
+        if audit_findings_text.exists() and include_private_and_public:
             data["Audit Findings Text"] = [x for x in audit_findings_text.values()]
-        if corrective_action_plan.exists():
+        if corrective_action_plan.exists() and include_private_and_public:
             data["Corrective Action Plan"] = [
                 x for x in corrective_action_plan.values()
             ]
