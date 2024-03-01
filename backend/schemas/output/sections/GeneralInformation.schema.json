@@ -178,8 +178,16 @@
          "type": "string"
       },
       "audit_period_other_months": {
-         "maxLength": 100,
-         "type": "string"
+         "anyOf": [
+            {
+               "pattern": "^0[0-9]|1[0-8]$",
+               "type": "string"
+            },
+            {
+               "const": "",
+               "type": "string"
+            }
+         ]
       },
       "audit_type": {
          "description": "Type of audit being submitted",

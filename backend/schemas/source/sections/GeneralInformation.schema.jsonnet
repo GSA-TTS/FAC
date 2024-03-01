@@ -20,8 +20,11 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
     },
     audit_type: Base.Enum.AuditType,
     audit_period_covered: Base.Enum.AuditPeriod,
-    audit_period_other_months: Types.string {
-      maxLength: 100,
+    audit_period_other_months:  {
+      anyOf: [
+        Base.Compound.MonthsOther,
+        Base.Compound.EmptyString,
+      ],
     },
 
     // Auditee information
