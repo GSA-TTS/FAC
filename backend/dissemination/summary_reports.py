@@ -566,13 +566,13 @@ def persist_workbook(workbook):
     return f"temp/{filename}"
 
 
-def generate_summary_report(report_ids, user_can_read_tribal=False):
+def generate_summary_report(report_ids, include_private=False):
     tribal_report_ids = _get_tribal_report_ids(report_ids)
     data = gather_report_data_dissemination(
-        report_ids, tribal_report_ids, user_can_read_tribal
+        report_ids, tribal_report_ids, include_private
     )
     workbook = create_workbook(data)
-    insert_dissem_coversheet(workbook, bool(tribal_report_ids), user_can_read_tribal)
+    insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
     filename = persist_workbook(workbook)
 
     return filename
