@@ -267,15 +267,9 @@ cannot_read_tribal_disclaimer = "This document includes one or more Tribal entit
 
 def _get_tribal_report_ids(report_ids):
     """Filters the given report_ids with only ones that are tribal"""
-    objects = General.objects.all().filter(report_id__in=report_ids)
-    tribal_report_ids = []
+    objects = General.objects.all().filter(report_id__in=report_ids, is_public=False)
 
-    for obj in objects:
-        report_id = obj.report_id
-        if not obj.is_public:
-            tribal_report_ids.append(report_id)
-
-    return tribal_report_ids
+    return [obj.report_id for obj in objects]
 
 
 def set_column_widths(worksheet):
