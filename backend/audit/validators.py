@@ -216,7 +216,7 @@ def validate_federal_award_json(value):
         raise ValidationError(message=_federal_awards_json_error(errors))
 
 
-def validate_general_information_json(value, is_data_migration=True):
+def validate_general_information_schema(general_information):
     """
     Apply JSON Schema for general information and report errors.
     """
@@ -224,15 +224,7 @@ def validate_general_information_json(value, is_data_migration=True):
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     validator = Draft7Validator(schema, format_checker=FormatChecker())
     try:
-        if not is_data_migration and settings.GSA_MIGRATION in [
-            value.get("auditee_email", ""),
-            value.get("auditor_email", ""),
-        ]:
-            raise JSONSchemaValidationError(
-                f"{settings.GSA_MIGRATION} not permitted outside of migrations"
-            )
-
-        for key, val in value.items():
+        for key, val in general_information.items():
             if key in schema["properties"] and val not in [None, "", [], {}]:
                 field_schema = {
                     "type": "object",
@@ -244,6 +236,73 @@ def validate_general_information_json(value, is_data_migration=True):
         raise ValidationError(
             _(err.message),
         ) from err
+    return general_information
+
+
+def validate_use_of_gsa_migration_keyword(general_information, is_data_migration):
+    """Check if GSA_MIGRATION keyword is used and is allowed to be used in general information"""
+
+    if not is_data_migration and settings.GSA_MIGRATION in [
+        general_information.get("auditee_email", ""),
+        general_information.get("auditor_email", ""),
+    ]:
+        raise ValidationError(
+            _(f"{settings.GSA_MIGRATION} not permitted outside of migrations"),
+        )
+
+    return general_information
+
+
+def validate_general_information_schema_rules(general_information):
+    """Check general information schema rules"""
+
+    # Check for invalid 'audit_period_other_months' usage
+    if general_information.get("audit_period_covered") in [
+        "annual",
+        "biennial",
+    ] and general_information.get("audit_period_other_months"):
+        if general_information.get("audit_period_other_months"):
+            raise ValidationError(
+                _(
+                    "Invalid Audit Period - 'Audit period months' should not be set for 'annual' or 'biennial' Audit periods"
+                )
+            )
+    # Ensure 'audit_period_other_months' is provided for 'other' audit period
+    elif general_information.get(
+        "audit_period_covered"
+    ) == "other" and not general_information.get("audit_period_other_months"):
+        raise ValidationError(
+            _(
+                "Invalid Audit Period - 'Audit period months' must be set for 'other' Audit period"
+            ),
+        )
+    # Validate USA auditor information
+    if general_information.get("auditor_country") == "USA" and not (
+        general_information.get("auditor_zip")
+        and general_information.get("auditor_state")
+    ):
+        raise ValidationError(_("Missing Auditor State or Zip Code"))
+
+    # Validate non-USA auditor state or zip code should not be provided
+    elif general_information.get("auditor_country") != "USA" and (
+        general_information.get("auditor_zip")
+        or general_information.get("auditor_state")
+    ):
+        raise ValidationError(
+            _("Invalid Auditor State or Zip Code for non-USA countries")
+        )
+
+    return general_information
+
+
+def validate_general_information_json(value, is_data_migration=True):
+    """
+    Apply Python checks to a partially filled general information record.
+    """
+    validate_use_of_gsa_migration_keyword(value, is_data_migration)
+    validate_general_information_schema(value)
+    validate_general_information_schema_rules(value)
+
     return value
 
 
@@ -251,7 +310,7 @@ def validate_general_information_complete_json(value):
     """
     Apply JSON Schema for general information completeness and report errors.
     """
-    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationComplete.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationRequired.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     try:

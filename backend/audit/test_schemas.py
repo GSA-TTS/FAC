@@ -42,7 +42,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
     """
 
     GENERAL_INFO_SCHEMA = json.loads(
-        (SECTION_SCHEMA_DIR / "GeneralInformation.schema.json").read_text(
+        (SECTION_SCHEMA_DIR / "GeneralInformationRequired.schema.json").read_text(
             encoding="utf-8"
         )
     )
