@@ -261,8 +261,8 @@ field_name_ordered = {
 restricted_model_names = ["captext", "findingtext", "note"]
 
 limit_disclaimer = f"This spreadsheet contains the first {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} results of your search. If you need to download more than {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} submissions, try limiting your search parameters to download in batches."
-can_read_tribal_disclaimer = "This document is for a Tribal entity that has chosen to keep their data private. Because your account has access to these submissions, this document includes their audit findings text, corrective action plan, and notes to SEFA. Don't share this data outside your agency."
-cannot_read_tribal_disclaimer = "This document is for a Tribal entity that has chosen to keep their data private. It doesn't include their audit findings text, corrective action plan, or notes to SEFA."
+can_read_tribal_disclaimer = "This document includes one or more Tribal entities that have chosen to keep their data private per 2 CFR 200.512(b)(2). Because your account has access to these submissions, this document includes their audit findings text, corrective action plan, and notes to SEFA. Don't share this data outside your agency."
+cannot_read_tribal_disclaimer = "This document includes one or more Tribal entities that have chosen to keep their data private per 2 CFR 200.512(b)(2). It doesn't include their audit findings text, corrective action plan, or notes to SEFA."
 
 
 def _get_tribal_report_ids(report_ids):
