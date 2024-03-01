@@ -275,7 +275,6 @@ def _get_tribal_report_ids(report_ids):
         if not obj.is_public:
             tribal_report_ids.append(report_id)
 
-    logger.warn(tribal_report_ids)
     return tribal_report_ids
 
 
