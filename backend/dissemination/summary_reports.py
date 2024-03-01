@@ -366,7 +366,7 @@ def _get_attribute_or_data(obj, field_name):
 
 
 def gather_report_data_dissemination(
-    report_ids, tribal_report_ids, user_can_read_tribal
+    report_ids, tribal_report_ids, include_private
 ):
     """
     Given a set of report IDs, fetch the disseminated data for each and asssemble into a dictionary with the following shape:
@@ -407,7 +407,7 @@ def gather_report_data_dissemination(
             # Omit rows for private tribal data when the user doesn't have perms
             if (
                 model_name in restricted_model_names
-                and not user_can_read_tribal
+                and not include_private
                 and report_id in tribal_report_ids
             ):
                 continue
