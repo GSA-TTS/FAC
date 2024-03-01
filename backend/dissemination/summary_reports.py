@@ -365,9 +365,7 @@ def _get_attribute_or_data(obj, field_name):
         return value
 
 
-def gather_report_data_dissemination(
-    report_ids, tribal_report_ids, include_private
-):
+def gather_report_data_dissemination(report_ids, tribal_report_ids, include_private):
     """
     Given a set of report IDs, fetch the disseminated data for each and asssemble into a dictionary with the following shape:
 
