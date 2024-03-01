@@ -266,7 +266,7 @@ cannot_read_tribal_disclaimer = "This document includes one or more Tribal entit
 
 
 def _get_tribal_report_ids(report_ids):
-    """ Filters the given report_ids with only ones that are tribal """
+    """Filters the given report_ids with only ones that are tribal"""
     objects = General.objects.all().filter(report_id__in=report_ids)
     tribal_report_ids = []
 
