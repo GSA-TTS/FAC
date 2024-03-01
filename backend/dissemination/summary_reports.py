@@ -299,7 +299,7 @@ def insert_precert_coversheet(workbook):
     protect_sheet(sheet)
 
 
-def insert_dissem_coversheet(workbook, contains_tribal, user_can_read_tribal):
+def insert_dissem_coversheet(workbook, contains_tribal, include_private):
     sheet = workbook.create_sheet("Coversheet", 0)
     sheet.append(["Time created", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")])
     sheet.append(
@@ -310,7 +310,7 @@ def insert_dissem_coversheet(workbook, contains_tribal, user_can_read_tribal):
     )
 
     if contains_tribal:
-        if user_can_read_tribal:
+        if include_private:
             sheet.append(
                 [
                     "Note",
