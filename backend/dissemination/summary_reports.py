@@ -266,15 +266,16 @@ cannot_read_tribal_disclaimer = "This document includes one or more Tribal entit
 
 
 def _get_tribal_report_ids(report_ids):
-    # Determine which reports are tribal
+    """ Filters the given report_ids with only ones that are tribal """
     objects = General.objects.all().filter(report_id__in=report_ids)
     tribal_report_ids = []
 
     for obj in objects:
-        if _get_attribute_or_data(obj, "report_id") == "2019-06-CENSUS-0000227336":
-            # if not _get_attribute_or_data(obj, "is_public"):
-            tribal_report_ids.append(obj.report_id)
+        report_id = obj.report_id
+        if not obj.is_public:
+            tribal_report_ids.append(report_id)
 
+    logger.warn(tribal_report_ids)
     return tribal_report_ids
 
 
@@ -314,8 +315,6 @@ def insert_dissem_coversheet(workbook, contains_tribal, user_can_read_tribal):
             limit_disclaimer,
         ]
     )
-
-    logger.warn(contains_tribal)
 
     if contains_tribal:
         if user_can_read_tribal:
