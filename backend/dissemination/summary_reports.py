@@ -265,6 +265,19 @@ can_read_tribal_disclaimer = "This document is for a Tribal entity that has chos
 cannot_read_tribal_disclaimer = "This document is for a Tribal entity that has chosen to keep their data private. It doesn't include their audit findings text, corrective action plan, or notes to SEFA."
 
 
+def _get_tribal_report_ids(report_ids):
+    # Determine which reports are tribal
+    objects = General.objects.all().filter(report_id__in=report_ids)
+    tribal_report_ids = []
+
+    for obj in objects:
+        if _get_attribute_or_data(obj, "report_id") == "2019-06-CENSUS-0000227336":
+            # if not _get_attribute_or_data(obj, "is_public"):
+            tribal_report_ids.append(obj.report_id)
+
+    return tribal_report_ids
+
+
 def set_column_widths(worksheet):
     dims = {}
     for row in worksheet.rows:
@@ -554,15 +567,7 @@ def persist_workbook(workbook):
 
 
 def generate_summary_report(report_ids, user_can_read_tribal=False):
-    # Determine which reports are private
-    objects = General.objects.all().filter(report_id__in=report_ids)
-    tribal_report_ids = []
-
-    for obj in objects:
-        if _get_attribute_or_data(obj, "report_id") == "2019-06-CENSUS-0000227336":
-            # if not _get_attribute_or_data(obj, "is_public"):
-            tribal_report_ids.append(obj.report_id)
-
+    tribal_report_ids = _get_tribal_report_ids(report_ids)
     data = gather_report_data_dissemination(
         report_ids, tribal_report_ids, user_can_read_tribal
     )
