@@ -15,9 +15,22 @@ def assert_all_results_public(cls, results):
         cls.assertTrue(r.is_public)
 
 
-def assert_all_results_private_and_public(cls, results):
+def assert_results_contain_private_and_public(cls, results):
+    """Assert that both public and private results were found."""
+    found_public = False
+    found_private = False
+
     for r in results:
-        cls.assertTrue(r.is_public or not r.is_public)
+        if r.is_public:
+            found_public = True
+        else:
+            found_private = True
+
+        if found_public and found_private:
+            break
+
+    cls.assertTrue(found_public, "No public results found.")
+    cls.assertTrue(found_private, "No private results found.")
 
 
 class SearchGeneralTests(TestCase):
@@ -33,7 +46,7 @@ class SearchGeneralTests(TestCase):
 
         results = search_general()
 
-        assert_all_results_private_and_public(self, results)
+        assert_results_contain_private_and_public(self, results)
         self.assertEqual(len(results), public_count + private_count)
 
     def test_name_matches_auditee_name(self):
