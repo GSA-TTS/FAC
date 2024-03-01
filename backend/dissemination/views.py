@@ -30,6 +30,7 @@ from dissemination.models import (
     OneTimeAccess,
 )
 from dissemination.summary_reports import generate_summary_report
+from support.decorators import newrelic_timing_metric
 
 from users.permissions import can_read_tribal
 
@@ -128,6 +129,7 @@ class Search(View):
             },
         )
 
+    @newrelic_timing_metric("search")
     def post(self, request, *args, **kwargs):
         """
         When accessing the search page through post, run a search and display the results.

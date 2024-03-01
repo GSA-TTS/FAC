@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+
 from jsonschema import Draft7Validator, FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
 
@@ -11,7 +12,6 @@ from django.conf import settings
 import requests
 from openpyxl import load_workbook
 from pypdf import PdfReader
-
 
 from audit.intakelib import (
     additional_ueis_named_ranges,
@@ -33,6 +33,7 @@ from audit.fixtures.excel import (
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
 )
+from support.decorators import newrelic_timing_metric
 
 
 logger = logging.getLogger(__name__)
@@ -392,6 +393,7 @@ def _scan_file(file):
         )
 
 
+@newrelic_timing_metric("validate_file_infection")
 def validate_file_infection(file):
     """Files must pass an AV scan"""
     logger.info(f"Attempting to scan file: {file}.")
