@@ -28,7 +28,7 @@ def _scan_file(file):
             settings.AV_SCAN_URL,
             files={"file": file},
             data={"name": file.name},
-            timeout=15,
+            timeout=30,
         )
     except requests.exceptions.ConnectionError:
         logger.error("SCAN Connection error")
@@ -181,7 +181,7 @@ class Command(BaseCommand):
         paths = options["paths"]
 
         # The bucket name is a "friendly" name.
-        # We need to look it up in VCAP_SERVICES if we are not local, and 
+        # We need to look it up in VCAP_SERVICES if we are not local, and
         # then convert it to the brokered name.
         if os.getenv("ENV") not in ["LOCAL", "TESTING"]:
             brokered_bucket = lookup_bucket_in_vcap(bucket)
