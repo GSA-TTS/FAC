@@ -162,7 +162,7 @@ def lookup_bucket_in_vcap(friendly_bucket):
             return instance["credentials"]["bucket"]
     # If we get here, it is bad.
     logger.error("======================================")
-    logger.error(f"Could not get bucket name in production environment.")
+    logger.error(f'Could not get bucket name in production environment.')
     logger.error("Exiting.")
     logger.error("======================================")
     os.exit(-1)
