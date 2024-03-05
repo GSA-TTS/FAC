@@ -18,13 +18,13 @@ GET {{scheme}}://{{api_url}}/audit_access
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}  
 x-api-user-id: {{api_user_id}}
 x-api-key: {{$processEnv API_GOV_KEY}} 
-accept-profile: admin_api_v1_0_0
+accept-profile: admin_api_v1_1_0
 
 ###
 GET {{scheme}}://{{api_url}}/singleauditchecklist
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}     
 x-api-user-id: {{api_user_id}}
-accept-profile: admin_api_v1_0_0
+accept-profile: admin_api_v1_1_0
 x-api-key: {{$processEnv API_GOV_KEY}}   
 
 ###
@@ -32,7 +32,7 @@ x-api-key: {{$processEnv API_GOV_KEY}}
 GET {{scheme}}://{{api_url}}/tribal_access
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}     
 x-api-user-id: {{api_user_id}}
-accept-profile: admin_api_v1_0_0
+accept-profile: admin_api_v1_1_0
 x-api-key: {{$processEnv API_GOV_KEY}}   
 
 
@@ -41,7 +41,7 @@ x-api-key: {{$processEnv API_GOV_KEY}}
 POST {{scheme}}://{{api_url}}/rpc/add_tribal_access_email
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
 x-api-user-id: {{api_user_id}}
-content-profile: admin_api_v1_0_0
+content-profile: admin_api_v1_1_0
 content-type: application/json 
 Prefer: params=single-object
 x-api-key: {{$processEnv API_GOV_KEY}}   
@@ -55,7 +55,7 @@ x-api-key: {{$processEnv API_GOV_KEY}}
 POST {{scheme}}://{{api_url}}/rpc/add_tribal_access_emails
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
 x-api-user-id: {{api_user_id}}
-content-profile: admin_api_v1_0_0
+content-profile: admin_api_v1_1_0
 content-type: application/json 
 Prefer: params=single-object
 x-api-key: {{$processEnv API_GOV_KEY}}   
@@ -74,7 +74,7 @@ x-api-key: {{$processEnv API_GOV_KEY}}
 POST {{scheme}}://{{api_url}}/rpc/remove_tribal_access_email
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
 x-api-user-id: {{api_user_id}}
-content-profile: admin_api_v1_0_0
+content-profile: admin_api_v1_1_0
 content-type: application/json 
 Prefer: params=single-object
 x-api-key: {{$processEnv API_GOV_KEY}}   
@@ -89,7 +89,7 @@ x-api-key: {{$processEnv API_GOV_KEY}}
 POST {{scheme}}://{{api_url}}/rpc/remove_tribal_access_emails
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
 x-api-user-id: {{api_user_id}}
-content-profile: admin_api_v1_0_0
+content-profile: admin_api_v1_1_0
 content-type: application/json 
 Prefer: params=single-object
 x-api-key: {{$processEnv API_GOV_KEY}}   
@@ -109,6 +109,6 @@ x-api-key: {{$processEnv API_GOV_KEY}}
 GET {{scheme}}://{{api_url}}/admin_api_events
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}     
 x-api-user-id: {{api_user_id}}
-accept-profile: admin_api_v1_0_0
+accept-profile: admin_api_v1_1_0
 x-api-key: {{$processEnv API_GOV_KEY}}   
 
