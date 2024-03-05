@@ -4,6 +4,8 @@
 
 const API_GOV_JWT = Cypress.env('API_GOV_JWT') || '';
 const API_GOV_KEY = Cypress.env('API_GOV_KEY') || '';
+const API_GOV_USER_ID = Cypress.env('API_GOV_USER_ID');
+const API_GOV_KEY_ADMIN = Cypress.env('API_GOV_KEY_ADMIN');
 const API_GOV_USER_ID_ADMIN = Cypress.env('API_GOV_USER_ID_ADMIN');
 const API_GOV_URL = Cypress.env('API_GOV_URL');
 const API_VERSION = Cypress.env('API_VERSION');
@@ -25,7 +27,7 @@ function grantTribalAccess(email, user_id) {
     url: `${API_GOV_URL}/rpc/add_tribal_api_key_access`,
     headers: {
       Authorization: `Bearer ${API_GOV_JWT}`,
-      'X-Api-Key': API_GOV_KEY,
+      'X-Api-Key': API_GOV_KEY_ADMIN,
       'X-Api-User-Id': API_GOV_USER_ID_ADMIN,
       'Content-Profile': ADMIN_API_VERSION,
       'Content-Type': 'application/json',
@@ -47,7 +49,7 @@ function revokeTribalAccess(email, user_id) {
     url: `${API_GOV_URL}/rpc/remove_tribal_api_key_access`,
     headers: {
       Authorization: `Bearer ${API_GOV_JWT}`,
-      'X-Api-Key': API_GOV_KEY,
+      'X-Api-Key': API_GOV_KEY_ADMIN,
       'X-Api-User-Id': API_GOV_USER_ID_ADMIN,
       'Content-Profile': ADMIN_API_VERSION,
       'Content-Type': 'application/json',
@@ -84,7 +86,7 @@ export function testReportIdFoundWithoutTribalAccess(reportId) {
 
 export function testReportIdFoundWithTribalAccess(reportId) {
   const tribal_access_email = `${crypto.randomUUID()}@example.com`;
-  const tribal_access_user_id = crypto.randomUUID();
+  const tribal_access_user_id = API_GOV_USER_ID;
 
   grantTribalAccess(tribal_access_email, tribal_access_user_id);
   
@@ -110,7 +112,7 @@ export function testReportIdFoundWithTribalAccess(reportId) {
 
 export function testReportIdNotFoundWithTribalAccess(reportId) {
   const tribal_access_email = `${crypto.randomUUID()}@example.com`;
-  const tribal_access_user_id = crypto.randomUUID();
+  const tribal_access_user_id = API_GOV_USER_ID;
 
   grantTribalAccess(tribal_access_email, tribal_access_user_id);
   
