@@ -28,7 +28,10 @@ jobs:
     environment: ${{ inputs.environment }}
     env:
       CYPRESS_API_GOV_KEY: ${{ secrets.CYPRESS_API_GOV_KEY }}
+      CYPRESS_API_GOV_USER_ID_ADMIN: ${{ secrets.CYPRESS_API_GOV_USER_ID_ADMIN }}
       CYPRESS_API_GOV_URL: ${{ secrets.CYPRESS_API_GOV_URL }}
+      CYPRESS_API_VERSION: ${{ secrets.CYPRESS_API_VERSION }}
+      CYPRESS_ADMIN_API_VERSION: ${{ secrets.CYPRESS_ADMIN_API_VERSION }}
       CYPRESS_BASE_URL: ${{ inputs.url }}
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
       CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
