@@ -335,7 +335,7 @@ class OneTimeAccessDownloadView(View):
             raise BadRequest()
 
 
-class SingleSummaryReportDownloadView(ReportAccessRequiredMixin, View):
+class SingleSummaryReportDownloadView(View):
     def get(self, request, report_id):
         """
         Given a report_id in the URL, generate the summary report in S3 and
