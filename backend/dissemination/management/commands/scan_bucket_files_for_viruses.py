@@ -155,6 +155,7 @@ def check_scan_ok(result):
 #         "volume_mounts": []
 #     }, ...
 
+
 def lookup_bucket_in_vcap(friendly_bucket):
     vcap_services = json.loads(os.getenv("VCAP_SERVICES"))
     for instance in vcap_services["s3"]:
@@ -172,7 +173,9 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--bucket", type=str, required=True)
         parser.add_argument("--object", type=str, required=False, default=None)
-        parser.add_argument("--paths", type=str, nargs="+", required=False, default=None)
+        parser.add_argument(
+            "--paths", type=str, nargs="+", required=False, default=None
+        )
         pass
 
     def handle(self, *args, **options):
