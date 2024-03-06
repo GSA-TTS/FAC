@@ -19,17 +19,17 @@
 
 .usa-hero__heading, .usa-hero p {
     color: #1b1b1b;
-    font-family: Public Sans Web,
+    font-family: "Public Sans Web",
     -apple-system,
     BlinkMacSystemFont,
-    Segoe UI,
+    "Segoe UI",
     Roboto,
     Helvetica,
     Arial,
     sans-serif,
-    Apple Color Emoji,
-    Segoe UI Emoji,
-    Segoe UI Symbol;
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol";
 }
 
 .usa-hero .usa-hero__heading, .usa-hero p, .usa-hero .usa-button-group {
@@ -72,13 +72,13 @@
 .home-image.submission {
   background: url('../img/home/submit_an_audit.png');
   background-size: cover;
-  box-shadow: inset 0 0 0 2000px rgba(26, 68, 128, 0.7);
+  box-shadow: inset 0 0 0 2000px rgb(26 68 128 / 70%);
 }
 
 .home-image.searching {
   background: url('../img/home/search_for_audits.png');
   background-size: cover;
-  box-shadow: inset 0 0 0 2000px rgba(26, 68, 128, 0.7);
+  box-shadow: inset 0 0 0 2000px rgb(26 68 128 / 70%);
 }
 
 .home-image {

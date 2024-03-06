@@ -26,6 +26,7 @@
     padding-right: .5rem;
   }
 }
+
 .usa-header {
   background-color: #f3f9fe;
 
@@ -44,15 +45,11 @@
 }
 
 .usa-nav-container-links {
-  background: linear-gradient(to right, #DFF0F6 0%, rgba(223, 240, 246, 0.00) 87.5%);
+  background: linear-gradient(to right, #DFF0F6 0%, rgb(223 240 246 / 0%) 87.5%);
 }
 
 .usa-nav-container-links.is-visible {
   background-color: #f3f9fe;
-}
-
-.usa-menu-btn {
-  background-color: color('primary-darker');
 }
 
 .sign-in,
