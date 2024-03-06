@@ -1,147 +1,211 @@
 {% load static %}
 {% load sprite_helper %}
-<div class="usa-nav-container">
+<div class="usa-overlay"></div>
+<header class="usa-header usa-header--extended">
     <div class="usa-navbar">
         <div class="usa-logo" id="basic-logo">
-            <em class="usa-logo__text">
-                <a href="/" title="FAC.gov">
-                    <img src="{% static 'img/fac-full-logo.svg' %}" role="img" width="109" height="26" alt="FAC.gov" />
-                </a>
-            </em>
+            <a class="usa-logo-link" href="/">
+                <em class="usa-logo__text grid-row">
+                    <div class="font-sans-sm text-normal text-primary-dark width-15 margin-left-1 margin-top-05 display-grid grid-column">
+                        <p class="margin-0">Federal Audit</p>
+                        <p class="margin-0">Clearinghouse</p>
+                    </div>
+                </em>
+            </a>
         </div>
-        <button class="usa-menu-btn">Menu</button>
+        <button type="button" class="usa-menu-btn">Menu</button>
     </div>
-    <nav aria-label="Primary navigation" class="usa-nav">
-        <button class="usa-nav__close">
-            <img src="{% static 'img/usa-icons/close.svg' %}" role="img" alt="Close" />
-        </button>
-        <ul class="usa-nav__primary usa-accordion pa11y-ignore">
-            <li class="usa-nav__primary-item">
-                <button class="usa-accordion__button usa-nav__link"
-                        aria-expanded="false"
-                        aria-controls="nav-section-data">
-                    <span>Data</span>
-                </button>
-                <ul id="nav-section-data" class="usa-nav__submenu" hidden="">
-                    <li class="usa-nav__submenu-item">
-                        <a href="{% url 'dissemination:Search' %}"
-                           target="_blank">Search audits</a>
+    <nav aria-label="Primary navigation" class="usa-nav usa-nav-container-links">
+        <div class="usa-nav__inner">
+            <button type="button" class="usa-nav__close">
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    {% uswds_sprite "close" %}
+                </svg>
+            </button>
+            <div class="usa-nav-container padding-0">
+                <ul class="usa-nav__primary usa-accordion">
+                    <li class="usa-nav__primary-item">
+                        <button
+                            class="usa-accordion__button usa-nav__link"
+                            aria-expanded="false"
+                            aria-controls="basic-nav-search" >
+                            <span>Audit search</span>
+                        </button>
+                        <ul id="basic-nav-search" class="usa-nav__submenu">
+                            <li class="usa-nav__submenu-item">
+                                <a href="{% url 'dissemination:Search' %}"
+                                   target="_blank">Search</a>
+                            </li>
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}search-resources/"
+                                   target="_blank">Search resources</a>
+                            </li>
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}api/"
+                                target="_blank">Developer resources</a>
+                            </li>
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}search-resources/tribal/"
+                                target="_blank">Tribal audits</a>
+                            </li>
+                        </ul>
                     </li>
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}developers/"
-                           target="_blank">API</a>
+                    <li class="usa-nav__primary-item">
+                        <button
+                            class="usa-accordion__button usa-nav__link"
+                            aria-expanded="false"
+                            aria-controls="basic-nav-submission" >
+                            <span>Audit submission</span>
+                        </button>
+                        <ul id="basic-nav-submission" class="usa-nav__submenu">
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}audit-resources/"
+                                   target="_blank">Submission resources</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="usa-nav__primary-item">
+                        <button
+                            class="usa-accordion__button usa-nav__link"
+                            aria-expanded="false"
+                            aria-controls="basic-nav-updates" >
+                            <span>Updates &#38; News</span>
+                        </button>
+                        <ul id="basic-nav-updates" class="usa-nav__submenu">
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}updates/"
+                                   target="_blank">FAC updates</a>
+                            </li>
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}omb/"
+                                   target="_blank">OMB announcements</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="usa-nav__primary-item">
+                        <button
+                            class="usa-accordion__button usa-nav__link"
+                            aria-expanded="false"
+                            aria-controls="basic-nav-policy" >
+                            <span>Policy &#38; Compliance</span>
+                        </button>
+                        <ul id="basic-nav-policy" class="usa-nav__submenu">
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}compliance/"
+                                   target="_blank">Compliance</a>
+                            </li>
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}uniform-guidance/"
+                                   target="_blank">Uniform guidance</a>
+                            </li>
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}audit-resources/burden-statement/"
+                                   target="_blank">Burden statement</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="usa-nav__primary-item">
+                        <a class="usa-nav__link text-primary-dark" href="https://support.fac.gov/hc" target="_blank">
+                            <span class="text-primary-dark">Helpdesk</span>
+                        </a>
+                    </li>
+                    {% comment %}
+                        OMB_NUMBER and OMB_EXP_DATE are global.
+                        Added in /config/settings, passed in /config/context_processors.py 
+                    {% endcomment %}
+                    <li class="usa-nav__primary-item flex-align-self-center margin-left-2 width-card desktop:width-15 padding-top-2 desktop:padding-top-0">
+                        <span class="text-primary-darker"><strong>OMB#</strong> {{ OMB_NUMBER }} <strong>EXP:</strong> {{ OMB_EXP_DATE }}</span>
                     </li>
                 </ul>
-            </li>
-            <li class="usa-nav__primary-item">
-                <a class="usa-nav-link" href="{{ STATIC_SITE_URL }}audits/"
-                           target="_blank">Audit submission</a>
-            </li>
-            <li class="usa-nav__primary-item">
-                <button class="usa-accordion__button usa-nav__link"
-                        aria-expanded="false"
-                        aria-controls="basic-nav-section-2">
-                    <span>Policy &#38; News</span>
-                </button>
-                <ul id="basic-nav-section-2" class="usa-nav__submenu" hidden="">
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}policy/"
-                           target="_blank">Policy</a>
-                    </li>
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}info/announcements/"
-                           target="_blank">OMB Announcements</a>
-                    </li>
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}info/updates/"
-                           target="_blank">FAC Updates</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="usa-nav__primary-item">
-                <button class="usa-accordion__button usa-nav__link"
-                        aria-expanded="false"
-                        aria-controls="basic-nav-section-3">
-                    <span>Support</span>
-                </button>
-                <ul id="basic-nav-section-3" class="usa-nav__submenu" hidden="">
-                    <li class="usa-nav__submenu-item">
-                        <a href="https://support.fac.gov/hc/en-us"
-                           target="_blank">Help center</a>
-                    </li>
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}welcome/"
-                           target="_blank">Welcome</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-        {% if request.user.is_authenticated %}
-            <form action="/openid/logout" class="sign-out">
-                <button class="usa-button usa-button--unstyled">
-                    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                        {% uswds_sprite "logout" %}
-                    </svg>
-                    <span>Sign out</span>
-                    {% if request.user.first_name == '' %}
-                        <span>{{ request.user.email }}</span>
-                    {% else %}
-                        <span>{{ request.user.first_name }} {{ request.user.last_name }}</span>
-                    {% endif %}
-                </button>
-            </form>
-        {% else %}
-            <div class="sign-in">
-                <a class="sign-in-logo display-flex flex-align-self-center"
-                   aria-controls="login-modal"
-                   href="/openid/login/"
-                   data-open-modal
-                   tabindex="0"
-                   role="button"><span>Sign in</span> Submit and review your audits</a>
-                <div class="usa-modal usa-modal--lg"
-                     id="login-modal"
-                     aria-labelledby="login-modal-heading"
-                     aria-describedby="login-modal-description">
-                    <div class="usa-modal__content">
-                        <div class="usa-modal__main">
-                            <h2 class="usa-modal__heading" id="login-modal-heading">You must log in to continue</h2>
-                            <div id="login-modal-description">
-                                <p>
-                                    Submitting information to the Federal Audit Clearinghouse requires authentication
-                                    which will now be handled by <a href="http://login.gov">Login.gov</a>.
-                                    <strong>You cannot use your old Census FAC credentials to access the new GSA
-                                        system.</strong> On the next screen you can use an existing Login.gov
-                                        account or create a new one to securely sign in.
-                                    </p>
-                                </div>
-                                <div class="usa-modal__footer">
-                                    <ul class="usa-button-group">
-                                        <li class="usa-button-group__item">
-                                            <a href="/openid/login/">
+            </div>
+            <div class="usa-nav__secondary flex flex-row flex-align-center">
+                <div class="search">
+                    <form class="usa-search usa-search--small margin-bottom-1" id="search_form" action="https://search.usa.gov/search" method="get" role="search">
+                        <input type="hidden" name="affiliate" id="affiliate" value="fac-transition-site" autocomplete="off">
+                        <label class="usa-sr-only" for="query">
+                            Search
+                        </label>
+                        <input class="usa-input" id="query" type="search" name="query" placeholder="Search www.fac.gov">
+                        <button class="usa-button bg-primary-darker" type="submit" data-disable-with="Search">
+                            <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                {% uswds_sprite "search" %}
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                {% if request.user.is_authenticated %}
+                    <form action="/openid/logout" class="sign-out padding-left-2 margin-left-0 desktop:margin-left-2 border-left border-primary-dark">
+                        <button class="usa-button usa-button--unstyled">
+                            <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                {% uswds_sprite "logout" %}
+                            </svg>
+                            <span>Sign out</span>
+                            {% if request.user.first_name == '' %}
+                                <span>{{ request.user.email }}</span>
+                            {% else %}
+                                <span>{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                            {% endif %}
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="padding-left-2 margin-left-2 border-left border-primary-dark">
+                        <a class="sign-in display-flex flex-row"
+                        aria-controls="login-modal"
+                        href="/openid/login/"
+                        data-open-modal
+                        tabindex="0"
+                        role="button">
+                            <svg class="usa-icon usa-icon--size-4" aria-hidden="true" focusable="false" role="img">
+                                {% uswds_sprite "save_alt" %}
+                            </svg>
+                            <span class="font-sans-sm">Sign in</span>
+                        </a>
+                        <div class="usa-modal usa-modal--lg"
+                            id="login-modal"
+                            aria-labelledby="login-modal-heading"
+                            aria-describedby="login-modal-description">
+                            <div class="usa-modal__content">
+                                <div class="usa-modal__main">
+                                    <h2 class="usa-modal__heading" id="login-modal-heading">You must log in to continue</h2>
+                                    <div id="login-modal-description">
+                                        <p>
+                                            Submitting information to the Federal Audit Clearinghouse requires authentication
+                                            which will now be handled by <a href="http://login.gov">Login.gov</a>.
+                                            <strong>You cannot use your old Census FAC credentials to access the new GSA
+                                            system.</strong> On the next screen you can use an existing Login.gov
+                                            account or create a new one to securely sign in.
+                                        </p>
+                                    </div>
+                                    <div class="usa-modal__footer">
+                                        <ul class="usa-button-group">
+                                            <li class="usa-button-group__item">
+                                                <a href="/openid/login/">
+                                                    <button type="button"
+                                                            class="usa-button sign-in-button"
+                                                            id="sign-in"
+                                                            data-close-modal>Authenticate with Login.gov</button>
+                                                </a>
+                                            </li>
+                                            <li class="usa-button-group__item">
                                                 <button type="button"
-                                                        class="usa-button sign-in-button"
-                                                        id="sign-in"
-                                                        data-close-modal>Authenticate with Login.gov</button>
-                                            </a>
-                                        </li>
-                                        <li class="usa-button-group__item">
-                                            <button type="button"
-                                                    class="usa-button usa-button--unstyled padding-105 text-center"
-                                                    data-close-modal>Cancel</button>
-                                        </li>
-                                    </ul>
+                                                        class="usa-button usa-button--unstyled padding-105 text-center"
+                                                        data-close-modal>Cancel</button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
+                                <button class="usa-button usa-modal__close"
+                                        aria-label="Close this window"
+                                        data-close-modal>
+                                    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                        {% uswds_sprite "close" %}
+                                    </svg>
+                                </button>
                             </div>
-                            <button class="usa-button usa-modal__close"
-                                    aria-label="Close this window"
-                                    data-close-modal>
-                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                    {% uswds_sprite "close" %}
-                                </svg>
-                            </button>
                         </div>
                     </div>
-                </div>
-            {% endif %}
-        </nav>
-    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</header>
