@@ -82,12 +82,12 @@ function display_error_table(data) {
 
   const validationTable = `<p>Error on validation. Check the following cells for errors, and re-upload.
   Common errors include incorrect data types or missing information.</p>
-  <table class="usa-table usa-table--striped">
+  <table class="usa-table usa-table--striped width-full">
     <thead>
       <tr>
         <th scope="col">Cell</th>
-        <th scope="col">Field</th>
-        <th scope="col">Help Text</th>
+        <th scope="col">Column name</th>
+        <th scope="col">What went wrong</th>
       </tr>
     </thead>
     <tbody>

@@ -592,6 +592,19 @@ class OneTimeAccess(models.Model):
     )
 
 
+class TribalApiAccessKeyIds(models.Model):
+    email = models.TextField(
+        "Email of the user",
+        unique=True,
+    )
+    key_id = models.TextField(
+        "Key ID for the api access",
+    )
+    date_added = models.DateField(
+        "Added date of the record",
+    )
+
+
 class MigrationInspectionRecord(models.Model):
     audit_year = models.TextField(blank=True, null=True)
     dbkey = models.TextField(blank=True, null=True)

@@ -1,4 +1,3 @@
-from collections import namedtuple
 from datetime import timedelta
 import logging
 import math
@@ -31,6 +30,7 @@ from dissemination.models import (
     OneTimeAccess,
 )
 from dissemination.summary_reports import generate_summary_report
+from support.decorators import newrelic_timing_metric
 
 from users.permissions import can_read_tribal
 
@@ -81,57 +81,6 @@ def include_private_results(request):
     return True
 
 
-def clean_form_data(form):
-    """
-    Given a SearchForm, return a namedtuple with its cleaned and formatted data.
-    Ideally, this makes accessing form data later a little more readable.
-    """
-    FormData = namedtuple(
-        "FormData",
-        "uei_or_eins alns names start_date end_date cog_or_oversight agency_name audit_years auditee_state order_by order_direction limit page",
-    )
-
-    if form.is_valid():
-        uei_or_eins = form.cleaned_data["uei_or_ein"].splitlines()
-        alns = form.cleaned_data["aln"].replace(", ", " ").split()
-        names = form.cleaned_data["entity_name"].splitlines()
-        start_date = form.cleaned_data["start_date"]
-        end_date = form.cleaned_data["end_date"]
-        cog_or_oversight = form.cleaned_data["cog_or_oversight"]
-        agency_name = form.cleaned_data["agency_name"]
-        audit_years = [
-            int(year) for year in form.cleaned_data["audit_year"]
-        ]  # Cast strings from HTML to int
-        auditee_state = form.cleaned_data["auditee_state"]
-        order_by = form.cleaned_data["order_by"]
-        order_direction = form.cleaned_data["order_direction"]
-
-        # TODO: Add a limit choice field to the form
-        limit = form.cleaned_data["limit"] or 30
-        page = int(form.cleaned_data["page"] or 1)
-
-        form_data = FormData(
-            uei_or_eins,
-            alns,
-            names,
-            start_date,
-            end_date,
-            cog_or_oversight,
-            agency_name,
-            audit_years,
-            auditee_state,
-            order_by,
-            order_direction,
-            limit,
-            page,
-        )
-
-    else:
-        raise BadRequest("Form data validation error.", form.errors)
-
-    return form_data
-
-
 def run_search(form_data, include_private):
     """
     Given cleaned form data and an 'include_private' boolean, run the search.
@@ -140,18 +89,21 @@ def run_search(form_data, include_private):
 
     # As a dictionary, this is easily extensible.
     search_parameters = {
-        "alns": form_data.alns,
-        "names": form_data.names,
-        "uei_or_eins": form_data.uei_or_eins,
-        "start_date": form_data.start_date,
-        "end_date": form_data.end_date,
-        "cog_or_oversight": form_data.cog_or_oversight,
-        "agency_name": form_data.agency_name,
-        "audit_years": form_data.audit_years,
-        "auditee_state": form_data.auditee_state,
+        "alns": form_data["aln"],
+        "names": form_data["entity_name"],
+        "uei_or_eins": form_data["uei_or_ein"],
+        "start_date": form_data["start_date"],
+        "end_date": form_data["end_date"],
+        "cog_or_oversight": form_data["cog_or_oversight"],
+        "agency_name": form_data["agency_name"],
+        "audit_years": form_data["audit_year"],
+        "findings": form_data["findings"],
+        "direct_funding": form_data["direct_funding"],
+        "major_program": form_data["major_program"],
+        "auditee_state": form_data["auditee_state"],
         "include_private": include_private,
-        "order_by": form_data.order_by,
-        "order_direction": form_data.order_direction,
+        "order_by": form_data["order_by"],
+        "order_direction": form_data["order_direction"],
     }
 
     _add_search_params_to_newrelic(search_parameters)
@@ -171,11 +123,13 @@ class Search(View):
             "search.html",
             {
                 "form": form,
+                "form_user_input": {"audit_year": ["2023"]},
                 "state_abbrevs": STATE_ABBREVS,
                 "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
             },
         )
 
+    @newrelic_timing_metric("search")
     def post(self, request, *args, **kwargs):
         """
         When accessing the search page through post, run a search and display the results.
@@ -186,57 +140,53 @@ class Search(View):
         results = []
         context = {}
 
-        form_data = clean_form_data(form)
+        # form_data = clean_form_data(form)
+        if form.is_valid():
+            form_data = form.cleaned_data
+            form_user_input = {
+                k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
+            }
+        else:
+            raise ValidationError(f"Form error in Search POST. {form.errors}")
 
-        # If no years are checked, check 2023.
-        logger.info(form_data)
-        if len(form_data.audit_years) == 0:
-            form_data = form_data._replace(
-                audit_years=[2023]
-            )  # To search on the correct year
-            form.cleaned_data["audit_year"] = [
-                "2023"
-            ]  # To include the param into the rendered page
+        logger.info(f"Searching on fields: {form_data}")
 
         include_private = include_private_results(request)
         results = run_search(form_data, include_private)
 
-        results_count = len(results)
+        results_count = results.count()
 
         # Reset page to one if the page number surpasses how many pages there actually are
-        page = form_data.page
-        ceiling = math.ceil(results_count / form_data.limit)
+        page = form_data["page"]
+        ceiling = math.ceil(results_count / form_data["limit"])
         if page > ceiling:
             page = 1
 
         logger.info(f"TOTAL: results_count: [{results_count}]")
 
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
-        paginator = Paginator(object_list=results, per_page=form_data.limit)
+        paginator = Paginator(object_list=results, per_page=form_data["limit"])
         paginator_results = paginator.get_page(page)
         paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
             page, on_each_side=1
         )
 
         # Reformat these so the date-picker elements in HTML prepopulate
-        if form.cleaned_data["start_date"]:
-            form.cleaned_data["start_date"] = form.cleaned_data["start_date"].strftime(
-                "%Y-%m-%d"
-            )
-        if form.cleaned_data["end_date"]:
-            form.cleaned_data["end_date"] = form.cleaned_data["end_date"].strftime(
-                "%Y-%m-%d"
-            )
+        if form_data["start_date"]:
+            form_data["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
+        if form_data["end_date"]:
+            form_data["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         context = context | {
             "form": form,
+            "form_user_input": form_user_input,
             "state_abbrevs": STATE_ABBREVS,
-            "limit": form_data.limit,
+            "limit": form_data["limit"],
             "results": paginator_results,
             "results_count": results_count,
             "page": page,
-            "order_by": form_data.order_by,
-            "order_direction": form_data.order_direction,
+            "order_by": form_data["order_by"],
+            "order_direction": form_data["order_direction"],
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
         time_beginning_render = time.time()
@@ -405,9 +355,13 @@ class MultipleSummaryReportDownloadView(View):
         form = SearchForm(request.POST)
 
         try:
-            cleaned_data = clean_form_data(form)
+            if form.is_valid():
+                form_data = form.cleaned_data
+            else:
+                raise ValidationError("Form error in Search POST.")
+
             include_private = include_private_results(request)
-            results = run_search(cleaned_data, include_private)
+            results = run_search(form_data, include_private)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:

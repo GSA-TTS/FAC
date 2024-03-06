@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from dissemination.models import General, FederalAward
-from dissemination.search import search_general, search_alns
+from dissemination.models import General, FederalAward, Finding
+from dissemination.search import search_general, search_alns, search
 
 from model_bakery import baker
 
@@ -480,3 +480,109 @@ class SearchALNTests(TestCase):
             results_alns[0].finding_my_aln is False
             and results_alns[0].finding_all_aln is False
         )
+
+
+class SearchAdvancedFilterTests(TestCase):
+    def test_search_findings(self):
+        """
+        When making a search on a particular type of finding, search_general should only return records with a finding of that type.
+        """
+        findings_fields = [
+            {"is_modified_opinion": "Y"},
+            {"is_other_findings": "Y"},
+            {"is_material_weakness": "Y"},
+            {"is_significant_deficiency": "Y"},
+            {"is_other_matters": "Y"},
+            {"is_questioned_costs": "Y"},
+            {"is_repeat_finding": "Y"},
+        ]
+
+        # For every field, create a General object with an associated Finding with a 'Y' in that field.
+        gen_objects = []
+        finding_objects = []
+        for field in findings_fields:
+            general = baker.make(
+                General,
+                is_public=True,
+            )
+            finding = baker.make(Finding, report_id=general, **field)
+            finding_objects.append(finding)
+            gen_objects.append(general)
+
+        # One field returns the one appropriate general
+        params = {"findings": ["is_modified_opinion"]}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+
+        # Three fields returns three appropriate generals
+        params = {
+            "findings": [
+                "is_other_findings",
+                "is_material_weakness",
+                "is_significant_deficiency",
+            ]
+        }
+        results = search(params)
+        self.assertEqual(len(results), 3)
+
+        # Garbage fields don't apply any filters, so everything comes back
+        params = {"findings": ["a_garbage_field"]}
+        results = search(params)
+        self.assertEqual(len(results), 7)
+
+    def test_search_direct_funding(self):
+        """
+        When making a search on direct/passthrough funding, search_general should only return records with an award of that type.
+        """
+        general_direct = baker.make(
+            General,
+            is_public=True,
+        )
+        baker.make(FederalAward, report_id=general_direct, is_direct="Y")
+
+        general_passthrough = baker.make(
+            General,
+            is_public=True,
+        )
+        baker.make(FederalAward, report_id=general_passthrough, is_direct="N")
+
+        params = {"direct_funding": ["direct_funding"]}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], general_direct)
+
+        params = {"direct_funding": ["passthrough_funding"]}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], general_passthrough)
+
+        # One can search on both, even if there's not much reason to.
+        params = {"direct_funding": ["direct_funding", "passthrough_funding"]}
+        results = search(params)
+        self.assertEqual(len(results), 2)
+
+    def test_search_major_program(self):
+        """
+        When making a search on major program, search_general should only return records with an award of that type.
+        """
+        general_major = baker.make(
+            General,
+            is_public=True,
+        )
+        baker.make(FederalAward, report_id=general_major, is_major="Y")
+
+        general_non_major = baker.make(
+            General,
+            is_public=True,
+        )
+        baker.make(FederalAward, report_id=general_non_major, is_major="N")
+
+        params = {"major_program": [True]}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], general_major)
+
+        params = {"major_program": [False]}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], general_non_major)
