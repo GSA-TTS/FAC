@@ -20,7 +20,7 @@ from audit.get_agency_names import get_agency_names, get_audit_info_lists
 
 import newrelic.agent
 
-newrelic.agent.initialize(config_file="newrelic.ini")
+newrelic.agent.initialize(config_file="newrelic.ini", environment="preview")
 
 env = environs.Env()
 
