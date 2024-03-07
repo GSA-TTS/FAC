@@ -20,7 +20,9 @@ from audit.get_agency_names import get_agency_names, get_audit_info_lists
 
 import newrelic.agent
 
-newrelic.agent.initialize(config_file="newrelic.ini", environment="preview")
+newrelic.agent.initialize(ignore_errors=[
+    "django.core.exceptions:PermissionDenied"
+])
 
 env = environs.Env()
 
