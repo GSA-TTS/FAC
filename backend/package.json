@@ -43,7 +43,7 @@
   "dependencies": {
     "@uswds/uswds": "^3.5.0",
     "autoprefixer": "^10.4.13",
-    "esbuild": "^0.19.5",
+    "esbuild": "^0.19.11",
     "esbuild-sass-plugin": "2.4.5",
     "glob": "10.3.10",
     "npm": "^9.4.2",
