@@ -20,7 +20,7 @@ from audit.get_agency_names import get_agency_names, get_audit_info_lists
 
 import newrelic.agent
 
-newrelic.agent.initialize()
+newrelic.agent.initialize(config_file="newrelic.ini")
 
 env = environs.Env()
 
@@ -82,6 +82,11 @@ LOGGING = {
         "django": {"handlers": ["local_debug_logger", "prod_logger"]},
     },
 }
+
+logging.getLogger('boto3').setLevel(logging.CRITICAL)
+logging.getLogger('botocore').setLevel(logging.CRITICAL)
+logging.getLogger('nose').setLevel(logging.CRITICAL)
+logging.getLogger('s3transfer').setLevel(logging.CRITICAL)
 
 TEST_RUN = False
 if len(sys.argv) > 1 and sys.argv[1] == "test":
