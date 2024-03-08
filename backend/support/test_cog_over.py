@@ -46,6 +46,7 @@ class CogOverTests(TestCase):
             index=1,
             report_id="1",
             dbkey=None,
+            audit_year='2019',
         )
         migration_inspection_record.save()
         for i in range(6):
@@ -75,6 +76,7 @@ class CogOverTests(TestCase):
                 index=i,
                 report_id=i,
                 dbkey=str(10_000 + i),
+                audit_year='2019',
             )
             migration_inspection_record.save()
 
@@ -93,6 +95,7 @@ class CogOverTests(TestCase):
             index=11,
             report_id="11",
             dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
+            audit_year='2022',
         )
         migration_inspection_record.save()
 
@@ -110,6 +113,7 @@ class CogOverTests(TestCase):
             index=12,
             report_id="12",
             dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
+            audit_year='2019',
         )
         migration_inspection_record.save()
         for i in range(6):
