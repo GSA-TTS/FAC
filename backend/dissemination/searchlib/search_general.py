@@ -1,10 +1,75 @@
 from django.db.models import Q
-from dissemination.models import General
+from dissemination.models import DisseminationCombined
 import time
 from math import ceil
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+# def search_general(params=None):
+#     params = params or {}
+#     # Time general reduction
+#     t0 = time.time()
+
+#     ##############
+#     # Initialize query.
+#     # This is where tribal/is_public is set by default.
+#     q_base = _initialize_query(params.get("include_private", False))
+#     r_base = General.objects.filter(q_base)
+
+#     ##############
+#     # Audit years
+#     # query.add(_get_audit_years_match_query(audit_years), Q.AND)
+#     q_audit_year = _get_audit_years_match_query(params.get("audit_years", None))
+#     r_audit_year = General.objects.filter(q_audit_year)
+
+#     ##############
+#     # State
+#     q_state = _get_auditee_state_match_query(params.get("auditee_state", None))
+#     r_state = General.objects.filter(q_state)
+
+#     ##############
+#     # Names
+#     q_names = _get_names_match_query(params.get("names", None))
+#     r_names = General.objects.filter(q_names)
+
+#     ##############
+#     # UEI/EIN
+#     q_uei = _get_uei_or_eins_match_query(params.get("uei_or_eins", None))
+#     r_uei = General.objects.filter(q_uei)
+
+#     ##############
+#     # Start/end dates
+#     q_start_date = _get_start_date_match_query(params.get("start_date", None))
+#     r_start_date = General.objects.filter(q_start_date)
+#     q_end_date = _get_end_date_match_query(params.get("end_date", None))
+#     r_end_date = General.objects.filter(q_end_date)
+
+#     ##############
+#     # Cog/Over
+#     q_cogover = _get_cog_or_oversight_match_query(
+#         params.get("agency_name", None), params.get("cog_or_oversight", None)
+#     )
+#     r_cogover = General.objects.filter(q_cogover)
+
+#     ##############
+#     # Intersection
+#     # Intersection on result sets is an &.
+#     results = (
+#         r_audit_year
+#         & r_start_date
+#         & r_end_date
+#         & r_state
+#         & r_cogover
+#         & r_names
+#         & r_uei
+#         & r_base
+#     )
+
+#     t1 = time.time()
+#     report_timing("search_general", params, t0, t1)
+#     return results
 
 
 def search_general(params=None):
@@ -16,42 +81,42 @@ def search_general(params=None):
     # Initialize query.
     # This is where tribal/is_public is set by default.
     q_base = _initialize_query(params.get("include_private", False))
-    r_base = General.objects.filter(q_base)
+    r_base = DisseminationCombined.objects.filter(q_base)
 
     ##############
     # Audit years
     # query.add(_get_audit_years_match_query(audit_years), Q.AND)
     q_audit_year = _get_audit_years_match_query(params.get("audit_years", None))
-    r_audit_year = General.objects.filter(q_audit_year)
+    r_audit_year = DisseminationCombined.objects.filter(q_audit_year)
 
     ##############
     # State
     q_state = _get_auditee_state_match_query(params.get("auditee_state", None))
-    r_state = General.objects.filter(q_state)
+    r_state = DisseminationCombined.objects.filter(q_state)
 
     ##############
     # Names
     q_names = _get_names_match_query(params.get("names", None))
-    r_names = General.objects.filter(q_names)
+    r_names = DisseminationCombined.objects.filter(q_names)
 
     ##############
     # UEI/EIN
     q_uei = _get_uei_or_eins_match_query(params.get("uei_or_eins", None))
-    r_uei = General.objects.filter(q_uei)
+    r_uei = DisseminationCombined.objects.filter(q_uei)
 
     ##############
     # Start/end dates
     q_start_date = _get_start_date_match_query(params.get("start_date", None))
-    r_start_date = General.objects.filter(q_start_date)
+    r_start_date = DisseminationCombined.objects.filter(q_start_date)
     q_end_date = _get_end_date_match_query(params.get("end_date", None))
-    r_end_date = General.objects.filter(q_end_date)
+    r_end_date = DisseminationCombined.objects.filter(q_end_date)
 
     ##############
     # Cog/Over
     q_cogover = _get_cog_or_oversight_match_query(
         params.get("agency_name", None), params.get("cog_or_oversight", None)
     )
-    r_cogover = General.objects.filter(q_cogover)
+    r_cogover = DisseminationCombined.objects.filter(q_cogover)
 
     ##############
     # Intersection
