@@ -31,6 +31,7 @@ function setup_cgov_env {
     # Logging level, (critical, error, warning, info and debug). Default to info
     export NEW_RELIC_LOG_LEVEL=info
 
+    # Used for configuring the logging details sent to new relic
     export NEW_RELIC_CONFIG_FILE=newrelic.ini
 
     # https://docs.newrelic.com/docs/security/security-privacy/compliance/fedramp-compliant-endpoints/
