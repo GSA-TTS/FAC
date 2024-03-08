@@ -620,3 +620,204 @@ class MigrationInspectionRecord(models.Model):
     passthrough = models.JSONField(blank=True, null=True)
     general = models.JSONField(blank=True, null=True)
     secondary_auditor = models.JSONField(blank=True, null=True)
+
+
+class DisseminationCombined(models.Model):
+    """
+    Represents the 'dissemination_combined' materialized view.
+    """
+
+    id = models.BigAutoField(primary_key=True)
+    # General Information
+    report_id = models.TextField(
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        unique=True,
+    )
+    award_reference = models.TextField(
+        "Order that the award line was reported in Award",
+    )
+    reference_number = models.TextField(
+        "Findings Reference Numbers",
+        help_text=docs.finding_ref_nums_findings,
+    )
+    fac_accepted_date = models.DateField(
+        "The date at which the audit transitioned to 'accepted'",
+    )
+    federal_agency_prefix = models.TextField(
+        "2-char code refers to an agency",
+    )
+    federal_award_extension = models.TextField(
+        "3-digit extn for a program defined by the agency",
+    )
+    aln = models.TextField(
+        "federal agency prefix '.' federal award extension",
+    )
+    additional_award_identification = models.TextField(
+        "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
+        help_text=docs.award_identification,
+    )
+    cognizant_agency = models.TextField(
+        "Two digit Federal agency prefix of the cognizant agency",
+        help_text=docs.cognizant_agency,
+        null=True,
+    )
+    oversight_agency = models.TextField(
+        "Two digit Federal agency prefix of the oversight agency",
+        help_text=docs.oversight_agency,
+        null=True,
+    )
+    auditee_uei = models.TextField("Auditee UEI", help_text=docs.uei_general)
+    auditee_ein = models.TextField(
+        "Primary Employer Identification Number",
+    )
+    audit_type = models.TextField(
+        "Type of Audit",
+        help_text=docs.audit_type,
+    )
+    audit_year = models.TextField(
+        "Audit year from fy_start_date.",
+        help_text=docs.audit_year_general,
+    )
+    auditee_certify_name = models.TextField(
+        "Name of Auditee Certifying Official",
+        help_text=docs.auditee_certify_name,
+    )
+    auditee_contact_name = models.TextField(
+        "Name of Auditee Contact",
+        help_text=docs.auditee_contact,
+    )
+    auditee_email = models.TextField(
+        "Auditee Email address",
+        help_text=docs.auditee_email,
+    )
+    auditee_name = models.TextField("Name of the Auditee", help_text=docs.auditee_name)
+    auditee_city = models.TextField("Auditee City", help_text=docs.city)
+    auditee_state = models.TextField("Auditee State", help_text=docs.state)
+    auditee_zip = models.TextField(
+        "Auditee Zip Code",
+        help_text=docs.zip_code,
+    )
+    auditor_state = models.TextField("CPA State", help_text=docs.auditor_state)
+    auditor_city = models.TextField("CPA City", help_text=docs.auditor_city)
+    auditor_zip = models.TextField(
+        "CPA Zip Code",
+        help_text=docs.auditor_zip_code,
+    )
+    auditor_contact_name = models.TextField(
+        "Name of CPA Contact",
+        help_text=docs.auditor_contact,
+    )
+    auditor_email = models.TextField(
+        "CPA mail address (optional)",
+        help_text=docs.auditor_email,
+    )
+    auditor_firm_name = models.TextField(
+        "CPA Firm Name", help_text=docs.auditor_firm_name
+    )
+    auditor_ein = models.TextField(
+        "CPA Firm EIN (only available for audit years 2013 and beyond)",
+        help_text=docs.auditor_ein,
+    )
+
+    # Federal Award Details
+    amount_expended = models.BigIntegerField(
+        "Amount Expended for the Federal Program",
+        help_text=docs.amount,
+    )
+    findings_count = models.IntegerField(
+        "Number of findings for the federal program (only available for audit years 2013 and beyond)",
+        help_text=docs.findings_count,
+    )
+    is_direct = models.TextField(
+        "Indicate whether or not the award was received directly from a Federal awarding agency",
+        help_text=docs.direct,
+    )
+    is_loan = models.TextField(
+        "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)",
+        help_text=docs.loans,
+    )
+    is_major = models.TextField(
+        "Indicate whether or not the Federal program is a major program",
+        help_text=docs.major_program,
+    )
+    is_passthrough_award = models.TextField(
+        "Indicates whether or not funds were passed through to any subrecipients for the Federal program",
+        help_text=docs.passthrough_award,
+    )
+    audit_report_type = models.TextField(
+        "Type of Report Issued on the Major Program Compliance",
+        help_text=docs.type_report_major_program_cfdainfo,
+    )
+    passthrough_amount = models.BigIntegerField(
+        "Amount passed through to subrecipients",
+        help_text=docs.passthrough_amount,
+        null=True,
+    )
+    federal_program_name = models.TextField(
+        "Name of Federal Program",
+        help_text=docs.federal_program_name,
+    )
+    federal_program_total = models.BigIntegerField(
+        "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same CFDA Prefix and Extension",
+        help_text=docs.program_total,
+    )
+    cluster_name = models.TextField(
+        "The name of the cluster",
+        help_text=docs.cluster_name,
+    )
+    other_cluster_name = models.TextField(
+        "The name of the cluster (if not listed in the Compliance Supplement)",
+        help_text=docs.other_cluster_name,
+    )
+    state_cluster_name = models.TextField(
+        "The name of the state cluster",
+        help_text=docs.state_cluster_name,
+    )
+    cluster_total = models.BigIntegerField(
+        "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same Cluster Name",
+        help_text=docs.cluster_total,
+    )
+
+    # Finding Details
+    is_material_weakness = models.TextField(
+        "Material Weakness finding",
+        help_text=docs.material_weakness_findings,
+    )
+    is_modified_opinion = models.TextField(
+        "Modified Opinion finding", help_text=docs.modified_opinion
+    )
+    is_other_findings = models.TextField(
+        "Other findings", help_text=docs.other_findings
+    )
+    is_other_matters = models.TextField(
+        "Other non-compliance", help_text=docs.other_non_compliance
+    )
+    is_questioned_costs = models.TextField(
+        "Questioned Costs", help_text=docs.questioned_costs_findings
+    )
+    is_repeat_finding = models.TextField(
+        "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit",
+        help_text=docs.repeat_finding,
+    )
+    is_significant_deficiency = models.TextField(
+        "Significant Deficiency finding",
+        help_text=docs.significant_deficiency_findings,
+    )
+    prior_finding_ref_numbers = models.TextField(
+        "Audit finding reference numbers from the immediate prior audit",
+        help_text=docs.prior_finding_ref_nums,
+    )
+
+    type_requirement = models.TextField(
+        "Type Requirement Failure",
+        help_text=docs.type_requirement_findings,
+    )
+    is_public = models.BooleanField(
+        "True for public records, False for non-public records", default=False
+    )
+
+    # Meta options
+    class Meta:
+        managed = False  # This tells Django that this model is unmanaged
+        db_table = "dissemination_combined"

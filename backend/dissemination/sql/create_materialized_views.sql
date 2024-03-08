@@ -1,9 +1,16 @@
+CREATE SEQUENCE dissemination_combined_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE;
+
 -----------------------
 -- dissemination_combined
 -- This table is used primarily by search.
 CREATE MATERIALIZED VIEW IF NOT EXISTS 
 	dissemination_combined AS 
 	SELECT 
+		nextval('dissemination_combined_id_seq') AS id,
 		dg.report_id,
 		dfa.award_reference,
 		df.reference_number,
