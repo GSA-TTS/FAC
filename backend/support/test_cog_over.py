@@ -35,7 +35,7 @@ class CogOverTests(TestCase):
         gen = baker.make(
             General,
             index=1,
-            ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
             report_id="1",
             total_amount_expended="210000000",
             audit_year='2019',
@@ -53,7 +53,6 @@ class CogOverTests(TestCase):
             cfda = baker.make(
                 FederalAward,
                 index=i,
-                ein=gen.ein,
                 report_id=gen.report_id,
                 federal_agency_prefix="84",
                 federal_award_extension="032",
@@ -65,7 +64,7 @@ class CogOverTests(TestCase):
             gen = baker.make(
                 General,
                 index=i,
-                ein=DUP_EIN_WITHOUT_RESOLVER,
+                auditee_ein=DUP_EIN_WITHOUT_RESOLVER,
                 report_id=i,
                 total_amount_expended="10000000",
                 audit_year='2019',
@@ -84,7 +83,7 @@ class CogOverTests(TestCase):
             General,
             index=11,
             report_id='11',
-            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            auditee_ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
             uei=RESOLVABLE_UEI_WITHOUT_BASELINE,
             total_amount_expended="210000000",
             audit_year='2022',
@@ -102,7 +101,7 @@ class CogOverTests(TestCase):
         gen = baker.make(
             General,
             index=12,
-            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            auditee_ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
             report_id='12',
             total_amount_expended="210000000",
             audit_year='2019',
@@ -120,7 +119,6 @@ class CogOverTests(TestCase):
             cfda = baker.make(
                 FederalAward,
                 index=i + 10,
-                ein=gen.ein,
                 report_id=gen.report_id,
                 federal_agency_prefix="22",
                 federal_award_extension="032",
