@@ -3,7 +3,7 @@ from django.db.models.functions import Cast
 from django.db.models import BigIntegerField
 
 
-from dissemination.hist_models.census_2022 import CensusGen22, CensusCfda22
+from dissemination.models import General, FederalAward
 from audit.models import SingleAuditChecklist, User
 from support.models import CognizantAssignment
 
@@ -22,9 +22,9 @@ class Command(BaseCommand):
             return
 
         initialize_db()
-        gens = CensusGen22.objects.annotate(
-            amt=Cast("totfedexpend", output_field=BigIntegerField())
-        ).all()
+        gens = General.objects.annotate(
+            amt=Cast("total_amount_expended", output_field=BigIntegerField())
+        ).filter(Q(audit_year='2022'))
         print(f"Count of 2022 submissions: {len(gens)}")
         processed = cog_mismatches = over_mismatches = 0
 
@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 award["direct_or_indirect_award"]["is_direct"],
             )
 
-    def make_sac(self, gen: CensusGen22):
+    def make_sac(self, gen: General):
         general_information = {
             "auditee_fiscal_period_start": "2022-11-01",
             "auditee_fiscal_period_end": "2023-11-01",
@@ -93,7 +93,7 @@ class Command(BaseCommand):
         )
         return sac
 
-    def make_awards(self, gen: CensusGen22):
+    def make_awards(self, gen: General):
         awards = {
             "FederalAwards": {
                 "auditee_uei": gen.uei,
@@ -101,20 +101,20 @@ class Command(BaseCommand):
                 "total_amount_expended": gen.amt,
             }
         }
-        cfdas = CensusCfda22.objects.annotate(
-            amt=Cast("amount", output_field=BigIntegerField())
-        ).filter(ein=gen.ein, dbkey=gen.dbkey)
+        cfdas = FederalAward.objects.annotate(
+            amt=Cast("amount_expended", output_field=BigIntegerField())
+        ).filter(ein=gen.ein, report_id=gen.report_id)
         for cfda in cfdas:
             awards["FederalAwards"]["federal_awards"].append(
                 {
-                    "award_reference": cfda.index,
+                    "award_reference": cfda.award_reference,
                     "program": {
-                        "program_name": cfda.cfdaprogramname,
+                        "program_name": cfda.federal_program_name,
                         "amount_expended": cfda.amt,
-                        "federal_agency_prefix": cfda.cfda[:2],
-                        "three_digit_extension": cfda.cfda[2:],
+                        "federal_agency_prefix": cfda.federal_agency_prefix,
+                        "three_digit_extension": cfda.federal_award_extension,
                     },
-                    "direct_or_indirect_award": {"is_direct": cfda.direct},
+                    "direct_or_indirect_award": {"is_direct": cfda.is_direct},
                 },
             )
         return awards
