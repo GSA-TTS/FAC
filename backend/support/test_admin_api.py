@@ -12,7 +12,7 @@ class TestAdminAPI(TestCase):
     # We can force a UUID locally that would not work when using api.data.gov,
     # because api.data.gov sets/overwrites this.
     api_user_uuid = "61ba59b2-f545-4c2f-9b24-9655c706a06c"
-    admin_api_version = "admin_api_v1_0_0"
+    admin_api_version = "admin_api_v1_1_0"
 
     def get_connection(self):
         cloudgov = ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]

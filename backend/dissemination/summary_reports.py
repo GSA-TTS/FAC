@@ -258,6 +258,19 @@ field_name_ordered = {
     ],
 }
 
+restricted_model_names = ["captext", "findingtext", "note"]
+
+limit_disclaimer = f"This spreadsheet contains the first {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} results of your search. If you need to download more than {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} submissions, try limiting your search parameters to download in batches."
+can_read_tribal_disclaimer = "This document includes one or more Tribal entities that have chosen to keep their data private per 2 CFR 200.512(b)(2). Because your account has access to these submissions, this document includes their audit findings text, corrective action plan, and notes to SEFA. Don't share this data outside your agency."
+cannot_read_tribal_disclaimer = "This document includes one or more Tribal entities that have chosen to keep their data private per 2 CFR 200.512(b)(2). It doesn't include their audit findings text, corrective action plan, or notes to SEFA."
+
+
+def _get_tribal_report_ids(report_ids):
+    """Filters the given report_ids with only ones that are tribal"""
+    objects = General.objects.all().filter(report_id__in=report_ids, is_public=False)
+
+    return [obj.report_id for obj in objects]
+
 
 def set_column_widths(worksheet):
     dims = {}
@@ -286,15 +299,32 @@ def insert_precert_coversheet(workbook):
     protect_sheet(sheet)
 
 
-def insert_dissem_coversheet(workbook):
+def insert_dissem_coversheet(workbook, contains_tribal, include_private):
     sheet = workbook.create_sheet("Coversheet", 0)
     sheet.append(["Time created", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")])
     sheet.append(
         [
             "Note",
-            f"This spreadsheet contains the first {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} results of your search. If you need to download more than {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} submissions, try limiting your search parameters to download in batches.",
+            limit_disclaimer,
         ]
     )
+
+    if contains_tribal:
+        if include_private:
+            sheet.append(
+                [
+                    "Note",
+                    can_read_tribal_disclaimer,
+                ]
+            )
+        else:
+            sheet.append(
+                [
+                    "Note",
+                    cannot_read_tribal_disclaimer,
+                ]
+            )
+
     # Uncomment if we want to link to the FAC API for larger data dumps.
     # sheet.cell(row=3, column=2).value = "FAC API Link"
     # sheet.cell(row=3, column=2).hyperlink = f"{settings.STATIC_SITE_URL}/developers/"
@@ -335,7 +365,7 @@ def _get_attribute_or_data(obj, field_name):
         return value
 
 
-def gather_report_data_dissemination(report_ids):
+def gather_report_data_dissemination(report_ids, tribal_report_ids, include_private):
     """
     Given a set of report IDs, fetch the disseminated data for each and asssemble into a dictionary with the following shape:
 
@@ -370,9 +400,20 @@ def gather_report_data_dissemination(report_ids):
 
         objects = model.objects.all().filter(report_id__in=report_ids)
         for obj in objects:
+            report_id = _get_attribute_or_data(obj, "report_id")
+
+            # Omit rows for private tribal data when the user doesn't have perms
+            if (
+                model_name in restricted_model_names
+                and not include_private
+                and report_id in tribal_report_ids
+            ):
+                continue
+
             data[model_name]["entries"].append(
                 [_get_attribute_or_data(obj, field_name) for field_name in field_names]
             )
+
     return data
 
 
@@ -515,10 +556,13 @@ def persist_workbook(workbook):
     return f"temp/{filename}"
 
 
-def generate_summary_report(report_ids):
-    data = gather_report_data_dissemination(report_ids)
+def generate_summary_report(report_ids, include_private=False):
+    tribal_report_ids = _get_tribal_report_ids(report_ids)
+    data = gather_report_data_dissemination(
+        report_ids, tribal_report_ids, include_private
+    )
     workbook = create_workbook(data)
-    insert_dissem_coversheet(workbook)
+    insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
     filename = persist_workbook(workbook)
 
     return filename
