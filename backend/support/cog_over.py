@@ -102,7 +102,7 @@ def determine_hist_agency(ein, uei):
 def get_dbkey(ein, uei):
     try:
         report_id = General.objects.values_list("report_id", flat=True).get(
-            Q(ein=ein), Q(uei=uei), Q(audit_year='2022')
+            Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year='2022')
         )
     except (General.DoesNotExist, General.MultipleObjectsReturned):
         report_id = None
@@ -136,7 +136,7 @@ def lookup_baseline(ein, uei, dbkey):
 def get_2019_gen(ein, report_id):
     gens = General.objects.annotate(
         amt=Cast("total_amount_expended", output_field=BigIntegerField())
-    ).filter(Q(ein=ein), Q(report_id=report_id), Q(audit_year='2019'))
+    ).filter(Q(auditee_ein=ein), Q(report_id=report_id), Q(audit_year='2019'))
 
     if len(gens) != 1:
         return (len(gens), 0)
@@ -147,7 +147,7 @@ def get_2019_gen(ein, report_id):
 def get_2019_cfdas(ein, report_id):
     cfdas = FederalAward.objects.annotate(
         amt=Cast("amount_expended", output_field=BigIntegerField())
-    ).filter(Q(ein=ein), Q(report_id=report_id))
+    ).filter(Q(report_id=report_id))
 
     if len(cfdas) == 0:
         return None
