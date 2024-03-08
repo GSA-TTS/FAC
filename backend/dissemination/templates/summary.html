@@ -41,17 +41,18 @@
                             </svg>
                             <p class="margin-0">SF-SAC</p>
                         </a>
-
-                        <a class="usa-button display-flex font-sans-xl"
-                           href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                           target="_blank">
-                            <svg class="usa-icon margin-right-1 flex-align-self-center"
-                                 aria-hidden="true"
-                                 role="img">
-                                {% uswds_sprite "file_download" %}
-                            </svg>
-                            <p class="margin-0">Single audit report</p>
-                        </a>
+                        {% if general.is_public or include_private %}
+                            <a class="usa-button display-flex font-sans-xl"
+                            href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
+                            target="_blank">
+                                <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                    aria-hidden="true"
+                                    role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                                <p class="margin-0">Single audit report</p>
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -230,7 +231,11 @@
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                 <p class="margin-y-1 {% if not data|getkey:"Notes to SEFA" %}text-gray-30{% endif %}">
                                     <span><strong>Notes to SEFA:</strong>&nbsp;
-                                        {{ data|getkey:"Notes to SEFA"|length }}
+                                        {% if general.is_public or include_private %}
+                                            {{ data|getkey:"Notes to SEFA"|length }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
                                     </span>
                                 </p>
                             </td>
@@ -247,7 +252,11 @@
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                 <p class="margin-y-1 {% if not data|getkey:"Audit Findings Text" %}text-gray-30{% endif %}">
                                     <span><strong>Findings text:</strong>&nbsp;
-                                        {{ data|getkey:"Audit Findings Text"|length }}
+                                        {% if general.is_public or include_private %}
+                                            {{ data|getkey:"Audit Findings Text"|length }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
                                     </span>
                                 </p>
                             </td>
@@ -257,7 +266,11 @@
                             <td class="grid-col-12 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
                                 <p class="margin-y-1 {% if not data|getkey:"Corrective Action Plan" %}text-gray-30{% endif %}">
                                     <span><strong>CAP:</strong>&nbsp;
-                                        {{ data|getkey:"Corrective Action Plan"|length }}
+                                        {% if general.is_public or include_private %}
+                                            {{ data|getkey:"Corrective Action Plan"|length }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
                                     </span>
                                 </p>
                             </td>
