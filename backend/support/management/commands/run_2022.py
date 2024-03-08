@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db.models.functions import Cast
-from django.db.models import BigIntegerField
+from django.db.models import BigIntegerField, Q
 
 
 from dissemination.models import General, FederalAward
@@ -35,13 +35,13 @@ class Command(BaseCommand):
             if not sac.cognizant_agency and not sac.oversight_agency:
                 sac.assign_cog_over()
             processed += 1
-            if gen.cogagency != sac.cognizant_agency:
+            if gen.cognizant_agency != sac.cognizant_agency:
                 cog_mismatches += 1
-                print(f"Cog mismatch. Expected {gen.cogagency}")
+                print(f"Cog mismatch. Expected {gen.cognizant_agency}")
                 self.show_mismatch(sac)
-            if gen.oversightagency != sac.oversight_agency:
+            if gen.oversight_agency != sac.oversight_agency:
                 over_mismatches += 1
-                print(f"Oversight mismatch. Expected {gen.oversightagency}")
+                print(f"Oversight mismatch. Expected {gen.oversight_agency}")
                 self.show_mismatch(sac)
             if processed % 1000 == 0:
                 print(
@@ -65,15 +65,15 @@ class Command(BaseCommand):
             sac.oversight_agency,
             sac.federal_awards["FederalAwards"]["total_amount_expended"],
         )
-        for award in sac.federal_awards["FederalAwards"]["federal_awards"]:
-            print(
-                "Award:",
-                award["award_reference"],
-                award["program"]["amount_expended"],
-                award["program"]["federal_agency_prefix"],
-                award["program"]["three_digit_extension"],
-                award["direct_or_indirect_award"]["is_direct"],
-            )
+        # for award in sac.federal_awards["FederalAwards"]["federal_awards"]:
+        #     print(
+        #         "Award:",
+        #         award["award_reference"],
+        #         award["program"]["amount_expended"],
+        #         award["program"]["federal_agency_prefix"],
+        #         award["program"]["three_digit_extension"],
+        #         award["direct_or_indirect_award"]["is_direct"],
+        #     )
 
     def make_sac(self, gen: General):
         general_information = {
@@ -82,8 +82,8 @@ class Command(BaseCommand):
             "met_spending_threshold": True,
             "is_usa_based": True,
         }
-        general_information["ein"] = gen.ein
-        general_information["auditee_uei"] = gen.uei
+        general_information["ein"] = gen.auditee_ein
+        general_information["auditee_uei"] = gen.auditee_uei
         federal_awards = self.make_awards(gen)
         sac = SingleAuditChecklist.objects.create(
             submitted_by=User.objects.first(),
@@ -96,14 +96,14 @@ class Command(BaseCommand):
     def make_awards(self, gen: General):
         awards = {
             "FederalAwards": {
-                "auditee_uei": gen.uei,
+                "auditee_uei": gen.auditee_uei,
                 "federal_awards": [],
                 "total_amount_expended": gen.amt,
             }
         }
         cfdas = FederalAward.objects.annotate(
             amt=Cast("amount_expended", output_field=BigIntegerField())
-        ).filter(ein=gen.ein, report_id=gen.report_id)
+        ).filter(report_id=gen.report_id)
         for cfda in cfdas:
             awards["FederalAwards"]["federal_awards"].append(
                 {
