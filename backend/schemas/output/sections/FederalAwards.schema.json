@@ -73,6 +73,7 @@
                                           "ECONOMIC DEVELOPMENT CLUSTER",
                                           "EMPLOYMENT SERVICE CLUSTER",
                                           "FEDERAL TRANSIT CLUSTER",
+                                          "FEDERAL MOTOR CARRIER SAFETY ASSISTANCE (FMCSA)",
                                           "FISH AND WILDLIFE CLUSTER",
                                           "FOOD DISTRIBUTION CLUSTER",
                                           "FOREIGN FOOD AID DONATION CLUSTER",
@@ -96,7 +97,6 @@
                                           "WIOA CLUSTER",
                                           "CDBG - ENTITLEMENT GRANTS CLUSTER",
                                           "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
-                                          "FEDERAL MOTOR CARRIER SAFETY ASSISTANCE (FMCSA)",
                                           "N/A"
                                        ],
                                        "type": "string"
