@@ -5,19 +5,16 @@ refresh_views = """
 REFRESH MATERIALIZED VIEW dissemination_combined;
 """
 
+
 class Command(BaseCommand):
     help = """
     Runs sql scripts  to recreate access tables for the postgrest API.
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('-c', '--create', 
-                            action='store_true', default=False)
-        parser.add_argument('-d', '--drop', 
-                            action='store_true', default=False)
-        parser.add_argument('-r-', '--refresh', 
-                            action='store_true', default=False)
-
+        parser.add_argument("-c", "--create", action="store_true", default=False)
+        parser.add_argument("-d", "--drop", action="store_true", default=False)
+        parser.add_argument("-r-", "--refresh", action="store_true", default=False)
 
     def handle(self, *args, **options):
         path = "dissemination/sql"

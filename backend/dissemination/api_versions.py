@@ -33,6 +33,7 @@ def exec_sql_at_path(dir, filename):
         sql = open(path, "r").read()
         curs.execute(sql)
 
+
 def exec_sql(location, version, filename):
     conn = connection(get_conn_string())
     conn.autocommit = True
