@@ -83,6 +83,11 @@ LOGGING = {
     },
 }
 
+logging.getLogger("boto3").setLevel(logging.CRITICAL)
+logging.getLogger("botocore").setLevel(logging.CRITICAL)
+logging.getLogger("nose").setLevel(logging.CRITICAL)
+logging.getLogger("s3transfer").setLevel(logging.CRITICAL)
+
 TEST_RUN = False
 if len(sys.argv) > 1 and sys.argv[1] == "test":
     # This should reduce the volume of message displayed when running tests, but
