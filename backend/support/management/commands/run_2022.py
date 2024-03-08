@@ -35,13 +35,17 @@ class Command(BaseCommand):
             if not sac.cognizant_agency and not sac.oversight_agency:
                 sac.assign_cog_over()
             processed += 1
+            if gen.cognizant_agency == '':
+                gen.cognizant_agency = None
+            if gen.oversight_agency == '':
+                gen.oversight_agency = None
             if gen.cognizant_agency != sac.cognizant_agency:
                 cog_mismatches += 1
-                print(f"Cog mismatch. Expected {gen.cognizant_agency}")
+                print(f"Cog mismatch. Calculated {sac.cognizant_agency} Expected {gen.cognizant_agency}")
                 self.show_mismatch(sac)
             if gen.oversight_agency != sac.oversight_agency:
                 over_mismatches += 1
-                print(f"Oversight mismatch. Expected {gen.oversight_agency}")
+                print(f"Oversight mismatch. Calculated {sac.oversight_agency} Expected {gen.oversight_agency}")
                 self.show_mismatch(sac)
             if processed % 1000 == 0:
                 print(
@@ -65,15 +69,15 @@ class Command(BaseCommand):
             sac.oversight_agency,
             sac.federal_awards["FederalAwards"]["total_amount_expended"],
         )
-        # for award in sac.federal_awards["FederalAwards"]["federal_awards"]:
-        #     print(
-        #         "Award:",
-        #         award["award_reference"],
-        #         award["program"]["amount_expended"],
-        #         award["program"]["federal_agency_prefix"],
-        #         award["program"]["three_digit_extension"],
-        #         award["direct_or_indirect_award"]["is_direct"],
-        #     )
+        for award in sac.federal_awards["FederalAwards"]["federal_awards"]:
+            print(
+                "Award:",
+                award["award_reference"],
+                award["program"]["amount_expended"],
+                award["program"]["federal_agency_prefix"],
+                award["program"]["three_digit_extension"],
+                award["direct_or_indirect_award"]["is_direct"],
+            )
 
     def make_sac(self, gen: General):
         general_information = {
