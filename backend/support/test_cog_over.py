@@ -1,6 +1,5 @@
 from django.test import TestCase
-from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
-from dissemination.hist_models.census_2022 import CensusGen22
+from dissemination.models import General, MigrationInspectionRecord, FederalAward
 
 from model_bakery import baker
 from faker import Faker
@@ -29,64 +28,100 @@ class CogOverTests(TestCase):
 
     def setUp(self):
         with connection.schema_editor() as schema_editor:
-            schema_editor.create_model(CensusGen19)
-            schema_editor.create_model(CensusGen22)
-            schema_editor.create_model(CensusCfda19)
+            schema_editor.create_model(General)
+            schema_editor.create_model(MigrationInspectionRecord)
+            schema_editor.create_model(FederalAward)
 
         gen = baker.make(
-            CensusGen19,
+            General,
             index=1,
             ein=UNIQUE_EIN_WITHOUT_DBKEY,
-            dbkey=None,
-            totfedexpend="210000000",
+            report_id="1",
+            total_amount_expended="210000000",
+            audit_year='2019',
         )
         gen.save()
+        migration_inspection_record = baker.make(
+            MigrationInspectionRecord,
+            index=1,
+            report_id="1",
+            dbkey=None,
+        )
+        migration_inspection_record.save()
         for i in range(6):
             cfda = baker.make(
-                CensusCfda19,
+                FederalAward,
                 index=i,
                 ein=gen.ein,
-                dbkey=gen.dbkey,
-                cfda="84.032",
-                amount=10_000_000 * i,
-                direct="Y",
+                report_id=gen.report_id,
+                federal_agency_prefix="84",
+                federal_award_extension="032",
+                amount_expended=10_000_000 * i,
+                is_direct="Y",
             )
             cfda.save()
         for i in range(2, 5):
             gen = baker.make(
-                CensusGen19,
+                General,
                 index=i,
                 ein=DUP_EIN_WITHOUT_RESOLVER,
-                dbkey=str(10_000 + i),
-                totfedexpend="10000000",
+                report_id=i,
+                total_amount_expended="10000000",
+                audit_year='2019',
             )
             gen.save()
+            migration_inspection_record = baker.make(
+                MigrationInspectionRecord,
+                index=i,
+                report_id=i,
+                dbkey=str(10_000 + i),
+            )
+            migration_inspection_record.save()
+
         gen = baker.make(
-            CensusGen22,
+            General,
             index=11,
+            report_id='11',
             ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
             uei=RESOLVABLE_UEI_WITHOUT_BASELINE,
-            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
-            totfedexpend="210000000",
+            total_amount_expended="210000000",
+            audit_year='2022',
         )
         gen.save()
-        gen = baker.make(
-            CensusGen19,
+        migration_inspection_record = baker.make(
+            MigrationInspectionRecord,
             index=11,
-            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            report_id="11",
             dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
-            totfedexpend="210000000",
+        )
+        migration_inspection_record.save()
+
+        gen = baker.make(
+            General,
+            index=12,
+            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            report_id='12',
+            total_amount_expended="210000000",
+            audit_year='2019',
         )
         gen.save()
+        migration_inspection_record = baker.make(
+            MigrationInspectionRecord,
+            index=12,
+            report_id="12",
+            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
+        )
+        migration_inspection_record.save()
         for i in range(6):
             cfda = baker.make(
-                CensusCfda19,
+                FederalAward,
                 index=i + 10,
                 ein=gen.ein,
-                dbkey=gen.dbkey,
-                cfda="22.032",
-                amount=10_000_000 * i,
-                direct="Y",
+                report_id=gen.report_id,
+                federal_agency_prefix="22",
+                federal_award_extension="032",
+                amount_expended=10_000_000 * i,
+                is_direct="Y",
             )
             cfda.save()
 
