@@ -3,6 +3,7 @@ module "production" {
   cf_space_name         = "production"
   new_relic_license_key = var.new_relic_license_key
   pgrst_jwt_secret      = var.pgrst_jwt_secret
+  clamav_instances      = 6
   database_plan         = "xlarge-gp-psql-redundant"
 }
 
