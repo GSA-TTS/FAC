@@ -24,7 +24,7 @@ class Command(BaseCommand):
         initialize_db()
         gens = General.objects.annotate(
             amt=Cast("total_amount_expended", output_field=BigIntegerField())
-        ).filter(Q(audit_year='2022'))
+        ).filter(Q(audit_year="2022"))
         print(f"Count of 2022 submissions: {len(gens)}")
         processed = cog_mismatches = over_mismatches = 0
 
@@ -35,17 +35,21 @@ class Command(BaseCommand):
             if not sac.cognizant_agency and not sac.oversight_agency:
                 sac.assign_cog_over()
             processed += 1
-            if gen.cognizant_agency == '':
+            if gen.cognizant_agency == "":
                 gen.cognizant_agency = None
-            if gen.oversight_agency == '':
+            if gen.oversight_agency == "":
                 gen.oversight_agency = None
             if gen.cognizant_agency != sac.cognizant_agency:
                 cog_mismatches += 1
-                print(f"Cog mismatch. Calculated {sac.cognizant_agency} Expected {gen.cognizant_agency}")
+                print(
+                    f"Cog mismatch. Calculated {sac.cognizant_agency} Expected {gen.cognizant_agency}"
+                )
                 self.show_mismatch(sac)
             if gen.oversight_agency != sac.oversight_agency:
                 over_mismatches += 1
-                print(f"Oversight mismatch. Calculated {sac.oversight_agency} Expected {gen.oversight_agency}")
+                print(
+                    f"Oversight mismatch. Calculated {sac.oversight_agency} Expected {gen.oversight_agency}"
+                )
                 self.show_mismatch(sac)
             if processed % 1000 == 0:
                 print(
