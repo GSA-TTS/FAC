@@ -19,7 +19,7 @@ def verify_auditee_uei_schema(ir):
     uei_value = uei_range.get("values")
     with open(f"{settings.OUTPUT_BASE_DIR}/UeiSchema.json") as file:
         schema = json.load(file)
-    for index, uei in enumerate(uei_value):
+    for uei in uei_value:
         try:
             data = {"uei": uei}
             validate(instance=data, schema=schema)
