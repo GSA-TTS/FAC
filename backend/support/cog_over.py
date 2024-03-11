@@ -102,7 +102,7 @@ def determine_hist_agency(ein, uei):
 def get_dbkey(ein, uei):
     try:
         report_id = General.objects.values_list("report_id", flat=True).get(
-            Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year='2022')
+            Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year="2022")
         )
     except (General.DoesNotExist, General.MultipleObjectsReturned):
         report_id = None
@@ -111,9 +111,12 @@ def get_dbkey(ein, uei):
 
     try:
         dbkey = MigrationInspectionRecord.objects.values_list("dbkey", flat=True).get(
-            Q(report_id=report_id), Q(audit_year='2022')
+            Q(report_id=report_id), Q(audit_year="2022")
         )[:]
-    except (MigrationInspectionRecord.DoesNotExist, MigrationInspectionRecord.MultipleObjectsReturned):
+    except (
+        MigrationInspectionRecord.DoesNotExist,
+        MigrationInspectionRecord.MultipleObjectsReturned,
+    ):
         dbkey = None
     return report_id, dbkey
 
@@ -136,7 +139,7 @@ def lookup_baseline(ein, uei, dbkey):
 def get_2019_gen(ein, report_id):
     gens = General.objects.annotate(
         amt=Cast("total_amount_expended", output_field=BigIntegerField())
-    ).filter(Q(auditee_ein=ein), Q(report_id=report_id), Q(audit_year='2019'))
+    ).filter(Q(auditee_ein=ein), Q(report_id=report_id), Q(audit_year="2019"))
 
     if len(gens) != 1:
         return (len(gens), 0)
