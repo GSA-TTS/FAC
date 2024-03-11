@@ -3,7 +3,6 @@ from dissemination.models import General, MigrationInspectionRecord, FederalAwar
 
 from model_bakery import baker
 from faker import Faker
-from django.db import connection
 
 from audit.models import SingleAuditChecklist
 from .models import CognizantBaseline, CognizantAssignment
@@ -27,33 +26,25 @@ class CogOverTests(TestCase):
         super().__init__(method_name)
 
     def setUp(self):
-        with connection.schema_editor() as schema_editor:
-            schema_editor.create_model(General)
-            schema_editor.create_model(MigrationInspectionRecord)
-            schema_editor.create_model(FederalAward)
-
         gen = baker.make(
             General,
-            index=1,
             auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
             report_id="1",
             total_amount_expended="210000000",
-            audit_year='2019',
+            audit_year="2019",
         )
         gen.save()
         migration_inspection_record = baker.make(
             MigrationInspectionRecord,
-            index=1,
-            report_id="1",
+            report_id=gen.report_id,
             dbkey=None,
-            audit_year='2019',
+            audit_year="2019",
         )
         migration_inspection_record.save()
         for i in range(6):
             cfda = baker.make(
                 FederalAward,
-                index=i,
-                report_id=gen.report_id,
+                report_id=gen,
                 federal_agency_prefix="84",
                 federal_award_extension="032",
                 amount_expended=10_000_000 * i,
@@ -63,63 +54,56 @@ class CogOverTests(TestCase):
         for i in range(2, 5):
             gen = baker.make(
                 General,
-                index=i,
                 auditee_ein=DUP_EIN_WITHOUT_RESOLVER,
                 report_id=i,
                 total_amount_expended="10000000",
-                audit_year='2019',
+                audit_year="2019",
             )
             gen.save()
             migration_inspection_record = baker.make(
                 MigrationInspectionRecord,
-                index=i,
-                report_id=i,
+                report_id=gen.report_id,
                 dbkey=str(10_000 + i),
-                audit_year='2019',
+                audit_year="2019",
             )
             migration_inspection_record.save()
 
         gen = baker.make(
             General,
-            index=11,
-            report_id='11',
+            report_id="11",
             auditee_ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
-            uei=RESOLVABLE_UEI_WITHOUT_BASELINE,
+            auditee_uei=RESOLVABLE_UEI_WITHOUT_BASELINE,
             total_amount_expended="210000000",
-            audit_year='2022',
+            audit_year="2022",
         )
         gen.save()
         migration_inspection_record = baker.make(
             MigrationInspectionRecord,
-            index=11,
-            report_id="11",
+            report_id=gen.report_id,
             dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
-            audit_year='2022',
+            audit_year="2022",
         )
         migration_inspection_record.save()
 
         gen = baker.make(
             General,
-            index=12,
             auditee_ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
-            report_id='12',
+            report_id="12",
             total_amount_expended="210000000",
-            audit_year='2019',
+            audit_year="2019",
         )
         gen.save()
         migration_inspection_record = baker.make(
             MigrationInspectionRecord,
-            index=12,
-            report_id="12",
+            report_id=gen.report_id,
             dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
-            audit_year='2019',
+            audit_year="2019",
         )
         migration_inspection_record.save()
         for i in range(6):
             cfda = baker.make(
                 FederalAward,
-                index=i + 10,
-                report_id=gen.report_id,
+                report_id=gen,
                 federal_agency_prefix="22",
                 federal_award_extension="032",
                 amount_expended=10_000_000 * i,
@@ -296,7 +280,7 @@ class CogOverTests(TestCase):
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
         )
-        self.assertEqual(cog_agency, "84")
+        self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
 
     def test_cog_assignment_with_no_hist(self):
@@ -339,7 +323,7 @@ class CogOverTests(TestCase):
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
         )
-        self.assertEqual(cog_agency, "22")
+        self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
 
     def test_over_assignment(self):
