@@ -9,5 +9,6 @@ module "dev" {
   swagger_instances     = 1
   https_proxy_instances = 1
   smtp_proxy_instances  = 1
+  clamav_instances      = 1
   recursive_delete      = true
 }
