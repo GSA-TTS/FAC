@@ -78,7 +78,7 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
 
 
 def determine_hist_agency(ein, uei):
-    report_id, dbkey = get_dbkey(ein, uei)
+    report_id, dbkey = get_reportid_dbkey(ein, uei)
 
     cog_agency = lookup_baseline(ein, uei, dbkey)
     if cog_agency:
@@ -99,7 +99,7 @@ def determine_hist_agency(ein, uei):
     return cognizant_agency
 
 
-def get_dbkey(ein, uei):
+def get_reportid_dbkey(ein, uei):
     try:
         report_id = General.objects.values_list("report_id", flat=True).get(
             Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year="2022")
