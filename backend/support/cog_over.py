@@ -78,15 +78,15 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
 
 
 def determine_hist_agency(ein, uei):
-    report_id, dbkey = get_reportid_dbkey(ein, uei)
+    dbkey = get_dbkey(ein, uei)
 
     cog_agency = lookup_baseline(ein, uei, dbkey)
     if cog_agency:
         return cog_agency
-    (gen_count, total_amount_expended) = get_2019_gen(ein, report_id)
+    (gen_count, total_amount_expended, report_id_2019) = get_2019_gen(ein, uei)
     if gen_count != 1:
         return None
-    cfdas = get_2019_cfdas(ein, report_id)
+    cfdas = get_2019_cfdas(ein, report_id_2019)
     if not cfdas:
         # logger.warning("Found no cfda data for dbkey {dbkey} in 2019")
         return None
@@ -99,7 +99,7 @@ def determine_hist_agency(ein, uei):
     return cognizant_agency
 
 
-def get_reportid_dbkey(ein, uei):
+def get_dbkey(ein, uei):
     try:
         report_id = General.objects.values_list("report_id", flat=True).get(
             Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year="2022")
@@ -107,7 +107,7 @@ def get_reportid_dbkey(ein, uei):
     except (General.DoesNotExist, General.MultipleObjectsReturned):
         report_id = None
         dbkey = None
-        return report_id, dbkey
+        return dbkey
 
     try:
         dbkey = MigrationInspectionRecord.objects.values_list("dbkey", flat=True).get(
@@ -118,7 +118,7 @@ def get_reportid_dbkey(ein, uei):
         MigrationInspectionRecord.MultipleObjectsReturned,
     ):
         dbkey = None
-    return report_id, dbkey
+    return dbkey
 
 
 def lookup_baseline(ein, uei, dbkey):
@@ -136,15 +136,15 @@ def lookup_baseline(ein, uei, dbkey):
     return cognizant_agency
 
 
-def get_2019_gen(ein, report_id):
+def get_2019_gen(ein, uei):
     gens = General.objects.annotate(
         amt=Cast("total_amount_expended", output_field=BigIntegerField())
-    ).filter(Q(auditee_ein=ein), Q(report_id=report_id), Q(audit_year="2019"))
+    ).filter(Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year="2019"))
 
     if len(gens) != 1:
-        return (len(gens), 0)
+        return (len(gens), 0, None)
     gen = gens[0]
-    return (1, gen.amt)
+    return (1, gen.amt, gen.report_id)
 
 
 def get_2019_cfdas(ein, report_id):
