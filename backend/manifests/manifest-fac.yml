@@ -6,7 +6,7 @@ applications:
       - python_buildpack
     memory: ((mem_amount))
     path: ../
-    timeout: 180
+    timeout: 360
     disk_quota: 2G
     env:
       ENV: ((cf_env_name))
