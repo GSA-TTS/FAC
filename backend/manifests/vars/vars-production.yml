@@ -1,7 +1,7 @@
 app_name: gsa-fac
-mem_amount: 6G
+mem_amount: 8G
 cf_env_name: PRODUCTION
 env_name: prod
 service_name: production
 endpoint: app.fac.gov
-instances: 2
+instances: 6

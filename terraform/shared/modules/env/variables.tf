@@ -1,15 +1,15 @@
 # These variables expose what is open for customization in an environment. Where
 # there are defaults, they are the production defaults.
-# 
+#
 # Example usage:
-# 
+#
 # For production:
 #   module "production" {
 #     source        = "../shared/modules/base"
 #     cf_space_name = "production"
 #     # No further customization needed
 #   }
-# 
+#
 # For dev:
 #   module "dev" {
 #     cf_space_name = "dev"
@@ -66,6 +66,18 @@ variable "smtp_proxy_instances" {
   type        = number
   description = "the number of instances of the SMTP proxy application to run (default: 2)"
   default     = 2
+}
+
+variable "clamav_instances" {
+  type        = number
+  description = "the number of instances of the clamav application to run (default: 1)"
+  default     = 1
+}
+
+variable "clamav_memory" {
+  type        = number
+  description = "memory in MB to allocate to clamav app"
+  default     = 3072
 }
 
 variable "new_relic_license_key" {
