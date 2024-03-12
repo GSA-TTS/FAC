@@ -79,8 +79,6 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
 
 def determine_hist_agency(ein, uei):
     dbkey = get_dbkey(ein, uei)
-    if dbkey is None:
-        return None
 
     cog_agency = lookup_baseline(ein, uei, dbkey)
     if cog_agency:
