@@ -65,7 +65,7 @@
                "type": "string"
             },
             "version": {
-               "const": "1.0.4",
+               "const": "1.0.5",
                "type": "string"
             }
          },

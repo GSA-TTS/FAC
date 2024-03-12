@@ -46,12 +46,6 @@ def search(params):
 def _set_general_defaults(params):
     #############
     # Set some defaults.
-
-    # Let's make sure we have a confirmation that
-    # we default to not sharing data marked as suppressed.
-    if not params.get("include_private"):
-        params["include_private"] = False
-
     # Set default order direction
     if not params.get("order_by", None):
         params["order_by"] = ORDER_BY.fac_accepted_date

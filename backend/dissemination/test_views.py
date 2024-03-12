@@ -177,37 +177,39 @@ class SearchViewTests(TestCase):
         self.assertContains(response, "Search single audit reports")
         self.assertNotContains(response, "Results: ")
 
-    def test_anonymous_returns_only_public(self):
+    def test_anonymous_returns_private_and_public(self):
+        """Anonymous users should see all reports (public and private included)."""
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
 
         response = self.anon_client.post(self._search_url(), {})
 
-        self.assertContains(response, "Results: 5")
+        self.assertContains(response, "Results: 10")
 
         # all of the public reports should show up on the page
         for p in public:
             self.assertContains(response, p.report_id)
 
-        # none of the private reports should show up on the page
+        # all of the private reports should show up on the page
         for p in private:
-            self.assertNotContains(response, p.report_id)
+            self.assertContains(response, p.report_id)
 
-    def test_non_permissioned_returns_only_public(self):
+    def test_non_permissioned_returns_private_and_public(self):
+        """Non-permissioned users should see all reports (public and private included)."""
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
 
         response = self.auth_client.post(self._search_url(), {})
 
-        self.assertContains(response, "Results: 5")
+        self.assertContains(response, "Results: 10")
 
         # all of the public reports should show up on the page
         for p in public:
             self.assertContains(response, p.report_id)
 
-        # none of the private reports should show up on the page
+        # all of the private reports should show up on the page
         for p in private:
-            self.assertNotContains(response, p.report_id)
+            self.assertContains(response, p.report_id)
 
     def test_permissioned_returns_all(self):
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
@@ -512,7 +514,7 @@ class SummaryViewTests(TestCase):
 
     def test_private_summary(self):
         """
-        Anonymous requests for private audit summaries should return 403
+        Anonymous requests for private audit summaries should return 200
         """
         baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=False)
         url = reverse(
@@ -520,7 +522,7 @@ class SummaryViewTests(TestCase):
         )
 
         response = self.client.get(url)
-        self.assertEquals(response.status_code, 403)
+        self.assertEquals(response.status_code, 200)
 
     def test_permissioned_private_summary(self):
         """
@@ -637,14 +639,26 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEquals(response.status_code, 404)
 
+    @patch("dissemination.views.get_download_url")
     @patch("dissemination.summary_reports.persist_workbook")
-    def test_no_permissions_returns_404_on_private(self, mock_persist_workbook):
+    def test_no_permissions_returns_404_on_private(
+        self, mock_persist_workbook, mock_get_download_url
+    ):
         """
-        Non-permissioned users cannot access private audits through the summary report post.
+        Non-permissioned users can access private audits through the summary report post.
         """
+        mock_persist_workbook.return_value = self._mock_filename()
+        mock_get_download_url.return_value = self._mock_download_url()
+
         self._make_general(is_public=False)
         response = self.anon_client.post(self._summary_report_url(), {})
-        self.assertEquals(response.status_code, 404)
+        self.assertRedirects(
+            response,
+            self._mock_download_url(),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=False,
+        )
 
     @patch("dissemination.views.get_download_url")
     @patch("dissemination.summary_reports.persist_workbook")

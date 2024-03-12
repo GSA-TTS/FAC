@@ -35,14 +35,14 @@ local NotesToSefa = Types.object {
   properties: {
     auditee_uei: Base.Compound.UniqueEntityIdentifier,
     accounting_policies: Types.string,
-    is_minimis_rate_used:{
+    is_minimis_rate_used: {
       oneOf: [
         Types.string {
           const: Base.Const.GSA_MIGRATION,
         },
         Base.Enum.YorNorBoth,
       ],
-    }, 
+    },
     rate_explained: Types.string,
     notes_to_sefa_entries: Types.array {
       items: NotesToSefaEntry,

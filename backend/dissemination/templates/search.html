@@ -300,16 +300,18 @@
                                             </a>
                                         </td>
                                         <td>
-                                            <a class="usa-link display-flex flex-column flex-align-center"
-                                               href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
-                                               target="_blank">
-                                                <svg class="usa-icon usa-icon--size-4"
-                                                     aria-hidden="true"
-                                                     focusable="false"
-                                                     role="img">
-                                                    {% uswds_sprite "file_download" %}
-                                                </svg>
-                                            </a>
+                                            {% if result.is_public or include_private %}
+                                                <a class="usa-link display-flex flex-column flex-align-center"
+                                                href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
+                                                target="_blank">
+                                                    <svg class="usa-icon usa-icon--size-4"
+                                                        aria-hidden="true"
+                                                        focusable="false"
+                                                        role="img">
+                                                        {% uswds_sprite "file_download" %}
+                                                    </svg>
+                                                </a>
+                                            {% endif %}
                                         </td>
                                         {% if result.finding_my_aln is not None%}
                                             <td>
