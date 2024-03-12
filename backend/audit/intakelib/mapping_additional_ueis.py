@@ -28,7 +28,7 @@ from .checks import run_all_general_checks, run_all_additional_ueis_checks
 logger = logging.getLogger(__name__)
 
 
-def extract_additional_ueis(file, is_gsa_migration=False):
+def extract_additional_ueis(file, is_gsa_migration=False, auditee_uei=None):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
     )
@@ -42,7 +42,9 @@ def extract_additional_ueis(file, is_gsa_migration=False):
     )
 
     ir = extract_workbook_as_ir(file)
-    run_all_general_checks(ir, FORM_SECTIONS.ADDITIONAL_UEIS, is_gsa_migration)
+    run_all_general_checks(
+        ir, FORM_SECTIONS.ADDITIONAL_UEIS, is_gsa_migration, auditee_uei
+    )
     xform_ir = run_all_additional_ueis_transforms(ir)
     run_all_additional_ueis_checks(xform_ir, is_gsa_migration)
     result = _extract_generic_data(xform_ir, params)
