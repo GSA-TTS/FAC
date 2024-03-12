@@ -249,7 +249,13 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 event_user=request.user, event_type=self._event_type(form_section)
             )
 
-            auditee_uei = sac.general_information["auditee_uei"]
+            auditee_uei = None
+            if (
+                sac.general_information is not None
+                and "auditee_uei" in sac.general_information
+            ):
+                auditee_uei = sac.general_information["auditee_uei"]
+
             audit_data = self._extract_and_validate_data(
                 form_section, excel_file, auditee_uei
             )
