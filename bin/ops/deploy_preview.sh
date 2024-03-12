@@ -17,8 +17,8 @@ echo "Before data: ${before_data}"
 before_sha=$(echo "${before_data}"|xargs|cut -d'}' -f1|cut -d':' -f3|xargs)
 echo "Before SHA: ${before_sha}"
 echo "cf comand on next line:"
-echo cf push -f backend/manifests/manifest-preview.yml --vars-file backend/manifests/vars/vars-"${cfspace}".yml --strategy rolling
-cf push -f backend/manifests/manifest-preview.yml --vars-file backend/manifests/vars/vars-"${cfspace}".yml --strategy rolling
+echo cf push -f backend/manifests/manifest-preview.yml -t 300 --vars-file backend/manifests/vars/vars-"${cfspace}".yml --strategy rolling
+cf push -f backend/manifests/manifest-preview.yml -t 300 --vars-file backend/manifests/vars/vars-"${cfspace}".yml --strategy rolling
 after_data=$(cf curl "/v3/apps/${appguid}/relationships/current_droplet")
 echo "After data: ${after_data}"
 after_sha=$(echo "${after_data}"|xargs|cut -d'}' -f1|cut -d':' -f3|xargs)
