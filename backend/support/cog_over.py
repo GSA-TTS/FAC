@@ -79,6 +79,8 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
 
 def determine_hist_agency(ein, uei):
     dbkey = get_dbkey(ein, uei)
+    if dbkey is None:
+        return None
 
     cog_agency = lookup_baseline(ein, uei, dbkey)
     if cog_agency:
@@ -86,7 +88,7 @@ def determine_hist_agency(ein, uei):
     (gen_count, total_amount_expended, report_id_2019) = get_2019_gen(ein, uei)
     if gen_count != 1:
         return None
-    cfdas = get_2019_cfdas(ein, report_id_2019)
+    cfdas = get_2019_cfdas(report_id_2019)
     if not cfdas:
         # logger.warning("Found no cfda data for dbkey {dbkey} in 2019")
         return None
@@ -147,7 +149,7 @@ def get_2019_gen(ein, uei):
     return (1, gen.amt, gen.report_id)
 
 
-def get_2019_cfdas(ein, report_id):
+def get_2019_cfdas(report_id):
     cfdas = FederalAward.objects.annotate(
         amt=Cast("amount_expended", output_field=BigIntegerField())
     ).filter(Q(report_id=report_id))
