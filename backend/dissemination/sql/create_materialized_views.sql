@@ -104,7 +104,10 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		df.is_repeat_finding,
 		df.is_significant_deficiency,
 		df.prior_finding_ref_numbers,
-		df.type_requirement
+		df.type_requirement,
+		-- ALL of Passthrough
+		dp.passthrough_name,
+		dp.passthrough_id
 	FROM 
 		dissemination_federalaward dfa
 	LEFT JOIN dissemination_general dg 
@@ -112,4 +115,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 	LEFT JOIN dissemination_finding df 
 		ON dfa.report_id = df.report_id 
 		AND dfa.award_reference = df.award_reference
+	LEFT JOIN dissemination_passthrough dp
+		ON dfa.report_id = dp.report_id 
+		AND dfa.award_reference = dp.award_reference
 	;	
