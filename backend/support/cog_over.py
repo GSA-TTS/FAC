@@ -112,7 +112,7 @@ def get_dbkey(ein, uei):
     try:
         dbkey = MigrationInspectionRecord.objects.values_list("dbkey", flat=True).get(
             Q(report_id=report_id), Q(audit_year="2022")
-        )[:]
+        )
     except (
         MigrationInspectionRecord.DoesNotExist,
         MigrationInspectionRecord.MultipleObjectsReturned,
