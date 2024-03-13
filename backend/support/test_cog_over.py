@@ -39,7 +39,7 @@ class CogOverTests(TestCase):
         migration_inspection_record = baker.make(
             MigrationInspectionRecord,
             report_id=gen.report_id,
-            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
+            dbkey=None,
             audit_year="2022",
         )
         migration_inspection_record.save()
