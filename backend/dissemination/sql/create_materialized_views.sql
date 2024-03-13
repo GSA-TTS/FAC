@@ -9,16 +9,17 @@ CREATE SEQUENCE dissemination_combined_id_seq
 -- This table is used primarily by search.
 CREATE MATERIALIZED VIEW IF NOT EXISTS 
 	dissemination_combined AS 
-	SELECT 
+	SELECT
 		nextval('dissemination_combined_id_seq') AS id,
+
 		dg.report_id,
 		dfa.award_reference,
 		df.reference_number,
 		dg.fac_accepted_date::date,
-		
 		dfa.federal_agency_prefix,
 		dfa.federal_award_extension,
 		dfa.federal_agency_prefix||'.'||dfa.federal_award_extension as aln,
+		dfa.amount_expended,
 		dfa.additional_award_identification,
 
 		dg.cognizant_agency,
@@ -41,8 +42,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		dg.auditor_email,
 		dg.auditor_firm_name,
 		dg.auditor_ein,
-
-		dfa.amount_expended,
+		
 		dfa.findings_count,
 		dfa.is_direct::boolean,
 		dfa.is_loan::boolean,
@@ -56,7 +56,6 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		dfa.other_cluster_name,
 		dfa.state_cluster_name,
 		dfa.cluster_total,
-
 		df.is_material_weakness::boolean,
 		df.is_modified_opinion::boolean,
 		df.is_other_findings::boolean,
@@ -67,12 +66,11 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		df.prior_finding_ref_numbers,
 		df.type_requirement, 
 		dg.is_public
-	from
-		dissemination_federalaward dfa,
-		dissemination_finding df,
-		dissemination_general dg 
-	where 
-		df.award_reference = dfa.award_reference
-		and dg.report_id = dfa.report_id 
-		and dg.report_id = df.report_id
-		;
+	FROM 
+		dissemination_federalaward dfa
+	LEFT JOIN dissemination_general dg 
+		ON dfa.report_id = dg.report_id
+	LEFT JOIN dissemination_finding df 
+		ON dfa.report_id = df.report_id 
+		AND dfa.award_reference = df.award_reference
+	;	
