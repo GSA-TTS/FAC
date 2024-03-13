@@ -1,7 +1,7 @@
 app_name: gsa-fac
-mem_amount: 2G
+mem_amount: 4G
 cf_env_name: PREVIEW
 env_name: preview
 service_name: preview
 endpoint: fac-preview.app.cloud.gov
-instances: 1
+instances: 2

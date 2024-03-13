@@ -73,6 +73,7 @@
                                           "ECONOMIC DEVELOPMENT CLUSTER",
                                           "EMPLOYMENT SERVICE CLUSTER",
                                           "FEDERAL TRANSIT CLUSTER",
+                                          "FEDERAL MOTOR CARRIER SAFETY ASSISTANCE (FMCSA)",
                                           "FISH AND WILDLIFE CLUSTER",
                                           "FOOD DISTRIBUTION CLUSTER",
                                           "FOREIGN FOOD AID DONATION CLUSTER",
@@ -551,7 +552,7 @@
                "type": "string"
             },
             "version": {
-               "const": "1.0.4",
+               "const": "1.0.5",
                "type": "string"
             }
          },
