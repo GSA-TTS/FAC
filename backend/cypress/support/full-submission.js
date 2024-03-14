@@ -95,8 +95,8 @@ export function testFullSubmission(isTribal, isPublic) {
   cy.get(".usa-link").contains("Pre-submission validation").click();
   testCrossValidation();
 
-    // test unlock certification
-    testUnlock();
+  // test unlock certification
+  testUnlock();
 
   // Auditor certification
   cy.get(".usa-link").contains("Auditor Certification").click();
