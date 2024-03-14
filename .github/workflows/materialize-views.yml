@@ -3,12 +3,23 @@ name: Run the Materialize Views Django Function
 on:
   schedule:
     # Run every 4 hours
-    # - cron: '0 */4 * * *'
     - cron: '*/5 * * * *'
+
   workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        description: The environment the workflow should run on.
+        options:
+          - dev
+          - staging
+          - preview
+          - production
 
 jobs:
-  materialize-views:
+  scheduled-materialize-views:
+    if: ${{ github.event.schedule == '*/5 * * * *' }}
     strategy:
       matrix:
         environments: ["dev", "staging", "production"]
@@ -17,6 +28,19 @@ jobs:
     environment: ${{ matrix.environments }}
     env:
       space: ${{ matrix.environments }}
+    steps:
+      - name: Run Command
+        shell: bash
+        id: date
+        run: echo "Testing Matrix"
+
+  dispatch-materialize-views:
+    if: ${{ github.event.inputs.environment != '' }}
+    name: Run Materialize Views
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
     steps:
       - name: Run Command
         shell: bash
