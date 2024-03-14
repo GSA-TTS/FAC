@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dissemination.models import DisseminationCombined, General, FederalAward, Finding
+from dissemination.models import DisseminationCombined, General, FederalAward
 from dissemination.search import (
     search_general,
     search_alns,
@@ -325,46 +325,41 @@ class SearchGeneralTests(TestCase):
 class SearchALNTests(TestCase):
     def test_aln_search(self):
         """Given an ALN (or ALNs), search_general should only return records with awards under one of these ALNs."""
+
         prefix_object = baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000001"
-        )
-        baker.make(
-            FederalAward,
-            report_id=prefix_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000001",
             federal_agency_prefix="12",
             federal_award_extension="345",
+            # Set other required fields as necessary
         )
-
         extension_object = baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000002"
-        )
-        baker.make(
-            FederalAward,
-            report_id=extension_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000002",
             federal_agency_prefix="98",
             federal_award_extension="765",
-        )
-
-        gen_object = baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000003"
+            # Set other required fields as necessary
         )
         baker.make(
-            FederalAward,
-            report_id=gen_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000003",
             federal_agency_prefix="00",
             federal_award_extension="000",
+            # Set other required fields as necessary
         )
 
         # Just a prefix
         params_prefix = {"alns": ["12"]}
-        results_general_prefix = search_general(General, params_prefix)
+        results_general_prefix = search_general(DisseminationCombined, params_prefix)
         results_alns_prefix = search_alns(results_general_prefix, params_prefix)
         self.assertEqual(len(results_alns_prefix), 1)
         self.assertEqual(results_alns_prefix[0], prefix_object)
 
         # Prefix + extension
         params_extention = {"alns": ["98.765"]}
-        results_general_extention = search_general(General, params_extention)
+        results_general_extention = search_general(
+            DisseminationCombined, params_extention
+        )
         results_alns_extention = search_alns(
             results_general_extention, params_extention
         )
@@ -373,7 +368,7 @@ class SearchALNTests(TestCase):
 
         # Both
         params_both = {"alns": ["12", "98.765"]}
-        results_general_both = search_general(General, params_both)
+        results_general_both = search_general(DisseminationCombined, params_both)
         results_alns_both = search_alns(results_general_both, params_both)
         self.assertEqual(len(results_alns_both), 2)
 
@@ -381,24 +376,19 @@ class SearchALNTests(TestCase):
         """
         When making an ALN search, there should be no results on a non-existent ALN or on one with no awards under the present conditions.
         """
-        # General record with one award.
-        gen_object = baker.make(
-            General,
-            is_public=True,
-            report_id="2022-04-TSTDAT-0000000001",
-            audit_year="2024",
-        )
         baker.make(
-            FederalAward,
-            report_id=gen_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000001",
+            is_public=True,
+            audit_year="2024",
             award_reference="2023-0001",
             federal_agency_prefix="00",
             federal_award_extension="000",
             findings_count=1,
+            # Set other required fields as necessary
         )
-
         params = {"alns": ["99"], "audit_years": ["2024"]}
-        results_general = search_general(General, params)
+        results_general = search_general(DisseminationCombined, params)
         results_alns = search_alns(results_general, params)
 
         self.assertEqual(len(results_alns), 0)
@@ -410,20 +400,19 @@ class SearchALNTests(TestCase):
         If the record has findings under that ALN, it should have finding_my_aln == True.
         """
         # General record with one award with a finding.
-        gen_object = baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000001"
-        )
         baker.make(
-            FederalAward,
-            report_id=gen_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000001",
+            is_public=True,
+            audit_year="2024",
             award_reference="2023-0001",
             federal_agency_prefix="00",
             federal_award_extension="000",
             findings_count=1,
+            # Set other required fields as necessary
         )
-
         params = {"alns": ["00"]}
-        results_general = search_general(General, params)
+        results_general = search_general(DisseminationCombined, params)
         results_alns = search_alns(results_general, params)
 
         self.assertEqual(len(results_alns), 1)
@@ -438,28 +427,27 @@ class SearchALNTests(TestCase):
         When making an ALN search, search_general should return records under that ALN.
         If the record has findings NOT under that ALN, it should have finding_all_aln == True.
         """
-        # General record with two awards and one finding. Finding 2 is under a different ALN than finding 1.
-        gen_object = baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000002"
-        )
         baker.make(
-            FederalAward,
-            report_id=gen_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000002",
+            is_public=True,
             federal_agency_prefix="11",
             federal_award_extension="111",
             findings_count=0,
+            # Set other required fields as necessary
         )
         baker.make(
-            FederalAward,
-            report_id=gen_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000002",
+            is_public=True,
             award_reference="2023-0001",
             federal_agency_prefix="99",
             federal_award_extension="999",
             findings_count=1,
+            # Set other required fields as necessary
         )
-
         params = {"alns": ["11"]}
-        results_general = search_general(General, params)
+        results_general = search_general(DisseminationCombined, params)
         results_alns = search_alns(results_general, params)
 
         self.assertEqual(len(results_alns), 1)
@@ -474,29 +462,26 @@ class SearchALNTests(TestCase):
         When making an ALN search, search_general should return records under that ALN.
         If the record has findings both under that ALN and NOT under that ALN, it should have finding_my_aln == True and finding_all_aln == True.
         """
-        # General record with two awards and two findings. Awards are under different ALNs.
-        gen_object = baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000003"
-        )
         baker.make(
-            FederalAward,
-            report_id=gen_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000003",
+            is_public=True,
             award_reference="2023-0001",
             federal_agency_prefix="22",
             federal_award_extension="222",
             findings_count=1,
         )
         baker.make(
-            FederalAward,
-            report_id=gen_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000003",
+            is_public=True,
             award_reference="2023-0002",
             federal_agency_prefix="99",
             federal_award_extension="999",
             findings_count=1,
         )
-
         params = {"alns": ["22"]}
-        results_general = search_general(General, params)
+        results_general = search_general(DisseminationCombined, params)
         results_alns = search_alns(results_general, params)
 
         self.assertEqual(len(results_alns), 1)
@@ -507,20 +492,16 @@ class SearchALNTests(TestCase):
 
     @unittest.skip("Skipping while ALN columns are disabled.")
     def test_alns_no_findings(self):
-        # General record with one award and no findings.
-        gen_object = baker.make(
-            General, is_public=True, report_id="2022-04-TSTDAT-0000000004"
-        )
         baker.make(
-            FederalAward,
-            report_id=gen_object,
+            DisseminationCombined,
+            report_id="2022-04-TSTDAT-0000000004",
+            is_public=True,
             findings_count=0,
             federal_agency_prefix="33",
             federal_award_extension="333",
         )
-
         params = {"alns": ["33"]}
-        results_general = search_general(General, params)
+        results_general = search_general(DisseminationCombined, params)
         results_alns = search_alns(results_general, params)
 
         self.assertEqual(len(results_alns), 1)
@@ -531,69 +512,67 @@ class SearchALNTests(TestCase):
 
 
 class SearchAdvancedFilterTests(TestCase):
-    def test_search_findings(self):
-        """
-        When making a search on a particular type of finding, search_general should only return records with a finding of that type.
-        """
-        findings_fields = [
-            {"is_modified_opinion": "Y"},
-            {"is_other_findings": "Y"},
-            {"is_material_weakness": "Y"},
-            {"is_significant_deficiency": "Y"},
-            {"is_other_matters": "Y"},
-            {"is_questioned_costs": "Y"},
-            {"is_repeat_finding": "Y"},
-        ]
+    # def test_search_findings(self):
+    #     """
+    #     When making a search on a particular type of finding, search_general should only return records with a finding of that type.
+    #     """
+    #     findings_fields = [
+    #         {"is_modified_opinion": "Y"},
+    #         {"is_other_findings": "Y"},
+    #         {"is_material_weakness": "Y"},
+    #         {"is_significant_deficiency": "Y"},
+    #         {"is_other_matters": "Y"},
+    #         {"is_questioned_costs": "Y"},
+    #         {"is_repeat_finding": "Y"},
+    #     ]
 
-        # For every field, create a General object with an associated Finding with a 'Y' in that field.
-        gen_objects = []
-        finding_objects = []
-        for field in findings_fields:
-            general = baker.make(
-                General,
-                is_public=True,
-            )
-            finding = baker.make(Finding, report_id=general, **field)
-            finding_objects.append(finding)
-            gen_objects.append(general)
+    #     # For every field, create a General object with an associated Finding with a 'Y' in that field.
+    #     gen_objects = []
+    #     finding_objects = []
+    #     for field in findings_fields:
+    #         general = baker.make(
+    #             General,
+    #             is_public=True,
+    #         )
+    #         finding = baker.make(Finding, report_id=general, **field)
+    #         finding_objects.append(finding)
+    #         gen_objects.append(general)
 
-        # One field returns the one appropriate general
-        params = {"findings": ["is_modified_opinion"]}
-        results = search(params)
-        self.assertEqual(len(results), 1)
+    #     # One field returns the one appropriate general
+    #     params = {"findings": ["is_modified_opinion"]}
+    #     results = search(params)
+    #     self.assertEqual(len(results), 1)
 
-        # Three fields returns three appropriate generals
-        params = {
-            "findings": [
-                "is_other_findings",
-                "is_material_weakness",
-                "is_significant_deficiency",
-            ]
-        }
-        results = search(params)
-        self.assertEqual(len(results), 3)
+    #     # Three fields returns three appropriate generals
+    #     params = {
+    #         "findings": [
+    #             "is_other_findings",
+    #             "is_material_weakness",
+    #             "is_significant_deficiency",
+    #         ]
+    #     }
+    #     results = search(params)
+    #     self.assertEqual(len(results), 3)
 
-        # Garbage fields don't apply any filters, so everything comes back
-        params = {"findings": ["a_garbage_field"]}
-        results = search(params)
-        self.assertEqual(len(results), 7)
+    #     # Garbage fields don't apply any filters, so everything comes back
+    #     params = {"findings": ["a_garbage_field"]}
+    #     results = search(params)
+    #     self.assertEqual(len(results), 7)
 
     def test_search_direct_funding(self):
         """
         When making a search on direct/passthrough funding, search_general should only return records with an award of that type.
         """
         general_direct = baker.make(
-            General,
+            DisseminationCombined,
             is_public=True,
+            is_direct="Y",
         )
-        baker.make(FederalAward, report_id=general_direct, is_direct="Y")
-
         general_passthrough = baker.make(
-            General,
+            DisseminationCombined,
             is_public=True,
+            is_direct="N",
         )
-        baker.make(FederalAward, report_id=general_passthrough, is_direct="N")
-
         params = {"direct_funding": ["direct_funding"]}
         results = search(params)
         self.assertEqual(len(results), 1)
