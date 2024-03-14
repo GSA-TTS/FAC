@@ -16,18 +16,23 @@ logger = logging.getLogger(__name__)
 # Their ORM cookbook looks to be useful reading.
 # https://books.agiliq.com/projects/django-orm-cookbook/en/latest/subquery.html
 
+
 def is_only_general_params(params_dict):
     params_set = set(list(params_dict.keys()))
-    gen_set = set(["audit_years", 
-                   "auditee_state",
-                   "names",
-                   "uei_or_eins",
-                   "start_date",
-                   "end_date",
-                   "agency_name",
-                   "cog_or_oversight"
-                   ])
+    gen_set = set(
+        [
+            "audit_years",
+            "auditee_state",
+            "names",
+            "uei_or_eins",
+            "start_date",
+            "end_date",
+            "agency_name",
+            "cog_or_oversight",
+        ]
+    )
     return params_set.issubset(gen_set)
+
 
 def search(params):
     """
@@ -44,7 +49,6 @@ def search(params):
     ##############
     # GENERAL
 
-    base_model = None
     if is_only_general_params(params):
         results = search_general(General, params)
         results = _sort_results(results, params)
@@ -55,7 +59,7 @@ def search(params):
         results = search_findings(results, params)
         results = search_direct_funding(results, params)
         results = search_major_program(results, params)
-    
+
     results = results.distinct("report_id", params.get("order_by", "fac_accepted_date"))
 
     t1 = time.time()

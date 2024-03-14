@@ -1,8 +1,7 @@
-from django.db.models import Q
-from dissemination.models import DisseminationCombined
 import time
 from math import ceil
 import logging
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 

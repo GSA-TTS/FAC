@@ -1,15 +1,12 @@
 from django.test import TestCase
 
-from dissemination.models import (
-    DisseminationCombined,
-    General, 
-    FederalAward, 
-    Finding)
+from dissemination.models import DisseminationCombined, General, FederalAward, Finding
 from dissemination.search import (
-    search_general, 
-    search_alns, 
+    search_general,
+    search_alns,
     search,
-    is_only_general_params)
+    is_only_general_params,
+)
 
 from model_bakery import baker
 
@@ -42,12 +39,11 @@ def assert_results_contain_private_and_public(cls, results):
 
 
 class SearchGeneralTests(TestCase):
-
     def test_is_only_general_params_works(self):
         params = {
             "uei_or_eins": "not_important",
-            "agency_name": "not_important", 
-            "start_date": "not_important"
+            "agency_name": "not_important",
+            "start_date": "not_important",
         }
         bad_params = {
             "uei_or_eins": "not_important",
@@ -207,7 +203,7 @@ class SearchGeneralTests(TestCase):
             {
                 "start_date": search_start_date,
                 "end_date": search_end_date,
-            }
+            },
         )
 
         assert_all_results_public(self, results)
@@ -234,7 +230,7 @@ class SearchGeneralTests(TestCase):
             {
                 "cog_or_oversight": "cog",
                 "agency_name": "01",
-            }
+            },
         )
 
         assert_all_results_public(self, results)
@@ -256,7 +252,7 @@ class SearchGeneralTests(TestCase):
             {
                 "cog_or_oversight": "oversight",
                 "agency_name": "01",
-            }
+            },
         )
 
         assert_all_results_public(self, results)
@@ -276,7 +272,7 @@ class SearchGeneralTests(TestCase):
             General,
             {
                 "audit_years": [2016],
-            }
+            },
         )
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
@@ -285,7 +281,7 @@ class SearchGeneralTests(TestCase):
             General,
             {
                 "audit_years": [2020],
-            }
+            },
         )
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
@@ -294,7 +290,7 @@ class SearchGeneralTests(TestCase):
             General,
             {
                 "audit_years": [2020, 2021, 2022],
-            }
+            },
         )
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 3)
