@@ -1,15 +1,12 @@
-from django.test import TestCase
-
-import os
 from datetime import datetime
-
-
 import jwt
+import os
 import requests
 
-from config import settings
+from django.test import TestCase
 
-api_schemas = ["api_v1_0_0"]
+from config import settings
+from dissemination.templatetags.field_name_to_label import field_name_to_label
 
 
 class APIViewTests(TestCase):
@@ -62,3 +59,18 @@ class APIViewTests(TestCase):
             self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
         )
         self.assertEquals(response.status_code, 400)
+
+
+class TemplateTagTests(TestCase):
+    def test_field_name_to_label(self):
+        """
+        Given a field name with underscores like "report_id", it should be converted
+        to display like "Report Id"
+        """
+        sample_field = "report_id"
+        converted_sample_field = field_name_to_label(sample_field)
+        self.assertEquals(converted_sample_field, "Report Id")
+
+        sample_field = "auditee_contact_title"
+        converted_sample_field = field_name_to_label(sample_field)
+        self.assertEquals(converted_sample_field, "Auditee Contact Title")

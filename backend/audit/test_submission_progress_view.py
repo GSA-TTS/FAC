@@ -8,9 +8,11 @@ from audit.cross_validation import (
     sac_validation_shape,
     submission_progress_check,
 )
-from audit.cross_validation.naming import SECTION_NAMES
-from .models import Access, SingleAuditChecklist
+from audit.cross_validation.naming import SECTION_NAMES, find_section_by_name
+from .models import Access, SingleAuditChecklist, SubmissionEvent
 from .test_views import _load_json
+
+import datetime
 
 
 AUDIT_JSON_FIXTURES = Path(__file__).parent / "fixtures" / "json"
@@ -105,11 +107,71 @@ class SubmissionProgressViewTests(TestCase):
             addl_sections["federal_awards"] = {"FederalAwards": {"federal_awards": []}}
         addl_sections["general_information"] = info
         del addl_sections["single_audit_report"]
+        user = baker.make(User, email="a@a.com")
         sac = baker.make(SingleAuditChecklist, **addl_sections)
+
+        baker.make(
+            SubmissionEvent,
+            sac=sac,
+            user=user,
+            event=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+        )
+        baker.make(
+            SubmissionEvent,
+            sac=sac,
+            user=user,
+            event=SubmissionEvent.EventType.AUDIT_INFORMATION_UPDATED,
+        )
+        baker.make(
+            SubmissionEvent,
+            sac=sac,
+            user=user,
+            event=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+        )
+        baker.make(
+            SubmissionEvent,
+            sac=sac,
+            user=user,
+            event=SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
+        )
+        baker.make(
+            SubmissionEvent,
+            sac=sac,
+            user=user,
+            event=SubmissionEvent.EventType.NOTES_TO_SEFA_UPDATED,
+        )
+
         shaped_sac = sac_validation_shape(sac)
         result = submission_progress_check(shaped_sac, sar=True, crossval=False)
+
         self.assertEqual(result["general_information"]["display"], "complete")
         self.assertTrue(result["general_information"]["completed"])
+
+        self.assertEqual(result["audit_information"]["completed_by"], "a@a.com")
+        self.assertIsInstance(
+            result["audit_information"]["completed_date"], datetime.datetime
+        )
+
+        self.assertEqual(result["federal_awards"]["completed_by"], "a@a.com")
+        self.assertIsInstance(
+            result["federal_awards"]["completed_date"], datetime.datetime
+        )
+
+        self.assertEqual(result["general_information"]["completed_by"], "a@a.com")
+        self.assertIsInstance(
+            result["general_information"]["completed_date"], datetime.datetime
+        )
+
+        self.assertEqual(result["notes_to_sefa"]["completed_by"], "a@a.com")
+        self.assertIsInstance(
+            result["notes_to_sefa"]["completed_date"], datetime.datetime
+        )
+
+        self.assertEqual(result["single_audit_report"]["completed_by"], "a@a.com")
+        self.assertIsInstance(
+            result["single_audit_report"]["completed_date"], datetime.datetime
+        )
+
         conditional_keys = (
             "additional_ueis",
             "additional_eins",
@@ -118,3 +180,36 @@ class SubmissionProgressViewTests(TestCase):
         for key in conditional_keys:
             self.assertEqual(result[key]["display"], "inactive")
         self.assertTrue(result["complete"])
+
+    def test_submission_progress_check_crossval_incomplete(self):
+        """
+        Check that we return the appropriate incomplete sections.
+        """
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        sac = baker.make(SingleAuditChecklist, general_information=info)
+        shaped_sac = sac_validation_shape(sac)
+        result = submission_progress_check(shaped_sac, sar=None, crossval=True)
+        expected = "The following sections are incomplete: Audit Information, Federal Awards, Notes to SEFA, Single Audit Report."
+        self.assertEqual(result[0]["error"], expected)
+
+    def test_find_section_by_name(self):
+        """
+        This test added for test coverage purposes.
+
+        """
+
+        names = (
+            "SECONDARY_AUDITORS",
+            "SecondaryAuditors",
+            "Secondary Auditors",
+            "Secondary Auditors",
+            "report_submission:secondary-auditors",
+            "secondary_auditors",
+            "secondary-auditors",
+        )
+
+        for name in names:
+            self.assertEqual(
+                find_section_by_name(name).snake_case, "secondary_auditors"
+            )

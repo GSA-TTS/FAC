@@ -13,7 +13,7 @@
                "type": "string"
             },
             "version": {
-               "const": "1.0.0",
+               "const": "1.0.5",
                "type": "string"
             }
          },
@@ -31,30 +31,46 @@
                "type": "string"
             },
             "auditee_uei": {
-               "allOf": [
+               "oneOf": [
                   {
-                     "maxLength": 12,
-                     "minLength": 12
+                     "allOf": [
+                        {
+                           "maxLength": 12,
+                           "minLength": 12
+                        },
+                        {
+                           "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
+                        },
+                        {
+                           "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+                        },
+                        {
+                           "pattern": "^(?![0-9]{9})"
+                        }
+                     ],
+                     "type": "string"
                   },
                   {
-                     "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
-                  },
-                  {
-                     "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
-                  },
-                  {
-                     "pattern": "^(?![0-9]{9})"
+                     "const": "GSA_MIGRATION",
+                     "type": "string"
                   }
-               ],
-               "type": "string"
+               ]
             },
             "is_minimis_rate_used": {
-               "enum": [
-                  "Y",
-                  "N",
-                  "Both"
-               ],
-               "type": "string"
+               "oneOf": [
+                  {
+                     "const": "GSA_MIGRATION",
+                     "type": "string"
+                  },
+                  {
+                     "enum": [
+                        "Y",
+                        "N",
+                        "Both"
+                     ],
+                     "type": "string"
+                  }
+               ]
             },
             "notes_to_sefa_entries": {
                "items": {
@@ -63,7 +79,8 @@
                      "contains_chart_or_table": {
                         "enum": [
                            "Y",
-                           "N"
+                           "N",
+                           "GSA_MIGRATION"
                         ],
                         "type": "string"
                      },

@@ -9,8 +9,6 @@ local Meta = Types.object {
     section_name: Types.string {
       enum: [Sheets.section_names.NOTES_TO_SEFA],
     },
-    // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
-    // Once we establish a versioning pattern, we can update this and enforce it accordingly.
     version: Types.string {
       const: Sheets.WORKBOOKS_VERSION,
     },
@@ -25,7 +23,7 @@ local NotesToSefaEntry = {
   properties: {
     note_title: Types.string,
     note_content: Types.string,
-    contains_chart_or_table: Base.Enum.YorN,
+    contains_chart_or_table: Base.Enum.YorNorGsaMigration,
     seq_number: Types.integer,
   },
   required: ['note_title', 'note_content', 'contains_chart_or_table'],
@@ -37,7 +35,14 @@ local NotesToSefa = Types.object {
   properties: {
     auditee_uei: Base.Compound.UniqueEntityIdentifier,
     accounting_policies: Types.string,
-    is_minimis_rate_used: Base.Enum.YorNorBoth,
+    is_minimis_rate_used: {
+      oneOf: [
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+        Base.Enum.YorNorBoth,
+      ],
+    },
     rate_explained: Types.string,
     notes_to_sefa_entries: Types.array {
       items: NotesToSefaEntry,

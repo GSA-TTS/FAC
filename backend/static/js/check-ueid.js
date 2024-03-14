@@ -193,10 +193,10 @@ function validateFyStartDate(fyInput) {
   [userFy.year, userFy.month, userFy.day] = fyInput.value.split('-');
   fyErrorContainer.innerHTML = '';
 
-  if (userFy.year < 2020) {
+  if (userFy.year < 2016) {
     const errorEl = document.createElement('li');
     errorEl.innerHTML =
-      'We are currently only accepting audits from FY22.\
+      'We are currently only accepting audits from FY16 or later.\
       To submit an audit for a different fiscal period, \
       visit the <a href="https://facides.census.gov/Account/Login.aspx">Census Bureau</a>.';
     fyErrorContainer.appendChild(errorEl);
@@ -239,6 +239,9 @@ function attachEventHandlers() {
   const btnValidateUEI = document.getElementById('auditee_uei-btn');
   btnValidateUEI.addEventListener('click', (e) => {
     e.preventDefault();
+    document.getElementById('auditee_uei').value = document
+      .getElementById('auditee_uei')
+      .value.toUpperCase();
     validateUEID();
   });
 

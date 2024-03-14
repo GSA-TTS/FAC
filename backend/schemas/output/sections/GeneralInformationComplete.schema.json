@@ -156,10 +156,18 @@
          "type": "string"
       },
       "auditee_email": {
-         "format": "email",
-         "maxLength": 100,
-         "minLength": 1,
-         "type": "string"
+         "oneOf": [
+            {
+               "format": "email",
+               "maxLength": 100,
+               "minLength": 1,
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "auditee_fiscal_period_end": {
          "format": "date"
@@ -242,22 +250,30 @@
          "title": "State"
       },
       "auditee_uei": {
-         "allOf": [
+         "oneOf": [
             {
-               "maxLength": 12,
-               "minLength": 12
+               "allOf": [
+                  {
+                     "maxLength": 12,
+                     "minLength": 12
+                  },
+                  {
+                     "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
+                  },
+                  {
+                     "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+                  },
+                  {
+                     "pattern": "^(?![0-9]{9})"
+                  }
+               ],
+               "type": "string"
             },
             {
-               "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
-            },
-            {
-               "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
-            },
-            {
-               "pattern": "^(?![0-9]{9})"
+               "const": "GSA_MIGRATION",
+               "type": "string"
             }
-         ],
-         "type": "string"
+         ]
       },
       "auditee_zip": {
          "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
@@ -300,10 +316,18 @@
          "type": "boolean"
       },
       "auditor_email": {
-         "format": "email",
-         "maxLength": 100,
-         "minLength": 1,
-         "type": "string"
+         "oneOf": [
+            {
+               "format": "email",
+               "maxLength": 100,
+               "minLength": 1,
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "auditor_firm_name": {
          "maxLength": 100,

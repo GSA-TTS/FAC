@@ -19,6 +19,12 @@
         "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nNulla facilisis urna et sem congue, ac pharetra ipso lorem sagittis. Maecenas sed nunc vel neque dignissim consequat.",
         "contains_chart_or_table": "Y",
         "seq_number": 2
+      },
+      {
+        "note_title": "GSA Migration Note",
+        "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nNulla facilisis urna et sem congue, ac pharetra ipso lorem sagittis. Maecenas sed nunc vel neque dignissim consequat.",
+        "contains_chart_or_table": "GSA_MIGRATION",
+        "seq_number": 3
       }
     ]
   }

@@ -22,7 +22,7 @@ We use [manifests](https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.h
 - [cf-cli](https://docs.cloudfoundry.org/cf-cli/) Cloudfoundry's CLI
   - Mac install of v8 needed for Cloud.gov: `brew install cloudfoundry/tap/cf-cli@8`
 - [cloud.gov dashboard](https://www.cloud.gov)
-- [cloud.gov deploy action](https://github.com/18F/cg-deploy-action)
+- [cloud.gov deploy action](https://github.com/cloud-gov/cg-cli-tools)
 - [application logs](https://logs.fr.cloud.gov/) with search and dashboard
 
 ## Cloud.gov
@@ -86,7 +86,6 @@ cf push -f manifests/manifest-dev.yml
 1.  Create a [new release](https://github.com/GSA-TTS/FAC/releases/new).
     *   Create a new tag in the form `v1.[YYYYMMDD]` with the current date, such as `v1.20230329`, and use that as the tag for the release.
     *   **_Remember to set the target to `prod`_**.
-    *   For the moment, check the “Set as a pre-release” checkbox. We may change this close to or after MVP.
 3.  Wait for the checks to pass.
 4.  If checks fail, or if reviewers request changes, something has gone awry. Investigation and/or starting over from a branch and making a PR against `main` may be required.
 5.  Verify that the deploy steps all passed.
@@ -102,6 +101,7 @@ Select a space:
 cf logs gsa-fac
 ```
 9.  Post the most recent dbbackup and mediabackup file names in https://github.com/GSA-TTS/FAC/issues/2221
+    - *NOTE* the following is not necessary as of this time. django-dbbackup is not backing up the media due to the file sizes being too large, and we will be using another method for getting the media backed up (TBD)
 
 To see more about branching and the deployment steps, see the [Branching](branching.md) page.
 
@@ -126,6 +126,41 @@ cd app
 export LD_LIBRARY_PATH=~/deps/0/python/lib
 ~/deps/0/python/bin/python manage.py {COMMAND WITH ARGS}
 ```
+
+## Production ssh access
+
+Only users with the appropriate cloud.gov access can do this.
+
+Open a [production ssh log issue](https://github.com/GSA-TTS/FAC/issues/new?assignees=&labels=prodssh&projects=GSA-TTS%2F11&template=production-ssh-access.yaml&title=%5BProduction+ssh+access%5D%3A+) to track this.
+
+```shell
+cf target -s production
+cf allow-space-ssh production
+date -u +"%Y-%m-%d %H:%M"
+```
+
+Keep this timestamp to enter in the issue as the start time.
+
+```shell
+cf ssh gsa-fac
+/tmp/lifecycle/shell
+source .profile
+set +e
+```
+
+
+Log what you do while accessing production in the issue.
+
+Once you’re done, log out, then, locally, run:
+
+```shell
+cf disallow-space-ssh production
+date -u +"%Y-%m-%d %H:%M"
+```
+
+Keep this timestamp to enter in the issue as the end time.
+
+Note: **do not run** `cf disable-ssh gsa-fac`, as this will require application restarts in order to enable access again. Disabling access at the space level is sufficient.
 
 ## Troubleshooting
 

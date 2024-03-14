@@ -31,7 +31,6 @@
          "single_cells": [
             {
                "format": "text",
-               "formula": "=\"1.0.0\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
@@ -45,11 +44,11 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
+               "value": "1.0.5",
                "width": 48
             },
             {
                "format": "text",
-               "formula": "=\"FederalAwardsExpended\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#section_name",
                   "text": "The workbook you tried to upload is for a different section."
@@ -63,6 +62,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
+               "value": "FederalAwardsExpended",
                "width": 48
             },
             {
@@ -89,8 +89,8 @@
                "format": "dollar",
                "formula": "=SUM('Form'!F$FIRSTROW:F$LASTROW)",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#positive_number",
-                  "text": "The number must be zero or greater"
+                  "link": "https://fac.gov/documentation/validation/#any_number",
+                  "text": "Must be a number"
                },
                "keep_locked": true,
                "range_cell": "B5",
@@ -99,9 +99,9 @@
                "title_cell": "A5",
                "type": "single_cell",
                "validation": {
-                  "custom_error": "This cell must be a positive number",
-                  "custom_title": "Positive numbers",
-                  "formula1": "=AND(ISNUMBER(FIRSTCELLREF),OR(SIGN(FIRSTCELLREF)=0,SIGN(FIRSTCELLREF)=1))",
+                  "custom_error": "This cell must be a number",
+                  "custom_title": "Numbers",
+                  "formula1": "=ISNUMBER(FIRSTCELLREF)",
                   "type": "custom"
                },
                "width": 36
@@ -186,7 +186,7 @@
                "title_cell": "E1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "If known, the Program Name should have been provided  for you. Please do not change the Program Name unless absolutely necessary or the Program Name is unknown. The Program Name must be 300 characters or less. Continue?",
+                  "custom_error": "If known, the Program Name should have been provided for you. Please do not change the Program Name unless absolutely necessary or the Program Name is unknown. The Program Name must be 300 characters or less. If the drop-down menu is empty, you may need to enter an Agency Prefix and ALN in columns B and C.Continue?",
                   "custom_title": "Unknown Federal Program Name",
                   "errorStyle": "warning",
                   "formula1": "=Y{0}:Y{0}",
@@ -197,17 +197,17 @@
             {
                "format": "dollar",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#positive_number",
-                  "text": "The number must be zero or greater"
+                  "link": "https://fac.gov/documentation/validation/#any_number",
+                  "text": "Must be a number"
                },
                "range_name": "amount_expended",
                "title": "Amount Expended",
                "title_cell": "F1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "This cell must be a positive number",
-                  "custom_title": "Positive numbers",
-                  "formula1": "=AND(ISNUMBER(FIRSTCELLREF),OR(SIGN(FIRSTCELLREF)=0,SIGN(FIRSTCELLREF)=1))",
+                  "custom_error": "This cell must be a number",
+                  "custom_title": "Numbers",
+                  "formula1": "=ISNUMBER(FIRSTCELLREF)",
                   "type": "custom"
                }
             },
@@ -257,10 +257,10 @@
             },
             {
                "format": "dollar",
-               "formula": "=SUMIFS(amount_expended,cfda_key,V{0})",
+               "formula": "=IF(A{0}=\"\",0,SUMIFS(amount_expended,cfda_key,V{0}))",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#positive_number",
-                  "text": "The number must be zero or greater"
+                  "link": "https://fac.gov/documentation/validation/#any_number",
+                  "text": "Must be a number"
                },
                "keep_locked": true,
                "range_name": "federal_program_total",
@@ -268,9 +268,9 @@
                "title_cell": "J1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "This cell must be a positive number",
-                  "custom_title": "Positive numbers",
-                  "formula1": "=AND(ISNUMBER(FIRSTCELLREF),OR(SIGN(FIRSTCELLREF)=0,SIGN(FIRSTCELLREF)=1))",
+                  "custom_error": "This cell must be a number",
+                  "custom_title": "Numbers",
+                  "formula1": "=ISNUMBER(FIRSTCELLREF)",
                   "type": "custom"
                }
             },
@@ -278,8 +278,8 @@
                "format": "dollar",
                "formula": "=IF(G{0}=\"OTHER CLUSTER NOT LISTED ABOVE\",SUMIFS(amount_expended,uniform_other_cluster_name,X{0}), IF(AND(OR(G{0}=\"N/A\",G{0}=\"\"),H{0}=\"\"),0,IF(G{0}=\"STATE CLUSTER\",SUMIFS(amount_expended,uniform_state_cluster_name,W{0}),SUMIFS(amount_expended,cluster_name,G{0}))))",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#positive_number",
-                  "text": "The number must be zero or greater"
+                  "link": "https://fac.gov/documentation/validation/#any_number",
+                  "text": "Must be a number"
                },
                "keep_locked": true,
                "range_name": "cluster_total",
@@ -287,9 +287,9 @@
                "title_cell": "K1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "This cell must be a positive number",
-                  "custom_title": "Positive numbers",
-                  "formula1": "=AND(ISNUMBER(FIRSTCELLREF),OR(SIGN(FIRSTCELLREF)=0,SIGN(FIRSTCELLREF)=1))",
+                  "custom_error": "This cell must be a number",
+                  "custom_title": "Numbers",
+                  "formula1": "=ISNUMBER(FIRSTCELLREF)",
                   "type": "custom"
                }
             },
@@ -393,8 +393,8 @@
             {
                "format": "dollar",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#positive_number",
-                  "text": "The number must be zero or greater"
+                  "link": "https://fac.gov/documentation/validation/#any_number",
+                  "text": "Must be a number"
                },
                "range_name": "subrecipient_amount",
                "title": "If yes (Passed Through), Amount Passed Through to Subrecipients",
@@ -458,7 +458,7 @@
             },
             {
                "format": "text",
-               "formula": "=IF(OR(B{0}=\"\",C{0}),\"\",CONCATENATE(B{0},\".\",C{0}))",
+               "formula": "=IF(OR(B{0}=\"\",C{0}=\"\"),\"\",CONCATENATE(B{0},\".\",C{0}))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "Please contact support"
@@ -546,6 +546,7 @@
                      "ECONOMIC DEVELOPMENT CLUSTER",
                      "EMPLOYMENT SERVICE CLUSTER",
                      "FEDERAL TRANSIT CLUSTER",
+                     "FEDERAL MOTOR CARRIER SAFETY ASSISTANCE (FMCSA)",
                      "FISH AND WILDLIFE CLUSTER",
                      "FOOD DISTRIBUTION CLUSTER",
                      "FOREIGN FOOD AID DONATION CLUSTER",

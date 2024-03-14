@@ -1,7 +1,7 @@
 # Install python dependencies
 install:
 	@pip install -r requirements.txt
-	@npm i
+	@npm ci
 
 # Generate an updated requirements.txt
 compile:
@@ -34,8 +34,6 @@ lint:
 	@black --check .
 	@echo "bandit:"
 	@bandit -c pyproject.toml -r .
-	@echo "Installing type stubs:"
-	@python -m pip install types-pytz
 	@echo "mypy:"
 	@mypy .
 	@echo "djlint:"
@@ -59,8 +57,12 @@ docker-first-run:
 	docker compose build
 	docker compose run web bash -c '\
 		python manage.py makemigrations &&\
-		python manage.py migrate\
-		'
+		python manage.py migrate'
+
+docker-migrate:
+	docker compose run web bash -c '\
+		python manage.py makemigrations &&\
+		python manage.py migrate'
 
 docker-load-data:
 	docker compose up -d && docker compose run web ./load_data.sh
@@ -83,7 +85,7 @@ docker-nctest:
 
 docker-lint:
 	docker compose build
-	docker compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && python -m pip install types-pytz && mypy . && djlint .'
+	docker compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
 
 ghcr-first-run:
 	docker compose -f docker-compose-web.yml run web python manage.py makemigrations

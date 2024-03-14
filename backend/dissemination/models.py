@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from . import docs
 
@@ -6,20 +7,24 @@ from .hist_models import census_2019, census_2022  # noqa: F401
 
 BIGINT_MAX_DIGITS = 25
 
-REPORT_ID_FK_HELP_TEXT = "; foreign key everywhere else"
+REPORT_ID_FK_HELP_TEXT = "GSAFAC generated identifier"
 
 
 class FindingText(models.Model):
     """Specific findings details. References General"""
 
-    report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     finding_ref_number = models.TextField(
         "Finding Reference Number - FK",
         help_text=docs.finding_ref_nums_findingstext,
     )
-    contains_chart_or_table = models.BooleanField(
+    contains_chart_or_table = models.TextField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
         help_text=docs.charts_tables_findingstext,
     )
@@ -32,14 +37,26 @@ class FindingText(models.Model):
 class AdditionalUei(models.Model):
     """Additional UEIs for this audit."""
 
-    report_id = models.TextField(REPORT_ID_FK_HELP_TEXT)
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
+    )
     additional_uei = models.TextField()
 
 
 class AdditionalEin(models.Model):
     """Additional EINs for this audit."""
 
-    report_id = models.TextField(REPORT_ID_FK_HELP_TEXT)
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
+    )
     additional_ein = models.TextField()
 
 
@@ -81,8 +98,12 @@ class Finding(models.Model):
         "Audit finding reference numbers from the immediate prior audit",
         help_text=docs.prior_finding_ref_nums,
     )
-    report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     # each element in the list is a FK to Finding
     type_requirement = models.TextField(
@@ -93,6 +114,20 @@ class Finding(models.Model):
 
 class FederalAward(models.Model):
     """Information about the federal award section of the form. References General"""
+
+    # 20240125 - These are indices that would be used in our ALN search/annotation.
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=["report_id",]),
+    #         # This is possibly redundant with the pairwise index?
+    #         models.Index(fields=["federal_agency_prefix",]),
+    #         models.Index(fields=["federal_agency_prefix", "federal_award_extension"]),
+    #         models.Index(fields=[
+    #             "report_id",
+    #             "federal_agency_prefix",
+    #             "findings_count"
+    #             ]),
+    #     ]
 
     additional_award_identification = models.TextField(
         "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
@@ -164,12 +199,16 @@ class FederalAward(models.Model):
         help_text=docs.passthrough_amount,
         null=True,
     )
-    report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
-    )
     state_cluster_name = models.TextField(
         "The name of the state cluster",
         help_text=docs.state_cluster_name,
+    )
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
 
 
@@ -188,8 +227,12 @@ class CapText(models.Model):
         "Content of the Corrective Action Plan (CAP)",
         help_text=docs.text_captext,
     )
-    report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
 
 
@@ -201,8 +244,12 @@ class Note(models.Model):
     )
     is_minimis_rate_used = models.TextField("'Yes', 'No', or 'Both' (2 CFR 200.414(f))")
     rate_explained = models.TextField("Explanation for minimis rate")
-    report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     content = models.TextField("Content of the Note", help_text=docs.content)
     note_title = models.TextField("Note title", help_text=docs.title)
@@ -218,8 +265,12 @@ class Passthrough(models.Model):
     award_reference = models.TextField(
         "Order that the award line was reported",
     )
-    report_id = models.TextField(
-        "G-FAC generated identifier. FK refers to General",
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
     passthrough_id = models.TextField(
         "Identifying Number Assigned by the Pass-through Entity",
@@ -234,9 +285,17 @@ class Passthrough(models.Model):
 class General(models.Model):
     # Relational fields
     # null = True for these so we can load in phases, may want to tighten validation later
+    # 20240125 - These are indices that would be used in our ALN search/annotation.
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=["report_id",]),
+    #         models.Index(fields=["fac_accepted_date",]),
+
+    #     ]
 
     report_id = models.TextField(
-        "G-FAC generated identifier. ",
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
         unique=True,
     )
     auditee_certify_name = models.TextField(
@@ -246,6 +305,14 @@ class General(models.Model):
     auditee_certify_title = models.TextField(
         "Title of Auditee Certifying Official",
         help_text=docs.auditee_certify_title,
+    )
+    auditor_certify_name = models.TextField(
+        "Name of Auditor Certifying Official",
+        help_text=docs.auditor_certify_name,
+    )
+    auditor_certify_title = models.TextField(
+        "Title of Auditor Certifying Official",
+        help_text=docs.auditor_certify_title,
     )
     auditee_contact_name = models.TextField(
         "Name of Auditee Contact",
@@ -322,10 +389,12 @@ class General(models.Model):
     cognizant_agency = models.TextField(
         "Two digit Federal agency prefix of the cognizant agency",
         help_text=docs.cognizant_agency,
+        null=True,
     )
     oversight_agency = models.TextField(
         "Two digit Federal agency prefix of the oversight agency",
         help_text=docs.oversight_agency,
+        null=True,
     )
 
     # Dates
@@ -344,6 +413,9 @@ class General(models.Model):
     )
     submitted_date = models.DateField(
         "The date at which the audit transitioned to 'submitted'",
+    )
+    fac_accepted_date = models.DateField(
+        "The date at which the audit transitioned to 'accepted'",
     )
     # auditor_signature_date = models.DateField(
     #     "The date on which the auditor signed the audit",
@@ -497,6 +569,54 @@ class SecondaryAuditor(models.Model):
         "Title of CPA Contact",
         help_text=docs.auditor_title,
     )
-    report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
     )
+
+
+class OneTimeAccess(models.Model):
+    uuid = models.UUIDField()
+    timestamp = models.DateTimeField(
+        auto_now_add=True,
+    )
+    api_key_id = models.TextField(
+        "API key Id for the user",
+    )
+    report_id = models.TextField(
+        "Report ID",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+    )
+
+
+class TribalApiAccessKeyIds(models.Model):
+    email = models.TextField(
+        "Email of the user",
+        unique=True,
+    )
+    key_id = models.TextField(
+        "Key ID for the api access",
+    )
+    date_added = models.DateField(
+        "Added date of the record",
+    )
+
+
+class MigrationInspectionRecord(models.Model):
+    audit_year = models.TextField(blank=True, null=True)
+    dbkey = models.TextField(blank=True, null=True)
+    report_id = models.TextField(blank=True, null=True)
+    run_datetime = models.DateTimeField(default=timezone.now)
+    finding_text = models.JSONField(blank=True, null=True)
+    additional_uei = models.JSONField(blank=True, null=True)
+    additional_ein = models.JSONField(blank=True, null=True)
+    finding = models.JSONField(blank=True, null=True)
+    federal_award = models.JSONField(blank=True, null=True)
+    cap_text = models.JSONField(blank=True, null=True)
+    note = models.JSONField(blank=True, null=True)
+    passthrough = models.JSONField(blank=True, null=True)
+    general = models.JSONField(blank=True, null=True)
+    secondary_auditor = models.JSONField(blank=True, null=True)

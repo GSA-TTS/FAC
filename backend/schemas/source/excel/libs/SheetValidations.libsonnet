@@ -52,11 +52,19 @@ local PositiveNumberValidation = {
   custom_title: 'Positive numbers',
 };
 
+local NumberValidation = {
+  type: 'custom',
+  // Is it a number ?
+  formula1: '=ISNUMBER(FIRSTCELLREF)',
+  custom_error: 'This cell must be a number',
+  custom_title: 'Numbers',
+};
+
 local ReferenceNumberValidation = {
   type: 'custom',
   //It is neccessary to allow blank otherwise user cannot delete the value
-  formula1: '=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = "20", ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = "-", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))',
-  custom_error: 'Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)',
+  formula1: '=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = "20", (MID(FIRSTCELLREF, 3, 1) * 1) > 0, ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = "-", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))',
+  custom_error: 'Expecting a value in the format YYYY-NNN, where YYYY is a year after 2010 and NNN a three digit number (e.g. 2023-001)',
   custom_title: 'Reference number',
 };
 
@@ -87,6 +95,7 @@ local AwardReferenceValidation = {
   NoValidation: { type: 'NOVALIDATION' },
   FAPPrefixValidation: FAPPrefixValidation,
   PositiveNumberValidation: PositiveNumberValidation,
+  NumberValidation: NumberValidation,
   LookupValidation: LookupValidation,
   RangeLookupValidation: RangeLookupValidation,
   StringOfLengthNine: StringOfSize(9),
@@ -110,9 +119,11 @@ local AwardReferenceValidation = {
     type: 'list',
     formula1: '=Y{0}:Y{0}',
     errorStyle: 'warning',
-    custom_error: 'If known, the Program Name should have been provided  for you. ' +
+    custom_error: 'If known, the Program Name should have been provided for you. ' +
                   'Please do not change the Program Name unless absolutely necessary ' +
                   'or the Program Name is unknown. The Program Name must be 300 characters or less. ' +
+                  'If the drop-down menu is empty, you may need to enter an Agency Prefix ' +
+                  'and ALN in columns B and C.' +
                   'Continue?',    
     custom_title: 'Unknown Federal Program Name',
   },  

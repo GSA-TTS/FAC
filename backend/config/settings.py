@@ -83,6 +83,11 @@ LOGGING = {
     },
 }
 
+logging.getLogger("boto3").setLevel(logging.CRITICAL)
+logging.getLogger("botocore").setLevel(logging.CRITICAL)
+logging.getLogger("nose").setLevel(logging.CRITICAL)
+logging.getLogger("s3transfer").setLevel(logging.CRITICAL)
+
 TEST_RUN = False
 if len(sys.argv) > 1 and sys.argv[1] == "test":
     # This should reduce the volume of message displayed when running tests, but
@@ -97,8 +102,10 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.humanize",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.postgres",
     "django.contrib.staticfiles",
 ]
 
@@ -118,9 +125,9 @@ INSTALLED_APPS += [
     "api",
     "users",
     "report_submission",
-    "cms",
     # "data_distro",
     "dissemination",
+    "census_historical_migration",
     "support",
 ]
 
@@ -150,6 +157,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.static_site_url",
                 "config.context_processors.omb_num_exp_date",
+                "config.context_processors.current_environment",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
@@ -171,7 +179,13 @@ DATABASES = {
     ),
 }
 
-POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
+POSTGREST = {
+    "URL": env.str("POSTGREST_URL", "http://api:3000"),
+    "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),
+    "DEVELOPMENT": "https://api-dev.fac.gov",
+    "STAGING": "https://api-staging.fac.gov",
+    "PRODUCTION": "https://api.fac.gov",
+}
 
 
 # Password validation
@@ -218,6 +232,7 @@ CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 STATIC_URL = "/static/"
 
+
 # Environment specific configurations
 DEBUG = False
 if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
@@ -236,6 +251,7 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
+
     AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
         "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
     )
@@ -249,8 +265,13 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
         "AWS_S3_PRIVATE_ENDPOINT", "http://minio:9000"
     )
+    AWS_PRIVATE_DEFAULT_ACL = "private"
 
     AWS_S3_ENDPOINT_URL = AWS_S3_PRIVATE_ENDPOINT
+
+    # when running locally, the internal endpoint (docker network) is different from the external endpoint (host network)
+    AWS_S3_PRIVATE_INTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
+    AWS_S3_PRIVATE_EXTERNAL_ENDPOINT = "http://localhost:9001"
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
@@ -302,6 +323,10 @@ else:
 
             AWS_S3_PRIVATE_ENDPOINT = s3_creds["endpoint"]
             AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_PRIVATE_ENDPOINT}"
+
+            # in deployed environments, the internal & external endpoint URLs are the same
+            AWS_S3_PRIVATE_INTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
+            AWS_S3_PRIVATE_EXTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
 
             AWS_PRIVATE_LOCATION = "static"
             AWS_PRIVATE_DEFAULT_ACL = "private"
@@ -376,15 +401,9 @@ else:
     # Will not be enabled in cloud environments
     DISABLE_AUTH = False
 
-# Remove once all Census data has been migrated
-# Add these as env vars, look at the bucket for values
-AWS_CENSUS_ACCESS_KEY_ID = secret("AWS_CENSUS_ACCESS_KEY_ID", "")
-AWS_CENSUS_SECRET_ACCESS_KEY = secret("AWS_CENSUS_SECRET_ACCESS_KEY", "")
-AWS_CENSUS_STORAGE_BUCKET_NAME = secret("AWS_CENSUS_STORAGE_BUCKET_NAME", "")
-AWS_S3_CENSUS_REGION_NAME = secret("AWS_S3_CENSUS_REGION_NAME", "")
-
 
 ADMIN_URL = "admin/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -510,3 +529,22 @@ STATIC_SITE_URL = "https://fac.gov/"
 # OMB-assigned values. Number doesn't change, date does.
 OMB_NUMBER = "3090-0330"
 OMB_EXP_DATE = "09/30/2026"
+
+# APP-level constants
+CENSUS_DATA_SOURCE = "CENSUS"
+DOLLAR_THRESHOLD = 750000
+SUMMARY_REPORT_DOWNLOAD_LIMIT = 1000
+
+# A version of these regexes also exists in Base.libsonnet
+REGEX_ALN_PREFIX = r"^([0-9]{2})$"
+REGEX_RD_EXTENSION = r"^RD[0-9]?$"
+REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
+REGEX_U_EXTENSION = r"^U[0-9]{2}$"
+GSA_MIGRATION = "GSA_MIGRATION"  # There is a copy of `GSA_MIGRATION` in Base.libsonnet. If you change it here, change it there too.
+GSA_MIGRATION_INT = -999999999
+# A copy of theses constants exists in schema/source/base/Base.libsonnet
+STATE_CLUSTER = "STATE CLUSTER"
+OTHER_CLUSTER = "OTHER CLUSTER NOT LISTED ABOVE"
+NOT_APPLICABLE = "N/A"
+
+ONE_TIME_ACCESS_TTL_SECS = 60

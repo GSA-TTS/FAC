@@ -1,0 +1,50 @@
+---
+name: Failed data migration reprocessor
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        description: The environment the workflow should run on.
+        options:
+          - dev
+          - staging
+          - preview
+      year:
+        required: true
+        type: string
+        description: Provide audit year.
+      page_size:
+        required: true
+        type: string
+        description: Number of audit reports by page.
+      pages:
+        required: true
+        type: string
+        description: Comma-separated list of pages.
+      error_tag:
+        required: true
+        type: string
+        description: Error tag associated with failed migrations.
+
+jobs:
+  historic-data-migrator:
+    name: Generate and disseminate historic data in ${{ inputs.environment }} database
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Django command to generate and disseminate historic data in ${{ inputs.environment }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 1G -m 1G --name failed_data_migration_reprocessor --command "python manage.py reprocess_failed_migration --year ${{ inputs.year }} --page_size ${{ inputs.page_size }} --pages ${{ inputs.pages }} --error_tag ${{ inputs.error_tag }}"

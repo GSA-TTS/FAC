@@ -31,6 +31,15 @@ jobs:
       autoapprove: false
     secrets: inherit
 
+  new-relic-record:
+    name: Record deployment to New Relic
+    needs:
+      - deploy-infrastructure-staging
+    uses: ./.github/workflows/new-relic-deployment.yml
+    with:
+      environment: "staging"
+    secrets: inherit
+
   deploy-staging:
     name: Deploy application
     needs:
@@ -56,4 +65,13 @@ jobs:
     secrets: inherit
     with:
       url: "https://fac-staging.app.cloud.gov"
+      environment: "staging"
+
+  generate-e2e-test-data:
+    needs:
+      - deploy-staging
+    name:
+    uses: ./.github/workflows/end-to-end-test-data-generator.yml
+    secrets: inherit
+    with:
       environment: "staging"

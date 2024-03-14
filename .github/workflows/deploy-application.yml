@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore npm cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-npm
         with:
           path: ~/.npm
@@ -30,12 +30,12 @@ jobs:
             fac-build-
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Restore pip cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-pip
         with:
           path: |
@@ -49,7 +49,7 @@ jobs:
 
       - name: Install npm dependencies
         working-directory: ./backend
-        run: npm install
+        run: npm ci --production
 
       - name: Compile JS/CSS assets
         working-directory: ./backend
@@ -77,7 +77,7 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf bind-service gsa-fac backups -w
+          command: cf bind-service gsa-fac backups
 
       - name: Backup the database (Prod Only)
         if: startsWith(github.ref, 'refs/tags/v1.')
@@ -89,7 +89,20 @@ jobs:
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 2G -m 2G --name pg_backup --command "./backup_database.sh ${{ env.space }}"
 
+      - name: Deploy Preview to cloud.gov
+        if: ${{ inputs.environment == 'preview' }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          cf_manifest: backend/manifests/manifest-preview.yml
+          cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
+          command: bin/ops/deploy_preview.sh
+
       - name: Deploy fac to cloud.gov
+        if: ${{ inputs.environment  != 'preview' }}
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
@@ -118,3 +131,18 @@ jobs:
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 6G -m 1G --name load_data --command "./load_data.sh"
+
+      # This has to happen after an application deployment because the manifest (currently) is responsible
+      # for binding the "logdrain service" to the "gsa-fac application". This also needs to be done
+      # based on the suspicion that fluentbit cannot register the incoming logs when it is initially
+      # created, resulting in a 502. Restarting the application after everything is configured results
+      # in a 201, or, the expected status when transmitting logs.
+      - name: Restart the logshipper application
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf restart logshipper
+

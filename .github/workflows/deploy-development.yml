@@ -47,6 +47,15 @@ jobs:
       autoapprove: false
     secrets: inherit
 
+  new-relic-record:
+    name: Record deployment to New Relic
+    needs:
+      - deploy-infrastructure-dev
+    uses: ./.github/workflows/new-relic-deployment.yml
+    with:
+      environment: "dev"
+    secrets: inherit
+
   deploy-dev:
     name: Deploy application
     needs:
@@ -64,3 +73,11 @@ jobs:
     with:
       url: "https://fac-dev.app.cloud.gov/"
 
+  generate-e2e-test-data:
+    needs:
+      - deploy-dev
+    name:
+    uses: ./.github/workflows/end-to-end-test-data-generator.yml
+    secrets: inherit
+    with:
+      environment: "dev"

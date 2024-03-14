@@ -29,14 +29,14 @@
                     <p class="text-base">Select any of the following that apply.</p>
                     {% for pair in gaap_results %}
                         <div class="usa-checkbox">
-                            <input id="gaap_results--{{ pair.tag }}"
+                            <input id="gaap_results--{{ pair.key }}"
                                    name="gaap_results"
                                    class="usa-checkbox__input"
                                    required
                                    type="checkbox"
-                                   value="{{ pair.tag }}"
-                                   {% if pair.tag in form.cleaned_data.gaap_results %}checked{% endif %} />
-                            <label class="usa-checkbox__label" for="gaap_results--{{ pair.tag }}">{{ pair.readable }}</label>
+                                   value="{{ pair.key }}"
+                                   {% if pair.key in form.cleaned_data.gaap_results %}checked{% endif %} />
+                            <label class="usa-checkbox__label" for="gaap_results--{{ pair.key }}">{{ pair.value }}</label>
                         </div>
                     {% endfor %}
                     <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
@@ -46,13 +46,13 @@
                         <legend>What was the special purpose framework? Select only one.</legend>
                         {% for pair in sp_framework_basis %}
                             <div class="usa-checkbox">
-                                <input id="sp_framework_basis--{{ pair.tag }}"
+                                <input id="sp_framework_basis--{{ pair.key }}"
                                     name="sp_framework_basis"
                                     class="usa-radio__input"
                                     type="radio"
-                                    value="{{ pair.tag }}"
-                                    {% if pair.tag in form.cleaned_data.sp_framework_basis %}checked{% endif %} />
-                                <label class="usa-radio__label" for="sp_framework_basis--{{ pair.tag }}">{{ pair.readable }}</label>
+                                    value="{{ pair.key }}"
+                                    {% if pair.key in form.cleaned_data.sp_framework_basis %}checked{% endif %} />
+                                <label class="usa-radio__label" for="sp_framework_basis--{{ pair.key }}">{{ pair.value }}</label>
                             </div>
                         {% endfor %}
                         <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
@@ -88,13 +88,13 @@
                         <p class="text-base">Select any of the following that apply.</p>
                         {% for pair in sp_framework_opinions %}
                             <div class="usa-checkbox">
-                                <input id="sp_framework_opinions--{{ pair.tag }}"
+                                <input id="sp_framework_opinions--{{ pair.key }}"
                                     name="sp_framework_opinions"
                                     class="usa-checkbox__input"
                                     type="checkbox"
-                                    value="{{ pair.tag }}"
-                                    {% if pair.tag in form.cleaned_data.sp_framework_opinions %}checked{% endif %} />
-                                <label class="usa-checkbox__label" for="sp_framework_opinions--{{ pair.tag }}">{{ pair.readable }}</label>
+                                    value="{{ pair.key }}"
+                                    {% if pair.key in form.cleaned_data.sp_framework_opinions %}checked{% endif %} />
+                                <label class="usa-checkbox__label" for="sp_framework_opinions--{{ pair.key }}">{{ pair.value }}</label>
                             </div>
                         {% endfor %}
                         <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-row">
+            {% if submission_status in target_statuses %}
+                <form class="grid-col-8 grid-offset-2"
+                      id="unlock-after-certification"
+                      method="post">
+                    {% csrf_token %}
+                    <fieldset class="usa-fieldset">
+                        <legend class="usa-legend usa-legend--large" id="unlock-after-certification">Unlock submission</legend>
+                        <h3>
+                            {% comment %} &#8209; is a non-breaking hyphen, to avoid splitting "re-validated" across two lines. {% endcomment %}
+                            I understand that by unlocking this submission it will need to be re&#8209;validated before certification.
+                        </h3>
+                        <div class="usa-checkbox" hidden>
+                            <input id="unlock_after_certification"
+                                   name="unlock_after_certification"
+                                   class="usa-checkbox__input"
+                                   required
+                                   type="checkbox"
+                                   value="True"
+                                   checked />
+                            <label class="usa-checkbox__label" for="unlock-for-certification-checkbox"></label>
+                        </div>
+                    </fieldset>
+                    <div class="grid-row margin-bottom-8 margin-top-6">
+                        <button class="usa-button tablet:grid-col-5" id="continue">Unlock submission</button>
+                        <a class="usa-link tablet:margin-left-3 tablet:margin-top-0 margin-top-2 tablet:grid-col-2 flex-align-self-center"
+                           id="unlock-after-certification-button"
+                           href="{% url 'audit:MySubmissions' %}"
+                           aria-controls="form-cancel">Cancel</a>
+                    </div>
+                </form>
+            {% else %}
+                <p class="margin-bottom-6">This form is only accessible for submissions that have been locked for certification. This submission is not locked for certification.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
+from django.conf import settings
 from unittest.mock import patch
 from model_bakery import baker
 
@@ -31,7 +32,7 @@ SAMPLE_BASE_SAC_DATA = {
         "ein": "123456789",
         "ein_not_an_ssn_attestation": True,
         "multiple_eins_covered": False,
-        "auditee_uei": "ZQGGHJH74DW7",
+        "auditee_uei": "zQGGHJH74DW7",
         "multiple_ueis_covered": False,
         "secondary_auditors_exist": True,
         "auditee_name": "Auditee McAudited",
@@ -104,7 +105,7 @@ class TestPreliminaryViews(TestCase):
     }
 
     step2_data = {
-        "auditee_uei": "LW4MXE7SKMV1",
+        "auditee_uei": "Lw4MXE7SKMV1",
         "auditee_fiscal_period_start": "01/01/2021",
         "auditee_fiscal_period_end": "12/31/2021",
     }
@@ -188,8 +189,7 @@ class TestPreliminaryViews(TestCase):
         self.assertTemplateUsed(step2_get, "report_submission/step-2.html")
 
         step2_data = {
-            "auditee_name": "Federal Bureau of Control",
-            "auditee_uei": "KZV2XNZZN3A8",
+            "auditee_uei": "kZV2XNZZN3A8",
             "auditee_fiscal_period_start": "01/01/2022",
             "auditee_fiscal_period_end": "01/01/2023",
         }
@@ -206,8 +206,11 @@ class TestPreliminaryViews(TestCase):
         step3_post = self.client.post(step3, data=self.step3_data)
 
         self.assertEqual(step3_post.status_code, 302)
-        self.assertEqual(step3_post.url[:39], "/report_submission/general-information/")
-        report_id = step3_post.url[-17:]
+        path_segments = step3_post.url.split("/")
+        self.assertEqual(
+            "/".join(path_segments[:3]), "/report_submission/general-information"
+        )
+        report_id = path_segments[-1]
 
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         combined = self.step1_data | step2_data
@@ -222,6 +225,8 @@ class TestPreliminaryViews(TestCase):
                 ).strftime("%Y-%m-%d")
                 self.assertEqual(combined_date_formatted, getattr(sac, k))
             # Test everything else normally
+            elif k == "auditee_uei":
+                self.assertEqual(combined[k].upper(), getattr(sac, k))
             else:
                 self.assertEqual(combined[k], getattr(sac, k))
 
@@ -295,7 +300,7 @@ class TestPreliminaryViews(TestCase):
         self.assertTemplateUsed(get_response, "report_submission/step-2.html")
 
         data = {
-            "auditee_uei": "ZQGGHJH74DW7",
+            "auditee_uei": "ZqGGHJH74DW7",
             "auditee_fiscal_period_start": "2023-08-31",
             "auditee_fiscal_period_end": "2023-08-01",
         }
@@ -584,9 +589,15 @@ class GeneralInformationFormViewTests(TestCase):
         updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
         for field in data:
-            if (
-                field != "auditee_fiscal_period_start"
-                and field != "auditee_fiscal_period_end"
+            if field == "auditee_uei":
+                self.assertEqual(
+                    getattr(updated_sac, field),
+                    data[field].upper(),
+                    f"mismatch for field: {field}",
+                )
+            if field not in (
+                "auditee_fiscal_period_start",
+                "auditee_fiscal_period_end",
             ):
                 self.assertEqual(
                     getattr(updated_sac, field),
@@ -637,6 +648,54 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.assertContains(response, "Dates should be in the format")
 
+    def test_post_gsa_migration_error(self):
+        """If GSA_MIGRATION is present as an email, the submission should be rejected"""
+        user = baker.make(User)
+
+        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
+        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
+
+        data = {
+            "audit_type": "single-audit",
+            "auditee_fiscal_period_start": "11/01/2021",
+            "auditee_fiscal_period_end": "11/01/2022",
+            "audit_period_covered": "other",
+            "audit_period_other_months": "10",
+            "ein": "123456780",
+            "ein_not_an_ssn_attestation": True,
+            "multiple_eins_covered": True,
+            "auditee_uei": "ZQGGHJH74DW8",
+            "multiple_ueis_covered": True,
+            "secondary_auditors_exist": True,
+            "auditee_name": "Auditee McAudited again",
+            "auditee_address_line_1": "500 feet into left field",
+            "auditee_city": "Chicago",
+            "auditee_state": "IL",
+            "auditee_zip": "60640",
+            "auditee_contact_name": "Updated Designated Representative",
+            "auditee_contact_title": "Lord of Windows",
+            "auditee_phone": "5558675310",
+            "auditee_email": settings.GSA_MIGRATION,  # Not allowed
+            "auditor_firm_name": "Penny Audit Store",
+            "auditor_ein": "123456780",
+            "auditor_ein_not_an_ssn_attestation": True,
+            "auditor_contact_name": "Qualified Robot Accountant",
+            "auditor_contact_title": "Just an extraordinary person",
+            "auditor_phone": "9876543210",
+            "auditor_email": settings.GSA_MIGRATION,  # Not allowed
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 400)
+
     def test_post_validates_general_information(self):
         """When the general information form is submitted, the data should be validated against the general information schema"""
         user = baker.make(User)
@@ -659,7 +718,7 @@ class GeneralInformationFormViewTests(TestCase):
             "ein": "123456780",
             "ein_not_an_ssn_attestation": True,
             "multiple_eins_covered": False,
-            "auditee_uei": "ZQGGHJH74DW8",
+            "auditee_uei": "ZQGGhJH74DW8",
             "multiple_ueis_covered": False,
             "secondary_auditors_exist": True,
             "auditee_name": "Auditee McAudited again",

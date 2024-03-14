@@ -1,0 +1,30 @@
+---
+name: Perform a tar snapshot of the media
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  backup-media:
+    name: Perform Media Backups
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Backup media files
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name s3_tar_snapshot --command "./s3-tar-snapshot.sh"

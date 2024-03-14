@@ -66,7 +66,6 @@
                         <label for="auditee_name" hidden>Auditee name</label>
                         <input class="usa-input"
                             id="auditee_name"
-                            name="auditee_name"
                             disabled="true"
                             hidden />
                     </div>
@@ -154,14 +153,17 @@
             </div>
         </div>
     </div>
-    </div>
     <div class="usa-modal usa-modal--lg uei-search-result loading"
         id="uei-search-result"
         aria-labelledby="uei-search-result-heading"
         aria-describedby="uei-search-result-description">
         <div class="usa-modal__content">
             <div class="usa-modal__main">
-                <img src="/static/img/loader.svg" alt="loading"/>
+
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img" alt="loading">
+                    {% uswds_sprite "loader" %}
+                </svg>
+
                 <h2 class="usa-modal__heading" id="uei-search-result-heading"></h2>
                 <div class="usa-prose" id="uei-search-result-description"></div>
                 <div class="usa-modal__footer">
@@ -186,7 +188,6 @@
                 </svg>
             </button>
         </div>
-    </div>
     </div>
     <script src="{% static 'compiled/js/check-ueid.js' %}"></script>
 {% endblock %}

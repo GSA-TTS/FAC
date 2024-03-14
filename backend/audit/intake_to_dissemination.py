@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 import pytz
 from django.db import IntegrityError
 
@@ -26,14 +25,17 @@ def omit(remove, d) -> dict:
 
 
 class IntakeToDissemination(object):
-    def __init__(self, sac) -> None:
+    DISSEMINATION = "dissemination"
+    PRE_CERTIFICATION_REVIEW = "pre_certification_review"
+
+    def __init__(self, sac, mode=DISSEMINATION) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
-        audit_date = sac.general_information.get(
-            "auditee_fiscal_period_start", datetime.now
-        )
+        audit_date = sac.general_information["auditee_fiscal_period_end"]
         self.audit_year = int(audit_date.split("-")[0])
         self.loaded_objects: dict[str, list] = {}
+        self.mode = mode
+        self.errors: list[str] = []
 
     def load_all(self):
         load_methods = {
@@ -53,9 +55,11 @@ class IntakeToDissemination(object):
                 # Each method writes results into self.loaded_objects
                 load_method()
             except KeyError as key_error:
-                logger.warning(
+                error = (
                     f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
                 )
+                logger.warning(error)
+                self.errors.append(error)
         return self.loaded_objects
 
     def get_dissemination_objects(self):
@@ -68,9 +72,9 @@ class IntakeToDissemination(object):
                     model_class = type(object_list[0])
                     model_class.objects.bulk_create(object_list)
             except IntegrityError as e:
-                logging.warning(
-                    f"An error occurred during bulk creation for {key}: {e}"
-                )
+                error = f"An error occurred during bulk creation for {key}: {e}"
+                logger.warning(error)
+                self.errors.append(error)
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -82,14 +86,14 @@ class IntakeToDissemination(object):
             )
             for entry in findings_text_entries:
                 finding_text_ = FindingText(
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     finding_ref_number=entry["reference_number"],
-                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                    contains_chart_or_table=entry["contains_chart_or_table"],
                     finding_text=entry["text_of_finding"],
                 )
                 findings_text_objects.append(finding_text_)
-            self.loaded_objects["FindingTexts"] = findings_text_objects
 
+        self.loaded_objects["FindingTexts"] = findings_text_objects
         return findings_text_objects
 
     def load_findings(self):
@@ -118,7 +122,7 @@ class IntakeToDissemination(object):
                     is_repeat_finding=findings["repeat_prior_reference"],
                     is_significant_deficiency=entry["significant_deficiency"],
                     prior_finding_ref_numbers=findings.get("prior_references", ""),
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     type_requirement=program["compliance_requirement"],
                 )
                 findings_objects.append(finding)
@@ -159,7 +163,7 @@ class IntakeToDissemination(object):
                 passthrough_amount=entry["subrecipients"].get(
                     "subrecipient_amount", None
                 ),
-                report_id=self.single_audit_checklist.report_id,
+                report_id=self.loaded_objects["Generals"][0],
                 state_cluster_name=cluster.get("state_cluster_name", ""),
             )
             federal_awards_objects.append(federal_award)
@@ -180,7 +184,7 @@ class IntakeToDissemination(object):
                     contains_chart_or_table=entry["contains_chart_or_table"],
                     finding_ref_number=entry["reference_number"],
                     planned_action=entry["planned_action"],
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                 )
                 cap_text_objects.append(cap_text)
 
@@ -188,7 +192,11 @@ class IntakeToDissemination(object):
         return cap_text_objects
 
     def load_notes(self):
-        sefa = self.single_audit_checklist.notes_to_sefa or {}
+        """
+        Transforms the notes_to_sefa contents into the structure required for
+        dissemination. This structure is a list of dissemination.models.Note instances.
+        """
+        sefa = self.single_audit_checklist.notes_to_sefa
         n2sefa = sefa.get("NotesToSefa", {})
         sefa_objects = []
         if n2sefa:
@@ -198,7 +206,7 @@ class IntakeToDissemination(object):
             entries = n2sefa.get("notes_to_sefa_entries", [])
             if len(entries) == 0:
                 note = Note(
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     accounting_policies=accounting_policies,
                     is_minimis_rate_used=is_minimis_rate_used,
                     rate_explained=rate_explained,
@@ -207,7 +215,7 @@ class IntakeToDissemination(object):
             else:
                 for entry in entries:
                     note = Note(
-                        report_id=self.report_id,
+                        report_id=self.loaded_objects["Generals"][0],
                         accounting_policies=accounting_policies,
                         is_minimis_rate_used=is_minimis_rate_used,
                         rate_explained=rate_explained,
@@ -230,7 +238,7 @@ class IntakeToDissemination(object):
             for entity in entities:
                 passthrough = Passthrough(
                     award_reference=entry["award_reference"],
-                    report_id=self.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     passthrough_id=entity.get("passthrough_identifying_number", ""),
                     passthrough_name=entity["passthrough_name"],
                 )
@@ -262,28 +270,50 @@ class IntakeToDissemination(object):
         return formatted_date
 
     def load_general(self):
+        """
+        Transforms general_information and other content into the structure required for
+        dissemination. This structure is a list with one entry, a
+        dissemination.models.General instance.
+        """
         general_information = self.single_audit_checklist.general_information
-        audit_information = self.single_audit_checklist.audit_information or {}
-        auditee_certification = self.single_audit_checklist.auditee_certification or {}
-        # auditor_certification = self.single_audit_checklist.auditor_certification or {}
+        audit_information = self.single_audit_checklist.audit_information
+        auditee_certification = self.single_audit_checklist.auditee_certification
+        auditor_certification = self.single_audit_checklist.auditor_certification or {}
         tribal_data_consent = self.single_audit_checklist.tribal_data_consent or {}
-        cognizant_agency = self.single_audit_checklist.cognizant_agency or ""
-        oversight_agency = self.single_audit_checklist.oversight_agency or ""
+        cognizant_agency = self.single_audit_checklist.cognizant_agency
+        oversight_agency = self.single_audit_checklist.oversight_agency
 
         dates_by_status = self._get_dates_from_sac()
         status = self.single_audit_checklist.STATUS
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
-        auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
-        auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
-        submitted_date = self._convert_utc_to_american_samoa_zone(
-            dates_by_status[status.SUBMITTED]
-        )
-        auditee_certify_name = auditee_certification.get("auditee_signature", {}).get(
-            "auditee_name", ""
-        )
-        auditee_certify_title = auditee_certification.get("auditee_signature", {}).get(
-            "auditee_title", ""
-        )
+        if self.mode == IntakeToDissemination.DISSEMINATION:
+            submitted_date = self._convert_utc_to_american_samoa_zone(
+                dates_by_status[status.SUBMITTED]
+            )
+            fac_accepted_date = submitted_date
+            auditee_certify_name = auditee_certification["auditee_signature"][
+                "auditee_name"
+            ]
+            auditee_certify_title = auditee_certification["auditee_signature"][
+                "auditee_title"
+            ]
+            auditor_certify_name = auditor_certification["auditor_signature"][
+                "auditor_name"
+            ]
+            auditor_certify_title = auditor_certification["auditor_signature"][
+                "auditor_title"
+            ]
+            auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
+            auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
+        elif self.mode == IntakeToDissemination.PRE_CERTIFICATION_REVIEW:
+            submitted_date = None
+            fac_accepted_date = submitted_date
+            auditee_certify_name = None
+            auditee_certify_title = None
+            auditee_certified_date = None
+            auditor_certify_name = None
+            auditor_certify_title = None
+            auditor_certified_date = None
 
         total_amount_expended = self.single_audit_checklist.federal_awards[
             "FederalAwards"
@@ -361,6 +391,8 @@ class IntakeToDissemination(object):
             report_id=self.report_id,
             auditee_certify_name=auditee_certify_name,
             auditee_certify_title=auditee_certify_title,
+            auditor_certify_name=auditor_certify_name,
+            auditor_certify_title=auditor_certify_title,
             cognizant_agency=cognizant_agency,
             oversight_agency=oversight_agency,
             date_created=self.single_audit_checklist.date_created,
@@ -368,10 +400,8 @@ class IntakeToDissemination(object):
             auditor_certified_date=auditor_certified_date,
             auditee_certified_date=auditee_certified_date,
             submitted_date=submitted_date,
-            # auditor_signature_date=auditor_certification["auditor_signature"]["auditor_certification_date_signed"],
-            # auditee_signature_date=auditee_certification["auditee_signature"]["auditee_certification_date_signed"],
+            fac_accepted_date=fac_accepted_date,
             audit_year=str(self.audit_year),
-            # is_duplicate_reports = Util.bool_to_yes_no(audit_information["is_aicpa_audit_guide_included"]), #FIXME This mapping does not seem correct
             total_amount_expended=total_amount_expended,
             type_audit_code="UG",
             is_public=is_public,
@@ -391,7 +421,6 @@ class IntakeToDissemination(object):
             secondary_auditors_entries = secondary_auditors.get(
                 "SecondaryAuditors", {}
             ).get("secondary_auditors_entries", [])
-
             for secondary_auditor in secondary_auditors_entries:
                 sec_auditor = SecondaryAuditor(
                     address_city=secondary_auditor["secondary_auditor_address_city"],
@@ -408,7 +437,7 @@ class IntakeToDissemination(object):
                     contact_name=secondary_auditor["secondary_auditor_contact_name"],
                     contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
                     contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                    report_id=self.single_audit_checklist.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                 )
                 sec_objs.append(sec_auditor)
 
@@ -425,7 +454,7 @@ class IntakeToDissemination(object):
         ):
             for entry in addls["AdditionalUEIs"]["additional_ueis_entries"]:
                 uei = AdditionalUei(
-                    report_id=self.single_audit_checklist.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     additional_uei=entry["additional_uei"],
                 )
                 uei_objs.append(uei)
@@ -442,7 +471,7 @@ class IntakeToDissemination(object):
         ):
             for entry in addls["AdditionalEINs"]["additional_eins_entries"]:
                 ein = AdditionalEin(
-                    report_id=self.single_audit_checklist.report_id,
+                    report_id=self.loaded_objects["Generals"][0],
                     additional_ein=entry["additional_ein"],
                 )
                 ein_objs.append(ein)

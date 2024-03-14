@@ -114,12 +114,13 @@ class FACAuthenticationBackendTests(TestCase):
         backend = FACAuthenticationBackend()
 
         login_id = str(uuid4())
-        email = "a@a.com"
+        email = "a+a@a.com"
 
         access1 = baker.make(Access, email=email)
         access2 = baker.make(Access, email=email)
 
-        user_info = {"sub": login_id, "email": email, "all_emails": [email]}
+        # use different casing in the user info to ensure we're not case sensitive
+        user_info = {"sub": login_id, "email": "A@A.CoM", "all_emails": ["A+a@A.cOm"]}
 
         factory = RequestFactory()
         request = factory.get("/")
@@ -131,3 +132,52 @@ class FACAuthenticationBackendTests(TestCase):
 
         self.assertEqual(user, updated_access1.user)
         self.assertEqual(user, updated_access2.user)
+
+    def test_claimed_access_reassigned_to_new_user(self):
+        """
+        If a user presents with an email that matches Access objects that have already been assigned to a different user, those Access objects should be updated to point to the new user
+        """
+        backend = FACAuthenticationBackend()
+
+        email = "a@a.com"
+
+        login_id_1 = str(uuid4())
+        login_id_2 = str(uuid4())
+
+        # given that we have an existing user (user_1) with email a@a.com
+        user_a_1 = baker.make(User, username=login_id_1, email=email)
+
+        # and that user has some claimed Accesses
+        access_1 = baker.make(Access, email=email, user=user_a_1)
+        access_2 = baker.make(Access, email=email, user=user_a_1)
+
+        # and there are other claimed Accesses for other users
+        user_b = baker.make(User, email="b@b.com")
+        access_3 = baker.make(Access, email="b@b.com", user=user_b)
+
+        # and there are other unclaimed Accesses for other emails
+        access_4 = baker.make(Access, email="c@c.com", user=None)
+
+        user_a_2_info = {"sub": login_id_2, "email": email, "all_emails": [email]}
+
+        factory = RequestFactory()
+        request = factory.get("/")
+
+        # when a different login.gov user (user_a_2) presents with email a@a.com
+        user_a_2 = backend.authenticate(request, **user_a_2_info)
+
+        updated_access_1 = Access.objects.get(pk=access_1.id)
+        updated_access_2 = Access.objects.get(pk=access_2.id)
+        updated_access_3 = Access.objects.get(pk=access_3.id)
+        updated_access_4 = Access.objects.get(pk=access_4.id)
+
+        # then the Access objects formerly associated with user_a_1 should now be associated with user_a_2
+        self.assertEqual(user_a_2, updated_access_1.user)
+        self.assertEqual(user_a_2, updated_access_2.user)
+
+        # and the Access object associated with user_3 remain unchanged
+        self.assertEqual(user_b, updated_access_3.user)
+
+        # and the unclaimed Access object remains unclaimed
+        self.assertEqual("c@c.com", updated_access_4.email)
+        self.assertEqual(None, updated_access_4.user)

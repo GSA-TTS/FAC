@@ -9,7 +9,10 @@ from django.views import View
 
 import api.views
 
+from audit.cross_validation import sac_validation_shape
 from audit.cross_validation.naming import NC, SECTION_NAMES as SN
+from audit.cross_validation.submission_progress_check import section_completed_metadata
+
 from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
 from audit.validators import validate_general_information_json
 
@@ -65,8 +68,7 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
         formatted_post = {
             "csrfmiddlewaretoken": request.POST.get("csrfmiddlewaretoken"),
-            "auditee_uei": form.cleaned_data["auditee_uei"],
-            "auditee_name": request.POST.get("auditee_name"),
+            "auditee_uei": form.cleaned_data["auditee_uei"].upper(),
             "auditee_address_line_1": request.POST.get("auditee_address_line_1"),
             "auditee_city": request.POST.get("auditee_city"),
             "auditee_state": request.POST.get("auditee_state"),
@@ -199,7 +201,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
-            validated = validate_general_information_json(general_information)
+            validated = validate_general_information_json(general_information, False)
             sac.general_information = validated
             if general_information.get("audit_type"):
                 sac.audit_type = general_information["audit_type"]
@@ -300,6 +302,10 @@ class UploadPageView(LoginRequiredMixin, View):
                 "DB_id": SN[NC.FEDERAL_AWARDS].snake_case,
                 "instructions_url": instructions_base_url + "federal-awards/",
                 "workbook_url": workbook_base_url + "federal-awards-workbook.xlsx",
+                # below URL handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
+                "existing_workbook_url": reverse(
+                    "audit:FederalAwardsExpended", args=[report_id]
+                ),
             },
             "notes-to-sefa": {
                 "view_id": "notes-to-sefa",
@@ -308,6 +314,9 @@ class UploadPageView(LoginRequiredMixin, View):
                 "DB_id": SN[NC.NOTES_TO_SEFA].snake_case,
                 "instructions_url": instructions_base_url + "notes-to-sefa/",
                 "workbook_url": workbook_base_url + "notes-to-sefa-workbook.xlsx",
+                "existing_workbook_url": reverse(
+                    f"audit:{SN[NC.NOTES_TO_SEFA].camel_case}", args=[report_id]
+                ),
             },
             "audit-findings": {
                 "view_id": "audit-findings",
@@ -318,7 +327,11 @@ class UploadPageView(LoginRequiredMixin, View):
                 + "federal-awards-audit-findings/",
                 "no_findings_disclaimer": True,
                 "workbook_url": workbook_base_url
-                + "federal-awards-audit-findings.xlsx",
+                + "federal-awards-audit-findings-workbook.xlsx",
+                "existing_workbook_url": reverse(
+                    f"audit:{SN[NC.FINDINGS_UNIFORM_GUIDANCE].camel_case}",
+                    args=[report_id],
+                ),
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
@@ -328,8 +341,10 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions_url": instructions_base_url
                 + "federal-awards-audit-findings-text/",
                 "no_findings_disclaimer": True,
-                "workbook_url": workbook_base_url
-                + "federal-awards-audit-findings-text-workbook.xlsx",
+                "workbook_url": workbook_base_url + "audit-findings-text-workbook.xlsx",
+                "existing_workbook_url": reverse(
+                    f"audit:{SN[NC.FINDINGS_TEXT].camel_case}", args=[report_id]
+                ),
             },
             "cap": {
                 "view_id": "cap",
@@ -340,6 +355,10 @@ class UploadPageView(LoginRequiredMixin, View):
                 "no_findings_disclaimer": True,
                 "workbook_url": workbook_base_url
                 + "corrective-action-plan-workbook.xlsx",
+                "existing_workbook_url": reverse(
+                    f"audit:{SN[NC.CORRECTIVE_ACTION_PLAN].camel_case}",
+                    args=[report_id],
+                ),
             },
             "additional-ueis": {
                 "view_id": "additional-ueis",
@@ -348,6 +367,9 @@ class UploadPageView(LoginRequiredMixin, View):
                 "DB_id": SN[NC.ADDITIONAL_UEIS].snake_case,
                 "instructions_url": instructions_base_url + "additional-ueis-workbook/",
                 "workbook_url": workbook_base_url + "additional-ueis-workbook.xlsx",
+                "existing_workbook_url": reverse(
+                    "audit:AdditionalUeis", args=[report_id]
+                ),
             },
             "secondary-auditors": {
                 "view_id": "secondary-auditors",
@@ -357,6 +379,10 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions_url": instructions_base_url
                 + "secondary-auditors-workbook/",
                 "workbook_url": workbook_base_url + "secondary-auditors-workbook.xlsx",
+                # below URL handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
+                "existing_workbook_url": reverse(
+                    f"audit:{SN[NC.SECONDARY_AUDITORS].camel_case}", args=[report_id]
+                ),
             },
             "additional-eins": {
                 "view_id": "additional-eins",
@@ -365,6 +391,10 @@ class UploadPageView(LoginRequiredMixin, View):
                 "DB_id": SN[NC.ADDITIONAL_EINS].snake_case,
                 "instructions_url": instructions_base_url + "additional-eins-workbook/",
                 "workbook_url": workbook_base_url + "additional-eins-workbook.xlsx",
+                # below URL handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
+                "existing_workbook_url": reverse(
+                    "audit:AdditionalEins", args=[report_id]
+                ),
             },
         }
 
@@ -384,12 +414,20 @@ class UploadPageView(LoginRequiredMixin, View):
             }
             # Using the current URL, append page specific context
             path_name = request.path.split("/")[2]
+
             for item in additional_context[path_name]:
                 context[item] = additional_context[path_name][item]
             try:
                 context["already_submitted"] = getattr(
                     sac, additional_context[path_name]["DB_id"]
                 )
+
+                shaped_sac = sac_validation_shape(sac)
+                completed_metadata = section_completed_metadata(shaped_sac, path_name)
+
+                context["last_uploaded_by"] = completed_metadata[0]
+                context["last_uploaded_at"] = completed_metadata[1]
+
             except Exception:
                 context["already_submitted"] = None
 

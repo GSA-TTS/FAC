@@ -1,10 +1,15 @@
 from unittest.mock import patch
 
+from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.test import Client, TestCase
 from django.urls import reverse
 
 from .common import less_console_noise
+
+from model_bakery import baker
+
+User = get_user_model()
 
 
 @patch("djangooidc.views.CLIENT", autospec=True)
@@ -78,8 +83,18 @@ class ViewsTest(TestCase):
         self.assertTemplateUsed(response, "401.html")
         self.assertIn("Unauthorized", response.content.decode("utf-8"))
 
+    def test_logout_anonymous_redirect_url(self, mock_client):
+        # attempting to logout as an anonymous user should redirect to homepage
+        response = self.client.get(reverse("logout"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/")
+
     def test_logout_redirect_url(self, mock_client):
         # setup
+        user = baker.make(User)
+        self.client.force_login(user)
+
         session = self.client.session
         session["state"] = "TEST"  # nosec B105
         session.save()

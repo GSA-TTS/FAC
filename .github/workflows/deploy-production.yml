@@ -32,6 +32,15 @@ jobs:
       autoapprove: false
     secrets: inherit
 
+  new-relic-record:
+    name: Record deployment to New Relic
+    needs:
+      - deploy-infrastructure-production
+    uses: ./.github/workflows/new-relic-deployment.yml
+    with:
+      environment: "production"
+    secrets: inherit
+
   deploy-production:
     name: Deploy application
     needs:

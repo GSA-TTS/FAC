@@ -31,7 +31,6 @@
          "single_cells": [
             {
                "format": "text",
-               "formula": "=\"1.0.0\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
@@ -45,11 +44,11 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
+               "value": "1.0.5",
                "width": 48
             },
             {
                "format": "text",
-               "formula": "=\"FindingsUniformGuidance\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#section_name",
                   "text": "The workbook you tried to upload is for a different section."
@@ -63,6 +62,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
+               "value": "FindingsUniformGuidance",
                "width": 48
             },
             {
@@ -118,9 +118,9 @@
                "title_cell": "B1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)",
+                  "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year after 2010 and NNN a three digit number (e.g. 2023-001)",
                   "custom_title": "Reference number",
-                  "formula1": "=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = \"20\", ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = \"-\", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))",
+                  "formula1": "=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = \"20\", (MID(FIRSTCELLREF, 3, 1) * 1) > 0, ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = \"-\", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))",
                   "type": "custom"
                },
                "width": 18

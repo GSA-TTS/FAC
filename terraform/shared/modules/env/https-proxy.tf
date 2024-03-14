@@ -23,6 +23,13 @@ module "https-proxy" {
       # We put in an upstream issue about this: https://github.com/caddyserver/forwardproxy/issues/102
       "*.newrelic.com:443",
 
+      # It was determined that NR wants to proxy a connection to a proxy. This does need the NEW_RELIC_PROXY_HOST="$https_proxy" set,
+      # in conjunction with this. We believe this to be a potential bug with the new relic agent,
+      # and will be reporting this to New Relic in the hopes of being able to remove the proxy from our allow list.
+      # This is thanks to Ryan Ahearn at 18F for pointing us in this direction
+      # https://gsa-tts.slack.com/archives/C09CR1Q9Z/p1699394487090859
+      "${var.cf_org_name}-${var.cf_space_name}-egress-https-proxy.apps.internal",
+
       # Login.gov sandbox
       "idp.int.identitysandbox.gov:443",
 
@@ -30,7 +37,13 @@ module "https-proxy" {
       "secure.login.gov:443",
 
       # Git
-      "*.github.com:443"
+      "*.github.com:443",
+      # The following needs to be added to the allowlist so that when we curl the s3-tar-tool to perform backups,
+      # the curl command can follow the redirect.
+      "objects.githubusercontent.com:443",
+
+      # The following needs to be added to the allowlist so that we can get aws cli onto the instance to perform backups.
+      "awscli.amazonaws.com:443"
     ],
     # The parens here make Terraform understand that the key below is a reference
     # Solution from https://stackoverflow.com/a/57401750

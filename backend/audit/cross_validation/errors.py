@@ -32,9 +32,13 @@ def err_awards_findings_but_no_findings_text():
 
 def err_missing_tribal_data_sharing_consent():
     return (
-        "As a tribal organization, you must complete the data "
-        "sharing consent statement before submitting your audit."
+        "As a tribal organization, the Auditee Certifying Official must complete "
+        "the data sharing consent statement before submitting your audit."
     )
+
+
+def err_unexpected_tribal_data_sharing_consent():
+    return "Tribal consent privacy flag set but non-tribal org type."
 
 
 def err_certifying_contacts_should_not_match():

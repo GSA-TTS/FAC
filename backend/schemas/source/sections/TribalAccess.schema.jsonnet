@@ -18,7 +18,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
   required: [
     'tribal_authorization_certifying_official_title',
     'is_tribal_information_authorized_to_be_public',
-    'tribal_authorization_certifying_official_name'
+    'tribal_authorization_certifying_official_name',
   ],
   title: 'TribalAccess',
   type: 'object',

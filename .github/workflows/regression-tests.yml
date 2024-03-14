@@ -28,7 +28,12 @@ jobs:
     environment: ${{ inputs.environment }}
     env:
       CYPRESS_API_GOV_KEY: ${{ secrets.CYPRESS_API_GOV_KEY }}
+      CYPRESS_API_GOV_USER_ID: ${{ secrets.CYPRESS_API_GOV_USER_ID }}
+      CYPRESS_API_GOV_KEY_ADMIN: ${{ secrets.CYPRESS_API_GOV_KEY_ADMIN }}
+      CYPRESS_API_GOV_USER_ID_ADMIN: ${{ secrets.CYPRESS_API_GOV_USER_ID_ADMIN }}
       CYPRESS_API_GOV_URL: ${{ secrets.CYPRESS_API_GOV_URL }}
+      CYPRESS_API_VERSION: ${{ secrets.CYPRESS_API_VERSION }}
+      CYPRESS_ADMIN_API_VERSION: ${{ secrets.CYPRESS_ADMIN_API_VERSION }}
       CYPRESS_BASE_URL: ${{ inputs.url }}
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
       CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
@@ -38,25 +43,27 @@ jobs:
       CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE }}
       DISABLE_AUTH: False
       # useful for debugging but otherwise complete overwhelm
-      # DEBUG: cypress:*
+      # DEBUG: cypress:server:util:process_profiler
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Create .env file
         run: touch .env
 
       - name: Run Cypress full submission test
-        uses: Wandalen/wretry.action@master
+        uses: cypress-io/github-action@v6
         with:
-          action: cypress-io/github-action@v6
-          with: |
-            working-directory: ./backend
-            spec: cypress/e2e/full-submission.cy.js
-          attempt_limit: 5
-          attempt_delay: 2000
+          browser: chrome
+          working-directory: ./backend
+          spec: cypress/e2e/full-submission.cy.js
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         # add the line below to store screenshots only on failures
         if: failure()
         with:

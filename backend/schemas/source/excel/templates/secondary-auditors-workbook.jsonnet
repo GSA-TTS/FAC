@@ -31,7 +31,7 @@ local single_cells = [
     title_cell: 'A2',
     range_cell: 'B2',
     format: 'text',
-    formula: '="' + Sheets.WORKBOOKS_VERSION + '"',
+    value: Sheets.WORKBOOKS_VERSION,
     help: Help.plain_text,
     validation: SV.NoValidation,
   },
@@ -43,7 +43,7 @@ local single_cells = [
     title_cell: 'A3',
     range_cell: 'B3',
     format: 'text',
-    formula: '="' + Sheets.section_names.SECONDARY_AUDITORS + '"',
+    value: Sheets.section_names.SECONDARY_AUDITORS,
     help: Help.wrong_workbook_template,
     validation: SV.NoValidation,
   },
@@ -63,7 +63,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       title_cell: 'A1',
-      width: 100,
+      width: 64,
       format: 'text',
       help: Help.plain_text,
     },
@@ -85,7 +85,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       title_cell: 'C1',
-      width: 100,
+      width: 64,
       format: 'text',
       help: Help.plain_text,
     },
@@ -96,7 +96,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       title_cell: 'D1',
-      width: 100,
+      width: 64,
       format: 'text',
       help: Help.plain_text,
     },
@@ -188,6 +188,7 @@ local sheets = [
     name: textSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
+    row_height: 36,
   },
   {
     name: stateCodeLookup,

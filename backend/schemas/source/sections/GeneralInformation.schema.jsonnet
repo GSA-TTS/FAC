@@ -18,7 +18,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
           format: 'date',
         },
         Base.Compound.EmptyString,
-      ]
+      ],
     },
     auditee_fiscal_period_end: Types.string {
       oneOf: [
@@ -26,19 +26,19 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
           format: 'date',
         },
         Base.Compound.EmptyString,
-      ]
+      ],
     },
     audit_type: {
       oneOf: [
         Base.Enum.AuditType,
         Base.Compound.EmptyString,
-      ]
+      ],
     },
     audit_period_covered: {
       oneOf: [
         Base.Enum.AuditPeriod,
         Base.Compound.EmptyString,
-      ]
+      ],
     },
     audit_period_other_months: Types.string {
       maxLength: 100,
@@ -68,7 +68,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
           title: 'State',
         },
         Base.Compound.EmptyString,
-      ]
+      ],
     },
     auditee_zip: {
       anyOf: [
@@ -87,19 +87,23 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
       oneOf: [
         Base.Compound.UnitedStatesPhone,
         Base.Compound.EmptyString,
-      ]
+      ],
     },
     auditee_email: Types.string {
       oneOf: [
-        {
+        Types.string {
           format: 'email',
+          maxLength: 100,
+        },
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
         },
         Base.Compound.EmptyString,
-      ]
+      ],
     },
 
     // Auditor information
-     auditor_ein: {
+    auditor_ein: {
       oneOf: [
         Base.Compound.EmployerIdentificationNumber,
         Base.Compound.EmptyString,
@@ -144,18 +148,20 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
       oneOf: [
         Base.Compound.UnitedStatesPhone,
         Base.Compound.EmptyString,
-      ]
-    },
-    auditor_email: Types.string {
-      oneOf: [
-        {
-          format: 'email',
-        },
-        Base.Compound.EmptyString
       ],
-      maxLength: 100,
     },
-
+    auditor_email: {
+      oneOf: [
+        Types.string {
+          format: 'email',
+          maxLength: 100,
+        },
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+        Base.Compound.EmptyString,
+      ],
+    },
     // Others
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
@@ -231,7 +237,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
               Base.Enum.UnitedStatesStateAbbr,
               Base.Compound.EmptyString,
             ],
-          }
+          },
         },
       },
     },

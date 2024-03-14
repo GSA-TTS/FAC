@@ -1,0 +1,46 @@
+---
+name: Historic Data Migration With Pagination
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        description: The environment the workflow should run on.
+        options:
+          - dev
+          - staging
+          - preview
+      year:
+        required: true
+        type: string
+        description: Provide audit year.
+      page_size:
+        required: true
+        type: string
+        description: Number of audit reports by page.
+      pages:
+        required: true
+        type: string
+        description: Comma-separated list of pages.
+
+jobs:
+  historic-data-migrator:
+    name: Generate and disseminate historic data in ${{ inputs.environment }} database
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Django command to generate and disseminate historic data in ${{ inputs.environment }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 1G -m 1G --name historic_data_migrator_with_pagination --command "python manage.py run_paginated_migration --year ${{ inputs.year }} --page_size ${{ inputs.page_size }} --pages ${{ inputs.pages }}"

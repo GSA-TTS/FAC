@@ -1,9 +1,9 @@
 import os
 import json
 import logging
+
 from jsonschema import Draft7Validator, FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
-from jsonschema.exceptions import SchemaError as JSONSchemaError
 
 from django.core.exceptions import ValidationError
 
@@ -13,13 +13,13 @@ import requests
 from openpyxl import load_workbook
 from pypdf import PdfReader
 
-from audit.excel import (
+from audit.intakelib import (
     additional_ueis_named_ranges,
     additional_eins_named_ranges,
     corrective_action_plan_named_ranges,
     federal_awards_named_ranges,
-    findings_text_named_ranges,
-    findings_uniform_guidance_named_ranges,
+    audit_findings_text_named_ranges,
+    audit_findings_named_ranges,
     secondary_auditors_named_ranges,
     notes_to_sefa_named_ranges,
 )
@@ -33,6 +33,7 @@ from audit.fixtures.excel import (
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
 )
+from support.decorators import newrelic_timing_metric
 
 
 logger = logging.getLogger(__name__)
@@ -209,23 +210,13 @@ def validate_federal_award_json(value):
     schema_path = settings.SECTION_SCHEMA_DIR / "FederalAwards.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
-    # FIXME: For some classes of error, this approach
-    # will go into an infinite/recursive loop in the iterator.
-    # There needs to either be a way to solve that, or we need
-    # to not use this approach.
-    # validator = Draft7Validator(schema)
-    # errors = list(validator.iter_errors(value))
-    # The side-effect is that now I only do one error at a time...
-    errors = []
-    try:
-        validate(schema=schema, instance=value)
-    except (JSONSchemaValidationError, JSONSchemaError) as e:
-        errors = [e]
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
     if len(errors) > 0:
         raise ValidationError(message=_federal_awards_json_error(errors))
 
 
-def validate_general_information_json(value):
+def validate_general_information_json(value, is_data_migration=True):
     """
     Apply JSON Schema for general information and report errors.
     """
@@ -233,6 +224,13 @@ def validate_general_information_json(value):
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     try:
+        if not is_data_migration and settings.GSA_MIGRATION in [
+            value.get("auditee_email", ""),
+            value.get("auditor_email", ""),
+        ]:
+            raise JSONSchemaValidationError(
+                f"{settings.GSA_MIGRATION} not permitted outside of migrations"
+            )
         validate(value, schema, format_checker=FormatChecker())
     except JSONSchemaValidationError as err:
         raise ValidationError(
@@ -395,6 +393,7 @@ def _scan_file(file):
         )
 
 
+@newrelic_timing_metric("validate_file_infection")
 def validate_file_infection(file):
     """Files must pass an AV scan"""
     logger.info(f"Attempting to scan file: {file}.")
@@ -497,7 +496,7 @@ def _findings_text_json_error(errors):
         XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_TEXT_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _get_error_details(template, findings_text_named_ranges(errors))
+    return _get_error_details(template, audit_findings_text_named_ranges(errors))
 
 
 def _findings_uniform_guidance_json_error(errors):
@@ -506,7 +505,7 @@ def _findings_uniform_guidance_json_error(errors):
         XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_UNIFORM_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _get_error_details(template, findings_uniform_guidance_named_ranges(errors))
+    return _get_error_details(template, audit_findings_named_ranges(errors))
 
 
 def _secondary_auditors_json_error(errors):
@@ -536,6 +535,8 @@ def validate_single_audit_report_file_extension(file):
 
 def validate_pdf_file_integrity(file):
     """Files must be readable PDFs"""
+    MIN_CHARARACTERS_IN_PDF = 6000
+
     try:
         reader = PdfReader(file)
 
@@ -544,11 +545,17 @@ def validate_pdf_file_integrity(file):
                 "We were unable to process the file you uploaded because it is encrypted."
             )
 
-        all_text = "".join([p.extract_text() for p in reader.pages])
+        text_length = 0
+        for page in reader.pages:
+            page_text = page.extract_text()
+            text_length += len(page_text)
+            # If we find enough characters, we're content.
+            if text_length >= MIN_CHARARACTERS_IN_PDF:
+                break
 
-        if len(all_text) == 0:
+        if text_length < MIN_CHARARACTERS_IN_PDF:
             raise ValidationError(
-                "We were unable to process the file you uploaded because it contains no readable text."
+                "We were unable to process the file you uploaded because it contains no readable text or too little text."
             )
 
     except ValidationError:

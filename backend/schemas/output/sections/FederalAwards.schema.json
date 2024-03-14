@@ -7,22 +7,30 @@
          "additionalProperties": false,
          "properties": {
             "auditee_uei": {
-               "allOf": [
+               "oneOf": [
                   {
-                     "maxLength": 12,
-                     "minLength": 12
+                     "allOf": [
+                        {
+                           "maxLength": 12,
+                           "minLength": 12
+                        },
+                        {
+                           "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
+                        },
+                        {
+                           "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+                        },
+                        {
+                           "pattern": "^(?![0-9]{9})"
+                        }
+                     ],
+                     "type": "string"
                   },
                   {
-                     "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
-                  },
-                  {
-                     "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
-                  },
-                  {
-                     "pattern": "^(?![0-9]{9})"
+                     "const": "GSA_MIGRATION",
+                     "type": "string"
                   }
-               ],
-               "type": "string"
+               ]
             },
             "federal_awards": {
                "items": {
@@ -37,6 +45,12 @@
                      },
                      "cluster": {
                         "allOf": [
+                           {
+                              "required": [
+                                 "cluster_name",
+                                 "cluster_total"
+                              ]
+                           },
                            {
                               "if": {
                                  "properties": {
@@ -59,6 +73,7 @@
                                           "ECONOMIC DEVELOPMENT CLUSTER",
                                           "EMPLOYMENT SERVICE CLUSTER",
                                           "FEDERAL TRANSIT CLUSTER",
+                                          "FEDERAL MOTOR CARRIER SAFETY ASSISTANCE (FMCSA)",
                                           "FISH AND WILDLIFE CLUSTER",
                                           "FOOD DISTRIBUTION CLUSTER",
                                           "FOREIGN FOOD AID DONATION CLUSTER",
@@ -165,7 +180,6 @@
                               "type": "string"
                            },
                            "cluster_total": {
-                              "minimum": 0,
                               "type": "number"
                            },
                            "other_cluster_name": {
@@ -175,15 +189,16 @@
                               "type": "string"
                            }
                         },
-                        "required": [
-                           "cluster_name",
-                           "cluster_total"
-                        ],
                         "type": "object"
                      },
                      "direct_or_indirect_award": {
                         "additionalProperties": false,
                         "allOf": [
+                           {
+                              "required": [
+                                 "is_direct"
+                              ]
+                           },
                            {
                               "if": {
                                  "properties": {
@@ -243,14 +258,16 @@
                               "type": "string"
                            }
                         },
-                        "required": [
-                           "is_direct"
-                        ],
                         "type": "object"
                      },
                      "loan_or_loan_guarantee": {
                         "additionalProperties": false,
                         "allOf": [
+                           {
+                              "required": [
+                                 "is_guaranteed"
+                              ]
+                           },
                            {
                               "if": {
                                  "properties": {
@@ -301,20 +318,31 @@
                                     "type": "string"
                                  },
                                  {
-                                    "const": "N/A",
+                                    "enum": [
+                                       "N/A",
+                                       "GSA_MIGRATION"
+                                    ],
                                     "type": "string"
                                  }
                               ]
                            }
                         },
-                        "required": [
-                           "is_guaranteed"
-                        ],
                         "type": "object"
                      },
                      "program": {
                         "additionalProperties": false,
                         "allOf": [
+                           {
+                              "required": [
+                                 "program_name",
+                                 "federal_agency_prefix",
+                                 "three_digit_extension",
+                                 "is_major",
+                                 "number_of_audit_findings",
+                                 "federal_program_total",
+                                 "amount_expended"
+                              ]
+                           },
                            {
                               "properties": {
                                  "number_of_audit_findings": {
@@ -357,7 +385,7 @@
                               "if": {
                                  "properties": {
                                     "three_digit_extension": {
-                                       "pattern": "^(RD|U[0-9]{2})$",
+                                       "pattern": "^(RD[0-9]?|U[0-9]{2})$",
                                        "type": "string"
                                     }
                                  }
@@ -380,7 +408,6 @@
                               "type": "string"
                            },
                            "amount_expended": {
-                              "minimum": 0,
                               "type": "number"
                            },
                            "audit_report_type": {
@@ -407,7 +434,6 @@
                               "type": "string"
                            },
                            "federal_program_total": {
-                              "minimum": 0,
                               "type": "number"
                            },
                            "is_major": {
@@ -424,24 +450,28 @@
                               "type": "string"
                            },
                            "three_digit_extension": {
-                              "pattern": "^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$",
-                              "type": "string"
+                              "oneOf": [
+                                 {
+                                    "pattern": "^(RD[0-9]?|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$",
+                                    "type": "string"
+                                 },
+                                 {
+                                    "const": "GSA_MIGRATION",
+                                    "type": "string"
+                                 }
+                              ]
                            }
                         },
-                        "required": [
-                           "program_name",
-                           "federal_agency_prefix",
-                           "three_digit_extension",
-                           "is_major",
-                           "number_of_audit_findings",
-                           "federal_program_total",
-                           "amount_expended"
-                        ],
                         "type": "object"
                      },
                      "subrecipients": {
                         "additionalProperties": false,
                         "allOf": [
+                           {
+                              "required": [
+                                 "is_passed"
+                              ]
+                           },
                            {
                               "if": {
                                  "properties": {
@@ -482,13 +512,9 @@
                               "type": "string"
                            },
                            "subrecipient_amount": {
-                              "minimum": 0,
                               "type": "number"
                            }
                         },
-                        "required": [
-                           "is_passed"
-                        ],
                         "type": "object"
                      }
                   },
@@ -505,7 +531,6 @@
                "type": "array"
             },
             "total_amount_expended": {
-               "minimum": 0,
                "type": "number"
             }
          },
@@ -527,7 +552,7 @@
                "type": "string"
             },
             "version": {
-               "const": "1.0.0",
+               "const": "1.0.5",
                "type": "string"
             }
          },
