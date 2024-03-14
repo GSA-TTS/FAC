@@ -7,49 +7,49 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def search_general(params=None):
-    params = params or {}
+def search_general(base_model, params=None):
+    params = params or dict()
     # Time general reduction
     t0 = time.time()
 
     ##############
     # Initialize query.
-    r_base = DisseminationCombined.objects.all()
+    r_base = base_model.objects.all()
 
     ##############
     # Audit years
     # query.add(_get_audit_years_match_query(audit_years), Q.AND)
     q_audit_year = _get_audit_years_match_query(params.get("audit_years", None))
-    r_audit_year = DisseminationCombined.objects.filter(q_audit_year)
+    r_audit_year = base_model.objects.filter(q_audit_year)
 
     ##############
     # State
     q_state = _get_auditee_state_match_query(params.get("auditee_state", None))
-    r_state = DisseminationCombined.objects.filter(q_state)
+    r_state = base_model.objects.filter(q_state)
 
     ##############
     # Names
     q_names = _get_names_match_query(params.get("names", None))
-    r_names = DisseminationCombined.objects.filter(q_names)
+    r_names = base_model.objects.filter(q_names)
 
     ##############
     # UEI/EIN
     q_uei = _get_uei_or_eins_match_query(params.get("uei_or_eins", None))
-    r_uei = DisseminationCombined.objects.filter(q_uei)
+    r_uei = base_model.objects.filter(q_uei)
 
     ##############
     # Start/end dates
     q_start_date = _get_start_date_match_query(params.get("start_date", None))
-    r_start_date = DisseminationCombined.objects.filter(q_start_date)
+    r_start_date = base_model.objects.filter(q_start_date)
     q_end_date = _get_end_date_match_query(params.get("end_date", None))
-    r_end_date = DisseminationCombined.objects.filter(q_end_date)
+    r_end_date = base_model.objects.filter(q_end_date)
 
     ##############
     # Cog/Over
     q_cogover = _get_cog_or_oversight_match_query(
         params.get("agency_name", None), params.get("cog_or_oversight", None)
     )
-    r_cogover = DisseminationCombined.objects.filter(q_cogover)
+    r_cogover = base_model.objects.filter(q_cogover)
 
     ##############
     # Intersection
