@@ -183,36 +183,59 @@
                                 </p>
                             </td>
                         </tr>
-                        <tr class="grid-row grid-col-12 margin-top-2">
-                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
-                                <p class="margin-y-1">
-                                    <strong>Address:&nbsp;</strong>{{ general.auditor_address_line_1 }}
-                                </p>
-                            </td>
-                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
-                                <p class="margin-y-1">
-                                    <strong>City and state:&nbsp;</strong>{{ general.auditor_city }}, {{ general.auditor_state }}
-                                </p>
-                            </td>
-                        </tr>
-                        <tr class="grid-row grid-col-12 margin-top-2">
-                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
-                                <p class="margin-y-1">
-                                    <strong>Zip code:&nbsp;</strong>{{ general.auditor_zip }}
-                                </p>
-                            </td>
-                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
-                                <p class="margin-y-1">
-                                    <span><strong>Secondary Auditors?</strong>&nbsp;
-                                        {% if  data|getkey:"Secondary Auditors" %}
-                                            Y
-                                        {% else %}
-                                            N
-                                        {% endif %}
-                                    </span>
-                                </p>
-                            </td>
-                        </tr>
+                        {% if general.auditor_address_line_1 %}
+                            {% comment %} Domestic auditor {% endcomment %}
+                            <tr class="grid-row grid-col-12 margin-top-2">
+                                <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                    <p class="margin-y-1">
+                                        <strong>Address:&nbsp;</strong>{{ general.auditor_address_line_1 }}
+                                    </p>
+                                </td>
+                                <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                    <p class="margin-y-1">
+                                        <strong>City and state:&nbsp;</strong>{{ general.auditor_city }}, {{ general.auditor_state }}
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr class="grid-row grid-col-12 margin-top-2">
+                                <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                    <p class="margin-y-1">
+                                        <strong>Zip code:&nbsp;</strong>{{ general.auditor_zip }}
+                                    </p>
+                                </td>
+                                <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                    <p class="margin-y-1">
+                                        <span><strong>Secondary Auditors?</strong>&nbsp;
+                                            {% if  data|getkey:"Secondary Auditors" %}
+                                                Y
+                                            {% else %}
+                                                N
+                                            {% endif %}
+                                        </span>
+                                    </p>
+                                </td>
+                            </tr>
+                        {% else %}
+                            {% comment %} International auditor {% endcomment %}
+                            <tr class="grid-row grid-col-12 margin-top-2">
+                                <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                    <p class="margin-y-1">
+                                        <strong>Address:&nbsp;</strong>{{ general.auditor_foreign_address }}
+                                    </p>
+                                </td>
+                                <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                    <p class="margin-y-1">
+                                        <span><strong>Secondary Auditors?</strong>&nbsp;
+                                            {% if  data|getkey:"Secondary Auditors" %}
+                                                Y
+                                            {% else %}
+                                                N
+                                            {% endif %}
+                                        </span>
+                                    </p>
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
 
