@@ -38,8 +38,9 @@ function grantTribalAccess(email, user_id) {
       "key_id": `${user_id}`,
     }
   }).should((response) => {
-    expect(response.body).to.equal(true);
+    expect(response.body.success).to.equal("User access granted");
   });
+  console.log(`Granted access to ${email} and ${user_id}`)
 }
 
 function revokeTribalAccess(email, user_id) {
@@ -60,11 +61,12 @@ function revokeTribalAccess(email, user_id) {
       "key_id": `${user_id}`,
     }
   }).should((response) => {
-    expect(response.body).to.equal(true);
+    expect(response.body.success).to.equal("Removed record");
   });
 }
 
 export function testReportIdNotFoundWithoutTribalAccess(reportId) {
+  console.log("testReportIdNotFoundWithoutTribalAccess")
   cy.request({
     ...requestOptions,
     qs: {report_id: `eq.${reportId}`},
@@ -74,6 +76,7 @@ export function testReportIdNotFoundWithoutTribalAccess(reportId) {
 }
 
 export function testReportIdFoundWithoutTribalAccess(reportId) {
+  console.log("testReportIdFoundWithoutTribalAccess")
   cy.request({
     ...requestOptions,
     qs: {report_id: `eq.${reportId}`},
@@ -85,23 +88,30 @@ export function testReportIdFoundWithoutTribalAccess(reportId) {
 }
 
 export function testReportIdFoundWithTribalAccess(reportId) {
+  console.log("testReportIdFoundWithTribalAccess")
   const tribal_access_email = `${crypto.randomUUID()}@example.com`;
   const tribal_access_user_id = API_GOV_USER_ID;
 
   grantTribalAccess(tribal_access_email, tribal_access_user_id);
-  
+  console.log(`Attempting Tribal API access with ${API_GOV_JWT} and ${tribal_access_user_id}`)
+  the_headers = {
+    Authorization: `Bearer ${API_GOV_JWT}`,
+    'X-Api-Key': API_GOV_KEY,
+    'X-Api-User-Id': tribal_access_user_id,
+    'Accept-Profile': API_VERSION
+  }
+  console.log("HEADERS")
+  console.log(the_headers)
   // try to pull the tribal, non-public data from the API using the (now) privileged user
   cy.request({
     method: 'GET',
     url: `${API_GOV_URL}/general`,
-    headers: {
-      Authorization: `Bearer ${API_GOV_JWT}`,
-      'X-Api-Key': API_GOV_KEY,
-      'X-Api-User-Id': tribal_access_user_id,
-      'Accept-Profile': API_VERSION
-    },
+    headers: the_headers,
     qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
+    console.log("Before logging the response body")
+    console.log(response)
+    console.log("After the response body")
     expect(response.body).to.have.length(1);
     const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
     expect(Boolean(hasAgency)).to.be.true;
