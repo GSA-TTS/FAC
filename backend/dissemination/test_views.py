@@ -10,7 +10,7 @@ from audit.models import (
     SingleAuditReportFile,
     generate_sac_report_id,
 )
-from dissemination.test_search import SearchBaseTestCase
+from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
     General,
     FederalAward,
@@ -147,7 +147,7 @@ class PdfDownloadViewTests(TestCase):
         self.assertIn(file.filename, response.url)
 
 
-class SearchViewTests(SearchBaseTestCase):
+class SearchViewTests(TestMaterializedViewBuilder):
     def setUp(self):
         super().setUp()
         self.anon_client = Client()
@@ -598,7 +598,7 @@ class SummaryViewTests(TestCase):
         )
 
 
-class SummaryReportDownloadViewTests(SearchBaseTestCase):
+class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
     def setUp(self):
         super().setUp()
         self.anon_client = Client()

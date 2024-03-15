@@ -323,7 +323,7 @@ class SearchGeneralTests(TestCase):
         self.assertEqual(len(results), 0)
 
 
-class SearchBaseTestCase(TestCase):
+class TestMaterializedViewBuilder(TestCase):
     def setUp(self):
         super().setUp()
         self.execute_sql_file("dissemination/sql/create_materialized_views.sql")
@@ -357,7 +357,7 @@ class SearchBaseTestCase(TestCase):
             cursor.execute(sql_commands)
 
 
-class SearchALNTests(SearchBaseTestCase):
+class SearchALNTests(TestMaterializedViewBuilder):
     def test_aln_search(self):
         """Given an ALN (or ALNs), search_general should only return records with awards under one of these ALNs."""
 
@@ -575,7 +575,7 @@ class SearchALNTests(SearchBaseTestCase):
         )
 
 
-class SearchAdvancedFilterTests(SearchBaseTestCase):
+class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
     def test_search_findings(self):
         """
         When making a search on a particular type of finding, search_general should only return records with a finding of that type.

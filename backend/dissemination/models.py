@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-from django.conf import settings
 from . import docs
 
 from .hist_models import census_2019, census_2022  # noqa: F401
@@ -629,7 +628,7 @@ class DisseminationCombined(models.Model):
 
     # Meta options
     class Meta:
-        managed = settings.TEST_RUN
+        managed = False
         db_table = "dissemination_combined"
 
     id = models.BigAutoField(primary_key=True)
