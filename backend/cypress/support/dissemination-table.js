@@ -93,9 +93,12 @@ export function testReportIdFoundWithTribalAccess(reportId) {
   const tribal_access_user_id = API_GOV_USER_ID;
 
   grantTribalAccess(tribal_access_email, tribal_access_user_id);
+  console.log("DONE GRANTING TRIBAL ACCESS");
+
   console.log(`Attempting Tribal API access with ${API_GOV_JWT} and ${tribal_access_user_id}`)
-  the_headers = {
-    Authorization: `Bearer ${API_GOV_JWT}`,
+  
+  var the_headers = {
+    'Authorization': `Bearer ${API_GOV_JWT}`,
     'X-Api-Key': API_GOV_KEY,
     'X-Api-User-Id': tribal_access_user_id,
     'Accept-Profile': API_VERSION
@@ -131,7 +134,7 @@ export function testReportIdNotFoundWithTribalAccess(reportId) {
     method: 'GET',
     url: `${API_GOV_URL}/general`,
     headers: {
-      Authorization: `Bearer ${API_GOV_JWT}`,
+      'Authorization': `Bearer ${API_GOV_JWT}`,
       'X-Api-Key': API_GOV_KEY,
       'X-Api-User-Id': tribal_access_user_id,
       'Accept-Profile': API_VERSION
