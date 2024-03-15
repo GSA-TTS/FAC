@@ -6,7 +6,7 @@ from .searchlib.search_alns import search_alns
 from .searchlib.search_findings import search_findings
 from .searchlib.search_direct_funding import search_direct_funding
 from .searchlib.search_major_program import search_major_program
-from dissemination.models import General, DisseminationCombined
+from dissemination.models import DisseminationCombined
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ def search(params):
     # GENERAL
 
     if is_only_general_params(params):
-        results = search_general(General, params)
+        results = search_general(DisseminationCombined, params)
         results = _sort_results(results, params)
     else:
         results = search_general(DisseminationCombined, params)
