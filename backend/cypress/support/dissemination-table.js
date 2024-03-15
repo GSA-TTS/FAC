@@ -11,14 +11,27 @@ const API_GOV_URL = Cypress.env('API_GOV_URL');
 const API_VERSION = Cypress.env('API_VERSION');
 const ADMIN_API_VERSION = Cypress.env('ADMIN_API_VERSION');
 
-const requestOptions = {
-  method: 'GET',
-  url: `${API_GOV_URL}/general`,
-  headers: {
-    Authorization: `Bearer ${API_GOV_JWT}`,
-    'X-Api-Key': API_GOV_KEY,
-  },
-}
+function apiRequestOptions(endpoint) {
+  return {
+    method: 'GET',
+    url: `${API_GOV_URL}/${endpoint}`,
+    headers: {
+      'Authorization': `Bearer ${API_GOV_JWT}`,
+      'X-Api-Key': API_GOV_KEY,
+      'Accept-Profile': API_VERSION,
+      'X-Api-User-Id': API_GOV_USER_ID,
+    },
+  };
+};
+
+const tribalAdminApiHeaders = {
+  'Authorization': `Bearer ${API_GOV_JWT}`,
+  'X-Api-Key': API_GOV_KEY_ADMIN,
+  'X-Api-User-Id': API_GOV_USER_ID_ADMIN,
+  'Content-Profile': ADMIN_API_VERSION,
+  'Content-Type': 'application/json',
+  'Prefer': 'params=single-object',
+};
 
 function grantTribalAccess(email, user_id) {
   // use admin user to grant tribal access to user
@@ -26,12 +39,7 @@ function grantTribalAccess(email, user_id) {
     method: 'POST',
     url: `${API_GOV_URL}/rpc/add_tribal_api_key_access`,
     headers: {
-      Authorization: `Bearer ${API_GOV_JWT}`,
-      'X-Api-Key': API_GOV_KEY_ADMIN,
-      'X-Api-User-Id': API_GOV_USER_ID_ADMIN,
-      'Content-Profile': ADMIN_API_VERSION,
-      'Content-Type': 'application/json',
-      'Prefer': 'params=single-object',
+      ...tribalAdminApiHeaders,
     },
     body: {
       "email": `${email}`,
@@ -41,6 +49,7 @@ function grantTribalAccess(email, user_id) {
     expect(response.body.result).to.equal("success");
   });
   console.log(`Granted access to ${email} and ${user_id}`)
+
 }
 
 function revokeTribalAccess(email, user_id) {
@@ -49,12 +58,7 @@ function revokeTribalAccess(email, user_id) {
     method: 'POST',
     url: `${API_GOV_URL}/rpc/remove_tribal_api_key_access`,
     headers: {
-      Authorization: `Bearer ${API_GOV_JWT}`,
-      'X-Api-Key': API_GOV_KEY_ADMIN,
-      'X-Api-User-Id': API_GOV_USER_ID_ADMIN,
-      'Content-Profile': ADMIN_API_VERSION,
-      'Content-Type': 'application/json',
-      'Prefer': 'params=single-object',
+      ...tribalAdminApiHeaders
     },
     body: {
       "email": `${email}`,
@@ -63,80 +67,144 @@ function revokeTribalAccess(email, user_id) {
   }).should((response) => {
     expect(response.body.result).to.equal("success");
   });
+  console.log(`Revoked access for ${email} and ${user_id}`)
+
 }
 
-export function testReportIdNotFoundWithoutTribalAccess(reportId) {
-  console.log("testReportIdNotFoundWithoutTribalAccess")
-  cy.request({
-    ...requestOptions,
-    qs: {report_id: `eq.${reportId}`},
-  }).should((response) => {
-    expect(response.body).to.have.length(0);
-  });
-}
 
-export function testReportIdFoundWithoutTribalAccess(reportId) {
-  console.log("testReportIdFoundWithoutTribalAccess")
-  cy.request({
-    ...requestOptions,
-    qs: {report_id: `eq.${reportId}`},
-  }).should((response) => {
-    expect(response.body).to.have.length(1);
-    const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
-    expect(Boolean(hasAgency)).to.be.true;
-  });
-}
+// We're testing a 2x2.
+//                    is tribal                           is not tribal             
+//           ┌────────────────────────────────┬────────────────────────────────┐    
+//           │                                │                                │    
+//           │                                │                                │    
+//           │                                │                                │    
+//           │                                │                                │    
+//  public   │    UNPRIVILEGED KEY OK         │        UNPRIVILEGED KEY OK     │    
+//           │                                │                                │    
+//           │                                │                                │    
+//           │                                │                                │    
+//           │                                │                                │    
+//           ├────────────────────────────────┼────────────────────────────────┤    
+//           │                                │                                │    
+//           │                                │                                │    
+//           │                                │                                │    
+//           │                                │                                │    
+// private   │     PRIV KEY OK / UNPRIV NO    │       DOES NOT COMPUTE         │    
+//           │                                │                                │    
+//           │                                │                                │    
+//           │                                │                                │    
+//           │                                │                                │    
+//           └────────────────────────────────┴────────────────────────────────┘    
 
-export function testReportIdFoundWithTribalAccess(reportId) {
-  console.log("testReportIdFoundWithTribalAccess")
-  const tribal_access_email = `${crypto.randomUUID()}@example.com`;
-  const tribal_access_user_id = API_GOV_USER_ID;
+const public_endpoints = [
+  "general", 
+  "federal_awards", 
+  "findings", 
+  "additional_ueis",
+  // "passthrough",
+  "secondary_auditors",
+  // "additional_eins"
+];
+const private_endpoints = [
+  "findings_text", 
+  "corrective_action_plans", 
+  "notes_to_sefa",
+];
 
-  grantTribalAccess(tribal_access_email, tribal_access_user_id);
-  var the_headers = {
-    'Authorization': `Bearer ${API_GOV_JWT}`,
-    'X-Api-Key': API_GOV_KEY,
-    'X-Api-User-Id': tribal_access_user_id,
-    'Accept-Profile': API_VERSION
+
+export function testSubmissionAccess(reportId, isTribal, isPublic) {
+  console.log(`reportId: ${reportId}, isTribal: ${isTribal}, isPublic: ${isPublic}`);
+
+  if (isTribal && isPublic) {
+    // When it is Tribal and public, we should always
+    // find the report id in the public and private endpoints
+    expect(isTribal).to.be.true
+    expect(isPublic).to.be.true
+    for (const ep of public_endpoints.concat(private_endpoints)) {
+      testWithUnprivilegedKey(reportId, ep, 1);
+      testWithPrivilegedKey(reportId, ep, 1);
+    }
+  } else if (isTribal && !isPublic) {
+    // When it is Tribal, but not public, we need...
+    expect(isTribal).to.be.true
+    expect(isPublic).to.be.false
+
+    // To always find the report id in public endpoints
+    for (const ep of public_endpoints) {
+      testWithUnprivilegedKey(reportId, ep, 1);
+      testWithPrivilegedKey(reportId, ep, 1);
+    }
+
+    // To *not* find the report id in private endpoints
+    // when we have an unprivileged key, but we should
+    // find it there when we have a privileged key.
+    for (const ep of private_endpoints) {
+      testWithUnprivilegedKey(reportId, ep, 0);
+      testWithPrivilegedKey(reportId, ep, 1);
+    }
+  } else if (!isTribal && isPublic) {
+    // This is a standard audit.
+    expect(isTribal).to.be.false
+    expect(isPublic).to.be.true
+    // We should always find it in all endpoints, priv or unpriv.
+    for (const ep of public_endpoints.concat(private_endpoints)) {
+      testWithUnprivilegedKey(reportId, ep, 1);
+      testWithPrivilegedKey(reportId, ep, 1);
+    }
+  } else if (!isTribal && !isPublic) {
+    // This should not be possible, and should fail.
+    console.log("Unreachable test case in testTribalAccess");
+    expect(true).to.be.false;
+  } else {
+    // We really should never be here.
+    console.log("The universe broke in testTribalAccess");
+    expect(false).to.be.true;
   }
-
-  // try to pull the tribal, non-public data from the API using the (now) privileged user
-  cy.request({
-    method: 'GET',
-    url: `${API_GOV_URL}/general`,
-    headers: the_headers,
-    qs: {report_id: `eq.${reportId}`},
-  }).should((response) => {
-    expect(response.body).to.have.length(1);
-    const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
-    expect(Boolean(hasAgency)).to.be.true;
-  });
-
-  revokeTribalAccess(tribal_access_email, tribal_access_user_id);
 }
 
-export function testReportIdNotFoundWithTribalAccess(reportId) {
-  console.log("testReportIdNotFoundWithTribalAccess")
-  const tribal_access_email = `${crypto.randomUUID()}@example.com`;
-  const tribal_access_user_id = API_GOV_USER_ID;
-
-  grantTribalAccess(tribal_access_email, tribal_access_user_id);
-  
-  // try to pull the tribal, non-public data from the API using the (now) privileged user
+export function testWithUnprivilegedKey(reportId, endpoint, expected_length) {
+  console.log(`unpriv reportId: ${reportId}, endpoint: ${endpoint}, len: ${expected_length}`)
   cy.request({
-    method: 'GET',
-    url: `${API_GOV_URL}/general`,
-    headers: {
-      'Authorization': `Bearer ${API_GOV_JWT}`,
-      'X-Api-Key': API_GOV_KEY,
-      'X-Api-User-Id': tribal_access_user_id,
-      'Accept-Profile': API_VERSION
-    },
+    ...apiRequestOptions(endpoint),
     qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
-    expect(response.body).to.have.length(0);
+    expect(response.body).to.have.length(expected_length);
   });
 
+  if (expected_length > 0) {
+    cy.request({
+      ...apiRequestOptions('general'),
+      qs: {report_id: `eq.${reportId}`},
+    }).should((response) => {
+      const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
+      expect(Boolean(hasAgency)).to.be.true;  
+      });  
+  }
+}
+
+export function testWithPrivilegedKey(reportId, endpoint, expected_length) {
+  console.log(`priv reportId: ${reportId}, endpoint: ${endpoint}, len: ${expected_length}`)
+  // First grant access to this key
+  const tribal_access_email = `${crypto.randomUUID()}@example.com`;
+  const tribal_access_user_id = API_GOV_USER_ID;
+  grantTribalAccess(tribal_access_email, tribal_access_user_id);
+  // Do the request
+  cy.request({
+    ...apiRequestOptions(endpoint),
+    qs: {report_id: `eq.${reportId}`},
+  }).should((response) => {
+    expect(response.body).to.have.length(expected_length);
+  });
+
+  if (expected_length > 0) {
+    cy.request({
+      ...apiRequestOptions('general'),
+      qs: {report_id: `eq.${reportId}`},
+    }).should((response) => {
+      const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
+      expect(Boolean(hasAgency)).to.be.true;  
+      });  
+  }
   revokeTribalAccess(tribal_access_email, tribal_access_user_id);
 }
 
