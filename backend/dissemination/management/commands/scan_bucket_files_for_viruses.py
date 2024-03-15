@@ -1,6 +1,9 @@
 import logging
 import boto3
 import requests
+import os
+import json
+
 from io import BytesIO
 from botocore.client import ClientError, Config
 
@@ -25,7 +28,7 @@ def _scan_file(file):
             settings.AV_SCAN_URL,
             files={"file": file},
             data={"name": file.name},
-            timeout=15,
+            timeout=30,
         )
     except requests.exceptions.ConnectionError:
         logger.error("SCAN Connection error")
@@ -85,7 +88,7 @@ def scan_file_in_s3(bucket, object_name):
 def scan_files_at_path_in_s3(bucket, path):
     s3 = get_s3_client()
     paginator = s3.get_paginator("list_objects_v2")
-    pages = paginator.paginate(Bucket="bucket", Prefix="prefix")
+    pages = paginator.paginate(Bucket=bucket, Prefix=path)
     good_count, bad_count = 0, 0
 
     if pages:
@@ -121,17 +124,71 @@ def check_scan_ok(result):
         return False
 
 
+# The VCAP_SERVICES for S3 instances looks like this:
+# "s3": [
+#     {
+#         "label": "s3",
+#         "provider": null,
+#         "plan": "basic",
+#         "name": "backups",
+#         "tags": [
+#             "AWS",
+#             "S3",
+#             "object-storage"
+#         ],
+#         "instance_guid": "UUID",
+#         "instance_name": "backups",
+#         "binding_guid": "UUID",
+#         "binding_name": null,
+#         "credentials": {
+#             "uri": "s3://KEYID:SECKEY@s3-us-gov-west-1.amazonaws.com/cg-BUCKET",
+#             "insecure_skip_verify": false,
+#             "access_key_id": "KEYID",
+#             "secret_access_key": "SECKEY",
+#             "region": "us-gov-west-1",
+#             "bucket": "cg-BUCKET",
+#             "endpoint": "s3-us-gov-west-1.amazonaws.com",
+#             "fips_endpoint": "s3-fips.us-gov-west-1.amazonaws.com",
+#             "additional_buckets": []
+#         },
+#         "syslog_drain_url": null,
+#         "volume_mounts": []
+#     }, ...
+
+
+def lookup_bucket_in_vcap(friendly_bucket):
+    vcap_services = json.loads(os.getenv("VCAP_SERVICES"))
+    for instance in vcap_services["s3"]:
+        if instance["instance_name"] == friendly_bucket:
+            return instance["credentials"]["bucket"]
+    # If we get here, it is bad.
+    logger.error("======================================")
+    logger.error("Could not get bucket name in production environment.")
+    logger.error("Exiting.")
+    logger.error("======================================")
+    os.exit(-1)
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--bucket", type=str, required=True)
         parser.add_argument("--object", type=str, required=False, default=None)
-        parser.add_argument("--path", type=str, required=False, default=None)
+        parser.add_argument(
+            "--paths", type=str, nargs="+", required=False, default=None
+        )
         pass
 
     def handle(self, *args, **options):
         bucket = options["bucket"]
         object = options["object"]
-        path = options["path"]
+        paths = options["paths"]
+
+        # The bucket name is a "friendly" name.
+        # We need to look it up in VCAP_SERVICES if we are not local, and
+        # then convert it to the brokered name.
+        if os.getenv("ENV") not in ["LOCAL", "TESTING"]:
+            brokered_bucket = lookup_bucket_in_vcap(bucket)
+            bucket = brokered_bucket
 
         # Do we want to scan a single object?
         if object:
@@ -140,10 +197,15 @@ class Command(BaseCommand):
                 pass
             else:
                 logger.error(f"SCAN FAIL: {object}")
-        if path:
-            results = scan_files_at_path_in_s3(bucket, path)
+        if paths:
+            all_results = {}
+            for path in paths:
+                results = scan_files_at_path_in_s3(bucket, path)
+                for key in ["good_count", "bad_count"]:
+                    all_results[key] = results[key] + all_results.get(key, 0)
             logger.info(
-                "SCAN OK: COUNT passed: %s, failed: %s",
-                results["good_count"],
-                results["bad_count"],
+                "SCAN OK: PATH %s COUNT passed: %s, failed: %s",
+                path,
+                all_results["good_count"],
+                all_results["bad_count"],
             )
