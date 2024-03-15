@@ -338,7 +338,7 @@ class TestAdminAPI(TestCase):
                   "key_id": str(uuid.uuid4())},
         )
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json(), {"success" : "User access granted"})
+        self.assertEquals(response.json()['result'], "success")
         
     def test_remove_tribal_api_key_access(self):
 
@@ -362,7 +362,7 @@ class TestAdminAPI(TestCase):
                   "key_id": flynn_id},
         )
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json(), {"success" : "User access granted"})
+        self.assertEquals(response.json()["result"], "success")
         
         # Try removing the person we just added
         query_url = self.api_url + "/rpc/remove_tribal_api_key_access"
@@ -382,7 +382,7 @@ class TestAdminAPI(TestCase):
                   "key_id": flynn_id},
         )
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json(), {'success': 'Removed record'})
+        self.assertEquals(response.json()['result'], 'success')
         
         # Try removing them again
         query_url = self.api_url + "/rpc/remove_tribal_api_key_access"
@@ -402,4 +402,4 @@ class TestAdminAPI(TestCase):
                   "key_id": flynn_id},
         )
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json(), {'failure': 'User did not exist in table'})
+        self.assertEquals(response.json()['result'], 'failure')

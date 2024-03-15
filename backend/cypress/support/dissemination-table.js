@@ -38,7 +38,7 @@ function grantTribalAccess(email, user_id) {
       "key_id": `${user_id}`,
     }
   }).should((response) => {
-    expect(response.body.success).to.equal("User access granted");
+    expect(response.body.result).to.equal("success");
   });
   console.log(`Granted access to ${email} and ${user_id}`)
 }
@@ -61,7 +61,7 @@ function revokeTribalAccess(email, user_id) {
       "key_id": `${user_id}`,
     }
   }).should((response) => {
-    expect(response.body.success).to.equal("Removed record");
+    expect(response.body.result).to.equal("success");
   });
 }
 
@@ -93,18 +93,13 @@ export function testReportIdFoundWithTribalAccess(reportId) {
   const tribal_access_user_id = API_GOV_USER_ID;
 
   grantTribalAccess(tribal_access_email, tribal_access_user_id);
-  console.log("DONE GRANTING TRIBAL ACCESS");
-
-  console.log(`Attempting Tribal API access with ${API_GOV_JWT} and ${tribal_access_user_id}`)
-  
   var the_headers = {
     'Authorization': `Bearer ${API_GOV_JWT}`,
     'X-Api-Key': API_GOV_KEY,
     'X-Api-User-Id': tribal_access_user_id,
     'Accept-Profile': API_VERSION
   }
-  console.log("HEADERS")
-  console.log(the_headers)
+
   // try to pull the tribal, non-public data from the API using the (now) privileged user
   cy.request({
     method: 'GET',
@@ -112,9 +107,6 @@ export function testReportIdFoundWithTribalAccess(reportId) {
     headers: the_headers,
     qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
-    console.log("Before logging the response body")
-    console.log(response)
-    console.log("After the response body")
     expect(response.body).to.have.length(1);
     const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
     expect(Boolean(hasAgency)).to.be.true;
@@ -124,6 +116,7 @@ export function testReportIdFoundWithTribalAccess(reportId) {
 }
 
 export function testReportIdNotFoundWithTribalAccess(reportId) {
+  console.log("testReportIdNotFoundWithTribalAccess")
   const tribal_access_email = `${crypto.randomUUID()}@example.com`;
   const tribal_access_user_id = API_GOV_USER_ID;
 
@@ -146,3 +139,4 @@ export function testReportIdNotFoundWithTribalAccess(reportId) {
 
   revokeTribalAccess(tribal_access_email, tribal_access_user_id);
 }
+

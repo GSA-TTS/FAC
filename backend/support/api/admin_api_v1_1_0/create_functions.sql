@@ -283,7 +283,6 @@ $remove_tribal_access_emails$ LANGUAGE plpgsql;
 
 --The function below add_tribal_api_key_access adds read access to a tribal API for a specified email.
 --It checks if the API user has read permissions.
---If the email already exists in the database, the function returns false.
 --Otherwise, it adds the email with 'read-tribal' permission, logs the event, and returns true.
 
 CREATE OR REPLACE FUNCTION admin_api_v1_1_0.add_tribal_api_key_access(params JSON) 
@@ -306,7 +305,9 @@ BEGIN
         -- For purposes of this function, lets call that "succses", and return true.
         IF user_exists THEN
             RAISE INFO 'ADMIN_API add_tribal_api_key_access ALREADY_EXISTS %', params->>'email';
-            RETURN json_build_object('success', 'User with this key already exists')::JSON;
+            RETURN json_build_object(
+                'result', 'success',
+                'message', 'User with this key already exists')::JSON;
 
         END IF;
 
@@ -314,17 +315,23 @@ BEGIN
         INSERT INTO public.dissemination_TribalApiAccessKeyIds (email, key_id, date_added)
         VALUES (params->>'email', params->>'key_id', CURRENT_TIMESTAMP);
         RAISE INFO 'ADMIN_API add_tribal_api_key_access ACCESS_GRANTED % %', params->>'email', params->>'key_id';
-        RETURN json_build_object('success', 'User access granted')::JSON;
+        RETURN json_build_object(
+            'result', 'success', 
+            'message', 'User access granted')::JSON;
     ELSE
-        -- If the user does not have CREATE permissions, then we should return false. 
+        -- If the user does not have CREATE permissions, then we should return a message to that effect. 
         -- It is a permissions error, but still, we need to know this failed.
         RAISE INFO 'ADMIN_API add_tribal_api_key_access ADMIN_LACKS_CREATE';
-        RETURN json_build_object('failure', 'Admin user lacks CREATE permissions')::JSON;
+        RETURN json_build_object(
+            'result', 'failure', 
+            'message', 'Admin user lacks CREATE permissions')::JSON;
     END IF;
 
     -- Return false by default.
     RAISE INFO 'ADMIN_API add_tribal_api_key_access WAT %', params->>'email';
-    RETURN json_build_object('failure', 'Unknown error in access addition')::JSON;
+    RETURN json_build_object(
+        'result', 'failure', 
+        'message', 'Unknown error in access addition')::JSON;
 END;
 $add_tribal_api_key_access$ LANGUAGE plpgsql;
 
@@ -354,17 +361,25 @@ BEGIN
             DELETE FROM public.dissemination_TribalApiAccessKeyIds
             WHERE email = params->>'email';
             RAISE INFO 'ADMIN_API remove_tribal_api_key_access ACCESS_REMOVED %', params->>'email';
-            RETURN json_build_object('success', 'Removed record')::JSON; 
+            RETURN json_build_object(
+                'result', 'success', 
+                'message', 'Removed record')::JSON; 
         ELSE
             RAISE INFO 'ADMIN_API remove_tribal_api_key_access DID_NOT_EXIST %', params->>'email';
-            RETURN json_build_object('failure', 'User did not exist in table')::JSON;
+            RETURN json_build_object(
+                'result', 'failure', 
+                'message', 'User did not exist in table')::JSON;
         END IF;
     ELSE
         RAISE INFO 'ADMIN_API remove_tribal_api_key_access ADMIN_LACKS_DELETE';
-        RETURN json_build_object('failure', 'Admin user lacks DELETE permissions')::JSON; -- Return false if the API user doesn't have read permissions
+        RETURN json_build_object(
+            'result', 'failure', 
+            'message', 'Admin user lacks DELETE permissions')::JSON; -- Return false if the API user doesn't have read permissions
     END IF;
     RAISE INFO 'ADMIN_API add_tribal_api_key_access WAT %', params->>'email';
-    RETURN json_build_object('failure', 'Uknown error in access removal')::JSON;
+    RETURN json_build_object(
+        'result', 'failure', 
+        'message', 'Uknown error in access removal')::JSON;
 END;
 $remove_tribal_api_key_access$ LANGUAGE plpgsql;
 
