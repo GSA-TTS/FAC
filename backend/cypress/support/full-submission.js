@@ -8,6 +8,7 @@ import { testAuditeeCertification } from './auditee-certification.js';
 import { testReportIdFoundWithTribalAccess, testReportIdFoundWithoutTribalAccess, testReportIdNotFoundWithoutTribalAccess } from './dissemination-table.js';
 import { testTribalAuditPublic, testTribalAuditPrivate } from './tribal-audit-form.js';
 import { testInitializeAudit } from './initialize-audit.js';
+import { testUnlock } from './unlock-cert.js';
 import {
   testWorkbookFederalAwards,
   testWorkbookNotesToSEFA,
@@ -93,6 +94,9 @@ export function testFullSubmission(isTribal, isPublic) {
 
   cy.get(".usa-link").contains("Pre-submission validation").click();
   testCrossValidation();
+
+  // test unlock certification
+  testUnlock();
 
   // Auditor certification
   cy.get(".usa-link").contains("Auditor Certification").click();
