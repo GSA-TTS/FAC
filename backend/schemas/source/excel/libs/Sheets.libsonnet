@@ -41,7 +41,8 @@ local section_names = {
 };
 
 // All workbooks should get the same version number.
-local WORKBOOKS_VERSION = '1.0.4';
+// When bumping, also add the new version to AUTHORIZED_VERSIONS in check_version_number.py
+local WORKBOOKS_VERSION = '1.0.5';
 
 {
   single_cell: single_cell,
