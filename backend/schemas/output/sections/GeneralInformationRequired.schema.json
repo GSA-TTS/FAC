@@ -651,7 +651,13 @@
       "multiple_eins_covered",
       "multiple_ueis_covered",
       "secondary_auditors_exist",
-      "user_provided_organization_type"
+      "user_provided_organization_type",
+      "auditee_zip",
+      "auditor_address_line_1",
+      "auditor_city",
+      "auditor_country",
+      "audit_period_covered",
+      "auditor_international_address"
    ],
    "title": "GeneralInformation",
    "type": "object",
