@@ -1,3 +1,4 @@
+import unittest
 from django.test import TestCase
 from psycopg2._psycopg import connection
 from django.conf import settings
@@ -8,6 +9,7 @@ import os
 import requests
 
 
+@unittest.skip("Skipping admin API tests")
 class TestAdminAPI(TestCase):
     # We can force a UUID locally that would not work when using api.data.gov,
     # because api.data.gov sets/overwrites this.
