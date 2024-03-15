@@ -29,10 +29,12 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # So, we don't have strictly have to drop them.
     # But, we might change them between deploys.
     # In which case, we should drop and recreate.
-    drop_materialized_views
-    gonogo "drop_materialized_views"
-    create_materialized_views
-    gonogo "create_materialized_views"
+    # 2024-03-15 We need to remove these since they
+    # take time and will cause deployment to time out.
+    # drop_materialized_views
+    # gonogo "drop_materialized_views"
+    # create_materialized_views
+    # gonogo "create_materialized_views"
 
     #####
     # API TEARDOWN
