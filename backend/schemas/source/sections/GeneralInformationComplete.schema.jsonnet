@@ -75,16 +75,23 @@ Requires most fields, has consitional checks for conditional fields.
       minLength: 1,
     },
     auditor_country: Base.Enum.CountryType,
-    auditor_international_address: Types.string {
-      maxLength: 100,
+    auditor_international_address: {
+      oneOf: [
+        Base.Compound.EmptyString,
+        Base.Compound.NonEmptyString,
+      ],
     },
-    auditor_address_line_1: Types.string {
-      maxLength: 100,
-      minLength: 1,
+    auditor_address_line_1: {
+      oneOf: [
+        Base.Compound.EmptyString,
+        Base.Compound.NonEmptyString,
+      ],
     },
-    auditor_city: Types.string {
-      maxLength: 100,
-      minLength: 1,
+    auditor_city: {
+      oneOf: [
+        Base.Compound.EmptyString,
+        Base.Compound.NonEmptyString,
+      ],
     },
     auditor_state: {
       oneOf: [
@@ -182,11 +189,16 @@ Requires most fields, has consitional checks for conditional fields.
       },
       'then': {
         properties: {
+          auditor_address_line_1: Base.Compound.NonEmptyString,
+          auditor_city: Base.Compound.NonEmptyString,
+          auditor_state: Base.Enum.UnitedStatesStateAbbr,
           auditor_zip: Base.Compound.Zip,
+
+          auditor_international_address: Base.Compound.EmptyString
         },
       },
     },
-    // If auditor is NOT from the USA, the zip should be empty.
+    // If auditor is NOT from the USA, international things should be filled in.
     {
       'if': {
         properties: {
@@ -199,7 +211,12 @@ Requires most fields, has consitional checks for conditional fields.
       },
       'then': {
         properties: {
+          auditor_address_line_1: Base.Compound.EmptyString,
+          auditor_city: Base.Compound.EmptyString,
+          auditor_state: Base.Compound.EmptyString,
           auditor_zip: Base.Compound.EmptyString,
+
+          auditor_international_address: Base.Compound.NonEmptyString
         },
       },
     },

@@ -32,11 +32,11 @@ local RequiredField = [
   'user_provided_organization_type',
 
   //FIXME-MSHD: These fields were not enforced in GeneralInformationComplete.schema.jsonnet ???
-  'auditee_zip',
-  'auditor_address_line_1',
-  'auditor_city',
-  'auditor_country',
-  'audit_period_covered',
+  // 'auditee_zip',
+  // 'auditor_address_line_1',
+  // 'auditor_city',
+  // 'auditor_country',
+  // 'audit_period_covered',
 ];
 
 GeneralInformation {
