@@ -1,5 +1,4 @@
 from datetime import datetime
-import unittest
 import jwt
 import os
 import requests
@@ -10,7 +9,6 @@ from config import settings
 from dissemination.templatetags.field_name_to_label import field_name_to_label
 
 
-@unittest.skip("Skipping API tests")
 class APIViewTests(TestCase):
     def setUp(self):
         self.api_url = settings.POSTGREST.get("URL")
