@@ -72,7 +72,7 @@ function revokeTribalAccess(email, user_id) {
 }
 
 
-// We're testing a 2x2.
+// We're testing a 2x2. Actually, this would be better as a table, as this is a 3D test.
 //                    is tribal                           is not tribal             
 //           ┌────────────────────────────────┬────────────────────────────────┐    
 //           │                                │                                │    
@@ -96,6 +96,31 @@ function revokeTribalAccess(email, user_id) {
 //           │                                │                                │    
 //           └────────────────────────────────┴────────────────────────────────┘    
 
+// This could be reworked into a table test.
+// However, the tests below should be clear
+// enough to not require a full re-working.
+
+// Where
+// T = Tribal(1)/Not Tribal(0)
+// P = Private(1)/Public(0)
+// U = Privileged(1)/Unprivileged(0)
+// L = Length expected
+
+// T P U L
+// -------
+// 0 0 0 1
+// 0 0 1 1
+// 0 1 0 -
+// 0 1 1 -
+// 1 0 0 1
+// 1 0 1 1
+// 1 1 0 0
+// 1 1 1 1
+
+// Where `-` means 'not possible'. 
+
+// We are missing passthrough and additional_eins in the test data.
+// However, they're meant to be public, so they can be let go for now. 
 const public_endpoints = [
   "general", 
   "federal_awards", 
@@ -112,9 +137,11 @@ const private_endpoints = [
 ];
 
 
-export function testSubmissionAccess(reportId, isTribal, isPublic) {
+export function testSubmissionAccess(reportId, isTribal, isPublic) {  
   console.log(`reportId: ${reportId}, isTribal: ${isTribal}, isPublic: ${isPublic}`);
-
+  ////////////////////////////////////////
+  // The audit IS tribal and IS public
+  ////////////////////////////////////////
   if (isTribal && isPublic) {
     // When it is Tribal and public, we should always
     // find the report id in the public and private endpoints
@@ -124,11 +151,14 @@ export function testSubmissionAccess(reportId, isTribal, isPublic) {
       testWithUnprivilegedKey(reportId, ep, 1);
       testWithPrivilegedKey(reportId, ep, 1);
     }
-  } else if (isTribal && !isPublic) {
-    // When it is Tribal, but not public, we need...
+  }
+  ////////////////////////////////////////
+  // The audit IS tribal and IS NOT public
+  ////////////////////////////////////////
+  else if (isTribal && !isPublic) {
     expect(isTribal).to.be.true
     expect(isPublic).to.be.false
-
+    // When it is Tribal, but not public, we need...
     // To always find the report id in public endpoints
     for (const ep of public_endpoints) {
       testWithUnprivilegedKey(reportId, ep, 1);
@@ -142,7 +172,11 @@ export function testSubmissionAccess(reportId, isTribal, isPublic) {
       testWithUnprivilegedKey(reportId, ep, 0);
       testWithPrivilegedKey(reportId, ep, 1);
     }
-  } else if (!isTribal && isPublic) {
+  }
+  ////////////////////////////////////////
+  // The audit IS NOT tribal and IS public
+  ////////////////////////////////////////
+  else if (!isTribal && isPublic) {
     // This is a standard audit.
     expect(isTribal).to.be.false
     expect(isPublic).to.be.true
@@ -151,11 +185,20 @@ export function testSubmissionAccess(reportId, isTribal, isPublic) {
       testWithUnprivilegedKey(reportId, ep, 1);
       testWithPrivilegedKey(reportId, ep, 1);
     }
-  } else if (!isTribal && !isPublic) {
-    // This should not be possible, and should fail.
+  }
+  ////////////////////////////////////////
+  // The audit IS NOT tribal and IS NOT public
+  // (This is not possible.)
+  ////////////////////////////////////////
+  else if (!isTribal && !isPublic) {
     console.log("Unreachable test case in testTribalAccess");
     expect(true).to.be.false;
-  } else {
+  }
+  ////////////////////////////////////////
+  // The audit somehow is none of the above.
+  // (This is not possible.)
+  ////////////////////////////////////////
+  else {
     // We really should never be here.
     console.log("The universe broke in testTribalAccess");
     expect(false).to.be.true;

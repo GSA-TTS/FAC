@@ -135,14 +135,6 @@ export function testFullSubmission(isTribal, isPublic) {
 
   testSubmissionAccess(reportId, isTribal, isPublic);
 
-    // // The Report should not be in the dissemination table
-    // if (isPublic) {
-    //   testPublicReportIdFoundWithoutTribalAccess(reportId);
-    //   testReportIdFoundWithTribalAccess(reportId);
-    // } else {
-    //   testPrivateReportIdNotFoundWithoutTribalAccess(reportId);
-    //   testReportIdFoundWithTribalAccess(reportId);
-    // }
   });
 
   testLogoutGov();
