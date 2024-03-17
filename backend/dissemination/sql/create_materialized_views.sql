@@ -120,7 +120,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		AND dfa.award_reference = dp.award_reference
 	;	
 
-CREATE INDEX IF NOT EXISTS IF NOT EXISTS dc_report_id_idx 
+CREATE INDEX IF NOT EXISTS dc_report_id_idx 
 	on dissemination_combined (report_id);
 
 CREATE INDEX IF NOT EXISTS dc_auditee_certify_name_idx 
@@ -155,10 +155,10 @@ CREATE INDEX IF NOT EXISTS dc_start_date_idx
 CREATE INDEX IF NOT EXISTS dc_end_date_idx 
 	ON dissemination_combined (fy_end_date);
 
-CREATE INDEX IF NOT EXISTS dc_auditee_uei 
+CREATE INDEX IF NOT EXISTS dc_auditee_uei_idx 
 	ON dissemination_combined (auditee_uei);
 
-CREATE INDEX IF NOT EXISTS dc_auditee_ein 
+CREATE INDEX IF NOT EXISTS dc_auditee_ein_idx
 	ON dissemination_combined (auditee_ein);
 
 CREATE INDEX IF NOT EXISTS dc_federal_agency_prefix_idx 

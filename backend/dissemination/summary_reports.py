@@ -267,10 +267,12 @@ cannot_read_tribal_disclaimer = "This document includes one or more Tribal entit
 
 
 def _get_tribal_report_ids(report_ids):
+    t0 = time.time()
     """Filters the given report_ids with only ones that are tribal"""
     objects = General.objects.all().filter(report_id__in=report_ids, is_public=False)
-
-    return [obj.report_id for obj in objects]
+    objs = [obj.report_id for obj in objects]
+    t1 = time.time()
+    return (objs, t1-t0)
 
 
 def set_column_widths(worksheet):
@@ -382,6 +384,7 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
         ...
     }
     """
+    t0 = time.time()
 
     # Make report IDs unique
     report_ids = set(report_ids)
@@ -414,8 +417,8 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
             data[model_name]["entries"].append(
                 [_get_attribute_or_data(obj, field_name) for field_name in field_names]
             )
-
-    return data
+    t1 = time.time()
+    return (data, t1-t0)
 
 
 def gather_report_data_pre_certification(i2d_data):
@@ -493,6 +496,7 @@ def gather_report_data_pre_certification(i2d_data):
 
 
 def create_workbook(data, protect_sheets=False):
+    t0 = time.time()
     workbook = pyxl.Workbook()
 
     for sheet_name in data.keys():
@@ -518,11 +522,12 @@ def create_workbook(data, protect_sheets=False):
 
     # remove sheet that is created during workbook construction
     workbook.remove_sheet(workbook.get_sheet_by_name("Sheet"))
-
-    return workbook
+    t1 = time.time()
+    return (workbook, t1-t0)
 
 
 def persist_workbook(workbook):
+    t0 = time.time()
     s3_client = boto3_client(
         service_name="s3",
         region_name=settings.AWS_S3_PRIVATE_REGION_NAME,
@@ -553,30 +558,30 @@ def persist_workbook(workbook):
         except ClientError:
             logger.warn(f"Unable to put summary report file {filename} in S3!")
             raise
-
-    return f"temp/{filename}"
+    t1 = time.time()
+    return (f"temp/{filename}", t1-t0)
 
 
 def generate_summary_report(report_ids, include_private=False):
     t0 = time.time()
-    tribal_report_ids = _get_tribal_report_ids(report_ids)
-    data = gather_report_data_dissemination(
+    (tribal_report_ids, ttri) = _get_tribal_report_ids(report_ids)
+    (data, tgrdd) = gather_report_data_dissemination(
         report_ids, tribal_report_ids, include_private
     )
-    workbook = create_workbook(data)
+    (workbook, tcw) = create_workbook(data)
     insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
-    filename = persist_workbook(workbook)
+    (filename, tpw) = persist_workbook(workbook)
     t1 = time.time()
-    logger.info(f"SUMMARY_REPORTS generate_summary_report {t1-t0}")
+    logger.info(f"SUMMARY_REPORTS generate_summary_report total: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}")
     return filename
 
-
+# Ignore performance profiling for the presub.
 def generate_presubmission_report(i2d_data):
     data = gather_report_data_pre_certification(i2d_data)
-    workbook = create_workbook(data, protect_sheets=True)
+    (workbook, _) = create_workbook(data, protect_sheets=True)
     insert_precert_coversheet(workbook)
     workbook.security.workbookPassword = str(uuid.uuid4())
     workbook.security.lockStructure = True
-    filename = persist_workbook(workbook)
+    (filename, _) = persist_workbook(workbook)
 
     return filename
