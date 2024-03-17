@@ -34,10 +34,10 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # 2024-03-17 Will they? Are health checks at the app 
     # level, or is the container considered "good" once it hits
     # the .profile?
-    drop_materialized_views
-    gonogo "drop_materialized_views"
-    create_materialized_views
-    gonogo "create_materialized_views"
+    # drop_materialized_views
+    # gonogo "drop_materialized_views"
+    # create_materialized_views
+    # gonogo "create_materialized_views"
 
     #####
     # API TEARDOWN
