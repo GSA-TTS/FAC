@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-
 from . import docs
 
 from .hist_models import census_2019, census_2022  # noqa: F401
@@ -627,6 +626,11 @@ class DisseminationCombined(models.Model):
     Represents the 'dissemination_combined' materialized view.
     """
 
+    # Meta options
+    class Meta:
+        managed = False
+        db_table = "dissemination_combined"
+
     id = models.BigAutoField(primary_key=True)
     # General Information
     report_id = models.TextField(
@@ -866,6 +870,9 @@ class DisseminationCombined(models.Model):
     federal_award_extension = models.TextField(
         "3-digit extn for a program defined by the agency",
     )
+    aln = models.TextField(
+        "2-char agency code concatenated to 3-digit program extn",
+    )
     federal_program_name = models.TextField(
         "Name of Federal Program",
         help_text=docs.federal_program_name,
@@ -956,8 +963,3 @@ class DisseminationCombined(models.Model):
         "Type Requirement Failure",
         help_text=docs.type_requirement_findings,
     )
-
-    # Meta options
-    class Meta:
-        managed = False  # This tells Django that this model is unmanaged
-        db_table = "dissemination_combined"

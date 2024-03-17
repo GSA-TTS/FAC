@@ -10,6 +10,7 @@ from audit.models import (
     SingleAuditReportFile,
     generate_sac_report_id,
 )
+from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
     General,
     FederalAward,
@@ -146,8 +147,9 @@ class PdfDownloadViewTests(TestCase):
         self.assertIn(file.filename, response.url)
 
 
-class SearchViewTests(TestCase):
+class SearchViewTests(TestMaterializedViewBuilder):
     def setUp(self):
+        super().setUp()
         self.anon_client = Client()
         self.auth_client = Client()
         self.perm_client = Client()
@@ -181,7 +183,11 @@ class SearchViewTests(TestCase):
         """Anonymous users should see all reports (public and private included)."""
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-
+        for p in public:
+            baker.make(FederalAward, report_id=p)
+        for p in private:
+            baker.make(FederalAward, report_id=p)
+        self.refresh_materialized_view()
         response = self.anon_client.post(self._search_url(), {})
 
         self.assertContains(response, "Results: 10")
@@ -198,7 +204,11 @@ class SearchViewTests(TestCase):
         """Non-permissioned users should see all reports (public and private included)."""
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-
+        for p in public:
+            baker.make(FederalAward, report_id=p)
+        for p in private:
+            baker.make(FederalAward, report_id=p)
+        self.refresh_materialized_view()
         response = self.auth_client.post(self._search_url(), {})
 
         self.assertContains(response, "Results: 10")
@@ -214,6 +224,11 @@ class SearchViewTests(TestCase):
     def test_permissioned_returns_all(self):
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
+        for p in public:
+            baker.make(FederalAward, report_id=p)
+        for p in private:
+            baker.make(FederalAward, report_id=p)
+        self.refresh_materialized_view()
 
         response = self.perm_client.post(self._search_url(), {})
 
@@ -583,8 +598,9 @@ class SummaryViewTests(TestCase):
         )
 
 
-class SummaryReportDownloadViewTests(TestCase):
+class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
     def setUp(self):
+        super().setUp()
         self.anon_client = Client()
         self.perm_client = Client()
 
@@ -633,7 +649,9 @@ class SummaryReportDownloadViewTests(TestCase):
         """
         Searches with no results should return a 404, not an empty excel file.
         """
-        self._make_general(is_public=False, auditee_uei="123456789012")
+        general = self._make_general(is_public=False, auditee_uei="123456789012")
+        baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
         response = self.anon_client.post(
             self._summary_report_url(), {"uei_or_ein": "NotTheOther1"}
         )
@@ -650,7 +668,9 @@ class SummaryReportDownloadViewTests(TestCase):
         mock_persist_workbook.return_value = self._mock_filename()
         mock_get_download_url.return_value = self._mock_download_url()
 
-        self._make_general(is_public=False)
+        general = self._make_general(is_public=False)
+        baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
         response = self.anon_client.post(self._summary_report_url(), {})
         self.assertRedirects(
             response,
@@ -671,8 +691,9 @@ class SummaryReportDownloadViewTests(TestCase):
         mock_persist_workbook.return_value = self._mock_filename()
         mock_get_download_url.return_value = self._mock_download_url()
 
-        self._make_general(is_public=False)
-
+        general = self._make_general(is_public=False)
+        baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
         response = self.perm_client.post(self._summary_report_url(), {})
         self.assertRedirects(
             response,
@@ -693,7 +714,9 @@ class SummaryReportDownloadViewTests(TestCase):
         mock_persist_workbook.return_value = self._mock_filename()
         mock_get_download_url.return_value = self._mock_download_url()
 
-        self._make_general(is_public=True)
+        general = self._make_general(is_public=True)
+        baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
 
         response = self.anon_client.post(self._summary_report_url(), {})
         self.assertRedirects(
@@ -716,10 +739,12 @@ class SummaryReportDownloadViewTests(TestCase):
         mock_get_download_url.return_value = self._mock_download_url()
 
         for i in range(4):
-            self._make_general(
+            general = self._make_general(
                 is_public=True,
                 report_id=generate_sac_report_id(end_date="2023-12-31", count=str(i)),
             )
+            baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
 
         with self.settings(SUMMARY_REPORT_DOWNLOAD_LIMIT=2):
             response = self.anon_client.post(self._summary_report_url(), {})

@@ -15,7 +15,7 @@ class TestAdminAPI(TestCase):
     admin_api_version = "admin_api_v1_1_0"
 
     def get_connection(self):
-        cloudgov = ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]
+        cloudgov = ["TESTING", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]
         if settings.ENVIRONMENT not in cloudgov:
             conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
         else:

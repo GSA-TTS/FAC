@@ -3,7 +3,6 @@ import openpyxl as pyxl
 import io
 import logging
 import uuid
-import time
 
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
@@ -25,6 +24,7 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
+    DisseminationCombined,
 )
 
 logger = logging.getLogger(__name__)
@@ -558,7 +558,6 @@ def persist_workbook(workbook):
 
 
 def generate_summary_report(report_ids, include_private=False):
-    t0 = time.time()
     tribal_report_ids = _get_tribal_report_ids(report_ids)
     data = gather_report_data_dissemination(
         report_ids, tribal_report_ids, include_private
@@ -566,8 +565,7 @@ def generate_summary_report(report_ids, include_private=False):
     workbook = create_workbook(data)
     insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
     filename = persist_workbook(workbook)
-    t1 = time.time()
-    logger.info(f"SUMMARY_REPORTS generate_summary_report {t1-t0}")
+
     return filename
 
 

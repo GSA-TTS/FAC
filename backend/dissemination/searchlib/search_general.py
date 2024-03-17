@@ -1,12 +1,7 @@
-from django.db.models import Q
-from django.contrib.postgres.search import (
-    SearchQuery, 
-    SearchVector
-)
-from dissemination.models import DisseminationCombined
 import time
 from math import ceil
 import logging
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -171,7 +166,6 @@ def _get_names_match_query(names_list):
     for field in name_fields:
         field_q = Q()
         for name in flattened:
-            print(name)
             field_q.add(Q(**{f"{field}__icontains": name}), Q.AND)
         names_match.add(field_q, Q.OR)
     

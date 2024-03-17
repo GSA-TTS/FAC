@@ -119,3 +119,59 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		ON dfa.report_id = dp.report_id 
 		AND dfa.award_reference = dp.award_reference
 	;	
+
+CREATE INDEX IF NOT EXISTS IF NOT EXISTS dc_report_id_idx 
+	on dissemination_combined (report_id);
+
+CREATE INDEX IF NOT EXISTS dc_auditee_certify_name_idx 
+	ON dissemination_combined 
+	((lower(auditee_certify_name)));
+
+CREATE INDEX IF NOT EXISTS dc_auditee_name_idx 
+	ON dissemination_combined 
+	((lower(auditee_name)));
+
+CREATE INDEX IF NOT EXISTS dc_auditor_certify_name_idx 
+	ON dissemination_combined 
+	((lower(auditor_certify_name)));
+
+CREATE INDEX IF NOT EXISTS dc_auditor_contact_name_idx 
+	ON dissemination_combined 
+	((lower(auditor_contact_name)));
+
+CREATE INDEX IF NOT EXISTS dc_auditor_firm_name_idx 
+	ON dissemination_combined 
+	((lower(auditor_firm_name)));
+
+CREATE INDEX IF NOT EXISTS dc_auditee_email_idx 
+	on dissemination_combined ((lower(auditee_email)));
+
+CREATE INDEX IF NOT EXISTS dc_auditor_email_idx 
+	on dissemination_combined ((lower(auditor_email)));
+
+CREATE INDEX IF NOT EXISTS dc_start_date_idx 
+	ON dissemination_combined (fy_start_date);
+
+CREATE INDEX IF NOT EXISTS dc_end_date_idx 
+	ON dissemination_combined (fy_end_date);
+
+CREATE INDEX IF NOT EXISTS dc_auditee_uei 
+	ON dissemination_combined (auditee_uei);
+
+CREATE INDEX IF NOT EXISTS dc_auditee_ein 
+	ON dissemination_combined (auditee_ein);
+
+CREATE INDEX IF NOT EXISTS dc_federal_agency_prefix_idx 
+	on dissemination_combined (federal_agency_prefix);
+
+CREATE INDEX IF NOT EXISTS dc_federal_award_extension_idx 
+	on dissemination_combined (federal_award_extension);
+
+CREATE INDEX IF NOT EXISTS dc_audit_year_idx 
+	on dissemination_combined (audit_year);
+
+CREATE INDEX IF NOT EXISTS dc_aln_idx 
+	on dissemination_combined (aln);
+
+-- CREATE INDEX IF NOT EXISTS dc__idx 
+-- 	on dissemination_combined ();
