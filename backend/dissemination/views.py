@@ -350,8 +350,6 @@ class SingleSummaryReportDownloadView(View):
 
         return redirect(download_url)
 
-alternator = 0
-
 class MultipleSummaryReportDownloadView(View):
     def post(self, request):
         """
@@ -375,10 +373,8 @@ class MultipleSummaryReportDownloadView(View):
             if len(results) == 0:
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
-
-            global alternator
-            alternator += 1
-            if (alternator % 2 == 0):
+            # Alternates every 10 seconds; even it is old, odd new.
+            if (((int(time.time())//10) % 10) % 2) == 0:
                 filename = generate_summary_report(report_ids, include_private)
             else:
                 filename = generate_summary_report_two(report_ids, include_private)
