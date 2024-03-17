@@ -1,4 +1,8 @@
 from django.db.models import Q
+from django.contrib.postgres.search import (
+    SearchQuery, 
+    SearchVector
+)
 from dissemination.models import DisseminationCombined
 import time
 from math import ceil
@@ -123,31 +127,56 @@ def _get_auditee_state_match_query(auditee_state):
     return Q(auditee_state__in=[auditee_state])
 
 
-def _get_names_match_query(names):
+def _get_names_match_query(names_list):
     """
     Given a list of (potential) names, return the query object that searches auditee and firm names.
     """
-    if not names:
+    if not names_list:
         return Q()
 
     name_fields = [
-        "auditee_city",
+        # "auditee_city",
         "auditee_contact_name",
+        "auditee_certify_name",
         "auditee_email",
         "auditee_name",
-        "auditee_state",
-        "auditor_city",
+        # "auditee_state",
+        # "auditor_city",
         "auditor_contact_name",
+        "auditor_certify_name",
         "auditor_email",
         "auditor_firm_name",
-        "auditor_state",
+        # "auditor_state",
     ]
 
     names_match = Q()
 
-    # turn ["name1", "name2", "name3"] into "name1 name2 name3"
-    names = " ".join(names)
+    # The search terms are coming in as a string in a list.
+    # E.g. the search text "college berea" returns nothing,
+    # when it should return entries for "Berea College". That is 
+    # because it comes in as 
+    # ["college berea"]
+    # 
+    # This has to be flattened to a list of singleton terms.
+    flattened = []
+    for term in names_list:
+        for sub in term.split():
+            flattened.append(sub)
+    
+    # Now, for each field (e.g. "auditee_contact_name")
+    # build up an AND over the terms. We want something where all of the
+    # terms appear.
+    # Then, do an OR over all of the fields. If that combo appears in 
+    # any of the fields, we want to return it.    
     for field in name_fields:
-        names_match.add(Q(**{"%s__search" % field: names}), Q.OR)
+        field_q = Q()
+        for name in flattened:
+            print(name)
+            field_q.add(Q(**{f"{field}__icontains": name}), Q.AND)
+        names_match.add(field_q, Q.OR)
+    
+    # Now, "college berea" and "university state ohio" return
+    # the appropriate terms. It is also significantly faster than what
+    # we had before.
 
     return names_match
