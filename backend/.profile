@@ -31,10 +31,13 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # In which case, we should drop and recreate.
     # 2024-03-15 We need to remove these since they
     # take time and will cause deployment to time out.
-    # drop_materialized_views
-    # gonogo "drop_materialized_views"
-    # create_materialized_views
-    # gonogo "create_materialized_views"
+    # 2024-03-17 Will they? Are health checks at the app 
+    # level, or is the container considered "good" once it hits
+    # the .profile?
+    drop_materialized_views
+    gonogo "drop_materialized_views"
+    create_materialized_views
+    gonogo "create_materialized_views"
 
     #####
     # API TEARDOWN
