@@ -30,6 +30,8 @@ from dissemination.models import (
     OneTimeAccess,
 )
 from dissemination.summary_reports import generate_summary_report
+from dissemination.summary_reports_two import generate_summary_report as generate_summary_report_two
+
 from support.decorators import newrelic_timing_metric
 
 from users.permissions import can_read_tribal
@@ -348,6 +350,7 @@ class SingleSummaryReportDownloadView(View):
 
         return redirect(download_url)
 
+alternator = 0
 
 class MultipleSummaryReportDownloadView(View):
     def post(self, request):
@@ -373,7 +376,12 @@ class MultipleSummaryReportDownloadView(View):
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
 
-            filename = generate_summary_report(report_ids, include_private)
+            global alternator
+            alternator += 1
+            if (alternator % 2 == 0):
+                filename = generate_summary_report(report_ids, include_private)
+            else:
+                filename = generate_summary_report_two(report_ids, include_private)
             download_url = get_download_url(filename)
 
             return redirect(download_url)

@@ -572,7 +572,7 @@ def generate_summary_report(report_ids, include_private=False):
     insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
     (filename, tpw) = persist_workbook(workbook)
     t1 = time.time()
-    logger.info(f"SUMMARY_REPORTS generate_summary_report total: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}")
+    logger.info(f"SUMMARY_REPORTS generate_summary_report\n\ttotal: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}")
     return filename
 
 # Ignore performance profiling for the presub.

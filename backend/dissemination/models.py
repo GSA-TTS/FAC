@@ -963,3 +963,13 @@ class DisseminationCombined(models.Model):
         "Type Requirement Failure",
         help_text=docs.type_requirement_findings,
     )
+    
+    passthrough_id = models.TextField(
+        "Identifying Number Assigned by the Pass-through Entity",
+        help_text=docs.passthrough_id,
+    )
+    passthrough_name = models.TextField(
+        "Name of Pass-through Entity",
+        help_text=docs.passthrough_name,
+    )
+

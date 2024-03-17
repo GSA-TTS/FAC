@@ -12,7 +12,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 	SELECT
 		nextval('dissemination_combined_id_seq') AS id,
 		dg.report_id,
-		df.award_reference,
+		dfa.award_reference,
 		df.reference_number,
 		-- Build a composite ALN in case we want/need it
 		dfa.federal_agency_prefix||'.'||dfa.federal_award_extension as aln,
