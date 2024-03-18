@@ -31,8 +31,9 @@ class SummaryReportTests(TestCase):
         public_report_ids = [g.report_id for g in public_general]
         tribal_report_ids = [g.report_id for g in tribal_general]
 
+        (ls, _) = _get_tribal_report_ids(public_report_ids + tribal_report_ids)
         self.assertEqual(
-            len(_get_tribal_report_ids(public_report_ids + tribal_report_ids)),
+            len(ls),
             2,
         )
 
@@ -41,8 +42,9 @@ class SummaryReportTests(TestCase):
         public_general = baker.make(General, _quantity=3, is_public=True)
         public_report_ids = [g.report_id for g in public_general]
 
+        (ls, _) = _get_tribal_report_ids(public_report_ids)
         self.assertEqual(
-            len(_get_tribal_report_ids(public_report_ids)),
+            len(ls),
             0,
         )
 
@@ -51,8 +53,9 @@ class SummaryReportTests(TestCase):
         tribal_general = baker.make(General, _quantity=2, is_public=False)
         tribal_report_ids = [g.report_id for g in tribal_general]
 
+        (ls, _) = _get_tribal_report_ids(tribal_report_ids)
         self.assertListEqual(
-            _get_tribal_report_ids(tribal_report_ids),
+            ls,
             tribal_report_ids,
         )
 
@@ -100,7 +103,7 @@ class SummaryReportTests(TestCase):
         baker.make(FindingText, report_id=tribal_general)
 
         # Get the data that constitutes the summary workbook
-        data = gather_report_data_dissemination(
+        (data, _) = gather_report_data_dissemination(
             public_report_ids + tribal_report_ids,
             tribal_report_ids,
             include_private,
