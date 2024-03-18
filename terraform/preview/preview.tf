@@ -13,7 +13,7 @@ module "preview" {
   recursive_delete      = true
   json_params = jsonencode(
     {
-      "storage" : 40,
+      "storage" : 50,
     }
   )
 }
