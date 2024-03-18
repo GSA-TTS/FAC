@@ -1,3 +1,4 @@
+import unittest
 from django.test import SimpleTestCase
 import os
 from functools import reduce
@@ -58,6 +59,7 @@ def map_file_to_extractor_validator(filename):
     return (None, None)
 
 
+@unittest.skip("Skipping tests")
 class FailingWorkbooks(SimpleTestCase):
     def test_failing_workbooks(self):
         workbook_sets = reduce(

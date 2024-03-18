@@ -20,6 +20,8 @@ class TestAdminAPI(TestCase):
             conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
         else:
             conn_string = settings.CONNECTION_STRING
+        print("conn_string")
+        print(conn_string)
         conn = connection(conn_string)
         return conn
 
@@ -52,9 +54,11 @@ class TestAdminAPI(TestCase):
 
     # https://stackoverflow.com/questions/2511679/python-number-of-rows-affected-by-cursor-executeselect
     def test_users_exist_in_perms_table(self):
+        print("TestAdminAPI.test_users_exist_in_perms_table")
         with self.get_connection().cursor() as cur:
             cur.execute("SELECT count(*) FROM public.support_administrative_key_uuids;")
             (number_of_rows,) = cur.fetchone()
+            print("TestAdminAPI.test_users_exist_in_perms_table", number_of_rows)
             self.assertGreaterEqual(number_of_rows, 1)
 
     def setUp(self):
@@ -81,6 +85,8 @@ class TestAdminAPI(TestCase):
         response = requests.get(
             self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
         )
+        print("test_postgrest_url_is_reachable")
+        print(self.api_url)
         self.assertEquals(response.status_code, 200)
 
     def test_assert_fails_with_bad_user_id(self):
