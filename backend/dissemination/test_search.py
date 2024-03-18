@@ -345,16 +345,7 @@ class TestMaterializedViewBuilder(TestCase):
 
     def refresh_materialized_view(self):
         """Refresh the materialized view"""
-        sql_file_path = os.path.join(
-            os.getcwd(), "dissemination/sql/refresh_materialized_views.sql"
-        )
-
-        # Read and execute the SQL commands to refresh the materialized view
-        with open(sql_file_path, "r") as sql_file:
-            sql_commands = sql_file.read()
-
-        with connection.cursor() as cursor:
-            cursor.execute(sql_commands)
+        self.execute_sql_file("dissemination/sql/refresh_materialized_views.sql")
 
 
 class SearchALNTests(TestMaterializedViewBuilder):

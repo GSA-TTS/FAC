@@ -383,12 +383,7 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     names_not_in_dc = all_names - names_in_dc
     visited = set()
 
-    for model_name in names_in_dc:
-        data[model_name] = {
-            "field_names": field_name_ordered[model_name],
-            "entries": [],
-        }
-    for model_name in names_not_in_dc:
+    for model_name in names_in_dc.union(names_not_in_dc):
         data[model_name] = {
             "field_names": field_name_ordered[model_name],
             "entries": [],
@@ -399,10 +394,10 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     for obj in dc_results:
         for model_name in names_in_dc:
             field_names = field_name_ordered[model_name]
-            report_id = _get_attribute_or_data(obj, "report_id")
-            award_reference = _get_attribute_or_data(obj, "award_reference")
-            reference_number = _get_attribute_or_data(obj, "reference_number")
-            passthrough_name = _get_attribute_or_data(obj, "passthrough_name")
+            report_id = getattr(obj, "report_id")
+            award_reference = getattr(obj, "award_reference")
+            reference_number = getattr(obj, "reference_number")
+            passthrough_name = getattr(obj, "passthrough_name")
 
             # WATCH THIS IF/ELIF
             # It is making sure we do not double-disseminate some rows.
@@ -429,11 +424,13 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
                 pass
             ####
             # FINDING
-            elif model_name == "finding" and reference_number is None:
+            elif (model_name == "finding" 
+                  and 
+                  (award_reference is None or reference_number is None)):
                 # And we don't include rows in finding where there are none.
                 pass
             else:
-                # Track for all models. Really only matters for `general`.
+                # Track to limit duplication
                 if model_name == "general":
                     visited.add(report_id)
                 # Handle special tracking for federal awards, so we don't duplicate award # rows.
@@ -449,13 +446,14 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
                 else:
                     data[model_name]["entries"].append(
                         [
-                            _get_attribute_or_data(obj, field_name)
+                            getattr(obj, field_name)
                             for field_name in field_names
                         ]
                     )
 
     for model_name in names_not_in_dc:
         model = _get_model_by_name(model_name)
+        print(model_name)
         field_names = field_name_ordered[model_name]
         objects = model.objects.all().filter(report_id__in=report_ids)
         # Walk the objects
