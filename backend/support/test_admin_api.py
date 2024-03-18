@@ -85,6 +85,8 @@ class TestAdminAPI(TestCase):
         response = requests.get(
             self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
         )
+        print("test_postgrest_url_is_reachable")
+        print(self.api_url)
         self.assertEquals(response.status_code, 200)
 
     def test_assert_fails_with_bad_user_id(self):
