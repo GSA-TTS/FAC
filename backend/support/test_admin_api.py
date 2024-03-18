@@ -15,9 +15,12 @@ class TestAdminTableBuilder(TestCase):
         self.execute_sql_file("support/api/admin_api_v1_1_0/base.sql")
         self.execute_sql_file("support/api/admin_api_v1_1_0/create_schema.sql")
         self.execute_sql_file("support/api/admin_api_v1_1_0/create_functions.sql")
+        self.execute_sql_file("support/api/admin_api_v1_1_0/create_views.sql")
 
     def tearDown(self):
         super().tearDown()
+        self.execute_sql_file("support/api/admin_api_v1_1_0/drop_views.sql")
+        self.execute_sql_file("support/api/admin_api_v1_1_0/drop_schema.sql")
 
     def execute_sql_file(self, relative_path):
         """Execute the SQL commands in the file at the given path."""
