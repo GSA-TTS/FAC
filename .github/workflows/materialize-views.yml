@@ -58,4 +58,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name dispatch_refresh_materialize_views --command "python manage.py materialize_views --refresh"
+          command: cf run-task gsa-fac -k 2G -m 2G --name dispatch_refresh_materialize_views --command "python manage.py materialized_views --refresh"
