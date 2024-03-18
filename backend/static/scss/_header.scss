@@ -12,46 +12,78 @@
   .usa-header--basic .usa-nav-container {
     align-items: center;
   }
-
-  .usa-header--basic .usa-navbar {
-    width: 25%;
-  }
-}
-
-.sign-in,
-.sign-out {
-  background-color: color('primary-darker');
-  padding: 1em;
 }
 
 .usa-menu-btn {
   background-color: color('primary-darker');
 }
 
-.sign-in-logo,
-.sign-in-logo:active,
-.sign-in-logo:visited {
-  color: #fff;
+.search-alert-banner {
+  background-color: color('gold-5v');
+  font-size: .88rem;
+  padding-block: .2rem;
+}
+
+.usa-nav__primary button {
+  padding: 1rem;
+  padding-left: .5;
+  
+  span {
+    padding-right: .5rem;
+  }
+}
+
+.usa-header {
+  background-color: #f3f9fe;
+
+  .usa-logo em {
+    &::before {
+      content: url('../img/fac-logo-full.svg');
+    }
+  }
+}
+
+.usa-logo-link,
+.usa-logo-link:active,
+.usa-logo-link:visited {
+  color: color('primary-darker');
+  text-decoration: none;
+}
+
+.usa-nav-container-links {
+  background: linear-gradient(to right, #DFF0F6 0%, rgb(223 240 246 / 0%) 87.5%);
+}
+
+.usa-nav-container-links.is-visible {
+  background-color: #f3f9fe;
+}
+
+.sign-in,
+.sign-in:active,
+.sign-in:visited {
+  color: color('primary-darker');
   font-size: 0.88rem;
   font-weight: bold;
   line-height: 1.1rem;
   margin: 0;
   display: inline-block;
-  padding: 0.75rem 0 0.75rem 2.1rem;
   text-decoration: none;
-  background-image: url('../img/usa-icons/account_circle.svg');
-  background-position: 0 50%;
-  background-repeat: no-repeat;
-  background-size: 2rem;
 
   span {
     font-weight: normal;
     display: block;
   }
+
+  svg {
+    transform: rotate(270deg);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
 }
 
 .sign-out {
-  padding: 1.8rem 2.8rem 1.8rem 1.4rem;
+  padding: 1.4rem;
+  background-color: color('primary-darker');
 
   button {
     color: #fff;
@@ -78,33 +110,4 @@
       margin-right: 0.4em;
     }
   }
-}
-
-.sign-out button:hover,
-.sign-in-logo:hover {
-  text-decoration: underline;
-}
-
-.sign-in-logo::before {
-  // content: url('../img/usa-icons/account_circle.svg');
-  display: block;
-  float: left;
-}
-
-.usa-header {
-  background-color: #f3f9fe;
-
-  .usa-accordion__button {
-    color: #171717
-  };
-
-  a.usa-nav-link {
-    color: #171717
-  };
-}
-
-.fac-beta-banner {
-    background-color: color('gold-5v');
-    font-size: .88rem;
-    padding-block: .2rem;
 }

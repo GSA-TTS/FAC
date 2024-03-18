@@ -1,6 +1,26 @@
 {% extends "base.html" %}
 {% load static %}
 {% load sprite_helper %}
+
+{% comment %}
+All input fields besides UEI/EIN are commented out pending a performance investigation and fix.
+Summary report downloads are also disabled.
+Alerts have been put in place.
+
+To undo this action, complete the following steps. 
+Search filters:
+    1. Uncomment the search filters
+Warnings:
+    1. Remove search-alert-performance.html and its imports.
+    2. Remove the warning banner in header.html
+Summary report downloads:
+    1. Uncomment the summary report download button here
+    2. Uncomment the SF-SAC download button in summary.html
+    3. Remove the forced Http404 in SingleSummaryReportDownloadView (dissemination/views.py)
+
+See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
+{% endcomment %}
+
 {% block content %}
     <div class="desktop:padding-x-10">
         <div class="grid-row">
@@ -22,6 +42,7 @@
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
                          {% comment %} Audit Year {% endcomment %}
+                         {% comment %}
                          <button type="button"
                                  class="usa-accordion__button"
                                  aria-expanded="true"
@@ -38,15 +59,20 @@
                                  </div>
                              {% endfor %}
                          </div> 
+                        {% endcomment %}
+
                         {% comment %} UEI/EIN {% endcomment %}
                         <label for="uei-or-ein">
                             <button type="button"
                                     class="usa-accordion__button"
-                                    aria-expanded={% if form_user_input.uei_or_ein %}"true"{% else %}"false"{% endif %}
+                                    aria-expanded="true"
+                                    {% comment %} aria-expanded={% if form_user_input.uei_or_ein %}"true"{% else %}"false"{% endif %} {% endcomment %}
                                     aria-controls="uei-or-ein">UEI or EIN</button>
                         </label>
-                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>
+                        <textarea class="usa-textarea width-card-lg" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>
+                        
                         {% comment %} ALN/CFDA {% endcomment %}
+                        {% comment %}
                         <label for="aln">
                             <button type="button"
                                     class="usa-accordion__button"
@@ -54,7 +80,10 @@
                                     aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
                         </label>
                         <textarea class="usa-textarea" id="aln" name="aln">{{form_user_input.aln}}</textarea>
+                        {% endcomment %}
+
                         {% comment %} Name {% endcomment %}
+                        {% comment %}
                         <label for="entity-name">
                             <button type="button"
                                     class="usa-accordion__button"
@@ -62,7 +91,10 @@
                                     aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
                         </label>
                         <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form_user_input.entity_name}}</textarea>
+                        {% endcomment %}
+
                         {% comment %} Release Date(s) {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.start_date or form_user_input.end_date %}"true"{% else %}"false"{% endif %}
@@ -93,7 +125,10 @@
                                 </div>
                             </div>
                         </div>
+                        {% endcomment %}
+
                         {% comment %} State {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.auditee_state %}"true"{% else %}"false"{% endif %}
@@ -111,7 +146,10 @@
                                 {% endfor %}
                             </select>
                         </div>
+                        {% endcomment %}
+
                         {% comment %} Cog/Over {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.cog_or_oversight %}"true"{% else %}"false"{% endif %}
@@ -137,7 +175,10 @@
                                   name="agency_name"
                                   value="{{ form_user_input.agency_name }}" />
                         </div>
+                        {% endcomment %}
+
                         {% comment %} Findings {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.findings %}"true"{% else %}"false"{% endif %}
@@ -154,7 +195,10 @@
                               </div>
                           {% endfor %}
                         </div>
+                        {% endcomment %}
+
                         {% comment %} Direct funding {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.direct_funding %}"true"{% else %}"false"{% endif %}
@@ -171,7 +215,10 @@
                               </div>
                           {% endfor %}
                         </div>
+                        {% endcomment %}
+
                         {% comment %} Major program {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.major_program %}"true"{% else %}"false"{% endif %}
@@ -188,15 +235,18 @@
                               </div>
                           {% endfor %}
                         </div>
+                        {% endcomment %}
                     </div>
                       
                     {% comment %} Submission {% endcomment %}
+                    {% comment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
                         <input class="usa-button usa-button--unstyled"
                                type="reset"
                                value="Reset Search" />
                     </div>
+                    {% endcomment %}
 
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
                     <input class="usa-input"
@@ -221,13 +271,15 @@
             </div>
             <div class="grid-col audit-search-results">
                 <h2 class="font-sans-2xl">Search single audit reports</h2>
+                {% include "search-alert-performance.html"%}
+                {% include "search-alert-info.html"%}
                 {% if results|length > 0 %}
-                    {% include "search-alert-info.html"%}
                     <div class="margin-y-2 grid-row display-flex flex-justify">
                         <p class="margin-0 flex-align-self-center">
                             <strong>Results: {{ results_count }}</strong>
                             <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                         </p>
+                        {% comment %}
                         {% if results_count <= summary_report_download_limit %}
                             <button class="usa-button display-flex"
                                     formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
@@ -241,6 +293,7 @@
                                 <p class="margin-0">Download all</p>
                             </button>
                         {% endif %}
+                        {% endcomment %}
                     </div>
                     
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">
@@ -377,9 +430,6 @@
                         </ul>
                     </nav>
                 {% elif results is not None %}
-                    {% include "search-alert-info.html"%}
-                    <div class="usa-alert usa-alert--info">
-                    </div>
                     <div class="search-instructions">
                         <img src="{% static 'img/circle-arrow.svg' %}"
                              alt="an arrow points left, toward the search form" />
@@ -388,7 +438,6 @@
                         </p>
                     </div>
                 {% else %}
-                    {% include "search-alert-info.html"%}
                     <div class="search-instructions">
                         <img src="{% static 'img/circle-arrow.svg' %}"
                             alt="an arrow points left, toward the search form" />
