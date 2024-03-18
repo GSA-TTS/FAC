@@ -4,6 +4,20 @@
 
 {% comment %}
 All input fields besides UEI/EIN are commented out pending a performance investigation and fix.
+Summary report downloads are also disabled.
+Alerts have been put in place.
+
+To undo this action, complete the following steps. 
+Search filters:
+    1. Uncomment the search filters
+Warnings:
+    1. Remove search-alert-performance.html and its imports.
+    2. Remove the warning banner in header.html
+Summary report downloads:
+    1. Uncomment the summary report download button here
+    2. Uncomment the SF-SAC download button in summary.html
+    3. Remove the forced Http404 in SingleSummaryReportDownloadView (dissemination/views.py)
+
 See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
 {% endcomment %}
 
@@ -265,6 +279,7 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                             <strong>Results: {{ results_count }}</strong>
                             <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                         </p>
+                        {% comment %}
                         {% if results_count <= summary_report_download_limit %}
                             <button class="usa-button display-flex"
                                     formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
@@ -278,6 +293,7 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                                 <p class="margin-0">Download all</p>
                             </button>
                         {% endif %}
+                        {% endcomment %}
                     </div>
                     
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">
