@@ -1,9 +1,9 @@
 from datetime import datetime
-import openpyxl as pyxl
 import io
 import logging
 import uuid
 import time
+import openpyxl as pyxl
 
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
@@ -424,9 +424,9 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
                 pass
             ####
             # FINDING
-            elif (model_name == "finding" 
-                  and 
-                  (award_reference is None or reference_number is None)):
+            elif model_name == "finding" and (
+                award_reference is None or reference_number is None
+            ):
                 # And we don't include rows in finding where there are none.
                 pass
             else:
@@ -445,10 +445,7 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
                     pass
                 else:
                     data[model_name]["entries"].append(
-                        [
-                            getattr(obj, field_name)
-                            for field_name in field_names
-                        ]
+                        [getattr(obj, field_name) for field_name in field_names]
                     )
 
     for model_name in names_not_in_dc:

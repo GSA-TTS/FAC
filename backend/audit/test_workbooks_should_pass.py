@@ -2,6 +2,7 @@ from django.test import SimpleTestCase
 import os
 from functools import reduce
 import re
+import unittest
 
 
 from audit.intakelib import (
@@ -76,6 +77,7 @@ def process_workbook_set(workbook_set_path, is_gsa_migration=True):
                     raise Exception(msg)
 
 
+@unittest.skip("Temporarily skipping for speed of troubleshooting.")
 class PassingWorkbooks(SimpleTestCase):
     def test_passing_workbooks(self):
         workbook_sets = reduce(

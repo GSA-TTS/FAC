@@ -20,6 +20,7 @@ class TestAdminAPI(TestCase):
             conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
         else:
             conn_string = settings.CONNECTION_STRING
+        print(conn_string)
         conn = connection(conn_string)
         return conn
 
