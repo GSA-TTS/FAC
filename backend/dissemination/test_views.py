@@ -1,4 +1,3 @@
-import unittest
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
@@ -148,7 +147,6 @@ class PdfDownloadViewTests(TestCase):
         self.assertIn(file.filename, response.url)
 
 
-@unittest.skip("Temporarily skipping for troubleshooting.")
 class SearchViewTests(TestMaterializedViewBuilder):
     def setUp(self):
         super().setUp()
@@ -600,7 +598,6 @@ class SummaryViewTests(TestCase):
         )
 
 
-@unittest.skip("Temporarily skipping for troubleshooting.")
 class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
     def setUp(self):
         super().setUp()

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from psycopg2._psycopg import connection
+from django.db import connection
 from django.conf import settings
 
 from datetime import datetime
@@ -8,21 +8,31 @@ import os
 import requests
 
 
-class TestAdminAPI(TestCase):
+class TestAdminTableBuilder(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.execute_sql_file("support/api/admin_api_v1_1_0/create_access_tables.sql")
+
+    def tearDown(self):
+        super().tearDown()
+
+    def execute_sql_file(self, relative_path):
+        """Execute the SQL commands in the file at the given path."""
+        full_path = os.path.join(os.getcwd(), relative_path)
+        try:
+            with open(full_path, "r") as file:
+                sql_commands = file.read()
+            with connection.cursor() as cursor:
+                cursor.execute(sql_commands)
+        except Exception as e:
+            print(f"Error executing SQL command: {e}")
+
+
+class TestAdminAPI(TestAdminTableBuilder):
     # We can force a UUID locally that would not work when using api.data.gov,
     # because api.data.gov sets/overwrites this.
     api_user_uuid = "61ba59b2-f545-4c2f-9b24-9655c706a06c"
     admin_api_version = "admin_api_v1_1_0"
-
-    def get_connection(self):
-        cloudgov = ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]
-        if settings.ENVIRONMENT not in cloudgov:
-            conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
-        else:
-            conn_string = settings.CONNECTION_STRING
-        print(conn_string)
-        conn = connection(conn_string)
-        return conn
 
     def admin_api_events_exist(self):
         # If we did the above, there should be non-zero events in the
@@ -53,12 +63,13 @@ class TestAdminAPI(TestCase):
 
     # https://stackoverflow.com/questions/2511679/python-number-of-rows-affected-by-cursor-executeselect
     def test_users_exist_in_perms_table(self):
-        with self.get_connection().cursor() as cur:
+        with connection.cursor() as cur:
             cur.execute("SELECT count(*) FROM public.support_administrative_key_uuids;")
             (number_of_rows,) = cur.fetchone()
             self.assertGreaterEqual(number_of_rows, 1)
 
     def setUp(self):
+        super().setUp()
         self.api_url = settings.POSTGREST.get("URL")
         self.encoded_jwt = jwt.encode(
             self.create_payload(role="api_fac_gov"),
