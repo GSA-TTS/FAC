@@ -91,8 +91,6 @@ variable "pgrst_jwt_secret" {
 }
 
 variable "json_params" {
-  type = map(object({
-    storage = number
-  }))
+  type        = string
   description = "Optional parameters used for service instance (-c)"
 }
