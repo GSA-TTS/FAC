@@ -272,7 +272,7 @@ def _get_tribal_report_ids(report_ids):
     objects = General.objects.all().filter(report_id__in=report_ids, is_public=False)
     objs = [obj.report_id for obj in objects]
     t1 = time.time()
-    return (objs, t1-t0)
+    return (objs, t1 - t0)
 
 
 def set_column_widths(worksheet):
@@ -418,7 +418,7 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
                 [_get_attribute_or_data(obj, field_name) for field_name in field_names]
             )
     t1 = time.time()
-    return (data, t1-t0)
+    return (data, t1 - t0)
 
 
 def gather_report_data_pre_certification(i2d_data):
@@ -523,7 +523,7 @@ def create_workbook(data, protect_sheets=False):
     # remove sheet that is created during workbook construction
     workbook.remove_sheet(workbook.get_sheet_by_name("Sheet"))
     t1 = time.time()
-    return (workbook, t1-t0)
+    return (workbook, t1 - t0)
 
 
 def persist_workbook(workbook):
@@ -559,7 +559,7 @@ def persist_workbook(workbook):
             logger.warn(f"Unable to put summary report file {filename} in S3!")
             raise
     t1 = time.time()
-    return (f"temp/{filename}", t1-t0)
+    return (f"temp/{filename}", t1 - t0)
 
 
 def generate_summary_report(report_ids, include_private=False):
@@ -572,8 +572,11 @@ def generate_summary_report(report_ids, include_private=False):
     insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
     (filename, tpw) = persist_workbook(workbook)
     t1 = time.time()
-    logger.info(f"SUMMARY_REPORTS generate_summary_report\n\ttotal: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}")
+    logger.info(
+        f"SUMMARY_REPORTS generate_summary_report\n\ttotal: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}"
+    )
     return filename
+
 
 # Ignore performance profiling for the presub.
 def generate_presubmission_report(i2d_data):

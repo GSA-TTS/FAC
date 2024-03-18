@@ -25,7 +25,7 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
-    DisseminationCombined
+    DisseminationCombined,
 )
 
 logger = logging.getLogger(__name__)
@@ -266,11 +266,13 @@ limit_disclaimer = f"This spreadsheet contains the first {settings.SUMMARY_REPOR
 can_read_tribal_disclaimer = "This document includes one or more Tribal entities that have chosen to keep their data private per 2 CFR 200.512(b)(2). Because your account has access to these submissions, this document includes their audit findings text, corrective action plan, and notes to SEFA. Don't share this data outside your agency."
 cannot_read_tribal_disclaimer = "This document includes one or more Tribal entities that have chosen to keep their data private per 2 CFR 200.512(b)(2). It doesn't include their audit findings text, corrective action plan, or notes to SEFA."
 
+
 def _get_model_by_name(name):
     for m in models:
         if m.__name__.lower() == name:
             return m
     return None
+
 
 def _get_tribal_report_ids(report_ids):
     t0 = time.time()
@@ -278,7 +280,7 @@ def _get_tribal_report_ids(report_ids):
     objects = General.objects.all().filter(report_id__in=report_ids, is_public=False)
     objs = [obj.report_id for obj in objects]
     t1 = time.time()
-    return (objs, t1-t0)
+    return (objs, t1 - t0)
 
 
 def set_column_widths(worksheet):
@@ -382,9 +384,15 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     visited = set()
 
     for model_name in names_in_dc:
-        data[model_name] = {"field_names": field_name_ordered[model_name], "entries": []}
+        data[model_name] = {
+            "field_names": field_name_ordered[model_name],
+            "entries": [],
+        }
     for model_name in names_not_in_dc:
-        data[model_name] = {"field_names": field_name_ordered[model_name], "entries": []}
+        data[model_name] = {
+            "field_names": field_name_ordered[model_name],
+            "entries": [],
+        }
 
     # Do all of the names in the DisseminationCombined at the same time.
     # That way, we only go through the results once.
@@ -392,7 +400,7 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
         for model_name in names_in_dc:
             field_names = field_name_ordered[model_name]
             report_id = _get_attribute_or_data(obj, "report_id")
-            award_reference =_get_attribute_or_data(obj, "award_reference")
+            award_reference = _get_attribute_or_data(obj, "award_reference")
             reference_number = _get_attribute_or_data(obj, "reference_number")
             passthrough_name = _get_attribute_or_data(obj, "passthrough_name")
 
@@ -405,18 +413,19 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
             ####
             # PASSTHROUGH
             # We should never disseminate something that has no name.
-            elif (model_name == "passthrough"
-                  and passthrough_name is None):
+            elif model_name == "passthrough" and passthrough_name is None:
                 pass
             ####
             # FEDERAL AWARD
-            # This condition is actually filtering out the damage to the 
+            # This condition is actually filtering out the damage to the
             # data from the race hazard we had at the start of 2024.
             # NOTE
             # We cannot filter `passthrough` here. Each award reference row has
             # a one-to-many relationship with passthrough.
-            elif (model_name == "federalaward"
-                    and f"{report_id}-{award_reference}" in visited):
+            elif (
+                model_name == "federalaward"
+                and f"{report_id}-{award_reference}" in visited
+            ):
                 pass
             ####
             # FINDING
@@ -439,7 +448,10 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
                     pass
                 else:
                     data[model_name]["entries"].append(
-                        [_get_attribute_or_data(obj, field_name) for field_name in field_names]
+                        [
+                            _get_attribute_or_data(obj, field_name)
+                            for field_name in field_names
+                        ]
                     )
 
     for model_name in names_not_in_dc:
@@ -448,7 +460,7 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
         objects = model.objects.all().filter(report_id__in=report_ids)
         # Walk the objects
         for obj in objects:
-            report_id = _get_attribute_or_data(obj, "report_id")                
+            report_id = _get_attribute_or_data(obj, "report_id")
             # Omit rows for private tribal data when the user doesn't have perms
             if (
                 model_name in restricted_model_names
@@ -458,10 +470,13 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
                 pass
             else:
                 data[model_name]["entries"].append(
-                    [_get_attribute_or_data(obj, field_name) for field_name in field_names]
+                    [
+                        _get_attribute_or_data(obj, field_name)
+                        for field_name in field_names
+                    ]
                 )
     t1 = time.time()
-    return (data, t1-t0)
+    return (data, t1 - t0)
 
 
 def gather_report_data_pre_certification(i2d_data):
@@ -566,7 +581,7 @@ def create_workbook(data, protect_sheets=False):
     # remove sheet that is created during workbook construction
     workbook.remove_sheet(workbook.get_sheet_by_name("Sheet"))
     t1 = time.time()
-    return (workbook, t1-t0)
+    return (workbook, t1 - t0)
 
 
 def persist_workbook(workbook):
@@ -602,7 +617,7 @@ def persist_workbook(workbook):
             logger.warn(f"Unable to put summary report file {filename} in S3!")
             raise
     t1 = time.time()
-    return (f"temp/{filename}", t1-t0)
+    return (f"temp/{filename}", t1 - t0)
 
 
 def generate_summary_report(report_ids, include_private=False):
@@ -615,8 +630,11 @@ def generate_summary_report(report_ids, include_private=False):
     insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
     (filename, tpw) = persist_workbook(workbook)
     t1 = time.time()
-    logger.info(f"SUMMARY_REPORTS generate_summary_report_two\n\ttotal: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}")
+    logger.info(
+        f"SUMMARY_REPORTS generate_summary_report_two\n\ttotal: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}"
+    )
     return filename
+
 
 # Ignore performance profiling for the presub.
 def generate_presubmission_report(i2d_data):
