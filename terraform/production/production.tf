@@ -7,7 +7,7 @@ module "production" {
   database_plan         = "xlarge-gp-psql-redundant"
   json_params = jsonencode(
     {
-      "storage" : 40,
+      "storage" : 50,
     }
   )
 }
