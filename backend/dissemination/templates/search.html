@@ -257,8 +257,9 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
             </div>
             <div class="grid-col audit-search-results">
                 <h2 class="font-sans-2xl">Search single audit reports</h2>
+                {% include "search-alert-performance.html"%}
+                {% include "search-alert-info.html"%}
                 {% if results|length > 0 %}
-                    {% include "search-alert-info.html"%}
                     <div class="margin-y-2 grid-row display-flex flex-justify">
                         <p class="margin-0 flex-align-self-center">
                             <strong>Results: {{ results_count }}</strong>
@@ -413,9 +414,6 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                         </ul>
                     </nav>
                 {% elif results is not None %}
-                    {% include "search-alert-info.html"%}
-                    <div class="usa-alert usa-alert--info">
-                    </div>
                     <div class="search-instructions">
                         <img src="{% static 'img/circle-arrow.svg' %}"
                              alt="an arrow points left, toward the search form" />
@@ -424,7 +422,6 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                         </p>
                     </div>
                 {% else %}
-                    {% include "search-alert-info.html"%}
                     <div class="search-instructions">
                         <img src="{% static 'img/circle-arrow.svg' %}"
                             alt="an arrow points left, toward the search form" />
