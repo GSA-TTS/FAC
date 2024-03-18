@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 {% load sprite_helper %}
+
+{% comment %}
+All input fields besides UEI/EIN are commented out pending a performance investigation and fix.
+See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
+{% endcomment %}
+
 {% block content %}
     <div class="desktop:padding-x-10">
         <div class="grid-row">
@@ -22,6 +28,7 @@
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
                          {% comment %} Audit Year {% endcomment %}
+                         {% comment %}
                          <button type="button"
                                  class="usa-accordion__button"
                                  aria-expanded="true"
@@ -38,15 +45,20 @@
                                  </div>
                              {% endfor %}
                          </div> 
+                        {% endcomment %}
+
                         {% comment %} UEI/EIN {% endcomment %}
                         <label for="uei-or-ein">
                             <button type="button"
                                     class="usa-accordion__button"
-                                    aria-expanded={% if form_user_input.uei_or_ein %}"true"{% else %}"false"{% endif %}
+                                    aria-expanded="true"
+                                    {% comment %} aria-expanded={% if form_user_input.uei_or_ein %}"true"{% else %}"false"{% endif %} {% endcomment %}
                                     aria-controls="uei-or-ein">UEI or EIN</button>
                         </label>
-                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>
+                        <textarea class="usa-textarea width-card-lg" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>
+                        
                         {% comment %} ALN/CFDA {% endcomment %}
+                        {% comment %}
                         <label for="aln">
                             <button type="button"
                                     class="usa-accordion__button"
@@ -54,7 +66,10 @@
                                     aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
                         </label>
                         <textarea class="usa-textarea" id="aln" name="aln">{{form_user_input.aln}}</textarea>
+                        {% endcomment %}
+
                         {% comment %} Name {% endcomment %}
+                        {% comment %}
                         <label for="entity-name">
                             <button type="button"
                                     class="usa-accordion__button"
@@ -62,7 +77,10 @@
                                     aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
                         </label>
                         <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form_user_input.entity_name}}</textarea>
+                        {% endcomment %}
+
                         {% comment %} Release Date(s) {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.start_date or form_user_input.end_date %}"true"{% else %}"false"{% endif %}
@@ -93,7 +111,10 @@
                                 </div>
                             </div>
                         </div>
+                        {% endcomment %}
+
                         {% comment %} State {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.auditee_state %}"true"{% else %}"false"{% endif %}
@@ -111,7 +132,10 @@
                                 {% endfor %}
                             </select>
                         </div>
+                        {% endcomment %}
+
                         {% comment %} Cog/Over {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.cog_or_oversight %}"true"{% else %}"false"{% endif %}
@@ -137,7 +161,10 @@
                                   name="agency_name"
                                   value="{{ form_user_input.agency_name }}" />
                         </div>
+                        {% endcomment %}
+
                         {% comment %} Findings {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.findings %}"true"{% else %}"false"{% endif %}
@@ -154,7 +181,10 @@
                               </div>
                           {% endfor %}
                         </div>
+                        {% endcomment %}
+
                         {% comment %} Direct funding {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.direct_funding %}"true"{% else %}"false"{% endif %}
@@ -171,7 +201,10 @@
                               </div>
                           {% endfor %}
                         </div>
+                        {% endcomment %}
+
                         {% comment %} Major program {% endcomment %}
+                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.major_program %}"true"{% else %}"false"{% endif %}
@@ -188,15 +221,18 @@
                               </div>
                           {% endfor %}
                         </div>
+                        {% endcomment %}
                     </div>
                       
                     {% comment %} Submission {% endcomment %}
+                    {% comment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
                         <input class="usa-button usa-button--unstyled"
                                type="reset"
                                value="Reset Search" />
                     </div>
+                    {% endcomment %}
 
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
                     <input class="usa-input"
