@@ -12,6 +12,8 @@ class TestAdminTableBuilder(TestCase):
     def setUp(self):
         super().setUp()
         self.execute_sql_file("support/api/admin_api_v1_1_0/create_access_tables.sql")
+        self.execute_sql_file("support/api/admin_api_v1_1_0/create_schema.sql")
+        self.execute_sql_file("support/api/admin_api_v1_1_0/create_functions.sql")
 
     def tearDown(self):
         super().tearDown()
@@ -93,6 +95,8 @@ class TestAdminAPI(TestAdminTableBuilder):
         response = requests.get(
             self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
         )
+        print("test_postgrest_url_is_reachable: ", self.api_url)
+        print("PGRST_JWT_SECRET: ", os.getenv("PGRST_JWT_SECRET"))
         self.assertEquals(response.status_code, 200)
 
     def test_assert_fails_with_bad_user_id(self):
