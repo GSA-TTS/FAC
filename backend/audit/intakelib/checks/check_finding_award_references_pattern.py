@@ -25,7 +25,7 @@ def award_references_pattern(ir):
     errors = []
     for index, award_reference in enumerate(award_references["values"]):
         if (not re.match(AWARD_REFERENCES_REGEX1, str(award_reference))
-            or not re.match(AWARD_REFERENCES_REGEX2, str(award_reference))):
+            and not re.match(AWARD_REFERENCES_REGEX2, str(award_reference))):
             errors.append(
                 build_cell_error_tuple(
                     ir,
