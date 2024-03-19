@@ -12,6 +12,7 @@ django-fsm
 environs[django]
 faker
 fs
+greenlet>=3.0rc3
 gunicorn[gevent]
 jsonpath-ng
 jsonschema
