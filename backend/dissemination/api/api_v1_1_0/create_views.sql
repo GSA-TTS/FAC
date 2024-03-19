@@ -197,6 +197,8 @@ create view api_v1_1_0.general as
         gen.auditee_ein,
         gen.auditee_zip,
         -- auditor
+        gen.auditor_certify_name,
+        gen.auditor_certify_title,
         gen.auditor_phone,
         gen.auditor_state,
         gen.auditor_city,
