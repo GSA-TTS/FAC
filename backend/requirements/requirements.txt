@@ -16,7 +16,7 @@ attrs==23.1.0
     #   referencing
 boto3==1.28.72
     # via
-    #   -r requirements.in
+    #   -r requirements/requirements.in
     #   django-storages
 botocore==1.31.72
     # via
@@ -25,14 +25,14 @@ botocore==1.31.72
 certifi==2023.7.22
     # via requests
 cfenv==0.5.3
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 cffi==1.16.0
     # via cryptography
 charset-normalizer==3.3.1
     # via requests
-cryptography==41.0.7
+cryptography==42.0.4
     # via
-    #   -r requirements.in
+    #   -r requirements/requirements.in
     #   oic
 defusedxml==0.7.1
     # via oic
@@ -40,9 +40,9 @@ dj-database-url==2.1.0
     # via environs
 dj-email-url==1.0.6
     # via environs
-django==5.0.1
+django==5.0.2
     # via
-    #   -r requirements.in
+    #   -r requirements/requirements.in
     #   dj-database-url
     #   django-cors-headers
     #   django-csp
@@ -53,39 +53,39 @@ django==5.0.1
 django-cache-url==3.4.4
     # via environs
 django-cors-headers==4.3.0
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 django-csp==3.7
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 django-dbbackup==4.0.2
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 django-fsm==2.8.1
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 django-storages[boto3]==1.14.2
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 djangorestframework==3.14.0
     # via
-    #   -r requirements.in
+    #   -r requirements/requirements.in
     #   djangorestframework-simplejwt
 djangorestframework-simplejwt==5.3.0
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 environs[django]==9.5.0
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 et-xmlfile==1.1.0
     # via openpyxl
 faker==19.12.0
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 fs==2.4.16
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 furl==2.1.3
     # via cfenv
 future==0.18.3
     # via pyjwkest
 greenlet==2.0.2
     # via
-    #   -r requirements.in
+    #   -r requirements/requirements.in
     #   sqlalchemy
 gunicorn==21.2.0
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 idna==3.4
     # via requests
 jmespath==1.0.1
@@ -93,9 +93,9 @@ jmespath==1.0.1
     #   boto3
     #   botocore
 jsonpath-ng==1.6.0
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 jsonschema==4.19.1
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 jsonschema-specifications==2023.7.1
     # via jsonschema
 mako==1.2.4
@@ -105,13 +105,13 @@ markupsafe==2.1.3
 marshmallow==3.20.1
     # via environs
 newrelic==9.1.1
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 numpy==1.26.1
     # via pandas
 oic==1.6.1
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 openpyxl==3.1.2
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 orderedmultidict==1.0.1
     # via furl
 packaging==23.2
@@ -119,20 +119,20 @@ packaging==23.2
     #   gunicorn
     #   marshmallow
 pandas==2.1.2
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 peewee==3.17.0
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 ply==3.11
     # via jsonpath-ng
 psycopg2-binary==2.9.9
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 pycparser==2.21
     # via cffi
 pycryptodome==3.20.0
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 pycryptodomex==3.20.0
     # via
-    #   -r requirements.in
+    #   -r requirements/requirements.in
     #   oic
     #   pyjwkest
 pydantic==2.4.2
@@ -142,15 +142,15 @@ pydantic-core==2.10.1
 pydantic-settings==2.0.3
     # via oic
 pydash==7.0.6
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 pyjwkest==1.4.2
     # via oic
 pyjwt==2.8.0
     # via
-    #   -r requirements.in
+    #   -r requirements/requirements.in
     #   djangorestframework-simplejwt
-pypdf==3.16.4
-    # via -r requirements.in
+pypdf==4.0.2
+    # via -r requirements/requirements.in
 python-dateutil==2.8.2
     # via
     #   botocore
@@ -161,23 +161,23 @@ python-dotenv==1.0.0
     #   environs
     #   pydantic-settings
 python-json-logger==2.0.7
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 python-slugify==8.0.1
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 pytz==2023.3.post1
     # via
     #   django-dbbackup
     #   djangorestframework
     #   pandas
 pyyaml==6.0.1
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 referencing==0.30.2
     # via
     #   jsonschema
     #   jsonschema-specifications
 requests==2.31.0
     # via
-    #   -r requirements.in
+    #   -r requirements/requirements.in
     #   oic
     #   pyjwkest
 rpds-py==0.10.6
@@ -194,15 +194,16 @@ six==1.16.0
     #   pyjwkest
     #   python-dateutil
 sqlalchemy==2.0.22
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 sqlparse==0.4.4
     # via
-    #   -r requirements.in
+    #   -r requirements/requirements.in
     #   django
 text-unidecode==1.3
     # via python-slugify
 typing-extensions==4.8.0
     # via
+    #   asgiref
     #   dj-database-url
     #   pydantic
     #   pydantic-core
@@ -211,9 +212,10 @@ typing-extensions==4.8.0
 tzdata==2023.3
     # via pandas
 uritemplate==4.1.1
-    # via -r requirements.in
+    # via -r requirements/requirements.in
 urllib3==2.0.7
     # via
+    #   -r requirements/requirements.in
     #   botocore
     #   requests
 
