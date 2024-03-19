@@ -31,7 +31,7 @@ Range = NT(
 # an environment variable for one-offs.
 try:
     rows = os.getenv("MAX_ROWS")
-    MAX_ROWS=int(rows)
+    MAX_ROWS = int(rows)
 except ValueError:
     MAX_ROWS = 10000
 XLSX_MAX_ROWS = 1048576  # Excel has a maximum of 1048576 rows
