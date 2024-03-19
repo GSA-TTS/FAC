@@ -8,6 +8,7 @@ import os
 import requests
 import uuid
 
+
 class TestAdminAPI(TestCase):
     # We can force a UUID locally that would not work when using api.data.gov,
     # because api.data.gov sets/overwrites this.
@@ -320,7 +321,6 @@ class TestAdminAPI(TestCase):
         self.admin_api_events_exist()
 
     def test_add_tribal_api_key_access(self):
-
         query_url = self.api_url + "/rpc/add_tribal_api_key_access"
         response = requests.post(
             query_url,
@@ -334,14 +334,15 @@ class TestAdminAPI(TestCase):
                 "x-api-user-id": TestAdminAPI.api_user_uuid,
             },
             timeout=10,
-            json={"email": f"test.{uuid.uuid4()}@fac.gsa.gov", 
-                  "key_id": str(uuid.uuid4())},
+            json={
+                "email": f"test.{uuid.uuid4()}@fac.gsa.gov",
+                "key_id": str(uuid.uuid4()),
+            },
         )
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json()['result'], "success")
-        
-    def test_remove_tribal_api_key_access(self):
+        self.assertEquals(response.json()["result"], "success")
 
+    def test_remove_tribal_api_key_access(self):
         flynn_email = f"{uuid.uuid4()}@fac.gsa.gov"
         flynn_id = f"{uuid.uuid4()}"
 
@@ -358,12 +359,11 @@ class TestAdminAPI(TestCase):
                 "x-api-user-id": TestAdminAPI.api_user_uuid,
             },
             timeout=10,
-            json={"email": flynn_email, 
-                  "key_id": flynn_id},
+            json={"email": flynn_email, "key_id": flynn_id},
         )
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.json()["result"], "success")
-        
+
         # Try removing the person we just added
         query_url = self.api_url + "/rpc/remove_tribal_api_key_access"
         response = requests.post(
@@ -378,12 +378,11 @@ class TestAdminAPI(TestCase):
                 "x-api-user-id": TestAdminAPI.api_user_uuid,
             },
             timeout=10,
-            json={"email": flynn_email, 
-                  "key_id": flynn_id},
+            json={"email": flynn_email, "key_id": flynn_id},
         )
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json()['result'], 'success')
-        
+        self.assertEquals(response.json()["result"], "success")
+
         # Try removing them again
         query_url = self.api_url + "/rpc/remove_tribal_api_key_access"
         response = requests.post(
@@ -398,8 +397,7 @@ class TestAdminAPI(TestCase):
                 "x-api-user-id": TestAdminAPI.api_user_uuid,
             },
             timeout=10,
-            json={"email": flynn_email, 
-                  "key_id": flynn_id},
+            json={"email": flynn_email, "key_id": flynn_id},
         )
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json()['result'], 'failure')
+        self.assertEquals(response.json()["result"], "failure")
