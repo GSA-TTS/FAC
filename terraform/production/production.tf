@@ -5,6 +5,11 @@ module "production" {
   pgrst_jwt_secret      = var.pgrst_jwt_secret
   clamav_instances      = 6
   database_plan         = "xlarge-gp-psql-redundant"
+  json_params = jsonencode(
+    {
+      "storage" : 50,
+    }
+  )
 }
 
 # Note: The very first time we run apply in production, this will fail because
