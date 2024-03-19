@@ -12,7 +12,8 @@ from audit.intakelib.common import (
 logger = logging.getLogger(__name__)
 
 # A version of this regex also exists in Base.libsonnet
-AWARD_REFERENCES_REGEX = r"^AWARD-(?!0000)[0-9]{4}$"
+AWARD_REFERENCES_REGEX1 = r"^AWARD-(?!0000)[0-9]{4}$"
+AWARD_REFERENCES_REGEX2 = r"^AWARD-(?!00000)[0-9]{5}$"
 
 
 # DESCRIPTION
@@ -23,7 +24,8 @@ def award_references_pattern(ir):
     award_references = get_range_by_name(ir, "award_reference")
     errors = []
     for index, award_reference in enumerate(award_references["values"]):
-        if not re.match(AWARD_REFERENCES_REGEX, str(award_reference)):
+        if (not re.match(AWARD_REFERENCES_REGEX1, str(award_reference))
+            or not re.match(AWARD_REFERENCES_REGEX2, str(award_reference))):
             errors.append(
                 build_cell_error_tuple(
                     ir,
