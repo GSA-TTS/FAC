@@ -13,7 +13,7 @@ environs[django]
 faker
 fs
 greenlet==2.0.2
-gunicorn
+gunicorn[eventlet]
 jsonpath-ng
 jsonschema
 newrelic
