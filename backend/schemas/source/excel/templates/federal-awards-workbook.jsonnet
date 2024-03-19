@@ -88,7 +88,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       keep_locked: true,
-      formula: '=IF(B{0}<>"", "AWARD-"&TEXT(ROW()-1,"0000"), "")',
+      formula: '=IF(B{0}<>"", "AWARD-"&TEXT(ROW()-1,"00000"), "")',
       width: 18,
       help: Help.award_reference,
     },
