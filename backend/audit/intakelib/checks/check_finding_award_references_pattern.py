@@ -12,11 +12,11 @@ from audit.intakelib.common import (
 logger = logging.getLogger(__name__)
 
 # A version of this regex also exists in Base.libsonnet
-AWARD_REFERENCES_REGEX = r"^AWARD-(?!0000)[0-9]{4}$"
+AWARD_REFERENCES_REGEX = r"^AWARD-(?!0{4,5}$)[0-9]{4,5}$"
 
 
 # DESCRIPTION
-# Award references should be of format AWARD-####
+# Award references should be of format AWARD-#### or AWARD-#####
 # TESTED BY
 # has_bad_award_references.xlsx
 def award_references_pattern(ir):
