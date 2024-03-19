@@ -11,8 +11,9 @@ To undo this action, complete the following steps.
 Search filters:
     1. Uncomment the search filters
 Warnings:
-    1. Remove search-alert-performance.html and its imports.
-    2. Remove the warning banner in header.html
+    1. Remove search-alert-performance.html and its imports
+    2. Uncomment the search-alert-info.html import
+    3. Remove the warning banner in header.html
 Summary report downloads:
     1. Uncomment the summary report download button here
     2. Uncomment the SF-SAC download button in summary.html
@@ -272,7 +273,7 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
             <div class="grid-col audit-search-results">
                 <h2 class="font-sans-2xl">Search single audit reports</h2>
                 {% include "search-alert-performance.html"%}
-                {% include "search-alert-info.html"%}
+                {% comment %} {% include "search-alert-info.html"%} {% endcomment %}
                 {% if results|length > 0 %}
                     <div class="margin-y-2 grid-row display-flex flex-justify">
                         <p class="margin-0 flex-align-self-center">
