@@ -11,7 +11,7 @@ begin;
 
 -- DROP TABLE public.audit_access;
 
-CREATE OR REPLACE VIEW admin_api_v1_0_0.audit_access AS
+CREATE OR REPLACE VIEW admin_api_v1_1_0.audit_access AS
     SELECT
         aa.role,
         aa.fullname,
@@ -21,11 +21,11 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.audit_access AS
     FROM
         public.audit_access aa
     WHERE
-        admin_api_v1_0_0_functions.has_admin_data_access('READ')
+        admin_api_v1_1_0_functions.has_admin_data_access('READ')
     ORDER BY aa.id
 ;
 
-CREATE OR REPLACE VIEW admin_api_v1_0_0.singleauditchecklist AS
+CREATE OR REPLACE VIEW admin_api_v1_1_0.singleauditchecklist AS
     SELECT
         sac.id,
         sac.date_created,
@@ -54,11 +54,11 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.singleauditchecklist AS
     from
         public.audit_singleauditchecklist sac
     where
-        admin_api_v1_0_0_functions.has_admin_data_access('READ')
+        admin_api_v1_1_0_functions.has_admin_data_access('READ')
     order by sac.id
 ;
 
-CREATE OR REPLACE VIEW admin_api_v1_0_0.tribal_access AS
+CREATE OR REPLACE VIEW admin_api_v1_1_0.tribal_access AS
     SELECT
         uup.email,
         up.slug as permission
@@ -68,11 +68,11 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.tribal_access AS
     WHERE
         (uup.permission_id = up.id)
         AND (up.slug = 'read-tribal')
-        AND admin_api_v1_0_0_functions.has_admin_data_access('READ')
+        AND admin_api_v1_1_0_functions.has_admin_data_access('READ')
     ORDER BY uup.id
 ;
 
-CREATE OR REPLACE VIEW admin_api_v1_0_0.admin_api_events AS
+CREATE OR REPLACE VIEW admin_api_v1_1_0.admin_api_events AS
     SELECT
         ae.timestamp,
         ae.api_key_uuid,
@@ -81,7 +81,7 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.admin_api_events AS
     FROM
         public.support_adminapievent ae
     WHERE
-        admin_api_v1_0_0_functions.has_admin_data_access('READ')
+        admin_api_v1_1_0_functions.has_admin_data_access('READ')
     ORDER BY ae.id
 ;
 
