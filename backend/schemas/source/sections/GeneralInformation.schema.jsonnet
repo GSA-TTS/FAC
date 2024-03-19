@@ -3,7 +3,7 @@ local Func = import '../base/Functions.libsonnet';
 local Types = Base.Types;
 
 /*
-Typechecks fields, but allows for empty data as well. Contains conditional Checks.
+Typechecks fields, but allows for empty data as well. Contains conditional checks.
 */
 {
   '$id': 'http://example.org/generalinformation',
@@ -160,6 +160,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
         },
       ],
     },
+    // If auditor is from the USA, address info should be included.
     {
       'if': {
         properties: {
@@ -170,11 +171,16 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
       },
       'then': {
         properties: {
-          auditor_zip: Base.Compound.Zip,
+          auditor_address_line_1: Base.Compound.NonEmptyString,
+          auditor_city: Base.Compound.NonEmptyString,
           auditor_state: Base.Enum.UnitedStatesStateAbbr,
+          auditor_zip: Base.Compound.Zip,
+
+          auditor_international_address: Base.Compound.EmptyString
         },
       },
     },
+    // If auditor is NOT from the USA, international things should be filled in.
     {
       'if': {
         properties: {
@@ -187,8 +193,12 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
       },
       'then': {
         properties: {
-          auditor_zip: Base.Compound.EmptyString,
+          auditor_address_line_1: Base.Compound.EmptyString,
+          auditor_city: Base.Compound.EmptyString,
           auditor_state: Base.Compound.EmptyString,
+          auditor_zip: Base.Compound.EmptyString,
+
+          auditor_international_address: Base.Compound.NonEmptyString
         },
       },
     },
