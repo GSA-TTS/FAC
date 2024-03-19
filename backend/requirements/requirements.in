@@ -21,6 +21,7 @@ oic
 openpyxl
 pandas
 peewee
+psycogreen
 psycopg2-binary
 pycryptodome>=3.19.1
 pycryptodomex>=3.19.1
