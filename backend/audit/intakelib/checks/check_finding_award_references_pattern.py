@@ -16,7 +16,7 @@ AWARD_REFERENCES_REGEX = r"^AWARD-(?!0{4,5}$)[0-9]{4,5}$"
 
 
 # DESCRIPTION
-# Award references should be of format AWARD-####
+# Award references should be of format AWARD-#### or AWARD-#####
 # TESTED BY
 # has_bad_award_references.xlsx
 def award_references_pattern(ir):

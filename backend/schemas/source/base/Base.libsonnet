@@ -296,7 +296,7 @@ local Compound = {
   AwardReference: Types.string {
     title: 'AwardReference',
     description: 'Award Reference',
-    pattern: '^AWARD-(?!00000)[0-9]{5}$',
+    pattern: '^AWARD-(?!0{4,5}$)[0-9]{4,5}$',
   },
   PriorReferences: Types.string {
     title: 'PriorReferences',
