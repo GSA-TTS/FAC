@@ -1,4 +1,4 @@
-CREATE SEQUENCE dissemination_combined_id_seq
+CREATE SEQUENCE IF NOT EXISTS dissemination_combined_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
