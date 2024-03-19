@@ -8,21 +8,29 @@ import os
 import requests
 
 
-class TestAdminTableBuilder(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.execute_sql_file("support/api/admin_api_v1_1_0/create_access_tables.sql")
-        self.execute_sql_file("support/api/admin_api_v1_1_0/base.sql")
-        self.execute_sql_file("support/api/admin_api_v1_1_0/create_schema.sql")
-        self.execute_sql_file("support/api/admin_api_v1_1_0/create_functions.sql")
-        self.execute_sql_file("support/api/admin_api_v1_1_0/create_views.sql")
+class TestAdminTableBuilder:
+    @classmethod
+    def create_access_tables(cls):
+        cls.execute_sql_file("support/api/admin_api_v1_1_0/create_access_tables.sql")
 
-    def tearDown(self):
-        super().tearDown()
-        self.execute_sql_file("support/api/admin_api_v1_1_0/drop_views.sql")
-        self.execute_sql_file("support/api/admin_api_v1_1_0/drop_schema.sql")
+    # @classmethod
+    # def base(cls):
+    #     cls.execute_sql_file("support/api/admin_api_v1_1_0/base.sql")
 
-    def execute_sql_file(self, relative_path):
+    # @classmethod
+    # def create_schema(cls):
+    #     cls.execute_sql_file("support/api/admin_api_v1_1_0/create_schema.sql")
+
+    # @classmethod
+    # def create_functions(cls):
+    #     cls.execute_sql_file("support/api/admin_api_v1_1_0/create_functions.sql")
+
+    # @classmethod
+    # def create_views(cls):
+    #     cls.execute_sql_file("support/api/admin_api_v1_1_0/create_views.sql")
+
+    @classmethod
+    def execute_sql_file(cls, relative_path):
         """Execute the SQL commands in the file at the given path."""
         full_path = os.path.join(os.getcwd(), relative_path)
         try:
@@ -34,7 +42,7 @@ class TestAdminTableBuilder(TestCase):
             print(f"Error executing SQL command: {e}")
 
 
-class TestAdminAPI(TestAdminTableBuilder):
+class TestAdminAPI(TestCase):
     # We can force a UUID locally that would not work when using api.data.gov,
     # because api.data.gov sets/overwrites this.
     api_user_uuid = "61ba59b2-f545-4c2f-9b24-9655c706a06c"
@@ -69,6 +77,7 @@ class TestAdminAPI(TestAdminTableBuilder):
 
     # https://stackoverflow.com/questions/2511679/python-number-of-rows-affected-by-cursor-executeselect
     def test_users_exist_in_perms_table(self):
+        TestAdminTableBuilder.create_access_tables()
         with connection.cursor() as cur:
             cur.execute("SELECT count(*) FROM public.support_administrative_key_uuids;")
             (number_of_rows,) = cur.fetchone()
