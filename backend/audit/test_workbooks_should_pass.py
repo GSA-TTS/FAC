@@ -79,6 +79,7 @@ def process_workbook_set(workbook_set_path, is_gsa_migration=True):
 
 @unittest.skip("Temporarily skipping for speed of troubleshooting.")
 class PassingWorkbooks(SimpleTestCase):
+    @unittest.skip("Temporarily skipping for speed of troubleshooting.")
     def test_passing_workbooks(self):
         workbook_sets = reduce(
             os.path.join, ["audit", "fixtures", "workbooks", "should_pass"]

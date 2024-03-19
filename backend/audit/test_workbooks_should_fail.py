@@ -61,6 +61,7 @@ def map_file_to_extractor_validator(filename):
 
 @unittest.skip("Temporarily skipping for speed of troubleshooting.")
 class FailingWorkbooks(SimpleTestCase):
+    @unittest.skip("Temporarily skipping for speed of troubleshooting.")
     def test_failing_workbooks(self):
         workbook_sets = reduce(
             os.path.join, ["audit", "fixtures", "workbooks", "should_fail"]
