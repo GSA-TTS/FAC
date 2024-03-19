@@ -341,6 +341,10 @@ class SingleSummaryReportDownloadView(View):
         Given a report_id in the URL, generate the summary report in S3 and
         redirect to its download link.
         """
+        raise Http404(
+            "SF-SAC downloads are temporarily disabled. See the FAC status page for more details."
+        )
+
         sac = get_object_or_404(General, report_id=report_id)
         include_private = include_private_results(request)
         filename = generate_summary_report([sac.report_id], include_private)

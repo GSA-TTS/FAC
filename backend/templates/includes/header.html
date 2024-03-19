@@ -8,7 +8,9 @@
         </div>
     </section>
 {% endif %}
-
+<section class="search-alert-banner">
+    <div class="grid-container">Audit search is currently limited to UEI-only. For more information, visit <a href="{{ STATIC_SITE_URL }}status/" target="_blank">the FAC system status page</a>.</div>
+</section>
 <section class="usa-banner" aria-label="Official government website">
     <div class="usa-accordion">
         <header class="usa-banner__header">
@@ -85,23 +87,4 @@
         </div>
     </div>
 </section>
-<div class="usa-overlay"></div>
-<header class="usa-header usa-header--basic">
-    {% include "includes/nav_primary.html" %}
-</header>
-{% comment %} "Breadcrumbs" for all pages, excepting the homepage. {% endcomment %}
-{% if request.path != '/' %}
-    <header class="usa-header usa-header-basic">
-        <div class="bg-primary-darker text-white width-full height-6">
-            <div class="grid-container">
-                {% comment %}
-                    OMB_NUMBER and OMB_EXP_DATE are global.
-                    Added in /config/settings, passed in /config/context_processors.py 
-                {% endcomment %}
-                <p class="margin-0 padding-top-105">
-                    OMB# <strong>{{ OMB_NUMBER }}</strong> EXP: <strong>{{ OMB_EXP_DATE }}</strong>
-                </p>
-            </div>
-        </div>
-    </header>
-{% endif %}
+{% include "includes/nav_primary.html" %}
