@@ -29,11 +29,13 @@ Range = NT(
 
 # We can compile larger workbooks by setting
 # an environment variable for one-offs.
+DEFAULT_MAX_ROWS = 10000
+rows = os.getenv("MAX_ROWS", DEFAULT_MAX_ROWS)
 try:
-    rows = os.getenv("MAX_ROWS")
     MAX_ROWS = int(rows)
 except ValueError:
-    MAX_ROWS = 10000
+    MAX_ROWS = DEFAULT_MAX_ROWS
+
 XLSX_MAX_ROWS = 1048576  # Excel has a maximum of 1048576 rows
 XLSX_MAX_COLS = 16384  # Excel has a maximum of 16384 columns
 
