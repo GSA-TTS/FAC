@@ -29,10 +29,9 @@ from dissemination.models import (
     AdditionalUei,
     OneTimeAccess,
 )
-from dissemination.summary_reports import generate_summary_report
-from dissemination.summary_reports_two import (
-    generate_summary_report as generate_summary_report_two,
-)
+
+# from dissemination.summary_reports import generate_summary_report
+from dissemination.summary_reports_two import generate_summary_report
 
 from support.decorators import newrelic_timing_metric
 
@@ -377,10 +376,11 @@ class MultipleSummaryReportDownloadView(View):
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
             # Alternates every 10 seconds; even it is old, odd new.
-            if (((int(time.time()) // 10) % 10) % 2) == 0:
-                filename = generate_summary_report(report_ids, include_private)
-            else:
-                filename = generate_summary_report_two(report_ids, include_private)
+            # if (((int(time.time()) // 10) % 10) % 2) == 0:
+            #     filename = generate_summary_report(report_ids, include_private)
+            # else:
+            #     filename = generate_summary_report(report_ids, include_private)
+            filename = generate_summary_report(report_ids, include_private)
             download_url = get_download_url(filename)
 
             return redirect(download_url)
