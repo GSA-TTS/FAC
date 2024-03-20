@@ -11,7 +11,7 @@ from audit.models import (
     generate_sac_report_id,
 )
 
-# from dissemination.test_search import TestMaterializedViewBuilder
+from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
     General,
     FederalAward,
@@ -148,100 +148,100 @@ class PdfDownloadViewTests(TestCase):
         self.assertIn(file.filename, response.url)
 
 
-# class SearchViewTests(TestMaterializedViewBuilder):
-#     def setUp(self):
-#         super().setUp()
-#         self.anon_client = Client()
-#         self.auth_client = Client()
-#         self.perm_client = Client()
+class SearchViewTests(TestMaterializedViewBuilder):
+    def setUp(self):
+        super().setUp()
+        self.anon_client = Client()
+        self.auth_client = Client()
+        self.perm_client = Client()
 
-#         self.auth_user = baker.make(User)
-#         self.auth_client.force_login(self.auth_user)
+        self.auth_user = baker.make(User)
+        self.auth_client.force_login(self.auth_user)
 
-#         self.perm_user = baker.make(User)
-#         permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
-#         baker.make(
-#             UserPermission,
-#             email=self.perm_user.email,
-#             user=self.perm_user,
-#             permission=permission,
-#         )
-#         self.perm_client.force_login(self.perm_user)
+        self.perm_user = baker.make(User)
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(
+            UserPermission,
+            email=self.perm_user.email,
+            user=self.perm_user,
+            permission=permission,
+        )
+        self.perm_client.force_login(self.perm_user)
 
-#     def _search_url(self):
-#         return reverse("dissemination:Search")
+    def _search_url(self):
+        return reverse("dissemination:Search")
 
-#     def test_allows_anonymous(self):
-#         response = self.anon_client.get(self._search_url())
-#         self.assertEqual(response.status_code, 200)
+    def test_allows_anonymous(self):
+        response = self.anon_client.get(self._search_url())
+        self.assertEqual(response.status_code, 200)
 
-#     def test_search(self):
-#         response = self.anon_client.post(self._search_url(), {})
-#         self.assertContains(response, "Search single audit reports")
-#         self.assertNotContains(response, "Results: ")
+    def test_search(self):
+        response = self.anon_client.post(self._search_url(), {})
+        self.assertContains(response, "Search single audit reports")
+        self.assertNotContains(response, "Results: ")
 
-#     def test_anonymous_returns_private_and_public(self):
-#         """Anonymous users should see all reports (public and private included)."""
-#         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-#         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-#         for p in public:
-#             baker.make(FederalAward, report_id=p)
-#         for p in private:
-#             baker.make(FederalAward, report_id=p)
-#         self.refresh_materialized_view()
-#         response = self.anon_client.post(self._search_url(), {})
+    def test_anonymous_returns_private_and_public(self):
+        """Anonymous users should see all reports (public and private included)."""
+        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
+        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
+        for p in public:
+            baker.make(FederalAward, report_id=p)
+        for p in private:
+            baker.make(FederalAward, report_id=p)
+        self.refresh_materialized_view()
+        response = self.anon_client.post(self._search_url(), {})
 
-#         self.assertContains(response, "Results: 10")
+        self.assertContains(response, "Results: 10")
 
-#         # all of the public reports should show up on the page
-#         for p in public:
-#             self.assertContains(response, p.report_id)
+        # all of the public reports should show up on the page
+        for p in public:
+            self.assertContains(response, p.report_id)
 
-#         # all of the private reports should show up on the page
-#         for p in private:
-#             self.assertContains(response, p.report_id)
+        # all of the private reports should show up on the page
+        for p in private:
+            self.assertContains(response, p.report_id)
 
-#     def test_non_permissioned_returns_private_and_public(self):
-#         """Non-permissioned users should see all reports (public and private included)."""
-#         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-#         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-#         for p in public:
-#             baker.make(FederalAward, report_id=p)
-#         for p in private:
-#             baker.make(FederalAward, report_id=p)
-#         self.refresh_materialized_view()
-#         response = self.auth_client.post(self._search_url(), {})
+    def test_non_permissioned_returns_private_and_public(self):
+        """Non-permissioned users should see all reports (public and private included)."""
+        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
+        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
+        for p in public:
+            baker.make(FederalAward, report_id=p)
+        for p in private:
+            baker.make(FederalAward, report_id=p)
+        self.refresh_materialized_view()
+        response = self.auth_client.post(self._search_url(), {})
 
-#         self.assertContains(response, "Results: 10")
+        self.assertContains(response, "Results: 10")
 
-#         # all of the public reports should show up on the page
-#         for p in public:
-#             self.assertContains(response, p.report_id)
+        # all of the public reports should show up on the page
+        for p in public:
+            self.assertContains(response, p.report_id)
 
-#         # all of the private reports should show up on the page
-#         for p in private:
-#             self.assertContains(response, p.report_id)
+        # all of the private reports should show up on the page
+        for p in private:
+            self.assertContains(response, p.report_id)
 
-#     def test_permissioned_returns_all(self):
-#         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-#         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-#         for p in public:
-#             baker.make(FederalAward, report_id=p)
-#         for p in private:
-#             baker.make(FederalAward, report_id=p)
-#         self.refresh_materialized_view()
+    def test_permissioned_returns_all(self):
+        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
+        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
+        for p in public:
+            baker.make(FederalAward, report_id=p)
+        for p in private:
+            baker.make(FederalAward, report_id=p)
+        self.refresh_materialized_view()
 
-#         response = self.perm_client.post(self._search_url(), {})
+        response = self.perm_client.post(self._search_url(), {})
 
-#         self.assertContains(response, "Results: 10")
+        self.assertContains(response, "Results: 10")
 
-#         # all of the public reports should show up on the page
-#         for p in public:
-#             self.assertContains(response, p.report_id)
+        # all of the public reports should show up on the page
+        for p in public:
+            self.assertContains(response, p.report_id)
 
-#         # all of the private reports should show up on the page
-#         for p in private:
-#             self.assertContains(response, p.report_id)
+        # all of the private reports should show up on the page
+        for p in private:
+            self.assertContains(response, p.report_id)
 
 
 class OneTimeAccessDownloadViewTests(TestCase):
@@ -599,160 +599,160 @@ class SummaryViewTests(TestCase):
         )
 
 
-# class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
-#     def setUp(self):
-#         super().setUp()
-#         self.anon_client = Client()
-#         self.perm_client = Client()
+class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
+    def setUp(self):
+        super().setUp()
+        self.anon_client = Client()
+        self.perm_client = Client()
 
-#         self.perm_user = baker.make(User)
-#         permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
-#         baker.make(
-#             UserPermission,
-#             email=self.perm_user.email,
-#             user=self.perm_user,
-#             permission=permission,
-#         )
-#         self.perm_client.force_login(self.perm_user)
+        self.perm_user = baker.make(User)
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(
+            UserPermission,
+            email=self.perm_user.email,
+            user=self.perm_user,
+            permission=permission,
+        )
+        self.perm_client.force_login(self.perm_user)
 
-#     def _make_general(self, is_public=True, **kwargs):
-#         """
-#         Create a General object in dissemination with the keyword arguments passed in.
-#         """
-#         general = baker.make(
-#             General,
-#             is_public=is_public,
-#             **kwargs,
-#         )
-#         return general
+    def _make_general(self, is_public=True, **kwargs):
+        """
+        Create a General object in dissemination with the keyword arguments passed in.
+        """
+        general = baker.make(
+            General,
+            is_public=is_public,
+            **kwargs,
+        )
+        return general
 
-#     def _summary_report_url(self):
-#         return reverse("dissemination:MultipleSummaryReportDownload")
+    def _summary_report_url(self):
+        return reverse("dissemination:MultipleSummaryReportDownload")
 
-#     def _mock_filename(self):
-#         return "some-report-name.xlsx"
+    def _mock_filename(self):
+        return "some-report-name.xlsx"
 
-#     def _mock_download_url(self):
-#         return "http://example.com/gsa-fac-private-s3/temp/some-report-name.xlsx"
+    def _mock_download_url(self):
+        return "http://example.com/gsa-fac-private-s3/temp/some-report-name.xlsx"
 
-#     @patch("dissemination.summary_reports.persist_workbook")
-#     def test_bad_search_returns_400(self, mock_persist_workbook):
-#         """
-#         Submitting a form with bad parameters should throw a BadRequest.
-#         """
-#         response = self.anon_client.post(
-#             self._summary_report_url(), {"start_date": "Not a date"}
-#         )
-#         self.assertEquals(response.status_code, 400)
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_bad_search_returns_400(self, mock_persist_workbook):
+        """
+        Submitting a form with bad parameters should throw a BadRequest.
+        """
+        response = self.anon_client.post(
+            self._summary_report_url(), {"start_date": "Not a date"}
+        )
+        self.assertEquals(response.status_code, 400)
 
-#     @patch("dissemination.summary_reports.persist_workbook")
-#     def test_empty_results_returns_404(self, mock_persist_workbook):
-#         """
-#         Searches with no results should return a 404, not an empty excel file.
-#         """
-#         general = self._make_general(is_public=False, auditee_uei="123456789012")
-#         baker.make(FederalAward, report_id=general)
-#         self.refresh_materialized_view()
-#         response = self.anon_client.post(
-#             self._summary_report_url(), {"uei_or_ein": "NotTheOther1"}
-#         )
-#         self.assertEquals(response.status_code, 404)
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_empty_results_returns_404(self, mock_persist_workbook):
+        """
+        Searches with no results should return a 404, not an empty excel file.
+        """
+        general = self._make_general(is_public=False, auditee_uei="123456789012")
+        baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
+        response = self.anon_client.post(
+            self._summary_report_url(), {"uei_or_ein": "NotTheOther1"}
+        )
+        self.assertEquals(response.status_code, 404)
 
-#     @patch("dissemination.views.get_download_url")
-#     @patch("dissemination.summary_reports.persist_workbook")
-#     def test_no_permissions_returns_404_on_private(
-#         self, mock_persist_workbook, mock_get_download_url
-#     ):
-#         """
-#         Non-permissioned users can access private audits through the summary report post.
-#         """
-#         mock_persist_workbook.return_value = self._mock_filename()
-#         mock_get_download_url.return_value = self._mock_download_url()
+    @patch("dissemination.views.get_download_url")
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_no_permissions_returns_404_on_private(
+        self, mock_persist_workbook, mock_get_download_url
+    ):
+        """
+        Non-permissioned users can access private audits through the summary report post.
+        """
+        mock_persist_workbook.return_value = self._mock_filename()
+        mock_get_download_url.return_value = self._mock_download_url()
 
-#         general = self._make_general(is_public=False)
-#         baker.make(FederalAward, report_id=general)
-#         self.refresh_materialized_view()
-#         response = self.anon_client.post(self._summary_report_url(), {})
-#         self.assertRedirects(
-#             response,
-#             self._mock_download_url(),
-#             status_code=302,
-#             target_status_code=200,
-#             fetch_redirect_response=False,
-#         )
+        general = self._make_general(is_public=False)
+        baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
+        response = self.anon_client.post(self._summary_report_url(), {})
+        self.assertRedirects(
+            response,
+            self._mock_download_url(),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=False,
+        )
 
-#     @patch("dissemination.views.get_download_url")
-#     @patch("dissemination.summary_reports.persist_workbook")
-#     def test_permissions_returns_file_on_private(
-#         self, mock_persist_workbook, mock_get_download_url
-#     ):
-#         """
-#         Permissioned users recieve a file if there are private results.
-#         """
-#         mock_persist_workbook.return_value = self._mock_filename()
-#         mock_get_download_url.return_value = self._mock_download_url()
+    @patch("dissemination.views.get_download_url")
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_permissions_returns_file_on_private(
+        self, mock_persist_workbook, mock_get_download_url
+    ):
+        """
+        Permissioned users recieve a file if there are private results.
+        """
+        mock_persist_workbook.return_value = self._mock_filename()
+        mock_get_download_url.return_value = self._mock_download_url()
 
-#         general = self._make_general(is_public=False)
-#         baker.make(FederalAward, report_id=general)
-#         self.refresh_materialized_view()
-#         response = self.perm_client.post(self._summary_report_url(), {})
-#         self.assertRedirects(
-#             response,
-#             self._mock_download_url(),
-#             status_code=302,
-#             target_status_code=200,
-#             fetch_redirect_response=False,
-#         )
+        general = self._make_general(is_public=False)
+        baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
+        response = self.perm_client.post(self._summary_report_url(), {})
+        self.assertRedirects(
+            response,
+            self._mock_download_url(),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=False,
+        )
 
-#     @patch("dissemination.views.get_download_url")
-#     @patch("dissemination.summary_reports.persist_workbook")
-#     def test_empty_search_params_returns_file(
-#         self, mock_persist_workbook, mock_get_download_url
-#     ):
-#         """
-#         File should be generated on empty search parameters ("search all").
-#         """
-#         mock_persist_workbook.return_value = self._mock_filename()
-#         mock_get_download_url.return_value = self._mock_download_url()
+    @patch("dissemination.views.get_download_url")
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_empty_search_params_returns_file(
+        self, mock_persist_workbook, mock_get_download_url
+    ):
+        """
+        File should be generated on empty search parameters ("search all").
+        """
+        mock_persist_workbook.return_value = self._mock_filename()
+        mock_get_download_url.return_value = self._mock_download_url()
 
-#         general = self._make_general(is_public=True)
-#         baker.make(FederalAward, report_id=general)
-#         self.refresh_materialized_view()
+        general = self._make_general(is_public=True)
+        baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
 
-#         response = self.anon_client.post(self._summary_report_url(), {})
-#         self.assertRedirects(
-#             response,
-#             self._mock_download_url(),
-#             status_code=302,
-#             target_status_code=200,
-#             fetch_redirect_response=False,
-#         )
+        response = self.anon_client.post(self._summary_report_url(), {})
+        self.assertRedirects(
+            response,
+            self._mock_download_url(),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=False,
+        )
 
-#     @patch("dissemination.views.get_download_url")
-#     @patch("dissemination.summary_reports.persist_workbook")
-#     def test_many_results_returns_file(
-#         self, mock_persist_workbook, mock_get_download_url
-#     ):
-#         """
-#         File should still be generated if there are above SUMMARY_REPORT_DOWNLOAD_LIMIT total results.
-#         """
-#         mock_persist_workbook.return_value = self._mock_filename()
-#         mock_get_download_url.return_value = self._mock_download_url()
+    @patch("dissemination.views.get_download_url")
+    @patch("dissemination.summary_reports.persist_workbook")
+    def test_many_results_returns_file(
+        self, mock_persist_workbook, mock_get_download_url
+    ):
+        """
+        File should still be generated if there are above SUMMARY_REPORT_DOWNLOAD_LIMIT total results.
+        """
+        mock_persist_workbook.return_value = self._mock_filename()
+        mock_get_download_url.return_value = self._mock_download_url()
 
-#         for i in range(4):
-#             general = self._make_general(
-#                 is_public=True,
-#                 report_id=generate_sac_report_id(end_date="2023-12-31", count=str(i)),
-#             )
-#             baker.make(FederalAward, report_id=general)
-#         self.refresh_materialized_view()
+        for i in range(4):
+            general = self._make_general(
+                is_public=True,
+                report_id=generate_sac_report_id(end_date="2023-12-31", count=str(i)),
+            )
+            baker.make(FederalAward, report_id=general)
+        self.refresh_materialized_view()
 
-#         with self.settings(SUMMARY_REPORT_DOWNLOAD_LIMIT=2):
-#             response = self.anon_client.post(self._summary_report_url(), {})
-#             self.assertRedirects(
-#                 response,
-#                 self._mock_download_url(),
-#                 status_code=302,
-#                 target_status_code=200,
-#                 fetch_redirect_response=False,
-#             )
+        with self.settings(SUMMARY_REPORT_DOWNLOAD_LIMIT=2):
+            response = self.anon_client.post(self._summary_report_url(), {})
+            self.assertRedirects(
+                response,
+                self._mock_download_url(),
+                status_code=302,
+                target_status_code=200,
+                fetch_redirect_response=False,
+            )
