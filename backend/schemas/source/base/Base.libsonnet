@@ -174,8 +174,6 @@ local Enum = {
     enum: [
       'program-specific',
       'single-audit',
-      // Include after we are able to recieve ACEE submissions.
-      // 'alternative-compliance-engagement',
     ],
     title: 'AuditType',
   },
