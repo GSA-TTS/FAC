@@ -14,7 +14,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("-c", "--create", action="store_true", default=False)
         parser.add_argument("-d", "--drop", action="store_true", default=False)
-        parser.add_argument("-r-", "--refresh", action="store_true", default=False)
+        parser.add_argument("-r", "--refresh", action="store_true", default=False)
 
     def handle(self, *args, **options):
         path = "dissemination/sql"
