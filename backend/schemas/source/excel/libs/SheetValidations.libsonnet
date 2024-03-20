@@ -119,9 +119,8 @@ local AwardReferenceValidation = {
     type: 'list',
     formula1: '=Y{0}:Y{0}',
     errorStyle: 'warning',
-    custom_error: 'If known, the Program Name should have been provided for you. ' +
-                  'Please do not change the Program Name unless absolutely necessary ' +
-                  'or the Program Name is unknown. The Program Name must be 300 characters or less. ' +
+    custom_error: 'If the Program Name was provided, please, do not change it unless necessary or unknown. ' +
+                  'The Program Name must be under 300 characters.' +
                   'If the drop-down menu is empty, you may need to enter an Agency Prefix ' +
                   'and ALN in columns B and C.' +
                   'Continue?',    
