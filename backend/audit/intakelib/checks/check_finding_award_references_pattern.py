@@ -18,6 +18,7 @@ AWARD_REFERENCES_REGEX5 = r"^AWARD-(?!0{5}$)[0-9]{5}$"
 AWARD_LEN_4_DIGITS = 10
 AWARD_LEN_5_DIGITS = 11
 
+
 # DESCRIPTION
 # Award references should be of format AWARD-#### or AWARD-#####
 # TESTED BY
