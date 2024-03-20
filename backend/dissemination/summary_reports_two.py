@@ -366,29 +366,43 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     }
     """
     t0 = time.time()
-
     # Make report IDs unique
     report_ids = set(report_ids)
+    all_names = set(field_name_ordered.keys())
+    names_in_dc = set(["general", "federalaward", "finding", "passthrough"])
+    names_not_in_dc = all_names - names_in_dc
+    data = initialize_data_structure(names_in_dc.union(names_not_in_dc))
 
+    process_combined_results(
+        report_ids, names_in_dc, data, include_private, tribal_report_ids
+    )
+
+    process_non_combined_results(
+        report_ids, names_not_in_dc, data, include_private, tribal_report_ids
+    )
+
+    return (data, time.time() - t0)
+
+
+def initialize_data_structure(names):
     data = {}
+    for model_name in names:
+        data[model_name] = {
+            "field_names": field_name_ordered[model_name],
+            "entries": [],
+        }
+    return data
 
+
+def process_combined_results(
+    report_ids, names_in_dc, data, include_private, tribal_report_ids
+):
     # Grab all the rows from the combined table into a local structure.
     # We'll do this in memory. This table flattens general, federalaward, and findings
     # so we can move much faster on those tables without extra lookups.
     dc_results = DisseminationCombined.objects.all().filter(report_id__in=report_ids)
     # Different tables want to be visited/filtered differently.
-
-    all_names = set(field_name_ordered.keys())
-    names_in_dc = set(["general", "federalaward", "finding", "passthrough"])
-    names_not_in_dc = all_names - names_in_dc
     visited = set()
-
-    for model_name in names_in_dc.union(names_not_in_dc):
-        data[model_name] = {
-            "field_names": field_name_ordered[model_name],
-            "entries": [],
-        }
-
     # Do all of the names in the DisseminationCombined at the same time.
     # That way, we only go through the results once.
     for obj in dc_results:
@@ -448,6 +462,10 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
                         [getattr(obj, field_name) for field_name in field_names]
                     )
 
+
+def process_non_combined_results(
+    report_ids, names_not_in_dc, data, include_private, tribal_report_ids
+):
     for model_name in names_not_in_dc:
         model = _get_model_by_name(model_name)
         print(model_name)
@@ -470,8 +488,131 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
                         for field_name in field_names
                     ]
                 )
-    t1 = time.time()
-    return (data, t1 - t0)
+
+
+# def gather_report_data_dissemination(report_ids, tribal_report_ids, include_private):
+#     """
+#     Given a set of report IDs, fetch the disseminated data for each and asssemble into a dictionary with the following shape:
+
+#     {
+#         general: {
+#             field_names: [],
+#             entries: [],
+#         },
+#         federal_award: {
+#             field_names: [],
+#             entries: [],
+#         },
+#         ...
+#     }
+#     """
+#     t0 = time.time()
+
+#     # Make report IDs unique
+#     report_ids = set(report_ids)
+
+#     data = {}
+
+#     # Grab all the rows from the combined table into a local structure.
+#     # We'll do this in memory. This table flattens general, federalaward, and findings
+#     # so we can move much faster on those tables without extra lookups.
+#     dc_results = DisseminationCombined.objects.all().filter(report_id__in=report_ids)
+#     # Different tables want to be visited/filtered differently.
+
+#     all_names = set(field_name_ordered.keys())
+#     names_in_dc = set(["general", "federalaward", "finding", "passthrough"])
+#     names_not_in_dc = all_names - names_in_dc
+#     visited = set()
+
+#     for model_name in names_in_dc.union(names_not_in_dc):
+#         data[model_name] = {
+#             "field_names": field_name_ordered[model_name],
+#             "entries": [],
+#         }
+
+#     # Do all of the names in the DisseminationCombined at the same time.
+#     # That way, we only go through the results once.
+#     for obj in dc_results:
+#         for model_name in names_in_dc:
+#             field_names = field_name_ordered[model_name]
+#             report_id = getattr(obj, "report_id")
+#             award_reference = getattr(obj, "award_reference")
+#             reference_number = getattr(obj, "reference_number")
+#             passthrough_name = getattr(obj, "passthrough_name")
+
+#             # WATCH THIS IF/ELIF
+#             # It is making sure we do not double-disseminate some rows.
+#             ####
+#             # GENERAL
+#             if model_name == "general" and report_id in visited:
+#                 pass
+#             ####
+#             # PASSTHROUGH
+#             # We should never disseminate something that has no name.
+#             elif model_name == "passthrough" and passthrough_name is None:
+#                 pass
+#             ####
+#             # FEDERAL AWARD
+#             # This condition is actually filtering out the damage to the
+#             # data from the race hazard we had at the start of 2024.
+#             # NOTE
+#             # We cannot filter `passthrough` here. Each award reference row has
+#             # a one-to-many relationship with passthrough.
+#             elif (
+#                 model_name == "federalaward"
+#                 and f"{report_id}-{award_reference}" in visited
+#             ):
+#                 pass
+#             ####
+#             # FINDING
+#             elif model_name == "finding" and (
+#                 award_reference is None or reference_number is None
+#             ):
+#                 # And we don't include rows in finding where there are none.
+#                 pass
+#             else:
+#                 # Track to limit duplication
+#                 if model_name == "general":
+#                     visited.add(report_id)
+#                 # Handle special tracking for federal awards, so we don't duplicate award # rows.
+#                 if model_name == "federalaward":
+#                     visited.add(f"{report_id}-{award_reference}")
+#                 # Omit rows for private tribal data when the user doesn't have perms
+#                 if (
+#                     model_name in restricted_model_names
+#                     and not include_private
+#                     and report_id in tribal_report_ids
+#                 ):
+#                     pass
+#                 else:
+#                     data[model_name]["entries"].append(
+#                         [getattr(obj, field_name) for field_name in field_names]
+#                     )
+
+#     for model_name in names_not_in_dc:
+#         model = _get_model_by_name(model_name)
+#         print(model_name)
+#         field_names = field_name_ordered[model_name]
+#         objects = model.objects.all().filter(report_id__in=report_ids)
+#         # Walk the objects
+#         for obj in objects:
+#             report_id = _get_attribute_or_data(obj, "report_id")
+#             # Omit rows for private tribal data when the user doesn't have perms
+#             if (
+#                 model_name in restricted_model_names
+#                 and not include_private
+#                 and report_id in tribal_report_ids
+#             ):
+#                 pass
+#             else:
+#                 data[model_name]["entries"].append(
+#                     [
+#                         _get_attribute_or_data(obj, field_name)
+#                         for field_name in field_names
+#                     ]
+#                 )
+#     t1 = time.time()
+#     return (data, t1 - t0)
 
 
 def gather_report_data_pre_certification(i2d_data):
