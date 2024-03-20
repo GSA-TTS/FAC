@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 AWARD_REFERENCES_REGEX = r"^AWARD-(?!0{4,5}$)[0-9]{4,5}$"
 
+
 def sequential_award_numbers(ir):
     ars = get_range_by_name(ir, "award_reference")
     errors = []
@@ -23,7 +24,10 @@ def sequential_award_numbers(ir):
         if not re.match(AWARD_REFERENCES_REGEX, str(v)):
             errors.append(
                 build_cell_error_tuple(
-                    ir, ars, ndx, get_message("check_sequential_award_numbers_regex").format(msg)
+                    ir,
+                    ars,
+                    ndx,
+                    get_message("check_sequential_award_numbers_regex").format(msg),
                 )
             )
 
@@ -33,9 +37,7 @@ def sequential_award_numbers(ir):
                     ir,
                     ars,
                     ndx,
-                    get_message("check_sequential_award_numbers_off").format(
-                        v, msg
-                    ),
+                    get_message("check_sequential_award_numbers_off").format(v, msg),
                 )
             )
 

@@ -43,7 +43,7 @@ def award_references_pattern(ir):
                     ),
                 )
             )
-    
+
     # Decide on what to look for, based on the preponderance of lengths.
     if count_length_4 > count_length_5:
         THE_REGEX = AWARD_REFERENCES_REGEX4
