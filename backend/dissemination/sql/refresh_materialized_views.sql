@@ -1,1 +1,1 @@
-REFRESH MATERIALIZED VIEW dissemination_combined;
+REFRESH MATERIALIZED VIEW CONCURRENTLY dissemination_combined;

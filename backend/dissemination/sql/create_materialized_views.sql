@@ -173,5 +173,8 @@ CREATE INDEX IF NOT EXISTS dc_audit_year_idx
 CREATE INDEX IF NOT EXISTS dc_aln_idx 
 	on dissemination_combined (aln);
 
+CREATE UNIQUE INDEX id_idx 
+	ON dissemination_combined (id);
+
 -- CREATE INDEX IF NOT EXISTS dc__idx 
 -- 	on dissemination_combined ();
