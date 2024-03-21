@@ -630,7 +630,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         return reverse("dissemination:MultipleSummaryReportDownload")
 
     def _mock_filename(self):
-        return "some-report-name.xlsx"
+        return "some-report-name.xlsx", None
 
     def _mock_download_url(self):
         return "http://example.com/gsa-fac-private-s3/temp/some-report-name.xlsx"
@@ -673,6 +673,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         baker.make(FederalAward, report_id=general)
         self.refresh_materialized_view()
         response = self.anon_client.post(self._summary_report_url(), {})
+        mock_persist_workbook.assert_called_once()
         self.assertRedirects(
             response,
             self._mock_download_url(),
@@ -687,7 +688,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         self, mock_persist_workbook, mock_get_download_url
     ):
         """
-        Permissioned users recieve a file if there are private results.
+        Permissioned users receive a file if there are private results.
         """
         mock_persist_workbook.return_value = self._mock_filename()
         mock_get_download_url.return_value = self._mock_download_url()
@@ -696,6 +697,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         baker.make(FederalAward, report_id=general)
         self.refresh_materialized_view()
         response = self.perm_client.post(self._summary_report_url(), {})
+        mock_persist_workbook.assert_called_once()
         self.assertRedirects(
             response,
             self._mock_download_url(),
@@ -720,6 +722,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         self.refresh_materialized_view()
 
         response = self.anon_client.post(self._summary_report_url(), {})
+        mock_persist_workbook.assert_called_once()
         self.assertRedirects(
             response,
             self._mock_download_url(),
@@ -749,6 +752,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
 
         with self.settings(SUMMARY_REPORT_DOWNLOAD_LIMIT=2):
             response = self.anon_client.post(self._summary_report_url(), {})
+            mock_persist_workbook.assert_called_once()
             self.assertRedirects(
                 response,
                 self._mock_download_url(),
