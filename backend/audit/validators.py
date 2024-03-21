@@ -296,17 +296,15 @@ def validate_general_information_schema_rules(general_information):
     elif general_information.get("auditor_country") != "USA" and not (
         general_information.get("auditor_international_address")
     ):
-        raise ValidationError(
-            _("Missing Auditor International Address")
-        )
+        raise ValidationError(_("Missing Auditor International Address"))
 
     return general_information
 
 
 def validate_general_information_json(value, is_data_migration=True):
     """
-    Apply JSON Schema and Python checks to a general information record. 
-    
+    Apply JSON Schema and Python checks to a general information record.
+
     Keyword arguments:
     is_data_migration -- True if ignoring GSA_MIGRATION emails. (default True)
     """
@@ -320,7 +318,7 @@ def validate_general_information_complete_json(value, is_data_migration=True):
     """
     Apply JSON Schema and Python checks to a general information record.
     Performs additional checks to enforce completeness.
-    
+
     Keyword arguments:
     is_data_migration -- True if ignoring GSA_MIGRATION emails. (default True)
     """
