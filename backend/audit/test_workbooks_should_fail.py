@@ -1,7 +1,6 @@
 import os
 from functools import reduce
 import re
-import unittest
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 
@@ -59,9 +58,7 @@ def map_file_to_extractor_validator(filename):
     return (None, None)
 
 
-@unittest.skip("Temporarily skipping for speed of troubleshooting.")
 class FailingWorkbooks(SimpleTestCase):
-    @unittest.skip("Temporarily skipping for speed of troubleshooting.")
     def test_failing_workbooks(self):
         workbook_sets = reduce(
             os.path.join, ["audit", "fixtures", "workbooks", "should_fail"]
