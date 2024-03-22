@@ -13,6 +13,7 @@ source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
 source tools/seed_cog_baseline.sh
+source tools/materialized_views.sh
 
 #####
 # SETUP THE LOCAL ENVIRONMENT
@@ -36,6 +37,17 @@ gonogo "migrate_app_tables"
 # Standup the API, which may depend on migration changes
 api_standup
 gonogo "api_standup"
+
+#####
+# MATERIALIZED VIEWS
+# These are unmanaged from Django's POV.
+# So, we don't have strictly have to drop them.
+# But, we might change them between deploys.
+# In which case, we should drop and recreate.
+drop_materialized_views
+gonogo "drop_materialized_views"
+create_materialized_views
+gonogo "create_materialized_views"
 
 #####
 # SEED COG/OVER TABLES
