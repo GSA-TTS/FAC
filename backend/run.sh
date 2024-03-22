@@ -39,17 +39,6 @@ api_standup
 gonogo "api_standup"
 
 #####
-# MATERIALIZED VIEWS
-# These are unmanaged from Django's POV.
-# So, we don't have strictly have to drop them.
-# But, we might change them between deploys.
-# In which case, we should drop and recreate.
-drop_materialized_views
-gonogo "drop_materialized_views"
-create_materialized_views
-gonogo "create_materialized_views"
-
-#####
 # SEED COG/OVER TABLES
 # Setup tables for cog/over assignments
 seed_cog_baseline
