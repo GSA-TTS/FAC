@@ -631,7 +631,7 @@ class DisseminationCombined(models.Model):
         managed = False
         db_table = "dissemination_combined"
 
-    id = models.BigAutoField(primary_key=True)
+    # id = models.BigAutoField(primary_key=True)
     # General Information
     report_id = models.TextField(
         "Report ID",
