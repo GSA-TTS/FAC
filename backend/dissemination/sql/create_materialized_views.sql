@@ -1,8 +1,8 @@
-CREATE SEQUENCE IF NOT EXISTS dissemination_combined_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE;
+-- CREATE SEQUENCE IF NOT EXISTS dissemination_combined_id_seq
+--     START WITH 1
+--     INCREMENT BY 1
+--     NO MINVALUE
+--     NO MAXVALUE;
 
 -----------------------
 -- dissemination_combined
@@ -10,7 +10,9 @@ CREATE SEQUENCE IF NOT EXISTS dissemination_combined_id_seq
 CREATE MATERIALIZED VIEW IF NOT EXISTS 
 	dissemination_combined AS 
 	SELECT
-		nextval('dissemination_combined_id_seq') AS id,
+		-- nextval('dissemination_combined_id_seq') AS id,
+		-- PRIMARY KEY (dg.report_id, dfa.award_reference, df.reference_number),
+		dg.report_id||'-'||dfa.award_reference||'-'||df.reference_number as pk,
 		dg.report_id,
 		dfa.award_reference,
 		df.reference_number,
@@ -104,10 +106,10 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		df.is_repeat_finding,
 		df.is_significant_deficiency,
 		df.prior_finding_ref_numbers,
-		df.type_requirement,
+		df.type_requirement
 		-- ALL of Passthrough
-		dp.passthrough_name,
-		dp.passthrough_id
+		-- dp.passthrough_name,
+		-- dp.passthrough_id
 	FROM 
 		dissemination_federalaward dfa
 	LEFT JOIN dissemination_general dg 
@@ -115,10 +117,13 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 	LEFT JOIN dissemination_finding df 
 		ON dfa.report_id = df.report_id 
 		AND dfa.award_reference = df.award_reference
-	LEFT JOIN dissemination_passthrough dp
-		ON dfa.report_id = dp.report_id 
-		AND dfa.award_reference = dp.award_reference
+	-- LEFT JOIN dissemination_passthrough dp
+	-- 	ON dfa.report_id = dp.report_id 
+	-- 	AND dfa.award_reference = dp.award_reference
 	;	
+
+CREATE UNIQUE INDEX ON dissemination_combined (pk);
+
 
 CREATE INDEX IF NOT EXISTS dc_report_id_idx 
 	on dissemination_combined (report_id);
@@ -173,8 +178,8 @@ CREATE INDEX IF NOT EXISTS dc_audit_year_idx
 CREATE INDEX IF NOT EXISTS dc_aln_idx 
 	on dissemination_combined (aln);
 
-CREATE UNIQUE INDEX id_idx 
-	ON dissemination_combined (id);
+-- CREATE UNIQUE INDEX id_idx 
+-- 	ON dissemination_combined (id);
 
 -- CREATE INDEX IF NOT EXISTS dc__idx 
 -- 	on dissemination_combined ();
