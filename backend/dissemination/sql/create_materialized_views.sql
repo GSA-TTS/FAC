@@ -1,8 +1,8 @@
--- CREATE SEQUENCE IF NOT EXISTS dissemination_combined_id_seq
---     START WITH 1
---     INCREMENT BY 1
---     NO MINVALUE
---     NO MAXVALUE;
+CREATE SEQUENCE IF NOT EXISTS dissemination_combined_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE;
 
 -----------------------
 -- dissemination_combined
@@ -10,14 +10,14 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS 
 	dissemination_combined AS 
 	SELECT
-		-- nextval('dissemination_combined_id_seq') AS id,
+		nextval('dissemination_combined_id_seq') AS id,
 		-- PRIMARY KEY (dg.report_id, dfa.award_reference, df.reference_number),
-		dg.report_id||'-'||dfa.award_reference||'-'||df.reference_number as pk,
+		concat(dg.report_id,'-',dfa.award_reference,'-',df.reference_number) as dc_id,
 		dg.report_id,
 		dfa.award_reference,
 		df.reference_number,
 		-- Build a composite ALN in case we want/need it
-		dfa.federal_agency_prefix||'.'||dfa.federal_award_extension as aln,
+		concat(dfa.federal_agency_prefix,'.',dfa.federal_award_extension) as aln,
 		-- All of diss_general as of 20240313
 		dg.agencies_with_prior_findings,
 		dg.audit_period_covered,
@@ -122,7 +122,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 	-- 	AND dfa.award_reference = dp.award_reference
 	;	
 
-CREATE UNIQUE INDEX ON dissemination_combined (pk);
+CREATE UNIQUE INDEX ON dissemination_combined (dc_id);
 
 
 CREATE INDEX IF NOT EXISTS dc_report_id_idx 

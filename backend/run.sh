@@ -44,10 +44,10 @@ gonogo "api_standup"
 # So, we don't have strictly have to drop them.
 # But, we might change them between deploys.
 # In which case, we should drop and recreate.
-drop_materialized_views
-gonogo "drop_materialized_views"
-create_materialized_views
-gonogo "create_materialized_views"
+# drop_materialized_views
+# gonogo "drop_materialized_views"
+# create_materialized_views
+# gonogo "create_materialized_views"
 
 #####
 # SEED COG/OVER TABLES
