@@ -8,7 +8,7 @@ CREATE SEQUENCE IF NOT EXISTS dissemination_combined_id_seq
 -- dissemination_combined
 -- This table is used primarily by search.
 CREATE MATERIALIZED VIEW IF NOT EXISTS 
-	dissemination_combined AS 
+	dissemination_combined_temp AS 
 	SELECT
 		nextval('dissemination_combined_id_seq') AS id,
 		-- PRIMARY KEY (dg.report_id, dfa.award_reference, df.reference_number),
@@ -122,8 +122,12 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 	-- 	AND dfa.award_reference = dp.award_reference
 	;	
 
-CREATE UNIQUE INDEX ON dissemination_combined (dc_id);
 
+DROP MATERIALIZED VIEW IF EXISTS dissemination_combined;
+ALTER SEQUENCE dissemination_combined_id_seq RESTART;
+ALTER MATERIALIZED VIEW dissemination_combined_temp RENAME TO dissemination_combined;
+
+CREATE UNIQUE INDEX IF NOT EXISTS dc_id_ndx ON dissemination_combined (dc_id);
 
 CREATE INDEX IF NOT EXISTS dc_report_id_idx 
 	on dissemination_combined (report_id);
