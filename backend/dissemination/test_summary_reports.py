@@ -1,24 +1,28 @@
-from django.test import TestCase
-
+from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.summary_reports import (
     can_read_tribal_disclaimer,
     cannot_read_tribal_disclaimer,
     gather_report_data_dissemination,
     generate_summary_report,
-    _get_tribal_report_ids,
+    get_tribal_report_ids,
     insert_dissem_coversheet,
 )
-from dissemination.models import General, CapText, Note, FindingText
+from dissemination.models import FederalAward, General, CapText, Note, FindingText
 
 from model_bakery import baker
 import openpyxl as pyxl
 
 
-class SummaryReportTests(TestCase):
+class SummaryReportTests(TestMaterializedViewBuilder):
     def test_generate_summary_report_returns_filename(self):
         """The filename returned should be correctly formatted"""
         general = baker.make(General, _quantity=100)
         report_ids = [g.report_id for g in general]
+
+        for g in general:
+            baker.make(FederalAward, report_id=g)
+        self.refresh_materialized_view()
+
         filename = generate_summary_report(report_ids)
 
         self.assertTrue(filename.startswith, "fac-summary-report-")
@@ -31,8 +35,16 @@ class SummaryReportTests(TestCase):
         public_report_ids = [g.report_id for g in public_general]
         tribal_report_ids = [g.report_id for g in tribal_general]
 
+        for g in public_general:
+            baker.make(FederalAward, report_id=g)
+        for g in tribal_general:
+            baker.make(FederalAward, report_id=g)
+
+        self.refresh_materialized_view()
+
+        (ls, _) = get_tribal_report_ids(public_report_ids + tribal_report_ids)
         self.assertEqual(
-            len(_get_tribal_report_ids(public_report_ids + tribal_report_ids)),
+            len(ls),
             2,
         )
 
@@ -41,8 +53,14 @@ class SummaryReportTests(TestCase):
         public_general = baker.make(General, _quantity=3, is_public=True)
         public_report_ids = [g.report_id for g in public_general]
 
+        for g in public_general:
+            baker.make(FederalAward, report_id=g)
+
+        self.refresh_materialized_view()
+
+        (ls, _) = get_tribal_report_ids(public_report_ids)
         self.assertEqual(
-            len(_get_tribal_report_ids(public_report_ids)),
+            len(ls),
             0,
         )
 
@@ -51,8 +69,14 @@ class SummaryReportTests(TestCase):
         tribal_general = baker.make(General, _quantity=2, is_public=False)
         tribal_report_ids = [g.report_id for g in tribal_general]
 
+        for g in tribal_general:
+            baker.make(FederalAward, report_id=g)
+
+        self.refresh_materialized_view()
+
+        (ls, _) = get_tribal_report_ids(tribal_report_ids)
         self.assertListEqual(
-            _get_tribal_report_ids(tribal_report_ids),
+            ls,
             tribal_report_ids,
         )
 
@@ -100,7 +124,7 @@ class SummaryReportTests(TestCase):
         baker.make(FindingText, report_id=tribal_general)
 
         # Get the data that constitutes the summary workbook
-        data = gather_report_data_dissemination(
+        (data, _) = gather_report_data_dissemination(
             public_report_ids + tribal_report_ids,
             tribal_report_ids,
             include_private,

@@ -1,7 +1,13 @@
+import os
+from django.db import connection
 from django.test import TestCase
-
-from dissemination.models import General, FederalAward, Finding
-from dissemination.search import search_general, search_alns, search
+from dissemination.models import DisseminationCombined, Finding, General, FederalAward
+from dissemination.search import (
+    search_general,
+    search_alns,
+    search,
+    is_only_general_params,
+)
 
 from model_bakery import baker
 
@@ -34,6 +40,21 @@ def assert_results_contain_private_and_public(cls, results):
 
 
 class SearchGeneralTests(TestCase):
+    def test_is_only_general_params_works(self):
+        params = {
+            "uei_or_eins": "not_important",
+            "agency_name": "not_important",
+            "start_date": "not_important",
+        }
+        bad_params = {
+            "uei_or_eins": "not_important",
+            "findings": "not_important",
+            "start_date": "not_important",
+        }
+
+        self.assertTrue(is_only_general_params(params))
+        self.assertFalse(is_only_general_params(bad_params))
+
     def test_empty_query(self):
         """
         Given empty query parameters, search_general should return all records
@@ -44,19 +65,20 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, _quantity=public_count)
         baker.make(General, is_public=False, _quantity=private_count)
 
-        results = search_general()
+        results = search_general(General)
 
         assert_results_contain_private_and_public(self, results)
         self.assertEqual(len(results), public_count + private_count)
 
     def test_name_matches_auditee_name(self):
         """
-        Given an entity name, search_general should return records with a matching auditee_name
+        Given an entity name, search_general(General) should return records with a matching auditee_name
         """
         auditee_name = "auditeeeeeeee"
         baker.make(General, is_public=True, auditee_name=auditee_name)
 
         results = search_general(
+            General,
             {"names": [auditee_name]},
         )
 
@@ -71,6 +93,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditor_firm_name=auditor_firm_name)
 
         results = search_general(
+            General,
             {"names": [auditor_firm_name]},
         )
 
@@ -88,7 +111,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_name="city of bronze")
         baker.make(General, is_public=True, auditee_name="bronze city")
 
-        results = search_general({"names": names})
+        results = search_general(General, {"names": names})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
@@ -102,7 +125,7 @@ class SearchGeneralTests(TestCase):
         )
         baker.make(General, is_public=True, auditor_firm_name="not this one")
 
-        results = search_general({"names": ["UNIVERSITY"]})
+        results = search_general(General, {"names": ["UNIVERSITY"]})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
@@ -116,6 +139,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_uei=auditee_uei)
 
         results = search_general(
+            General,
             {"uei_or_eins": [auditee_uei]},
         )
 
@@ -130,6 +154,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_ein=auditee_ein)
 
         results = search_general(
+            General,
             {"uei_or_eins": [auditee_ein]},
         )
 
@@ -151,7 +176,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_uei="not-looking-for-this-uei")
         baker.make(General, is_public=True, auditee_ein="not-looking-for-this-ein")
 
-        results = search_general({"uei_or_eins": uei_or_eins})
+        results = search_general(General, {"uei_or_eins": uei_or_eins})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
@@ -175,10 +200,11 @@ class SearchGeneralTests(TestCase):
         search_end_date = datetime.date(2023, 6, 15)
 
         results = search_general(
+            General,
             {
                 "start_date": search_start_date,
                 "end_date": search_end_date,
-            }
+            },
         )
 
         assert_all_results_public(self, results)
@@ -201,10 +227,11 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="01")
 
         results = search_general(
+            General,
             {
                 "cog_or_oversight": "cog",
                 "agency_name": "01",
-            }
+            },
         )
 
         assert_all_results_public(self, results)
@@ -222,10 +249,11 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="02")
 
         results = search_general(
+            General,
             {
                 "cog_or_oversight": "oversight",
                 "agency_name": "01",
-            }
+            },
         )
 
         assert_all_results_public(self, results)
@@ -242,25 +270,28 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, audit_year="2022")
 
         results = search_general(
+            General,
             {
                 "audit_years": [2016],
-            }
+            },
         )
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
 
         results = search_general(
+            General,
             {
                 "audit_years": [2020],
-            }
+            },
         )
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
 
         results = search_general(
+            General,
             {
                 "audit_years": [2020, 2021, 2022],
-            }
+            },
         )
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 3)
@@ -279,22 +310,48 @@ class SearchGeneralTests(TestCase):
         )
 
         # there should be on result for AL
-        results = search_general({"auditee_state": "AL"})
+        results = search_general(General, {"auditee_state": "AL"})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], al)
 
         # there should be no results for WI
-        results = search_general({"auditee_state": "WI"})
+        results = search_general(General, {"auditee_state": "WI"})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
 
 
-class SearchALNTests(TestCase):
+class TestMaterializedViewBuilder(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.execute_sql_file("dissemination/sql/create_materialized_views.sql")
+
+    def tearDown(self):
+        self.execute_sql_file("dissemination/sql/drop_materialized_views.sql")
+        super().tearDown()
+
+    def execute_sql_file(self, relative_path):
+        """Execute the SQL commands in the file at the given path."""
+        full_path = os.path.join(os.getcwd(), relative_path)
+        try:
+            with open(full_path, "r") as file:
+                sql_commands = file.read()
+            with connection.cursor() as cursor:
+                cursor.execute(sql_commands)
+        except Exception as e:
+            print(f"Error executing SQL command: {e}")
+
+    def refresh_materialized_view(self):
+        """Refresh the materialized view"""
+        self.execute_sql_file("dissemination/sql/refresh_materialized_views.sql")
+
+
+class SearchALNTests(TestMaterializedViewBuilder):
     def test_aln_search(self):
         """Given an ALN (or ALNs), search_general should only return records with awards under one of these ALNs."""
+
         prefix_object = baker.make(
             General, is_public=True, report_id="2022-04-TSTDAT-0000000001"
         )
@@ -324,28 +381,37 @@ class SearchALNTests(TestCase):
             federal_agency_prefix="00",
             federal_award_extension="000",
         )
+        self.refresh_materialized_view()
 
         # Just a prefix
         params_prefix = {"alns": ["12"]}
-        results_general_prefix = search_general(params_prefix)
+        results_general_prefix = search_general(DisseminationCombined, params_prefix)
         results_alns_prefix = search_alns(results_general_prefix, params_prefix)
         self.assertEqual(len(results_alns_prefix), 1)
-        self.assertEqual(results_alns_prefix[0], prefix_object)
+        # Check if the prefix_object's report_id is in the results
+        self.assertIn(prefix_object.report_id, results_alns_prefix[0].report_id)
 
         # Prefix + extension
         params_extention = {"alns": ["98.765"]}
-        results_general_extention = search_general(params_extention)
+        results_general_extention = search_general(
+            DisseminationCombined, params_extention
+        )
         results_alns_extention = search_alns(
             results_general_extention, params_extention
         )
         self.assertEqual(len(results_alns_extention), 1)
-        self.assertEqual(results_alns_extention[0], extension_object)
+        self.assertIn(extension_object.report_id, results_alns_extention[0].report_id)
 
         # Both
         params_both = {"alns": ["12", "98.765"]}
-        results_general_both = search_general(params_both)
+        results_general_both = search_general(DisseminationCombined, params_both)
         results_alns_both = search_alns(results_general_both, params_both)
+
         self.assertEqual(len(results_alns_both), 2)
+        result_report_ids = set(result.report_id for result in results_alns_both)
+        self.assertSetEqual(
+            result_report_ids, {prefix_object.report_id, extension_object.report_id}
+        )
 
     def test_no_associated_awards(self):
         """
@@ -354,8 +420,8 @@ class SearchALNTests(TestCase):
         # General record with one award.
         gen_object = baker.make(
             General,
-            is_public=True,
             report_id="2022-04-TSTDAT-0000000001",
+            is_public=True,
             audit_year="2024",
         )
         baker.make(
@@ -366,9 +432,9 @@ class SearchALNTests(TestCase):
             federal_award_extension="000",
             findings_count=1,
         )
-
+        self.refresh_materialized_view()
         params = {"alns": ["99"], "audit_years": ["2024"]}
-        results_general = search_general(params)
+        results_general = search_general(DisseminationCombined, params)
         results_alns = search_alns(results_general, params)
 
         self.assertEqual(len(results_alns), 0)
@@ -500,7 +566,7 @@ class SearchALNTests(TestCase):
         )
 
 
-class SearchAdvancedFilterTests(TestCase):
+class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
     def test_search_findings(self):
         """
         When making a search on a particular type of finding, search_general should only return records with a finding of that type.
@@ -517,16 +583,26 @@ class SearchAdvancedFilterTests(TestCase):
 
         # For every field, create a General object with an associated Finding with a 'Y' in that field.
         gen_objects = []
+        award_objects = []
         finding_objects = []
         for field in findings_fields:
             general = baker.make(
                 General,
                 is_public=True,
             )
-            finding = baker.make(Finding, report_id=general, **field)
+            award = baker.make(
+                FederalAward,
+                report_id=general,
+                findings_count=1,
+                award_reference="2023-001",
+            )
+            finding = baker.make(
+                Finding, report_id=general, award_reference="2023-001", **field
+            )
             finding_objects.append(finding)
             gen_objects.append(general)
-
+            award_objects.append(award)
+        self.refresh_materialized_view()
         # One field returns the one appropriate general
         params = {"findings": ["is_modified_opinion"]}
         results = search(params)
@@ -563,16 +639,17 @@ class SearchAdvancedFilterTests(TestCase):
             is_public=True,
         )
         baker.make(FederalAward, report_id=general_passthrough, is_direct="N")
+        self.refresh_materialized_view()
 
         params = {"direct_funding": ["direct_funding"]}
         results = search(params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0], general_direct)
+        self.assertEqual(results[0].report_id, general_direct.report_id)
 
         params = {"direct_funding": ["passthrough_funding"]}
         results = search(params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0], general_passthrough)
+        self.assertEqual(results[0].report_id, general_passthrough.report_id)
 
         # One can search on both, even if there's not much reason to.
         params = {"direct_funding": ["direct_funding", "passthrough_funding"]}
@@ -594,13 +671,13 @@ class SearchAdvancedFilterTests(TestCase):
             is_public=True,
         )
         baker.make(FederalAward, report_id=general_non_major, is_major="N")
-
+        self.refresh_materialized_view()
         params = {"major_program": [True]}
         results = search(params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0], general_major)
+        self.assertEqual(results[0].report_id, general_major.report_id)
 
         params = {"major_program": [False]}
         results = search(params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0], general_non_major)
+        self.assertEqual(results[0].report_id, general_non_major.report_id)

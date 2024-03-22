@@ -174,8 +174,6 @@ local Enum = {
     enum: [
       'program-specific',
       'single-audit',
-      // Include after we are able to recieve ACEE submissions.
-      // 'alternative-compliance-engagement',
     ],
     title: 'AuditType',
   },
@@ -296,7 +294,7 @@ local Compound = {
   AwardReference: Types.string {
     title: 'AwardReference',
     description: 'Award Reference',
-    pattern: '^AWARD-(?!0000)[0-9]{4}$',
+    pattern: '^AWARD-(?!0{4,5}$)[0-9]{4,5}$',
   },
   PriorReferences: Types.string {
     title: 'PriorReferences',
