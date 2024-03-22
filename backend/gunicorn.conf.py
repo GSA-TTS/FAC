@@ -8,6 +8,6 @@ def post_fork(server, worker):
 
 max_requests = 500
 max_requests_jitter = 50
-timeout = 180
+timeout = 600
 workers = 4
 worker_class = "gevent"

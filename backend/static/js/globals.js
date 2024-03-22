@@ -1,4 +1,4 @@
-export const UPLOAD_TIMEOUT = 180000; // 3m
+export const UPLOAD_TIMEOUT = 600000; // 10m
 
 export const UPLOAD_URLS = {
   'federal-awards': 'federal-awards-expended',
