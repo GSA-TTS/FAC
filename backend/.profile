@@ -14,7 +14,6 @@ source tools/migrate_app_tables.sh
 source tools/api_standup.sh
 source tools/run_collectstatic.sh
 source tools/seed_cog_baseline.sh
-source tools/materialized_views.sh
 
 #####
 # SETUP THE CGOV ENVIRONMENT
@@ -22,22 +21,6 @@ setup_env
 gonogo "setup_env"
 
 if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
-
-    #####
-    # MATERIALIZED VIEWS
-    # These are unmanaged from Django's POV.
-    # So, we don't have strictly have to drop them.
-    # But, we might change them between deploys.
-    # In which case, we should drop and recreate.
-    # 2024-03-15 We need to remove these since they
-    # take time and will cause deployment to time out.
-    # 2024-03-17 Will they? Are health checks at the app 
-    # level, or is the container considered "good" once it hits
-    # the .profile?
-    # drop_materialized_views
-    # gonogo "drop_materialized_views"
-    # create_materialized_views
-    # gonogo "create_materialized_views"
 
     #####
     # API TEARDOWN

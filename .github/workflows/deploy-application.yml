@@ -132,16 +132,6 @@ jobs:
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 6G -m 1G --name load_data --command "./load_data.sh"
 
-      # - name: Run Materialized views creation in ${{ env.space }}
-      #   uses: cloud-gov/cg-cli-tools@main
-      #   with:
-      #     cf_username: ${{ secrets.CF_USERNAME }}
-      #     cf_password: ${{ secrets.CF_PASSWORD }}
-      #     cf_org: gsa-tts-oros-fac
-      #     cf_space: ${{ env.space }}
-      #     command: cf run-task gsa-fac -k 2G -m 2G --name create_materialized_views --command "python manage.py materialized_views --create"
-
-
       # This has to happen after an application deployment because the manifest (currently) is responsible
       # for binding the "logdrain service" to the "gsa-fac application". This also needs to be done
       # based on the suspicion that fluentbit cannot register the incoming logs when it is initially
