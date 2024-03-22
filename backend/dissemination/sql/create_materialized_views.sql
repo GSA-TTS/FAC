@@ -12,7 +12,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 	SELECT
 		nextval('dissemination_combined_id_seq') AS id,
 		-- PRIMARY KEY (dg.report_id, dfa.award_reference, df.reference_number),
-		concat(dg.report_id,'-',dfa.award_reference,'-',df.reference_number) as dc_id,
+		-- concat(dg.report_id,'-',dfa.award_reference,'-',df.reference_number) as dc_id,
 		dg.report_id,
 		dfa.award_reference,
 		df.reference_number,
@@ -127,7 +127,7 @@ DROP MATERIALIZED VIEW IF EXISTS dissemination_combined;
 ALTER SEQUENCE dissemination_combined_id_seq RESTART;
 ALTER MATERIALIZED VIEW dissemination_combined_temp RENAME TO dissemination_combined;
 
-CREATE UNIQUE INDEX IF NOT EXISTS dc_id_ndx ON dissemination_combined (dc_id);
+-- CREATE UNIQUE INDEX IF NOT EXISTS dc_id_ndx ON dissemination_combined (dc_id);
 
 CREATE INDEX IF NOT EXISTS dc_report_id_idx 
 	on dissemination_combined (report_id);

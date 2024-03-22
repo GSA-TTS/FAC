@@ -631,7 +631,7 @@ class DisseminationCombined(models.Model):
         managed = False
         db_table = "dissemination_combined"
 
-    dc_id = models.TextField("dc_id", unique=True)
+    # dc_id = models.TextField("dc_id", unique=True)
     # General Information
     report_id = models.TextField(
         "Report ID",
