@@ -87,7 +87,7 @@ local LoanBalanceValidation = {
 local AwardReferenceValidation = {
   type: 'custom',
   formula1: '=AND(LEN(FIRSTCELLREF)=11, LEFT(FIRSTCELLREF, 6)="AWARD-", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 5))), NOT(FIRSTCELLREF="AWARD-00000"))',
-  custom_error: 'The value should follow the pattern AWARD-#### (where #### is a four-digit number).',
+  custom_error: 'The value should follow the pattern AWARD-##### (where ##### is a five-digit number).',
   custom_title: 'Award Reference validation',
 };
 
@@ -120,9 +120,9 @@ local AwardReferenceValidation = {
     formula1: '=Y{0}:Y{0}',
     errorStyle: 'warning',
     custom_error: 'If the Program Name was provided, please, do not change it unless necessary or unknown. ' +
-                  'The Program Name must be under 300 characters.' +
+                  'The Program Name must be under 300 characters. ' +
                   'If the drop-down menu is empty, you may need to enter an Agency Prefix ' +
-                  'and ALN in columns B and C.' +
+                  'and ALN in columns B and C. ' +
                   'Continue?',
     custom_title: 'Unknown Federal Program Name',
   },
