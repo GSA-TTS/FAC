@@ -31,7 +31,7 @@ messages = {
     "check_missing_federal_program_total": "Missing federal program total",
     "check_missing_cluster_total": "Missing cluster total",
     "check_all_unique_award_numbers": "Repeated award number",
-    "check_sequential_award_numbers_regex": "Award references should be of the form AWARD-####",
+    "check_sequential_award_numbers_regex": "Award references should be of the form {}",
     "check_sequential_award_numbers_off": "Award reference is {}, but should be {}",
     "check_num_findings_always_present": "Number of audit findings must zero or greater",
     "check_missing_cluster_name": "Cluster name cannot be blank; select a name or N/A",
@@ -66,7 +66,7 @@ messages = {
     "check_aln_three_digit_extension_invalid": "The three digit extension should follow one of these formats: ###, RD#, or U##, where # represents a number",
     "check_prior_references_invalid": "Prior references must be <b>N/A</b> or a comma-separated list of values in the format <b>20##-###</b>, for example, <b>2019-001, 2019-002</b>",
     "check_finding_reference_invalid": "Finding references must be in the format <b>20##-###</b> where the first four digits are a year after 2010, for example, <b>2019-001, 2019-002</b>",
-    "check_award_references_invalid": "Award references must be of the form <b>AWARD-####</b>, for example, <b>AWARD-0001</b>",
+    "check_award_references_invalid": "Combining award references of 4 and 5-digit lengths is not allowed. If needed, zero-pad this number to make it 5 digits",
     "check_aln_prefix_invalid": "The federal agency prefix should be a two-digit value, for example, <b>10</b>",
     "check_additional_award_identification_present": "Missing additional award identification",
     "check_federal_program_total": "Federal program total is {}, but should be {}",
@@ -80,4 +80,5 @@ messages = {
     "check_integer_values": "<b>{}</b> is not a valid integer",
     "check_gsa_migration_keyword": "<b>GSA_MIGRATION</b> is not allowed.",
     "check_cluster_names": "Invalid cluster name",
+    "check_award_references_len_4_or_5": "Award references must all follow the pattern AWARD-#### or AWARD-#####; {} does not fit either",
 }

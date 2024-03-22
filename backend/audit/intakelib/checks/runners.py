@@ -68,6 +68,7 @@ federal_awards_checks = general_checks + [
     has_all_the_named_ranges(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     has_all_required_fields(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     has_invalid_yorn_field(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
+    award_references_pattern,
     federal_award_amount_passed_through_optional,
     check_cluster_names,
     state_cluster_names,
