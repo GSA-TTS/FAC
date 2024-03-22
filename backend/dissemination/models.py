@@ -631,7 +631,6 @@ class DisseminationCombined(models.Model):
         managed = False
         db_table = "dissemination_combined"
 
-    # dc_id = models.TextField("dc_id", unique=True)
     # General Information
     report_id = models.TextField(
         "Report ID",
@@ -924,7 +923,6 @@ class DisseminationCombined(models.Model):
     )
 
     # Finding Details
-
     reference_number = models.TextField(
         "Findings Reference Numbers",
         help_text=docs.finding_ref_nums_findings,

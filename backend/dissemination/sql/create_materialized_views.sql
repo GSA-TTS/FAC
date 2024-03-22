@@ -11,8 +11,6 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 	dissemination_combined_temp AS 
 	SELECT
 		nextval('dissemination_combined_id_seq') AS id,
-		-- PRIMARY KEY (dg.report_id, dfa.award_reference, df.reference_number),
-		-- concat(dg.report_id,'-',dfa.award_reference,'-',df.reference_number) as dc_id,
 		dg.report_id,
 		dfa.award_reference,
 		df.reference_number,
@@ -108,8 +106,6 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		df.prior_finding_ref_numbers,
 		df.type_requirement
 		-- ALL of Passthrough
-		-- dp.passthrough_name,
-		-- dp.passthrough_id
 	FROM 
 		dissemination_federalaward dfa
 	LEFT JOIN dissemination_general dg 
@@ -117,17 +113,12 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 	LEFT JOIN dissemination_finding df 
 		ON dfa.report_id = df.report_id 
 		AND dfa.award_reference = df.award_reference
-	-- LEFT JOIN dissemination_passthrough dp
-	-- 	ON dfa.report_id = dp.report_id 
-	-- 	AND dfa.award_reference = dp.award_reference
 	;	
 
 
 DROP MATERIALIZED VIEW IF EXISTS dissemination_combined;
 ALTER SEQUENCE dissemination_combined_id_seq RESTART;
 ALTER MATERIALIZED VIEW dissemination_combined_temp RENAME TO dissemination_combined;
-
--- CREATE UNIQUE INDEX IF NOT EXISTS dc_id_ndx ON dissemination_combined (dc_id);
 
 CREATE INDEX IF NOT EXISTS dc_report_id_idx 
 	on dissemination_combined (report_id);
@@ -181,9 +172,3 @@ CREATE INDEX IF NOT EXISTS dc_audit_year_idx
 
 CREATE INDEX IF NOT EXISTS dc_aln_idx 
 	on dissemination_combined (aln);
-
--- CREATE UNIQUE INDEX id_idx 
--- 	ON dissemination_combined (id);
-
--- CREATE INDEX IF NOT EXISTS dc__idx 
--- 	on dissemination_combined ();
