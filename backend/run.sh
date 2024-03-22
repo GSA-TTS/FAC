@@ -13,7 +13,6 @@ source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
 source tools/seed_cog_baseline.sh
-source tools/materialized_views.sh
 
 #####
 # SETUP THE LOCAL ENVIRONMENT
