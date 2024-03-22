@@ -1,55 +1,54 @@
-from django.db.models import Q
-from dissemination.models import General
 import time
 from math import ceil
 import logging
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
 
-def search_general(params=None):
-    params = params or {}
+def search_general(base_model, params=None):
+    params = params or dict()
     # Time general reduction
     t0 = time.time()
 
     ##############
     # Initialize query.
-    r_base = General.objects.all()
+    r_base = base_model.objects.all()
 
     ##############
     # Audit years
     # query.add(_get_audit_years_match_query(audit_years), Q.AND)
     q_audit_year = _get_audit_years_match_query(params.get("audit_years", None))
-    r_audit_year = General.objects.filter(q_audit_year)
+    r_audit_year = base_model.objects.filter(q_audit_year)
 
     ##############
     # State
     q_state = _get_auditee_state_match_query(params.get("auditee_state", None))
-    r_state = General.objects.filter(q_state)
+    r_state = base_model.objects.filter(q_state)
 
     ##############
     # Names
     q_names = _get_names_match_query(params.get("names", None))
-    r_names = General.objects.filter(q_names)
+    r_names = base_model.objects.filter(q_names)
 
     ##############
     # UEI/EIN
     q_uei = _get_uei_or_eins_match_query(params.get("uei_or_eins", None))
-    r_uei = General.objects.filter(q_uei)
+    r_uei = base_model.objects.filter(q_uei)
 
     ##############
     # Start/end dates
     q_start_date = _get_start_date_match_query(params.get("start_date", None))
-    r_start_date = General.objects.filter(q_start_date)
+    r_start_date = base_model.objects.filter(q_start_date)
     q_end_date = _get_end_date_match_query(params.get("end_date", None))
-    r_end_date = General.objects.filter(q_end_date)
+    r_end_date = base_model.objects.filter(q_end_date)
 
     ##############
     # Cog/Over
     q_cogover = _get_cog_or_oversight_match_query(
         params.get("agency_name", None), params.get("cog_or_oversight", None)
     )
-    r_cogover = General.objects.filter(q_cogover)
+    r_cogover = base_model.objects.filter(q_cogover)
 
     ##############
     # Intersection
@@ -123,31 +122,55 @@ def _get_auditee_state_match_query(auditee_state):
     return Q(auditee_state__in=[auditee_state])
 
 
-def _get_names_match_query(names):
+def _get_names_match_query(names_list):
     """
     Given a list of (potential) names, return the query object that searches auditee and firm names.
     """
-    if not names:
+    if not names_list:
         return Q()
 
     name_fields = [
-        "auditee_city",
+        # "auditee_city",
         "auditee_contact_name",
+        "auditee_certify_name",
         "auditee_email",
         "auditee_name",
-        "auditee_state",
-        "auditor_city",
+        # "auditee_state",
+        # "auditor_city",
         "auditor_contact_name",
+        "auditor_certify_name",
         "auditor_email",
         "auditor_firm_name",
-        "auditor_state",
+        # "auditor_state",
     ]
 
     names_match = Q()
 
-    # turn ["name1", "name2", "name3"] into "name1 name2 name3"
-    names = " ".join(names)
+    # The search terms are coming in as a string in a list.
+    # E.g. the search text "college berea" returns nothing,
+    # when it should return entries for "Berea College". That is
+    # because it comes in as
+    # ["college berea"]
+    #
+    # This has to be flattened to a list of singleton terms.
+    flattened = []
+    for term in names_list:
+        for sub in term.split():
+            flattened.append(sub)
+
+    # Now, for each field (e.g. "auditee_contact_name")
+    # build up an AND over the terms. We want something where all of the
+    # terms appear.
+    # Then, do an OR over all of the fields. If that combo appears in
+    # any of the fields, we want to return it.
     for field in name_fields:
-        names_match.add(Q(**{"%s__search" % field: names}), Q.OR)
+        field_q = Q()
+        for name in flattened:
+            field_q.add(Q(**{f"{field}__icontains": name}), Q.AND)
+        names_match.add(field_q, Q.OR)
+
+    # Now, "college berea" and "university state ohio" return
+    # the appropriate terms. It is also significantly faster than what
+    # we had before.
 
     return names_match
