@@ -8,6 +8,7 @@ json: format_jsonnet build_templates build_templates build_audit_json
 template_specs = $(wildcard source/excel/templates/*.jsonnet)
 section_specs = $(wildcard source/sections/*.jsonnet)
 audit_specs = $(wildcard source/audit/*.jsonnet)
+base_specs = $(wildcard source/base/*.jsonnet)
 
 xlsx = $(wildcard output/excel/xlsx/*-workbook*.xlsx)
 json = $(wildcard output/excel/json/*.json)
@@ -66,4 +67,10 @@ build_templates: build_template_json
 	for jsonnet_file in $(template_specs); do \
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
 		jsonnet -o output/excel/json/"$$base_name.json" "$$jsonnet_file"; \
+	done
+
+build_base_schemas:
+	for jsonnet_file in $(base_specs); do \
+		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
+		jsonnet -o output/base/"$$base_name.json" "$$jsonnet_file"; \
 	done

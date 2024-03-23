@@ -192,12 +192,12 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             FORM_SECTIONS.SECONDARY_AUDITORS: SubmissionEvent.EventType.SECONDARY_AUDITORS_UPDATED,
         }[form_section]
 
-    def _extract_and_validate_data(self, form_section, excel_file):
+    def _extract_and_validate_data(self, form_section, excel_file, auditee_uei):
         handler_info = self.FORM_SECTION_HANDLERS.get(form_section)
         if handler_info is None:
             logger.warning("No form section found with name %s", form_section)
             raise BadRequest()
-        audit_data = handler_info["extractor"](excel_file.file)
+        audit_data = handler_info["extractor"](excel_file.file, auditee_uei=auditee_uei)
         validator = handler_info.get("validator")
         if validator is not None and callable(validator):
             validator(audit_data)
@@ -249,7 +249,16 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 event_user=request.user, event_type=self._event_type(form_section)
             )
 
-            audit_data = self._extract_and_validate_data(form_section, excel_file)
+            auditee_uei = None
+            if (
+                sac.general_information is not None
+                and "auditee_uei" in sac.general_information
+            ):
+                auditee_uei = sac.general_information["auditee_uei"]
+
+            audit_data = self._extract_and_validate_data(
+                form_section, excel_file, auditee_uei
+            )
 
             self._save_audit_data(sac, form_section, audit_data)
 
