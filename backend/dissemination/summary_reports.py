@@ -536,7 +536,7 @@ def gather_report_data_pre_certification(i2d_data):
     # Choices were made, consequences followed. We want to clean this up.
     fields_to_ignore = {
         "federalaward": ["aln"],
-        "finding": [ "aln", "federal_agency_prefix", "federal_award_extension" ],
+        "finding": ["aln", "federal_agency_prefix", "federal_award_extension"],
     }
 
     # For every model (FederalAward, CapText, etc), add the skeleton object ('field_names' and empty 'entries') to 'data'.
