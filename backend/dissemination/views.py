@@ -472,11 +472,12 @@ class MultipleSummaryReportDownloadView(View):
         3. Generate a summary report with the report_ids, which goes into into S3
         4. Redirect to the download url of this new report
         """
-        form = SearchForm(request.POST)
+        form = AdvancedSearchForm(request.POST)
 
         try:
             if form.is_valid():
                 form_data = form.cleaned_data
+                form_data["advanced_search_flag"] = True
             else:
                 raise ValidationError("Form error in Search POST.")
 
