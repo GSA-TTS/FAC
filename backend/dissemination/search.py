@@ -7,7 +7,6 @@ from .searchlib.search_findings import search_findings
 from .searchlib.search_direct_funding import search_direct_funding
 from .searchlib.search_major_program import search_major_program
 from dissemination.models import DisseminationCombined, General
-from copy import deepcopy
 
 logger = logging.getLogger(__name__)
 
