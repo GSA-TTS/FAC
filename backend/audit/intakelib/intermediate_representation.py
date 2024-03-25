@@ -238,40 +238,51 @@ def is_cell_or_range_coord(s):
     return is_good_range_coord(s) or is_good_cell_coord(s)
 
 
+def process_destination(dn, title, coord, sheets_by_name, workbook):
+    """Process a destination for a defined name."""
+    # Make sure this looks like a range string
+    if is_cell_or_range_coord(coord):
+        range = {}
+        range["name"] = dn.name
+        # If it is a range, grab both parts
+        if is_good_range_coord(coord):
+            range["start_cell"] = abs_ref_to_cell(coord, 0)
+            range["end_cell"] = abs_ref_to_cell(coord, 1)
+        # If it is a single cell (e.g. a UEI cell), then
+        # make the start and end the same
+        elif is_good_cell_coord(coord):
+            range["start_cell"] = abs_ref_to_cell(coord, 0)
+            range["end_cell"] = range["start_cell"]
+
+        # Grab the values for this range using the start/end values
+        range["values"] = load_workbook_range(
+            range["start_cell"], range["end_cell"], workbook[title]
+        )
+
+        # Now, either append to a given sheet, or start a new sheet.
+        if title in sheets_by_name:
+            sheets_by_name[title].append(range)
+        else:
+            sheets_by_name[title] = [range]
+
+
 def extract_workbook_as_ir(file):
     workbook = _open_workbook(file)
     sheets_by_name = {}
+
     for named_range_name in workbook.defined_names:
         dn = workbook.defined_names[named_range_name]
         # If the user mangles the workbook enough, we get #REF errors
         if "#ref" in dn.attr_text.lower():
+            logger.info(f"Workbook has #REF errors for {named_range_name}.")
             raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
         else:
-            title, coord = next(dn.destinations)
-            # Make sure this looks like a range string
-            if is_cell_or_range_coord(coord):
-                range = {}
-                range["name"] = dn.name
-                # If it is a range, grab both parts
-                if is_good_range_coord(coord):
-                    range["start_cell"] = abs_ref_to_cell(coord, 0)
-                    range["end_cell"] = abs_ref_to_cell(coord, 1)
-                # If it is a single cell (e.g. a UEI cell), then
-                # make the start and end the same
-                elif is_good_cell_coord(coord):
-                    range["start_cell"] = abs_ref_to_cell(coord, 0)
-                    range["end_cell"] = range["start_cell"]
-
-                # Grab the values for this range using the start/end values
-                range["values"] = load_workbook_range(
-                    range["start_cell"], range["end_cell"], workbook[title]
-                )
-
-                # Now, either append to a given sheet, or start a new sheet.
-                if title in sheets_by_name:
-                    sheets_by_name[title].append(range)
-                else:
-                    sheets_by_name[title] = [range]
+            try:
+                title, coord = next(dn.destinations)
+                process_destination(dn, title, coord, sheets_by_name, workbook)
+            except StopIteration:
+                logger.info(f"No destinations found for {named_range_name}.")
+                raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
 
     # Build the IR, which is a list of sheets.
     sheets = []

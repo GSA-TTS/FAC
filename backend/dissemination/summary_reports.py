@@ -528,6 +528,17 @@ def gather_report_data_pre_certification(i2d_data):
 
     data = {}
 
+    # FIXME
+    # This is because additional fields were added to the SF-SAC.
+    # Then, we introduced DisseminationCombined
+    # Then, we got rid of `_` on field names.
+    # Now, this broke.
+    # Choices were made, consequences followed. We want to clean this up.
+    fields_to_ignore = {
+        "federalaward": ["aln"],
+        "finding": ["aln", "federal_agency_prefix", "federal_award_extension"],
+    }
+
     # For every model (FederalAward, CapText, etc), add the skeleton object ('field_names' and empty 'entries') to 'data'.
     # Then, for every object in the dissemination_data (objects of type FederalAward, CapText, etc) create a row (array) for the summary.
     # Every row is created by looping over the field names and appending the data.
@@ -540,7 +551,7 @@ def gather_report_data_pre_certification(i2d_data):
         field_names = [
             field_name
             for field_name in field_name_ordered[model_name]
-            if not field_name.startswith("_")
+            if field_name not in fields_to_ignore.get(model_name, [])
         ]  # Column names, omitting "_" fields
         data[model_name] = {
             "field_names": field_names,
