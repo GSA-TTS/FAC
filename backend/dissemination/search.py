@@ -35,26 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 def is_only_general_params(params_dict):
-    only_general_params = True
-
-    if "advanced_search_flag" in params_dict:
-        return False
-
-    # These should be empty lists if it is only general
-    for k in [
-        "cog_or_oversight",
-        "agency_name",
-        "findings",
-        "direct_funding",
-        "major_program",
-    ]:
-        # An empty list is falsy
-        # A list with values is truthy
-        if params_dict.get(k, False):
-            # If we find one of these has values, then this is not general only.
-            only_general_params = False
-
-    return only_general_params
+    return params_dict.get("advanced_search_flag", False)
 
 
 def search(params):
