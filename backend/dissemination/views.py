@@ -119,7 +119,6 @@ def run_search(form_data):
         }
         search_parameters.update(advanced_parameters)
 
-
     _add_search_params_to_newrelic(search_parameters)
 
     return search(search_parameters)
@@ -263,7 +262,7 @@ class Search(View):
 
         # Tells the backend we're running basic search.
         form_data["advanced_search_flag"] = False
-        
+
         logger.info(f"Searching on fields: {form_data}")
 
         include_private = include_private_results(request)
