@@ -50,7 +50,7 @@ def is_only_general_params(params_dict):
     ]:
         # An empty list is falsy
         # A list with values is truthy
-        if params_dict[k]:
+        if params_dict.get(k, False):
             # If we find one of these has values, then this is not general only.
             only_general_params = False
 

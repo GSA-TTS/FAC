@@ -43,8 +43,8 @@ class SearchGeneralTests(TestCase):
     def test_is_only_general_params_works(self):
         params = {
             "uei_or_eins": "not_important",
-            "agency_name": "not_important",
             "start_date": "not_important",
+            "state": "not_important",
         }
         bad_params = {
             "uei_or_eins": "not_important",
