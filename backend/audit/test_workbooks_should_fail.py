@@ -1,7 +1,7 @@
-from django.test import SimpleTestCase
 import os
 from functools import reduce
 import re
+from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 
 from audit.intakelib import (

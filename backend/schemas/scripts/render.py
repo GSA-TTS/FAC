@@ -1,3 +1,4 @@
+import os
 from openpyxl import Workbook
 from openpyxl.workbook.defined_name import DefinedName
 from openpyxl.worksheet.datavalidation import DataValidation
@@ -26,7 +27,15 @@ Range = NT(
     "name,column,label_row,range_start_row,range_start,abs_range_start,full_range",
 )
 
-MAX_ROWS = 10000
+# We can compile larger workbooks by setting
+# an environment variable for one-offs.
+DEFAULT_MAX_ROWS = 10000
+rows = os.getenv("MAX_ROWS", DEFAULT_MAX_ROWS)
+try:
+    MAX_ROWS = int(rows)
+except ValueError:
+    MAX_ROWS = DEFAULT_MAX_ROWS
+
 XLSX_MAX_ROWS = 1048576  # Excel has a maximum of 1048576 rows
 XLSX_MAX_COLS = 16384  # Excel has a maximum of 16384 columns
 

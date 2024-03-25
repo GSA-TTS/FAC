@@ -1,44 +1,55 @@
 {% extends "base.html" %}
 {% block content %}
-    <section class="usa-hero" aria-label="Introduction">
-        <div class="grid-container">
-            <h1 class="text-base-darkest font-sans-2xl">
-                The Federal Audit Clearinghouse (FAC) is the place to submit and review federal
-                grant audits.
-            </h1>
-            <p class="font-sans-lg">
-                When an organization spends $750,000 or more in federal grant funds in a given year, they are required to
-                submit an audit.
-            </p>
-            <ul class="usa-card-group margin-top-10">
-                <li class="usa-card desktop:grid-col-6">
-                    <div class="usa-card__container">
-                        <div>
-                            <a class="usa-button sign-in-button"
-                               aria-controls="login-modal"
-                               data-open-modal
-                               href="/openid/login/">Sign in</a>
-                        </div>
-                        <p class="usa-card__body">Sign in to submit and review your audits.</p>
-                    </div>
-                </li>
-                <li class="usa-card desktop:grid-col-6">
-                    <div class="usa-card__container">
-                        <div>
-                            <a class="usa-button usa-button--outline"
-                               href="{% url 'dissemination:Search' %}">Search audit reports</a>
-                        </div>
-                        <p class="usa-card__body">
-                            Search audits accepted since October 1, 2023.
-                            Older reports are available
-                            <a class="usa-link usa-link--external"
-                               href="https://facides.census.gov/Account/Login.aspx"
-                               target="_blank">from the Census Bureau</a>
-                            .
-                        </p>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </section>
+<div class="home margin-bottom-4">
+    <div class="grid-container">
+      {# Title #}
+      <h1 class="font-sans-3xl text-primary-darker">
+          <span class="text-heavy">
+              The Federal Audit Clearinghouse (FAC)
+          </span>
+          <span class="text-semibold">
+              is the place to submit and review federal grant audits.
+          </span>
+      </h1>
+  
+      <hr />
+  
+      {# Cards #}
+      <ul class="usa-list usa-list--unstyled width-full margin-top-4">
+          <li class="usa-card">
+              <div class="usa-card__container radius-0 border-2px border-base-light">
+                  <div class="usa-card__header border-bottom-2px border-base-light bg-accent-cool-lighter padding-y-105">
+                      <h2 class="usa-card__heading font-sans-2xl text-primary-darker text-bold">I want to</h2>
+                  </div>
+                  <div class="usa-card__body bg-base-lightest margin-0">
+                      <ul class="usa-card-group display-flex desktop:flex-row flex-justify">
+                          <li class="usa-card grid-col flex-fill padding-top-4 padding-bottom-2">
+                              <div class="usa-card__container home-image submission shadow-1">
+                                  <a class="usa-link text-white font-sans-2xl margin-0 text-semibold display-flex flex-column flex-align-center"
+                                      href="/openid/login/"
+                                      aria-controls="login-modal"
+                                      data-open-modal >
+                                      <p class="font-sans-2xl margin-0 display-block">Submit</p>
+                                      <p class="font-sans-xl margin-0">an audit</p>
+                                  </a>
+                              </div>
+                          </li>
+                          <p class="font-sans-2xl text-primary-darker text-semibold margin-x-4 margin-y-0 flex-align-self-center">or</p>
+                          <li class="usa-card grid-col flex-fill padding-top-4 padding-bottom-2">
+                              <div class="usa-card__container home-image searching shadow-1">
+                                  <a class="usa-link text-white font-sans-2xl margin-0 text-semibold display-flex flex-column flex-align-center"
+                                      href="{% url 'dissemination:Search' %}"
+                                      target="_blank">
+                                      <p class="font-sans-2xl margin-0 display-block">Search</p>
+                                      <p class="font-sans-xl margin-0">for audits</p>
+                                  </a>
+                              </div>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </li>
+      </ul>
+    </div>
+  </div>
 {% endblock content %}

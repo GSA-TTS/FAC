@@ -7,7 +7,7 @@ data "docker_registry_image" "clamav" {
 }
 
 module "clamav" {
-  source = "github.com/18f/terraform-cloudgov//clamav?ref=v0.8.0"
+  source = "github.com/18f/terraform-cloudgov//clamav?ref=v0.9.0"
 
   # This generates eg "fac-av-staging.apps.internal", avoiding collisions with routes for other projects and spaces
   name           = local.clam_name
