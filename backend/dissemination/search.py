@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 def is_only_general_params(params_dict):
-    return params_dict.get("advanced_search_flag", False)
+    return not params_dict.get("advanced_search_flag", False)
 
 
 def search(params):
