@@ -6,7 +6,7 @@ from dissemination.search import (
     search_general,
     search_alns,
     search,
-    is_only_general_params,
+    is_advanced_search,
 )
 
 from model_bakery import baker
@@ -40,20 +40,23 @@ def assert_results_contain_private_and_public(cls, results):
 
 
 class SearchGeneralTests(TestCase):
-    def test_is_only_general_params_works(self):
-        params = {
+    def is_advanced_search(self):
+        basic_params = {
+            "names": "not_important",
             "uei_or_eins": "not_important",
-            "agency_name": "not_important",
             "start_date": "not_important",
+            "advanced_search_flag": False,
         }
-        bad_params = {
+        advanced_params = {
+            "names": "not_important",
             "uei_or_eins": "not_important",
-            "findings": "not_important",
             "start_date": "not_important",
+            "alns": "not_important",
+            "advanced_search_flag": True,
         }
 
-        self.assertTrue(is_only_general_params(params))
-        self.assertFalse(is_only_general_params(bad_params))
+        self.assertTrue(is_advanced_search(advanced_params))
+        self.assertFalse(is_advanced_search(basic_params))
 
     def test_empty_query(self):
         """
@@ -604,7 +607,7 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
             award_objects.append(award)
         self.refresh_materialized_view()
         # One field returns the one appropriate general
-        params = {"findings": ["is_modified_opinion"]}
+        params = {"findings": ["is_modified_opinion"], "advanced_search_flag": True}
         results = search(params)
         self.assertEqual(len(results), 1)
 
@@ -614,13 +617,14 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
                 "is_other_findings",
                 "is_material_weakness",
                 "is_significant_deficiency",
-            ]
+            ],
+            "advanced_search_flag": True,
         }
         results = search(params)
         self.assertEqual(len(results), 3)
 
         # Garbage fields don't apply any filters, so everything comes back
-        params = {"findings": ["a_garbage_field"]}
+        params = {"findings": ["a_garbage_field"], "advanced_search_flag": True}
         results = search(params)
         self.assertEqual(len(results), 7)
 
@@ -641,18 +645,24 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         baker.make(FederalAward, report_id=general_passthrough, is_direct="N")
         self.refresh_materialized_view()
 
-        params = {"direct_funding": ["direct_funding"]}
+        params = {"direct_funding": ["direct_funding"], "advanced_search_flag": True}
         results = search(params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_direct.report_id)
 
-        params = {"direct_funding": ["passthrough_funding"]}
+        params = {
+            "direct_funding": ["passthrough_funding"],
+            "advanced_search_flag": True,
+        }
         results = search(params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_passthrough.report_id)
 
         # One can search on both, even if there's not much reason to.
-        params = {"direct_funding": ["direct_funding", "passthrough_funding"]}
+        params = {
+            "direct_funding": ["direct_funding", "passthrough_funding"],
+            "advanced_search_flag": True,
+        }
         results = search(params)
         self.assertEqual(len(results), 2)
 
@@ -672,12 +682,12 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         )
         baker.make(FederalAward, report_id=general_non_major, is_major="N")
         self.refresh_materialized_view()
-        params = {"major_program": [True]}
+        params = {"major_program": ["True"], "advanced_search_flag": True}
         results = search(params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_major.report_id)
 
-        params = {"major_program": [False]}
+        params = {"major_program": ["False"], "advanced_search_flag": True}
         results = search(params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_non_major.report_id)

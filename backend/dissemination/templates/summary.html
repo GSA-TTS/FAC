@@ -31,7 +31,7 @@
                 </div>
                 <div class="grid-col-12 tablet:grid-col-5 tablet:display-flex flex-column tablet:flex-justify-end">
                     <div class="margin-0 flex-align-self-end margin-top-2">
-                        {% comment %}
+                        
                         <a class="usa-button display-flex font-sans-xl margin-bottom-2"
                            href="{% url 'dissemination:SummaryReportDownload' report_id=report_id %}"
                            target="_blank">
@@ -42,7 +42,7 @@
                             </svg>
                             <p class="margin-0">SF-SAC</p>
                         </a>
-                        {% endcomment %}
+                        
                         {% if general.is_public or include_private %}
                             <a class="usa-button display-flex font-sans-xl"
                             href="{% url 'dissemination:PdfDownload' report_id=report_id %}"

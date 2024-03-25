@@ -4,18 +4,32 @@
     <div class="usa-alert__body">
         <h4 class="usa-alert__heading">Searching the FAC database</h4>
         <p class="usa-alert__text padding-bottom-2">
-            Learn more about how our search filters work on <a href='https://www.fac.gov/data/resources/' target='_blank'>our Search Resources page</a>.
+            <!-- Learn more about how our search filters work on <a href='https://www.fac.gov/data/resources/' target='_blank'>our Search Resources page</a>. -->
+            Learn more about search on <a href='https://www.fac.gov/data/resources/' target='_blank'>our Search Resources page</a>.
         </p>
 
+        <!--
         <h4 class="usa-alert__heading">Sorting</h4>
         <p class="usa-alert__text padding-bottom-2">
             Use the arrows at the top of each column to sort results.
         </p>
+      -->
 
         <h4 class="usa-alert__heading">Summary reports</h4>
-        <p class="usa-alert__text">
+        <p class="usa-alert__text padding-bottom-2">
             For search results of {{ summary_report_download_limit|intcomma }} submissions or less, you can download a combined spreadsheet of all data. 
             If you need to download more than {{ summary_report_download_limit|intcomma }} submissions, try limiting your search parameters to download in batches.
         </p>
+        {% if "advanced" in request.path %}
+        <h4 class="usa-alert__heading">Basic search</h4>
+        <p class="usa-alert__text">
+          We update advanced search nightly with new submissions. <a href="/dissemination/search">Basic search</a> is always up-to-date. This is best for users wanting to confirm their submissions are complete.
+        </p>
+        {% else %}
+        <h4 class="usa-alert__heading">Advanced search</h4>
+        <p class="usa-alert__text">
+          Audit resolution officials may want to use the <a href="advanced/">advanced search</a> for additional filters.
+        </p>
+        {% endif %}
     </div>
 </div>
