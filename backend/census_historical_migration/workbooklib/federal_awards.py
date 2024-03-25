@@ -357,7 +357,7 @@ def xform_match_number_passthrough_names_ids(names, ids):
     Matches the number of passthrough names and IDs.
     Iterates over a list of passthrough names and IDs.
     If the number of passthrough names is greater than the number of passthrough IDs,
-    it fills in the missing passthrough IDs with `NA`.
+    it fills in the missing passthrough IDs with `GSA_MIGRATION`.
     """
     # Transformation to be documented.
     for idx, (name, id) in enumerate(zip(names, ids)):

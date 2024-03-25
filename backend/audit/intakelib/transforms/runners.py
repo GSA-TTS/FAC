@@ -1,6 +1,10 @@
 import logging
 from copy import deepcopy
 
+from .xform_fill_missing_passthrough_ids_with_na import (
+    fill_missing_passthrough_ids_with_na,
+)
+
 from .xform_all_amount_expended_need_to_be_integers import (
     convert_amount_expended_to_integers,
 )
@@ -112,6 +116,7 @@ federal_awards_transforms = general_transforms + [
     regenerate_uniform_cluster_names,
     reformat_federal_agency_prefix,
     generate_cfda_keys,
+    fill_missing_passthrough_ids_with_na,
 ]
 
 audit_findings_transforms = general_transforms + [
