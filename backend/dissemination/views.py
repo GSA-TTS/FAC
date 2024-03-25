@@ -158,7 +158,7 @@ class AdvancedSearch(View):
             }
         else:
             raise ValidationError(f"Form error in Search POST. {form.errors}")
-        
+
         # Tells the backend we're running advanced search.
         form_data["advanced_search_flag"] = True
 
@@ -209,6 +209,7 @@ class AdvancedSearch(View):
             f"Total time between post and render {int(math.ceil((time_beginning_render - time_starting_post) * 1000))}ms"
         )
         return render(request, "advanced.html", context)
+
 
 class Search(View):
     @method_decorator(csrf_exempt)

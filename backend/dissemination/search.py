@@ -6,7 +6,7 @@ from .searchlib.search_alns import search_alns
 from .searchlib.search_findings import search_findings
 from .searchlib.search_direct_funding import search_direct_funding
 from .searchlib.search_major_program import search_major_program
-from dissemination.models import (DisseminationCombined, General)
+from dissemination.models import DisseminationCombined, General
 from copy import deepcopy
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # https://books.agiliq.com/projects/django-orm-cookbook/en/latest/subquery.html
 
 # {'alns': [], -- DisseminationCombined
-#  'names': ['AWESOME'], -- General 
+#  'names': ['AWESOME'], -- General
 #  'uei_or_eins': [],  -- General
 #  'start_date': None,  -- General
 #  'end_date': None,  -- General
@@ -34,17 +34,24 @@ logger = logging.getLogger(__name__)
 #  'order_direction': -- General
 #  'descending', 'LIMIT': 1000} -- General
 
+
 def is_only_general_params(params_dict):
     only_general_params = True
 
     if "advanced_search_flag" in params_dict:
         return False
-    
+
     # These should be empty lists if it is only general
-    for k in ["cog_or_oversight", "agency_name", "findings", "direct_funding", "major_program"]:
+    for k in [
+        "cog_or_oversight",
+        "agency_name",
+        "findings",
+        "direct_funding",
+        "major_program",
+    ]:
         # An empty list is falsy
         # A list with values is truthy
-        if params_dict[k]: 
+        if params_dict[k]:
             # If we find one of these has values, then this is not general only.
             only_general_params = False
 
