@@ -34,8 +34,8 @@ logger = logging.getLogger(__name__)
 #  'descending', 'LIMIT': 1000} -- General
 
 
-def is_only_general_params(params_dict):
-    return not params_dict.get("advanced_search_flag", False)
+def is_advanced_search(params_dict):
+    return params_dict.get("advanced_search_flag")
 
 
 def search(params):
@@ -54,11 +54,7 @@ def search(params):
     # GENERAL
 
     logger.info(params)
-    if is_only_general_params(params):
-        logger.info("search Searching `General`")
-        results = search_general(General, params)
-        results = _sort_results(results, params)
-    else:
+    if is_advanced_search(params):
         logger.info("search Searching `DisseminationCombined`")
         results = search_general(DisseminationCombined, params)
         results = _sort_results(results, params)
@@ -66,6 +62,10 @@ def search(params):
         results = search_findings(results, params)
         results = search_direct_funding(results, params)
         results = search_major_program(results, params)
+    else:
+        logger.info("search Searching `General`")
+        results = search_general(General, params)
+        results = _sort_results(results, params)
 
     results = results.distinct("report_id", params.get("order_by", "fac_accepted_date"))
 

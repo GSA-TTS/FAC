@@ -6,7 +6,7 @@ from dissemination.search import (
     search_general,
     search_alns,
     search,
-    is_only_general_params,
+    is_advanced_search,
 )
 
 from model_bakery import baker
@@ -40,20 +40,23 @@ def assert_results_contain_private_and_public(cls, results):
 
 
 class SearchGeneralTests(TestCase):
-    def test_is_only_general_params_works(self):
-        params = {
+    def is_advanced_search(self):
+        basic_params = {
+            "names": "not_important",
             "uei_or_eins": "not_important",
             "start_date": "not_important",
-            "state": "not_important",
+            "advanced_search_flag": False,
         }
-        bad_params = {
+        advanced_params = {
+            "names": "not_important",
             "uei_or_eins": "not_important",
-            "findings": "not_important",
             "start_date": "not_important",
+            "alns": "not_important",
+            "advanced_search_flag": True,
         }
 
-        self.assertTrue(is_only_general_params(params))
-        self.assertFalse(is_only_general_params(bad_params))
+        self.assertTrue(is_advanced_search(advanced_params))
+        self.assertFalse(is_advanced_search(basic_params))
 
     def test_empty_query(self):
         """
