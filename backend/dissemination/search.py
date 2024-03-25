@@ -6,7 +6,8 @@ from .searchlib.search_alns import search_alns
 from .searchlib.search_findings import search_findings
 from .searchlib.search_direct_funding import search_direct_funding
 from .searchlib.search_major_program import search_major_program
-from dissemination.models import DisseminationCombined
+from dissemination.models import (DisseminationCombined, General)
+from copy import deepcopy
 
 logger = logging.getLogger(__name__)
 
@@ -16,22 +17,38 @@ logger = logging.getLogger(__name__)
 # Their ORM cookbook looks to be useful reading.
 # https://books.agiliq.com/projects/django-orm-cookbook/en/latest/subquery.html
 
+# {'alns': [], -- DisseminationCombined
+#  'names': ['AWESOME'], -- General 
+#  'uei_or_eins': [],  -- General
+#  'start_date': None,  -- General
+#  'end_date': None,  -- General
+#  'cog_or_oversight': '', -- General, but not wanted
+#  'agency_name': '',  -- NO IDEA
+#  'audit_years': [], -- General
+#  'findings': [], -- DisseminationCombined
+#  'direct_funding': [], -- DisseminationCombined
+#  'major_program': [], -- DisseminationCombined
+#  'auditee_state': '', -- General
+#  'order_by': -- General
+#  'fac_accepted_date', -- General
+#  'order_direction': -- General
+#  'descending', 'LIMIT': 1000} -- General
 
 def is_only_general_params(params_dict):
-    params_set = set(list(params_dict.keys()))
-    gen_set = set(
-        [
-            "audit_years",
-            "auditee_state",
-            "names",
-            "uei_or_eins",
-            "start_date",
-            "end_date",
-            "agency_name",
-            "cog_or_oversight",
-        ]
-    )
-    return params_set.issubset(gen_set)
+    only_general_params = True
+
+    if "advanced_search_flag" in params_dict:
+        return False
+    
+    # These should be empty lists if it is only general
+    for k in ["cog_or_oversight", "agency_name", "findings", "direct_funding", "major_program"]:
+        # An empty list is falsy
+        # A list with values is truthy
+        if params_dict[k]: 
+            # If we find one of these has values, then this is not general only.
+            only_general_params = False
+
+    return only_general_params
 
 
 def search(params):
@@ -49,10 +66,13 @@ def search(params):
     ##############
     # GENERAL
 
+    logger.info(params)
     if is_only_general_params(params):
-        results = search_general(DisseminationCombined, params)
+        logger.info("search Searching `General`")
+        results = search_general(General, params)
         results = _sort_results(results, params)
     else:
+        logger.info("search Searching `DisseminationCombined`")
         results = search_general(DisseminationCombined, params)
         results = _sort_results(results, params)
         results = search_alns(results, params)

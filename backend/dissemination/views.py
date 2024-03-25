@@ -109,6 +109,8 @@ def run_search(form_data):
         "order_by": form_data["order_by"],
         "order_direction": form_data["order_direction"],
     }
+    if "advanced_search_flag" in form_data:
+        search_parameters["advanced_search_flag"] = form_data["advanced_search_flag"]
 
     _add_search_params_to_newrelic(search_parameters)
 
@@ -156,8 +158,11 @@ class AdvancedSearch(View):
             }
         else:
             raise ValidationError(f"Form error in Search POST. {form.errors}")
+        
+        # Tells the backend we're running advanced search.
+        form_data["advanced_search_flag"] = True
 
-        logger.info(f"Searching on fields: {form_data}")
+        logger.info(f"Advanced searching on fields: {form_data}")
 
         include_private = include_private_results(request)
 
