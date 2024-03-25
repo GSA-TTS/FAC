@@ -51,20 +51,20 @@ def _add_search_params_to_newrelic(search_parameters):
         "end_date",
         "agency_name",
         "auditee_state",
-        "cog_or_oversight" if is_advanced else None,
     ]
-    singles = [e for e in singles if e is not None]
-
-    newrelic.agent.add_custom_attributes(
-        [(f"request.search.{k}", str(search_parameters[k])) for k in singles]
-    )
 
     multis = [
         "uei_or_eins",
         "names",
-        "alns" if is_advanced else None,
     ]
-    multis = [e for e in multis if e is not None]
+
+    if is_advanced:
+        singles.append("cog_or_oversight")
+        multis.append("alns")
+
+    newrelic.agent.add_custom_attributes(
+        [(f"request.search.{k}", str(search_parameters[k])) for k in singles]
+    )
 
     newrelic.agent.add_custom_attributes(
         [(f"request.search.{k}", ",".join(search_parameters[k])) for k in multis]
@@ -109,7 +109,7 @@ def run_search(form_data):
     search_parameters = basic_parameters.copy()
 
     search_parameters["advanced_search_flag"] = form_data["advanced_search_flag"]
-    if "advanced_search_flag" is True:
+    if search_parameters["advanced_search_flag"]:
         advanced_parameters = {
             "alns": form_data["aln"],
             "findings": form_data["findings"],
