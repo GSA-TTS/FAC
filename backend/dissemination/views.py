@@ -45,13 +45,15 @@ logger = logging.getLogger(__name__)
 
 
 def _add_search_params_to_newrelic(search_parameters):
+    is_advanced = search_parameters["advanced_search_flag"]
     singles = [
         "start_date",
         "end_date",
-        "cog_or_oversight",
         "agency_name",
         "auditee_state",
+        "cog_or_oversight" if is_advanced else None,
     ]
+    singles = [e for e in singles if e is not None]
 
     newrelic.agent.add_custom_attributes(
         [(f"request.search.{k}", str(search_parameters[k])) for k in singles]
@@ -59,9 +61,10 @@ def _add_search_params_to_newrelic(search_parameters):
 
     multis = [
         "uei_or_eins",
-        "alns",
         "names",
+        "alns" if is_advanced else None,
     ]
+    multis = [e for e in multis if e is not None]
 
     newrelic.agent.add_custom_attributes(
         [(f"request.search.{k}", ",".join(search_parameters[k])) for k in multis]
@@ -92,25 +95,30 @@ def run_search(form_data):
     Returns the results QuerySet.
     """
 
-    # As a dictionary, this is easily extensible.
-    search_parameters = {
-        "alns": form_data["aln"],
+    basic_parameters = {
         "names": form_data["entity_name"],
         "uei_or_eins": form_data["uei_or_ein"],
         "start_date": form_data["start_date"],
         "end_date": form_data["end_date"],
-        "cog_or_oversight": form_data["cog_or_oversight"],
         "agency_name": form_data["agency_name"],
         "audit_years": form_data["audit_year"],
-        "findings": form_data["findings"],
-        "direct_funding": form_data["direct_funding"],
-        "major_program": form_data["major_program"],
         "auditee_state": form_data["auditee_state"],
         "order_by": form_data["order_by"],
         "order_direction": form_data["order_direction"],
     }
-    if "advanced_search_flag" in form_data:
-        search_parameters["advanced_search_flag"] = form_data["advanced_search_flag"]
+    search_parameters = basic_parameters.copy()
+
+    search_parameters["advanced_search_flag"] = form_data["advanced_search_flag"]
+    if "advanced_search_flag" is True:
+        advanced_parameters = {
+            "alns": form_data["aln"],
+            "findings": form_data["findings"],
+            "direct_funding": form_data["direct_funding"],
+            "major_program": form_data["major_program"],
+            "cog_or_oversight": form_data["cog_or_oversight"],
+        }
+        search_parameters.update(advanced_parameters)
+
 
     _add_search_params_to_newrelic(search_parameters)
 
@@ -253,6 +261,9 @@ class Search(View):
         else:
             raise ValidationError(f"Form error in Search POST. {form.errors}")
 
+        # Tells the backend we're running basic search.
+        form_data["advanced_search_flag"] = False
+        
         logger.info(f"Searching on fields: {form_data}")
 
         include_private = include_private_results(request)
