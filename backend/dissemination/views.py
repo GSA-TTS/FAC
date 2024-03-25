@@ -17,6 +17,7 @@ from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
 
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import SearchForm
+from dissemination.forms import AdvancedSearchForm
 from dissemination.search import search
 from dissemination.mixins import ReportAccessRequiredMixin
 from dissemination.models import (
@@ -113,6 +114,96 @@ def run_search(form_data):
 
     return search(search_parameters)
 
+
+class AdvancedSearch(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(AdvancedSearch, self).dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        """
+        When accessing the search page through get, return the blank search page.
+        """
+        form = AdvancedSearchForm()
+
+        return render(
+            request,
+            "advanced.html",
+            {
+                "form": form,
+                "form_user_input": {"audit_year": ["2023"]},
+                "state_abbrevs": STATE_ABBREVS,
+                "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+            },
+        )
+
+    @newrelic_timing_metric("search-advanced")
+    def post(self, request, *args, **kwargs):
+        """
+        When accessing the search page through post, run a search and display the results.
+        """
+        time_starting_post = time.time()
+
+        form = AdvancedSearchForm(request.POST)
+        results = []
+        context = {}
+
+        # form_data = clean_form_data(form)
+        if form.is_valid():
+            form_data = form.cleaned_data
+            form_user_input = {
+                k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
+            }
+        else:
+            raise ValidationError(f"Form error in Search POST. {form.errors}")
+
+        logger.info(f"Searching on fields: {form_data}")
+
+        include_private = include_private_results(request)
+
+        results = run_search(form_data)
+
+        results_count = results.count()
+
+        # Reset page to one if the page number surpasses how many pages there actually are
+        page = form_data["page"]
+        ceiling = math.ceil(results_count / form_data["limit"])
+        if page > ceiling:
+            page = 1
+
+        logger.info(f"TOTAL: results_count: [{results_count}]")
+
+        # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
+        paginator = Paginator(object_list=results, per_page=form_data["limit"])
+        paginator_results = paginator.get_page(page)
+        paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
+            page, on_each_side=1
+        )
+
+        # Reformat these so the date-picker elements in HTML prepopulate
+        if form_data["start_date"]:
+            form_data["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
+        if form_data["end_date"]:
+            form_data["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
+
+        context = context | {
+            "form": form,
+            "form_user_input": form_user_input,
+            "state_abbrevs": STATE_ABBREVS,
+            "limit": form_data["limit"],
+            "results": paginator_results,
+            "include_private": include_private,
+            "results_count": results_count,
+            "page": page,
+            "order_by": form_data["order_by"],
+            "order_direction": form_data["order_direction"],
+            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+        }
+        time_beginning_render = time.time()
+        logger.info(
+            f"Total time between post and render {int(math.ceil((time_beginning_render - time_starting_post) * 1000))}ms"
+        )
+        return render(request, "advanced.html", context)
 
 class Search(View):
     @method_decorator(csrf_exempt)

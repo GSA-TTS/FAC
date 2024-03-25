@@ -28,7 +28,7 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                 <h3>Filters</h3>
                 <form class="usa-form"
                       id="search-form"
-                      action="{% url 'dissemination:Search' %}"
+                      action="{% url 'dissemination:AdvancedSearch' %}"
                       enctype='multipart/form-data'
                       method="post">
                     {% csrf_token %}
@@ -42,7 +42,6 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
                          {% comment %} Audit Year {% endcomment %}
-                         {% comment %}
                          <button type="button"
                                  class="usa-accordion__button"
                                  aria-expanded="true"
@@ -59,7 +58,6 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                                  </div>
                              {% endfor %}
                          </div> 
-                        {% endcomment %}
 
                         {% comment %} UEI/EIN {% endcomment %}
                         <label for="uei-or-ein">
@@ -72,7 +70,6 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                         <textarea class="usa-textarea width-card-lg" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>
                         
                         {% comment %} ALN/CFDA {% endcomment %}
-                        {% comment %}
                         <label for="aln">
                             <button type="button"
                                     class="usa-accordion__button"
@@ -80,7 +77,6 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                                     aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
                         </label>
                         <textarea class="usa-textarea" id="aln" name="aln">{{form_user_input.aln}}</textarea>
-                        {% endcomment %}
 
                         {% comment %} Name {% endcomment %}
                         <label for="entity-name">
@@ -143,7 +139,6 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                         </div>
 
                         {% comment %} Cog/Over {% endcomment %}
-                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.cog_or_oversight %}"true"{% else %}"false"{% endif %}
@@ -169,10 +164,8 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                                   name="agency_name"
                                   value="{{ form_user_input.agency_name }}" />
                         </div>
-                        {% endcomment %}
 
                         {% comment %} Findings {% endcomment %}
-                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.findings %}"true"{% else %}"false"{% endif %}
@@ -189,10 +182,8 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                               </div>
                           {% endfor %}
                         </div>
-                        {% endcomment %}
 
                         {% comment %} Direct funding {% endcomment %}
-                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.direct_funding %}"true"{% else %}"false"{% endif %}
@@ -209,10 +200,8 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                               </div>
                           {% endfor %}
                         </div>
-                        {% endcomment %}
 
                         {% comment %} Major program {% endcomment %}
-                        {% comment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded={% if form_user_input.major_program %}"true"{% else %}"false"{% endif %}
@@ -229,7 +218,6 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                               </div>
                           {% endfor %}
                         </div>
-                        {% endcomment %}
                     </div>
                       
                     {% comment %} Submission {% endcomment %}
@@ -271,7 +259,7 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                             <strong>Results: {{ results_count }}</strong>
                             <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                         </p>
-                        {% comment %}
+                        {% comment %} SF-SAC generation {% endcomment %}
                         {% if results_count <= summary_report_download_limit %}
                             <button class="usa-button display-flex"
                                     formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
@@ -285,7 +273,6 @@ See https://github.com/GSA-TTS/FAC/issues/3526 for more information.
                                 <p class="margin-0">Download all</p>
                             </button>
                         {% endif %}
-                        {% endcomment %}
                     </div>
                     
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">
