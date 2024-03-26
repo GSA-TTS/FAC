@@ -70,6 +70,20 @@
          },
          "then": {
             "properties": {
+               "auditor_address_line_1": {
+                  "maxLength": 100,
+                  "minLength": 1,
+                  "type": "string"
+               },
+               "auditor_city": {
+                  "maxLength": 100,
+                  "minLength": 1,
+                  "type": "string"
+               },
+               "auditor_international_address": {
+                  "const": "",
+                  "type": "string"
+               },
                "auditor_state": {
                   "description": "US States 2-letter abbreviations",
                   "enum": [
@@ -153,6 +167,19 @@
          },
          "then": {
             "properties": {
+               "auditor_address_line_1": {
+                  "const": "",
+                  "type": "string"
+               },
+               "auditor_city": {
+                  "const": "",
+                  "type": "string"
+               },
+               "auditor_international_address": {
+                  "maxLength": 100,
+                  "minLength": 1,
+                  "type": "string"
+               },
                "auditor_state": {
                   "const": "",
                   "type": "string"

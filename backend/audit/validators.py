@@ -276,6 +276,7 @@ def validate_general_information_schema_rules(general_information):
                 "Invalid Audit Period - 'Audit period months' must be set for 'other' Audit period"
             ),
         )
+
     # Validate USA auditor information
     if general_information.get("auditor_country") == "USA" and not (
         general_information.get("auditor_zip")
@@ -291,34 +292,40 @@ def validate_general_information_schema_rules(general_information):
         raise ValidationError(
             _("Invalid Auditor State or Zip Code for non-USA countries")
         )
+    # Validate non-USA auditor address is provided
+    elif general_information.get("auditor_country") != "USA" and not (
+        general_information.get("auditor_international_address")
+    ):
+        raise ValidationError(_("Missing Auditor International Address"))
 
     return general_information
 
 
 def validate_general_information_json(value, is_data_migration=True):
     """
-    Apply Python checks to a partially filled general information record.
+    Apply JSON Schema and Python checks to a general information record.
+
+    Keyword arguments:
+    is_data_migration -- True if ignoring GSA_MIGRATION emails. (default True)
+    """
+    validate_use_of_gsa_migration_keyword(value, is_data_migration)
+    validate_general_information_schema(value)
+
+    return value
+
+
+def validate_general_information_complete_json(value, is_data_migration=True):
+    """
+    Apply JSON Schema and Python checks to a general information record.
+    Performs additional checks to enforce completeness.
+
+    Keyword arguments:
+    is_data_migration -- True if ignoring GSA_MIGRATION emails. (default True)
     """
     validate_use_of_gsa_migration_keyword(value, is_data_migration)
     validate_general_information_schema(value)
     validate_general_information_schema_rules(value)
 
-    return value
-
-
-def validate_general_information_complete_json(value):
-    """
-    Apply JSON Schema for general information completeness and report errors.
-    """
-    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationRequired.schema.json"
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
-
-    try:
-        validate(value, schema, format_checker=FormatChecker())
-    except JSONSchemaValidationError as err:
-        raise ValidationError(
-            _(err.message),
-        ) from err
     return value
 
 

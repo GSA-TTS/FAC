@@ -679,6 +679,7 @@ class GeneralInformationFormViewTests(TestCase):
             "auditee_city": "Chicago",
             "auditee_state": "IL",
             "auditee_zip": "60640",
+            "auditor_international_address": "",
             "auditee_contact_name": "Updated Designated Representative",
             "auditee_contact_title": "Lord of Windows",
             "auditee_phone": "5558675310",
