@@ -15,9 +15,9 @@ def search_major_program(general_results, params):
     q = Q()
     major_program_fields = params.get("major_program", [])
 
-    if True in major_program_fields:
+    if "True" in major_program_fields:
         q |= Q(is_major="Y")
-    elif False in major_program_fields:
+    elif "False" in major_program_fields:
         q |= Q(is_major="N")
 
     filtered_general_results = general_results.filter(q).distinct()
