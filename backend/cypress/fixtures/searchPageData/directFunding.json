@@ -1,0 +1,6 @@
+{
+    "directFunding": [
+        "direct_funding",
+        "passthrough_funding"
+    ]
+}
