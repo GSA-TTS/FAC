@@ -1,0 +1,23 @@
+---
+name: Materialized Views daily refresh
+on:
+  schedule:
+    # Invoke at 6 UTC/4 EST every day
+    - cron: '0 6 * * *'
+
+jobs:
+  dispatch-materialized-views:
+    name: Run Materialized Views create command on prod
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      space: production
+    steps:
+      - name: Run Command
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: production
+          command: cf run-task gsa-fac -k 2G -m 2G --name dispatch_create_materialized_views --command "python manage.py materialized_views --create"
