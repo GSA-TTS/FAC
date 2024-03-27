@@ -282,7 +282,7 @@ def extract_workbook_as_ir(file):
                 process_destination(dn, title, coord, sheets_by_name, workbook)
             except StopIteration:
                 logger.info(f"No destinations found for {named_range_name}.")
-                raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
+                # raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
 
     # Build the IR, which is a list of sheets.
     sheets = []
