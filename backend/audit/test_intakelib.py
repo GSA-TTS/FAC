@@ -1,3 +1,4 @@
+import unittest
 from django.test import SimpleTestCase
 from copy import deepcopy
 from audit.intakelib.intermediate_representation import (
@@ -144,6 +145,9 @@ class TestExtractWorkbookAsIr(SimpleTestCase):
         with self.assertRaises(ValidationError):
             extract_workbook_as_ir("dummy_file_with_ref_error")
 
+    @unittest.skip(
+        "Skipping this test as we have turned off check for no destination found in extract_workbook_as_ir."
+    )
     @patch("audit.intakelib.intermediate_representation._open_workbook")
     def test_no_destination_found(self, mock_open_workbook):
         """Test handling of a workbook with no destinations found for a named range."""
