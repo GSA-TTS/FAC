@@ -26,7 +26,7 @@
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.2.5",
     "@lhci/cli": "^0.12.0",
-    "cypress": "^13.6.6",
+    "cypress": "^13.7.1",
     "cypress-file-upload": "^5.0.8",
     "cypress-otp": "^1.0.3",
     "eslint": "^8.46.0",
