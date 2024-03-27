@@ -21,15 +21,21 @@ constructor() {
     this.majorProgramAccordionButton = '.usa-accordion__button:contains("Major program")';
     this.majorProgramRadio = '.usa-radio__input[name="major_program"]';
     this.searchSubmitButton = 'input.usa-button[type="submit"][value="Search"]';
+    this.searchTable = '.usa-table';
+    //this.viewReport = '.usa-link display-flex flex-column flex-align-center';
 
 }
 
 checkAuditYearCheckbox(year){
-    cy.get(this.yearCheckboxById(year)).check({force: true}).should('be.checked').and('have.value', year);
+    cy.get(this.yearCheckboxById(year)).should('be.checked').and('have.value', year);
 }
 
 uncheckAuditYearCheckbox(year){
-    cy.get(this.yearCheckboxById(year)).uncheck({force: true}).should('not.be.checked').and('have.value', year);
+    cy.get(this.yearCheckboxById(year)).uncheck({force:true}).should('not.be.checked').and('have.value', year);
+}
+
+checkAllYearsCheckbox(year){
+    cy.get(this.yearCheckboxById('all_years')).check({force:true}).should('be.checked').and('have.value', year);
 }
 
 testUEIorEin(value) {
@@ -106,6 +112,14 @@ uncheckMajorProgramRadio(value){
 
 testSearchSubmitButton(){
     cy.get(`${this.searchSubmitButton}:last`).click();
+}
+
+testSearchTable(){
+    cy.get(this.searchTable).should('exist');
+    cy.contains('td', 'D7A4J33FUMJ1')
+            .siblings()
+            .find('a.usa-link[href^="/dissemination/summary"]')
+            .click();
 }
 
 }

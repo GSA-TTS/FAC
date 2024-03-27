@@ -64,12 +64,7 @@ describe('Test Basic Search Fields', () => {
     it('checks Audit Years', () => {
       search.checkAuditYearCheckbox('2023');
       search.uncheckAuditYearCheckbox('2023');
-      yearsToCheck.forEach((year) => {
-        search.checkAuditYearCheckbox(year);
-      });
-      yearsToCheck.forEach((year) => {
-        search.uncheckAuditYearCheckbox(year);
-      })
+      search.checkAllYearsCheckbox('all_years');
       search.testUEIorEin(ueiOrein);
       search.testName(name);
       const [startDate, endDate] = accDate;
@@ -78,6 +73,8 @@ describe('Test Basic Search Fields', () => {
         search.testState(state);
 
         search.testSearchSubmitButton();
+
+        search.testSearchTable();
 
 
     });
