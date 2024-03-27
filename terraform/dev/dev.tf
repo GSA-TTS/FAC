@@ -11,4 +11,9 @@ module "dev" {
   smtp_proxy_instances  = 1
   clamav_instances      = 1
   recursive_delete      = true
+  json_params = jsonencode(
+    {
+      "storage" : 50,
+    }
+  )
 }

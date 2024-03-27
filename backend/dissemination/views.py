@@ -9,6 +9,8 @@ from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
@@ -29,7 +31,9 @@ from dissemination.models import (
     AdditionalUei,
     OneTimeAccess,
 )
+
 from dissemination.summary_reports import generate_summary_report
+
 from support.decorators import newrelic_timing_metric
 
 from users.permissions import can_read_tribal
@@ -111,6 +115,10 @@ def run_search(form_data):
 
 
 class Search(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(Search, self).dispatch(*args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         """
         When accessing the search page through get, return the blank search page.
@@ -341,6 +349,10 @@ class SingleSummaryReportDownloadView(View):
         Given a report_id in the URL, generate the summary report in S3 and
         redirect to its download link.
         """
+        raise Http404(
+            "SF-SAC downloads are temporarily disabled. See the FAC status page for more details."
+        )
+
         sac = get_object_or_404(General, report_id=report_id)
         include_private = include_private_results(request)
         filename = generate_summary_report([sac.report_id], include_private)
@@ -372,7 +384,6 @@ class MultipleSummaryReportDownloadView(View):
             if len(results) == 0:
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
-
             filename = generate_summary_report(report_ids, include_private)
             download_url = get_download_url(filename)
 
