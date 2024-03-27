@@ -4,9 +4,8 @@ import logging
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
 
-from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
-from dissemination.hist_models.census_2022 import CensusGen22
 from support.models import CognizantBaseline, CognizantAssignment
+from dissemination.models import General, MigrationInspectionRecord, FederalAward
 
 logger = logging.getLogger(__name__)
 
@@ -84,10 +83,10 @@ def determine_hist_agency(ein, uei):
     cog_agency = lookup_baseline(ein, uei, dbkey)
     if cog_agency:
         return cog_agency
-    (gen_count, total_amount_expended) = get_2019_gen(ein, dbkey)
+    (gen_count, total_amount_expended, report_id_2019) = get_2019_gen(ein, uei)
     if gen_count != 1:
         return None
-    cfdas = get_2019_cfdas(ein, dbkey)
+    cfdas = get_2019_cfdas(report_id_2019)
     if not cfdas:
         # logger.warning("Found no cfda data for dbkey {dbkey} in 2019")
         return None
@@ -102,10 +101,22 @@ def determine_hist_agency(ein, uei):
 
 def get_dbkey(ein, uei):
     try:
-        dbkey = CensusGen22.objects.values_list("dbkey", flat=True).get(
-            Q(ein=ein), Q(uei=uei) | Q(uei=None)
-        )[:]
-    except (CensusGen22.DoesNotExist, CensusGen22.MultipleObjectsReturned):
+        report_id = General.objects.values_list("report_id", flat=True).get(
+            Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year="2022")
+        )
+    except (General.DoesNotExist, General.MultipleObjectsReturned):
+        report_id = None
+        dbkey = None
+        return dbkey
+
+    try:
+        dbkey = MigrationInspectionRecord.objects.values_list("dbkey", flat=True).get(
+            Q(report_id=report_id), Q(audit_year="2022")
+        )
+    except (
+        MigrationInspectionRecord.DoesNotExist,
+        MigrationInspectionRecord.MultipleObjectsReturned,
+    ):
         dbkey = None
     return dbkey
 
@@ -125,27 +136,27 @@ def lookup_baseline(ein, uei, dbkey):
     return cognizant_agency
 
 
-def get_2019_gen(ein, dbkey):
-    gens = CensusGen19.objects.annotate(
-        amt=Cast("totfedexpend", output_field=BigIntegerField())
-    ).filter(Q(ein=ein), Q(dbkey=dbkey))
+def get_2019_gen(ein, uei):
+    gens = General.objects.annotate(
+        amt=Cast("total_amount_expended", output_field=BigIntegerField())
+    ).filter(Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year="2019"))
 
     if len(gens) != 1:
-        return (len(gens), 0)
+        return (len(gens), 0, None)
     gen = gens[0]
-    return (1, gen.amt)
+    return (1, gen.amt, gen.report_id)
 
 
-def get_2019_cfdas(ein, dbkey):
-    cfdas = CensusCfda19.objects.annotate(
-        amt=Cast("amount", output_field=BigIntegerField())
-    ).filter(Q(ein=ein), Q(dbkey=dbkey))
+def get_2019_cfdas(report_id):
+    cfdas = FederalAward.objects.annotate(
+        amt=Cast("amount_expended", output_field=BigIntegerField())
+    ).filter(Q(report_id=report_id))
 
     if len(cfdas) == 0:
         return None
     baseline_cfdas = []
     for row in cfdas:
-        baseline_cfdas.append((row.cfda, row.amt, row.direct))
+        baseline_cfdas.append((row.federal_agency_prefix, row.amt, row.is_direct))
     return baseline_cfdas
 
 

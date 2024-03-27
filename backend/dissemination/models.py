@@ -2,8 +2,6 @@ from django.db import models
 from django.utils import timezone
 from . import docs
 
-from .hist_models import census_2019, census_2022  # noqa: F401
-
 BIGINT_MAX_DIGITS = 25
 
 REPORT_ID_FK_HELP_TEXT = "GSAFAC generated identifier"
