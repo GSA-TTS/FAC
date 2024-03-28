@@ -28,7 +28,7 @@
   "auditor_address_line_1": "Main Hall",
   "met_spending_threshold": true,
   "secondary_auditors_exist": false,
-  "audit_period_other_months": "null",
+  "audit_period_other_months": "",
   "auditee_fiscal_period_end": "2023-01-01",
   "ein_not_an_ssn_attestation": true,
   "auditee_fiscal_period_start": "2022-01-01",
