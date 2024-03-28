@@ -380,6 +380,8 @@ def validate_file_size(file, max_file_size_mb):
 
 
 def _scan_file(file):
+    error_message = "We were unable to complete a security inspection of the file, please try again or contact support for assistance."
+
     try:
         return requests.post(
             settings.AV_SCAN_URL,
@@ -387,10 +389,12 @@ def _scan_file(file):
             data={"name": file.name},
             timeout=30,
         )
+    # Common upload issues get their own messages. These messages display as form errors.
+    # Allow other errors to be raised and either caught elsewhere or passed to a 400 page.
     except requests.exceptions.ConnectionError:
-        raise ValidationError(
-            "We were unable to complete a security inspection of the file, please try again or contact support for assistance."
-        )
+        raise ValidationError(f"Connection error. {error_message}")
+    except requests.exceptions.ReadTimeout:
+        raise ValidationError(f"Read timed out. {error_message}")
 
 
 @newrelic_timing_metric("validate_file_infection")
