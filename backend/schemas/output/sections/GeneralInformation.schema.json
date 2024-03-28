@@ -71,12 +71,12 @@
          "then": {
             "properties": {
                "auditor_address_line_1": {
-                  "maxLength": 100,
+                  "maxLength": 500,
                   "minLength": 1,
                   "type": "string"
                },
                "auditor_city": {
-                  "maxLength": 100,
+                  "maxLength": 500,
                   "minLength": 1,
                   "type": "string"
                },
@@ -176,7 +176,7 @@
                   "type": "string"
                },
                "auditor_international_address": {
-                  "maxLength": 100,
+                  "maxLength": 500,
                   "minLength": 1,
                   "type": "string"
                },

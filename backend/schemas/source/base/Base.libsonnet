@@ -313,7 +313,7 @@ local Compound = {
   },
   NonEmptyString: Types.string {
     minLength: 1,
-    maxLength: 100,
+    maxLength: 500,
   },
   EmployerIdentificationNumber: Types.string {
     pattern: '^[0-9]{9}$',
