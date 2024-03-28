@@ -7,6 +7,7 @@ applications:
     memory: ((mem_amount))
     path: ../
     timeout: 180
+    cf_startup_timeout: 10
     disk_quota: 2G
     env:
       ENV: ((cf_env_name))
