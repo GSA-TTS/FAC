@@ -231,8 +231,10 @@ def validate_general_information_schema(general_information):
                     "properties": {key: schema["properties"][key]},
                 }
                 validator.validate({key: val}, field_schema)
-
     except JSONSchemaValidationError as err:
+        logger.error(
+            f"ValidationError in General Information: Invalid value: {val} for key: {key}"
+        )
         raise ValidationError(
             _(err.message),
         ) from err
@@ -278,19 +280,25 @@ def validate_general_information_schema_rules(general_information):
         )
 
     # Validate USA auditor information
-    if general_information.get("auditor_country") == "USA" and not (
-        general_information.get("auditor_zip")
-        and general_information.get("auditor_state")
+    if general_information.get("auditor_country") == "USA" and (
+        not general_information.get("auditor_zip")
+        or not general_information.get("auditor_state")
+        or not general_information.get("auditor_address_line_1")
+        or not general_information.get("auditor_city")
     ):
-        raise ValidationError(_("Missing Auditor State or Zip Code"))
+        raise ValidationError(_("Missing Auditor Street or City or State or Zip Code"))
 
     # Validate non-USA auditor state or zip code should not be provided
     elif general_information.get("auditor_country") != "USA" and (
         general_information.get("auditor_zip")
         or general_information.get("auditor_state")
+        or general_information.get("auditor_city")
+        or general_information.get("auditor_address_line_1")
     ):
         raise ValidationError(
-            _("Invalid Auditor State or Zip Code for non-USA countries")
+            _(
+                "Invalid Auditor Street or City or State or Zip Code for non-USA countries"
+            )
         )
     # Validate non-USA auditor address is provided
     elif general_information.get("auditor_country") != "USA" and not (
