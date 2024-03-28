@@ -70,7 +70,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional check
     },
     auditor_country: Base.Enum.CountryType,
     auditor_international_address: Types.string {
-      maxLength: 100,
+      maxLength: 500,
     },
     auditor_address_line_1: Types.string {
       maxLength: 100,

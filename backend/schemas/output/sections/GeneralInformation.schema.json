@@ -413,7 +413,7 @@
          "type": "string"
       },
       "auditor_international_address": {
-         "maxLength": 100,
+         "maxLength": 500,
          "type": "string"
       },
       "auditor_phone": {
