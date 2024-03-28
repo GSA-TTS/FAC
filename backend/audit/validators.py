@@ -387,7 +387,7 @@ def _scan_file(file):
             settings.AV_SCAN_URL,
             files={"file": file},
             data={"name": file.name},
-            timeout=30,
+            timeout=0.001,
         )
     # Common upload issues get their own messages. These messages display as form errors.
     # Allow other errors to be raised and either caught elsewhere or passed to a 400 page.
