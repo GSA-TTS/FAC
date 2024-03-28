@@ -467,7 +467,7 @@ def _scan_file(file):
             settings.AV_SCAN_URL,
             files={"file": file},
             data={"name": file.name},
-            timeout=15,
+            timeout=30,
         )
     except requests.exceptions.ConnectionError:
         raise ValidationError(

@@ -12,8 +12,8 @@ django-fsm
 environs[django]
 faker
 fs
-greenlet==2.0.2
-gunicorn
+greenlet>=3.0rc3
+gunicorn[gevent]
 jsonpath-ng
 jsonschema
 newrelic
@@ -21,6 +21,7 @@ oic
 openpyxl
 pandas
 peewee
+psycogreen
 psycopg2-binary
 pycryptodome>=3.19.1
 pycryptodomex>=3.19.1
