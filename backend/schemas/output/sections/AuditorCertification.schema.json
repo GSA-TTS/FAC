@@ -16,6 +16,9 @@
             "is_OMB_limited": {
                "type": "boolean"
             },
+            "is_accurate_and_complete": {
+               "type": "boolean"
+            },
             "is_auditee_responsible": {
                "type": "boolean"
             }
@@ -25,6 +28,7 @@
             "is_auditee_responsible",
             "has_used_auditors_report",
             "has_no_auditee_procedures",
+            "is_accurate_and_complete",
             "is_FAC_releasable"
          ],
          "type": "object"

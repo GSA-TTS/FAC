@@ -67,6 +67,19 @@
                         <span class="usa-error-message">{{ form.errors.has_no_auditee_procedures|striptags }}</span>
                     </div>
                     <div class="usa-checkbox margin-top-4">
+                        <input id="is_accurate_and_complete"
+                               name="is_accurate_and_complete"
+                               class="usa-checkbox__input"
+                               required
+                               type="checkbox"
+                               value="True"
+                               {% if form.cleaned_data.is_accurate_and_complete %}checked{% endif %} />
+                        <label class="usa-checkbox__label" for="is_accurate_and_complete">
+                            All information required to be reported in this Form SF-SAC in its entirety and such information is accurate and complete.
+                        </label>
+                        <span class="usa-error-message">{{ form.errors.is_accurate_and_complete|striptags }}</span>
+                    </div>
+                    <div class="usa-checkbox margin-top-4">
                         <input id="is_FAC_releasable"
                                name="is_FAC_releasable"
                                class="usa-checkbox__input"
