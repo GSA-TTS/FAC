@@ -1,5 +1,5 @@
 ---
-name: Run the Materialize Views Django Function
+name: Materialized Views create
 on:
   workflow_dispatch:
     inputs:
@@ -14,7 +14,7 @@ on:
           - production
 
 jobs:
-  dispatch-materialize-views:
+  dispatch-materialized-views:
     if: ${{ github.event.inputs.environment != '' }}
     name: Run Materialize Views on ${{ inputs.environment }}
     runs-on: ubuntu-latest
