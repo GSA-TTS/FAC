@@ -18,7 +18,7 @@ class Util:
         if json_array is None:
             return ""
         elif isinstance(json_array, list):
-            return ", ".join(map(str, json_array))
+            return ",".join(map(str, json_array))
         else:
             # FIXME This should raise an error
             return f"NOT AN ARRAY: {json_array}"
