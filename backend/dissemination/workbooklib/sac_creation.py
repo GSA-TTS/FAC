@@ -146,6 +146,7 @@ def _fake_general_information(dbkey, auditee_name="DEFAULT AUDITEE"):
         "auditor_ein_not_an_ssn_attestation": True,
         "auditor_email": gobj.cpaemail if gobj.cpaemail else "noemailfound@noemail.com",
         "auditor_firm_name": gobj.cpafirmname,
+        "auditor_international_address": "",
         "auditor_phone": gobj.cpaphone,
         # TODO: when we include territories in our valid states, remove this restriction
         "auditor_state": gobj.cpastate,
