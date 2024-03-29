@@ -3,12 +3,13 @@ from model_bakery import baker
 from audit.models import SingleAuditChecklist
 
 from .errors import err_biennial_low_risk
-from .validate_general_information import _check_biennial_low_risk
+from .check_biennial_low_risk import check_biennial_low_risk
+from .sac_validation_shape import sac_validation_shape
 
 
 class CheckBiennialLowRiskTests(TestCase):
     """
-    Tests for _check_biennial_low_risk validation
+    Tests for check_biennial_low_risk validation
     """
 
     def test_no_biennial_no_low_risk(self):
@@ -19,9 +20,7 @@ class CheckBiennialLowRiskTests(TestCase):
         sac.general_information = {"audit_period_covered": "annual"}
         sac.audit_information = {"is_low_risk_auditee": False}
 
-        validation_result = _check_biennial_low_risk(
-            sac.general_information, sac.audit_information
-        )
+        validation_result = check_biennial_low_risk(sac_validation_shape(sac))
 
         self.assertEqual(validation_result, [])
 
@@ -33,9 +32,7 @@ class CheckBiennialLowRiskTests(TestCase):
         sac.general_information = {"audit_period_covered": "biennial"}
         sac.audit_information = {"is_low_risk_auditee": False}
 
-        validation_result = _check_biennial_low_risk(
-            sac.general_information, sac.audit_information
-        )
+        validation_result = check_biennial_low_risk(sac_validation_shape(sac))
 
         self.assertEqual(validation_result, [])
 
@@ -47,9 +44,7 @@ class CheckBiennialLowRiskTests(TestCase):
         sac.general_information = {"audit_period_covered": "annual"}
         sac.audit_information = {"is_low_risk_auditee": True}
 
-        validation_result = _check_biennial_low_risk(
-            sac.general_information, sac.audit_information
-        )
+        validation_result = check_biennial_low_risk(sac_validation_shape(sac))
 
         self.assertEqual(validation_result, [])
 
@@ -61,9 +56,7 @@ class CheckBiennialLowRiskTests(TestCase):
         sac.general_information = {"audit_period_covered": "biennial"}
         sac.audit_information = {"is_low_risk_auditee": True}
 
-        validation_result = _check_biennial_low_risk(
-            sac.general_information, sac.audit_information
-        )
+        validation_result = check_biennial_low_risk(sac_validation_shape(sac))
 
         self.assertEqual(len(validation_result), 1)
-        self.assertEqual(validation_result[0], {"error": err_biennial_low_risk})
+        self.assertEqual(validation_result[0], {"error": err_biennial_low_risk()})
