@@ -7,7 +7,7 @@ from audit.intakelib.common import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 
-AUTHORIZED_VERSIONS = {"1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5"}
+AUTHORIZED_VERSIONS = {"1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5", "1.1.0"}
 
 
 # DESCRIPTION

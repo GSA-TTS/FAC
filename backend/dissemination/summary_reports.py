@@ -1,8 +1,9 @@
 from datetime import datetime
-import openpyxl as pyxl
 import io
 import logging
 import uuid
+import time
+import openpyxl as pyxl
 
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
@@ -24,6 +25,7 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
+    DisseminationCombined,
 )
 
 logger = logging.getLogger(__name__)
@@ -177,7 +179,7 @@ field_name_ordered = {
         "award_reference",
         "federal_agency_prefix",
         "federal_award_extension",
-        "_aln",
+        "aln",
         "findings_count",
         "additional_award_identification",
         "federal_program_name",
@@ -197,9 +199,9 @@ field_name_ordered = {
     ],
     "finding": [
         "report_id",
-        "_federal_agency_prefix",
-        "_federal_award_extension",
-        "_aln",
+        "federal_agency_prefix",
+        "federal_award_extension",
+        "aln",
         "award_reference",
         "reference_number",
         "type_requirement",
@@ -265,11 +267,20 @@ can_read_tribal_disclaimer = "This document includes one or more Tribal entities
 cannot_read_tribal_disclaimer = "This document includes one or more Tribal entities that have chosen to keep their data private per 2 CFR 200.512(b)(2). It doesn't include their audit findings text, corrective action plan, or notes to SEFA."
 
 
-def _get_tribal_report_ids(report_ids):
+def _get_model_by_name(name):
+    for m in models:
+        if m.__name__.lower() == name:
+            return m
+    return None
+
+
+def get_tribal_report_ids(report_ids):
+    t0 = time.time()
     """Filters the given report_ids with only ones that are tribal"""
     objects = General.objects.all().filter(report_id__in=report_ids, is_public=False)
-
-    return [obj.report_id for obj in objects]
+    objs = [obj.report_id for obj in objects]
+    t1 = time.time()
+    return (objs, t1 - t0)
 
 
 def set_column_widths(worksheet):
@@ -332,37 +343,10 @@ def insert_dissem_coversheet(workbook, contains_tribal, include_private):
 
 
 def _get_attribute_or_data(obj, field_name):
-    if field_name.startswith("_"):
-        if field_name == "_aln":
-            if isinstance(obj, FederalAward):
-                return (
-                    getattr(obj, "federal_agency_prefix")
-                    + "."
-                    + getattr(obj, "federal_award_extension")
-                )
-            elif isinstance(obj, Finding):
-                fa = FederalAward.objects.get(
-                    report_id=getattr(obj, "report_id"),
-                    award_reference=getattr(obj, "award_reference"),
-                )
-                return (
-                    getattr(fa, "federal_agency_prefix")
-                    + "."
-                    + getattr(fa, "federal_award_extension")
-                )
-        else:
-            field_name = field_name[1:]
-            if isinstance(obj, Finding):
-                fa = FederalAward.objects.get(
-                    report_id=getattr(obj, "report_id"),
-                    award_reference=getattr(obj, "award_reference"),
-                )
-                return getattr(fa, field_name)
-    else:
-        value = getattr(obj, field_name)
-        if isinstance(value, General):
-            value = value.report_id
-        return value
+    value = getattr(obj, field_name)
+    if isinstance(value, General):
+        value = value.report_id
+    return value
 
 
 def gather_report_data_dissemination(report_ids, tribal_report_ids, include_private):
@@ -381,40 +365,129 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
         ...
     }
     """
-
+    t0 = time.time()
     # Make report IDs unique
     report_ids = set(report_ids)
+    all_names = set(field_name_ordered.keys())
+    names_in_dc = set(["general", "federalaward", "finding", "passthrough"])
+    names_not_in_dc = all_names - names_in_dc
+    data = initialize_data_structure(names_in_dc.union(names_not_in_dc))
 
+    process_combined_results(
+        report_ids, names_in_dc, data, include_private, tribal_report_ids
+    )
+
+    process_non_combined_results(
+        report_ids, names_not_in_dc, data, include_private, tribal_report_ids
+    )
+
+    return (data, time.time() - t0)
+
+
+def initialize_data_structure(names):
     data = {}
+    for model_name in names:
+        data[model_name] = {
+            "field_names": field_name_ordered[model_name],
+            "entries": [],
+        }
+    return data
 
-    for model in models:
-        model_name = model.__name__.lower()
 
-        # This pulls directly from the model
-        #   fields = model._meta.get_fields()
-        #   field_names = [f.name for f in fields]
-        # This uses the ordered columns above
+def process_combined_results(
+    report_ids, names_in_dc, data, include_private, tribal_report_ids
+):
+    # Grab all the rows from the combined table into a local structure.
+    # We'll do this in memory. This table flattens general, federalaward, and findings
+    # so we can move much faster on those tables without extra lookups.
+    dc_results = DisseminationCombined.objects.all().filter(report_id__in=report_ids)
+    # Different tables want to be visited/filtered differently.
+    visited = set()
+    # Do all of the names in the DisseminationCombined at the same time.
+    # That way, we only go through the results once.
+    for obj in dc_results:
+        for model_name in names_in_dc:
+            field_names = field_name_ordered[model_name]
+            report_id = getattr(obj, "report_id")
+            award_reference = getattr(obj, "award_reference")
+            reference_number = getattr(obj, "reference_number")
+            passthrough_name = getattr(obj, "passthrough_name")
+
+            # WATCH THIS IF/ELIF
+            # It is making sure we do not double-disseminate some rows.
+            ####
+            # GENERAL
+            if model_name == "general" and report_id in visited:
+                pass
+            ####
+            # PASSTHROUGH
+            # We should never disseminate something that has no name.
+            elif model_name == "passthrough" and passthrough_name is None:
+                pass
+            ####
+            # FEDERAL AWARD
+            # This condition is actually filtering out the damage to the
+            # data from the race hazard we had at the start of 2024.
+            # NOTE
+            # We cannot filter `passthrough` here. Each award reference row has
+            # a one-to-many relationship with passthrough.
+            elif (
+                model_name == "federalaward"
+                and f"{report_id}-{award_reference}" in visited
+            ):
+                pass
+            ####
+            # FINDING
+            elif model_name == "finding" and (
+                award_reference is None or reference_number is None
+            ):
+                # And we don't include rows in finding where there are none.
+                pass
+            else:
+                # Track to limit duplication
+                if model_name == "general":
+                    visited.add(report_id)
+                # Handle special tracking for federal awards, so we don't duplicate award # rows.
+                if model_name == "federalaward":
+                    visited.add(f"{report_id}-{award_reference}")
+                # Omit rows for private tribal data when the user doesn't have perms
+                if (
+                    model_name in restricted_model_names
+                    and not include_private
+                    and report_id in tribal_report_ids
+                ):
+                    pass
+                else:
+                    data[model_name]["entries"].append(
+                        [getattr(obj, field_name) for field_name in field_names]
+                    )
+
+
+def process_non_combined_results(
+    report_ids, names_not_in_dc, data, include_private, tribal_report_ids
+):
+    for model_name in names_not_in_dc:
+        model = _get_model_by_name(model_name)
+        print(model_name)
         field_names = field_name_ordered[model_name]
-
-        data[model_name] = {"field_names": field_names, "entries": []}
-
         objects = model.objects.all().filter(report_id__in=report_ids)
+        # Walk the objects
         for obj in objects:
             report_id = _get_attribute_or_data(obj, "report_id")
-
             # Omit rows for private tribal data when the user doesn't have perms
             if (
                 model_name in restricted_model_names
                 and not include_private
                 and report_id in tribal_report_ids
             ):
-                continue
-
-            data[model_name]["entries"].append(
-                [_get_attribute_or_data(obj, field_name) for field_name in field_names]
-            )
-
-    return data
+                pass
+            else:
+                data[model_name]["entries"].append(
+                    [
+                        _get_attribute_or_data(obj, field_name)
+                        for field_name in field_names
+                    ]
+                )
 
 
 def gather_report_data_pre_certification(i2d_data):
@@ -455,6 +528,17 @@ def gather_report_data_pre_certification(i2d_data):
 
     data = {}
 
+    # FIXME
+    # This is because additional fields were added to the SF-SAC.
+    # Then, we introduced DisseminationCombined
+    # Then, we got rid of `_` on field names.
+    # Now, this broke.
+    # Choices were made, consequences followed. We want to clean this up.
+    fields_to_ignore = {
+        "federalaward": ["aln"],
+        "finding": ["aln", "federal_agency_prefix", "federal_award_extension"],
+    }
+
     # For every model (FederalAward, CapText, etc), add the skeleton object ('field_names' and empty 'entries') to 'data'.
     # Then, for every object in the dissemination_data (objects of type FederalAward, CapText, etc) create a row (array) for the summary.
     # Every row is created by looping over the field names and appending the data.
@@ -467,7 +551,7 @@ def gather_report_data_pre_certification(i2d_data):
         field_names = [
             field_name
             for field_name in field_name_ordered[model_name]
-            if not field_name.startswith("_")
+            if field_name not in fields_to_ignore.get(model_name, [])
         ]  # Column names, omitting "_" fields
         data[model_name] = {
             "field_names": field_names,
@@ -492,6 +576,7 @@ def gather_report_data_pre_certification(i2d_data):
 
 
 def create_workbook(data, protect_sheets=False):
+    t0 = time.time()
     workbook = pyxl.Workbook()
 
     for sheet_name in data.keys():
@@ -517,11 +602,12 @@ def create_workbook(data, protect_sheets=False):
 
     # remove sheet that is created during workbook construction
     workbook.remove_sheet(workbook.get_sheet_by_name("Sheet"))
-
-    return workbook
+    t1 = time.time()
+    return (workbook, t1 - t0)
 
 
 def persist_workbook(workbook):
+    t0 = time.time()
     s3_client = boto3_client(
         service_name="s3",
         region_name=settings.AWS_S3_PRIVATE_REGION_NAME,
@@ -552,28 +638,33 @@ def persist_workbook(workbook):
         except ClientError:
             logger.warn(f"Unable to put summary report file {filename} in S3!")
             raise
-
-    return f"temp/{filename}"
+    t1 = time.time()
+    return (f"temp/{filename}", t1 - t0)
 
 
 def generate_summary_report(report_ids, include_private=False):
-    tribal_report_ids = _get_tribal_report_ids(report_ids)
-    data = gather_report_data_dissemination(
+    t0 = time.time()
+    (tribal_report_ids, ttri) = get_tribal_report_ids(report_ids)
+    (data, tgrdd) = gather_report_data_dissemination(
         report_ids, tribal_report_ids, include_private
     )
-    workbook = create_workbook(data)
+    (workbook, tcw) = create_workbook(data)
     insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
-    filename = persist_workbook(workbook)
-
+    (filename, tpw) = persist_workbook(workbook)
+    t1 = time.time()
+    logger.info(
+        f"SUMMARY_REPORTS generate_summary_report\n\ttotal: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}"
+    )
     return filename
 
 
+# Ignore performance profiling for the presub.
 def generate_presubmission_report(i2d_data):
     data = gather_report_data_pre_certification(i2d_data)
-    workbook = create_workbook(data, protect_sheets=True)
+    (workbook, _) = create_workbook(data, protect_sheets=True)
     insert_precert_coversheet(workbook)
     workbook.security.workbookPassword = str(uuid.uuid4())
     workbook.security.lockStructure = True
-    filename = persist_workbook(workbook)
+    (filename, _) = persist_workbook(workbook)
 
     return filename

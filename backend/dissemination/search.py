@@ -6,6 +6,7 @@ from .searchlib.search_alns import search_alns
 from .searchlib.search_findings import search_findings
 from .searchlib.search_direct_funding import search_direct_funding
 from .searchlib.search_major_program import search_major_program
+from dissemination.models import DisseminationCombined, General
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +15,27 @@ logger = logging.getLogger(__name__)
 # https://books.agiliq.com/en/latest/README.html
 # Their ORM cookbook looks to be useful reading.
 # https://books.agiliq.com/projects/django-orm-cookbook/en/latest/subquery.html
+
+# {'alns': [], -- DisseminationCombined
+#  'names': ['AWESOME'], -- General
+#  'uei_or_eins': [],  -- General
+#  'start_date': None,  -- General
+#  'end_date': None,  -- General
+#  'cog_or_oversight': '', -- General, but not wanted
+#  'agency_name': '',  -- NO IDEA
+#  'audit_years': [], -- General
+#  'findings': [], -- DisseminationCombined
+#  'direct_funding': [], -- DisseminationCombined
+#  'major_program': [], -- DisseminationCombined
+#  'auditee_state': '', -- General
+#  'order_by': -- General
+#  'fac_accepted_date', -- General
+#  'order_direction': -- General
+#  'descending', 'LIMIT': 1000} -- General
+
+
+def is_advanced_search(params_dict):
+    return params_dict.get("advanced_search_flag")
 
 
 def search(params):
@@ -30,12 +52,21 @@ def search(params):
 
     ##############
     # GENERAL
-    results = search_general(params)
-    results = _sort_results(results, params)
-    results = search_alns(results, params)
-    results = search_findings(results, params)
-    results = search_direct_funding(results, params)
-    results = search_major_program(results, params)
+
+    logger.info(params)
+    if is_advanced_search(params):
+        logger.info("search Searching `DisseminationCombined`")
+        results = search_general(DisseminationCombined, params)
+        results = _sort_results(results, params)
+        results = search_alns(results, params)
+        results = search_findings(results, params)
+        results = search_direct_funding(results, params)
+        results = search_major_program(results, params)
+    else:
+        logger.info("search Searching `General`")
+        results = search_general(General, params)
+        results = _sort_results(results, params)
+
     results = results.distinct("report_id", params.get("order_by", "fac_accepted_date"))
 
     t1 = time.time()

@@ -5,7 +5,7 @@ const LOGIN_TEST_OTP_SECRET = Cypress.env('LOGIN_TEST_OTP_SECRET');
 
 export function testLoginGovLogin(
   email=LOGIN_TEST_EMAIL, password=LOGIN_TEST_PASSWORD, secret=LOGIN_TEST_OTP_SECRET) {
-  cy.get('a.usa-button.sign-in-button').click();
+  cy.get('a.usa-link[href="/openid/login/"][role="button"]').click();
   cy.get('button.usa-button.sign-in-button')
     .should('contain.text', 'Authenticate with Login.gov')
     .click();

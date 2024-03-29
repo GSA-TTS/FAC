@@ -1,6 +1,7 @@
 from psycopg2._psycopg import connection
 from config import settings
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,16 @@ def get_conn_string():
     else:
         conn_string = settings.CONNECTION_STRING
     return conn_string
+
+
+def exec_sql_at_path(dir, filename):
+    conn = connection(get_conn_string())
+    conn.autocommit = True
+    path = os.path.join(dir, filename)
+    with conn.cursor() as curs:
+        logger.info(f"EXEC SQL {path}")
+        sql = open(path, "r").read()
+        curs.execute(sql)
 
 
 def exec_sql(location, version, filename):

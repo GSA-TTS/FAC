@@ -63,14 +63,12 @@ def _build_aln_q(full_alns, agency_numbers):
     q = Q()
     if agency_numbers:
         # Build a filter for the agency numbers. E.g. given 93 and 45
-        q |= Q(
-            federalaward__federal_agency_prefix__in=[an.prefix for an in agency_numbers]
-        )
+        q |= Q(federal_agency_prefix__in=[an.prefix for an in agency_numbers])
 
     if full_alns:
         for full_aln in full_alns:
-            q |= Q(federalaward__federal_agency_prefix=full_aln.prefix) & Q(
-                federalaward__federal_award_extension=full_aln.program
+            q |= Q(federal_agency_prefix=full_aln.prefix) & Q(
+                federal_award_extension=full_aln.program
             )
 
     return q

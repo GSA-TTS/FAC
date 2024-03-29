@@ -6,7 +6,7 @@ export function testUnlock() {
         const reportId = url.split('/').pop();
         cy.get('.usa-button').contains('Unlock').click();
         cy.get('#continue').contains('Unlock submission').click();
-        cy.get('img[alt="FAC.gov"]').should('exist').click();
+        cy.get('#basic-logo').should('exist').click();
         cy.url().should('match', /\/audit\//);
         cy.contains('td', `${reportId}`)
             .siblings()

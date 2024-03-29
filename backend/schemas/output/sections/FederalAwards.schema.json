@@ -39,7 +39,7 @@
                   "properties": {
                      "award_reference": {
                         "description": "Award Reference",
-                        "pattern": "^AWARD-(?!0000)[0-9]{4}$",
+                        "pattern": "^AWARD-(?!0{4,5}$)[0-9]{4,5}$",
                         "title": "AwardReference",
                         "type": "string"
                      },
@@ -552,7 +552,7 @@
                "type": "string"
             },
             "version": {
-               "const": "1.0.5",
+               "const": "1.1.0",
                "type": "string"
             }
          },

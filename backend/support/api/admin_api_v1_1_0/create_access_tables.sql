@@ -6,6 +6,7 @@
 -- This is because administrative keys can read/write
 -- to some tables in the database. They can read internal and
 -- in-flight data.
+
 DROP TABLE IF EXISTS support_administrative_key_uuids;
 
 CREATE TABLE support_administrative_key_uuids 
@@ -45,3 +46,4 @@ INSERT INTO support_administrative_key_uuids
         '2023-12-08'
     )
     ;
+
