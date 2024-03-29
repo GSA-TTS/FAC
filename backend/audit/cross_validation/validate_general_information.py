@@ -1,10 +1,14 @@
 import json
-from django.conf import settings
+
 from jsonschema import FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
 from django.core.exceptions import ValidationError
+from django.conf import settings
+
 from audit.cross_validation.naming import NC
 from audit.validators import validate_general_information_schema_rules
+from .errors import err_biennial_low_risk
+
 
 required_fields = {
     #  `key_in_json_schema: label_for_user`
@@ -62,12 +66,16 @@ def validate_general_information(sac_dict, *_args, **_kwargs):
     must return to the General Information page, and once there they will get
     friendlier errors when they try to proceed.
     """
-    all_sections = sac_dict["sf_sac_sections"]
-    general_information = all_sections[NC.GENERAL_INFORMATION]
     schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationRequired.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
+    all_sections = sac_dict["sf_sac_sections"]
+    general_information = all_sections[NC.GENERAL_INFORMATION]
     errors = _check_required_field(general_information)
+
+    audit_information = all_sections[NC.AUDIT_INFORMATION]
+    errors.extend(_check_biennial_low_risk(general_information, audit_information))
+
     if errors:
         return errors
     try:
@@ -94,3 +102,16 @@ def _check_required_field(general_information):
         return [{"error": f"Missing required fields: {', '.join(missing_fields)}"}]
 
     return []
+
+
+def _check_biennial_low_risk(general_information, audit_information):
+    """
+    Check that both biennial and low risk flags aren't both set.
+    """
+    if (
+        general_information["audit_period_covered"] == "biennial"
+        and audit_information["is_low_risk_auditee"]
+    ):
+        return [{"error": err_biennial_low_risk}]
+    else:
+        return []
