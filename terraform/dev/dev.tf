@@ -4,7 +4,7 @@ module "dev" {
   new_relic_license_key = var.new_relic_license_key
   pgrst_jwt_secret      = var.pgrst_jwt_secret
 
-  database_plan         = "micro-psql"
+  database_plan         = "medium-gp-psql"
   postgrest_instances   = 1
   swagger_instances     = 1
   https_proxy_instances = 1

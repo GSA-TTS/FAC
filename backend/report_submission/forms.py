@@ -60,6 +60,7 @@ class AuditeeInfoForm(forms.Form):
 
 class GeneralInformationForm(forms.Form):
     max_string_length = 100
+    foreign_address_max_length = 500
     choices_state_abbrevs = list((i, i) for i in STATE_ABBREVS)
 
     audit_type = forms.CharField(required=False)
@@ -104,7 +105,7 @@ class GeneralInformationForm(forms.Form):
     auditor_ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     auditor_country = forms.CharField(required=False)
     auditor_international_address = forms.CharField(
-        max_length=max_string_length, required=False
+        max_length=foreign_address_max_length, required=False
     )
     auditor_address_line_1 = forms.CharField(
         max_length=max_string_length, required=False
