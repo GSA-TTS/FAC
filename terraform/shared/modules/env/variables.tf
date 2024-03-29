@@ -89,3 +89,8 @@ variable "pgrst_jwt_secret" {
   type        = string
   description = "the JWT signing secret for validating JWT tokens from api.data.gov"
 }
+
+variable "json_params" {
+  type        = string
+  description = "Optional parameters used for service instance (-c)"
+}

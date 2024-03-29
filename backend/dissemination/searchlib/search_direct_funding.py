@@ -15,9 +15,9 @@ def search_direct_funding(general_results, params):
     for field in direct_funding_fields:
         match field:
             case "direct_funding":
-                q |= Q(federalaward__is_direct="Y")
+                q |= Q(is_direct="Y")
             case "passthrough_funding":
-                q |= Q(federalaward__is_direct="N")
+                q |= Q(is_direct="N")
             case _:
                 pass
 

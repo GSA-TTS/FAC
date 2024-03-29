@@ -113,7 +113,7 @@
          "name": "Form",
          "open_ranges": [
             {
-               "formula": "=IF(B{0}<>\"\", \"AWARD-\"&TEXT(ROW()-1,\"0000\"), \"\")",
+               "formula": "=IF(B{0}<>\"\", \"AWARD-\"&TEXT(ROW()-1,\"00000\"), \"\")",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#award_reference",
                   "text": "Award reference have the form AWARD-NNNN (e.g. AWARD-0001)"
@@ -186,7 +186,7 @@
                "title_cell": "E1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "If known, the Program Name should have been provided for you. Please do not change the Program Name unless absolutely necessary or the Program Name is unknown. The Program Name must be 300 characters or less. If the drop-down menu is empty, you may need to enter an Agency Prefix and ALN in columns B and C.Continue?",
+                  "custom_error": "If the Program Name was provided, please, do not change it unless necessary or unknown. The Program Name must be under 300 characters. If the drop-down menu is empty, you may need to enter an Agency Prefix and ALN in columns B and C. Continue?",
                   "custom_title": "Unknown Federal Program Name",
                   "errorStyle": "warning",
                   "formula1": "=Y{0}:Y{0}",

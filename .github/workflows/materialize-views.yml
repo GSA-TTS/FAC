@@ -1,0 +1,32 @@
+---
+name: Run the Materialize Views Django Function
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        description: The environment the workflow should run on.
+        options:
+          - dev
+          - staging
+          - preview
+          - production
+
+jobs:
+  dispatch-materialize-views:
+    if: ${{ github.event.inputs.environment != '' }}
+    name: Run Materialize Views on ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Run Command
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name dispatch_create_materialized_views --command "python manage.py materialized_views --create"

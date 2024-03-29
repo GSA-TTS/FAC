@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+{% load static %}
+{% load sprite_helper %}
+
+{% block content %}
+    <div class="desktop:padding-x-10">
+        <div class="grid-row">
+            <div class="grid-col-auto audit-search-form">
+                <h3>Filters</h3>
+                <form class="usa-form"
+                      id="search-form"
+                      action="{% url 'dissemination:AdvancedSearch' %}"
+                      enctype='multipart/form-data'
+                      method="post">
+                    {% csrf_token %}
+                    {% comment %} Submission {% endcomment %}
+                    <div class="search-submit">
+                        <input class="usa-button" type="submit" value="Search" />
+                        <input class="usa-button usa-button--unstyled"
+                               type="reset"
+                               value="Reset Search" />
+                    </div>
+                    <div class="usa-accordion usa-accordion--multiselectable"
+                         data-allow-multiple>
+                         {% comment %} Audit Year {% endcomment %}
+                         <button type="button"
+                                 class="usa-accordion__button"
+                                 aria-expanded="true"
+                                 aria-controls="audit-year">Audit Year</button>
+                         <div id="audit-year">
+                             {% for value, text in form.audit_year.field.choices %}
+                                 <div class="usa-checkbox bg-base-lighter">
+                                     <input class="usa-checkbox__input"
+                                            id="audit-year-{{ text }}"
+                                            name="audit_year" type="checkbox"
+                                            value={{value}}
+                                            {% if value in form_user_input.audit_year or text in form_user_input.audit_year %}checked{% endif %} />
+                                     <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
+                                 </div>
+                             {% endfor %}
+                         </div> 
+
+                        {% comment %} UEI/EIN {% endcomment %}
+                        <label for="uei-or-ein">
+                            <button type="button"
+                                    class="usa-accordion__button"
+                                    aria-expanded="true"
+                                    {% comment %} aria-expanded={% if form_user_input.uei_or_ein %}"true"{% else %}"false"{% endif %} {% endcomment %}
+                                    aria-controls="uei-or-ein">UEI or EIN</button>
+                        </label>
+                        <textarea class="usa-textarea width-card-lg" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>
+                        
+                        {% comment %} ALN/CFDA {% endcomment %}
+                        <label for="aln">
+                            <button type="button"
+                                    class="usa-accordion__button"
+                                    aria-expanded={% if form_user_input.aln %}"true"{% else %}"false"{% endif %}
+                                    aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
+                        </label>
+                        <textarea class="usa-textarea" id="aln" name="aln">{{form_user_input.aln}}</textarea>
+
+                        {% comment %} Name {% endcomment %}
+                        <label for="entity-name">
+                            <button type="button"
+                                    class="usa-accordion__button"
+                                    aria-expanded={% if form_user_input.entity_name %}"true"{% else %}"false"{% endif %}
+                                    aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
+                        </label>
+                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form_user_input.entity_name}}</textarea>
+
+                        {% comment %} Release Date(s) {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.start_date or form_user_input.end_date %}"true"{% else %}"false"{% endif %}
+                                aria-controls="fac-release-date">FAC acceptance date</button>
+                        <div id="fac-release-date">
+                            <div class="usa-form-group">
+                                <label class="usa-label" id="start-date-label" for="start-date">Start date</label>
+                                <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
+                                <div class="usa-date-picker"
+                                     data-default-value="{{ form_user_input.start_date }}">
+                                    <input class="usa-input"
+                                           id="start-date"
+                                           name="start_date"
+                                           aria-labelledby="start-date-label"
+                                           aria-describedby="start-date-hint" />
+                                </div>
+                            </div>
+                            <div class="usa-form-group">
+                                <label class="usa-label" id="end-date-label" for="end-date">End date</label>
+                                <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
+                                <div class="usa-date-picker"
+                                     data-default-value="{{ form_user_input.end_date }}">
+                                    <input class="usa-input"
+                                           id="end-date"
+                                           name="end_date"
+                                           aria-labelledby="end-date-label"
+                                           aria-describedby="end-date-hint" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {% comment %} State {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.auditee_state %}"true"{% else %}"false"{% endif %}
+                                aria-controls="state">State</button>
+                        <div id="state" class="usa-form-group">
+                            <label class="usa-label" for="auditee_state">
+                                State
+                            </label>
+                            <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
+                                <option value id="state--none">- Select -</option>
+                                {% for state in state_abbrevs %}
+                                <option value="{{ state }}" {% if form_user_input.auditee_state == state %}selected{% endif %}>
+                                    {{ state }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        {% comment %} Cog/Over {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.cog_or_oversight %}"true"{% else %}"false"{% endif %}
+                                aria-controls="cognizant">Cognizant or Oversight</button>
+                        <div id="cognizant">
+                            <label class="usa-label" for="options">Select one</label>
+                            <select class="usa-select" name="cog_or_oversight" id="options">
+                                <option id="cog_or_oversight--none" value>- Select -</option>
+                                <option id="cog_or_oversight--cog"
+                                        value="cog"
+                                        {% if form_user_input.cog_or_oversight == "cog" %}selected{% endif %}>
+                                    Cognizant
+                                </option>
+                                <option id="cog_or_oversight--oversight"
+                                        value="oversight"
+                                        {% if form_user_input.cog_or_oversight == "oversight" %}selected{% endif %}>
+                                    Oversight
+                                </option>
+                            </select>
+                            <label class="usa-label" for="agency-name">Federal agency number</label>
+                            <input class="usa-input"
+                                  id="agency-name"
+                                  name="agency_name"
+                                  value="{{ form_user_input.agency_name }}" />
+                        </div>
+
+                        {% comment %} Findings {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.findings %}"true"{% else %}"false"{% endif %}
+                                aria-controls="auditfindings">Audit findings</button>
+                        <div id="auditfindings">
+                          {% for value, text in form.findings.field.choices %}
+                              <div class="usa-checkbox bg-base-lighter">
+                                  <input class="usa-checkbox__input"
+                                          id="findings-{{ text }}"
+                                          name="findings" type="checkbox"
+                                          value={{value}}
+                                          {% if value in form_user_input.findings %}checked{% endif %} />
+                                  <label class="usa-checkbox__label" for="findings-{{ text }}">{{ text }}</label>
+                              </div>
+                          {% endfor %}
+                        </div>
+
+                        {% comment %} Direct funding {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.direct_funding %}"true"{% else %}"false"{% endif %}
+                                aria-controls="fundingdirect">Direct funding</button>
+                        <div id="fundingdirect">
+                          {% for value, text in form.direct_funding.field.choices %}
+                              <div class="usa-checkbox bg-base-lighter">
+                                  <input class="usa-checkbox__input"
+                                          id="direct_funding-{{ text }}"
+                                          name="direct_funding" type="checkbox"
+                                          value={{value}}
+                                          {% if value in form_user_input.direct_funding %}checked{% endif %} />
+                                  <label class="usa-checkbox__label" for="direct_funding-{{ text }}">{{ text }}</label>
+                              </div>
+                          {% endfor %}
+                        </div>
+
+                        {% comment %} Major program {% endcomment %}
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded={% if form_user_input.major_program %}"true"{% else %}"false"{% endif %}
+                                aria-controls="majorprogram">Major program</button>
+                        <div id="majorprogram" class="usa-form-group">
+                          {% for value, text in form.major_program.field.choices %}
+                              <div class="usa-radio bg-base-lighter">
+                                  <input class="usa-radio__input"
+                                          id="major_program-{{ text }}"
+                                          name="major_program" type="radio"
+                                          value={{value}}
+                                          {% if value in form_user_input.major_program %}checked{% endif %} />
+                                  <label class="usa-radio__label" for="major_program-{{ text }}">{{ text }}</label>
+                              </div>
+                          {% endfor %}
+                        </div>
+                    </div>
+                      
+                    {% comment %} Submission {% endcomment %}
+                    <div class="search-submit">
+                        <input class="usa-button" type="submit" value="Search" />
+                        <input class="usa-button usa-button--unstyled"
+                               type="reset"
+                               value="Reset Search" />
+                    </div>
+
+                    {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
+                    <input class="usa-input"
+                        id="page"
+                        name="page"
+                        type="number"
+                        value="{{ page }}"
+                        hidden />
+                    
+                    {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
+                    <input class="usa-input"
+                        id="order_by"
+                        name="order_by"
+                        value="{{ order_by }}"
+                        hidden />
+                    <input class="usa-input"
+                        id="order_direction"
+                        name="order_direction"
+                        value="{{ order_direction }}"
+                        hidden />
+                </form>
+            </div>
+            <div class="grid-col audit-search-results">
+                <h2 class="font-sans-2xl">Search single audit reports</h2>
+                {% include "search-alert-info.html"%}
+                {% if results|length > 0 %}
+                    <div class="margin-y-2 grid-row display-flex flex-justify">
+                        <p class="margin-0 flex-align-self-center">
+                            <strong>Results: {{ results_count }}</strong>
+                            <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
+                        </p>
+                        {% comment %} SF-SAC generation {% endcomment %}
+                        {% if results_count <= summary_report_download_limit %}
+                            <button class="usa-button display-flex"
+                                    formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
+                                    form="search-form"
+                                    value="Search">
+                                <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                    aria-hidden="true"
+                                    role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                                <p class="margin-0">Download all</p>
+                            </button>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="usa-table-container--scrollable margin-0" tabindex="0">
+                        <table class="usa-table usa-table--striped usa-table--compact width-full">
+                            <thead>
+                                <tr>
+                                    {% include "search-table-header.html" with friendly_title="Name" field_name="auditee_name" %}
+                                    {% include "search-table-header.html" with friendly_title="UEI or EIN" field_name="auditee_uei" %}
+                                    {% include "search-table-header.html" with friendly_title="Acc Date" field_name="fac_accepted_date" %}
+                                    {% include "search-table-header.html" with friendly_title="AY" field_name="audit_year" %}
+                                    {% include "search-table-header.html" with friendly_title="Cog or Over" field_name="cog_over" %}
+                                    <th scope="col" role="columnheader">View</th>
+                                    <th scope="col" role="columnheader">PDF</th>
+                                    {% if results.0.finding_my_aln is not None %}
+                                        {% include "search-table-header.html" with friendly_title="Finding my ALN" field_name="findings_my_aln"%}
+                                        {% include "search-table-header.html" with friendly_title="Finding other ALN" field_name="findings_all_aln"%}
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                    <tr>
+                                        <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
+                                        {% comment %} Display UEI. If it's "GSA_MIGRATION", use the EIN instead. If no EIN, just show "GSA_MIGRATION". {% endcomment %}
+                                        <td>
+                                            {% if result.auditee_uei != "GSA_MIGRATION" %}
+                                                {{ result.auditee_uei }}
+                                            {% elif result.auditee_ein %}
+                                                {{ result.auditee_ein }}
+                                            {% else %}
+                                                {{ result.auditee_uei }}
+                                            {% endif %}
+                                        </td>
+                                        {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
+                                        <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}
+                                        </td>
+                                        <td>{{ result.audit_year }}</td>
+                                        <td>
+                                            {% if result.oversight_agency %}
+                                                OVER-{{ result.oversight_agency }}
+                                            {% elif  result.cognizant_agency %}
+                                                COG-{{ result.cognizant_agency }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a class="usa-link display-flex flex-column flex-align-center"
+                                               href="{% url 'dissemination:Summary' report_id=result.report_id %}"
+                                               target="_blank">
+                                                <svg class="usa-icon usa-icon--size-4"
+                                                     aria-hidden="true"
+                                                     focusable="false"
+                                                     role="img">
+                                                    {% uswds_sprite "visibility" %}
+                                                </svg>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if result.is_public or include_private %}
+                                                <a class="usa-link display-flex flex-column flex-align-center"
+                                                href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
+                                                target="_blank">
+                                                    <svg class="usa-icon usa-icon--size-4"
+                                                        aria-hidden="true"
+                                                        focusable="false"
+                                                        role="img">
+                                                        {% uswds_sprite "file_download" %}
+                                                    </svg>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        {% if result.finding_my_aln is not None%}
+                                            <td>
+                                                <span class="display-flex flex-column flex-align-center">
+                                                    {% if result.finding_my_aln %}
+                                                        Y
+                                                    {% else %}
+                                                        N
+                                                    {% endif %}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="display-flex flex-column flex-align-center">
+                                                    {% if result.finding_all_aln %}
+                                                        Y
+                                                    {% else %}
+                                                        N
+                                                    {% endif %}
+                                                </span>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav aria-label="Pagination" class="usa-pagination">
+                        <ul class="usa-pagination__list">
+                            {% if results.has_previous %}
+                                <li class="usa-pagination__item usa-pagination__arrow">
+                                    <a class="usa-pagination__link usa-pagination__previous-page"
+                                        aria-label="Previous page">
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            {% uswds_sprite "navigate_before" %}
+                                        </svg>
+                                        <span class="usa-pagination__link-text">Previous</span></a>
+                                </li>
+                            {% endif %}
+                            {% for page_number in results.adjusted_elided_pages %}
+                                {% if page_number == results.paginator.ELLIPSIS %}
+                                    <li class="usa-pagination__item usa-pagination__overflow"
+                                        aria-label="ellipsis indicating non-visible pages">
+                                        <span>…</span>
+                                    </li>
+                                {% else %}
+                                    <li class="usa-pagination__item usa-pagination__page-no">
+                                        <a class="usa-pagination__button {% if results.number == page_number %}usa-current{% endif %}"
+                                            aria-label="Page {{ page_number }}">{{ page_number }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if results.has_next %}
+                                <li class="usa-pagination__item usa-pagination__arrow">
+                                    <a class="usa-pagination__link usa-pagination__next-page"
+                                        aria-label="Next page">
+                                        <span class="usa-pagination__link-text">Next</span>
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            {% uswds_sprite "navigate_next" %}
+                                        </svg>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% elif results is not None %}
+                    <div class="search-instructions">
+                        <img src="{% static 'img/circle-arrow.svg' %}"
+                             alt="an arrow points left, toward the search form" />
+                        <p>
+                            No results found.
+                        </p>
+                    </div>
+                {% else %}
+                    <div class="search-instructions">
+                        <img src="{% static 'img/circle-arrow.svg' %}"
+                            alt="an arrow points left, toward the search form" />
+                        <p>
+                            Enter your filters and select <em>Search</em> to begin
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="usa-modal"
+         id="device-orientation-modal"
+         aria-labelledby="device-orientation-modal-heading"
+         aria-describedby="device-orientation-modal-description">
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                <h2 class="usa-modal__heading" id="device-orientation-modal-heading">Please rotate your device</h2>
+                <div class="usa-prose">
+                    <p id="device-orientation-modal-description">Search works best with your device in landscape orientation.</p>
+                </div>
+            </div>
+            <button type="button"
+                    class="usa-button usa-modal__close dismiss-orientation-modal"
+                    aria-label="Close this window"
+                    data-close-modal>
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    {% uswds_sprite "close" %}
+                </svg>
+            </button>
+        </div>
+    </div>
+    <a href="#device-orientation-modal"
+       id="orientation-toggle"
+       aria-controls="device-orientation-modal"
+       data-open-modal></a>
+    <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>
+    <script src="{% static 'compiled/js/search-results.js' %}"></script>
+{% endblock content %}
