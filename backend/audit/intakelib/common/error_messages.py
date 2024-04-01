@@ -78,7 +78,8 @@ messages = {
     "check_cardinality_of_passthrough_names_and_ids": "You used a <b>|</b> (bar character) to indicate multiple passthrough names and IDs; you must provide equal numbers of names and IDs. You provided <b>{}</b> name{} and <b>{}</b> ID{}",
     "check_workbook_version": "Single audit workbook template version {} is not supported. Please download the latest workbook and transfer your data to it",
     "check_integer_values": "<b>{}</b> is not a valid integer",
-    "check_gsa_migration_keyword": "<b>GSA_MIGRATION</b> is not allowed.",
+    "check_gsa_migration_keyword": "<b>GSA_MIGRATION</b> is not allowed",
     "check_cluster_names": "Invalid cluster name",
     "check_award_references_len_4_or_5": "Award references must all follow the pattern AWARD-#### or AWARD-#####; {} does not fit either",
+    "check_max_rows": "The number of rows in the {} named range exceeds the maximum allowed for this version of the workbook",
 }
