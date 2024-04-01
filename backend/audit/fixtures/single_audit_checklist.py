@@ -85,6 +85,7 @@ def fake_auditor_certification():
         "is_auditee_responsible": True,
         "has_used_auditors_report": True,
         "has_no_auditee_procedures": True,
+        "is_accurate_and_complete": True,
         "is_FAC_releasable": True,
     }
     data_step_2 = {
