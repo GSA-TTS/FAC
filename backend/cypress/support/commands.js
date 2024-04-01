@@ -28,6 +28,7 @@
 import 'cypress-file-upload';
 import { testLoginGovLogin } from './login-gov.js';
 import { testLogoutGov } from './logout-gov.js';
+require('cypress-downloadfile/lib/downloadFileCommand'); 
 
 Cypress.Commands.add('login', () => {
   testLoginGovLogin();

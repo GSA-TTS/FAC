@@ -14,7 +14,7 @@ let majorProgram;
 
 beforeEach(() => {
   cy.visit('/dissemination/search/');
-  
+
   cy.fixture('searchPageData/auditYears.json').then((data) => {
     yearsToCheck = data.yearsToCheck;
   })
@@ -60,7 +60,7 @@ beforeEach(() => {
 
 //basic search test
 describe('Test Basic Search Fields', () => {
-    
+
     it('checks Audit Years', () => {
       search.checkAuditYearCheckbox('2023');
       search.uncheckAuditYearCheckbox('2023');
@@ -76,8 +76,65 @@ describe('Test Basic Search Fields', () => {
 
         search.testSearchTable();
 
+        search.testSummaryReport();
 
     });
 
 
   });
+
+//advanced search test
+// describe('Test Basic Search Fields', () => {
+
+//   it('checks Audit Years', () => {
+//     //advanceSearchButton
+//     search.testAdvSearch();
+
+//     //audit years
+//     search.checkAuditYearCheckbox('2023');
+//     search.uncheckAuditYearCheckbox('2023');
+//     search.checkAllYearsCheckbox('all_years');
+
+//     //ueiORein
+//     search.testUEIorEin(ueiOrein);
+//     search.testALN(aln);
+//     search.testName(name);
+
+//     //facAcceptanceDate
+//     const [startDate, endDate] = accDate;
+//     search.testFACacceptanceDate(startDate, endDate);
+
+//     //state
+//     search.testState(state);
+
+//     //cogORover
+//     const [cog, over] = cogOrover;
+//     search.testCogorOver(over);
+
+//     //findings
+//     search.openFindingsAccordion();
+//     findings.forEach((findings) => {
+//       search.checkAuditFindingsCheckbox(findings);
+//     });
+    
+//     //directFunding
+//     search.openDirectFundingAccordion();
+//     directFunding.forEach((funding) => {
+//       search.checkDirectFundingCheckbox(funding);
+//     });
+
+//     //majorProgram
+//     search.openMajorProgramAccordion();
+//     const [T, F] = majorProgram;
+//     search.checkMajorProgramRadio(T);
+
+//     search.testSearchSubmitButton();
+
+//     search.testSearchTable();
+
+
+//   });
+
+
+// });
+
