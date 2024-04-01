@@ -534,7 +534,9 @@ OMB_EXP_DATE = "09/30/2026"
 CENSUS_DATA_SOURCE = "CENSUS"
 DOLLAR_THRESHOLD = 750000
 SUMMARY_REPORT_DOWNLOAD_LIMIT = 1000
-DEFAULT_MAX_ROWS = 10000 # A version of this constant also exists in schemas.scrpits.render.py
+DEFAULT_MAX_ROWS = (
+    10000  # A version of this constant also exists in schemas.scrpits.render.py
+)
 MAX_ROWS = 20000
 
 # A version of these regexes also exists in Base.libsonnet
