@@ -124,7 +124,11 @@ function attachEventHandlersSorting() {
 function attachEventHandlersSubmission() {
   search_submit_buttons.forEach((button) => {
     button.addEventListener('click', (e) => {
-      search_arrow.hidden = true;
+      // The arrow won't be there if results were previously populated
+      if (search_arrow) {
+        search_arrow.hidden = true;
+      }
+
       loader.hidden = false;
 
       search_submit_buttons.forEach((btn) => {

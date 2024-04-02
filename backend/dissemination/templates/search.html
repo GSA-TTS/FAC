@@ -144,6 +144,12 @@
                 <h2 class="font-sans-2xl">Search single audit reports</h2>
                 {% include "search-alert-info.html"%}
                 {% if results|length > 0 %}
+                    <div class="margin-y-2 display-flex flex-justify-center">
+                        <img hidden id="loader"
+                            src="{% static 'img/loader.svg' %}"
+                            alt="spinner for processing search" />
+                    </div>
+
                     <div class="margin-y-2 grid-row display-flex flex-justify">
                         <p class="margin-0 flex-align-self-center">
                             <strong>Results: {{ results_count }}</strong>
@@ -267,8 +273,12 @@
                     </nav>
                 {% elif results is not None %}
                     <div class="search-instructions">
-                        <img src="{% static 'img/circle-arrow.svg' %}"
-                             alt="an arrow points left, toward the search form" />
+                        <img id=search_arrow
+                            src="{% static 'img/circle-arrow.svg' %}"
+                            alt="an arrow points left, toward the search form" />
+                        <img hidden id="loader"
+                            src="{% static 'img/loader.svg' %}"
+                            alt="spinner for processing search" />
                         <p>
                             No results found.
                         </p>
