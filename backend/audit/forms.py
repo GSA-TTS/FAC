@@ -78,6 +78,7 @@ class AuditorCertificationStep1Form(forms.Form):
     has_used_auditors_report = forms.BooleanField()
     has_no_auditee_procedures = forms.BooleanField()
     is_FAC_releasable = forms.BooleanField()
+    is_accurate_and_complete = forms.BooleanField()
 
 
 class AuditorCertificationStep2Form(forms.Form):
