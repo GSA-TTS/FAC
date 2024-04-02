@@ -1,6 +1,7 @@
 var FORM = document.getElementById('search-form');
 const pagination_links = document.querySelectorAll('[aria-label^="Page"]');
 const next_page_link = document.querySelectorAll('[aria-label="Next page"]');
+const search_submit_buttons = document.querySelectorAll('[type="submit"]');
 const previous_page_link = document.querySelectorAll(
   '[aria-label="Previous page"]'
 );
@@ -114,10 +115,27 @@ function attachEventHandlersSorting() {
   });
 }
 
+/*
+  Disable both search buttons once either one is clicked (to prevent multiple submissions) before submitting
+*/
+function attachEventHandlersSubmission() {
+  search_submit_buttons.forEach((button) => {
+    button.addEventListener('click', (e) => {
+      search_submit_buttons.forEach((btn) => {
+        btn.disabled = true;
+        btn.value = "Searching..."
+      });
+
+      FORM.submit();
+    });
+  });
+}
+
 function init() {
   attachEventHandlersPagination();
   attachEventHandlersReset();
   attachEventHandlersSorting();
+  attachEventHandlersSubmission();
 }
 
 window.onload = init;
