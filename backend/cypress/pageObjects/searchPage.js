@@ -133,22 +133,27 @@ class searchPage {
     }
 
     testSummaryReport() {
-        cy.url().should('include', '/dissemination/summary/2022-12-GSAFAC-0000000001');
-        cy.get(this.sfSacDownloadBtn).should('exist').click();
-        cy.get(this.singleAuditBtn).should('exist').click();
-        cy.wait(5000);
-        this.testSfSacDownload();
-        this.testSumReportDownload();
+        cy.url().then(url => {
+            const reportId = url.split('/').pop();
+            cy.url().should('include', `/dissemination/summary/${reportId}`);
+            cy.get(this.sfSacDownloadBtn).should('exist').click();
+            cy.get(this.singleAuditBtn).should('exist').click();
+            cy.wait(5000);
+            this.testSfSacDownload(url);
+            this.testSumReportDownload(url);
+        })
     }
 
-    testSfSacDownload() {
-        const url = Cypress.config().baseUrl + '/dissemination/summary/2022-12-GSAFAC-0000000001'
-        cy.downloadFile(url,
+    testSfSacDownload(url) {
+        const reportId = url.split('/').pop();
+        const downloadUrl = Cypress.config().baseUrl + `/dissemination/summary/${reportId}`
+        cy.downloadFile(downloadUrl,
             'cypress/downloads', '2022-12-GSAFAC-0000000001.xlsx');
     }
-    testSumReportDownload() {
-        const url = Cypress.config().baseUrl + '/dissemination/summary/2022-12-GSAFAC-0000000001'
-        cy.downloadFile(url,
+    testSumReportDownload(url) {
+        const reportId = url.split('/').pop();
+        const downloadUrl = Cypress.config().baseUrl + `/dissemination/summary/${reportId}`
+        cy.downloadFile(downloadUrl,
             'cypress/downloads', '2022-12-GSAFAC-0000000001.pdf');
     }
 
