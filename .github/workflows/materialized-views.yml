@@ -1,6 +1,9 @@
 ---
 name: Materialized Views create
 on:
+  schedule:
+    # Invoke at 6 UTC EST every day
+    - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
       environment:
@@ -14,8 +17,27 @@ on:
           - production
 
 jobs:
+  scheduled-materialized-views:
+    if: ${{ github.event_name == 'schedule' }}
+    strategy:
+      matrix:
+        environments: ["dev", "staging", "production"]
+    name: Run Materialized Views Matrix
+    runs-on: ubuntu-latest
+    environment: ${{ matrix.environments }}
+    env:
+      space: ${{ matrix.environments }}
+    steps:
+      - name: Run Command
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name dispatch_create_materialized_views --command "python manage.py materialized_views --create"
+
   dispatch-materialized-views:
-    if: ${{ github.event.inputs.environment != '' }}
     name: Run Materialize Views on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
