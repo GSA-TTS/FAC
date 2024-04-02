@@ -123,7 +123,7 @@ function attachEventHandlersSorting() {
 */
 function attachEventHandlersSubmission() {
   search_submit_buttons.forEach((button) => {
-    button.addEventListener('click', (e) => {
+    button.addEventListener('click', () => {
       // The arrow won't be there if results were previously populated
       if (search_arrow) {
         search_arrow.hidden = true;
@@ -133,7 +133,7 @@ function attachEventHandlersSubmission() {
 
       search_submit_buttons.forEach((btn) => {
         btn.disabled = true;
-        btn.value = "Searching..."
+        btn.value = 'Searching...'
       });
 
       FORM.submit();
