@@ -133,7 +133,7 @@ function attachEventHandlersSubmission() {
 
       search_submit_buttons.forEach((btn) => {
         btn.disabled = true;
-        btn.value = 'Searching...'
+        btn.value = 'Searching...';
       });
 
       FORM.submit();
