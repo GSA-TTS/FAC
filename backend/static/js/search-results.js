@@ -1,9 +1,12 @@
 var FORM = document.getElementById('search-form');
 const pagination_links = document.querySelectorAll('[aria-label^="Page"]');
 const next_page_link = document.querySelectorAll('[aria-label="Next page"]');
+const search_submit_buttons = document.querySelectorAll('[type="submit"]');
 const previous_page_link = document.querySelectorAll(
   '[aria-label="Previous page"]'
 );
+const loader = document.getElementById(`loader`);
+const search_arrow = document.getElementById(`search_arrow`);
 
 /*
   If any pagination links are clicked, set the page form element and submit it for a reload.
@@ -114,10 +117,35 @@ function attachEventHandlersSorting() {
   });
 }
 
+/*
+  Disable both search buttons once either one is clicked (to prevent multiple submissions),
+  show the loader instead of the arrow image, and then submit.
+*/
+function attachEventHandlersSubmission() {
+  search_submit_buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+      // The arrow won't be there if results were previously populated
+      if (search_arrow) {
+        search_arrow.hidden = true;
+      }
+
+      loader.hidden = false;
+
+      search_submit_buttons.forEach((btn) => {
+        btn.disabled = true;
+        btn.value = 'Searching...';
+      });
+
+      FORM.submit();
+    });
+  });
+}
+
 function init() {
   attachEventHandlersPagination();
   attachEventHandlersReset();
   attachEventHandlersSorting();
+  attachEventHandlersSubmission();
 }
 
 window.onload = init;

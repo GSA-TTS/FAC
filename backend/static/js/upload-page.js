@@ -9,6 +9,7 @@ const already_submitted = document.getElementById(`already-submitted`); // Boole
 
 const file_input = document.getElementById(`file-input-${view_id}-xlsx`); // <input type="file">
 const info_box = document.getElementById(`info_box`); // <div>
+const loader = document.getElementById(`loader`); // <div>
 
 /*
   Function definitions
@@ -102,6 +103,8 @@ function display_error_table(data) {
 function attachFileUploadHandler() {
   file_input.addEventListener('change', (e) => {
     try {
+      loader.hidden = false;
+
       info_box.hidden = false;
       if (already_submitted) already_submitted.hidden = true;
       info_box.innerHTML = 'Validating your file...';
@@ -172,6 +175,9 @@ function attachFileUploadHandler() {
         })
         .catch((error) => {
           handleErrors(error);
+        })
+        .finally(() => {
+          loader.hidden = true;
         });
     } catch (error) {
       info_box.innerHTML = `Error when sending excel file.\n ${error}`;
