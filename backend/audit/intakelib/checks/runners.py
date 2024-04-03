@@ -5,7 +5,7 @@ from .check_finding_award_references_pattern import award_references_pattern
 from .check_cluster_names import check_cluster_names
 from audit.fixtures.excel import FORM_SECTIONS
 from .check_gsa_migration_keyword import check_for_gsa_migration_keyword
-
+from .check_data_row_range_in_form_sheet import validate_ranges
 
 ############
 # General checks
@@ -65,6 +65,7 @@ general_checks = [
     verify_auditee_uei_match,
     look_for_empty_rows,
     start_and_end_rows_of_all_columns_are_same,
+    validate_ranges,
 ]
 
 federal_awards_checks = general_checks + [
