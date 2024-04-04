@@ -156,15 +156,31 @@ class AdvancedSearch(View):
         form = AdvancedSearchForm(request.POST)
         results = []
         context = {}
+        form_user_input = {}
 
-        # form_data = clean_form_data(form)
         if form.is_valid():
             form_data = form.cleaned_data
-            form_user_input = {
-                k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
-            }
+            # Cleaning v1
+            # This is a dictionary comprehension. Very cool.
+            # Hard to stick any debugging into.
+            # form_user_input = {
+            #     k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
+            # }
+
+            # Cleaning v2
+            # I did this because I wanted to see things.
+            # I *think* it has the same semantics as above.
+            # However, it then... broke things? Like, the `page` variable
+            # below was coming through as a string?
+            for k, v in form.data.lists():
+                # print(f"k {k} v {v}")
+                if len(v) == 1:
+                    form_user_input[k] = v[0]
+                else:
+                    form_user_input[k] = v
         else:
             raise ValidationError(f"Form error in Search POST. {form.errors}")
+
 
         # Tells the backend we're running advanced search.
         form_data["advanced_search_flag"] = True
@@ -193,10 +209,10 @@ class AdvancedSearch(View):
         )
 
         # Reformat these so the date-picker elements in HTML prepopulate
-        if form_data["start_date"]:
-            form_data["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
-        if form_data["end_date"]:
-            form_data["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
+        if form_user_input["start_date"]:
+            form_user_input["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
+        if form_user_input["end_date"]:
+            form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         context = context | {
             "form": form,
@@ -250,17 +266,33 @@ class Search(View):
         form = SearchForm(request.POST)
         results = []
         context = {}
+        form_user_input = {}
 
-        # form_data = clean_form_data(form)
         if form.is_valid():
             form_data = form.cleaned_data
-            form_user_input = {
-                k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
-            }
+            # Cleaning v1
+            # This is a dictionary comprehension. Very cool.
+            # Hard to stick any debugging into.
+            # form_user_input = {
+            #     k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
+            # }
+
+            # Cleaning v2
+            # I did this because I wanted to see things.
+            # I *think* it has the same semantics as above.
+            # However, it then... broke things? Like, the `page` variable
+            # below was coming through as a string?
+            for k, v in form.data.lists():
+                # print(f"k {k} v {v}")
+                if len(v) == 1:
+                    form_user_input[k] = v[0]
+                else:
+                    form_user_input[k] = v
         else:
             raise ValidationError(f"Form error in Search POST. {form.errors}")
 
-        # Tells the backend we're running basic search.
+        # We want to inject this into the form_data; it will never be
+        # form_user_input. Tells the backend we're running basic search.
         form_data["advanced_search_flag"] = False
 
         logger.info(f"Searching on fields: {form_data}")
@@ -271,7 +303,6 @@ class Search(View):
 
         results_count = results.count()
 
-        # Reset page to one if the page number surpasses how many pages there actually are
         page = form_data["page"]
         ceiling = math.ceil(results_count / form_data["limit"])
         if page > ceiling:
@@ -286,11 +317,16 @@ class Search(View):
             page, on_each_side=1
         )
 
+        # WARNING MCJ 20240404
+        # These were `form_data` instead of `form_user_input`. I think this is why 
+        # the form was not repopulating.
         # Reformat these so the date-picker elements in HTML prepopulate
-        if form_data["start_date"]:
-            form_data["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
+        if form_user_input["start_date"]:
+            form_user_input["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
         if form_data["end_date"]:
-            form_data["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
+            form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
+        
+
 
         context = context | {
             "form": form,
