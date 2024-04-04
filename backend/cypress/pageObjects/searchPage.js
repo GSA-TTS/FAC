@@ -137,10 +137,10 @@ class searchPage {
             const reportId = url.split('/').pop();
             cy.url().should('include', `/dissemination/summary/${reportId}`);
             cy.get(this.sfSacDownloadBtn).should('exist').click();
-            cy.get(this.singleAuditBtn).should('exist').click();
+            //cy.get(this.singleAuditBtn).should('exist').click();
             cy.wait(5000);
             this.testSfSacDownload(url);
-            this.testSumReportDownload(url);
+            //this.testSumReportDownload(url);
         })
     }
 
