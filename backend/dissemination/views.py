@@ -194,9 +194,9 @@ class AdvancedSearch(View):
 
         # Reformat these so the date-picker elements in HTML prepopulate
         if form_data["start_date"]:
-            form_data["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
+            form_user_input["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
         if form_data["end_date"]:
-            form_data["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
+            form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         context = context | {
             "form": form,
@@ -288,9 +288,9 @@ class Search(View):
 
         # Reformat these so the date-picker elements in HTML prepopulate
         if form_data["start_date"]:
-            form_data["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
+            form_user_input["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
         if form_data["end_date"]:
-            form_data["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
+            form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         context = context | {
             "form": form,
