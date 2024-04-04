@@ -1,5 +1,5 @@
 ---
-name: Materialized views create
+name: Run the Materialized Views Function
 on:
   schedule:
     # Invoke at 6 UTC EST every day
@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         environments: ["dev", "staging", "production"]
-    name: Run scheduled materialized views create
+    name: Run materialized views create on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ matrix.environments }}
     env:
@@ -35,10 +35,11 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name dispatch_create_materialized_views --command "python manage.py materialized_views --create"
+          command: cf run-task gsa-fac -k 2G -m 2G --name scheduled_create_materialized_views --command "python manage.py materialized_views --create"
 
   dispatch-materialized-views:
-    name: Run materialize views create on ${{ inputs.environment }}
+    if: ${{ github.event.inputs.environment != '' }}
+    name: Run materialized views create on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
