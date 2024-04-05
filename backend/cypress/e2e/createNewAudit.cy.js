@@ -1,4 +1,4 @@
-import { testValidGeneralInfo } from '../support/general-info.js';
+import { GeneralInfoForm } from '../pageObjects/general-info';
 
 describe('Create new audit', () => {
   before(() => {
@@ -37,6 +37,6 @@ describe('Create new audit', () => {
   });
 
   it('Fills out the General Information Form', () => {
-    testValidGeneralInfo();
+    GeneralInfoForm();
   });
 });

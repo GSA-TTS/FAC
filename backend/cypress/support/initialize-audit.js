@@ -1,7 +1,7 @@
 import { testValidAccess } from './check-access.js';
 import { testValidEligibility } from './check-eligibility.js';
 import { testValidAuditeeInfo } from './auditee-info.js';
-import { testValidGeneralInfo } from './general-info.js';
+import GeneralInfoForm  from '../pageObjects/general-info.js';
 import { testWithUnprivilegedKey } from './dissemination-table.js';
 
 export function testInitializeAudit(isTribal=false) {
@@ -26,7 +26,11 @@ export function testInitializeAudit(isTribal=false) {
     // testReportIdNotFoundWithoutTribalAccess(reportId);
     testWithUnprivilegedKey(reportId, 'general', 0);
   });
+  const generalInfoForm = new GeneralInfoForm();
 
   // Fill out the general info form
-  testValidGeneralInfo();
+  generalInfoForm.selectAuditTypeAndPeriod();
+  generalInfoForm.fillAuditeeInformation();
+  generalInfoForm.fillAuditorInformation();
+  generalInfoForm.clickContinueButton();
 }
