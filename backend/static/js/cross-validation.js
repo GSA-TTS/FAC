@@ -5,8 +5,9 @@ const loader = document.getElementById(`loader`); // <div>
 
 // On form submission, display the loader and disable the submit button
 function attachValidationHandler() {
-  FORM.addEventListener('submit', (e) => {
+  FORM.addEventListener('submit', () => {
     loader.hidden = false;
+    validation_button.innerText = 'Validating...';
     validation_button.disabled = true;
   });
 }
