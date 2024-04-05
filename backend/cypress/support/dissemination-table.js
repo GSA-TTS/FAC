@@ -11,6 +11,8 @@ const API_GOV_URL = Cypress.env('API_GOV_URL');
 const API_VERSION = Cypress.env('API_VERSION');
 const ADMIN_API_VERSION = Cypress.env('ADMIN_API_VERSION');
 
+const API_GOV_USER_EMAIL = `${API_GOV_USER_ID}@example.com`;
+
 function apiRequestOptions(endpoint) {
   return {
     method: 'GET',
@@ -52,7 +54,7 @@ function grantTribalAccess(email, user_id) {
 
 }
 
-function revokeTribalAccess(email, user_id) {
+function revokeTribalAccess(email, user_id, requireSuccess) {
   // use admin user to revoke tribal access to user
   cy.request({
     method: 'POST',
@@ -65,7 +67,11 @@ function revokeTribalAccess(email, user_id) {
       "key_id": `${user_id}`,
     }
   }).should((response) => {
-    expect(response.body.result).to.equal("success");
+    if (requireSuccess) {
+      expect(response.body.result).to.equal("success");
+    } else {
+      expect(response.body.result).to.be.oneOf(["success", "failure"]);
+    }
   });
   console.log(`Revoked access for ${email} and ${user_id}`)
 
@@ -139,6 +145,10 @@ const private_endpoints = [
 
 export function testSubmissionAccess(reportId, isTribal, isPublic) {  
   console.log(`reportId: ${reportId}, isTribal: ${isTribal}, isPublic: ${isPublic}`);
+
+  // First, make sure we don't already have tribal access from a previous run
+  revokeTribalAccess(API_GOV_USER_EMAIL, API_GOV_USER_ID, false);
+
   ////////////////////////////////////////
   // The audit IS tribal and IS public
   ////////////////////////////////////////
@@ -228,9 +238,7 @@ export function testWithUnprivilegedKey(reportId, endpoint, expected_length) {
 export function testWithPrivilegedKey(reportId, endpoint, expected_length) {
   console.log(`priv reportId: ${reportId}, endpoint: ${endpoint}, len: ${expected_length}`)
   // First grant access to this key
-  const tribal_access_email = `${crypto.randomUUID()}@example.com`;
-  const tribal_access_user_id = API_GOV_USER_ID;
-  grantTribalAccess(tribal_access_email, tribal_access_user_id);
+  grantTribalAccess(API_GOV_USER_EMAIL, API_GOV_USER_ID);
   // Do the request
   cy.request({
     ...apiRequestOptions(endpoint),
@@ -248,6 +256,6 @@ export function testWithPrivilegedKey(reportId, endpoint, expected_length) {
       expect(Boolean(hasAgency)).to.be.true;  
       });  
   }
-  revokeTribalAccess(tribal_access_email, tribal_access_user_id);
+  revokeTribalAccess(API_GOV_USER_EMAIL, API_GOV_USER_ID, true);
 }
 
