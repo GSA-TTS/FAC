@@ -1,0 +1,31 @@
+{% comment %} Acceptance Date {% endcomment %}
+<button type="button"
+        class="usa-accordion__button"
+        aria-expanded={% if form_user_input.start_date or form_user_input.end_date %}"true"{% else %}"false"{% endif %}
+        aria-controls="fac-release-date">FAC acceptance date</button>
+<div id="fac-release-date">
+    <div class="usa-form-group">
+        <label class="usa-label" id="start-date-label" for="start-date">Start date</label>
+        <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
+        <div class="usa-date-picker"
+                data-default-value="{{ form_user_input.start_date }}">
+            <input class="usa-input"
+                    id="start-date"
+                    name="start_date"
+                    aria-labelledby="start-date-label"
+                    aria-describedby="start-date-hint" />
+        </div>
+    </div>
+    <div class="usa-form-group">
+        <label class="usa-label" id="end-date-label" for="end-date">End date</label>
+        <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
+        <div class="usa-date-picker"
+                data-default-value="{{ form_user_input.end_date }}">
+            <input class="usa-input"
+                    id="end-date"
+                    name="end_date"
+                    aria-labelledby="end-date-label"
+                    aria-describedby="end-date-hint" />
+        </div>
+    </div>
+</div>

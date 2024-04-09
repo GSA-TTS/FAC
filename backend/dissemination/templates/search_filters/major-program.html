@@ -1,0 +1,17 @@
+{% comment %} Major Program {% endcomment %}
+<button type="button"
+        class="usa-accordion__button"
+        aria-expanded={% if form_user_input.major_program %}"true"{% else %}"false"{% endif %}
+        aria-controls="majorprogram">Major program</button>
+<div id="majorprogram" class="usa-form-group">
+    {% for value, text in form.major_program.field.choices %}
+        <div class="usa-radio bg-base-lighter">
+            <input class="usa-radio__input"
+                    id="major_program-{{ text }}"
+                    name="major_program" type="radio"
+                    value={{value}}
+                    {% if value in form_user_input.major_program %}checked{% endif %} />
+            <label class="usa-radio__label" for="major_program-{{ text }}">{{ text }}</label>
+        </div>
+    {% endfor %}
+</div>

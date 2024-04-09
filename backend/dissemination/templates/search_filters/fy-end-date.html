@@ -1,0 +1,19 @@
+{% comment %} Fiscal Year End Date {% endcomment %}
+<button type="button"
+        class="usa-accordion__button"
+        aria-expanded={% if form_user_input.fy_end_date %}"true"{% else %}"false"{% endif %}
+        aria-controls="fy-end-date-accordion">Fiscal year end date</button>
+<div id="fy-end-date-accordion">
+    <div class="usa-form-group">
+        <label class="usa-label" id="fy-end-date-label" for="fy-end-date">End date</label>
+        <div class="usa-hint" id="fy-end-date-hint">mm/dd/yyyy</div>
+        <div class="usa-date-picker"
+                data-default-value="{{ form_user_input.fy_end_date }}">
+            <input class="usa-input"
+                    id="fy-end-date"
+                    name="fy_end_date"
+                    aria-labelledby="fy-end-date-label"
+                    aria-describedby="fy-end-date-hint" />
+        </div>
+    </div>
+</div>

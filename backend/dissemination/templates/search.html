@@ -9,7 +9,6 @@
                 <h3>Filters</h3>
                 <form class="usa-form"
                       id="search-form"
-                      action="{% url 'dissemination:Search' %}"
                       enctype='multipart/form-data'
                       method="post">
                     {% csrf_token %}
@@ -22,93 +21,33 @@
                     </div>
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
-                         {% comment %} Audit Year {% endcomment %}
-                         <button type="button"
-                                 class="usa-accordion__button"
-                                 aria-expanded="true"
-                                 aria-controls="audit-year">Audit Year</button>
-                         <div id="audit-year">
-                             {% for value, text in form.audit_year.field.choices %}
-                                 <div class="usa-checkbox bg-base-lighter">
-                                     <input class="usa-checkbox__input"
-                                            id="audit-year-{{ text }}"
-                                            name="audit_year" type="checkbox"
-                                            value={{value}}
-                                            {% if value in form_user_input.audit_year or text in form_user_input.audit_year %}checked{% endif %} />
-                                     <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
-                                 </div>
-                             {% endfor %}
-                         </div>
-
-                        {% comment %} UEI/EIN {% endcomment %}
-                        <label for="uei-or-ein">
-                            <button type="button"
-                                    class="usa-accordion__button"
-                                    aria-expanded="true"
-                                    {% comment %} aria-expanded={% if form_user_input.uei_or_ein %}"true"{% else %}"false"{% endif %} {% endcomment %}
-                                    aria-controls="uei-or-ein">UEI or EIN</button>
-                        </label>
-                        <textarea class="usa-textarea width-card-lg" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>
-
-                        {% comment %} Name {% endcomment %}
-                        <label for="entity-name">
-                            <button type="button"
-                                    class="usa-accordion__button"
-                                    aria-expanded={% if form_user_input.entity_name %}"true"{% else %}"false"{% endif %}
-                                    aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
-                        </label>
-                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form_user_input.entity_name}}</textarea>
-
-                        {% comment %} Release Date(s) {% endcomment %}
-                        <button type="button"
-                                class="usa-accordion__button"
-                                aria-expanded={% if form_user_input.start_date or form_user_input.end_date %}"true"{% else %}"false"{% endif %}
-                                aria-controls="fac-release-date">FAC acceptance date</button>
-                        <div id="fac-release-date">
-                            <div class="usa-form-group">
-                                <label class="usa-label" id="start-date-label" for="start-date">Start date</label>
-                                <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
-                                <div class="usa-date-picker"
-                                     data-default-value="{{ form_user_input.start_date }}">
-                                    <input class="usa-input"
-                                           id="start-date"
-                                           name="start_date"
-                                           aria-labelledby="start-date-label"
-                                           aria-describedby="start-date-hint" />
-                                </div>
-                            </div>
-                            <div class="usa-form-group">
-                                <label class="usa-label" id="end-date-label" for="end-date">End date</label>
-                                <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
-                                <div class="usa-date-picker"
-                                     data-default-value="{{ form_user_input.end_date }}">
-                                    <input class="usa-input"
-                                           id="end-date"
-                                           name="end_date"
-                                           aria-labelledby="end-date-label"
-                                           aria-describedby="end-date-hint" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {% comment %} State {% endcomment %}
-                        <button type="button"
-                                class="usa-accordion__button"
-                                aria-expanded={% if form_user_input.auditee_state %}"true"{% else %}"false"{% endif %}
-                                aria-controls="state">State</button>
-                        <div id="state" class="usa-form-group">
-                            <label class="usa-label" for="auditee_state">
-                                State
-                            </label>
-                            <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
-                                <option value id="state--none">- Select -</option>
-                                {% for state in state_abbrevs %}
-                                <option value="{{ state }}" {% if form_user_input.auditee_state == state %}selected{% endif %}>
-                                    {{ state }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                        {% if advanced_search_flag %}
+                            {% comment %} Advanced search contains filters the cross-reference tables (materialized DisseminationCombined table). {% endcomment %}
+                            {% include "search_filters/audit-year.html"%}
+                            {% include "search_filters/uei-ein.html"%}
+                            {% include "search_filters/aln.html"%}
+                            {% include "search_filters/name.html"%}
+                            {% include "search_filters/acceptance-date.html"%}
+                            {% include "search_filters/state.html"%}
+                            {% include "search_filters/cog-over.html"%}
+                            {% include "search_filters/findings.html"%}
+                            {% include "search_filters/direct_funding.html"%}
+                            {% include "search_filters/major-program.html"%}
+                            {% include "search_filters/fy-end-date.html"%}
+                            {% include "search_filters/type-requirement.html"%}
+                            {% include "search_filters/entity-type.html"%}
+                            {% include "search_filters/report-id.html"%}
+                        {% else %}
+                            {% comment %} Basic search contains filters only applicable to the general table. {% endcomment %}
+                            {% include "search_filters/audit-year.html"%}
+                            {% include "search_filters/uei-ein.html"%}
+                            {% include "search_filters/name.html"%}
+                            {% include "search_filters/acceptance-date.html"%}
+                            {% include "search_filters/state.html"%}
+                            {% include "search_filters/fy-end-date.html"%}
+                            {% include "search_filters/entity-type.html"%}
+                            {% include "search_filters/report-id.html"%}
+                        {% endif %}
                     </div>
 
                     {% comment %} Submission {% endcomment %}
@@ -155,7 +94,6 @@
                             <strong>Results: {{ results_count }}</strong>
                             <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                         </p>
-                        {% comment %}
                         {% if results_count <= summary_report_download_limit %}
                             <button class="usa-button display-flex"
                                     formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
@@ -169,7 +107,6 @@
                                 <p class="margin-0">Download all</p>
                             </button>
                         {% endif %}
-                        {% endcomment %}
                     </div>
 
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">

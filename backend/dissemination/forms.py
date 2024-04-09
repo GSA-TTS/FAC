@@ -25,6 +25,24 @@ class AdvancedSearchForm(forms.Form):
             "Repeat finding",
         ],
     }
+    entity_type_field_mapping = {
+        "field_name": [
+            "state",
+            "local",
+            "tribal",
+            "higher-ed",
+            "non-profit",
+            "unknown",
+        ],
+        "friendly_name": [
+            "State",
+            "Local Government",
+            "Indian tribe or tribal organization",
+            "Institution of Higher Education (IHE)",
+            "Non-profit",
+            "Unknown",
+        ],
+    }
 
     # Multiple choice field Tuples. "choices" variable in field declaration.
     AY_choices = (("all_years", "All years"),) + tuple(
@@ -35,30 +53,35 @@ class AdvancedSearchForm(forms.Form):
         ("direct_funding", "Direct funding"),
         ("passthrough_funding", "Passthrough funding"),
     )
+    entity_type_choices = list(zip(*entity_type_field_mapping.values()))
     major_program_choices = (
         (True, "Y"),
         (False, "N"),
     )
 
     # Query params
-    entity_name = forms.CharField(required=False)
-    uei_or_ein = forms.CharField(required=False)
-    aln = forms.CharField(required=False)
-    start_date = forms.DateField(required=False)
-    end_date = forms.DateField(required=False)
-    cog_or_oversight = forms.CharField(required=False)
     agency_name = forms.CharField(required=False)
+    aln = forms.CharField(required=False)
     audit_year = forms.MultipleChoiceField(
         choices=AY_choices, initial=[2023], required=False
     )
-    findings = forms.MultipleChoiceField(choices=findings_choices, required=False)
+    auditee_state = forms.CharField(required=False)
+    cog_or_oversight = forms.CharField(required=False)
     direct_funding = forms.MultipleChoiceField(
         choices=direct_funding_choices, required=False
     )
+    end_date = forms.DateField(required=False)
+    entity_name = forms.CharField(required=False)
+    entity_type = forms.MultipleChoiceField(choices=entity_type_choices, required=False)
+    findings = forms.MultipleChoiceField(choices=findings_choices, required=False)
+    fy_end_date = forms.DateField(required=False)
     major_program = forms.MultipleChoiceField(
         choices=major_program_choices, required=False
     )
-    auditee_state = forms.CharField(required=False)
+    report_id = forms.CharField(required=False)
+    start_date = forms.DateField(required=False)
+    type_requirement = forms.CharField(required=False)
+    uei_or_ein = forms.CharField(required=False)
 
     # Display params
     limit = forms.CharField(required=False)
@@ -123,6 +146,38 @@ class AdvancedSearchForm(forms.Form):
             return ["any"]
         return major_program
 
+    def clean_type_requirement(self):
+        """
+        Clean up the type requirement field. Uppercase all input. Replace common
+        separators with a newline. Split on the newlines.
+        Strip all the resulting elements.
+        """
+        text_input = self.cleaned_data["type_requirement"]
+        text_input = text_input.upper()
+        for delimiter in self.text_input_delimiters:
+            text_input = text_input.replace(delimiter, "\n")
+        text_input = [x.strip() for x in text_input.splitlines()]
+        return text_input
+
+    def clean_report_id(self):
+        """
+        Clean up the report_id field. Uppercase all input. Replace common
+        separators (except '-') with a newline. Split on the newlines.
+        Strip all the resulting elements.
+        """
+        report_id_delimiters = [
+            ",",
+            ":",
+            ";",
+            " ",
+        ]
+        text_input = self.cleaned_data["report_id"]
+        text_input = text_input.upper()
+        for delimiter in report_id_delimiters:
+            text_input = text_input.replace(delimiter, "\n")
+        text_input = [x.strip() for x in text_input.splitlines()]
+        return text_input
+
     def clean_page(self):
         """
         Default page number to one.
@@ -137,21 +192,44 @@ class AdvancedSearchForm(forms.Form):
 
 
 class SearchForm(forms.Form):
+    # Multiple choice field mappings
+    entity_type_field_mapping = {
+        "field_name": [
+            "state",
+            "local",
+            "tribal",
+            "higher-ed",
+            "non-profit",
+            "unknown",
+        ],
+        "friendly_name": [
+            "State",
+            "Local Government",
+            "Indian tribe or tribal organization",
+            "Institution of Higher Education (IHE)",
+            "Non-profit",
+            "Unknown",
+        ],
+    }
+
     # Multiple choice field Tuples. "choices" variable in field declaration.
     AY_choices = (("all_years", "All years"),) + tuple(
         (x, str(x)) for x in reversed(range(2016, 2024))
     )
+    entity_type_choices = list(zip(*entity_type_field_mapping.values()))
 
     # Query params
-    entity_name = forms.CharField(required=False)
-    uei_or_ein = forms.CharField(required=False)
-    start_date = forms.DateField(required=False)
-    end_date = forms.DateField(required=False)
-    agency_name = forms.CharField(required=False)
     audit_year = forms.MultipleChoiceField(
         choices=AY_choices, initial=[2023], required=False
     )
     auditee_state = forms.CharField(required=False)
+    end_date = forms.DateField(required=False)
+    entity_name = forms.CharField(required=False)
+    entity_type = forms.MultipleChoiceField(choices=entity_type_choices, required=False)
+    fy_end_date = forms.DateField(required=False)
+    report_id = forms.CharField(required=False)
+    start_date = forms.DateField(required=False)
+    uei_or_ein = forms.CharField(required=False)
 
     # Display params
     limit = forms.CharField(required=False)
@@ -195,6 +273,25 @@ class SearchForm(forms.Form):
         if "all_years" in audit_year:
             return []
         return audit_year
+
+    def clean_report_id(self):
+        """
+        Clean up the report_id field. Uppercase all input. Replace common
+        separators (except '-') with a newline. Split on the newlines.
+        Strip all the resulting elements.
+        """
+        report_id_delimiters = [
+            ",",
+            ":",
+            ";",
+            " ",
+        ]
+        text_input = self.cleaned_data["report_id"]
+        text_input = text_input.upper()
+        for delimiter in report_id_delimiters:
+            text_input = text_input.replace(delimiter, "\n")
+        text_input = [x.strip() for x in text_input.splitlines()]
+        return text_input
 
     def clean_page(self):
         """

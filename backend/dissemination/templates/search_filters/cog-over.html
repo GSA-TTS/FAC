@@ -1,0 +1,26 @@
+{% comment %} Cog/Over {% endcomment %}
+<button type="button"
+        class="usa-accordion__button"
+        aria-expanded={% if form_user_input.cog_or_oversight %}"true"{% else %}"false"{% endif %}
+        aria-controls="cognizant">Cognizant or Oversight</button>
+<div id="cognizant">
+    <label class="usa-label" for="options">Select one</label>
+    <select class="usa-select" name="cog_or_oversight" id="options">
+        <option id="cog_or_oversight--none" value>- Select -</option>
+        <option id="cog_or_oversight--cog"
+                value="cog"
+                {% if form_user_input.cog_or_oversight == "cog" %}selected{% endif %}>
+            Cognizant
+        </option>
+        <option id="cog_or_oversight--oversight"
+                value="oversight"
+                {% if form_user_input.cog_or_oversight == "oversight" %}selected{% endif %}>
+            Oversight
+        </option>
+    </select>
+    <label class="usa-label" for="agency-name">Federal agency number</label>
+    <input class="usa-input"
+            id="agency-name"
+            name="agency_name"
+            value="{{ form_user_input.agency_name }}" />
+</div>

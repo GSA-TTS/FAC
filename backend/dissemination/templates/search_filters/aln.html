@@ -1,0 +1,8 @@
+{% comment %} ALN/CFDA {% endcomment %}
+<label for="aln">
+    <button type="button"
+            class="usa-accordion__button"
+            aria-expanded={% if form_user_input.aln %}"true"{% else %}"false"{% endif %}
+            aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
+</label>
+<textarea class="usa-textarea" id="aln" name="aln">{{form_user_input.aln}}</textarea>
