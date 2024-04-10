@@ -1,5 +1,10 @@
+from django.conf import settings
+
+from ..workbooklib.findings import get_findings
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..workbooklib.excel_creation_utils import (
+    get_reference_numbers_from_findings,
+    get_reference_numbers_from_text_records,
     map_simple_columns,
     set_workbook_uei,
     sort_by_field,
@@ -37,6 +42,30 @@ def _get_cap_text(dbkey, year):
     return sort_by_field(results, "SEQ_NUMBER")
 
 
+def xform_add_placeholder_for_missing_references(findings, captexts):
+    """
+    Add placeholder for missing finding reference numbers.
+    """
+
+    expected_references = get_reference_numbers_from_findings(findings)
+    found_references = get_reference_numbers_from_text_records(captexts)
+
+    missing_references = expected_references - found_references
+
+    if missing_references:
+        for ref in missing_references:
+            captexts.append(
+                CapText(
+                    SEQ_NUMBER="0",
+                    FINDINGREFNUMS=ref,
+                    TEXT=settings.GSA_MIGRATION,
+                    CHARTSTABLES=settings.GSA_MIGRATION,
+                )
+            )
+
+    return captexts
+
+
 def generate_corrective_action_plan(audit_header, outfile):
     """
     Generates a corrective action plan workbook for a given audit header.
@@ -51,6 +80,8 @@ def generate_corrective_action_plan(audit_header, outfile):
     )
     set_workbook_uei(wb, uei)
     captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
+    findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
+    captexts = xform_add_placeholder_for_missing_references(findings, captexts)
     xform_sanitize_for_excel(captexts)
     map_simple_columns(wb, mappings, captexts)
     wb.save(outfile)

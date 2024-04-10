@@ -1,5 +1,13 @@
 {% load static %}
 <a class="usa-skipnav" href="#main-content">Skip to main content</a>
+
+{% if ENVIRONMENT != "PRODUCTION" %}
+    <section class="usa-banner" aria-label="Test site">
+        <div class="font-sans-lg padding-y-3 bg-secondary-darker text-white text-center">
+            TEST SITE: This is a test site. Do not begin audit submissions.
+        </div>
+    </section>
+{% endif %}
 <section class="usa-banner" aria-label="Official government website">
     <div class="usa-accordion">
         <header class="usa-banner__header">
@@ -10,7 +18,7 @@
                          alt="U.S. flag"/>
                 </div>
                 <div class="grid-col-fill tablet:grid-col-auto">
-                    <p class="usa-banner__header-text">An official website of the United States government</p>
+                    <p class="usa-banner__header-text">{% if ENVIRONMENT != "PRODUCTION" %}A DEMO{% else %}An official{% endif %} website of the United States government</p>
                     <p class="usa-banner__header-action" aria-hidden="true">Here’s how you know</p>
                 </div>
                 <button class="usa-accordion__button usa-banner__button"
@@ -76,23 +84,4 @@
         </div>
     </div>
 </section>
-<div class="usa-overlay"></div>
-<header class="usa-header usa-header--basic">
-    {% include "includes/nav_primary.html" %}
-</header>
-{% comment %} "Breadcrumbs" for all pages, excepting the homepage. {% endcomment %}
-{% if request.path != '/' %}
-    <header class="usa-header usa-header-basic">
-        <div class="bg-primary-darker text-white width-full height-6">
-            <div class="grid-container">
-                {% comment %}
-                    OMB_NUMBER and OMB_EXP_DATE are global.
-                    Added in /config/settings, passed in /config/context_processors.py 
-                {% endcomment %}
-                <p class="margin-0 padding-top-105">
-                    OMB# <strong>{{ OMB_NUMBER }}</strong> EXP: <strong>{{ OMB_EXP_DATE }}</strong>
-                </p>
-            </div>
-        </div>
-    </header>
-{% endif %}
+{% include "includes/nav_primary.html" %}

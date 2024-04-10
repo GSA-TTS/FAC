@@ -4,6 +4,7 @@ export function testAuditorCertification() {
   cy.get('label[for=is_auditee_responsible]').click();
   cy.get('label[for=has_used_auditors_report]').click();
   cy.get('label[for=has_no_auditee_procedures]').click();
+  cy.get('label[for=is_accurate_and_complete]').click();
   cy.get('label[for=is_FAC_releasable]').click();
   cy.get('.usa-button').contains('Agree to auditor certification').click();
 

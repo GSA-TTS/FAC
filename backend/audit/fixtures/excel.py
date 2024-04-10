@@ -6,6 +6,7 @@ from django.conf import settings
 
 UNKNOWN_WORKBOOK = "unknown_workbook"
 SHEETS_DIR = settings.XLSX_TEMPLATE_SHEET_DIR
+JSONSCHEMA_DIR = settings.XLSX_TEMPLATE_JSON_DIR
 TESTFILES_DIR = settings.DATA_FIXTURES / "audit" / "excel_schema_test_files"
 
 ADDITIONAL_UEIS_TEMPLATE = SHEETS_DIR / "additional-ueis-workbook.xlsx"
@@ -18,6 +19,19 @@ FINDINGS_UNIFORM_GUIDANCE_TEMPLATE = (
 )
 SECONDARY_AUDITORS_TEMPLATE = SHEETS_DIR / "secondary-auditors-workbook.xlsx"
 NOTES_TO_SEFA_TEMPLATE = SHEETS_DIR / "notes-to-sefa-workbook.xlsx"
+
+ADDITIONAL_UEIS_JSONSCHEMA = JSONSCHEMA_DIR / "additional-ueis-workbook.json"
+ADDITIONAL_EINS_JSONSCHEMA = JSONSCHEMA_DIR / "additional-eins-workbook.json"
+FEDERAL_AWARDS_JSONSCHEMA = JSONSCHEMA_DIR / "federal-awards-workbook.json"
+FINDINGS_TEXT_JSONSCHEMA = JSONSCHEMA_DIR / "audit-findings-text-workbook.json"
+CORRECTIVE_ACTION_PLAN_JSONSCHEMA = (
+    JSONSCHEMA_DIR / "corrective-action-plan-workbook.json"
+)
+FINDINGS_UNIFORM_GUIDANCE_JSONSCHEMA = (
+    JSONSCHEMA_DIR / "federal-awards-audit-findings-workbook.json"
+)
+SECONDARY_AUDITORS_JSONSCHEMA = JSONSCHEMA_DIR / "secondary-auditors-workbook.json"
+NOTES_TO_SEFA_JSONSCHEMA = JSONSCHEMA_DIR / "notes-to-sefa-workbook.json"
 
 ADDITIONAL_UEIS_TEMPLATE_DEFINITION = "additional-ueis-workbook.json"
 ADDITIONAL_EINS_TEMPLATE_DEFINITION = "additional-eins-workbook.json"

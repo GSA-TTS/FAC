@@ -2,7 +2,7 @@
 # FOUNDATION
 ###############################
 
-FROM python:3.10-slim AS foundation
+FROM python:3.11-slim AS foundation
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -27,9 +27,12 @@ RUN apt-get -yq update && \
 FROM foundation AS storage
 RUN apt-get install -yqq groff && \
     apt-get install -yqq zip && \
-    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
-    unzip awscli-bundle.zip && \
-    ./awscli-bundle/install -b /usr/local/bin/aws
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
+    #curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
+    #unzip awscli-bundle.zip && \
+    #./awscli-bundle/install -b /usr/local/bin/aws
 RUN curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
     chmod +x /usr/local/bin/mc
 

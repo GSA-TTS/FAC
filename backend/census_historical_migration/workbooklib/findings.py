@@ -1,7 +1,5 @@
 from ..change_record import (
-    CensusRecord,
     InspectionRecord,
-    GsaFacRecord,
 )
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
@@ -13,6 +11,7 @@ from ..workbooklib.excel_creation_utils import (
     set_range,
     set_workbook_uei,
     sort_by_field,
+    track_transformations,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
@@ -25,17 +24,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def sorted_string(s):
-    s_sorted = "".join(sorted(s))
-    # print(f's before: {s} after {s_sorted}')
-    return s_sorted
+def xform_sort_compliance_requirement(findings):
+    """Sorts and uppercases the compliance requirement string."""
+    # Transformation to be documented
+    for finding in findings:
+        value = string_to_string(finding.TYPEREQUIREMENT).upper()
+        finding.TYPEREQUIREMENT = "".join(sorted(value))
 
 
 def xform_prior_year_findings(value):
     """
     Transform the value of prior_references to N/A if empty.
     """
-    # Transformation to be documented.
+    # Transformation to be documented
     trimmed_value = string_to_string(value)
     if not trimmed_value:
         # See ticket #2912
@@ -95,16 +96,15 @@ def xform_construct_award_references(audits, findings):
     for find in findings:
         award_references.append(e2a[find.ELECAUDITSID])
         # Tracking changes
-        census_data = [CensusRecord("ELECAUDITSID", find.ELECAUDITSID).to_dict()]
-        gsa_fac_data = GsaFacRecord("award_reference", e2a[find.ELECAUDITSID]).to_dict()
-        transformation_functions = ["xform_construct_award_references"]
-        change_records.append(
-            {
-                "census_data": census_data,
-                "gsa_fac_data": gsa_fac_data,
-                "transformation_functions": transformation_functions,
-            }
+        track_transformations(
+            "ELECAUDITSID",
+            find.ELECAUDITSID,
+            "award_reference",
+            e2a[find.ELECAUDITSID],
+            ["xform_construct_award_references"],
+            change_records,
         )
+
     if change_records:
         InspectionRecord.append_finding_changes(change_records)
 
@@ -142,7 +142,7 @@ def _get_findings_grid(findings_list):
     ]
 
 
-def _get_findings(dbkey, year):
+def get_findings(dbkey, year):
     # CFDAs aka ELECAUDITS (or Audits) have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
     # The linkage here is that a given finding will have an elecauditid.
     # Multiple findings will have a given elecauditid. That's how to link them.
@@ -165,9 +165,9 @@ def generate_findings(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
-    findings = _get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
+    findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
     award_references = xform_construct_award_references(audits, findings)
-
+    xform_sort_compliance_requirement(findings)
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
 

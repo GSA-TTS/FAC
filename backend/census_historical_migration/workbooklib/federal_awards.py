@@ -1,3 +1,5 @@
+from audit.intakelib.checks.check_cluster_total import expected_cluster_total
+from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..exception_utils import DataMigrationError
 from ..transforms.xform_string_to_string import (
@@ -9,6 +11,7 @@ from .excel_creation_utils import (
     map_simple_columns,
     set_range,
     sort_by_field,
+    track_transformations,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -85,6 +88,132 @@ mappings = [
 ]
 
 
+def xform_missing_findings_count(audits):
+    """Default missing findings count to zero."""
+    # Transformation to be documented.
+    for audit in audits:
+        findings_count = string_to_string(audit.FINDINGSCOUNT)
+        if not findings_count:
+            audit.FINDINGSCOUNT = "0"
+
+
+def xform_missing_amount_expended(audits):
+    """Default missing amount expended to zero."""
+    # Transformation recorded.
+    change_records = []
+    is_empty_amount_expended_found = False
+    for audit in audits:
+        amount = string_to_string(audit.AMOUNT)
+        if not amount:
+            is_empty_amount_expended_found = True
+
+        amount = string_to_int(amount) if amount else 0
+
+        track_transformations(
+            "AMOUNT",
+            audit.AMOUNT,
+            "amount_expended",
+            amount,
+            ["xform_missing_amount_expended"],
+            change_records,
+        )
+        audit.AMOUNT = str(amount)
+
+    if change_records and is_empty_amount_expended_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
+def xform_missing_program_total(audits):
+    """Calculates missing program total for each award."""
+    program_totals = {}
+    for audit in audits:
+        cfda_key = (
+            f"{string_to_string(audit.CFDA_PREFIX)}.{string_to_string(audit.CFDA_EXT)}"
+        )
+        amount = string_to_int(audit.AMOUNT) if string_to_string(audit.AMOUNT) else 0
+        if cfda_key in program_totals:
+            program_totals[cfda_key] = program_totals[cfda_key] + amount
+        else:
+            program_totals[cfda_key] = amount
+
+    change_records = []
+    is_empty_program_total_found = False
+
+    for audit in audits:
+        program_total = string_to_string(audit.PROGRAMTOTAL)
+        cfda_key = (
+            f"{string_to_string(audit.CFDA_PREFIX)}.{string_to_string(audit.CFDA_EXT)}"
+        )
+        if not program_total:
+            is_empty_program_total_found = True
+
+        # Only use calculated program_total when program_total is empty
+        program_total = (
+            string_to_int(program_total) if program_total else program_totals[cfda_key]
+        )
+        track_transformations(
+            "PROGRAMTOTAL",
+            audit.PROGRAMTOTAL,
+            "federal_program_total",
+            program_total,
+            ["xform_missing_program_total"],
+            change_records,
+        )
+        audit.PROGRAMTOTAL = str(program_total)
+
+    if change_records and is_empty_program_total_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
+def xform_missing_cluster_total(
+    audits,
+    cluster_names,
+    other_cluster_names,
+    state_cluster_names,
+):
+    """Calculates missing cluster total for each award."""
+    uniform_state_cluster_names = [name.upper() for name in state_cluster_names]
+    uniform_other_cluster_names = [name.upper() for name in other_cluster_names]
+    amounts_expended = [
+        string_to_int(audit.AMOUNT) if string_to_string(audit.AMOUNT) else 0
+        for audit in audits
+    ]
+
+    change_records = []
+    is_empty_cluster_total_found = False
+    for idx, (name, audit) in enumerate(zip(cluster_names, audits)):
+        cluster_total = string_to_string(audit.CLUSTERTOTAL)
+        if not cluster_total:
+            is_empty_cluster_total_found = True
+
+        # Only use calculated cluster_total when cluster_total is empty
+        if cluster_total:
+            cluster_total = string_to_int(cluster_total)
+        else:
+            cluster_total = expected_cluster_total(
+                idx=idx,
+                name=name,
+                uniform_other_cluster_names=uniform_other_cluster_names,
+                uniform_state_cluster_names=uniform_state_cluster_names,
+                state_cluster_names=state_cluster_names,
+                cluster_names=cluster_names,
+                amounts_expended=amounts_expended,
+            )
+
+        track_transformations(
+            "CLUSTERTOTAL",
+            audit.CLUSTERTOTAL,
+            "cluster_total",
+            cluster_total,
+            ["xform_missing_cluster_total"],
+            change_records,
+        )
+        audit.CLUSTERTOTAL = str(cluster_total)
+
+    if change_records and is_empty_cluster_total_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
 def xform_constructs_cluster_names(
     audits: list[Audits],
 ) -> tuple[list[str], list[str], list[str]]:
@@ -103,11 +232,11 @@ def xform_constructs_cluster_names(
         other_cluster_names.append(other_cluster_name if other_cluster_name else "")
 
         # Handling specific cases
-        if cluster_name == "STATE CLUSTER":
+        if cluster_name == settings.STATE_CLUSTER:
             state_cluster_names[-1] = (
                 state_cluster_name if state_cluster_name else settings.GSA_MIGRATION
             )
-        elif cluster_name == "OTHER CLUSTER NOT LISTED ABOVE":
+        elif cluster_name == settings.OTHER_CLUSTER:
             other_cluster_names[-1] = (
                 other_cluster_name if other_cluster_name else settings.GSA_MIGRATION
             )
@@ -223,7 +352,31 @@ def _get_passthroughs(audits):
     return (passthrough_names, passthrough_ids)
 
 
-def xform_populate_default_passthrough_values(audits):
+def xform_match_number_passthrough_names_ids(names, ids):
+    """
+    Matches the number of passthrough names and IDs.
+    Iterates over a list of passthrough names and IDs.
+    If the number of passthrough names is greater than the number of passthrough IDs,
+    it fills in the missing passthrough IDs with `NA`.
+    """
+    # Transformation to be documented.
+    for idx, (name, id) in enumerate(zip(names, ids)):
+        passthrough_names = name.split("|")
+        passthrough_ids = id.split("|")
+        length_difference = len(passthrough_names) - len(passthrough_ids)
+        if length_difference > 0:
+            patch = [settings.GSA_MIGRATION for _ in range(length_difference)]
+            if id == "":
+                patch.append(settings.GSA_MIGRATION)
+                ids[idx] = "|".join(patch)
+            else:
+                passthrough_ids.extend(patch)
+                ids[idx] = "|".join(passthrough_ids)
+
+    return names, ids
+
+
+def xform_populate_default_passthrough_names_ids(audits):
     """
     Retrieves the passthrough names and IDs for a given list of audits.
     Automatically fills in default values for empty passthrough names and IDs.
@@ -231,7 +384,11 @@ def xform_populate_default_passthrough_values(audits):
     If the audit's DIRECT attribute is "N" and the passthrough name or ID is empty,
     it fills in a default value indicating that no passthrough name or ID was provided.
     """
+    # Transformation to be documented.
     passthrough_names, passthrough_ids = _get_passthroughs(audits)
+    passthrough_names, passthrough_ids = xform_match_number_passthrough_names_ids(
+        passthrough_names, passthrough_ids
+    )
     for index, audit, name, id in zip(
         range(len(audits)), audits, passthrough_names, passthrough_ids
     ):
@@ -258,14 +415,16 @@ def xform_populate_default_loan_balance(audits):
             if balance:
                 loans_at_end.append(balance)
             else:
-                loans_at_end.append(settings.GSA_MIGRATION)  # record transformation
+                loans_at_end.append(
+                    settings.GSA_MIGRATION
+                )  # transformation to be documented
         else:
-            if balance:
+            if balance and balance != "0":
                 raise DataMigrationError(
                     "Unexpected loan balance.", "unexpected_loan_balance"
                 )
             else:
-                loans_at_end.append("")
+                loans_at_end.append("")  # transformation to be documented
 
     return loans_at_end
 
@@ -333,13 +492,22 @@ def generate_federal_awards(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
-    map_simple_columns(wb, mappings, audits)
 
     (
         cluster_names,
         other_cluster_names,
         state_cluster_names,
     ) = xform_constructs_cluster_names(audits)
+
+    xform_missing_cluster_total(
+        audits, cluster_names, other_cluster_names, state_cluster_names
+    )
+    xform_missing_program_total(audits)
+    xform_missing_findings_count(audits)
+    xform_missing_amount_expended(audits)
+
+    map_simple_columns(wb, mappings, audits)
+
     set_range(wb, "cluster_name", cluster_names)
     set_range(wb, "other_cluster_name", other_cluster_names)
     set_range(wb, "state_cluster_name", state_cluster_names)
@@ -363,7 +531,7 @@ def generate_federal_awards(audit_header, outfile):
         conversion_fun=str,
     )
 
-    (passthrough_names, passthrough_ids) = xform_populate_default_passthrough_values(
+    (passthrough_names, passthrough_ids) = xform_populate_default_passthrough_names_ids(
         audits
     )
     set_range(wb, "passthrough_name", passthrough_names)

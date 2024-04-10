@@ -44,7 +44,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "value": "1.0.4",
+               "value": "1.0.5",
                "width": 48
             },
             {
@@ -101,9 +101,9 @@
                "title_cell": "A1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "The value should follow the pattern AWARD-#### (where #### is a four-digit number).",
+                  "custom_error": "The value should follow the pattern AWARD-##### (where ##### is a five-digit number).",
                   "custom_title": "Award Reference validation",
-                  "formula1": "=AND(LEN(FIRSTCELLREF)=10, LEFT(FIRSTCELLREF, 6)=\"AWARD-\", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 4))), NOT(FIRSTCELLREF=\"AWARD-0000\"))",
+                  "formula1": "=AND(LEN(FIRSTCELLREF)=11, LEFT(FIRSTCELLREF, 6)=\"AWARD-\", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 5))), NOT(FIRSTCELLREF=\"AWARD-00000\"))",
                   "type": "custom"
                },
                "width": 18
@@ -118,9 +118,9 @@
                "title_cell": "B1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)",
+                  "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year after 2010 and NNN a three digit number (e.g. 2023-001)",
                   "custom_title": "Reference number",
-                  "formula1": "=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = \"20\", ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = \"-\", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))",
+                  "formula1": "=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = \"20\", (MID(FIRSTCELLREF, 3, 1) * 1) > 0, ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = \"-\", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))",
                   "type": "custom"
                },
                "width": 18

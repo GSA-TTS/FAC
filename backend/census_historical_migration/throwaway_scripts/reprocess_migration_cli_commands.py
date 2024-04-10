@@ -8,8 +8,8 @@ import subprocess  # nosec
 
 # This script is a one-off to reprocess mdata migration for a failed
 # migration attempt associated with a specific error tag.
-# Command is `python generate_cli_commands.py year total_records pages_per_instance instances error_tag`
-# `python generate_cli_commands.py 2022 42000 5 80 invalid_email_error`
+# Command is `python reprocess_migration_cli_commands.py year total_records pages_per_instance instances error_tag`
+# `python reprocess_migration_cli_commands.py 2022 42000 5 80 invalid_email_error`
 
 parser = argparse.ArgumentParser(
     description="Trigger data migration Github Actions through gh API calls"

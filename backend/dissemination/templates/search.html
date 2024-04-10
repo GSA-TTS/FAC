@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load sprite_helper %}
+
 {% block content %}
     <div class="desktop:padding-x-10">
         <div class="grid-row">
@@ -21,58 +22,54 @@
                     </div>
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
+                         {% comment %} Audit Year {% endcomment %}
+                         <button type="button"
+                                 class="usa-accordion__button"
+                                 aria-expanded="true"
+                                 aria-controls="audit-year">Audit Year</button>
+                         <div id="audit-year">
+                             {% for value, text in form.audit_year.field.choices %}
+                                 <div class="usa-checkbox bg-base-lighter">
+                                     <input class="usa-checkbox__input"
+                                            id="audit-year-{{ text }}"
+                                            name="audit_year" type="checkbox"
+                                            value={{value}}
+                                            {% if value in form_user_input.audit_year or text in form_user_input.audit_year %}checked{% endif %} />
+                                     <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
+                                 </div>
+                             {% endfor %}
+                         </div>
+
                         {% comment %} UEI/EIN {% endcomment %}
                         <label for="uei-or-ein">
                             <button type="button"
                                     class="usa-accordion__button"
                                     aria-expanded="true"
+                                    {% comment %} aria-expanded={% if form_user_input.uei_or_ein %}"true"{% else %}"false"{% endif %} {% endcomment %}
                                     aria-controls="uei-or-ein">UEI or EIN</button>
                         </label>
-                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein">{{form.cleaned_data.uei_or_ein}}</textarea>
-                        {% comment %} ALN/CFDA {% endcomment %}
-                        <label for="aln">
-                            <button type="button"
-                                    class="usa-accordion__button"
-                                    aria-expanded="true"
-                                    aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
-                        </label>
-                        <textarea class="usa-textarea" id="aln" name="aln">{{form.cleaned_data.aln}}</textarea>
+                        <textarea class="usa-textarea width-card-lg" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>
+
                         {% comment %} Name {% endcomment %}
                         <label for="entity-name">
                             <button type="button"
                                     class="usa-accordion__button"
-                                    aria-expanded="true"
+                                    aria-expanded={% if form_user_input.entity_name %}"true"{% else %}"false"{% endif %}
                                     aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
                         </label>
-                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form.cleaned_data.entity_name}}</textarea>
-                        {% comment %} Audit Year {% endcomment %}
-                        <button type="button"
-                                class="usa-accordion__button"
-                                aria-expanded="true"
-                                aria-controls="audit-year">Audit Year</button>
-                        <div id="audit-year">
-                            {% for value, text in form.audit_year.field.choices %}
-                                <div class="usa-checkbox bg-base-lighter">
-                                    <input class="usa-checkbox__input"
-                                           id="audit-year-{{ text }}"
-                                           name="audit_year" type="checkbox"
-                                           value={{ value }}
-                                           {% if text in form.cleaned_data.audit_year %}checked{% endif %} />
-                                    <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
+                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form_user_input.entity_name}}</textarea>
+
                         {% comment %} Release Date(s) {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
-                                aria-expanded="true"
+                                aria-expanded={% if form_user_input.start_date or form_user_input.end_date %}"true"{% else %}"false"{% endif %}
                                 aria-controls="fac-release-date">FAC acceptance date</button>
                         <div id="fac-release-date">
                             <div class="usa-form-group">
                                 <label class="usa-label" id="start-date-label" for="start-date">Start date</label>
                                 <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
                                 <div class="usa-date-picker"
-                                     data-default-value="{{ form.cleaned_data.start_date }}">
+                                     data-default-value="{{ form_user_input.start_date }}">
                                     <input class="usa-input"
                                            id="start-date"
                                            name="start_date"
@@ -84,7 +81,7 @@
                                 <label class="usa-label" id="end-date-label" for="end-date">End date</label>
                                 <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
                                 <div class="usa-date-picker"
-                                     data-default-value="{{ form.cleaned_data.end_date }}">
+                                     data-default-value="{{ form_user_input.end_date }}">
                                     <input class="usa-input"
                                            id="end-date"
                                            name="end_date"
@@ -93,36 +90,11 @@
                                 </div>
                             </div>
                         </div>
-                        {% comment %} Cog/Over {% endcomment %}
-                        <button type="button"
-                                class="usa-accordion__button"
-                                aria-expanded="true"
-                                aria-controls="cognizant">Cognizant or Oversight</button>
-                        <div id="cognizant">
-                            <label class="usa-label" for="options">Select one</label>
-                            <select class="usa-select" name="cog_or_oversight" id="options">
-                                <option id="cog_or_oversight--none" value>- Select -</option>
-                                <option id="cog_or_oversight--cog"
-                                        value="cog"
-                                        {% if form.cleaned_data.cog_or_oversight == "cog" %}selected{% endif %}>
-                                    Cognizant
-                                </option>
-                                <option id="cog_or_oversight--oversight"
-                                        value="oversight"
-                                        {% if form.cleaned_data.cog_or_oversight == "oversight" %}selected{% endif %}>
-                                    Oversight
-                                </option>
-                            </select>
-                            <label class="usa-label" for="agency-name">Federal agency number</label>
-                            <input class="usa-input"
-                                   id="agency-name"
-                                   name="agency_name"
-                                   value="{{ form.cleaned_data.agency_name }}" />
-                        </div>
+
                         {% comment %} State {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
-                                aria-expanded="true"
+                                aria-expanded={% if form_user_input.auditee_state %}"true"{% else %}"false"{% endif %}
                                 aria-controls="state">State</button>
                         <div id="state" class="usa-form-group">
                             <label class="usa-label" for="auditee_state">
@@ -131,13 +103,14 @@
                             <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
                                 <option value id="state--none">- Select -</option>
                                 {% for state in state_abbrevs %}
-                                <option value="{{ state }}" {% if form.cleaned_data.auditee_state == state %}selected{% endif %}>
+                                <option value="{{ state }}" {% if form_user_input.auditee_state == state %}selected{% endif %}>
                                     {{ state }}
                                 </option>
                                 {% endfor %}
                             </select>
                         </div>
                     </div>
+
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
@@ -153,7 +126,7 @@
                         type="number"
                         value="{{ page }}"
                         hidden />
-                    
+
                     {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
                     <input class="usa-input"
                         id="order_by"
@@ -169,13 +142,20 @@
             </div>
             <div class="grid-col audit-search-results">
                 <h2 class="font-sans-2xl">Search single audit reports</h2>
+                {% include "search-alert-info.html"%}
                 {% if results|length > 0 %}
-                    {% include "search-alert-info.html"%}
+                    <div class="margin-y-2 display-flex flex-justify-center">
+                        <img hidden id="loader"
+                            src="{% static 'img/loader.svg' %}"
+                            alt="spinner for processing search" />
+                    </div>
+
                     <div class="margin-y-2 grid-row display-flex flex-justify">
                         <p class="margin-0 flex-align-self-center">
                             <strong>Results: {{ results_count }}</strong>
                             <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                         </p>
+                        {% comment %}
                         {% if results_count <= summary_report_download_limit %}
                             <button class="usa-button display-flex"
                                     formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
@@ -189,8 +169,9 @@
                                 <p class="margin-0">Download all</p>
                             </button>
                         {% endif %}
+                        {% endcomment %}
                     </div>
-                    
+
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">
                         <table class="usa-table usa-table--striped usa-table--compact width-full">
                             <thead>
@@ -199,33 +180,28 @@
                                     {% include "search-table-header.html" with friendly_title="UEI or EIN" field_name="auditee_uei" %}
                                     {% include "search-table-header.html" with friendly_title="Acc Date" field_name="fac_accepted_date" %}
                                     {% include "search-table-header.html" with friendly_title="AY" field_name="audit_year" %}
-                                    {% include "search-table-header.html" with friendly_title="Cog or Over" field_name="cog_over" %}
                                     <th scope="col" role="columnheader">View</th>
                                     <th scope="col" role="columnheader">PDF</th>
-                                    {% if results.0.finding_my_aln is not None%}
-                                        {% include "search-table-header.html" with friendly_title="Finding my ALN" field_name="findings_my_aln"%}
-                                        {% include "search-table-header.html" with friendly_title="Finding all ALN" field_name="findings_all_aln"%}
-                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for result in results %}
                                     <tr>
                                         <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
-                                        <td>{{ result.auditee_uei }}</td>
+                                        {% comment %} Display UEI. If it's "GSA_MIGRATION", use the EIN instead. If no EIN, just show "GSA_MIGRATION". {% endcomment %}
+                                        <td>
+                                            {% if result.auditee_uei != "GSA_MIGRATION" %}
+                                                {{ result.auditee_uei }}
+                                            {% elif result.auditee_ein %}
+                                                {{ result.auditee_ein }}
+                                            {% else %}
+                                                {{ result.auditee_uei }}
+                                            {% endif %}
+                                        </td>
                                         {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
                                         <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}
                                         </td>
                                         <td>{{ result.audit_year }}</td>
-                                        <td>
-                                            {% if result.oversight_agency %}
-                                                OVER-{{ result.oversight_agency }}
-                                            {% elif  result.cognizant_agency %}
-                                                COG-{{ result.cognizant_agency }}
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
                                         <td>
                                             <a class="usa-link display-flex flex-column flex-align-center"
                                                href="{% url 'dissemination:Summary' report_id=result.report_id %}"
@@ -239,37 +215,19 @@
                                             </a>
                                         </td>
                                         <td>
-                                            <a class="usa-link display-flex flex-column flex-align-center"
-                                               href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
-                                               target="_blank">
-                                                <svg class="usa-icon usa-icon--size-4"
-                                                     aria-hidden="true"
-                                                     focusable="false"
-                                                     role="img">
-                                                    {% uswds_sprite "file_download" %}
-                                                </svg>
-                                            </a>
+                                            {% if result.is_public or include_private %}
+                                                <a class="usa-link display-flex flex-column flex-align-center"
+                                                href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
+                                                target="_blank">
+                                                    <svg class="usa-icon usa-icon--size-4"
+                                                        aria-hidden="true"
+                                                        focusable="false"
+                                                        role="img">
+                                                        {% uswds_sprite "file_download" %}
+                                                    </svg>
+                                                </a>
+                                            {% endif %}
                                         </td>
-                                        {% if result.finding_my_aln is not None%}
-                                            <td>
-                                                <span class="display-flex flex-column flex-align-center">
-                                                    {% if result.finding_my_aln %}
-                                                        Y
-                                                    {% else %}
-                                                        N
-                                                    {% endif %}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="display-flex flex-column flex-align-center">
-                                                    {% if result.finding_all_aln %}
-                                                        Y
-                                                    {% else %}
-                                                        N
-                                                    {% endif %}
-                                                </span>
-                                            </td>
-                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -314,21 +272,25 @@
                         </ul>
                     </nav>
                 {% elif results is not None %}
-                    {% include "search-alert-info.html"%}
-                    <div class="usa-alert usa-alert--info">
-                    </div>
                     <div class="search-instructions">
-                        <img src="{% static 'img/circle-arrow.svg' %}"
-                             alt="an arrow points left, toward the search form" />
+                        <img id="search_arrow"
+                            src="{% static 'img/circle-arrow.svg' %}"
+                            alt="an arrow points left, toward the search form" />
+                        <img hidden id="loader"
+                            src="{% static 'img/loader.svg' %}"
+                            alt="spinner for processing search" />
                         <p>
                             No results found.
                         </p>
                     </div>
                 {% else %}
-                    {% include "search-alert-info.html"%}
                     <div class="search-instructions">
-                        <img src="{% static 'img/circle-arrow.svg' %}"
+                        <img id="search_arrow"
+                            src="{% static 'img/circle-arrow.svg' %}"
                             alt="an arrow points left, toward the search form" />
+                        <img hidden id="loader"
+                            src="{% static 'img/loader.svg' %}"
+                            alt="spinner for processing search" />
                         <p>
                             Enter your filters and select <em>Search</em> to begin
                         </p>

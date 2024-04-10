@@ -6,7 +6,6 @@ from audit.intakelib.intermediate_representation import (
 )
 from audit.intakelib.common import get_message, build_cell_error_tuple
 from ..common.util import is_int
-from .check_cluster_total import NOT_APPLICABLE
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +25,7 @@ def loan_balance_present(ir):
     for index, (guarantee, balance) in enumerate(
         zip(is_guaranteed, loan_balance_at_period_end)
     ):
-        if (guarantee == "N") and balance:
+        if (guarantee == "N") and balance is not None:
             errors.append(
                 build_cell_error_tuple(
                     ir,
@@ -36,7 +35,8 @@ def loan_balance_present(ir):
                 )
             )
         elif (guarantee == "Y") and not (
-            balance in [NOT_APPLICABLE, settings.GSA_MIGRATION] or is_int(balance)
+            balance in [settings.NOT_APPLICABLE, settings.GSA_MIGRATION]
+            or is_int(balance)
         ):
             errors.append(
                 build_cell_error_tuple(

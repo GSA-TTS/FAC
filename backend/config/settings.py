@@ -83,6 +83,11 @@ LOGGING = {
     },
 }
 
+logging.getLogger("boto3").setLevel(logging.CRITICAL)
+logging.getLogger("botocore").setLevel(logging.CRITICAL)
+logging.getLogger("nose").setLevel(logging.CRITICAL)
+logging.getLogger("s3transfer").setLevel(logging.CRITICAL)
+
 TEST_RUN = False
 if len(sys.argv) > 1 and sys.argv[1] == "test":
     # This should reduce the volume of message displayed when running tests, but
@@ -152,6 +157,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.static_site_url",
                 "config.context_processors.omb_num_exp_date",
+                "config.context_processors.current_environment",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
@@ -430,6 +436,7 @@ DATA_FIXTURES = BASE_DIR / "data_fixtures"
 AUDIT_TEST_DATA_ENTRY_DIR = DATA_FIXTURES / "audit" / "test_data_entries"
 AUDIT_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "audit"
 SECTION_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "sections"
+OUTPUT_BASE_DIR = BASE_DIR / "schemas" / "output" / "base"
 SCHEMA_BASE_DIR = BASE_DIR / "schemas" / "source" / "base"
 XLSX_TEMPLATE_JSON_DIR = BASE_DIR / "schemas" / "output" / "excel" / "json"
 XLSX_TEMPLATE_SHEET_DIR = BASE_DIR / "schemas" / "output" / "excel" / "xlsx"
@@ -528,6 +535,10 @@ OMB_EXP_DATE = "09/30/2026"
 CENSUS_DATA_SOURCE = "CENSUS"
 DOLLAR_THRESHOLD = 750000
 SUMMARY_REPORT_DOWNLOAD_LIMIT = 1000
+DEFAULT_MAX_ROWS = (
+    10000  # A version of this constant also exists in schemas.scrpits.render.py
+)
+MAX_ROWS = 20000
 
 # A version of these regexes also exists in Base.libsonnet
 REGEX_ALN_PREFIX = r"^([0-9]{2})$"
@@ -536,3 +547,9 @@ REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
 REGEX_U_EXTENSION = r"^U[0-9]{2}$"
 GSA_MIGRATION = "GSA_MIGRATION"  # There is a copy of `GSA_MIGRATION` in Base.libsonnet. If you change it here, change it there too.
 GSA_MIGRATION_INT = -999999999
+# A copy of theses constants exists in schema/source/base/Base.libsonnet
+STATE_CLUSTER = "STATE CLUSTER"
+OTHER_CLUSTER = "OTHER CLUSTER NOT LISTED ABOVE"
+NOT_APPLICABLE = "N/A"
+
+ONE_TIME_ACCESS_TTL_SECS = 60

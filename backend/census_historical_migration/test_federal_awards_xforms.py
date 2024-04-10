@@ -2,14 +2,22 @@ from unittest.mock import patch
 from django.conf import settings
 from django.test import SimpleTestCase
 
+from .transforms.xform_string_to_string import (
+    string_to_string,
+)
+
 from .exception_utils import DataMigrationError
 from .workbooklib.federal_awards import (
     is_valid_prefix,
+    xform_match_number_passthrough_names_ids,
+    xform_missing_amount_expended,
+    xform_missing_program_total,
+    xform_missing_cluster_total,
     xform_populate_default_award_identification_values,
     xform_populate_default_loan_balance,
     xform_constructs_cluster_names,
     xform_populate_default_passthrough_amount,
-    xform_populate_default_passthrough_values,
+    xform_populate_default_passthrough_names_ids,
     xform_replace_invalid_extension,
     is_valid_extension,
 )
@@ -135,6 +143,12 @@ class TestXformPopulateDefaultLoanBalance(SimpleTestCase):
         expected = [""]
         self.assertEqual(xform_populate_default_loan_balance(audits), expected)
 
+    def test_no_loan_with_zero_balance(self):
+        """Test the function with no loan and zero balance."""
+        audits = [self.MockAudit(LOANS="N", LOANBALANCE="0")]
+        expected = [""]
+        self.assertEqual(xform_populate_default_loan_balance(audits), expected)
+
     def test_unexpected_loan_balance(self):
         """Test the function raises DataMigrationError when loan balance is unexpected."""
         audits = [self.MockAudit(LOANS="N", LOANBALANCE="100")]
@@ -204,7 +218,7 @@ class TestXformPopulateDefaultPassthroughValues(SimpleTestCase):
             )
         ]
 
-        names, ids = xform_populate_default_passthrough_values(audits)
+        names, ids = xform_populate_default_passthrough_names_ids(audits)
 
         self.assertEqual(names[0], settings.GSA_MIGRATION)
         self.assertEqual(ids[0], settings.GSA_MIGRATION)
@@ -219,7 +233,7 @@ class TestXformPopulateDefaultPassthroughValues(SimpleTestCase):
             )
         ]
 
-        names, ids = xform_populate_default_passthrough_values(audits)
+        names, ids = xform_populate_default_passthrough_names_ids(audits)
 
         self.assertEqual(names[0], "Name1|Name2")
         self.assertEqual(ids[0], "ID1|ID2")
@@ -234,7 +248,7 @@ class TestXformPopulateDefaultPassthroughValues(SimpleTestCase):
             )
         ]
 
-        names, ids = xform_populate_default_passthrough_values(audits)
+        names, ids = xform_populate_default_passthrough_names_ids(audits)
 
         self.assertEqual(names[0], "")
         self.assertEqual(ids[0], "")
@@ -249,7 +263,7 @@ class TestXformPopulateDefaultPassthroughValues(SimpleTestCase):
             )
         ]
 
-        names, ids = xform_populate_default_passthrough_values(audits)
+        names, ids = xform_populate_default_passthrough_names_ids(audits)
 
         self.assertEqual(names[0], "Name")
         self.assertEqual(ids[0], "ID")
@@ -330,3 +344,215 @@ class TestCFDAFunctions(SimpleTestCase):
         audit = MockAudit("01", "ABC")
         result, _ = xform_replace_invalid_extension(audit)
         self.assertEqual(result, f"01.{settings.GSA_MIGRATION}")
+
+
+class TestXformMissingProgramTotal(SimpleTestCase):
+    class AuditMock:
+        def __init__(self, cfda_prefix, cfda_ext, amount, program_total=None):
+            self.CFDA_PREFIX = cfda_prefix
+            self.CFDA_EXT = cfda_ext
+            self.AMOUNT = amount
+            self.PROGRAMTOTAL = program_total
+
+    def test_with_missing_program_total(self):
+        """Test for missing program total"""
+        audits = [
+            self.AuditMock("10", "123", "100"),
+            self.AuditMock("10", "123", "200"),
+            self.AuditMock("20", "456", "300", "300"),
+        ]
+        expected_program_totals = {"10.123": "300", "20.456": "300"}
+
+        xform_missing_program_total(audits)
+
+        for audit in audits:
+            cfda_key = f"{string_to_string(audit.CFDA_PREFIX)}.{string_to_string(audit.CFDA_EXT)}"
+            self.assertEqual(audit.PROGRAMTOTAL, expected_program_totals[cfda_key])
+
+    def test_preserve_existing_program_total(self):
+        """Test for non missing program total"""
+        audits = [
+            self.AuditMock("10", "123", "100", "150"),
+            self.AuditMock("10", "123", "200", "350"),
+        ]
+        # In this case, we expect the original PROGRAMTOTAL values to be preserved
+        expected_program_totals = ["150", "350"]
+
+        xform_missing_program_total(audits)
+
+        for audit, expected in zip(audits, expected_program_totals):
+            self.assertEqual(audit.PROGRAMTOTAL, expected)
+
+
+class TestXformMissingClusterTotal(SimpleTestCase):
+    class AuditMock:
+        def __init__(
+            self,
+            amount,
+            cluster_name,
+            state_cluster_name="",
+            other_cluster_name="",
+            cluster_total="",
+        ):
+            self.AMOUNT = amount
+            self.CLUSTERTOTAL = cluster_total
+            self.CLUSTERNAME = cluster_name
+            self.STATECLUSTERNAME = state_cluster_name
+            self.OTHERCLUSTERNAME = other_cluster_name
+
+    def test_xform_missing_cluster_total(self):
+        """Test for missing cluster total"""
+        audits = [
+            self.AuditMock("100", "Cluster A"),
+            self.AuditMock("150", "Cluster B"),
+            self.AuditMock("150", "Cluster A", cluster_total="250"),
+        ]
+        cluster_names = ["Cluster A", "Cluster B", "Cluster A"]
+        other_cluster_names = ["", "", ""]
+        state_cluster_names = ["", "", ""]
+        expected_totals = ["250", "150", "250"]
+
+        xform_missing_cluster_total(
+            audits, cluster_names, other_cluster_names, state_cluster_names
+        )
+
+        for audit, expected in zip(audits, expected_totals):
+            self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+    def test_xform_missing_cluster_total_with_state_cluster(self):
+        """Test for missing state cluster total"""
+        audits = [
+            self.AuditMock("100", "Cluster A"),
+            self.AuditMock(
+                "150",
+                settings.STATE_CLUSTER,
+                state_cluster_name="State Cluster A",
+                cluster_total="300",
+            ),
+            self.AuditMock("150", "Cluster A", cluster_total="250"),
+            self.AuditMock(
+                "150", settings.STATE_CLUSTER, state_cluster_name="State Cluster A"
+            ),
+        ]
+        cluster_names = [
+            "Cluster A",
+            settings.STATE_CLUSTER,
+            "Cluster A",
+            settings.STATE_CLUSTER,
+        ]
+        other_cluster_names = ["", "", "", ""]
+        state_cluster_names = ["", "State Cluster A", "", "State Cluster A"]
+        expected_totals = ["250", "300", "250", "300"]
+
+        xform_missing_cluster_total(
+            audits, cluster_names, other_cluster_names, state_cluster_names
+        )
+
+        for audit, expected in zip(audits, expected_totals):
+            self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+    def test_xform_missing_cluster_total_with_other_cluster(self):
+        """Test for missing other cluster total"""
+        audits = [
+            self.AuditMock("100", "Cluster A"),
+            self.AuditMock(
+                "150",
+                settings.OTHER_CLUSTER,
+                other_cluster_name="Other Cluster A",
+                cluster_total="300",
+            ),
+            self.AuditMock("150", "Cluster A", cluster_total="250"),
+            self.AuditMock(
+                "150", settings.OTHER_CLUSTER, other_cluster_name="Other Cluster A"
+            ),
+        ]
+        cluster_names = [
+            "Cluster A",
+            settings.OTHER_CLUSTER,
+            "Cluster A",
+            settings.OTHER_CLUSTER,
+        ]
+        state_cluster_names = ["", "", "", ""]
+        other_cluster_names = ["", "Other Cluster A", "", "Other Cluster A"]
+        expected_totals = ["250", "300", "250", "300"]
+
+        xform_missing_cluster_total(
+            audits, cluster_names, other_cluster_names, state_cluster_names
+        )
+
+        for audit, expected in zip(audits, expected_totals):
+            self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+
+class TestXformMissingAmountExpended(SimpleTestCase):
+    class AuditMock:
+        def __init__(
+            self,
+            amount,
+        ):
+            self.AMOUNT = amount
+
+    def setUp(self):
+        self.audits = [
+            self.AuditMock("100"),  # Normal case
+            self.AuditMock(""),  # Empty string should default to '0'
+            self.AuditMock(None),  # None should default to '0'
+        ]
+
+    def test_xform_missing_amount_expended(self):
+        """Test for missing amount expended"""
+
+        xform_missing_amount_expended(self.audits)
+
+        expected_results = ["100", "0", "0"]
+        actual_results = [audit.AMOUNT for audit in self.audits]
+
+        self.assertEqual(actual_results, expected_results)
+
+
+class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
+    def test_match_numbers_all_empty(self):
+        """Test the function with all empty names and ids."""
+        names = ["", "", ""]
+        ids = ["", "", ""]
+        expected_ids = ["", "", ""]
+
+        transformed_names, transformed_ids = xform_match_number_passthrough_names_ids(
+            names, ids
+        )
+
+        self.assertEqual(transformed_names, names)
+        self.assertEqual(transformed_ids, expected_ids)
+
+    def test_match_numbers_non_empty_names_empty_ids(self):
+        """Test the function with non-empty names and empty ids."""
+        names = ["name1|name2", "name3|name4"]
+        ids = ["", ""]
+        expected_ids = [
+            f"{settings.GSA_MIGRATION}|{settings.GSA_MIGRATION}",
+            f"{settings.GSA_MIGRATION}|{settings.GSA_MIGRATION}",
+        ]
+
+        transformed_names, transformed_ids = xform_match_number_passthrough_names_ids(
+            names, ids
+        )
+
+        self.assertEqual(transformed_names, names)
+        self.assertEqual(transformed_ids, expected_ids)
+
+    def test_match_numbers_mixed_empty_and_non_empty(self):
+        """Test the function with mixed empty and non-empty names and ids."""
+        names = ["name1|name2|name3", "name4", ""]
+        ids = ["id1", "", ""]
+        expected_ids = [
+            f"id1|{settings.GSA_MIGRATION}|{settings.GSA_MIGRATION}",
+            "",
+            "",
+        ]
+
+        transformed_names, transformed_ids = xform_match_number_passthrough_names_ids(
+            names, ids
+        )
+
+        self.assertEqual(transformed_names, names)
+        self.assertEqual(transformed_ids, expected_ids)

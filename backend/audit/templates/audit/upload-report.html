@@ -78,7 +78,7 @@
                                    id="upload_report"
                                    id_test="upload-report__file-input"
                                    name="upload_report"
-                                   accept=".pdf"
+                                   accept=".pdf,.PDF"
                                    aria-describedby="file_input_upload_report"
                                    required
                                    type="file" />
@@ -90,6 +90,11 @@
                         A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
                     </p>
                 {% endif %}
+
+                <div hidden id="loader" class="cross-validation-loader margin-top-6">
+                    <img src="{% static 'img/loader.svg' %}" alt="spinner for processing upload" />
+                </div>
+
                 <button class="usa-button margin-bottom-8 margin-top-5" id="continue">{% if already_submitted %}Re-upload{% else %}Upload{% endif %} Single Audit Package</button>
                 <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
                     aria-controls="upload-cancel">Cancel</a>
@@ -98,4 +103,5 @@
         </div>
     </div>
     {% include "audit-metadata.html" %}
+    <script src="{% static 'compiled/js/upload-report.js' %}"></script>
 {% endblock content %}

@@ -12,17 +12,13 @@ from audit.models import SingleAuditChecklist
 
 class PredisseminationXlsxDownloadView(SingleAuditChecklistAccessRequiredMixin, View):
     def get(self, request, report_id, file_type):
-        sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
-        filename = get_filename(sac, file_type)
-
+        filename = get_filename(report_id, file_type)
         return redirect(get_download_url(filename))
 
 
 class PredisseminationPdfDownloadView(SingleAuditChecklistAccessRequiredMixin, View):
     def get(self, request, report_id):
-        sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
-        filename = get_filename(sac, "report")
-
+        filename = get_filename(report_id, "report")
         return redirect(get_download_url(filename))
 
 

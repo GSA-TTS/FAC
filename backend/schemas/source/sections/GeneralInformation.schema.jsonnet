@@ -3,7 +3,7 @@ local Func = import '../base/Functions.libsonnet';
 local Types = Base.Types;
 
 /*
-Typechecks fields, but allows for empty data as well. Contains conditional Checks.
+Typechecks fields, but allows for empty data as well. Contains conditional checks.
 */
 {
   '$id': 'http://example.org/generalinformation',
@@ -12,46 +12,24 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
   metamodel_version: '1.7.0',
   properties: {
     // Audit information
-    auditee_fiscal_period_start: Types.string {
-      oneOf: [
-        {
-          format: 'date',
-        },
+    auditee_fiscal_period_start: {
+      format: 'date',
+    },
+    auditee_fiscal_period_end: {
+      format: 'date',
+    },
+    audit_type: Base.Enum.AuditType,
+    audit_period_covered: Base.Enum.AuditPeriod,
+    audit_period_other_months:  {
+      anyOf: [
+        Base.Compound.MonthsOther,
         Base.Compound.EmptyString,
       ],
-    },
-    auditee_fiscal_period_end: Types.string {
-      oneOf: [
-        {
-          format: 'date',
-        },
-        Base.Compound.EmptyString,
-      ],
-    },
-    audit_type: {
-      oneOf: [
-        Base.Enum.AuditType,
-        Base.Compound.EmptyString,
-      ],
-    },
-    audit_period_covered: {
-      oneOf: [
-        Base.Enum.AuditPeriod,
-        Base.Compound.EmptyString,
-      ],
-    },
-    audit_period_other_months: Types.string {
-      maxLength: 100,
     },
 
     // Auditee information
     auditee_uei: Base.Compound.UniqueEntityIdentifier,
-    ein: {
-      oneOf: [
-        Base.Compound.EmployerIdentificationNumber,
-        Base.Compound.EmptyString,
-      ],
-    },
+    ein: Base.Compound.EmployerIdentificationNumber,
     ein_not_an_ssn_attestation: Types.boolean,
     auditee_name: Types.string {
       maxLength: 100,
@@ -62,20 +40,8 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
     auditee_city: Types.string {
       maxLength: 100,
     },
-    auditee_state: {
-      oneOf: [
-        Base.Enum.UnitedStatesStateAbbr {
-          title: 'State',
-        },
-        Base.Compound.EmptyString,
-      ],
-    },
-    auditee_zip: {
-      anyOf: [
-        Base.Compound.Zip,
-        Base.Compound.EmptyString,
-      ],
-    },
+    auditee_state: Base.Enum.UnitedStatesStateAbbr,
+    auditee_zip: Base.Compound.Zip,
 
     auditee_contact_name: Types.string {
       maxLength: 100,
@@ -83,12 +49,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
     auditee_contact_title: Types.string {
       maxLength: 100,
     },
-    auditee_phone: {
-      oneOf: [
-        Base.Compound.UnitedStatesPhone,
-        Base.Compound.EmptyString,
-      ],
-    },
+    auditee_phone: Base.Compound.UnitedStatesPhone,
     auditee_email: Types.string {
       oneOf: [
         Types.string {
@@ -98,24 +59,18 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
         Types.string {
           const: Base.Const.GSA_MIGRATION,
         },
-        Base.Compound.EmptyString,
       ],
     },
 
     // Auditor information
-    auditor_ein: {
-      oneOf: [
-        Base.Compound.EmployerIdentificationNumber,
-        Base.Compound.EmptyString,
-      ],
-    },
+    auditor_ein: Base.Compound.EmployerIdentificationNumber,
     auditor_ein_not_an_ssn_attestation: Types.boolean,
     auditor_firm_name: Types.string {
       maxLength: 100,
     },
     auditor_country: Base.Enum.CountryType,
     auditor_international_address: Types.string {
-      maxLength: 100,
+      maxLength: 500,
     },
     auditor_address_line_1: Types.string {
       maxLength: 100,
@@ -144,12 +99,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
     auditor_contact_title: Types.string {
       maxLength: 100,
     },
-    auditor_phone: {
-      oneOf: [
-        Base.Compound.UnitedStatesPhone,
-        Base.Compound.EmptyString,
-      ],
-    },
+    auditor_phone: Base.Compound.UnitedStatesPhone,
     auditor_email: {
       oneOf: [
         Types.string {
@@ -159,18 +109,12 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
         Types.string {
           const: Base.Const.GSA_MIGRATION,
         },
-        Base.Compound.EmptyString,
       ],
     },
     // Others
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
-    user_provided_organization_type: {
-      oneOf: [
-        Base.Enum.OrganizationType,
-        Base.Compound.EmptyString,
-      ],
-    },
+    user_provided_organization_type: Base.Enum.OrganizationType,
     multiple_eins_covered: Types.boolean,
     multiple_ueis_covered: Types.boolean,
     secondary_auditors_exist: Types.boolean,
@@ -216,6 +160,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
         },
       ],
     },
+    // If auditor is from the USA, address info should be included.
     {
       'if': {
         properties: {
@@ -226,21 +171,16 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
       },
       'then': {
         properties: {
-          auditor_zip: {
-            anyOf: [
-              Base.Compound.Zip,
-              Base.Compound.EmptyString,
-            ],
-          },
-          auditor_state: {
-            anyOf: [
-              Base.Enum.UnitedStatesStateAbbr,
-              Base.Compound.EmptyString,
-            ],
-          },
+          auditor_address_line_1: Base.Compound.NonEmptyString,
+          auditor_city: Base.Compound.NonEmptyString,
+          auditor_state: Base.Enum.UnitedStatesStateAbbr,
+          auditor_zip: Base.Compound.Zip,
+
+          auditor_international_address: Base.Compound.EmptyString
         },
       },
     },
+    // If auditor is NOT from the USA, international things should be filled in.
     {
       'if': {
         properties: {
@@ -253,8 +193,12 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
       },
       'then': {
         properties: {
-          auditor_zip: Base.Compound.EmptyString,
+          auditor_address_line_1: Base.Compound.EmptyString,
+          auditor_city: Base.Compound.EmptyString,
           auditor_state: Base.Compound.EmptyString,
+          auditor_zip: Base.Compound.EmptyString,
+
+          auditor_international_address: Base.Compound.NonEmptyString
         },
       },
     },

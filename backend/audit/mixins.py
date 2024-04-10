@@ -10,11 +10,23 @@ from .models import Access, SingleAuditChecklist
 User = get_user_model()
 
 
+PERMISSION_DENIED_MESSAGE = "You do not have access to this audit."
+
+
 class CertificationPermissionDenied(PermissionDenied):
     def __init__(self, message, eligible_users):
         super().__init__(message)
 
         self.eligible_users = eligible_users
+
+
+def check_authenticated(request):
+    if not hasattr(request, "user"):
+        raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+    if not request.user:
+        raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+    if not request.user.is_authenticated:
+        raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
 
 def has_access(sac, user):
@@ -34,12 +46,14 @@ class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
 
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
+            check_authenticated(request)
+
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
-                raise PermissionDenied("You do not have access to this audit.")
+                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
         except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -53,10 +67,12 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         role = "certifying_auditee_contact"
         try:
+            check_authenticated(request)
+
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
-                raise PermissionDenied("You do not have access to this audit")
+                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
             if not has_role(sac, request.user, role):
                 eligible_accesses = Access.objects.select_related("user").filter(
@@ -65,10 +81,11 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
                 eligible_users = [acc.user for acc in eligible_accesses]
 
                 raise CertificationPermissionDenied(
-                    "bad role", eligible_users=eligible_users
+                    "Invalid role. User is not the Auditee Certifying Official.",
+                    eligible_users=eligible_users,
                 )
         except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -82,10 +99,12 @@ class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         role = "certifying_auditor_contact"
         try:
+            check_authenticated(request)
+
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
-                raise PermissionDenied("You do not have access to this audit")
+                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
             if not has_role(sac, request.user, role):
                 eligible_accesses = Access.objects.select_related("user").filter(
@@ -93,9 +112,10 @@ class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
                 )
                 eligible_users = [acc.user for acc in eligible_accesses]
                 raise CertificationPermissionDenied(
-                    "bad role", eligible_users=eligible_users
+                    "Invalid role. User is not the Auditor Certifying Official.",
+                    eligible_users=eligible_users,
                 )
         except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
         return super().dispatch(request, *args, **kwargs)

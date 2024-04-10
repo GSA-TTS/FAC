@@ -30,6 +30,11 @@
                     {% else %}
                         <h3>No errors were found.</h3>
                     {% endif %}
+
+                    <div hidden id="loader" class="cross-validation-loader margin-top-6">
+                        <img src="{% static 'img/loader.svg' %}" alt="spinner for processing upload" />
+                    </div>
+                    
                     <div class="margin-top-6">
                         <button class="usa-button margin-right-105" id="begin-validation">Begin Validation</button>
                         {% if errors.errors %}
@@ -48,4 +53,5 @@
             </form>
         </div>
     </div>
+    <script src="{% static 'compiled/js/cross-validation.js' %}"></script>
 {% endblock content %}

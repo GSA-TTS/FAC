@@ -31,7 +31,6 @@ def trigger_migration_workflow(
     cmds = []
     for ndx, page_set in enumerate(page_chunks):
         # gh workflow run historic-data-migrator-with-pagination.yml -f environment=preview -f year=2022 -f page_size=1 -f pages=1
-        print(f"# Instance {ndx + 1}")
         cmds.append(
             [
                 "gh",

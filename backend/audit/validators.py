@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+
 from jsonschema import Draft7Validator, FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
 
@@ -11,7 +12,6 @@ from django.conf import settings
 import requests
 from openpyxl import load_workbook
 from pypdf import PdfReader
-
 
 from audit.intakelib import (
     additional_ueis_named_ranges,
@@ -33,6 +33,7 @@ from audit.fixtures.excel import (
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
 )
+from support.decorators import newrelic_timing_metric
 
 
 logger = logging.getLogger(__name__)
@@ -215,35 +216,124 @@ def validate_federal_award_json(value):
         raise ValidationError(message=_federal_awards_json_error(errors))
 
 
-def validate_general_information_json(value):
+def validate_general_information_schema(general_information):
     """
     Apply JSON Schema for general information and report errors.
     """
-    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformation.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationRequired.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
-
+    validator = Draft7Validator(schema, format_checker=FormatChecker())
     try:
-        validate(value, schema, format_checker=FormatChecker())
+        for key, val in general_information.items():
+            if key in schema["properties"] and val not in [None, "", [], {}]:
+                field_schema = {
+                    "type": "object",
+                    "properties": {key: schema["properties"][key]},
+                }
+                validator.validate({key: val}, field_schema)
     except JSONSchemaValidationError as err:
+        logger.error(
+            f"ValidationError in General Information: Invalid value: {val} for key: {key}"
+        )
         raise ValidationError(
             _(err.message),
         ) from err
+    return general_information
+
+
+def validate_use_of_gsa_migration_keyword(general_information, is_data_migration):
+    """Check if GSA_MIGRATION keyword is used and is allowed to be used in general information"""
+
+    if not is_data_migration and settings.GSA_MIGRATION in [
+        general_information.get("auditee_email", ""),
+        general_information.get("auditor_email", ""),
+    ]:
+        raise ValidationError(
+            _(f"{settings.GSA_MIGRATION} not permitted outside of migrations"),
+        )
+
+    return general_information
+
+
+def validate_general_information_schema_rules(general_information):
+    """Check general information schema rules"""
+
+    # Check for invalid 'audit_period_other_months' usage
+    if general_information.get("audit_period_covered") in [
+        "annual",
+        "biennial",
+    ] and general_information.get("audit_period_other_months"):
+        if general_information.get("audit_period_other_months"):
+            raise ValidationError(
+                _(
+                    "Invalid Audit Period - 'Audit period months' should not be set for 'annual' or 'biennial' Audit periods"
+                )
+            )
+    # Ensure 'audit_period_other_months' is provided for 'other' audit period
+    elif general_information.get(
+        "audit_period_covered"
+    ) == "other" and not general_information.get("audit_period_other_months"):
+        raise ValidationError(
+            _(
+                "Invalid Audit Period - 'Audit period months' must be set for 'other' Audit period"
+            ),
+        )
+
+    # Validate USA auditor information
+    if general_information.get("auditor_country") == "USA" and (
+        not general_information.get("auditor_zip")
+        or not general_information.get("auditor_state")
+        or not general_information.get("auditor_address_line_1")
+        or not general_information.get("auditor_city")
+    ):
+        raise ValidationError(_("Missing Auditor Street or City or State or Zip Code"))
+
+    # Validate non-USA auditor state or zip code should not be provided
+    elif general_information.get("auditor_country") != "USA" and (
+        general_information.get("auditor_zip")
+        or general_information.get("auditor_state")
+        or general_information.get("auditor_city")
+        or general_information.get("auditor_address_line_1")
+    ):
+        raise ValidationError(
+            _(
+                "Invalid Auditor Street or City or State or Zip Code for non-USA countries"
+            )
+        )
+    # Validate non-USA auditor address is provided
+    elif general_information.get("auditor_country") != "USA" and not (
+        general_information.get("auditor_international_address")
+    ):
+        raise ValidationError(_("Missing Auditor International Address"))
+
+    return general_information
+
+
+def validate_general_information_json(value, is_data_migration=True):
+    """
+    Apply JSON Schema and Python checks to a general information record.
+
+    Keyword arguments:
+    is_data_migration -- True if ignoring GSA_MIGRATION emails. (default True)
+    """
+    validate_use_of_gsa_migration_keyword(value, is_data_migration)
+    validate_general_information_schema(value)
+
     return value
 
 
-def validate_general_information_complete_json(value):
+def validate_general_information_complete_json(value, is_data_migration=True):
     """
-    Apply JSON Schema for general information completeness and report errors.
-    """
-    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationComplete.schema.json"
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    Apply JSON Schema and Python checks to a general information record.
+    Performs additional checks to enforce completeness.
 
-    try:
-        validate(value, schema, format_checker=FormatChecker())
-    except JSONSchemaValidationError as err:
-        raise ValidationError(
-            _(err.message),
-        ) from err
+    Keyword arguments:
+    is_data_migration -- True if ignoring GSA_MIGRATION emails. (default True)
+    """
+    validate_use_of_gsa_migration_keyword(value, is_data_migration)
+    validate_general_information_schema(value)
+    validate_general_information_schema_rules(value)
+
     return value
 
 
@@ -372,19 +462,24 @@ def validate_file_size(file, max_file_size_mb):
 
 
 def _scan_file(file):
+    error_message = "We were unable to complete a security inspection of the file, please try again or contact support for assistance."
+
     try:
         return requests.post(
             settings.AV_SCAN_URL,
             files={"file": file},
             data={"name": file.name},
-            timeout=15,
+            timeout=30,
         )
+    # Common upload issues get their own messages. These messages display as form errors.
+    # Allow other errors to be raised and either caught elsewhere or passed to a 400 page.
     except requests.exceptions.ConnectionError:
-        raise ValidationError(
-            "We were unable to complete a security inspection of the file, please try again or contact support for assistance."
-        )
+        raise ValidationError(f"Connection error. {error_message}")
+    except requests.exceptions.ReadTimeout:
+        raise ValidationError(f"Read timed out. {error_message}")
 
 
+@newrelic_timing_metric("validate_file_infection")
 def validate_file_infection(file):
     """Files must pass an AV scan"""
     logger.info(f"Attempting to scan file: {file}.")
