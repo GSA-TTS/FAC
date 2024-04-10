@@ -78,6 +78,7 @@ class AdvancedSearchForm(forms.Form):
     major_program = forms.MultipleChoiceField(
         choices=major_program_choices, required=False
     )
+    passthrough_name = forms.CharField(required=False)
     report_id = forms.CharField(required=False)
     start_date = forms.DateField(required=False)
     type_requirement = forms.CharField(required=False)
@@ -177,6 +178,14 @@ class AdvancedSearchForm(forms.Form):
             text_input = text_input.replace(delimiter, "\n")
         text_input = [x.strip() for x in text_input.splitlines()]
         return text_input
+    
+    def clean_passthrough_name(self):
+        """
+        Clean the passthrough name field. We can't trust that separators aren't a part of 
+        a name somewhere, so just split on newlines.
+        """
+        text_input = self.cleaned_data["passthrough_name"]
+        return text_input.splitlines()
 
     def clean_page(self):
         """

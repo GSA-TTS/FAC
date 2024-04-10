@@ -117,8 +117,9 @@ def run_search(form_data):
             "cog_or_oversight": form_data["cog_or_oversight"],
             "direct_funding": form_data["direct_funding"],
             "findings": form_data["findings"],
-            "type_requirement": form_data["type_requirement"],
             "major_program": form_data["major_program"],
+            "passthrough_name": form_data["passthrough_name"],
+            "type_requirement": form_data["type_requirement"],
         }
         search_parameters.update(advanced_parameters)
 
