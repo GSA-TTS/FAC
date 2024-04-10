@@ -1,7 +1,14 @@
 import os
 from django.db import connection
 from django.test import TestCase
-from dissemination.models import DisseminationCombined, Finding, General, FederalAward
+from dissemination.models import (
+    DisseminationCombined,
+    Finding,
+    General,
+    FederalAward,
+    AdditionalUei,
+    AdditionalEin,
+)
 from dissemination.search import (
     search_general,
     search_alns,
@@ -184,6 +191,64 @@ class SearchGeneralTests(TestCase):
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
 
+    def test_additional_ein(self):
+        """
+        Given an EIN, search_general should return records that match on the auditee_ein and records with an applicable additional_ein.
+        """
+        ein = "123456789"
+
+        # Two target records, one general with the EIN and one general with an applicable additional EIN
+        baker.make(General, is_public=True, auditee_ein=ein)
+        general_additional_ein = baker.make(
+            General, is_public=True, auditee_ein="not-looking-for-this-ein"
+        )
+        baker.make(AdditionalEin, report_id=general_additional_ein, additional_ein=ein)
+
+        # Two filler records
+        baker.make(General, is_public=True, auditee_ein="not-looking-for-this-ein")
+        general_filler = baker.make(
+            General, is_public=True, auditee_ein="not-looking-for-this-ein"
+        )
+        baker.make(
+            AdditionalEin,
+            report_id=general_filler,
+            additional_ein="not-looking-for-this-additional-ein",
+        )
+
+        results = search_general(General, {"uei_or_eins": [ein]})
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 2)
+
+    def test_additional_uei(self):
+        """
+        Given an UEI, search_general should return records that match on the auditee_uei and records with an applicable additional_uei.
+        """
+        uei = "ABCDEFGH0001"
+
+        # Two target records, one general with the UEI and one general with an applicable additional UEI
+        baker.make(General, is_public=True, auditee_uei=uei)
+        general_additional_uei = baker.make(
+            General, is_public=True, auditee_uei="not-looking-for-this-uei"
+        )
+        baker.make(AdditionalUei, report_id=general_additional_uei, additional_uei=uei)
+
+        # Two filler records
+        baker.make(General, is_public=True, auditee_uei="not-looking-for-this-uei")
+        general_filler = baker.make(
+            General, is_public=True, auditee_uei="not-looking-for-this-uei"
+        )
+        baker.make(
+            AdditionalUei,
+            report_id=general_filler,
+            additional_uei="not-looking-for-this-additional-uei",
+        )
+
+        results = search_general(General, {"uei_or_eins": [uei]})
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 2)
+
     def test_date_range(self):
         """
         Given a start and end date, search_general should return only records inside the date range
@@ -324,6 +389,68 @@ class SearchGeneralTests(TestCase):
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
+
+    def test_fy_end_date(self):
+        """Given an end date, search_general should return only records with a matching fy_end_date"""
+        date_target = datetime.date(2022, 1, 1)
+        date_filler = datetime.date(2022, 12, 31)
+
+        baker.make(General, is_public=True, fy_end_date=date_target)
+        baker.make(General, is_public=True, fy_end_date=date_filler)
+
+        results = search_general(General, {"fy_end_date": date_target})
+        assert_all_results_public(self, results)
+
+        # One result for the target date, with the matching fy_end_date
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].fy_end_date, date_target)
+
+    def test_entity_type(self):
+        """
+        Given a list of entity types, search_general should only return records with an entity_type among the list.
+        """
+        entity_types = [
+            "state",
+            "local",
+            "tribal",
+            "higher-ed",
+            "non-profit",
+            "unknown",
+        ]
+        for entity_type in entity_types:
+            baker.make(General, is_public=True, entity_type=entity_type)
+
+        # Searching for one type yields one result with the correct field
+        results = search_general(General, {"entity_type": [entity_types[0]]})
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].entity_type, entity_types[0])
+
+        # Searching for several types yields the same number of results
+        results = search_general(General, {"entity_type": entity_types[2:4]})
+        self.assertEqual(len(results), 2)
+
+    def test_report_id(self):
+        """
+        Given a list report IDs, search_general should only return records with a matching report_id.
+        """
+        report_ids = [
+            "2022-04-TSTDAT-0000000001",
+            "2022-04-TSTDAT-0000000002",
+            "2022-04-TSTDAT-0000000003",
+            "2022-04-TSTDAT-0000000004",
+            "2022-04-TSTDAT-0000000005",
+        ]
+        for id in report_ids:
+            baker.make(General, is_public=True, report_id=id)
+
+        # Searching for one ID yields one result with the correct ID
+        results = search_general(General, {"report_id": [report_ids[0]]})
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].report_id, report_ids[0])
+
+        # Searching for several IDs yields the same number of results
+        results = search_general(General, {"report_id": report_ids[2:4]})
+        self.assertEqual(len(results), 2)
 
 
 class TestMaterializedViewBuilder(TestCase):
@@ -682,6 +809,7 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         )
         baker.make(FederalAward, report_id=general_non_major, is_major="N")
         self.refresh_materialized_view()
+
         params = {"major_program": ["True"], "advanced_search_flag": True}
         results = search(params)
         self.assertEqual(len(results), 1)
@@ -691,3 +819,45 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         results = search(params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_non_major.report_id)
+
+    def test_search_type_requirement(self):
+        """
+        When making a search on type requirement, search_general should only return records with a matching combination.
+        """
+        type_requirements = [
+            "P",
+            "N",
+            "L",
+            "I",
+            "AB",
+        ]
+        # For each type requirement, generate a general object and a matching award & finding.
+        # The award is necessary for the materialized view to pick up the Finding
+        for tr in type_requirements:
+            general_foreign_object = baker.make(General, is_public=True)
+            baker.make(
+                FederalAward,
+                report_id=general_foreign_object,
+                award_reference="AWARD-0001",
+            )
+            baker.make(
+                Finding,
+                report_id=general_foreign_object,
+                award_reference="AWARD-0001",
+                type_requirement=tr,
+            )
+        self.refresh_materialized_view()
+
+        params = {
+            "type_requirement": [type_requirements[0]],
+            "advanced_search_flag": True,
+        }
+        results = search(params)
+        self.assertEqual(len(results), 1)
+
+        params = {
+            "type_requirement": type_requirements[2:4],
+            "advanced_search_flag": True,
+        }
+        results = search(params)
+        self.assertEqual(len(results), 2)
