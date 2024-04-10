@@ -17,7 +17,6 @@ def search_type_requirement(general_results, params):
 
     for tr in type_requirements:
         q |= Q(type_requirement=tr)
-
     filtered_general_results = general_results.filter(q).distinct()
 
     t1 = time.time()
