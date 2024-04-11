@@ -1,4 +1,16 @@
 from django import forms
+from .searchlib.search_constants import text_input_delimiters, report_id_delimiters
+
+
+def clean_text_field(text_input, delimiters=text_input_delimiters):
+    """
+    Clean up a given field. Replace common separators with a newline. Split on the newlines.
+    Strip all the resulting elements.
+    """
+    for delimiter in delimiters:
+        text_input = text_input.replace(delimiter, "\n")
+    text_input = [x.strip() for x in text_input.splitlines()]
+    return text_input
 
 
 class AdvancedSearchForm(forms.Form):
@@ -90,25 +102,13 @@ class AdvancedSearchForm(forms.Form):
     order_by = forms.CharField(required=False)
     order_direction = forms.CharField(required=False)
 
-    # Variables for cleaning functions
-    text_input_delimiters = [
-        ",",
-        ":",
-        ";",
-        "-",
-        " ",
-    ]
-
     def clean_aln(self):
         """
         Clean up the ALN field. Replace common separators with a newline.
         Split on the newlines. Strip all the resulting elements.
         """
         text_input = self.cleaned_data["aln"]
-        for delimiter in self.text_input_delimiters:
-            text_input = text_input.replace(delimiter, "\n")
-        text_input = [x.strip() for x in text_input.splitlines()]
-        return text_input
+        return clean_text_field(text_input)
 
     def clean_entity_name(self):
         """
@@ -124,10 +124,7 @@ class AdvancedSearchForm(forms.Form):
         Split on the newlines. Strip all the resulting elements.
         """
         text_input = self.cleaned_data["uei_or_ein"]
-        for delimiter in self.text_input_delimiters:
-            text_input = text_input.replace(delimiter, "\n")
-        text_input = [x.strip() for x in text_input.splitlines()]
-        return text_input
+        return clean_text_field(text_input)
 
     def clean_audit_year(self):
         """
@@ -155,10 +152,7 @@ class AdvancedSearchForm(forms.Form):
         """
         text_input = self.cleaned_data["type_requirement"]
         text_input = text_input.upper()
-        for delimiter in self.text_input_delimiters:
-            text_input = text_input.replace(delimiter, "\n")
-        text_input = [x.strip() for x in text_input.splitlines()]
-        return text_input
+        return clean_text_field(text_input)
 
     def clean_report_id(self):
         """
@@ -166,18 +160,8 @@ class AdvancedSearchForm(forms.Form):
         separators (except '-') with a newline. Split on the newlines.
         Strip all the resulting elements.
         """
-        report_id_delimiters = [
-            ",",
-            ":",
-            ";",
-            " ",
-        ]
         text_input = self.cleaned_data["report_id"]
-        text_input = text_input.upper()
-        for delimiter in report_id_delimiters:
-            text_input = text_input.replace(delimiter, "\n")
-        text_input = [x.strip() for x in text_input.splitlines()]
-        return text_input
+        return clean_text_field(text_input, report_id_delimiters)
 
     def clean_passthrough_name(self):
         """
@@ -246,15 +230,6 @@ class SearchForm(forms.Form):
     order_by = forms.CharField(required=False)
     order_direction = forms.CharField(required=False)
 
-    # Variables for cleaning functions
-    text_input_delimiters = [
-        ",",
-        ":",
-        ";",
-        "-",
-        " ",
-    ]
-
     def clean_entity_name(self):
         """
         Clean the name field. We can't trust that separators aren't a part of a name somewhere,
@@ -269,10 +244,7 @@ class SearchForm(forms.Form):
         Split on the newlines. Strip all the resulting elements.
         """
         text_input = self.cleaned_data["uei_or_ein"]
-        for delimiter in self.text_input_delimiters:
-            text_input = text_input.replace(delimiter, "\n")
-        text_input = [x.strip() for x in text_input.splitlines()]
-        return text_input
+        return clean_text_field(text_input)
 
     def clean_audit_year(self):
         """
@@ -289,18 +261,8 @@ class SearchForm(forms.Form):
         separators (except '-') with a newline. Split on the newlines.
         Strip all the resulting elements.
         """
-        report_id_delimiters = [
-            ",",
-            ":",
-            ";",
-            " ",
-        ]
         text_input = self.cleaned_data["report_id"]
-        text_input = text_input.upper()
-        for delimiter in report_id_delimiters:
-            text_input = text_input.replace(delimiter, "\n")
-        text_input = [x.strip() for x in text_input.splitlines()]
-        return text_input
+        return clean_text_field(text_input, report_id_delimiters)
 
     def clean_page(self):
         """
