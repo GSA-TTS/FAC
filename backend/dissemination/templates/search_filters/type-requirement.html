@@ -5,4 +5,7 @@
             aria-expanded={% if form_user_input.type_requirement %}"true"{% else %}"false"{% endif %}
             aria-controls="type-requirement">Type Requirement</button>
 </label>
-<textarea class="usa-textarea" id="type-requirement" name="type_requirement" placeholder="P, N, L, I, B, ...">{{form_user_input.type_requirement}}</textarea>
+<div id="type-requirement">
+    <div class="usa-hint" id="type_requirement-hint">Separate type requirements with spaces</div>
+    <textarea class="usa-textarea" id="type-requirement-input" name="type_requirement" placeholder="P N L I B ...">{{form_user_input.type_requirement}}</textarea>
+</div>
