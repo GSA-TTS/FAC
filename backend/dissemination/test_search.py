@@ -390,15 +390,15 @@ class SearchGeneralTests(TestCase):
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
 
-    def test_fy_end_date(self):
-        """Given an end date, search_general should return only records with a matching fy_end_date"""
+    def test_fy_end_month(self):
+        """Given an end month, search_general should return only records with a matching fy_end_date"""
         date_target = datetime.date(2022, 1, 1)
         date_filler = datetime.date(2022, 12, 31)
 
         baker.make(General, is_public=True, fy_end_date=date_target)
         baker.make(General, is_public=True, fy_end_date=date_filler)
 
-        results = search_general(General, {"fy_end_date": date_target})
+        results = search_general(General, {"fy_end_month": date_target.month})
         assert_all_results_public(self, results)
 
         # One result for the target date, with the matching fy_end_date
