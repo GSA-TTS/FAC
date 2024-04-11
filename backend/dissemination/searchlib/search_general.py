@@ -134,7 +134,7 @@ def _get_cog_or_oversight_match_query(agency_name, cog_or_oversight):
     if not agency_name:
         return Q()
 
-    if cog_or_oversight.lower() == "both":
+    if cog_or_oversight.lower() == "either":
         return Q(
             Q(cognizant_agency__in=[agency_name])
             | Q(oversight_agency__in=[agency_name])
