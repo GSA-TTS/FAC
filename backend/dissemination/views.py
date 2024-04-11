@@ -99,7 +99,7 @@ def run_search(form_data):
         "auditee_state": form_data["auditee_state"],
         "end_date": form_data["end_date"],
         "entity_type": form_data["entity_type"],
-        "fy_end_date": form_data["fy_end_date"],
+        "fy_end_month": form_data["fy_end_month"],
         "names": form_data["entity_name"],
         "report_id": form_data["report_id"],
         "start_date": form_data["start_date"],
@@ -201,10 +201,6 @@ class AdvancedSearch(View):
             form_user_input["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
         if form_data["end_date"]:
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
-        if form_data["fy_end_date"]:
-            form_user_input["fy_end_date"] = form_data["fy_end_date"].strftime(
-                "%Y-%m-%d"
-            )
 
         context = context | {
             "advanced_search_flag": True,
@@ -300,10 +296,6 @@ class Search(View):
             form_user_input["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
         if form_data["end_date"]:
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
-        if form_data["fy_end_date"]:
-            form_user_input["fy_end_date"] = form_data["fy_end_date"].strftime(
-                "%Y-%m-%d"
-            )
 
         context = context | {
             "advanced_search_flag": False,

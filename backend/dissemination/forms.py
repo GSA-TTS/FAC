@@ -74,7 +74,7 @@ class AdvancedSearchForm(forms.Form):
     entity_name = forms.CharField(required=False)
     entity_type = forms.MultipleChoiceField(choices=entity_type_choices, required=False)
     findings = forms.MultipleChoiceField(choices=findings_choices, required=False)
-    fy_end_date = forms.DateField(required=False)
+    fy_end_month = forms.CharField(required=False)
     major_program = forms.MultipleChoiceField(
         choices=major_program_choices, required=False
     )
@@ -235,7 +235,7 @@ class SearchForm(forms.Form):
     end_date = forms.DateField(required=False)
     entity_name = forms.CharField(required=False)
     entity_type = forms.MultipleChoiceField(choices=entity_type_choices, required=False)
-    fy_end_date = forms.DateField(required=False)
+    fy_end_month = forms.CharField(required=False)
     report_id = forms.CharField(required=False)
     start_date = forms.DateField(required=False)
     uei_or_ein = forms.CharField(required=False)

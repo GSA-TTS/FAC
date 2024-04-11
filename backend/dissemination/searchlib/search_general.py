@@ -52,9 +52,9 @@ def search_general(base_model, params=None):
     r_cogover = base_model.objects.filter(q_cogover)
 
     ##############
-    # Fiscal year end date
-    q_fy_end_date = _get_fy_end_date_match_query(params.get("fy_end_date", None))
-    r_fy_end_date = base_model.objects.filter(q_fy_end_date)
+    # Fiscal year end month
+    q_fy_end_month = _get_fy_end_month_match_query(params.get("fy_end_month", None))
+    r_fy_end_month = base_model.objects.filter(q_fy_end_month)
 
     ##############
     # Entity type
@@ -78,7 +78,7 @@ def search_general(base_model, params=None):
         & r_names
         & r_uei
         & r_base
-        & r_fy_end_date
+        & r_fy_end_month
         & r_entity_type
         & r_report_id
     )
@@ -208,11 +208,11 @@ def _get_names_match_query(names_list):
     return names_match
 
 
-def _get_fy_end_date_match_query(fy_end_date):
-    if not fy_end_date:
+def _get_fy_end_month_match_query(fy_end_month):
+    if not fy_end_month:
         return Q()
 
-    return Q(fy_end_date=fy_end_date)
+    return Q(fy_end_date__month=fy_end_month)
 
 
 def _get_entity_type_match_query(entity_types):
