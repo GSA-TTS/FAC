@@ -23,7 +23,7 @@ def search_passthrough_name(general_results, params):
         for sub in term.split():
             q_sub.add(Q(passthrough_name__icontains=sub), Q.AND)
         q.add(q_sub, Q.OR)
-    
+
     filtered_general_results = general_results.filter(q).distinct()
 
     t1 = time.time()

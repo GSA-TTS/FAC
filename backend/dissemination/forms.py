@@ -178,10 +178,10 @@ class AdvancedSearchForm(forms.Form):
             text_input = text_input.replace(delimiter, "\n")
         text_input = [x.strip() for x in text_input.splitlines()]
         return text_input
-    
+
     def clean_passthrough_name(self):
         """
-        Clean the passthrough name field. We can't trust that separators aren't a part of 
+        Clean the passthrough name field. We can't trust that separators aren't a part of
         a name somewhere, so just split on newlines.
         """
         text_input = self.cleaned_data["passthrough_name"]
