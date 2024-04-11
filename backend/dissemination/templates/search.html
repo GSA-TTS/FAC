@@ -118,6 +118,7 @@
                                     {% include "search-table-header.html" with friendly_title="UEI or EIN" field_name="auditee_uei" %}
                                     {% include "search-table-header.html" with friendly_title="Acc Date" field_name="fac_accepted_date" %}
                                     {% include "search-table-header.html" with friendly_title="AY" field_name="audit_year" %}
+                                    {% include "search-table-header.html" with friendly_title="Cog or Over" field_name="cog_over" %}
                                     <th scope="col" role="columnheader">View</th>
                                     <th scope="col" role="columnheader">PDF</th>
                                 </tr>
@@ -140,6 +141,15 @@
                                         <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}
                                         </td>
                                         <td>{{ result.audit_year }}</td>
+                                        <td>
+                                            {% if result.oversight_agency %}
+                                                OVER-{{ result.oversight_agency }}
+                                            {% elif  result.cognizant_agency %}
+                                                COG-{{ result.cognizant_agency }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
                                         <td>
                                             <a class="usa-link display-flex flex-column flex-align-center"
                                                href="{% url 'dissemination:Summary' report_id=result.report_id %}"
