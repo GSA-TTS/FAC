@@ -1,0 +1,17 @@
+{% comment %} Direct funding {% endcomment %}
+<button type="button"
+        class="usa-accordion__button"
+        aria-expanded={% if form_user_input.direct_funding %}"true"{% else %}"false"{% endif %}
+        aria-controls="fundingdirect">Direct funding</button>
+<div id="fundingdirect">
+    {% for value, text in form.direct_funding.field.choices %}
+        <div class="usa-checkbox bg-base-lighter">
+            <input class="usa-checkbox__input"
+                    id="direct_funding-{{ text }}"
+                    name="direct_funding" type="checkbox"
+                    value={{value}}
+                    {% if value in form_user_input.direct_funding %}checked{% endif %} />
+            <label class="usa-checkbox__label" for="direct_funding-{{ text }}">{{ text }}</label>
+        </div>
+    {% endfor %}
+</div>

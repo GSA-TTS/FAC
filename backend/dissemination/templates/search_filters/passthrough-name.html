@@ -1,0 +1,8 @@
+{% comment %} ALN/CFDA {% endcomment %}
+<label for="passthrough-name">
+    <button type="button"
+            class="usa-accordion__button"
+            aria-expanded={% if form_user_input.passthrough_name %}"true"{% else %}"false"{% endif %}
+            aria-controls="passthrough-name">Passthrough Name</button>
+</label>
+<textarea class="usa-textarea" id="passthrough-name" name="passthrough_name">{{form_user_input.passthrough_name}}</textarea>

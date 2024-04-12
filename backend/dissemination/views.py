@@ -49,7 +49,6 @@ def _add_search_params_to_newrelic(search_parameters):
     singles = [
         "start_date",
         "end_date",
-        "agency_name",
         "auditee_state",
     ]
 
@@ -96,13 +95,15 @@ def run_search(form_data):
     """
 
     basic_parameters = {
-        "names": form_data["entity_name"],
-        "uei_or_eins": form_data["uei_or_ein"],
-        "start_date": form_data["start_date"],
-        "end_date": form_data["end_date"],
-        "agency_name": form_data["agency_name"],
         "audit_years": form_data["audit_year"],
         "auditee_state": form_data["auditee_state"],
+        "end_date": form_data["end_date"],
+        "entity_type": form_data["entity_type"],
+        "fy_end_month": form_data["fy_end_month"],
+        "names": form_data["entity_name"],
+        "report_id": form_data["report_id"],
+        "start_date": form_data["start_date"],
+        "uei_or_eins": form_data["uei_or_ein"],
         "order_by": form_data["order_by"],
         "order_direction": form_data["order_direction"],
     }
@@ -111,11 +112,14 @@ def run_search(form_data):
     search_parameters["advanced_search_flag"] = form_data["advanced_search_flag"]
     if search_parameters["advanced_search_flag"]:
         advanced_parameters = {
+            "agency_name": form_data["agency_name"],
             "alns": form_data["aln"],
-            "findings": form_data["findings"],
-            "direct_funding": form_data["direct_funding"],
-            "major_program": form_data["major_program"],
             "cog_or_oversight": form_data["cog_or_oversight"],
+            "direct_funding": form_data["direct_funding"],
+            "findings": form_data["findings"],
+            "major_program": form_data["major_program"],
+            "passthrough_name": form_data["passthrough_name"],
+            "type_requirement": form_data["type_requirement"],
         }
         search_parameters.update(advanced_parameters)
 
@@ -137,8 +141,9 @@ class AdvancedSearch(View):
 
         return render(
             request,
-            "advanced.html",
+            "search.html",
             {
+                "advanced_search_flag": True,
                 "form": form,
                 "form_user_input": {"audit_year": ["2023"]},
                 "state_abbrevs": STATE_ABBREVS,
@@ -157,7 +162,6 @@ class AdvancedSearch(View):
         results = []
         context = {}
 
-        # form_data = clean_form_data(form)
         if form.is_valid():
             form_data = form.cleaned_data
             form_user_input = {
@@ -199,23 +203,24 @@ class AdvancedSearch(View):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         context = context | {
-            "form": form,
+            "advanced_search_flag": True,
             "form_user_input": form_user_input,
-            "state_abbrevs": STATE_ABBREVS,
-            "limit": form_data["limit"],
-            "results": paginator_results,
+            "form": form,
             "include_private": include_private,
-            "results_count": results_count,
-            "page": page,
+            "limit": form_data["limit"],
             "order_by": form_data["order_by"],
             "order_direction": form_data["order_direction"],
+            "page": page,
+            "results_count": results_count,
+            "results": paginator_results,
+            "state_abbrevs": STATE_ABBREVS,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
         time_beginning_render = time.time()
         logger.info(
             f"Total time between post and render {int(math.ceil((time_beginning_render - time_starting_post) * 1000))}ms"
         )
-        return render(request, "advanced.html", context)
+        return render(request, "search.html", context)
 
 
 class Search(View):
@@ -233,6 +238,7 @@ class Search(View):
             request,
             "search.html",
             {
+                "advanced_search_flag": False,
                 "form": form,
                 "form_user_input": {"audit_year": ["2023"]},
                 "state_abbrevs": STATE_ABBREVS,
@@ -251,7 +257,6 @@ class Search(View):
         results = []
         context = {}
 
-        # form_data = clean_form_data(form)
         if form.is_valid():
             form_data = form.cleaned_data
             form_user_input = {
@@ -293,16 +298,17 @@ class Search(View):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         context = context | {
-            "form": form,
+            "advanced_search_flag": False,
             "form_user_input": form_user_input,
-            "state_abbrevs": STATE_ABBREVS,
-            "limit": form_data["limit"],
-            "results": paginator_results,
+            "form": form,
             "include_private": include_private,
-            "results_count": results_count,
-            "page": page,
+            "limit": form_data["limit"],
             "order_by": form_data["order_by"],
             "order_direction": form_data["order_direction"],
+            "page": page,
+            "results_count": results_count,
+            "results": paginator_results,
+            "state_abbrevs": STATE_ABBREVS,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
         time_beginning_render = time.time()

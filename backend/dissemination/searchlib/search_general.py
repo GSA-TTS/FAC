@@ -2,6 +2,7 @@ import time
 from math import ceil
 import logging
 from django.db.models import Q
+from dissemination.models import AdditionalEin, AdditionalUei
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,21 @@ def search_general(base_model, params=None):
     r_cogover = base_model.objects.filter(q_cogover)
 
     ##############
+    # Fiscal year end month
+    q_fy_end_month = _get_fy_end_month_match_query(params.get("fy_end_month", None))
+    r_fy_end_month = base_model.objects.filter(q_fy_end_month)
+
+    ##############
+    # Entity type
+    q_entity_type = _get_entity_type_match_query(params.get("entity_type", None))
+    r_entity_type = base_model.objects.filter(q_entity_type)
+
+    ##############
+    # Report ID
+    q_report_id = _get_report_id_match_query(params.get("report_id", None))
+    r_report_id = base_model.objects.filter(q_report_id)
+
+    ##############
     # Intersection
     # Intersection on result sets is an &.
     results = (
@@ -62,6 +78,9 @@ def search_general(base_model, params=None):
         & r_names
         & r_uei
         & r_base
+        & r_fy_end_month
+        & r_entity_type
+        & r_report_id
     )
 
     t1 = time.time()
@@ -78,8 +97,21 @@ def _get_uei_or_eins_match_query(uei_or_eins):
     if not uei_or_eins:
         return Q()
 
+    r_uei = (
+        AdditionalEin.objects.filter(additional_ein__in=uei_or_eins)
+        .values_list("report_id")
+        .distinct()
+    )
+    r_ein = (
+        AdditionalUei.objects.filter(additional_uei__in=uei_or_eins)
+        .values_list("report_id")
+        .distinct()
+    )
     uei_or_ein_match = Q(
-        Q(auditee_uei__in=uei_or_eins) | Q(auditee_ein__in=uei_or_eins)
+        Q(auditee_ein__in=uei_or_eins)
+        | Q(auditee_uei__in=uei_or_eins)
+        | Q(report_id__in=r_ein)
+        | Q(report_id__in=r_uei)
     )
     return uei_or_ein_match
 
@@ -99,10 +131,15 @@ def _get_end_date_match_query(end_date):
 
 
 def _get_cog_or_oversight_match_query(agency_name, cog_or_oversight):
-    if not cog_or_oversight:
+    if not agency_name:
         return Q()
 
-    if cog_or_oversight.lower() == "cog":
+    if cog_or_oversight.lower() == "either":
+        return Q(
+            Q(cognizant_agency__in=[agency_name])
+            | Q(oversight_agency__in=[agency_name])
+        )
+    elif cog_or_oversight.lower() == "cog":
         return Q(cognizant_agency__in=[agency_name])
     elif cog_or_oversight.lower() == "oversight":
         return Q(oversight_agency__in=[agency_name])
@@ -174,3 +211,24 @@ def _get_names_match_query(names_list):
     # we had before.
 
     return names_match
+
+
+def _get_fy_end_month_match_query(fy_end_month):
+    if not fy_end_month:
+        return Q()
+
+    return Q(fy_end_date__month=fy_end_month)
+
+
+def _get_entity_type_match_query(entity_types):
+    if not entity_types:
+        return Q()
+
+    return Q(entity_type__in=entity_types)
+
+
+def _get_report_id_match_query(report_ids):
+    if not report_ids:
+        return Q()
+
+    return Q(report_id__in=report_ids)
