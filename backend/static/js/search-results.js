@@ -63,7 +63,7 @@ function attachEventHandlersReset() {
     end_date.value = '';
     // Reset Cog/Over dropdown
     var default_cog_over_option = document.getElementById(
-      'cog_or_oversight--none'
+      'cog_or_oversight--both'
     );
     default_cog_over_option.selected = true;
     // Wipe agency name
