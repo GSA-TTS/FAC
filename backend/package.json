@@ -25,10 +25,10 @@
   "license": "ISC",
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.2.5",
-    "cypress": "^13.6.6",
+    "cypress": "^13.7.3",
     "cypress-file-upload": "^5.0.8",
     "cypress-otp": "^1.0.3",
-    "eslint": "^8.46.0",
+    "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-prettier": "^5.1.3",
