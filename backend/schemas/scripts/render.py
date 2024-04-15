@@ -29,6 +29,7 @@ Range = NT(
 
 # We can compile larger workbooks by setting
 # an environment variable for one-offs.
+# A version of DEFAULT_MAX_ROWS exists in settings.py
 DEFAULT_MAX_ROWS = 10000
 rows = os.getenv("MAX_ROWS", DEFAULT_MAX_ROWS)
 try:
