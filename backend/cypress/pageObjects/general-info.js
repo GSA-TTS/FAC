@@ -33,7 +33,7 @@ class GeneralInfoForm {
         this.multipleUEIsYesLabel = 'label[for=multiple-ueis-yes]';
         this.secondaryAuditorsField = 'label[for=secondary_auditors-yes]';
     }
-    
+
 
     selectAuditTypeAndPeriod() {
         cy.get(this.auditTypeSingle).click();
@@ -76,8 +76,8 @@ class GeneralInfoForm {
         cy.get(this.continueButton).click();
         cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
     }
-    
-    
+
+
 }
 
 
