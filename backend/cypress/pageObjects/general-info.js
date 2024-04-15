@@ -1,23 +1,4 @@
-import auditeeNameField from '../fixtures/genInfoData/auditeeNameField.json';
-import einField from '../fixtures/genInfoData/einField.json';
-import auditeeAddressLine1Field from '../fixtures/genInfoData/auditeeAddressLine1Field.json';
-import auditeeCityField from '../fixtures/genInfoData/auditeeCityField.json';
-import auditeeStateField from '../fixtures/genInfoData/auditeeStateField.json';
-import auditeeZipField from '../fixtures/genInfoData/auditeeZipField.json';
-import auditeeContactNameField from '../fixtures/genInfoData/auditeeContactNameField.json';
-import auditeeContactTitleField from '../fixtures/genInfoData/auditeeContactTitleField.json';
-import auditeePhoneField from '../fixtures/genInfoData/auditeePhoneField.json';
-import auditeeEmailField from '../fixtures/genInfoData/auditeeEmailField.json';
-import auditorEINField from '../fixtures/genInfoData/auditorEINField.json';
-import auditorFirmNameField from '../fixtures/genInfoData/auditorFirmNameField.json';
-import auditorAddressLine1Field from '../fixtures/genInfoData/auditorAddressLine1Field.json';
-import auditorCityField from '../fixtures/genInfoData/auditorCityField.json';
-import auditorStateField from '../fixtures/genInfoData/auditorStateField.json';
-import auditorZipField from '../fixtures/genInfoData/auditorZipField.json';
-import auditorContactNameField from '../fixtures/genInfoData/auditorContactNameField.json';
-import auditorContactTitleField from '../fixtures/genInfoData/auditorContactTitleField.json';
-import auditorPhoneField from '../fixtures/genInfoData/auditorPhoneField.json';
-import auditorEmailField from '../fixtures/genInfoData/auditorEmailField.json';
+import genInfoData from '../fixtures/genInfoData/genInfoData.json';
 
 
 class GeneralInfoForm {
@@ -61,33 +42,33 @@ class GeneralInfoForm {
     }
 
     fillAuditeeInformation() {
-        cy.get(this.auditeeNameField).type(auditeeNameField.auditeeNameField);
-        cy.get(this.einField).type(einField.einField);
+        cy.get(this.auditeeNameField).type(genInfoData.auditeeNameField);
+        cy.get(this.einField).type(genInfoData.einField);
         cy.get(this.einNotSSNAttestationLabel).click();
         cy.get(this.multipleEINsYesLabel).click();
-        cy.get(this.auditeeAddressLine1Field).type(auditeeAddressLine1Field.auditeeAddressLine1Field);
-        cy.get(this.auditeeCityField).type(auditeeCityField.auditeeCityField);
-        cy.get(this.auditeeStateField).type(auditeeStateField.auditeeStateField + '{enter}');
-        cy.get(this.auditeeZipField).type(auditeeZipField.auditeeZipField);
-        cy.get(this.auditeeContactNameField).type(auditeeContactNameField.auditeeContactNameField);
-        cy.get(this.auditeeContactTitleField).type(auditeeContactTitleField.auditeeContactTitleField);
-        cy.get(this.auditeePhoneField).type(auditeePhoneField.auditeePhoneField);
-        cy.get(this.auditeeEmailField).type(auditeeEmailField.auditeeEmailField);
+        cy.get(this.auditeeAddressLine1Field).type(genInfoData.auditeeAddressLine1Field);
+        cy.get(this.auditeeCityField).type(genInfoData.auditeeCityField);
+        cy.get(this.auditeeStateField).type(genInfoData.auditeeStateField + '{enter}');
+        cy.get(this.auditeeZipField).type(genInfoData.auditeeZipField);
+        cy.get(this.auditeeContactNameField).type(genInfoData.auditeeContactNameField);
+        cy.get(this.auditeeContactTitleField).type(genInfoData.auditeeContactTitleField);
+        cy.get(this.auditeePhoneField).type(genInfoData.auditeePhoneField);
+        cy.get(this.auditeeEmailField).type(genInfoData.auditeeEmailField);
         cy.get(this.multipleUEIsYesLabel).click();
     }
 
     fillAuditorInformation() {
-        cy.get(this.auditorEINField).type(auditorEINField.auditorEINField);
+        cy.get(this.auditorEINField).type(genInfoData.auditorEINField);
         cy.get(this.auditorEINNotSSNAttestationLabel).click();
-        cy.get(this.auditorFirmNameField).type(auditorFirmNameField.auditorFirmNameField);
-        cy.get(this.auditorAddressLine1Field).type(auditorAddressLine1Field.auditorAddressLine1Field);
-        cy.get(this.auditorCityField).type(auditorCityField.auditorCityField);
-        cy.get(this.auditorStateField).type(auditorStateField.auditorStateField + '{enter}');
-        cy.get(this.auditorZipField).type(auditorZipField.auditorZipField);
-        cy.get(this.auditorContactNameField).type(auditorContactNameField.auditorContactNameField);
-        cy.get(this.auditorContactTitleField).type(auditorContactTitleField.auditorContactTitleField);
-        cy.get(this.auditorPhoneField).type(auditorPhoneField.auditorPhoneField);
-        cy.get(this.auditorEmailField).type(auditorEmailField.auditorEmailField);
+        cy.get(this.auditorFirmNameField).type(genInfoData.auditorFirmNameField);
+        cy.get(this.auditorAddressLine1Field).type(genInfoData.auditorAddressLine1Field);
+        cy.get(this.auditorCityField).type(genInfoData.auditorCityField);
+        cy.get(this.auditorStateField).type(genInfoData.auditorStateField + '{enter}');
+        cy.get(this.auditorZipField).type(genInfoData.auditorZipField);
+        cy.get(this.auditorContactNameField).type(genInfoData.auditorContactNameField);
+        cy.get(this.auditorContactTitleField).type(genInfoData.auditorContactTitleField);
+        cy.get(this.auditorPhoneField).type(genInfoData.auditorPhoneField);
+        cy.get(this.auditorEmailField).type(genInfoData.auditorEmailField);
         cy.get(this.secondaryAuditorsField).click();
     }
 

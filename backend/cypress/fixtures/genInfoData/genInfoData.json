@@ -1,0 +1,23 @@
+{
+    "auditorFirmNameField": "House of Auditor",
+    "auditorContactNameField": "Jane Doe",
+    "auditorContactTitleField": "Auditor",
+    "auditorEmailField": "qualified.human.accountant@auditor",
+    "auditorPhoneField": "5555555555",
+    "auditorAddressLine1Field": "123 Around the corner",
+    "auditorCityField": "Centreville",
+    "auditorStateField": "VA",
+    "auditorZipField": "20121",
+    "auditorEINField": "987654321",
+    "auditeeNameField": "Audit McAuditee",
+    "auditeeContactNameField": "John Doe",
+    "auditeeContactTitleField": "Keymaster",
+    "auditeeEmailField": "va@test",
+    "auditeePhoneField": "5558675309",
+    "auditeeAddressLine1Field": "1111 E Broad ST",
+    "auditeeCityField": "Richmond",
+    "auditeeStateField": "VA",
+    "auditeeZipField": "23219",
+    "auditeeUEI": "CMBSGK6P7BE1",
+    "einField": "546000173"
+}
