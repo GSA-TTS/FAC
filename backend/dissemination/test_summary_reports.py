@@ -1,3 +1,4 @@
+from django.test import SimpleTestCase
 from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.summary_reports import (
     can_read_tribal_disclaimer,
@@ -6,6 +7,7 @@ from dissemination.summary_reports import (
     generate_summary_report,
     get_tribal_report_ids,
     insert_dissem_coversheet,
+    separate_notes_single_fields_from_array_fields,
 )
 from dissemination.models import FederalAward, General, CapText, Note, FindingText
 
@@ -152,3 +154,73 @@ class SummaryReportTests(TestMaterializedViewBuilder):
     def test_gather_report_data_dissemination_include_private(self):
         """Summaries with tribal data and access"""
         self._test_gather_report_data_dissemination_helper(True)
+
+
+class SeparateNotesSingleFieldsFromArrayFields(SimpleTestCase):
+    def test_basic_separation(self):
+        data = {
+            "note": {
+                "field_names": [
+                    "id",
+                    "report_id",
+                    "note_title",
+                    "accounting_policies",
+                    "rate_explained",
+                    "is_minimis_rate_used",
+                    "content",
+                    "contains_chart_or_table",
+                ],
+                "entries": [
+                    [1, "rpt1", "note1", "policy", "rate", "N", "content1", "Y"],
+                    [2, "rpt1", "note2", "policy", "rate", "N", "content2", "N"],
+                ],
+            }
+        }
+        expected_output = {
+            "note": {
+                "field_names": [
+                    "id",
+                    "report_id",
+                    "note_title",
+                    "content",
+                    "contains_chart_or_table",
+                ],
+                "entries": [
+                    [1, "rpt1", "note1", "content1", "Y"],
+                    [2, "rpt1", "note2", "content2", "N"],
+                ],
+            },
+            "note_coversheet": {
+                "field_names": [
+                    "report_id",
+                    "accounting_policies",
+                    "rate_explained",
+                    "is_minimis_rate_used",
+                ],
+                "entries": [["rpt1", "policy", "rate", "N"]],
+            },
+        }
+        result = separate_notes_single_fields_from_array_fields(data)
+        self.assertEqual(result, expected_output)
+
+    def test_missing_section(self):
+        data = {}
+        result = separate_notes_single_fields_from_array_fields(data)
+        self.assertEqual(result, {})
+
+    def test_empty_entries(self):
+        data = {
+            "note": {
+                "field_names": [
+                    "report_id",
+                    "accounting_policies",
+                    "rate_explained",
+                    "is_minimis_rate_used",
+                    "other_info",
+                ],
+                "entries": [],
+            }
+        }
+        expected_output = data  # Expect no change since there are no entries to process
+        result = separate_notes_single_fields_from_array_fields(data)
+        self.assertEqual(result, expected_output)
