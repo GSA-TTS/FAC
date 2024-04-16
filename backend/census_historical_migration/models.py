@@ -446,6 +446,39 @@ class ELECCAPTEXT(models.Model):
     MULTIPLEUEIS = models.TextField(blank=True, null=True)
 
 
+class ELECRPT_REVISIONS(models.Model):
+    ELECRPTREVISIONID = models.TextField(blank=True, null=True)
+    REPORTID = models.TextField(blank=True, null=True)
+    VERSION = models.TextField(blank=True, null=True)
+    DBKEY = models.TextField(blank=True, null=True)
+    AUDITYEAR = models.TextField(blank=True, null=True)
+    GENINFO = models.TextField(blank=True, null=True)
+    GENINFO_EXPLAIN = models.TextField(blank=True, null=True)
+    FEDERALAWARDS = models.TextField(blank=True, null=True)
+    FEDERALAWARDS_EXPLAIN = models.TextField(blank=True, null=True)
+    NOTESTOSEFA = models.TextField(blank=True, null=True)
+    NOTESTOSEFA_EXPLAIN = models.TextField(blank=True, null=True)
+    AUDITINFO = models.TextField(blank=True, null=True)
+    AUDITINFO_EXPLAIN = models.TextField(blank=True, null=True)
+    FINDINGS = models.TextField(blank=True, null=True)
+    FINDINGS_EXPLAIN = models.TextField(blank=True, null=True)
+    FINDINGSTEXT = models.TextField(blank=True, null=True)
+    FINDINGSTEXT_EXPLAIN = models.TextField(blank=True, null=True)
+    CAP = models.TextField(blank=True, null=True)
+    CAP_EXPLAIN = models.TextField(blank=True, null=True)
+    OTHER = models.TextField(blank=True, null=True)
+    OTHER_EXPLAIN = models.TextField(blank=True, null=True)
+
+
+class FEDERALAGENCYLOOKUP(models.Model):
+    ID = models.TextField(blank=True, null=True)
+    CFDAPREFIX = models.TextField(blank=True, null=True)
+    NAME = models.TextField(blank=True, null=True)
+    ACRONYM = models.TextField(blank=True, null=True)
+    STARTEXT = models.TextField(blank=True, null=True)
+    ENDEXT = models.TextField(blank=True, null=True)
+
+
 class ReportMigrationStatus(models.Model):
     audit_year = models.TextField(blank=True, null=True)
     dbkey = models.TextField(blank=True, null=True)
