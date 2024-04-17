@@ -88,9 +88,7 @@ describe('Test Basic Search Fields', () => {
 
     //summary report
     search.testSummaryReport();
-
   });
-
 
 });
 
