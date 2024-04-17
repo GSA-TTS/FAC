@@ -156,8 +156,6 @@ class searchPage {
         cy.downloadFile(downloadUrl,
             'cypress/downloads', '2022-12-GSAFAC-0000000001.pdf');
     }
-
-
 }
 
 export default searchPage;
