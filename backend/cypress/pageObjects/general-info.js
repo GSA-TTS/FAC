@@ -19,7 +19,6 @@ import auditorContactTitleField from '../fixtures/genInfoData/auditorContactTitl
 import auditorPhoneField from '../fixtures/genInfoData/auditorPhoneField.json';
 import auditorEmailField from '../fixtures/genInfoData/auditorEmailField.json';
 
-
 class GeneralInfoForm {
     constructor() {
         this.auditTypeSingle = 'label[for=single-audit]';
