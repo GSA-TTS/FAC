@@ -139,14 +139,33 @@ def section_completed_metadata(sac, section_key):
     try:
         section = find_section_by_name(section_key)
         event_type = section.submission_event
-
         report_id = sac["sf_sac_meta"]["report_id"]
-        event = SubmissionEvent.objects.filter(
-            sac__report_id=report_id, event=event_type
-        ).latest("timestamp")
+        try:
+            submission_event = SubmissionEvent.objects.filter(
+                sac__report_id=report_id, event=event_type
+            ).latest("timestamp")
+        except SubmissionEvent.DoesNotExist:
+            submission_event = None
+        try:
+            deletion_event = SubmissionEvent.objects.filter(
+                sac__report_id=report_id, event=section.deletion_event
+            ).latest("timestamp")
+        except SubmissionEvent.DoesNotExist:
+            deletion_event = None
+        if deletion_event and (
+            not submission_event
+            or deletion_event.timestamp > submission_event.timestamp
+        ):
+            # If the deletion event is more recent than the submission event, the section is not complete.
+            return None, None
 
-        return event.user.email, event.timestamp
-    except SubmissionEvent.DoesNotExist:
+        if submission_event:
+            return submission_event.user.email, submission_event.timestamp
+
+        # If there is no submission event, the section is not complete.
+        return None, None
+
+    except Exception:
         return None, None
 
 
