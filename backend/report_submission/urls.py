@@ -60,7 +60,7 @@ urlpatterns = [
 for page_id in upload_page_ids:
     urlpatterns.append(
         path(
-            f"{page_id.lower()}/<str:report_id>",
+            f"{str(page_id).lower()}/<str:report_id>",
             views.UploadPageView.as_view(),
             name=page_id,
         )
@@ -68,7 +68,7 @@ for page_id in upload_page_ids:
 for page_id in removable_file_page_ids:
     urlpatterns.append(
         path(
-            f"delete-{page_id.lower()}/<str:report_id>",
+            f"delete-{str(page_id).lower()}/<str:report_id>",
             views.DeleteFileView.as_view(),
             name=f"delete-{page_id}",
         )
