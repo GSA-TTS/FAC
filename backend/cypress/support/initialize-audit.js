@@ -1,4 +1,4 @@
-import { testValidAccess } from './check-access.js';
+import { accessAndSubmissionPage } from '../pageObjects/check-access.js'
 import { testValidEligibility } from './check-eligibility.js';
 import { testValidAuditeeInfo } from './auditee-info.js';
 import GeneralInfoForm  from '../pageObjects/general-info.js';
@@ -17,7 +17,8 @@ export function testInitializeAudit(isTribal=false) {
   testValidAuditeeInfo();
 
   // Now the accessandsubmission screen
-  testValidAccess();
+  const checkAccessPage = new accessAndSubmissionPage();
+  checkAccessPage.testValidAccess();
 
   // Report should not yet be in the dissemination table
   cy.url().then(url => {

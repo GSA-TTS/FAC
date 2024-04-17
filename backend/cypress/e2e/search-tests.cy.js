@@ -1,4 +1,4 @@
-import searchPage from '../pageObjects/searchPage.js';
+import searchPage from '../pageObjects/search-page.js';
 
 let search;
 let yearsToCheck;
@@ -15,7 +15,7 @@ let majorProgram;
 beforeEach(() => {
   cy.visit('/dissemination/search/');
 
-  cy.fixture('searchPageData/auditYears.json').then((data) => {
+  cy.fixture('searchPageData/audit-years.json').then((data) => {
     yearsToCheck = data.yearsToCheck;
   })
 
@@ -31,7 +31,7 @@ beforeEach(() => {
     name = data.name;
   })
 
-  cy.fixture('searchPageData/accDate.json').then((data) => {
+  cy.fixture('searchPageData/acc-date.json').then((data) => {
     accDate = data.accDate;
   })
 
@@ -43,15 +43,15 @@ beforeEach(() => {
     cogOrover = data.cogOrover;
   })
 
-  cy.fixture('searchPageData/auditFindings.json').then((data) => {
+  cy.fixture('searchPageData/audit-findings.json').then((data) => {
     findings = data.findings;
   })
 
-  cy.fixture('searchPageData/directFunding.json').then((data) => {
+  cy.fixture('searchPageData/direct-funding.json').then((data) => {
     directFunding = data.directFunding;
   })
 
-  cy.fixture('searchPageData/majorProgram.json').then((data) => {
+  cy.fixture('searchPageData/major-program.json').then((data) => {
     majorProgram = data.majorProgram;
   })
 
