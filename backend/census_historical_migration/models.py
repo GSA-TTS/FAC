@@ -393,6 +393,10 @@ class ELECAUDITS(models.Model):
 
     CFDAPROGRAMNAME = models.TextField(blank=True, null=True)
 
+    UEI = models.TextField(blank=True, null=True)
+
+    MULTIPLEUEIS = models.TextField(blank=True, null=True)
+
 
 class ELECPASSTHROUGH(models.Model):
     ID = models.TextField(blank=True, null=True)
