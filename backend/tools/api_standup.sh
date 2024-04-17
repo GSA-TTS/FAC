@@ -22,7 +22,8 @@ function api_standup {
 
     startup_log "API_STANDUP" "END"
 
-    result=$((($d1 + $d2) + $d3))
+    r1=$(($d1+$d2))
+    result=$(($r1+$d3))
     # If these are all zero, we're all good.
     return $result
 }
