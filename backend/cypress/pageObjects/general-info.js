@@ -51,7 +51,6 @@ class GeneralInfoForm {
         this.multipleUEIsYesLabel = 'label[for=multiple-ueis-yes]';
         this.secondaryAuditorsField = 'label[for=secondary_auditors-yes]';
     }
-    
 
     selectAuditTypeAndPeriod() {
         cy.get(this.auditTypeSingle).click();
