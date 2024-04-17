@@ -94,9 +94,6 @@ class GeneralInfoForm {
         cy.get(this.continueButton).click();
         cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
     }
-    
-    
 }
-
 
 export default GeneralInfoForm;
