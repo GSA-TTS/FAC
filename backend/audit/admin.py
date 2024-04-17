@@ -30,6 +30,8 @@ class SACAdmin(admin.ModelAdmin):
     list_filter = [
         "cognizant_agency",
         "oversight_agency",
+        "oversight_agency",
+        "submission_status",
     ]
     readonly_fields = ("submitted_by",)
     search_fields = ("general_information__auditee_uei", "report_id")
