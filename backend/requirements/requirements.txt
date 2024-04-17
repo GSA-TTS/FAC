@@ -80,13 +80,16 @@ furl==2.1.3
     # via cfenv
 future==0.18.3
     # via pyjwkest
-greenlet==2.0.2
+gevent==24.2.1
+    # via gunicorn
+greenlet==3.0.3
     # via
     #   -r requirements/requirements.in
+    #   gevent
     #   sqlalchemy
-gunicorn==21.2.0
+gunicorn[gevent]==21.2.0
     # via -r requirements/requirements.in
-idna==3.4
+idna==3.7
     # via requests
 jmespath==1.0.1
     # via
@@ -124,6 +127,8 @@ peewee==3.17.0
     # via -r requirements/requirements.in
 ply==3.11
     # via jsonpath-ng
+psycogreen==1.0.2
+    # via -r requirements/requirements.in
 psycopg2-binary==2.9.9
     # via -r requirements/requirements.in
 pycparser==2.21
@@ -218,6 +223,10 @@ urllib3==2.0.7
     #   -r requirements/requirements.in
     #   botocore
     #   requests
+zope-event==5.0
+    # via gevent
+zope-interface==6.3
+    # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
