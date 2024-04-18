@@ -54,7 +54,7 @@ DISABLE_AUTH =
 
 For local testing, you may need to specify a few other variables:
 
-* A port other than `9000` for clamav-rest: add `CLAMAV_PORT: {port number}` to your `.env` file.
+* A port other than `9000` for clamav-rest: add `CLAMAV_PORT = {port number}` to your `.env` file.
 * Cypress variables for running local end-to-end tests. See the [testing docs](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md#end-to-end-testing) for more.
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
