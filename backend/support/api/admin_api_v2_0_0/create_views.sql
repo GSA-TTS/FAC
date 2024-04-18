@@ -110,6 +110,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecauditfindings AS
         eaf."PRIORFINDINGREFNUMS"
     FROM 
         public.census_historical_migration_elecauditfindings eaf
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY eaf.id
 ;    
 
@@ -126,6 +128,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecauditheader_ims AS
         eahi."IMAGE_EXISTS"
     FROM
         public.census_historical_migration_elecauditheader_ims eahi
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         eahi.id
 ;
@@ -228,6 +232,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecauditheader AS
         eah."CPACOUNTRY"
     FROM
         public.census_historical_migration_elecauditheader eah
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         eah.id
 ;
@@ -272,6 +278,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecaudits AS
         ea."MULTIPLEUEIS"
     FROM
         public.census_historical_migration_elecaudits ea
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         ea.id
 ;
@@ -290,6 +298,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.eleccaptext AS
         ect."MULTIPLEUEIS"
     FROM
         public.census_historical_migration_eleccaptext ect
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         ect.id
 ;
@@ -315,6 +325,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.eleccpas AS
         ecpa."CPAEIN"
     FROM
         public.census_historical_migration_eleccpas ecpa
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         ecpa.id
 ;
@@ -330,6 +342,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.eleceins as
         eein."DUNSEQNUM"
     FROM
         public.census_historical_migration_eleceins eein
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         eein.id
 ;
@@ -348,6 +362,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecfindingstext AS
         eft."MULTIPLEUEIS"
     FROM
         public.census_historical_migration_elecfindingstext eft
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         eft.id
 ;
@@ -368,6 +384,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecnotes AS
         en."MULTIPLEUEIS"
     FROM
         public.census_historical_migration_elecnotes en
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         en.id
 ;
@@ -382,6 +400,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecpassthrough AS
         ep."PASSTHROUGHID"
     FROM
         public.census_historical_migration_elecpassthrough ep
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         ep.id
 ;
@@ -411,6 +431,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecrpt_revisions AS
         err."OTHER_EXPLAIN"
     FROM
         public.census_historical_migration_elecrpt_revisions err
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         err.id
 ;
@@ -426,6 +448,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecueis AS
         euei."SEQNUM"
     FROM
         public.census_historical_migration_elecueis euei
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         euei.id
 ; 
@@ -440,6 +464,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.federalagencylookup AS
         fal."ENDEXT"
     FROM
         public.census_historical_migration_federalagencylookup fal
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
         fal.id
 ; 
