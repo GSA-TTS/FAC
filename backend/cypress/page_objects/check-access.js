@@ -6,7 +6,7 @@ export class accessAndSubmissionPage {
             '#auditee_contacts_fullname', '#auditee_contacts_email', '#auditee_contacts_re_email',
             '#auditor_contacts_fullname', '#auditor_contacts_email', '#auditor_contacts_re_email',
         ];
-    }
+    };
 
     addValidInfo(field) {
         const fieldType = field.split('_').pop();
@@ -16,7 +16,7 @@ export class accessAndSubmissionPage {
             .clear()
             .type(fieldType === 'email' ? email : 'Percy A. Person')
             .blur();
-    }
+    };
 
     testValidAccess() {
         this.accessFields.forEach((field) => {
@@ -24,6 +24,6 @@ export class accessAndSubmissionPage {
         });
         cy.get('.usa-button').contains('Save and create').click();
         cy.url().should('contains', '/report_submission/general-information/');
-    }
-}
+    };
+};
 export default accessAndSubmissionPage;

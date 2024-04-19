@@ -51,8 +51,7 @@ function grantTribalAccess(email, user_id) {
     expect(response.body.result).to.equal("success");
   });
   console.log(`Granted access to ${email} and ${user_id}`)
-
-}
+};
 
 function revokeTribalAccess(email, user_id, requireSuccess) {
   // use admin user to revoke tribal access to user
@@ -74,8 +73,7 @@ function revokeTribalAccess(email, user_id, requireSuccess) {
     }
   });
   console.log(`Revoked access for ${email} and ${user_id}`)
-
-}
+};
 
 
 // We're testing a 2x2. Actually, this would be better as a table, as this is a 3D test.
@@ -174,7 +172,6 @@ export function testSubmissionAccess(reportId, isTribal, isPublic) {
       testWithUnprivilegedKey(reportId, ep, 1);
       testWithPrivilegedKey(reportId, ep, 1);
     }
-
     // To *not* find the report id in private endpoints
     // when we have an unprivileged key, but we should
     // find it there when we have a privileged key.
@@ -212,8 +209,8 @@ export function testSubmissionAccess(reportId, isTribal, isPublic) {
     // We really should never be here.
     console.log("The universe broke in testTribalAccess");
     expect(false).to.be.true;
-  }
-}
+  };
+};
 
 export function testWithUnprivilegedKey(reportId, endpoint, expected_length) {
   console.log(`unpriv reportId: ${reportId}, endpoint: ${endpoint}, len: ${expected_length}`)
@@ -232,8 +229,8 @@ export function testWithUnprivilegedKey(reportId, endpoint, expected_length) {
       const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
       expect(Boolean(hasAgency)).to.be.true;  
       });  
-  }
-}
+  };
+};
 
 export function testWithPrivilegedKey(reportId, endpoint, expected_length) {
   console.log(`priv reportId: ${reportId}, endpoint: ${endpoint}, len: ${expected_length}`)
@@ -255,7 +252,7 @@ export function testWithPrivilegedKey(reportId, endpoint, expected_length) {
       const hasAgency = response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency;
       expect(Boolean(hasAgency)).to.be.true;  
       });  
-  }
+  };
   revokeTribalAccess(API_GOV_USER_EMAIL, API_GOV_USER_ID, true);
-}
+};
 

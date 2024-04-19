@@ -1,6 +1,4 @@
 import genInfoData from '../fixtures/gen_info_data/gen-info-data.json';
-
-
 class GeneralInfoForm {
     constructor() {
         this.auditTypeSingle = 'label[for=single-audit]';
@@ -32,14 +30,13 @@ class GeneralInfoForm {
         this.auditeeUEI = '#auditee_uei';
         this.multipleUEIsYesLabel = 'label[for=multiple-ueis-yes]';
         this.secondaryAuditorsField = 'label[for=secondary_auditors-yes]';
-    }
-
+    };
 
     selectAuditTypeAndPeriod() {
         cy.get(this.auditTypeSingle).click();
 
         cy.get(this.auditPeriodAnnual).click();
-    }
+    };
 
     fillAuditeeInformation() {
         cy.get(this.auditeeNameField).type(genInfoData.auditeeNameField);
@@ -55,7 +52,7 @@ class GeneralInfoForm {
         cy.get(this.auditeePhoneField).type(genInfoData.auditeePhoneField);
         cy.get(this.auditeeEmailField).type(genInfoData.auditeeEmailField);
         cy.get(this.multipleUEIsYesLabel).click();
-    }
+    };
 
     fillAuditorInformation() {
         cy.get(this.auditorEINField).type(genInfoData.auditorEINField);
@@ -69,16 +66,14 @@ class GeneralInfoForm {
         cy.get(this.auditorContactTitleField).type(genInfoData.auditorContactTitleField);
         cy.get(this.auditorPhoneField).type(genInfoData.auditorPhoneField);
         cy.get(this.auditorEmailField).type(genInfoData.auditorEmailField);
-        cy.get(this.secondaryAuditorsField).click();
+      ;  cy.get(this.secondaryAuditorsField).click();
     }
 
     clickContinueButton() {
         cy.get(this.continueButton).click();
         cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
-    }
-
-
-}
+    };
+};
 
 
 export default GeneralInfoForm;

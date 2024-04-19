@@ -38,4 +38,4 @@ export function testLoginGovLogin(
     }
   );
   cy.url().should('match', /\/audit\/$/);
-}
+};

@@ -36,15 +36,14 @@ beforeEach(() => {
   entityType = searchData.entityType;
   passthroughName = searchData.passthroughName;
   reportId = searchData.reportId;
-
-
+  
   search = new searchPage();
 });
 
 //basic search test
 describe('Test Basic Search Fields', () => {
 
-  it('checks Audit Years', () => {
+  it('Submits search page with filled-out fields', () => {
     //audit years
     search.checkAuditYearCheckbox('2023');
     search.uncheckAuditYearCheckbox('2023');
@@ -80,14 +79,13 @@ describe('Test Basic Search Fields', () => {
 
     //summary report
     search.testSummaryReport();
-
   });
 });
 
 //advanced search test
 describe('Test Advance Search Fields', () => {
 
-  it('checks Audit Years', () => {
+  it('Submits search page with advanced filled-out fields', () => {
     //advanceSearchButton
     search.testAdvSearch();
 
@@ -149,8 +147,6 @@ describe('Test Advance Search Fields', () => {
 
     //summary report
     search.testSummaryReport();
-
-
   });
 });
 

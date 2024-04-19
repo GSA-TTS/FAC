@@ -10,7 +10,6 @@ export function testPdfAuditReport() {
   cy.get('#schedule_findings').type(1);
   cy.get('#schedule_prior_findings').type(1);
   cy.get('#CAP_page').type(1);
-
   cy.get('#upload_report').selectFile('cypress/fixtures/basic.pdf');
   cy.get('#continue').click(); // Performs upload and return to main page
-}
+};

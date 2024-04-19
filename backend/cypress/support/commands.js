@@ -32,8 +32,8 @@ require('cypress-downloadfile/lib/downloadFileCommand');
 
 Cypress.Commands.add('login', () => {
   testLoginGovLogin();
-})
+});
 
 Cypress.Commands.add('logout',() => {
   testLogoutGov();
-})
+});

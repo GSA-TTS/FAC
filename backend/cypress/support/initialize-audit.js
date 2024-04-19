@@ -34,4 +34,4 @@ export function testInitializeAudit(isTribal=false) {
   generalInfoForm.fillAuditeeInformation();
   generalInfoForm.fillAuditorInformation();
   generalInfoForm.clickContinueButton();
-}
+};

@@ -21,4 +21,4 @@ export function testValidAuditeeInfo() {
 
   // and assert on the URL we end up at
   cy.url().should('match', /\/report_submission\/accessandsubmission\/$/);
-}
+};
