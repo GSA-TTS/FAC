@@ -1,4 +1,4 @@
-  ---
+---
 name: Trivy Scan
 on:
   workflow_dispatch:
