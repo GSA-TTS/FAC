@@ -79,8 +79,9 @@ services:
     environment:
       MAX_FILE_SIZE: 30M
       SIGNATURE_CHECKS: 1
+      PORT: ${CLAMAV_PORT:-9000}
     ports:
-      - "9000:9000"
+      - ${CLAMAV_PORT:-9000:9000}
 
   #---------------------------------------------
   # Minio (S3 clone)
