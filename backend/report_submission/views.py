@@ -340,6 +340,10 @@ class UploadPageView(LoginRequiredMixin, View):
                     f"audit:{SN[NC.FINDINGS_UNIFORM_GUIDANCE].camel_case}",
                     args=[report_id],
                 ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.FINDINGS_UNIFORM_GUIDANCE].url_tail}",
+                    args=[report_id],
+                ),
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
@@ -352,6 +356,10 @@ class UploadPageView(LoginRequiredMixin, View):
                 "workbook_url": workbook_base_url + "audit-findings-text-workbook.xlsx",
                 "existing_workbook_url": reverse(
                     f"audit:{SN[NC.FINDINGS_TEXT].camel_case}", args=[report_id]
+                ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.FINDINGS_TEXT].url_tail}",
+                    args=[report_id],
                 ),
             },
             "cap": {
@@ -367,6 +375,10 @@ class UploadPageView(LoginRequiredMixin, View):
                     f"audit:{SN[NC.CORRECTIVE_ACTION_PLAN].camel_case}",
                     args=[report_id],
                 ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.CORRECTIVE_ACTION_PLAN].url_tail.upper()}",
+                    args=[report_id],
+                ),
             },
             "additional-ueis": {
                 "view_id": "additional-ueis",
@@ -378,6 +390,10 @@ class UploadPageView(LoginRequiredMixin, View):
                 "existing_workbook_url": reverse(
                     "audit:AdditionalUeis", args=[report_id]
                 ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.ADDITIONAL_UEIS].url_tail}",
+                    args=[report_id],
+                ),
             },
             "secondary-auditors": {
                 "view_id": "secondary-auditors",
@@ -387,9 +403,13 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions_url": instructions_base_url
                 + "secondary-auditors-workbook/",
                 "workbook_url": workbook_base_url + "secondary-auditors-workbook.xlsx",
-                # below URL handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
+                # below URLs handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
                 "existing_workbook_url": reverse(
                     f"audit:{SN[NC.SECONDARY_AUDITORS].camel_case}", args=[report_id]
+                ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.SECONDARY_AUDITORS].url_tail}",
+                    args=[report_id],
                 ),
             },
             "additional-eins": {
@@ -399,9 +419,13 @@ class UploadPageView(LoginRequiredMixin, View):
                 "DB_id": SN[NC.ADDITIONAL_EINS].snake_case,
                 "instructions_url": instructions_base_url + "additional-eins-workbook/",
                 "workbook_url": workbook_base_url + "additional-eins-workbook.xlsx",
-                # below URL handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
+                # below URLs handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
                 "existing_workbook_url": reverse(
                     "audit:AdditionalEins", args=[report_id]
+                ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.ADDITIONAL_EINS].url_tail}",
+                    args=[report_id],
                 ),
             },
         }
