@@ -33,8 +33,9 @@
                         </button>
                         <ul id="basic-nav-search" class="usa-nav__submenu">
                             <li class="usa-nav__submenu-item">
-                                <a href="{% url 'dissemination:Search' %}"
-                                   target="_blank">Search</a>
+                                <a href="{% url 'dissemination:Search' %}">
+                                    Search
+                                </a>
                             </li>
                             <li class="usa-nav__submenu-item">
                                 <a href="{{ STATIC_SITE_URL }}search-resources/"
@@ -61,6 +62,11 @@
                             <li class="usa-nav__submenu-item">
                                 <a href="{{ STATIC_SITE_URL }}audit-resources/"
                                    target="_blank">Submission resources</a>
+                            </li>
+                            <li class="usa-nav__submenu-item">
+                                <a href="{% url 'audit:MySubmissions' %}">
+                                    Submission home
+                                </a>
                             </li>
                         </ul>
                     </li>

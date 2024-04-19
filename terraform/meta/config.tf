@@ -30,7 +30,6 @@ locals {
     "daniel.swick@gsa.gov",
     "alexander.steel@gsa.gov",
     "sudha.kumar@gsa.gov",
-    "purvin.patel@gsa.gov",
     "philip.dominguez@gsa.gov",
   ]
 
