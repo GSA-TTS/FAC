@@ -1,4 +1,5 @@
-import searchPage from '../pageObjects/search-page.js';
+import searchPage from '../page_objects/search-page.js';
+import searchData from '../fixtures/search_page_data/search_data.json'
 
 let search;
 let yearsToCheck;
@@ -11,49 +12,31 @@ let cogOrover;
 let findings;
 let directFunding;
 let majorProgram;
+let fiscalYearEndMonth;
+let typeRequirement;
+let entityType;
+let passthroughName;
+let reportId;
 
 beforeEach(() => {
   cy.visit('/dissemination/search/');
 
-  cy.fixture('searchPageData/audit-years.json').then((data) => {
-    yearsToCheck = data.yearsToCheck;
-  })
+  yearsToCheck = searchData.yearsToCheck;
+  ueiOrein = searchData.ueiOrein;
+  aln = searchData.aln;
+  name = searchData.name;
+  accDate = searchData.accDate;
+  state = searchData.state;
+  cogOrover = searchData.cogOrover;
+  findings = searchData.findings;
+  directFunding = searchData.directFunding;
+  majorProgram = searchData.majorProgram;
+  fiscalYearEndMonth = searchData.fiscalYearEndMonth;
+  typeRequirement = searchData.typeRequirement;
+  entityType = searchData.entityType;
+  passthroughName = searchData.passthroughName;
+  reportId = searchData.reportId;
 
-  cy.fixture('searchPageData/uei-ein.json').then((data) => {
-    ueiOrein = data.ueiOrein;
-  })
-
-  cy.fixture('searchPageData/aln.json').then((data) => {
-    aln = data.aln;
-  })
-
-  cy.fixture('searchPageData/name.json').then((data) => {
-    name = data.name;
-  })
-
-  cy.fixture('searchPageData/acc-date.json').then((data) => {
-    accDate = data.accDate;
-  })
-
-  cy.fixture('searchPageData/state.json').then((data) => {
-    state = data.state;
-  })
-
-  cy.fixture('searchPageData/cog-over.json').then((data) => {
-    cogOrover = data.cogOrover;
-  })
-
-  cy.fixture('searchPageData/audit-findings.json').then((data) => {
-    findings = data.findings;
-  })
-
-  cy.fixture('searchPageData/direct-funding.json').then((data) => {
-    directFunding = data.directFunding;
-  })
-
-  cy.fixture('searchPageData/major-program.json').then((data) => {
-    majorProgram = data.majorProgram;
-  })
 
   search = new searchPage();
 });
@@ -80,6 +63,15 @@ describe('Test Basic Search Fields', () => {
     //state
     search.testState(state);
 
+    //fyEndMonth
+    search.openAndSelectFyEndMonth(fiscalYearEndMonth);
+
+    //entityType
+    search.openAndSelectEntityTypeCheckbox(entityType);
+
+    //reportID
+    search.testReportId(reportId);
+
     //submit button
     search.testSearchSubmitButton();
 
@@ -90,67 +82,75 @@ describe('Test Basic Search Fields', () => {
     search.testSummaryReport();
 
   });
-
-
 });
 
 //advanced search test
-// describe('Test Advance Search Fields', () => {
+describe('Test Advance Search Fields', () => {
 
-//   it('checks Audit Years', () => {
-//     //advanceSearchButton
-//     search.testAdvSearch();
+  it('checks Audit Years', () => {
+    //advanceSearchButton
+    search.testAdvSearch();
 
-//     //audit years
-//     search.checkAuditYearCheckbox('2023');
-//     search.uncheckAuditYearCheckbox('2023');
-//     search.checkAllYearsCheckbox('all_years');
+    //audit years
+    search.checkAuditYearCheckbox('2023');
+    search.uncheckAuditYearCheckbox('2023');
+    search.checkAllYearsCheckbox('all_years');
 
-//     //ueiORein
-//     search.testUEIorEin(ueiOrein);
-//     search.testALN(aln);
-//     search.testName(name);
+    //ueiORein
+    search.testUEIorEin(ueiOrein);
+    search.testALN(aln);
+    search.testName(name);
 
-//     //facAcceptanceDate
-//     const [startDate, endDate] = accDate;
-//     search.testFACacceptanceDate(startDate, endDate);
+    //facAcceptanceDate
+    const [startDate, endDate] = accDate;
+    search.testFACacceptanceDate(startDate, endDate);
 
-//     //state
-//     search.testState(state);
+    //state
+    search.testState(state);
 
-//     //cogORover
-//     const [cog, over] = cogOrover;
-//     search.testCogorOver(over);
+    //fyEndMonth
+    search.openAndSelectFyEndMonth(fiscalYearEndMonth);
 
-//     //findings
-//     search.openFindingsAccordion();
-//     findings.forEach((findings) => {
-//       search.checkAuditFindingsCheckbox(findings);
-//     });
+    //typeRequirement
+    search.testTypeRequirement(typeRequirement);
 
-//     //directFunding
-//     search.openDirectFundingAccordion();
-//     directFunding.forEach((funding) => {
-//       search.checkDirectFundingCheckbox(funding);
-//     });
+    //entityType
+    search.openAndSelectEntityTypeCheckbox(entityType);
 
-//     //majorProgram
-//     search.openMajorProgramAccordion();
-//     const [T, F] = majorProgram;
-//     search.checkMajorProgramRadio(T);
+    //reportID
+    search.testReportId(reportId);
 
-//     //submit button
-//     search.testSearchSubmitButton();
+    //cogORover
+    const [either, cog, over] = cogOrover;
+    search.testCogorOver(either);
 
-//     //search results
-//     search.testSearchTable();
+    //findings
+    search.openFindingsAccordion();
+    findings.forEach((findings) => {
+      search.checkAuditFindingsCheckbox(findings);
+    });
 
-//     //summary report
-//     search.testSummaryReport();
+    //directFunding
+    search.openDirectFundingAccordion();
+    directFunding.forEach((funding) => {
+      search.checkDirectFundingCheckbox(funding);
+    });
+
+    //majorProgram
+    search.openMajorProgramAccordion();
+    const [T, F] = majorProgram;
+    search.checkMajorProgramRadio(T);
+
+    //submit button
+    search.testSearchSubmitButton();
+
+    //search results
+    search.testSearchTable();
+
+    //summary report
+    search.testSummaryReport();
 
 
-//   });
-
-
-// });
+  });
+});
 

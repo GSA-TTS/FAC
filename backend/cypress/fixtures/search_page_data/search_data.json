@@ -1,0 +1,49 @@
+{
+    "accDate": [
+        "04/01/2024",
+        "04/30/2024"
+    ],
+    "aln": "93",
+    "findings": [
+        "all_findings",
+        "is_modified_opinion",
+        "is_other_findings",
+        "is_material_weakness",
+        "is_significant_deficiency",
+        "is_other_matters",
+        "is_questioned_costs",
+        "is_repeat_finding"
+    ],
+    "yearsToCheck": [
+        "all_years",
+        "2023",
+        "2022",
+        "2021",
+        "2020",
+        "2019",
+        "2018",
+        "2017",
+        "2016"
+    ],
+    "cogOrover": [
+        "either",
+        "cog",
+        "oversight"
+    ],
+    "directFunding": [
+        "direct_funding",
+        "passthrough_funding"
+    ],
+    "majorProgram": [
+        "True",
+        "False"
+    ],
+    "name": "Audit McAuditee",
+    "state": "VA",
+    "ueiOrein": "D7A4J33FUMJ1",
+    "fiscalYearEndMonth": "12",
+    "typeRequirement": "A",
+    "entityType": "tribal",
+    "passthroughName": "SDE",
+    "reportId": "2022-12-GSAFAC-0000000001"
+}

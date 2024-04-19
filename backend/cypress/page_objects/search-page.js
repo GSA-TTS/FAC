@@ -3,7 +3,7 @@ class searchPage {
         this.auditYearCheckbox = '#audit-year input[type="checkbox"]';
         //define a function 'yearCheckboxById' that takes a 'year' argument. Using a dynamic selector.
         this.yearCheckboxById = (year) => (year.toLowerCase() === 'all_years' ? '#audit-year [id^="audit-year-"]' : `#audit-year-${year}`);
-        this.accordionButton = '.usa-accordion__button';
+        this.accordionBtn = '.usa-accordion__button';
         this.ueiOrEinField = '#uei-or-ein';
         this.alnField = '#aln';
         this.entityNameField = '#entity-name';
@@ -11,21 +11,30 @@ class searchPage {
         this.endDateField = '#end-date';
         this.auditeeState = '#auditee_state';
         this.optionsField = '#options';
-        this.findingsAccordionButton = '.usa-accordion__button:contains("Audit findings")';
+        this.findingsAccordionBtn = '.usa-accordion__button:contains("Audit findings")';
         this.auditFindingsCheckbox = '#usa-checkbox__input[value="${value}"]';
         this.findingsCheckboxId = (findings) => `.usa-checkbox__input[value="${findings.toLowerCase()}"]`;
-        this.directFundingAccordionButton = '.usa-accordion__button:contains("Direct funding")';
+        this.directFundingAccordionBtn = '.usa-accordion__button:contains("Direct funding")';
         this.directFundingCheckbox = '#usa-checkbox__input[value="${value}"]';
         this.directFundingCheckboxId = (funding) => `.usa-checkbox__input[value="${funding.toLowerCase()}"]`;
-        this.majorProgramAccordionButton = '.usa-accordion__button:contains("Major program")';
+        this.majorProgramAccordionBtn = '.usa-accordion__button:contains("Major program")';
         this.majorProgramRadio = '.usa-radio__input[name="major_program"]';
-        this.searchSubmitButton = 'input.usa-button[type="submit"][value="Search"]';
+        this.searchSubmitBtn = 'input.usa-button[type="submit"][value="Search"]';
         this.searchTable = '.usa-table';
-        this.advanceSearchBtn = 'a[href="advanced/"]';
+        this.advanceSearchBtn = 'a[href="/dissemination/search/advanced/"]';
         //summaryReport
         this.sfSacDownloadBtn = 'a.usa-button p:contains("SF-SAC")';
         this.singleAuditBtn = 'a.usa-button p:contains("Single audit report")';
-
+        this.fiscalYearEndMonthBtn = '.usa-accordion__button:contains("Fiscal year end month")';
+        this.typeRequirementBtn = '.usa-accordion__button:contains("Type Requirement")';
+        this.typeRequirementField = '#type-requirement-input';
+        this.entityTypeBtn = '.usa-accordion__button:contains("Entity type")';
+        this.passThroughName = '.usa-accordion__button:contains("Passthrough Name")';
+        this.reportId = '.usa-accordion__button:contains("Report ID")';
+        this.fyEndMonth = '#fy_end_month';
+        this.entityTypeCheckboxId = (entity) => `.usa-checkbox__input[value="${entity}"]`;
+        this.reportdIdAccordionBtn = '.usa-accordion__button:contains("Report ID")';
+        this.reportIdField = '#report-id';
     }
 
     checkAuditYearCheckbox(year) {
@@ -46,38 +55,33 @@ class searchPage {
     }
 
     testALN(value) {
-        cy.get(this.accordionButton).contains('Assistance Listing Number (formerly CFDA').as('accordionButton').click();
+        cy.get(this.accordionBtn).contains('Assistance Listing Number (formerly CFDA').as('accordionButton').click();
         cy.get(this.alnField).clear().type(value);
     }
 
     testName(value) {
-        cy.get(this.accordionButton).contains('Name (Entity, Auditee, or Auditor)').as('accordionButton').click();
+        cy.get(this.accordionBtn).contains('Name (Entity, Auditee, or Auditor)').as('accordionButton').click();
         cy.get(this.entityNameField).clear().type(value);
     }
 
     testFACacceptanceDate(startDate, endDate) {
-        cy.get(this.accordionButton).contains('FAC acceptance date').as('accordionButton').click();
+        cy.get(this.accordionBtn).contains('FAC acceptance date').as('accordionButton').click();
         cy.get(this.startDateField).clear().type(startDate);
         cy.get(this.endDateField).clear().type(endDate);
     }
 
     testState(value) {
-        cy.get(this.accordionButton).contains('State').as('accordionButton').click();
+        cy.get(this.accordionBtn).contains('State').as('accordionButton').click();
         cy.get(this.auditeeState).select(value);
     }
 
     testCogorOver(value) {
-        cy.get(this.accordionButton).contains('Cognizant or Oversight').as('accordionButton').click();
-        cy.get(this.optionsField).select(value);
-    }
-
-    testCogorOver(value) {
-        cy.get(this.accordionButton).contains('Cognizant or Oversight').as('accordionButton').click();
+        cy.get(this.accordionBtn).contains('Cognizant or Oversight').as('accordionButton').click();
         cy.get(this.optionsField).select(value);
     }
 
     openFindingsAccordion() {
-        cy.get(this.findingsAccordionButton).as('accordionButton').click();
+        cy.get(this.findingsAccordionBtn).as('accordionButton').click();
     }
 
     checkAuditFindingsCheckbox(findings) {
@@ -89,7 +93,7 @@ class searchPage {
     }
 
     openDirectFundingAccordion() {
-        cy.get(this.directFundingAccordionButton).as('accordionButton').click();
+        cy.get(this.directFundingAccordionBtn).as('accordionButton').click();
     }
 
     checkDirectFundingCheckbox(funding) {
@@ -101,7 +105,7 @@ class searchPage {
     }
 
     openMajorProgramAccordion() {
-        cy.get(this.majorProgramAccordionButton).as('accordionButton').click();
+        cy.get(this.majorProgramAccordionBtn).as('accordionButton').click();
     }
 
     checkMajorProgramRadio(value) {
@@ -112,8 +116,28 @@ class searchPage {
         cy.get(`${this.majorProgramRadio}[value="${value}"]`).check({ force: true }).should('be.checked').and('have.value', value);
     }
 
+    openAndSelectFyEndMonth(value) {
+        cy.get(this.fiscalYearEndMonthBtn).as('accordionButton').click();
+        cy.get(this.fyEndMonth).select(value);
+    }
+
+    openAndSelectEntityTypeCheckbox(entity) {
+        cy.get(this.entityTypeBtn).as('accordionButton').click();
+        cy.get(this.entityTypeCheckboxId(entity)).check({ force: true }).should('be.checked').and('have.value', entity);
+    }
+
+    testReportId(value) {
+        cy.get(this.reportdIdAccordionBtn).as('accordionButton').click();
+        cy.get(this.reportIdField).clear().type(value);
+    }
+
+    testTypeRequirement(value) {
+        cy.get(this.typeRequirementBtn).as('accordionButton').click();
+        cy.get(this.typeRequirementField).clear().type(value);
+    }
+
     testSearchSubmitButton() {
-        cy.get(`${this.searchSubmitButton}:last`).click();
+        cy.get(`${this.searchSubmitBtn}:last`).click();
     }
 
     testSearchTable() {
@@ -137,6 +161,7 @@ class searchPage {
             const reportId = url.split('/').pop();
             cy.url().should('include', `/dissemination/summary/${reportId}`);
             cy.get(this.sfSacDownloadBtn).should('exist').click();
+            //single audit report pdf may not appear for certain audits
             //cy.get(this.singleAuditBtn).should('exist').click();
             cy.wait(5000);
             this.testSfSacDownload(url);

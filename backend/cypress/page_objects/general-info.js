@@ -1,4 +1,4 @@
-import genInfoData from '../fixtures/genInfoData/genInfoData.json';
+import genInfoData from '../fixtures/gen_info_data/gen-info-data.json';
 
 
 class GeneralInfoForm {

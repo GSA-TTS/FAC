@@ -1,7 +1,7 @@
-import { accessAndSubmissionPage } from '../pageObjects/check-access.js'
+import { accessAndSubmissionPage } from '../page_objects/check-access.js'
 import { testValidEligibility } from './check-eligibility.js';
 import { testValidAuditeeInfo } from './auditee-info.js';
-import GeneralInfoForm  from '../pageObjects/general-info.js';
+import GeneralInfoForm  from '../page_objects/general-info.js';
 import { testWithUnprivilegedKey } from './dissemination-table.js';
 
 export function testInitializeAudit(isTribal=false) {
