@@ -780,7 +780,9 @@ def add_messages_to_request(request):
 class DeleteFileViewTest(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.create_user(username="user", password="password")
+        self.user = User.objects.create_user(
+            username="user", password="password"
+        )  # nosec
         self.view = DeleteFileView()
         self.report_id = "12345"
         self.path_name = "delete-audit-findings"
