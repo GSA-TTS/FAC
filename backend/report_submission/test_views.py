@@ -780,7 +780,7 @@ class TestRemoveExtraFields(TestCase):
         self.assertNotIn("auditor_international_address", result)
 
     def test_remove_usa_address_fields_for_non_usa_without_usa_address_fields(self):
-        # Non provided fields are returned as empty strings from the form 
+        # Non provided fields are returned as empty strings from the form
         self.data["auditor_address_line_1"] = ""
         self.data["auditor_city"] = ""
         self.data["auditor_state"] = ""
