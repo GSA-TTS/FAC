@@ -199,6 +199,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             form = self._wipe_auditor_address(form)
             form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
+            form.cleaned_data = self.remove_extra_fields(form.cleaned_data)
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
             validated = validate_general_information_json(general_information, False)
@@ -254,6 +255,35 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             return datetime.strptime(date_str, "%Y-%m-%d").strftime("%m/%d/%Y")
         except ValueError:
             return date_str
+
+    def remove_extra_fields(self, data):
+        """Remove unnecessary fields. This function only removes empty fields.
+        Non empty fields are validated against the schema in the next step."""
+        # Remove unnecessary fields based on auditor_country and auditor_international_address
+        # If USA is selected and auditor_international_address is not provided, remove the international address field
+        if (
+            data["auditor_country"] == "USA"
+            and not data["auditor_international_address"]
+        ):
+            data.pop("auditor_international_address")
+        # If non-USA is selected and auditor_international_address is provided, and USA address fields are not provided, remove the empty USA address fields
+        elif data["auditor_country"] != "USA" and data["auditor_international_address"]:
+            if not data["auditor_address_line_1"]:
+                data.pop("auditor_address_line_1")
+            if not data["auditor_city"]:
+                data.pop("auditor_city")
+            if not data["auditor_state"]:
+                data.pop("auditor_state")
+            if not data["auditor_zip"]:
+                data.pop("auditor_zip")
+        # Remove unnecessary fields based on audit_period_covered
+        # If audit_period_covered is not "other" and audit_period_other_months is not provided, remove the audit_period_other_months field
+        if (
+            data["audit_period_covered"] != "other"
+            and not data["audit_period_other_months"]
+        ):
+            data.pop("audit_period_other_months")
+        return data
 
     def _dates_to_hyphens(self, data):
         """
