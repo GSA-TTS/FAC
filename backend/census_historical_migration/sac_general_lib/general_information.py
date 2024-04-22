@@ -160,6 +160,14 @@ def xform_update_multiple_ueis_flag(audit_header):
         audit_header.MULTIPLEUEIS = "Y" if ueis else "N"
 
 
+def xform_update_entity_type(audit_header):
+    """Updates ENTITY_TYPE.
+    This updates does not propagate to the database, it only updates the object.
+    """
+    if audit_header.ENTITY_TYPE == "":
+        audit_header.ENTITY_TYPE = "tribal" if audit_header.SUPPRESSION_CODE.upper() == "IT" else "unknown"
+
+
 def _period_covered(s):
     """Helper to transform the period covered from Census format to FAC format."""
     if s not in PERIOD_DICT:
@@ -342,6 +350,7 @@ def general_information(audit_header):
     """Generates general information JSON."""
     xform_update_multiple_eins_flag(audit_header)
     xform_update_multiple_ueis_flag(audit_header)
+    xform_update_entity_type(audit_header)
     general_information = create_json_from_db_object(audit_header, mappings)
     transformations = [
         xform_auditee_fiscal_period_start,
