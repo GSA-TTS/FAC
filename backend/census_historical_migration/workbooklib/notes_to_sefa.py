@@ -168,8 +168,8 @@ def _get_notes(dbkey, year):
 
 
 def xform_missing_notes_records(audit_header, policies_content, rate_content):
-    """Transforms missing notes records for 2016, 2017, and 2018 audits."""
-    if string_to_string(audit_header.AUDITYEAR) in ["2018", "2017", "2016"] and not (
+    """Transforms missing notes records for 2022, 2021, 2020, 2019, 2016, 2017 and 2018 audits."""
+    if string_to_string(audit_header.AUDITYEAR) in ["2022", "2021", "2020", "2019", "2018", "2017", "2016"] and not (
         policies_content or rate_content
     ):
         policies_content = settings.GSA_MIGRATION
