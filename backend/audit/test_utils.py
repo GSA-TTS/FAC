@@ -36,4 +36,3 @@ class TestRemoveExtraFields(SimpleTestCase):
     def test_remove_audit_period_other_months_when_not_other(self):
         result = Util.remove_extra_fields(self.data)
         self.assertNotIn("audit_period_other_months", result)
-
