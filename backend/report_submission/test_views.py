@@ -6,7 +6,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.conf import settings
 from unittest.mock import patch
-from report_submission.views import GeneralInformationFormView
 from model_bakery import baker
 
 from audit.models import Access, SingleAuditChecklist, SubmissionEvent
@@ -759,55 +758,3 @@ class GeneralInformationFormViewTests(TestCase):
             "GSA_MIGRATION not permitted outside of migrations",
             response.context["errors"],
         )
-
-
-class TestRemoveExtraFields(TestCase):
-    def setUp(self):
-        self.instance = GeneralInformationFormView()
-        self.data = {
-            "auditor_country": "USA",
-            "auditor_address_line_1": "123 Main St",
-            "auditor_city": "Anytown",
-            "auditor_state": "CA",
-            "auditor_zip": "90210",
-            "auditor_international_address": "",
-            "audit_period_covered": "biennial",
-            "audit_period_other_months": "",
-        }
-
-    def test_remove_international_address_for_usa_without_address(self):
-        result = self.instance.remove_extra_fields(self.data)
-        self.assertNotIn("auditor_international_address", result)
-
-    def test_remove_usa_address_fields_for_non_usa_without_usa_address_fields(self):
-        # Non provided fields are returned as empty strings from the form
-        self.data["auditor_address_line_1"] = ""
-        self.data["auditor_city"] = ""
-        self.data["auditor_state"] = ""
-        self.data["auditor_zip"] = ""
-        self.data["auditor_country"] = "non-USA"
-        self.data["auditor_international_address"] = "123 International St"
-        result = self.instance.remove_extra_fields(self.data)
-        self.assertNotIn("auditor_zip", result)
-        self.assertNotIn("auditor_state", result)
-        self.assertNotIn("auditor_address_line_1", result)
-        self.assertNotIn("auditor_city", result)
-
-    def test_remove_audit_period_other_months_when_not_other(self):
-        result = self.instance.remove_extra_fields(self.data)
-        self.assertNotIn("audit_period_other_months", result)
-
-    def test_no_field_removed_if_conditions_not_met(self):
-        data = {
-            "auditor_country": "USA",
-            "auditor_international_address": "123 International St",
-            "auditor_address_line_1": "123 Main St",
-            "auditor_city": "Anytown",
-            "auditor_state": "CA",
-            "auditor_zip": "90210",
-            "audit_period_covered": "other",
-            "audit_period_other_months": "January-March",
-        }
-        original_data = data.copy()
-        result = self.instance.remove_extra_fields(data)
-        self.assertEqual(result, original_data)

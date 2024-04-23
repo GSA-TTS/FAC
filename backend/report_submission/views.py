@@ -16,6 +16,7 @@ from audit.cross_validation.submission_progress_check import section_completed_m
 from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
 from audit.validators import validate_general_information_json
 
+from audit.utils import Util
 from config.settings import STATIC_SITE_URL, STATE_ABBREVS
 
 from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
@@ -199,10 +200,15 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             form = self._wipe_auditor_address(form)
             form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
-            form.cleaned_data = self.remove_extra_fields(form.cleaned_data)
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
-            validated = validate_general_information_json(general_information, False)
+            # Remove extra fields based on auditor_country and auditor_international_address and based on audit_period_covered
+            # This patch is necessary to filter out unnecessary empty fields returned by the form.
+            # We need the call here to account for general information sections created before this code change.
+            patched_general_information = Util.remove_extra_fields(general_information)
+            validated = validate_general_information_json(
+                patched_general_information, False
+            )
             sac.general_information = validated
             if general_information.get("audit_type"):
                 sac.audit_type = general_information["audit_type"]
@@ -255,35 +261,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             return datetime.strptime(date_str, "%Y-%m-%d").strftime("%m/%d/%Y")
         except ValueError:
             return date_str
-
-    def remove_extra_fields(self, data):
-        """Remove unnecessary fields. This function only removes empty fields.
-        Non empty fields are validated against the schema in the next step."""
-        # Remove unnecessary fields based on auditor_country and auditor_international_address
-        # If USA is selected and auditor_international_address is not provided, remove the international address field
-        if (
-            data["auditor_country"] == "USA"
-            and not data["auditor_international_address"]
-        ):
-            data.pop("auditor_international_address")
-        # If non-USA is selected and auditor_international_address is provided, and USA address fields are not provided, remove the empty USA address fields
-        elif data["auditor_country"] != "USA" and data["auditor_international_address"]:
-            if not data["auditor_address_line_1"]:
-                data.pop("auditor_address_line_1")
-            if not data["auditor_city"]:
-                data.pop("auditor_city")
-            if not data["auditor_state"]:
-                data.pop("auditor_state")
-            if not data["auditor_zip"]:
-                data.pop("auditor_zip")
-        # Remove unnecessary fields based on audit_period_covered
-        # If audit_period_covered is not "other" and audit_period_other_months is not provided, remove the audit_period_other_months field
-        if (
-            data["audit_period_covered"] != "other"
-            and not data["audit_period_other_months"]
-        ):
-            data.pop("audit_period_other_months")
-        return data
 
     def _dates_to_hyphens(self, data):
         """
