@@ -193,9 +193,23 @@ def transform_missing_note_title_and_content(notes):
     """ Transforms missing note title and note content. """
     for i in range(len(notes)):
         if notes[i].TITLE.strip() == "":
+            track_data_transformation(
+                notes[i].TITLE,
+                settings.GSA_MIGRATION,
+                "transform_missing_note_title_and_content",
+                "note_title",
+            )
             notes[i].TITLE = settings.GSA_MIGRATION
+
         if notes[i].CONTENT.strip() == "":
+            track_data_transformation(
+                notes[i].CONTENT,
+                settings.GSA_MIGRATION,
+                "transform_missing_note_title_and_content",
+                "content",
+            )
             notes[i].CONTENT = settings.GSA_MIGRATION
+
     return notes
 
 
@@ -211,6 +225,7 @@ def generate_notes_to_sefa(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     notes = _get_notes(audit_header.DBKEY, audit_header.AUDITYEAR)
+    notes = transform_missing_note_title_and_content(notes)
     rate_content, index = _get_minimis_cost_rate(
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
@@ -226,8 +241,6 @@ def generate_notes_to_sefa(audit_header, outfile):
     set_range(wb, "rate_explained", [rate_content])
 
     contains_chart_or_tables = [settings.GSA_MIGRATION] * len(notes)
-
-    notes = transform_missing_note_title_and_content(notes)
 
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)
