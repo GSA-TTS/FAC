@@ -189,9 +189,12 @@ def xform_missing_notes_records(audit_header, policies_content, rate_content):
     return policies_content, rate_content
 
 
-def process_missing_note_content(notes):
+def transform_missing_note_title_and_content(notes):
+    """ Transforms missing note title and note content. """
     for i in range(len(notes)):
-        if notes[i].TITLE != "" and notes[i].CONTENT == "":
+        if notes[i].TITLE.strip() == "":
+            notes[i].TITLE = settings.GSA_MIGRATION
+        if notes[i].CONTENT.strip() == "":
             notes[i].CONTENT = settings.GSA_MIGRATION
     return notes
 
@@ -224,7 +227,7 @@ def generate_notes_to_sefa(audit_header, outfile):
 
     contains_chart_or_tables = [settings.GSA_MIGRATION] * len(notes)
 
-    notes = process_missing_note_content(notes)
+    notes = transform_missing_note_title_and_content(notes)
 
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)
