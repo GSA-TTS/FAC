@@ -84,7 +84,7 @@ function resetCheckboxes() {
   Array.from(all_checkboxes).forEach((checkbox) => {
     checkbox.checked = false;
   });
-  if (AY_checkboxes[1]){
+  if (AY_checkboxes[1]) {
     AY_checkboxes[1].checked = true;
   }
 }
