@@ -76,15 +76,17 @@ function attachEventHandlersReset() {
  * Re-check audit year 2023.
  */
 function resetCheckboxes() {
-  var checkboxes = document.querySelectorAll(
+  var all_checkboxes = document.querySelectorAll(
     '[type="checkbox"], [type="radio"]'
   );
-  var audit_year_2023 = document.getElementById('audit-year-2023');
+  var AY_checkboxes = document.querySelectorAll('input[id^=audit-year]');
 
-  Array.from(checkboxes).forEach((checkbox) => {
+  Array.from(all_checkboxes).forEach((checkbox) => {
     checkbox.checked = false;
   });
-  audit_year_2023.checked = true;
+  if (AY_checkboxes[1]){
+    AY_checkboxes[1].checked = true;
+  }
 }
 
 /**
