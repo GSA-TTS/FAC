@@ -38,3 +38,18 @@ variable "disk_quota" {
   description = "disk in MB to allocate to cg-logshipper app instance"
   default     = 512
 }
+
+variable "clamav_id" {
+  type        = string
+  description = "the full string of the clamav api resource id"
+}
+
+variable "s3_id" {
+  type        = string
+  description = "the full string of the s3 resource id"
+}
+
+variable "db_id" {
+  type        = string
+  description = "the full string of the database resource id"
+}
