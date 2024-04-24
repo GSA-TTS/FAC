@@ -129,6 +129,7 @@ audit_findings_text_checks = general_checks + [
     has_all_the_named_ranges(FORM_SECTIONS.FINDINGS_TEXT),
     has_all_required_fields(FORM_SECTIONS.FINDINGS_TEXT),
     has_invalid_yorn_field(FORM_SECTIONS.FINDINGS_TEXT),
+    finding_reference_pattern,
 ]
 
 corrective_action_plan_checks = general_checks + [
@@ -136,6 +137,7 @@ corrective_action_plan_checks = general_checks + [
     has_all_the_named_ranges(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
     has_all_required_fields(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
     has_invalid_yorn_field(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
+    finding_reference_pattern,
 ]
 
 secondary_auditors_checks = general_checks + [
