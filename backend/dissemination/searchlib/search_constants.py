@@ -14,3 +14,21 @@ class ORDER_BY:
 class DIRECTION:
     ascending = "ascending"
     descending = "descending"
+
+
+#  Standard text fields - UEI, ALN.
+text_input_delimiters = [
+    ",",
+    ":",
+    ";",
+    "-",
+    " ",
+]
+
+# Report ID field. Cannot include '-'.
+report_id_delimiters = [
+    ",",
+    ":",
+    ";",
+    " ",
+]

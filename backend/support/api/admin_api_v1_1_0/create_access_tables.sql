@@ -6,6 +6,7 @@
 -- This is because administrative keys can read/write
 -- to some tables in the database. They can read internal and
 -- in-flight data.
+
 DROP TABLE IF EXISTS support_administrative_key_uuids;
 
 CREATE TABLE support_administrative_key_uuids 
@@ -27,12 +28,6 @@ INSERT INTO support_administrative_key_uuids
         '2023-12-04'
     ),
     (
-        'carley.jackson@gsa.gov',
-        'a938cfca-c8eb-4065-b2eb-782d04bd58ef',
-        'CREATE,READ,DELETE',
-        '2023-12-04'
-    ),
-    (
         'timothy.ballard@gsa.gov',
         '1e2845a0-c844-4a6f-84ac-f398b58ce7c9',
         'CREATE,READ,DELETE',
@@ -45,3 +40,4 @@ INSERT INTO support_administrative_key_uuids
         '2023-12-08'
     )
     ;
+

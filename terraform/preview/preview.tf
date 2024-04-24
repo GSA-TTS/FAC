@@ -9,7 +9,13 @@ module "preview" {
   swagger_instances     = 1
   https_proxy_instances = 1
   smtp_proxy_instances  = 1
+  clamav_instances      = 2
   recursive_delete      = true
+  json_params = jsonencode(
+    {
+      "storage" : 50,
+    }
+  )
 }
 
 import {

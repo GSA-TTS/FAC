@@ -9,12 +9,15 @@ from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
 
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import SearchForm
+from dissemination.forms import AdvancedSearchForm
 from dissemination.search import search
 from dissemination.mixins import ReportAccessRequiredMixin
 from dissemination.models import (
@@ -29,7 +32,9 @@ from dissemination.models import (
     AdditionalUei,
     OneTimeAccess,
 )
+
 from dissemination.summary_reports import generate_summary_report
+
 from support.decorators import newrelic_timing_metric
 
 from users.permissions import can_read_tribal
@@ -40,23 +45,25 @@ logger = logging.getLogger(__name__)
 
 
 def _add_search_params_to_newrelic(search_parameters):
+    is_advanced = search_parameters["advanced_search_flag"]
     singles = [
         "start_date",
         "end_date",
-        "cog_or_oversight",
-        "agency_name",
         "auditee_state",
     ]
+
+    multis = [
+        "uei_or_eins",
+        "names",
+    ]
+
+    if is_advanced:
+        singles.append("cog_or_oversight")
+        multis.append("alns")
 
     newrelic.agent.add_custom_attributes(
         [(f"request.search.{k}", str(search_parameters[k])) for k in singles]
     )
-
-    multis = [
-        "uei_or_eins",
-        "alns",
-        "names",
-    ]
 
     newrelic.agent.add_custom_attributes(
         [(f"request.search.{k}", ",".join(search_parameters[k])) for k in multis]
@@ -81,47 +88,62 @@ def include_private_results(request):
     return True
 
 
-def run_search(form_data, include_private):
+def run_search(form_data):
     """
-    Given cleaned form data and an 'include_private' boolean, run the search.
+    Given cleaned form data, run the search.
     Returns the results QuerySet.
     """
 
-    # As a dictionary, this is easily extensible.
-    search_parameters = {
-        "alns": form_data["aln"],
-        "names": form_data["entity_name"],
-        "uei_or_eins": form_data["uei_or_ein"],
-        "start_date": form_data["start_date"],
-        "end_date": form_data["end_date"],
-        "cog_or_oversight": form_data["cog_or_oversight"],
-        "agency_name": form_data["agency_name"],
+    basic_parameters = {
         "audit_years": form_data["audit_year"],
-        "findings": form_data["findings"],
-        "direct_funding": form_data["direct_funding"],
-        "major_program": form_data["major_program"],
         "auditee_state": form_data["auditee_state"],
-        "include_private": include_private,
+        "end_date": form_data["end_date"],
+        "entity_type": form_data["entity_type"],
+        "fy_end_month": form_data["fy_end_month"],
+        "names": form_data["entity_name"],
+        "report_id": form_data["report_id"],
+        "start_date": form_data["start_date"],
+        "uei_or_eins": form_data["uei_or_ein"],
         "order_by": form_data["order_by"],
         "order_direction": form_data["order_direction"],
     }
+    search_parameters = basic_parameters.copy()
+
+    search_parameters["advanced_search_flag"] = form_data["advanced_search_flag"]
+    if search_parameters["advanced_search_flag"]:
+        advanced_parameters = {
+            "agency_name": form_data["agency_name"],
+            "alns": form_data["aln"],
+            "cog_or_oversight": form_data["cog_or_oversight"],
+            "direct_funding": form_data["direct_funding"],
+            "findings": form_data["findings"],
+            "major_program": form_data["major_program"],
+            "passthrough_name": form_data["passthrough_name"],
+            "type_requirement": form_data["type_requirement"],
+        }
+        search_parameters.update(advanced_parameters)
 
     _add_search_params_to_newrelic(search_parameters)
 
     return search(search_parameters)
 
 
-class Search(View):
+class AdvancedSearch(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(AdvancedSearch, self).dispatch(*args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         """
         When accessing the search page through get, return the blank search page.
         """
-        form = SearchForm()
+        form = AdvancedSearchForm()
 
         return render(
             request,
             "search.html",
             {
+                "advanced_search_flag": True,
                 "form": form,
                 "form_user_input": {"audit_year": ["2023"]},
                 "state_abbrevs": STATE_ABBREVS,
@@ -129,18 +151,17 @@ class Search(View):
             },
         )
 
-    @newrelic_timing_metric("search")
+    @newrelic_timing_metric("search-advanced")
     def post(self, request, *args, **kwargs):
         """
         When accessing the search page through post, run a search and display the results.
         """
         time_starting_post = time.time()
 
-        form = SearchForm(request.POST)
+        form = AdvancedSearchForm(request.POST)
         results = []
         context = {}
 
-        # form_data = clean_form_data(form)
         if form.is_valid():
             form_data = form.cleaned_data
             form_user_input = {
@@ -149,10 +170,14 @@ class Search(View):
         else:
             raise ValidationError(f"Form error in Search POST. {form.errors}")
 
-        logger.info(f"Searching on fields: {form_data}")
+        # Tells the backend we're running advanced search.
+        form_data["advanced_search_flag"] = True
+
+        logger.info(f"Advanced searching on fields: {form_data}")
 
         include_private = include_private_results(request)
-        results = run_search(form_data, include_private)
+
+        results = run_search(form_data)
 
         results_count = results.count()
 
@@ -173,20 +198,22 @@ class Search(View):
 
         # Reformat these so the date-picker elements in HTML prepopulate
         if form_data["start_date"]:
-            form_data["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
+            form_user_input["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
         if form_data["end_date"]:
-            form_data["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
+            form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         context = context | {
-            "form": form,
+            "advanced_search_flag": True,
             "form_user_input": form_user_input,
-            "state_abbrevs": STATE_ABBREVS,
+            "form": form,
+            "include_private": include_private,
             "limit": form_data["limit"],
-            "results": paginator_results,
-            "results_count": results_count,
-            "page": page,
             "order_by": form_data["order_by"],
             "order_direction": form_data["order_direction"],
+            "page": page,
+            "results_count": results_count,
+            "results": paginator_results,
+            "state_abbrevs": STATE_ABBREVS,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
         time_beginning_render = time.time()
@@ -196,7 +223,102 @@ class Search(View):
         return render(request, "search.html", context)
 
 
-class AuditSummaryView(ReportAccessRequiredMixin, View):
+class Search(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(Search, self).dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        """
+        When accessing the search page through get, return the blank search page.
+        """
+        form = SearchForm()
+
+        return render(
+            request,
+            "search.html",
+            {
+                "advanced_search_flag": False,
+                "form": form,
+                "form_user_input": {"audit_year": ["2023"]},
+                "state_abbrevs": STATE_ABBREVS,
+                "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+            },
+        )
+
+    @newrelic_timing_metric("search")
+    def post(self, request, *args, **kwargs):
+        """
+        When accessing the search page through post, run a search and display the results.
+        """
+        time_starting_post = time.time()
+
+        form = SearchForm(request.POST)
+        results = []
+        context = {}
+
+        if form.is_valid():
+            form_data = form.cleaned_data
+            form_user_input = {
+                k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
+            }
+        else:
+            raise ValidationError(f"Form error in Search POST. {form.errors}")
+
+        # Tells the backend we're running basic search.
+        form_data["advanced_search_flag"] = False
+
+        logger.info(f"Searching on fields: {form_data}")
+
+        include_private = include_private_results(request)
+
+        results = run_search(form_data)
+
+        results_count = results.count()
+
+        # Reset page to one if the page number surpasses how many pages there actually are
+        page = form_data["page"]
+        ceiling = math.ceil(results_count / form_data["limit"])
+        if page > ceiling:
+            page = 1
+
+        logger.info(f"TOTAL: results_count: [{results_count}]")
+
+        # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
+        paginator = Paginator(object_list=results, per_page=form_data["limit"])
+        paginator_results = paginator.get_page(page)
+        paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
+            page, on_each_side=1
+        )
+
+        # Reformat these so the date-picker elements in HTML prepopulate
+        if form_data["start_date"]:
+            form_user_input["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
+        if form_data["end_date"]:
+            form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
+
+        context = context | {
+            "advanced_search_flag": False,
+            "form_user_input": form_user_input,
+            "form": form,
+            "include_private": include_private,
+            "limit": form_data["limit"],
+            "order_by": form_data["order_by"],
+            "order_direction": form_data["order_direction"],
+            "page": page,
+            "results_count": results_count,
+            "results": paginator_results,
+            "state_abbrevs": STATE_ABBREVS,
+            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+        }
+        time_beginning_render = time.time()
+        logger.info(
+            f"Total time between post and render {int(math.ceil((time_beginning_render - time_starting_post) * 1000))}ms"
+        )
+        return render(request, "search.html", context)
+
+
+class AuditSummaryView(View):
     def get(self, request, report_id):
         """
         Display information about the given report in the dissemination tables.
@@ -213,7 +335,9 @@ class AuditSummaryView(ReportAccessRequiredMixin, View):
         general_data = general.values()[0]
         del general_data["id"]
 
-        data = self.get_audit_content(report_id)
+        include_private = include_private_results(request)
+        include_private_and_public = include_private or general_data["is_public"]
+        data = self.get_audit_content(report_id, include_private_and_public)
 
         # Add entity name and UEI to the context, for the footer.
         context = {
@@ -221,12 +345,13 @@ class AuditSummaryView(ReportAccessRequiredMixin, View):
             "auditee_name": general_data["auditee_name"],
             "auditee_uei": general_data["auditee_uei"],
             "general": general_data,
+            "include_private": include_private,
             "data": data,
         }
 
         return render(request, "summary.html", context)
 
-    def get_audit_content(self, report_id):
+    def get_audit_content(self, report_id, include_private_and_public):
         """
         Grab everything relevant from the dissemination tables.
         Wrap that data into a dict, and return it.
@@ -244,13 +369,13 @@ class AuditSummaryView(ReportAccessRequiredMixin, View):
 
         # QuerySet values to an array of dicts
         data["Awards"] = [x for x in awards.values()]
-        if notes_to_sefa.exists():
+        if notes_to_sefa.exists() and include_private_and_public:
             data["Notes to SEFA"] = [x for x in notes_to_sefa.values()]
         if audit_findings.exists():
             data["Audit Findings"] = [x for x in audit_findings.values()]
-        if audit_findings_text.exists():
+        if audit_findings_text.exists() and include_private_and_public:
             data["Audit Findings Text"] = [x for x in audit_findings_text.values()]
-        if corrective_action_plan.exists():
+        if corrective_action_plan.exists() and include_private_and_public:
             data["Corrective Action Plan"] = [
                 x for x in corrective_action_plan.values()
             ]
@@ -331,14 +456,15 @@ class OneTimeAccessDownloadView(View):
             raise BadRequest()
 
 
-class SingleSummaryReportDownloadView(ReportAccessRequiredMixin, View):
+class SingleSummaryReportDownloadView(View):
     def get(self, request, report_id):
         """
         Given a report_id in the URL, generate the summary report in S3 and
         redirect to its download link.
         """
         sac = get_object_or_404(General, report_id=report_id)
-        filename = generate_summary_report([sac.report_id])
+        include_private = include_private_results(request)
+        filename = generate_summary_report([sac.report_id], include_private)
         download_url = get_download_url(filename)
 
         return redirect(download_url)
@@ -352,23 +478,23 @@ class MultipleSummaryReportDownloadView(View):
         3. Generate a summary report with the report_ids, which goes into into S3
         4. Redirect to the download url of this new report
         """
-        form = SearchForm(request.POST)
+        form = AdvancedSearchForm(request.POST)
 
         try:
             if form.is_valid():
                 form_data = form.cleaned_data
+                form_data["advanced_search_flag"] = True
             else:
                 raise ValidationError("Form error in Search POST.")
 
             include_private = include_private_results(request)
-            results = run_search(form_data, include_private)
+            results = run_search(form_data)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
-
-            filename = generate_summary_report(report_ids)
+            filename = generate_summary_report(report_ids, include_private)
             download_url = get_download_url(filename)
 
             return redirect(download_url)

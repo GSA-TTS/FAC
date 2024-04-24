@@ -5,10 +5,12 @@ from .check_finding_award_references_pattern import award_references_pattern
 from .check_cluster_names import check_cluster_names
 from audit.fixtures.excel import FORM_SECTIONS
 from .check_gsa_migration_keyword import check_for_gsa_migration_keyword
-
+from .check_data_row_range_in_form_sheet import validate_ranges
 
 ############
 # General checks
+from .check_uei_schema import verify_auditee_uei_schema
+from .check_uei_match import verify_auditee_uei_match
 from .check_uei_exists import uei_exists
 from .check_is_a_workbook import is_a_workbook
 from .check_look_for_empty_rows import look_for_empty_rows
@@ -59,8 +61,11 @@ general_checks = [
     is_a_workbook,
     validate_workbook_version,
     uei_exists,
+    verify_auditee_uei_schema,
+    verify_auditee_uei_match,
     look_for_empty_rows,
     start_and_end_rows_of_all_columns_are_same,
+    validate_ranges,
 ]
 
 federal_awards_checks = general_checks + [
@@ -68,6 +73,7 @@ federal_awards_checks = general_checks + [
     has_all_the_named_ranges(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     has_all_required_fields(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     has_invalid_yorn_field(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
+    award_references_pattern,
     federal_award_amount_passed_through_optional,
     check_cluster_names,
     state_cluster_names,
@@ -139,7 +145,9 @@ secondary_auditors_checks = general_checks + [
 ]
 
 
-def run_all_checks(ir, list_of_checks, section_name=None, is_data_migration=False):
+def run_all_checks(
+    ir, list_of_checks, section_name=None, is_data_migration=False, auditee_uei=None
+):
     errors = []
     if section_name:
         res = is_right_workbook(section_name)(ir)
@@ -159,7 +167,10 @@ def run_all_checks(ir, list_of_checks, section_name=None, is_data_migration=Fals
         check_for_gsa_migration_keyword(ir)
 
     for fun in list_of_checks:
-        res = fun(ir)
+        if fun == verify_auditee_uei_match:
+            res = fun(ir, auditee_uei)
+        else:
+            res = fun(ir)
         if isinstance(res, list) and all(map(lambda v: isinstance(v, tuple), res)):
             errors = errors + res
         elif isinstance(res, tuple):
@@ -172,9 +183,13 @@ def run_all_checks(ir, list_of_checks, section_name=None, is_data_migration=Fals
         raise ValidationError(errors)
 
 
-def run_all_general_checks(ir, section_name, is_data_migration=False):
+def run_all_general_checks(ir, section_name, is_data_migration=False, auditee_uei=None):
     run_all_checks(
-        ir, general_checks, section_name, is_data_migration=is_data_migration
+        ir,
+        general_checks,
+        section_name,
+        is_data_migration=is_data_migration,
+        auditee_uei=auditee_uei,
     )
 
 

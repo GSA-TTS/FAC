@@ -5,9 +5,10 @@ import { testAuditInformationForm } from './audit-info-form.js';
 import { testPdfAuditReport } from './report-pdf.js';
 import { testAuditorCertification } from './auditor-certification.js';
 import { testAuditeeCertification } from './auditee-certification.js';
-import { testReportIdFoundWithTribalAccess, testReportIdFoundWithoutTribalAccess, testReportIdNotFoundWithoutTribalAccess } from './dissemination-table.js';
+import { testSubmissionAccess } from './dissemination-table.js';
 import { testTribalAuditPublic, testTribalAuditPrivate } from './tribal-audit-form.js';
 import { testInitializeAudit } from './initialize-audit.js';
+import { testUnlock } from './unlock-cert.js';
 import {
   testWorkbookFederalAwards,
   testWorkbookNotesToSEFA,
@@ -94,6 +95,9 @@ export function testFullSubmission(isTribal, isPublic) {
   cy.get(".usa-link").contains("Pre-submission validation").click();
   testCrossValidation();
 
+  // test unlock certification
+  testUnlock();
+
   // Auditor certification
   cy.get(".usa-link").contains("Auditor Certification").click();
   testAuditorCertification();
@@ -129,14 +133,8 @@ export function testFullSubmission(isTribal, isPublic) {
       /audits are complete/
     ).siblings().contains('td', reportId);
 
-    // The Report should not be in the dissemination table
-    if (isPublic) {
-      testReportIdFoundWithoutTribalAccess(reportId);
-      testReportIdFoundWithTribalAccess(reportId);
-    } else {
-      testReportIdNotFoundWithoutTribalAccess(reportId);
-      testReportIdFoundWithTribalAccess(reportId);
-    }
+  testSubmissionAccess(reportId, isTribal, isPublic);
+
   });
 
   testLogoutGov();

@@ -679,6 +679,7 @@ class GeneralInformationFormViewTests(TestCase):
             "auditee_city": "Chicago",
             "auditee_state": "IL",
             "auditee_zip": "60640",
+            "auditor_international_address": "",
             "auditee_contact_name": "Updated Designated Representative",
             "auditee_contact_title": "Lord of Windows",
             "auditee_phone": "5558675310",
@@ -694,7 +695,11 @@ class GeneralInformationFormViewTests(TestCase):
 
         response = self.client.post(url, data=data)
 
-        self.assertEqual(response.status_code, 400)
+        self.assertIn("errors", response.context)
+        self.assertIn(
+            "GSA_MIGRATION not permitted outside of migrations",
+            response.context["errors"],
+        )
 
     def test_post_validates_general_information(self):
         """When the general information form is submitted, the data should be validated against the general information schema"""
@@ -749,3 +754,7 @@ class GeneralInformationFormViewTests(TestCase):
         response = self.client.post(url, data=data)
 
         self.assertContains(response, "Dates should be in the format")
+        self.assertNotIn(
+            "GSA_MIGRATION not permitted outside of migrations",
+            response.context["errors"],
+        )

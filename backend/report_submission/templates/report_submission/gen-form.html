@@ -66,7 +66,10 @@
                         </fieldset>
                         <fieldset class="usa-fieldset question" id="type-of-audit">
                             <legend class="usa-legend">Type of audit</legend>
-                            <p id="type_of_audit_instruction">Which type of Uniform Guidance audit are you filing for?</p>
+                            <p id="type_of_audit_instruction" class="margin-bottom-0">Which type of Uniform Guidance audit are you filing?</p>
+                            <p class="margin-top-0">
+                                Refer to <a class="usa-link" href="https://www.ecfr.gov/current/title-2/subtitle-A/chapter-II/part-200/subpart-F/subject-group-ECFRfd0932e473d10ba/section-200.507" target="_blank">2 CFR 200.507</a>.
+                            </p>
                             <div class="usa-radio">
                                 <input class="usa-radio__input"
                                        type="radio"
@@ -97,7 +100,10 @@
                         </fieldset>
                         <fieldset class="usa-fieldset question" id="audit-period">
                             <legend class="usa-legend">Audit period</legend>
-                            <p id="audit_period_instruction">How long of an audit period is covered in this report?</p>
+                            <p id="type_of_audit_instruction" class="margin-bottom-0">How long of an audit period is covered in this report?</p>
+                            <p class="margin-top-0">
+                                Refer to <a class="usa-link" href="https://www.ecfr.gov/current/title-2/subtitle-A/chapter-II/part-200/subpart-F/subject-group-ECFRfd0932e473d10ba/section-200.504" target="_blank">2 CFR 200.504</a>.
+                            </p>
                             <div class="usa-radio">
                                 <input class="usa-radio__input"
                                        type="radio"
@@ -164,7 +170,7 @@
                                 </ul>
                             </div>
                             <fieldset class="usa-fieldset radio">
-                                <legend class="usa-legend">Are multiple EINs covered in this report?</legend>
+                                <legend class="usa-legend">Does this audit represent multiple entities with their own EINs? (e.g., a statewide audit that covers many departments, each of which may have its own EIN)*</legend>
                                 <p class="usa-hint margin-0">You'll be able to add additional EINs later.</p>
                                 <div class="usa-radio">
                                     <input class="usa-radio__input"
@@ -255,7 +261,7 @@
                                        value="{{ auditee_uei | default_if_none:'' }}" />
                             </div>
                             <fieldset class="usa-fieldset radio">
-                                <legend class="usa-legend">Are multiple UEIs covered in this report?</legend>
+                                <legend class="usa-legend">Does this audit represent multiple entities with their own UEIs? (e.g., a statewide audit that covers many departments, each of which may have its own UEI)</legend>
                                 <p class="usa-hint margin-0">You'll be able to add additional UEIs later.</p>
                                 <div class="usa-radio">
                                     <input class="usa-radio__input"
