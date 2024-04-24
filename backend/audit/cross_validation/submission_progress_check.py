@@ -114,39 +114,69 @@ def progress_check(sac, sections, key):
     if key == "general_information":
         return general_information_progress_check(progress, general_info, sac)
 
-    # If it's not required, it's inactive:
+    # It's not required:
     if not conditions[key]:
+        # If it's not required but has been completed, it remains active so user can remove the worksheet:
+        if sections.get(key):
+            completed_by, completed_date = section_completed_metadata(sac, key)
+            if completed_by or completed_date:
+                return construct_progress_metadata(
+                    key, progress, completed_by, completed_date
+                )
+        # If it's not required and has not been completed, it's inactive.
         return {key: progress | {"display": "inactive"}}
 
     # If it is required, it should be present
     if sections.get(key):
         completed_by, completed_date = section_completed_metadata(sac, key)
-
-        return {
-            key: progress
-            | {
-                "display": "complete",
-                "completed": True,
-                "completed_by": completed_by,
-                "completed_date": completed_date,
-            }
-        }
+        return construct_progress_metadata(key, progress, completed_by, completed_date)
 
     return {key: progress | {"display": "incomplete", "completed": False}}
+
+
+def construct_progress_metadata(key, progress, completed_by, completed_date):
+    return {
+        key: progress
+        | {
+            "display": "complete",
+            "completed": True,
+            "completed_by": completed_by,
+            "completed_date": completed_date,
+        }
+    }
 
 
 def section_completed_metadata(sac, section_key):
     try:
         section = find_section_by_name(section_key)
         event_type = section.submission_event
-
         report_id = sac["sf_sac_meta"]["report_id"]
-        event = SubmissionEvent.objects.filter(
-            sac__report_id=report_id, event=event_type
-        ).latest("timestamp")
+        try:
+            submission_event = SubmissionEvent.objects.filter(
+                sac__report_id=report_id, event=event_type
+            ).latest("timestamp")
+        except SubmissionEvent.DoesNotExist:
+            submission_event = None
+        try:
+            deletion_event = SubmissionEvent.objects.filter(
+                sac__report_id=report_id, event=section.deletion_event
+            ).latest("timestamp")
+        except SubmissionEvent.DoesNotExist:
+            deletion_event = None
+        if deletion_event and (
+            not submission_event
+            or deletion_event.timestamp > submission_event.timestamp
+        ):
+            # If the deletion event is more recent than the submission event, the section is not complete.
+            return None, None
 
-        return event.user.email, event.timestamp
-    except SubmissionEvent.DoesNotExist:
+        if submission_event:
+            return submission_event.user.email, submission_event.timestamp
+
+        # If there is no submission event, the section is not complete.
+        return None, None
+
+    except Exception:
         return None, None
 
 
