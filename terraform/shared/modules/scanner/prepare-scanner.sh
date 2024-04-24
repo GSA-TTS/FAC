@@ -13,10 +13,10 @@ tmpdir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
 cd "$tmpdir"
 
 # Grab a copy of the zip file for the specified ref
-curl -s -L https://github.com/GSA-TTS/fac-scanner/archive/${GITREF}.zip --output scanner.zip
+curl -s -L https://github.com/GSA-TTS/fac-periodic-scanner/archive/${GITREF}.zip --output scanner.zip
 
 # Tell Terraform where to find it
 cat << EOF
-{ "path": "proxy.zip" }
+{ "path": "scanner.zip" }
 EOF
 

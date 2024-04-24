@@ -14,13 +14,13 @@ resource "cloudfoundry_route" "scanner_route" {
   # Yields something like: orgname-spacename-name.apps.internal
 }
 
-# data "external" "scannerzip" {
-#   program     = ["/bin/sh", "prepare-scanner.sh"]
-#   working_dir = path.module
-#   query = {
-#     gitref = var.gitref
-#   }
-# }
+data "external" "scannerzip" {
+  program     = ["/bin/sh", "prepare-scanner.sh"]
+  working_dir = path.module
+  query = {
+    gitref = var.gitref
+  }
+}
 
 resource "cloudfoundry_app" "scanner_app" {
   name       = var.name
