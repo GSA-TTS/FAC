@@ -25,7 +25,10 @@ The three states for a section block:
 			{% include './created-by.html' with name=completed_by time=completed_date %}
 
             <p class="margin-0">
-                <a class="usa-link" href="{% url reverse_url report_id %}">{{ edit_text }}</a>
+                <a class="usa-link" href="{% url reverse_url_for_file_upload report_id %}">{{ edit_text }}</a>
+                {% if delete_text %} |
+                <a class="usa-link" href="{% url reverse_url_for_file_deletion report_id %}">{{ delete_text }}</a>
+                {% endif %}
             </p>
         </div>
 	{% comment %} 2. Inactive {% endcomment %}
@@ -41,7 +44,7 @@ The three states for a section block:
     {% else %}
         <div>
             <p class="text-bold margin-0">
-                <a class="usa-link" href="{% url reverse_url report_id %}">{{ title }}</a>
+                <a class="usa-link" href="{% url reverse_url_for_file_upload report_id %}">{{ title }}</a>
             </p>
             <p class="margin-0">
                 {{ text }}

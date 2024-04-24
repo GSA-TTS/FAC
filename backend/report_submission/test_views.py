@@ -2,13 +2,18 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.conf import settings
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
+from report_submission.views import DeleteFileView
 from model_bakery import baker
 
 from audit.models import Access, SingleAuditChecklist, SubmissionEvent
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.exceptions import PermissionDenied
+from django.contrib.messages import get_messages
 
 
 def omit(remove, d) -> dict:
@@ -758,3 +763,105 @@ class GeneralInformationFormViewTests(TestCase):
             "GSA_MIGRATION not permitted outside of migrations",
             response.context["errors"],
         )
+
+
+def add_session_to_request(request):
+    """Middleware to add session to request."""
+    middleware = SessionMiddleware(lambda x: x)
+    middleware.process_request(request)
+    request.session.save()
+
+
+def add_messages_to_request(request):
+    """Attach a message storage to the request."""
+    setattr(request, "_messages", FallbackStorage(request))
+
+
+class DeleteFileViewTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create_user(
+            username="user", password="password"
+        )  # nosec
+        self.view = DeleteFileView()
+        self.report_id = "12345"
+        self.path_name = "delete-audit-findings"
+        self.url = reverse(
+            "report_submission:audit-findings-text",
+            kwargs={"report_id": self.report_id},
+        )
+
+    def make_request(self, method="get"):
+        if method.lower() == "post":
+            request = self.factory.post(self.url)
+        else:
+            request = self.factory.get(self.url)
+        request.user = self.user
+        request.path = "/delete/" + self.path_name + "/"
+        add_session_to_request(request)
+        add_messages_to_request(request)
+        return request
+
+    def test_get_no_access(self):
+        request = self.make_request("get")
+        with patch("audit.models.SingleAuditChecklist.objects.get") as mock_get:
+            mock_get.side_effect = SingleAuditChecklist.DoesNotExist
+            with self.assertRaises(PermissionDenied):
+                self.view.get(request, report_id=self.report_id)
+
+    def test_get_successful_render(self):
+        sac = MagicMock(report_id=self.report_id)
+        access = MagicMock(user=self.user)
+        request = self.make_request("get")
+
+        with patch("audit.models.SingleAuditChecklist.objects.get", return_value=sac):
+            with patch("audit.models.Access.objects.filter", return_value=[access]):
+                response = self.view.get(request, report_id=self.report_id)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn("delete-audit-findings", response.content.decode())
+
+    def test_post_no_access(self):
+        request = self.factory.post(self.url)
+        request.user = self.user
+        request.path = "/delete/" + self.path_name + "/"
+        request = self.make_request("get")
+
+        with patch("audit.models.SingleAuditChecklist.objects.get"):
+            with patch("audit.models.Access.objects.filter", return_value=[]):
+                response = self.view.post(request, report_id=self.report_id)
+                self.assertEqual(response.status_code, 302)
+
+        messages = [message.message for message in get_messages(request)]
+        self.assertIn("You do not have access to this audit.", messages)
+
+    def test_post_file_deletion_successful(self):
+        sac = MagicMock(report_id=self.report_id)
+        access = MagicMock(user=self.user)
+        request = self.factory.post(self.url)
+        request.user = self.user
+        request.path = "/delete/" + self.path_name + "/"
+        request = self.make_request("get")
+
+        with patch("audit.models.SingleAuditChecklist.objects.get", return_value=sac):
+            with patch("audit.models.Access.objects.filter", return_value=[access]):
+                with patch("audit.models.ExcelFile.objects.filter") as mock_filter:
+                    mock_files = MagicMock()
+                    mock_filter.return_value = mock_files
+                    mock_files.count.return_value = 1
+
+                    response = self.view.post(request, report_id=self.report_id)
+                    self.assertEqual(response.status_code, 302)
+                    mock_files.delete.assert_called_once()
+
+    def test_post_unexpected_error(self):
+        request = self.factory.post(self.url)
+        request.user = self.user
+        request.path = "/delete/" + self.path_name + "/"
+        request = self.make_request("get")
+
+        with patch("audit.models.SingleAuditChecklist.objects.get") as mock_get:
+            mock_get.side_effect = Exception("Unexpected error")
+            response = self.view.post(request, report_id=self.report_id)
+            self.assertEqual(response.status_code, 302)
+        messages = [message.message for message in get_messages(request)]
+        self.assertIn("An unexpected error occurred.", messages)
