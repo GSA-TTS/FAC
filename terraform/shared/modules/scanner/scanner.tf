@@ -1,3 +1,10 @@
+module "env" {
+  source  = "./env"
+  s3_id   = module.env.s3-private.bucket_id
+  db_id   = module.database.instance_id
+  clam_id = module.clamav.clamav.app_id
+}
+
 data "cloudfoundry_domain" "internal" {
   name = "apps.internal"
 }
@@ -40,15 +47,15 @@ resource "cloudfoundry_app" "scanner_app" {
   }
 
   service_binding {
-    service_instance = module.s3-private.bucket_id
+    service_instance = module.env.s3_id
   }
 
   service_binding {
-    service_instance = module.database.cloudfoundry_app.instance_id
+    service_instance = module.env.db_id
   }
 
   service_binding {
-    service_instance = module.clamav.instance_id
+    service_instance = module.env.clam_id
   }
 }
 

@@ -14,7 +14,7 @@ module "fac-file-scanner" {
 
 resource "cloudfoundry_network_policy" "scanner-network-policy" {
   policy {
-    source_app      = module.scanner.app_id
+    source_app      = module.scanner_app.app_id
     destination_app = module.https-proxy.app_id
     port            = "61443"
     protocol        = "tcp"
