@@ -39,7 +39,7 @@
                   "properties": {
                      "award_reference": {
                         "description": "Award Reference",
-                        "pattern": "^AWARD-(?!0000)[0-9]{4}$",
+                        "pattern": "^AWARD-(?!0{4,5}$)[0-9]{4,5}$",
                         "title": "AwardReference",
                         "type": "string"
                      },
@@ -73,6 +73,7 @@
                                           "ECONOMIC DEVELOPMENT CLUSTER",
                                           "EMPLOYMENT SERVICE CLUSTER",
                                           "FEDERAL TRANSIT CLUSTER",
+                                          "FEDERAL MOTOR CARRIER SAFETY ASSISTANCE (FMCSA)",
                                           "FISH AND WILDLIFE CLUSTER",
                                           "FOOD DISTRIBUTION CLUSTER",
                                           "FOREIGN FOOD AID DONATION CLUSTER",
@@ -551,7 +552,7 @@
                "type": "string"
             },
             "version": {
-               "const": "1.0.4",
+               "const": "1.1.0",
                "type": "string"
             }
          },

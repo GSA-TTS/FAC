@@ -1,0 +1,25 @@
+{% comment %} Fiscal Year End Date {% endcomment %}
+<button type="button"
+        class="usa-accordion__button"
+        aria-expanded={% if form_user_input.fy_end_month %}"true"{% else %}"false"{% endif %}
+        aria-controls="fy-end-date-accordion">Fiscal year end month</button>
+<div id="fy-end-date-accordion">
+    <div class="usa-memorable-date">
+        <div class="usa-form-group usa-form-group--month usa-form-group--select">
+            <label class="usa-label" for="fy_end_month">Month</label>
+            <select class="usa-select"
+                    id="fy_end_month"
+                    name="fy_end_month">
+                <option value id="fy-month--none">- Select -</option>
+                {% with '1 2 3 4 5 6 7 8 9 10 11 12' as list %}
+                    {% for i in list.split %}
+                        <option value="{{i}}"
+                                {% if i in form_user_input.fy_end_month %}selected{% endif %}>
+                            {{i}} - {% cycle 'January' 'February' 'March' 'April' 'May' 'June' 'July' 'August' 'September' 'October' 'November' 'December' %}
+                        </option>
+                    {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+    </div>
+</div>

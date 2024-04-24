@@ -1,7 +1,5 @@
 from ..change_record import (
-    CensusRecord,
     InspectionRecord,
-    GsaFacRecord,
 )
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_string import (
@@ -13,6 +11,7 @@ from ..workbooklib.excel_creation_utils import (
     set_range,
     set_workbook_uei,
     sort_by_field,
+    track_transformations,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
@@ -112,21 +111,6 @@ def xform_construct_award_references(audits, findings):
     return award_references
 
 
-def track_transformations(
-    census_column, census_value, gsa_field, gsa_value, transformation_functions, records
-):
-    """Tracks all transformations."""
-    census_data = [CensusRecord(column=census_column, value=census_value).to_dict()]
-    gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
-    records.append(
-        {
-            "census_data": census_data,
-            "gsa_fac_data": gsa_fac_data,
-            "transformation_functions": transformation_functions,
-        }
-    )
-
-
 def _get_findings_grid(findings_list):
     # The original copy of allowed_combos is in audit/intakelib/checks/check_findings_grid_validation.py
     allowed_combos = {
@@ -158,7 +142,7 @@ def _get_findings_grid(findings_list):
     ]
 
 
-def _get_findings(dbkey, year):
+def get_findings(dbkey, year):
     # CFDAs aka ELECAUDITS (or Audits) have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
     # The linkage here is that a given finding will have an elecauditid.
     # Multiple findings will have a given elecauditid. That's how to link them.
@@ -181,7 +165,7 @@ def generate_findings(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
-    findings = _get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
+    findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
     award_references = xform_construct_award_references(audits, findings)
     xform_sort_compliance_requirement(findings)
     map_simple_columns(wb, mappings, findings)

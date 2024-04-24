@@ -1,11 +1,12 @@
 from psycopg2._psycopg import connection
 from config import settings
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
 # These are API versions we want live.
-live = {"dissemination": ["api_v1_0_3"], "support": ["admin_api_v1_0_0"]}
+live = {"dissemination": ["api_v1_0_3", "api_v1_1_0"], "support": ["admin_api_v1_1_0"]}
 
 # These are API versions we have deprecated.
 # They will be removed. It should be safe to leave them
@@ -21,6 +22,16 @@ def get_conn_string():
     else:
         conn_string = settings.CONNECTION_STRING
     return conn_string
+
+
+def exec_sql_at_path(dir, filename):
+    conn = connection(get_conn_string())
+    conn.autocommit = True
+    path = os.path.join(dir, filename)
+    with conn.cursor() as curs:
+        logger.info(f"EXEC SQL {path}")
+        sql = open(path, "r").read()
+        curs.execute(sql)
 
 
 def exec_sql(location, version, filename):
@@ -79,7 +90,7 @@ def create_functions(location):
 
 def deprecate_schemas_and_views(location):
     for version in deprecated[location]:
-        exec_sql(location, version, "drop.sql")
+        exec_sql(location, version, "drop_schema.sql")
 
 
 def create_access_tables(location):

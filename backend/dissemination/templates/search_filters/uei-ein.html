@@ -1,0 +1,9 @@
+{% comment %} UEI/EIN {% endcomment %}
+<label for="uei-or-ein">
+    <button type="button"
+            class="usa-accordion__button"
+            aria-expanded="true"
+            {% comment %} aria-expanded={% if form_user_input.uei_or_ein %}"true"{% else %}"false"{% endif %} {% endcomment %}
+            aria-controls="uei-or-ein">UEI or EIN</button>
+</label>
+<textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein">{{form_user_input.uei_or_ein}}</textarea>

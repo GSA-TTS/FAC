@@ -3,7 +3,9 @@ import logging
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
+from django.db import transaction
 from django.db.models import F
+from django.db.transaction import TransactionManagementError
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -57,6 +59,7 @@ from audit.validators import (
 )
 
 from dissemination.file_downloads import get_download_url, get_filename
+from dissemination.models import General
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
@@ -189,12 +192,12 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             FORM_SECTIONS.SECONDARY_AUDITORS: SubmissionEvent.EventType.SECONDARY_AUDITORS_UPDATED,
         }[form_section]
 
-    def _extract_and_validate_data(self, form_section, excel_file):
+    def _extract_and_validate_data(self, form_section, excel_file, auditee_uei):
         handler_info = self.FORM_SECTION_HANDLERS.get(form_section)
         if handler_info is None:
             logger.warning("No form section found with name %s", form_section)
             raise BadRequest()
-        audit_data = handler_info["extractor"](excel_file.file)
+        audit_data = handler_info["extractor"](excel_file.file, auditee_uei=auditee_uei)
         validator = handler_info.get("validator")
         if validator is not None and callable(validator):
             validator(audit_data)
@@ -218,9 +221,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             report_id = kwargs["report_id"]
             form_section = kwargs["form_section"]
 
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            filename = get_filename(sac, form_section)
+            filename = get_filename(report_id, form_section)
             download_url = get_download_url(filename)
 
             return redirect(download_url)
@@ -248,7 +249,16 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 event_user=request.user, event_type=self._event_type(form_section)
             )
 
-            audit_data = self._extract_and_validate_data(form_section, excel_file)
+            auditee_uei = None
+            if (
+                sac.general_information is not None
+                and "auditee_uei" in sac.general_information
+            ):
+                auditee_uei = sac.general_information["auditee_uei"]
+
+            audit_data = self._extract_and_validate_data(
+                form_section, excel_file, auditee_uei
+            )
 
             self._save_audit_data(sac, form_section, audit_data)
 
@@ -720,14 +730,20 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             sac.save(
                 event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
             )
-            disseminated = sac.disseminate()
-            # FIXME: We should now provide a reasonable error to the user.
+
+            with transaction.atomic():
+                disseminated = sac.disseminate()
+
+            # disseminated is None if there were no errors.
             if disseminated is None:
                 sac.transition_to_disseminated()
                 sac.save(
                     event_user=request.user,
                     event_type=SubmissionEvent.EventType.DISSEMINATED,
                 )
+            else:
+                pass
+                # FIXME: We should now provide a reasonable error to the user.
 
             logger.info(
                 "Dissemination errors: %s, report_id: %s", disseminated, report_id
@@ -737,6 +753,19 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
+        except TransactionManagementError:
+            # This is most likely the result of a race condition, where the user hits
+            # the submit button multiple times and the requests get round-robined to
+            # different instances, and the second attempt tries to insert an existing
+            # report_id into the dissemination.General table.
+            # Our assumption is that the first request succeeded (otherwise there
+            # wouldn't be an entry with that report_id to cause the error), and that we
+            # should log this but not report it to the user.
+            # See https://github.com/GSA-TTS/FAC/issues/3347
+            logger.info("IntegrityError on disseminating report_id: %s", report_id)
+            if General.objects.get(report_id=sac.report_id):
+                return redirect(reverse("audit:MySubmissions"))
+            raise
 
 
 # 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView

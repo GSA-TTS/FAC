@@ -8,7 +8,7 @@
                   id="auditor-certification-step-1"
                   method="post">
                 {% csrf_token %}
-                <fieldset class="usa-fieldset padding-bottom-2">
+                <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large" id="auditor-certification">Auditor certification</legend>
                     <h3>Check the box next to each item confirm your report meets the requirements.</h3>
                     <p class="text-base">You must check all boxes in order to certify your single audit.</p>
@@ -55,9 +55,7 @@
                         <input id="has_no_auditee_procedures"
                                name="has_no_auditee_procedures"
                                class="usa-checkbox__input"
-                               {% comment %}
                                required
-                               {% endcomment %}
                                type="checkbox"
                                value="True"
                                {% if form.cleaned_data.has_no_auditee_procedures %}checked{% endif %} />
@@ -65,6 +63,19 @@
                             No auditor has performed any audit work since the completion of the auditor's report or the single audit submission workbooks.
                         </label>
                         <span class="usa-error-message">{{ form.errors.has_no_auditee_procedures|striptags }}</span>
+                    </div>
+                    <div class="usa-checkbox margin-top-4">
+                        <input id="is_accurate_and_complete"
+                               name="is_accurate_and_complete"
+                               class="usa-checkbox__input"
+                               required
+                               type="checkbox"
+                               value="True"
+                               {% if form.cleaned_data.is_accurate_and_complete %}checked{% endif %} />
+                        <label class="usa-checkbox__label" for="is_accurate_and_complete">
+                            All information required to be reported in this Form SF-SAC in its entirety and such information is accurate and complete.
+                        </label>
+                        <span class="usa-error-message">{{ form.errors.is_accurate_and_complete|striptags }}</span>
                     </div>
                     <div class="usa-checkbox margin-top-4">
                         <input id="is_FAC_releasable"
@@ -75,7 +86,7 @@
                                value="True"
                                {% if form.cleaned_data.is_FAC_releasable %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="is_FAC_releasable">
-                            The full reporting package and auditor's report may shared publicly by the Federal Audit Clearinghouse or the report auditee, as required by the Uniform Guidance.
+                            The full reporting package and auditor's report may be shared publicly by the Federal Audit Clearinghouse or the report auditee, as required by the Uniform Guidance.
                         </label>
                         <span class="usa-error-message">{{ form.errors.is_FAC_releasable|striptags }}</span>
                     </div>

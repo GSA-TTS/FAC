@@ -1,5 +1,9 @@
+from django.conf import settings
+from ..workbooklib.findings import get_findings
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..workbooklib.excel_creation_utils import (
+    get_reference_numbers_from_findings,
+    get_reference_numbers_from_text_records,
     map_simple_columns,
     set_workbook_uei,
     sort_by_field,
@@ -35,6 +39,30 @@ def _get_findings_texts(dbkey, year):
     return sort_by_field(results, "SEQ_NUMBER")
 
 
+def xform_add_placeholder_for_missing_references(findings, findings_texts):
+    """
+    Add placeholder for missing finding reference numbers.
+    """
+
+    expected_references = get_reference_numbers_from_findings(findings)
+    found_references = get_reference_numbers_from_text_records(findings_texts)
+
+    missing_references = expected_references - found_references
+
+    if missing_references:
+        for ref in missing_references:
+            findings_texts.append(
+                FindingsText(
+                    SEQ_NUMBER="0",
+                    FINDINGREFNUMS=ref,
+                    TEXT=settings.GSA_MIGRATION,
+                    CHARTSTABLES=settings.GSA_MIGRATION,
+                )
+            )
+
+    return findings_texts
+
+
 def generate_findings_text(audit_header, outfile):
     """
     Generates a findings text workbook for a given audit header.
@@ -46,8 +74,11 @@ def generate_findings_text(audit_header, outfile):
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.FINDINGS_TEXT])
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
-
+    findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
     findings_texts = _get_findings_texts(audit_header.DBKEY, audit_header.AUDITYEAR)
+    findings_texts = xform_add_placeholder_for_missing_references(
+        findings, findings_texts
+    )
     xform_sanitize_for_excel(findings_texts)
     map_simple_columns(wb, mappings, findings_texts)
 

@@ -201,7 +201,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
-            validated = validate_general_information_json(general_information)
+            validated = validate_general_information_json(general_information, False)
             sac.general_information = validated
             if general_information.get("audit_type"):
                 sac.audit_type = general_information["audit_type"]
@@ -215,8 +215,12 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
-            message = f"ValidationError for report ID {report_id}: {err.message}"
-            raise BadRequest(message)
+            context = form.cleaned_data | {
+                "errors": [err.message],
+                "report_id": report_id,
+                "state_abbrevs": STATE_ABBREVS,
+            }
+            return render(request, "report_submission/gen-form.html", context)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
         except Exception as err:
@@ -229,39 +233,41 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         Given a general_information object containging both auditee_fiscal_period_start
         and auditee_fiscal_period_start, convert YYYY-MM-DD to MM/DD/YYYY for display.
         """
-        try:
-            datetime_object_start = datetime.strptime(
-                data.get("auditee_fiscal_period_start", ""), "%Y-%m-%d"
-            )
-            datetime_object_end = datetime.strptime(
-                data.get("auditee_fiscal_period_end", ""), "%Y-%m-%d"
-            )
-            data["auditee_fiscal_period_start"] = datetime_object_start.strftime(
-                "%m/%d/%Y"
-            )
-            data["auditee_fiscal_period_end"] = datetime_object_end.strftime("%m/%d/%Y")
-        except Exception:
-            return data
+
+        data["auditee_fiscal_period_start"] = self._parse_hyphened_date(
+            data.get("auditee_fiscal_period_start", "")
+        )
+        data["auditee_fiscal_period_end"] = self._parse_hyphened_date(
+            data.get("auditee_fiscal_period_end", "")
+        )
+
         return data
+
+    def _parse_slashed_date(self, date_str):
+        try:
+            return datetime.strptime(date_str, "%m/%d/%Y").strftime("%Y-%m-%d")
+        except ValueError:
+            return date_str
+
+    def _parse_hyphened_date(self, date_str):
+        try:
+            return datetime.strptime(date_str, "%Y-%m-%d").strftime("%m/%d/%Y")
+        except ValueError:
+            return date_str
 
     def _dates_to_hyphens(self, data):
         """
         Given a general_information object containging both auditee_fiscal_period_start
         and auditee_fiscal_period_start, convert MM/DD/YYYY to YYYY-MM-DD for storage.
         """
-        try:
-            datetime_object_start = datetime.strptime(
-                data.get("auditee_fiscal_period_start", ""), "%m/%d/%Y"
-            )
-            datetime_object_end = datetime.strptime(
-                data.get("auditee_fiscal_period_end", ""), "%m/%d/%Y"
-            )
-            data["auditee_fiscal_period_start"] = datetime_object_start.strftime(
-                "%Y-%m-%d"
-            )
-            data["auditee_fiscal_period_end"] = datetime_object_end.strftime("%Y-%m-%d")
-        except Exception:
-            return data
+
+        data["auditee_fiscal_period_start"] = self._parse_slashed_date(
+            data.get("auditee_fiscal_period_start", "")
+        )
+        data["auditee_fiscal_period_end"] = self._parse_slashed_date(
+            data.get("auditee_fiscal_period_end", "")
+        )
+
         return data
 
     def _wipe_auditor_address(self, form):

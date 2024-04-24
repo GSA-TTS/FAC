@@ -11,9 +11,12 @@ We use [Django's test execution framework](https://docs.djangoproject.com/en/4.0
   - [Writing new tests](#writing-new-tests)
   - [Testing Actions Locally](#testing-actions-locally)
   - [Accessibility](#accessibility)
-  - [Security Scans](#security-scans)
+  - [Security scans](#security-scans)
+      - [OWASP ZAP](#owasp-zap)
+      - [Bandit](#bandit)
   - [Linting](#linting)
 - [End-to-end testing](#end-to-end-testing)
+  - [Testing behind Login.gov](#testing-behind-logingov)
 
 ## Packages
  - [model_bakery](https://model-bakery.readthedocs.io/en/latest/), to help create data and instances within our tests
@@ -125,9 +128,11 @@ in files in [backend/cypress/e2e/](/backend/cypress/e2e). To run these tests:
 - [Create a testing login.gov account](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md#testing-behind-logingov)
 - [Set up the fac() alias](https://github.com/GSA-TTS/FAC/blob/main/docs/development.md?plain=1#L125)
 - [Generate a new JWT](https://github.com/GSA-TTS/FAC/blob/main/backend/dissemination/README.md#creating-a-jwt-secret)
-- `CYPRESS_LOGIN_TEST_EMAIL='<your email>' CYPRESS_LOGIN_TEST_PASSWORD='<your  password>' CYPRESS_LOGIN_TEST_OTP_SECRET='<your otp>' CYPRESS_LOGIN_TEST_EMAIL_AUDITEE='<auditee email*>' CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE='<auditee password*>' CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE='<auditee otp*>' CYPRESS_API_GOV_JWT='<your jwt>' CYPRESS_API_GOV_URL='localhost:3000' npx cypress open`
+- `CYPRESS_LOGIN_TEST_EMAIL='<your email>' CYPRESS_LOGIN_TEST_PASSWORD='<your  password>' CYPRESS_LOGIN_TEST_OTP_SECRET='<your otp>' CYPRESS_LOGIN_TEST_EMAIL_AUDITEE='<auditee email*>' CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE='<auditee password*>' CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE='<auditee otp*>' CYPRESS_API_GOV_JWT='<your jwt>' CYPRESS_API_GOV_URL='localhost:3000' CYPRESS_API_GOV_USER_ID_ADMIN='<admin user uuid**>' CYPRESS_ADMIN_API_VERSION='<current admin api version***>' npx cypress open`
 	- Note: All of this goes on one line
 	- *: These fields can be found in the [FAC dev keys Google doc](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0)
+	- **: This field can be the UUID associated with any of the [users with administrative privileges](https://github.com/GSA-TTS/FAC/blob/main/backend/support/api/admin_api_v1_0_0/create_access_tables.sql)
+	- ***: This current value for this field can be found [here](https://github.com/GSA-TTS/FAC/blob/1af236093cab16beb783eec4021b162f04c90840/backend/docker-compose.yml#L112)
 - Click `E2E Testing`
 - Select `Chrome` and click `Start E2E Testing in Chrome`
 

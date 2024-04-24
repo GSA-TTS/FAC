@@ -30,6 +30,8 @@ class SACAdmin(admin.ModelAdmin):
     list_filter = [
         "cognizant_agency",
         "oversight_agency",
+        "oversight_agency",
+        "submission_status",
     ]
     readonly_fields = ("submitted_by",)
     search_fields = ("general_information__auditee_uei", "report_id")
@@ -81,6 +83,7 @@ class AuditReportAdmin(admin.ModelAdmin):
 
 class SubmissionEventAdmin(admin.ModelAdmin):
     list_display = ("sac", "user", "timestamp", "event")
+    search_fields = ("sac__report_id", "user__username")
 
 
 admin.site.register(Access, AccessAdmin)

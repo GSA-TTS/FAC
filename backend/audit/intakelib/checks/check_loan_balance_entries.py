@@ -7,7 +7,6 @@ from audit.intakelib.intermediate_representation import (
 )
 from audit.intakelib.common import get_message, build_cell_error_tuple
 from ..common.util import is_int
-from .check_cluster_total import NOT_APPLICABLE
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ def loan_balance_entry_is_valid(ir):
     for index, balance in enumerate(loan_balance_at_period_end):
         # Check if balance is not a number, empty string, or "N/A"
         if not (
-            balance in [NOT_APPLICABLE, "", settings.GSA_MIGRATION, None]
+            balance in [settings.NOT_APPLICABLE, "", settings.GSA_MIGRATION, None]
             or is_int(balance)
         ):
             errors.append(

@@ -15,3 +15,11 @@ def omb_num_exp_date(request):
     Displayed as a legal requirement on the header of every page.
     """
     return {"OMB_NUMBER": settings.OMB_NUMBER, "OMB_EXP_DATE": settings.OMB_EXP_DATE}
+
+
+def current_environment(request):
+    """
+    Returns the ENVIRONMENT (str) in template context form.
+    Used in determining the display of the TEST SITE Banner.
+    """
+    return {"ENVIRONMENT": settings.ENVIRONMENT}

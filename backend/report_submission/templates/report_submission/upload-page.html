@@ -40,7 +40,7 @@
                                type="file"
                                name="file-input-{{ view_id }}-xlsx"
                                aria-describedby="file-input-{{ view_id }}-xlsx"
-                               accept=".xlsx" />
+                               accept=".xlsx,.XLSX" />
                     </div>
 
                     {% if already_submitted %}
@@ -53,6 +53,10 @@
                     {% endif %}
 
                     <div hidden id="info_box" class="grid-row margin-bottom-3 margin-top-3"></div>
+
+                    <div hidden id="loader" class="margin-bottom-3">
+                        <img src="{% static 'img/loader.svg' %}" alt="spinner for processing upload" />
+                    </div>
 
                     <button class="usa-button margin-bottom-8" id="continue" disabled="disabled">Return to Report Home</button>
                     <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"

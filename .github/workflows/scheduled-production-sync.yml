@@ -1,9 +1,9 @@
 ---
 name: Sync Production Media Files
 on:
-  #schedule:
+  schedule:
     # Invoke every 2 hours
-    # - cron: '0 */2 * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch: null
 
 jobs:
