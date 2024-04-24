@@ -14,7 +14,7 @@ from audit.intakelib.common import (
 logger = logging.getLogger(__name__)
 
 # A version of these regexes also exists in Base.libsonnet
-PRIOR_REFERENCES_REGEX = r"^20[1-9][0-9]-[0-9]{3}(,\s*20[1-9][0-9]-[0-9]{3})*$"
+PRIOR_REFERENCES_REGEX = r"^[1-2][0-9]{3}-[0-9]{3}(,\s*[1-2][0-9]{3}-[0-9]{3})*$"
 
 
 # DESCRIPTION
