@@ -6,6 +6,7 @@ from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
+from django.contrib import messages
 
 import api.views
 
@@ -16,6 +17,9 @@ from audit.cross_validation.submission_progress_check import section_completed_m
 from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
 from audit.validators import validate_general_information_json
 
+from audit.utils import Util
+from audit.models.models import ExcelFile
+from audit.fixtures.excel import FORM_SECTIONS
 from config.settings import STATIC_SITE_URL, STATE_ABBREVS
 
 from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
@@ -201,7 +205,13 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
-            validated = validate_general_information_json(general_information, False)
+            # Remove extra fields based on auditor_country and auditor_international_address and based on audit_period_covered
+            # This patch is necessary to filter out unnecessary empty fields returned by the form.
+            # We need the call here to account for general information sections created before this code change.
+            patched_general_information = Util.remove_extra_fields(general_information)
+            validated = validate_general_information_json(
+                patched_general_information, False
+            )
             sac.general_information = validated
             if general_information.get("audit_type"):
                 sac.audit_type = general_information["audit_type"]
@@ -338,6 +348,10 @@ class UploadPageView(LoginRequiredMixin, View):
                     f"audit:{SN[NC.FINDINGS_UNIFORM_GUIDANCE].camel_case}",
                     args=[report_id],
                 ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.FINDINGS_UNIFORM_GUIDANCE].url_tail}",
+                    args=[report_id],
+                ),
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
@@ -350,6 +364,10 @@ class UploadPageView(LoginRequiredMixin, View):
                 "workbook_url": workbook_base_url + "audit-findings-text-workbook.xlsx",
                 "existing_workbook_url": reverse(
                     f"audit:{SN[NC.FINDINGS_TEXT].camel_case}", args=[report_id]
+                ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.FINDINGS_TEXT].url_tail}",
+                    args=[report_id],
                 ),
             },
             "cap": {
@@ -365,6 +383,10 @@ class UploadPageView(LoginRequiredMixin, View):
                     f"audit:{SN[NC.CORRECTIVE_ACTION_PLAN].camel_case}",
                     args=[report_id],
                 ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.CORRECTIVE_ACTION_PLAN].url_tail.upper()}",
+                    args=[report_id],
+                ),
             },
             "additional-ueis": {
                 "view_id": "additional-ueis",
@@ -376,6 +398,10 @@ class UploadPageView(LoginRequiredMixin, View):
                 "existing_workbook_url": reverse(
                     "audit:AdditionalUeis", args=[report_id]
                 ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.ADDITIONAL_UEIS].url_tail}",
+                    args=[report_id],
+                ),
             },
             "secondary-auditors": {
                 "view_id": "secondary-auditors",
@@ -385,9 +411,13 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions_url": instructions_base_url
                 + "secondary-auditors-workbook/",
                 "workbook_url": workbook_base_url + "secondary-auditors-workbook.xlsx",
-                # below URL handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
+                # below URLs handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
                 "existing_workbook_url": reverse(
                     f"audit:{SN[NC.SECONDARY_AUDITORS].camel_case}", args=[report_id]
+                ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.SECONDARY_AUDITORS].url_tail}",
+                    args=[report_id],
                 ),
             },
             "additional-eins": {
@@ -397,9 +427,13 @@ class UploadPageView(LoginRequiredMixin, View):
                 "DB_id": SN[NC.ADDITIONAL_EINS].snake_case,
                 "instructions_url": instructions_base_url + "additional-eins-workbook/",
                 "workbook_url": workbook_base_url + "additional-eins-workbook.xlsx",
-                # below URL handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
+                # below URLs handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
                 "existing_workbook_url": reverse(
                     "audit:AdditionalEins", args=[report_id]
+                ),
+                "remove_existing_workbook": reverse(
+                    f"report_submission:delete-{SN[NC.ADDITIONAL_EINS].url_tail}",
+                    args=[report_id],
                 ),
             },
         }
@@ -453,3 +487,119 @@ class UploadPageView(LoginRequiredMixin, View):
             logger.info("Unexpected error in UploadPageView post.\n", e)
 
         raise BadRequest()
+
+
+class DeleteFileView(LoginRequiredMixin, View):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.additional_context = {
+            "delete-audit-findings": {
+                "view_id": "delete-audit-findings",
+                "section_name": SN[NC.FINDINGS_UNIFORM_GUIDANCE].friendly_title,
+                "field_name": SN[NC.FINDINGS_UNIFORM_GUIDANCE].snake_case,
+                "form_section": FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
+                "event_type": SubmissionEvent.EventType.FINDINGS_UNIFORM_GUIDANCE_DELETED,
+            },
+            "delete-audit-findings-text": {
+                "view_id": "delete-audit-findings-text",
+                "section_name": SN[NC.FINDINGS_TEXT].friendly_title,
+                "field_name": SN[NC.FINDINGS_TEXT].snake_case,
+                "form_section": FORM_SECTIONS.FINDINGS_TEXT,
+                "event_type": SubmissionEvent.EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_DELETED,
+            },
+            "delete-cap": {
+                "view_id": "delete-cap",
+                "section_name": SN[NC.CORRECTIVE_ACTION_PLAN].friendly_title,
+                "field_name": SN[NC.CORRECTIVE_ACTION_PLAN].snake_case,
+                "form_section": FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
+                "event_type": SubmissionEvent.EventType.CORRECTIVE_ACTION_PLAN_DELETED,
+            },
+            "delete-additional-ueis": {
+                "view_id": "delete-additional-ueis",
+                "section_name": SN[NC.ADDITIONAL_UEIS].friendly_title,
+                "field_name": SN[NC.ADDITIONAL_UEIS].snake_case,
+                "form_section": FORM_SECTIONS.ADDITIONAL_UEIS,
+                "event_type": SubmissionEvent.EventType.ADDITIONAL_UEIS_DELETED,
+            },
+            "delete-secondary-auditors": {
+                "view_id": "delete-secondary-auditors",
+                "section_name": SN[NC.SECONDARY_AUDITORS].friendly_title,
+                "field_name": SN[NC.SECONDARY_AUDITORS].snake_case,
+                "form_section": FORM_SECTIONS.SECONDARY_AUDITORS,
+                "event_type": SubmissionEvent.EventType.SECONDARY_AUDITORS_DELETED,
+            },
+            "delete-additional-eins": {
+                "view_id": "delete-additional-eins",
+                "section_name": SN[NC.ADDITIONAL_EINS].friendly_title,
+                "field_name": SN[NC.ADDITIONAL_EINS].snake_case,
+                "form_section": FORM_SECTIONS.ADDITIONAL_EINS,
+                "event_type": SubmissionEvent.EventType.ADDITIONAL_EINS_DELETED,
+            },
+        }
+
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            # Context for every upload page
+            context = {
+                "report_id": report_id,
+            }
+            # Using the current URL, append page specific context
+            path_name = request.path.split("/")[2]
+
+            context["view_id"] = self.additional_context[path_name]["view_id"]
+            context["section_name"] = self.additional_context[path_name]["section_name"]
+
+            return render(request, "report_submission/delete-file-page.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                messages.error(request, "You do not have access to this audit.")
+                return redirect(request.path)
+            path_name = request.path.split("/")[2]
+            section = self.additional_context[path_name]
+
+            try:
+                excel_files = ExcelFile.objects.filter(
+                    sac=sac, form_section=section["form_section"]
+                )
+                logger.info(f"Deleting {excel_files.count()} files.")
+                excel_files.delete()
+
+                setattr(sac, section["field_name"], None)
+                sac.save()
+            except ExcelFile.DoesNotExist:
+                messages.error(request, "File not found.")
+                return redirect(request.path)
+
+            SubmissionEvent.objects.create(
+                sac_id=sac.id,
+                user=request.user,
+                event=section["event_type"],
+            )
+
+            logger.info("The file has been successfully deleted.")
+            return redirect(f"/audit/submission-progress/{report_id}")
+
+        except SingleAuditChecklist.DoesNotExist:
+            logger.error(f"Audit: {report_id} not found")
+            messages.error(request, "Audit not found.")
+            return redirect(request.path)
+
+        except Exception as e:
+            logger.error(f"Unexpected error in DeleteFileView post: {str(e)}")
+            messages.error(request, "An unexpected error occurred.")
+            return redirect(request.path)

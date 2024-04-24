@@ -32,7 +32,6 @@
   "auditee_fiscal_period_end": "2023-01-01",
   "ein_not_an_ssn_attestation": true,
   "auditee_fiscal_period_start": "2022-01-01",
-  "auditor_international_address": "",
   "user_provided_organization_type": "non-profit",
   "auditor_ein_not_an_ssn_attestation": true 
 }

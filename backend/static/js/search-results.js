@@ -8,10 +8,9 @@ const previous_page_link = document.querySelectorAll(
 const loader = document.getElementById(`loader`);
 const search_arrow = document.getElementById(`search_arrow`);
 
-/*
-  If any pagination links are clicked, set the page form element and submit it for a reload.
-  If the next or previous page buttons are clicked, set the page form element to be +/- 1 and submit for a reload.
-*/
+/**
+ * Attach event handlers for the pagination buttons. On click, set the appropriate form inputs and submit it for a reload.
+ */
 function attachEventHandlersPagination() {
   pagination_links.forEach((link) => {
     link.addEventListener('click', (e) => {
@@ -37,59 +36,90 @@ function attachEventHandlersPagination() {
   }
 }
 
-/*
-  The standard form behavior resets to the default value, which is whatever the user entered on the last form submission, _not_ fully empty fields.
-  We cannot just loop over every form element, because buttons and hidden inputs should be handled differently.
-*/
+/**
+ * Attach an event listener to form 'reset' event.
+ * On form reset, wipe all fields and return them to their default states.
+ */
 function attachEventHandlersReset() {
+  // The standard form behavior does _not_ reset to fully empty fields if the user had just made a search.
   FORM.addEventListener('reset', (e) => {
     e.preventDefault();
+
+    resetCheckboxes();
+    resetCogOver();
+
     // Empty out textareas
     var text_areas = document.getElementsByTagName('textarea');
     Array.from(text_areas).forEach((input) => {
       input.value = '';
     });
-    // Uncheck checkboxes
-    var checkboxes = document.querySelectorAll(
-      '[type="checkbox"], [type="radio"]'
+    // Wipe date fields
+    var date_inputs = document.querySelectorAll(
+      'div.usa-date-picker__wrapper > input'
     );
-    Array.from(checkboxes).forEach((checkbox) => {
-      checkbox.checked = false;
+    Array.from(date_inputs).forEach((date_input) => {
+      date_input.value = '';
     });
-    // Wipe FAC release dates
-    var start_date = document.getElementById('start-date');
-    var end_date = document.getElementById('end-date');
-    start_date.value = '';
-    end_date.value = '';
-    // Reset Cog/Over dropdown
-    var default_cog_over_option = document.getElementById(
-      'cog_or_oversight--both'
-    );
-    default_cog_over_option.selected = true;
-    // Wipe agency name
-    var agency_name = document.getElementById('agency-name');
-    agency_name.value = '';
     // Reset state dropdown
     var default_state_option = document.getElementById('state--none');
     default_state_option.selected = true;
+    // Reset fiscal year end month
+    var default_FY_option = document.getElementById('fy-month--none');
+    default_FY_option.selected = true;
 
     FORM.reset();
   });
 }
 
-/*
-  Get the table headers and their sort buttons.
-  Using the ID of the table headers, attach event handlers to re-submit the form when clicking them.
-  This will reload the page with the associated sort values, so that searches appear to sort across many pages.
+/**
+ * Reset the checkboxes. Clears audit year, entity type, etc.
+ * Re-check audit year 2023.
+ */
+function resetCheckboxes() {
+  var all_checkboxes = document.querySelectorAll(
+    '[type="checkbox"], [type="radio"]'
+  );
+  var AY_checkboxes = document.querySelectorAll('input[id^=audit-year]');
 
-  If the sort buttons get clicked, we have one of three states:
-    1. We are not sorting, and we move to sort in descending.
-    2. We are sorting by descending, and we move to sort in ascending.
-    3. We are sorting by ascending, and we move to no sort at all.
-      i. In this case, we wipe both the order_by and order_direction fields. Or, it will maintain the values and sort anyway.
-  In any case, we want to reset the page number to one.
-*/
+  Array.from(all_checkboxes).forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+  if (AY_checkboxes[1]) {
+    AY_checkboxes[1].checked = true;
+  }
+}
+
+/**
+ * Reset the Cognizant or Oversight fields, if they exist.
+ */
+function resetCogOver() {
+  var default_cog_over_option = document.getElementById(
+    'cog_or_oversight--either'
+  );
+  var cog_over_agency_number = document.getElementById('agency-name');
+  if (default_cog_over_option) {
+    default_cog_over_option.selected = true;
+    cog_over_agency_number.value = '';
+  }
+}
+
+/**
+ * Attach event handlers to the sort buttons in the table header.
+ * When clicked, set the appropriate sort direction in the form inputs and submit for a reload.
+ */
 function attachEventHandlersSorting() {
+  /*
+    Get the table headers and their sort buttons.
+    Using the ID of the table headers, attach event handlers to re-submit the form when clicking them.
+    This will reload the page with the associated sort values, so that searches appear to sort across many pages.
+
+    If the sort buttons get clicked, we have one of three states:
+      1. We are not sorting, and we move to sort in descending.
+      2. We are sorting by descending, and we move to sort in ascending.
+      3. We are sorting by ascending, and we move to no sort at all.
+        i. In this case, we wipe both the order_by and order_direction fields. Or, it will maintain the values and sort anyway.
+    In any case, we want to reset the page number to one.
+  */
   var FORM = document.getElementById('search-form');
   var table_headers = document.querySelectorAll('th[id]');
 
@@ -117,10 +147,10 @@ function attachEventHandlersSorting() {
   });
 }
 
-/*
-  Disable both search buttons once either one is clicked (to prevent multiple submissions),
-  show the loader instead of the arrow image, and then submit.
-*/
+/**
+ * Attach event listeners for form submission.
+ * On clicking "Search", disable both search buttons and show the loader instead of the arrow image, then submit.
+ */
 function attachEventHandlersSubmission() {
   search_submit_buttons.forEach((button) => {
     button.addEventListener('click', () => {
