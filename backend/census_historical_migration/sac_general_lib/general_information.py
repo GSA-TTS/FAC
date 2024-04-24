@@ -170,6 +170,13 @@ def xform_update_entity_type(audit_header):
             if audit_header.SUPPRESSION_CODE.strip().upper() == "IT"
             else "unknown"
         )
+        track_transformations(
+            "ENTITY_TYPE",
+            "",
+            "entity_type",
+            audit_header.ENTITY_TYPE,
+            "xform_update_entity_type",
+        )
 
 
 def _period_covered(s):
