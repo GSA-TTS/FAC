@@ -20,12 +20,7 @@ Typechecks fields, but allows for empty data as well. Contains conditional check
     },
     audit_type: Base.Enum.AuditType,
     audit_period_covered: Base.Enum.AuditPeriod,
-    audit_period_other_months:  {
-      anyOf: [
-        Base.Compound.MonthsOther,
-        Base.Compound.EmptyString,
-      ],
-    },
+    audit_period_other_months: Base.Compound.MonthsOther,
 
     // Auditee information
     auditee_uei: Base.Compound.UniqueEntityIdentifier,
@@ -70,28 +65,19 @@ Typechecks fields, but allows for empty data as well. Contains conditional check
     },
     auditor_country: Base.Enum.CountryType,
     auditor_international_address: Types.string {
+      minLength: 1,
       maxLength: 500,
     },
     auditor_address_line_1: Types.string {
+      minLength: 1,
       maxLength: 100,
     },
     auditor_city: Types.string {
+      minLength: 1,
       maxLength: 100,
     },
-    auditor_state: {
-      anyOf: [
-        Base.Enum.UnitedStatesStateAbbr {
-          title: 'State',
-        },
-        Base.Compound.EmptyString,
-      ],
-    },
-    auditor_zip: {
-      anyOf: [
-        Base.Compound.Zip,
-        Base.Compound.EmptyString,
-      ],
-    },
+    auditor_state: Base.Enum.UnitedStatesStateAbbr,
+    auditor_zip: Base.Compound.Zip,
 
     auditor_contact_name: Types.string {
       maxLength: 100,
@@ -119,90 +105,6 @@ Typechecks fields, but allows for empty data as well. Contains conditional check
     multiple_ueis_covered: Types.boolean,
     secondary_auditors_exist: Types.boolean,
   },
-  allOf: [
-    {
-      anyOf: [
-        {
-          'if': {
-            properties: {
-              audit_period_covered: {
-                const: 'annual',
-              },
-            },
-          },
-          'then': {
-            audit_period_other_months: Base.Enum.EmptyString_Null,
-          },
-        },
-        {
-          'if': {
-            properties: {
-              audit_period_covered: {
-                const: 'biennial',
-              },
-            },
-          },
-          'then': {
-            audit_period_other_months: Base.Enum.EmptyString_Null,
-          },
-        },
-        {
-          'if': {
-            properties: {
-              audit_period_covered: {
-                const: 'other',
-              },
-            },
-          },
-          'then': {
-            audit_period_other_months: Base.Compound.MonthsOther,
-          },
-        },
-      ],
-    },
-    // If auditor is from the USA, address info should be included.
-    {
-      'if': {
-        properties: {
-          auditor_country: {
-            const: 'USA',
-          },
-        },
-      },
-      'then': {
-        properties: {
-          auditor_address_line_1: Base.Compound.NonEmptyString,
-          auditor_city: Base.Compound.NonEmptyString,
-          auditor_state: Base.Enum.UnitedStatesStateAbbr,
-          auditor_zip: Base.Compound.Zip,
-
-          auditor_international_address: Base.Compound.EmptyString
-        },
-      },
-    },
-    // If auditor is NOT from the USA, international things should be filled in.
-    {
-      'if': {
-        properties: {
-          auditor_country: {
-            not: {
-              const: 'USA',
-            },
-          },
-        },
-      },
-      'then': {
-        properties: {
-          auditor_address_line_1: Base.Compound.EmptyString,
-          auditor_city: Base.Compound.EmptyString,
-          auditor_state: Base.Compound.EmptyString,
-          auditor_zip: Base.Compound.EmptyString,
-
-          auditor_international_address: Base.Compound.NonEmptyString
-        },
-      },
-    },
-  ],
   title: 'GeneralInformation',
   type: 'object',
   version: null,

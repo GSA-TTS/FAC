@@ -16,6 +16,8 @@ from audit.cross_validation.submission_progress_check import section_completed_m
 
 from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
 from audit.validators import validate_general_information_json
+
+from audit.utils import Util
 from audit.models.models import ExcelFile
 from audit.fixtures.excel import FORM_SECTIONS
 from config.settings import STATIC_SITE_URL, STATE_ABBREVS
@@ -203,7 +205,13 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
-            validated = validate_general_information_json(general_information, False)
+            # Remove extra fields based on auditor_country and auditor_international_address and based on audit_period_covered
+            # This patch is necessary to filter out unnecessary empty fields returned by the form.
+            # We need the call here to account for general information sections created before this code change.
+            patched_general_information = Util.remove_extra_fields(general_information)
+            validated = validate_general_information_json(
+                patched_general_information, False
+            )
             sac.general_information = validated
             if general_information.get("audit_type"):
                 sac.audit_type = general_information["audit_type"]
