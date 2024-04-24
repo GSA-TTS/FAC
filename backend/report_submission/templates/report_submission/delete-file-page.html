@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-row">
+            {% comment %} {% include "../sidenav.html" %} {% endcomment %}
+            <form class="tablet:grid-col-8 tablet:grid-offset-2"
+                  id="{{ view_id }}"
+                  id_test="delete-file-page__form"
+                  method="post">
+                {% csrf_token %}
+                {% if messages %}
+                <div class="grid-row">
+                    {% for message in messages %}
+                    <div class="usa-alert usa-alert--{{ message.tags }}">
+                        <div class="usa-alert__body">
+                            <p class="usa-alert__text">{{ message }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large">
+                        Delete {{section_name}} Worksheet
+                    </legend>
+
+                    <div class="usa-alert usa-alert--warning margin-bottom-3 margin-top-3">
+                        <div class="usa-alert__body">
+                            <p class="usa-alert__text">
+                                This action is irreversible. Once a file is deleted, it cannot be retrieved. Please ensure that you wish to permanently delete this file.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <p class="margin-bottom-2">Confirm the deletion of the {{section_name}} worksheet by clicking the <b>Delete Worksheet</b> button below.</p>
+                    
+                    <button class="usa-button margin-bottom-8" id="delete">Delete Worksheet</button>
+                    <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
+                    aria-controls="upload-cancel">Cancel</a>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+
+{% endblock content %}

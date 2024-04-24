@@ -20,8 +20,6 @@ local RequiredField = [
   'auditor_email',
   'auditor_firm_name',
   'auditor_phone',
-  'auditor_state',
-  'auditor_zip',
   'ein',
   'ein_not_an_ssn_attestation',
   'is_usa_based',
@@ -31,13 +29,102 @@ local RequiredField = [
   'secondary_auditors_exist',
   'user_provided_organization_type',
   'auditee_zip',
-  'auditor_address_line_1',
-  'auditor_city',
   'auditor_country',
   'audit_period_covered',
-  'auditor_international_address',
 ];
 
 GeneralInformation {
   required: RequiredField,
+  allOf: [
+    {
+      anyOf: [
+        {
+          'if': {
+            properties: {
+              audit_period_covered: {
+                const: 'annual',
+              },
+            },
+          },
+          'then': {
+            not: {
+              required: ['audit_period_other_months'],
+            },
+          },
+        },
+        {
+          'if': {
+            properties: {
+              audit_period_covered: {
+                const: 'biennial',
+              },
+            },
+          },
+          'then': {
+            not: {
+              required: ['audit_period_other_months'],
+            },
+          },
+        },
+        {
+          'if': {
+            properties: {
+              audit_period_covered: {
+                const: 'other',
+              },
+            },
+          },
+          'then': {
+            required: ['audit_period_other_months'],
+          },
+        },
+      ],
+    },
+    // If auditor is from the USA, address info should be included.
+    {
+      'if': {
+        properties: {
+          auditor_country: {
+            const: 'USA',
+          },
+        },
+      },
+      'then': {
+        allOf:[
+          {
+            not: {
+              required: ['auditor_international_address'],
+            },
+          },
+          {
+            required: ['auditor_address_line_1', 'auditor_city', 'auditor_state','auditor_zip'],
+          }
+        ]
+      },
+    },
+    // If auditor is NOT from the USA, international things should be filled in.
+    {
+      'if': {
+        properties: {
+          auditor_country: {
+            not: {
+              const: 'USA',
+            },
+          },
+        },
+      },
+      'then': {
+        allOf: [
+          {
+            not: {
+              required: ['auditor_address_line_1', 'auditor_city', 'auditor_state','auditor_zip'],
+            },
+          },
+          {
+            required: ['auditor_international_address'],
+          }
+        ]
+      },
+    },
+  ],
 }

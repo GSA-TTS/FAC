@@ -1,3 +1,4 @@
+from copy import deepcopy
 import json
 from django.conf import settings
 from jsonschema import FormatChecker, validate
@@ -5,6 +6,7 @@ from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
 from django.core.exceptions import ValidationError
 from audit.cross_validation.naming import NC
 from audit.validators import validate_general_information_schema_rules
+from audit.utils import Util
 
 required_fields = {
     #  `key_in_json_schema: label_for_user`
@@ -63,16 +65,19 @@ def validate_general_information(sac_dict, *_args, **_kwargs):
     friendlier errors when they try to proceed.
     """
     all_sections = sac_dict["sf_sac_sections"]
-    general_information = all_sections[NC.GENERAL_INFORMATION]
+    general_information = deepcopy(all_sections[NC.GENERAL_INFORMATION])
     schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationRequired.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
-
-    errors = _check_required_field(general_information)
+    # Removing extra fields from the general information (if any) to avoid
+    # blocking submission of reports that were created prior to 'Util.remove_extra_fields' code change.
+    # Patch can be removed in few months from 04/23/2024.
+    patched_general_information = Util.remove_extra_fields(general_information)
+    errors = _check_required_field(patched_general_information)
     if errors:
         return errors
     try:
-        validate_general_information_schema_rules(general_information)
-        validate(general_information, schema, format_checker=FormatChecker())
+        validate_general_information_schema_rules(patched_general_information)
+        validate(patched_general_information, schema, format_checker=FormatChecker())
     except JSONSchemaValidationError as err:
         return [{"error": f"General Information: {str(err)}"}]
     except ValidationError as err:
