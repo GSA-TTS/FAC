@@ -26,10 +26,10 @@ locals {
   app_id = cloudfoundry_app.scanner_app.id
 }
 
-resource "cloudfoundry_app" "scanner_app" {
+resource "cloudfoundry_app" "fac-file-scanner" {
   name      = var.name
   space     = data.cloudfoundry_space.scanner_space.id
-  buildpack = "python_buildpack"
+  buildpacks = ["https://github.com/cloudfoundry/apt-buildpack", "nginx_buildpack"]
   path      = "${path.module}/${data.external.scannerzip.result.path}"
   # source_code_hash  = filesha256("${path.module}/${data.external.scannerzip.result.path}")
   timeout           = 180
