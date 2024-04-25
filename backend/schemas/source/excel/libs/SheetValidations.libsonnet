@@ -24,6 +24,13 @@ local YoNoBValidation = {
   custom_error: "Must be 'Y' or 'N' or 'Both'",
   custom_title: 'Y/N/Both',
 };
+local YorNorGsaMigration = {
+  type: 'list',
+  allow_blank: 'False',
+  formula1: '"Y,N,GSA_MIGRATION"',
+  custom_error: "Must be 'Y' or 'N' or 'GSA_MIGRATION'",
+  custom_title: 'Y/N/GSA_MIGRATION',
+};
 // FIRSTCELLREF is magic, and gets replaced with the top
 // of the relevant named range. It uses a relative row reference,
 // so that it applies to every cell in the range.
@@ -101,6 +108,7 @@ local AwardReferenceValidation = {
   StringOfLengthNine: StringOfSize(9),
   StringOfLengthTwelve: StringOfSize(12),
   YoNValidation: YoNValidation,
+  YorNorGsaMigration: YorNorGsaMigration,
   ReferenceNumberValidation: ReferenceNumberValidation,
   LoanBalanceValidation: LoanBalanceValidation,
   // WARNING MCJ

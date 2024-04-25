@@ -44,7 +44,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "value": "1.0.5",
+               "value": "1.1.0",
                "width": 48
             },
             {
@@ -384,9 +384,9 @@
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N'",
-                  "custom_title": "Y/N",
-                  "formula1": "\"Y,N\"",
+                  "custom_error": "Must be 'Y' or 'N' or 'GSA_MIGRATION'",
+                  "custom_title": "Y/N/GSA_MIGRATION",
+                  "formula1": "\"Y,N,GSA_MIGRATION\"",
                   "type": "list"
                }
             },
