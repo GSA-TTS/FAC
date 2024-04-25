@@ -30,7 +30,7 @@ resource "cloudfoundry_app" "scanner_app" {
   name       = var.name
   space      = data.cloudfoundry_space.scanner_space.id
   buildpacks = ["python_buildpack"]
-  # path       = "${path.module}/${data.external.scannerzip.result.path}"
+  path       = "${path.module}/${data.external.scannerzip.result.path}"
   # source_code_hash  = filesha256("${path.module}/${data.external.scannerzip.result.path}")
   timeout           = 180
   disk_quota        = var.disk_quota
