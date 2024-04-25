@@ -29,7 +29,7 @@ locals {
 resource "cloudfoundry_app" "scanner_app" {
   name      = var.name
   space     = data.cloudfoundry_space.scanner_space.id
-  buildpacks = ["https://github.com/cloudfoundry/apt-buildpack", "nginx_buildpack"]
+  buildpacks = ["https://github.com/cloudfoundry/apt-buildpack", "https://github.com/cloudfoundry/python-buildpack"]
   path      = "${path.module}/${data.external.scannerzip.result.path}"
   # source_code_hash  = filesha256("${path.module}/${data.external.scannerzip.result.path}")
   timeout           = 180
