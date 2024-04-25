@@ -36,9 +36,8 @@ resource "cloudfoundry_app" "scanner_app" {
   disk_quota        = var.disk_quota
   memory            = var.scanner_memory
   instances         = var.scanner_instances
-  command           = "echo hello world"
   strategy          = "rolling"
-  health_check_type = "process"
+  health_check_type = "http"
 
   # service_binding {
   #   service_instance = var.clamav_id
