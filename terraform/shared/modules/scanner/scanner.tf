@@ -39,23 +39,23 @@ resource "cloudfoundry_app" "scanner_app" {
   strategy          = "rolling"
   health_check_type = "process"
 
-  service_binding {
-    service_instance = var.clamav_id
-  }
+  # service_binding {
+  #   service_instance = var.clamav_id
+  # }
 
-  service_binding {
-    service_instance = var.s3_id
-  }
+  # service_binding {
+  #   service_instance = var.s3_id
+  # }
 
-  service_binding {
-    service_instance = var.db_id
-  }
+  # service_binding {
+  #   service_instance = var.db_id
+  # }
 
-  routes {
-    route = cloudfoundry_route.scanner_route.id
-  }
+  # routes {
+  #   route = cloudfoundry_route.scanner_route.id
+  # }
+
   environment = {
     PROXYROUTE = var.https_proxy
   }
 }
-
