@@ -26,7 +26,7 @@ locals {
   app_id = cloudfoundry_app.scanner_app.id
 }
 
-resource "cloudfoundry_app" "fac-file-scanner" {
+resource "cloudfoundry_app" "scanner_app" {
   name      = var.name
   space     = data.cloudfoundry_space.scanner_space.id
   buildpacks = ["https://github.com/cloudfoundry/apt-buildpack", "nginx_buildpack"]
