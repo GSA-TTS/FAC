@@ -232,12 +232,10 @@ def xform_auditee_fiscal_period_end(general_information):
     """Transforms the fiscal period end from Census format to FAC format."""
     # Transformation to be documented.
     if general_information.get("auditee_fiscal_period_end"):
-        general_information[
-            "auditee_fiscal_period_end"
-        ] = xform_census_date_to_datetime(
-            general_information.get("auditee_fiscal_period_end")
-        ).strftime(
-            "%Y-%m-%d"
+        general_information["auditee_fiscal_period_end"] = (
+            xform_census_date_to_datetime(
+                general_information.get("auditee_fiscal_period_end")
+            ).strftime("%Y-%m-%d")
         )
     else:
         raise DataMigrationError(
