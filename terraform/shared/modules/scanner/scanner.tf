@@ -43,9 +43,9 @@ resource "cloudfoundry_app" "scanner_app" {
   #   service_instance = var.clamav_id
   # }
 
-  # service_binding {
-  #   service_instance = var.s3_id
-  # }
+  service_binding {
+    service_instance = var.s3_id
+  }
 
   # service_binding {
   #   service_instance = var.db_id
