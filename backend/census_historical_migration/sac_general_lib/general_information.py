@@ -168,7 +168,8 @@ def xform_update_entity_type(audit_header):
 
         audit_header.ENTITY_TYPE = (
             "tribal"
-            if audit_header.SUPPRESSION_CODE.strip().upper() == "IT"
+            if string_to_string(audit_header.SUPPRESSION_CODE).upper() == "IT"
+
             else "unknown"
         )
         track_transformations(
