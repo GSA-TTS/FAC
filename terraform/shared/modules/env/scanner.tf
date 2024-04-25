@@ -3,7 +3,8 @@ locals {
 }
 
 data "cloudfoundry_app" "app" {
-  name = local.clam_name
+  name_or_id = local.clam_name
+  space      = var.cf_space_name
 }
 
 data "cloudfoundry_service" "s3" {
