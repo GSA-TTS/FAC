@@ -8,10 +8,10 @@ data "cloudfoundry_space" "scanner_space" {
 }
 
 resource "cloudfoundry_route" "scanner_route" {
-  space    = data.cloudfoundry_space.apps.id
-  domain   = data.cloudfoundry_domain.public.id
-  hostname = "${var.name}-${var.cf_space_name}"
-  # Yields something like: fac-file-scanner-spacename
+  space    = data.cloudfoundry_space.scanner_space.id
+  domain   = data.cloudfoundry_domain.internal.id
+  hostname = "${var.name}-${replace(var.cf_space_name, ".", "-")}"
+  # Yields something like: fac-file-scanner-spacename.apps.internal
 }
 
 data "external" "scannerzip" {
