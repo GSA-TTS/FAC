@@ -1,10 +1,10 @@
 locals {
-  scanner_name = "fac-scanner"
+  scanner_name = "fac-file-scanner"
 }
 
 module "fac-file-scanner" {
   source            = "../scanner"
-  name              = local.logshipper_name
+  name              = local.scanner_name
   cf_org_name       = var.cf_org_name
   cf_space_name     = var.cf_space_name
   scanner_instances = 1
