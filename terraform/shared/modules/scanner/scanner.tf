@@ -32,12 +32,13 @@ resource "cloudfoundry_app" "scanner_app" {
   buildpack = "https://github.com/cloudfoundry/python-buildpack"
   path      = "${path.module}/${data.external.scannerzip.result.path}"
   # source_code_hash  = filesha256("${path.module}/${data.external.scannerzip.result.path}")
-  timeout           = 180
-  disk_quota        = var.disk_quota
-  memory            = var.scanner_memory
-  instances         = var.scanner_instances
-  strategy          = "rolling"
-  health_check_type = "http"
+  timeout                    = 180
+  disk_quota                 = var.disk_quota
+  memory                     = var.scanner_memory
+  instances                  = var.scanner_instances
+  strategy                   = "rolling"
+  health_check_type          = "http"
+  health_check_http_endpoint = "localhost:8080"
 
   # service_binding {
   #   service_instance = var.clamav_id
