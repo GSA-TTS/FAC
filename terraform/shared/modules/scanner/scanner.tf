@@ -23,15 +23,15 @@ data "external" "scannerzip" {
 }
 
 resource "cloudfoundry_user_provided_service" "clam" {
-  name = "clamav_ups"
+  name  = "clamav_ups"
   space = data.cloudfoundry_space.scanner_space.id
   credentials = {
-    "AV_SCAN_URL": local.scan_url
+    "AV_SCAN_URL" : local.scan_url
   }
 }
 
 locals {
-  app_id = cloudfoundry_app.scanner_app.id
+  app_id   = cloudfoundry_app.scanner_app.id
   scan_url = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
 }
 
