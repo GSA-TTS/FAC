@@ -197,30 +197,24 @@ def xform_missing_notes_records(audit_header, policies_content, rate_content):
 
 def transform_missing_note_title_and_content(notes):
     """Transforms missing note title and note content."""
-    for i in range(len(notes)):
-        if (
-            string_to_string(notes[i].TITLE) == ""
-            and string_to_string(notes[i].CONTENT) != ""
-        ):
+    for note in notes:
+        if string_to_string(note.TITLE) == "" and string_to_string(note.CONTENT) != "":
             track_data_transformation(
-                notes[i].TITLE,
+                note.TITLE,
                 settings.GSA_MIGRATION,
                 "transform_missing_note_title_and_content",
                 "note_title",
             )
-            notes[i].TITLE = settings.GSA_MIGRATION
+            note.TITLE = settings.GSA_MIGRATION
 
-        if (
-            string_to_string(notes[i].CONTENT) == ""
-            and string_to_string(notes[i].TITLE) != ""
-        ):
+        if string_to_string(note.CONTENT) == "" and string_to_string(note.TITLE) != "":
             track_data_transformation(
-                notes[i].CONTENT,
+                note.CONTENT,
                 settings.GSA_MIGRATION,
                 "transform_missing_note_title_and_content",
                 "content",
             )
-            notes[i].CONTENT = settings.GSA_MIGRATION
+            note.CONTENT = settings.GSA_MIGRATION
 
     return notes
 
