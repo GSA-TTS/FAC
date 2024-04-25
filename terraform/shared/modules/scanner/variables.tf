@@ -39,11 +39,6 @@ variable "disk_quota" {
   default     = 512
 }
 
-variable "clamav_id" {
-  type        = string
-  description = "the full string of the clamav api resource id"
-}
-
 variable "s3_id" {
   type        = string
   description = "the full string of the s3 resource id"
