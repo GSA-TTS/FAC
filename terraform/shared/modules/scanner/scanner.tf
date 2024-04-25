@@ -37,8 +37,7 @@ resource "cloudfoundry_app" "scanner_app" {
   memory                     = var.scanner_memory
   instances                  = var.scanner_instances
   strategy                   = "rolling"
-  health_check_type          = "http"
-  health_check_http_endpoint = "localhost:8080"
+  health_check_type          = "none"
 
   # service_binding {
   #   service_instance = var.clamav_id
