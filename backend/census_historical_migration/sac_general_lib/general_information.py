@@ -165,11 +165,9 @@ def xform_update_entity_type(audit_header):
     This updates does not propagate to the database, it only updates the object.
     """
     if string_to_string(audit_header.ENTITY_TYPE) == "":
-
         audit_header.ENTITY_TYPE = (
             "tribal"
             if string_to_string(audit_header.SUPPRESSION_CODE).upper() == "IT"
-
             else "unknown"
         )
         track_transformations(
@@ -234,10 +232,12 @@ def xform_auditee_fiscal_period_end(general_information):
     """Transforms the fiscal period end from Census format to FAC format."""
     # Transformation to be documented.
     if general_information.get("auditee_fiscal_period_end"):
-        general_information["auditee_fiscal_period_end"] = (
-            xform_census_date_to_datetime(
-                general_information.get("auditee_fiscal_period_end")
-            ).strftime("%Y-%m-%d")
+        general_information[
+            "auditee_fiscal_period_end"
+        ] = xform_census_date_to_datetime(
+            general_information.get("auditee_fiscal_period_end")
+        ).strftime(
+            "%Y-%m-%d"
         )
     else:
         raise DataMigrationError(
