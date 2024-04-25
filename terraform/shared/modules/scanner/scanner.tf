@@ -49,7 +49,7 @@ resource "cloudfoundry_app" "scanner_app" {
   health_check_type = "port"
 
   service_binding {
-    service_instance = cloudfoundry_user_provided_service.clamav_ups.id
+    service_instance = cloudfoundry_user_provided_service.clam.id
   }
 
   service_binding {
