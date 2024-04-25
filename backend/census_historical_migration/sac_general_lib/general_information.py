@@ -162,8 +162,8 @@ def xform_update_multiple_ueis_flag(audit_header):
 
 def xform_update_entity_type(audit_header):
     """Updates ENTITY_TYPE.
-    This update does not propagate to the database, it only updates the object."""
-
+    This updates does not propagate to the database, it only updates the object.
+    """
     if string_to_string(audit_header.ENTITY_TYPE) == "":
         audit_header.ENTITY_TYPE = (
             "tribal"
