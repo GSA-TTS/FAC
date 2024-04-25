@@ -37,7 +37,7 @@ resource "cloudfoundry_app" "scanner_app" {
   memory                     = var.scanner_memory
   instances                  = var.scanner_instances
   strategy                   = "rolling"
-  health_check_type          = "none"
+  health_check_type          = "port"
 
   # service_binding {
   #   service_instance = var.clamav_id
