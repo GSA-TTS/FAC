@@ -216,7 +216,7 @@ def xform_missing_cluster_total(
 
 def xform_is_passthrough_award(audits):
     """
-    Replaces missing PASSTHROUGHAWARD field GSA_MIGRATION
+    Replaces missing PASSTHROUGHAWARD field with GSA_MIGRATION
     """
     change_records = []
     is_empty_passthrough_found = False
@@ -233,6 +233,7 @@ def xform_is_passthrough_award(audits):
                 "xform_is_passthrough_award",
                 change_records,
             )
+            
             audit.PASSTHROUGHAWARD = settings.GSA_MIGRATION
 
     if change_records and is_empty_passthrough_found:
