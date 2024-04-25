@@ -2,15 +2,26 @@ locals {
   scanner_name = "fac-file-scanner"
 }
 
+data "cloudfoundry_app" "app" {
+  name = local.clam_name
+}
+
+data "cloudfoundry_service" "s3" {
+  name = "fac-private-s3"
+}
+
+data "cloudfoundry_service" "rds" {
+  name = "fac-db"
+}
 module "fac-file-scanner" {
   source            = "../scanner"
   name              = local.scanner_name
   cf_org_name       = var.cf_org_name
   cf_space_name     = var.cf_space_name
   https_proxy       = module.https-proxy.https_proxy
-  clamav_id         = module.clamav.app_id
-  db_id             = module.database.instance_id
-  s3_id             = module.s3-private.bucket_id
+  clamav_id         = data.cloudfoundry_app.app.id
+  db_id             = data.cloudfoundry_service.rds.id
+  s3_id             = data.cloudfoundry_service.s3.id
   scanner_instances = 1
   scanner_memory    = 512
   disk_quota        = 512
