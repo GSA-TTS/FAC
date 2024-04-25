@@ -22,8 +22,17 @@ data "external" "scannerzip" {
   }
 }
 
+resource "cloudfoundry_user_provided_service" "clam" {
+  name = "clamav_ups"
+  space = data.cloudfoundry_space.scanner_space.id
+  credentials = {
+    "AV_SCAN_URL": local.scan_url
+  }
+}
+
 locals {
   app_id = cloudfoundry_app.scanner_app.id
+  scan_url = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
 }
 
 resource "cloudfoundry_app" "scanner_app" {
@@ -38,6 +47,10 @@ resource "cloudfoundry_app" "scanner_app" {
   instances         = var.scanner_instances
   strategy          = "rolling"
   health_check_type = "port"
+
+  service_binding {
+    service_instance = cloudfoundry_user_provided_service.clamav_ups.id
+  }
 
   service_binding {
     service_instance = var.s3_id
