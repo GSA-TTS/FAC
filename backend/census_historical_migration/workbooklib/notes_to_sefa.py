@@ -198,7 +198,10 @@ def xform_missing_notes_records(audit_header, policies_content, rate_content):
 def transform_missing_note_title_and_content(notes):
     """Transforms missing note title and note content."""
     for i in range(len(notes)):
-        if notes[i].TITLE.strip() == "":
+        if (
+            string_to_string(notes[i].TITLE) == ""
+            and string_to_string(notes[i].CONTENT) != ""
+        ):
             track_data_transformation(
                 notes[i].TITLE,
                 settings.GSA_MIGRATION,
@@ -207,7 +210,10 @@ def transform_missing_note_title_and_content(notes):
             )
             notes[i].TITLE = settings.GSA_MIGRATION
 
-        if notes[i].CONTENT.strip() == "":
+        if (
+            string_to_string(notes[i].CONTENT) == ""
+            and string_to_string(notes[i].TITLE) != ""
+        ):
             track_data_transformation(
                 notes[i].CONTENT,
                 settings.GSA_MIGRATION,
@@ -246,7 +252,12 @@ def generate_notes_to_sefa(audit_header, outfile):
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
     set_range(wb, "rate_explained", [rate_content])
 
-    contains_chart_or_tables = [settings.GSA_MIGRATION] * len(notes)
+    contains_chart_or_tables = []
+    for note in notes:
+        if string_to_string(note.TITLE) == "" and string_to_string(note.CONTENT) == "":
+            contains_chart_or_tables.append("")
+        else:
+            contains_chart_or_tables.append(settings.GSA_MIGRATION)
 
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)
