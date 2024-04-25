@@ -12,6 +12,7 @@ resource "cloudfoundry_route" "scanner_route" {
   domain   = data.cloudfoundry_domain.internal.id
   hostname = "${var.cf_org_name}-${replace(var.cf_space_name, ".", "-")}-${var.name}"
   # Yields something like: orgname-spacename-name.apps.internal
+  depends_on = [ cloudfoundry_app.scanner_app ]
 }
 
 data "external" "scannerzip" {
