@@ -233,7 +233,7 @@ def xform_is_passthrough_award(audits):
                 "xform_is_passthrough_award",
                 change_records,
             )
-            
+
             audit.PASSTHROUGHAWARD = settings.GSA_MIGRATION
 
     if change_records and is_empty_passthrough_found:
