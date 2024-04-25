@@ -1,7 +1,10 @@
+from copy import deepcopy
 from audit.cross_validation.naming import NC, find_section_by_name
 from audit.models.submission_event import SubmissionEvent
 from audit.validators import validate_general_information_complete_json
 from django.core.exceptions import ValidationError
+
+from audit.utils import Util
 
 
 def submission_progress_check(sac, sar=None, crossval=True):
@@ -187,8 +190,12 @@ def general_information_progress_check(progress, general_info, sac):
     "general_information" as the key and the progress as the value.
     """
     try:
+        # Removing extra fields from the general information (if any) to avoid
+        # blocking submission of reports that were created prior to 'Util.remove_extra_fields' code change.
+        # Patch can be removed in few months from 04/23/2024.
+        patched_general_info = Util.remove_extra_fields(deepcopy(general_info))
         is_general_info_complete = bool(
-            validate_general_information_complete_json(general_info)
+            validate_general_information_complete_json(patched_general_info)
         )
     except ValidationError:
         is_general_info_complete = False
