@@ -22,6 +22,10 @@ data "external" "scannerzip" {
   }
 }
 
+locals {
+  app_id = cloudfoundry_app.scanner_app.id
+}
+
 resource "cloudfoundry_app" "scanner_app" {
   name       = var.name
   space      = data.cloudfoundry_space.scanner_space.id

@@ -12,12 +12,12 @@ module "fac-file-scanner" {
   disk_quota        = 256
   clamav_id         = module.clamav.app_id
   db_id             = module.database.instance_id
-  s3_id             = module.s3-private.bucket
+  s3_id             = module.s3-private.bucket_id
 }
 
 resource "cloudfoundry_network_policy" "scanner-network-policy" {
   policy {
-    source_app      = module.scanner_app.app_id
+    source_app      = module.fac-file-scanner.app_id
     destination_app = module.https-proxy.app_id
     port            = "61443"
     protocol        = "tcp"
