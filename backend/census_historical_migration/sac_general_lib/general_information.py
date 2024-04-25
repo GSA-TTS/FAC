@@ -164,7 +164,8 @@ def xform_update_entity_type(audit_header):
     """Updates ENTITY_TYPE.
     This updates does not propagate to the database, it only updates the object.
     """
-    if audit_header.ENTITY_TYPE.strip() == "":
+    if string_to_string(audit_header.ENTITY_TYPE) == "":
+
         audit_header.ENTITY_TYPE = (
             "tribal"
             if audit_header.SUPPRESSION_CODE.strip().upper() == "IT"
