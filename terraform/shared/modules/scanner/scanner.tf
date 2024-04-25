@@ -47,9 +47,9 @@ resource "cloudfoundry_app" "scanner_app" {
     service_instance = var.s3_id
   }
 
-  # service_binding {
-  #   service_instance = var.db_id
-  # }
+  service_binding {
+    service_instance = var.db_id
+  }
 
   routes {
     route = cloudfoundry_route.scanner_route.id
