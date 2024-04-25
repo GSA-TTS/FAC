@@ -22,4 +22,10 @@ resource "cloudfoundry_network_policy" "scanner-network-policy" {
     port            = "61443"
     protocol        = "tcp"
   }
+  policy {
+    source_app      = module.fac-file-scanner.app_id
+    destination_app = module.clamav.app_id
+    port            = "61443"
+    protocol        = "tcp"
+  }
 }
