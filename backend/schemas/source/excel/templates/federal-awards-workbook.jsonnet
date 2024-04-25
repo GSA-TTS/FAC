@@ -241,7 +241,7 @@ local open_ranges_defns = [
     Sheets.y_or_n_range {
       help: Help.yorn,
     },
-    SV.YorNorGsaMigration,
+    SV.YoNValidation,
     'Federal Award Passed Through to Subrecipients',
     'is_passed',
   ],

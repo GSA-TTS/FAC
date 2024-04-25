@@ -384,9 +384,9 @@
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N' or 'GSA_MIGRATION'",
-                  "custom_title": "Y/N/GSA_MIGRATION",
-                  "formula1": "\"Y,N,GSA_MIGRATION\"",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
                   "type": "list"
                }
             },
