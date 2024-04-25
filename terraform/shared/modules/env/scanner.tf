@@ -10,7 +10,7 @@ module "fac-file-scanner" {
   https_proxy       = module.https-proxy.https_proxy
   clamav_id         = module.clamav.app_id
   db_id             = module.database.instance_id
-  s3_id             = module.s3-private.instance_id
+  s3_id             = module.s3-private.bucket_id
   scanner_instances = 1
   scanner_memory    = 512
   disk_quota        = 512
