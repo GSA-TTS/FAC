@@ -21,12 +21,14 @@ class CheckAwardRefExistenceTest(TestCase):
         return {
             "FederalAwards": {
                 "federal_awards": [
-                    {
-                        "program": {"federal_agency_prefix": "10"},
-                        "award_reference": award_ref,
-                    }
-                    if award_ref
-                    else {"program": {"federal_agency_prefix": "22"}}
+                    (
+                        {
+                            "program": {"federal_agency_prefix": "10"},
+                            "award_reference": award_ref,
+                        }
+                        if award_ref
+                        else {"program": {"federal_agency_prefix": "22"}}
+                    )
                     for award_ref in award_refs
                 ],
             }

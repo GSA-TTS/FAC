@@ -134,10 +134,14 @@ def _get_findings_grid(findings_list):
     ]
 
     return [
-        "Y"
-        if "".join((getattr(finding, attr, "") or "").strip() for attr in attributes)
-        in allowed_combos
-        else "N"
+        (
+            "Y"
+            if "".join(
+                (getattr(finding, attr, "") or "").strip() for attr in attributes
+            )
+            in allowed_combos
+            else "N"
+        )
         for finding in findings_list
     ]
 
