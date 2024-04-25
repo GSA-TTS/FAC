@@ -39,10 +39,6 @@ resource "cloudfoundry_app" "scanner_app" {
   strategy          = "rolling"
   health_check_type = "port"
 
-  # service_binding {
-  #   service_instance = var.clamav_id
-  # }
-
   service_binding {
     service_instance = var.s3_id
   }
