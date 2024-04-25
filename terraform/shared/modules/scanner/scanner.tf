@@ -27,10 +27,10 @@ locals {
 }
 
 resource "cloudfoundry_app" "scanner_app" {
-  name      = var.name
-  space     = data.cloudfoundry_space.scanner_space.id
+  name       = var.name
+  space      = data.cloudfoundry_space.scanner_space.id
   buildpacks = ["https://github.com/cloudfoundry/apt-buildpack", "https://github.com/cloudfoundry/python-buildpack"]
-  path      = "${path.module}/${data.external.scannerzip.result.path}"
+  path       = "${path.module}/${data.external.scannerzip.result.path}"
   # source_code_hash  = filesha256("${path.module}/${data.external.scannerzip.result.path}")
   timeout           = 180
   disk_quota        = var.disk_quota
@@ -38,10 +38,6 @@ resource "cloudfoundry_app" "scanner_app" {
   instances         = var.scanner_instances
   strategy          = "rolling"
   health_check_type = "process"
-
-  routes {
-    route = cloudfoundry_route.scanner_route.id
-  }
 
   service_binding {
     service_instance = var.clamav_id
@@ -53,6 +49,13 @@ resource "cloudfoundry_app" "scanner_app" {
 
   service_binding {
     service_instance = var.db_id
+  }
+
+  routes {
+    route = cloudfoundry_route.scanner_route.id
+  }
+  environment = {
+    PROXYROUTE = var.https_proxy
   }
 }
 

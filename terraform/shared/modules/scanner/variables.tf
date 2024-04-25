@@ -53,3 +53,8 @@ variable "db_id" {
   type        = string
   description = "the full string of the database resource id"
 }
+
+variable "https_proxy" {
+  type        = string
+  description = "the full string of the https proxy for use with the logshipper app"
+}
