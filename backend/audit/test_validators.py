@@ -932,9 +932,9 @@ class TribalAccessTests(SimpleTestCase):
         """Test that wrong value types raise a validation error."""
         for case in self.SIMPLE_CASES:
             case_copy = jsoncopy(case)
-            case_copy[
-                "is_tribal_information_authorized_to_be_public"
-            ] = "incorrect_type"
+            case_copy["is_tribal_information_authorized_to_be_public"] = (
+                "incorrect_type"
+            )
 
             with self.assertRaises(ValidationError):
                 validate_tribal_data_consent_json(case_copy)
