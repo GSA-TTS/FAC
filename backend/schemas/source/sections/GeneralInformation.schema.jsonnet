@@ -24,7 +24,14 @@ Typechecks fields, but allows for empty data as well. Contains conditional check
 
     // Auditee information
     auditee_uei: Base.Compound.UniqueEntityIdentifier,
-    ein: Base.Compound.EmployerIdentificationNumber,
+    ein: {
+      oneOf: [
+        Base.Compound.EmployerIdentificationNumber,
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+      ],
+    },
     ein_not_an_ssn_attestation: Types.boolean,
     auditee_name: Types.string {
       maxLength: 100,
@@ -58,7 +65,14 @@ Typechecks fields, but allows for empty data as well. Contains conditional check
     },
 
     // Auditor information
-    auditor_ein: Base.Compound.EmployerIdentificationNumber,
+    auditor_ein: {
+      oneOf: [
+        Base.Compound.EmployerIdentificationNumber,
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+      ],
+    },
     auditor_ein_not_an_ssn_attestation: Types.boolean,
     auditor_firm_name: Types.string {
       maxLength: 100,

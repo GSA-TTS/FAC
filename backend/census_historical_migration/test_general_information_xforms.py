@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from unittest.mock import patch
 from django.conf import settings
 from django.test import SimpleTestCase
 
@@ -13,6 +14,8 @@ from .sac_general_lib.general_information import (
     xform_entity_type,
     xform_replace_empty_auditor_email,
     xform_replace_empty_auditee_email,
+    xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
+    xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
 )
 from .exception_utils import (
     DataMigrationError,
@@ -261,3 +264,69 @@ class TestXformReplaceEmptyAuditeeEmail(SimpleTestCase):
         input_data = {}
         expected_output = {"auditee_email": settings.GSA_MIGRATION}
         self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
+
+
+class TestXformReplaceEmptyOrInvalidEins(SimpleTestCase):
+    def test_auditor_ein_valid(self):
+        """Test that valid auditor EIN is not replaced."""
+        info = {"auditor_ein": "123456789"}
+        result = xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration(info)
+        self.assertEqual(result["auditor_ein"], "123456789")
+
+    def test_auditor_ein_invalid_replaced(self):
+        """Test that invalid auditor EIN is replaced."""
+        info = {"auditor_ein": "invalid_ein"}
+        with patch(
+            "census_historical_migration.sac_general_lib.general_information.track_transformations"
+        ) as mock_track:
+            result = xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration(info)
+            mock_track.assert_called_once_with(
+                "AUDITOR_EIN",
+                "invalid_ein",
+                "auditor_ein",
+                settings.GSA_MIGRATION,
+                "xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration",
+            )
+            self.assertEqual(result["auditor_ein"], settings.GSA_MIGRATION)
+
+    def test_auditor_ein_empty_replaced(self):
+        """Test that empty auditor EIN is replaced."""
+        info = {"auditor_ein": ""}
+        with patch(
+            "census_historical_migration.sac_general_lib.general_information.track_transformations"
+        ) as mock_track:
+            result = xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration(info)
+            mock_track.assert_called_once()
+            self.assertEqual(result["auditor_ein"], settings.GSA_MIGRATION)
+
+    def test_auditee_ein_valid(self):
+        """Test that valid auditee EIN is not replaced."""
+        info = {"ein": "123456789"}
+        result = xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(info)
+        self.assertEqual(result["ein"], "123456789")
+
+    def test_auditee_ein_invalid_replaced(self):
+        """Test that invalid auditee EIN is replaced."""
+        info = {"ein": "invalid_ein"}
+        with patch(
+            "census_historical_migration.sac_general_lib.general_information.track_transformations"
+        ) as mock_track:
+            result = xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(info)
+            mock_track.assert_called_once_with(
+                "EIN",
+                "invalid_ein",
+                "auditee_ein",
+                settings.GSA_MIGRATION,
+                "xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration",
+            )
+            self.assertEqual(result["ein"], settings.GSA_MIGRATION)
+
+    def test_auditee_ein_empty_replaced(self):
+        """Test that empty auditee EIN is replaced."""
+        info = {"ein": ""}
+        with patch(
+            "census_historical_migration.sac_general_lib.general_information.track_transformations"
+        ) as mock_track:
+            result = xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(info)
+            mock_track.assert_called_once()
+            self.assertEqual(result["ein"], settings.GSA_MIGRATION)
