@@ -1,6 +1,7 @@
 """
 Custom tag to support simpler writing of USWDS sprite icon references.
 """
+
 from django import template
 
 register = template.Library()

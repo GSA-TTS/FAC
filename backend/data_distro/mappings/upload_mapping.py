@@ -3,6 +3,7 @@ Mapping for upload.
 Used by public_data_loader.
 Update with create_upload_mapping management command.
 """
+
 upload_mapping = {
     "gen": {
         "AUDITEECERTIFYNAME": ["Auditee", "auditee_certify_name"],
