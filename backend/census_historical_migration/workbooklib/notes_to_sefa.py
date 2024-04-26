@@ -167,38 +167,13 @@ def _get_notes(dbkey, year):
     return sort_by_field(results, "SEQ_NUMBER")
 
 
-def xform_missing_notes_records(audit_header, policies_content, rate_content):
-    """Transforms missing notes records for 2022, 2021, 2020, 2019, 2016, 2017 and 2018 audits."""
-    if string_to_string(audit_header.AUDITYEAR) in [
-        "2022",
-        "2021",
-        "2020",
-        "2019",
-        "2018",
-        "2017",
-        "2016",
-    ] and not (policies_content or rate_content):
-        policies_content = settings.GSA_MIGRATION
-        rate_content = settings.GSA_MIGRATION
-        track_data_transformation(
-            policies_content,
-            settings.GSA_MIGRATION,
-            "xform_missing_notes_records",
-            "accounting_policies",
-        )
-        track_data_transformation(
-            rate_content,
-            settings.GSA_MIGRATION,
-            "xform_missing_notes_records",
-            "rate_explained",
-        )
-    return policies_content, rate_content
+def xform_missing_notes_records_v2(audit_header, policies_content, rate_content):
+    """Transforms missing notes records for 2022, 2021, 2020, 2019, 2016, 2017 and 2018 audits.
+    Note:
+    This function replaces xform_missing_notes_records function.
+    This function covers all years 2016 through 2022.
+    This function tracks census data for policies_content and rate_content."""
 
-
-def xform_missing_notes_records_track_census_data(
-    audit_header, policies_content, rate_content
-):
-    """Transforms missing notes records for 2022, 2021, 2020, 2019, 2016, 2017 and 2018 audits."""
     if string_to_string(audit_header.AUDITYEAR) in [
         "2022",
         "2021",
@@ -211,14 +186,14 @@ def xform_missing_notes_records_track_census_data(
         track_data_transformation(
             policies_content,
             settings.GSA_MIGRATION,
-            "xform_missing_notes_records_track_census_data",
+            "xform_missing_notes_records_v2",
             "accounting_policies",
         )
         policies_content = settings.GSA_MIGRATION
         track_data_transformation(
             rate_content,
             settings.GSA_MIGRATION,
-            "xform_missing_notes_records_track_census_data",
+            "xform_missing_notes_records_v2",
             "rate_explained",
         )
         rate_content = settings.GSA_MIGRATION
@@ -269,7 +244,7 @@ def generate_notes_to_sefa(audit_header, outfile):
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
     is_minimis_rate_used = xform_is_minimis_rate_used(rate_content, index)
-    policies_content, rate_content = xform_missing_notes_records_track_census_data(
+    policies_content, rate_content = xform_missing_notes_records_v2(
         audit_header, policies_content, rate_content
     )
     set_range(wb, "accounting_policies", [policies_content])
