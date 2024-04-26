@@ -19,11 +19,11 @@ end note
 Boundary(cloudgov, "Cloud.gov Boundary") {
     Boundary(atob, "ATO Boundary") {
         Boundary(backend, "FAC application", "egress-controlled-space") {
+            System(api, "REST API ", "PostgREST")
             System(django, "FAC Web App", "Django")
             Boundary(services, "FAC Internal Services") {
                 System(scan, "Virus Scanner", "ClamAV")
                 System(scanner, "FAC File Scanner", "Python")
-                System(api, "REST API ", "PostgREST")
             }
         }
         Boundary(proxy, "Proxy services", "egress-permitted-space"){
