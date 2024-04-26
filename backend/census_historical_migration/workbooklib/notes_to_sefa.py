@@ -200,14 +200,14 @@ def xform_missing_notes_records_v2(audit_header, policies_content, rate_content)
     return policies_content, rate_content
 
 
-def transform_missing_note_title_and_content(notes):
+def xform_missing_note_title_and_content(notes):
     """Transforms missing note title and note content."""
     for note in notes:
         if string_to_string(note.TITLE) == "" and string_to_string(note.CONTENT) != "":
             track_data_transformation(
                 note.TITLE,
                 settings.GSA_MIGRATION,
-                "transform_missing_note_title_and_content",
+                "xform_missing_note_title_and_content",
                 "note_title",
             )
             note.TITLE = settings.GSA_MIGRATION
@@ -216,7 +216,7 @@ def transform_missing_note_title_and_content(notes):
             track_data_transformation(
                 note.CONTENT,
                 settings.GSA_MIGRATION,
-                "transform_missing_note_title_and_content",
+                "xform_missing_note_title_and_content",
                 "content",
             )
             note.CONTENT = settings.GSA_MIGRATION
@@ -236,7 +236,7 @@ def generate_notes_to_sefa(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     notes = _get_notes(audit_header.DBKEY, audit_header.AUDITYEAR)
-    notes = transform_missing_note_title_and_content(notes)
+    notes = xform_missing_note_title_and_content(notes)
     rate_content, index = _get_minimis_cost_rate(
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
