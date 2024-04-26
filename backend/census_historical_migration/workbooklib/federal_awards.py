@@ -222,10 +222,11 @@ def xform_is_passthrough_award(audits):
     is_empty_passthrough_found = False
 
     for audit in audits:
-        if audit.PASSTHROUGHAWARD.strip() == "":
+        if not string_to_string(audit.PASSTHROUGHAWARD):
             is_empty_passthrough_found = True
 
-            if int(audit.PASSTHROUGHAMOUNT):
+            amount = string_to_string(audit.PASSTHROUGHAMOUNT)
+            if amount and amount != "0":
                 audit.PASSTHROUGHAWARD = "Y"
             else:
                 audit.PASSTHROUGHAWARD = "N"
