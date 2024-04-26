@@ -316,6 +316,7 @@ local Compound = {
     maxLength: 500,
   },
   EmployerIdentificationNumber: Types.string {
+    # A python version of these regexes also exists in settings.py
     pattern: '^[0-9]{9}$',
   },
   UniqueEntityIdentifier: {
