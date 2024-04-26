@@ -308,14 +308,7 @@ local Parts = {
   Subrecipients: Types.object {
     additionalProperties: false,
     properties: {
-      is_passed: {
-      oneOf: [
-        Types.string {
-          const: Base.Const.GSA_MIGRATION,
-        },
-        Base.Enum.YorN,
-      ],
-    },
+      is_passed: Base.Enum.YorN,
       subrecipient_amount: Types.number,
     },
     allOf: Validations.SubrecipientValidations,

@@ -216,7 +216,7 @@ def xform_missing_cluster_total(
 
 def xform_is_passthrough_award(audits):
     """
-    Replaces missing PASSTHROUGHAWARD field with GSA_MIGRATION
+    Extrapolates missing PASSTHROUGHAWARD using PASSTHROUGHAMOUNT
     """
     change_records = []
     is_empty_passthrough_found = False
@@ -225,16 +225,19 @@ def xform_is_passthrough_award(audits):
         if audit.PASSTHROUGHAWARD.strip() == "":
             is_empty_passthrough_found = True
 
+            if int(audit.PASSTHROUGHAMOUNT):
+                audit.PASSTHROUGHAWARD = "Y"
+            else:
+                audit.PASSTHROUGHAWARD = "N"
+
             track_transformations(
                 "PASSTHROUGHAWARD",
                 "",
                 "is_passthrough_award",
-                settings.GSA_MIGRATION,
+                audit.PASSTHROUGHAWARD,
                 "xform_is_passthrough_award",
                 change_records,
             )
-
-            audit.PASSTHROUGHAWARD = settings.GSA_MIGRATION
 
     if change_records and is_empty_passthrough_found:
         InspectionRecord.append_federal_awards_changes(change_records)

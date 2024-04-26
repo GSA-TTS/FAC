@@ -505,19 +505,11 @@
                         ],
                         "properties": {
                            "is_passed": {
-                              "oneOf": [
-                                 {
-                                    "const": "GSA_MIGRATION",
-                                    "type": "string"
-                                 },
-                                 {
-                                    "enum": [
-                                       "Y",
-                                       "N"
-                                    ],
-                                    "type": "string"
-                                 }
-                              ]
+                              "enum": [
+                                 "Y",
+                                 "N"
+                              ],
+                              "type": "string"
                            },
                            "subrecipient_amount": {
                               "type": "number"
