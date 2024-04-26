@@ -209,23 +209,20 @@ class TestXformMissingNoteTitleAndContent(SimpleTestCase):
     def test_note_w_no_title(self):
         notes = self._mock_notes_no_title()
         result = xform_missing_note_title_and_content(notes)
-        self.assertIn(settings.GSA_MIGRATION, result[0].TITLE)
-        self.assertIn(settings.GSA_MIGRATION, result[1].TITLE)
-        self.assertNotIn(settings.GSA_MIGRATION, result[0].CONTENT)
-        self.assertNotIn(settings.GSA_MIGRATION, result[1].CONTENT)
+        for note in result:
+            self.assertIn(settings.GSA_MIGRATION, note.TITLE)
+            self.assertNotIn(settings.GSA_MIGRATION, note.CONTENT)
 
     def test_note_w_no_content(self):
         notes = self._mock_notes_no_content()
         result = xform_missing_note_title_and_content(notes)
-        self.assertNotIn(settings.GSA_MIGRATION, result[0].TITLE)
-        self.assertNotIn(settings.GSA_MIGRATION, result[1].TITLE)
-        self.assertIn(settings.GSA_MIGRATION, result[0].CONTENT)
-        self.assertIn(settings.GSA_MIGRATION, result[1].CONTENT)
+        for note in result:
+            self.assertNotIn(settings.GSA_MIGRATION, note.TITLE)
+            self.assertIn(settings.GSA_MIGRATION, note.CONTENT)
 
     def test_note_with_title_content(self):
         notes = self._mock_notes_with_title_content()
         result = xform_missing_note_title_and_content(notes)
-        self.assertNotIn(settings.GSA_MIGRATION, result[0].TITLE)
-        self.assertNotIn(settings.GSA_MIGRATION, result[1].TITLE)
-        self.assertNotIn(settings.GSA_MIGRATION, result[0].CONTENT)
-        self.assertNotIn(settings.GSA_MIGRATION, result[1].CONTENT)
+        for note in result:
+            self.assertNotIn(settings.GSA_MIGRATION, note.TITLE)
+            self.assertNotIn(settings.GSA_MIGRATION, note.CONTENT)
