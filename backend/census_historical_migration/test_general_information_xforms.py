@@ -352,6 +352,8 @@ class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
         self.assertIn(
             "UeiSchema.json file contains invalid JSON", str(context.exception)
         )
+
+
 class TestXformReplaceEmptyOrInvalidEins(SimpleTestCase):
     def test_auditor_ein_valid(self):
         """Test that valid auditor EIN is not replaced."""
