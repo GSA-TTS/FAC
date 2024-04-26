@@ -160,7 +160,7 @@ def is_uei_valid(uei):
             "UeiSchema.json file contains invalid JSON.", "invalid_uei_schema_json"
         )
 
-    except ValidationError as e:
+    except ValidationError:
         return False
 
     except Exception as e:
