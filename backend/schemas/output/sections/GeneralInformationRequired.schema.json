@@ -303,8 +303,16 @@
          "type": "string"
       },
       "auditor_ein": {
-         "pattern": "^[0-9]{9}$",
-         "type": "string"
+         "oneOf": [
+            {
+               "pattern": "^[0-9]{9}$",
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "auditor_ein_not_an_ssn_attestation": {
          "type": "boolean"
@@ -404,8 +412,16 @@
          "type": "string"
       },
       "ein": {
-         "pattern": "^[0-9]{9}$",
-         "type": "string"
+         "oneOf": [
+            {
+               "pattern": "^[0-9]{9}$",
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "ein_not_an_ssn_attestation": {
          "type": "boolean"
