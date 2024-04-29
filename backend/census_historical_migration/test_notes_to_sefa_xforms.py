@@ -5,6 +5,7 @@ from .exception_utils import DataMigrationError
 from .workbooklib.notes_to_sefa import (
     xform_is_minimis_rate_used,
     xform_missing_note_title_and_content,
+    xform_missing_notes_records_v2,
 )
 
 
@@ -154,9 +155,11 @@ class TestXformMissingNoteTitleAndContent(SimpleTestCase):
             self,
             TITLE,
             CONTENT,
+            TYPE_ID,
         ):
             self.TITLE = TITLE
             self.CONTENT = CONTENT
+            self.TYPE_ID = TYPE_ID
 
     def _mock_notes_no_title(self):
         notes = []
@@ -164,12 +167,14 @@ class TestXformMissingNoteTitleAndContent(SimpleTestCase):
             self.MockNote(
                 TITLE="",
                 CONTENT="SUPPORTIVE HOUSING FOR THE ELDERLY (14.157) - Balances outstanding at the end of the audit period were 3356.",
+                TYPE_ID=3,
             )
         )
         notes.append(
             self.MockNote(
                 TITLE="",
                 CONTENT="MORTGAGE INSURANCE FOR THE PURCHASE OR REFINANCING OF EXISTING MULTIFAMILY HOUSING PROJECTS (14.155) - Balances outstanding at the end of the audit period were 4040.",
+                TYPE_ID=3,
             )
         )
         return notes
@@ -180,12 +185,14 @@ class TestXformMissingNoteTitleAndContent(SimpleTestCase):
             self.MockNote(
                 TITLE="Loan/loan guarantee outstanding balances",
                 CONTENT="",
+                TYPE_ID=3,
             )
         )
         notes.append(
             self.MockNote(
                 TITLE="Federally Funded Insured Mortgages and Capital Advances",
                 CONTENT="",
+                TYPE_ID=3,
             )
         )
         return notes
@@ -196,12 +203,14 @@ class TestXformMissingNoteTitleAndContent(SimpleTestCase):
             self.MockNote(
                 TITLE="Loan/loan guarantee outstanding balances",
                 CONTENT="SUPPORTIVE HOUSING FOR THE ELDERLY (14.157) - Balances outstanding at the end of the audit period were 4000.",
+                TYPE_ID=3,
             )
         )
         notes.append(
             self.MockNote(
                 TITLE="Federally Funded Insured Mortgages and Capital Advances",
                 CONTENT="MORTGAGE INSURANCE FOR THE PURCHASE OR REFINANCING OF EXISTING MULTIFAMILY HOUSING PROJECTS (14.155) - Balances outstanding at the end of the audit period were 5000.",
+                TYPE_ID=3,
             )
         )
         return notes
@@ -226,3 +235,253 @@ class TestXformMissingNoteTitleAndContent(SimpleTestCase):
         for note in result:
             self.assertNotIn(settings.GSA_MIGRATION, note.TITLE)
             self.assertNotIn(settings.GSA_MIGRATION, note.CONTENT)
+
+
+class TestXformMissingNotesRecordsV2(SimpleTestCase):
+    class MockAuditHeader:
+        def __init__(
+            self,
+            DBKEY,
+            AUDITYEAR,
+        ):
+            self.DBKEY = DBKEY
+            self.AUDITYEAR = AUDITYEAR
+
+    class MockNote:
+        def __init__(
+            self,
+            TITLE,
+            CONTENT,
+            TYPE_ID,
+            DBKEY,
+            AUDITYEAR,
+        ):
+            self.TITLE = TITLE
+            self.CONTENT = CONTENT
+            self.TYPE_ID = TYPE_ID
+            self.DBKEY = DBKEY
+            self.AUDITYEAR = AUDITYEAR
+
+    def _mock_notes_valid_year_policies_no_rate(self):
+        notes = []
+        notes.append(
+            self.MockNote(
+                TITLE="Significant Accounting Policies Used in Preparing the SEFA",
+                CONTENT="Expenditures reported on the Schedule are reported on the accrual basis of accounting.  Such expenditures are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenditures are not allowable or are limited as to reimbursement.",
+                TYPE_ID=1,
+                DBKEY="123456789",
+                AUDITYEAR="2022",
+            )
+        )
+        audit_header = self.MockAuditHeader(
+            DBKEY="123456789",
+            AUDITYEAR="2022",
+        )
+        return notes, audit_header
+
+    def _mock_notes_valid_year_rate_no_policies(self):
+        notes = []
+        notes.append(
+            self.MockNote(
+                TITLE="10% De Minimis Cost Rate",
+                CONTENT="The auditee did not elect to use the de minimis cost rate.",
+                TYPE_ID=2,
+                DBKEY="223456789",
+                AUDITYEAR="2021",
+            )
+        )
+        audit_header = self.MockAuditHeader(
+            DBKEY="223456789",
+            AUDITYEAR="2021",
+        )
+        return notes, audit_header
+
+    def _mock_notes_valid_year_no_rate_no_policies(self):
+        notes = []
+        audit_header = self.MockAuditHeader(
+            DBKEY="223456788",
+            AUDITYEAR="2020",
+        )
+        return notes, audit_header
+
+    def _mock_notes_valid_year_rate_policies(self):
+        notes = []
+        notes.append(
+            self.MockNote(
+                TITLE="10% De Minimis Cost Rate",
+                CONTENT="The auditee did not elect to use the de minimis cost rate.",
+                TYPE_ID=2,
+                DBKEY="123456788",
+                AUDITYEAR="2018",
+            )
+        )
+        notes.append(
+            self.MockNote(
+                TITLE="Significant Accounting Policies Used in Preparing the SEFA",
+                CONTENT="Expenditures reported on the Schedule are reported on the accrual basis of accounting.  Such expenditures are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenditures are not allowable or are limited as to reimbursement.",
+                TYPE_ID=1,
+                DBKEY="123456788",
+                AUDITYEAR="2018",
+            )
+        )
+        audit_header = self.MockAuditHeader(
+            DBKEY="123456788",
+            AUDITYEAR="2018",
+        )
+        return notes, audit_header
+
+    def _mock_notes_invalid_year_policies_no_rate(self):
+        notes = []
+        notes.append(
+            self.MockNote(
+                TITLE="Significant Accounting Policies Used in Preparing the SEFA",
+                CONTENT="Expenditures reported on the Schedule are reported on the accrual basis of accounting.  Such expenditures are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenditures are not allowable or are limited as to reimbursement.",
+                TYPE_ID=1,
+                DBKEY="124456788",
+                AUDITYEAR="2015",
+            )
+        )
+        audit_header = self.MockAuditHeader(
+            DBKEY="124456788",
+            AUDITYEAR="2015",
+        )
+        return notes, audit_header
+
+    def _mock_notes_invalid_year_rate_no_policies(self):
+        notes = []
+        notes.append(
+            self.MockNote(
+                TITLE="10% De Minimis Cost Rate",
+                CONTENT="The auditee did not elect to use the de minimis cost rate.",
+                TYPE_ID=2,
+                DBKEY="124456789",
+                AUDITYEAR="2014",
+            )
+        )
+        audit_header = self.MockAuditHeader(
+            DBKEY="124456789",
+            AUDITYEAR="2014",
+        )
+        return notes, audit_header
+
+    def _mock_notes_invalid_year_no_rate_no_policies(self):
+        notes = []
+        audit_header = self.MockAuditHeader(
+            DBKEY="134456788",
+            AUDITYEAR="2013",
+        )
+        return notes, audit_header
+
+    def _mock_notes_invalid_year_rate_policies(self):
+        notes = []
+        notes.append(
+            self.MockNote(
+                TITLE="10% De Minimis Cost Rate",
+                CONTENT="The auditee did not elect to use the de minimis cost rate.",
+                TYPE_ID=2,
+                DBKEY="124466788",
+                AUDITYEAR="1800",
+            )
+        )
+        notes.append(
+            self.MockNote(
+                TITLE="Significant Accounting Policies Used in Preparing the SEFA",
+                CONTENT="Expenditures reported on the Schedule are reported on the accrual basis of accounting.  Such expenditures are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenditures are not allowable or are limited as to reimbursement.",
+                TYPE_ID=1,
+                DBKEY="124466788",
+                AUDITYEAR="1800",
+            )
+        )
+        audit_header = self.MockAuditHeader(
+            DBKEY="124466788",
+            AUDITYEAR="1800",
+        )
+        return notes, audit_header
+
+    def test_xform_missing_notes_records_v2_with_valid_year_policies_no_rate(self):
+        notes, audit_header = self._mock_notes_valid_year_policies_no_rate()
+        policies_content = list(filter(lambda note: note.TYPE_ID == 1, notes))[
+            0
+        ].CONTENT
+        rate_content = ""
+        result_policies_content, result_rate_content = xform_missing_notes_records_v2(
+            audit_header, policies_content, rate_content
+        )
+        self.assertEqual(policies_content, result_policies_content)
+        self.assertEqual(rate_content, result_rate_content)
+
+    def test_xform_missing_notes_records_v2_with_valid_year_rate_no_policies(self):
+        notes, audit_header = self._mock_notes_valid_year_rate_no_policies()
+        policies_content = ""
+        rate_content = list(filter(lambda note: note.TYPE_ID == 2, notes))[0].CONTENT
+        result_policies_content, result_rate_content = xform_missing_notes_records_v2(
+            audit_header, policies_content, rate_content
+        )
+        self.assertEqual(rate_content, result_rate_content)
+        self.assertEqual(policies_content, result_policies_content)
+
+    def test_xform_missing_notes_records_v2_with_valid_year_no_rate_no_policies(self):
+        notes, audit_header = self._mock_notes_valid_year_no_rate_no_policies()
+        policies_content = ""
+        rate_content = ""
+        result_policies_content, result_rate_content = xform_missing_notes_records_v2(
+            audit_header, policies_content, rate_content
+        )
+        self.assertEqual(settings.GSA_MIGRATION, result_policies_content)
+        self.assertEqual(settings.GSA_MIGRATION, result_rate_content)
+
+    def test_xform_missing_notes_records_v2_with_valid_year_rate_policies(self):
+        notes, audit_header = self._mock_notes_valid_year_rate_policies()
+        policies_content = list(filter(lambda note: note.TYPE_ID == 1, notes))[
+            0
+        ].CONTENT
+        rate_content = list(filter(lambda note: note.TYPE_ID == 2, notes))[0].CONTENT
+        result_policies_content, result_rate_content = xform_missing_notes_records_v2(
+            audit_header, policies_content, rate_content
+        )
+        self.assertEqual(policies_content, result_policies_content)
+        self.assertEqual(rate_content, result_rate_content)
+
+    def test_xform_missing_notes_records_v2_with_invalid_year_policies_no_rate(self):
+        notes, audit_header = self._mock_notes_invalid_year_policies_no_rate()
+        policies_content = list(filter(lambda note: note.TYPE_ID == 1, notes))[
+            0
+        ].CONTENT
+        rate_content = ""
+        result_policies_content, result_rate_content = xform_missing_notes_records_v2(
+            audit_header, policies_content, rate_content
+        )
+        self.assertEqual(policies_content, result_policies_content)
+        self.assertEqual(rate_content, result_rate_content)
+
+    def test_xform_missing_notes_records_v2_with_invalid_year_rate_no_policies(self):
+        notes, audit_header = self._mock_notes_invalid_year_rate_no_policies()
+        policies_content = ""
+        rate_content = list(filter(lambda note: note.TYPE_ID == 2, notes))[0].CONTENT
+        result_policies_content, result_rate_content = xform_missing_notes_records_v2(
+            audit_header, policies_content, rate_content
+        )
+        self.assertEqual(policies_content, result_policies_content)
+        self.assertEqual(rate_content, result_rate_content)
+
+    def test_xform_missing_notes_records_v2_with_invalid_year_no_rate_no_policies(self):
+        notes, audit_header = self._mock_notes_invalid_year_no_rate_no_policies()
+        policies_content = ""
+        rate_content = ""
+        result_policies_content, result_rate_content = xform_missing_notes_records_v2(
+            audit_header, policies_content, rate_content
+        )
+        self.assertEqual(policies_content, result_policies_content)
+        self.assertEqual(rate_content, result_rate_content)
+
+    def test_xform_missing_notes_records_v2_with_invalid_year_rate_policies(self):
+        notes, audit_header = self._mock_notes_invalid_year_rate_policies()
+        policies_content = list(filter(lambda note: note.TYPE_ID == 1, notes))[
+            0
+        ].CONTENT
+        rate_content = list(filter(lambda note: note.TYPE_ID == 2, notes))[0].CONTENT
+        result_policies_content, result_rate_content = xform_missing_notes_records_v2(
+            audit_header, policies_content, rate_content
+        )
+        self.assertEqual(policies_content, result_policies_content)
+        self.assertEqual(rate_content, result_rate_content)
