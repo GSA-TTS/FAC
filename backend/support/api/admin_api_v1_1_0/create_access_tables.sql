@@ -28,12 +28,6 @@ INSERT INTO support_administrative_key_uuids
         '2023-12-04'
     ),
     (
-        'carley.jackson@gsa.gov',
-        'a938cfca-c8eb-4065-b2eb-782d04bd58ef',
-        'CREATE,READ,DELETE',
-        '2023-12-04'
-    ),
-    (
         'timothy.ballard@gsa.gov',
         '1e2845a0-c844-4a6f-84ac-f398b58ce7c9',
         'CREATE,READ,DELETE',

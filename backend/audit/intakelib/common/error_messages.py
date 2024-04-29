@@ -1,5 +1,7 @@
 messages = {
     "check_uei_exists": "You did not provide a UEI on the coversheet",
+    "check_uei_schema": "The auditee UEI is not valid",
+    "check_uei_match": "The auditee UEI on the coversheet does not match the UEI entered in the General Information section",
     "check_cluster_names_state_cluster_missing": "You need to provide a state cluster name when selecting STATE CLUSTER",
     "check_cluster_names_no_state_cluster_needed": "State cluster must be blank unless you are selecting STATE CLUSTER",
     "check_other_cluster_names_cluster_name_missing": "You need to provide an altername cluster name when selecting OTHER CLUSTER",
@@ -78,7 +80,8 @@ messages = {
     "check_cardinality_of_passthrough_names_and_ids": "You used a <b>|</b> (bar character) to indicate multiple passthrough names and IDs; you must provide equal numbers of names and IDs. You provided <b>{}</b> name{} and <b>{}</b> ID{}",
     "check_workbook_version": "Single audit workbook template version {} is not supported. Please download the latest workbook and transfer your data to it",
     "check_integer_values": "<b>{}</b> is not a valid integer",
-    "check_gsa_migration_keyword": "<b>GSA_MIGRATION</b> is not allowed.",
+    "check_gsa_migration_keyword": "<b>GSA_MIGRATION</b> is not allowed",
     "check_cluster_names": "Invalid cluster name",
     "check_award_references_len_4_or_5": "Award references must all follow the pattern AWARD-#### or AWARD-#####; {} does not fit either",
+    "check_max_rows": "The number of rows in the {} named range exceeds the maximum allowed for this version of the workbook",
 }

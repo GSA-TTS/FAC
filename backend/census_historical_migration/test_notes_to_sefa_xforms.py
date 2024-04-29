@@ -2,7 +2,10 @@ from django.conf import settings
 from django.test import SimpleTestCase
 
 from .exception_utils import DataMigrationError
-from .workbooklib.notes_to_sefa import xform_is_minimis_rate_used
+from .workbooklib.notes_to_sefa import (
+    xform_is_minimis_rate_used,
+    xform_missing_note_title_and_content,
+)
 
 
 class TestXformIsMinimisRateUsed(SimpleTestCase):
@@ -143,3 +146,83 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
     def test_empty_string(self):
         """Test that the function returns GSA MIGRATION keyword when the input is an empty string."""
         self.assertEqual(xform_is_minimis_rate_used(""), settings.GSA_MIGRATION)
+
+
+class TestXformMissingNoteTitleAndContent(SimpleTestCase):
+    class MockNote:
+        def __init__(
+            self,
+            TITLE,
+            CONTENT,
+        ):
+            self.TITLE = TITLE
+            self.CONTENT = CONTENT
+
+    def _mock_notes_no_title(self):
+        notes = []
+        notes.append(
+            self.MockNote(
+                TITLE="",
+                CONTENT="SUPPORTIVE HOUSING FOR THE ELDERLY (14.157) - Balances outstanding at the end of the audit period were 3356.",
+            )
+        )
+        notes.append(
+            self.MockNote(
+                TITLE="",
+                CONTENT="MORTGAGE INSURANCE FOR THE PURCHASE OR REFINANCING OF EXISTING MULTIFAMILY HOUSING PROJECTS (14.155) - Balances outstanding at the end of the audit period were 4040.",
+            )
+        )
+        return notes
+
+    def _mock_notes_no_content(self):
+        notes = []
+        notes.append(
+            self.MockNote(
+                TITLE="Loan/loan guarantee outstanding balances",
+                CONTENT="",
+            )
+        )
+        notes.append(
+            self.MockNote(
+                TITLE="Federally Funded Insured Mortgages and Capital Advances",
+                CONTENT="",
+            )
+        )
+        return notes
+
+    def _mock_notes_with_title_content(self):
+        notes = []
+        notes.append(
+            self.MockNote(
+                TITLE="Loan/loan guarantee outstanding balances",
+                CONTENT="SUPPORTIVE HOUSING FOR THE ELDERLY (14.157) - Balances outstanding at the end of the audit period were 4000.",
+            )
+        )
+        notes.append(
+            self.MockNote(
+                TITLE="Federally Funded Insured Mortgages and Capital Advances",
+                CONTENT="MORTGAGE INSURANCE FOR THE PURCHASE OR REFINANCING OF EXISTING MULTIFAMILY HOUSING PROJECTS (14.155) - Balances outstanding at the end of the audit period were 5000.",
+            )
+        )
+        return notes
+
+    def test_note_w_no_title(self):
+        notes = self._mock_notes_no_title()
+        result = xform_missing_note_title_and_content(notes)
+        for note in result:
+            self.assertIn(settings.GSA_MIGRATION, note.TITLE)
+            self.assertNotIn(settings.GSA_MIGRATION, note.CONTENT)
+
+    def test_note_w_no_content(self):
+        notes = self._mock_notes_no_content()
+        result = xform_missing_note_title_and_content(notes)
+        for note in result:
+            self.assertNotIn(settings.GSA_MIGRATION, note.TITLE)
+            self.assertIn(settings.GSA_MIGRATION, note.CONTENT)
+
+    def test_note_with_title_content(self):
+        notes = self._mock_notes_with_title_content()
+        result = xform_missing_note_title_and_content(notes)
+        for note in result:
+            self.assertNotIn(settings.GSA_MIGRATION, note.TITLE)
+            self.assertNotIn(settings.GSA_MIGRATION, note.CONTENT)

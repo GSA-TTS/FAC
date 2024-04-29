@@ -39,7 +39,7 @@ export LDFLAGS="-L/usr/local/opt/openssl/lib -L/usr/local/lib -L/usr/local/opt/e
 You may need to install the Python version being used by the team. The following take place in the `backend` directory of the checked out repository.
 
 ```
-FAC_PYTHON_VERSION=`cat .python-version`
+FAC_PYTHON_VERSION=`cat ../.python-version`
 pyenv install $FAC_PYTHON_VERSION
 ```
 

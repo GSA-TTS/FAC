@@ -225,9 +225,9 @@ field_name_ordered = {
         "id",
         "report_id",
         "note_title",
-        "is_minimis_rate_used",
         "accounting_policies",
         "rate_explained",
+        "is_minimis_rate_used",
         "content",
         "contains_chart_or_table",
     ],
@@ -578,8 +578,10 @@ def gather_report_data_pre_certification(i2d_data):
 def create_workbook(data, protect_sheets=False):
     t0 = time.time()
     workbook = pyxl.Workbook()
-
-    for sheet_name in data.keys():
+    # remove sheet that is created during workbook construction
+    default_sheet = workbook.active
+    workbook.remove(default_sheet)
+    for sheet_name in sorted(data.keys()):
         sheet = workbook.create_sheet(sheet_name)
 
         # create a header row with the field names
@@ -600,8 +602,6 @@ def create_workbook(data, protect_sheets=False):
         if protect_sheets:
             protect_sheet(sheet)
 
-    # remove sheet that is created during workbook construction
-    workbook.remove_sheet(workbook.get_sheet_by_name("Sheet"))
     t1 = time.time()
     return (workbook, t1 - t0)
 
@@ -648,6 +648,7 @@ def generate_summary_report(report_ids, include_private=False):
     (data, tgrdd) = gather_report_data_dissemination(
         report_ids, tribal_report_ids, include_private
     )
+    data = separate_notes_single_fields_from_array_fields(data)
     (workbook, tcw) = create_workbook(data)
     insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
     (filename, tpw) = persist_workbook(workbook)
@@ -661,6 +662,7 @@ def generate_summary_report(report_ids, include_private=False):
 # Ignore performance profiling for the presub.
 def generate_presubmission_report(i2d_data):
     data = gather_report_data_pre_certification(i2d_data)
+    data = separate_notes_single_fields_from_array_fields(data)
     (workbook, _) = create_workbook(data, protect_sheets=True)
     insert_precert_coversheet(workbook)
     workbook.security.workbookPassword = str(uuid.uuid4())
@@ -668,3 +670,51 @@ def generate_presubmission_report(i2d_data):
     (filename, _) = persist_workbook(workbook)
 
     return filename
+
+
+def separate_notes_single_fields_from_array_fields(data):
+    """Split the notes fields into two groups, one for the coversheet and one for the contents."""
+    section = "note"
+    split_field_names = [
+        "accounting_policies",
+        "rate_explained",
+        "is_minimis_rate_used",
+    ]
+    nested_dict = data[section] if section in data else None
+    field_names = nested_dict["field_names"] if nested_dict else []
+    entries = nested_dict["entries"] if nested_dict else []
+    retained_field_names = [
+        name for name in field_names if name not in split_field_names
+    ]
+    split_field_names = ["report_id"] + split_field_names
+
+    if nested_dict and entries:
+        split_entries = []
+        retained_entries = []
+        seen = set()
+        # Split the entries into two groups, one for the coversheet and one for the contents.
+        for entry in entries:
+            split_entry = []
+            retained_entry = []
+            for field_name, value in zip(field_names, entry):
+                if field_name in split_field_names:
+                    split_entry.append(value)
+                if field_name in retained_field_names:
+                    retained_entry.append(value)
+
+            # Add the retained entry to the retained entries list.
+            retained_entries.append(retained_entry)
+            # Only add the split entry if it hasn't been seen before.
+            if tuple(split_entry) not in seen:
+                split_entries.append(split_entry)
+                seen.add(tuple(split_entry))
+
+        # Update the data dictionary with the new entries.
+        data[section] = {
+            "field_names": retained_field_names,
+            "entries": retained_entries,
+        }
+        new_key = f"{section}_coversheet"
+        data[new_key] = {"field_names": split_field_names, "entries": split_entries}
+
+    return data

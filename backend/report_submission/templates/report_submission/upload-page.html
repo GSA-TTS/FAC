@@ -47,12 +47,22 @@
                         <p class="text-green" id="already-submitted">
                             A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
                         </p>
-                        <p>Last uploaded by {{last_uploaded_by}} at {{last_uploaded_at}} <a class="usa-link display-flex flex-column"
-                            href={{existing_workbook_url}}
-                            target="_blank">Download current workbook</a></p>
+                        <p>Last uploaded by {{last_uploaded_by}} at {{last_uploaded_at}}
+                            <span class="display-flex">
+                                <a class="usa-link" href="{{existing_workbook_url}}" target="_blank">Download current workbook</a>
+                                {% if remove_existing_workbook %}
+                                    <span>&nbsp;|&nbsp;</span>
+                                    <a class="usa-link" id="remove-workbook-link" href="{{remove_existing_workbook}}">Remove current workbook</a>
+                                {% endif %}
+                            </span>
+                        </p>
                     {% endif %}
 
                     <div hidden id="info_box" class="grid-row margin-bottom-3 margin-top-3"></div>
+
+                    <div hidden id="loader" class="margin-bottom-3">
+                        <img src="{% static 'img/loader.svg' %}" alt="spinner for processing upload" />
+                    </div>
 
                     <button class="usa-button margin-bottom-8" id="continue" disabled="disabled">Return to Report Home</button>
                     <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"

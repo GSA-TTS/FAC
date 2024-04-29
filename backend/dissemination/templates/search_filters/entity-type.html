@@ -1,0 +1,17 @@
+{% comment %} Entity Type {% endcomment %}
+<button type="button"
+        class="usa-accordion__button"
+        aria-expanded={% if form_user_input.entity_type %}"true"{% else %}"false"{% endif %}
+        aria-controls="entity-type">Entity type</button>
+<div id="entity-type" class="usa-form-group">
+    {% for value, text in form.entity_type.field.choices %}
+        <div class="usa-checkbox bg-base-lighter">
+            <input class="usa-checkbox__input"
+                    id="entity_type-{{ text }}"
+                    name="entity_type" type="checkbox"
+                    value={{value}}
+                    {% if value in form_user_input.entity_type %}checked{% endif %} />
+            <label class="usa-checkbox__label" for="entity_type-{{ text }}">{{ text }}</label>
+        </div>
+    {% endfor %}
+</div>

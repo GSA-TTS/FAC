@@ -6,27 +6,25 @@ labels: ''
 assignees: ''
 ---
 
-# For everyone
+## For everyone
 
-- [ ] Remove from [the FAC-team Google Group](https://groups.google.com/a/gsa.gov/g/fac-team/members)
+- [ ] Remove from Google groups as applicable:
+  - [ ] [FAC-team](https://groups.google.com/a/gsa.gov/g/fac-team/members) 
+  - [ ] [fac-gov-test-users](https://groups.google.com/a/gsa.gov/g/fac-gov-test-users/members)
+  - [ ] [fac-gov-api-dev](https://groups.google.com/a/gsa.gov/g/fac-gov-api-dev)
 - [ ] Remove from [the FAC team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members)
-- [ ] Remove from the private channel #oros-fac-private in Slack (“/remove @[person]”)
-
-**For designers, also...**
-
+- [ ] Remove from the private channels #oros-fac-private and #fac-helpdesk in Slack (“/remove @[person]”)
 - [ ] Remove from active Figma projects
+- [ ] Remove from Mural
+- [ ] Remove from Zendesk 
+- [ ] Check for and remove admin access in the FAC application: this may include designated permissions and/or checked-in API  access ([for example](https://github.com/GSA-TTS/FAC/blob/fb0e7bdf1cb1807291e6b6eef068e97b4574078c/backend/support/api/admin_api_v1_1_0/create_access_tables.sql#L21))
 
-**For engineers, also...**
-
+## For GitHub contributors
 - [ ] Make a PR to [remove the departing team member from the list of developers and managers](https://github.com/GSA-TTS/FAC/tree/main/terraform/meta/config.tf) with access to our spaces.
 - [ ] [Remove the departing team member as a member of the FAC group in New Relic.](https://one.newrelic.com/admin-portal/organizations/users-list) (@GSA-TTS/fac-admins can do this)
     - [ ] If they're leaving TTS altogether, also delete their account. 
-- [ ] Remove the user from any test accounts (e.g. the Google Group that is used for Cypress test accounts) if they are in that group.
-- [ ] Remove from the API GG if they are a member.
 
-
-**For product leads/owners, also...**
-
-- [ ] Make someone else the owner of [the various Google Groups in the project README](https://docs.google.com/document/d/1g8nYqYS_ifFlZB-DBgfeSoJRMB__EqWsmLnacyk-bDI/edit#heading=h.81zynabayrrg) (and remove them)
-- [ ] Make someone else the Maintainer and remove the departing team member from [the FAC-admins team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-admins/members) and [the FAC-team team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members).
+## For admins
+- [ ] If the departing team member is a Google Group manager, designate a new manager for any groups they manage.
+- [ ] If they are the on Make someone else the Maintainer and remove the departing team member from [the FAC-admins team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-admins/members) and [the FAC-team team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members).
 - [ ] Remove any deployment tokens associated with the PL/PO from the repository.

@@ -41,26 +41,32 @@ SECTIONS_PAGE = {
     "findings_uniform_guidance": {
         "edit_text": f"Edit the {SECTIONS_NAMING['findings_uniform_guidance']['friendly_title']}",
         "text": "This workbook is only necessary if there are findings listed in Workbook 1: Federal Awards. Complete this workbook using the Summary Schedule of Prior Audit Findings and the information in the financial statement audit. If there are no audit findings, you do not need to complete this workbook.",
+        "delete_text": f"Remove the {SECTIONS_NAMING['findings_uniform_guidance']['friendly_title']}",
     },
     "findings_text": {
         "edit_text": f"Edit the {SECTIONS_NAMING['findings_text']['friendly_title']}",
         "text": "This workbook is only necessary if there are findings listed in Workbook 1: Federal Awards. Enter the full text of the audit finding, listing the finding reference number for each. Do not include charts, tables, or footnotes. If there are no audit findings, you do not need to complete this workbook.",
+        "delete_text": f"Remove the {SECTIONS_NAMING['findings_text']['friendly_title']}",
     },
     "corrective_action_plan": {
         "edit_text": f"Edit the {SECTIONS_NAMING['corrective_action_plan']['friendly_title']}",
         "text": "This workbook is only necessary if there are findings listed in Workbook 1: Federal Awards. Information in this workbook should match the data you entered in Workbook 1. You only need to enter plans for findings once if they relate to more than one program. If there are no audit findings, you do not need to complete this workbook.",
+        "delete_text": f"Remove the {SECTIONS_NAMING['corrective_action_plan']['friendly_title']}",
     },
     "additional_ueis": {
         "edit_text": f"Edit the {SECTIONS_NAMING['additional_ueis']['friendly_title']}",
         "text": "This workbook is only necessary if the audit report covers multiple UEIs. List the additional UEIs covered by the audit, excluding the primary UEI.",
+        "delete_text": f"Remove the {SECTIONS_NAMING['additional_ueis']['friendly_title']}",
     },
     "secondary_auditors": {
         "edit_text": f"Edit the {SECTIONS_NAMING['secondary_auditors']['friendly_title']}",
         "text": "This workbook is only necessary if multiple auditors did the audit work.",
+        "delete_text": f"Remove the {SECTIONS_NAMING['secondary_auditors']['friendly_title']}",
     },
     "additional_eins": {
         "edit_text": f"Edit the {SECTIONS_NAMING['additional_eins']['friendly_title']}",
         "text": "This workbook is only necessary if the audit report covers multiple EINs. List the additional EINs covered by the audit, excluding the primary EIN.",
+        "delete_text": f"Remove the {SECTIONS_NAMING['additional_eins']['friendly_title']}",
     },
 }
 
