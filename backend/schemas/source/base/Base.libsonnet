@@ -299,12 +299,12 @@ local Compound = {
   PriorReferences: Types.string {
     title: 'PriorReferences',
     description: 'Prior references',
-    pattern: '^20[1-9][0-9]-[0-9]{3}(,\\s*20[1-9][0-9]-[0-9]{3})*$',
+    pattern: '^[1-2][0-9]{3}-[0-9]{3}(,\\s*[1-2][0-9]{3}-[0-9]{3})*$',
   },
   ReferenceNumber: Types.string {
     title: 'ReferenceNumber',
     description: 'Reference Number',
-    pattern: '^20[1-9][0-9]-[0-9]{3}$',
+    pattern: '^[1-2][0-9]{3}-[0-9]{3}$',
   },
   ComplianceRequirement: {
     title: 'ComplianceRequirement',
