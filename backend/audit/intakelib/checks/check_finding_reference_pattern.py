@@ -13,12 +13,12 @@ from audit.intakelib.common import (
 logger = logging.getLogger(__name__)
 
 # A version of these regexes also exists in Base.libsonnet
-FINDING_REFERENCE_REGEX = r"^20[1-9][0-9]-[0-9]{3}(,\s*20[1-9][0-9]-[0-9]{3})*$"
+FINDING_REFERENCE_REGEX = r"^[1-2][0-9]{3}-[0-9]{3}(,\s*[1-2][0-9]{3}-[0-9]{3})*$"
 
 
 # DESCRIPTION
 # Finding references should be in 20##-### format where the first four
-# digits are a year >= 2010.
+# digits are a year >= 1900.
 # TESTED BY
 # has_bad_references.xlsx
 def finding_reference_pattern(ir):
