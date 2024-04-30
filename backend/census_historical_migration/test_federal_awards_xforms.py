@@ -19,6 +19,7 @@ from .workbooklib.federal_awards import (
     xform_populate_default_passthrough_amount,
     xform_populate_default_passthrough_names_ids,
     xform_replace_invalid_extension,
+    xform_is_passthrough_award,
     is_valid_extension,
 )
 
@@ -304,6 +305,34 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
         audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="")]
         expected = [str(settings.GSA_MIGRATION_INT)]
         self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
+
+
+class TestXformIsPassthroughAward(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, PASSTHROUGHAWARD, PASSTHROUGHAMOUNT):
+            self.PASSTHROUGHAWARD = PASSTHROUGHAWARD
+            self.PASSTHROUGHAMOUNT = PASSTHROUGHAMOUNT
+
+    def test_passthrough_award_Y(self):
+        """Test the function with a valid passthrough award."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="0")]
+        expected = "Y"
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
+    def test_passthrough_award_empty_with_amount(self):
+        """Test the function with an empty passthrough award and truthy amount."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="", PASSTHROUGHAMOUNT="42")]
+        expected = "Y"
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
+    def test_passthrough_award_empty_with_no_amount(self):
+        """Test the function with an empty passthrough award and falsy amount."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="", PASSTHROUGHAMOUNT="0")]
+        expected = "N"
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
 
 
 class TestCFDAFunctions(SimpleTestCase):
