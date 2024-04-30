@@ -21,6 +21,7 @@ from .workbooklib.federal_awards import (
     xform_replace_invalid_extension,
     xform_is_passthrough_award,
     is_valid_extension,
+    xform_cluster_names,
 )
 
 
@@ -585,3 +586,25 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
 
         self.assertEqual(transformed_names, names)
         self.assertEqual(transformed_ids, expected_ids)
+
+
+class TestXformClusterNames(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, cluster_name):
+            self.CLUSTERNAME = cluster_name
+
+    def test_cluster_name_not_other_cluster(self):
+        audits = []
+        audits.append(self.MockAudit("STUDENT FINANCIAL ASSISTANCE"))
+        audits.append(self.MockAudit("RESEARCH AND DEVELOPMENT"))
+        result = xform_cluster_names(audits)
+        for index in range(len(result)):
+            self.assertEqual(result[index].CLUSTERNAME, audits[index].CLUSTERNAME)
+
+    def test_cluster_name_other_cluster(self):
+        audits = []
+        audits.append(self.MockAudit("OTHER CLUSTER"))
+        audits.append(self.MockAudit("OTHER CLUSTER"))
+        result = xform_cluster_names(audits)
+        for audit in result:
+            self.assertEqual(audit.CLUSTERNAME, settings.OTHER_CLUSTER)
