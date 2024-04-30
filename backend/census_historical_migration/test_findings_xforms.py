@@ -3,7 +3,10 @@ from django.test import SimpleTestCase
 
 from .workbooklib.findings_text import xform_add_placeholder_for_missing_references
 
-from .workbooklib.findings import xform_sort_compliance_requirement
+from .workbooklib.findings import (
+  xform_sort_compliance_requirement,
+  xform_missing_compliance_requirement,
+)
 
 
 class TestXformSortComplianceRequirement(SimpleTestCase):
@@ -97,3 +100,23 @@ class TestXformAddPlaceholderForMissingFindingsText(SimpleTestCase):
         )  # Expecting two items in findings_texts
         self.assertEqual(findings_texts[0].FINDINGREFNUMS, "ref1")
         self.assertEqual(findings_texts[1].FINDINGREFNUMS, "ref2")
+
+
+class TestXformMissingComplianceRequirement(SimpleTestCase):
+    class Findings:
+        def __init__(self, type_requirement):
+            self.TYPEREQUIREMENT = type_requirement
+
+    def test_missing_compliance_requirement(self):
+        mock_findings = [self.Findings("")]
+
+        xform_missing_compliance_requirement(mock_findings)
+
+        self.assertEqual(mock_findings[0].TYPEREQUIREMENT, settings.GSA_MIGRATION)
+
+    def test_normal_compliance_requirement(self):
+        mock_findings = [self.Findings("ABC")]
+
+        xform_missing_compliance_requirement(mock_findings)
+
+        self.assertEqual(mock_findings[0].TYPEREQUIREMENT, "ABC")

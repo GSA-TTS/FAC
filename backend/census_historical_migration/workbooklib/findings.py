@@ -197,6 +197,7 @@ def generate_findings(audit_header, outfile):
     findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
     award_references = xform_construct_award_references(audits, findings)
     xform_sort_compliance_requirement(findings)
+    xform_missing_compliance_requirement(findings)
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
 
