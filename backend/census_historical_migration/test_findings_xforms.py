@@ -4,8 +4,8 @@ from django.test import SimpleTestCase
 from .workbooklib.findings_text import xform_add_placeholder_for_missing_references
 
 from .workbooklib.findings import (
-  xform_sort_compliance_requirement,
-  xform_missing_compliance_requirement,
+    xform_sort_compliance_requirement,
+    xform_missing_compliance_requirement,
 )
 
 
