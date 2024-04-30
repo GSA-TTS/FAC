@@ -258,7 +258,6 @@ def xform_constructs_cluster_names(
 
 def xform_program_name(audits):
     """Default missing program_name to GSA_MIGRATION"""
-
     change_records = []
     is_empty_program_name_found = False
 
