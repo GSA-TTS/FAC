@@ -214,6 +214,36 @@ def xform_missing_cluster_total(
         InspectionRecord.append_federal_awards_changes(change_records)
 
 
+def xform_is_passthrough_award(audits):
+    """
+    Extrapolates missing PASSTHROUGHAWARD using PASSTHROUGHAMOUNT
+    """
+    change_records = []
+    is_empty_passthrough_found = False
+
+    for audit in audits:
+        if not string_to_string(audit.PASSTHROUGHAWARD):
+            is_empty_passthrough_found = True
+
+            amount = string_to_string(audit.PASSTHROUGHAMOUNT)
+            if amount and amount != "0":
+                audit.PASSTHROUGHAWARD = "Y"
+            else:
+                audit.PASSTHROUGHAWARD = "N"
+
+            track_transformations(
+                "PASSTHROUGHAWARD",
+                "",
+                "is_passthrough_award",
+                audit.PASSTHROUGHAWARD,
+                "xform_is_passthrough_award",
+                change_records,
+            )
+
+    if change_records and is_empty_passthrough_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
 def xform_constructs_cluster_names(
     audits: list[Audits],
 ) -> tuple[list[str], list[str], list[str]]:
@@ -530,6 +560,7 @@ def generate_federal_awards(audit_header, outfile):
     xform_missing_findings_count(audits)
     xform_missing_amount_expended(audits)
     xform_program_name(audits)
+    xform_is_passthrough_award(audits)
 
     map_simple_columns(wb, mappings, audits)
 
