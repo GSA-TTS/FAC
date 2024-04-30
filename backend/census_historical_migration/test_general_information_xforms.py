@@ -271,7 +271,13 @@ class TestXformReplaceEmptyAuditeeEmail(SimpleTestCase):
 
 class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
 
+    class MockAuditHeader:
+
+        def __init__(self, UEI):
+            self.UEI = UEI
+
     def setUp(self):
+        self.audit_header = self.MockAuditHeader("")
         self.valid_uei = "ZQGGHJH74DW7"
         self.invalid_uei = "123"
         self.uei_schema = {
@@ -293,17 +299,22 @@ class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
 
     def test_auditee_uei_valid(self):
         """Test that valid auditee EIN is not replaced."""
-        info = {"auditee_uei": "ZQGGHJH74DW7"}
-        result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(info)
-        self.assertEqual(result["auditee_uei"], "ZQGGHJH74DW7")
+        self.audit_header.UEI = "ZQGGHJH74DW7"
+        result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(
+            self.audit_header
+        )
+        print(result)
+        self.assertEqual(result.UEI, "ZQGGHJH74DW7")
 
     def test_auditee_uei_invalid_replaced(self):
         """Test that invalid auditee UEI is replaced."""
-        info = {"auditee_uei": "invalid_uei"}
+        self.audit_header.UEI = "invalid_uei"
         with patch(
             "census_historical_migration.sac_general_lib.general_information.track_transformations"
         ) as mock_track:
-            result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(info)
+            result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(
+                self.audit_header
+            )
             mock_track.assert_called_once_with(
                 "UEI",
                 "invalid_uei",
@@ -311,17 +322,19 @@ class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
                 settings.GSA_MIGRATION,
                 "xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration",
             )
-            self.assertEqual(result["auditee_uei"], settings.GSA_MIGRATION)
+            self.assertEqual(result.UEI, settings.GSA_MIGRATION)
 
     def test_auditee_uei_empty_replaced(self):
         """Test that empty auditee UEI is replaced."""
-        info = {"auditee_uei": ""}
+        self.audit_header.UEI = "auditee_uei"
         with patch(
             "census_historical_migration.sac_general_lib.general_information.track_transformations"
         ) as mock_track:
-            result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(info)
+            result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(
+                self.audit_header
+            )
             mock_track.assert_called_once()
-            self.assertEqual(result["auditee_uei"], settings.GSA_MIGRATION)
+            self.assertEqual(result.UEI, settings.GSA_MIGRATION)
 
     @patch("builtins.open", side_effect=FileNotFoundError)
     @patch(

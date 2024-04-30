@@ -366,23 +366,20 @@ def xform_replace_empty_auditee_email(general_information):
     return general_information
 
 
-def xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(general_information):
+def xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header):
     """Replaces empty or invalid auditee UEI with GSA Migration keyword"""
     # Transformation recorded.
-    if not (
-        general_information.get("auditee_uei")
-        and is_uei_valid(general_information.get("auditee_uei"))
-    ):
+    if not (audit_header.UEI and is_uei_valid(audit_header.UEI)):
         track_transformations(
             "UEI",
-            general_information.get("auditee_uei"),
+            audit_header.UEI,
             "auditee_uei",
             settings.GSA_MIGRATION,
             "xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration",
         )
-        general_information["auditee_uei"] = settings.GSA_MIGRATION
+        audit_header.UEI = settings.GSA_MIGRATION
 
-    return general_information
+    return audit_header
 
 
 def track_transformations(
@@ -449,6 +446,7 @@ def general_information(audit_header):
     xform_update_multiple_eins_flag(audit_header)
     xform_update_multiple_ueis_flag(audit_header)
     xform_update_entity_type(audit_header)
+    xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header)
     general_information = create_json_from_db_object(audit_header, mappings)
     transformations = [
         xform_auditee_fiscal_period_start,
@@ -458,7 +456,6 @@ def general_information(audit_header):
         xform_audit_type,
         xform_replace_empty_auditor_email,
         xform_replace_empty_auditee_email,
-        xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration,
         xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
         xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
     ]
