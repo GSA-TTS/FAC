@@ -286,6 +286,30 @@ def xform_constructs_cluster_names(
     return (cluster_names, other_cluster_names, state_cluster_names)
 
 
+def xform_program_name(audits):
+    """Default missing program_name to GSA_MIGRATION"""
+    change_records = []
+    is_empty_program_name_found = False
+
+    for audit in audits:
+        program_name = string_to_string(audit.FEDERALPROGRAMNAME)
+        if not program_name:
+            track_transformations(
+                "FEDERALPROGRAMNAME",
+                audit.FEDERALPROGRAMNAME,
+                "federal_program_name",
+                settings.GSA_MIGRATION,
+                ["xform_program_name"],
+                change_records,
+            )
+
+            is_empty_program_name_found = True
+            audit.FEDERALPROGRAMNAME = settings.GSA_MIGRATION
+
+    if change_records and is_empty_program_name_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
 def is_valid_prefix(prefix):
     """
     Checks if the provided prefix is a valid CFDA prefix.
@@ -563,6 +587,7 @@ def generate_federal_awards(audit_header, outfile):
     xform_missing_program_total(audits)
     xform_missing_findings_count(audits)
     xform_missing_amount_expended(audits)
+    xform_program_name(audits)
     xform_is_passthrough_award(audits)
 
     map_simple_columns(wb, mappings, audits)

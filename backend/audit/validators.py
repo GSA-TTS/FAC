@@ -247,6 +247,7 @@ def validate_use_of_gsa_migration_keyword(general_information, is_data_migration
     if not is_data_migration and settings.GSA_MIGRATION in [
         general_information.get("auditee_email", ""),
         general_information.get("auditor_email", ""),
+        general_information.get("auditee_uei", ""),
         general_information.get("ein", ""),
         general_information.get("auditor_ein", ""),
     ]:
