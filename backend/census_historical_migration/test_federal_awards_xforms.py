@@ -590,8 +590,8 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
 
 class TestXformMissingProgramName(SimpleTestCase):
     class AuditMock:
-        def __init__(self, program_total):
-            self.FEDERALPROGRAMNAME = program_total
+        def __init__(self, program_name):
+            self.FEDERALPROGRAMNAME = program_name
 
     def test_with_normal_program_name(self):
         """Test for missing program name"""

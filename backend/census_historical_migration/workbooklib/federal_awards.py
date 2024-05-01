@@ -297,7 +297,7 @@ def xform_program_name(audits):
             track_transformations(
                 "FEDERALPROGRAMNAME",
                 audit.FEDERALPROGRAMNAME,
-                "program_name",
+                "federal_program_name",
                 settings.GSA_MIGRATION,
                 ["xform_program_name"],
                 change_records,
