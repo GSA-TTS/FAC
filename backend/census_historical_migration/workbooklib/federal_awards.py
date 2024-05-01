@@ -541,7 +541,7 @@ def xform_cluster_names(audits):
     is_other_cluster_found = False
     for audit in audits:
         cluster_name = string_to_string(audit.CLUSTERNAME)
-        if "OTHER CLUSTER" in cluster_name:
+        if cluster_name and "OTHER CLUSTER" == cluster_name.upper():
             if cluster_name != settings.OTHER_CLUSTER:
                 is_other_cluster_found = True
                 track_transformations(
