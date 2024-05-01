@@ -20,6 +20,7 @@ from .workbooklib.federal_awards import (
     xform_populate_default_passthrough_names_ids,
     xform_replace_invalid_extension,
     xform_is_passthrough_award,
+    xform_missing_major_program,
     is_valid_extension,
 )
 
@@ -585,3 +586,38 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
 
         self.assertEqual(transformed_names, names)
         self.assertEqual(transformed_ids, expected_ids)
+
+
+class TestXformMissingMajorProgram(SimpleTestCase):
+    class AuditMock:
+        def __init__(
+            self,
+            major_program,
+            audit_type,
+        ):
+            self.MAJORPROGRAM = major_program
+            self.TYPEREPORT_MP = audit_type
+
+    def test_xform_normal_major_program(self):
+        """Test for normal major program"""
+        audits = [self.AuditMock("Y", "U")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "Y")
+
+    def test_xform_missing_major_program_with_audit_type(self):
+        """Test for missing major program with audit type provided"""
+        audits = [self.AuditMock("", "U")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "Y")
+
+    def test_xform_missing_major_program_without_audit_type(self):
+        """Test for missing major program without audit type provided"""
+        audits = [self.AuditMock("", "")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "N")
