@@ -541,18 +541,17 @@ def xform_cluster_names(audits):
     is_other_cluster_found = False
     for audit in audits:
         cluster_name = string_to_string(audit.CLUSTERNAME)
-        if cluster_name and "OTHER CLUSTER" == cluster_name.upper():
-            if cluster_name != settings.OTHER_CLUSTER:
-                is_other_cluster_found = True
-                track_transformations(
-                    "CLUSTERNAME",
-                    audit.CLUSTERNAME,
-                    "cluster_name",
-                    settings.OTHER_CLUSTER,
-                    ["xform_cluster_names"],
-                    change_records,
-                )
-                audit.CLUSTERNAME = settings.OTHER_CLUSTER
+        if cluster_name and cluster_name.upper() == "OTHER CLUSTER":
+            is_other_cluster_found = True
+            track_transformations(
+                "CLUSTERNAME",
+                audit.CLUSTERNAME,
+                "cluster_name",
+                settings.OTHER_CLUSTER,
+                ["xform_cluster_names"],
+                change_records,
+            )
+            audit.CLUSTERNAME = settings.OTHER_CLUSTER
 
     if change_records and is_other_cluster_found:
         InspectionRecord.append_federal_awards_changes(change_records)
