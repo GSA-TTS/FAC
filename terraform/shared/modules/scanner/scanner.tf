@@ -65,7 +65,7 @@ resource "cloudfoundry_app" "scanner_app" {
   }
 
   service_binding {
-    service_instance = cloudfoundry_user_provided_service.logdrain_service.id
+    service_instance = var.logdrain_id
   }
 
   routes {
