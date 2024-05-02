@@ -64,6 +64,10 @@ resource "cloudfoundry_app" "scanner_app" {
     service_instance = var.new_relic_id
   }
 
+  service_binding {
+    service_instance = cloudfoundry_user_provided_service.logdrain_service.id
+  }
+
   routes {
     route = cloudfoundry_route.scanner_route.id
   }
