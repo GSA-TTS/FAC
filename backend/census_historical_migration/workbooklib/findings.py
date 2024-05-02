@@ -44,7 +44,7 @@ def xform_missing_compliance_requirement(findings):
             track_transformations(
                 "TYPEREQUIREMENT",
                 finding.TYPEREQUIREMENT,
-                "compliance_requirement",
+                "type_requirement",
                 settings.GSA_MIGRATION,
                 ["xform_missing_compliance_requirement"],
                 change_records,
@@ -54,7 +54,7 @@ def xform_missing_compliance_requirement(findings):
             finding.TYPEREQUIREMENT = settings.GSA_MIGRATION
 
     if change_records and is_empty_compliance_requirement_found:
-        InspectionRecord.append_federal_awards_changes(change_records)
+        InspectionRecord.append_finding_changes(change_records)
 
 
 def xform_prior_year_findings(value):
