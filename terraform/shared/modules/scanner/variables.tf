@@ -62,5 +62,4 @@ variable "new_relic_id" {
 variable "https_proxy_id" {
   type        = string
   description = "the full string of the https_proxy id"
-
 }
