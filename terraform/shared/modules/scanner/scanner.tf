@@ -64,10 +64,6 @@ resource "cloudfoundry_app" "scanner_app" {
     service_instance = var.new_relic_id
   }
 
-  service_binding {
-    service_instance = var.https_proxy_id
-  }
-
   routes {
     route = cloudfoundry_route.scanner_route.id
   }

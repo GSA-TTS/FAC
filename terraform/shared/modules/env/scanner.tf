@@ -8,7 +8,6 @@ module "fac-file-scanner" {
   cf_org_name       = var.cf_org_name
   cf_space_name     = var.cf_space_name
   https_proxy       = module.https-proxy.https_proxy
-  https_proxy_id    = cloudfoundry_user_provided_service.credentials.https-proxy-creds.id
   db_id             = module.database.instance_id
   s3_id             = module.s3-private.bucket_id
   new_relic_id      = cloudfoundry_user_provided_service.credentials.id
