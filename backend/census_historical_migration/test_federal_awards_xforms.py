@@ -19,6 +19,7 @@ from .workbooklib.federal_awards import (
     xform_populate_default_passthrough_amount,
     xform_populate_default_passthrough_names_ids,
     xform_replace_invalid_extension,
+    xform_program_name,
     xform_is_passthrough_award,
     xform_missing_major_program,
     is_valid_extension,
@@ -621,3 +622,25 @@ class TestXformMissingMajorProgram(SimpleTestCase):
         xform_missing_major_program(audits)
 
         self.assertEqual(audits[0].MAJORPROGRAM, "N")
+
+
+class TestXformMissingProgramName(SimpleTestCase):
+    class AuditMock:
+        def __init__(self, program_name):
+            self.FEDERALPROGRAMNAME = program_name
+
+    def test_with_normal_program_name(self):
+        """Test for missing program name"""
+        audits = [self.AuditMock("Some fake name")]
+
+        xform_program_name(audits)
+
+        self.assertEqual(audits[0].FEDERALPROGRAMNAME, "Some fake name")
+
+    def test_with_missing_program_name(self):
+        """Test for missing program name"""
+        audits = [self.AuditMock("")]
+
+        xform_program_name(audits)
+
+        self.assertEqual(audits[0].FEDERALPROGRAMNAME, settings.GSA_MIGRATION)

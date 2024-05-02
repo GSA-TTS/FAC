@@ -150,6 +150,8 @@ cython_debug/
 .idea/
 backend/.idea/
 
+backend/census_historical_migration/data/
+
 # Data loading artifacts
 backend/data_distro/data_to_load/run_logs/Results_*
 backend/data_distro/data_to_load/run_logs/Lines_*
