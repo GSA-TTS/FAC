@@ -532,6 +532,32 @@ def xform_populate_default_passthrough_amount(audits):
     return passthrough_amounts
 
 
+def xform_cluster_names(audits):
+    """
+    If 'OTHER CLUSTER' is present in the clustername,
+    replace audit.CLUSTERNAME with settings.OTHER_CLUSTER and track transformation.
+    """
+    change_records = []
+    is_other_cluster_found = False
+    for audit in audits:
+        cluster_name = string_to_string(audit.CLUSTERNAME)
+        if cluster_name and cluster_name.upper() == "OTHER CLUSTER":
+            is_other_cluster_found = True
+            track_transformations(
+                "CLUSTERNAME",
+                audit.CLUSTERNAME,
+                "cluster_name",
+                settings.OTHER_CLUSTER,
+                ["xform_cluster_names"],
+                change_records,
+            )
+            audit.CLUSTERNAME = settings.OTHER_CLUSTER
+
+    if change_records and is_other_cluster_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+    return audits
+
+
 def generate_federal_awards(audit_header, outfile):
     """
     Generates a federal awards workbook for all awards associated with a given audit header.
@@ -546,6 +572,7 @@ def generate_federal_awards(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)
+    audits = xform_cluster_names(audits)
 
     (
         cluster_names,
@@ -597,7 +624,7 @@ def generate_federal_awards(audit_header, outfile):
     set_range(
         wb,
         "award_reference",
-        [f"AWARD-{n+1:04}" for n in range(len(audits))],
+        [f"AWARD-{n + 1:04}" for n in range(len(audits))],
     )
 
     # passthrough amount
