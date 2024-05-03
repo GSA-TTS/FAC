@@ -182,7 +182,11 @@ def track_transformations(sp_framework_gaap_results, audit_header):
             }
         )
 
-    if "is_sp_framework_required" in sp_framework_gaap_results:
+    if (
+        "is_sp_framework_required" in sp_framework_gaap_results
+        and sp_framework_gaap_results["is_sp_framework_required"]
+        != settings.GSA_MIGRATION
+    ):
         census_data = [
             CensusRecord(
                 column="TYPEREPORT_FS",
@@ -265,7 +269,10 @@ def track_transformations(sp_framework_gaap_results, audit_header):
 
 
 def xform_sp_framework_required(audit_header):
-    if 'S' in string_to_string(audit_header.TYPEREPORT_FS) and string_to_string(audit_header.SP_FRAMEWORK_REQUIRED) == '':
+    if (
+        "S" in string_to_string(audit_header.TYPEREPORT_FS)
+        and string_to_string(audit_header.SP_FRAMEWORK_REQUIRED) == ""
+    ):
         census_data = [
             CensusRecord(
                 column="TYPEREPORT_FS",
@@ -277,8 +284,7 @@ def xform_sp_framework_required(audit_header):
             ).to_dict(),
         ]
         gsa_fac_data = GsaFacRecord(
-            field="is_sp_framework_required",
-            value=settings.GSA_MIGRATION
+            field="is_sp_framework_required", value=settings.GSA_MIGRATION
         ).to_dict()
         InspectionRecord.append_general_changes(
             {
@@ -294,7 +300,7 @@ def xform_sp_framework_required(audit_header):
 
 
 def xform_lowrisk(audit_header):
-    if string_to_string(audit_header.LOWRISK) == '':
+    if string_to_string(audit_header.LOWRISK) == "":
         census_data = [
             CensusRecord(
                 column="LOWRISK",
@@ -302,8 +308,7 @@ def xform_lowrisk(audit_header):
             ).to_dict(),
         ]
         gsa_fac_data = GsaFacRecord(
-            field="is_low_risk_auditee",
-            value=settings.GSA_MIGRATION
+            field="is_low_risk_auditee", value=settings.GSA_MIGRATION
         ).to_dict()
         InspectionRecord.append_general_changes(
             {
