@@ -5,7 +5,10 @@ class Util:
     @staticmethod
     def bool_to_yes_no(condition):
         """Convert a boolean value to 'Yes' or 'No'."""
-        return "Yes" if condition else "No"
+        if condition == settings.GSA_MIGRATION:
+            return condition
+        else:
+            return "Yes" if condition else "No"
 
     @staticmethod
     def optional_bool(condition):
