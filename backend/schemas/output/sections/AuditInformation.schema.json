@@ -126,13 +126,29 @@
          "type": "boolean"
       },
       "is_low_risk_auditee": {
-         "type": "boolean"
+         "oneOf": [
+            {
+               "type": "boolean"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "is_material_noncompliance_disclosed": {
          "type": "boolean"
       },
       "is_sp_framework_required": {
-         "type": "boolean"
+         "oneOf": [
+            {
+               "type": "boolean"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "sp_framework_basis": {
          "items": {
