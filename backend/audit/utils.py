@@ -1,5 +1,6 @@
 from django.conf import settings
 
+
 class Util:
     @staticmethod
     def bool_to_yes_no(condition):
