@@ -1,24 +1,19 @@
 from django.test import SimpleTestCase
 
-from .exception_utils import DataMigrationError
-
-from .transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
-
-from .transforms.xform_string_to_int import (
-    string_to_int,
-)
-from .transforms.xform_string_to_string import string_to_string
-
-from .transforms.xform_string_to_bool import string_to_bool
-
 from .base_field_maps import FormFieldInDissem, FormFieldMap
-
+from .exception_utils import (
+  DataMigrationError,
+  DataMigrationValueError,
+)
 from .sac_general_lib.utils import (
     create_json_from_db_object,
     normalize_year_string_or_exit,
 )
-
-from .exception_utils import DataMigrationValueError
+from .transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
+from .transforms.xform_string_to_bool import string_to_bool
+from .transforms.xform_string_to_int import string_to_int
+from .transforms.xform_string_to_string import string_to_string
+from .transforms.xform_uppercase_y_or_n import uppercase_y_or_n
 
 
 class TestCreateJsonFromDbObject(SimpleTestCase):
@@ -129,6 +124,45 @@ class TestStringToBool(SimpleTestCase):
             string_to_bool("A")
         with self.assertRaises(DataMigrationValueError):
             string_to_bool("Z")
+
+class TestUppercaseYOrN(SimpleTestCase):
+    """Tests for the uppercase_y_or_n function."""
+
+    def test_valid_boolean_string(self):
+        self.assertEqual(uppercase_y_or_n("Y"), "Y")
+        self.assertEqual(uppercase_y_or_n("y"), "Y")
+        self.assertEqual(uppercase_y_or_n("N"), "N")
+        self.assertEqual(uppercase_y_or_n("n"), "N")
+
+    def test_string_with_spaces(self):
+        self.assertEqual(uppercase_y_or_n(" Y "), "Y")
+        self.assertEqual(uppercase_y_or_n("  n"), "N")
+
+    def test_empty_string(self):
+        with self.assertRaises(DataMigrationValueError):
+            uppercase_y_or_n("")
+
+    def test_non_string_input(self):
+        with self.assertRaises(DataMigrationValueError):
+            uppercase_y_or_n(123)
+        with self.assertRaises(DataMigrationValueError):
+            uppercase_y_or_n(None)
+        with self.assertRaises(DataMigrationValueError):
+            uppercase_y_or_n(["True"])
+        with self.assertRaises(DataMigrationValueError):
+            uppercase_y_or_n(True)
+
+    def test_string_length_more_than_one(self):
+        with self.assertRaises(DataMigrationValueError):
+            uppercase_y_or_n("Yes")
+        with self.assertRaises(DataMigrationValueError):
+            uppercase_y_or_n("No")
+
+    def test_invalid_single_character_string(self):
+        with self.assertRaises(DataMigrationValueError):
+            uppercase_y_or_n("A")
+        with self.assertRaises(DataMigrationValueError):
+            uppercase_y_or_n("Z")
 
 
 class TestStringToInt(SimpleTestCase):
