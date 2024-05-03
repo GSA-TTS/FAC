@@ -30,7 +30,11 @@ mappings = [
     ),
     SheetFieldMap("text_of_finding", "TEXT", "finding_text", None, str),
     SheetFieldMap(
-        "contains_chart_or_table", "CHARTSTABLES", WorkbookFieldInDissem, None, uppercase_y_or_n
+        "contains_chart_or_table",
+        "CHARTSTABLES",
+        WorkbookFieldInDissem,
+        None,
+        uppercase_y_or_n,
     ),
 ]
 
