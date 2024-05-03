@@ -1,9 +1,10 @@
+from django.conf import settings
 from django.test import SimpleTestCase
 
 from .base_field_maps import FormFieldInDissem, FormFieldMap
 from .exception_utils import (
-  DataMigrationError,
-  DataMigrationValueError,
+    DataMigrationError,
+    DataMigrationValueError,
 )
 from .sac_general_lib.utils import (
     create_json_from_db_object,
@@ -125,6 +126,7 @@ class TestStringToBool(SimpleTestCase):
         with self.assertRaises(DataMigrationValueError):
             string_to_bool("Z")
 
+
 class TestUppercaseYOrN(SimpleTestCase):
     """Tests for the uppercase_y_or_n function."""
 
@@ -141,6 +143,11 @@ class TestUppercaseYOrN(SimpleTestCase):
     def test_empty_string(self):
         with self.assertRaises(DataMigrationValueError):
             uppercase_y_or_n("")
+
+    def test_gsa_migration(self):
+        self.assertEqual(
+            uppercase_y_or_n(settings.GSA_MIGRATION), settings.GSA_MIGRATION
+        )
 
     def test_non_string_input(self):
         with self.assertRaises(DataMigrationValueError):
