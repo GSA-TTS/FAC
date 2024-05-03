@@ -289,6 +289,7 @@ def xform_sp_framework_required(audit_header):
                 ],
             }
         )
+        audit_header.SP_FRAMEWORK_REQUIRED = settings.GSA_MIGRATION
     return audit_header
 
 
@@ -313,6 +314,7 @@ def xform_lowrisk(audit_header):
                 ],
             }
         )
+        audit_header.LOWRISK = settings.GSA_MIGRATION
     return audit_header
 
 
