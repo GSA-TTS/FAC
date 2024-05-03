@@ -1,3 +1,5 @@
+from django.conf import settings
+
 class Util:
     @staticmethod
     def bool_to_yes_no(condition):
@@ -9,6 +11,8 @@ class Util:
         """Convert a boolean value or None to a string representation."""
         if condition is None:
             return ""
+        elif condition == settings.GSA_MIGRATION:
+            return condition
         else:
             return "Yes" if condition else "No"
 
