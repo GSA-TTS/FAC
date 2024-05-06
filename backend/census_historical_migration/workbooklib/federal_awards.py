@@ -96,7 +96,7 @@ def xform_missing_major_program(audits):
     for audit in audits:
         major_program = string_to_string(audit.MAJORPROGRAM)
         if not major_program:
-            new_value = "Y" if audit.TYPEREPORT_MP else "N"
+            new_value = "Y" if string_to_string(audit.TYPEREPORT_MP) else "N"
 
             track_transformations(
                 "MAJORPROGRAM",
