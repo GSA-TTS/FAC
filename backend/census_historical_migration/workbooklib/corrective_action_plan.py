@@ -68,9 +68,9 @@ def xform_add_placeholder_for_missing_references(findings, captexts):
     return captexts
 
 
-def xform_add_placeholder_for_missing_action_planned(captexts):
+def xform_add_placeholder_for_missing_action_planned_text(captexts):
     """
-    Add placeholder for missing planned actions.
+    Add placeholder for missing action planned texts.
     """
     for captext in captexts:
         if string_to_string(captext.FINDINGREFNUMS) and not string_to_string(
@@ -95,7 +95,7 @@ def generate_corrective_action_plan(audit_header, outfile):
     captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
     findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
     captexts = xform_add_placeholder_for_missing_references(findings, captexts)
-    xform_add_placeholder_for_missing_action_planned(captexts)
+    xform_add_placeholder_for_missing_action_planned_text(captexts)
     xform_sanitize_for_excel(captexts)
     map_simple_columns(wb, mappings, captexts)
     wb.save(outfile)
