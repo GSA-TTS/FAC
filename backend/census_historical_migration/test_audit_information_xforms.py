@@ -151,22 +151,22 @@ class TestXformSpFrameworkRequired(SimpleTestCase):
     def test_sp_framework_required_Y(self):
         """Test that the function returns 'Y' for SP_FRAMEWORK_REQUIRED."""
         audit_header = self._mock_audit_header()
-        result = xform_sp_framework_required(audit_header)
-        self.assertEqual(result.SP_FRAMEWORK_REQUIRED, "Y")
+        xform_sp_framework_required(audit_header)
+        self.assertEqual(audit_header.SP_FRAMEWORK_REQUIRED, "Y")
 
     def test_sp_framework_required_N(self):
         """Test that the function returns 'N' for SP_FRAMEWORK_REQUIRED."""
         audit_header = self._mock_audit_header()
         audit_header.SP_FRAMEWORK_REQUIRED = "N"
-        result = xform_sp_framework_required(audit_header)
-        self.assertEqual(result.SP_FRAMEWORK_REQUIRED, "N")
+        xform_sp_framework_required(audit_header)
+        self.assertEqual(audit_header.SP_FRAMEWORK_REQUIRED, "N")
 
     def test_sp_framework_required_blank(self):
         """Test that the function returns GSA_MIGRATION for SP_FRAMEWORK_REQUIRED."""
         audit_header = self._mock_audit_header()
         audit_header.SP_FRAMEWORK_REQUIRED = ""
-        result = xform_sp_framework_required(audit_header)
-        self.assertEqual(result.SP_FRAMEWORK_REQUIRED, settings.GSA_MIGRATION)
+        xform_sp_framework_required(audit_header)
+        self.assertEqual(audit_header.SP_FRAMEWORK_REQUIRED, settings.GSA_MIGRATION)
 
 
 class TestXformLowrisk(SimpleTestCase):
@@ -189,19 +189,19 @@ class TestXformLowrisk(SimpleTestCase):
     def test_lowrisk_Y(self):
         """Test that the function returns 'Y' for LOWRISK."""
         audit_header = self._mock_audit_header()
-        result = xform_lowrisk(audit_header)
-        self.assertEqual(result.LOWRISK, "Y")
+        xform_lowrisk(audit_header)
+        self.assertEqual(audit_header.LOWRISK, "Y")
 
     def test_lowrisk_N(self):
         """Test that the function returns 'N' for LOWRISK."""
         audit_header = self._mock_audit_header()
         audit_header.LOWRISK = "N"
-        result = xform_lowrisk(audit_header)
-        self.assertEqual(result.LOWRISK, "N")
+        xform_lowrisk(audit_header)
+        self.assertEqual(audit_header.LOWRISK, "N")
 
     def test_lowrisk_blank(self):
         """Test that the function returns GSA_MIGRATION for LOWRISK."""
         audit_header = self._mock_audit_header()
         audit_header.LOWRISK = ""
-        result = xform_lowrisk(audit_header)
-        self.assertEqual(result.LOWRISK, settings.GSA_MIGRATION)
+        xform_lowrisk(audit_header)
+        self.assertEqual(audit_header.LOWRISK, settings.GSA_MIGRATION)
