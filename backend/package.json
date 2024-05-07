@@ -5,7 +5,7 @@
   "main": "index.js",
   "engines": {
     "npm": ">=9.0.0",
-    "node": ">=18.0.0 <21.0.0"
+    "node": ">=20.0.0 <21.0.0"
   },
   "scripts": {
     "build": "run-p build:*",
