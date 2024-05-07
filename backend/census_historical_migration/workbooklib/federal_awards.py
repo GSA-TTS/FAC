@@ -1,10 +1,9 @@
 from audit.intakelib.checks.check_cluster_total import expected_cluster_total
-from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..transforms.xform_string_to_int import string_to_int
+from ..transforms.xform_string_to_string import string_to_string
+from ..transforms.xform_uppercase_y_or_n import uppercase_y_or_n
 from ..exception_utils import DataMigrationError
-from ..transforms.xform_string_to_string import (
-    string_to_string,
-)
 from .excel_creation_utils import (
     get_audits,
     set_workbook_uei,
@@ -60,7 +59,7 @@ mappings = [
         str,
     ),
     SheetFieldMap("cluster_total", "CLUSTERTOTAL", WorkbookFieldInDissem, None, int),
-    SheetFieldMap("is_guaranteed", "LOANS", "is_loan", None, str),
+    SheetFieldMap("is_guaranteed", "LOANS", "is_loan", None, uppercase_y_or_n),
     # In the intake process, we initially use convert_to_stripped_string to convert IR values into strings,
     # and then apply specific functions like convert_loan_balance_to_integers_or_na to convert particular fields
     # such as loan_balance_at_audit_period_end into their appropriate formats. Therefore, it's suitable to process
@@ -70,8 +69,10 @@ mappings = [
     SheetFieldMap(
         "loan_balance_at_audit_period_end", "LOANBALANCE", "loan_balance", None, str
     ),
-    SheetFieldMap("is_direct", "DIRECT", WorkbookFieldInDissem, None, str),
-    SheetFieldMap("is_passed", "PASSTHROUGHAWARD", "is_passthrough_award", None, str),
+    SheetFieldMap("is_direct", "DIRECT", WorkbookFieldInDissem, None, uppercase_y_or_n),
+    SheetFieldMap(
+        "is_passed", "PASSTHROUGHAWARD", "is_passthrough_award", None, uppercase_y_or_n
+    ),
     SheetFieldMap(
         "subrecipient_amount",
         "PASSTHROUGHAMOUNT",
@@ -79,7 +80,9 @@ mappings = [
         None,
         str,
     ),
-    SheetFieldMap("is_major", "MAJORPROGRAM", WorkbookFieldInDissem, None, str),
+    SheetFieldMap(
+        "is_major", "MAJORPROGRAM", WorkbookFieldInDissem, None, uppercase_y_or_n
+    ),
     SheetFieldMap("audit_report_type", "TYPEREPORT_MP", "audit_report_type", None, str),
     SheetFieldMap(
         "number_of_audit_findings", "FINDINGSCOUNT", "findings_count", None, int
