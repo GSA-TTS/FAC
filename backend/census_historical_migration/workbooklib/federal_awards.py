@@ -91,6 +91,32 @@ mappings = [
 ]
 
 
+def xform_missing_major_program(audits):
+    """Default missing major program by extrapolating from audit report type."""
+    change_records = []
+    is_empty_major_program_found = False
+
+    for audit in audits:
+        major_program = string_to_string(audit.MAJORPROGRAM)
+        if not major_program:
+            new_value = "Y" if string_to_string(audit.TYPEREPORT_MP) else "N"
+
+            track_transformations(
+                "MAJORPROGRAM",
+                audit.MAJORPROGRAM,
+                "is_major",
+                new_value,
+                ["xform_missing_major_program"],
+                change_records,
+            )
+
+            is_empty_major_program_found = True
+            audit.MAJORPROGRAM = new_value
+
+    if change_records and is_empty_major_program_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
 def xform_missing_findings_count(audits):
     """Default missing findings count to zero."""
     # Transformation to be documented.
@@ -591,6 +617,7 @@ def generate_federal_awards(audit_header, outfile):
     xform_missing_amount_expended(audits)
     xform_program_name(audits)
     xform_is_passthrough_award(audits)
+    xform_missing_major_program(audits)
 
     map_simple_columns(wb, mappings, audits)
 
