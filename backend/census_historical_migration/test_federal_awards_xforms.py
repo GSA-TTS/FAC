@@ -21,7 +21,9 @@ from .workbooklib.federal_awards import (
     xform_replace_invalid_extension,
     xform_program_name,
     xform_is_passthrough_award,
+    xform_missing_major_program,
     is_valid_extension,
+    xform_cluster_names,
 )
 
 
@@ -588,6 +590,41 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
         self.assertEqual(transformed_ids, expected_ids)
 
 
+class TestXformMissingMajorProgram(SimpleTestCase):
+    class AuditMock:
+        def __init__(
+            self,
+            major_program,
+            audit_type,
+        ):
+            self.MAJORPROGRAM = major_program
+            self.TYPEREPORT_MP = audit_type
+
+    def test_xform_normal_major_program(self):
+        """Test for normal major program"""
+        audits = [self.AuditMock("Y", "U")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "Y")
+
+    def test_xform_missing_major_program_with_audit_type(self):
+        """Test for missing major program with audit type provided"""
+        audits = [self.AuditMock("", "U")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "Y")
+
+    def test_xform_missing_major_program_without_audit_type(self):
+        """Test for missing major program without audit type provided"""
+        audits = [self.AuditMock("", "")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "N")
+
+
 class TestXformMissingProgramName(SimpleTestCase):
     class AuditMock:
         def __init__(self, program_name):
@@ -608,3 +645,25 @@ class TestXformMissingProgramName(SimpleTestCase):
         xform_program_name(audits)
 
         self.assertEqual(audits[0].FEDERALPROGRAMNAME, settings.GSA_MIGRATION)
+
+
+class TestXformClusterNames(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, cluster_name):
+            self.CLUSTERNAME = cluster_name
+
+    def test_cluster_name_not_other_cluster(self):
+        audits = []
+        audits.append(self.MockAudit("STUDENT FINANCIAL ASSISTANCE"))
+        audits.append(self.MockAudit("RESEARCH AND DEVELOPMENT"))
+        result = xform_cluster_names(audits)
+        for index in range(len(result)):
+            self.assertEqual(result[index].CLUSTERNAME, audits[index].CLUSTERNAME)
+
+    def test_cluster_name_other_cluster(self):
+        audits = []
+        audits.append(self.MockAudit("OTHER CLUSTER"))
+        audits.append(self.MockAudit("OTHER CLUSTER"))
+        result = xform_cluster_names(audits)
+        for audit in result:
+            self.assertEqual(audit.CLUSTERNAME, settings.OTHER_CLUSTER)

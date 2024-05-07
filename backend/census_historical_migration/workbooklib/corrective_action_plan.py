@@ -4,6 +4,7 @@ from ..transforms.xform_string_to_string import string_to_string
 
 from ..workbooklib.findings import get_findings
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..transforms.xform_uppercase_y_or_n import uppercase_y_or_n
 from ..workbooklib.excel_creation_utils import (
     get_reference_numbers_from_findings,
     get_reference_numbers_from_text_records,
@@ -33,7 +34,11 @@ mappings = [
     ),
     SheetFieldMap("planned_action", "TEXT", WorkbookFieldInDissem, None, str),
     SheetFieldMap(
-        "contains_chart_or_table", "CHARTSTABLES", WorkbookFieldInDissem, None, str
+        "contains_chart_or_table",
+        "CHARTSTABLES",
+        WorkbookFieldInDissem,
+        None,
+        uppercase_y_or_n,
     ),
 ]
 

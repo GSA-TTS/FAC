@@ -28,7 +28,14 @@ local Parts = {
     additionalProperties: false,
     properties: {
       award_reference: Base.Compound.AwardReference,
-      compliance_requirement: Base.Compound.ComplianceRequirementTypes,
+      compliance_requirement:{
+        oneOf: [
+          Base.Compound.ComplianceRequirementTypes,
+          Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+        ],
+      },
     },
     required: ['award_reference', 'compliance_requirement'],
   },
