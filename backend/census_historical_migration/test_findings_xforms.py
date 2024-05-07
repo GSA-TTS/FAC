@@ -140,6 +140,8 @@ class TestXformAddPlaceholderForMissingFindingsText(SimpleTestCase):
             "",
             "The TEXT field should remain empty if FINDINGREFNUMS is empty.",
         )
+
+
 class TestXformMissingComplianceRequirement(SimpleTestCase):
     class Findings:
         def __init__(self, type_requirement):
