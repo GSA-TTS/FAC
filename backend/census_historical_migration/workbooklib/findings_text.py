@@ -72,7 +72,7 @@ def xform_add_placeholder_for_missing_references(findings, findings_texts):
     return findings_texts
 
 
-def xform_add_placeholder_for_missing_findings_text(findings_texts):
+def xform_add_placeholder_for_missing_text_of_finding(findings_texts):
     """
     Add placeholder text for missing findings_text.
     """
@@ -99,7 +99,7 @@ def generate_findings_text(audit_header, outfile):
     findings_texts = xform_add_placeholder_for_missing_references(
         findings, findings_texts
     )
-    xform_add_placeholder_for_missing_findings_text(findings_texts)
+    xform_add_placeholder_for_missing_text_of_finding(findings_texts)
     xform_sanitize_for_excel(findings_texts)
     map_simple_columns(wb, mappings, findings_texts)
 

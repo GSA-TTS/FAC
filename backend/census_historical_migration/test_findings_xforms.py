@@ -2,7 +2,7 @@ from django.conf import settings
 from django.test import SimpleTestCase
 
 from .workbooklib.findings_text import (
-    xform_add_placeholder_for_missing_findings_text,
+    xform_add_placeholder_for_missing_text_of_finding,
     xform_add_placeholder_for_missing_references,
 )
 
@@ -105,7 +105,7 @@ class TestXformAddPlaceholderForMissingFindingsText(SimpleTestCase):
         self.assertEqual(findings_texts[1].FINDINGREFNUMS, "ref2")
 
 
-class TestXformAddPlaceholderForMissingFindingsText(SimpleTestCase):
+class TestXformAddPlaceholderForMissingTextOfFinding(SimpleTestCase):
 
     class FindingsText:
         def __init__(self, FINDINGREFNUMS=None, TEXT=None):
@@ -115,7 +115,7 @@ class TestXformAddPlaceholderForMissingFindingsText(SimpleTestCase):
     def test_add_placeholder_to_empty_text(self):
         findings_texts = [self.FindingsText(FINDINGREFNUMS="123", TEXT="")]
         expected_text = settings.GSA_MIGRATION
-        xform_add_placeholder_for_missing_findings_text(findings_texts)
+        xform_add_placeholder_for_missing_text_of_finding(findings_texts)
         self.assertEqual(
             findings_texts[0].TEXT,
             expected_text,
@@ -125,7 +125,7 @@ class TestXformAddPlaceholderForMissingFindingsText(SimpleTestCase):
     def test_no_placeholder_if_text_present(self):
         findings_texts = [self.FindingsText(FINDINGREFNUMS="123", TEXT="Existing text")]
         expected_text = "Existing text"
-        xform_add_placeholder_for_missing_findings_text(findings_texts)
+        xform_add_placeholder_for_missing_text_of_finding(findings_texts)
         self.assertEqual(
             findings_texts[0].TEXT,
             expected_text,
@@ -134,7 +134,7 @@ class TestXformAddPlaceholderForMissingFindingsText(SimpleTestCase):
 
     def test_empty_finding_refnums_no_change(self):
         findings_texts = [self.FindingsText(FINDINGREFNUMS="", TEXT="")]
-        xform_add_placeholder_for_missing_findings_text(findings_texts)
+        xform_add_placeholder_for_missing_text_of_finding(findings_texts)
         self.assertEqual(
             findings_texts[0].TEXT,
             "",
