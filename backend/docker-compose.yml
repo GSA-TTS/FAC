@@ -81,7 +81,7 @@ services:
       SIGNATURE_CHECKS: 1
       PORT: ${CLAMAV_PORT:-9000}
     ports:
-      - ${CLAMAV_PORT:-9000:9000}
+      - ${CLAMAV_PORT:-9000}:${CLAMAV_PORT:-9000}
 
   #---------------------------------------------
   # Minio (S3 clone)
