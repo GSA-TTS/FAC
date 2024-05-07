@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from backend.census_historical_migration.transforms.xform_string_to_string import (
+from ..transforms.xform_string_to_string import (
     string_to_string,
 )
 from ..workbooklib.findings import get_findings
