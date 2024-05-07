@@ -296,7 +296,6 @@ def xform_sp_framework_required(audit_header):
             }
         )
         audit_header.SP_FRAMEWORK_REQUIRED = settings.GSA_MIGRATION
-    return audit_header
 
 
 def xform_lowrisk(audit_header):
@@ -320,13 +319,12 @@ def xform_lowrisk(audit_header):
             }
         )
         audit_header.LOWRISK = settings.GSA_MIGRATION
-    return audit_header
 
 
 def audit_information(audit_header):
     """Generates audit information JSON."""
-    audit_header = xform_sp_framework_required(audit_header)
-    audit_header = xform_lowrisk(audit_header)
+    xform_sp_framework_required(audit_header)
+    xform_lowrisk(audit_header)
     results = xform_build_sp_framework_gaap_results(audit_header)
     agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY, audit_header.AUDITYEAR)
     audit_info = create_json_from_db_object(audit_header, mappings)
