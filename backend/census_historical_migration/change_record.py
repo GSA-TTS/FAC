@@ -45,6 +45,10 @@ class InspectionRecord:
     def append_federal_awards_changes(data):
         InspectionRecord.change["federal_award"].append(data)
 
+    @staticmethod
+    def append_secondary_auditors_changes(data):
+        InspectionRecord.change["secondary_auditor"].append(data)
+
 
 class CensusRecord:
     def __init__(self, column="", value=""):
