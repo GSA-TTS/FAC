@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.test import SimpleTestCase
 
-from .workbooklib.findings_text import xform_add_placeholder_for_missing_references
+from .workbooklib.findings_text import (
+    xform_add_placeholder_for_missing_findings_text,
+    xform_add_placeholder_for_missing_references,
+)
 
 from .workbooklib.findings import xform_sort_compliance_requirement
 
@@ -97,3 +100,40 @@ class TestXformAddPlaceholderForMissingFindingsText(SimpleTestCase):
         )  # Expecting two items in findings_texts
         self.assertEqual(findings_texts[0].FINDINGREFNUMS, "ref1")
         self.assertEqual(findings_texts[1].FINDINGREFNUMS, "ref2")
+
+
+class TestXformAddPlaceholderForMissingFindingsText(SimpleTestCase):
+
+    class FindingsText:
+        def __init__(self, FINDINGREFNUMS=None, TEXT=None):
+            self.FINDINGREFNUMS = FINDINGREFNUMS
+            self.TEXT = TEXT
+
+    def test_add_placeholder_to_empty_text(self):
+        findings_texts = [self.CapText(FINDINGREFNUMS="123", TEXT="")]
+        expected_text = settings.GSA_MIGRATION
+        xform_add_placeholder_for_missing_findings_text(findings_texts)
+        self.assertEqual(
+            findings_texts[0].TEXT,
+            expected_text,
+            "The TEXT field should have the placeholder text.",
+        )
+
+    def test_no_placeholder_if_text_present(self):
+        findings_texts = [self.CapText(FINDINGREFNUMS="123", TEXT="Existing text")]
+        expected_text = "Existing text"
+        xform_add_placeholder_for_missing_findings_text(findings_texts)
+        self.assertEqual(
+            findings_texts[0].TEXT,
+            expected_text,
+            "The TEXT field should not be modified.",
+        )
+
+    def test_empty_finding_refnums_no_change(self):
+        findings_texts = [self.CapText(FINDINGREFNUMS="", TEXT="")]
+        xform_add_placeholder_for_missing_findings_text(findings_texts)
+        self.assertEqual(
+            findings_texts[0].TEXT,
+            "",
+            "The TEXT field should remain empty if FINDINGREFNUMS is empty.",
+        )
