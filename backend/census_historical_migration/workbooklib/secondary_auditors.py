@@ -84,7 +84,7 @@ def xform_cpafirmname(secondary_auditors):
             )
             secondary_auditor.CPAFIRMNAME = settings.GSA_MIGRATION
     if change_records and is_empty_cpafirmname_found:
-        InspectionRecord.append_secondary_auditors_changes(change_records)
+        InspectionRecord.append_secondary_auditor_changes(change_records)
 
 
 def generate_secondary_auditors(audit_header, outfile):
