@@ -182,7 +182,11 @@ def track_transformations(sp_framework_gaap_results, audit_header):
             }
         )
 
-    if "is_sp_framework_required" in sp_framework_gaap_results:
+    if (
+        "is_sp_framework_required" in sp_framework_gaap_results
+        and sp_framework_gaap_results["is_sp_framework_required"]
+        != settings.GSA_MIGRATION
+    ):
         census_data = [
             CensusRecord(
                 column="TYPEREPORT_FS",
@@ -264,8 +268,63 @@ def track_transformations(sp_framework_gaap_results, audit_header):
         )
 
 
+def xform_sp_framework_required(audit_header):
+    if (
+        "S" in string_to_string(audit_header.TYPEREPORT_FS)
+        and string_to_string(audit_header.SP_FRAMEWORK_REQUIRED) == ""
+    ):
+        census_data = [
+            CensusRecord(
+                column="TYPEREPORT_FS",
+                value=audit_header.TYPEREPORT_FS,
+            ).to_dict(),
+            CensusRecord(
+                column="SP_FRAMEWORK_REQUIRED",
+                value=audit_header.SP_FRAMEWORK_REQUIRED,
+            ).to_dict(),
+        ]
+        gsa_fac_data = GsaFacRecord(
+            field="is_sp_framework_required", value=settings.GSA_MIGRATION
+        ).to_dict()
+        InspectionRecord.append_general_changes(
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_functions": [
+                    "xform_sp_framework_required",
+                ],
+            }
+        )
+        audit_header.SP_FRAMEWORK_REQUIRED = settings.GSA_MIGRATION
+
+
+def xform_lowrisk(audit_header):
+    if string_to_string(audit_header.LOWRISK) == "":
+        census_data = [
+            CensusRecord(
+                column="LOWRISK",
+                value=audit_header.LOWRISK,
+            ).to_dict(),
+        ]
+        gsa_fac_data = GsaFacRecord(
+            field="is_low_risk_auditee", value=settings.GSA_MIGRATION
+        ).to_dict()
+        InspectionRecord.append_general_changes(
+            {
+                "census_data": census_data,
+                "gsa_fac_data": gsa_fac_data,
+                "transformation_functions": [
+                    "xform_lowrisk",
+                ],
+            }
+        )
+        audit_header.LOWRISK = settings.GSA_MIGRATION
+
+
 def audit_information(audit_header):
     """Generates audit information JSON."""
+    xform_sp_framework_required(audit_header)
+    xform_lowrisk(audit_header)
     results = xform_build_sp_framework_gaap_results(audit_header)
     agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY, audit_header.AUDITYEAR)
     audit_info = create_json_from_db_object(audit_header, mappings)
