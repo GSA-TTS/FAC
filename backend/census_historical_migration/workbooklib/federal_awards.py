@@ -70,7 +70,6 @@ mappings = [
     SheetFieldMap(
         "loan_balance_at_audit_period_end", "LOANBALANCE", "loan_balance", None, str
     ),
-    SheetFieldMap("is_direct", "DIRECT", WorkbookFieldInDissem, None, str),
     SheetFieldMap("is_passed", "PASSTHROUGHAWARD", "is_passthrough_award", None, str),
     SheetFieldMap(
         "subrecipient_amount",
@@ -454,6 +453,42 @@ def xform_populate_default_passthrough_names_ids(audits):
     return (passthrough_names, passthrough_ids)
 
 
+def xform_replace_invalid_direct_award_flag(audits, passthrough_names):
+    """Replaces invalid DIRECT award flags with the default value settings.GSA_MIGRATION."""
+    is_directs = []
+    change_records = []
+    is_invalid_direct_flag_found = False
+    for audit, name in zip(audits, passthrough_names):
+        is_direct = string_to_string(audit.DIRECT)
+        if is_direct == "Y" and name:
+            is_invalid_direct_flag_found = True
+            track_transformations(
+                "DIRECT",
+                audit.DIRECT,
+                "is_direct",
+                settings.GSA_MIGRATION,
+                ["xform_replace_invalid_direct_award_flag"],
+                change_records,
+            )
+            is_directs.append(settings.GSA_MIGRATION)
+        else:
+            track_transformations(
+                "DIRECT",
+                is_direct,
+                "is_direct",
+                is_direct,
+                ["xform_replace_invalid_direct_award_flag"],
+                change_records,
+            )
+
+        is_directs.append(is_direct)
+
+    if change_records and is_invalid_direct_flag_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+    return is_directs
+
+
 def xform_populate_default_loan_balance(audits):
     """
     Automatically fills in default values for empty loan balances.
@@ -619,6 +654,9 @@ def generate_federal_awards(audit_header, outfile):
     )
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
+
+    is_directs = xform_replace_invalid_direct_award_flag(audits, passthrough_names)
+    set_range(wb, "is_direct", is_directs)
 
     # The award numbers!
     set_range(
