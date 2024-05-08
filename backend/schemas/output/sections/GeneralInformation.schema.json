@@ -306,8 +306,16 @@
          ]
       },
       "auditor_zip": {
-         "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
-         "type": "string"
+         "oneOf": [
+            {
+               "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "ein": {
          "oneOf": [
