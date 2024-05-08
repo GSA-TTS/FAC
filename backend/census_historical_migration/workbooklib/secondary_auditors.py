@@ -13,9 +13,6 @@ from ..models import ELECCPAS as Caps
 from ..change_record import InspectionRecord
 from audit.fixtures.excel import FORM_SECTIONS
 from django.conf import settings
-from ..change_record import InspectionRecord
-
-from django.conf import settings
 import openpyxl as pyxl
 
 import logging
