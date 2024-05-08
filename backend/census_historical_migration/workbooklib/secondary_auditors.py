@@ -132,6 +132,7 @@ def generate_secondary_auditors(audit_header, outfile):
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
     xform_address_state(secondary_auditors)
+    xform_cpafirmname(secondary_auditors)
     map_simple_columns(wb, mappings, secondary_auditors)
     wb.save(outfile)
 
