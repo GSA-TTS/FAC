@@ -3,6 +3,7 @@ from .xform_string_to_string import string_to_string
 
 from django.conf import settings
 
+
 def xform_remove_hyphen_and_pad_zip(zip):
     """
     Transform a ZIP code string by:
