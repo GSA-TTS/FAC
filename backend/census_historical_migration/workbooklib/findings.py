@@ -2,9 +2,8 @@ from ..change_record import (
     InspectionRecord,
 )
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
-from ..transforms.xform_string_to_string import (
-    string_to_string,
-)
+from ..transforms.xform_string_to_string import string_to_string
+from ..transforms.xform_uppercase_y_or_n import uppercase_y_or_n
 from ..workbooklib.excel_creation_utils import (
     get_audits,
     map_simple_columns,
@@ -82,23 +81,45 @@ mappings = [
     ),
     SheetFieldMap("reference_number", "FINDINGREFNUMS", "reference_number", None, str),
     SheetFieldMap(
-        "modified_opinion", "MODIFIEDOPINION", "is_modified_opinion", None, str
+        "modified_opinion",
+        "MODIFIEDOPINION",
+        "is_modified_opinion",
+        None,
+        uppercase_y_or_n,
     ),
-    SheetFieldMap("other_matters", "OTHERNONCOMPLIANCE", "is_other_matters", None, str),
     SheetFieldMap(
-        "material_weakness", "MATERIALWEAKNESS", "is_material_weakness", None, str
+        "other_matters",
+        "OTHERNONCOMPLIANCE",
+        "is_other_matters",
+        None,
+        uppercase_y_or_n,
+    ),
+    SheetFieldMap(
+        "material_weakness",
+        "MATERIALWEAKNESS",
+        "is_material_weakness",
+        None,
+        uppercase_y_or_n,
     ),
     SheetFieldMap(
         "significant_deficiency",
         "SIGNIFICANTDEFICIENCY",
         "is_significant_deficiency",
         None,
-        str,
+        uppercase_y_or_n,
     ),
-    SheetFieldMap("other_findings", "OTHERFINDINGS", "is_other_findings", None, str),
-    SheetFieldMap("questioned_costs", "QCOSTS", "is_questioned_costs", None, str),
     SheetFieldMap(
-        "repeat_prior_reference", "REPEATFINDING", "is_repeat_finding", None, str
+        "other_findings", "OTHERFINDINGS", "is_other_findings", None, uppercase_y_or_n
+    ),
+    SheetFieldMap(
+        "questioned_costs", "QCOSTS", "is_questioned_costs", None, uppercase_y_or_n
+    ),
+    SheetFieldMap(
+        "repeat_prior_reference",
+        "REPEATFINDING",
+        "is_repeat_finding",
+        None,
+        uppercase_y_or_n,
     ),
     SheetFieldMap(
         "prior_references",
