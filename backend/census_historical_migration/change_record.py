@@ -46,7 +46,7 @@ class InspectionRecord:
         InspectionRecord.change["federal_award"].append(data)
 
     @staticmethod
-    def append_secondary_auditors_changes(data):
+    def append_secondary_auditor_changes(data):
         InspectionRecord.change["secondary_auditor"].append(data)
 
 
