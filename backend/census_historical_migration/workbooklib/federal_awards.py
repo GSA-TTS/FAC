@@ -507,8 +507,7 @@ def xform_replace_invalid_direct_award_flag(audits, passthrough_names):
                 ["xform_replace_invalid_direct_award_flag"],
                 change_records,
             )
-
-        is_directs.append(is_direct)
+            is_directs.append(is_direct)
 
     if change_records and is_invalid_direct_flag_found:
         InspectionRecord.append_federal_awards_changes(change_records)

@@ -683,11 +683,10 @@ class TestXformReplaceInvalidDirectAwardFlag(SimpleTestCase):
             "",
         ]
 
-        result = xform_replace_invalid_direct_award_flag(audits, passthrough_names)
-
+        results = xform_replace_invalid_direct_award_flag(audits, passthrough_names)
         # Expect first audit DIRECT flag to be replaced with default
-        self.assertEqual(result[0], settings.GSA_MIGRATION)
+        self.assertEqual(results[0], settings.GSA_MIGRATION)
         # Expect second audit DIRECT flag to remain unchanged
-        self.assertEqual(result[1], "N")
+        self.assertEqual(results[1], "N")
         # Expect third audit DIRECT flag to remain unchanged
-        self.assertEqual(result[2], "Y")
+        self.assertEqual(results[2], "Y")
