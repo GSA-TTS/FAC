@@ -1,10 +1,9 @@
 from audit.intakelib.checks.check_cluster_total import expected_cluster_total
-from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..transforms.xform_string_to_int import string_to_int
+from ..transforms.xform_string_to_string import string_to_string
+from ..transforms.xform_uppercase_y_or_n import uppercase_y_or_n
 from ..exception_utils import DataMigrationError
-from ..transforms.xform_string_to_string import (
-    string_to_string,
-)
 from .excel_creation_utils import (
     get_audits,
     set_workbook_uei,
@@ -60,7 +59,7 @@ mappings = [
         str,
     ),
     SheetFieldMap("cluster_total", "CLUSTERTOTAL", WorkbookFieldInDissem, None, int),
-    SheetFieldMap("is_guaranteed", "LOANS", "is_loan", None, str),
+    SheetFieldMap("is_guaranteed", "LOANS", "is_loan", None, uppercase_y_or_n),
     # In the intake process, we initially use convert_to_stripped_string to convert IR values into strings,
     # and then apply specific functions like convert_loan_balance_to_integers_or_na to convert particular fields
     # such as loan_balance_at_audit_period_end into their appropriate formats. Therefore, it's suitable to process
@@ -78,13 +77,41 @@ mappings = [
         None,
         str,
     ),
-    SheetFieldMap("is_major", "MAJORPROGRAM", WorkbookFieldInDissem, None, str),
+    SheetFieldMap(
+        "is_major", "MAJORPROGRAM", WorkbookFieldInDissem, None, uppercase_y_or_n
+    ),
     SheetFieldMap("audit_report_type", "TYPEREPORT_MP", "audit_report_type", None, str),
     SheetFieldMap(
         "number_of_audit_findings", "FINDINGSCOUNT", "findings_count", None, int
     ),
     SheetFieldMap("amount_expended", "AMOUNT", WorkbookFieldInDissem, None, int),
 ]
+
+
+def xform_missing_major_program(audits):
+    """Default missing major program by extrapolating from audit report type."""
+    change_records = []
+    is_empty_major_program_found = False
+
+    for audit in audits:
+        major_program = string_to_string(audit.MAJORPROGRAM)
+        if not major_program:
+            new_value = "Y" if string_to_string(audit.TYPEREPORT_MP) else "N"
+
+            track_transformations(
+                "MAJORPROGRAM",
+                audit.MAJORPROGRAM,
+                "is_major",
+                new_value,
+                ["xform_missing_major_program"],
+                change_records,
+            )
+
+            is_empty_major_program_found = True
+            audit.MAJORPROGRAM = new_value
+
+    if change_records and is_empty_major_program_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
 
 
 def xform_missing_findings_count(audits):
@@ -623,6 +650,7 @@ def generate_federal_awards(audit_header, outfile):
     xform_missing_amount_expended(audits)
     xform_program_name(audits)
     xform_is_passthrough_award(audits)
+    xform_missing_major_program(audits)
 
     map_simple_columns(wb, mappings, audits)
 

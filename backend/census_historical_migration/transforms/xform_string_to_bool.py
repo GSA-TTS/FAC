@@ -1,4 +1,5 @@
 from ..exception_utils import DataMigrationValueError
+from django.conf import settings
 
 
 def string_to_bool(value):
@@ -11,6 +12,10 @@ def string_to_bool(value):
         )
 
     new_value = value.strip().upper()
+
+    if new_value == settings.GSA_MIGRATION:
+        return new_value
+
     if new_value not in ["Y", "N"]:
         raise DataMigrationValueError(
             f"Expected 'Y' or 'N', got '{value}'",
