@@ -167,7 +167,9 @@ def record_migration_transformations(audit_year, dbkey, report_id):
             "federal_award"
         ]
     if InspectionRecord.change["secondary_auditor"]:
-        migration_inspection_record.secondary_auditor = InspectionRecord.change["secondary_auditor"]
+        migration_inspection_record.secondary_auditor = InspectionRecord.change[
+            "secondary_auditor"
+        ]
 
     migration_inspection_record.save()
     InspectionRecord.reset()
