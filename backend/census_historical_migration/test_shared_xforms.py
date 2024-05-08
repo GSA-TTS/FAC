@@ -242,6 +242,9 @@ class TestNormalizeYearString(SimpleTestCase):
 
 
 class TestXformAddHyphenToZip(SimpleTestCase):
+    def test_empty_zip(self):
+        self.assertEqual(xform_remove_hyphen_and_pad_zip(""), settings.GSA_MIGRATION)
+
     def test_five_digit_zip(self):
         self.assertEqual(xform_remove_hyphen_and_pad_zip("12345"), "12345")
 
