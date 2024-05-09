@@ -107,7 +107,7 @@ def xform_address_zipcode(secondary_auditors):
             ["xform_address_zipcode"],
             change_records,
         )
-        
+
         secondary_auditor.CPAZIPCODE = address_zipcode
 
     if change_records and is_empty_address_zipcode_found:
