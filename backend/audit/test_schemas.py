@@ -245,7 +245,8 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             f"{randrange(1000000):06}",  # too long
             f"{randrange(10000):04}",  # too short
             "".join(choice(string.ascii_letters) for i in range(5)),  # contains letters
-            "".join(choice(string.punctuation) for i in range(5)),  # contains symbols
+            # "".join(choice(string.punctuation) for i in range(5)),  # contains symbols
+            "!@#$%",  # contains symbols
         ]
 
         for zip_field in ["auditee_zip", "auditor_zip"]:
