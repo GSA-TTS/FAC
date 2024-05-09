@@ -96,17 +96,19 @@ def xform_address_zipcode(secondary_auditors):
     for secondary_auditor in secondary_auditors:
         address_zipcode = string_to_string(secondary_auditor.CPAZIPCODE)
         if not address_zipcode:
-            track_transformations(
-                "CPAZIPCODE",
-                secondary_auditor.CPAZIPCODE,
-                "address_zipcode",
-                settings.GSA_MIGRATION,
-                ["xform_address_zipcode"],
-                change_records,
-            )
-
             is_empty_address_zipcode_found = True
-            secondary_auditor.CPAZIPCODE = settings.GSA_MIGRATION
+            address_zipcode = settings.GSA_MIGRATION
+
+        track_transformations(
+            "CPAZIPCODE",
+            secondary_auditor.CPAZIPCODE,
+            "address_zipcode",
+            address_zipcode,
+            ["xform_address_zipcode"],
+            change_records,
+        )
+        
+        secondary_auditor.CPAZIPCODE = address_zipcode
 
     if change_records and is_empty_address_zipcode_found:
         InspectionRecord.append_secondary_auditor_changes(change_records)

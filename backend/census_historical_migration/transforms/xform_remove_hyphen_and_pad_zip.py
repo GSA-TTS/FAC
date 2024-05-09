@@ -11,6 +11,10 @@ def xform_remove_hyphen_and_pad_zip(zip):
     - Raises an error for other cases.
     """
     # Transformation to be documented.
+
+    if not zip:
+        return zip
+
     strzip = string_to_string(zip)
     if "-" in strzip:
         parts = strzip.split("-")
