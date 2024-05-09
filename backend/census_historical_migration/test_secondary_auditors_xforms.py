@@ -48,7 +48,6 @@ class TestXformSecondaryAuditorsZipcode(SimpleTestCase):
 
         self.assertEqual(secondary_auditors[0].CPAZIPCODE, "10108")
 
-
     def test_missing_address_zipcode(self):
         # Setup specific test data
         secondary_auditors = [
