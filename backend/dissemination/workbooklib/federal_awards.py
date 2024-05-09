@@ -121,9 +121,9 @@ def _fix_addl_award_identification(Cfda, cfdas, dbkey):
         .order_by(Cfda.index)
     ):
         if cfda.awardidentification is None or len(cfda.awardidentification) < 1:
-            addls[get_list_index(cfdas, cfda.index)] = (
-                f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
-            )
+            addls[
+                get_list_index(cfdas, cfda.index)
+            ] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
         else:
             addls[get_list_index(cfdas, cfda.index)] = cfda.awardidentification
     return addls
@@ -174,9 +174,9 @@ def _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey):
             name = ""
         name = name.rstrip()
         if name == "" and cfda.direct == "N":
-            passthrough_names[get_list_index(cfdas, cfda.index)] = (
-                "NO PASSTHROUGH NAME PROVIDED"
-            )
+            passthrough_names[
+                get_list_index(cfdas, cfda.index)
+            ] = "NO PASSTHROUGH NAME PROVIDED"
         else:
             passthrough_names[get_list_index(cfdas, cfda.index)] = name
 
@@ -185,9 +185,9 @@ def _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey):
             id = ""
         id = id.rstrip()
         if id == "" and cfda.direct == "N":
-            passthrough_ids[get_list_index(cfdas, cfda.index)] = (
-                "NO PASSTHROUGH ID PROVIDED"
-            )
+            passthrough_ids[
+                get_list_index(cfdas, cfda.index)
+            ] = "NO PASSTHROUGH ID PROVIDED"
         else:
             passthrough_ids[get_list_index(cfdas, cfda.index)] = pnq.passthroughid
 
