@@ -54,7 +54,7 @@ class Command(BaseCommand):
             (191734, 22),
         ]
 
-        if ENVIRONMENT in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING"]:
+        if ENVIRONMENT in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING", "TESTING"]:
             if dbkeys_str and years_str:
                 logger.info(
                     f"Generating test reports for DBKEYS: {dbkeys_str} and YEARS: {years_str}"
