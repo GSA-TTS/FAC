@@ -61,6 +61,9 @@ jobs:
 
   a11y-testing:
     runs-on: ubuntu-latest
+    container:
+      image: cypress/browsers:node18.6.0-chrome105-ff104
+      options: --user 1001
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
