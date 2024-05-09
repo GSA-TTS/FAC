@@ -112,8 +112,7 @@ def xform_cpafirmname(secondary_auditors):
             ["xform_cpafirmname"],
             change_records,
         )
-        if is_empty_cpafirmname_found:
-            secondary_auditor.CPAFIRMNAME = cpafirmname
+        secondary_auditor.CPAFIRMNAME = cpafirmname
 
     if change_records and is_empty_cpafirmname_found:
         InspectionRecord.append_secondary_auditor_changes(change_records)
