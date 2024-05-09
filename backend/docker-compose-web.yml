@@ -18,7 +18,6 @@ services:
 
   web:
     image: ghcr.io/gsa-tts/fac/web-container:latest
-    options: --user 1001
     command: /src/run.sh
     depends_on:
       db:
