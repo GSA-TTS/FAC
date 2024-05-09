@@ -245,8 +245,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             f"{randrange(1000000):06}",  # too long
             f"{randrange(10000):04}",  # too short
             "".join(choice(string.ascii_letters) for i in range(5)),  # contains letters
-            # "".join(choice(string.punctuation) for i in range(5)),  # contains symbols
-            "!@#$%",  # contains symbols
+            "".join(choice(string.punctuation) for i in range(5)),  # contains symbols
         ]
 
         for zip_field in ["auditee_zip", "auditor_zip"]:
@@ -258,7 +257,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        f"'{bad_zip}' is not valid under any of the given schemas",
+                        "is not valid under any of the given schemas",
                         msg=f"ValidationError not raised with zip = {bad_zip}",
                     ):
                         validate(instance, schema)
@@ -291,7 +290,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        f"'{bad_zip}' is not valid under any of the given schemas",
+                        "is not valid under any of the given schemas",
                         msg=f"ValidationError not raised with zip = {bad_zip}",
                     ):
                         validate(instance, schema)
