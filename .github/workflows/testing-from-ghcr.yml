@@ -61,9 +61,6 @@ jobs:
 
   a11y-testing:
     runs-on: ubuntu-latest
-    container:
-      image: cypress/browsers:node18.6.0-chrome105-ff104
-      options: --user 1001
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
@@ -79,7 +76,7 @@ jobs:
  
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Start services
         working-directory: ./backend
