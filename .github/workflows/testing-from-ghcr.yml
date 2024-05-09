@@ -84,6 +84,15 @@ jobs:
           touch .env
           docker compose -f docker-compose-web.yml up -d
 
+      - name: Load historical data
+        working-directory: ./backend
+        run: docker compose -f docker-compose-web.yml run web ./load_data.sh
+      
+      # - name: Run migrations
+      #   working-directory: ./backend
+      #   run: |
+      #     docker compose -f docker-compose-web.yml run web python manage.py migrate
+
       - name: Load fixture data
         working-directory: ./backend
         run: |
