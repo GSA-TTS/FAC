@@ -8,10 +8,6 @@ from model_bakery import baker
 from dissemination.models import (
     General,
     FederalAward,
-    Finding,
-    FindingText,
-    Note,
-    CapText,
 )
 
 logger = logging.getLogger(__name__)
