@@ -71,6 +71,8 @@ jobs:
       ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
       DISABLE_AUTH: True  # Important for a11y tests
       PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
+    container:
+      options: --user 1001
     steps:
       - uses: actions/checkout@v4
  
@@ -87,11 +89,6 @@ jobs:
       - name: Load historical data
         working-directory: ./backend
         run: docker compose -f docker-compose-web.yml run web ./load_data.sh
-      
-      # - name: Run migrations
-      #   working-directory: ./backend
-      #   run: |
-      #     docker compose -f docker-compose-web.yml run web python manage.py migrate
 
       - name: Load fixture data
         working-directory: ./backend
