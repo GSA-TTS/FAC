@@ -94,7 +94,7 @@ def _get_secondary_auditors(dbkey, year):
 
 
 def xform_cpafirmname(secondary_auditors):
-    """ Track all secondary_auditors data in change_records.
+    """Track all secondary_auditors data in change_records.
     Save change_records in InspectionRecord only if blank CPAFIRMNAME is found."""
 
     change_records = []
