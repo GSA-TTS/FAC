@@ -94,20 +94,27 @@ def _get_secondary_auditors(dbkey, year):
 
 
 def xform_cpafirmname(secondary_auditors):
+    """ Track all secondary_auditors data in change_records.
+    Save change_records in InspectionRecord only if blank CPAFIRMNAME is found."""
+
     change_records = []
     is_empty_cpafirmname_found = False
     for secondary_auditor in secondary_auditors:
-        if secondary_auditor.CPAFIRMNAME == "":
+        cpafirmname = string_to_string(secondary_auditor.CPAFIRMNAME)
+        if cpafirmname == "":
             is_empty_cpafirmname_found = True
-            track_transformations(
-                "CPAFIRMNAME",
-                secondary_auditor.CPAFIRMNAME,
-                "auditor_name",
-                settings.GSA_MIGRATION,
-                ["xform_cpafirmname"],
-                change_records,
-            )
-            secondary_auditor.CPAFIRMNAME = settings.GSA_MIGRATION
+            cpafirmname = settings.GSA_MIGRATION
+        track_transformations(
+            "CPAFIRMNAME",
+            secondary_auditor.CPAFIRMNAME,
+            "auditor_name",
+            cpafirmname,
+            ["xform_cpafirmname"],
+            change_records,
+        )
+        if is_empty_cpafirmname_found:
+            secondary_auditor.CPAFIRMNAME = cpafirmname
+
     if change_records and is_empty_cpafirmname_found:
         InspectionRecord.append_secondary_auditor_changes(change_records)
 
