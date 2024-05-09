@@ -60,17 +60,28 @@ act test --platform ubuntu-latest=lucasalt/act_base:latest
 ```
 
 ## Accessibility
-
-We use a combination of [Lighthouse-ci](https://github.com/GoogleChrome/lighthouse-ci) and [Pa11y](https://pa11y.org/) for accessibility testing.
+We use a combination of [Cypress](https://www.cypress.io/) and [Axe](https://www.deque.com/axe/) for accessibility (A11y) testing. 
 
 Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
+Accessibility tests currently cover the full submission pipeline, the access management pages, and the search pages.
+They should run in less than half a minute for baseline coverage.
 
-To run Lighthouse or pa11y locally, install the dependencies on your machine and outside the docker container, run the following commands.
+To run accessibility tests locally, do the following:
 
+Ensure `DISABLE_AUTH=True` in your local environment variables. This will mean the blank "test_user@test.test" will be used. 
+You will not have to log in, do not need permissions to access pages, and the username in the top right will display strangely. 
+But, Cypress also won't need any permissions or have to rely on Login.gov in any way.
+
+"Log in" once (visit the app) to ensure the test user exists in your local environment.
+
+Run the `load_fixtures` management command in your docker container, to ensure a submission of type "In Progress", "Ready for Certification", and "Accepted" exist for the test user. This will also load some dummy dissemination objects, so that at least one record will exist for search.
 ```shell
-npm run test:a11y:lighthouse # to run lighthouse
-npm run test:a11y:pa11y      # to run pa11y
+docker compose exec web /bin/bash  # Enter the docker shell
+python manage.py load_fixtures     # Run the management command
 ```
+Open Cypress with `npx Cypress open`, and run the `accessibility.cy.js` spec.
+This can also be done in headless mode via the command line with:
+`npx cypress run --spec "cypress/e2e/accessibility.cy.js"`
 
 ## Security scans
 #### OWASP ZAP
