@@ -18,6 +18,17 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = (on, config) => {
   on("task", {
-    generateOTP: require("cypress-otp")
+    generateOTP: require("cypress-otp"),
+    log(message) {
+      console.log(message)
+
+      return null
+    },
+    table(message) {
+      console.table(message)
+
+      return null
+    }
   });
+
 }
