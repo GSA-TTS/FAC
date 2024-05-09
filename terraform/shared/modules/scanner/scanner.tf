@@ -32,7 +32,7 @@ resource "cloudfoundry_user_provided_service" "clam" {
 
 locals {
   app_id   = cloudfoundry_app.scanner_app.id
-  scan_url = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
+  scan_url = "https://fac-av-${var.cf_space_name}-fs.apps.internal:61443/scan"
 }
 
 resource "cloudfoundry_app" "scanner_app" {
