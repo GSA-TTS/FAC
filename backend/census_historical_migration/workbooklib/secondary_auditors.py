@@ -1,18 +1,23 @@
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_remove_hyphen_and_pad_zip import xform_remove_hyphen_and_pad_zip
+from ..transforms.xform_string_to_string import string_to_string
 from ..workbooklib.excel_creation_utils import (
     map_simple_columns,
     set_workbook_uei,
     sort_by_field,
+    track_transformations,
 )
 from ..base_field_maps import SheetFieldMap
 from ..workbooklib.templates import sections_to_template_paths
 from ..models import ELECCPAS as Caps
+from ..change_record import InspectionRecord
 from audit.fixtures.excel import FORM_SECTIONS
 
+from django.conf import settings
 import openpyxl as pyxl
 
 import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +64,54 @@ mappings = [
 ]
 
 
+def xform_address_state(secondary_auditors):
+    """Default missing address_state to GSA_MIGRATION"""
+    change_records = []
+    is_empty_address_state_found = False
+
+    for secondary_auditor in secondary_auditors:
+        address_state = string_to_string(secondary_auditor.CPASTATE)
+        if not address_state:
+            track_transformations(
+                "CPASTATE",
+                secondary_auditor.CPASTATE,
+                "address_state",
+                settings.GSA_MIGRATION,
+                ["xform_address_state"],
+                change_records,
+            )
+
+            is_empty_address_state_found = True
+            secondary_auditor.CPASTATE = settings.GSA_MIGRATION
+
+    if change_records and is_empty_address_state_found:
+        InspectionRecord.append_secondary_auditor_changes(change_records)
+
+
+def xform_address_zipcode(secondary_auditors):
+    """Default missing address_zipcode to GSA_MIGRATION"""
+    change_records = []
+    is_empty_address_zipcode_found = False
+
+    for secondary_auditor in secondary_auditors:
+        address_zipcode = string_to_string(secondary_auditor.CPAZIPCODE)
+        if not address_zipcode:
+            track_transformations(
+                "CPAZIPCODE",
+                secondary_auditor.CPAZIPCODE,
+                "address_zipcode",
+                settings.GSA_MIGRATION,
+                ["xform_address_zipcode"],
+                change_records,
+            )
+
+            is_empty_address_zipcode_found = True
+            secondary_auditor.CPAZIPCODE = settings.GSA_MIGRATION
+
+    if change_records and is_empty_address_zipcode_found:
+        InspectionRecord.append_secondary_auditor_changes(change_records)
+
+
 def _get_secondary_auditors(dbkey, year):
     results = Caps.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
 
@@ -81,6 +134,8 @@ def generate_secondary_auditors(audit_header, outfile):
     secondary_auditors = _get_secondary_auditors(
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
+    xform_address_state(secondary_auditors)
+    xform_address_zipcode(secondary_auditors)
     map_simple_columns(wb, mappings, secondary_auditors)
     wb.save(outfile)
 

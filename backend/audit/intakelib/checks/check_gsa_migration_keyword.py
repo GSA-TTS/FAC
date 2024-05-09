@@ -34,6 +34,7 @@ def check_for_gsa_migration_keyword(ir):
         "compliance_requirement",
         "auditee_zip",
         "auditor_zip",
+        "secondary_auditor_address_state",
     ]
 
     for range_name in range_names:
