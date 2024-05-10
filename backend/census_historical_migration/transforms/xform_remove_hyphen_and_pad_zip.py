@@ -1,10 +1,12 @@
 from ..exception_utils import DataMigrationError
 from .xform_string_to_string import string_to_string
+from django.conf import settings
 
 
 def xform_remove_hyphen_and_pad_zip(zip):
     """
     Transform a ZIP code string by removing hyphen if present and adding a leading zero when necessary.
+    - If the ZIP is settings.GSA_MIGRATION, return it
     - If the ZIP code has hyphen, remove that character.
     - If the ZIP code has 4 or 8 digits, pads with a leading zero.
     - Returns the ZIP code if it has 5 digits or 9 digitis (after padding if needed).
@@ -12,7 +14,7 @@ def xform_remove_hyphen_and_pad_zip(zip):
     """
     # Transformation to be documented.
 
-    if not zip:
+    if zip == settings.GSA_MIGRATION:
         return zip
 
     strzip = string_to_string(zip)
