@@ -248,23 +248,26 @@ def xform_is_passthrough_award(audits):
     is_empty_passthrough_found = False
 
     for audit in audits:
-        if not string_to_string(audit.PASSTHROUGHAWARD):
+        award = string_to_string(audit.PASSTHROUGHAWARD)
+        if not award:
             is_empty_passthrough_found = True
 
             amount = string_to_string(audit.PASSTHROUGHAMOUNT)
             if amount and amount != "0":
-                audit.PASSTHROUGHAWARD = "Y"
+                award = "Y"
             else:
-                audit.PASSTHROUGHAWARD = "N"
+                award = "N"
 
-            track_transformations(
-                "PASSTHROUGHAWARD",
-                "",
-                "is_passthrough_award",
-                audit.PASSTHROUGHAWARD,
-                "xform_is_passthrough_award",
-                change_records,
-            )
+        track_transformations(
+            "PASSTHROUGHAWARD",
+            audit.PASSTHROUGHAWARD,
+            "is_passthrough_award",
+            award,
+            "xform_is_passthrough_award",
+            change_records,
+        )
+
+        audit.PASSTHROUGHAWARD = award
 
     if change_records and is_empty_passthrough_found:
         InspectionRecord.append_federal_awards_changes(change_records)
