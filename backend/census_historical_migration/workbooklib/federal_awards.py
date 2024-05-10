@@ -37,6 +37,14 @@ import re
 
 logger = logging.getLogger(__name__)
 
+# Transformation Method Change Recording
+# For the purpose of recording changes, the transformation methods (i.e., xform_***)
+# below track all records related to the federal_awards section that undergoes transformation and
+# log these changes in a temporary array called `change_records`.
+# However, we only save this data into the InspectionRecord table if at least one of the records has been
+# modified by the transformation. If no records related to the given section
+# were modified, then we do not save `change_records` into the InspectionRecord.
+
 
 mappings = [
     SheetFieldMap(
@@ -544,6 +552,40 @@ def xform_populate_default_loan_balance(audits):
     return loans_at_end
 
 
+def xform_sanitize_additional_award_identification(audits, identifications):
+    """Sanitize the input to ensure it does not start with ="" and end with " which might be interpreted as a formula in Excel."""
+
+    change_records = []
+    news_identifications = []
+    has_modified_identification = False
+    for audit, identification in zip(audits, identifications):
+        if (
+            identification
+            and identification.startswith('=""')
+            and identification.endswith('"')
+        ):
+
+            new_identification = identification[3:-1]
+            has_modified_identification = True
+        else:
+            new_identification = identification
+        news_identifications.append(new_identification)
+
+        track_transformations(
+            "AWARDIDENTIFICATION",
+            audit.AWARDIDENTIFICATION,
+            "additional_award_identification",
+            new_identification,
+            ["xform_sanitize_additional_award_identification"],
+            change_records,
+        )
+    # See Transformation Method Change Recording at the top of this file.
+    if change_records and has_modified_identification:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+    return news_identifications
+
+
 def xform_populate_default_award_identification_values(audits):
     """
     Automatically fills in default values for empty additional award identifications.
@@ -700,10 +742,13 @@ def generate_federal_awards(audit_header, outfile):
     additional_award_identifications = (
         xform_populate_default_award_identification_values(audits)
     )
+    updated_awward_identifications = xform_sanitize_additional_award_identification(
+        audits, additional_award_identifications
+    )
     set_range(
         wb,
         "additional_award_identification",
-        additional_award_identifications,
+        updated_awward_identifications,
     )
 
     # loan balance at audit period end
