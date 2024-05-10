@@ -32,7 +32,7 @@ module "file_scanner_clamav" {
 
   # This generates eg "fac-av-staging-fs.apps.internal", avoiding collisions with routes for other projects and spaces
   name           = local.fs_clam_name
-  app_name_or_id = "gsa-fac"
+  app_name_or_id = "fac-file-scanner"
 
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space_name
