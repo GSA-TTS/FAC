@@ -45,5 +45,7 @@ module "file_scanner_clamav" {
   proxy_port     = module.https-proxy.port
   proxy_username = module.https-proxy.username
   proxy_password = module.https-proxy.password
+
+  depends_on = [module.fac-file-scanner.id]
 }
 
