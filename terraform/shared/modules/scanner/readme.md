@@ -9,8 +9,8 @@ module "fac-file-scanner" {
   cf_org_name       = var.cf_org_name
   cf_space_name     = var.cf_space_name
   https_proxy       = module.https-proxy.https_proxy
-  db_id             = module.database.instance_id
   s3_id             = module.s3-private.bucket_id
+  logdrain_id       = module.cg-logshipper.logdrain_service_id
   scanner_instances = #
   scanner_memory    = #
   disk_quota        = #
