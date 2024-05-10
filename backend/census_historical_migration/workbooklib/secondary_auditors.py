@@ -82,7 +82,7 @@ def xform_address_state(secondary_auditors):
             ["xform_address_state"],
             change_records,
         )
-        
+
         secondary_auditor.CPASTATE = address_state
 
     if change_records and is_empty_address_state_found:
