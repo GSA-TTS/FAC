@@ -62,5 +62,10 @@ variable "new_relic_id" {
 variable "logdrain_id" {
   type        = string
   description = "the full string of the logdrain id"
+}
 
+variable "recursive_delete" {
+  type        = bool
+  description = "when true, deletes service bindings attached to the resource (not recommended for production)"
+  default     = false
 }
