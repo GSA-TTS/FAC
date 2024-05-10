@@ -32,8 +32,6 @@ def check_for_gsa_migration_keyword(ir):
         "contains_chart_or_table",
         "is_minimis_rate_used",
         "compliance_requirement",
-        "auditee_zip",
-        "auditor_zip",
         "secondary_auditor_address_zipcode",
         "secondary_auditor_address_state",
     ]
