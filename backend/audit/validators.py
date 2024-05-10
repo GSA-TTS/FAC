@@ -258,7 +258,9 @@ def validate_use_of_gsa_migration_keyword(general_information, is_data_migration
     return general_information
 
 
-def validate_use_of_gsa_migration_keyword_in_audit_info(audit_information, is_data_migration):
+def validate_use_of_gsa_migration_keyword_in_audit_info(
+    audit_information, is_data_migration
+):
     """Check if GSA_MIGRATION keyword is used and is allowed to be used in audit information"""
 
     if not is_data_migration and settings.GSA_MIGRATION in [
