@@ -117,7 +117,7 @@ def xform_missing_major_program(audits):
 
             is_empty_major_program_found = True
             audit.MAJORPROGRAM = new_value
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_major_program_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -152,7 +152,7 @@ def xform_missing_amount_expended(audits):
             change_records,
         )
         audit.AMOUNT = str(amount)
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_amount_expended_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -194,7 +194,7 @@ def xform_missing_program_total(audits):
             change_records,
         )
         audit.PROGRAMTOTAL = str(program_total)
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_program_total_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -243,7 +243,7 @@ def xform_missing_cluster_total(
             change_records,
         )
         audit.CLUSTERTOTAL = str(cluster_total)
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_cluster_total_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -273,7 +273,7 @@ def xform_is_passthrough_award(audits):
                 "xform_is_passthrough_award",
                 change_records,
             )
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_passthrough_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -339,7 +339,7 @@ def xform_program_name(audits):
 
             is_empty_program_name_found = True
             audit.FEDERALPROGRAMNAME = settings.GSA_MIGRATION
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_program_name_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -516,7 +516,7 @@ def xform_replace_invalid_direct_award_flag(audits, passthrough_names):
                 change_records,
             )
             is_directs.append(is_direct)
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_invalid_direct_flag_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -655,7 +655,7 @@ def xform_cluster_names(audits):
                 change_records,
             )
             audit.CLUSTERNAME = settings.OTHER_CLUSTER
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_other_cluster_found:
         InspectionRecord.append_federal_awards_changes(change_records)
     return audits
