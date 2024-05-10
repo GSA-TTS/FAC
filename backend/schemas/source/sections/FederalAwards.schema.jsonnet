@@ -251,7 +251,14 @@ local Parts = {
     additionalProperties: false,
     description: 'If direct_award is N, the form must include a list of the pass-through entity by name and identifying number',
     properties: {
-      is_direct: Base.Enum.YorN,
+      is_direct: {
+        oneOf: [
+          Base.Enum.YorN,
+          Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+        ],
+      },
       entities: Types.array {
         items: Validations.PassThroughEntity,
       },
@@ -265,6 +272,18 @@ local Parts = {
           properties: {
             is_direct: {
               const: Base.Const.N,
+            },
+          },
+        },
+        'then': {
+          required: ['entities'],
+        },
+      },
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.GSA_MIGRATION,
             },
           },
         },

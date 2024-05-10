@@ -12,7 +12,6 @@ from ..workbooklib.templates import sections_to_template_paths
 from ..models import ELECCPAS as Caps
 from ..change_record import InspectionRecord
 from audit.fixtures.excel import FORM_SECTIONS
-
 from django.conf import settings
 import openpyxl as pyxl
 
@@ -128,6 +127,33 @@ def _get_secondary_auditors(dbkey, year):
     return sort_by_field(results, "ID")
 
 
+def xform_cpafirmname(secondary_auditors):
+    """NOTE: We track all secondary_auditors data in change_records.
+    Save change_records in InspectionRecord only if at least one blank CPAFIRMNAME is found.
+    We do this so that we can match changedrecord to record in dissemination table in a one on one fashion.
+    """
+
+    change_records = []
+    is_empty_cpafirmname_found = False
+    for secondary_auditor in secondary_auditors:
+        cpafirmname = string_to_string(secondary_auditor.CPAFIRMNAME)
+        if cpafirmname == "":
+            is_empty_cpafirmname_found = True
+            cpafirmname = settings.GSA_MIGRATION
+        track_transformations(
+            "CPAFIRMNAME",
+            secondary_auditor.CPAFIRMNAME,
+            "auditor_name",
+            cpafirmname,
+            ["xform_cpafirmname"],
+            change_records,
+        )
+        secondary_auditor.CPAFIRMNAME = cpafirmname
+
+    if change_records and is_empty_cpafirmname_found:
+        InspectionRecord.append_secondary_auditor_changes(change_records)
+
+
 def generate_secondary_auditors(audit_header, outfile):
     """
     Generates secondary auditor workbook for a given audit header.
@@ -146,6 +172,7 @@ def generate_secondary_auditors(audit_header, outfile):
     )
     xform_address_state(secondary_auditors)
     xform_address_zipcode(secondary_auditors)
+    xform_cpafirmname(secondary_auditors)
     map_simple_columns(wb, mappings, secondary_auditors)
     wb.save(outfile)
 

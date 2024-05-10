@@ -18,6 +18,7 @@ from .workbooklib.federal_awards import (
     xform_constructs_cluster_names,
     xform_populate_default_passthrough_amount,
     xform_populate_default_passthrough_names_ids,
+    xform_replace_invalid_direct_award_flag,
     xform_replace_invalid_extension,
     xform_program_name,
     xform_is_passthrough_award,
@@ -667,3 +668,25 @@ class TestXformClusterNames(SimpleTestCase):
         result = xform_cluster_names(audits)
         for audit in result:
             self.assertEqual(audit.CLUSTERNAME, settings.OTHER_CLUSTER)
+
+
+class TestXformReplaceInvalidDirectAwardFlag(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, direct_flag):
+            self.DIRECT = direct_flag
+
+    def test_replace_invalid_direct_award_flag(self):
+        audits = [self.MockAudit("Y"), self.MockAudit("N"), self.MockAudit("Y")]
+        passthrough_names = [
+            "some name",
+            "some other name",
+            "",
+        ]
+
+        results = xform_replace_invalid_direct_award_flag(audits, passthrough_names)
+        # Expect first audit DIRECT flag to be replaced with default
+        self.assertEqual(results[0], settings.GSA_MIGRATION)
+        # Expect second audit DIRECT flag to remain unchanged
+        self.assertEqual(results[1], "N")
+        # Expect third audit DIRECT flag to remain unchanged
+        self.assertEqual(results[2], "Y")
