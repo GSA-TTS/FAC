@@ -895,14 +895,18 @@ class AuditInformationTests(SimpleTestCase):
         ]:
             case = jsoncopy(self.SIMPLE_CASES[1])
             del case[required_field]
-            self.assertRaises(ValidationError, validate_audit_information_json, case, False)
+            self.assertRaises(
+                ValidationError, validate_audit_information_json, case, False
+            )
 
     def test_error_raised_for_missing_required_fields(self):
         """Test that missing required fields raises a validation error."""
         for key in self.SIMPLE_CASES[0].keys():
             case = jsoncopy(self.SIMPLE_CASES[0])
             del case[key]
-            self.assertRaises(ValidationError, validate_audit_information_json, case, False)
+            self.assertRaises(
+                ValidationError, validate_audit_information_json, case, False
+            )
 
     def test_gsa_migration(self):
         case = jsoncopy(self.SIMPLE_CASES[1])
