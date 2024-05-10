@@ -884,7 +884,7 @@ class AuditInformationTests(SimpleTestCase):
     def test_no_errors_when_audit_information_is_valid(self):
         """No errors should be raised when audit information is valid"""
         for case in self.SIMPLE_CASES:
-            validate_audit_information_json(case)
+            validate_audit_information_json(case, False)
 
     def test_error_raised_for_missing_required_fields_with_not_gaap(self):
         """Test that missing certain fields raises a validation error when 'gaap_results' contains 'not_gaap'."""
@@ -895,14 +895,20 @@ class AuditInformationTests(SimpleTestCase):
         ]:
             case = jsoncopy(self.SIMPLE_CASES[1])
             del case[required_field]
-            self.assertRaises(ValidationError, validate_audit_information_json, case)
+            self.assertRaises(ValidationError, validate_audit_information_json, case, False)
 
     def test_error_raised_for_missing_required_fields(self):
         """Test that missing required fields raises a validation error."""
         for key in self.SIMPLE_CASES[0].keys():
             case = jsoncopy(self.SIMPLE_CASES[0])
             del case[key]
-            self.assertRaises(ValidationError, validate_audit_information_json, case)
+            self.assertRaises(ValidationError, validate_audit_information_json, case, False)
+
+    def test_gsa_migration(self):
+        case = jsoncopy(self.SIMPLE_CASES[1])
+        case["is_sp_framework_required"] = ""
+        case["is_low_risk_auditee"] = ""
+        self.assertRaises(ValidationError, validate_audit_information_json, case, True)
 
 
 class TribalAccessTests(SimpleTestCase):
