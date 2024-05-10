@@ -76,10 +76,6 @@ resource "cloudfoundry_app" "scanner_app" {
   }
 
   service_binding {
-    service_instance = var.new_relic_id
-  }
-
-  service_binding {
     service_instance = var.logdrain_id
   }
 

@@ -54,11 +54,6 @@ variable "https_proxy" {
   description = "the full string of the https proxy for use with the logshipper app"
 }
 
-variable "new_relic_id" {
-  type        = string
-  description = "the full string of the new relic credentials id"
-}
-
 variable "logdrain_id" {
   type        = string
   description = "the full string of the logdrain id"

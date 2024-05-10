@@ -11,7 +11,6 @@ module "fac-file-scanner" {
   db_id             = module.database.instance_id
   s3_id             = module.s3-private.bucket_id
   logdrain_id       = module.cg-logshipper.logdrain_service_id
-  new_relic_id      = cloudfoundry_user_provided_service.credentials.id
   scanner_instances = 1
   scanner_memory    = 512
   disk_quota        = 512
