@@ -3,9 +3,15 @@
 <div class="usa-alert usa-alert--info">
     <div class="usa-alert__body">
         <h4 class="usa-alert__heading">Searching the FAC database</h4>
-        <p class="usa-alert__text padding-bottom-2">
-            Learn more about search on <a href='https://www.fac.gov/data/resources/' target='_blank'>our Search Resources page</a>.
-        </p>
+        {% if advanced_search_flag %}
+          <p class="usa-alert__text padding-bottom-2">
+              Learn more about how our advanced search flters work on <a href='https://www.fac.gov/search-resources/advanced/' target='_blank'>our resources page</a>.
+          </p>
+        {% else %}
+          <p class="usa-alert__text padding-bottom-2">
+            Learn more about how our search flters work on <a href='https://www.fac.gov/search-resources/filters/' target='_blank'>our resources page</a>.
+          </p>
+        {% endif %}
 
         <h4 class="usa-alert__heading">Summary reports</h4>
         <p class="usa-alert__text padding-bottom-2">

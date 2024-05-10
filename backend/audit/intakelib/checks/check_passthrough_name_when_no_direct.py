@@ -1,4 +1,6 @@
 import logging
+
+from django.conf import settings
 from audit.intakelib.intermediate_representation import get_range_by_name
 from audit.intakelib.common import get_message, build_cell_error_tuple
 
@@ -50,6 +52,15 @@ def passthrough_name_when_no_direct(ir):
                     is_direct,
                     ndx,
                     get_message("check_passthrough_name_when_yes_direct"),
+                )
+            )
+        elif (isd == settings.GSA_MIGRATION) and (not pname):
+            errors.append(
+                build_cell_error_tuple(
+                    ir,
+                    is_direct,
+                    ndx,
+                    get_message("check_passthrough_name_when_invalid_direct"),
                 )
             )
 
