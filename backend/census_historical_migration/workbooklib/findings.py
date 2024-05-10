@@ -40,17 +40,19 @@ def xform_missing_compliance_requirement(findings):
     for finding in findings:
         compliance_requirement = string_to_string(finding.TYPEREQUIREMENT)
         if not compliance_requirement:
-            track_transformations(
-                "TYPEREQUIREMENT",
-                finding.TYPEREQUIREMENT,
-                "type_requirement",
-                settings.GSA_MIGRATION,
-                ["xform_missing_compliance_requirement"],
-                change_records,
-            )
-
             is_empty_compliance_requirement_found = True
-            finding.TYPEREQUIREMENT = settings.GSA_MIGRATION
+            compliance_requirement = settings.GSA_MIGRATION
+
+        track_transformations(
+            "TYPEREQUIREMENT",
+            finding.TYPEREQUIREMENT,
+            "type_requirement",
+            compliance_requirement,
+            ["xform_missing_compliance_requirement"],
+            change_records,
+        )
+
+        finding.TYPEREQUIREMENT = compliance_requirement
 
     if change_records and is_empty_compliance_requirement_found:
         InspectionRecord.append_finding_changes(change_records)
