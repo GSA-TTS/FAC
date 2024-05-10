@@ -71,17 +71,19 @@ def xform_address_state(secondary_auditors):
     for secondary_auditor in secondary_auditors:
         address_state = string_to_string(secondary_auditor.CPASTATE)
         if not address_state:
-            track_transformations(
-                "CPASTATE",
-                secondary_auditor.CPASTATE,
-                "address_state",
-                settings.GSA_MIGRATION,
-                ["xform_address_state"],
-                change_records,
-            )
-
             is_empty_address_state_found = True
-            secondary_auditor.CPASTATE = settings.GSA_MIGRATION
+            address_state = settings.GSA_MIGRATION
+
+        track_transformations(
+            "CPASTATE",
+            secondary_auditor.CPASTATE,
+            "address_state",
+            address_state,
+            ["xform_address_state"],
+            change_records,
+        )
+        
+        secondary_auditor.CPASTATE = address_state
 
     if change_records and is_empty_address_state_found:
         InspectionRecord.append_secondary_auditor_changes(change_records)
