@@ -333,17 +333,20 @@ def xform_program_name(audits):
     for audit in audits:
         program_name = string_to_string(audit.FEDERALPROGRAMNAME)
         if not program_name:
-            track_transformations(
-                "FEDERALPROGRAMNAME",
-                audit.FEDERALPROGRAMNAME,
-                "federal_program_name",
-                settings.GSA_MIGRATION,
-                ["xform_program_name"],
-                change_records,
-            )
-
             is_empty_program_name_found = True
-            audit.FEDERALPROGRAMNAME = settings.GSA_MIGRATION
+            program_name = settings.GSA_MIGRATION
+
+        track_transformations(
+            "FEDERALPROGRAMNAME",
+            audit.FEDERALPROGRAMNAME,
+            "federal_program_name",
+            program_name,
+            ["xform_program_name"],
+            change_records,
+        )
+
+        audit.FEDERALPROGRAMNAME = program_name
+
     # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_program_name_found:
         InspectionRecord.append_federal_awards_changes(change_records)
