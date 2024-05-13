@@ -556,7 +556,7 @@ def xform_sanitize_additional_award_identification(audits, identifications):
     """Sanitize the input to ensure it does not start with ="" and end with " which might be interpreted as a formula in Excel."""
 
     change_records = []
-    news_identifications = []
+    new_identifications = []
     has_modified_identification = False
     for audit, identification in zip(audits, identifications):
         if (
