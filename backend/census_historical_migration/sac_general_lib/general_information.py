@@ -445,8 +445,10 @@ def set_audit_period_other_months(general_information, audit_header):
     """
     If PERIODCOVERED='O', set general_information[audit_period_other_months] to NUMBERMONTHS
     """
-    if string_to_string(audit_header.PERIODCOVERED) == 'O':
-        general_information["audit_period_other_months"] = str(audit_header.NUMBERMONTHS).zfill(2)
+    if string_to_string(audit_header.PERIODCOVERED) == "O":
+        general_information["audit_period_other_months"] = str(
+            audit_header.NUMBERMONTHS
+        ).zfill(2)
 
 
 def general_information(audit_header):
