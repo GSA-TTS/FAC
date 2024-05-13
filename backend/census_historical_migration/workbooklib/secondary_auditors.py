@@ -20,6 +20,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Transformation Method Change Recording
+# For the purpose of recording changes, the transformation methods (i.e., xform_***)
+# below track all records related to the secondary_auditors section that undergoes transformation and
+# log these changes in a temporary array called `change_records`.
+# However, we only save this data into the InspectionRecord table if at least one of the records has been
+# modified by the transformation. If no records related to the given section
+# were modified, then we do not save `change_records` into the InspectionRecord.
 
 mappings = [
     SheetFieldMap(
@@ -64,15 +71,7 @@ mappings = [
 
 
 def xform_address_state(secondary_auditors):
-    """
-    Default missing address_state to GSA_MIGRATION.
-
-    We track all records related to a section that undergo transformation and
-    log these changes in change_records. However, we only save this data into
-    the InspectionRecord table if at least one of the records has been
-    modified by the transformation. If no records related to the given section
-    were modified, then we do not save change_records into InspectionRecord.
-    """
+    """Default missing address_state to GSA_MIGRATION"""
     change_records = []
     is_empty_address_state_found = False
 
@@ -93,7 +92,35 @@ def xform_address_state(secondary_auditors):
 
         secondary_auditor.CPASTATE = address_state
 
+    # See Transformation Method Change Recording comment at the top of this file
     if change_records and is_empty_address_state_found:
+        InspectionRecord.append_secondary_auditor_changes(change_records)
+
+
+def xform_address_zipcode(secondary_auditors):
+    """Default missing address_zipcode to GSA_MIGRATION"""
+    change_records = []
+    is_empty_address_zipcode_found = False
+
+    for secondary_auditor in secondary_auditors:
+        address_zipcode = string_to_string(secondary_auditor.CPAZIPCODE)
+        if not address_zipcode:
+            is_empty_address_zipcode_found = True
+            address_zipcode = settings.GSA_MIGRATION
+
+        track_transformations(
+            "CPAZIPCODE",
+            secondary_auditor.CPAZIPCODE,
+            "address_zipcode",
+            address_zipcode,
+            ["xform_address_zipcode"],
+            change_records,
+        )
+
+        secondary_auditor.CPAZIPCODE = address_zipcode
+
+    # See Transformation Method Change Recording comment at the top of this file
+    if change_records and is_empty_address_zipcode_found:
         InspectionRecord.append_secondary_auditor_changes(change_records)
 
 
@@ -104,10 +131,7 @@ def _get_secondary_auditors(dbkey, year):
 
 
 def xform_cpafirmname(secondary_auditors):
-    """NOTE: We track all secondary_auditors data in change_records.
-    Save change_records in InspectionRecord only if at least one blank CPAFIRMNAME is found.
-    We do this so that we can match changedrecord to record in dissemination table in a one on one fashion.
-    """
+    """Default missing cpafirmname to GSA_MIGRATION"""
 
     change_records = []
     is_empty_cpafirmname_found = False
@@ -126,6 +150,7 @@ def xform_cpafirmname(secondary_auditors):
         )
         secondary_auditor.CPAFIRMNAME = cpafirmname
 
+    # See Transformation Method Change Recording comment at the top of this file
     if change_records and is_empty_cpafirmname_found:
         InspectionRecord.append_secondary_auditor_changes(change_records)
 
@@ -147,6 +172,7 @@ def generate_secondary_auditors(audit_header, outfile):
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
     xform_address_state(secondary_auditors)
+    xform_address_zipcode(secondary_auditors)
     xform_cpafirmname(secondary_auditors)
     map_simple_columns(wb, mappings, secondary_auditors)
     wb.save(outfile)
