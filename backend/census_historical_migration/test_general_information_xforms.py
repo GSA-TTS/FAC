@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta
-from unittest.mock import patch
+import json
+from unittest.mock import mock_open, patch
 from django.conf import settings
 from django.test import SimpleTestCase
 
 from .sac_general_lib.general_information import (
     AUDIT_TYPE_DICT,
     PERIOD_DICT,
+    is_uei_valid,
     xform_audit_period_covered,
     xform_audit_type,
     xform_auditee_fiscal_period_end,
@@ -14,8 +16,10 @@ from .sac_general_lib.general_information import (
     xform_entity_type,
     xform_replace_empty_auditor_email,
     xform_replace_empty_auditee_email,
+    xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration,
     xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
     xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
+    xform_replace_empty_zips,
 )
 from .exception_utils import (
     DataMigrationError,
@@ -266,6 +270,104 @@ class TestXformReplaceEmptyAuditeeEmail(SimpleTestCase):
         self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
 
 
+class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
+
+    class MockAuditHeader:
+
+        def __init__(self, UEI):
+            self.UEI = UEI
+
+    def setUp(self):
+        self.audit_header = self.MockAuditHeader("")
+        self.valid_uei = "ZQGGHJH74DW7"
+        self.invalid_uei = "123"
+        self.uei_schema = {
+            "oneOf": [
+                {
+                    "allOf": [
+                        {"maxLength": 12, "minLength": 12},
+                        {"pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"},
+                        {
+                            "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+                        },
+                        {"pattern": "^(?![0-9]{9})"},
+                    ],
+                    "type": "string",
+                },
+                {"const": "GSA_MIGRATION", "type": "string"},
+            ]
+        }
+
+    def test_auditee_uei_valid(self):
+        """Test that valid auditee EIN is not replaced."""
+        self.audit_header.UEI = "ZQGGHJH74DW7"
+        result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(
+            self.audit_header
+        )
+        print(result)
+        self.assertEqual(result.UEI, "ZQGGHJH74DW7")
+
+    def test_auditee_uei_invalid_replaced(self):
+        """Test that invalid auditee UEI is replaced."""
+        self.audit_header.UEI = "invalid_uei"
+        with patch(
+            "census_historical_migration.sac_general_lib.general_information.track_transformations"
+        ) as mock_track:
+            result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(
+                self.audit_header
+            )
+            mock_track.assert_called_once_with(
+                "UEI",
+                "invalid_uei",
+                "auditee_uei",
+                settings.GSA_MIGRATION,
+                "xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration",
+            )
+            self.assertEqual(result.UEI, settings.GSA_MIGRATION)
+
+    def test_auditee_uei_empty_replaced(self):
+        """Test that empty auditee UEI is replaced."""
+        self.audit_header.UEI = "auditee_uei"
+        with patch(
+            "census_historical_migration.sac_general_lib.general_information.track_transformations"
+        ) as mock_track:
+            result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(
+                self.audit_header
+            )
+            mock_track.assert_called_once()
+            self.assertEqual(result.UEI, settings.GSA_MIGRATION)
+
+    @patch("builtins.open", side_effect=FileNotFoundError)
+    @patch(
+        "census_historical_migration.sac_general_lib.general_information.settings.OUTPUT_BASE_DIR",
+        "some/dir",
+    )
+    def test_missing_schema_file(self, mock_open):
+        with self.assertRaises(DataMigrationError) as context:
+            is_uei_valid(self.valid_uei)
+        self.assertIn(
+            "UeiSchema.json file not found in some/dir", str(context.exception)
+        )
+
+    @patch("builtins.open", new_callable=mock_open, read_data="invalid json")
+    @patch(
+        "json.load",
+        side_effect=json.decoder.JSONDecodeError(
+            "Expecting value", "line 1 column 1 (char 0)", 0
+        ),
+    )
+    @patch(
+        "census_historical_migration.sac_general_lib.general_information.settings.OUTPUT_BASE_DIR",
+        "some/dir",
+    )
+    def test_invalid_json_schema_file(self, mock_json_load, mock_open):
+        with self.assertRaises(DataMigrationError) as context:
+            is_uei_valid(self.valid_uei)
+        self.assertIn(
+            "UeiSchema.json file contains invalid JSON", str(context.exception)
+        )
+
+
 class TestXformReplaceEmptyOrInvalidEins(SimpleTestCase):
     def test_auditor_ein_valid(self):
         """Test that valid auditor EIN is not replaced."""
@@ -330,3 +432,25 @@ class TestXformReplaceEmptyOrInvalidEins(SimpleTestCase):
             result = xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(info)
             mock_track.assert_called_once()
             self.assertEqual(result["ein"], settings.GSA_MIGRATION)
+
+
+class TestXformReplaceEmptyAuditorZip(SimpleTestCase):
+    def test_empty_auditor_zip(self):
+        """Test that an empty auditor_zip and auditee_zip are replaced with 'GSA_MIGRATION'"""
+        input_data = {
+            "auditee_zip": "",
+            "auditor_zip": "",
+        }
+        expected_output = {
+            "auditee_zip": settings.GSA_MIGRATION,
+            "auditor_zip": settings.GSA_MIGRATION,
+        }
+        self.assertEqual(xform_replace_empty_zips(input_data), expected_output)
+
+    def test_non_empty_auditor_zip(self):
+        """Test that a non-empty auditor_zip and auditee_zip remain unchanged"""
+        input_data = {
+            "auditee_zip": "10108",
+            "auditor_zip": "12345",
+        }
+        self.assertEqual(xform_replace_empty_zips(input_data), input_data)

@@ -18,7 +18,8 @@ from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
 )
-
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 from ..change_record import InspectionRecord, CensusRecord, GsaFacRecord
 
 
@@ -140,6 +141,32 @@ mappings = [
         "secondary_auditors_exist", "MULTIPLE_CPAS", None, None, bool
     ),  # In DB, not disseminated, needed for validation
 ]
+
+
+def is_uei_valid(uei):
+    try:
+        with open(f"{settings.OUTPUT_BASE_DIR}/UeiSchema.json") as schema:
+            schema_json = json.load(schema)
+            uei_schema = schema_json.get("properties")["uei"]
+            validate(instance=uei, schema=uei_schema)
+            return True
+    except FileNotFoundError:
+        raise DataMigrationError(
+            f"UeiSchema.json file not found in {settings.OUTPUT_BASE_DIR}",
+            "missing_uei_schema_json",
+        )
+    except json.decoder.JSONDecodeError:
+        raise DataMigrationError(
+            "UeiSchema.json file contains invalid JSON.", "invalid_uei_schema_json"
+        )
+
+    except ValidationError:
+        return False
+
+    except Exception as e:
+        raise DataMigrationError(
+            f"Error validating Auditee UEI: {e}", "cannot_valid_auditee_uei"
+        )
 
 
 def xform_update_multiple_eins_flag(audit_header):
@@ -339,6 +366,22 @@ def xform_replace_empty_auditee_email(general_information):
     return general_information
 
 
+def xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header):
+    """Replaces empty or invalid auditee UEI with GSA Migration keyword"""
+    # Transformation recorded.
+    if not (audit_header.UEI and is_uei_valid(audit_header.UEI)):
+        track_transformations(
+            "UEI",
+            audit_header.UEI,
+            "auditee_uei",
+            settings.GSA_MIGRATION,
+            "xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration",
+        )
+        audit_header.UEI = settings.GSA_MIGRATION
+
+    return audit_header
+
+
 def track_transformations(
     census_column, census_value, gsa_field, gsa_value, transformation_functions
 ):
@@ -398,11 +441,38 @@ def xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(general_inform
     return general_information
 
 
+def xform_replace_empty_zips(general_information):
+    """Replaces empty auditor and auditee zipcodes with GSA Migration keyword"""
+    # Transformation recorded.
+    if not general_information.get("auditor_zip"):
+        general_information["auditor_zip"] = settings.GSA_MIGRATION
+        track_transformations(
+            "CPAZIPCODE",
+            "",
+            "auditor_zip",
+            general_information["auditor_zip"],
+            "xform_replace_empty_zips",
+        )
+
+    if not general_information.get("auditee_zip"):
+        general_information["auditee_zip"] = settings.GSA_MIGRATION
+        track_transformations(
+            "ZIPCODE",
+            "",
+            "auditee_zip",
+            general_information["auditee_zip"],
+            "xform_replace_empty_zips",
+        )
+
+    return general_information
+
+
 def general_information(audit_header):
     """Generates general information JSON."""
     xform_update_multiple_eins_flag(audit_header)
     xform_update_multiple_ueis_flag(audit_header)
     xform_update_entity_type(audit_header)
+    xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header)
     general_information = create_json_from_db_object(audit_header, mappings)
     transformations = [
         xform_auditee_fiscal_period_start,
@@ -414,6 +484,7 @@ def general_information(audit_header):
         xform_replace_empty_auditee_email,
         xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
         xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
+        xform_replace_empty_zips,
     ]
 
     for transform in transformations:

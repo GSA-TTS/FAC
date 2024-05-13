@@ -3,8 +3,11 @@ from django.test import SimpleTestCase
 from .sac_general_lib.audit_information import (
     xform_build_sp_framework_gaap_results,
     xform_framework_basis,
+    xform_sp_framework_required,
+    xform_lowrisk,
 )
 from .exception_utils import DataMigrationError
+from django.conf import settings
 
 
 class TestXformBuildSpFrameworkGaapResults(SimpleTestCase):
@@ -123,3 +126,82 @@ class TestXformFrameworkBasis(SimpleTestCase):
         """Test that the function raises an exception when the basis has extra words."""
         with self.assertRaises(DataMigrationError):
             xform_framework_basis("Something with cash basis")
+
+
+class TestXformSpFrameworkRequired(SimpleTestCase):
+    class MockAuditHeader:
+        def __init__(
+            self,
+            DBKEY,
+            TYPEREPORT_FS,
+            SP_FRAMEWORK_REQUIRED,
+        ):
+            self.DBKEY = DBKEY
+            self.TYPEREPORT_FS = TYPEREPORT_FS
+            self.SP_FRAMEWORK_REQUIRED = SP_FRAMEWORK_REQUIRED
+
+    def _mock_audit_header(self):
+        """Returns a mock audit header with all necessary fields."""
+        return self.MockAuditHeader(
+            DBKEY="123456789",
+            TYPEREPORT_FS="AS",
+            SP_FRAMEWORK_REQUIRED="Y",
+        )
+
+    def test_sp_framework_required_Y(self):
+        """Test that the function returns 'Y' for SP_FRAMEWORK_REQUIRED."""
+        audit_header = self._mock_audit_header()
+        xform_sp_framework_required(audit_header)
+        self.assertEqual(audit_header.SP_FRAMEWORK_REQUIRED, "Y")
+
+    def test_sp_framework_required_N(self):
+        """Test that the function returns 'N' for SP_FRAMEWORK_REQUIRED."""
+        audit_header = self._mock_audit_header()
+        audit_header.SP_FRAMEWORK_REQUIRED = "N"
+        xform_sp_framework_required(audit_header)
+        self.assertEqual(audit_header.SP_FRAMEWORK_REQUIRED, "N")
+
+    def test_sp_framework_required_blank(self):
+        """Test that the function returns GSA_MIGRATION for SP_FRAMEWORK_REQUIRED."""
+        audit_header = self._mock_audit_header()
+        audit_header.SP_FRAMEWORK_REQUIRED = ""
+        xform_sp_framework_required(audit_header)
+        self.assertEqual(audit_header.SP_FRAMEWORK_REQUIRED, settings.GSA_MIGRATION)
+
+
+class TestXformLowrisk(SimpleTestCase):
+    class MockAuditHeader:
+        def __init__(
+            self,
+            DBKEY,
+            LOWRISK,
+        ):
+            self.DBKEY = DBKEY
+            self.LOWRISK = LOWRISK
+
+    def _mock_audit_header(self):
+        """Returns a mock audit header with all necessary fields."""
+        return self.MockAuditHeader(
+            DBKEY="123456789",
+            LOWRISK="Y",
+        )
+
+    def test_lowrisk_Y(self):
+        """Test that the function returns 'Y' for LOWRISK."""
+        audit_header = self._mock_audit_header()
+        xform_lowrisk(audit_header)
+        self.assertEqual(audit_header.LOWRISK, "Y")
+
+    def test_lowrisk_N(self):
+        """Test that the function returns 'N' for LOWRISK."""
+        audit_header = self._mock_audit_header()
+        audit_header.LOWRISK = "N"
+        xform_lowrisk(audit_header)
+        self.assertEqual(audit_header.LOWRISK, "N")
+
+    def test_lowrisk_blank(self):
+        """Test that the function returns GSA_MIGRATION for LOWRISK."""
+        audit_header = self._mock_audit_header()
+        audit_header.LOWRISK = ""
+        xform_lowrisk(audit_header)
+        self.assertEqual(audit_header.LOWRISK, settings.GSA_MIGRATION)
