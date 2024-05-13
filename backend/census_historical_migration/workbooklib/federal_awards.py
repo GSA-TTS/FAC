@@ -249,15 +249,7 @@ def xform_missing_cluster_total(
 
 
 def xform_is_passthrough_award(audits):
-    """
-    Extrapolates missing PASSTHROUGHAWARD using PASSTHROUGHAMOUNT.
-
-    We track all records related to a section that undergo transformation and
-    log these changes in change_records. However, we only save this data into
-    the InspectionRecord table if at least one of the records has been
-    modified by the transformation. If no records related to the given section
-    were modified, then we do not save change_records into InspectionRecord.
-    """
+    """Extrapolates missing PASSTHROUGHAWARD using PASSTHROUGHAMOUNT."""
     change_records = []
     is_empty_passthrough_found = False
 
