@@ -250,12 +250,30 @@ def validate_use_of_gsa_migration_keyword(general_information, is_data_migration
         general_information.get("auditee_uei", ""),
         general_information.get("ein", ""),
         general_information.get("auditor_ein", ""),
+        general_information.get("auditee_zip", ""),
+        general_information.get("auditor_zip", ""),
     ]:
         raise ValidationError(
             _(f"{settings.GSA_MIGRATION} not permitted outside of migrations"),
         )
 
     return general_information
+
+
+def validate_use_of_gsa_migration_keyword_in_audit_info(
+    audit_information, is_data_migration
+):
+    """Check if GSA_MIGRATION keyword is used and is allowed to be used in audit information"""
+
+    if not is_data_migration and settings.GSA_MIGRATION in [
+        audit_information.get("is_sp_framework_required", ""),
+        audit_information.get("is_low_risk_auditee", ""),
+    ]:
+        raise ValidationError(
+            _(f"{settings.GSA_MIGRATION} not permitted outside of migrations"),
+        )
+
+    return audit_information
 
 
 def validate_general_information_schema_rules(general_information):
@@ -340,7 +358,20 @@ def validate_general_information_complete_json(value, is_data_migration=True):
     return value
 
 
-def validate_audit_information_json(value):
+def validate_audit_information_json(value, is_data_migration=True):
+    """
+    Apply JSON Schema and Python checks to audit information record.
+
+    Keyword arguments:
+    is_data_migration -- True if ignoring GSA_MIGRATION emails. (default True)
+    """
+
+    validate_use_of_gsa_migration_keyword_in_audit_info(value, is_data_migration)
+    validate_audit_information_schema(value)
+    return value
+
+
+def validate_audit_information_schema(value):
     """
     Apply JSON Schema for audit information and report errors.
     """
