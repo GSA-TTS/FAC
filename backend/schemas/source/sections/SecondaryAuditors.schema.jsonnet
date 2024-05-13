@@ -35,7 +35,14 @@ local SecondaryAuditorsEntry = {
         },
       ],
     },
-    secondary_auditor_address_zipcode: Base.Compound.Zip,
+    secondary_auditor_address_zipcode: {
+      oneOf: [
+        Base.Compound.Zip,
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+      ],
+    },
     secondary_auditor_contact_name: Types.string,
     secondary_auditor_contact_title: Types.string,
     secondary_auditor_contact_phone: Base.Compound.UnitedStatesPhone,

@@ -136,8 +136,16 @@
                         "type": "string"
                      },
                      "secondary_auditor_address_zipcode": {
-                        "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
-                        "type": "string"
+                        "oneOf": [
+                           {
+                              "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
+                              "type": "string"
+                           },
+                           {
+                              "const": "GSA_MIGRATION",
+                              "type": "string"
+                           }
+                        ]
                      },
                      "secondary_auditor_contact_email": {
                         "format": "email",
