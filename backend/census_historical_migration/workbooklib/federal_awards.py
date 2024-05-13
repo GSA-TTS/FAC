@@ -568,7 +568,7 @@ def xform_sanitize_additional_award_identification(audits, identifications):
             has_modified_identification = True
         else:
             new_identification = identification
-        news_identifications.append(new_identification)
+        new_identifications.append(new_identification)
 
         track_transformations(
             "AWARDIDENTIFICATION",
