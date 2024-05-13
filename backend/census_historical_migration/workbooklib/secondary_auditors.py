@@ -89,7 +89,6 @@ def xform_address_state(secondary_auditors):
 
             is_empty_address_state_found = True
             secondary_auditor.CPASTATE = settings.GSA_MIGRATION
-            
     # See Transformation Method Change Recording comment at the top of this file
     if change_records and is_empty_address_state_found:
         InspectionRecord.append_secondary_auditor_changes(change_records)
