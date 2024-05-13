@@ -23,6 +23,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Transformation Method Change Recording
+# For the purpose of recording changes, the transformation methods (i.e., xform_***)
+# below track all records related to the federal_awards section that undergoes transformation and
+# log these changes in a temporary array called `change_records`.
+# However, we only save this data into the InspectionRecord table if at least one of the records has been
+# modified by the transformation. If no records related to the given section
+# were modified, then we do not save `change_records` into the InspectionRecord.
 
 def xform_sort_compliance_requirement(findings):
     """Sorts and uppercases the compliance requirement string."""
@@ -33,15 +40,7 @@ def xform_sort_compliance_requirement(findings):
 
 
 def xform_missing_compliance_requirement(findings):
-    """
-    Defaults missing compliance_requirement to GSA_MIGRATION.
-
-    We track all records related to a section that undergo transformation and
-    log these changes in change_records. However, we only save this data into
-    the InspectionRecord table if at least one of the records has been
-    modified by the transformation. If no records related to the given section
-    were modified, then we do not save change_records into InspectionRecord.
-    """
+    """Defaults missing compliance_requirement to GSA_MIGRATION"""
     change_records = []
     is_empty_compliance_requirement_found = False
 
@@ -62,6 +61,7 @@ def xform_missing_compliance_requirement(findings):
 
         finding.TYPEREQUIREMENT = compliance_requirement
 
+    # See Transformation Method Change Recording comment at the top of this file
     if change_records and is_empty_compliance_requirement_found:
         InspectionRecord.append_finding_changes(change_records)
 
