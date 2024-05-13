@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 # modified by the transformation. If no records related to the given section
 # were modified, then we do not save `change_records` into the InspectionRecord.
 
+
 def xform_sort_compliance_requirement(findings):
     """Sorts and uppercases the compliance requirement string."""
     # Transformation to be documented
