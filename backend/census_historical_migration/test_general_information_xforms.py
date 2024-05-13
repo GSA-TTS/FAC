@@ -19,6 +19,7 @@ from .sac_general_lib.general_information import (
     xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration,
     xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
     xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
+    xform_replace_empty_zips,
 )
 from .exception_utils import (
     DataMigrationError,
@@ -431,3 +432,25 @@ class TestXformReplaceEmptyOrInvalidEins(SimpleTestCase):
             result = xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(info)
             mock_track.assert_called_once()
             self.assertEqual(result["ein"], settings.GSA_MIGRATION)
+
+
+class TestXformReplaceEmptyAuditorZip(SimpleTestCase):
+    def test_empty_auditor_zip(self):
+        """Test that an empty auditor_zip and auditee_zip are replaced with 'GSA_MIGRATION'"""
+        input_data = {
+            "auditee_zip": "",
+            "auditor_zip": "",
+        }
+        expected_output = {
+            "auditee_zip": settings.GSA_MIGRATION,
+            "auditor_zip": settings.GSA_MIGRATION,
+        }
+        self.assertEqual(xform_replace_empty_zips(input_data), expected_output)
+
+    def test_non_empty_auditor_zip(self):
+        """Test that a non-empty auditor_zip and auditee_zip remain unchanged"""
+        input_data = {
+            "auditee_zip": "10108",
+            "auditor_zip": "12345",
+        }
+        self.assertEqual(xform_replace_empty_zips(input_data), input_data)

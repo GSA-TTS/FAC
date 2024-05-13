@@ -43,7 +43,14 @@ Typechecks fields, but allows for empty data as well. Contains conditional check
       maxLength: 100,
     },
     auditee_state: Base.Enum.UnitedStatesStateAbbr,
-    auditee_zip: Base.Compound.Zip,
+    auditee_zip: {
+      oneOf: [
+        Base.Compound.Zip,
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+      ],
+    },
 
     auditee_contact_name: Types.string {
       maxLength: 100,
@@ -91,7 +98,14 @@ Typechecks fields, but allows for empty data as well. Contains conditional check
       maxLength: 100,
     },
     auditor_state: Base.Enum.UnitedStatesStateAbbr,
-    auditor_zip: Base.Compound.Zip,
+    auditor_zip: {
+      oneOf: [
+        Base.Compound.Zip,
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+      ],
+    },
 
     auditor_contact_name: Types.string {
       maxLength: 100,

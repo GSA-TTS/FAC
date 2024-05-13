@@ -1,7 +1,7 @@
 FAC System Cloud boundary view
 ![FAC.gov  Cloud ATO boundary view]
 ```plantuml
-@startuml Context Diagram
+@startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 Person(User, "User", "GranteeOrAuditor")
@@ -10,19 +10,20 @@ Person(Staff, "User", "FAC Staff")
 Person(AgencyApp, "App", "Agency App")
 
 note as ConnectionNote
-All connections depicted are encrypted with TLS 1.2 unless otherwise noted. 
+All connections depicted are encrypted with TLS 1.2 unless otherwise noted.
 All connextions are on port 443 and use https unles otherwise noted.
-All connections use TCP. 
+All connections use TCP.
 end note
 
 
 Boundary(cloudgov, "Cloud.gov Boundary") {
     Boundary(atob, "ATO Boundary") {
         Boundary(backend, "FAC application", "egress-controlled-space") {
-            System(django, "FAC Web App", "Django") 
-            Boundary(services, "FAC Services") {
-                System(api, "REST API ", "PostgREST")
+            System(api, "REST API ", "PostgREST")
+            System(django, "FAC Web App", "Django")
+            Boundary(services, "FAC Internal Services") {
                 System(scan, "Virus Scanner", "ClamAV")
+                System(scanner, "FAC File Scanner", "Python")
             }
         }
         Boundary(proxy, "Proxy services", "egress-permitted-space"){
@@ -30,7 +31,7 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
             System(mail_proxy, "mail egress proxy", "proxy for SMTPS connections")
         }
         Boundary(pages, "cloud.gov pages") {
-            System(static, "FAC Static Site", "CG Pages") 
+            System(static, "FAC Static Site", "CG Pages")
         }
         Boundary(cloudgov-services,"Cloud.gov services") {
             System(db, "Database", "Brokered postgreSQL")
@@ -77,6 +78,9 @@ Rel(django, scan, "Scans attachments")
 Rel(django, db, "read/write") port 5432
 Rel(django, s3, "Stores single audit packages/Excel files")
 Rel(django, api, "Handles search requests") port 3000
-
+Rel(scanner, scan, "Scans files")
+Rel(scanner, s3, "Reads files from s3")
+Rel(scanner, db, "Writes scan results to table")
+Rel(scanner, https_proxy, "Reports logs to New Relic")
 @enduml
 ```
