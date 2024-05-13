@@ -596,23 +596,29 @@ def xform_populate_default_passthrough_amount(audits):
 def xform_cluster_names(audits):
     """
     If 'OTHER CLUSTER' is present in the clustername,
-    replace audit.CLUSTERNAME with settings.OTHER_CLUSTER and track transformation.
+    replace audit.CLUSTERNAME with settings.OTHER_CLUSTER.
+
+    NOTE: We track all cluster names in change_records.
+    Save change_records in InspectionRecord only if at least one CLUSTERNAME is 'OTHER CLUSTER'.
+    We do this so that we can match changedrecord to record in dissemination table in a one on one fashion.
     """
+
     change_records = []
     is_other_cluster_found = False
     for audit in audits:
         cluster_name = string_to_string(audit.CLUSTERNAME)
         if cluster_name and cluster_name.upper() == "OTHER CLUSTER":
             is_other_cluster_found = True
-            track_transformations(
-                "CLUSTERNAME",
-                audit.CLUSTERNAME,
-                "cluster_name",
-                settings.OTHER_CLUSTER,
-                ["xform_cluster_names"],
-                change_records,
-            )
-            audit.CLUSTERNAME = settings.OTHER_CLUSTER
+            cluster_name = settings.OTHER_CLUSTER
+        track_transformations(
+            "CLUSTERNAME",
+            audit.CLUSTERNAME,
+            "cluster_name",
+            cluster_name,
+            ["xform_cluster_names"],
+            change_records,
+        )
+        audit.CLUSTERNAME = cluster_name
 
     if change_records and is_other_cluster_found:
         InspectionRecord.append_federal_awards_changes(change_records)
