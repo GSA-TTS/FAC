@@ -250,6 +250,8 @@ def validate_use_of_gsa_migration_keyword(general_information, is_data_migration
         general_information.get("auditee_uei", ""),
         general_information.get("ein", ""),
         general_information.get("auditor_ein", ""),
+        general_information.get("auditee_zip", ""),
+        general_information.get("auditor_zip", ""),
     ]:
         raise ValidationError(
             _(f"{settings.GSA_MIGRATION} not permitted outside of migrations"),

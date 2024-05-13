@@ -25,6 +25,7 @@ from .workbooklib.federal_awards import (
     xform_missing_major_program,
     is_valid_extension,
     xform_cluster_names,
+    xform_sanitize_additional_award_identification,
 )
 
 
@@ -690,3 +691,23 @@ class TestXformReplaceInvalidDirectAwardFlag(SimpleTestCase):
         self.assertEqual(results[1], "N")
         # Expect third audit DIRECT flag to remain unchanged
         self.assertEqual(results[2], "Y")
+
+
+class TestXformSanitizeAdditionalAwardIdentification(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, value):
+            self.AWARDIDENTIFICATION = value
+
+    def test_sanitize_valid(self):
+        audits = [self.MockAudit('=""12345"'), self.MockAudit("text")]
+        identifications = ['=""12345"', "text"]
+        expected = ["12345", "text"]
+        result = xform_sanitize_additional_award_identification(audits, identifications)
+        self.assertEqual(result, expected)
+
+    def test_empty_and_none_identifications(self):
+        audits = [self.MockAudit(""), self.MockAudit(None), self.MockAudit('=""12345"')]
+        identifications = ["", None, '=""12345"']
+        expected = ["", None, "12345"]
+        result = xform_sanitize_additional_award_identification(audits, identifications)
+        self.assertEqual(result, expected)

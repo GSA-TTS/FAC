@@ -451,6 +451,32 @@ def set_audit_period_other_months(general_information, audit_header):
         ).zfill(2)
 
 
+def xform_replace_empty_zips(general_information):
+    """Replaces empty auditor and auditee zipcodes with GSA Migration keyword"""
+    # Transformation recorded.
+    if not general_information.get("auditor_zip"):
+        general_information["auditor_zip"] = settings.GSA_MIGRATION
+        track_transformations(
+            "CPAZIPCODE",
+            "",
+            "auditor_zip",
+            general_information["auditor_zip"],
+            "xform_replace_empty_zips",
+        )
+
+    if not general_information.get("auditee_zip"):
+        general_information["auditee_zip"] = settings.GSA_MIGRATION
+        track_transformations(
+            "ZIPCODE",
+            "",
+            "auditee_zip",
+            general_information["auditee_zip"],
+            "xform_replace_empty_zips",
+        )
+
+    return general_information
+
+
 def general_information(audit_header):
     """Generates general information JSON."""
     xform_update_multiple_eins_flag(audit_header)
@@ -469,6 +495,7 @@ def general_information(audit_header):
         xform_replace_empty_auditee_email,
         xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
         xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
+        xform_replace_empty_zips,
     ]
 
     for transform in transformations:
