@@ -636,12 +636,7 @@ def xform_populate_default_passthrough_amount(audits):
 
 def xform_cluster_names(audits):
     """
-    If 'OTHER CLUSTER' is present in the clustername,
-    replace audit.CLUSTERNAME with settings.OTHER_CLUSTER.
-
-    NOTE: We track all cluster names in change_records.
-    Save change_records in InspectionRecord only if at least one CLUSTERNAME is 'OTHER CLUSTER'.
-    We do this so that we can match changedrecord to record in dissemination table in a one on one fashion.
+    Replaces "OTHER CLUSTER" with the settings.OTHER_CLUSTER value.
     """
 
     change_records = []
