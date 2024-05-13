@@ -564,7 +564,6 @@ def xform_sanitize_additional_award_identification(audits, identifications):
             and identification.startswith('=""')
             and identification.endswith('"')
         ):
-
             new_identification = identification[3:-1]
             has_modified_identification = True
         else:
