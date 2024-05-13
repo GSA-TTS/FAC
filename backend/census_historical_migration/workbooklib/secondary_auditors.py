@@ -71,15 +71,7 @@ mappings = [
 
 
 def xform_address_state(secondary_auditors):
-    """
-    Default missing address_state to GSA_MIGRATION
-
-    We track all records related to a section that undergo transformation and
-    log these changes in change_records. However, we only save this data into
-    the InspectionRecord table if at least one of the records has been
-    modified by the transformation. If no records related to the given section
-    were modified, then we do not save change_records into InspectionRecord.
-    """
+    """Default missing address_state to GSA_MIGRATION"""
     change_records = []
     is_empty_address_state_found = False
 
@@ -97,6 +89,7 @@ def xform_address_state(secondary_auditors):
 
             is_empty_address_state_found = True
             secondary_auditor.CPASTATE = settings.GSA_MIGRATION
+            
     # See Transformation Method Change Recording comment at the top of this file
     if change_records and is_empty_address_state_found:
         InspectionRecord.append_secondary_auditor_changes(change_records)
