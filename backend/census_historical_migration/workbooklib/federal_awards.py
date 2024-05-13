@@ -582,7 +582,7 @@ def xform_sanitize_additional_award_identification(audits, identifications):
     if change_records and has_modified_identification:
         InspectionRecord.append_federal_awards_changes(change_records)
 
-    return news_identifications
+    return new_identifications
 
 
 def xform_populate_default_award_identification_values(audits):
