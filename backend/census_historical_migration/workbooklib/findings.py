@@ -40,7 +40,7 @@ def xform_sort_compliance_requirement(findings):
 
 
 def xform_missing_compliance_requirement(findings):
-    """Defaults missing compliance_requirement to GSA_MIGRATION"""
+    """Defaults missing compliance_requirement to GSA_MIGRATION."""
     change_records = []
     is_empty_compliance_requirement_found = False
 
