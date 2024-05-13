@@ -104,19 +104,20 @@ def xform_missing_major_program(audits):
     for audit in audits:
         major_program = string_to_string(audit.MAJORPROGRAM)
         if not major_program:
-            new_value = "Y" if string_to_string(audit.TYPEREPORT_MP) else "N"
-
-            track_transformations(
-                "MAJORPROGRAM",
-                audit.MAJORPROGRAM,
-                "is_major",
-                new_value,
-                ["xform_missing_major_program"],
-                change_records,
-            )
-
+            major_program = "Y" if string_to_string(audit.TYPEREPORT_MP) else "N"
             is_empty_major_program_found = True
-            audit.MAJORPROGRAM = new_value
+
+        track_transformations(
+            "MAJORPROGRAM",
+            audit.MAJORPROGRAM,
+            "is_major",
+            major_program,
+            ["xform_missing_major_program"],
+            change_records,
+        )
+
+        audit.MAJORPROGRAM = major_program
+
     # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_major_program_found:
         InspectionRecord.append_federal_awards_changes(change_records)
