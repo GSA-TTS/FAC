@@ -249,7 +249,9 @@ def xform_missing_cluster_total(
 
 
 def xform_is_passthrough_award(audits):
-    """Extrapolates missing PASSTHROUGHAWARD using PASSTHROUGHAMOUNT."""
+    """
+    Extrapolates missing PASSTHROUGHAWARD using PASSTHROUGHAMOUNT
+    """
     change_records = []
     is_empty_passthrough_found = False
 
