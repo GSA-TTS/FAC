@@ -441,9 +441,10 @@ def xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(general_inform
     return general_information
 
 
-def set_audit_period_other_months(general_information, audit_header):
+def xform_audit_period_other_months(general_information, audit_header):
     """
-    If PERIODCOVERED='O', set general_information[audit_period_other_months] to NUMBERMONTHS
+    When PERIODCOVERED is set to other, NUMBERMONTHS value defines the period.
+    Set general_information[audit_period_other_months] to NUMBERMONTHS for this case.
     """
     if string_to_string(audit_header.PERIODCOVERED) == "O":
         general_information["audit_period_other_months"] = str(
@@ -484,7 +485,7 @@ def general_information(audit_header):
     xform_update_entity_type(audit_header)
     xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header)
     general_information = create_json_from_db_object(audit_header, mappings)
-    set_audit_period_other_months(general_information, audit_header)
+    xform_audit_period_other_months(general_information, audit_header)
     transformations = [
         xform_auditee_fiscal_period_start,
         xform_auditee_fiscal_period_end,
