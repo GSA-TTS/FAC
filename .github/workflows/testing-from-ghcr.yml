@@ -5,8 +5,61 @@ on:
   workflow_call:
 
 jobs:
-  # django-test:
-  #   permissions: write-all
+  django-test:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    env:
+      ENV: TESTING
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+      DJANGO_BASE_URL: "http://localhost:8000"
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+      LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
+      DISABLE_AUTH: False
+      PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Create .env file
+        working-directory: ./backend
+        run: touch .env
+
+      - name: Start Services
+        working-directory: ./backend
+        run: docker compose -f docker-compose-web.yml up -d
+
+      - name: Load historical data
+        working-directory: ./backend
+        run: docker compose -f docker-compose-web.yml run web ./load_data.sh
+
+      - name: Run Django test suite
+        working-directory: ./backend
+        run: |
+          docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=85 && coverage xml -o coverage.xml'
+
+      - name: Copy Coverage From Docker Container
+        run: |
+          docker cp backend-web-1:/src/coverage.xml ./coverage.xml
+          pwd
+          ls -al | grep 'coverage'
+
+      - name: Publish Coverage Report to Pull Request
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: ./coverage.xml
+          minimum_coverage: 85
+          skip_covered: true # Set to true to remove 100% covered from report
+          fail_below_threshold: false # Fails the action if 90% threshold is not met
+          show_missing: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+
+  # a11y-testing:
   #   runs-on: ubuntu-latest
   #   env:
   #     ENV: TESTING
@@ -16,97 +69,20 @@ jobs:
   #     LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
   #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
   #     ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
-  #     DISABLE_AUTH: False
-  #     PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
+  #     DISABLE_AUTH: True
   #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-
+  #     - uses: actions/checkout@v4
   #     - uses: actions/setup-node@v4
   #       with:
-  #         node-version: 18
-
-  #     - name: Create .env file
-  #       working-directory: ./backend
-  #       run: touch .env
-
-  #     - name: Start Services
-  #       working-directory: ./backend
-  #       run: docker compose -f docker-compose-web.yml up -d
-
-  #     - name: Load historical data
-  #       working-directory: ./backend
-  #       run: docker compose -f docker-compose-web.yml run web ./load_data.sh
-
-  #     - name: Run Django test suite
+  #         node-version: 16
+  #     - name: Start services
   #       working-directory: ./backend
   #       run: |
-  #         docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=85 && coverage xml -o coverage.xml'
-
-  #     - name: Copy Coverage From Docker Container
+  #         touch .env
+  #         docker compose -f docker-compose.yml up -d
+  #     - name: Run Lighthouse CI and pa11y
+  #       working-directory: ./backend
   #       run: |
-  #         docker cp backend-web-1:/src/coverage.xml ./coverage.xml
-  #         pwd
-  #         ls -al | grep 'coverage'
-
-  #     - name: Publish Coverage Report to Pull Request
-  #       uses: 5monkeys/cobertura-action@master
-  #       with:
-  #         path: ./coverage.xml
-  #         minimum_coverage: 85
-  #         skip_covered: true # Set to true to remove 100% covered from report
-  #         fail_below_threshold: false # Fails the action if 90% threshold is not met
-  #         show_missing: true
-  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
-
-  a11y-testing:
-    runs-on: ubuntu-latest
-    container:
-      image: cypress/browsers:node18.6.0-chrome105-ff104
-      options: --user root
-    env:
-      ENV: TESTING
-      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
-      DJANGO_BASE_URL: "http://localhost:8000"
-      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
-      LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
-      DISABLE_AUTH: True  # Important for a11y tests
-      PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
-    steps:
-      - uses: actions/checkout@v4
- 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Start services
-        working-directory: ./backend
-        run: |
-          touch .env
-          docker compose -f docker-compose-web.yml up -d
-
-      - name: Load historical data
-        working-directory: ./backend
-        run: docker compose -f docker-compose-web.yml run web ./load_data.sh
-
-      - name: Load fixture data
-        working-directory: ./backend
-        run: |
-          docker compose -f docker-compose-web.yml run web bash -c 'python manage.py load_fixtures'
- 
-      - name: Run A11y tests via Cypress
-        uses: cypress-io/github-action@v6
-        with:
-          browser: chrome
-          working-directory: ./backend
-          spec: cypress/e2e/accessibility.cy.js
-
-      - uses: actions/upload-artifact@v4
-        # add the line below to store screenshots only on failures
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: backend/cypress/screenshots
-          if-no-files-found: warn # 'warn' or 'error' are also available, defaults to `warn`
+  #         sudo npm ci
+  #         npm run test:a11y:lighthouse
+  #         npm run test:a11y:pa11y
