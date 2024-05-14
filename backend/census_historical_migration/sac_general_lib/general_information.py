@@ -441,6 +441,18 @@ def xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(general_inform
     return general_information
 
 
+def xform_audit_period_other_months(general_information, audit_header):
+    """
+    This method addresses cases where the reporting period spans a non-standard duration, ensuring that
+    the total number of months covered is accurately accounted for. This is applicable in scenarios
+    where the covered period could span any number of months, rather than fixed annual or biennial periods.
+    """
+    if string_to_string(audit_header.PERIODCOVERED) == "O":
+        general_information["audit_period_other_months"] = str(
+            audit_header.NUMBERMONTHS
+        ).zfill(2)
+
+
 def xform_replace_empty_zips(general_information):
     """Replaces empty auditor and auditee zipcodes with GSA Migration keyword"""
     # Transformation recorded.
@@ -474,6 +486,7 @@ def general_information(audit_header):
     xform_update_entity_type(audit_header)
     xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header)
     general_information = create_json_from_db_object(audit_header, mappings)
+    xform_audit_period_other_months(general_information, audit_header)
     transformations = [
         xform_auditee_fiscal_period_start,
         xform_auditee_fiscal_period_end,
