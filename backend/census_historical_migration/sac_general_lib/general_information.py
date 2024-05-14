@@ -443,8 +443,9 @@ def xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(general_inform
 
 def xform_audit_period_other_months(general_information, audit_header):
     """
-    When PERIODCOVERED is set to other, NUMBERMONTHS value defines the period.
-    Set general_information[audit_period_other_months] to NUMBERMONTHS for this case.
+    This method addresses cases where the reporting period spans a non-standard duration, ensuring that
+    the total number of months covered is accurately accounted for. This is applicable in scenarios
+    where the covered period could span any number of months, rather than fixed annual or biennial periods.
     """
     if string_to_string(audit_header.PERIODCOVERED) == "O":
         general_information["audit_period_other_months"] = str(
