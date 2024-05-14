@@ -214,7 +214,7 @@ def _fake_audit_information(dbkey, auditee_name=None):
         ),
     }
 
-    audit.validators.validate_audit_information_json(audit_information)
+    audit.validators.validate_audit_information_json(audit_information, False)
 
     return audit_information
 
