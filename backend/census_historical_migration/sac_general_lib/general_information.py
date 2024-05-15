@@ -366,6 +366,21 @@ def xform_replace_empty_auditee_email(general_information):
     return general_information
 
 
+def xform_replace_empty_auditee_contact_name(general_information):
+    """Replaces empty auditee contact name with GSA Migration keyword"""
+    # Transformation recorded.
+    if not general_information.get("auditee_contact_name"):
+        general_information["auditee_contact_name"] = settings.GSA_MIGRATION
+        track_transformations(
+            "AUDITEECONTACT",
+            "",
+            "auditee_contact_name",
+            general_information["auditee_contact_name"],
+            "xform_replace_empty_auditee_contact_name",
+        )
+    return general_information
+
+
 def xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header):
     """Replaces empty or invalid auditee UEI with GSA Migration keyword"""
     # Transformation recorded.
@@ -498,6 +513,7 @@ def general_information(audit_header):
         xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
         xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
         xform_replace_empty_zips,
+        xform_replace_empty_auditee_contact_name,
     ]
 
     for transform in transformations:
