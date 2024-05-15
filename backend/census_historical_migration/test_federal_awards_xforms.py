@@ -305,13 +305,14 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
         with self.assertRaises(DataMigrationError):
             xform_populate_default_passthrough_amount(audits)
 
-    def test_passthrough_award_gsa_empty_amount(self):
+    def test_passthrough_award_Y_empty_amount(self):
         """Test for default value when passthrough award Y audit with empty amount."""
         audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="")]
         expected = [str(settings.GSA_MIGRATION_INT)]
         self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
-        """Test the function with a passthrough award Y audit with non-empty amount."""
+    def test_passthrough_award_gsa_empty_amount(self):
+        """Test the function with a passthrough award GSA_MIGRATION audit with non-empty amount."""
         audits = [
             self.MockAudit(
                 PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="100"
@@ -321,7 +322,7 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
         self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
     def test_passthrough_award_gsa_empty_amount(self):
-        """Test the function with a passthrough award N audit with empty amount."""
+        """Test the function with a passthrough award GSA_MIGRATIONN audit with empty amount."""
         audits = [
             self.MockAudit(
                 PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT=""
@@ -331,7 +332,7 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
         self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
     def test_passthrough_award_gsa_zero_amount(self):
-        """Test the function with a passthrough award N audit with zero amount."""
+        """Test the function with a passthrough award GSA_MIGRATION audit with zero amount."""
         audits = [
             self.MockAudit(
                 PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="0"
