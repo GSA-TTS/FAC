@@ -311,7 +311,7 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
         expected = [str(settings.GSA_MIGRATION_INT)]
         self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
-    def test_passthrough_award_gsa_empty_amount(self):
+    def test_passthrough_award_gsa_non_empty_amount(self):
         """Test the function with a passthrough award GSA_MIGRATION audit with non-empty amount."""
         audits = [
             self.MockAudit(
