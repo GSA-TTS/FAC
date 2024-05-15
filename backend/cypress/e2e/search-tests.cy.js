@@ -124,7 +124,6 @@ describe('Test search and return results', () => {
     cy.url().then(url => {
       search.downloadSfSac(url);
     });
-
   });
 });
 
@@ -241,81 +240,4 @@ describe('Test Advance Search Fields', () => {
     cy.url().should('include', '/dissemination/search/');
   });
 });
-
-
-
-// //advanced search test
-// describe('Test Advance Search Fields', () => {
-
-//   it('Submits search page with advanced filled-out fields', () => {
-//     //advanceSearchButton
-//     search.testAdvSearch();
-
-//     //audit years
-//     search.checkAuditYearCheckbox('2023');
-//     search.uncheckAuditYearCheckbox('2023');
-//     search.checkAllYearsCheckbox('all_years');
-
-//     //ueiORein
-//     search.testUEIorEin(ueiOrein);
-//     search.testALN(aln);
-//     search.testName(name);
-
-//     //facAcceptanceDate
-//     const [startDate, endDate] = accDate;
-//     search.testFACacceptanceDate(startDate, endDate);
-
-//     //state
-//     search.testState(state);
-
-//     //fyEndMonth
-//     search.openAndSelectFyEndMonth(fiscalYearEndMonth);
-
-//     //typeRequirement
-//     search.testTypeRequirement(typeRequirement);
-
-//     //entityType
-//     search.openAndSelectEntityTypeCheckbox(entityType);
-
-//     //reportID
-//     search.testReportId(reportId);
-
-//     //cogORover
-//     const [either, cog, over] = cogOrover;
-//     search.testCogorOver(either);
-
-//     //findings
-//     // search.openFindingsAccordion();
-//     // findings.forEach((findings) => {
-//     //   search.checkAuditFindingsCheckbox(findings);
-//     // });
-//     search.openFindingsAccordion();
-//     search.findings.forEach((findings) => {
-//       const el = searchPage.elements.findingsCheckboxId(findings);
-//       el.check({ force: true})
-//       .should('be.checked')
-//       .and('have.value', findings);
-//     })
-
-//directFunding
-// search.openDirectFundingAccordion();
-// directFunding.forEach((funding) => {
-//   search.checkDirectFundingCheckbox(funding);
-// });
-
-//     //majorProgram
-//     search.openMajorProgramAccordion();
-//     const [T, F] = majorProgram;
-//     search.checkMajorProgramRadio(T);
-
-//     //submit button
-//     search.testSearchSubmitButton();
-
-//     //search results
-//     search.testSearchTable();
-
-//     //summary report
-//     search.testSummaryReport();
-//   });
-// });
 
