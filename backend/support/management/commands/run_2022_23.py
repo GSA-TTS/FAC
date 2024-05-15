@@ -17,7 +17,7 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument("--year", help="Year(2022 or 2023)", type=str)
+        parser.add_argument("--year", help="Year(2022 or 2023 or 2024)", type=str)
 
     def handle(self, *args, **options):
         if ENVIRONMENT != "LOCAL":
@@ -27,6 +27,9 @@ class Command(BaseCommand):
         year = options.get("year")
         if not year:
             year = "2022"  # Default
+        elif year not in ["2022", "2023", "2024"]:
+            print(f"Invalid year {year}.  Expecteing 2022 / 2023 / 2024")
+            return
 
         initialize_db()
         gens = General.objects.annotate(
