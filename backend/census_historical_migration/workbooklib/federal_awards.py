@@ -251,21 +251,17 @@ def xform_missing_cluster_total(
 
 def xform_is_passthrough_award(audits):
     """
-    Extrapolates missing PASSTHROUGHAWARD using PASSTHROUGHAMOUNT
+    Replaces missing PASSTHROUGHAWARD with GSA_MIGRATION.
     """
     change_records = []
-    is_empty_passthrough_found = False
+    is_empty_award_found = False
 
     for audit in audits:
         award = string_to_string(audit.PASSTHROUGHAWARD)
-        if not award:
-            is_empty_passthrough_found = True
 
-            amount = string_to_string(audit.PASSTHROUGHAMOUNT)
-            if amount and amount != "0":
-                award = "Y"
-            else:
-                award = "N"
+        if not award:
+            is_empty_award_found = True
+            award = settings.GSA_MIGRATION
 
         track_transformations(
             "PASSTHROUGHAWARD",
@@ -279,7 +275,7 @@ def xform_is_passthrough_award(audits):
         audit.PASSTHROUGHAWARD = award
 
     # See Transformation Method Change Recording at the top of this file.
-    if change_records and is_empty_passthrough_found:
+    if change_records and is_empty_award_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
 
@@ -642,6 +638,40 @@ def xform_populate_default_passthrough_amount(audits):
     return passthrough_amounts
 
 
+def xform_populate_default_passthrough_amount_v2(audits):
+    """
+    Automatically fills in default values for empty passthrough amounts.
+    Iterates over a list of audits and their corresponding passthrough amounts.
+    If the audit's PASSTHROUGHAWARD attribute is "Y" and the passthrough amount is empty,
+    it fills in a default value indicating that no passthrough amount was provided.
+    """
+    passthrough_amounts = []
+
+    for audit in audits:
+        passthrough_award = string_to_string(audit.PASSTHROUGHAWARD).upper()
+        amount = string_to_string(audit.PASSTHROUGHAMOUNT)
+
+        if passthrough_award == settings.GSA_MIGRATION:
+            if not amount or amount == "0":
+                passthrough_amounts.append("")
+            else:
+                passthrough_amounts.append(amount)
+        elif passthrough_award == "Y":
+            if amount:
+                passthrough_amounts.append(amount)
+            else:
+                passthrough_amounts.append(str(settings.GSA_MIGRATION_INT))
+        else:
+            if not amount or amount == "0":
+                passthrough_amounts.append("")
+            else:
+                raise DataMigrationError(
+                    "Unexpected passthrough amount.", "unexpected_passthrough_amount"
+                )
+
+    return passthrough_amounts
+
+
 def xform_cluster_names(audits):
     """
     Replaces "OTHER CLUSTER" with the settings.OTHER_CLUSTER value.
@@ -743,7 +773,7 @@ def generate_federal_awards(audit_header, outfile):
     )
 
     # passthrough amount
-    passthrough_amounts = xform_populate_default_passthrough_amount(audits)
+    passthrough_amounts = xform_populate_default_passthrough_amount_v2(audits)
     set_range(wb, "subrecipient_amount", passthrough_amounts)
 
     # additional award identification
