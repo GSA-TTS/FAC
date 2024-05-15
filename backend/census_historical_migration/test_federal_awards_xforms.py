@@ -16,7 +16,7 @@ from .workbooklib.federal_awards import (
     xform_populate_default_award_identification_values,
     xform_populate_default_loan_balance,
     xform_constructs_cluster_names,
-    xform_populate_default_passthrough_amount_v2,
+    xform_populate_default_passthrough_amount,
     xform_populate_default_passthrough_names_ids,
     xform_replace_invalid_direct_award_flag,
     xform_replace_invalid_extension,
@@ -285,48 +285,60 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
         """Test the function with a passthrough award Y audit with non-empty amount."""
         audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="100")]
         expected = ["100"]
-        self.assertEqual(xform_populate_default_passthrough_amount_v2(audits), expected)
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
     def test_passthrough_award_N_empty_amount(self):
         """Test the function with a passthrough award N audit with empty amount."""
         audits = [self.MockAudit(PASSTHROUGHAWARD="N", PASSTHROUGHAMOUNT="")]
         expected = [""]
-        self.assertEqual(xform_populate_default_passthrough_amount_v2(audits), expected)
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
     def test_passthrough_award_N_zero_amount(self):
         """Test the function with a passthrough award N audit with zero amount."""
         audits = [self.MockAudit(PASSTHROUGHAWARD="N", PASSTHROUGHAMOUNT="0")]
         expected = [""]
-        self.assertEqual(xform_populate_default_passthrough_amount_v2(audits), expected)
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
     def test_passthrough_award_N_unexpected_amount(self):
         """Test the function raises DataMigrationError when passthrough award N and amount is unexpected."""
         audits = [self.MockAudit(PASSTHROUGHAWARD="N", PASSTHROUGHAMOUNT="100")]
         with self.assertRaises(DataMigrationError):
-            xform_populate_default_passthrough_amount_v2(audits)
+            xform_populate_default_passthrough_amount(audits)
 
     def test_passthrough_award_gsa_empty_amount(self):
         """Test for default value when passthrough award Y audit with empty amount."""
         audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="")]
         expected = [str(settings.GSA_MIGRATION_INT)]
-        self.assertEqual(xform_populate_default_passthrough_amount_v2(audits), expected)
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
         """Test the function with a passthrough award Y audit with non-empty amount."""
-        audits = [self.MockAudit(PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="100")]
+        audits = [
+            self.MockAudit(
+                PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="100"
+            )
+        ]
         expected = ["100"]
-        self.assertEqual(xform_populate_default_passthrough_amount_v2(audits), expected)
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
     def test_passthrough_award_gsa_empty_amount(self):
         """Test the function with a passthrough award N audit with empty amount."""
-        audits = [self.MockAudit(PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="")]
+        audits = [
+            self.MockAudit(
+                PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT=""
+            )
+        ]
         expected = [""]
-        self.assertEqual(xform_populate_default_passthrough_amount_v2(audits), expected)
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
     def test_passthrough_award_gsa_zero_amount(self):
         """Test the function with a passthrough award N audit with zero amount."""
-        audits = [self.MockAudit(PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="0")]
+        audits = [
+            self.MockAudit(
+                PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="0"
+            )
+        ]
         expected = [""]
-        self.assertEqual(xform_populate_default_passthrough_amount_v2(audits), expected)
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
 
 class TestXformIsPassthroughAward(SimpleTestCase):

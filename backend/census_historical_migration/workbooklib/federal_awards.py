@@ -622,34 +622,6 @@ def xform_populate_default_passthrough_amount(audits):
     for audit in audits:
         passthrough_award = string_to_string(audit.PASSTHROUGHAWARD).upper()
         amount = string_to_string(audit.PASSTHROUGHAMOUNT)
-        if passthrough_award == "Y":
-            if amount:
-                passthrough_amounts.append(amount)
-            else:
-                passthrough_amounts.append(str(settings.GSA_MIGRATION_INT))
-        else:
-            if not amount or amount == "0":
-                passthrough_amounts.append("")
-            else:
-                raise DataMigrationError(
-                    "Unexpected passthrough amount.", "unexpected_passthrough_amount"
-                )
-
-    return passthrough_amounts
-
-
-def xform_populate_default_passthrough_amount_v2(audits):
-    """
-    Automatically fills in default values for empty passthrough amounts.
-    Iterates over a list of audits and their corresponding passthrough amounts.
-    If the audit's PASSTHROUGHAWARD attribute is "Y" and the passthrough amount is empty,
-    it fills in a default value indicating that no passthrough amount was provided.
-    """
-    passthrough_amounts = []
-
-    for audit in audits:
-        passthrough_award = string_to_string(audit.PASSTHROUGHAWARD).upper()
-        amount = string_to_string(audit.PASSTHROUGHAMOUNT)
 
         if passthrough_award == settings.GSA_MIGRATION:
             if not amount or amount == "0":
@@ -773,7 +745,7 @@ def generate_federal_awards(audit_header, outfile):
     )
 
     # passthrough amount
-    passthrough_amounts = xform_populate_default_passthrough_amount_v2(audits)
+    passthrough_amounts = xform_populate_default_passthrough_amount(audits)
     set_range(wb, "subrecipient_amount", passthrough_amounts)
 
     # additional award identification
