@@ -20,6 +20,7 @@ from .sac_general_lib.general_information import (
     xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
     xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
     xform_replace_empty_zips,
+    xform_audit_period_other_months,
 )
 from .exception_utils import (
     DataMigrationError,
@@ -454,3 +455,61 @@ class TestXformReplaceEmptyAuditorZip(SimpleTestCase):
             "auditor_zip": "12345",
         }
         self.assertEqual(xform_replace_empty_zips(input_data), input_data)
+
+
+class TestXformAuditPeriodOtherMonths(SimpleTestCase):
+    class MockAuditHeader:
+        def __init__(self, PERIODCOVERED, NUMBERMONTHS):
+            self.PERIODCOVERED = PERIODCOVERED
+            self.NUMBERMONTHS = NUMBERMONTHS
+
+    def setUp(self):
+        self.audit_header = self.MockAuditHeader("", "")
+
+    def test_periodcovered_other_zfill(self):
+        """Test that audit_period_other_months is set to NUMBERMONTHS with padded zeroes"""
+        self.audit_header.PERIODCOVERED = "O"
+        self.audit_header.NUMBERMONTHS = "6"
+        general_information = {
+            "audit_period_other_months": "",
+        }
+        expected_output = {
+            "audit_period_other_months": "06",
+        }
+        xform_audit_period_other_months(general_information, self.audit_header)
+        self.assertEqual(
+            general_information,
+            expected_output,
+        )
+
+    def test_periodcovered_other_no_zfill(self):
+        """Test that audit_period_other_months is set to NUMBERMONTHS without padded zeroes"""
+        self.audit_header.PERIODCOVERED = "O"
+        self.audit_header.NUMBERMONTHS = "14"
+        general_information = {
+            "audit_period_other_months": "",
+        }
+        expected_output = {
+            "audit_period_other_months": "14",
+        }
+        xform_audit_period_other_months(general_information, self.audit_header)
+        self.assertEqual(
+            general_information,
+            expected_output,
+        )
+
+    def test_periodcovered_not_other(self):
+        """Test that audit_period_other_months is not set"""
+        self.audit_header.PERIODCOVERED = "A"
+        self.audit_header.NUMBERMONTHS = "10"
+        general_information = {
+            "audit_period_other_months": "",
+        }
+        expected_output = {
+            "audit_period_other_months": "",
+        }
+        xform_audit_period_other_months(general_information, self.audit_header)
+        self.assertEqual(
+            general_information,
+            expected_output,
+        )
