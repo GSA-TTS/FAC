@@ -17,7 +17,13 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument("--year", help="Year(2022 or 2023 or 2024)", type=str)
+        parser.add_argument(
+            "--year", help="Year(2022 or 2023 or 2024)", type=str, default="2022"
+        )
+
+    def is_year_invalid(self, year):
+        valid_years = ["2022", "2023", "2024"]
+        return year not in valid_years
 
     def handle(self, *args, **options):
         if ENVIRONMENT != "LOCAL":
@@ -25,10 +31,8 @@ class Command(BaseCommand):
             return
 
         year = options.get("year")
-        if not year:
-            year = "2022"  # Default
-        elif year not in ["2022", "2023", "2024"]:
-            print(f"Invalid year {year}.  Expecteing 2022 / 2023 / 2024")
+        if self.is_year_invalid(year):
+            print(f"Invalid year {year}.  Expecting 2022 / 2023 / 2024")
             return
 
         initialize_db()
