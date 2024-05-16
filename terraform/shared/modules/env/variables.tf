@@ -74,6 +74,12 @@ variable "clamav_instances" {
   default     = 1
 }
 
+variable "clamav_fs_instances" {
+  type        = number
+  description = "the number of instances of the clamav application to run (default: 1)"
+  default     = 1
+}
+
 variable "clamav_memory" {
   type        = number
   description = "memory in MB to allocate to clamav app"
