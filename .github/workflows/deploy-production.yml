@@ -1,9 +1,10 @@
 ---
 name: Deploy to Production Environment
 on:
-  push:
-    tags:
-      - v1.*
+  # push:
+  #   tags:
+  #     - v1.*
+  workflow_dispatch: null
 
 jobs:
   testing:
