@@ -58,6 +58,101 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.singleauditchecklist AS
     order by sac.id
 ;
 
+CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_access AS
+    SELECT
+        aa.id,
+        aa.role,
+        aa.fullname,
+        aa.email,
+        aa.sac_id,
+        aa.user_id
+    from
+        public.audit_access as aa
+    where
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
+    order by aa.id
+;
+
+CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_excelfile AS
+    SELECT
+        ae.id,
+        ae.file,
+        ae.filename,
+        ae.form_section,
+        ae.date_created,
+        ae.sac_id,
+        ae.user_id
+    FROM
+        public.audit_excelfile as ae
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
+    ORDER BY ae.id
+;
+
+CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_reportfile AS
+    SELECT
+        ar.id,
+        ar.file,
+        ar.filename,
+        ar.date_created,
+        ar.component_page_numbers,
+        ar.sac_id,
+        ar.user_id
+    FROM
+        public.audit_reportfile as ar
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
+    ORDER BY ar.id
+;
+
+CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_submissionevent AS
+    SELECT
+        ase.id,
+        ase.timestamp,
+        ase.event,
+        ase.sac_id,
+        ase.user_id,
+    FROM
+        public.audit_submissionevent as ase
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
+    ORDER BY ase.id
+;
+
+CREATE OR REPLACE VIEW admin_api_v2_0_0.auth_user AS
+    SELECT
+        au.id,
+        au.email,
+        au.is_staff,
+        au.is_superuser,
+        au.is_active,
+        au.last_login,
+        au.username,
+        au.first_name,
+        au.last_name,
+        au.date_joined
+    FROM
+        public.auth_user as au
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
+    ORDER BY au.id
+;
+
+CREATE OR REPLACE VIEW admin_api_v2_0_0.django_migrations AS
+    SELECT
+        djm.id,
+        djm.app,
+        djm.name,
+        djm.applied
+    FROM
+        public.django_migrations AS djm
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
+    ORDER BY djm.id
+;
+
+
+
 CREATE OR REPLACE VIEW admin_api_v2_0_0.tribal_access AS
     SELECT
         uup.email,
@@ -79,12 +174,63 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.admin_api_events AS
         ae.event,
         ae.event_data
     FROM
-        public.support_adminapievent ae
+        public.support_adminapievent AS ae
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY ae.id
 ;
 
+CREATE OR REPLACE VIEW admin_api_v2_0_0.support_cognizantassignment AS
+    SELECT
+        ca.id,
+        ca.report_id,
+        ca.cognizant_agency,
+        ca.date_assigned,
+        ca.assignor_email,
+        ca.override_comment,
+        ca.assignment_type
+    FROM
+        public.support_cognizantassignment AS ca
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
+    ORDER BY ca.id
+;
+
+
+CREATE OR REPLACE VIEW admin_api_v2_0_0.support_cognizantbaseline AS
+    SELECT
+        cb.id,
+        cb.dbkey,
+        cb.ein,
+        cb.uei,
+        cb.cognizant_agency,
+        cb.date_assigned,
+        cb.is_active,
+        cb.source
+    FROM
+        public.support_cognizantbaseline AS cb
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
+    ORDER BY cb.id
+;
+
+
+CREATE OR REPLACE VIEW admin_api_v2_0_0.curation_audit_log AS
+    SELECT
+        cur.id, 
+        cur.record_id,
+        cur.old_record_id,
+        cur.op,
+        cur.ts,
+        cur.table_old,
+        cur.table_schema,
+        cur.table_name
+    FROM
+        curation.record_version cur
+    WHERE
+        admin_api_v2_0_0_functions.has_admin_data_access('READ')
+    ORDER BY cur.id
+;
 
 
 --------------------------------------------------------------------------
