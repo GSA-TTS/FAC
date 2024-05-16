@@ -14,6 +14,7 @@ from .sac_general_lib.general_information import (
     xform_auditee_fiscal_period_start,
     xform_country,
     xform_entity_type,
+    xform_replace_empty_auditee_contact_name,
     xform_replace_empty_auditor_email,
     xform_replace_empty_auditee_email,
     xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration,
@@ -269,6 +270,32 @@ class TestXformReplaceEmptyAuditeeEmail(SimpleTestCase):
         input_data = {}
         expected_output = {"auditee_email": settings.GSA_MIGRATION}
         self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
+
+
+class TestXformReplaceEmptyAuditeeContactName(SimpleTestCase):
+    def test_empty_auditee_contact_name(self):
+        """Test that an empty auditee_contact_name is replaced with 'GSA_MIGRATION'"""
+        input_data = {"auditee_contact_name": ""}
+        expected_output = {"auditee_contact_name": settings.GSA_MIGRATION}
+        self.assertEqual(
+            xform_replace_empty_auditee_contact_name(input_data), expected_output
+        )
+
+    def test_non_empty_auditee_contact_name(self):
+        """Test that a non-empty auditee_contact_name remains unchanged"""
+        input_data = {"auditee_contact_name": "test"}
+        expected_output = {"auditee_contact_name": "test"}
+        self.assertEqual(
+            xform_replace_empty_auditee_contact_name(input_data), expected_output
+        )
+
+    def test_missing_auditee_contact_name(self):
+        """Test that a missing auditee_contact_name key is added and set to 'GSA_MIGRATION'"""
+        input_data = {}
+        expected_output = {"auditee_contact_name": settings.GSA_MIGRATION}
+        self.assertEqual(
+            xform_replace_empty_auditee_contact_name(input_data), expected_output
+        )
 
 
 class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
