@@ -21,7 +21,6 @@ locals {
     "bret.mogilefsky@gsa.gov",
     "james.person@gsa.gov",
     "jeanmarie.mariadassou@gsa.gov",
-    "matt.henry@gsa.gov",
     "tadhg.ohiggins@gsa.gov",
     "timothy.ballard@gsa.gov",
     "matthew.jadud@gsa.gov",
