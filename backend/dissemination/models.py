@@ -995,4 +995,5 @@ class IssueDescriptionRecord(models.Model):
     """Issue descriptions for unvalidated audit records."""
 
     issue_detail = models.TextField()
+    issue_tag = models.TextField()
     skipped_validation_method = models.TextField()
