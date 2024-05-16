@@ -9,6 +9,7 @@ source tools/util_startup.sh
 # This will choose the correct environment
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
+source tools/curation_audit_tracking_init.sh
 source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
@@ -18,6 +19,11 @@ source tools/seed_cog_baseline.sh
 # SETUP THE LOCAL ENVIRONMENT
 setup_env
 gonogo "setup_env"
+
+#####
+# CURATION AUDIT TRACKING
+curation_audit_tracking_init
+gonogo "curation_audit_tracking_init"
 
 #####
 # API TEARDOWN

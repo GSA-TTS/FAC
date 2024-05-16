@@ -13,9 +13,15 @@
     https://github.com/supabase/supa_audit
 */
 
+/*
+This only needs to be run once as part of the app startup.
 
--- Namespace to "audit"
-create schema if not exists audit;
+fac curation_audit_tracking --init
+
+*/
+
+-- Namespace to "curation"
+create schema if not exists curation;
 
 -- Installed on RDS, but must be created -- MCJ
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -24,7 +30,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- https://stackoverflow.com/questions/7624919/check-if-a-user-defined-type-already-exists-in-postgresql
 DO $$ BEGIN
     -- Create enum type for SQL operations to reduce disk/memory usage vs text
-    create type audit.operation as enum (
+    create type curation.operation as enum (
         'INSERT',
         'UPDATE',
         'DELETE',
@@ -36,7 +42,7 @@ END $$;
 
 
 
-create table if not exists audit.record_version(
+create table if not exists curation.record_version(
     -- unique auto-incrementing id
     id             bigserial primary key,
     -- uniquely identifies a record by primary key [primary key + table_oid]
@@ -44,7 +50,7 @@ create table if not exists audit.record_version(
     -- uniquely identifies a record before update/delete
     old_record_id  uuid,
     -- INSERT/UPDATE/DELETE/TRUNCATE/SNAPSHOT
-    op             audit.operation not null,
+    op             curation.operation not null,
     ts             timestamptz not null default (now()),
     table_oid      oid not null,
     table_schema   name not null,
@@ -68,8 +74,8 @@ create table if not exists audit.record_version(
 );
 
 -- mark the table as configuration data so it's included in database dumps and can be backed up
--- select pg_catalog.pg_extension_config_dump('audit.record_version', '');
--- select pg_catalog.pg_extension_config_dump('audit.record_version_id_seq', '');
+-- select pg_catalog.pg_extension_config_dump('curation.record_version', '');
+-- select pg_catalog.pg_extension_config_dump('curation.record_version_id_seq', '');
 
 do $$
     begin
@@ -93,33 +99,33 @@ do $$
             )
             then
 
-            alter table audit.record_version add column auth_uid  uuid default (auth.uid());
-            alter table audit.record_version add column auth_role text default (auth.role());
+            alter table curation.record_version add column auth_uid  uuid default (auth.uid());
+            alter table curation.record_version add column auth_role text default (auth.role());
         end if;
     end
 $$;
 
 
 create index if not exists record_version_record_id
-    on audit.record_version(record_id)
+    on curation.record_version(record_id)
     where record_id is not null;
 
 
 create index if not exists record_version_old_record_id
-    on audit.record_version(old_record_id)
+    on curation.record_version(old_record_id)
     where old_record_id is not null;
 
 
 create index if not exists record_version_ts
-    on audit.record_version
+    on curation.record_version
     using brin(ts);
 
 
 create index if not exists record_version_table_oid
-    on audit.record_version(table_oid);
+    on curation.record_version(table_oid);
 
 
-create or replace function audit.primary_key_columns(entity_oid oid)
+create or replace function curation.primary_key_columns(entity_oid oid)
     returns text[]
     stable
     security definer
@@ -144,7 +150,7 @@ as $$
 $$;
 
 
-create or replace function audit.to_record_id(entity_oid oid, pkey_cols text[], rec jsonb)
+create or replace function curation.to_record_id(entity_oid oid, pkey_cols text[], rec jsonb)
     returns uuid
     stable
     language sql
@@ -166,24 +172,23 @@ as $$
 $$;
 
 
-create or replace function audit.insert_update_delete_trigger()
+create or replace function curation.insert_update_delete_trigger()
     returns trigger
     security definer
-    -- can not use search_path = '' here because audit.to_record_id requires
+    -- can not use search_path = '' here because curation.to_record_id requires
     -- uuid_generate_v4, which may be installed in a user-defined schema
     language plpgsql
 as $$
 declare
-    pkey_cols text[] = audit.primary_key_columns(TG_RELID);
+    pkey_cols text[] = curation.primary_key_columns(TG_RELID);
 
     record_jsonb jsonb = to_jsonb(new);
-    record_id uuid = audit.to_record_id(TG_RELID, pkey_cols, record_jsonb);
+    record_id uuid = curation.to_record_id(TG_RELID, pkey_cols, record_jsonb);
 
     old_record_jsonb jsonb = to_jsonb(old);
-    old_record_id uuid = audit.to_record_id(TG_RELID, pkey_cols, old_record_jsonb);
+    old_record_id uuid = curation.to_record_id(TG_RELID, pkey_cols, old_record_jsonb);
 begin
-
-    insert into audit.record_version(
+    insert into curation.record_version(
         record_id,
         old_record_id,
         op,
@@ -196,7 +201,7 @@ begin
     select
         record_id,
         old_record_id,
-        TG_OP::audit.operation,
+        TG_OP::curation.operation,
         TG_RELID,
         TG_TABLE_SCHEMA,
         TG_TABLE_NAME,
@@ -208,21 +213,21 @@ end;
 $$;
 
 
-create or replace function audit.truncate_trigger()
+create or replace function curation.truncate_trigger()
     returns trigger
     security definer
     set search_path = ''
     language plpgsql
 as $$
 begin
-    insert into audit.record_version(
+    insert into curation.record_version(
         op,
         table_oid,
         table_schema,
         table_name
     )
     select
-        TG_OP::audit.operation,
+        TG_OP::curation.operation,
         TG_RELID,
         TG_TABLE_SCHEMA,
         TG_TABLE_NAME;
@@ -232,7 +237,7 @@ end;
 $$;
 
 
-create or replace function audit.enable_tracking(regclass)
+create or replace function curation.enable_tracking(regclass)
     returns void
     volatile
     security definer
@@ -241,41 +246,41 @@ create or replace function audit.enable_tracking(regclass)
 as $$
 declare
     statement_row text = format('
-        create trigger audit_i_u_d
+        create trigger curation_i_u_d
             after insert or update or delete
             on %s
             for each row
-            execute procedure audit.insert_update_delete_trigger();',
+            execute procedure curation.insert_update_delete_trigger();',
         $1
     );
 
     statement_stmt text = format('
-        create trigger audit_t
+        create trigger curation_t
             after truncate
             on %s
             for each statement
-            execute procedure audit.truncate_trigger();',
+            execute procedure curation.truncate_trigger();',
         $1
     );
 
-    pkey_cols text[] = audit.primary_key_columns($1);
+    pkey_cols text[] = curation.primary_key_columns($1);
 begin
     if pkey_cols = array[]::text[] then
-        raise exception 'Table % can not be audited because it has no primary key', $1;
+        raise exception 'Table % can not be curationed because it has no primary key', $1;
     end if;
 
-    if not exists(select 1 from pg_trigger where tgrelid = $1 and tgname = 'audit_i_u_d') then
+    if not exists(select 1 from pg_trigger where tgrelid = $1 and tgname = 'curation_i_u_d') then
         execute statement_row;
     end if;
 
-    if not exists(select 1 from pg_trigger where tgrelid = $1 and tgname = 'audit_t') then
+    if not exists(select 1 from pg_trigger where tgrelid = $1 and tgname = 'curation_t') then
         execute statement_stmt;
     end if;
 end;
 $$;
 
 
-create or replace function audit.disable_tracking(regclass)
+create or replace function curation.disable_tracking(regclass)
     returns void
     volatile
     security definer
@@ -284,12 +289,12 @@ create or replace function audit.disable_tracking(regclass)
 as $$
 declare
     statement_row text = format(
-        'drop trigger if exists audit_i_u_d on %s;',
+        'drop trigger if exists curation_i_u_d on %s;',
         $1
     );
 
     statement_stmt text = format(
-        'drop trigger if exists audit_t on %s;',
+        'drop trigger if exists curation_t on %s;',
         $1
     );
 begin

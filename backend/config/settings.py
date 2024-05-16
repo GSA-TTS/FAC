@@ -129,6 +129,7 @@ INSTALLED_APPS += [
     "dissemination",
     "census_historical_migration",
     "support",
+    "curation",
 ]
 
 MIDDLEWARE = [
