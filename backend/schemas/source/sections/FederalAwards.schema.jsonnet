@@ -327,7 +327,7 @@ local Parts = {
   Subrecipients: Types.object {
     additionalProperties: false,
     properties: {
-      is_passed: Base.Enum.YorN,
+      is_passed: Base.Enum.YorNorGsaMigration,
       subrecipient_amount: Types.number,
     },
     allOf: Validations.SubrecipientValidations,
