@@ -311,7 +311,7 @@ notify pgrst,
 create view api_v1_2_0.generalxawardsxfindings as
     select
         dc.id,
-        dg.report_id,
+        dc.report_id,
 		dc.award_reference,
 		dc.reference_number,
 		dc.aln,
