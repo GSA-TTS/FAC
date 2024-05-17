@@ -36,7 +36,7 @@ def check_for_gsa_migration_keyword(ir):
         "secondary_auditor_address_zipcode",
         "secondary_auditor_name",
         "secondary_auditor_address_state",
-        "is_passthrough_award",
+        "is_passed",
     ]
 
     for range_name in range_names:
