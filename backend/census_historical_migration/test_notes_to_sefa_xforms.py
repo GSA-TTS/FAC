@@ -6,6 +6,9 @@ from .workbooklib.notes_to_sefa import (
     xform_is_minimis_rate_used,
     xform_missing_note_title_and_content,
     xform_missing_notes_records_v2,
+    xform_rate_content,
+    xform_policies_content,
+    xform_sanitize_policies_content,
 )
 
 
@@ -485,3 +488,26 @@ class TestXformMissingNotesRecordsV2(SimpleTestCase):
         )
         self.assertEqual(policies_content, result_policies_content)
         self.assertEqual(rate_content, result_rate_content)
+
+class TestXformRateContent(SimpleTestCase):
+    def test_blank_rate_content(self):
+        self.assertEqual(xform_rate_content(""), settings.GSA_MIGRATION)
+
+    def test_non_blank_rate_content(self):
+        self.assertEqual(xform_rate_content("test_rate"), "test_rate")
+
+
+class TestXformPoliciesContent(SimpleTestCase):
+    def test_blank_policies_content(self):
+        self.assertEqual(xform_policies_content(""), settings.GSA_MIGRATION)
+
+    def test_non_blank_policies_content(self):
+        self.assertEqual(xform_policies_content("test_policies"), "test_policies")
+
+
+class TestXformSanitizePoliciesContent(SimpleTestCase):
+    def test_special_char_policies_content(self):
+        self.assertEqual(xform_sanitize_policies_content("====test_policies"), "test_policies")
+
+    def test_no_special_char_policies_content(self):
+        self.assertEqual(xform_sanitize_policies_content("test_policies"), "test_policies")
