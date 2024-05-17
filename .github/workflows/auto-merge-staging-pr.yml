@@ -1,8 +1,9 @@
 ---
 name: Auto Merge Pull Request With Approved Label
 on:
-  repository_dispatch:
-    types: [ ready-to-merge ]
+#   repository_dispatch:
+#     types: [ ready-to-merge ]
+    workflow_dispatch: null
 jobs:
   auto-merge:
     name: Auto Merge The Created Pull Request

@@ -1,5 +1,5 @@
-FAC System Cloud boundary view
 ![FAC.gov  Cloud ATO boundary view]
+
 ```plantuml
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
@@ -8,6 +8,7 @@ Person(User, "User", "GranteeOrAuditor")
 Person(Public, "User", "Public")
 Person(Staff, "User", "FAC Staff")
 Person(AgencyApp, "App", "Agency App")
+Person(SecOps, "App", "GSA Sec Ops")
 
 note as ConnectionNote
 All connections depicted are encrypted with TLS 1.2 unless otherwise noted.
@@ -23,8 +24,8 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
             System(django, "FAC Web App", "Django")
             Boundary(services, "FAC Internal Services") {
                 System(scan, "Virus Scanner", "ClamAV")
-                System(scanner, "FAC File Scanner", "Python")
             }
+                System(scanner, "FAC File Scanner", "Python")
         }
         Boundary(proxy, "Proxy services", "egress-permitted-space"){
             System(https_proxy, "web egress proxy", "proxy for HTTP/S connections")
@@ -36,6 +37,7 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
         Boundary(cloudgov-services,"Cloud.gov services") {
             System(db, "Database", "Brokered postgreSQL")
             System(s3, "PDF/XLS storage", "Brokered S3")
+            System(Logs, "System Logs", "Brokered S3")
         }
     }
 }
@@ -59,7 +61,7 @@ Rel(Staff, django, "Manages audits, roles, content", $tags="authenticated")
 Rel(User, Login, "Authenticates with")
 Rel(Staff, Login, "Authenticates with")
 Rel(AgencyApp, datagov, "Routes requests through") api.fac.gov
-
+Rel(SecOps,Logs, "Retrieves logs for mining")
 
 
 Rel(datagov, api, "Searches, filters, requests audit", $tags="authenticated") port 3000
@@ -77,6 +79,7 @@ Rel(mail_proxy, Email, "Sends emails using") port 587
 Rel(django, scan, "Scans attachments")
 Rel(django, db, "read/write") port 5432
 Rel(django, s3, "Stores single audit packages/Excel files")
+Rel(django, Logs, "Gathers and stores logs")
 Rel(django, api, "Handles search requests") port 3000
 Rel(scanner, scan, "Scans files")
 Rel(scanner, s3, "Reads files from s3")
