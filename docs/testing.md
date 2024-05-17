@@ -62,7 +62,7 @@ act test --platform ubuntu-latest=lucasalt/act_base:latest
 ## Accessibility
 We use a combination of [Cypress](https://www.cypress.io/) and [Axe](https://www.deque.com/axe/) for accessibility (A11y) testing. 
 
-Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
+<!-- TODO: Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch. -->
 Accessibility tests currently cover the full submission pipeline, the access management pages, and the search pages.
 They should run in less than half a minute for baseline coverage.
 
@@ -79,6 +79,9 @@ Run the `load_fixtures` management command in your docker container, to ensure a
 docker compose exec web /bin/bash  # Enter the docker shell
 python manage.py load_fixtures     # Run the management command
 ```
+
+Run `npm i` to ensure Cypress and its related dependencies are up-to-date.
+
 Open Cypress with `npx Cypress open`, and run the `accessibility.cy.js` spec.
 This can also be done in headless mode via the command line with:
 `npx cypress run --spec "cypress/e2e/accessibility.cy.js"`
