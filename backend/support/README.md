@@ -2,7 +2,7 @@
 
 ## Utility for testing cog/over 
 
-The `check_cog_over_for_year` command compares calculated cog/over values against production data. In production data, users can override a cog/over assignment, resulting in a mismatch. 
+The `check_cog_over_for_year` command compares calculated cog/over values against production data / test data loaded in LOCAL environment. In production data, users can override a cog/over assignment, resulting in a mismatch. 
 
 The `check_cog_over_for_year` command keeps track of the number of matches / mismatches and prints the information. No action is required for mismatches. However, if the test dataset does not include any overridden cog/over values, the command will not find any mismatches.
 
