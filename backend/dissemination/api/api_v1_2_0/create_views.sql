@@ -3,7 +3,7 @@ begin;
 ---------------------------------------
 -- finding_text
 ---------------------------------------
-create view api_v2_0_0.findings_text as
+create view api_v1_2_0.findings_text as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -18,14 +18,14 @@ create view api_v2_0_0.findings_text as
         ft.report_id = gen.report_id
          and
         (gen.is_public = true
-        or (gen.is_public = false and api_v2_0_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_2_0_functions.has_tribal_data_access()))
     order by ft.id
 ;
 
 ---------------------------------------
 -- additional_ueis
 ---------------------------------------
-create view api_v2_0_0.additional_ueis as
+create view api_v1_2_0.additional_ueis as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -43,7 +43,7 @@ create view api_v2_0_0.additional_ueis as
 ---------------------------------------
 -- finding
 ---------------------------------------
-create view api_v2_0_0.findings as
+create view api_v1_2_0.findings as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -70,7 +70,7 @@ create view api_v2_0_0.findings as
 ---------------------------------------
 -- federal award
 ---------------------------------------
-create view api_v2_0_0.federal_awards as
+create view api_v1_2_0.federal_awards as
     select
         award.report_id,
         gen.auditee_uei,
@@ -107,7 +107,7 @@ create view api_v2_0_0.federal_awards as
 ---------------------------------------
 -- corrective_action_plan
 ---------------------------------------
-create view api_v2_0_0.corrective_action_plans as
+create view api_v1_2_0.corrective_action_plans as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -123,14 +123,14 @@ create view api_v2_0_0.corrective_action_plans as
         ct.report_id = gen.report_id
         and
         (gen.is_public = true
-        or (gen.is_public = false and api_v2_0_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_2_0_functions.has_tribal_data_access()))
     order by ct.id
 ;
 
 ---------------------------------------
 -- notes_to_sefa
 ---------------------------------------
-create view api_v2_0_0.notes_to_sefa as
+create view api_v1_2_0.notes_to_sefa as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -149,14 +149,14 @@ create view api_v2_0_0.notes_to_sefa as
         note.report_id = gen.report_id
         and
         (gen.is_public = true
-        or (gen.is_public = false and api_v2_0_0_functions.has_tribal_data_access()))
+        or (gen.is_public = false and api_v1_2_0_functions.has_tribal_data_access()))
     order by note.id
 ;
 
 ---------------------------------------
 -- passthrough
 ---------------------------------------
-create view api_v2_0_0.passthrough as
+create view api_v1_2_0.passthrough as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -177,7 +177,7 @@ create view api_v2_0_0.passthrough as
 ---------------------------------------
 -- general
 ---------------------------------------
-create view api_v2_0_0.general as
+create view api_v1_2_0.general as
     select
         -- every table starts with report_id, UEI, and year
         gen.report_id,
@@ -260,7 +260,7 @@ create view api_v2_0_0.general as
 ---------------------------------------
 -- auditor (secondary auditor)
 ---------------------------------------
-create view api_v2_0_0.secondary_auditors as
+create view api_v1_2_0.secondary_auditors as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -284,7 +284,7 @@ create view api_v2_0_0.secondary_auditors as
     order by sa.id
 ;
 
-create view api_v2_0_0.additional_eins as
+create view api_v1_2_0.additional_eins as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -308,7 +308,7 @@ notify pgrst,
 ---------------------------------------
 -- materialized view - generalxawardsxfindings
 ---------------------------------------
-create view api_v2_0_0.generalxawardsxfindings as
+create view api_v1_2_0.generalxawardsxfindings as
     select
         dc.id,
         dg.report_id,

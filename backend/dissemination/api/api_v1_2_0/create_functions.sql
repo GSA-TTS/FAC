@@ -14,7 +14,7 @@
 -- To quote the work of Dav Pilkey, "remember this now."
 
 
-CREATE OR REPLACE FUNCTION api_v2_0_0_functions.get_header(item text) RETURNS text
+CREATE OR REPLACE FUNCTION api_v1_2_0_functions.get_header(item text) RETURNS text
     AS $get_header$
     declare res text;
    	begin
@@ -23,16 +23,16 @@ CREATE OR REPLACE FUNCTION api_v2_0_0_functions.get_header(item text) RETURNS te
    end;
 $get_header$ LANGUAGE plpgsql;
 
-create or replace function api_v2_0_0_functions.get_api_key_uuid() returns TEXT
+create or replace function api_v1_2_0_functions.get_api_key_uuid() returns TEXT
 as $gaku$
 declare uuid text;
 begin
-	select api_v2_0_0_functions.get_header('x-api-user-id') into uuid;
+	select api_v1_2_0_functions.get_header('x-api-user-id') into uuid;
 	return uuid;
 end;
 $gaku$ LANGUAGE plpgsql;
 
-create or replace function api_v2_0_0_functions.has_tribal_data_access() 
+create or replace function api_v1_2_0_functions.has_tribal_data_access() 
 returns boolean
 as $has_tribal_data_access$
 DECLARE 
@@ -40,7 +40,7 @@ DECLARE
     key_exists boolean;
 BEGIN
 
-    SELECT api_v2_0_0_functions.get_api_key_uuid() INTO uuid_header;
+    SELECT api_v1_2_0_functions.get_api_key_uuid() INTO uuid_header;
     SELECT 
         CASE WHEN EXISTS (
             SELECT key_id 
@@ -50,7 +50,7 @@ BEGIN
             ELSE 0::BOOLEAN
             END 
         INTO key_exists;
-    RAISE INFO 'api_v2_0_0 has_tribal % %', uuid_header, key_exists;
+    RAISE INFO 'api_v1_2_0 has_tribal % %', uuid_header, key_exists;
     RETURN key_exists;
 END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
