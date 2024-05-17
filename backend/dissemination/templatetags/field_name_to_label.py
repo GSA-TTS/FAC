@@ -2,6 +2,7 @@
 Custom tag to filter underscores out of strings and capitalize the first character.
 Example: "report_id" to "Report id"
 """
+
 from django import template
 
 register = template.Library()

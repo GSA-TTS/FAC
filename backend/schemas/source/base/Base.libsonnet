@@ -299,12 +299,12 @@ local Compound = {
   PriorReferences: Types.string {
     title: 'PriorReferences',
     description: 'Prior references',
-    pattern: '^20[1-9][0-9]-[0-9]{3}(,\\s*20[1-9][0-9]-[0-9]{3})*$',
+    pattern: '^[1-2][0-9]{3}-[0-9]{3}(,\\s*[1-2][0-9]{3}-[0-9]{3})*$',
   },
   ReferenceNumber: Types.string {
     title: 'ReferenceNumber',
     description: 'Reference Number',
-    pattern: '^20[1-9][0-9]-[0-9]{3}$',
+    pattern: '^[1-2][0-9]{3}-[0-9]{3}$',
   },
   ComplianceRequirement: {
     title: 'ComplianceRequirement',
@@ -316,6 +316,7 @@ local Compound = {
     maxLength: 500,
   },
   EmployerIdentificationNumber: Types.string {
+    # A python version of these regexes also exists in settings.py
     pattern: '^[0-9]{9}$',
   },
   UniqueEntityIdentifier: {

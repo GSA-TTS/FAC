@@ -121,9 +121,9 @@ def _fix_addl_award_identification(Cfda, cfdas, dbkey):
         .order_by(Cfda.index)
     ):
         if cfda.awardidentification is None or len(cfda.awardidentification) < 1:
-            addls[
-                get_list_index(cfdas, cfda.index)
-            ] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
+            addls[get_list_index(cfdas, cfda.index)] = (
+                f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
+            )
         else:
             addls[get_list_index(cfdas, cfda.index)] = cfda.awardidentification
     return addls
@@ -136,9 +136,11 @@ def _fix_pfixes(cfdas):
     # Truncate any nastiness in the CFDA extensions to three characters.
     extensions = map(lambda v: ((v.cfda).split(".")[1])[:3].upper(), cfdas)
     extensions = map(
-        lambda v: v
-        if re.search("^(RD|RD[0-9]|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v)
-        else "000",
+        lambda v: (
+            v
+            if re.search("^(RD|RD[0-9]|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v)
+            else "000"
+        ),
         extensions,
     )
     return (prefixes, extensions, map(lambda v: v.cfda, cfdas))
@@ -172,9 +174,9 @@ def _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey):
             name = ""
         name = name.rstrip()
         if name == "" and cfda.direct == "N":
-            passthrough_names[
-                get_list_index(cfdas, cfda.index)
-            ] = "NO PASSTHROUGH NAME PROVIDED"
+            passthrough_names[get_list_index(cfdas, cfda.index)] = (
+                "NO PASSTHROUGH NAME PROVIDED"
+            )
         else:
             passthrough_names[get_list_index(cfdas, cfda.index)] = name
 
@@ -183,9 +185,9 @@ def _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey):
             id = ""
         id = id.rstrip()
         if id == "" and cfda.direct == "N":
-            passthrough_ids[
-                get_list_index(cfdas, cfda.index)
-            ] = "NO PASSTHROUGH ID PROVIDED"
+            passthrough_ids[get_list_index(cfdas, cfda.index)] = (
+                "NO PASSTHROUGH ID PROVIDED"
+            )
         else:
             passthrough_ids[get_list_index(cfdas, cfda.index)] = pnq.passthroughid
 

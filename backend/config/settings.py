@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+
 from base64 import b64decode
 import os
 import sys
@@ -546,6 +547,7 @@ REGEX_ALN_PREFIX = r"^([0-9]{2})$"
 REGEX_RD_EXTENSION = r"^RD[0-9]?$"
 REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
 REGEX_U_EXTENSION = r"^U[0-9]{2}$"
+EMPLOYER_IDENTIFICATION_NUMBER = r"^[0-9]{9}$"
 GSA_MIGRATION = "GSA_MIGRATION"  # There is a copy of `GSA_MIGRATION` in Base.libsonnet. If you change it here, change it there too.
 GSA_MIGRATION_INT = -999999999
 # A copy of theses constants exists in schema/source/base/Base.libsonnet

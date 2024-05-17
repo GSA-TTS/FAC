@@ -93,7 +93,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     for key in keys_to_delete:
                         form.cleaned_data.pop(key, None)
 
-                validated = validate_audit_information_json(form.cleaned_data)
+                validated = validate_audit_information_json(form.cleaned_data, False)
 
                 sac.audit_information = validated
                 sac.save(

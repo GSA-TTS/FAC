@@ -129,7 +129,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                 with self.assertRaisesRegex(
                     exceptions.ValidationError,
-                    "does not match",
+                    "is not valid under any of the given schemas",
                     msg=f"ValidationError not raised with EIN = {bad_ein}",
                 ):
                     validate(instance, schema)
@@ -257,7 +257,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        "does not match",
+                        "is not valid under any of the given schemas",
                         msg=f"ValidationError not raised with zip = {bad_zip}",
                     ):
                         validate(instance, schema)
@@ -290,7 +290,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        "does not match",
+                        "is not valid under any of the given schemas",
                         msg=f"ValidationError not raised with zip = {bad_zip}",
                     ):
                         validate(instance, schema)

@@ -368,9 +368,9 @@ class IntakeToDisseminationTests(TestCase):
             "gaap_results": json.dumps([fake.word()]),
             "is_going_concern_included": "Y" if fake.boolean() else "N",
             "is_internal_control_deficiency_disclosed": "Y" if fake.boolean() else "N",
-            "is_internal_control_material_weakness_disclosed": "Y"
-            if fake.boolean()
-            else "N",
+            "is_internal_control_material_weakness_disclosed": (
+                "Y" if fake.boolean() else "N"
+            ),
             "is_material_noncompliance_disclosed": "Y" if fake.boolean() else "N",
             "is_aicpa_audit_guide_included": "Y" if fake.boolean() else "N",
             "is_low_risk_auditee": "Y" if fake.boolean() else "N",
