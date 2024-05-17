@@ -255,8 +255,8 @@ def generate_notes_to_sefa(audit_header, outfile):
     policies_content, rate_content = xform_missing_notes_records_v2(
         audit_header, policies_content, rate_content
     )
-    # Remove special characters in policies_content
-    policies_content = re.sub('[=]', '', policies_content)
+    # Remove leading special characters in policies_content
+    policies_content = policies_content.lstrip('=')
 
     set_range(wb, "accounting_policies", [policies_content])
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
