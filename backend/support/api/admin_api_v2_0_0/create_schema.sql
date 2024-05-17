@@ -41,6 +41,30 @@ begin
         GRANT SELECT ON public.support_administrative_key_uuids TO api_fac_gov;
         -- We want to see data in flight as admins.
         GRANT SELECT ON public.audit_singleauditchecklist TO api_fac_gov;
+        GRANT SELECT ON public.audit_access TO api_fac_gov;
+        GRANT SELECT ON public.audit_excelfile TO api_fac_gov;
+        GRANT SELECT ON public.audit_singleauditreportfile TO api_fac_gov;
+        GRANT SELECT ON public.audit_submissionevent TO api_fac_gov;
+        GRANT SELECT ON public.auth_user TO api_fac_gov;
+        GRANT SELECT ON public.django_migrations TO api_fac_gov;
+        GRANT SELECT ON public.support_cognizantassignment TO api_fac_gov;
+        GRANT SELECT ON public.support_cognizantbaseline TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_elecauditfindings TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_elecauditheader_ims TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_elecauditheader TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_elecaudits TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_eleccaptext TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_eleccpas TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_eleceins TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_elecfindingstext TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_elecnotes TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_elecpassthrough TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_elecrpt_revisions TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_elecueis TO api_fac_gov;
+        GRANT SELECT ON public.census_historical_migration_federalagencylookup TO api_fac_gov;
+        -- The curation record is not on public.
+        GRANT SELECT ON curation.record_version TO api_fac_gov;
+
 
         GRANT INSERT, SELECT, DELETE on public.dissemination_tribalapiaccesskeyids to api_fac_gov;
         GRANT INSERT on public.dissemination_onetimeaccess to api_fac_gov;

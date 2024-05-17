@@ -11,20 +11,6 @@ begin;
 
 -- DROP TABLE public.audit_access;
 
-CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_access AS
-    SELECT
-        aa.role,
-        aa.fullname,
-        aa.email,
-        aa.sac_id,
-        aa.user_id
-    FROM
-        public.audit_access aa
-    WHERE
-        admin_api_v2_0_0_functions.has_admin_data_access('READ')
-    ORDER BY aa.id
-;
-
 CREATE OR REPLACE VIEW admin_api_v2_0_0.singleauditchecklist AS
     SELECT
         sac.id,
@@ -89,7 +75,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_excelfile AS
     ORDER BY ae.id
 ;
 
-CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_reportfile AS
+CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_singleauditreportfile AS
     SELECT
         ar.id,
         ar.file,
@@ -99,7 +85,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_reportfile AS
         ar.sac_id,
         ar.user_id
     FROM
-        public.audit_reportfile as ar
+        public.audit_singleauditreportfile as ar
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY ar.id
@@ -111,9 +97,9 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.audit_submissionevent AS
         ase.timestamp,
         ase.event,
         ase.sac_id,
-        ase.user_id,
+        ase.user_id
     FROM
-        public.audit_submissionevent as ase
+        public.audit_submissionevent AS ase
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY ase.id
@@ -132,7 +118,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.auth_user AS
         au.last_name,
         au.date_joined
     FROM
-        public.auth_user as au
+        public.auth_user AS au
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY au.id
@@ -158,8 +144,8 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.tribal_access AS
         uup.email,
         up.slug as permission
     FROM
-        users_userpermission uup,
-        users_permission up
+        users_userpermission AS uup,
+        users_permission AS up
     WHERE
         (uup.permission_id = up.id)
         AND (up.slug = 'read-tribal')
@@ -222,11 +208,11 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.curation_audit_log AS
         cur.old_record_id,
         cur.op,
         cur.ts,
-        cur.table_old,
+        cur.table_oid,
         cur.table_schema,
         cur.table_name
     FROM
-        curation.record_version cur
+        curation.record_version AS cur
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY cur.id
@@ -255,7 +241,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecauditfindings AS
         eaf."REPEATFINDING",
         eaf."PRIORFINDINGREFNUMS"
     FROM 
-        public.census_historical_migration_elecauditfindings eaf
+        public.census_historical_migration_elecauditfindings AS eaf
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY eaf.id
@@ -273,7 +259,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecauditheader_ims AS
         eahi."VERSION",
         eahi."IMAGE_EXISTS"
     FROM
-        public.census_historical_migration_elecauditheader_ims eahi
+        public.census_historical_migration_elecauditheader_ims AS eahi
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -377,7 +363,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecauditheader AS
         eah."MULTIPLEUEIS",
         eah."CPACOUNTRY"
     FROM
-        public.census_historical_migration_elecauditheader eah
+        public.census_historical_migration_elecauditheader AS eah
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -423,7 +409,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecaudits AS
         ea."UEI",
         ea."MULTIPLEUEIS"
     FROM
-        public.census_historical_migration_elecaudits ea
+        public.census_historical_migration_elecaudits AS ea
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -443,7 +429,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.eleccaptext AS
         ect."UEI",
         ect."MULTIPLEUEIS"
     FROM
-        public.census_historical_migration_eleccaptext ect
+        public.census_historical_migration_eleccaptext AS ect
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -470,7 +456,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.eleccpas AS
         ecpa."CPAEMAIL",
         ecpa."CPAEIN"
     FROM
-        public.census_historical_migration_eleccpas ecpa
+        public.census_historical_migration_eleccpas AS ecpa
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -507,7 +493,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecfindingstext AS
         eft."UEI",
         eft."MULTIPLEUEIS"
     FROM
-        public.census_historical_migration_elecfindingstext eft
+        public.census_historical_migration_elecfindingstext AS eft
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -529,7 +515,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecnotes AS
         en."UEI",
         en."MULTIPLEUEIS"
     FROM
-        public.census_historical_migration_elecnotes en
+        public.census_historical_migration_elecnotes AS en
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -545,7 +531,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecpassthrough AS
         ep."PASSTHROUGHNAME",
         ep."PASSTHROUGHID"
     FROM
-        public.census_historical_migration_elecpassthrough ep
+        public.census_historical_migration_elecpassthrough AS ep
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -576,7 +562,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecrpt_revisions AS
         err."OTHER",
         err."OTHER_EXPLAIN"
     FROM
-        public.census_historical_migration_elecrpt_revisions err
+        public.census_historical_migration_elecrpt_revisions AS err
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -593,7 +579,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.elecueis AS
         euei."UEI",
         euei."SEQNUM"
     FROM
-        public.census_historical_migration_elecueis euei
+        public.census_historical_migration_elecueis AS euei
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
@@ -609,7 +595,7 @@ CREATE OR REPLACE VIEW admin_api_v2_0_0.federalagencylookup AS
         fal."STARTEXT",
         fal."ENDEXT"
     FROM
-        public.census_historical_migration_federalagencylookup fal
+        public.census_historical_migration_federalagencylookup AS fal
     WHERE
         admin_api_v2_0_0_functions.has_admin_data_access('READ')
     ORDER BY
