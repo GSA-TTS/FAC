@@ -132,12 +132,16 @@ def _get_accounting_policies(dbkey, year):
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=1 is the description of significant accounting policies.
     """Get the accounting policies for a given dbkey and audit year."""
+
+    content = ""
     try:
         note = Notes.objects.get(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="1")
-        content = string_to_string(note.CONTENT)
+        if note:
+            note = xform_missing_note_title_and_content([note])[0]
+            content = string_to_string(note.CONTENT)
     except Notes.DoesNotExist:
         logger.info(f"No accounting policies found for dbkey: {dbkey}")
-        content = ""
+
     return content
 
 
@@ -146,14 +150,18 @@ def _get_minimis_cost_rate(dbkey, year):
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=2 is the De Minimis cost rate.
+
+    rate = ""
+    index = ""
     try:
         note = Notes.objects.get(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="2")
-        rate = string_to_string(note.CONTENT)
-        index = string_to_string(note.NOTE_INDEX)
+        if note:
+            note = xform_missing_note_title_and_content([note])[0]
+            rate = string_to_string(note.CONTENT)
+            index = string_to_string(note.NOTE_INDEX)
     except Notes.DoesNotExist:
         logger.info(f"De Minimis cost rate not found for dbkey: {dbkey}")
-        rate = ""
-        index = ""
+
     return rate, index
 
 
@@ -247,6 +255,9 @@ def generate_notes_to_sefa(audit_header, outfile):
     policies_content, rate_content = xform_missing_notes_records_v2(
         audit_header, policies_content, rate_content
     )
+    # Remove special characters in policies_content
+    policies_content = re.sub('[=]', '', policies_content)
+
     set_range(wb, "accounting_policies", [policies_content])
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
     set_range(wb, "rate_explained", [rate_content])
