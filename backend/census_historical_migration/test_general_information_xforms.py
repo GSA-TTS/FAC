@@ -14,12 +14,14 @@ from .sac_general_lib.general_information import (
     xform_auditee_fiscal_period_start,
     xform_country,
     xform_entity_type,
+    xform_replace_empty_auditee_contact_name,
     xform_replace_empty_auditor_email,
     xform_replace_empty_auditee_email,
     xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration,
     xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
     xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
     xform_replace_empty_zips,
+    xform_audit_period_other_months,
 )
 from .exception_utils import (
     DataMigrationError,
@@ -270,6 +272,32 @@ class TestXformReplaceEmptyAuditeeEmail(SimpleTestCase):
         self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
 
 
+class TestXformReplaceEmptyAuditeeContactName(SimpleTestCase):
+    def test_empty_auditee_contact_name(self):
+        """Test that an empty auditee_contact_name is replaced with 'GSA_MIGRATION'"""
+        input_data = {"auditee_contact_name": ""}
+        expected_output = {"auditee_contact_name": settings.GSA_MIGRATION}
+        self.assertEqual(
+            xform_replace_empty_auditee_contact_name(input_data), expected_output
+        )
+
+    def test_non_empty_auditee_contact_name(self):
+        """Test that a non-empty auditee_contact_name remains unchanged"""
+        input_data = {"auditee_contact_name": "test"}
+        expected_output = {"auditee_contact_name": "test"}
+        self.assertEqual(
+            xform_replace_empty_auditee_contact_name(input_data), expected_output
+        )
+
+    def test_missing_auditee_contact_name(self):
+        """Test that a missing auditee_contact_name key is added and set to 'GSA_MIGRATION'"""
+        input_data = {}
+        expected_output = {"auditee_contact_name": settings.GSA_MIGRATION}
+        self.assertEqual(
+            xform_replace_empty_auditee_contact_name(input_data), expected_output
+        )
+
+
 class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
 
     class MockAuditHeader:
@@ -454,3 +482,61 @@ class TestXformReplaceEmptyAuditorZip(SimpleTestCase):
             "auditor_zip": "12345",
         }
         self.assertEqual(xform_replace_empty_zips(input_data), input_data)
+
+
+class TestXformAuditPeriodOtherMonths(SimpleTestCase):
+    class MockAuditHeader:
+        def __init__(self, PERIODCOVERED, NUMBERMONTHS):
+            self.PERIODCOVERED = PERIODCOVERED
+            self.NUMBERMONTHS = NUMBERMONTHS
+
+    def setUp(self):
+        self.audit_header = self.MockAuditHeader("", "")
+
+    def test_periodcovered_other_zfill(self):
+        """Test that audit_period_other_months is set to NUMBERMONTHS with padded zeroes"""
+        self.audit_header.PERIODCOVERED = "O"
+        self.audit_header.NUMBERMONTHS = "6"
+        general_information = {
+            "audit_period_other_months": "",
+        }
+        expected_output = {
+            "audit_period_other_months": "06",
+        }
+        xform_audit_period_other_months(general_information, self.audit_header)
+        self.assertEqual(
+            general_information,
+            expected_output,
+        )
+
+    def test_periodcovered_other_no_zfill(self):
+        """Test that audit_period_other_months is set to NUMBERMONTHS without padded zeroes"""
+        self.audit_header.PERIODCOVERED = "O"
+        self.audit_header.NUMBERMONTHS = "14"
+        general_information = {
+            "audit_period_other_months": "",
+        }
+        expected_output = {
+            "audit_period_other_months": "14",
+        }
+        xform_audit_period_other_months(general_information, self.audit_header)
+        self.assertEqual(
+            general_information,
+            expected_output,
+        )
+
+    def test_periodcovered_not_other(self):
+        """Test that audit_period_other_months is not set"""
+        self.audit_header.PERIODCOVERED = "A"
+        self.audit_header.NUMBERMONTHS = "10"
+        general_information = {
+            "audit_period_other_months": "",
+        }
+        expected_output = {
+            "audit_period_other_months": "",
+        }
+        xform_audit_period_other_months(general_information, self.audit_header)
+        self.assertEqual(
+            general_information,
+            expected_output,
+        )

@@ -576,11 +576,21 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
 
     def test_match_numbers_mixed_empty_and_non_empty(self):
         """Test the function with mixed empty and non-empty names and ids."""
-        names = ["name1|name2|name3", "name4", ""]
-        ids = ["id1", "", ""]
+        names = ["name1|name2|name3", "name4", "", "name5", ""]
+        ids = ["id1", "", "id2", "id3|id4", ""]
         expected_ids = [
             f"id1|{settings.GSA_MIGRATION}|{settings.GSA_MIGRATION}",
+            f"{settings.GSA_MIGRATION}",
+            "id2",
+            "id3|id4",
             "",
+        ]
+
+        expected_names = [
+            "name1|name2|name3",
+            "name4",
+            f"{settings.GSA_MIGRATION}",
+            f"name5|{settings.GSA_MIGRATION}",
             "",
         ]
 
@@ -588,7 +598,7 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
             names, ids
         )
 
-        self.assertEqual(transformed_names, names)
+        self.assertEqual(transformed_names, expected_names)
         self.assertEqual(transformed_ids, expected_ids)
 
 

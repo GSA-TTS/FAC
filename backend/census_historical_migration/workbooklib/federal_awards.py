@@ -104,19 +104,20 @@ def xform_missing_major_program(audits):
     for audit in audits:
         major_program = string_to_string(audit.MAJORPROGRAM)
         if not major_program:
-            new_value = "Y" if string_to_string(audit.TYPEREPORT_MP) else "N"
-
-            track_transformations(
-                "MAJORPROGRAM",
-                audit.MAJORPROGRAM,
-                "is_major",
-                new_value,
-                ["xform_missing_major_program"],
-                change_records,
-            )
-
+            major_program = "Y" if string_to_string(audit.TYPEREPORT_MP) else "N"
             is_empty_major_program_found = True
-            audit.MAJORPROGRAM = new_value
+
+        track_transformations(
+            "MAJORPROGRAM",
+            audit.MAJORPROGRAM,
+            "is_major",
+            major_program,
+            ["xform_missing_major_program"],
+            change_records,
+        )
+
+        audit.MAJORPROGRAM = major_program
+
     # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_major_program_found:
         InspectionRecord.append_federal_awards_changes(change_records)
@@ -256,23 +257,27 @@ def xform_is_passthrough_award(audits):
     is_empty_passthrough_found = False
 
     for audit in audits:
-        if not string_to_string(audit.PASSTHROUGHAWARD):
+        award = string_to_string(audit.PASSTHROUGHAWARD)
+        if not award:
             is_empty_passthrough_found = True
 
             amount = string_to_string(audit.PASSTHROUGHAMOUNT)
             if amount and amount != "0":
-                audit.PASSTHROUGHAWARD = "Y"
+                award = "Y"
             else:
-                audit.PASSTHROUGHAWARD = "N"
+                award = "N"
 
-            track_transformations(
-                "PASSTHROUGHAWARD",
-                "",
-                "is_passthrough_award",
-                audit.PASSTHROUGHAWARD,
-                "xform_is_passthrough_award",
-                change_records,
-            )
+        track_transformations(
+            "PASSTHROUGHAWARD",
+            audit.PASSTHROUGHAWARD,
+            "is_passthrough_award",
+            award,
+            "xform_is_passthrough_award",
+            change_records,
+        )
+
+        audit.PASSTHROUGHAWARD = award
+
     # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_passthrough_found:
         InspectionRecord.append_federal_awards_changes(change_records)
@@ -328,17 +333,20 @@ def xform_program_name(audits):
     for audit in audits:
         program_name = string_to_string(audit.FEDERALPROGRAMNAME)
         if not program_name:
-            track_transformations(
-                "FEDERALPROGRAMNAME",
-                audit.FEDERALPROGRAMNAME,
-                "federal_program_name",
-                settings.GSA_MIGRATION,
-                ["xform_program_name"],
-                change_records,
-            )
-
             is_empty_program_name_found = True
-            audit.FEDERALPROGRAMNAME = settings.GSA_MIGRATION
+            program_name = settings.GSA_MIGRATION
+
+        track_transformations(
+            "FEDERALPROGRAMNAME",
+            audit.FEDERALPROGRAMNAME,
+            "federal_program_name",
+            program_name,
+            ["xform_program_name"],
+            change_records,
+        )
+
+        audit.FEDERALPROGRAMNAME = program_name
+
     # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_program_name_found:
         InspectionRecord.append_federal_awards_changes(change_records)
@@ -442,10 +450,8 @@ def _get_passthroughs(audits):
 
 def xform_match_number_passthrough_names_ids(names, ids):
     """
-    Matches the number of passthrough names and IDs.
-    Iterates over a list of passthrough names and IDs.
-    If the number of passthrough names is greater than the number of passthrough IDs,
-    it fills in the missing passthrough IDs with `NA`.
+    Ensures that the number of passthrough IDs and the number of passthrough names match.
+    If there are more names than IDs (or more IDs than names), fills in the missing IDs (respectively, missing names) with a placeholder.
     """
     # Transformation to be documented.
     for idx, (name, id) in enumerate(zip(names, ids)):
@@ -460,6 +466,19 @@ def xform_match_number_passthrough_names_ids(names, ids):
             else:
                 passthrough_ids.extend(patch)
                 ids[idx] = "|".join(passthrough_ids)
+        elif length_difference < 0:
+            patch = [settings.GSA_MIGRATION for _ in range(-length_difference)]
+            if name == "":
+                patch.append(settings.GSA_MIGRATION)
+                names[idx] = "|".join(patch)
+            else:
+                passthrough_names.extend(patch)
+                names[idx] = "|".join(passthrough_names)
+        elif name and not id:
+            ids[idx] = settings.GSA_MIGRATION
+
+        elif id and not name:
+            names[idx] = settings.GSA_MIGRATION
 
     return names, ids
 
