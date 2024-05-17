@@ -256,7 +256,7 @@ def generate_notes_to_sefa(audit_header, outfile):
         audit_header, policies_content, rate_content
     )
     # Remove leading special characters in policies_content
-    policies_content = policies_content.lstrip('=')
+    policies_content = policies_content.lstrip("=")
 
     set_range(wb, "accounting_policies", [policies_content])
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
