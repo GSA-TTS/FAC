@@ -12,7 +12,7 @@ from config.settings import ENVIRONMENT
 
 class Command(BaseCommand):
     help = """
-    Analyze cog/over for 20122 submissions
+    Analyze cog/over for 2022 / 2023 / 2024 submissions in LOCAL environment only.
     Beware! Deletes any existing rows in SingleAuditChecklist
     """
 
@@ -144,7 +144,7 @@ class Command(BaseCommand):
 
 def initialize_db():
     """
-    This will delete existing data, and should only be run in a dev env
+    This will delete existing data, and should only be run in a local env
     """
     SingleAuditChecklist.objects.all().delete()
     CognizantAssignment.objects.all().delete()
