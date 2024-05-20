@@ -2,7 +2,7 @@ import copy
 from typing import Any
 
 
-class InvalidAuditRecord:
+class InvalidRecord:
     """Hold invalid record for the ongoing report migration"""
 
     DEFAULT: dict[str, Any] = {
@@ -21,24 +21,24 @@ class InvalidAuditRecord:
 
     @staticmethod
     def reset():
-        InvalidAuditRecord.change = copy.deepcopy(InvalidAuditRecord.DEFAULT)
+        InvalidRecord.change = copy.deepcopy(InvalidRecord.DEFAULT)
 
     @staticmethod
     def append_finding_changes(data):
-        InvalidAuditRecord.change["finding"].append(data)
+        InvalidRecord.change["finding"].append(data)
 
     @staticmethod
     def append_note_changes(data):
-        InvalidAuditRecord.change["note"].append(data)
+        InvalidRecord.change["note"].append(data)
 
     @staticmethod
     def append_general_changes(data):
-        InvalidAuditRecord.change["general"].append(data)
+        InvalidRecord.change["general"].append(data)
 
     @staticmethod
     def append_federal_awards_changes(data):
-        InvalidAuditRecord.change["federal_award"].append(data)
+        InvalidRecord.change["federal_award"].append(data)
 
     @staticmethod
     def append_secondary_auditor_changes(data):
-        InvalidAuditRecord.change["secondary_auditor"].append(data)
+        InvalidRecord.change["secondary_auditor"].append(data)
