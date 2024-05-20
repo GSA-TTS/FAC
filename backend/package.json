@@ -17,6 +17,7 @@
     "fix:stylelint": "npx stylelint --fix './static/scss'",
     "check-all": "run-p check:*",
     "fix-all": "run-p fix:*",
+    "test:a11y:cypress": "npx cypress run --spec 'cypress/e2e/accessibility.cy.js'",
     "test:e2e:ci": "npx cypress run"
   },
   "author": "",

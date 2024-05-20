@@ -83,8 +83,10 @@ python manage.py load_fixtures     # Run the management command
 Run `npm i` to ensure Cypress and its related dependencies are up-to-date.
 
 Open Cypress with `npx Cypress open`, and run the `accessibility.cy.js` spec.
-This can also be done in headless mode via the command line with:
-`npx cypress run --spec "cypress/e2e/accessibility.cy.js"`
+
+This can be done in headless mode via the command line with either of these two lines:
+1. `npx cypress run --spec "cypress/e2e/accessibility.cy.js"`
+2. `npm run test:a11y:cypress` (which in turn runs the above line).
 
 ## Security scans
 #### OWASP ZAP
