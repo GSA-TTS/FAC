@@ -141,6 +141,7 @@ def run_end_to_end(user, audit_header):
             audit_header.DBKEY,
             sac.report_id,
         )
+        track_invalid_records(audit_header.AUDITYEAR, audit_header.DBKEY, sac.report_id)
     except Exception as exc:
         handle_exception(exc, audit_header)
 
