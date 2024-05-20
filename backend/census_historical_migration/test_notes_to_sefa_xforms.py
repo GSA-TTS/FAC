@@ -508,7 +508,11 @@ class TestXformPoliciesContent(SimpleTestCase):
 
 class TestXformSanitizePoliciesContent(SimpleTestCase):
     def test_special_char_policies_content(self):
-        self.assertEqual(xform_sanitize_policies_content("====test_policies"), "test_policies")
+        self.assertEqual(
+            xform_sanitize_policies_content("====test_policies"), "test_policies"
+        )
 
     def test_no_special_char_policies_content(self):
-        self.assertEqual(xform_sanitize_policies_content("test_policies"), "test_policies")
+        self.assertEqual(
+            xform_sanitize_policies_content("test_policies"), "test_policies"
+        )
