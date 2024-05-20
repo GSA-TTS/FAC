@@ -489,6 +489,7 @@ class TestXformMissingNotesRecordsV2(SimpleTestCase):
         self.assertEqual(policies_content, result_policies_content)
         self.assertEqual(rate_content, result_rate_content)
 
+
 class TestXformRateContent(SimpleTestCase):
     def test_blank_rate_content(self):
         self.assertEqual(xform_rate_content(""), settings.GSA_MIGRATION)
