@@ -183,7 +183,18 @@ def track_invalid_records(audit_year, dbkey, report_id):
 
     if all(
         not InvalidRecord.change[key]
-        for key in ["general", "finding", "note", "federal_award", "secondary_auditor"]
+        for key in [
+            "general",
+            "finding",
+            "note",
+            "federal_award",
+            "secondary_auditor",
+            "additional_ein",
+            "additional_uei",
+            "passthrough",
+            "cap_text",
+            "finding_text",
+        ]
     ):
         return
 

@@ -42,3 +42,23 @@ class InvalidRecord:
     @staticmethod
     def append_secondary_auditor_changes(data):
         InvalidRecord.change["secondary_auditor"].append(data)
+
+    @staticmethod
+    def append_additional_ein_changes(data):
+        InvalidRecord.change["additional_ein"].append(data)
+
+    @staticmethod
+    def append_additional_uei_changes(data):
+        InvalidRecord.change["additional_uei"].append(data)
+
+    @staticmethod
+    def append_passthrough_changes(data):
+        InvalidRecord.change["passthrough"].append(data)
+
+    @staticmethod
+    def append_cap_text_changes(data):
+        InvalidRecord.change["cap_text"].append(data)
+
+    @staticmethod
+    def append_finding_text_changes(data):
+        InvalidRecord.change["finding_text"].append(data)
