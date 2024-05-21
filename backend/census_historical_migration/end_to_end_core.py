@@ -26,6 +26,7 @@ from dissemination.models import (
     Finding,
     FindingText,
     General,
+    InvalidAuditRecord,
     Note,
     Passthrough,
     SecondaryAuditor,
@@ -33,6 +34,7 @@ from dissemination.models import (
 )
 from census_historical_migration.migration_result import MigrationResult
 from .change_record import InspectionRecord
+from .invalid_record import InvalidRecord
 
 from django.core.exceptions import ValidationError
 from django.utils import timezone as django_timezone
@@ -139,6 +141,7 @@ def run_end_to_end(user, audit_header):
             audit_header.DBKEY,
             sac.report_id,
         )
+        track_invalid_records(audit_header.AUDITYEAR, audit_header.DBKEY, sac.report_id)
     except Exception as exc:
         handle_exception(exc, audit_header)
 
@@ -173,6 +176,50 @@ def record_migration_transformations(audit_year, dbkey, report_id):
 
     migration_inspection_record.save()
     InspectionRecord.reset()
+
+
+def track_invalid_records(audit_year, dbkey, report_id):
+    """Record invalid records for the current report"""
+
+    if all(
+        not InvalidRecord.change[key]
+        for key in [
+            "general",
+            "finding",
+            "note",
+            "federal_award",
+            "secondary_auditor",
+            "additional_ein",
+            "additional_uei",
+            "passthrough",
+            "cap_text",
+            "finding_text",
+        ]
+    ):
+        return
+
+    InvalidAuditRecord.objects.filter(audit_year=audit_year, dbkey=dbkey).delete()
+
+    invalid_audit_record = InvalidAuditRecord.objects.create(
+        audit_year=audit_year,
+        dbkey=dbkey,
+        report_id=report_id,
+    )
+    invalid_audit_record.run_datetime = django_timezone.now()
+    if InvalidRecord.change["general"]:
+        invalid_audit_record.general = InvalidRecord.change["general"]
+    if InvalidRecord.change["finding"]:
+        invalid_audit_record.finding = InvalidRecord.change["finding"]
+    if InvalidRecord.change["note"]:
+        invalid_audit_record.note = InvalidRecord.change["note"]
+    if InvalidRecord.change["federal_award"]:
+        invalid_audit_record.federal_award = InvalidRecord.change["federal_award"]
+    if InvalidRecord.change["secondary_auditor"]:
+        invalid_audit_record.secondary_auditor = InvalidRecord.change[
+            "secondary_auditor"
+        ]
+    invalid_audit_record.save()
+    InvalidRecord.reset()
 
 
 def record_migration_status(audit_year, dbkey):
