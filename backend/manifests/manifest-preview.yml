@@ -27,3 +27,4 @@ applications:
       - smtp-proxy-creds
       - fac-logdrain
       - fac-snapshot-db
+      - backups
