@@ -22,6 +22,7 @@ class searchPage {
         majorProgramAccordionBtn: () => cy.get('.usa-accordion__button:contains("Major program")'),
         majorProgramRadio: () => cy.get('.usa-radio__input[name="major_program"]'),
         searchSubmitBtn: () => cy.get('input.usa-button[type="submit"][value="Search"]'),
+        resetBtn: () => cy.get('input.usa-button[type="reset"][value="Reset Search"]'),
         searchTable: () => cy.get('.usa-table'),
         advanceSearchBtn: () => cy.get('a[href="/dissemination/search/advanced/"]'),
         sfSacDownloadBtn: () => cy.get('a.usa-button p:contains("SF-SAC")'),
@@ -41,6 +42,10 @@ class searchPage {
 
     clickSearchSubmitButton() {
         this.elements.searchSubmitBtn().last().click();
+    };
+
+    clickResetButton() {
+        this.elements.resetBtn().last().click();
     };
 
     downloadSfSac(url) {

@@ -76,57 +76,6 @@ describe('Test Basic Search Fields', () => {
   });
 });
 
-describe('Test search and return results', () => {
-  it('Fills out basic search fields and downloads summary report', () => {
-
-    search.elements.yearCheckboxById(searchData.yearsToCheck[0])
-      .check({ force: true })
-      .should('be.checked')
-      .and('have.value', searchData.yearsToCheck[0]);
-
-    search.elements.ueiOrEinField().clear().type(searchData.ueiOrein)
-      .should('have.value', searchData.ueiOrein);
-
-    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
-    search.elements.entityNameField().clear().type(searchData.name)
-      .should('have.value', searchData.name);
-
-    search.elements.facAcceptDateAccordionBtn().contains('FAC acceptance date').as('accordionButton').click();
-    search.elements.startDateField().clear().type(searchData.accDate[0]);
-    search.elements.endDateField().clear().type(searchData.accDate[1]);
-
-    search.elements.stateAccordionBtn().contains('State').as('accordionButton').click();
-    search.elements.auditeeState().select(searchData.state).should('have.value', searchData.state);
-
-    search.elements.fiscalYearEndMonthBtn().contains('Fiscal year end month').as('accordionButton').click();
-    search.elements.fyEndMonth().select(searchData.fiscalYearEndMonth).should('have.value', searchData.fiscalYearEndMonth);
-
-    search.elements.entityTypeAccordionBtn().contains('Entity type').as('accordionButton').click();
-    search.elements.entityTypeCheckboxId(searchData.entityType).check({ force: true }).should('be.checked').and('have.value', searchData.entityType);
-
-    search.elements.reportdIdAccordionBtn().as('accordionButton').click();
-    search.elements.reportIdField().clear().type(searchData.reportId)
-      .should('have.value', searchData.reportId);
-
-    search.clickSearchSubmitButton();
-    cy.url().should('include', '/dissemination/search/');
-
-    search.elements.searchTable().should('exist');
-    cy.contains('td', 'D')
-      .siblings()
-      .find('a.usa-link[href^="/dissemination/summary"]')
-      .should('have.attr', 'target', '_blank')
-      .invoke('removeAttr', 'target')
-      .click();
-
-    cy.url().should('include', '/dissemination/summary');
-
-    cy.url().then(url => {
-      search.downloadSfSac(url);
-    });
-  });
-});
-
 describe('Test Advance Search Fields', () => {
 
   it('Tests Audit Year Checkbox', () => {
@@ -240,4 +189,100 @@ describe('Test Advance Search Fields', () => {
     cy.url().should('include', '/dissemination/search/');
   });
 });
+
+describe('Test search and return results', () => {
+  it('Fills out basic search fields and downloads summary report', () => {
+
+    search.elements.yearCheckboxById(searchData.yearsToCheck[0])
+      .check({ force: true })
+      .should('be.checked')
+      .and('have.value', searchData.yearsToCheck[0]);
+
+    search.elements.ueiOrEinField().clear().type(searchData.ueiOrein)
+      .should('have.value', searchData.ueiOrein);
+
+    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameField().clear().type(searchData.name)
+      .should('have.value', searchData.name);
+
+    search.elements.facAcceptDateAccordionBtn().contains('FAC acceptance date').as('accordionButton').click();
+    search.elements.startDateField().clear().type(searchData.accDate[0]);
+    search.elements.endDateField().clear().type(searchData.accDate[1]);
+
+    search.elements.stateAccordionBtn().contains('State').as('accordionButton').click();
+    search.elements.auditeeState().select(searchData.state).should('have.value', searchData.state);
+
+    search.elements.fiscalYearEndMonthBtn().contains('Fiscal year end month').as('accordionButton').click();
+    search.elements.fyEndMonth().select(searchData.fiscalYearEndMonth).should('have.value', searchData.fiscalYearEndMonth);
+
+    search.elements.entityTypeAccordionBtn().contains('Entity type').as('accordionButton').click();
+    search.elements.entityTypeCheckboxId(searchData.entityType).check({ force: true }).should('be.checked').and('have.value', searchData.entityType);
+
+    search.elements.reportdIdAccordionBtn().as('accordionButton').click();
+    search.elements.reportIdField().clear().type(searchData.reportId)
+      .should('have.value', searchData.reportId);
+
+    search.clickSearchSubmitButton();
+    cy.url().should('include', '/dissemination/search/');
+
+    search.elements.searchTable().should('exist');
+    cy.contains('td', 'D')
+      .siblings()
+      .find('a.usa-link[href^="/dissemination/summary"]')
+      .should('have.attr', 'target', '_blank')
+      .invoke('removeAttr', 'target')
+      .click();
+
+    cy.url().should('include', '/dissemination/summary');
+
+    cy.url().then(url => {
+      search.downloadSfSac(url);
+    });
+  });
+});
+
+describe('Test Reset Search Button', () => {
+  it('Fills out basic search fields and clicks reset button', () => {
+    search.elements.yearCheckboxById(searchData.yearsToCheck[0])
+      .check({ force: true })
+      .should('be.checked')
+      .and('have.value', searchData.yearsToCheck[0]);
+
+    search.elements.ueiOrEinField().clear().type(searchData.ueiOrein)
+      .should('have.value', searchData.ueiOrein);
+
+    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameField().clear().type(searchData.name)
+      .should('have.value', searchData.name);
+
+    search.elements.facAcceptDateAccordionBtn().contains('FAC acceptance date').as('accordionButton').click();
+    search.elements.startDateField().clear().type(searchData.accDate[0]);
+    search.elements.endDateField().clear().type(searchData.accDate[1]);
+
+    search.elements.stateAccordionBtn().contains('State').as('accordionButton').click();
+    search.elements.auditeeState().select(searchData.state).should('have.value', searchData.state);
+
+    search.elements.fiscalYearEndMonthBtn().contains('Fiscal year end month').as('accordionButton').click();
+    search.elements.fyEndMonth().select(searchData.fiscalYearEndMonth).should('have.value', searchData.fiscalYearEndMonth);
+
+    search.elements.entityTypeAccordionBtn().contains('Entity type').as('accordionButton').click();
+    search.elements.entityTypeCheckboxId(searchData.entityType).check({ force: true }).should('be.checked').and('have.value', searchData.entityType);
+
+    search.elements.reportdIdAccordionBtn().as('accordionButton').click();
+    search.elements.reportIdField().clear().type(searchData.reportId)
+      .should('have.value', searchData.reportId);
+
+    search.clickResetButton();
+
+    search.elements.yearCheckboxById(searchData.yearsToCheck[1]).should('not.be.checked');
+    search.elements.ueiOrEinField().should('have.value', '');
+    search.elements.entityNameField().should('have.value', '');
+    search.elements.startDateField().should('have.value', '');
+    search.elements.endDateField().should('have.value', '');
+    search.elements.reportIdField().should('have.value', '');
+  });
+});
+
+
+
 
