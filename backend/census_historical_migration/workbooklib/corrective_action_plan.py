@@ -92,22 +92,38 @@ def track_invalid_records_with_extra_finding_references(findings, captexts):
     track the records as invalid records."""
 
     finding_refnums = []
+    captext_refnums = []
     for finding in findings:
         ref_number = string_to_string(finding.FINDINGREFNUMS)
         if ref_number:
             finding_refnums.append(ref_number)
-    invalid_records = []
     for captext in captexts:
         ref_number = string_to_string(captext.FINDINGREFNUMS)
-        if ref_number not in finding_refnums:
+        if ref_number:
+            captext_refnums.append(ref_number)
+    invalid_records = []
+    for captext_refnum in captext_refnums:
+        if captext_refnum not in finding_refnums:
             # invalid record
             census_data_tuples = [
-                ("FINDINGREFNUMS", ref_number),
+                ("FINDINGREFNUMS", captext_refnum),
             ]
             track_invalid_records(
                 census_data_tuples,
                 "finding_ref_number",
-                ref_number,
+                captext_refnum,
+                invalid_records,
+            )
+    for finding_refnum in finding_refnums:
+        if finding_refnum not in captext_refnums:
+            # invalid record
+            census_data_tuples = [
+                ("FINDINGREFNUMS", finding_refnum),
+            ]
+            track_invalid_records(
+                census_data_tuples,
+                "reference_number",
+                finding_refnum,
                 invalid_records,
             )
     if invalid_records:
