@@ -222,6 +222,22 @@ def track_transformations(
     )
 
 
+def track_invalid_records(census_data_tuples, gsa_field, gsa_value, records):
+    """Track invalid records."""
+    census_data = []
+    for census_column, census_value in census_data_tuples:
+        census_data.append(
+            CensusRecord(column=census_column, value=census_value).to_dict()
+        )
+    gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
+    records.append(
+        {
+            "census_data": census_data,
+            "gsa_fac_data": gsa_fac_data,
+        }
+    )
+
+
 def get_reference_numbers_from_findings(findings):
     """Get all reference numbers from the findings."""
     references = set()
