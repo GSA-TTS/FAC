@@ -16,49 +16,59 @@ class InvalidRecord:
         "cap_text": [],
         "secondary_auditor": [],
         "federal_award": [],
+        "validations_to_skip": [],
+        "invalid_migration_tag": [],
     }
-    change = copy.deepcopy(DEFAULT)
+    fields = copy.deepcopy(DEFAULT)
 
     @staticmethod
     def reset():
-        InvalidRecord.change = copy.deepcopy(InvalidRecord.DEFAULT)
+        InvalidRecord.fields = copy.deepcopy(InvalidRecord.DEFAULT)
 
     @staticmethod
-    def append_finding_changes(data):
-        InvalidRecord.change["finding"].append(data)
+    def append_invalid_finding_records(data):
+        InvalidRecord.fields["finding"].append(data)
 
     @staticmethod
-    def append_note_changes(data):
-        InvalidRecord.change["note"].append(data)
+    def append_invalid_note_records(data):
+        InvalidRecord.fields["note"].append(data)
 
     @staticmethod
-    def append_general_changes(data):
-        InvalidRecord.change["general"].append(data)
+    def append_invalid_general_records(data):
+        InvalidRecord.fields["general"].append(data)
 
     @staticmethod
-    def append_federal_awards_changes(data):
-        InvalidRecord.change["federal_award"].append(data)
+    def append_invalid_federal_awards_records(data):
+        InvalidRecord.fields["federal_award"].append(data)
 
     @staticmethod
-    def append_secondary_auditor_changes(data):
-        InvalidRecord.change["secondary_auditor"].append(data)
+    def append_invalid_secondary_auditor_records(data):
+        InvalidRecord.fields["secondary_auditor"].append(data)
 
     @staticmethod
-    def append_additional_ein_changes(data):
-        InvalidRecord.change["additional_ein"].append(data)
+    def append_invalid_additional_ein_records(data):
+        InvalidRecord.fields["additional_ein"].append(data)
 
     @staticmethod
-    def append_additional_uei_changes(data):
-        InvalidRecord.change["additional_uei"].append(data)
+    def append_invalid_additional_uei_records(data):
+        InvalidRecord.fields["additional_uei"].append(data)
 
     @staticmethod
-    def append_passthrough_changes(data):
-        InvalidRecord.change["passthrough"].append(data)
+    def append_invalid_passthrough_records(data):
+        InvalidRecord.fields["passthrough"].append(data)
 
     @staticmethod
-    def append_cap_text_changes(data):
-        InvalidRecord.change["cap_text"].append(data)
+    def append_invalid_cap_text_records(data):
+        InvalidRecord.fields["cap_text"].append(data)
 
     @staticmethod
-    def append_finding_text_changes(data):
-        InvalidRecord.change["finding_text"].append(data)
+    def append_invalid_finding_text_records(data):
+        InvalidRecord.fields["finding_text"].append(data)
+
+    @staticmethod
+    def append_validations_to_skip(data):
+        InvalidRecord.fields["validations_to_skip"].append(data)
+
+    @staticmethod
+    def append_invalid_migration_tag(data):
+        InvalidRecord.fields["invalid_migration_tag"].append(data)
