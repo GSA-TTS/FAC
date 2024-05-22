@@ -182,7 +182,7 @@ def track_invalid_records(audit_year, dbkey, report_id):
     """Record invalid records for the current report"""
 
     if all(
-        not InvalidRecord.change[key]
+        not InvalidRecord.fields[key]
         for key in [
             "general",
             "finding",
@@ -206,18 +206,29 @@ def track_invalid_records(audit_year, dbkey, report_id):
         report_id=report_id,
     )
     invalid_audit_record.run_datetime = django_timezone.now()
-    if InvalidRecord.change["general"]:
-        invalid_audit_record.general = InvalidRecord.change["general"]
-    if InvalidRecord.change["finding"]:
-        invalid_audit_record.finding = InvalidRecord.change["finding"]
-    if InvalidRecord.change["note"]:
-        invalid_audit_record.note = InvalidRecord.change["note"]
-    if InvalidRecord.change["federal_award"]:
-        invalid_audit_record.federal_award = InvalidRecord.change["federal_award"]
-    if InvalidRecord.change["secondary_auditor"]:
-        invalid_audit_record.secondary_auditor = InvalidRecord.change[
+    if InvalidRecord.fields["general"]:
+        invalid_audit_record.general = InvalidRecord.fields["general"]
+    if InvalidRecord.fields["finding"]:
+        invalid_audit_record.finding = InvalidRecord.fields["finding"]
+    if InvalidRecord.fields["note"]:
+        invalid_audit_record.note = InvalidRecord.fields["note"]
+    if InvalidRecord.fields["federal_award"]:
+        invalid_audit_record.federal_award = InvalidRecord.fields["federal_award"]
+    if InvalidRecord.fields["secondary_auditor"]:
+        invalid_audit_record.secondary_auditor = InvalidRecord.fields[
             "secondary_auditor"
         ]
+    if InvalidRecord.fields["additional_ein"]:
+        invalid_audit_record.additional_ein = InvalidRecord.fields["additional_ein"]
+    if InvalidRecord.fields["additional_uei"]:
+        invalid_audit_record.additional_uei = InvalidRecord.fields["additional_uei"]
+    if InvalidRecord.fields["passthrough"]:
+        invalid_audit_record.passthrough = InvalidRecord.fields["passthrough"]
+    if InvalidRecord.fields["cap_text"]:
+        invalid_audit_record.cap_text = InvalidRecord.fields["cap_text"]
+    if InvalidRecord.fields["finding_text"]:
+        invalid_audit_record.finding_text = InvalidRecord.fields["finding_text"]
+
     invalid_audit_record.save()
     InvalidRecord.reset()
 
