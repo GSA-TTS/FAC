@@ -141,7 +141,9 @@ def run_end_to_end(user, audit_header):
             audit_header.DBKEY,
             sac.report_id,
         )
-        track_invalid_records(audit_header.AUDITYEAR, audit_header.DBKEY, sac.report_id)
+        track_invalid_audit_records(
+            audit_header.AUDITYEAR, audit_header.DBKEY, sac.report_id
+        )
     except Exception as exc:
         handle_exception(exc, audit_header)
 
@@ -178,7 +180,7 @@ def record_migration_transformations(audit_year, dbkey, report_id):
     InspectionRecord.reset()
 
 
-def track_invalid_records(audit_year, dbkey, report_id):
+def track_invalid_audit_records(audit_year, dbkey, report_id):
     """Record invalid records for the current report"""
 
     if all(
