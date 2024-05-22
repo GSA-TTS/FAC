@@ -12,6 +12,7 @@ from ..workbooklib.excel_creation_utils import (
     set_workbook_uei,
     sort_by_field,
     xform_sanitize_for_excel,
+    track_invalid_records,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -20,7 +21,9 @@ from ..base_field_maps import (
 from ..workbooklib.templates import sections_to_template_paths
 from ..models import ELECCAPTEXT as CapText
 from audit.fixtures.excel import FORM_SECTIONS
-
+from collections import defaultdict
+from ..invalid_migration_tags import INVALID_MIGRATION_TAGS
+from ..invalid_record import InvalidRecord
 
 import openpyxl as pyxl
 
@@ -84,6 +87,39 @@ def xform_add_placeholder_for_missing_action_planned_text(captexts):
             captext.TEXT = settings.GSA_MIGRATION
 
 
+def track_invalid_records_with_extra_finding_references(findings, captexts):
+    """ If captexts have FINDINGREFNUMS that are not present in findings,
+    track the records as invalid records."""
+
+    finding_refnums = []
+    for finding in findings:
+        ref_number = string_to_string(finding.FINDINGREFNUMS)
+        if ref_number:
+            finding_refnums.append(ref_number)
+    invalid_records = []
+    for captext in captexts:
+        ref_number = string_to_string(captext.FINDINGREFNUMS)
+        if ref_number not in finding_refnums:
+            # invalid record
+            census_data_tuples = [
+                ("FINDINGREFNUMS", ref_number),
+            ]
+            track_invalid_records(
+                census_data_tuples,
+                "finding_ref_number",
+                ref_number,
+                invalid_records,
+            )
+    if invalid_records:
+        InvalidRecord.append_invalid_cap_text_records(invalid_records)
+        InvalidRecord.append_validations_to_skip(
+            "check_ref_number_in_cap"
+        )
+        InvalidRecord.append_invalid_migration_tag(
+            INVALID_MIGRATION_TAGS.EXTRA_FINDING_REFERENCE_NUMBERS_IN_CAPTEXT
+        )
+
+
 def generate_corrective_action_plan(audit_header, outfile):
     """
     Generates a corrective action plan workbook for a given audit header.
@@ -103,6 +139,7 @@ def generate_corrective_action_plan(audit_header, outfile):
     xform_add_placeholder_for_missing_action_planned_text(captexts)
     xform_sanitize_for_excel(captexts)
     map_simple_columns(wb, mappings, captexts)
+    track_invalid_records_with_extra_finding_references(findings, captexts)
     wb.save(outfile)
 
     return wb
