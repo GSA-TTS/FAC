@@ -16,6 +16,8 @@ class InvalidRecord:
         "cap_text": [],
         "secondary_auditor": [],
         "federal_award": [],
+        "validations_to_skip": [],
+        "invalid_migration_tag": [],
     }
     fields = copy.deepcopy(DEFAULT)
 
@@ -62,3 +64,11 @@ class InvalidRecord:
     @staticmethod
     def append_invalid_finding_text_records(data):
         InvalidRecord.fields["finding_text"].append(data)
+
+    @staticmethod
+    def append_validations_to_skip(data):
+        InvalidRecord.fields["validations_to_skip"].append(data)
+
+    @staticmethod
+    def append_invalid_migration_tag(data):
+        InvalidRecord.fields["invalid_migration_tag"].append(data)

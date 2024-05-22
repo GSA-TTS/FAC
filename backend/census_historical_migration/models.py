@@ -455,6 +455,8 @@ class ReportMigrationStatus(models.Model):
     dbkey = models.TextField(blank=True, null=True)
     run_datetime = models.DateTimeField(default=timezone.now)
     migration_status = models.TextField(blank=True, null=True)
+    invalid_migration_tags = models.TextField(blank=True, null=True)
+    skipped_validation_methods = models.TextField(blank=True, null=True)
 
 
 class MigrationErrorDetail(models.Model):
