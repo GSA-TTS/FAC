@@ -60,7 +60,12 @@ def xform_add_placeholder_for_missing_references(findings, captexts):
     expected_references = get_reference_numbers_from_findings(findings)
     found_references = get_reference_numbers_from_text_records(captexts)
 
+    logger.info(f"expected_references = {expected_references}")
+    logger.info(f"found_references = {found_references}")
+
     missing_references = expected_references - found_references
+
+    logger.info(f"missing_references = {missing_references}")
 
     if missing_references:
         for ref in missing_references:
@@ -87,24 +92,25 @@ def xform_add_placeholder_for_missing_action_planned_text(captexts):
             captext.TEXT = settings.GSA_MIGRATION
 
 
-def track_invalid_records_with_extra_finding_references(captexts):
-    """ If captexts have GSA_MIGRATION for Text,
+def track_invalid_records_with_captexts_no_findings(findings, captexts):
+    """ If there are no findings but captexts exist,
     track the records as invalid records."""
 
+    finding_refnums = get_reference_numbers_from_findings(findings)
+    captext_refnums = get_reference_numbers_from_text_records(captexts)
     invalid_records = []
-    for captext in captexts:
-        if captext.TEXT == string_to_string(settings.GSA_MIGRATION):
-            # invalid record
+    if captext_refnums and not finding_refnums:
+        invalid_records = []
+        for captext_refnum in captext_refnums:
             census_data_tuples = [
-                ("FINDINGREFNUMS", captext.FINDINGREFNUMS),
+                ("FINDINGREFNUMS", captext_refnum),
             ]
             track_invalid_records(
                 census_data_tuples,
                 "finding_ref_number",
-                captext.FINDINGREFNUMS,
+                captext_refnum,
                 invalid_records,
             )
-    logger.info(f"invalid_records = {invalid_records}")
 
     if invalid_records:
         InvalidRecord.append_invalid_cap_text_records(invalid_records)
@@ -133,14 +139,13 @@ def generate_corrective_action_plan(audit_header, outfile):
     captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
     findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
 
-    captexts = xform_add_placeholder_for_missing_references(findings, captexts)
+    invalid_record = track_invalid_records_with_captexts_no_findings(findings, captexts)
+    if not invalid_record:
+        captexts = xform_add_placeholder_for_missing_references(findings, captexts)
+
     xform_add_placeholder_for_missing_action_planned_text(captexts)
     xform_sanitize_for_excel(captexts)
     map_simple_columns(wb, mappings, captexts)
-
-    if track_invalid_records_with_extra_finding_references(captexts):
-        captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
-        xform_sanitize_for_excel(captexts)
 
     wb.save(outfile)
 
