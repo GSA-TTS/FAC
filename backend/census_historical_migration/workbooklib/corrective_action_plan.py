@@ -87,45 +87,25 @@ def xform_add_placeholder_for_missing_action_planned_text(captexts):
             captext.TEXT = settings.GSA_MIGRATION
 
 
-def track_invalid_records_with_extra_finding_references(findings, captexts):
-    """ If captexts have FINDINGREFNUMS that are not present in findings,
+def track_invalid_records_with_extra_finding_references(captexts):
+    """ If captexts have GSA_MIGRATION for Text,
     track the records as invalid records."""
 
-    finding_refnums = []
-    captext_refnums = []
-    for finding in findings:
-        ref_number = string_to_string(finding.FINDINGREFNUMS)
-        if ref_number:
-            finding_refnums.append(ref_number)
-    for captext in captexts:
-        ref_number = string_to_string(captext.FINDINGREFNUMS)
-        if ref_number:
-            captext_refnums.append(ref_number)
     invalid_records = []
-    for captext_refnum in captext_refnums:
-        if captext_refnum not in finding_refnums:
+    for captext in captexts:
+        if captext.TEXT == string_to_string(settings.GSA_MIGRATION):
             # invalid record
             census_data_tuples = [
-                ("FINDINGREFNUMS", captext_refnum),
+                ("FINDINGREFNUMS", captext.FINDINGREFNUMS),
             ]
             track_invalid_records(
                 census_data_tuples,
                 "finding_ref_number",
-                captext_refnum,
+                captext.FINDINGREFNUMS,
                 invalid_records,
             )
-    for finding_refnum in finding_refnums:
-        if finding_refnum not in captext_refnums:
-            # invalid record
-            census_data_tuples = [
-                ("FINDINGREFNUMS", finding_refnum),
-            ]
-            track_invalid_records(
-                census_data_tuples,
-                "reference_number",
-                finding_refnum,
-                invalid_records,
-            )
+    logger.info(f"invalid_records = {invalid_records}")
+
     if invalid_records:
         InvalidRecord.append_invalid_cap_text_records(invalid_records)
         InvalidRecord.append_validations_to_skip(
@@ -134,6 +114,7 @@ def track_invalid_records_with_extra_finding_references(findings, captexts):
         InvalidRecord.append_invalid_migration_tag(
             INVALID_MIGRATION_TAGS.EXTRA_FINDING_REFERENCE_NUMBERS_IN_CAPTEXT
         )
+    return invalid_records
 
 
 def generate_corrective_action_plan(audit_header, outfile):
@@ -151,11 +132,16 @@ def generate_corrective_action_plan(audit_header, outfile):
     set_workbook_uei(wb, uei)
     captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
     findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
+
     captexts = xform_add_placeholder_for_missing_references(findings, captexts)
     xform_add_placeholder_for_missing_action_planned_text(captexts)
     xform_sanitize_for_excel(captexts)
     map_simple_columns(wb, mappings, captexts)
-    track_invalid_records_with_extra_finding_references(findings, captexts)
+
+    if track_invalid_records_with_extra_finding_references(captexts):
+        captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
+        xform_sanitize_for_excel(captexts)
+
     wb.save(outfile)
 
     return wb
