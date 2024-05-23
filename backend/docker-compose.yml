@@ -57,7 +57,7 @@ services:
       ENV: ${ENV}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: 0.0.0.0 127.0.0.1 localhost
-      AV_SCAN_URL: http://clamav-rest:9000/scan
+      AV_SCAN_URL: http://clamav-rest:${CLAMAV_PORT:-9000}/scan
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
       ENABLE_DEBUG_TOOLBAR: false
@@ -81,7 +81,7 @@ services:
       SIGNATURE_CHECKS: 1
       PORT: ${CLAMAV_PORT:-9000}
     ports:
-      - ${CLAMAV_PORT:-9000:9000}
+      - ${CLAMAV_PORT:-9000}:${CLAMAV_PORT:-9000}
 
   #---------------------------------------------
   # Minio (S3 clone)

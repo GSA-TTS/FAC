@@ -14,13 +14,10 @@
                   }
                },
                "then": {
-                  "audit_period_other_months": {
-                     "description": "Empty string or null",
-                     "enum": [
-                        "",
-                        "null"
-                     ],
-                     "title": "EmptyString_Null"
+                  "not": {
+                     "required": [
+                        "audit_period_other_months"
+                     ]
                   }
                }
             },
@@ -33,13 +30,10 @@
                   }
                },
                "then": {
-                  "audit_period_other_months": {
-                     "description": "Empty string or null",
-                     "enum": [
-                        "",
-                        "null"
-                     ],
-                     "title": "EmptyString_Null"
+                  "not": {
+                     "required": [
+                        "audit_period_other_months"
+                     ]
                   }
                }
             },
@@ -52,10 +46,9 @@
                   }
                },
                "then": {
-                  "audit_period_other_months": {
-                     "pattern": "^0[0-9]|1[0-8]$",
-                     "type": "string"
-                  }
+                  "required": [
+                     "audit_period_other_months"
+                  ]
                }
             }
          ]
@@ -69,90 +62,23 @@
             }
          },
          "then": {
-            "properties": {
-               "auditor_address_line_1": {
-                  "maxLength": 500,
-                  "minLength": 1,
-                  "type": "string"
+            "allOf": [
+               {
+                  "not": {
+                     "required": [
+                        "auditor_international_address"
+                     ]
+                  }
                },
-               "auditor_city": {
-                  "maxLength": 500,
-                  "minLength": 1,
-                  "type": "string"
-               },
-               "auditor_international_address": {
-                  "const": "",
-                  "type": "string"
-               },
-               "auditor_state": {
-                  "description": "US States 2-letter abbreviations",
-                  "enum": [
-                     "AL",
-                     "AK",
-                     "AS",
-                     "AZ",
-                     "AR",
-                     "CA",
-                     "CO",
-                     "CT",
-                     "DE",
-                     "DC",
-                     "FM",
-                     "FL",
-                     "GA",
-                     "GU",
-                     "HI",
-                     "ID",
-                     "IL",
-                     "IN",
-                     "IA",
-                     "KS",
-                     "KY",
-                     "LA",
-                     "ME",
-                     "MH",
-                     "MD",
-                     "MA",
-                     "MI",
-                     "MN",
-                     "MS",
-                     "MO",
-                     "MT",
-                     "NE",
-                     "NV",
-                     "NH",
-                     "NJ",
-                     "NM",
-                     "NY",
-                     "NC",
-                     "ND",
-                     "MP",
-                     "OH",
-                     "OK",
-                     "OR",
-                     "PW",
-                     "PA",
-                     "PR",
-                     "RI",
-                     "SC",
-                     "SD",
-                     "TN",
-                     "TX",
-                     "UT",
-                     "VT",
-                     "VI",
-                     "VA",
-                     "WA",
-                     "WV",
-                     "WI",
-                     "WY"
+               {
+                  "required": [
+                     "auditor_address_line_1",
+                     "auditor_city",
+                     "auditor_state",
+                     "auditor_zip"
                   ]
-               },
-               "auditor_zip": {
-                  "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
-                  "type": "string"
                }
-            }
+            ]
          }
       },
       {
@@ -166,29 +92,23 @@
             }
          },
          "then": {
-            "properties": {
-               "auditor_address_line_1": {
-                  "const": "",
-                  "type": "string"
+            "allOf": [
+               {
+                  "not": {
+                     "required": [
+                        "auditor_address_line_1",
+                        "auditor_city",
+                        "auditor_state",
+                        "auditor_zip"
+                     ]
+                  }
                },
-               "auditor_city": {
-                  "const": "",
-                  "type": "string"
-               },
-               "auditor_international_address": {
-                  "maxLength": 500,
-                  "minLength": 1,
-                  "type": "string"
-               },
-               "auditor_state": {
-                  "const": "",
-                  "type": "string"
-               },
-               "auditor_zip": {
-                  "const": "",
-                  "type": "string"
+               {
+                  "required": [
+                     "auditor_international_address"
+                  ]
                }
-            }
+            ]
          }
       }
    ],
@@ -205,16 +125,8 @@
          "type": "string"
       },
       "audit_period_other_months": {
-         "anyOf": [
-            {
-               "pattern": "^0[0-9]|1[0-8]$",
-               "type": "string"
-            },
-            {
-               "const": "",
-               "type": "string"
-            }
-         ]
+         "pattern": "^0[0-9]|1[0-8]$",
+         "type": "string"
       },
       "audit_type": {
          "description": "Type of audit being submitted",
@@ -360,15 +272,25 @@
          ]
       },
       "auditee_zip": {
-         "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
-         "type": "string"
+         "oneOf": [
+            {
+               "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "auditor_address_line_1": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditor_city": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditor_contact_name": {
@@ -389,8 +311,16 @@
          "type": "string"
       },
       "auditor_ein": {
-         "pattern": "^[0-9]{9}$",
-         "type": "string"
+         "oneOf": [
+            {
+               "pattern": "^[0-9]{9}$",
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "auditor_ein_not_an_ssn_attestation": {
          "type": "boolean"
@@ -414,6 +344,7 @@
       },
       "auditor_international_address": {
          "maxLength": 500,
+         "minLength": 1,
          "type": "string"
       },
       "auditor_phone": {
@@ -421,93 +352,92 @@
          "type": "string"
       },
       "auditor_state": {
-         "anyOf": [
-            {
-               "description": "US States 2-letter abbreviations",
-               "enum": [
-                  "AL",
-                  "AK",
-                  "AS",
-                  "AZ",
-                  "AR",
-                  "CA",
-                  "CO",
-                  "CT",
-                  "DE",
-                  "DC",
-                  "FM",
-                  "FL",
-                  "GA",
-                  "GU",
-                  "HI",
-                  "ID",
-                  "IL",
-                  "IN",
-                  "IA",
-                  "KS",
-                  "KY",
-                  "LA",
-                  "ME",
-                  "MH",
-                  "MD",
-                  "MA",
-                  "MI",
-                  "MN",
-                  "MS",
-                  "MO",
-                  "MT",
-                  "NE",
-                  "NV",
-                  "NH",
-                  "NJ",
-                  "NM",
-                  "NY",
-                  "NC",
-                  "ND",
-                  "MP",
-                  "OH",
-                  "OK",
-                  "OR",
-                  "PW",
-                  "PA",
-                  "PR",
-                  "RI",
-                  "SC",
-                  "SD",
-                  "TN",
-                  "TX",
-                  "UT",
-                  "VT",
-                  "VI",
-                  "VA",
-                  "WA",
-                  "WV",
-                  "WI",
-                  "WY"
-               ],
-               "title": "State"
-            },
-            {
-               "const": "",
-               "type": "string"
-            }
+         "description": "US States 2-letter abbreviations",
+         "enum": [
+            "AL",
+            "AK",
+            "AS",
+            "AZ",
+            "AR",
+            "CA",
+            "CO",
+            "CT",
+            "DE",
+            "DC",
+            "FM",
+            "FL",
+            "GA",
+            "GU",
+            "HI",
+            "ID",
+            "IL",
+            "IN",
+            "IA",
+            "KS",
+            "KY",
+            "LA",
+            "ME",
+            "MH",
+            "MD",
+            "MA",
+            "MI",
+            "MN",
+            "MS",
+            "MO",
+            "MT",
+            "NE",
+            "NV",
+            "NH",
+            "NJ",
+            "NM",
+            "NY",
+            "NC",
+            "ND",
+            "MP",
+            "OH",
+            "OK",
+            "OR",
+            "PW",
+            "PA",
+            "PR",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VT",
+            "VI",
+            "VA",
+            "WA",
+            "WV",
+            "WI",
+            "WY"
          ]
       },
       "auditor_zip": {
-         "anyOf": [
+         "oneOf": [
             {
                "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
                "type": "string"
             },
             {
-               "const": "",
+               "const": "GSA_MIGRATION",
                "type": "string"
             }
          ]
       },
       "ein": {
-         "pattern": "^[0-9]{9}$",
-         "type": "string"
+         "oneOf": [
+            {
+               "pattern": "^[0-9]{9}$",
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "ein_not_an_ssn_attestation": {
          "type": "boolean"
@@ -562,8 +492,6 @@
       "auditor_email",
       "auditor_firm_name",
       "auditor_phone",
-      "auditor_state",
-      "auditor_zip",
       "ein",
       "ein_not_an_ssn_attestation",
       "is_usa_based",
@@ -573,11 +501,8 @@
       "secondary_auditors_exist",
       "user_provided_organization_type",
       "auditee_zip",
-      "auditor_address_line_1",
-      "auditor_city",
       "auditor_country",
-      "audit_period_covered",
-      "auditor_international_address"
+      "audit_period_covered"
    ],
    "title": "GeneralInformation",
    "type": "object",

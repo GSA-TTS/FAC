@@ -1,6 +1,7 @@
 """
 Custom tag to support the logic around sections on the Submission progress page.
 """
+
 from django import template
 
 register = template.Library()

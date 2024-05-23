@@ -1,7 +1,7 @@
 -c ../requirements.txt
 
 bandit
-black
+black>=24.3.0
 coverage
 django-debug-toolbar
 djlint

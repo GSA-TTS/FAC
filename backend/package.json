@@ -13,8 +13,6 @@
     "dev": "node build-assets.js --watch",
     "check:eslint": "npx eslint --ignore-pattern ../.gitignore static/js",
     "fix:eslint": "npx eslint --fix --ignore-pattern ../.gitignore static/js",
-    "check:eslint": "npx eslint --ignore-pattern ../.gitignore static/js",
-    "fix:eslint": "npx eslint --fix --ignore-pattern ../.gitignore static/js",
     "check:stylelint": "npx stylelint './static/scss'",
     "fix:stylelint": "npx stylelint --fix './static/scss'",
     "check-all": "run-p check:*",
@@ -27,7 +25,7 @@
   "license": "ISC",
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.2.5",
-    "cypress": "^13.7.3",
+    "cypress": "^13.8.1",
     "cypress-downloadfile": "^1.2.3",
     "cypress-file-upload": "^5.0.8",
     "cypress-otp": "^1.0.3",
@@ -44,11 +42,11 @@
   "dependencies": {
     "@uswds/uswds": "3.7.0",
     "autoprefixer": "^10.4.19",
-    "esbuild": "^0.19.12",
-    "esbuild-sass-plugin": "2.16.1",
-    "glob": "10.3.10",
+    "esbuild": "^0.20.2",
+    "esbuild-sass-plugin": "3.0.0",
+    "glob": "10.3.12",
     "npm-run-all": "^4.1.5",
-    "postcss": "^8.4.31",
+    "postcss": "^8.4.38",
     "postcss-cli": "^11.0.0"
   }
 }

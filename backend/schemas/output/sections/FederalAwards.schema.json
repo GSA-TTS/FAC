@@ -217,6 +217,20 @@
                               "if": {
                                  "properties": {
                                     "is_direct": {
+                                       "const": "GSA_MIGRATION"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "required": [
+                                    "entities"
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_direct": {
                                        "const": "Y"
                                     }
                                  }
@@ -251,11 +265,19 @@
                               "type": "array"
                            },
                            "is_direct": {
-                              "enum": [
-                                 "Y",
-                                 "N"
-                              ],
-                              "type": "string"
+                              "oneOf": [
+                                 {
+                                    "enum": [
+                                       "Y",
+                                       "N"
+                                    ],
+                                    "type": "string"
+                                 },
+                                 {
+                                    "const": "GSA_MIGRATION",
+                                    "type": "string"
+                                 }
+                              ]
                            }
                         },
                         "type": "object"
@@ -507,7 +529,8 @@
                            "is_passed": {
                               "enum": [
                                  "Y",
-                                 "N"
+                                 "N",
+                                 "GSA_MIGRATION"
                               ],
                               "type": "string"
                            },
@@ -552,7 +575,7 @@
                "type": "string"
             },
             "version": {
-               "const": "1.1.0",
+               "const": "1.1.1",
                "type": "string"
             }
          },

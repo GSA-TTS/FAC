@@ -18,8 +18,14 @@ from .workbooklib.federal_awards import (
     xform_constructs_cluster_names,
     xform_populate_default_passthrough_amount,
     xform_populate_default_passthrough_names_ids,
+    xform_replace_invalid_direct_award_flag,
     xform_replace_invalid_extension,
+    xform_program_name,
+    xform_is_passthrough_award,
+    xform_missing_major_program,
     is_valid_extension,
+    xform_cluster_names,
+    xform_sanitize_additional_award_identification,
 )
 
 
@@ -305,6 +311,71 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
         expected = [str(settings.GSA_MIGRATION_INT)]
         self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
+    def test_passthrough_award_gsa_non_empty_amount(self):
+        """Test the function with a passthrough award GSA_MIGRATION audit with non-empty amount."""
+        audits = [
+            self.MockAudit(
+                PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="100"
+            )
+        ]
+        expected = ["100"]
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
+
+    def test_passthrough_award_gsa_empty_amount(self):
+        """Test the function with a passthrough award GSA_MIGRATIONN audit with empty amount."""
+        audits = [
+            self.MockAudit(
+                PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT=""
+            )
+        ]
+        expected = [""]
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
+
+    def test_passthrough_award_gsa_zero_amount(self):
+        """Test the function with a passthrough award GSA_MIGRATION audit with zero amount."""
+        audits = [
+            self.MockAudit(
+                PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="0"
+            )
+        ]
+        expected = [""]
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
+
+
+class TestXformIsPassthroughAward(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, PASSTHROUGHAWARD, PASSTHROUGHAMOUNT):
+            self.PASSTHROUGHAWARD = PASSTHROUGHAWARD
+            self.PASSTHROUGHAMOUNT = PASSTHROUGHAMOUNT
+
+    def test_passthrough_award_Y(self):
+        """Test the function with a valid passthrough award."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="0")]
+        expected = "Y"
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
+    def test_passthrough_award_empty_with_amount(self):
+        """Test the function with an empty passthrough award and truthy amount."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="", PASSTHROUGHAMOUNT="42")]
+        expected = settings.GSA_MIGRATION
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
+    def test_passthrough_award_empty_with_no_amount(self):
+        """Test the function with an empty passthrough award and 0 amount."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="", PASSTHROUGHAMOUNT="0")]
+        expected = settings.GSA_MIGRATION
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
+    def test_passthrough_award_empty_with_empty_amount(self):
+        """Test the function with an empty passthrough award and empty amount."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="", PASSTHROUGHAMOUNT="")]
+        expected = settings.GSA_MIGRATION
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
 
 class TestCFDAFunctions(SimpleTestCase):
     def test_is_valid_prefix(self):
@@ -542,11 +613,21 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
 
     def test_match_numbers_mixed_empty_and_non_empty(self):
         """Test the function with mixed empty and non-empty names and ids."""
-        names = ["name1|name2|name3", "name4", ""]
-        ids = ["id1", "", ""]
+        names = ["name1|name2|name3", "name4", "", "name5", ""]
+        ids = ["id1", "", "id2", "id3|id4", ""]
         expected_ids = [
             f"id1|{settings.GSA_MIGRATION}|{settings.GSA_MIGRATION}",
+            f"{settings.GSA_MIGRATION}",
+            "id2",
+            "id3|id4",
             "",
+        ]
+
+        expected_names = [
+            "name1|name2|name3",
+            "name4",
+            f"{settings.GSA_MIGRATION}",
+            f"name5|{settings.GSA_MIGRATION}",
             "",
         ]
 
@@ -554,5 +635,126 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
             names, ids
         )
 
-        self.assertEqual(transformed_names, names)
+        self.assertEqual(transformed_names, expected_names)
         self.assertEqual(transformed_ids, expected_ids)
+
+
+class TestXformMissingMajorProgram(SimpleTestCase):
+    class AuditMock:
+        def __init__(
+            self,
+            major_program,
+            audit_type,
+        ):
+            self.MAJORPROGRAM = major_program
+            self.TYPEREPORT_MP = audit_type
+
+    def test_xform_normal_major_program(self):
+        """Test for normal major program"""
+        audits = [self.AuditMock("Y", "U")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "Y")
+
+    def test_xform_missing_major_program_with_audit_type(self):
+        """Test for missing major program with audit type provided"""
+        audits = [self.AuditMock("", "U")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "Y")
+
+    def test_xform_missing_major_program_without_audit_type(self):
+        """Test for missing major program without audit type provided"""
+        audits = [self.AuditMock("", "")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "N")
+
+
+class TestXformMissingProgramName(SimpleTestCase):
+    class AuditMock:
+        def __init__(self, program_name):
+            self.FEDERALPROGRAMNAME = program_name
+
+    def test_with_normal_program_name(self):
+        """Test for missing program name"""
+        audits = [self.AuditMock("Some fake name")]
+
+        xform_program_name(audits)
+
+        self.assertEqual(audits[0].FEDERALPROGRAMNAME, "Some fake name")
+
+    def test_with_missing_program_name(self):
+        """Test for missing program name"""
+        audits = [self.AuditMock("")]
+
+        xform_program_name(audits)
+
+        self.assertEqual(audits[0].FEDERALPROGRAMNAME, settings.GSA_MIGRATION)
+
+
+class TestXformClusterNames(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, cluster_name):
+            self.CLUSTERNAME = cluster_name
+
+    def test_cluster_name_not_other_cluster(self):
+        audits = []
+        audits.append(self.MockAudit("STUDENT FINANCIAL ASSISTANCE"))
+        audits.append(self.MockAudit("RESEARCH AND DEVELOPMENT"))
+        result = xform_cluster_names(audits)
+        for index in range(len(result)):
+            self.assertEqual(result[index].CLUSTERNAME, audits[index].CLUSTERNAME)
+
+    def test_cluster_name_other_cluster(self):
+        audits = []
+        audits.append(self.MockAudit("OTHER CLUSTER"))
+        audits.append(self.MockAudit("OTHER CLUSTER"))
+        result = xform_cluster_names(audits)
+        for audit in result:
+            self.assertEqual(audit.CLUSTERNAME, settings.OTHER_CLUSTER)
+
+
+class TestXformReplaceInvalidDirectAwardFlag(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, direct_flag):
+            self.DIRECT = direct_flag
+
+    def test_replace_invalid_direct_award_flag(self):
+        audits = [self.MockAudit("Y"), self.MockAudit("N"), self.MockAudit("Y")]
+        passthrough_names = [
+            "some name",
+            "some other name",
+            "",
+        ]
+
+        results = xform_replace_invalid_direct_award_flag(audits, passthrough_names)
+        # Expect first audit DIRECT flag to be replaced with default
+        self.assertEqual(results[0], settings.GSA_MIGRATION)
+        # Expect second audit DIRECT flag to remain unchanged
+        self.assertEqual(results[1], "N")
+        # Expect third audit DIRECT flag to remain unchanged
+        self.assertEqual(results[2], "Y")
+
+
+class TestXformSanitizeAdditionalAwardIdentification(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, value):
+            self.AWARDIDENTIFICATION = value
+
+    def test_sanitize_valid(self):
+        audits = [self.MockAudit('=""12345"'), self.MockAudit("text")]
+        identifications = ['=""12345"', "text"]
+        expected = ["12345", "text"]
+        result = xform_sanitize_additional_award_identification(audits, identifications)
+        self.assertEqual(result, expected)
+
+    def test_empty_and_none_identifications(self):
+        audits = [self.MockAudit(""), self.MockAudit(None), self.MockAudit('=""12345"')]
+        identifications = ["", None, '=""12345"']
+        expected = ["", None, "12345"]
+        result = xform_sanitize_additional_award_identification(audits, identifications)
+        self.assertEqual(result, expected)

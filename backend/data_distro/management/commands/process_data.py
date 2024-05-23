@@ -2,6 +2,7 @@
 Functions that the public data loader uses to process and transform data.
 These functions look at one row of data at a time and save results.
 """
+
 import re
 import traceback
 from dateutil import parser  # type: ignore

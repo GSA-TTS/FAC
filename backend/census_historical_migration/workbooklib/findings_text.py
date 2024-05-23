@@ -1,6 +1,11 @@
 from django.conf import settings
+
+from ..transforms.xform_string_to_string import (
+    string_to_string,
+)
 from ..workbooklib.findings import get_findings
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
+from ..transforms.xform_uppercase_y_or_n import uppercase_y_or_n
 from ..workbooklib.excel_creation_utils import (
     get_reference_numbers_from_findings,
     get_reference_numbers_from_text_records,
@@ -29,7 +34,11 @@ mappings = [
     ),
     SheetFieldMap("text_of_finding", "TEXT", "finding_text", None, str),
     SheetFieldMap(
-        "contains_chart_or_table", "CHARTSTABLES", WorkbookFieldInDissem, None, str
+        "contains_chart_or_table",
+        "CHARTSTABLES",
+        WorkbookFieldInDissem,
+        None,
+        uppercase_y_or_n,
     ),
 ]
 
@@ -63,6 +72,17 @@ def xform_add_placeholder_for_missing_references(findings, findings_texts):
     return findings_texts
 
 
+def xform_add_placeholder_for_missing_text_of_finding(findings_texts):
+    """
+    Add placeholder text for missing findings_text.
+    """
+    for findings_text in findings_texts:
+        if string_to_string(findings_text.FINDINGREFNUMS) and not string_to_string(
+            findings_text.TEXT
+        ):
+            findings_text.TEXT = settings.GSA_MIGRATION
+
+
 def generate_findings_text(audit_header, outfile):
     """
     Generates a findings text workbook for a given audit header.
@@ -79,6 +99,7 @@ def generate_findings_text(audit_header, outfile):
     findings_texts = xform_add_placeholder_for_missing_references(
         findings, findings_texts
     )
+    xform_add_placeholder_for_missing_text_of_finding(findings_texts)
     xform_sanitize_for_excel(findings_texts)
     map_simple_columns(wb, mappings, findings_texts)
 

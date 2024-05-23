@@ -4,6 +4,7 @@ Example:
 {{ data.'Notes to SEFA' }} does not work.
 Instead, {{ data|getkey:"Notes to SEFA" }}
 """
+
 from django import template
 
 register = template.Library()

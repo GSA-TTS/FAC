@@ -132,12 +132,14 @@ def _get_accounting_policies(dbkey, year):
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=1 is the description of significant accounting policies.
     """Get the accounting policies for a given dbkey and audit year."""
+
     try:
         note = Notes.objects.get(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="1")
         content = string_to_string(note.CONTENT)
     except Notes.DoesNotExist:
         logger.info(f"No accounting policies found for dbkey: {dbkey}")
         content = ""
+
     return content
 
 
@@ -146,6 +148,7 @@ def _get_minimis_cost_rate(dbkey, year):
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=2 is the De Minimis cost rate.
+
     try:
         note = Notes.objects.get(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="2")
         rate = string_to_string(note.CONTENT)
@@ -167,26 +170,106 @@ def _get_notes(dbkey, year):
     return sort_by_field(results, "SEQ_NUMBER")
 
 
-def xform_missing_notes_records(audit_header, policies_content, rate_content):
-    """Transforms missing notes records for 2016, 2017, and 2018 audits."""
-    if string_to_string(audit_header.AUDITYEAR) in ["2018", "2017", "2016"] and not (
-        policies_content or rate_content
-    ):
-        policies_content = settings.GSA_MIGRATION
-        rate_content = settings.GSA_MIGRATION
+def xform_missing_notes_records_v2(audit_header, policies_content, rate_content):
+    """Transforms missing notes records for 2022, 2021, 2020, 2019, 2016, 2017 and 2018 audits.
+    Note:
+    This function replaces xform_missing_notes_records function.
+    This function covers all years 2016 through 2022.
+    This function tracks census data for policies_content and rate_content."""
+
+    if string_to_string(audit_header.AUDITYEAR) in [
+        "2022",
+        "2021",
+        "2020",
+        "2019",
+        "2018",
+        "2017",
+        "2016",
+    ] and not (policies_content or rate_content):
         track_data_transformation(
             policies_content,
             settings.GSA_MIGRATION,
-            "xform_missing_notes_records",
+            "xform_missing_notes_records_v2",
             "accounting_policies",
         )
+        policies_content = settings.GSA_MIGRATION
         track_data_transformation(
             rate_content,
             settings.GSA_MIGRATION,
-            "xform_missing_notes_records",
+            "xform_missing_notes_records_v2",
             "rate_explained",
         )
+        rate_content = settings.GSA_MIGRATION
     return policies_content, rate_content
+
+
+def xform_missing_note_title_and_content(notes):
+    """Transforms missing note title and note content."""
+    for note in notes:
+        if string_to_string(note.TITLE) == "" and string_to_string(note.CONTENT) != "":
+            track_data_transformation(
+                note.TITLE,
+                settings.GSA_MIGRATION,
+                "xform_missing_note_title_and_content",
+                "note_title",
+            )
+            note.TITLE = settings.GSA_MIGRATION
+
+        if string_to_string(note.CONTENT) == "" and string_to_string(note.TITLE) != "":
+            track_data_transformation(
+                note.CONTENT,
+                settings.GSA_MIGRATION,
+                "xform_missing_note_title_and_content",
+                "content",
+            )
+            note.CONTENT = settings.GSA_MIGRATION
+
+    return notes
+
+
+def xform_rate_content(rate_content):
+    """Transform empty rate_content"""
+
+    if rate_content == "":
+        track_data_transformation(
+            rate_content,
+            settings.GSA_MIGRATION,
+            "xform_rate_content",
+            "content",
+        )
+        rate_content = settings.GSA_MIGRATION
+    return rate_content
+
+
+def xform_policies_content(policies_content):
+    """Transform empty policies_content"""
+
+    if policies_content == "":
+        track_data_transformation(
+            policies_content,
+            settings.GSA_MIGRATION,
+            "xform_policies_content",
+            "content",
+        )
+        policies_content = settings.GSA_MIGRATION
+
+    return policies_content
+
+
+def xform_sanitize_policies_content(policies_content):
+    """Transformation to Remove leading special characters in policies_content"""
+
+    xformed_policies_content = policies_content.lstrip("=")
+    if xformed_policies_content != policies_content:
+        track_data_transformation(
+            policies_content,
+            xformed_policies_content,
+            "xform_sanitize_policies_content",
+            "content",
+        )
+        policies_content = xformed_policies_content
+
+    return policies_content
 
 
 def generate_notes_to_sefa(audit_header, outfile):
@@ -201,6 +284,7 @@ def generate_notes_to_sefa(audit_header, outfile):
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     notes = _get_notes(audit_header.DBKEY, audit_header.AUDITYEAR)
+    notes = xform_missing_note_title_and_content(notes)
     rate_content, index = _get_minimis_cost_rate(
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
@@ -208,14 +292,24 @@ def generate_notes_to_sefa(audit_header, outfile):
         audit_header.DBKEY, audit_header.AUDITYEAR
     )
     is_minimis_rate_used = xform_is_minimis_rate_used(rate_content, index)
-    policies_content, rate_content = xform_missing_notes_records(
+    policies_content, rate_content = xform_missing_notes_records_v2(
         audit_header, policies_content, rate_content
     )
+
+    rate_content = xform_rate_content(rate_content)
+    policies_content = xform_policies_content(policies_content)
+    policies_content = xform_sanitize_policies_content(policies_content)
+
     set_range(wb, "accounting_policies", [policies_content])
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
     set_range(wb, "rate_explained", [rate_content])
 
-    contains_chart_or_tables = [settings.GSA_MIGRATION] * len(notes)
+    contains_chart_or_tables = []
+    for note in notes:
+        if string_to_string(note.TITLE) == "" and string_to_string(note.CONTENT) == "":
+            contains_chart_or_tables.append("")
+        else:
+            contains_chart_or_tables.append(settings.GSA_MIGRATION)
 
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)

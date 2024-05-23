@@ -1,6 +1,6 @@
 boto3
 cfenv
-cryptography>=42.0.0
+cryptography>=42.0.5
 django-cors-headers
 django-csp
 django-dbbackup
