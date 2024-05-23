@@ -37,6 +37,14 @@ import re
 
 logger = logging.getLogger(__name__)
 
+# Transformation Method Change Recording
+# For the purpose of recording changes, the transformation methods (i.e., xform_***)
+# below track all records related to the federal_awards section that undergoes transformation and
+# log these changes in a temporary array called `change_records`.
+# However, we only save this data into the InspectionRecord table if at least one of the records has been
+# modified by the transformation. If no records related to the given section
+# were modified, then we do not save `change_records` into the InspectionRecord.
+
 
 mappings = [
     SheetFieldMap(
@@ -69,10 +77,7 @@ mappings = [
     SheetFieldMap(
         "loan_balance_at_audit_period_end", "LOANBALANCE", "loan_balance", None, str
     ),
-    SheetFieldMap("is_direct", "DIRECT", WorkbookFieldInDissem, None, uppercase_y_or_n),
-    SheetFieldMap(
-        "is_passed", "PASSTHROUGHAWARD", "is_passthrough_award", None, uppercase_y_or_n
-    ),
+    SheetFieldMap("is_passed", "PASSTHROUGHAWARD", "is_passthrough_award", None, str),
     SheetFieldMap(
         "subrecipient_amount",
         "PASSTHROUGHAMOUNT",
@@ -99,20 +104,21 @@ def xform_missing_major_program(audits):
     for audit in audits:
         major_program = string_to_string(audit.MAJORPROGRAM)
         if not major_program:
-            new_value = "Y" if string_to_string(audit.TYPEREPORT_MP) else "N"
-
-            track_transformations(
-                "MAJORPROGRAM",
-                audit.MAJORPROGRAM,
-                "is_major",
-                new_value,
-                ["xform_missing_major_program"],
-                change_records,
-            )
-
+            major_program = "Y" if string_to_string(audit.TYPEREPORT_MP) else "N"
             is_empty_major_program_found = True
-            audit.MAJORPROGRAM = new_value
 
+        track_transformations(
+            "MAJORPROGRAM",
+            audit.MAJORPROGRAM,
+            "is_major",
+            major_program,
+            ["xform_missing_major_program"],
+            change_records,
+        )
+
+        audit.MAJORPROGRAM = major_program
+
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_major_program_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -147,7 +153,7 @@ def xform_missing_amount_expended(audits):
             change_records,
         )
         audit.AMOUNT = str(amount)
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_amount_expended_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -189,7 +195,7 @@ def xform_missing_program_total(audits):
             change_records,
         )
         audit.PROGRAMTOTAL = str(program_total)
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_program_total_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -238,38 +244,38 @@ def xform_missing_cluster_total(
             change_records,
         )
         audit.CLUSTERTOTAL = str(cluster_total)
-
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_cluster_total_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
 
 def xform_is_passthrough_award(audits):
     """
-    Extrapolates missing PASSTHROUGHAWARD using PASSTHROUGHAMOUNT
+    Replaces missing PASSTHROUGHAWARD with GSA_MIGRATION.
     """
     change_records = []
-    is_empty_passthrough_found = False
+    is_empty_award_found = False
 
     for audit in audits:
-        if not string_to_string(audit.PASSTHROUGHAWARD):
-            is_empty_passthrough_found = True
+        award = string_to_string(audit.PASSTHROUGHAWARD)
 
-            amount = string_to_string(audit.PASSTHROUGHAMOUNT)
-            if amount and amount != "0":
-                audit.PASSTHROUGHAWARD = "Y"
-            else:
-                audit.PASSTHROUGHAWARD = "N"
+        if not award:
+            is_empty_award_found = True
+            award = settings.GSA_MIGRATION
 
-            track_transformations(
-                "PASSTHROUGHAWARD",
-                "",
-                "is_passthrough_award",
-                audit.PASSTHROUGHAWARD,
-                "xform_is_passthrough_award",
-                change_records,
-            )
+        track_transformations(
+            "PASSTHROUGHAWARD",
+            audit.PASSTHROUGHAWARD,
+            "is_passthrough_award",
+            award,
+            "xform_is_passthrough_award",
+            change_records,
+        )
 
-    if change_records and is_empty_passthrough_found:
+        audit.PASSTHROUGHAWARD = award
+
+    # See Transformation Method Change Recording at the top of this file.
+    if change_records and is_empty_award_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
 
@@ -323,18 +329,21 @@ def xform_program_name(audits):
     for audit in audits:
         program_name = string_to_string(audit.FEDERALPROGRAMNAME)
         if not program_name:
-            track_transformations(
-                "FEDERALPROGRAMNAME",
-                audit.FEDERALPROGRAMNAME,
-                "federal_program_name",
-                settings.GSA_MIGRATION,
-                ["xform_program_name"],
-                change_records,
-            )
-
             is_empty_program_name_found = True
-            audit.FEDERALPROGRAMNAME = settings.GSA_MIGRATION
+            program_name = settings.GSA_MIGRATION
 
+        track_transformations(
+            "FEDERALPROGRAMNAME",
+            audit.FEDERALPROGRAMNAME,
+            "federal_program_name",
+            program_name,
+            ["xform_program_name"],
+            change_records,
+        )
+
+        audit.FEDERALPROGRAMNAME = program_name
+
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_program_name_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
@@ -437,10 +446,8 @@ def _get_passthroughs(audits):
 
 def xform_match_number_passthrough_names_ids(names, ids):
     """
-    Matches the number of passthrough names and IDs.
-    Iterates over a list of passthrough names and IDs.
-    If the number of passthrough names is greater than the number of passthrough IDs,
-    it fills in the missing passthrough IDs with `NA`.
+    Ensures that the number of passthrough IDs and the number of passthrough names match.
+    If there are more names than IDs (or more IDs than names), fills in the missing IDs (respectively, missing names) with a placeholder.
     """
     # Transformation to be documented.
     for idx, (name, id) in enumerate(zip(names, ids)):
@@ -455,6 +462,19 @@ def xform_match_number_passthrough_names_ids(names, ids):
             else:
                 passthrough_ids.extend(patch)
                 ids[idx] = "|".join(passthrough_ids)
+        elif length_difference < 0:
+            patch = [settings.GSA_MIGRATION for _ in range(-length_difference)]
+            if name == "":
+                patch.append(settings.GSA_MIGRATION)
+                names[idx] = "|".join(patch)
+            else:
+                passthrough_names.extend(patch)
+                names[idx] = "|".join(passthrough_names)
+        elif name and not id:
+            ids[idx] = settings.GSA_MIGRATION
+
+        elif id and not name:
+            names[idx] = settings.GSA_MIGRATION
 
     return names, ids
 
@@ -481,6 +501,41 @@ def xform_populate_default_passthrough_names_ids(audits):
         if direct == "N" and id == "":
             passthrough_ids[index] = settings.GSA_MIGRATION
     return (passthrough_names, passthrough_ids)
+
+
+def xform_replace_invalid_direct_award_flag(audits, passthrough_names):
+    """Replaces invalid DIRECT award flags with the default value settings.GSA_MIGRATION."""
+    is_directs = []
+    change_records = []
+    is_invalid_direct_flag_found = False
+    for audit, name in zip(audits, passthrough_names):
+        is_direct = string_to_string(audit.DIRECT)
+        if is_direct == "Y" and name:
+            is_invalid_direct_flag_found = True
+            track_transformations(
+                "DIRECT",
+                audit.DIRECT,
+                "is_direct",
+                settings.GSA_MIGRATION,
+                ["xform_replace_invalid_direct_award_flag"],
+                change_records,
+            )
+            is_directs.append(settings.GSA_MIGRATION)
+        else:
+            track_transformations(
+                "DIRECT",
+                is_direct,
+                "is_direct",
+                is_direct,
+                ["xform_replace_invalid_direct_award_flag"],
+                change_records,
+            )
+            is_directs.append(is_direct)
+    # See Transformation Method Change Recording at the top of this file.
+    if change_records and is_invalid_direct_flag_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+    return is_directs
 
 
 def xform_populate_default_loan_balance(audits):
@@ -510,6 +565,39 @@ def xform_populate_default_loan_balance(audits):
                 loans_at_end.append("")  # transformation to be documented
 
     return loans_at_end
+
+
+def xform_sanitize_additional_award_identification(audits, identifications):
+    """Sanitize the input to ensure it does not start with ="" and end with " which might be interpreted as a formula in Excel."""
+
+    change_records = []
+    new_identifications = []
+    has_modified_identification = False
+    for audit, identification in zip(audits, identifications):
+        if (
+            identification
+            and identification.startswith('=""')
+            and identification.endswith('"')
+        ):
+            new_identification = identification[3:-1]
+            has_modified_identification = True
+        else:
+            new_identification = identification
+        new_identifications.append(new_identification)
+
+        track_transformations(
+            "AWARDIDENTIFICATION",
+            audit.AWARDIDENTIFICATION,
+            "additional_award_identification",
+            new_identification,
+            ["xform_sanitize_additional_award_identification"],
+            change_records,
+        )
+    # See Transformation Method Change Recording at the top of this file.
+    if change_records and has_modified_identification:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+    return new_identifications
 
 
 def xform_populate_default_award_identification_values(audits):
@@ -545,7 +633,13 @@ def xform_populate_default_passthrough_amount(audits):
     for audit in audits:
         passthrough_award = string_to_string(audit.PASSTHROUGHAWARD).upper()
         amount = string_to_string(audit.PASSTHROUGHAMOUNT)
-        if passthrough_award == "Y":
+
+        if passthrough_award == settings.GSA_MIGRATION:
+            if not amount or amount == "0":
+                passthrough_amounts.append("")
+            else:
+                passthrough_amounts.append(amount)
+        elif passthrough_award == "Y":
             if amount:
                 passthrough_amounts.append(amount)
             else:
@@ -563,25 +657,26 @@ def xform_populate_default_passthrough_amount(audits):
 
 def xform_cluster_names(audits):
     """
-    If 'OTHER CLUSTER' is present in the clustername,
-    replace audit.CLUSTERNAME with settings.OTHER_CLUSTER and track transformation.
+    Replaces "OTHER CLUSTER" with the settings.OTHER_CLUSTER value.
     """
+
     change_records = []
     is_other_cluster_found = False
     for audit in audits:
         cluster_name = string_to_string(audit.CLUSTERNAME)
         if cluster_name and cluster_name.upper() == "OTHER CLUSTER":
             is_other_cluster_found = True
-            track_transformations(
-                "CLUSTERNAME",
-                audit.CLUSTERNAME,
-                "cluster_name",
-                settings.OTHER_CLUSTER,
-                ["xform_cluster_names"],
-                change_records,
-            )
-            audit.CLUSTERNAME = settings.OTHER_CLUSTER
-
+            cluster_name = settings.OTHER_CLUSTER
+        track_transformations(
+            "CLUSTERNAME",
+            audit.CLUSTERNAME,
+            "cluster_name",
+            cluster_name,
+            ["xform_cluster_names"],
+            change_records,
+        )
+        audit.CLUSTERNAME = cluster_name
+    # See Transformation Method Change Recording at the top of this file.
     if change_records and is_other_cluster_found:
         InspectionRecord.append_federal_awards_changes(change_records)
     return audits
@@ -650,6 +745,9 @@ def generate_federal_awards(audit_header, outfile):
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
+    is_directs = xform_replace_invalid_direct_award_flag(audits, passthrough_names)
+    set_range(wb, "is_direct", is_directs)
+
     # The award numbers!
     set_range(
         wb,
@@ -665,10 +763,13 @@ def generate_federal_awards(audit_header, outfile):
     additional_award_identifications = (
         xform_populate_default_award_identification_values(audits)
     )
+    updated_awward_identifications = xform_sanitize_additional_award_identification(
+        audits, additional_award_identifications
+    )
     set_range(
         wb,
         "additional_award_identification",
-        additional_award_identifications,
+        updated_awward_identifications,
     )
 
     # loan balance at audit period end

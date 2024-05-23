@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 # `GSA_MIGRATION` is a default value assigned to any required fields
-# that are missing, ensuring validation during the data migration process.
+# that are missing or invalid, ensuring validation during the data migration process.
 # See Ticket https://github.com/GSA-TTS/FAC/issues/2912.
 # This function is to ensure the `GSA_MIGRATION` keyword is only used
 # in the context of data migration.
@@ -26,13 +26,19 @@ def check_for_gsa_migration_keyword(ir):
         "state_cluster_name",
         "other_cluster_name",
         "cluster_name",
+        "is_direct",
         "loan_balance_at_audit_period_end",
         "passthrough_name",
         "passthrough_identifying_number",
         "contains_chart_or_table",
         "is_minimis_rate_used",
         "compliance_requirement",
+        "secondary_auditor_address_zipcode",
+        "secondary_auditor_name",
         "secondary_auditor_address_state",
+        "is_passed",
+        "accounting_policies",
+        "rate_explained",
     ]
 
     for range_name in range_names:

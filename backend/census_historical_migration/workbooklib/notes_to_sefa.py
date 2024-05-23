@@ -132,12 +132,14 @@ def _get_accounting_policies(dbkey, year):
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=1 is the description of significant accounting policies.
     """Get the accounting policies for a given dbkey and audit year."""
+
     try:
         note = Notes.objects.get(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="1")
         content = string_to_string(note.CONTENT)
     except Notes.DoesNotExist:
         logger.info(f"No accounting policies found for dbkey: {dbkey}")
         content = ""
+
     return content
 
 
@@ -146,6 +148,7 @@ def _get_minimis_cost_rate(dbkey, year):
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=2 is the De Minimis cost rate.
+
     try:
         note = Notes.objects.get(DBKEY=dbkey, AUDITYEAR=year, TYPE_ID="2")
         rate = string_to_string(note.CONTENT)
@@ -224,6 +227,51 @@ def xform_missing_note_title_and_content(notes):
     return notes
 
 
+def xform_rate_content(rate_content):
+    """Transform empty rate_content"""
+
+    if rate_content == "":
+        track_data_transformation(
+            rate_content,
+            settings.GSA_MIGRATION,
+            "xform_rate_content",
+            "content",
+        )
+        rate_content = settings.GSA_MIGRATION
+    return rate_content
+
+
+def xform_policies_content(policies_content):
+    """Transform empty policies_content"""
+
+    if policies_content == "":
+        track_data_transformation(
+            policies_content,
+            settings.GSA_MIGRATION,
+            "xform_policies_content",
+            "content",
+        )
+        policies_content = settings.GSA_MIGRATION
+
+    return policies_content
+
+
+def xform_sanitize_policies_content(policies_content):
+    """Transformation to Remove leading special characters in policies_content"""
+
+    xformed_policies_content = policies_content.lstrip("=")
+    if xformed_policies_content != policies_content:
+        track_data_transformation(
+            policies_content,
+            xformed_policies_content,
+            "xform_sanitize_policies_content",
+            "content",
+        )
+        policies_content = xformed_policies_content
+
+    return policies_content
+
+
 def generate_notes_to_sefa(audit_header, outfile):
     """
     Generates notes to SEFA workbook for a given audit header.
@@ -247,6 +295,11 @@ def generate_notes_to_sefa(audit_header, outfile):
     policies_content, rate_content = xform_missing_notes_records_v2(
         audit_header, policies_content, rate_content
     )
+
+    rate_content = xform_rate_content(rate_content)
+    policies_content = xform_policies_content(policies_content)
+    policies_content = xform_sanitize_policies_content(policies_content)
+
     set_range(wb, "accounting_policies", [policies_content])
     set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
     set_range(wb, "rate_explained", [rate_content])
