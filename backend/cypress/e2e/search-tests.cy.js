@@ -55,7 +55,6 @@ describe('Test Basic Search Fields', () => {
     search.elements.fyEndMonth().select(fyEndMonthValue).should('have.value', fyEndMonthValue);
   });
 
-
   it('Tests Entity Type Field', () => {
     const entityValue = searchData.entityType;
     search.elements.entityTypeAccordionBtn().contains('Entity type').as('accordionButton').click();
