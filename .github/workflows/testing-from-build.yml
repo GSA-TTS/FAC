@@ -78,10 +78,8 @@ jobs:
   #       run: |
   #         touch .env
   #         docker compose -f docker-compose.yml up -d
-  #
-  #     - name: Run Lighthouse CI and pa11y
+  #     - name: Run A11y tests
   #       working-directory: ./backend
   #       run: |
   #         sudo npm ci
-  #         npm run test:a11y:lighthouse
-  #         npm run test:a11y:pa11y
+  #         npx cypress run --spec "cypress/e2e/accessibility.cy.js"

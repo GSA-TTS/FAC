@@ -13,7 +13,7 @@ from audit.fixtures.single_audit_checklist import (
     load_single_audit_checklists,
     load_single_audit_checklists_for_email_address,
 )
-
+from audit.fixtures.dissemination import load_dissemination
 from users.fixtures import load_users
 
 logger = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ class Command(BaseCommand):
         if not options.get("email_addresses"):
             load_users()
             load_single_audit_checklists()
+            load_dissemination()
             logger.info("All fixtures loaded.")
         else:
             # We assume each arg is an email address:

@@ -17,8 +17,7 @@
     "fix:stylelint": "npx stylelint --fix './static/scss'",
     "check-all": "run-p check:*",
     "fix-all": "run-p fix:*",
-    "test:a11y:pa11y": "npx pa11y-ci -c ../.pa11yci",
-    "test:a11y:lighthouse": "npx lhci autorun --config='../lighthouserc.js'",
+    "test:a11y:cypress": "npx cypress run --spec 'cypress/e2e/accessibility.cy.js'",
     "test:e2e:ci": "npx cypress run"
   },
   "author": "",
@@ -26,6 +25,7 @@
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.2.5",
     "cypress": "^13.8.1",
+    "cypress-axe": "^1.5.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-otp": "^1.0.3",
     "eslint": "8.57",

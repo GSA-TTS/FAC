@@ -6,7 +6,7 @@
             <form class="tablet:grid-col-8" id="cross-validation" method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
-                    <legend class="usa-legend usa-legend--large" id="federal-awards">Pre-submission validation</legend>
+                    <h1 class="usa-legend usa-legend--large" id="federal-awards">Pre-submission validation</h1>
                     <p class="margin-y-3">
                         Check your workbooks to confirm you entered your data correctly. This tool also cross-validates the workbooks against each other.
                     </p>
@@ -19,8 +19,7 @@
                     <div class="margin-top-6">
                         <button class="usa-button" id="begin-validation">Begin Validation</button>
                         <button class="usa-button" id="proceed-to-certification" disabled>Proceed to certification</button>
-                        <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-cross-validation-link" href="{% url 'audit:SubmissionProgress' report_id %}"
-                            aria-controls="upload-cancel">Cancel</a>
+                        <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-cross-validation-link" href="{% url 'audit:SubmissionProgress' report_id %}">Cancel</a>
                     </div>
                 </fieldset>
             </form>
