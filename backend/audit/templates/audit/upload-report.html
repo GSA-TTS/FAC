@@ -13,16 +13,16 @@
                     <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>
                 {% endif %}
             </div>
-            <ol class="usa-process-list">
-                <form id="upload-report__form"
-                      id_test="upload-report__form"
-                      action="{% url 'audit:UploadReport' report_id %}"
-                      enctype='multipart/form-data'
-                      method="post">
-                    {% csrf_token %}
-                    <fieldset class="usa-fieldset">
+            <form id="upload-report__form"
+                    id_test="upload-report__form"
+                    action="{% url 'audit:UploadReport' report_id %}"
+                    enctype='multipart/form-data'
+                    method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <ol class="usa-process-list">
                         <li class="usa-process-list__item">
-                            <h4 class="usa-process-list__heading">Formatting requirements:</h4>
+                            <h2 class="usa-process-list__heading">Formatting requirements:</h2>
                             <ul>
                                 <li>Less than 30MB</li>
                                 <li>Unlocked with no password requirements</li>
@@ -32,13 +32,13 @@
                             </ul>
                         </li>
                         <li class="usa-process-list__item">
-                            <h4 class="usa-process-list__heading">Remove all Personally Identifiable Information (PII)</h4>
+                            <h2 class="usa-process-list__heading">Remove all Personally Identifiable Information (PII)</h2>
                             <p>
                                 PII includes but is not limited to: Social Security Numbers, account numbers, vehicle identification numbers, copies of cancelled checks, student names, dates of birth, personal addresses or personal phone numbers.
                             </p>
                         </li>
                         <li class="usa-process-list__item">
-                            <h4 class="usa-process-list__heading">Component page number</h4>
+                            <h2 class="usa-process-list__heading">Component page number</h2>
                             <p>
                                 Each required component on the checklist must have a numeric page number. Enter the starting PDF page number for each of the components listed below. <abbr title="required" class="usa-hint usa-hint--required">*</abbr> indicates a required field.
                             </p>
@@ -56,7 +56,7 @@
                                         {% endif %}
                                         <label class="margin-top-2 text-bold tablet:grid-col-2">Page #:</label>
                                         <input class="usa-input usa-input--medium tablet:grid-col-10"
-                                               id="{{ x.id }}"
+                                               id="upload-report__page-number-{{ forloop.counter }}"
                                                id_test="test-{{ x.id }}"
                                                name="{{ x.id }}"
                                                min="1"
@@ -70,7 +70,7 @@
                             </div>
                         </li>
                         <li class="usa-process-list__item">
-                            <h4 class="usa-process-list__heading">{% if already_submitted %}Re-upload{% else %}Upload{% endif %} your PDF</h4>
+                            <h2 class="usa-process-list__heading">{% if already_submitted %}Re-upload{% else %}Upload{% endif %} your PDF</h2>
                             <p>
                                 Select a compliant PDF to upload. <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </p>
@@ -84,7 +84,8 @@
                                    type="file" />
                             <span class="usa-error-message tablet:grid-col-12 margin-top-1">{{ form.errors.upload_report | striptags }}</span>
                         </li>
-                    </fieldset>
+                    </ol>
+                </fieldset>
                 {% if already_submitted %}
                     <p class="text-green" id="already-submitted">
                         A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
@@ -96,10 +97,8 @@
                 </div>
 
                 <button class="usa-button margin-bottom-8 margin-top-5" id="continue">{% if already_submitted %}Re-upload{% else %}Upload{% endif %} Single Audit Package</button>
-                <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
-                    aria-controls="upload-cancel">Cancel</a>
-                </form>
-            </ol>
+                <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}">Cancel</a>
+            </form>
         </div>
     </div>
     {% include "audit-metadata.html" %}
