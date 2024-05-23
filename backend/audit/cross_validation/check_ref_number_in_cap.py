@@ -35,15 +35,11 @@ def check_ref_number_in_cap(sac_dict, *_args, **_kwargs):
     in_use_references = set()
     errors = []
 
-    logger.info(f"data_source = {data_source}")
-    temp_data = InvalidRecord.fields["validations_to_skip"]
-    logger.info(f"InvalidRecord.fields[validations_to_skip] = {temp_data}")
+    skip_validation_function = InvalidRecord.fields["validations_to_skip"]
     if (
         data_source == settings.CENSUS_DATA_SOURCE
-        and "check_ref_number_in_cap"
-        in InvalidRecord.fields["validations_to_skip"]
+        and skip_validation_function == ["check_ref_number_in_cap"]
     ):
-        logger.info(f"Skip validation, errors = {errors}")
         # Skip this validation if it is a historical audit report with non-matching reference numbers
         return errors
 
