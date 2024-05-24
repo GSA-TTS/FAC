@@ -67,7 +67,7 @@ class TestTrackInvalidRecords(SimpleTestCase):
         )
         self.assertEqual(
             mock_invalid_audit_record_instance.secondary_auditor,
-            [["Secondary auditor record"]]
+            [["Secondary auditor record"]],
         )
 
         mock_invalid_audit_record_instance.save.assert_called_once()
@@ -116,7 +116,6 @@ class TestTrackInvalidRecords(SimpleTestCase):
             run_datetime=mock_timezone.now.return_value,
         )
 
-        self.assertEqual(mock_invalid_audit_record_instance.note, [["Note record"]])
         self.assertEqual(mock_invalid_audit_record_instance.note, [["Note record"]])
         mock_invalid_audit_record_instance.save.assert_called_once()
         self.assertEqual(InvalidRecord.fields, InvalidRecord.DEFAULT)
