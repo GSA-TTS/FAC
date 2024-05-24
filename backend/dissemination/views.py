@@ -315,7 +315,7 @@ class Search(View):
         total_time_ms = int(math.ceil((time_beginning_render - time_starting_post) * 1000))
         total_time_s = total_time_ms / 1000
         logger.info(
-            f"Total time between post and render {int(math.ceil((time_beginning_render - time_starting_post) * 1000))}ms"
+            f"Total time between post and render {total_time_ms}ms"
         )
         return render(request, "search.html", context | {"total_time_s": total_time_s})
 
