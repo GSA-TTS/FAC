@@ -59,14 +59,7 @@ def xform_add_placeholder_for_missing_references(findings, captexts):
 
     expected_references = get_reference_numbers_from_findings(findings)
     found_references = get_reference_numbers_from_text_records(captexts)
-
-    logger.info(f"expected_references = {expected_references}")
-    logger.info(f"found_references = {found_references}")
-
     missing_references = expected_references - found_references
-
-    logger.info(f"missing_references = {missing_references}")
-
     if missing_references:
         for ref in missing_references:
             captexts.append(
@@ -93,7 +86,7 @@ def xform_add_placeholder_for_missing_action_planned_text(captexts):
 
 
 def track_invalid_records_with_captexts_no_findings(findings, captexts):
-    """ If there are no findings but captexts exist,
+    """If there are no findings but captexts exist,
     track the records as invalid records."""
 
     finding_refnums = get_reference_numbers_from_findings(findings)
@@ -114,9 +107,7 @@ def track_invalid_records_with_captexts_no_findings(findings, captexts):
 
     if invalid_records:
         InvalidRecord.append_invalid_cap_text_records(invalid_records)
-        InvalidRecord.append_validations_to_skip(
-            "check_ref_number_in_cap"
-        )
+        InvalidRecord.append_validations_to_skip("check_ref_number_in_cap")
         InvalidRecord.append_invalid_migration_tag(
             INVALID_MIGRATION_TAGS.EXTRA_FINDING_REFERENCE_NUMBERS_IN_CAPTEXT
         )
