@@ -21,7 +21,6 @@ from ..base_field_maps import (
 from ..workbooklib.templates import sections_to_template_paths
 from ..models import ELECCAPTEXT as CapText
 from audit.fixtures.excel import FORM_SECTIONS
-from collections import defaultdict
 from ..invalid_migration_tags import INVALID_MIGRATION_TAGS
 from ..invalid_record import InvalidRecord
 
