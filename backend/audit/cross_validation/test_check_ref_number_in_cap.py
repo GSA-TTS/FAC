@@ -122,14 +122,14 @@ class CheckRefNumberInCapTests(TestCase):
         )
         self.assertIn({"error": expected_error}, errors)
 
-    def test_extra_references_for_historical_captexts(self):
+    def test_cap_references_no_findings_for_historical_captexts(self):
         """When there are extra references, an error should be raised."""
         duplicated_references = [
             ref
             for ref in [self.reference_1, self.reference_2, self.reference_3]
             for _ in range(generate_random_integer(2, 5))
         ]
-        sac = self._make_sac([self.reference_1], duplicated_references)
+        sac = self._make_sac([], duplicated_references)
 
         sac.data_source = settings.CENSUS_DATA_SOURCE
         InvalidRecord.reset()
