@@ -1,3 +1,8 @@
+from collections import defaultdict
+
+from ..invalid_migration_tags import INVALID_MIGRATION_TAGS
+
+from ..invalid_record import InvalidRecord
 from ..change_record import (
     InspectionRecord,
 )
@@ -10,6 +15,7 @@ from ..workbooklib.excel_creation_utils import (
     set_range,
     set_workbook_uei,
     sort_by_field,
+    track_invalid_records,
     track_transformations,
 )
 from ..base_field_maps import SheetFieldMap
@@ -212,6 +218,47 @@ def get_findings(dbkey, year):
     return sort_by_field(results, "ELECAUDITFINDINGSID")
 
 
+def has_duplicate_ref_numbers(award_refs, findings):
+    """Check if there are duplicate ref numbers for each award."""
+    ref_numbers = defaultdict(set)
+
+    for award_ref, finding in zip(award_refs, findings):
+        ref_number = string_to_string(finding.FINDINGREFNUMS)
+        if ref_number in ref_numbers[award_ref]:
+            return True
+        ref_numbers[award_ref].add(ref_number)
+
+    return False
+
+
+def track_invalid_records_with_repeated_ref_numbers(award_references, findings):
+    """Track invalid records with repeated ref numbers."""
+    has_duplicate_refs = has_duplicate_ref_numbers(award_references, findings)
+    if has_duplicate_refs:
+        invalid_records = []
+        for finding in findings:
+            ref_number = string_to_string(finding.FINDINGREFNUMS)
+            census_data_tuples = [
+                ("FINDINGREFNUMS", finding.FINDINGREFNUMS),
+                ("ELECAUDITSID", finding.ELECAUDITSID),
+            ]
+            track_invalid_records(
+                census_data_tuples,
+                "reference_number",
+                ref_number,
+                invalid_records,
+            )
+
+        if invalid_records:
+            InvalidRecord.append_invalid_finding_records(invalid_records)
+            InvalidRecord.append_validations_to_skip(
+                "check_finding_reference_uniqueness"
+            )
+            InvalidRecord.append_invalid_migration_tag(
+                INVALID_MIGRATION_TAGS.DUPLICATE_FINDING_REFERENCE_NUMBERS
+            )
+
+
 def generate_findings(audit_header, outfile):
     """
     Generates a federal awards audit findings workbook for all findings associated with a given audit header.
@@ -232,7 +279,7 @@ def generate_findings(audit_header, outfile):
     xform_missing_compliance_requirement(findings)
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
-
+    track_invalid_records_with_repeated_ref_numbers(award_references, findings)
     grid = _get_findings_grid(findings)
     # We need a magic "is_valid" column, which is computed in the workbook.
     set_range(wb, "is_valid", grid, conversion_fun=str)
