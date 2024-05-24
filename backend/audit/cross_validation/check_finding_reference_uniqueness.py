@@ -1,3 +1,5 @@
+from django.conf import settings
+from census_historical_migration.invalid_record import InvalidRecord
 from .errors import (
     err_duplicate_finding_reference,
 )
@@ -10,6 +12,7 @@ def check_finding_reference_uniqueness(sac_dict, *_args, **_kwargs):
     """
 
     all_sections = sac_dict.get("sf_sac_sections", {})
+    data_source = sac_dict.get("sf_sac_meta", {}).get("data_source", "")
     findings_uniform_guidance_section = (
         all_sections.get("findings_uniform_guidance") or {}
     )
@@ -20,6 +23,14 @@ def check_finding_reference_uniqueness(sac_dict, *_args, **_kwargs):
     ref_numbers = defaultdict(set)
     duplicate_ref_number = defaultdict(set)
     errors = []
+
+    if (
+        data_source == settings.CENSUS_DATA_SOURCE
+        and "check_finding_reference_uniqueness"
+        in InvalidRecord.fields["validations_to_skip"]
+    ):
+        # Skip this validation if it is an historical audit report with duplicate reference numbers
+        return errors
 
     for finding in findings_uniform_guidance:
         award_ref = finding["program"]["award_reference"]
