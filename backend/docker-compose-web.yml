@@ -28,6 +28,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+      
+  historic-data:
+    image: ghcr.io/gsa-tts/fac-historic-public-csvs/load-historic-public-data:20230912
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
 
   web:
     image: ghcr.io/gsa-tts/fac/web-container:latest
