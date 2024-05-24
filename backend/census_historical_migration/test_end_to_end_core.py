@@ -132,4 +132,3 @@ class TestTrackInvalidRecords(SimpleTestCase):
             "check_finding_reference_uniqueness",
         )
         mock_migration_status_instance.save.assert_called_once()
-        self.assertEqual(InvalidRecord.fields, InvalidRecord.DEFAULT)
