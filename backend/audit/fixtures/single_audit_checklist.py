@@ -119,12 +119,13 @@ def fake_auditee_certification():
     return data_step_1, data_step_2
 
 
-def _create_sac(user, auditee_name):
+def _create_sac(user, auditee_name, submission_status="in_progress"):
     """Create a single example SAC."""
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
         general_information=_fake_general_information(auditee_name),
+        submission_status=submission_status,
     )
 
     Access = apps.get_model("audit.Access")
@@ -133,6 +134,18 @@ def _create_sac(user, auditee_name):
         user=user,
         email=user.email,
         role="editor",
+    )
+    Access.objects.create(
+        sac=sac,
+        user=user,
+        email=user.email,
+        role="certifying_auditor_contact",
+    )
+    Access.objects.create(
+        sac=sac,
+        user=user,
+        email=user.email,
+        role="certifying_auditee_contact",
     )
     logger.info("Created single audit checklist %s", sac)
     return sac
@@ -193,9 +206,10 @@ def _post_create_federal_awards(this_sac, this_user):
 SACS = [
     {"auditee_name": "SAC in progress"},
     {
-        "auditee_name": "Federal awards submitted",
-        "post_create_callable": _post_create_federal_awards,
+        "auditee_name": "SAC ready for certification",
+        "submission_status": "ready_for_certification",
     },
+    {"auditee_name": "SAC fully submitted", "submission_status": "disseminated"},
 ]
 
 
@@ -205,12 +219,13 @@ def _load_single_audit_checklists_for_user(user):
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     for item_info in SACS:
         auditee_name = item_info["auditee_name"]
+        submission_status = item_info.get("submission_status", "in_progress")
         sac = SingleAuditChecklist.objects.filter(
             submitted_by=user, general_information__auditee_name=auditee_name
         ).first()
         if sac is None:
             # need to make this object
-            sac = _create_sac(user, auditee_name)
+            sac = _create_sac(user, auditee_name, submission_status)
 
 
 def load_single_audit_checklists():

@@ -82,7 +82,7 @@
                 </form>
             </div>
             <div class="grid-col audit-search-results">
-                <h2 class="font-sans-2xl">Search single audit reports</h2>
+                <h1 class="font-sans-2xl">Search single audit reports</h1>
                 {% include "search-alert-info.html"%}
                 {% if results|length > 0 %}
                     <div class="margin-y-2 display-flex flex-justify-center">
@@ -270,6 +270,7 @@
     </div>
     <a href="#device-orientation-modal"
        id="orientation-toggle"
+       aria-label="Orientation modal"
        aria-controls="device-orientation-modal"
        data-open-modal></a>
     <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>

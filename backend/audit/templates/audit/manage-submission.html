@@ -5,7 +5,7 @@
         <div>
             {% csrf_token %}
             <div class="grid-col-12 tablet:grid-col-7">
-                <legend class="usa-legend usa-legend--large font-sans-2xl">Manage user roles</legend>
+                <h1 class="usa-legend usa-legend--large font-sans-2xl">Manage user roles</h1>
                 <legend class="usa-legend usa-legend--large text-normal font-sans-xl margin-top-4">
                     {% if auditee_name %}<p class="margin-0 text-bold">{{ auditee_name }}</p>{% endif %}
                     <p class="margin-0 text-semibold">
@@ -67,11 +67,9 @@
             </table>
             <p class="font-sans-xs">(<strong>*</strong>) Indicates user has not logged in to view this submission.</p>
             <a class="usa-button usa-button margin-top-5"
-                href="{{ add_editor_url }}"
-                aria-controls="add-editor">Add editor</a>
+                href="{{ add_editor_url }}">Add editor</a>
             <a class="usa-button usa-button--unstyled margin-left-2"
-                href="{{ progress_url }}"
-                aria-controls="return-to-checklist">Return to checklist</a>
+                href="{{ progress_url }}">Return to checklist</a>
         </div>
     </div>
     {% include "audit-metadata.html" %}

@@ -299,9 +299,7 @@ class TestXformReplaceEmptyAuditeeContactName(SimpleTestCase):
 
 
 class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
-
     class MockAuditHeader:
-
         def __init__(self, UEI):
             self.UEI = UEI
 

@@ -97,13 +97,13 @@ CONTAINER ID   IMAGE                               COMMAND           CREATED    
 90439baa0e2f   ghcr.io/gsa-tts/fac/clamav:latest   "entrypoint.sh"   38 seconds ago   Up 38 seconds   0.0.0.0:9000->9000/tcp, 0.0.0.0:9443->9443/tcp   clamav
 ```
 
-Finally, let us scan a file. For ease of demonstration, we will be scanning the `.pa11yci` file at the root of the FAC repository.
+Finally, let us scan a file. For ease of demonstration, we will be scanning the `.gitignore` file at the root of the FAC repository.
 ```bash
 curl -i -F "file=@filename" http://localhost:9000/scan
 ```
 The scan on the file shows that there contains no virus
 ```bash
-$ curl -i -F "file=@.pa11yci" http://localhost:9000/scan
+$ curl -i -F "file=@.gitignore" http://localhost:9000/scan
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Date: Wed, 14 Jun 2023 18:50:46 GMT

@@ -244,6 +244,7 @@
                         <input id="dollar_threshold"
                                name="dollar_threshold"
                                class="usa-input usa-input--medium tablet:grid-col-2"
+                               aria-label="Dollar threshold input"
                                min="1"
                                pattern="\d+"
                                required
@@ -305,8 +306,7 @@
                 <button class="usa-button margin-top-2 margin-bottom-10"
                         id="continue"
                         name="continue">Save and continue to the next section</button>
-                <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-audit-info-form-link" href="{% url 'audit:SubmissionProgress' report_id %}"
-                    aria-controls="upload-cancel">Cancel</a>
+                <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-audit-info-form-link" href="{% url 'audit:SubmissionProgress' report_id %}">Cancel</a>
             </form>
         </div>
     </div>
