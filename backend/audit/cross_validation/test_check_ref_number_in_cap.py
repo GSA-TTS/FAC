@@ -122,7 +122,7 @@ class CheckRefNumberInCapTests(TestCase):
         )
         self.assertIn({"error": expected_error}, errors)
 
-    def test_cap_references_no_findings_for_historical_captexts(self):
+    def test_more_cap_references_less_findings_for_historical_captexts(self):
         """When there are extra references, update InvalidRecord and do not raise error."""
         duplicated_references = [
             ref
