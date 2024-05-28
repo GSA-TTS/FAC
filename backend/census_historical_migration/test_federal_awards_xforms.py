@@ -12,7 +12,7 @@ from .workbooklib.federal_awards import (
     xform_match_number_passthrough_names_ids,
     xform_missing_amount_expended,
     xform_missing_program_total,
-    xform_missing_cluster_total,
+    xform_missing_cluster_total_v2,
     xform_populate_default_award_identification_values,
     xform_populate_default_loan_balance,
     xform_constructs_cluster_names,
@@ -483,7 +483,7 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         state_cluster_names = ["", "", ""]
         expected_totals = ["250", "150", "250"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
@@ -515,7 +515,7 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         state_cluster_names = ["", "State Cluster A", "", "State Cluster A"]
         expected_totals = ["250", "300", "250", "300"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
@@ -547,7 +547,7 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         other_cluster_names = ["", "Other Cluster A", "", "Other Cluster A"]
         expected_totals = ["250", "300", "250", "300"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
