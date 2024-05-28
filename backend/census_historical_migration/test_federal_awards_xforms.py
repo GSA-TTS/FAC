@@ -5,7 +5,6 @@ from django.test import SimpleTestCase
 from .transforms.xform_string_to_string import (
     string_to_string,
 )
-
 from .exception_utils import DataMigrationError
 from .workbooklib.federal_awards import (
     is_valid_prefix,
@@ -27,6 +26,8 @@ from .workbooklib.federal_awards import (
     xform_cluster_names,
     xform_sanitize_additional_award_identification,
 )
+from census_historical_migration.invalid_migration_tags import INVALID_MIGRATION_TAGS
+from census_historical_migration.invalid_record import InvalidRecord
 
 
 class TestXformConstructsClusterNames(SimpleTestCase):
@@ -553,6 +554,36 @@ class TestXformMissingClusterTotal(SimpleTestCase):
 
         for audit, expected in zip(audits, expected_totals):
             self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+    def test_xform_missing_cluster_total_invalid(self):
+        """Test for incorrect cluster total"""
+        audits = [
+            self.AuditMock("150", "Cluster A", cluster_total="33"),
+        ]
+        cluster_names = ["Cluster A"]
+        other_cluster_names = [""]
+        state_cluster_names = [""]
+        expected_totals = ["33"]
+
+        InvalidRecord.reset()
+        xform_missing_cluster_total_v2(
+            audits, cluster_names, other_cluster_names, state_cluster_names
+        )
+
+        for audit, expected in zip(audits, expected_totals):
+            self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+        self.assertEqual(
+            InvalidRecord.fields["validations_to_skip"],
+            ["cluster_total_is_correct"],
+        )
+        self.assertEqual(
+            InvalidRecord.fields["federal_award"],
+            [[{
+                'census_data': [{'column': 'CLUSTERTOTAL', 'value': 33}],
+                'gsa_fac_data': {'field': 'cluster_total', 'value': 150},
+            }]],
+        )
 
 
 class TestXformMissingAmountExpended(SimpleTestCase):

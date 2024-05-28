@@ -290,7 +290,7 @@ def xform_missing_cluster_total_v2(
 
         if cluster_total != '' and cluster_total != gsa_cluster_total:
             census_data_tuples = [
-                ("CLUSTERTOTAL", audit.CLUSTERTOTAL),
+                ("CLUSTERTOTAL", cluster_total),
             ]
             track_invalid_records(
                 census_data_tuples,
