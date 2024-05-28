@@ -86,7 +86,7 @@ def xform_add_placeholder_for_missing_action_planned_text(captexts):
 
 def track_invalid_records_with_more_captexts_less_findings(findings, captexts):
     """If there are more captexts than findings,
-    track the records as invalid records."""
+    track all the records as invalid records."""
 
     finding_refnums = get_reference_numbers_from_findings(findings)
     captext_refnums = get_reference_numbers_from_text_records(captexts)
@@ -94,7 +94,7 @@ def track_invalid_records_with_more_captexts_less_findings(findings, captexts):
     extra_captexts = captext_refnums.difference(finding_refnums)
     if len(extra_captexts) > 0:
         invalid_records = []
-        for captext_refnum in extra_captexts:
+        for captext_refnum in captext_refnums:
             census_data_tuples = [
                 ("FINDINGREFNUMS", captext_refnum),
             ]
