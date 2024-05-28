@@ -84,14 +84,14 @@ def xform_add_placeholder_for_missing_action_planned_text(captexts):
             captext.TEXT = settings.GSA_MIGRATION
 
 
-def track_invalid_records_with_captexts_no_findings(findings, captexts):
-    """If there are no findings but captexts exist,
+def track_invalid_records_with_more_captexts_less_findings(findings, captexts):
+    """If there are more captexts than findings,
     track the records as invalid records."""
 
     finding_refnums = get_reference_numbers_from_findings(findings)
     captext_refnums = get_reference_numbers_from_text_records(captexts)
     invalid_records = []
-    if captext_refnums and not finding_refnums:
+    if len(set(captext_refnums).difference(set(finding_refnums))) > 0:
         invalid_records = []
         for captext_refnum in captext_refnums:
             census_data_tuples = [
@@ -129,7 +129,9 @@ def generate_corrective_action_plan(audit_header, outfile):
     captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
     findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
 
-    invalid_record = track_invalid_records_with_captexts_no_findings(findings, captexts)
+    invalid_record = track_invalid_records_with_more_captexts_less_findings(
+        findings, captexts
+    )
     if not invalid_record:
         captexts = xform_add_placeholder_for_missing_references(findings, captexts)
 
