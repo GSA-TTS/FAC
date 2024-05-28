@@ -6,6 +6,7 @@ from audit.intakelib.intermediate_representation import (
     get_range_by_name,
 )
 from audit.intakelib.common import get_message, build_cell_error_tuple
+from census_historical_migration.invalid_record import InvalidRecord
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 # DESCRIPTION
 # The sum of the amount_expended for a given cluster should equal the corresponding cluster_total
 # K{0}=IF(G{0}="OTHER CLUSTER NOT LISTED ABOVE",SUMIFS(amount_expended,uniform_other_cluster_name,X{0}),IF(AND(OR(G{0}="N/A",G{0}=""),H{0}=""),0,IF(G{0}="STATE CLUSTER",SUMIFS(amount_expended,uniform_state_cluster_name,W{0}),SUMIFS(amount_expended,cluster_name,G{0}))))
-def cluster_total_is_correct(ir):
+def cluster_total_is_correct(ir, is_data_migration=False):
     uniform_other_cluster_names = get_range_values_by_name(
         ir, "uniform_other_cluster_name"
     )
@@ -26,6 +27,14 @@ def cluster_total_is_correct(ir):
     amounts_expended = get_range_values_by_name(ir, "amount_expended")
 
     errors = []
+
+    if (
+        is_data_migration
+        and "cluster_total_is_correct"
+        in InvalidRecord.fields["validations_to_skip"]
+    ):
+        # Skip this validation if it is an historical audit report with incorrect cluster total
+        return errors
 
     # Validating each cluster_total
     for idx, name in enumerate(cluster_names):

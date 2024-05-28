@@ -171,6 +171,8 @@ def run_all_checks(
     for fun in list_of_checks:
         if fun == verify_auditee_uei_match:
             res = fun(ir, auditee_uei)
+        elif fun == cluster_total_is_correct:
+            res = fun(ir, is_data_migration)
         else:
             res = fun(ir)
         if isinstance(res, list) and all(map(lambda v: isinstance(v, tuple), res)):
