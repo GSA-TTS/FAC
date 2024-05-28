@@ -1,3 +1,5 @@
+from django.conf import settings
+from census_historical_migration.invalid_record import InvalidRecord
 from .errors import (
     err_missing_or_extra_references,
 )
@@ -13,6 +15,7 @@ def check_ref_number_in_findings_text(sac_dict, *_args, **_kwargs):
     """
 
     all_sections = sac_dict.get("sf_sac_sections", {})
+    data_source = sac_dict.get("sf_sac_meta", {}).get("data_source", "")
     findings_uniform_guidance_section = (
         all_sections.get("findings_uniform_guidance") or {}
     )
@@ -25,6 +28,14 @@ def check_ref_number_in_findings_text(sac_dict, *_args, **_kwargs):
     declared_references = set()
     in_use_references = set()
     errors = []
+
+    skip_validation_function = InvalidRecord.fields["validations_to_skip"]
+    if (
+        data_source == settings.CENSUS_DATA_SOURCE
+        and "check_ref_number_in_findings_text" in skip_validation_function
+    ):
+        # Skip this validation if it is a historical audit report with non-matching reference numbers
+        return errors
 
     for finding in findings_uniform_guidance:
         ref_number = finding["findings"]["reference_number"]
