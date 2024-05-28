@@ -32,7 +32,6 @@ from ..change_record import (
     GsaFacRecord,
 )
 
-
 import openpyxl as pyxl
 
 import logging
@@ -288,7 +287,7 @@ def xform_missing_cluster_total_v2(
             amounts_expended=amounts_expended,
         )
 
-        if cluster_total != '' and cluster_total != gsa_cluster_total:
+        if cluster_total != "" and cluster_total != gsa_cluster_total:
             census_data_tuples = [
                 ("CLUSTERTOTAL", cluster_total),
             ]
@@ -317,9 +316,7 @@ def xform_missing_cluster_total_v2(
 
     if invalid_records:
         InvalidRecord.append_invalid_federal_awards_records(invalid_records)
-        InvalidRecord.append_validations_to_skip(
-            "cluster_total_is_correct"
-        )
+        InvalidRecord.append_validations_to_skip("cluster_total_is_correct")
         InvalidRecord.append_invalid_migration_tag(
             INVALID_MIGRATION_TAGS.INCORRECT_CLUSTER_TOTAL,
         )

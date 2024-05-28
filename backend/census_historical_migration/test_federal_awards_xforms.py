@@ -579,10 +579,14 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         )
         self.assertEqual(
             InvalidRecord.fields["federal_award"],
-            [[{
-                'census_data': [{'column': 'CLUSTERTOTAL', 'value': 33}],
-                'gsa_fac_data': {'field': 'cluster_total', 'value': 150},
-            }]],
+            [
+                [
+                    {
+                        "census_data": [{"column": "CLUSTERTOTAL", "value": 33}],
+                        "gsa_fac_data": {"field": "cluster_total", "value": 150},
+                    }
+                ]
+            ],
         )
 
 
