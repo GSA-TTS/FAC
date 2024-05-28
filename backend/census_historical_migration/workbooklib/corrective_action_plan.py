@@ -110,7 +110,6 @@ def track_invalid_records_with_more_captexts_less_findings(findings, captexts):
         InvalidRecord.append_invalid_migration_tag(
             INVALID_MIGRATION_TAGS.EXTRA_FINDING_REFERENCE_NUMBERS_IN_CAPTEXT
         )
-    return invalid_records
 
 
 def generate_corrective_action_plan(audit_header, outfile):
@@ -128,13 +127,8 @@ def generate_corrective_action_plan(audit_header, outfile):
     set_workbook_uei(wb, uei)
     captexts = _get_cap_text(audit_header.DBKEY, audit_header.AUDITYEAR)
     findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
-
-    invalid_record = track_invalid_records_with_more_captexts_less_findings(
-        findings, captexts
-    )
-    if not invalid_record:
-        captexts = xform_add_placeholder_for_missing_references(findings, captexts)
-
+    track_invalid_records_with_more_captexts_less_findings(findings, captexts)
+    captexts = xform_add_placeholder_for_missing_references(findings, captexts)
     xform_add_placeholder_for_missing_action_planned_text(captexts)
     xform_sanitize_for_excel(captexts)
     map_simple_columns(wb, mappings, captexts)
