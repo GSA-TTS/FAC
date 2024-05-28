@@ -91,7 +91,7 @@ def track_invalid_records_with_more_captexts_less_findings(findings, captexts):
     finding_refnums = get_reference_numbers_from_findings(findings)
     captext_refnums = get_reference_numbers_from_text_records(captexts)
     invalid_records = []
-    if len(set(captext_refnums).difference(set(finding_refnums))) > 0:
+    if len(captext_refnums.difference(finding_refnums)) > 0:
         invalid_records = []
         for captext_refnum in captext_refnums:
             census_data_tuples = [
