@@ -90,12 +90,13 @@ def track_invalid_records_with_more_findings_texts_than_findings(
     findings, findings_texts
 ):
     """If there are more findings_texts than findings,
-    track the records as invalid records."""
+    track all the records as invalid records."""
 
     finding_refnums = get_reference_numbers_from_findings(findings)
     findings_text_refnums = get_reference_numbers_from_text_records(findings_texts)
     invalid_records = []
-    if len(findings_text_refnums.difference(finding_refnums)) > 0:
+    extra_findings_texts = findings_text_refnums.difference(finding_refnums)
+    if len(extra_findings_texts) > 0:
         invalid_records = []
         for findings_text_refnum in findings_text_refnums:
             census_data_tuples = [
