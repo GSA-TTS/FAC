@@ -168,29 +168,22 @@ def run_all_checks(
         # We want to make sure no one put in a GSA_MIGRATION keyword.
         check_for_gsa_migration_keyword(ir)
 
-    str_to_checks_lambdas = (
+    checks_with_special_args = (
         {  # Mapping these to prevent over-complexity in the loop below
-            "verify_auditee_uei_match": lambda: verify_auditee_uei_match(
-                ir, auditee_uei
+            verify_auditee_uei_match: lambda: verify_auditee_uei_match(
+                ir,
+                auditee_uei,
             ),
-            "cluster_total_is_correct": lambda: cluster_total_is_correct(
+            cluster_total_is_correct: lambda: cluster_total_is_correct(
                 ir,
                 is_data_migration,
             ),
         }
     )
-    checks_with_special_args = [verify_auditee_uei_match, cluster_total_is_correct]
-    str_to_checks_with_special_args = {
-        "verify_auditee_uei_match": verify_auditee_uei_match,
-        "cluster_total_is_correct": cluster_total_is_correct,
-    }
 
     for fun in list_of_checks:
         if fun in checks_with_special_args:
-            check_str = list(str_to_checks_with_special_args.keys())[
-                list(str_to_checks_with_special_args.values()).index(fun)
-            ]
-            res = str_to_checks_lambdas[check_str]()
+            res = checks_with_special_args[fun]()
         else:
             res = fun(ir)
 
