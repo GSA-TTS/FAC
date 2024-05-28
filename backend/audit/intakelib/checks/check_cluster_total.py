@@ -30,8 +30,7 @@ def cluster_total_is_correct(ir, is_data_migration=False):
 
     if (
         is_data_migration
-        and "cluster_total_is_correct"
-        in InvalidRecord.fields["validations_to_skip"]
+        and "cluster_total_is_correct" in InvalidRecord.fields["validations_to_skip"]
     ):
         # Skip this validation if it is an historical audit report with incorrect cluster total
         return errors

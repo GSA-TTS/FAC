@@ -168,20 +168,30 @@ def run_all_checks(
         # We want to make sure no one put in a GSA_MIGRATION keyword.
         check_for_gsa_migration_keyword(ir)
 
+    checks_with_special_args = (
+        {  # Mapping these to prevent over-complexity in the loop below
+            verify_auditee_uei_match: lambda: verify_auditee_uei_match(ir, auditee_uei),
+            cluster_total_is_correct: lambda: cluster_total_is_correct(
+                ir, is_data_migration
+            ),
+        }
+    )
+
     for fun in list_of_checks:
-        if fun == verify_auditee_uei_match:
-            res = fun(ir, auditee_uei)
-        elif fun == cluster_total_is_correct:
-            res = fun(ir, is_data_migration)
+        if fun in checks_with_special_args:
+            res = checks_with_special_args[fun]
         else:
             res = fun(ir)
+
         if isinstance(res, list) and all(map(lambda v: isinstance(v, tuple), res)):
             errors = errors + res
         elif isinstance(res, tuple):
             errors.append(res)
         else:
             pass
+
     logger.info(f"Found {len(errors)} errors in the IR passes.")
+
     if len(errors) > 0:
         logger.info("Raising a validation error.")
         raise ValidationError(errors)
