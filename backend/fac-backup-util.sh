@@ -7,7 +7,7 @@ s3_name="fac-private-s3"
 backup_s3_name="backups"
 db_name="fac-db"
 backup_db_name="fac-snapshot-db"
-export ENV="${base_environment}"
+export ENV="$base_environment"
 date=$(date +%Y%m%d%H%M)
 mkdir tmp && cd tmp || return
 
