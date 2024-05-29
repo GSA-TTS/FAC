@@ -709,6 +709,8 @@ def track_invalid_federal_program_total(audits, cfda_key_values):
 
         census_data_tuples = [
             ("PROGRAMTOTAL", federal_program_total_values[idx]),
+            ("AMOUNT", amount_expended_values[idx]),
+            ("CFDA", key),
         ]
         track_invalid_records(
             census_data_tuples,
