@@ -150,7 +150,7 @@ secondary_auditors_checks = general_checks + [
 
 skippable_checks = {
     "federal_program_total_is_correct": federal_program_total_is_correct,
-    "cluster_total_is_correct": cluster_total_is_correct
+    "cluster_total_is_correct": cluster_total_is_correct,
 }
 
 
