@@ -212,7 +212,7 @@ def run_check(fun, ir, is_data_migration, auditee_uei):
         and fun_name in InvalidRecord.fields["validations_to_skip"]
     ):
         return None
-    elif fun == verify_auditee_uei_schema:
+    elif fun == verify_auditee_uei_match:
         return fun(ir, auditee_uei)
     else:
         return fun(ir)
