@@ -149,7 +149,8 @@ secondary_auditors_checks = general_checks + [
 ]
 
 skippable_checks = {
-    "federal_program_total_is_correct": federal_program_total_is_correct
+    "federal_program_total_is_correct": federal_program_total_is_correct,
+    "cluster_total_is_correct": cluster_total_is_correct
 }
 
 
@@ -205,18 +206,6 @@ def get_key_by_value(d, target_value):
 
 def run_check(fun, ir, is_data_migration, auditee_uei):
     """Run the validation check if it is not skippable, or if it is skippable, only run if this is not a data migration."""
-    checks_with_special_args = (
-        {  # Mapping these to prevent over-complexity in the loop below
-            verify_auditee_uei_match: lambda: verify_auditee_uei_match(
-                ir,
-                auditee_uei,
-            ),
-            cluster_total_is_correct: lambda: cluster_total_is_correct(
-                ir,
-                is_data_migration,
-            ),
-        }
-    )
 
     fun_name = get_key_by_value(skippable_checks, fun)
     if (
@@ -225,8 +214,8 @@ def run_check(fun, ir, is_data_migration, auditee_uei):
         and fun_name in InvalidRecord.fields["validations_to_skip"]
     ):
         return None
-    elif fun in checks_with_special_args:
-        return checks_with_special_args[fun]()
+    elif fun == verify_auditee_uei_match:
+        return fun(ir, auditee_uei)
     else:
         return fun(ir)
 
