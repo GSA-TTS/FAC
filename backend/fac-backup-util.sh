@@ -3,49 +3,57 @@ set -e
 source tools/util_startup.sh
 base_environment=$1
 run_option=$2
+s3_name="fac-private-s3"
+backup_s3_name="backups"
+db_name="fac-db"
+backup_db_name="fac-snapshot-db"
 export ENV="${base_environment}"
 date=$(date +%Y%m%d%H%M)
 mkdir tmp && cd tmp || return
 
-function GetUtil() {
+GetUtil() {
     local version="v0.1.0"
     curl -x "$https_proxy" -L "https://github.com/GSA-TTS/fac-backup-utility/releases/download/$version/gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz" -O
     tar -xvf gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz && rm gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz
 }
-function InstallAWS() {
+InstallAWS() {
     ./gov.gsa.fac.cgov-util install_aws
 }
-function AWSS3Sync() {
-    ./gov.gsa.fac.cgov-util s3_sync --source_s3 s3://fac-private-s3/ --dest_s3 s3://backups/
+AWSS3Sync() {
+    ./gov.gsa.fac.cgov-util s3_sync --source_s3 s3://"$1"/ --dest_s3 s3://"$2"/
 }
-function RDSToS3Dump() {
-    ./gov.gsa.fac.cgov-util db_to_s3 --db fac-db --s3path s3://backups/"$date"/
+RDSToS3Dump() {
+    ./gov.gsa.fac.cgov-util db_to_s3 --db "$1" --s3path s3://"$2"/"$date"/
 }
-function RDSToRDS() {
-    ./gov.gsa.fac.cgov-util db_to_db --src_db fac-db --dest_db fac-snapshot-db
+RDSToRDS() {
+    ./gov.gsa.fac.cgov-util db_to_db --src_db "$1" --dest_db "$2"
 }
-# S3ToRDSTableRestore() {
-#     ./gov.gsa.fac.cgov-util s3_to_db --db fac-db --s3path s3://backups/"$date"/
-# }
 
 if [ "$run_option" == "deploy_backup" ]; then
     GetUtil
     gonogo "curl_util"
     InstallAWS
     gonogo "install_aws"
-    RDSToS3Dump
+    RDSToS3Dump "$db_name" "$backup_s3_name"
     gonogo "db_to_s3"
-    AWSS3Sync
+    AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
 elif [ "$run_option" == "scheduled_backup" ]; then
     GetUtil
     gonogo "curl_util"
     InstallAWS
     gonogo "install_aws"
-    RDSToS3Dump
+    RDSToS3Dump "$db_name" "$backup_s3_name"
     gonogo "db_to_s3"
-    RDSToRDS
+    RDSToRDS "$db_name" "$backup_db_name"
     gonogo "db_to_db"
-    AWSS3Sync
+    AWSS3Sync "$s3_name" "$backup_s3_name"
+    gonogo "s3_sync"
+elif [ "$run_option" == "media_sync" ]; then
+    GetUtil
+    gonogo "curl_util"
+    InstallAWS
+    gonogo "install_aws"
+    AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
 fi
