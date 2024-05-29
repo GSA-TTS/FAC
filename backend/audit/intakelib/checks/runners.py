@@ -149,8 +149,8 @@ secondary_auditors_checks = general_checks + [
 ]
 
 skippable_checks = {
-    "federal_program_total_is_correct": federal_program_total_is_correct,
     "cluster_total_is_correct": cluster_total_is_correct,
+    "federal_program_total_is_correct": federal_program_total_is_correct,
 }
 
 
@@ -206,7 +206,6 @@ def get_key_by_value(d, target_value):
 
 def run_check(fun, ir, is_data_migration, auditee_uei):
     """Run the validation check if it is not skippable, or if it is skippable, only run if this is not a data migration."""
-
     fun_name = get_key_by_value(skippable_checks, fun)
     if (
         is_data_migration

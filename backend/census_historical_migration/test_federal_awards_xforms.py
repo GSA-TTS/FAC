@@ -3,9 +3,7 @@ from django.conf import settings
 from django.test import SimpleTestCase
 
 from .invalid_migration_tags import INVALID_MIGRATION_TAGS
-
 from .invalid_record import InvalidRecord
-
 from .transforms.xform_string_to_string import (
     string_to_string,
 )
