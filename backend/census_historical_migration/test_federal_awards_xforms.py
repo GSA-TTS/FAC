@@ -31,7 +31,6 @@ from .workbooklib.federal_awards import (
     xform_cluster_names,
     xform_sanitize_additional_award_identification,
 )
-from census_historical_migration.invalid_record import InvalidRecord
 
 
 class TestXformConstructsClusterNames(SimpleTestCase):
