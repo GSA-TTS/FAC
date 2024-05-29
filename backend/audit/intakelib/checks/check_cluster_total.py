@@ -6,7 +6,6 @@ from audit.intakelib.intermediate_representation import (
     get_range_by_name,
 )
 from audit.intakelib.common import get_message, build_cell_error_tuple
-from census_historical_migration.invalid_record import InvalidRecord
 
 logger = logging.getLogger(__name__)
 
