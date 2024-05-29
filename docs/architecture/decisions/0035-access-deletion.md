@@ -84,12 +84,6 @@ We should support this use case by allowing users with the **Audit Editor** role
 
 For the moment, we will not support this use case, but will evaluate how much of a demand there is for removing Certifying Officials without requirement replacement users for their roles.
 
------
-
-> Story 2: As an employee of an organization which has undergone a period of upheaval, who has just discovered that the organization needs to make a submission to the FAC and who believes an in-progress submission exists, I want to be added to that submission as an **Audit Editor** so that I can finish the submission and add/remove others from roles as appropriate
-
-We should not support this use case within the application; doing so would render us susceptible to various forms of social engineering attacks. We do not have any means of verifying the identities of correspondents, nor of verifying any claims they make about their status with respect to any organization or submission. In cases such as this one, we should require the user to start a new submission and acquire any materials they need from their own organization.
-
 ## Decision
 
 We will add a feature granting users with the **Audit Editor** role the ability to remove that role from others.
