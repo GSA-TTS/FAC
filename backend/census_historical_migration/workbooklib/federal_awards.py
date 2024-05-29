@@ -1,4 +1,5 @@
 from audit.intakelib.checks.check_cluster_total import expected_cluster_total
+from ..invalid_migration_tags import INVALID_MIGRATION_TAGS
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_string import string_to_string
@@ -6,10 +7,12 @@ from ..transforms.xform_uppercase_y_or_n import uppercase_y_or_n
 from ..exception_utils import DataMigrationError
 from .excel_creation_utils import (
     get_audits,
+    get_range_values,
     set_workbook_uei,
     map_simple_columns,
     set_range,
     sort_by_field,
+    track_invalid_records,
     track_transformations,
 )
 from ..base_field_maps import (
@@ -28,7 +31,7 @@ from ..change_record import (
     InspectionRecord,
     GsaFacRecord,
 )
-
+from ..invalid_record import InvalidRecord
 import openpyxl as pyxl
 
 import logging
@@ -682,6 +685,48 @@ def xform_cluster_names(audits):
     return audits
 
 
+def track_invalid_federal_program_total(audits, cfda_key_values):
+    """
+    Tracks invalid federal program totals.
+    """
+    federal_program_total_values = get_range_values("PROGRAMTOTAL", audits, None, int)
+    amount_expended_values = get_range_values("AMOUNT", audits, None, int)
+    invalid_records = []
+    amount_expended_values = get_range_values("AMOUNT", audits, None, int)
+    has_invalid_federal_program_total = False
+    # Validating each federal_program_total
+    for idx, key in enumerate(cfda_key_values):
+        # Compute the sum for current cfda_key
+        computed_sum = sum(
+            [
+                amount
+                for k, amount in zip(cfda_key_values, amount_expended_values)
+                if k == key
+            ]
+        )
+        if computed_sum != federal_program_total_values[idx]:
+            has_invalid_federal_program_total = True
+
+        census_data_tuples = [
+            ("PROGRAMTOTAL", federal_program_total_values[idx]),
+            ("AMOUNT", amount_expended_values[idx]),
+            ("CFDA", key),
+        ]
+        track_invalid_records(
+            census_data_tuples,
+            "federal_program_total",
+            computed_sum,
+            invalid_records,
+        )
+
+    if has_invalid_federal_program_total and invalid_records:
+        InvalidRecord.append_invalid_federal_awards_records(invalid_records)
+        InvalidRecord.append_validations_to_skip("federal_program_total_is_correct")
+        InvalidRecord.append_invalid_migration_tag(
+            INVALID_MIGRATION_TAGS.INVALID_FEDERAL_PROGRAM_TOTAL
+        )
+
+
 def generate_federal_awards(audit_header, outfile):
     """
     Generates a federal awards workbook for all awards associated with a given audit header.
@@ -779,7 +824,7 @@ def generate_federal_awards(audit_header, outfile):
         "loan_balance_at_audit_period_end",
         loan_balances,
     )
-
+    track_invalid_federal_program_total(audits, full_cfdas)
     # Total amount expended must be calculated and inserted
     total = 0
     for audit in audits:
