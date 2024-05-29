@@ -269,6 +269,7 @@ def xform_missing_cluster_total_v2(
     change_records = []
     invalid_records = []
     is_empty_cluster_total_found = False
+    is_incorrect_cluster_total_found = False
 
     for idx, (name, audit) in enumerate(zip(cluster_names, audits)):
         cluster_total = string_to_string(audit.CLUSTERTOTAL)
@@ -287,19 +288,17 @@ def xform_missing_cluster_total_v2(
             amounts_expended=amounts_expended,
         )
 
-        if cluster_total != "" and cluster_total != gsa_cluster_total:
-            census_data_tuples = [
-                ("CLUSTERTOTAL", cluster_total),
-            ]
-            track_invalid_records(
-                census_data_tuples,
-                "cluster_total",
-                gsa_cluster_total,
-                invalid_records,
-            )
+        if not is_empty_cluster_total_found and cluster_total != gsa_cluster_total:
+            is_incorrect_cluster_total_found = True
         else:
             cluster_total = gsa_cluster_total
 
+        track_invalid_records(
+            [("CLUSTERTOTAL", cluster_total)],
+            "cluster_total",
+            gsa_cluster_total,
+            invalid_records,
+        )
         track_transformations(
             "CLUSTERTOTAL",
             audit.CLUSTERTOTAL,
@@ -308,13 +307,14 @@ def xform_missing_cluster_total_v2(
             ["xform_missing_cluster_total_v2"],
             change_records,
         )
+
         audit.CLUSTERTOTAL = str(cluster_total)
 
     # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_cluster_total_found:
         InspectionRecord.append_federal_awards_changes(change_records)
 
-    if invalid_records:
+    if invalid_records and is_incorrect_cluster_total_found:
         InvalidRecord.append_invalid_federal_awards_records(invalid_records)
         InvalidRecord.append_validations_to_skip("cluster_total_is_correct")
         InvalidRecord.append_invalid_migration_tag(
