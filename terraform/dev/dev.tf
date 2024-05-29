@@ -24,7 +24,7 @@ module "dev" {
 module "dev-backups-bucket" {
   source = "github.com/18f/terraform-cloudgov//s3?ref=v0.9.1"
 
-  cf_org_name   = local.org_name
+  cf_org_name   = var.cf_org_name
   cf_space_name = "dev"
   name          = "backups"
   s3_plan_name  = "basic"
