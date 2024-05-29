@@ -1,0 +1,41 @@
+---
+name: Backup the database with fac-backup-utility
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        default: "preview"
+jobs:
+  backup-media:
+    name: Perform Media Backups
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Backup media files
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name s3_sync --command "./fac-backup-util.sh ${{inputs.environment }} media_sync"
+
+  backup-dev-database:
+    name: Perform Database Backup
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Backup Dev Database
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 3G -m 2G --name backup_db --command "./fac-backup-util.sh ${{inputs.environment }} scheduled_backup"
