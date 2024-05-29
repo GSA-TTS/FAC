@@ -206,14 +206,14 @@ def get_key_by_value(d, target_value):
 def run_check(fun, ir, is_data_migration, auditee_uei):
     """Run the validation check if it is not skippable, or if it is skippable, only run if this is not a data migration."""
     fun_name = get_key_by_value(skippable_checks, fun)
-    if fun == verify_auditee_uei_match:
-        return fun(ir, auditee_uei)
-    elif (
+    if (
         is_data_migration
         and fun_name
         and fun_name in InvalidRecord.fields["validations_to_skip"]
     ):
         return None
+    elif fun == verify_auditee_uei_schema:
+        return fun(ir, auditee_uei)
     else:
         return fun(ir)
 
