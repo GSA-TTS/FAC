@@ -197,6 +197,7 @@ def check_for_gsa_migration_keyword_if_needed(ir, is_data_migration):
     if not is_data_migration:
         check_for_gsa_migration_keyword(ir)
 
+
 def get_key_by_value(d, target_value):
     keys = [key for key, value in d.items() if value == target_value]
     return keys[0] if keys else None
