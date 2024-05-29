@@ -2,12 +2,17 @@ from unittest.mock import patch
 from django.conf import settings
 from django.test import SimpleTestCase
 
+from .invalid_migration_tags import INVALID_MIGRATION_TAGS
+
+from .invalid_record import InvalidRecord
+
 from .transforms.xform_string_to_string import (
     string_to_string,
 )
 from .exception_utils import DataMigrationError
 from .workbooklib.federal_awards import (
     is_valid_prefix,
+    track_invalid_federal_program_total,
     xform_match_number_passthrough_names_ids,
     xform_missing_amount_expended,
     xform_missing_program_total,
@@ -792,3 +797,55 @@ class TestXformSanitizeAdditionalAwardIdentification(SimpleTestCase):
         expected = ["", None, "12345"]
         result = xform_sanitize_additional_award_identification(audits, identifications)
         self.assertEqual(result, expected)
+
+
+class TestTrackInvalidFederalProgramTotal(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, PROGRAMTOTAL, AMOUNT):
+            self.PROGRAMTOTAL = PROGRAMTOTAL
+            self.AMOUNT = AMOUNT
+
+    def setUp(self):
+        self.audits = [
+            self.MockAudit(PROGRAMTOTAL="100", AMOUNT="50"),
+            self.MockAudit(PROGRAMTOTAL="200", AMOUNT="200"),
+            self.MockAudit(PROGRAMTOTAL="150", AMOUNT="100"),
+        ]
+        self.cfda_key_values = ["1234", "5678", "1234"]
+
+        # Reset InvalidRecord before each test
+        InvalidRecord.reset()
+
+    def test_track_invalid_federal_program_total(self):
+        """Test for invalid federal program total"""
+
+        track_invalid_federal_program_total(self.audits, self.cfda_key_values)
+
+        # Check the results in InvalidRecord
+        self.assertEqual(len(InvalidRecord.fields["federal_award"]), 1)
+        self.assertIn(
+            "federal_program_total_is_correct",
+            InvalidRecord.fields["validations_to_skip"],
+        )
+        self.assertIn(
+            INVALID_MIGRATION_TAGS.INVALID_FEDERAL_PROGRAM_TOTAL,
+            InvalidRecord.fields["invalid_migration_tag"],
+        )
+
+    def test_no_invalid_federal_program_total(self):
+        # Adjust mock data for no invalid records
+        self.audits = [
+            self.MockAudit(PROGRAMTOTAL="150", AMOUNT="50"),
+            self.MockAudit(PROGRAMTOTAL="200", AMOUNT="200"),
+            self.MockAudit(PROGRAMTOTAL="150", AMOUNT="100"),
+        ]
+
+        track_invalid_federal_program_total(self.audits, self.cfda_key_values)
+
+        # Check that no invalid records are added
+        self.assertEqual(len(InvalidRecord.fields["federal_award"]), 0)
+        self.assertNotIn(
+            "federal_program_total_is_correct",
+            InvalidRecord.fields["validations_to_skip"],
+        )
+        self.assertNotIn
