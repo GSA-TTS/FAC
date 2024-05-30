@@ -13,6 +13,7 @@ from ..workbooklib.excel_creation_utils import (
     set_workbook_uei,
     sort_by_field,
     xform_sanitize_for_excel,
+    track_invalid_records,
 )
 from ..base_field_maps import (
     SheetFieldMap,
@@ -21,6 +22,8 @@ from ..base_field_maps import (
 from ..workbooklib.templates import sections_to_template_paths
 from ..models import ELECFINDINGSTEXT as FindingsText
 from audit.fixtures.excel import FORM_SECTIONS
+from ..invalid_migration_tags import INVALID_MIGRATION_TAGS
+from ..invalid_record import InvalidRecord
 
 import openpyxl as pyxl
 
@@ -83,6 +86,37 @@ def xform_add_placeholder_for_missing_text_of_finding(findings_texts):
             findings_text.TEXT = settings.GSA_MIGRATION
 
 
+def track_invalid_records_with_more_findings_texts_than_findings(
+    findings, findings_texts
+):
+    """If there are more findings_texts than findings,
+    track all the records as invalid records."""
+
+    finding_refnums = get_reference_numbers_from_findings(findings)
+    findings_text_refnums = get_reference_numbers_from_text_records(findings_texts)
+    invalid_records = []
+    extra_findings_texts = findings_text_refnums.difference(finding_refnums)
+    if len(extra_findings_texts) > 0:
+        invalid_records = []
+        for findings_text_refnum in findings_text_refnums:
+            census_data_tuples = [
+                ("FINDINGREFNUMS", findings_text_refnum),
+            ]
+            track_invalid_records(
+                census_data_tuples,
+                "finding_ref_number",
+                findings_text_refnum,
+                invalid_records,
+            )
+
+    if invalid_records:
+        InvalidRecord.append_invalid_finding_text_records(invalid_records)
+        InvalidRecord.append_validations_to_skip("check_ref_number_in_findings_text")
+        InvalidRecord.append_invalid_migration_tag(
+            INVALID_MIGRATION_TAGS.EXTRA_FINDING_REFERENCE_NUMBERS_IN_FINDINGSTEXT
+        )
+
+
 def generate_findings_text(audit_header, outfile):
     """
     Generates a findings text workbook for a given audit header.
@@ -96,6 +130,10 @@ def generate_findings_text(audit_header, outfile):
     set_workbook_uei(wb, uei)
     findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
     findings_texts = _get_findings_texts(audit_header.DBKEY, audit_header.AUDITYEAR)
+
+    track_invalid_records_with_more_findings_texts_than_findings(
+        findings, findings_texts
+    )
     findings_texts = xform_add_placeholder_for_missing_references(
         findings, findings_texts
     )
