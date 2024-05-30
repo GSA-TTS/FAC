@@ -1,0 +1,44 @@
+---
+name: Restore the database with fac-backup-utility
+### Common Commands:
+# ./fac-restore-util.sh v0.1.2 s3_restore 202405301232
+# ./fac-restore-util.sh v0.1.2 db_restore
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: string
+        default: "preview"
+      util_version:
+        description: Version for fac backup utility to use (ex. vX.Y.Z)
+        required: true
+        type: string
+      s3_backup_date:
+        description: 'Date of the folder in s3://${BUCKET}/backups/ (ex. YYYYMMDDHHmm)'
+        required: false
+        type: string
+      backup_operation:
+        description: Operation for fac-backup-utility
+        required: true
+        type: choice
+        options:
+          - 's3_restore'
+          - 'db_restore'
+jobs:
+  fac-backup:
+    if: contains('["asteel-gsa", "jadudm", "timoballard", "danswick", "tadhg-ohiggins"]', github.actor)
+    name: Perform Database Backup
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Backup FAC Database and Sync Media
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 3G -m 2G --name backup_util --command "./fac-restore-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }} ${{ inputs.s3_backup_date }}"
