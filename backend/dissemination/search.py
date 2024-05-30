@@ -40,7 +40,7 @@ def is_advanced_search(params_dict):
     """
     Returns True if the 'advanced_search_flag' param is True.
     """
-    return params_dict.get("advanced_search_flag")
+    return params_dict.get("advanced_search_flag", False)
 
 
 def search(params):
