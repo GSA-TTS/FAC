@@ -119,11 +119,11 @@ def _sort_results(results, params):
             new_results = results.order_by(f"{direction}audit_year")
         case ORDER_BY.cog_over:
             if params.get("order_direction") == DIRECTION.ascending:
-                # Ex. COG-01, COG-99, OVER-01, OVER-99
-                new_results = results.order_by("cognizant_agency", "oversight_agency")
-            else:
-                # Ex. OVER-01, OVER-99, COG-01, COG-99
+                # Ex. COG-01 -> COG-99, OVER-01 -> OVER-99
                 new_results = results.order_by("oversight_agency", "cognizant_agency")
+            else:
+                # Ex. OVER-99 -> OVER-01, COG-99 -> COG-01
+                new_results = results.order_by("-oversight_agency", "-cognizant_agency")
         case _:
             new_results = results.order_by(f"{direction}fac_accepted_date")
 
@@ -140,7 +140,7 @@ def _make_distinct(results, params):
 
     # cog_over needs to be broken out here in the same order it is broken out in _sort_results().
     if order_by == "cog_over" and order_direction == "ascending":
-        results = results.distinct("report_id", "cognizant_agency", "oversight_agency")
+        results = results.distinct("report_id", "oversight_agency", "cognizant_agency")
     elif order_by == "cog_over":
         results = results.distinct("report_id", "oversight_agency", "cognizant_agency")
     else:

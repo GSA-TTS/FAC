@@ -873,13 +873,13 @@ class SearchSortTests(TestCase):
                 General,
                 is_public=True,
                 cognizant_agency=agency_number,
-                oversight_agency=None,
+                oversight_agency="",
             )
             baker.make(
                 General,
                 is_public=True,
                 oversight_agency=agency_number,
-                cognizant_agency=None,
+                cognizant_agency="",
             )
 
         results_cognizant = search(
@@ -901,7 +901,7 @@ class SearchSortTests(TestCase):
             },
         )
         self.assertEqual(len(results_oversight), 6)
-        self.assertEqual(results_oversight[0].oversight_agency, "01")
+        self.assertEqual(results_oversight[0].oversight_agency, "03")
         self.assertEqual(
-            results_oversight[len(results_oversight) - 1].cognizant_agency, "03"
+            results_oversight[len(results_oversight) - 1].cognizant_agency, "01"
         )
