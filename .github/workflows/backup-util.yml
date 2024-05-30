@@ -14,6 +14,9 @@ on:
       s3_restore_folder_date:
         required: false
         type: string
+      util_version:
+        required: true
+        type: string
   push:
     branches: [as/db-backup-util]
 jobs:
@@ -34,7 +37,7 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 3G -m 2G --name backup_db --command "./fac-backup-util.sh v0.1.2 scheduled_backup"
+          command: cf run-task gsa-fac -k 3G -m 2G --name s3_restore --command "./fac-restore-util.sh v0.1.2 s3_restore 202405301232"
           ### Common Commands:
           # ./fac-backup-util.sh v0.1.2 initial_backup
           # ./fac-backup-util.sh v0.1.2 deploy_backup
