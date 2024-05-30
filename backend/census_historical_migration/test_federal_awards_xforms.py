@@ -3,13 +3,10 @@ from django.conf import settings
 from django.test import SimpleTestCase
 
 from .invalid_migration_tags import INVALID_MIGRATION_TAGS
-
 from .invalid_record import InvalidRecord
-
 from .transforms.xform_string_to_string import (
     string_to_string,
 )
-
 from .exception_utils import DataMigrationError
 from .workbooklib.federal_awards import (
     is_valid_prefix,
@@ -17,7 +14,7 @@ from .workbooklib.federal_awards import (
     xform_match_number_passthrough_names_ids,
     xform_missing_amount_expended,
     xform_missing_program_total,
-    xform_missing_cluster_total,
+    xform_missing_cluster_total_v2,
     xform_populate_default_award_identification_values,
     xform_populate_default_loan_balance,
     xform_constructs_cluster_names,
@@ -488,7 +485,7 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         state_cluster_names = ["", "", ""]
         expected_totals = ["250", "150", "250"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
@@ -520,7 +517,7 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         state_cluster_names = ["", "State Cluster A", "", "State Cluster A"]
         expected_totals = ["250", "300", "250", "300"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
@@ -552,12 +549,51 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         other_cluster_names = ["", "Other Cluster A", "", "Other Cluster A"]
         expected_totals = ["250", "300", "250", "300"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
         for audit, expected in zip(audits, expected_totals):
             self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+    def test_xform_missing_cluster_total_invalid(self):
+        """Test for incorrect cluster total"""
+        audits = [
+            self.AuditMock("150", "Cluster A", cluster_total="33"),
+        ]
+        cluster_names = ["Cluster A"]
+        other_cluster_names = [""]
+        state_cluster_names = [""]
+        expected_totals = ["33"]
+
+        InvalidRecord.reset()
+        xform_missing_cluster_total_v2(
+            audits, cluster_names, other_cluster_names, state_cluster_names
+        )
+
+        for audit, expected in zip(audits, expected_totals):
+            self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+        self.assertEqual(
+            InvalidRecord.fields["validations_to_skip"],
+            ["cluster_total_is_correct"],
+        )
+        self.assertEqual(
+            InvalidRecord.fields["federal_award"],
+            [
+                [
+                    {
+                        "census_data": [
+                            {"column": "CLUSTERTOTAL", "value": 33},
+                            {"column": "CLUSTERNAME", "value": "Cluster A"},
+                            {"column": "STATECLUSTERNAME", "value": ""},
+                            {"column": "OTHERCLUSTERNAME", "value": ""},
+                        ],
+                        "gsa_fac_data": {"field": "cluster_total", "value": 150},
+                    }
+                ]
+            ],
+        )
 
 
 class TestXformMissingAmountExpended(SimpleTestCase):
