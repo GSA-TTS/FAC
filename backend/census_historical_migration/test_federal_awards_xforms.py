@@ -585,9 +585,9 @@ class TestXformMissingClusterTotal(SimpleTestCase):
                     {
                         "census_data": [
                             {"column": "CLUSTERTOTAL", "value": 33},
-                            {'column': 'CLUSTERNAME', 'value': 'Cluster A'},
-                            {'column': 'STATECLUSTERNAME', 'value': ''},
-                            {'column': 'OTHERCLUSTERNAME', 'value': ''},
+                            {"column": "CLUSTERNAME", "value": "Cluster A"},
+                            {"column": "STATECLUSTERNAME", "value": ""},
+                            {"column": "OTHERCLUSTERNAME", "value": ""},
                         ],
                         "gsa_fac_data": {"field": "cluster_total", "value": 150},
                     }
