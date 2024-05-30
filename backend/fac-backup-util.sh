@@ -24,10 +24,20 @@ RDSToS3Dump() {
     ./gov.gsa.fac.cgov-util db_to_s3 --db "$1" --s3path s3://"$2"/"$date"/
 }
 RDSToRDS() {
-    ./gov.gsa.fac.cgov-util db_to_db --src_db "$1" --dest_db "$2"
+    ./gov.gsa.fac.cgov-util db_to_db --src_db "$1" --dest_db "$2" --operation "$3"
 }
 
-if [ "$run_option" == "deploy_backup" ]; then
+if [ "$run_option" == "initial_backup" ]; then
+    GetUtil
+    InstallAWS
+    gonogo "install_aws"
+    RDSToS3Dump "$db_name" "$backup_s3_name"
+    gonogo "db_to_s3"
+    RDSToRDS "$db_name" "$backup_db_name" "initial"
+    gonogo "db_to_db"
+    AWSS3Sync "$s3_name" "$backup_s3_name"
+    gonogo "s3_sync"
+elif [ "$run_option" == "deploy_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
@@ -41,7 +51,7 @@ elif [ "$run_option" == "scheduled_backup" ]; then
     gonogo "install_aws"
     RDSToS3Dump "$db_name" "$backup_s3_name"
     gonogo "db_to_s3"
-    RDSToRDS "$db_name" "$backup_db_name"
+    RDSToRDS "$db_name" "$backup_db_name" "backup"
     gonogo "db_to_db"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
