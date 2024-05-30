@@ -12,7 +12,7 @@ mkdir tmp && cd tmp || return
 
 GetUtil() {
     curl -x "$https_proxy" -L "https://github.com/GSA-TTS/fac-backup-utility/releases/download/$version/gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz" -O
-    tar -xvf gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz && rm gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz
+    tar -xvf "gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz" && rm "gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz"
 }
 InstallAWS() {
     ./gov.gsa.fac.cgov-util install_aws
