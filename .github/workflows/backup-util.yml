@@ -7,8 +7,18 @@ on:
         required: true
         type: string
         default: "preview"
+      db_to_db_operation:
+        required: false
+        type: string
+        default: "backup"
+      s3_restore_folder_date:
+        required: false
+        type: string
+  push:
+    branches: [as/db-backup-util]
 jobs:
   fac-backup:
+    # if: contains('["asteel-gsa","x", "y", "z"]', github.actor)
     name: Perform Database Backup
     runs-on: ubuntu-latest
     # environment: ${{ inputs.environment }}
@@ -25,3 +35,9 @@ jobs:
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 3G -m 2G --name backup_db --command "./fac-backup-util.sh v0.1.1 deploy_backup"
+          ### Common Commands:
+          # ./fac-backup-util.sh v0.1.1 initial_backup
+          # ./fac-backup-util.sh v0.1.1 deploy_backup
+          # ./fac-backup-util.sh v0.1.1 scheduled_backup
+          # ./fac-restore-util.sh v0.1.1 s3_restore 202405301232
+          # ./fac-restore-util.sh v0.1.1 db_restore
