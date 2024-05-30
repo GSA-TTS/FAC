@@ -1,16 +1,13 @@
 #!/bin/bash
 set -e
 source tools/util_startup.sh
-base_environment=$1
-run_option=$2
-date_of_backup=$3
+run_option=$1
+date_of_backup=$2
 s3_name="fac-private-s3"
 backup_s3_name="backups"
 db_name="fac-db"
 backup_db_name="fac-snapshot-db"
-export ENV="${base_environment}"
-date=$(date +%Y%m%d%H%M)
-mkdir tmp && cd tmp || return
+mkdir backups_tmp && cd backups_tmp || return
 
 GetUtil() {
     local version="v0.1.0"
@@ -32,7 +29,6 @@ S3ToRDSTableRestore() {
 
 if [ "$run_option" == "s3_restore" ]; then
     GetUtil
-    gonogo "curl_util"
     InstallAWS
     gonogo "install_aws"
     S3ToRDSTableRestore "$db_name" "$backup_s3_name" "$date_of_backup"
@@ -41,10 +37,10 @@ if [ "$run_option" == "s3_restore" ]; then
     gonogo "s3_sync"
 elif [ "$run_option" == "db_restore" ]; then
     GetUtil
-    gonogo "curl_util"
     InstallAWS
     gonogo "install_aws"
     RDSToRDS "$backup_db_name" "$db_name"
+    gonogo "db_to_db"
     AWSS3Sync "$backup_s3_name" "$s3_name"
     gonogo "s3_sync"
 fi

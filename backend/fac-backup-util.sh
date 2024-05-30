@@ -1,13 +1,11 @@
 #!/bin/bash
 set -e
 source tools/util_startup.sh
-base_environment=$1
-run_option=$2
+run_option=$1
 s3_name="fac-private-s3"
 backup_s3_name="backups"
 db_name="fac-db"
 backup_db_name="fac-snapshot-db"
-export ENV="$base_environment"
 date=$(date +%Y%m%d%H%M)
 mkdir tmp && cd tmp || return
 
@@ -31,7 +29,6 @@ RDSToRDS() {
 
 if [ "$run_option" == "deploy_backup" ]; then
     GetUtil
-    gonogo "curl_util"
     InstallAWS
     gonogo "install_aws"
     RDSToS3Dump "$db_name" "$backup_s3_name"
@@ -40,7 +37,6 @@ if [ "$run_option" == "deploy_backup" ]; then
     gonogo "s3_sync"
 elif [ "$run_option" == "scheduled_backup" ]; then
     GetUtil
-    gonogo "curl_util"
     InstallAWS
     gonogo "install_aws"
     RDSToS3Dump "$db_name" "$backup_s3_name"
@@ -51,7 +47,6 @@ elif [ "$run_option" == "scheduled_backup" ]; then
     gonogo "s3_sync"
 elif [ "$run_option" == "media_sync" ]; then
     GetUtil
-    gonogo "curl_util"
     InstallAWS
     gonogo "install_aws"
     AWSS3Sync "$s3_name" "$backup_s3_name"
