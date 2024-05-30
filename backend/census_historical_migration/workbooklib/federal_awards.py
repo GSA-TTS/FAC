@@ -288,13 +288,18 @@ def xform_missing_cluster_total_v2(
             amounts_expended=amounts_expended,
         )
 
-        if not is_empty_cluster_total_found and cluster_total != gsa_cluster_total:
+        if cluster_total != "" and cluster_total != gsa_cluster_total:
             is_incorrect_cluster_total_found = True
         else:
             cluster_total = gsa_cluster_total
 
         track_invalid_records(
-            [("CLUSTERTOTAL", cluster_total)],
+            [
+                ("CLUSTERTOTAL", cluster_total),
+                ("CLUSTERNAME", audit.CLUSTERNAME),
+                ("STATECLUSTERNAME", audit.STATECLUSTERNAME),
+                ("OTHERCLUSTERNAME", audit.OTHERCLUSTERNAME),
+            ],
             "cluster_total",
             gsa_cluster_total,
             invalid_records,
