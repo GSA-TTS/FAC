@@ -868,7 +868,7 @@ class SearchSortTests(TestCase):
         """
         When sorting on COG/OVER, the appropriate records should come back first.
         """
-        for agency_number in ["01", "03", "02"]:  # Generate out of order intentionally
+        for agency_number in ["02", "03", "01"]:  # Generate out of order intentionally
             baker.make(
                 General,
                 is_public=True,
