@@ -1,0 +1,24 @@
+---
+name: Backup Environments
+on:
+  schedule:
+    # Invoke every 2 hours
+    - cron: '0 */2 * * *'
+  workflow_dispatch: null
+
+jobs:
+  backup-environment:
+    strategy:
+      fail-fast: false
+      matrix:
+        environment:
+          - name: dev
+          - name: staging
+          - name: production
+    uses: ./.github/workflows/fac-backup-util-scheduled.yml
+    secrets: inherit
+    with:
+      environment: ${{ matrix.environment.name }}
+      util_version: "v0.1.2"
+      backup_operation: "scheduled_backup"
+
