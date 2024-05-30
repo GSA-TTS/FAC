@@ -24,4 +24,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 3G -m 2G --name backup_db --command "./fac-backup-util.sh deploy_backup"
+          command: cf run-task gsa-fac -k 3G -m 2G --name backup_db --command "./fac-backup-util.sh v0.1.1 deploy_backup"

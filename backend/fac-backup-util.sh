@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 source tools/util_startup.sh
-run_option=$1
+version=$1
+run_option=$2
 s3_name="fac-private-s3"
 backup_s3_name="backups"
 db_name="fac-db"
@@ -10,7 +11,6 @@ date=$(date +%Y%m%d%H%M)
 mkdir tmp && cd tmp || return
 
 GetUtil() {
-    local version="v0.1.0"
     curl -x "$https_proxy" -L "https://github.com/GSA-TTS/fac-backup-utility/releases/download/$version/gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz" -O
     tar -xvf gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz && rm gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz
 }
