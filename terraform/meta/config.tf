@@ -24,7 +24,6 @@ locals {
     "tadhg.ohiggins@gsa.gov",
     "timothy.ballard@gsa.gov",
     "matthew.jadud@gsa.gov",
-    "edward.zapata@gsa.gov",
     "hassandeme.mamasambo@gsa.gov",
     "daniel.swick@gsa.gov",
     "alexander.steel@gsa.gov",
