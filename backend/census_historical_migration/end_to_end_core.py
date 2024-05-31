@@ -113,6 +113,7 @@ def disseminate(sac):
 def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
     InspectionRecord.reset()
+    InvalidRecord.reset()
     try:
         sac = setup_sac(user, audit_header)
         builder_loader = workbook_builder_loader(user, sac, audit_header)
@@ -141,7 +142,13 @@ def run_end_to_end(user, audit_header):
             audit_header.DBKEY,
             sac.report_id,
         )
-        track_invalid_records(audit_header.AUDITYEAR, audit_header.DBKEY, sac.report_id)
+
+        track_invalid_audit_records(
+            audit_header.AUDITYEAR,
+            audit_header.DBKEY,
+            sac.report_id,
+        )
+
     except Exception as exc:
         handle_exception(exc, audit_header)
 
@@ -178,46 +185,55 @@ def record_migration_transformations(audit_year, dbkey, report_id):
     InspectionRecord.reset()
 
 
-def track_invalid_records(audit_year, dbkey, report_id):
+def track_invalid_audit_records(audit_year, dbkey, report_id):
     """Record invalid records for the current report"""
 
-    if all(
-        not InvalidRecord.change[key]
-        for key in [
-            "general",
-            "finding",
-            "note",
-            "federal_award",
-            "secondary_auditor",
-            "additional_ein",
-            "additional_uei",
-            "passthrough",
-            "cap_text",
-            "finding_text",
-        ]
-    ):
+    # Return early if no invalid migration tags
+    if not InvalidRecord.fields["invalid_migration_tag"]:
         return
 
+    # Delete existing invalid records for this audit and dbkey
     InvalidAuditRecord.objects.filter(audit_year=audit_year, dbkey=dbkey).delete()
 
+    # Create a new invalid audit record
     invalid_audit_record = InvalidAuditRecord.objects.create(
         audit_year=audit_year,
         dbkey=dbkey,
         report_id=report_id,
+        run_datetime=django_timezone.now(),
     )
-    invalid_audit_record.run_datetime = django_timezone.now()
-    if InvalidRecord.change["general"]:
-        invalid_audit_record.general = InvalidRecord.change["general"]
-    if InvalidRecord.change["finding"]:
-        invalid_audit_record.finding = InvalidRecord.change["finding"]
-    if InvalidRecord.change["note"]:
-        invalid_audit_record.note = InvalidRecord.change["note"]
-    if InvalidRecord.change["federal_award"]:
-        invalid_audit_record.federal_award = InvalidRecord.change["federal_award"]
-    if InvalidRecord.change["secondary_auditor"]:
-        invalid_audit_record.secondary_auditor = InvalidRecord.change[
-            "secondary_auditor"
-        ]
+
+    # Fields to copy from InvalidRecord to invalid_audit_record
+    fields_to_copy = [
+        "general",
+        "finding",
+        "note",
+        "federal_award",
+        "secondary_auditor",
+        "additional_ein",
+        "additional_uei",
+        "passthrough",
+        "cap_text",
+        "finding_text",
+    ]
+
+    for field in fields_to_copy:
+        if InvalidRecord.fields[field]:
+            setattr(invalid_audit_record, field, InvalidRecord.fields[field])
+
+    # Update migration status
+    migration_status = ReportMigrationStatus.objects.get(
+        audit_year=audit_year, dbkey=dbkey
+    )
+    migration_status.invalid_migration_tags = ",".join(
+        InvalidRecord.fields["invalid_migration_tag"]
+    )
+    migration_status.skipped_validation_methods = ",".join(
+        InvalidRecord.fields["validations_to_skip"]
+    )
+    migration_status.save()
+
+    # Save the invalid audit record and reset InvalidRecord
     invalid_audit_record.save()
     InvalidRecord.reset()
 

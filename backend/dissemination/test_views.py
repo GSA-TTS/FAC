@@ -178,7 +178,8 @@ class SearchViewTests(TestMaterializedViewBuilder):
     def test_search(self):
         response = self.anon_client.post(self._search_url(), {})
         self.assertContains(response, "Search single audit reports")
-        self.assertNotContains(response, "Results: ")
+        # If there are results, we'll see "results in x seconds" somewhere.
+        self.assertNotContains(response, "results in")
 
     def test_anonymous_returns_private_and_public(self):
         """Anonymous users should see all reports (public and private included)."""
@@ -191,7 +192,8 @@ class SearchViewTests(TestMaterializedViewBuilder):
         self.refresh_materialized_view()
         response = self.anon_client.post(self._search_url(), {})
 
-        self.assertContains(response, "Results: 10")
+        # 1-10 of <strong>10</strong> results in x seconds.
+        self.assertContains(response, "<strong>10</strong>")
 
         # all of the public reports should show up on the page
         for p in public:
@@ -212,7 +214,8 @@ class SearchViewTests(TestMaterializedViewBuilder):
         self.refresh_materialized_view()
         response = self.auth_client.post(self._search_url(), {})
 
-        self.assertContains(response, "Results: 10")
+        # 1-10 of <strong>10</strong> results in x seconds.
+        self.assertContains(response, "<strong>10</strong>")
 
         # all of the public reports should show up on the page
         for p in public:
@@ -233,7 +236,8 @@ class SearchViewTests(TestMaterializedViewBuilder):
 
         response = self.perm_client.post(self._search_url(), {})
 
-        self.assertContains(response, "Results: 10")
+        # 1-10 of <strong>10</strong> results in x seconds.
+        self.assertContains(response, "<strong>10</strong>")
 
         # all of the public reports should show up on the page
         for p in public:
