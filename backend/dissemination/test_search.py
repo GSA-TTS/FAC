@@ -861,3 +861,47 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         }
         results = search(params)
         self.assertEqual(len(results), 2)
+
+
+class SearchSortTests(TestCase):
+    def test_sort_cog_over(self):
+        """
+        When sorting on COG/OVER, the appropriate records should come back first.
+        """
+        for agency_number in ["02", "03", "01"]:  # Generate out of order intentionally
+            baker.make(
+                General,
+                is_public=True,
+                cognizant_agency=agency_number,
+                oversight_agency="",
+            )
+            baker.make(
+                General,
+                is_public=True,
+                oversight_agency=agency_number,
+                cognizant_agency="",
+            )
+
+        results_cognizant = search(
+            {
+                "order_by": "cog_over",
+                "order_direction": "ascending",
+            },
+        )
+        self.assertEqual(len(results_cognizant), 6)
+        self.assertEqual(results_cognizant[0].cognizant_agency, "01")
+        self.assertEqual(
+            results_cognizant[len(results_cognizant) - 1].oversight_agency, "03"
+        )
+
+        results_oversight = search(
+            {
+                "order_by": "cog_over",
+                "order_direction": "descending",
+            },
+        )
+        self.assertEqual(len(results_oversight), 6)
+        self.assertEqual(results_oversight[0].oversight_agency, "03")
+        self.assertEqual(
+            results_oversight[len(results_oversight) - 1].cognizant_agency, "01"
+        )
