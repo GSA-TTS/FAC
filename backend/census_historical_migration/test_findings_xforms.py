@@ -257,6 +257,7 @@ class TestTrackInvalidRecordsWithRepeatedRefNumbers(SimpleTestCase):
 
 class TestXformReplaceRequiredFields(SimpleTestCase):
     class Finding:
+
         def __init__(
             self,
             MODIFIEDOPINION,
@@ -264,12 +265,14 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
             MATERIALWEAKNESS,
             SIGNIFICANTDEFICIENCY,
             OTHERFINDINGS,
+            QCOSTS,
         ):
             self.MODIFIEDOPINION = MODIFIEDOPINION
             self.OTHERNONCOMPLIANCE = OTHERNONCOMPLIANCE
             self.MATERIALWEAKNESS = MATERIALWEAKNESS
             self.SIGNIFICANTDEFICIENCY = SIGNIFICANTDEFICIENCY
             self.OTHERFINDINGS = OTHERFINDINGS
+            self.QCOSTS = QCOSTS
 
     def test_replace_empty_fields(self):
         findings = [
@@ -279,6 +282,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
                 MATERIALWEAKNESS="Present",
                 SIGNIFICANTDEFICIENCY="",
                 OTHERFINDINGS="Present",
+                QCOSTS="",
             ),
             self.Finding(
                 MODIFIEDOPINION="Present",
@@ -286,6 +290,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
                 MATERIALWEAKNESS="",
                 SIGNIFICANTDEFICIENCY="",
                 OTHERFINDINGS="Present",
+                QCOSTS="",
             ),
             self.Finding(
                 MODIFIEDOPINION="",
@@ -293,6 +298,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
                 MATERIALWEAKNESS="Present",
                 SIGNIFICANTDEFICIENCY="",
                 OTHERFINDINGS="",
+                QCOSTS="Present",
             ),
         ]
 
@@ -303,18 +309,21 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
         self.assertEqual(findings[0].MATERIALWEAKNESS, "Present")
         self.assertEqual(findings[0].SIGNIFICANTDEFICIENCY, settings.GSA_MIGRATION)
         self.assertEqual(findings[0].OTHERFINDINGS, "Present")
+        self.assertEqual(findings[0].QCOSTS, settings.GSA_MIGRATION)
 
         self.assertEqual(findings[1].MODIFIEDOPINION, "Present")
         self.assertEqual(findings[1].OTHERNONCOMPLIANCE, "Present")
         self.assertEqual(findings[1].MATERIALWEAKNESS, settings.GSA_MIGRATION)
         self.assertEqual(findings[1].SIGNIFICANTDEFICIENCY, settings.GSA_MIGRATION)
         self.assertEqual(findings[1].OTHERFINDINGS, "Present")
+        self.assertEqual(findings[1].QCOSTS, settings.GSA_MIGRATION)
 
         self.assertEqual(findings[2].MODIFIEDOPINION, settings.GSA_MIGRATION)
         self.assertEqual(findings[2].OTHERNONCOMPLIANCE, "Present")
         self.assertEqual(findings[2].MATERIALWEAKNESS, "Present")
         self.assertEqual(findings[2].SIGNIFICANTDEFICIENCY, settings.GSA_MIGRATION)
         self.assertEqual(findings[2].OTHERFINDINGS, settings.GSA_MIGRATION)
+        self.assertEqual(findings[2].QCOSTS, "Present")
 
 
 class TestXformMissingRepeatPriorReference(SimpleTestCase):
