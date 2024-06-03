@@ -533,6 +533,7 @@ def xform_replace_empty_zips(general_information):
             new_auditee_zip,
             "xform_replace_empty_zips",
         )
+        general_information["auditee_zip"] = new_auditee_zip
 
     return general_information
 

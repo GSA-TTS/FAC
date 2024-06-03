@@ -462,21 +462,47 @@ class TestXformReplaceEmptyOrInvalidEins(SimpleTestCase):
 
 class TestXformReplaceEmptyAuditorZip(SimpleTestCase):
     def test_empty_auditor_zip(self):
-        """Test that an empty auditor_zip and auditee_zip are replaced with 'GSA_MIGRATION'"""
+        """Test that an empty US auditor_zip and auditee_zip are replaced with 'GSA_MIGRATION'"""
         input_data = {
             "auditee_zip": "",
+            "auditor_country": "USA",
             "auditor_zip": "",
         }
         expected_output = {
             "auditee_zip": settings.GSA_MIGRATION,
+            "auditor_country": "USA",
             "auditor_zip": settings.GSA_MIGRATION,
         }
         self.assertEqual(xform_replace_empty_zips(input_data), expected_output)
 
+    def test_empty_non_us_auditor_zip(self):
+        """Test that an empty non-US auditor_zip is not replaced with 'GSA_MIGRATION'"""
+        input_data = {
+            "auditee_zip": "",
+            "auditor_country": "non-USA",
+            "auditor_zip": "",
+        }
+        expected_output = {
+            "auditee_zip": settings.GSA_MIGRATION,
+            "auditor_country": "non-USA",
+            "auditor_zip": "",
+        }
+        self.assertEqual(xform_replace_empty_zips(input_data), expected_output)
+
     def test_non_empty_auditor_zip(self):
-        """Test that a non-empty auditor_zip and auditee_zip remain unchanged"""
+        """Test that a non-empty US auditor_zip and auditee_zip remain unchanged"""
         input_data = {
             "auditee_zip": "10108",
+            "auditor_country": "USA",
+            "auditor_zip": "12345",
+        }
+        self.assertEqual(xform_replace_empty_zips(input_data), input_data)
+
+    def test_non_empty_non_us_auditor_zip(self):
+        """Test that a non-empty non-US auditor_zip and auditee_zip remain unchanged"""
+        input_data = {
+            "auditee_zip": "10108",
+            "auditor_country": "non-USA",
             "auditor_zip": "12345",
         }
         self.assertEqual(xform_replace_empty_zips(input_data), input_data)
