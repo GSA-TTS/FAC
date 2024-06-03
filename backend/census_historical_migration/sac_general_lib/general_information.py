@@ -505,36 +505,32 @@ def xform_replace_empty_zips(general_information):
 
     if is_usa_auditor:
         if not auditor_zip:
-            general_information["auditor_zip"] = settings.GSA_MIGRATION
+            new_auditor_zip = settings.GSA_MIGRATION
         else:
-            general_information["auditor_zip"] = xform_remove_hyphen_and_pad_zip(
-                auditor_zip
-            )
+            new_auditor_zip = xform_remove_hyphen_and_pad_zip(auditor_zip)
 
-        track_transformations(
-            "CPAZIPCODE",
-            "",
-            "auditor_zip",
-            general_information["auditor_zip"],
-            "xform_replace_empty_zips",
-        )
+        if new_auditor_zip != auditor_zip:
+            track_transformations(
+                "CPAZIPCODE",
+                auditor_zip,
+                "auditor_zip",
+                new_auditor_zip,
+                "xform_replace_empty_zips",
+            )
+            general_information["auditor_zip"] = new_auditor_zip
 
     auditee_zip = general_information.get("auditee_zip")
-    is_usa_auditee = general_information.get("auditor_country") != "non-USA"
+    if not auditee_zip:
+        new_auditee_zip = settings.GSA_MIGRATION
+    else:
+        new_auditee_zip = xform_remove_hyphen_and_pad_zip(auditee_zip)
 
-    if is_usa_auditee:
-        if not general_information.get("auditee_zip"):
-            general_information["auditee_zip"] = settings.GSA_MIGRATION
-        else:
-            general_information["auditee_zip"] = xform_remove_hyphen_and_pad_zip(
-                auditee_zip
-            )
-
+    if new_auditee_zip != auditee_zip:
         track_transformations(
             "ZIPCODE",
-            "",
+            auditee_zip,
             "auditee_zip",
-            general_information["auditee_zip"],
+            new_auditee_zip,
             "xform_replace_empty_zips",
         )
 
