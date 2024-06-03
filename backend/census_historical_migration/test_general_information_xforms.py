@@ -102,8 +102,9 @@ class TestXformEntityType(SimpleTestCase):
 
 class TestXformCountry(SimpleTestCase):
     class MockAuditHeader:
-        def __init__(self, CPASTATE):
+        def __init__(self, CPASTATE, CPAFOREIGN=""):
             self.CPASTATE = CPASTATE
+            self.CPAFOREIGN = CPAFOREIGN
 
     def setUp(self):
         self.general_information = {
@@ -136,6 +137,16 @@ class TestXformCountry(SimpleTestCase):
         self.audit_header.CPASTATE = "XX"
         with self.assertRaises(DataMigrationError):
             xform_country_v2(self.general_information, self.audit_header)
+
+    def test_when_auditor_country_set_to_non_us(self):
+        """Test that the function returns the correct results when the auditor country is set to NON-US."""
+        self.general_information["auditor_country"] = "NON-US"
+        self.audit_header.CPAFOREIGN = "Some foreign address"
+        result = xform_country_v2(self.general_information, self.audit_header)
+        self.assertEqual(result["auditor_country"], "non-USA")
+        self.assertEqual(
+            result["auditor_international_address"], "Some foreign address"
+        )
 
 
 class TestXformAuditeeFiscalPeriodEnd(SimpleTestCase):
