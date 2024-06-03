@@ -12,7 +12,7 @@ from .sac_general_lib.general_information import (
     xform_audit_type,
     xform_auditee_fiscal_period_end,
     xform_auditee_fiscal_period_start,
-    xform_country,
+    xform_country_v2,
     xform_entity_type,
     xform_replace_empty_auditee_contact_name,
     xform_replace_empty_auditor_email,
@@ -114,20 +114,20 @@ class TestXformCountry(SimpleTestCase):
     def test_when_auditor_country_set_to_us(self):
         """Test that the function returns the correct results when the auditor country is set to US."""
         self.general_information["auditor_country"] = "US"
-        result = xform_country(self.general_information, self.audit_header)
+        result = xform_country_v2(self.general_information, self.audit_header)
         self.assertEqual(result["auditor_country"], "USA")
 
     def test_when_auditor_country_set_to_usa(self):
         """Test that the function returns the correct results when the auditor country is set to USA."""
         self.general_information["auditor_country"] = "USA"
-        result = xform_country(self.general_information, self.audit_header)
+        result = xform_country_v2(self.general_information, self.audit_header)
         self.assertEqual(result["auditor_country"], "USA")
 
     def test_when_auditor_country_set_to_empty_string_and_auditor_state_valid(self):
         """Test that the function returns the correct results when the auditor country is set to an empty string."""
         self.general_information["auditor_country"] = ""
         self.audit_header.CPASTATE = "MA"
-        result = xform_country(self.general_information, self.audit_header)
+        result = xform_country_v2(self.general_information, self.audit_header)
         self.assertEqual(result["auditor_country"], "USA")
 
     def test_when_auditor_country_set_to_empty_string_and_auditor_state_invalid(self):
@@ -135,7 +135,7 @@ class TestXformCountry(SimpleTestCase):
         self.general_information["auditor_country"] = ""
         self.audit_header.CPASTATE = "XX"
         with self.assertRaises(DataMigrationError):
-            xform_country(self.general_information, self.audit_header)
+            xform_country_v2(self.general_information, self.audit_header)
 
 
 class TestXformAuditeeFiscalPeriodEnd(SimpleTestCase):
