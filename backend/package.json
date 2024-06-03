@@ -29,7 +29,7 @@
     "cypress-axe": "^1.5.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-otp": "^1.0.3",
-    "eslint": "8.57",
+    "eslint": "9.4",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-cypress": "^2.12.1",
     "prettier": "^3.2.5",
