@@ -18,8 +18,8 @@ on:
         description: Version for fac backup utility to use (ex. vX.Y.Z)
         required: true
         type: string
-      s3_backup_folder:
-        description: 'Name of the folder in s3://${BUCKET}/backups/ (ex. sheduled-mm-dd-HH)'
+      s3_backup_path:
+        description: 'Name of the folder in s3://${BUCKET}/backups/ (ex. sheduled/mm-dd-HH)'
         required: false
         type: string
       backup_operation:
@@ -45,4 +45,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 7G -m 3G --name restore_util --command "./fac-restore-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }} ${{ inputs.s3_backup_folder }}"
+          command: cf run-task gsa-fac -k 7G -m 3G --name restore_util --command "./fac-restore-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }} ${{ inputs.s3_backup_path }}"

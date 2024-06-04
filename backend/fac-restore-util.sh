@@ -3,7 +3,7 @@ set -e
 source tools/util_startup.sh
 version=$1
 run_option=$2
-date_of_backup=$3
+path_of_backup=$3
 s3_name="fac-private-s3"
 backup_s3_name="backups"
 db_name="fac-db"
@@ -12,7 +12,7 @@ mkdir backups_tmp && cd backups_tmp || return
 
 GetUtil() {
     curl -x "$https_proxy" -L "https://github.com/GSA-TTS/fac-backup-utility/releases/download/$version/gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz" -O
-    tar -xvf gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz && rm gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz
+    tar -xvf "gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz" && rm "gov.gsa.fac.cgov-util-$version-linux-amd64.tar.gz"
 }
 InstallAWS() {
     ./gov.gsa.fac.cgov-util install_aws
@@ -31,7 +31,7 @@ if [ "$run_option" == "s3_restore" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
-    S3ToRDSTableRestore "$db_name" "$backup_s3_name" "$date_of_backup"
+    S3ToRDSTableRestore "$db_name" "$backup_s3_name" "$path_of_backup"
     gonogo "s3_to_db"
     AWSS3Sync "$backup_s3_name" "$s3_name"
     gonogo "s3_sync"

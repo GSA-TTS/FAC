@@ -33,7 +33,7 @@ if [ "$run_option" == "initial_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
-    RDSToS3Dump "$db_name" "$backup_s3_name" "initial-$initial_date"
+    RDSToS3Dump "$db_name" "$backup_s3_name" "initial/$initial_date"
     gonogo "db_to_s3"
     RDSToRDS "$db_name" "$backup_db_name" "initial"
     gonogo "db_to_db"
@@ -51,7 +51,7 @@ elif [ "$run_option" == "scheduled_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
-    RDSToS3Dump "$db_name" "$backup_s3_name" "scheduled-$scheduled_date"
+    RDSToS3Dump "$db_name" "$backup_s3_name" "scheduled/$scheduled_date"
     gonogo "db_to_s3"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
@@ -59,7 +59,7 @@ elif [ "$run_option" == "daily_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
-    RDSToS3Dump "$db_name" "$backup_s3_name" "daily-$daily_date"
+    RDSToS3Dump "$db_name" "$backup_s3_name" "daily/$daily_date"
     gonogo "db_to_s3"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
