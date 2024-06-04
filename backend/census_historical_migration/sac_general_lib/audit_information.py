@@ -75,7 +75,12 @@ def _get_agency_prefixes(dbkey, year):
     audits = get_audits(dbkey, year)
 
     for audit_detail in audits:
-        agencies.add(string_to_string(audit_detail.CFDA_PREFIX))
+        prefix = (
+            string_to_string(audit_detail.CFDA_PREFIX)
+            if audit_detail.CFDA_PREFIX
+            else string_to_string(audit_detail.CFDA).split(".")[0]
+        )
+        agencies.add(prefix)
 
     return agencies
 
