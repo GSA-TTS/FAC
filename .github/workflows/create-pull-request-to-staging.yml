@@ -2,7 +2,7 @@
 name: Create Pull Request To Staging
 on:
   workflow_call:
-  workflow_dispatch: null
+  workflow_dispatch:
 
 env:
   GH_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
