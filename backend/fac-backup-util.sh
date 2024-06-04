@@ -7,7 +7,8 @@ s3_name="fac-private-s3"
 backup_s3_name="backups"
 db_name="fac-db"
 backup_db_name="fac-snapshot-db"
-date=$(date +%Y%m%d%H%M)
+#date=$(date +%Y%m%d%H%M)
+date=$(date +%m-%d-%H)
 mkdir tmp && cd tmp || return
 
 GetUtil() {
@@ -21,7 +22,7 @@ AWSS3Sync() {
     ./gov.gsa.fac.cgov-util s3_sync --source_s3 s3://"$1"/ --dest_s3 s3://"$2"/
 }
 RDSToS3Dump() {
-    ./gov.gsa.fac.cgov-util db_to_s3 --db "$1" --s3path s3://"$2"/"$date"/
+    ./gov.gsa.fac.cgov-util db_to_s3 --db "$1" --s3path s3://"$2"/"$3"/
 }
 RDSToRDS() {
     ./gov.gsa.fac.cgov-util db_to_db --src_db "$1" --dest_db "$2" --operation "$3"
@@ -31,7 +32,7 @@ if [ "$run_option" == "initial_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
-    RDSToS3Dump "$db_name" "$backup_s3_name"
+    RDSToS3Dump "$db_name" "$backup_s3_name" "initial-$date"
     gonogo "db_to_s3"
     RDSToRDS "$db_name" "$backup_db_name" "initial"
     gonogo "db_to_db"
@@ -49,7 +50,7 @@ elif [ "$run_option" == "scheduled_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
-    RDSToS3Dump "$db_name" "$backup_s3_name"
+    RDSToS3Dump "$db_name" "$backup_s3_name" "scheduled-$date"
     gonogo "db_to_s3"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"

@@ -64,9 +64,9 @@ Database backups occur in the following ways:
 ### Restoring
 Restoring from backups can be run via workflow, from designated individuals. There are two paths that we can restore from.
 
-1. S3 Restore takes a `YYYYMMDDHHmm` input, and is required for the backups to be restored. The utility looks in `s3://${bucket}/backups/YYYYMMDDHHmm/` for its table dumps, and without supplying the target backups, it will not restore. Once it does a `--data-only` restoration, it will then sync the files from the backups bucket to the application bucket. We do this to ensure the contents of the application bucket are up to date, relative to the data in the database. We know that if we use the latest folder in `/backups/` then the contents of the s3 are the latest available, from the prior backup.
+1. S3 Restore takes a `operation-mm-DD-HH` input (ex `scheduled-06-04-10`), and is required for the backups to be restored. The utility looks in `s3://${bucket}/backups/operation-mm-DD-HH/` for its table dumps, and without supplying the target backups, it will not restore. Once it does a `--data-only` restoration, it will then sync the files from the backups bucket to the application bucket. We do this to ensure the contents of the application bucket are up to date, relative to the data in the database. We know that if we use the latest folder in `/backups/` then the contents of the s3 are the latest available, from the prior backup.
 ```bash
-./fac-restore-util.sh v0.1.3 s3_restore 202405301232
+./fac-restore-util.sh v0.1.3 s3_restore scheduled-06-04-10
 # Curl the utility
 # Install AWS
 # DB to S3 table dump (backups -> fac-db) [Truncate target table before --data-only pg_restore]
