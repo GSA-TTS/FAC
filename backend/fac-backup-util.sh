@@ -7,8 +7,9 @@ s3_name="fac-private-s3"
 backup_s3_name="backups"
 db_name="fac-db"
 backup_db_name="fac-snapshot-db"
-#date=$(date +%Y%m%d%H%M)
-date=$(date +%m-%d-%H)
+initial_date=$(date +%Y%m%d%H%M)
+scheduled_date=$(date +%m-%d-%H)
+daily_date=$(date +%m-%d)
 mkdir tmp && cd tmp || return
 
 GetUtil() {
@@ -32,7 +33,7 @@ if [ "$run_option" == "initial_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
-    RDSToS3Dump "$db_name" "$backup_s3_name" "initial-$date"
+    RDSToS3Dump "$db_name" "$backup_s3_name" "initial-$initial_date"
     gonogo "db_to_s3"
     RDSToRDS "$db_name" "$backup_db_name" "initial"
     gonogo "db_to_db"
@@ -50,7 +51,15 @@ elif [ "$run_option" == "scheduled_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
-    RDSToS3Dump "$db_name" "$backup_s3_name" "scheduled-$date"
+    RDSToS3Dump "$db_name" "$backup_s3_name" "scheduled-$scheduled_date"
+    gonogo "db_to_s3"
+    AWSS3Sync "$s3_name" "$backup_s3_name"
+    gonogo "s3_sync"
+elif [ "$run_option" == "daily_backup" ]; then
+    GetUtil
+    InstallAWS
+    gonogo "install_aws"
+    RDSToS3Dump "$db_name" "$backup_s3_name" "daily-$daily_date"
     gonogo "db_to_s3"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"

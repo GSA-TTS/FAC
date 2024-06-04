@@ -72,6 +72,12 @@ Restoring from backups can be run via workflow, from designated individuals. The
 # DB to S3 table dump (backups -> fac-db) [Truncate target table before --data-only pg_restore]
 # AWS S3 sync (backups -> fac-private-s3)
 ```
+Potential Options for restoration:
+```bash
+initial-YYYYmmddHHMM
+scheduled-mm-dd-HH
+daily-mm-dd
+```
 
 2. Database to database restoration also can occur as well, using `psql` to dump the tables from the cold store database to the live database.
 ```bash
