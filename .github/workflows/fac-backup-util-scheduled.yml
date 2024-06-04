@@ -9,7 +9,6 @@ on:
       environment:
         required: true
         type: string
-        default: "preview"
       util_version:
         description: Version for fac backup utility to use (ex. vX.Y.Z)
         required: true
@@ -19,7 +18,7 @@ on:
         required: true
         type: string
 jobs:
-  fac-backup:
+  fac-backup-scheduled:
     name: Perform Database Backup
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
@@ -33,5 +32,5 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 3G -m 2G --name backup_util_scheduled --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          command: cf run-task gsa-fac -k 7G -m 3G --name backup_util_scheduled --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
 

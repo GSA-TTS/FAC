@@ -8,8 +8,12 @@ on:
     inputs:
       environment:
         required: true
-        type: string
-        default: "preview"
+        type: choice
+        options:
+          - 'dev'
+          - 'preview'
+          - 'staging'
+          - 'production'
       util_version:
         description: Version for fac backup utility to use (ex. vX.Y.Z)
         required: true
@@ -40,4 +44,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 3G -m 2G --name backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          command: cf run-task gsa-fac -k 7G -m 3G --name backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"

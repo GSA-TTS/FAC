@@ -8,14 +8,18 @@ on:
     inputs:
       environment:
         required: true
-        type: string
-        default: "preview"
+        type: choice
+        options:
+          - 'dev'
+          - 'preview'
+          - 'staging'
+          - 'production'
       util_version:
         description: Version for fac backup utility to use (ex. vX.Y.Z)
         required: true
         type: string
-      s3_backup_date:
-        description: 'Date of the folder in s3://${BUCKET}/backups/ (ex. YYYYMMDDHHmm)'
+      s3_backup_folder:
+        description: 'Name of the folder in s3://${BUCKET}/backups/ (ex. sheduled-mm-dd-HH)'
         required: false
         type: string
       backup_operation:
@@ -26,7 +30,7 @@ on:
           - 's3_restore'
           - 'db_restore'
 jobs:
-  fac-backup:
+  fac-restore:
     if: contains('["asteel-gsa", "jadudm", "timoballard", "danswick", "tadhg-ohiggins"]', github.actor)
     name: Perform Database Backup
     runs-on: ubuntu-latest
@@ -34,11 +38,11 @@ jobs:
     env:
       space: ${{ inputs.environment }}
     steps:
-      - name: Backup FAC Database and Sync Media
+      - name: Restore FAC Database and Sync Media
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 3G -m 2G --name backup_util --command "./fac-restore-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }} ${{ inputs.s3_backup_date }}"
+          command: cf run-task gsa-fac -k 7G -m 3G --name restore_util --command "./fac-restore-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }} ${{ inputs.s3_backup_folder }}"
