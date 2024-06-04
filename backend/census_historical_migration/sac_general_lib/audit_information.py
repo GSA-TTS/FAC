@@ -84,7 +84,7 @@ def xform_framework_basis(basis):
     """Transforms the framework basis from Census format to FAC format.
     For context, see ticket #2912.
     """
-    # Transformation recorded (see xform_build_sp_framework_gaap_results).
+    # Transformation recorded (see xform_build_sp_framework_gaap_results_v2).
     basis = string_to_string(basis)
     if is_single_word(basis):
         mappings = {
@@ -109,7 +109,7 @@ def xform_census_keys_to_fac_options(census_keys, fac_options):
     """Maps the census keys to FAC options.
     For context, see ticket #2912.
     """
-    # Transformation recorded (see xform_build_sp_framework_gaap_results).
+    # Transformation recorded (see xform_build_sp_framework_gaap_results_v2).
     if "U" in census_keys:
         fac_options.append("unmodified_opinion")
     if "Q" in census_keys:
@@ -120,7 +120,7 @@ def xform_census_keys_to_fac_options(census_keys, fac_options):
         fac_options.append("disclaimer_of_opinion")
 
 
-def xform_build_sp_framework_gaap_results(audit_header):
+def xform_build_sp_framework_gaap_results_v2(audit_header):
     """Returns the SP Framework and GAAP results for a given audit header."""
     # Transformation recorded.
     sp_framework_gaap_data = string_to_string(audit_header.TYPEREPORT_FS).upper()
@@ -149,7 +149,13 @@ def xform_build_sp_framework_gaap_results(audit_header):
             sp_framework_opinions, sp_framework_gaap_results["sp_framework_opinions"]
         )
         sp_framework_gaap_results["sp_framework_basis"] = []
-        basis = xform_framework_basis(audit_header.SP_FRAMEWORK)
+
+        if not string_to_string(audit_header.SP_FRAMEWORK):
+            audit_header.SP_FRAMEWORK = settings.GSA_MIGRATION
+            basis = settings.GSA_MIGRATION
+        else:
+            basis = xform_framework_basis(audit_header.SP_FRAMEWORK)
+
         sp_framework_gaap_results["sp_framework_basis"].append(basis)
 
     track_transformations(sp_framework_gaap_results, audit_header)
@@ -176,7 +182,7 @@ def track_transformations(sp_framework_gaap_results, audit_header):
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
                 "transformation_functions": [
-                    "xform_build_sp_framework_gaap_results",
+                    "xform_build_sp_framework_gaap_results_v2",
                     "xform_census_keys_to_fac_options",
                 ],
             }
@@ -207,7 +213,7 @@ def track_transformations(sp_framework_gaap_results, audit_header):
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
-                "transformation_functions": ["xform_build_sp_framework_gaap_results"],
+                "transformation_functions": ["xform_build_sp_framework_gaap_results_v2"],
             }
         )
 
@@ -233,7 +239,7 @@ def track_transformations(sp_framework_gaap_results, audit_header):
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
                 "transformation_functions": [
-                    "xform_build_sp_framework_gaap_results",
+                    "xform_build_sp_framework_gaap_results_v2",
                     "xform_census_keys_to_fac_options",
                 ],
             }
@@ -261,7 +267,7 @@ def track_transformations(sp_framework_gaap_results, audit_header):
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
                 "transformation_functions": [
-                    "xform_build_sp_framework_gaap_results",
+                    "xform_build_sp_framework_gaap_results_v2",
                     "xform_framework_basis",
                 ],
             }
@@ -325,7 +331,7 @@ def audit_information(audit_header):
     """Generates audit information JSON."""
     xform_sp_framework_required(audit_header)
     xform_lowrisk(audit_header)
-    results = xform_build_sp_framework_gaap_results(audit_header)
+    results = xform_build_sp_framework_gaap_results_v2(audit_header)
     agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY, audit_header.AUDITYEAR)
     audit_info = create_json_from_db_object(audit_header, mappings)
     audit_info = {
