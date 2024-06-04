@@ -31,7 +31,7 @@ jobs:
       work-dir: ./backend
 
   testing:
-    name: Run Django, Lighthouse, a11y and lint
+    name: Run Django and lint
     needs:
       - build-container
     uses: ./.github/workflows/testing-from-ghcr.yml
