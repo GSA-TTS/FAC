@@ -213,7 +213,9 @@ def track_transformations(sp_framework_gaap_results, audit_header):
             {
                 "census_data": census_data,
                 "gsa_fac_data": gsa_fac_data,
-                "transformation_functions": ["xform_build_sp_framework_gaap_results_v2"],
+                "transformation_functions": [
+                    "xform_build_sp_framework_gaap_results_v2"
+                ],
             }
         )
 
