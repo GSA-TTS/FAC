@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - v1.*
-  workflow_dispatch: null
 
 jobs:
   testing:
