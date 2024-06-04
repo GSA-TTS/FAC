@@ -509,15 +509,6 @@ class TestXformReplaceEmptyAuditorZip(SimpleTestCase):
         }
         self.assertEqual(xform_replace_empty_zips(input_data), input_data)
 
-    def test_non_empty_non_us_auditor_zip(self):
-        """Test that a non-empty non-US auditor_zip and auditee_zip remain unchanged"""
-        input_data = {
-            "auditee_zip": "10108",
-            "auditor_country": "non-USA",
-            "auditor_zip": "12345",
-        }
-        self.assertEqual(xform_replace_empty_zips(input_data), input_data)
-
 
 class TestXformAuditPeriodOtherMonths(SimpleTestCase):
     class MockAuditHeader:

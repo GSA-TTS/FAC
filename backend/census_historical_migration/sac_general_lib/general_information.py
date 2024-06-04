@@ -262,7 +262,12 @@ def xform_country_v2(general_information, audit_header):
     ).upper()
     if auditor_country in ["US", "USA"]:
         general_information["auditor_country"] = "USA"
-    elif auditor_country == "NON-US":
+    elif auditor_country == "NON-US" and not (
+        audit_header.CPAZIPCODE
+        or audit_header.CPASTATE
+        or audit_header.CPACITY
+        or audit_header.CPASTREET1
+    ):
         general_information["auditor_country"] = "non-USA"
         general_information["auditor_international_address"] = audit_header.CPAFOREIGN
     elif auditor_country == "":
