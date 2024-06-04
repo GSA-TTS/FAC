@@ -1,5 +1,5 @@
 ---
-name: Backup the database with fac-backup-utility (restore test)
+name: Backup the database with fac-backup-utility
 ### Common Commands:
 # ./fac-backup-util.sh v0.1.3 initial_backup
 # ./fac-backup-util.sh v0.1.3 deploy_backup
@@ -33,7 +33,7 @@ jobs:
     env:
       space: ${{ inputs.environment }}
     steps:
-      - name: Backup FAC Database and Sync Media (restore test)
+      - name: Backup FAC Database and Sync Media
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
