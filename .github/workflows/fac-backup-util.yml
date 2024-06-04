@@ -37,7 +37,7 @@ jobs:
       # space: ${{ inputs.environment }}
       space: "preview"
       util_version: v0.1.3
-      restore_operation: s3_restore
+      restore_operation: db_restore
       s3_backup_path: "daily/06-04/"
     steps:
       - name: Backup FAC Database and Sync Media (restore test)
@@ -48,4 +48,4 @@ jobs:
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
           # command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
-          command: cf run-task gsa-fac -k 7G -m 3G --name s3_restore_util --command "./fac-restore-util.sh ${{ env.util_version }} ${{ env.restore_operation }} ${{ env.s3_backup_path }}"
+          command: cf run-task gsa-fac -k 7G -m 3G --name db_restore_util --command "./fac-restore-util.sh ${{ env.util_version }} ${{ env.restore_operation }} ${{ env.s3_backup_path }}"
