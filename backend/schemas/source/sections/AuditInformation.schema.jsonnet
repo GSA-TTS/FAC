@@ -9,7 +9,7 @@ local AuditInformation = Types.object {
       items: Base.Enum.GAAPResults,
     },
     sp_framework_basis: Types.array {
-      items: Base.Enum.SP_Framework_Basis,
+      items: Base.Enum.SP_Framework_BasisGSAMigration,
     },
     sp_framework_opinions: Types.array {
       items: Base.Enum.SP_Framework_Opinions,
@@ -19,8 +19,8 @@ local AuditInformation = Types.object {
       oneOf: [
         Types.boolean,
         Types.string {
-            const: Base.Const.GSA_MIGRATION,
-          },
+          const: Base.Const.GSA_MIGRATION,
+        },
       ],
     },
     is_going_concern_included: Types.boolean,
@@ -32,8 +32,8 @@ local AuditInformation = Types.object {
       oneOf: [
         Types.boolean,
         Types.string {
-            const: Base.Const.GSA_MIGRATION,
-          },
+          const: Base.Const.GSA_MIGRATION,
+        },
       ],
     },
     agencies: Types.array {
