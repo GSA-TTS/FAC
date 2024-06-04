@@ -22,7 +22,7 @@ on:
         description: 'Name of the folder in s3://${BUCKET}/backups/ (ex. sheduled/mm-dd-HH)'
         required: false
         type: string
-      backup_operation:
+      restore_operation:
         description: Operation for fac-backup-utility
         required: true
         type: choice
@@ -45,4 +45,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 7G -m 3G --name restore_util --command "./fac-restore-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }} ${{ inputs.s3_backup_path }}"
+          command: cf run-task gsa-fac -k 7G -m 3G --name restore_util --command "./fac-restore-util.sh ${{ inputs.util_version }} ${{ inputs.restore_operation }} ${{ inputs.s3_backup_path }}"
