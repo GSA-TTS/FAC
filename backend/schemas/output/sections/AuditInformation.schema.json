@@ -152,13 +152,14 @@
       },
       "sp_framework_basis": {
          "items": {
-            "description": "SP Framework Basis (Audit Information)",
+            "description": "SP Framework Basis (Audit Information) + GSA_MIGRATION",
             "enum": [
                "cash_basis",
                "tax_basis",
                "contractual_basis",
                "regulatory_basis",
-               "other_basis"
+               "other_basis",
+               "GSA_MIGRATION"
             ],
             "type": "string"
          },
