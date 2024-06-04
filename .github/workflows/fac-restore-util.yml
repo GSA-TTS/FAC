@@ -1,8 +1,8 @@
 ---
 name: Restore the database with fac-backup-utility
 ### Common Commands:
-# ./fac-restore-util.sh v0.1.2 s3_restore 202405301232
-# ./fac-restore-util.sh v0.1.2 db_restore
+# ./fac-restore-util.sh v0.1.3 s3_restore 202405301232
+# ./fac-restore-util.sh v0.1.3 db_restore
 on:
   workflow_dispatch:
     inputs:
