@@ -24,7 +24,7 @@ def xform_remove_hyphen_and_pad_zip(zip):
             strzip = "".join(parts)
         else:
             raise DataMigrationError(
-                "Zip code is malformed.",
+                f"Zip code {strzip} is malformed.",
                 "invalid_zip",
             )
 
@@ -34,6 +34,6 @@ def xform_remove_hyphen_and_pad_zip(zip):
         return strzip
     else:
         raise DataMigrationError(
-            "Zip code is malformed.",
+            f"Zip code {strzip} is malformed.",
             "invalid_zip",
         )
