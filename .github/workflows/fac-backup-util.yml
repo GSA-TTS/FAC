@@ -25,17 +25,19 @@ on:
         options:
           - 'initial_backup'
           - 'deploy_backup'
-  # push:
-  #   branches: [as/db-backup-util]
+  push:
+    branches: [as/db-backup-util]
 jobs:
   fac-backup:
     name: Perform Database Backup
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    # environment: "preview"
+    # environment: ${{ inputs.environment }}
+    environment: "preview"
     env:
-      space: ${{ inputs.environment }}
-      # space: "preview"
+      # space: ${{ inputs.environment }}
+      space: "preview"
+      util_version: v0.1.3
+      backup_operation: deploy_backup
     steps:
       - name: Backup FAC Database and Sync Media
         uses: cloud-gov/cg-cli-tools@main
@@ -44,4 +46,5 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 7G -m 3G --name backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          #command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh ${{ env.util_version }} ${{ env.backup_operation }}"
