@@ -226,6 +226,10 @@ local Enum = {
     description: 'SP Framework Basis (Audit Information)',
     enum: std.map(function(pair) pair.key, GAAP.sp_framework_basis),
   },
+  SP_Framework_BasisGSAMigration: Types.string {
+    description: 'SP Framework Basis (Audit Information) + GSA_MIGRATION',
+    enum: std.map(function(pair) pair.key, GAAP.sp_framework_basis) + [Const.GSA_MIGRATION],
+  },
   SP_Framework_Opinions: Types.string {
     description: 'SP Framework Opinions (Audit Information)',
     enum: std.map(function(pair) pair.key, GAAP.sp_framework_opinions),
