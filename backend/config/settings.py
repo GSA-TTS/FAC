@@ -555,3 +555,10 @@ OTHER_CLUSTER = "OTHER CLUSTER NOT LISTED ABOVE"
 NOT_APPLICABLE = "N/A"
 
 ONE_TIME_ACCESS_TTL_SECS = 60
+
+# Expire sessions after 30 minutes
+# https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-age
+SESSION_COOKIE_AGE = 30 * 60
+# Keep sessions alive if the user is active
+# https://docs.djangoproject.com/en/dev/ref/settings/#session-save-every-request
+SESSION_SAVE_EVERY_REQUEST = True

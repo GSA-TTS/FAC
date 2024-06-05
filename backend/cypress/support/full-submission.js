@@ -79,14 +79,14 @@ export function testFullSubmission(isTribal, isPublic) {
         testTribalAuditPublic();
       } else {
         testTribalAuditPrivate();
-      }
+      };
 
       // Login as Auditor
       testLogoutGov();
       testLoginGovLogin();
       cy.visit(`/audit/submission-progress/${reportId}`);
-    })
-  }
+    });
+  };
 
   // Complete the audit information form
   cy.get(".usa-link").contains("Audit Information form").click();
@@ -133,9 +133,8 @@ export function testFullSubmission(isTribal, isPublic) {
       /audits are complete/
     ).siblings().contains('td', reportId);
 
-  testSubmissionAccess(reportId, isTribal, isPublic);
-
+    testSubmissionAccess(reportId, isTribal, isPublic);
   });
 
   testLogoutGov();
-}
+};

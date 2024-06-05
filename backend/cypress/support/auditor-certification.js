@@ -13,4 +13,4 @@ export function testAuditorCertification() {
 	cy.get('#auditor_title').type('Auditor');
   cy.get('#auditor_certification_date_signed').type("01/01/2022");
   cy.get('.usa-button').contains('Agree to auditor certification').click();
-}
+};

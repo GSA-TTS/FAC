@@ -1,3 +1,3 @@
-require('@uswds/uswds');
-require('./api.js');
-require('./validate.js');
+import '@uswds/uswds';
+import './api.js';
+import './validate.js';

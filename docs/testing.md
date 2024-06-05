@@ -60,17 +60,33 @@ act test --platform ubuntu-latest=lucasalt/act_base:latest
 ```
 
 ## Accessibility
+We use a combination of [Cypress](https://www.cypress.io/) and [Axe](https://www.deque.com/axe/) for accessibility (A11y) testing. 
 
-We use a combination of [Lighthouse-ci](https://github.com/GoogleChrome/lighthouse-ci) and [Pa11y](https://pa11y.org/) for accessibility testing.
+<!-- TODO: Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch. -->
+Accessibility tests currently cover the full submission pipeline, the access management pages, and the search pages.
+They should run in less than half a minute for baseline coverage.
 
-Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
+To run accessibility tests locally, do the following:
 
-To run Lighthouse or pa11y locally, install the dependencies on your machine and outside the docker container, run the following commands.
+Ensure `DISABLE_AUTH=True` in your local environment variables. This will mean the blank "test_user@test.test" will be used. 
+You will not have to log in, do not need permissions to access pages, and the username in the top right will display strangely. 
+But, Cypress also won't need any permissions or have to rely on Login.gov in any way.
 
+"Log in" once (visit the app) to ensure the test user exists in your local environment.
+
+Run the `load_fixtures` management command in your docker container, to ensure a submission of type "In Progress", "Ready for Certification", and "Accepted" exist for the test user. This will also load some dummy dissemination objects, so that at least one record will exist for search.
 ```shell
-npm run test:a11y:lighthouse # to run lighthouse
-npm run test:a11y:pa11y      # to run pa11y
+docker compose exec web /bin/bash  # Enter the docker shell
+python manage.py load_fixtures     # Run the management command
 ```
+
+Run `npm i` to ensure Cypress and its related dependencies are up-to-date.
+
+Open Cypress with `npx Cypress open`, and run the `accessibility.cy.js` spec.
+
+This can be done in headless mode via the command line with either of these two lines:
+1. `npx cypress run --spec "cypress/e2e/accessibility.cy.js"`
+2. `npm run test:a11y:cypress` (which in turn runs the above line).
 
 ## Security scans
 #### OWASP ZAP

@@ -529,7 +529,8 @@
                            "is_passed": {
                               "enum": [
                                  "Y",
-                                 "N"
+                                 "N",
+                                 "GSA_MIGRATION"
                               ],
                               "type": "string"
                            },

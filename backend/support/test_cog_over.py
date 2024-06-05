@@ -1,10 +1,8 @@
 from django.test import TestCase
-from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
-from dissemination.hist_models.census_2022 import CensusGen22
+from dissemination.models import General, MigrationInspectionRecord, FederalAward
 
 from model_bakery import baker
 from faker import Faker
-from django.db import connection
 
 from audit.models import SingleAuditChecklist
 from .models import CognizantBaseline, CognizantAssignment
@@ -20,6 +18,7 @@ EIN_2023_ONLY = "EIN202312"
 RESOLVABLE_EIN_WITHOUT_BASELINE = "REWOB1234"
 RESOLVABLE_UEI_WITHOUT_BASELINE = "RUWOB1234"
 RESOLVABLE_DBKEY_WITHOUT_BASELINE = "20220"
+RESOLVABLE_DBKEY_WITH_BASELINE = "202201"
 UEI_WITH_BASELINE = "UB0011223"
 
 
@@ -28,65 +27,106 @@ class CogOverTests(TestCase):
         super().__init__(method_name)
 
     def setUp(self):
-        with connection.schema_editor() as schema_editor:
-            schema_editor.create_model(CensusGen19)
-            schema_editor.create_model(CensusGen22)
-            schema_editor.create_model(CensusCfda19)
-
         gen = baker.make(
-            CensusGen19,
-            index=1,
-            ein=UNIQUE_EIN_WITHOUT_DBKEY,
-            dbkey=None,
-            totfedexpend="210000000",
+            General,
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            report_id="1111-03-GSAFAC-0000201960",
+            total_amount_expended="210000000",
+            audit_year="2022",
         )
         gen.save()
+        migration_inspection_record = baker.make(
+            MigrationInspectionRecord,
+            report_id=gen.report_id,
+            dbkey=None,
+            audit_year="2022",
+        )
+        migration_inspection_record.save()
+        gen = baker.make(
+            General,
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            report_id="1111-04-CENSUS-0000191850",
+            total_amount_expended="210000000",
+            audit_year="2019",
+        )
+        gen.save()
+        migration_inspection_record = baker.make(
+            MigrationInspectionRecord,
+            report_id=gen.report_id,
+            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
+            audit_year="2019",
+        )
+        migration_inspection_record.save()
         for i in range(6):
             cfda = baker.make(
-                CensusCfda19,
-                index=i,
-                ein=gen.ein,
-                dbkey=gen.dbkey,
-                cfda="84.032",
-                amount=10_000_000 * i,
-                direct="Y",
+                FederalAward,
+                report_id=gen,
+                federal_agency_prefix="84",
+                federal_award_extension="032",
+                amount_expended=10_000_000 * i,
+                is_direct="Y",
             )
             cfda.save()
         for i in range(2, 5):
             gen = baker.make(
-                CensusGen19,
-                index=i,
-                ein=DUP_EIN_WITHOUT_RESOLVER,
-                dbkey=str(10_000 + i),
-                totfedexpend="10000000",
+                General,
+                auditee_ein=DUP_EIN_WITHOUT_RESOLVER,
+                report_id=i,
+                total_amount_expended="10000000",
+                audit_year="2019",
             )
             gen.save()
+            migration_inspection_record = baker.make(
+                MigrationInspectionRecord,
+                report_id=gen.report_id,
+                dbkey=str(10_000 + i),
+                audit_year="2019",
+            )
+            migration_inspection_record.save()
+
         gen = baker.make(
-            CensusGen22,
-            index=11,
-            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
-            uei=RESOLVABLE_UEI_WITHOUT_BASELINE,
-            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
-            totfedexpend="210000000",
+            General,
+            report_id="1111-05-GSAFAC-0000191750",
+            auditee_ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            auditee_uei=RESOLVABLE_UEI_WITHOUT_BASELINE,
+            total_amount_expended="210000000",
+            audit_year="2022",
         )
         gen.save()
-        gen = baker.make(
-            CensusGen19,
-            index=11,
-            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+        migration_inspection_record = baker.make(
+            MigrationInspectionRecord,
+            report_id=gen.report_id,
             dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
-            totfedexpend="210000000",
+            audit_year="2022",
+        )
+        migration_inspection_record.save()
+
+        gen = baker.make(
+            General,
+            auditee_ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            auditee_uei=RESOLVABLE_UEI_WITHOUT_BASELINE,
+            report_id="1111-06-CENSUS-0000171851",
+            total_amount_expended="210000000",
+            audit_year="2019",
         )
         gen.save()
+        migration_inspection_record = baker.make(
+            MigrationInspectionRecord,
+            report_id=gen.report_id,
+            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
+            audit_year="2019",
+        )
+        migration_inspection_record.save()
         for i in range(6):
             cfda = baker.make(
-                CensusCfda19,
-                index=i + 10,
-                ein=gen.ein,
-                dbkey=gen.dbkey,
-                cfda="22.032",
-                amount=10_000_000 * i,
-                direct="Y",
+                FederalAward,
+                report_id=gen,
+                federal_agency_prefix="22",
+                federal_award_extension="032",
+                amount_expended=10_000_000 * i,
+                is_direct="Y",
             )
             cfda.save()
 
@@ -346,10 +386,28 @@ class CogOverTests(TestCase):
         sac.general_information["auditee_uei"] = BASE_UEI
         sac.general_information["ein"] = BASE_EIN
 
+        gen = baker.make(
+            General,
+            report_id="1111-07-CENSUS-0000161749",
+            auditee_ein=BASE_EIN,
+            auditee_uei=BASE_UEI,
+            total_amount_expended="210000000",
+            audit_year="2022",
+        )
+        gen.save()
+        migration_inspection_record = baker.make(
+            MigrationInspectionRecord,
+            report_id=gen.report_id,
+            dbkey=RESOLVABLE_DBKEY_WITH_BASELINE,
+            audit_year="2022",
+        )
+        migration_inspection_record.save()
+
         baker.make(
             CognizantBaseline,
             uei=BASE_UEI,
             ein=BASE_EIN,
+            dbkey=RESOLVABLE_DBKEY_WITH_BASELINE,
             cognizant_agency=BASE_COG,
             is_active=True,
         )
@@ -367,6 +425,7 @@ class CogOverTests(TestCase):
         sac = self._fake_sac()
         sac.general_information["auditee_uei"] = BASE_UEI
         sac.general_information["ein"] = BASE_EIN
+        sac.report_id = "9991-09-GSAFAC-0000201851"
         sac.save()
 
         baker.make(
@@ -396,10 +455,10 @@ class CogOverTests(TestCase):
             assignor_email="test_cog_over   @test.gov",
             override_comment="test_cog_over",
         ).save()
-        cbs = CognizantBaseline.objects.all()
-        self.assertEquals(len(cbs), 2)
         cas = CognizantAssignment.objects.all()
         self.assertEquals(len(cas), 2)
+        cbs = CognizantBaseline.objects.all()
+        self.assertEquals(len(cbs), 2)
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEquals(sac.cognizant_agency, oberride_cog)
 
@@ -411,4 +470,4 @@ class CogOverTests(TestCase):
         )
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
-        self.assertEquals(sac.cognizant_agency, oberride_cog)
+        self.assertEquals(sac.cognizant_agency, cog_agency)

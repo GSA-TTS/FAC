@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.test import TestCase
 from audit.models import SingleAuditChecklist
+from census_historical_migration.invalid_record import InvalidRecord
 from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
 from .sac_validation_shape import sac_validation_shape
 from .errors import err_duplicate_finding_reference
@@ -83,3 +85,26 @@ class CheckFindingReferenceUniquenessTests(TestCase):
                 )
             }
             self.assertIn(expected_error, errors)
+
+    def test_duplicate_references_for_historical_award(self):
+        """
+        Check that errors are not returned for historical awards with duplicate reference numbers.
+        """
+        range_size = generate_random_integer(2, 4)
+        sac = baker.make(SingleAuditChecklist)
+        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
+            [self._award_reference() for _ in range(range_size)],
+            [
+                [
+                    self._reference_number(self.REF_MIN),
+                    self._reference_number(self.REF_MIN),
+                    self._reference_number(self.REF_MAX),
+                ]
+            ],
+        )
+        sac.data_source = settings.CENSUS_DATA_SOURCE
+        InvalidRecord.reset()
+        InvalidRecord.append_validations_to_skip("check_finding_reference_uniqueness")
+
+        errors = check_finding_reference_uniqueness(sac_validation_shape(sac))
+        self.assertEqual(errors, [])

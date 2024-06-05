@@ -108,3 +108,7 @@ def err_missing_or_extra_references(
         )
 
     return ", ".join(messages) + "."
+
+
+def err_no_federal_awards():
+    return "This submission contains no federal awards."

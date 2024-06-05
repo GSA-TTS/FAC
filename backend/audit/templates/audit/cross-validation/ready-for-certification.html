@@ -6,7 +6,7 @@
             <form class="tablet:grid-col-8" id="ready-for-certification" method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
-                    <legend class="usa-legend usa-legend--large" id="federal-awards">Lock for certification</legend>
+                    <h1 class="usa-legend usa-legend--large" id="federal-awards">Lock for certification</h1>
                     <p>
                         You are now ready to lock your single audit submission for auditee and auditor certification. Each must review and certify the documents before they can be submitted to the FAC.
                     </p>
@@ -20,8 +20,7 @@
                     <button class="usa-button margin-top-2" id="continue">Lock for certification</button>
                     <a id="cancel-lock-for-certification-link"
                        class="usa-button usa-button--unstyled margin-left-2"
-                       href="{% url 'audit:SubmissionProgress' report_id %}"
-                       aria-controls="form-cancel">Cancel</a>
+                       href="{% url 'audit:SubmissionProgress' report_id %}">Cancel</a>
                 </fieldset>
             </form>
         </div>

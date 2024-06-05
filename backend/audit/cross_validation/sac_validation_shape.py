@@ -77,6 +77,7 @@ def sac_validation_shape(sac):
             "audit_type": sac.audit_type,
             "transition_name": sac.transition_name,
             "transition_date": sac.transition_date,
+            "data_source": sac.data_source,
         },
     }
 

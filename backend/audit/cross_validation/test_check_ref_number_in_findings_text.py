@@ -1,3 +1,5 @@
+from django.conf import settings
+from census_historical_migration.invalid_record import InvalidRecord
 from django.test import TestCase
 from .utils import generate_random_integer, make_findings_uniform_guidance
 from audit.models import SingleAuditChecklist
@@ -119,3 +121,20 @@ class CheckRefNumberInFindingsTextTests(TestCase):
             {self.reference_2}, {self.reference_3}, SECTION_NAMES.AUDIT_FINDINGS_TEXT
         )
         self.assertIn({"error": expected_error}, errors)
+
+    def test_more_finding_references_less_findings_for_historical_findingstexts(self):
+        """When there are extra references, update InvalidRecord and do not raise error."""
+        duplicated_references = [
+            ref
+            for ref in [self.reference_1, self.reference_2, self.reference_3]
+            for _ in range(generate_random_integer(2, 5))
+        ]
+        sac = self._make_sac([], duplicated_references)
+
+        sac.data_source = settings.CENSUS_DATA_SOURCE
+        InvalidRecord.reset()
+        InvalidRecord.append_validations_to_skip("check_ref_number_in_findings_text")
+
+        errors = check_ref_number_in_findings_text(sac_validation_shape(sac))
+
+        self.assertEqual(errors, [])

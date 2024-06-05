@@ -12,8 +12,9 @@ from .sac_general_lib.general_information import (
     xform_audit_type,
     xform_auditee_fiscal_period_end,
     xform_auditee_fiscal_period_start,
-    xform_country,
+    xform_country_v2,
     xform_entity_type,
+    xform_replace_empty_auditee_contact_name,
     xform_replace_empty_auditor_email,
     xform_replace_empty_auditee_email,
     xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration,
@@ -103,6 +104,10 @@ class TestXformCountry(SimpleTestCase):
     class MockAuditHeader:
         def __init__(self, CPASTATE):
             self.CPASTATE = CPASTATE
+            self.CPASTREET1 = ""
+            self.CPACITY = ""
+            self.CPAZIPCODE = ""
+            self.CPAFOREIGN = ""
 
     def setUp(self):
         self.general_information = {
@@ -113,20 +118,20 @@ class TestXformCountry(SimpleTestCase):
     def test_when_auditor_country_set_to_us(self):
         """Test that the function returns the correct results when the auditor country is set to US."""
         self.general_information["auditor_country"] = "US"
-        result = xform_country(self.general_information, self.audit_header)
+        result = xform_country_v2(self.general_information, self.audit_header)
         self.assertEqual(result["auditor_country"], "USA")
 
     def test_when_auditor_country_set_to_usa(self):
         """Test that the function returns the correct results when the auditor country is set to USA."""
         self.general_information["auditor_country"] = "USA"
-        result = xform_country(self.general_information, self.audit_header)
+        result = xform_country_v2(self.general_information, self.audit_header)
         self.assertEqual(result["auditor_country"], "USA")
 
     def test_when_auditor_country_set_to_empty_string_and_auditor_state_valid(self):
         """Test that the function returns the correct results when the auditor country is set to an empty string."""
         self.general_information["auditor_country"] = ""
         self.audit_header.CPASTATE = "MA"
-        result = xform_country(self.general_information, self.audit_header)
+        result = xform_country_v2(self.general_information, self.audit_header)
         self.assertEqual(result["auditor_country"], "USA")
 
     def test_when_auditor_country_set_to_empty_string_and_auditor_state_invalid(self):
@@ -134,7 +139,24 @@ class TestXformCountry(SimpleTestCase):
         self.general_information["auditor_country"] = ""
         self.audit_header.CPASTATE = "XX"
         with self.assertRaises(DataMigrationError):
-            xform_country(self.general_information, self.audit_header)
+            xform_country_v2(self.general_information, self.audit_header)
+
+    def test_when_auditor_country_set_to_non_us(self):
+        """Test that the function returns the correct results when the auditor country is set to NON-US."""
+        self.general_information["auditor_country"] = "NON-US"
+        self.audit_header.CPAFOREIGN = "Some foreign address"
+        result = xform_country_v2(self.general_information, self.audit_header)
+        self.assertEqual(result["auditor_country"], "non-USA")
+        self.assertEqual(
+            result["auditor_international_address"], "Some foreign address"
+        )
+
+    def test_when_auditor_country_set_to_non_us_and_state_set(self):
+        """Test that the function raises an exception when the auditor country is NON-US and the auditor state is set."""
+        self.general_information["auditor_country"] = "NON-US"
+        self.audit_header.CPASTATE = "MA"
+        with self.assertRaises(DataMigrationError):
+            xform_country_v2(self.general_information, self.audit_header)
 
 
 class TestXformAuditeeFiscalPeriodEnd(SimpleTestCase):
@@ -271,10 +293,34 @@ class TestXformReplaceEmptyAuditeeEmail(SimpleTestCase):
         self.assertEqual(xform_replace_empty_auditee_email(input_data), expected_output)
 
 
+class TestXformReplaceEmptyAuditeeContactName(SimpleTestCase):
+    def test_empty_auditee_contact_name(self):
+        """Test that an empty auditee_contact_name is replaced with 'GSA_MIGRATION'"""
+        input_data = {"auditee_contact_name": ""}
+        expected_output = {"auditee_contact_name": settings.GSA_MIGRATION}
+        self.assertEqual(
+            xform_replace_empty_auditee_contact_name(input_data), expected_output
+        )
+
+    def test_non_empty_auditee_contact_name(self):
+        """Test that a non-empty auditee_contact_name remains unchanged"""
+        input_data = {"auditee_contact_name": "test"}
+        expected_output = {"auditee_contact_name": "test"}
+        self.assertEqual(
+            xform_replace_empty_auditee_contact_name(input_data), expected_output
+        )
+
+    def test_missing_auditee_contact_name(self):
+        """Test that a missing auditee_contact_name key is added and set to 'GSA_MIGRATION'"""
+        input_data = {}
+        expected_output = {"auditee_contact_name": settings.GSA_MIGRATION}
+        self.assertEqual(
+            xform_replace_empty_auditee_contact_name(input_data), expected_output
+        )
+
+
 class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
-
     class MockAuditHeader:
-
         def __init__(self, UEI):
             self.UEI = UEI
 
@@ -437,21 +483,38 @@ class TestXformReplaceEmptyOrInvalidEins(SimpleTestCase):
 
 class TestXformReplaceEmptyAuditorZip(SimpleTestCase):
     def test_empty_auditor_zip(self):
-        """Test that an empty auditor_zip and auditee_zip are replaced with 'GSA_MIGRATION'"""
+        """Test that an empty US auditor_zip and auditee_zip are replaced with 'GSA_MIGRATION'"""
         input_data = {
             "auditee_zip": "",
+            "auditor_country": "USA",
             "auditor_zip": "",
         }
         expected_output = {
             "auditee_zip": settings.GSA_MIGRATION,
+            "auditor_country": "USA",
             "auditor_zip": settings.GSA_MIGRATION,
         }
         self.assertEqual(xform_replace_empty_zips(input_data), expected_output)
 
+    def test_empty_non_us_auditor_zip(self):
+        """Test that an empty non-US auditor_zip is not replaced with 'GSA_MIGRATION'"""
+        input_data = {
+            "auditee_zip": "",
+            "auditor_country": "non-USA",
+            "auditor_zip": "",
+        }
+        expected_output = {
+            "auditee_zip": settings.GSA_MIGRATION,
+            "auditor_country": "non-USA",
+            "auditor_zip": "",
+        }
+        self.assertEqual(xform_replace_empty_zips(input_data), expected_output)
+
     def test_non_empty_auditor_zip(self):
-        """Test that a non-empty auditor_zip and auditee_zip remain unchanged"""
+        """Test that a non-empty US auditor_zip and auditee_zip remain unchanged"""
         input_data = {
             "auditee_zip": "10108",
+            "auditor_country": "USA",
             "auditor_zip": "12345",
         }
         self.assertEqual(xform_replace_empty_zips(input_data), input_data)

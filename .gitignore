@@ -51,7 +51,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-.lighthouseci/
 backend/cypress/screenshots/
 backend/cypress/videos/
 
@@ -165,8 +164,6 @@ backend/data_distro/data_to_load/*.txt
 node_modules/
 backend/static/compiled
 staticfiles/
-
-# pa11y_tests/screenshots/*.png
 
 # Things that folks might want to have in their local directories
 # that don't need to be checked in

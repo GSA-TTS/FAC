@@ -9,4 +9,4 @@ export function testFederalAwards(isTribal=false) {
   // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
   cy.get(".usa-link").contains("Federal Awards").click();
   testWorkbookFederalAwards(false);
-}
+};
