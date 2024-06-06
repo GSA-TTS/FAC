@@ -154,8 +154,9 @@ def xform_cpafirmname(secondary_auditors):
     if change_records and is_empty_cpafirmname_found:
         InspectionRecord.append_secondary_auditor_changes(change_records)
 
+
 def xform_pad_contact_phone_with_nine(secondary_auditors):
-    """ Pad contact phone with 9s if less than 10 digits """
+    """Pad contact phone with 9s if less than 10 digits"""
     change_records = []
     is_pad_applied = False
     for secondary_auditor in secondary_auditors:
