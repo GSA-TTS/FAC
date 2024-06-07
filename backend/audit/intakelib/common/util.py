@@ -81,7 +81,7 @@ def get_missing_value_errors(ir, range_name, message_key):
     errors = []
     if range_data:
         for index, value in enumerate(range_data["values"]):
-            if appears_empty(value):
+            if appears_empty(value) and range_name != "reference_number":
                 errors.append(
                     build_cell_error_tuple(
                         ir,
