@@ -301,10 +301,17 @@ local Compound = {
     description: 'Prior references',
     pattern: '^[1-2][0-9]{3}-[0-9]{3}(,\\s*[1-2][0-9]{3}-[0-9]{3})*$',
   },
-  ReferenceNumber: Types.string {
-    title: 'ReferenceNumber',
-    description: 'Reference Number',
-    pattern: '^[1-2][0-9]{3}-[0-9]{3}$',
+  ReferenceNumber: {
+    oneOf: [
+      Types.string {
+        title: 'ReferenceNumber',
+        description: 'Reference Number',
+        pattern: '^[1-2][0-9]{3}-[0-9]{3}$',
+      },
+      Types.string {
+        const: Const.GSA_MIGRATION,
+      },
+    ],
   },
   ComplianceRequirement: {
     title: 'ComplianceRequirement',
