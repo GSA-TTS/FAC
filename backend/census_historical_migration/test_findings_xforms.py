@@ -266,6 +266,8 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
             SIGNIFICANTDEFICIENCY,
             OTHERFINDINGS,
             QCOSTS,
+            FINDINGREFNUMS,
+
         ):
             self.MODIFIEDOPINION = MODIFIEDOPINION
             self.OTHERNONCOMPLIANCE = OTHERNONCOMPLIANCE
@@ -273,6 +275,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
             self.SIGNIFICANTDEFICIENCY = SIGNIFICANTDEFICIENCY
             self.OTHERFINDINGS = OTHERFINDINGS
             self.QCOSTS = QCOSTS
+            self.FINDINGREFNUMS = FINDINGREFNUMS
 
     def test_replace_empty_fields(self):
         findings = [
@@ -283,6 +286,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
                 SIGNIFICANTDEFICIENCY="",
                 OTHERFINDINGS="Present",
                 QCOSTS="",
+                FINDINGREFNUMS="",
             ),
             self.Finding(
                 MODIFIEDOPINION="Present",
@@ -291,6 +295,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
                 SIGNIFICANTDEFICIENCY="",
                 OTHERFINDINGS="Present",
                 QCOSTS="",
+                FINDINGREFNUMS="Present",
             ),
             self.Finding(
                 MODIFIEDOPINION="",
@@ -299,6 +304,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
                 SIGNIFICANTDEFICIENCY="",
                 OTHERFINDINGS="",
                 QCOSTS="Present",
+                FINDINGREFNUMS="",
             ),
         ]
 
@@ -310,6 +316,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
         self.assertEqual(findings[0].SIGNIFICANTDEFICIENCY, settings.GSA_MIGRATION)
         self.assertEqual(findings[0].OTHERFINDINGS, "Present")
         self.assertEqual(findings[0].QCOSTS, settings.GSA_MIGRATION)
+        self.assertEqual(findings[0].FINDINGREFNUMS, settings.GSA_MIGRATION)
 
         self.assertEqual(findings[1].MODIFIEDOPINION, "Present")
         self.assertEqual(findings[1].OTHERNONCOMPLIANCE, "Present")
@@ -317,6 +324,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
         self.assertEqual(findings[1].SIGNIFICANTDEFICIENCY, settings.GSA_MIGRATION)
         self.assertEqual(findings[1].OTHERFINDINGS, "Present")
         self.assertEqual(findings[1].QCOSTS, settings.GSA_MIGRATION)
+        self.assertEqual(findings[1].FINDINGREFNUMS, "Present")
 
         self.assertEqual(findings[2].MODIFIEDOPINION, settings.GSA_MIGRATION)
         self.assertEqual(findings[2].OTHERNONCOMPLIANCE, "Present")
@@ -324,6 +332,7 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
         self.assertEqual(findings[2].SIGNIFICANTDEFICIENCY, settings.GSA_MIGRATION)
         self.assertEqual(findings[2].OTHERFINDINGS, settings.GSA_MIGRATION)
         self.assertEqual(findings[2].QCOSTS, "Present")
+        self.assertEqual(findings[2].FINDINGREFNUMS, settings.GSA_MIGRATION)
 
 
 class TestXformMissingRepeatPriorReference(SimpleTestCase):
