@@ -9,8 +9,8 @@
   },
   "scripts": {
     "build": "run-p build:*",
-    "build:esbuild": "node build-assets.js",
-    "dev": "node build-assets.js --watch",
+    "build:esbuild": "node build-assets.mjs",
+    "dev": "node build-assets.mjs --watch",
     "check:eslint": "npx eslint",
     "fix:eslint": "npx eslint --fix",
     "check:stylelint": "npx stylelint './static/scss'",
