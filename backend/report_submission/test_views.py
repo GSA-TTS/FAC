@@ -394,6 +394,7 @@ class TestPreliminaryViews(TestCase):
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertTrue("report_submission/eligibility" in response.url)
 
+
 class GeneralInformationFormViewTests(TestCase):
     def test_get_requires_login(self):
         """Requests to the GET endpoint require the user to be authenticated"""
