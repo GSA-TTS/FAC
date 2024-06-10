@@ -1,13 +1,15 @@
-const { defineConfig } = require('cypress');
-const { downloadFile } = require('cypress-downloadfile/lib/addPlugin');
+import { defineConfig } from 'cypress';
+import { downloadFile } from 'cypress-downloadfile/lib/addPlugin.js';
+import indexTasks from './cypress/plugins/index.mjs';
 
-module.exports = defineConfig({
+export default defineConfig({
   e2e: {
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
+    // eslint-disable-next-line no-unused-vars
     setupNodeEvents(on, config) {
       on('task', {downloadFile});
-      return require('./cypress/plugins/index.js')(on, config);
+      return indexTasks(on, config);
     },
     baseUrl: 'http://localhost:8000/',
     excludeSpecPattern: ['*/*/**/sf-sac-general-info.cy.js', '*/*/**/display-submissions.cy.js'],
