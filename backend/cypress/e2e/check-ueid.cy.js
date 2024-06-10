@@ -25,7 +25,8 @@ describe('Create New Audit', () => {
 
     describe('Auditee UEID', () => {
       function leaveUeiBlank() {
-        cy.get('#auditee_uei').click().blur();
+        cy.get('#auditee_uei').click();
+        cy.get('#auditee_uei').blur();
       }
 
       it('should display an error message when left blank', () => {
@@ -39,22 +40,28 @@ describe('Create New Audit', () => {
       });
 
       it('should remove the error message when input is supplied', () => {
-        cy.get('#auditee_uei').type('ASDF').blur();
+        cy.get('#auditee_uei').type('ASDF');
+        cy.get('#auditee_uei').blur();
         cy.get('#auditee_uei-not-null').should('not.be.visible');
       });
 
       it('should indicate when the supplied input is too short', () => {
-        cy.get('#auditee_uei').type('ASDF').blur();
+        cy.get('#auditee_uei').type('ASDF');
+        cy.get('#auditee_uei').blur();
         cy.get('#auditee_uei-length').should('be.visible');
       });
 
       it('should indicate when the supplied input is too long', () => {
-        cy.get('#auditee_uei').clear().type('ASDFASDFASDFA').blur();
+        cy.get('#auditee_uei').clear();
+        cy.get('#auditee_uei').type('THIRTEENLONG0');
+        cy.get('#auditee_uei').blur();
         cy.get('#auditee_uei-length').should('be.visible');
       });
 
       it('should remove the error message when the input is correct', () => {
-        cy.get('#auditee_uei').clear().type('ASDFASDFASDF').blur();
+        cy.get('#auditee_uei').clear();
+        cy.get('#auditee_uei').type('TWELVELONG01');
+        cy.get('#auditee_uei').blur();
         cy.get('#auditee_uei-length').should('not.be.visible');
       });
 
@@ -65,12 +72,14 @@ describe('Create New Audit', () => {
 
     describe('Fiscal Year Start Validation', () => {
       function leaveFyStartBlank() {
-        cy.get('#auditee_fiscal_period_end').click().blur();
+        cy.get('#auditee_fiscal_period_end').click();
+        cy.get('#auditee_fiscal_period_end').blur();
       }
 
       it('should display an error message when left blank', () => {
         leaveFyStartBlank();
-        cy.get('#auditee_fiscal_period_start').click().blur();
+        cy.get('#auditee_fiscal_period_start').click();
+        cy.get('#auditee_fiscal_period_start').blur();
         cy.get('#auditee_fiscal_period_start-not-null').should('be.visible');
       });
 
@@ -84,7 +93,8 @@ describe('Create New Audit', () => {
         leaveFyStartBlank();
 
         // act
-        cy.get('#auditee_fiscal_period_start').type('01/01/2022').blur();
+        cy.get('#auditee_fiscal_period_start').type('01/01/2022');
+        cy.get('#auditee_fiscal_period_start').blur();
 
         // assert
         cy.get('#auditee_fiscal_period_start-not-null').should(
@@ -98,14 +108,16 @@ describe('Create New Audit', () => {
       });
 
       it('should not show an error if the user enters a date after 12/31/2015', () => {
-        cy.get('#auditee_fiscal_period_start').clear().type('1/1/2016');
+        cy.get('#auditee_fiscal_period_start').clear();
+        cy.get('#auditee_fiscal_period_start').type('1/1/2016');
         cy.get('#fy-error-message li').should('have.length', 0);
       });
     });
 
     describe('Fiscal Year End Validation', () => {
       function leaveFyEndBlank() {
-        cy.get('#auditee_fiscal_period_end').click().blur();
+        cy.get('#auditee_fiscal_period_end').click();
+        cy.get('#auditee_fiscal_period_end').blur();
       }
 
       it('should display an error message when left blank', () => {
@@ -119,18 +131,22 @@ describe('Create New Audit', () => {
       });
 
       it('should remove the error message when input is supplied', () => {
-        cy.get('#auditee_fiscal_period_end').type('01/31/2022').blur();
+        cy.get('#auditee_fiscal_period_end').type('01/31/2022');
+        cy.get('#auditee_fiscal_period_end').blur();
         cy.get('#auditee_fiscal_period_end-not-null').should('not.be.visible');
       });
 
       it('should ensure that the end date is later than the start date', () => {
-        cy.get('#auditee_fiscal_period_start').type('12/31/2022').blur();
-        cy.get('#auditee_fiscal_period_end').type('11/31/2022').blur();
+        cy.get('#auditee_fiscal_period_start').type('12/31/2022');
+        cy.get('#auditee_fiscal_period_start').blur();
+        cy.get('#auditee_fiscal_period_end').type('11/31/2022');
+        cy.get('#auditee_fiscal_period_end').blur();
         cy.get('#auditee_fiscal_period_end-date-order').should('be.visible');
       });
 
       it('should remove the error message when valid end date is supplied', () => {
-        cy.get('#auditee_fiscal_period_end').type('01/31/2023').blur();
+        cy.get('#auditee_fiscal_period_end').type('01/31/2023');
+        cy.get('#auditee_fiscal_period_end').blur();
         cy.get('#auditee_fiscal_period_end-date-order').should(
           'not.be.visible'
         );
@@ -139,7 +155,9 @@ describe('Create New Audit', () => {
 
     describe('UEI Validation via API', () => {
       beforeEach(() => {
-        cy.get('#auditee_uei').clear().type('ASDFASDFASDF').blur();
+        cy.get('#auditee_uei').clear();
+        cy.get('#auditee_uei').type('ASDFASDFASDF');
+        cy.get('#auditee_uei').blur();
         cy.get('#auditee_uei-btn').as('searchButton');
         cy.get('.usa-modal__footer button.primary').as('primaryButton');
         cy.get('.usa-modal__footer button.secondary').as('secondaryButton');
@@ -268,7 +286,9 @@ describe('Create New Audit', () => {
 
     describe('Add Auditee UEID', () => {
       it('should add auditee UEI', () => {
-        cy.get('#auditee_uei').clear().type('CMBSGK6P7BE1').blur();
+        cy.get('#auditee_uei').clear();
+        cy.get('#auditee_uei').type('CMBSGK6P7BE1');
+        cy.get('#auditee_uei').blur();
       });
     });
 
@@ -306,11 +326,13 @@ describe('Create New Audit', () => {
 
     describe('ADD Fiscal start/end dates', () => {
       it('Enter expected start date', () => {
-        cy.get('#auditee_fiscal_period_start').clear().type('05/08/2023');
+        cy.get('#auditee_fiscal_period_start').clear();
+        cy.get('#auditee_fiscal_period_start').type('05/08/2023');
         cy.get('#fy-error-message li').should('have.length', 0);
       });
       it('Enter expected end date', () => {
-        cy.get('#auditee_fiscal_period_end').clear().type('05/08/2024');
+        cy.get('#auditee_fiscal_period_end').clear();
+        cy.get('#auditee_fiscal_period_end').type('05/08/2024');
         cy.get('#fy-error-message li').should('have.length', 0);
       });
     });
@@ -318,12 +340,16 @@ describe('Create New Audit', () => {
 
   describe('Auditee info validation via API', () => {
     function completeFormWithValidInfo() {
-      cy.get('#auditee_uei').clear().type('CMBSGK6P7BE1S').blur();
+      cy.get('#auditee_uei').clear();
+      cy.get('#auditee_uei').type('CMBSGK6P7BE1S');
+      cy.get('#auditee_uei').blur();
       cy.get('#auditee_uei-btn').as('searchButton');
       cy.get('.usa-modal__footer button.primary').as('primaryButton');
       cy.get('.usa-modal__footer button.secondary').as('secondaryButton');
-      cy.get('#auditee_fiscal_period_start').clear().type('05/08/2023');
-      cy.get('#auditee_fiscal_period_end').clear().type('05/08/2024');
+      cy.get('#auditee_fiscal_period_start').clear();
+      cy.get('#auditee_fiscal_period_start').type('05/08/2023');
+      cy.get('#auditee_fiscal_period_end').clear();
+      cy.get('#auditee_fiscal_period_end').type('05/08/2024');
     }
 
     xit('should return auditee info errors from the remote server', () => {
