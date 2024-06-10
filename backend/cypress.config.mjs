@@ -6,7 +6,6 @@ export default defineConfig({
   e2e: {
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
-    // eslint-disable-next-line no-unused-vars
     setupNodeEvents(on, config) {
       on('task', {downloadFile});
       return indexTasks(on, config);

@@ -10,7 +10,7 @@ compile:
 	@pip-compile --generate-hashes ./requirements/requirements.in -o requirements.txt --allow-unsafe
 
 compile-assets:
-	@node build-assets.js
+	@node build-assets.mjs
 
 # Generate an updated dev-requirements.txt
 compile-dev:
@@ -39,7 +39,7 @@ lint:
 	@echo "djlint:"
 	@djlint .
 	@echo eslint
-	@npx eslint --ignore-path ../.gitignore static/js
+	@npx eslint
 
 # Run Django tests:
 test:
