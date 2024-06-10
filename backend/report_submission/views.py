@@ -53,10 +53,14 @@ class EligibilityFormView(LoginRequiredMixin, View):
 # Step 2
 class AuditeeInfoFormView(LoginRequiredMixin, View):
     def get(self, request):
-        args = {}
-        args["step"] = 2
-        args["form"] = AuditeeInfoForm()
-        return render(request, "report_submission/step-2.html", args)
+        referer = request.META.get("HTTP_REFERER")
+        if not (referer and referer.endswith("report_submission/eligibility/")):
+            return redirect(reverse("report_submission:eligibility"))
+        else:
+            args = {}
+            args["step"] = 2
+            args["form"] = AuditeeInfoForm()
+            return render(request, "report_submission/step-2.html", args)
 
     # render auditee info form
 
