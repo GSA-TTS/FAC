@@ -267,7 +267,6 @@ class TestXformReplaceRequiredFields(SimpleTestCase):
             OTHERFINDINGS,
             QCOSTS,
             FINDINGREFNUMS,
-
         ):
             self.MODIFIEDOPINION = MODIFIEDOPINION
             self.OTHERNONCOMPLIANCE = OTHERNONCOMPLIANCE
