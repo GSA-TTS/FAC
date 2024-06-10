@@ -9,6 +9,7 @@ from audit.intakelib.common import (
     build_cell_error_tuple,
     appears_empty,
 )
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +26,10 @@ def finding_reference_pattern(ir):
     references = get_range_by_name(ir, "reference_number")
     errors = []
     for index, reference in enumerate(references["values"]):
-        if not appears_empty(reference) and (
-            not re.match(FINDING_REFERENCE_REGEX, str(reference))
+        if (
+            not appears_empty(reference)
+            and reference != settings.GSA_MIGRATION
+            and (not re.match(FINDING_REFERENCE_REGEX, str(reference)))
         ):
             errors.append(
                 build_cell_error_tuple(
