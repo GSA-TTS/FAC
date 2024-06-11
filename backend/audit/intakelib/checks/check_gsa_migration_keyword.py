@@ -44,6 +44,7 @@ def check_for_gsa_migration_keyword(ir):
         "material_weakness",
         "significant_deficiency",
         "repeat_prior_reference",
+        "reference_number",
         "is_guaranteed",
     ]
 

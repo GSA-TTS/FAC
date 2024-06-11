@@ -23,7 +23,14 @@ local Meta = Types.object {
 local FindingsTextEntry = {
   additionalProperties: false,
   properties: {
-    reference_number: Base.Compound.ReferenceNumber,
+    reference_number: {
+      oneOf: [
+        Base.Compound.ReferenceNumber,
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+      ],
+    },
     text_of_finding: Types.string,
     contains_chart_or_table: Base.Enum.YorNorGsaMigration,
   },
