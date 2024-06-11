@@ -155,6 +155,30 @@ def xform_cpafirmname(secondary_auditors):
         InspectionRecord.append_secondary_auditor_changes(change_records)
 
 
+def xform_pad_contact_phone_with_nine(secondary_auditors):
+    """Pad contact phone with 9s if less than 10 digits"""
+    change_records = []
+    is_pad_applied = False
+    for secondary_auditor in secondary_auditors:
+        contact_phone = string_to_string(secondary_auditor.CPAPHONE)
+        if contact_phone == "999999999":
+            contact_phone = "9999999999"
+            is_pad_applied = True
+        track_transformations(
+            "CPAPHONE",
+            secondary_auditor.CPAPHONE,
+            "contact_phone",
+            contact_phone,
+            ["xform_contact_phone"],
+            change_records,
+        )
+        secondary_auditor.CPAPHONE = contact_phone
+
+    # See Transformation Method Change Recording comment at the top of this file
+    if change_records and is_pad_applied:
+        InspectionRecord.append_secondary_auditor_changes(change_records)
+
+
 def generate_secondary_auditors(audit_header, outfile):
     """
     Generates secondary auditor workbook for a given audit header.
@@ -174,6 +198,7 @@ def generate_secondary_auditors(audit_header, outfile):
     xform_address_state(secondary_auditors)
     xform_address_zipcode(secondary_auditors)
     xform_cpafirmname(secondary_auditors)
+    xform_pad_contact_phone_with_nine(secondary_auditors)
     map_simple_columns(wb, mappings, secondary_auditors)
     wb.save(outfile)
 
