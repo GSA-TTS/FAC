@@ -188,8 +188,8 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(response.url, "/report_submission/auditeeinfo/")
 
         step2 = reverse("report_submission:auditeeinfo")
-        my_header = {"HTTP_REFERER": "report_submission/eligibility/"}
-        step2_get = self.client.get(step2, **my_header)
+        headers = {"HTTP_REFERER": "report_submission/eligibility/"}
+        step2_get = self.client.get(step2, **headers)
         self.assertEqual(step2_get.status_code, 200)
         self.assertTemplateUsed(step2_get, "report_submission/step-base.html")
         self.assertTemplateUsed(step2_get, "report_submission/step-2.html")
@@ -263,9 +263,9 @@ class TestPreliminaryViews(TestCase):
         user = baker.make(User)
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
-        my_header = {"HTTP_REFERER": "report_submission/eligibility/"}
+        headers = {"HTTP_REFERER": "report_submission/eligibility/"}
 
-        get_response = self.client.get(url, **my_header)
+        get_response = self.client.get(url, **headers)
         self.assertTrue(user.is_authenticated)
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
@@ -299,9 +299,9 @@ class TestPreliminaryViews(TestCase):
         user = baker.make(User)
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
-        my_header = {"HTTP_REFERER": "report_submission/eligibility/"}
+        headers = {"HTTP_REFERER": "report_submission/eligibility/"}
 
-        get_response = self.client.get(url, **my_header)
+        get_response = self.client.get(url, **headers)
         self.assertTrue(user.is_authenticated)
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
@@ -367,8 +367,8 @@ class TestPreliminaryViews(TestCase):
 
     def test_auditeeinfoformview_get_requires_login(self):
         url = reverse("report_submission:auditeeinfo")
-        my_header = {"HTTP_REFERER": "report_submission/eligibility/"}
-        response = self.client.get(url, **my_header)
+        headers = {"HTTP_REFERER": "report_submission/eligibility/"}
+        response = self.client.get(url, **headers)
 
         # Should redirect to login page
         self.assertIsInstance(response, HttpResponseRedirect)
