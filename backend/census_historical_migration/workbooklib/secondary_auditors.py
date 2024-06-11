@@ -161,8 +161,8 @@ def xform_pad_contact_phone_with_nine(secondary_auditors):
     is_pad_applied = False
     for secondary_auditor in secondary_auditors:
         contact_phone = string_to_string(secondary_auditor.CPAPHONE)
-        if len(contact_phone) < 10 and contact_phone == "999999999":
-            contact_phone = contact_phone.ljust(10, "9")
+        if contact_phone == "999999999":
+            contact_phone = "9999999999"
             is_pad_applied = True
         track_transformations(
             "CPAPHONE",
