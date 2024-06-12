@@ -1,4 +1,4 @@
-# 35. Access deletion: allow deletion of Audit Editor role
+# 36. Access deletion: allow deletion of Audit Editor role
 
 Date: 2024-05-28
 
