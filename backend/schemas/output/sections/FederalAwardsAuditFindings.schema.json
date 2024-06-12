@@ -341,10 +341,18 @@
                               "type": "string"
                            },
                            "reference_number": {
-                              "description": "Reference Number",
-                              "pattern": "^[1-2][0-9]{3}-[0-9]{3}$",
-                              "title": "ReferenceNumber",
-                              "type": "string"
+                              "oneOf": [
+                                 {
+                                    "description": "Reference Number",
+                                    "pattern": "^[1-2][0-9]{3}-[0-9]{3}$",
+                                    "title": "ReferenceNumber",
+                                    "type": "string"
+                                 },
+                                 {
+                                    "const": "GSA_MIGRATION",
+                                    "type": "string"
+                                 }
+                              ]
                            },
                            "repeat_prior_reference": {
                               "enum": [

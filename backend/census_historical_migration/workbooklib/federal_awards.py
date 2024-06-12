@@ -503,6 +503,32 @@ def is_valid_extension(extension):
     return any(re.match(pattern, str(extension)) for pattern in patterns)
 
 
+def xform_replace_missing_prefix(audits):
+    """Replaces missing ALN prefixes with the corresponding value in CFDA"""
+    change_records = []
+    is_empty_prefix_found = False
+    for audit in audits:
+        prefix = string_to_string(audit.CFDA_PREFIX)
+        if not prefix:
+            is_empty_prefix_found = True
+            prefix = string_to_string(audit.CFDA).split(".")[0]
+
+        track_transformations(
+            "CFDA_PREFIX",
+            audit.CFDA_PREFIX,
+            "federal_agency_prefix",
+            prefix,
+            ["xform_replace_missing_prefix"],
+            change_records,
+        )
+
+        audit.CFDA_PREFIX = prefix
+
+    # See Transformation Method Change Recording at the top of this file.
+    if change_records and is_empty_prefix_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
 def xform_replace_invalid_extension(audit):
     """Replaces invalid ALN extensions with the default value settings.GSA_MIGRATION."""
     prefix = string_to_string(audit.CFDA_PREFIX)
@@ -626,7 +652,7 @@ def xform_populate_default_passthrough_names_ids(audits):
         range(len(audits)), audits, passthrough_names, passthrough_ids
     ):
         direct = string_to_string(audit.DIRECT)
-        if direct == "N" and name == "":
+        if direct in {"N", settings.GSA_MIGRATION} and name == "":
             passthrough_names[index] = settings.GSA_MIGRATION
         if direct == "N" and id == "":
             passthrough_ids[index] = settings.GSA_MIGRATION
@@ -854,6 +880,40 @@ def track_invalid_federal_program_total(audits, cfda_key_values):
         )
 
 
+def xform_replace_required_values_with_gsa_migration_when_empty(audits):
+    """Replace empty fields with GSA_MIGRATION."""
+    fields_to_check = [
+        ("LOANS", "is_loan"),
+        ("DIRECT", "is_direct"),
+    ]
+
+    for in_db, in_dissem in fields_to_check:
+        _replace_empty_field(audits, in_db, in_dissem)
+
+
+def _replace_empty_field(audits, name_in_db, name_in_dissem):
+    """Replace empty fields with GSA_MIGRATION."""
+    change_records = []
+    has_empty_field = False
+    for audit in audits:
+        current_value = getattr(audit, name_in_db)
+        if not string_to_string(current_value):
+            has_empty_field = True
+            setattr(audit, name_in_db, settings.GSA_MIGRATION)
+
+        track_transformations(
+            name_in_db,
+            current_value,
+            name_in_dissem,
+            settings.GSA_MIGRATION,
+            ["xform_replace_required_values_with_gsa_migration_when_empty"],
+            change_records,
+        )
+
+    if change_records and has_empty_field:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
 def generate_federal_awards(audit_header, outfile):
     """
     Generates a federal awards workbook for all awards associated with a given audit header.
@@ -887,6 +947,8 @@ def generate_federal_awards(audit_header, outfile):
     xform_is_passthrough_award(audits)
     xform_missing_major_program(audits)
     track_invalid_number_of_audit_findings(audits, audit_header)
+    xform_replace_required_values_with_gsa_migration_when_empty(audits)
+    xform_replace_missing_prefix(audits)
     map_simple_columns(wb, mappings, audits)
 
     set_range(wb, "cluster_name", cluster_names)

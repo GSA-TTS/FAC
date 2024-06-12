@@ -268,6 +268,7 @@ def xform_replace_required_fields_with_gsa_migration_when_empty(findings):
         ("SIGNIFICANTDEFICIENCY", "is_significant_deficiency"),
         ("OTHERFINDINGS", "is_other_findings"),
         ("QCOSTS", "is_questioned_costs"),
+        ("FINDINGREFNUMS", "reference_number"),
     ]
 
     for in_db, in_dissem in fields_to_check:

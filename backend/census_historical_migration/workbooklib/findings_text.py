@@ -63,6 +63,8 @@ def xform_add_placeholder_for_missing_references(findings, findings_texts):
 
     if missing_references:
         for ref in missing_references:
+            if not ref:
+                ref = settings.GSA_MIGRATION
             findings_texts.append(
                 FindingsText(
                     SEQ_NUMBER="0",

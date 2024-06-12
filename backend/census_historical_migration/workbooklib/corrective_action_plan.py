@@ -61,6 +61,8 @@ def xform_add_placeholder_for_missing_references(findings, captexts):
     missing_references = expected_references - found_references
     if missing_references:
         for ref in missing_references:
+            if not ref:
+                ref = settings.GSA_MIGRATION
             captexts.append(
                 CapText(
                     SEQ_NUMBER="0",
