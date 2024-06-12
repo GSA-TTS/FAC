@@ -92,8 +92,8 @@ def track_invalid_records_with_more_captexts_less_findings(findings, captexts):
     captext_refnums = get_reference_numbers_from_text_records(captexts)
     invalid_records = []
     extra_captexts = captext_refnums.difference(finding_refnums)
-    if len(extra_captexts) > 0:
-        invalid_records = []
+    missing_captexts = finding_refnums.difference(captext_refnums)
+    if len(extra_captexts):
         for captext_refnum in captext_refnums:
             census_data_tuples = [
                 ("FINDINGREFNUMS", captext_refnum),
@@ -104,9 +104,21 @@ def track_invalid_records_with_more_captexts_less_findings(findings, captexts):
                 captext_refnum,
                 invalid_records,
             )
+        InvalidRecord.append_invalid_cap_text_records(invalid_records)
+    elif len(missing_captexts):
+        for finding_refnum in missing_captexts:
+            census_data_tuples = [
+                ("FINDINGREFNUMS", finding_refnum),
+            ]
+            track_invalid_records(
+                census_data_tuples,
+                "reference_number",
+                finding_refnum,
+                invalid_records,
+            )
+        InvalidRecord.append_invalid_finding_records(invalid_records)
 
     if invalid_records:
-        InvalidRecord.append_invalid_cap_text_records(invalid_records)
         InvalidRecord.append_validations_to_skip("check_ref_number_in_cap")
         InvalidRecord.append_invalid_migration_tag(
             INVALID_MIGRATION_TAGS.EXTRA_FINDING_REFERENCE_NUMBERS_IN_CAPTEXT
