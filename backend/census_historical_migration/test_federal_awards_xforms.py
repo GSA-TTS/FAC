@@ -876,7 +876,7 @@ class TestTrackInvalidNumberOfAuditFindings(TestCase):
 
         InvalidRecord.reset()
 
-    @patch("census_historical_migration.workbooklib.findings.get_findings")
+    @patch("census_historical_migration.workbooklib.federal_awards.get_findings")
     def test_track_invalid_number_of_audit_findings(self, mock_get_findings):
         """Test tracking for invalid number of audit findings"""
         # Mock the findings and audits data
