@@ -939,6 +939,8 @@ class TestTrackInvalidNumberOfAuditFindings(TestCase):
 
         mock_get_findings.assert_called_once_with("some_dbkey", "2024")
         self.assertEqual(len(InvalidRecord.fields["federal_award"]), 0)
+
+
 class TestXformMissingPrefix(SimpleTestCase):
     class MockAudit:
 
