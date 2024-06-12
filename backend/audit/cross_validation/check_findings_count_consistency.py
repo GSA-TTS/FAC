@@ -1,3 +1,6 @@
+from django.conf import settings
+
+from census_historical_migration.invalid_record import InvalidRecord
 from .errors import (
     err_findings_count_inconsistent,
 )
@@ -19,10 +22,17 @@ def check_findings_count_consistency(sac_dict, *_args, **_kwargs):
     findings_uniform_guidance = findings_uniform_guidance_section.get(
         "findings_uniform_guidance_entries", []
     )
-
+    data_source = sac_dict.get("sf_sac_meta", {}).get("data_source", "")
     expected_award_refs_count = {}
     found_award_refs_count = defaultdict(int)
     errors = []
+    if (
+        data_source == settings.CENSUS_DATA_SOURCE
+        and "check_findings_count_consistency"
+        in InvalidRecord.fields["validations_to_skip"]
+    ):
+        # Skip this validation if it is an historical audit report with incorrect findings count
+        return errors
 
     for award in federal_awards:
         award_reference = award.get("award_reference", None)

@@ -1,4 +1,6 @@
+from collections import defaultdict
 from audit.intakelib.checks.check_cluster_total import expected_cluster_total
+from .findings import get_findings
 from ..invalid_migration_tags import INVALID_MIGRATION_TAGS
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_int import string_to_int
@@ -124,6 +126,56 @@ def xform_missing_major_program(audits):
     # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_major_program_found:
         InspectionRecord.append_federal_awards_changes(change_records)
+
+
+from collections import defaultdict
+
+
+def track_invalid_number_of_audit_findings(audits, audit_header):
+    """Track invalid number of audit findings."""
+    findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
+
+    invalid_audit_records = []
+    is_incorrect_findings_count_found = False
+    expected_finding_count = defaultdict(int)
+    declared_finding_count = defaultdict(int)
+
+    # Count the expected findings
+    for finding in findings:
+        expected_finding_count[finding.ELECAUDITSID] += 1
+
+    # Count the declared findings
+    for audit in audits:
+        declared_finding_count[audit.ELECAUDITSID] = string_to_int(audit.FINDINGSCOUNT)
+
+    # Check for discrepancies in findings count
+    if (
+        len(expected_finding_count) != len(declared_finding_count)
+        or sum(expected_finding_count.values()) != sum(declared_finding_count.values())
+        or declared_finding_count != expected_finding_count
+    ):
+        is_incorrect_findings_count_found = True
+
+    # Track invalid audit records if discrepancies are found
+    if is_incorrect_findings_count_found:
+        for audit in audits:
+            elec_audits_id = audit.ELECAUDITSID
+            expected_count = expected_finding_count[elec_audits_id]
+            track_invalid_records(
+                [
+                    ("ELECAUDITSID", elec_audits_id),
+                    ("FINDINGSCOUNT", audit.FINDINGSCOUNT),
+                ],
+                "findings_count",
+                str(expected_count),
+                invalid_audit_records,
+            )
+
+        InvalidRecord.append_validations_to_skip("check_findings_count_consistency")
+        InvalidRecord.append_invalid_migration_tag(
+            INVALID_MIGRATION_TAGS.INCORRECT_FINDINGS_COUNT,
+        )
+        InvalidRecord.append_invalid_federal_awards_records(invalid_audit_records)
 
 
 def xform_missing_findings_count(audits):
@@ -828,12 +880,13 @@ def generate_federal_awards(audit_header, outfile):
         audits, cluster_names, other_cluster_names, state_cluster_names
     )
     xform_missing_program_total(audits)
+
     xform_missing_findings_count(audits)
     xform_missing_amount_expended(audits)
     xform_program_name(audits)
     xform_is_passthrough_award(audits)
     xform_missing_major_program(audits)
-
+    track_invalid_number_of_audit_findings(audits, audit_header)
     map_simple_columns(wb, mappings, audits)
 
     set_range(wb, "cluster_name", cluster_names)
