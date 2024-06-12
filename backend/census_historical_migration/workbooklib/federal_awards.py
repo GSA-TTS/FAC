@@ -128,9 +128,6 @@ def xform_missing_major_program(audits):
         InspectionRecord.append_federal_awards_changes(change_records)
 
 
-from collections import defaultdict
-
-
 def track_invalid_number_of_audit_findings(audits, audit_header):
     """Track invalid number of audit findings."""
     findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
