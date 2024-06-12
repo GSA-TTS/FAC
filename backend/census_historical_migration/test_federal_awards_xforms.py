@@ -904,7 +904,7 @@ class TestTrackInvalidNumberOfAuditFindings(TestCase):
                         {"column": "ELECAUDITSID", "value": "audit1"},
                         {"column": "FINDINGSCOUNT", "value": "2"},
                     ],
-                    "gsa_fac_data": {"field": "findings_count", "value": "0"},
+                    "gsa_fac_data": {"field": "findings_count", "value": "2"},
                 },
                 {
                     "census_data": [
