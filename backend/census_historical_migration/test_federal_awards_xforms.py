@@ -27,6 +27,8 @@ from .workbooklib.federal_awards import (
     xform_missing_major_program,
     is_valid_extension,
     xform_cluster_names,
+    xform_replace_missing_prefix,
+    xform_replace_required_values_with_gsa_migration_when_empty,
     xform_sanitize_additional_award_identification,
 )
 
@@ -851,3 +853,62 @@ class TestTrackInvalidFederalProgramTotal(SimpleTestCase):
             InvalidRecord.fields["validations_to_skip"],
         )
         self.assertNotIn
+
+
+class TestXformMissingPrefix(SimpleTestCase):
+    class MockAudit:
+
+        def __init__(self, CFDA_PREFIX, CFDA):
+            self.CFDA_PREFIX = CFDA_PREFIX
+            self.CFDA = CFDA
+
+    def test_for_no_missing_prefix(self):
+        """Test for no missing prefix"""
+        audits = [self.MockAudit("01", "01.123"), self.MockAudit("02", "02.456")]
+
+        xform_replace_missing_prefix(audits)
+
+        self.assertEqual(audits[0].CFDA_PREFIX, "01")
+        self.assertEqual(audits[1].CFDA_PREFIX, "02")
+
+    def test_for_missing_prefix(self):
+        """Test for missing prefix"""
+        audits = [self.MockAudit("", "01.123"), self.MockAudit("02", "02.456")]
+
+        xform_replace_missing_prefix(audits)
+
+        self.assertEqual(audits[0].CFDA_PREFIX, "01")
+        self.assertEqual(audits[1].CFDA_PREFIX, "02")
+
+
+class TestXformReplaceMissingFields(SimpleTestCase):
+
+    class MockAudit:
+
+        def __init__(
+            self,
+            LOANS,
+            DIRECT,
+        ):
+            self.LOANS = LOANS
+            self.DIRECT = DIRECT
+
+    def test_replace_empty_fields(self):
+        audits = [
+            self.MockAudit(
+                LOANS="",
+                DIRECT="",
+            ),
+            self.MockAudit(
+                LOANS="Present",
+                DIRECT="Present",
+            ),
+        ]
+
+        xform_replace_required_values_with_gsa_migration_when_empty(audits)
+
+        self.assertEqual(audits[0].LOANS, settings.GSA_MIGRATION)
+        self.assertEqual(audits[0].DIRECT, settings.GSA_MIGRATION)
+
+        self.assertEqual(audits[1].LOANS, "Present")
+        self.assertEqual(audits[1].DIRECT, "Present")

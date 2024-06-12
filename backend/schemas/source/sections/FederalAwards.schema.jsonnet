@@ -311,7 +311,7 @@ local Parts = {
     additionalProperties: false,
     description: 'A loan or loan guarantee and balance',
     properties: {
-      is_guaranteed: Base.Enum.YorN,
+      is_guaranteed: Base.Enum.YorNorGsaMigration,
       loan_balance_at_audit_period_end: {
         anyOf: [
           Types.integer,

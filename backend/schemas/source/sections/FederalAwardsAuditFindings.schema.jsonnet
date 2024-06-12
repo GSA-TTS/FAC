@@ -42,7 +42,14 @@ local Parts = {
   Findings: Types.object {
     additionalProperties: false,
     properties: {
-      reference_number: Base.Compound.ReferenceNumber,
+      reference_number: {
+        oneOf: [
+          Base.Compound.ReferenceNumber,
+          Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+        ],
+      },
       is_valid: Base.Enum.YorNorGsaMigration,
       repeat_prior_reference: Base.Enum.YorNorGsaMigration,
       prior_references: Types.string,
