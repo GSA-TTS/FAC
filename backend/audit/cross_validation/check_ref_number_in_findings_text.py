@@ -29,10 +29,10 @@ def check_ref_number_in_findings_text(sac_dict, *_args, **_kwargs):
     in_use_references = set()
     errors = []
 
-    skip_validation_function = InvalidRecord.fields["validations_to_skip"]
     if (
         data_source == settings.CENSUS_DATA_SOURCE
-        and "check_ref_number_in_findings_text" in skip_validation_function
+        and "check_ref_number_in_findings_text"
+        in InvalidRecord.fields["validations_to_skip"]
     ):
         # Skip this validation if it is a historical audit report with non-matching reference numbers
         return errors
