@@ -92,7 +92,7 @@ mappings = [
         "ZIPCODE",
         FormFieldInDissem,
         None,
-        xform_remove_hyphen_and_pad_zip,
+        str,
     ),
     FormFieldMap("auditor_address_line_1", "CPASTREET1", FormFieldInDissem, None, str),
     FormFieldMap("auditor_city", "CPACITY", FormFieldInDissem, None, str),
@@ -112,7 +112,7 @@ mappings = [
         "CPAZIPCODE",
         FormFieldInDissem,
         None,
-        xform_remove_hyphen_and_pad_zip,
+        str,
     ),
     FormFieldMap("ein", "EIN", "auditee_ein", None, str),
     FormFieldMap(
@@ -228,13 +228,48 @@ def _census_audit_type(s):
 
 
 def xform_country(general_information, audit_header):
-    """Transforms the country from Census format to FAC format."""
+    """Transforms the country from Census format to FAC format. This method is now deprecated."""
     # Transformation to be documented.
     auditor_country = string_to_string(
         general_information.get("auditor_country")
     ).upper()
     if auditor_country in ["US", "USA"]:
         general_information["auditor_country"] = "USA"
+    elif auditor_country == "":
+        valid_file = open(f"{settings.SCHEMA_BASE_DIR}/States.json")
+        valid_json = json.load(valid_file)
+        auditor_state = string_to_string(audit_header.CPASTATE).upper()
+        if auditor_state in valid_json["UnitedStatesStateAbbr"]:
+            general_information["auditor_country"] = "USA"
+        else:
+            raise DataMigrationError(
+                f"Unable to determine auditor country. Invalid state: {auditor_state}",
+                "invalid_state",
+            )
+    else:
+        raise DataMigrationError(
+            f"Unable to determine auditor country. Unknown code: {auditor_country}",
+            "invalid_country",
+        )
+
+    return general_information
+
+
+def xform_country_v2(general_information, audit_header):
+    """Transforms the country from Census format to FAC format."""
+    auditor_country = string_to_string(
+        general_information.get("auditor_country")
+    ).upper()
+    if auditor_country in ["US", "USA"]:
+        general_information["auditor_country"] = "USA"
+    elif auditor_country == "NON-US" and not (
+        audit_header.CPAZIPCODE
+        or audit_header.CPASTATE
+        or audit_header.CPACITY
+        or audit_header.CPASTREET1
+    ):
+        general_information["auditor_country"] = "non-USA"
+        general_information["auditor_international_address"] = audit_header.CPAFOREIGN
     elif auditor_country == "":
         valid_file = open(f"{settings.SCHEMA_BASE_DIR}/States.json")
         valid_json = json.load(valid_file)
@@ -381,6 +416,21 @@ def xform_replace_empty_auditee_contact_name(general_information):
     return general_information
 
 
+def xform_replace_empty_auditee_contact_title(general_information):
+    """Replaces empty auditee contact title with GSA Migration keyword"""
+    # Transformation recorded.
+    if not general_information.get("auditee_contact_title"):
+        general_information["auditee_contact_title"] = settings.GSA_MIGRATION
+        track_transformations(
+            "AUDITEETITLE",
+            "",
+            "auditee_contact_title",
+            general_information["auditee_contact_title"],
+            "xform_replace_empty_auditee_contact_title",
+        )
+    return general_information
+
+
 def xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header):
     """Replaces empty or invalid auditee UEI with GSA Migration keyword"""
     # Transformation recorded.
@@ -470,26 +520,40 @@ def xform_audit_period_other_months(general_information, audit_header):
 
 def xform_replace_empty_zips(general_information):
     """Replaces empty auditor and auditee zipcodes with GSA Migration keyword"""
-    # Transformation recorded.
-    if not general_information.get("auditor_zip"):
-        general_information["auditor_zip"] = settings.GSA_MIGRATION
-        track_transformations(
-            "CPAZIPCODE",
-            "",
-            "auditor_zip",
-            general_information["auditor_zip"],
-            "xform_replace_empty_zips",
-        )
+    auditor_zip = general_information.get("auditor_zip")
+    is_usa_auditor = general_information.get("auditor_country") != "non-USA"
 
-    if not general_information.get("auditee_zip"):
-        general_information["auditee_zip"] = settings.GSA_MIGRATION
+    if is_usa_auditor:
+        if not auditor_zip:
+            new_auditor_zip = settings.GSA_MIGRATION
+        else:
+            new_auditor_zip = xform_remove_hyphen_and_pad_zip(auditor_zip)
+
+        if new_auditor_zip != auditor_zip:
+            track_transformations(
+                "CPAZIPCODE",
+                auditor_zip,
+                "auditor_zip",
+                new_auditor_zip,
+                "xform_replace_empty_zips",
+            )
+            general_information["auditor_zip"] = new_auditor_zip
+
+    auditee_zip = general_information.get("auditee_zip")
+    if not auditee_zip:
+        new_auditee_zip = settings.GSA_MIGRATION
+    else:
+        new_auditee_zip = xform_remove_hyphen_and_pad_zip(auditee_zip)
+
+    if new_auditee_zip != auditee_zip:
         track_transformations(
             "ZIPCODE",
-            "",
+            auditee_zip,
             "auditee_zip",
-            general_information["auditee_zip"],
+            new_auditee_zip,
             "xform_replace_empty_zips",
         )
+        general_information["auditee_zip"] = new_auditee_zip
 
     return general_information
 
@@ -505,7 +569,7 @@ def general_information(audit_header):
     transformations = [
         xform_auditee_fiscal_period_start,
         xform_auditee_fiscal_period_end,
-        xform_country,
+        xform_country_v2,
         xform_audit_period_covered,
         xform_audit_type,
         xform_replace_empty_auditor_email,
@@ -514,10 +578,11 @@ def general_information(audit_header):
         xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
         xform_replace_empty_zips,
         xform_replace_empty_auditee_contact_name,
+        xform_replace_empty_auditee_contact_title,
     ]
 
     for transform in transformations:
-        if transform == xform_country:
+        if transform == xform_country_v2:
             general_information = transform(general_information, audit_header)
         else:
             general_information = transform(general_information)

@@ -332,7 +332,8 @@
                            "is_valid": {
                               "enum": [
                                  "Y",
-                                 "N"
+                                 "N",
+                                 "GSA_MIGRATION"
                               ],
                               "type": "string"
                            },
@@ -340,15 +341,24 @@
                               "type": "string"
                            },
                            "reference_number": {
-                              "description": "Reference Number",
-                              "pattern": "^[1-2][0-9]{3}-[0-9]{3}$",
-                              "title": "ReferenceNumber",
-                              "type": "string"
+                              "oneOf": [
+                                 {
+                                    "description": "Reference Number",
+                                    "pattern": "^[1-2][0-9]{3}-[0-9]{3}$",
+                                    "title": "ReferenceNumber",
+                                    "type": "string"
+                                 },
+                                 {
+                                    "const": "GSA_MIGRATION",
+                                    "type": "string"
+                                 }
+                              ]
                            },
                            "repeat_prior_reference": {
                               "enum": [
                                  "Y",
-                                 "N"
+                                 "N",
+                                 "GSA_MIGRATION"
                               ],
                               "type": "string"
                            }
@@ -363,28 +373,32 @@
                      "material_weakness": {
                         "enum": [
                            "Y",
-                           "N"
+                           "N",
+                           "GSA_MIGRATION"
                         ],
                         "type": "string"
                      },
                      "modified_opinion": {
                         "enum": [
                            "Y",
-                           "N"
+                           "N",
+                           "GSA_MIGRATION"
                         ],
                         "type": "string"
                      },
                      "other_findings": {
                         "enum": [
                            "Y",
-                           "N"
+                           "N",
+                           "GSA_MIGRATION"
                         ],
                         "type": "string"
                      },
                      "other_matters": {
                         "enum": [
                            "Y",
-                           "N"
+                           "N",
+                           "GSA_MIGRATION"
                         ],
                         "type": "string"
                      },
@@ -8611,14 +8625,16 @@
                      "questioned_costs": {
                         "enum": [
                            "Y",
-                           "N"
+                           "N",
+                           "GSA_MIGRATION"
                         ],
                         "type": "string"
                      },
                      "significant_deficiency": {
                         "enum": [
                            "Y",
-                           "N"
+                           "N",
+                           "GSA_MIGRATION"
                         ],
                         "type": "string"
                      }

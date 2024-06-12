@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 {% load static %}
 {% load sprite_helper %}
 
@@ -92,8 +93,7 @@
 
                     <div class="margin-y-2 grid-row display-flex flex-justify">
                         <p class="margin-0 flex-align-self-center">
-                            <strong>Results: {{ results_count }}</strong>
-                            <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
+                            <span>{{ results.start_index }}-{{results.end_index}} of <strong>{{ results_count|intcomma }}</strong> results in {{ total_time_s|floatformat }} seconds.</span>
                         </p>
                         {% if results_count <= summary_report_download_limit %}
                             <button class="usa-button display-flex"

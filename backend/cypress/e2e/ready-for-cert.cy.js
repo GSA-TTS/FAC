@@ -19,5 +19,5 @@ describe('Ready for SF-SAC Certification', () => {
   it('clicks Submit for Certification', () => {
     cy.visit(`/audit/ready-for-certification/${reportTestId}`);
     cy.get('#continue').click();
-  })
+  });
 });

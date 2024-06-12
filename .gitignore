@@ -51,7 +51,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-.lighthouseci/
 backend/cypress/screenshots/
 backend/cypress/videos/
 

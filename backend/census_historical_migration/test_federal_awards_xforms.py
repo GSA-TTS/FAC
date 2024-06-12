@@ -2,17 +2,19 @@ from unittest.mock import patch
 from django.conf import settings
 from django.test import SimpleTestCase
 
+from .invalid_migration_tags import INVALID_MIGRATION_TAGS
+from .invalid_record import InvalidRecord
 from .transforms.xform_string_to_string import (
     string_to_string,
 )
-
 from .exception_utils import DataMigrationError
 from .workbooklib.federal_awards import (
     is_valid_prefix,
+    track_invalid_federal_program_total,
     xform_match_number_passthrough_names_ids,
     xform_missing_amount_expended,
     xform_missing_program_total,
-    xform_missing_cluster_total,
+    xform_missing_cluster_total_v2,
     xform_populate_default_award_identification_values,
     xform_populate_default_loan_balance,
     xform_constructs_cluster_names,
@@ -25,6 +27,8 @@ from .workbooklib.federal_awards import (
     xform_missing_major_program,
     is_valid_extension,
     xform_cluster_names,
+    xform_replace_missing_prefix,
+    xform_replace_required_values_with_gsa_migration_when_empty,
     xform_sanitize_additional_award_identification,
 )
 
@@ -483,7 +487,7 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         state_cluster_names = ["", "", ""]
         expected_totals = ["250", "150", "250"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
@@ -515,7 +519,7 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         state_cluster_names = ["", "State Cluster A", "", "State Cluster A"]
         expected_totals = ["250", "300", "250", "300"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
@@ -547,12 +551,51 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         other_cluster_names = ["", "Other Cluster A", "", "Other Cluster A"]
         expected_totals = ["250", "300", "250", "300"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
         for audit, expected in zip(audits, expected_totals):
             self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+    def test_xform_missing_cluster_total_invalid(self):
+        """Test for incorrect cluster total"""
+        audits = [
+            self.AuditMock("150", "Cluster A", cluster_total="33"),
+        ]
+        cluster_names = ["Cluster A"]
+        other_cluster_names = [""]
+        state_cluster_names = [""]
+        expected_totals = ["33"]
+
+        InvalidRecord.reset()
+        xform_missing_cluster_total_v2(
+            audits, cluster_names, other_cluster_names, state_cluster_names
+        )
+
+        for audit, expected in zip(audits, expected_totals):
+            self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+        self.assertEqual(
+            InvalidRecord.fields["validations_to_skip"],
+            ["cluster_total_is_correct"],
+        )
+        self.assertEqual(
+            InvalidRecord.fields["federal_award"],
+            [
+                [
+                    {
+                        "census_data": [
+                            {"column": "CLUSTERTOTAL", "value": 33},
+                            {"column": "CLUSTERNAME", "value": "Cluster A"},
+                            {"column": "STATECLUSTERNAME", "value": ""},
+                            {"column": "OTHERCLUSTERNAME", "value": ""},
+                        ],
+                        "gsa_fac_data": {"field": "cluster_total", "value": 150},
+                    }
+                ]
+            ],
+        )
 
 
 class TestXformMissingAmountExpended(SimpleTestCase):
@@ -758,3 +801,114 @@ class TestXformSanitizeAdditionalAwardIdentification(SimpleTestCase):
         expected = ["", None, "12345"]
         result = xform_sanitize_additional_award_identification(audits, identifications)
         self.assertEqual(result, expected)
+
+
+class TestTrackInvalidFederalProgramTotal(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, PROGRAMTOTAL, AMOUNT):
+            self.PROGRAMTOTAL = PROGRAMTOTAL
+            self.AMOUNT = AMOUNT
+
+    def setUp(self):
+        self.audits = [
+            self.MockAudit(PROGRAMTOTAL="100", AMOUNT="50"),
+            self.MockAudit(PROGRAMTOTAL="200", AMOUNT="200"),
+            self.MockAudit(PROGRAMTOTAL="150", AMOUNT="100"),
+        ]
+        self.cfda_key_values = ["1234", "5678", "1234"]
+
+        # Reset InvalidRecord before each test
+        InvalidRecord.reset()
+
+    def test_track_invalid_federal_program_total(self):
+        """Test for invalid federal program total"""
+
+        track_invalid_federal_program_total(self.audits, self.cfda_key_values)
+
+        # Check the results in InvalidRecord
+        self.assertEqual(len(InvalidRecord.fields["federal_award"]), 1)
+        self.assertIn(
+            "federal_program_total_is_correct",
+            InvalidRecord.fields["validations_to_skip"],
+        )
+        self.assertIn(
+            INVALID_MIGRATION_TAGS.INVALID_FEDERAL_PROGRAM_TOTAL,
+            InvalidRecord.fields["invalid_migration_tag"],
+        )
+
+    def test_no_invalid_federal_program_total(self):
+        # Adjust mock data for no invalid records
+        self.audits = [
+            self.MockAudit(PROGRAMTOTAL="150", AMOUNT="50"),
+            self.MockAudit(PROGRAMTOTAL="200", AMOUNT="200"),
+            self.MockAudit(PROGRAMTOTAL="150", AMOUNT="100"),
+        ]
+
+        track_invalid_federal_program_total(self.audits, self.cfda_key_values)
+
+        # Check that no invalid records are added
+        self.assertEqual(len(InvalidRecord.fields["federal_award"]), 0)
+        self.assertNotIn(
+            "federal_program_total_is_correct",
+            InvalidRecord.fields["validations_to_skip"],
+        )
+        self.assertNotIn
+
+
+class TestXformMissingPrefix(SimpleTestCase):
+    class MockAudit:
+
+        def __init__(self, CFDA_PREFIX, CFDA):
+            self.CFDA_PREFIX = CFDA_PREFIX
+            self.CFDA = CFDA
+
+    def test_for_no_missing_prefix(self):
+        """Test for no missing prefix"""
+        audits = [self.MockAudit("01", "01.123"), self.MockAudit("02", "02.456")]
+
+        xform_replace_missing_prefix(audits)
+
+        self.assertEqual(audits[0].CFDA_PREFIX, "01")
+        self.assertEqual(audits[1].CFDA_PREFIX, "02")
+
+    def test_for_missing_prefix(self):
+        """Test for missing prefix"""
+        audits = [self.MockAudit("", "01.123"), self.MockAudit("02", "02.456")]
+
+        xform_replace_missing_prefix(audits)
+
+        self.assertEqual(audits[0].CFDA_PREFIX, "01")
+        self.assertEqual(audits[1].CFDA_PREFIX, "02")
+
+
+class TestXformReplaceMissingFields(SimpleTestCase):
+
+    class MockAudit:
+
+        def __init__(
+            self,
+            LOANS,
+            DIRECT,
+        ):
+            self.LOANS = LOANS
+            self.DIRECT = DIRECT
+
+    def test_replace_empty_fields(self):
+        audits = [
+            self.MockAudit(
+                LOANS="",
+                DIRECT="",
+            ),
+            self.MockAudit(
+                LOANS="Present",
+                DIRECT="Present",
+            ),
+        ]
+
+        xform_replace_required_values_with_gsa_migration_when_empty(audits)
+
+        self.assertEqual(audits[0].LOANS, settings.GSA_MIGRATION)
+        self.assertEqual(audits[0].DIRECT, settings.GSA_MIGRATION)
+
+        self.assertEqual(audits[1].LOANS, "Present")
+        self.assertEqual(audits[1].DIRECT, "Present")

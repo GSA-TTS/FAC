@@ -8,4 +8,4 @@ export function testLogoutGov() {
       cy.contains('Yes, sign out of Login.gov').click();
     }
   );
-}
+};
