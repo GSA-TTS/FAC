@@ -10,3 +10,4 @@ class INVALID_MIGRATION_TAGS:
     EXTRA_FINDING_REFERENCE_NUMBERS_IN_FINDINGSTEXT = (
         "extra_finding_reference_numbers_in_findingstext"
     )
+    INCORRECT_FINDINGS_COUNT = "incorrect_findings_count"

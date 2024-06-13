@@ -98,8 +98,9 @@ def track_invalid_records_with_more_findings_texts_than_findings(
     findings_text_refnums = get_reference_numbers_from_text_records(findings_texts)
     invalid_records = []
     extra_findings_texts = findings_text_refnums.difference(finding_refnums)
-    if len(extra_findings_texts) > 0:
-        invalid_records = []
+    missing_findings_texts = finding_refnums.difference(findings_text_refnums)
+
+    if len(extra_findings_texts):
         for findings_text_refnum in findings_text_refnums:
             census_data_tuples = [
                 ("FINDINGREFNUMS", findings_text_refnum),
@@ -110,9 +111,20 @@ def track_invalid_records_with_more_findings_texts_than_findings(
                 findings_text_refnum,
                 invalid_records,
             )
-
-    if invalid_records:
         InvalidRecord.append_invalid_finding_text_records(invalid_records)
+    elif len(missing_findings_texts):
+        for finding_refnum in missing_findings_texts:
+            census_data_tuples = [
+                ("FINDINGREFNUMS", finding_refnum),
+            ]
+            track_invalid_records(
+                census_data_tuples,
+                "reference_number",
+                finding_refnum,
+                invalid_records,
+            )
+        InvalidRecord.append_invalid_finding_records(invalid_records)
+    if invalid_records:
         InvalidRecord.append_validations_to_skip("check_ref_number_in_findings_text")
         InvalidRecord.append_invalid_migration_tag(
             INVALID_MIGRATION_TAGS.EXTRA_FINDING_REFERENCE_NUMBERS_IN_FINDINGSTEXT
