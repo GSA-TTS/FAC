@@ -53,8 +53,11 @@ class EligibilityFormView(LoginRequiredMixin, View):
 # Step 2
 class AuditeeInfoFormView(LoginRequiredMixin, View):
     def get(self, request):
-        referer = request.META.get("HTTP_REFERER")
-        if not (referer and referer.endswith("report_submission/eligibility/")):
+        entry_form_data = request.user.profile.entry_form_data
+        eligible = api.views.eligibility_check(request.user, entry_form_data)
+
+        # Prevent users from skipping the eligibility form
+        if not eligible.get("eligible"):
             return redirect(reverse("report_submission:eligibility"))
         else:
             args = {}

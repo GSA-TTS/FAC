@@ -74,6 +74,12 @@ EMAIL_TO_ROLE = {
     "auditor_contacts_email": "editor",
 }
 
+VALID_ELIGIBILITY_DATA = {
+    "is_usa_based": True,
+    "met_spending_threshold": True,
+    "user_provided_organization_type": "state",
+}
+
 
 class TestPreliminaryViews(TestCase):
     """
@@ -188,8 +194,7 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(response.url, "/report_submission/auditeeinfo/")
 
         step2 = reverse("report_submission:auditeeinfo")
-        headers = {"HTTP_REFERER": "report_submission/eligibility/"}
-        step2_get = self.client.get(step2, **headers)
+        step2_get = self.client.get(step2)
         self.assertEqual(step2_get.status_code, 200)
         self.assertTemplateUsed(step2_get, "report_submission/step-base.html")
         self.assertTemplateUsed(step2_get, "report_submission/step-2.html")
@@ -261,11 +266,14 @@ class TestPreliminaryViews(TestCase):
         }
 
         user = baker.make(User)
+        user.profile.entry_form_data = (
+            VALID_ELIGIBILITY_DATA
+        )
+        user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
-        headers = {"HTTP_REFERER": "report_submission/eligibility/"}
 
-        get_response = self.client.get(url, **headers)
+        get_response = self.client.get(url)
         self.assertTrue(user.is_authenticated)
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
@@ -297,11 +305,14 @@ class TestPreliminaryViews(TestCase):
         mock_get_uei_info.return_value = {"valid": True}
 
         user = baker.make(User)
+        user.profile.entry_form_data = (
+            VALID_ELIGIBILITY_DATA
+        )
+        user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
-        headers = {"HTTP_REFERER": "report_submission/eligibility/"}
 
-        get_response = self.client.get(url, **headers)
+        get_response = self.client.get(url)
         self.assertTrue(user.is_authenticated)
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
@@ -367,8 +378,7 @@ class TestPreliminaryViews(TestCase):
 
     def test_auditeeinfoformview_get_requires_login(self):
         url = reverse("report_submission:auditeeinfo")
-        headers = {"HTTP_REFERER": "report_submission/eligibility/"}
-        response = self.client.get(url, **headers)
+        response = self.client.get(url)
 
         # Should redirect to login page
         self.assertIsInstance(response, HttpResponseRedirect)
@@ -382,11 +392,17 @@ class TestPreliminaryViews(TestCase):
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertTrue("openid/login" in response.url)
 
-    def test_auditeeinfo_no_referer_redirect(self):
+    def test_auditeeinfo_no_eligibility(self):
         user = baker.make(User)
+        user.profile.entry_form_data = (
+            {
+                **VALID_ELIGIBILITY_DATA,
+                "is_usa_based": False,
+            }
+        )
+        user.profile.save()
         self.client.force_login(user)
 
-        # Not supplying required HTTP_REFERER header here
         url = reverse("report_submission:auditeeinfo")
         response = self.client.get(url)
 
