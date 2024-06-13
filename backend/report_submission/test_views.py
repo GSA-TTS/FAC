@@ -266,9 +266,7 @@ class TestPreliminaryViews(TestCase):
         }
 
         user = baker.make(User)
-        user.profile.entry_form_data = (
-            VALID_ELIGIBILITY_DATA
-        )
+        user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
         user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
@@ -305,9 +303,7 @@ class TestPreliminaryViews(TestCase):
         mock_get_uei_info.return_value = {"valid": True}
 
         user = baker.make(User)
-        user.profile.entry_form_data = (
-            VALID_ELIGIBILITY_DATA
-        )
+        user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
         user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
@@ -394,12 +390,10 @@ class TestPreliminaryViews(TestCase):
 
     def test_auditeeinfo_no_eligibility(self):
         user = baker.make(User)
-        user.profile.entry_form_data = (
-            {
-                **VALID_ELIGIBILITY_DATA,
-                "is_usa_based": False,
-            }
-        )
+        user.profile.entry_form_data = {
+            **VALID_ELIGIBILITY_DATA,
+            "is_usa_based": False,
+        }
         user.profile.save()
         self.client.force_login(user)
 
