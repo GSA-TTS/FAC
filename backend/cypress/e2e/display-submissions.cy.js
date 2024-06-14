@@ -19,7 +19,7 @@ describe('Display my audit submissions', () => {
         { body: [] }
       ).as('hasNoData');
       cy.visit('/submissions/');
-      cy.wait('@hasNoData').then((interception) => {
+      cy.wait('@hasNoData').then(() => {
         cy.get('.usa-table-container')
           .should('have.attr', 'class')
           .and('contain', 'display-none');

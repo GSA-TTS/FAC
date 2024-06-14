@@ -1,4 +1,4 @@
-import { selectValidEntries } from '../support/check-eligibility.js';
+import { selectValidEntries, testValidEligibility } from '../support/check-eligibility.js';
 
 describe('Create New Audit', () => {
   beforeEach(() => {
@@ -78,7 +78,7 @@ describe('Create New Audit', () => {
     });
 
     it('should navigate to next step after successful submission', () => {
-      testValidEligbility();
+      testValidEligibility();
     });
   });
 
