@@ -105,6 +105,8 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         info_check = api.views.auditee_info_check(
             request.user, request.user.profile.entry_form_data
         )
+
+        # Prevent users from skipping the auditee info form
         if info_check.get("errors"):
             return redirect(reverse("report_submission:auditeeinfo"))
         else:
