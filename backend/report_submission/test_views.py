@@ -392,7 +392,7 @@ class TestPreliminaryViews(TestCase):
         user = baker.make(User)
         user.profile.entry_form_data = {
             **self.step1_data,
-            "is_usa_based": False,
+            "is_usa_based": False,  # Ineligible
         }
         user.profile.save()
         self.client.force_login(user)
@@ -400,9 +400,22 @@ class TestPreliminaryViews(TestCase):
         url = reverse("report_submission:auditeeinfo")
         response = self.client.get(url)
 
-        # Should redirect to step 1 page since HTTP_REFERER isn't present
+        # Should redirect to step 1 page due to no eligibility
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertTrue("report_submission/eligibility" in response.url)
+
+    def test_accessandsubmission_no_auditee_info(self):
+        user = baker.make(User)
+        user.profile.entry_form_data = self.step1_data
+        user.profile.save()
+        self.client.force_login(user)
+
+        url = reverse("report_submission:accessandsubmission")
+        response = self.client.get(url)
+
+        # Should redirect to step 2 page since auditee info isn't present
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("report_submission/auditeeinfo" in response.url)
 
 
 class GeneralInformationFormViewTests(TestCase):
