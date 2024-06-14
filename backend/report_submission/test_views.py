@@ -74,12 +74,6 @@ EMAIL_TO_ROLE = {
     "auditor_contacts_email": "editor",
 }
 
-VALID_ELIGIBILITY_DATA = {
-    "is_usa_based": True,
-    "met_spending_threshold": True,
-    "user_provided_organization_type": "state",
-}
-
 
 class TestPreliminaryViews(TestCase):
     """
@@ -116,9 +110,9 @@ class TestPreliminaryViews(TestCase):
     }
 
     step2_data = {
-        "auditee_uei": "Lw4MXE7SKMV1",
-        "auditee_fiscal_period_start": "01/01/2021",
-        "auditee_fiscal_period_end": "12/31/2021",
+        "auditee_uei": "D7A4J33FUMJ1",
+        "auditee_fiscal_period_start": "2021-01-01",
+        "auditee_fiscal_period_end": "2021-12-31",
     }
 
     step3_data = {
@@ -266,7 +260,7 @@ class TestPreliminaryViews(TestCase):
         }
 
         user = baker.make(User)
-        user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        user.profile.entry_form_data = self.step1_data
         user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
@@ -303,7 +297,7 @@ class TestPreliminaryViews(TestCase):
         mock_get_uei_info.return_value = {"valid": True}
 
         user = baker.make(User)
-        user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        user.profile.entry_form_data = self.step1_data
         user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
@@ -338,6 +332,12 @@ class TestPreliminaryViews(TestCase):
         Check that the POST succeeds with appropriate data.
         """
         user = baker.make(User)
+        user.profile.entry_form_data = {
+            **self.step1_data,
+            **self.step2_data,
+            **self.step3_data,
+        }
+        user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:accessandsubmission")
 
@@ -391,7 +391,7 @@ class TestPreliminaryViews(TestCase):
     def test_auditeeinfo_no_eligibility(self):
         user = baker.make(User)
         user.profile.entry_form_data = {
-            **VALID_ELIGIBILITY_DATA,
+            **self.step1_data,
             "is_usa_based": False,
         }
         user.profile.save()

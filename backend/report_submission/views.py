@@ -102,9 +102,15 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 # Step 3
 class AccessAndSubmissionFormView(LoginRequiredMixin, View):
     def get(self, request):
-        args = {}
-        args["step"] = 3
-        return render(request, "report_submission/step-3.html", args)
+        info_check = api.views.auditee_info_check(
+            request.user, request.user.profile.entry_form_data
+        )
+        if info_check.get("errors"):
+            return redirect(reverse("report_submission:auditeeinfo"))
+        else:
+            args = {}
+            args["step"] = 3
+            return render(request, "report_submission/step-3.html", args)
 
     # render access-submission form
 
