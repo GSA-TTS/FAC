@@ -41,14 +41,16 @@ describe('Create New Audit', () => {
     describe('Auditee certifying official', () => {
       describe('Full name', () => {
         it('should display an error message when left blank', () => {
-          cy.get('#certifying_auditee_contact_fullname').click().blur();
+          cy.get('#certifying_auditee_contact_fullname').click();
+          cy.get('#certifying_auditee_contact_fullname').blur();
           cy.get('#certifying_auditee_contact_fullname-not-null').should(
             'be.visible'
           );
         });
 
         it('should disable the submit button when fields are left blank', () => {
-          cy.get('#certifying_auditee_contact_fullname').click().blur();
+          cy.get('#certifying_auditee_contact_fullname').click();
+          cy.get('#certifying_auditee_contact_fullname').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
@@ -66,36 +68,39 @@ describe('Create New Audit', () => {
       });
       describe('Email Address', () => {
         it('should display an error message when left blank', () => {
-          cy.get('#certifying_auditee_contact_email').click().blur();
+          cy.get('#certifying_auditee_contact_email').click();
+          cy.get('#certifying_auditee_contact_email').blur();
           cy.get('#certifying_auditee_contact_email-not-null').should(
             'be.visible'
           );
         });
 
         it('should disable the submit button when fields are left blank', () => {
-          cy.get('#certifying_auditee_contact_email').click().blur();
+          cy.get('#certifying_auditee_contact_email').click();
+          cy.get('#certifying_auditee_contact_email').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
         it('should remove the error message when input is supplied', () => {
-          cy.get('#certifying_auditee_contact_email')
-            .clear()
-            .type('A Name')
-            .blur();
+          cy.get('#certifying_auditee_contact_email').clear();
+          cy.get('#certifying_auditee_contact_email').type('A Name');
+          cy.get('#certifying_auditee_contact_email').blur();
           cy.get('#certifying_auditee_contact_email-not-null').should(
             'not.be.visible'
           );
         });
 
         it('should display an error message when entry is invalid', () => {
-          cy.get('#certifying_auditee_contact_email').click().blur();
+          cy.get('#certifying_auditee_contact_email').click();
+          cy.get('#certifying_auditee_contact_email').blur();
           cy.get('#certifying_auditee_contact_email-error-message').should(
             'be.visible'
           );
         });
 
         it('should disable the submit button when fields are invalid', () => {
-          cy.get('#certifying_auditee_contact_email').click().blur();
+          cy.get('#certifying_auditee_contact_email').click();
+          cy.get('#certifying_auditee_contact_email').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
@@ -115,10 +120,11 @@ describe('Create New Audit', () => {
       describe('Email Address Confirmation', () => {
         it('should display an error message when input does not match email field', () => {
           addValidInfo('#certifying_auditee_contact_email');
-          cy.get('#certifying_auditee_contact_re_email')
-            .clear()
-            .type('test.address-wit')
-            .blur();
+          cy.get('#certifying_auditee_contact_re_email').clear();
+          cy.get('#certifying_auditee_contact_re_email').type(
+            'test.address-wit'
+          );
+          cy.get('#certifying_auditee_contact_re_email').blur();
           cy.get('#certifying_auditee_contact_re_email-must-match').should(
             'be.visible'
           );
@@ -138,14 +144,16 @@ describe('Create New Audit', () => {
 
       describe('Full name', () => {
         it('should display an error message when left blank', () => {
-          cy.get('#certifying_auditor_contact_fullname').click().blur();
+          cy.get('#certifying_auditor_contact_fullname').click();
+          cy.get('#certifying_auditor_contact_fullname').blur();
           cy.get('#certifying_auditor_contact_fullname-not-null').should(
             'be.visible'
           );
         });
 
         it('should disable the submit button when fields are left blank', () => {
-          cy.get('#certifying_auditor_contact_fullname').click().blur();
+          cy.get('#certifying_auditor_contact_fullname').click();
+          cy.get('#certifying_auditor_contact_fullname').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
@@ -164,40 +172,43 @@ describe('Create New Audit', () => {
 
       describe('Email Address', () => {
         it('should display an error message when left blank', () => {
-          cy.get('#certifying_auditor_contact_email').click().blur();
+          cy.get('#certifying_auditor_contact_email').click();
+          cy.get('#certifying_auditor_contact_email').blur();
           cy.get('#certifying_auditor_contact_email-not-null').should(
             'be.visible'
           );
         });
 
         it('should disable the submit button when fields are left blank', () => {
-          cy.get('#certifying_auditor_contact_email').click().blur();
+          cy.get('#certifying_auditor_contact_email').click();
+          cy.get('#certifying_auditor_contact_email').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
         it('should remove the error message when input is supplied', () => {
-          cy.get('#certifying_auditor_contact_email')
-            .clear()
-            .type('A Name')
-            .blur();
+          cy.get('#certifying_auditor_contact_email').clear();
+          cy.get('#certifying_auditor_contact_email').type('A Name');
+          cy.get('#certifying_auditor_contact_email').blur();
           cy.get('#certifying_auditor_contact_email-not-null').should(
             'not.be.visible'
           );
         });
 
         it('should display an error message when entry is invalid', () => {
-          cy.get('#certifying_auditor_contact_email')
-            .clear()
-            .type('A Name')
-            .blur();
-          cy.get('#certifying_auditor_contact_email').click().blur();
+          cy.get('#certifying_auditor_contact_email').clear();
+          cy.get('#certifying_auditor_contact_email').type('A Name');
+          cy.get('#certifying_auditor_contact_email').blur();
+            
+          cy.get('#certifying_auditor_contact_email').click();
+          cy.get('#certifying_auditor_contact_email').blur();
           cy.get('#certifying_auditor_contact_email-email').should(
             'be.visible'
           );
         });
 
         it('should disable the submit button when fields are invalid', () => {
-          cy.get('#certifying_auditor_contact_email').click().blur();
+          cy.get('#certifying_auditor_contact_email').click();
+          cy.get('#certifying_auditor_contact_email').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
@@ -216,10 +227,11 @@ describe('Create New Audit', () => {
       describe('Email Address Confirmation', () => {
         it('should display an error message when input does not match email field', () => {
           addValidInfo('#certifying_auditor_contact_email')
-          cy.get('#certifying_auditor_contact_re_email')
-            .clear()
-            .type('test.address-wit')
-            .blur();
+          cy.get('#certifying_auditor_contact_re_email').clear();
+          cy.get('#certifying_auditor_contact_re_email').type(
+            'test.address-wit'
+          );
+          cy.get('#certifying_auditor_contact_re_email').blur();
           cy.get('#certifying_auditor_contact_re_email-must-match').should(
             'be.visible'
           );
@@ -240,14 +252,16 @@ describe('Create New Audit', () => {
 
       describe('Full name', () => {
         it('should display an error message when left blank', () => {
-          cy.get('#auditee_contacts_fullname').click().blur();
+          cy.get('#auditee_contacts_fullname').click();
+          cy.get('#auditee_contacts_fullname').blur();
           cy.get('#auditee_contacts_fullname-not-null').should(
             'be.visible'
           );
         });
 
         it('should disable the submit button when fields are left blank', () => {
-          cy.get('#auditee_contacts_fullname').click().blur();
+          cy.get('#auditee_contacts_fullname').click();
+          cy.get('#auditee_contacts_fullname').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
@@ -266,22 +280,28 @@ describe('Create New Audit', () => {
 
       describe('Email Address', () => {
         it('should display an error message when left blank', () => {
-          cy.get('#auditee_contacts_email').click().blur();
+          cy.get('#auditee_contacts_email').click();
+          cy.get('#auditee_contacts_email').blur();
           cy.get('#auditee_contacts_email-not-null').should('be.visible');
         });
 
         it('should disable the submit button when fields are left blank', () => {
-          cy.get('#auditee_contacts_email').click().blur();
+          cy.get('#auditee_contacts_email').click();
+          cy.get('#auditee_contacts_email').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
         it('should remove the error message when input is supplied', () => {
-          cy.get('#auditee_contacts_email').clear().type('A Name').blur();
+          cy.get('#auditee_contacts_email').clear();
+          cy.get('#auditee_contacts_email').type('A Name');
+          cy.get('#auditee_contacts_email').blur();
           cy.get('#auditee_contacts_email-not-null').should('not.be.visible');
         });
 
         it('should display an error message when entry is invalid', () => {
-          cy.get('#auditee_contacts_email').clear().type('A Name').blur();
+          cy.get('#auditee_contacts_email').clear();
+          cy.get('#auditee_contacts_email').type('A Name');
+          cy.get('#auditee_contacts_email').blur();
           cy.get('#auditee_contacts_email-email').should('be.visible');
         });
 
@@ -295,10 +315,9 @@ describe('Create New Audit', () => {
         it('should display an error message when input does not match email field', () => {
           addValidInfo('#auditee_contacts_email')
 
-          cy.get('#auditee_contacts_re_email')
-            .clear()
-            .type('test.address-wit')
-            .blur();
+          cy.get('#auditee_contacts_re_email').clear();
+          cy.get('#auditee_contacts_re_email').type('test.address-wit');
+          cy.get('#auditee_contacts_re_email').blur();
           cy.get('#auditee_contacts_re_email-must-match').should('be.visible');
         });
 
@@ -332,14 +351,18 @@ describe('Create New Audit', () => {
         cy.get('.auditee_contacts').within(() => {
           cy.get('button').click();
           cy.get('.grid-row').should('have.length', 4);
-          cy.get('input[id*="auditee_contacts_email"]')
-            .eq(1)
-            .clear()
-            .type('test.address-with+features@test.gsa.gov');
-          cy.get('input[id*="auditee_contacts_re_email"]')
-            .eq(1)
-            .clear()
-            .type('test.address-with+features@test.gsa.gov');
+
+          cy.get('input[id*="auditee_contacts_email"]').eq(1);
+          cy.get('input[id*="auditee_contacts_email"]').clear();
+          cy.get('input[id*="auditee_contacts_email"]').type(
+            'test.address-with+features@test.gsa.gov'
+          );
+
+          cy.get('input[id*="auditee_contacts_re_email"]').eq(1);
+          cy.get('input[id*="auditee_contacts_re_email"]').clear();
+          cy.get('input[id*="auditee_contacts_re_email"]').type(
+            'test.address-with+features@test.gsa.gov'
+          );
         });
       });
     });
@@ -348,14 +371,16 @@ describe('Create New Audit', () => {
 
       describe('Full name', () => {
         it('should display an error message when left blank', () => {
-          cy.get('#auditor_contacts_fullname').click().blur();
+          cy.get('#auditor_contacts_fullname').click();
+          cy.get('#auditor_contacts_fullname').blur();
           cy.get('#auditor_contacts_fullname-not-null').should(
             'be.visible'
           );
         });
 
         it('should disable the submit button when fields are left blank', () => {
-          cy.get('#auditor_contacts_fullname').click().blur();
+          cy.get('#auditor_contacts_fullname').click();
+          cy.get('#auditor_contacts_fullname').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
@@ -374,27 +399,35 @@ describe('Create New Audit', () => {
 
       describe('Email Address', () => {
         it('should display an error message when left blank', () => {
-          cy.get('#auditor_contacts_email').click().blur();
+          cy.get('#auditor_contacts_email').click();
+          cy.get('#auditor_contacts_email').blur();
           cy.get('#auditor_contacts_email-not-null').should('be.visible');
         });
 
         it('should disable the submit button when fields are left blank', () => {
-          cy.get('#auditor_contacts_email').click().blur();
+          cy.get('#auditor_contacts_email').click();
+          cy.get('#auditor_contacts_email').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
         it('should remove the error message when input is supplied', () => {
-          cy.get('#auditor_contacts_email').clear().type('A Name').blur();
+          cy.get('#auditor_contacts_email').clear();
+          cy.get('#auditor_contacts_email').type('A Name');
+          cy.get('#auditor_contacts_email').blur();
           cy.get('#auditor_contacts_email-not-null').should('not.be.visible');
         });
 
         it('should display an error message when entry is invalid', () => {
-          cy.get('#auditor_contacts_email').clear().type('A Name').blur();
+          cy.get('#auditor_contacts_email').clear();
+          cy.get('#auditor_contacts_email').type('A Name');
+          cy.get('#auditor_contacts_email').blur();
           cy.get('#auditor_contacts_email-email').should('be.visible');
         });
 
         it('should disable the submit button when fields are invalid', () => {
-          cy.get('#auditor_contacts_email').clear().type('A Name').blur();
+          cy.get('#auditor_contacts_email').clear();
+          cy.get('#auditor_contacts_email').type('A Name');
+          cy.get('#auditor_contacts_email').blur();
           cy.get('button').contains('Create').should('be.disabled');
         });
 
@@ -411,12 +444,11 @@ describe('Create New Audit', () => {
 
       describe('Email Address Confirmation', () => {
         it('should display an error message when input does not match email field', () => {
-          addValidInfo('#auditor_contacts_email')
+          addValidInfo('#auditor_contacts_email');
 
-          cy.get('#auditor_contacts_re_email')
-            .clear()
-            .type('test.address-wit')
-            .blur();
+          cy.get('#auditor_contacts_re_email').clear();
+          cy.get('#auditor_contacts_re_email').type('test.address-wit');
+          cy.get('#auditor_contacts_re_email').blur();
           cy.get('#auditor_contacts_re_email-must-match').should('be.visible');
         });
 
@@ -450,18 +482,18 @@ describe('Create New Audit', () => {
         cy.get('.auditor_contacts').within(() => {
           cy.get('button').click();
           cy.get('.grid-row').should('have.length', 4);
-          cy.get('input[id*="auditor_contacts_fullname"]')
-            .eq(1)
-            .clear()
-            .type('A Name');
-          cy.get('input[id*="auditor_contacts_email"]')
-            .eq(1)
-            .clear()
-            .type('test.address-with+features@test.gsa.gov');
-          cy.get('input[id*="auditor_contacts_re_email"]')
-            .eq(1)
-            .clear()
-            .type('test.address-with+features@test.gsa.gov');
+          cy.get('input[id*="auditor_contacts_fullname"]').eq(1).clear();
+          cy.get('input[id*="auditor_contacts_fullname"]').type('A Name');
+
+          cy.get('input[id*="auditor_contacts_email"]').eq(1).clear();
+          cy.get('input[id*="auditor_contacts_email"]').type(
+            'test.address-with+features@test.gsa.gov'
+          );
+
+          cy.get('input[id*="auditor_contacts_re_email"]').eq(1).clear();
+          cy.get('input[id*="auditor_contacts_re_email"]').type(
+            'test.address-with+features@test.gsa.gov'
+          );
         });
       });
     });

@@ -1,25 +1,28 @@
-const esbuild = require('esbuild');
-const postcss = require('postcss');
-const autoprefixer = require('autoprefixer');
-const fs = require('fs');
-const glob = require('glob');
-const path = require('path');
-const { sassPlugin } = require('esbuild-sass-plugin');
+import { readFile, writeFile } from 'fs';
+import { sync } from 'glob';
+import process from 'node:process';
+import { join } from 'path';
+import postcss from 'postcss';
+
+import autoprefixer from 'autoprefixer';
+import { context } from 'esbuild';
+import { sassPlugin } from 'esbuild-sass-plugin';
+
 
 (async () => {
   const watch = process.argv.includes('--watch');
-  const jsPath = glob.sync(path.join('.', 'static', 'js', '*.js'));
+  const jsPath = sync(join('.', 'static', 'js', '*.js'));
 
   const runPostcss = (cssIn, cssOut) => {
     console.info('Running postcss');
 
-    fs.readFile(cssIn, (err, css) => {
+    readFile(cssIn, (err, css) => {
       postcss([autoprefixer])
         .process(css, { from: cssIn, to: cssOut })
         .then((result) => {
-          fs.writeFile(cssOut, result.css, () => true);
+          writeFile(cssOut, result.css, () => true);
           if (result.map) {
-            fs.writeFile(cssOut + '.map', result.map.toString(), () => true);
+            writeFile(cssOut + '.map', result.map.toString(), () => true);
           }
         });
     });
@@ -69,7 +72,7 @@ const { sassPlugin } = require('esbuild-sass-plugin');
     plugins: plugins,
   };
 
-  let ctx = await esbuild.context({ ...buildOptions, plugins });
+  let ctx = await context({ ...buildOptions, plugins });
   if (watch) {
     console.info('Watching assets...');
     await ctx.watch();

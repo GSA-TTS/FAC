@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 // ***********************************************************
 // This example plugins/index.js can be used to load plugins
 //
@@ -12,13 +11,15 @@
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
+import generateOTP from "cypress-otp";
+
 /**
  * @type {Cypress.PluginConfig}
  */
 // eslint-disable-next-line no-unused-vars
-module.exports = (on, config) => {
+export default (on, config) => {
   on("task", {
-    generateOTP: require("cypress-otp"),
+    generateOTP: generateOTP,
     log(message) {
       console.log(message)
 
