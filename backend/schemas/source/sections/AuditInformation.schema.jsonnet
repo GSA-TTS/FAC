@@ -6,7 +6,7 @@ local AuditInformation = Types.object {
   additionalProperties: false,
   properties: {
     gaap_results: Types.array {
-      items: Base.Enum.GAAPResults,
+      items: Base.Enum.GAAPResults_GSAMigration,
     },
     sp_framework_basis: Types.array {
       items: Base.Enum.SP_Framework_Basis,
@@ -23,11 +23,46 @@ local AuditInformation = Types.object {
           },
       ],
     },
-    is_going_concern_included: Types.boolean,
-    is_internal_control_deficiency_disclosed: Types.boolean,
-    is_internal_control_material_weakness_disclosed: Types.boolean,
-    is_material_noncompliance_disclosed: Types.boolean,
-    is_aicpa_audit_guide_included: Types.boolean,
+    is_going_concern_included: {
+      oneOf: [
+        Types.boolean,
+        Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+      ],
+    },
+    is_internal_control_deficiency_disclosed: {
+      oneOf: [
+        Types.boolean,
+        Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+      ],
+    },
+    is_internal_control_material_weakness_disclosed: {
+      oneOf: [
+        Types.boolean,
+        Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+      ],
+    },
+    is_material_noncompliance_disclosed: {
+      oneOf: [
+        Types.boolean,
+        Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+      ],
+    },
+    is_aicpa_audit_guide_included: {
+      oneOf: [
+        Types.boolean,
+        Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+      ],
+    },
     is_low_risk_auditee: {
       oneOf: [
         Types.boolean,
@@ -37,7 +72,7 @@ local AuditInformation = Types.object {
       ],
     },
     agencies: Types.array {
-      items: Base.Compound.ALNPrefixes,
+      items: Base.Compound.ALNPrefixesWithGsaMigration,
     },
   },
   required: [
