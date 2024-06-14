@@ -373,16 +373,17 @@ def ace_audit_information(audit_header):
     # Tracking invalid records
     invalid_records = []
     for mapping in mappings:
-        in_sheet = mapping.in_sheet
         in_dissem = (
-            mapping.in_dissem if mapping.in_dissem != FormFieldInDissem else in_sheet
+            mapping.in_dissem
+            if mapping.in_dissem != FormFieldInDissem
+            else mapping.in_form
         )
         track_invalid_records(
             [
                 (mapping.in_db, getattr(audit_header, mapping.in_db)),
             ],
-            "in_dissem",
-            default[in_dissem],
+            in_dissem,
+            default[mapping.in_form],
             invalid_records,
         )
 
