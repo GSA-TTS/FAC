@@ -268,6 +268,13 @@ def validate_use_of_gsa_migration_keyword_in_audit_info(
     if not is_data_migration and settings.GSA_MIGRATION in [
         audit_information.get("is_sp_framework_required", ""),
         audit_information.get("is_low_risk_auditee", ""),
+        audit_information.get("is_going_concern_included", ""),
+        audit_information.get("is_internal_control_deficiency_disclosed", ""),
+        audit_information.get("is_internal_control_material_weakness_disclosed", ""),
+        audit_information.get("is_material_noncompliance_disclosed", ""),
+        audit_information.get("is_aicpa_audit_guide_included", ""),
+        ",".join(audit_information.get("agencies", [])),
+        ",".join(audit_information.get("gaap_results", [])),
     ]:
         raise ValidationError(
             _(f"{settings.GSA_MIGRATION} not permitted outside of migrations"),
