@@ -386,7 +386,7 @@ def ace_audit_information(audit_header):
             default[mapping.in_form],
             invalid_records,
         )
-
+    if invalid_records:
         InvalidRecord.append_invalid_migration_tag(
             INVALID_MIGRATION_TAGS.ACE_AUDIT_REPORT,
         )
