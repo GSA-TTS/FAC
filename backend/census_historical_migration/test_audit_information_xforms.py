@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock, patch
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase
 
 from .sac_general_lib.audit_information import (
     ace_audit_information,
