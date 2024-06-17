@@ -15,7 +15,7 @@ resource "newrelic_notification_destination" "email_destination" {
 
   property {
     key = "email"
-    value = "timothy.ballard@gsa.gov"
+    value = ["timothy.ballard@gsa.gov", "timothy.ballard+1@gsa.gov"]
   }
 }
 
