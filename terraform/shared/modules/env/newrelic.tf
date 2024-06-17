@@ -7,3 +7,8 @@ resource "cloudfoundry_user_provided_service" "credentials" {
   }
   tags = ["newrelic-creds"]
 }
+
+module "newrelic" {
+  source = "../newrelic"
+  cf_space_name = var.cf_space_name
+}
