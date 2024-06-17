@@ -11,4 +11,6 @@ resource "cloudfoundry_user_provided_service" "credentials" {
 module "newrelic" {
   source = "../newrelic"
   cf_space_name = var.cf_space_name
+  new_relic_account_id = var.new_relic_account_id
+  new_relic_api_key = var.new_relic_api_key
 }
