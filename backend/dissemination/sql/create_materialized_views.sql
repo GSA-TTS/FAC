@@ -198,6 +198,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		FROM dissemination_general dg
 		WHERE dg.report_id ilike '%CENSUS%')
 	SELECT DISTINCT
+		nextval('census_gsa_crosswalk_id_seq') AS id,
 		chmr.audit_year,
 		chmr.dbkey,
 		gd.report_id,
