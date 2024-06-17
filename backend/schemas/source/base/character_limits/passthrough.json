@@ -1,0 +1,26 @@
+{
+  "report_id": {
+    "min": 25,
+    "max": 25
+  },
+  "auditee_uei": {
+    "min": 12,
+    "max": 13
+  },
+  "audit_year": {
+    "min": 4,
+    "max": 4
+  },
+  "award_reference": {
+    "min": 10,
+    "max": 10
+  },
+  "passthrough_id": {
+    "min": 0,
+    "max": 368
+  },
+  "passthrough_name": {
+    "min": 0,
+    "max": 421
+  }
+}

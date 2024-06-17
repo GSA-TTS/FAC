@@ -1,0 +1,242 @@
+{
+  "report_id": {
+    "min": 25,
+    "max": 25
+  },
+  "auditee_uei": {
+    "min": 12,
+    "max": 13
+  },
+  "audit_year": {
+    "min": 4,
+    "max": 4
+  },
+  "auditee_certify_name": {
+    "min": 2,
+    "max": 76
+  },
+  "auditee_certify_title": {
+    "min": 2,
+    "max": 81
+  },
+  "auditee_contact_name": {
+    "min": 1,
+    "max": 70
+  },
+  "auditee_email": {
+    "min": 7,
+    "max": 51
+  },
+  "auditee_name": {
+    "min": 3,
+    "max": 99
+  },
+  "auditee_phone": {
+    "min": 10,
+    "max": 10
+  },
+  "auditee_contact_title": {
+    "min": 2,
+    "max": 97
+  },
+  "auditee_address_line_1": {
+    "min": 1,
+    "max": 80
+  },
+  "auditee_city": {
+    "min": 1,
+    "max": 31
+  },
+  "auditee_state": {
+    "min": 2,
+    "max": 2
+  },
+  "auditee_ein": {
+    "min": 9,
+    "max": 9
+  },
+  "auditee_zip": {
+    "min": 5,
+    "max": 9
+  },
+  "auditor_phone": {
+    "min": 10,
+    "max": 10
+  },
+  "auditor_state": {
+    "min": 0,
+    "max": 2
+  },
+  "auditor_city": {
+    "min": 0,
+    "max": 30
+  },
+  "auditor_contact_title": {
+    "min": 1,
+    "max": 55
+  },
+  "auditor_address_line_1": {
+    "min": 0,
+    "max": 75
+  },
+  "auditor_zip": {
+    "min": 0,
+    "max": 9
+  },
+  "auditor_country": {
+    "min": 3,
+    "max": 7
+  },
+  "auditor_contact_name": {
+    "min": 1,
+    "max": 65
+  },
+  "auditor_email": {
+    "min": 10,
+    "max": 47
+  },
+  "auditor_firm_name": {
+    "min": 1,
+    "max": 86
+  },
+  "auditor_foreign_address": {
+    "min": 0,
+    "max": 76
+  },
+  "auditor_ein": {
+    "min": 9,
+    "max": 9
+  },
+  "cognizant_agency": {
+    "min": 2,
+    "max": 2
+  },
+  "oversight_agency": {
+    "min": 2,
+    "max": 2
+  },
+  "date_created": {
+    "min": 10,
+    "max": 10
+  },
+  "ready_for_certification_date": {
+    "min": 10,
+    "max": 10
+  },
+  "auditor_certified_date": {
+    "min": 10,
+    "max": 10
+  },
+  "auditee_certified_date": {
+    "min": 10,
+    "max": 10
+  },
+  "submitted_date": {
+    "min": 10,
+    "max": 10
+  },
+  "fac_accepted_date": {
+    "min": 10,
+    "max": 10
+  },
+  "fy_end_date": {
+    "min": 10,
+    "max": 10
+  },
+  "fy_start_date": {
+    "min": 10,
+    "max": 10
+  },
+  "audit_type": {
+    "min": 12,
+    "max": 16
+  },
+  "gaap_results": {
+    "min": 8,
+    "max": 77
+  },
+  "sp_framework_basis": {
+    "min": 0,
+    "max": 17
+  },
+  "is_sp_framework_required": {
+    "min": 0,
+    "max": 3
+  },
+  "sp_framework_opinions": {
+    "min": 0,
+    "max": 60
+  },
+  "is_going_concern_included": {
+    "min": 2,
+    "max": 3
+  },
+  "is_internal_control_deficiency_disclosed": {
+    "min": 2,
+    "max": 3
+  },
+  "is_internal_control_material_weakness_disclosed": {
+    "min": 2,
+    "max": 3
+  },
+  "is_material_noncompliance_disclosed": {
+    "min": 2,
+    "max": 3
+  },
+  "dollar_threshold": {
+    "min": 1,
+    "max": 7409350297
+  },
+  "is_low_risk_auditee": {
+    "min": 2,
+    "max": 3
+  },
+  "agencies_with_prior_findings": {
+    "min": 2,
+    "max": 142
+  },
+  "entity_type": {
+    "min": 5,
+    "max": 10
+  },
+  "number_months": {
+    "min": 0,
+    "max": 2
+  },
+  "audit_period_covered": {
+    "min": 5,
+    "max": 8
+  },
+  "total_amount_expended": {
+    "min": 0,
+    "max": 241863115093
+  },
+  "type_audit_code": {
+    "min": 2,
+    "max": 2
+  },
+  "is_public": {
+    "min": 0,
+    "max": 0
+  },
+  "data_source": {
+    "min": 6,
+    "max": 6
+  },
+  "is_aicpa_audit_guide_included": {
+    "min": 2,
+    "max": 3
+  },
+  "is_additional_ueis": {
+    "min": 2,
+    "max": 3
+  },
+  "is_multiple_eins": {
+    "min": 2,
+    "max": 3
+  },
+  "is_secondary_auditors": {
+    "min": 2,
+    "max": 3
+  }
+}
