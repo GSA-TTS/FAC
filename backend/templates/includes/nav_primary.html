@@ -117,7 +117,7 @@
                     </li>
                     {% comment %}
                         OMB_NUMBER and OMB_EXP_DATE are global.
-                        Added in /config/settings, passed in /config/context_processors.py 
+                        Added in /config/settings, passed in /config/context_processors.py
                     {% endcomment %}
                     <li class="usa-nav__primary-item flex-align-self-center margin-left-2 width-card desktop:width-15 padding-top-2 desktop:padding-top-0">
                         <span class="text-primary-darker"><strong>OMB#</strong> {{ OMB_NUMBER }} <strong>EXP:</strong> {{ OMB_EXP_DATE }}</span>
@@ -185,7 +185,7 @@
                                     <div class="usa-modal__footer">
                                         <ul class="usa-button-group">
                                             <li class="usa-button-group__item">
-                                                <a href="/openid/login/">
+                                                <a href="{% url 'login' %}?next={{ request.path }}">
                                                     <button type="button"
                                                             class="usa-button sign-in-button"
                                                             id="sign-in"

@@ -53,10 +53,17 @@ class EligibilityFormView(LoginRequiredMixin, View):
 # Step 2
 class AuditeeInfoFormView(LoginRequiredMixin, View):
     def get(self, request):
-        args = {}
-        args["step"] = 2
-        args["form"] = AuditeeInfoForm()
-        return render(request, "report_submission/step-2.html", args)
+        entry_form_data = request.user.profile.entry_form_data
+        eligible = api.views.eligibility_check(request.user, entry_form_data)
+
+        # Prevent users from skipping the eligibility form
+        if not eligible.get("eligible"):
+            return redirect(reverse("report_submission:eligibility"))
+        else:
+            args = {}
+            args["step"] = 2
+            args["form"] = AuditeeInfoForm()
+            return render(request, "report_submission/step-2.html", args)
 
     # render auditee info form
 
@@ -95,9 +102,17 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 # Step 3
 class AccessAndSubmissionFormView(LoginRequiredMixin, View):
     def get(self, request):
-        args = {}
-        args["step"] = 3
-        return render(request, "report_submission/step-3.html", args)
+        info_check = api.views.auditee_info_check(
+            request.user, request.user.profile.entry_form_data
+        )
+
+        # Prevent users from skipping the auditee info form
+        if info_check.get("errors"):
+            return redirect(reverse("report_submission:auditeeinfo"))
+        else:
+            args = {}
+            args["step"] = 3
+            return render(request, "report_submission/step-3.html", args)
 
     # render access-submission form
 
