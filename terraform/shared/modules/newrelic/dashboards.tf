@@ -1,5 +1,5 @@
 resource "newrelic_one_dashboard" "search_dashboard" {
-  name = "Search Dashboard (${var.cf_space_name}) - from TF"
+  name = "Search Dashboard (${var.cf_space_name})"
   permissions = "public_read_only"
 
   page {

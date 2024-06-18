@@ -15,7 +15,7 @@ resource "newrelic_notification_destination" "email_destination" {
 
   property {
     key = "email"
-    value = "timothy.ballard@gsa.gov, timothy.ballard+1@gsa.gov"
+    value = "daniel.swick@gsa.gov, matthew.jadud@gsa.gov, alexander.steel@gsa.gov"
   }
 }
 
@@ -81,7 +81,7 @@ resource "newrelic_nrql_alert_condition" "error_transactions" {
   account_id = var.new_relic_account_id
   policy_id = newrelic_alert_policy.alert_policy.id
   
-  name = "Error Transactions (%) - From TF"
+  name = "Error Transactions (%)"
   type = "static"
 
   nrql {
@@ -91,14 +91,14 @@ resource "newrelic_nrql_alert_condition" "error_transactions" {
   critical {
     operator = "above"
     threshold = 5
-    threshold_duration = 60
+    threshold_duration = 300
     threshold_occurrences = "all"
   }
 
   warning {
     operator = "above"
     threshold = 3
-    threshold_duration = 60
+    threshold_duration = 300
     threshold_occurrences = "all"
   }
   fill_option = "none"
