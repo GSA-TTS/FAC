@@ -177,3 +177,55 @@ CREATE INDEX IF NOT EXISTS dc_audit_year_idx
 
 CREATE INDEX IF NOT EXISTS dc_aln_idx 
 	on dissemination_combined (aln);
+
+
+-- Census to GSA Crosswalk
+CREATE SEQUENCE IF NOT EXISTS census_gsa_crosswalk_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE;
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS
+	census_gsa_crosswalk_temp AS
+	WITH dissemination_general_data_sub_temp AS
+		(SELECT 
+			dg.report_id,
+			dg.auditee_uei,
+			dg.auditee_ein,
+			substring(dg.report_id, 1, 4) as audit_year,
+			ltrim(substring(dg.report_id, 16, 25), '0') as dbkey 
+		FROM dissemination_general dg
+		WHERE dg.report_id ilike '%CENSUS%')
+	SELECT DISTINCT
+		nextval('census_gsa_crosswalk_id_seq') AS id,
+		chmr.audit_year,
+		chmr.dbkey,
+		gd.report_id,
+		gd.auditee_uei,
+		gd.auditee_ein,
+		chmr.run_datetime,
+		chmr.migration_status 
+	FROM census_historical_migration_reportmigrationstatus chmr
+	INNER JOIN dissemination_general_data_sub_temp gd
+	ON chmr.audit_year = gd.audit_year AND chmr.dbkey = gd.dbkey 
+	WHERE chmr.migration_status = 'SUCCESS';
+
+DROP MATERIALIZED VIEW IF EXISTS census_gsa_crosswalk;
+ALTER SEQUENCE census_gsa_crosswalk_id_seq RESTART;
+ALTER MATERIALIZED VIEW census_gsa_crosswalk_temp RENAME TO census_gsa_crosswalk;
+
+CREATE INDEX IF NOT EXISTS cg_crosswalk_report_id_idx
+	on census_gsa_crosswalk (report_id);
+
+CREATE INDEX IF NOT EXISTS cg_crosswalk_audit_year_idx
+	on census_gsa_crosswalk (audit_year);
+
+CREATE INDEX IF NOT EXISTS cg_crosswalk_dbkey_idx
+	on census_gsa_crosswalk (dbkey);
+
+CREATE INDEX IF NOT EXISTS cg_crosswalk_auditee_uei_idx
+	on census_gsa_crosswalk (auditee_uei);
+
+CREATE INDEX IF NOT EXISTS cg_crosswalk_auditee_ein_idx
+	on census_gsa_crosswalk (auditee_ein);
