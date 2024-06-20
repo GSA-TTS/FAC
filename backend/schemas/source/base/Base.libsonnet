@@ -222,6 +222,10 @@ local Enum = {
     description: 'GAAP Results (Audit Information)',
     enum: std.map(function(pair) pair.key, GAAP.gaap_results),
   },
+  GAAPResults_GSAMigration: Types.string {
+    description: 'GAAP Results (Audit Information)',
+    enum: std.map(function(pair) pair.key, GAAP.gaap_results) + [Const.GSA_MIGRATION],
+  },
   SP_Framework_Basis: Types.string {
     description: 'SP Framework Basis (Audit Information)',
     enum: std.map(function(pair) pair.key, GAAP.sp_framework_basis),
@@ -381,6 +385,14 @@ local SchemaBase = Types.object {
       enum: ClusterNames.cluster_names + [Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
     },
     ALNPrefixes: type_aln_prefix,
+    ALNPrefixesWithGsaMigration:  {
+      oneOf: [
+        type_aln_prefix,
+        Types.string {
+          const: Const.GSA_MIGRATION,
+        },
+      ],
+    },
     ThreeDigitExtension: {
       oneOf: [
         type_three_digit_extension,

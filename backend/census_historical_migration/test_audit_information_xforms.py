@@ -1,6 +1,8 @@
+from unittest.mock import MagicMock, patch
 from django.test import SimpleTestCase
 
 from .sac_general_lib.audit_information import (
+    ace_audit_information,
     xform_build_sp_framework_gaap_results,
     xform_framework_basis,
     xform_sp_framework_required,
@@ -205,3 +207,76 @@ class TestXformLowrisk(SimpleTestCase):
         audit_header.LOWRISK = ""
         xform_lowrisk(audit_header)
         self.assertEqual(audit_header.LOWRISK, settings.GSA_MIGRATION)
+
+
+class TestAceAuditInformation(SimpleTestCase):
+
+    def setUp(self):
+        self.audit_header = MagicMock()
+        self.audit_header.some_field = "test_value"
+
+        self.default_values = {
+            "dollar_threshold": settings.GSA_MIGRATION_INT,
+            "gaap_results": [settings.GSA_MIGRATION],
+            "is_going_concern_included": settings.GSA_MIGRATION,
+            "is_internal_control_deficiency_disclosed": settings.GSA_MIGRATION,
+            "is_internal_control_material_weakness_disclosed": settings.GSA_MIGRATION,
+            "is_material_noncompliance_disclosed": settings.GSA_MIGRATION,
+            "is_aicpa_audit_guide_included": settings.GSA_MIGRATION,
+            "is_low_risk_auditee": settings.GSA_MIGRATION,
+            "agencies": [settings.GSA_MIGRATION],
+        }
+
+    @patch(
+        "census_historical_migration.sac_general_lib.audit_information.create_json_from_db_object"
+    )
+    def test_ace_audit_information_with_actual_values(self, mock_create_json):
+        """Test that the function returns the correct values when all fields are present."""
+        mock_create_json.return_value = {
+            "dollar_threshold": 1000,
+            "is_low_risk_auditee": True,
+            "new_field": "new_value",
+        }
+
+        result = ace_audit_information(self.audit_header)
+
+        expected_result = self.default_values.copy()
+        expected_result.update(
+            {
+                "dollar_threshold": 1000,
+                "is_low_risk_auditee": True,
+                "new_field": "new_value",
+            }
+        )
+
+        self.assertEqual(result, expected_result)
+
+    @patch(
+        "census_historical_migration.sac_general_lib.audit_information.create_json_from_db_object"
+    )
+    def test_ace_audit_information_with_default_values(self, mock_create_json):
+        """Test that the function returns the correct values when all fields are missing."""
+        mock_create_json.return_value = {}
+
+        result = ace_audit_information(self.audit_header)
+
+        expected_result = self.default_values
+
+        self.assertEqual(result, expected_result)
+
+    @patch(
+        "census_historical_migration.sac_general_lib.audit_information.create_json_from_db_object"
+    )
+    def test_ace_audit_information_with_mixed_values(self, mock_create_json):
+        """Test that the function returns the correct values when some fields are missing."""
+        mock_create_json.return_value = {
+            "dollar_threshold": None,
+            "is_low_risk_auditee": True,
+        }
+
+        result = ace_audit_information(self.audit_header)
+
+        expected_result = self.default_values.copy()
+        expected_result.update({"is_low_risk_auditee": True})
+
+        self.assertEqual(result, expected_result)
