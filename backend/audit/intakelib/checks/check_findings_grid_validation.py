@@ -1,3 +1,4 @@
+from django.conf import settings
 from audit.intakelib.intermediate_representation import (
     get_range_values_by_name,
     get_range_by_name,
@@ -17,7 +18,7 @@ from audit.intakelib.common import get_message, build_cell_error_tuple
 # This makes sure that the right combos are present.
 # WHY
 # It's in the UG.
-def findings_grid_validation(ir):
+def findings_grid_validation(ir, is_gsa_migration=False):
     # A copy of allowed_combos is in dissemination/workbooklib/findings.py
     # Values copied directly out of the UG
     allowed_combos = [
@@ -54,7 +55,9 @@ def findings_grid_validation(ir):
         user_grid_ls = [mo, om, mw, sd, of]
         user_grid = "".join(user_grid_ls)
         # Check if the resulting string is in the allowed combinations.
-        if user_grid not in allowed_combos:
+        if is_gsa_migration and settings.GSA_MIGRATION in user_grid_ls:
+            pass
+        elif user_grid not in allowed_combos:
             errors.append(
                 build_cell_error_tuple(
                     ir,

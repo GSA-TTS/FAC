@@ -153,6 +153,8 @@ skippable_checks = {
     "federal_program_total_is_correct": federal_program_total_is_correct,
 }
 
+require_gsa_migration_flag = [findings_grid_validation, finding_reference_pattern]
+
 
 def run_all_checks(
     ir, list_of_checks, section_name=None, is_data_migration=False, auditee_uei=None
@@ -215,6 +217,8 @@ def run_check(fun, ir, is_data_migration, auditee_uei):
         return None
     elif fun == verify_auditee_uei_match:
         return fun(ir, auditee_uei)
+    elif fun in require_gsa_migration_flag:
+        return fun(ir, is_data_migration)
     else:
         return fun(ir)
 

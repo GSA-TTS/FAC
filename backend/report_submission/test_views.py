@@ -110,9 +110,9 @@ class TestPreliminaryViews(TestCase):
     }
 
     step2_data = {
-        "auditee_uei": "Lw4MXE7SKMV1",
-        "auditee_fiscal_period_start": "01/01/2021",
-        "auditee_fiscal_period_end": "12/31/2021",
+        "auditee_uei": "D7A4J33FUMJ1",
+        "auditee_fiscal_period_start": "2021-01-01",
+        "auditee_fiscal_period_end": "2021-12-31",
     }
 
     step3_data = {
@@ -260,6 +260,8 @@ class TestPreliminaryViews(TestCase):
         }
 
         user = baker.make(User)
+        user.profile.entry_form_data = self.step1_data
+        user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
 
@@ -295,6 +297,8 @@ class TestPreliminaryViews(TestCase):
         mock_get_uei_info.return_value = {"valid": True}
 
         user = baker.make(User)
+        user.profile.entry_form_data = self.step1_data
+        user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
 
@@ -328,6 +332,12 @@ class TestPreliminaryViews(TestCase):
         Check that the POST succeeds with appropriate data.
         """
         user = baker.make(User)
+        user.profile.entry_form_data = {
+            **self.step1_data,
+            **self.step2_data,
+            **self.step3_data,
+        }
+        user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:accessandsubmission")
 
@@ -377,6 +387,35 @@ class TestPreliminaryViews(TestCase):
         # Should redirect to login page
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertTrue("openid/login" in response.url)
+
+    def test_auditeeinfo_no_eligibility(self):
+        user = baker.make(User)
+        user.profile.entry_form_data = {
+            **self.step1_data,
+            "is_usa_based": False,  # Ineligible
+        }
+        user.profile.save()
+        self.client.force_login(user)
+
+        url = reverse("report_submission:auditeeinfo")
+        response = self.client.get(url)
+
+        # Should redirect to step 1 page due to no eligibility
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("report_submission/eligibility" in response.url)
+
+    def test_accessandsubmission_no_auditee_info(self):
+        user = baker.make(User)
+        user.profile.entry_form_data = self.step1_data
+        user.profile.save()
+        self.client.force_login(user)
+
+        url = reverse("report_submission:accessandsubmission")
+        response = self.client.get(url)
+
+        # Should redirect to step 2 page since auditee info isn't present
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("report_submission/auditeeinfo" in response.url)
 
 
 class GeneralInformationFormViewTests(TestCase):

@@ -1,6 +1,6 @@
 from unittest.mock import patch
 from django.conf import settings
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 from .invalid_migration_tags import INVALID_MIGRATION_TAGS
 from .invalid_record import InvalidRecord
@@ -11,6 +11,7 @@ from .exception_utils import DataMigrationError
 from .workbooklib.federal_awards import (
     is_valid_prefix,
     track_invalid_federal_program_total,
+    track_invalid_number_of_audit_findings,
     xform_match_number_passthrough_names_ids,
     xform_missing_amount_expended,
     xform_missing_program_total,
@@ -27,6 +28,8 @@ from .workbooklib.federal_awards import (
     xform_missing_major_program,
     is_valid_extension,
     xform_cluster_names,
+    xform_replace_missing_prefix,
+    xform_replace_required_values_with_gsa_migration_when_empty,
     xform_sanitize_additional_award_identification,
 )
 
@@ -851,3 +854,147 @@ class TestTrackInvalidFederalProgramTotal(SimpleTestCase):
             InvalidRecord.fields["validations_to_skip"],
         )
         self.assertNotIn
+
+
+class TestTrackInvalidNumberOfAuditFindings(TestCase):
+
+    class MockAudit:
+        def __init__(self, elec_audits_id, findings_count):
+            self.ELECAUDITSID = elec_audits_id
+            self.FINDINGSCOUNT = findings_count
+
+    class MockFinding:
+        def __init__(self, elec_audits_id):
+            self.ELECAUDITSID = elec_audits_id
+
+    class MockAuditHeader:
+        def __init__(self, dbkey, audityear):
+            self.DBKEY = dbkey
+            self.AUDITYEAR = audityear
+
+    def setUp(self):
+
+        InvalidRecord.reset()
+
+    @patch("census_historical_migration.workbooklib.federal_awards.get_findings")
+    def test_track_invalid_number_of_audit_findings(self, mock_get_findings):
+        """Test tracking for invalid number of audit findings"""
+        # Mock the findings and audits data
+        mock_findings = [
+            self.MockFinding("audit1"),
+            self.MockFinding("audit1"),
+        ]
+
+        mock_audits = [
+            self.MockAudit("audit1", "2"),
+            self.MockAudit("audit2", "1"),
+        ]
+
+        mock_audit_header = self.MockAuditHeader("some_dbkey", "2024")
+
+        mock_get_findings.return_value = mock_findings
+
+        track_invalid_number_of_audit_findings(mock_audits, mock_audit_header)
+        mock_get_findings.assert_called_once_with("some_dbkey", "2024")
+        # Check if the invalid records were appended correctly
+        expected_invalid_records = [
+            [
+                {
+                    "census_data": [
+                        {"column": "ELECAUDITSID", "value": "audit1"},
+                        {"column": "FINDINGSCOUNT", "value": "2"},
+                    ],
+                    "gsa_fac_data": {"field": "findings_count", "value": "2"},
+                },
+                {
+                    "census_data": [
+                        {"column": "ELECAUDITSID", "value": "audit2"},
+                        {"column": "FINDINGSCOUNT", "value": "1"},
+                    ],
+                    "gsa_fac_data": {"field": "findings_count", "value": "0"},
+                },
+            ]
+        ]
+
+        for expected_record in expected_invalid_records:
+            self.assertIn(expected_record, InvalidRecord.fields["federal_award"])
+
+    @patch("census_historical_migration.workbooklib.federal_awards.get_findings")
+    def test_no_tracking_with_valid_number_of_audit_findings(self, mock_get_findings):
+        """Test no tracking for valid number of audit findings"""
+        # Mock the findings and audits data
+        mock_findings = [
+            self.MockFinding("audit1"),
+            self.MockFinding("audit1"),
+        ]
+
+        mock_audits = [
+            self.MockAudit("audit1", "2"),
+        ]
+
+        mock_audit_header = self.MockAuditHeader("some_dbkey", "2024")
+        mock_get_findings.return_value = mock_findings
+
+        track_invalid_number_of_audit_findings(mock_audits, mock_audit_header)
+
+        mock_get_findings.assert_called_once_with("some_dbkey", "2024")
+        self.assertEqual(len(InvalidRecord.fields["federal_award"]), 0)
+
+
+class TestXformMissingPrefix(SimpleTestCase):
+    class MockAudit:
+
+        def __init__(self, CFDA_PREFIX, CFDA):
+            self.CFDA_PREFIX = CFDA_PREFIX
+            self.CFDA = CFDA
+
+    def test_for_no_missing_prefix(self):
+        """Test for no missing prefix"""
+        audits = [self.MockAudit("01", "01.123"), self.MockAudit("02", "02.456")]
+
+        xform_replace_missing_prefix(audits)
+
+        self.assertEqual(audits[0].CFDA_PREFIX, "01")
+        self.assertEqual(audits[1].CFDA_PREFIX, "02")
+
+    def test_for_missing_prefix(self):
+        """Test for missing prefix"""
+        audits = [self.MockAudit("", "01.123"), self.MockAudit("02", "02.456")]
+
+        xform_replace_missing_prefix(audits)
+
+        self.assertEqual(audits[0].CFDA_PREFIX, "01")
+        self.assertEqual(audits[1].CFDA_PREFIX, "02")
+
+
+class TestXformReplaceMissingFields(SimpleTestCase):
+
+    class MockAudit:
+
+        def __init__(
+            self,
+            LOANS,
+            DIRECT,
+        ):
+            self.LOANS = LOANS
+            self.DIRECT = DIRECT
+
+    def test_replace_empty_fields(self):
+        audits = [
+            self.MockAudit(
+                LOANS="",
+                DIRECT="",
+            ),
+            self.MockAudit(
+                LOANS="Present",
+                DIRECT="Present",
+            ),
+        ]
+
+        xform_replace_required_values_with_gsa_migration_when_empty(audits)
+
+        self.assertEqual(audits[0].LOANS, settings.GSA_MIGRATION)
+        self.assertEqual(audits[0].DIRECT, settings.GSA_MIGRATION)
+
+        self.assertEqual(audits[1].LOANS, "Present")
+        self.assertEqual(audits[1].DIRECT, "Present")

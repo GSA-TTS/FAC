@@ -12,6 +12,8 @@ from .workbooklib.findings_text import (
 from .workbooklib.findings import (
     has_duplicate_ref_numbers,
     track_invalid_records_with_repeated_ref_numbers,
+    xform_empty_repeat_prior_reference,
+    xform_replace_required_fields_with_gsa_migration_when_empty,
     xform_sort_compliance_requirement,
     xform_missing_compliance_requirement,
 )
@@ -251,3 +253,104 @@ class TestTrackInvalidRecordsWithRepeatedRefNumbers(SimpleTestCase):
 
         self.assertEqual(InvalidRecord.fields["finding"], [])
         self.assertEqual(InvalidRecord.fields["validations_to_skip"], [])
+
+
+class TestXformReplaceRequiredFields(SimpleTestCase):
+    class Finding:
+
+        def __init__(
+            self,
+            MODIFIEDOPINION,
+            OTHERNONCOMPLIANCE,
+            MATERIALWEAKNESS,
+            SIGNIFICANTDEFICIENCY,
+            OTHERFINDINGS,
+            QCOSTS,
+            FINDINGREFNUMS,
+        ):
+            self.MODIFIEDOPINION = MODIFIEDOPINION
+            self.OTHERNONCOMPLIANCE = OTHERNONCOMPLIANCE
+            self.MATERIALWEAKNESS = MATERIALWEAKNESS
+            self.SIGNIFICANTDEFICIENCY = SIGNIFICANTDEFICIENCY
+            self.OTHERFINDINGS = OTHERFINDINGS
+            self.QCOSTS = QCOSTS
+            self.FINDINGREFNUMS = FINDINGREFNUMS
+
+    def test_replace_empty_fields(self):
+        findings = [
+            self.Finding(
+                MODIFIEDOPINION="",
+                OTHERNONCOMPLIANCE="",
+                MATERIALWEAKNESS="Present",
+                SIGNIFICANTDEFICIENCY="",
+                OTHERFINDINGS="Present",
+                QCOSTS="",
+                FINDINGREFNUMS="",
+            ),
+            self.Finding(
+                MODIFIEDOPINION="Present",
+                OTHERNONCOMPLIANCE="Present",
+                MATERIALWEAKNESS="",
+                SIGNIFICANTDEFICIENCY="",
+                OTHERFINDINGS="Present",
+                QCOSTS="",
+                FINDINGREFNUMS="Present",
+            ),
+            self.Finding(
+                MODIFIEDOPINION="",
+                OTHERNONCOMPLIANCE="Present",
+                MATERIALWEAKNESS="Present",
+                SIGNIFICANTDEFICIENCY="",
+                OTHERFINDINGS="",
+                QCOSTS="Present",
+                FINDINGREFNUMS="",
+            ),
+        ]
+
+        xform_replace_required_fields_with_gsa_migration_when_empty(findings)
+
+        self.assertEqual(findings[0].MODIFIEDOPINION, settings.GSA_MIGRATION)
+        self.assertEqual(findings[0].OTHERNONCOMPLIANCE, settings.GSA_MIGRATION)
+        self.assertEqual(findings[0].MATERIALWEAKNESS, "Present")
+        self.assertEqual(findings[0].SIGNIFICANTDEFICIENCY, settings.GSA_MIGRATION)
+        self.assertEqual(findings[0].OTHERFINDINGS, "Present")
+        self.assertEqual(findings[0].QCOSTS, settings.GSA_MIGRATION)
+        self.assertEqual(findings[0].FINDINGREFNUMS, settings.GSA_MIGRATION)
+
+        self.assertEqual(findings[1].MODIFIEDOPINION, "Present")
+        self.assertEqual(findings[1].OTHERNONCOMPLIANCE, "Present")
+        self.assertEqual(findings[1].MATERIALWEAKNESS, settings.GSA_MIGRATION)
+        self.assertEqual(findings[1].SIGNIFICANTDEFICIENCY, settings.GSA_MIGRATION)
+        self.assertEqual(findings[1].OTHERFINDINGS, "Present")
+        self.assertEqual(findings[1].QCOSTS, settings.GSA_MIGRATION)
+        self.assertEqual(findings[1].FINDINGREFNUMS, "Present")
+
+        self.assertEqual(findings[2].MODIFIEDOPINION, settings.GSA_MIGRATION)
+        self.assertEqual(findings[2].OTHERNONCOMPLIANCE, "Present")
+        self.assertEqual(findings[2].MATERIALWEAKNESS, "Present")
+        self.assertEqual(findings[2].SIGNIFICANTDEFICIENCY, settings.GSA_MIGRATION)
+        self.assertEqual(findings[2].OTHERFINDINGS, settings.GSA_MIGRATION)
+        self.assertEqual(findings[2].QCOSTS, "Present")
+        self.assertEqual(findings[2].FINDINGREFNUMS, settings.GSA_MIGRATION)
+
+
+class TestXformMissingRepeatPriorReference(SimpleTestCase):
+    class Finding:
+        def __init__(self, PRIORFINDINGREFNUMS, REPEATFINDING):
+            self.PRIORFINDINGREFNUMS = PRIORFINDINGREFNUMS
+            self.REPEATFINDING = REPEATFINDING
+
+    def test_replace_empty_repeat_finding(self):
+        findings = [
+            self.Finding(PRIORFINDINGREFNUMS="123", REPEATFINDING=""),
+            self.Finding(PRIORFINDINGREFNUMS="", REPEATFINDING=""),
+            self.Finding(PRIORFINDINGREFNUMS="456", REPEATFINDING="N"),
+            self.Finding(PRIORFINDINGREFNUMS="", REPEATFINDING="Y"),
+        ]
+
+        xform_empty_repeat_prior_reference(findings)
+
+        self.assertEqual(findings[0].REPEATFINDING, "Y")
+        self.assertEqual(findings[1].REPEATFINDING, "N")
+        self.assertEqual(findings[2].REPEATFINDING, "N")
+        self.assertEqual(findings[3].REPEATFINDING, "Y")

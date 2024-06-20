@@ -39,6 +39,13 @@ def check_for_gsa_migration_keyword(ir):
         "is_passed",
         "accounting_policies",
         "rate_explained",
+        "modified_opinion",
+        "other_matters",
+        "material_weakness",
+        "significant_deficiency",
+        "repeat_prior_reference",
+        "reference_number",
+        "is_guaranteed",
     ]
 
     for range_name in range_names:

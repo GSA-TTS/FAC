@@ -1,4 +1,6 @@
+from collections import defaultdict
 from audit.intakelib.checks.check_cluster_total import expected_cluster_total
+from .findings import get_findings
 from ..invalid_migration_tags import INVALID_MIGRATION_TAGS
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
 from ..transforms.xform_string_to_int import string_to_int
@@ -124,6 +126,53 @@ def xform_missing_major_program(audits):
     # See Transformation Method Change Recording at the top of this file.
     if change_records and is_empty_major_program_found:
         InspectionRecord.append_federal_awards_changes(change_records)
+
+
+def track_invalid_number_of_audit_findings(audits, audit_header):
+    """Track invalid number of audit findings."""
+    findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
+
+    invalid_audit_records = []
+    is_incorrect_findings_count_found = False
+    expected_finding_count = defaultdict(int)
+    declared_finding_count = defaultdict(int)
+
+    # Count the expected findings
+    for finding in findings:
+        expected_finding_count[finding.ELECAUDITSID] += 1
+
+    # Count the declared findings
+    for audit in audits:
+        declared_finding_count[audit.ELECAUDITSID] = string_to_int(audit.FINDINGSCOUNT)
+
+    # Check for discrepancies in findings count
+    if (
+        len(expected_finding_count) != len(declared_finding_count)
+        or sum(expected_finding_count.values()) != sum(declared_finding_count.values())
+        or declared_finding_count != expected_finding_count
+    ):
+        is_incorrect_findings_count_found = True
+
+    # Track invalid audit records if discrepancies are found
+    if is_incorrect_findings_count_found:
+        for audit in audits:
+            elec_audits_id = audit.ELECAUDITSID
+            expected_count = expected_finding_count[elec_audits_id]
+            track_invalid_records(
+                [
+                    ("ELECAUDITSID", elec_audits_id),
+                    ("FINDINGSCOUNT", audit.FINDINGSCOUNT),
+                ],
+                "findings_count",
+                str(expected_count),
+                invalid_audit_records,
+            )
+
+        InvalidRecord.append_validations_to_skip("check_findings_count_consistency")
+        InvalidRecord.append_invalid_migration_tag(
+            INVALID_MIGRATION_TAGS.INCORRECT_FINDINGS_COUNT,
+        )
+        InvalidRecord.append_invalid_federal_awards_records(invalid_audit_records)
 
 
 def xform_missing_findings_count(audits):
@@ -451,6 +500,32 @@ def is_valid_extension(extension):
     return any(re.match(pattern, str(extension)) for pattern in patterns)
 
 
+def xform_replace_missing_prefix(audits):
+    """Replaces missing ALN prefixes with the corresponding value in CFDA"""
+    change_records = []
+    is_empty_prefix_found = False
+    for audit in audits:
+        prefix = string_to_string(audit.CFDA_PREFIX)
+        if not prefix:
+            is_empty_prefix_found = True
+            prefix = string_to_string(audit.CFDA).split(".")[0]
+
+        track_transformations(
+            "CFDA_PREFIX",
+            audit.CFDA_PREFIX,
+            "federal_agency_prefix",
+            prefix,
+            ["xform_replace_missing_prefix"],
+            change_records,
+        )
+
+        audit.CFDA_PREFIX = prefix
+
+    # See Transformation Method Change Recording at the top of this file.
+    if change_records and is_empty_prefix_found:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
 def xform_replace_invalid_extension(audit):
     """Replaces invalid ALN extensions with the default value settings.GSA_MIGRATION."""
     prefix = string_to_string(audit.CFDA_PREFIX)
@@ -574,7 +649,7 @@ def xform_populate_default_passthrough_names_ids(audits):
         range(len(audits)), audits, passthrough_names, passthrough_ids
     ):
         direct = string_to_string(audit.DIRECT)
-        if direct == "N" and name == "":
+        if direct in {"N", settings.GSA_MIGRATION} and name == "":
             passthrough_names[index] = settings.GSA_MIGRATION
         if direct == "N" and id == "":
             passthrough_ids[index] = settings.GSA_MIGRATION
@@ -802,6 +877,40 @@ def track_invalid_federal_program_total(audits, cfda_key_values):
         )
 
 
+def xform_replace_required_values_with_gsa_migration_when_empty(audits):
+    """Replace empty fields with GSA_MIGRATION."""
+    fields_to_check = [
+        ("LOANS", "is_loan"),
+        ("DIRECT", "is_direct"),
+    ]
+
+    for in_db, in_dissem in fields_to_check:
+        _replace_empty_field(audits, in_db, in_dissem)
+
+
+def _replace_empty_field(audits, name_in_db, name_in_dissem):
+    """Replace empty fields with GSA_MIGRATION."""
+    change_records = []
+    has_empty_field = False
+    for audit in audits:
+        current_value = getattr(audit, name_in_db)
+        if not string_to_string(current_value):
+            has_empty_field = True
+            setattr(audit, name_in_db, settings.GSA_MIGRATION)
+
+        track_transformations(
+            name_in_db,
+            current_value,
+            name_in_dissem,
+            settings.GSA_MIGRATION,
+            ["xform_replace_required_values_with_gsa_migration_when_empty"],
+            change_records,
+        )
+
+    if change_records and has_empty_field:
+        InspectionRecord.append_federal_awards_changes(change_records)
+
+
 def generate_federal_awards(audit_header, outfile):
     """
     Generates a federal awards workbook for all awards associated with a given audit header.
@@ -828,12 +937,15 @@ def generate_federal_awards(audit_header, outfile):
         audits, cluster_names, other_cluster_names, state_cluster_names
     )
     xform_missing_program_total(audits)
+
     xform_missing_findings_count(audits)
     xform_missing_amount_expended(audits)
     xform_program_name(audits)
     xform_is_passthrough_award(audits)
     xform_missing_major_program(audits)
-
+    track_invalid_number_of_audit_findings(audits, audit_header)
+    xform_replace_required_values_with_gsa_migration_when_empty(audits)
+    xform_replace_missing_prefix(audits)
     map_simple_columns(wb, mappings, audits)
 
     set_range(wb, "cluster_name", cluster_names)

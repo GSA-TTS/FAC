@@ -15,6 +15,4 @@ describe('Full audit submissions', () => {
   it('Non-tribal, public', () => {
     testFullSubmission(false, true);
   });
-
-
 });

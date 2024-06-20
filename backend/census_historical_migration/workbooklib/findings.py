@@ -259,6 +259,70 @@ def track_invalid_records_with_repeated_ref_numbers(award_references, findings):
             )
 
 
+def xform_replace_required_fields_with_gsa_migration_when_empty(findings):
+    """Replace empty fields with GSA_MIGRATION."""
+    fields_to_check = [
+        ("MODIFIEDOPINION", "is_modified_opinion"),
+        ("OTHERNONCOMPLIANCE", "is_other_matters"),
+        ("MATERIALWEAKNESS", "is_material_weakness"),
+        ("SIGNIFICANTDEFICIENCY", "is_significant_deficiency"),
+        ("OTHERFINDINGS", "is_other_findings"),
+        ("QCOSTS", "is_questioned_costs"),
+        ("FINDINGREFNUMS", "reference_number"),
+    ]
+
+    for in_db, in_dissem in fields_to_check:
+        _replace_empty_field(findings, in_db, in_dissem)
+
+
+def _replace_empty_field(findings, name_in_db, name_in_dissem):
+    """Replace empty fields with GSA_MIGRATION."""
+    change_records = []
+    has_empty_field = False
+    for finding in findings:
+        current_value = getattr(finding, name_in_db)
+        if not string_to_string(current_value):
+            has_empty_field = True
+            setattr(finding, name_in_db, settings.GSA_MIGRATION)
+
+        track_transformations(
+            name_in_db,
+            current_value,
+            name_in_dissem,
+            settings.GSA_MIGRATION,
+            ["xform_replace_required_fields_with_gsa_migration_when_empty"],
+            change_records,
+        )
+
+    if change_records and has_empty_field:
+        InspectionRecord.append_finding_changes(change_records)
+
+
+def xform_empty_repeat_prior_reference(findings):
+    """Replace empty repeat prior reference with N if prior reference is empty else Y."""
+    change_records = []
+    has_empty_field = False
+    for finding in findings:
+        prior_finding_ref_nums = string_to_string(finding.PRIORFINDINGREFNUMS)
+        repeat_prior_reference = string_to_string(finding.REPEATFINDING)
+
+        if not repeat_prior_reference:
+            has_empty_field = True
+            finding.REPEATFINDING = "Y" if prior_finding_ref_nums else "N"
+
+        track_transformations(
+            "REPEATFINDING",
+            repeat_prior_reference,
+            "is_repeat_finding",
+            finding.REPEATFINDING,
+            ["xform_missing_repeat_prior_reference"],
+            change_records,
+        )
+
+    if change_records and has_empty_field:
+        InspectionRecord.append_finding_changes(change_records)
+
+
 def generate_findings(audit_header, outfile):
     """
     Generates a federal awards audit findings workbook for all findings associated with a given audit header.
@@ -276,6 +340,8 @@ def generate_findings(audit_header, outfile):
     findings = get_findings(audit_header.DBKEY, audit_header.AUDITYEAR)
     award_references = xform_construct_award_references(audits, findings)
     xform_sort_compliance_requirement(findings)
+    xform_replace_required_fields_with_gsa_migration_when_empty(findings)
+    xform_empty_repeat_prior_reference(findings)
     xform_missing_compliance_requirement(findings)
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
