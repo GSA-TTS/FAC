@@ -53,6 +53,9 @@ resource "newrelic_workflow" "alert_workflow" {
   }
 }
 
+/*
+Alert if a log entry indicates that the fac-file-scanner found an infected file
+*/
 resource "newrelic_nrql_alert_condition" "infected_file_found" {
   policy_id = newrelic_alert_policy.alert_policy.id
   name = "Infected File Found!"
@@ -77,6 +80,9 @@ resource "newrelic_nrql_alert_condition" "infected_file_found" {
   aggregation_delay = 120
 }
 
+/*
+Alert if the percentage of transactions resulting in an error surpasses a fixed threshold
+*/
 resource "newrelic_nrql_alert_condition" "error_transactions" {
   account_id = var.new_relic_account_id
   policy_id = newrelic_alert_policy.alert_policy.id
