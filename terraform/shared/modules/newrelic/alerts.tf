@@ -1,6 +1,6 @@
 data "newrelic_entity" "gsa-fac" {
-  name = "gsa-fac-${var.cf_space_name}"
-  type = "APPLICATION"
+  name   = "gsa-fac-${var.cf_space_name}"
+  type   = "APPLICATION"
   domain = "APM" 
 }
 
@@ -10,24 +10,24 @@ resource "newrelic_alert_policy" "alert_policy" {
 
 resource "newrelic_notification_destination" "email_destination" {
   account_id = var.new_relic_account_id
-  name = "email_destination"
-  type = "EMAIL"
+  name       = "email_destination"
+  type       = "EMAIL"
 
   property {
-    key = "email"
+    key   = "email"
     value = "daniel.swick@gsa.gov, matthew.jadud@gsa.gov, alexander.steel@gsa.gov"
   }
 }
 
 resource "newrelic_notification_channel" "email_channel" {
-  account_id = var.new_relic_account_id
-  name = "${var.cf_space_name}_email_notification_channel"
-  type = "EMAIL"
-  product = "IINT"
+  account_id     = var.new_relic_account_id
+  name           = "${var.cf_space_name}_email_notification_channel"
+  type           = "EMAIL"
+  product        = "IINT"
   destination_id = newrelic_notification_destination.email_destination.id
 
   property {
-    key = "subject"
+    key   = "subject"
     value = "{{issueTitle}}"
   }
 }
@@ -43,8 +43,8 @@ resource "newrelic_workflow" "alert_workflow" {
 
     predicate {
       attribute = "labels.policyIds"
-      operator = "EXACTLY_MATCHES"
-      values = [newrelic_alert_policy.alert_policy.id]
+      operator  = "EXACTLY_MATCHES"
+      values    = [newrelic_alert_policy.alert_policy.id]
     }    
   }
 
@@ -58,8 +58,8 @@ Alert if a log entry indicates that the fac-file-scanner found an infected file
 */
 resource "newrelic_nrql_alert_condition" "infected_file_found" {
   policy_id = newrelic_alert_policy.alert_policy.id
-  name = "Infected File Found!"
-  enabled = true
+  name      = "Infected File Found!"
+  enabled   = true
 
   violation_time_limit_seconds = 259200
 
@@ -85,7 +85,7 @@ Alert if the percentage of transactions resulting in an error surpasses a fixed 
 */
 resource "newrelic_nrql_alert_condition" "error_transactions" {
   account_id = var.new_relic_account_id
-  policy_id = newrelic_alert_policy.alert_policy.id
+  policy_id  = newrelic_alert_policy.alert_policy.id
   
   name = "Error Transactions (%)"
   type = "static"
@@ -95,7 +95,7 @@ resource "newrelic_nrql_alert_condition" "error_transactions" {
   }
 
   critical {
-    operator             = "above"
+    operator              = "above"
     threshold             = 5
     threshold_duration    = 300
     threshold_occurrences = "all"
@@ -107,6 +107,7 @@ resource "newrelic_nrql_alert_condition" "error_transactions" {
     threshold_duration    = 300
     threshold_occurrences = "all"
   }
+
   fill_option        = "none"
   aggregation_window = 60
   aggregation_method = "event_flow"
