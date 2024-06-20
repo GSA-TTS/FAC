@@ -1,7 +1,7 @@
 data "newrelic_entity" "gsa-fac" {
   name   = "gsa-fac-${var.cf_space_name}"
   type   = "APPLICATION"
-  domain = "APM" 
+  domain = "APM"
 }
 
 resource "newrelic_alert_policy" "alert_policy" {
@@ -45,7 +45,7 @@ resource "newrelic_workflow" "alert_workflow" {
       attribute = "labels.policyIds"
       operator  = "EXACTLY_MATCHES"
       values    = [newrelic_alert_policy.alert_policy.id]
-    }    
+    }
   }
 
   destination {
@@ -86,7 +86,7 @@ Alert if the percentage of transactions resulting in an error surpasses a fixed 
 resource "newrelic_nrql_alert_condition" "error_transactions" {
   account_id = var.new_relic_account_id
   policy_id  = newrelic_alert_policy.alert_policy.id
-  
+
   name = "Error Transactions (%)"
   type = "static"
 

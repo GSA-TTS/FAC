@@ -8,7 +8,6 @@ resource "newrelic_one_dashboard" "search_dashboard" {
     widget_billboard {
       title = "Searches Per Hour"
 
-
       row    = 1
       column = 1
       width  = 3
