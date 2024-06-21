@@ -100,3 +100,13 @@ variable "json_params" {
   type        = string
   description = "Optional parameters used for service instance (-c)"
 }
+
+variable "new_relic_account_id" {
+  type        = number
+  description = "New Relic Account ID"
+}
+
+variable "new_relic_api_key" {
+  type        = string
+  description = "New Relic API key"
+}
