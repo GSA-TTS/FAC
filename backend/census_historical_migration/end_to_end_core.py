@@ -35,6 +35,7 @@ from dissemination.models import (
 from census_historical_migration.migration_result import MigrationResult
 from .change_record import InspectionRecord
 from .invalid_record import InvalidRecord
+from .report_type_flag import AceFlag
 
 from django.core.exceptions import ValidationError
 from django.utils import timezone as django_timezone
@@ -114,6 +115,7 @@ def run_end_to_end(user, audit_header):
     """Attempts to migrate the given audit"""
     InspectionRecord.reset()
     InvalidRecord.reset()
+    AceFlag.reset()
     try:
         sac = setup_sac(user, audit_header)
         builder_loader = workbook_builder_loader(user, sac, audit_header)
@@ -236,6 +238,7 @@ def track_invalid_audit_records(audit_year, dbkey, report_id):
     # Save the invalid audit record and reset InvalidRecord
     invalid_audit_record.save()
     InvalidRecord.reset()
+    AceFlag.reset()
 
 
 def record_migration_status(audit_year, dbkey):
