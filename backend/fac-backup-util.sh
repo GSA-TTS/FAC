@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 source tools/util_startup.sh
+source tools/setup_env.sh
+setup_env
 version=$1
 run_option=$2
 s3_name="fac-private-s3"
