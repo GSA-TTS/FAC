@@ -21,3 +21,12 @@ module "staging" {
   )
 }
 
+module "staging-backups-bucket" {
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v0.9.1"
+
+  cf_org_name   = var.cf_org_name
+  cf_space_name = "staging"
+  name          = "backups"
+  s3_plan_name  = "basic"
+  tags          = ["s3"]
+}
