@@ -1,4 +1,10 @@
-Completion of the ADR closes https://github.com/GSA-TTS/FAC/issues/2909
+# 38. Data Migration Change Record
+
+Date: 2024-06-25
+
+## Status
+
+Accepted
 
 ## Areas of impact
 
@@ -18,6 +24,7 @@ Completion of the ADR closes https://github.com/GSA-TTS/FAC/issues/2909
 ](https://github.com/GSA-TTS/FAC/issues/2848)
 - [Logging and Transformation Tracking](https://github.com/GSA-TTS/FAC/issues/2909)
 - [Data discrepancy compilation](https://github.com/GSA-TTS/FAC/issues/2912)
+- [Completion of the ADR closes](https://github.com/GSA-TTS/FAC/issues/2909)
 
 ## Context
 The Census to GSA migration will require that some data be altered to improve its quality. The aim of this ADR is to establish a strategy for maintaining a complete record of any and all changes made, such that the original data can be reconstructed. In doing so, we are annotating where historical data fails to meet the validations in place with the FAC today.
