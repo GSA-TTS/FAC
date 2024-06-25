@@ -21,6 +21,16 @@ module "preview" {
   )
 }
 
+module "preview-backups-bucket" {
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v0.9.1"
+
+  cf_org_name   = var.cf_org_name
+  cf_space_name = "preview"
+  name          = "backups"
+  s3_plan_name  = "basic"
+  tags          = ["s3"]
+}
+
 import {
   to = module.preview.module.clamav.cloudfoundry_app.clamav_api
   id = "ed9b5108-1e31-44b8-9ba0-375e091c5589"

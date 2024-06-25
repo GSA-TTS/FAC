@@ -1,0 +1,36 @@
+---
+name: Backup the database with fac-backup-utility
+### Common Commands:
+# ./fac-backup-util.sh v0.1.3 scheduled_backup
+# ./fac-backup-util.sh v0.1.3 daily_backup
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      util_version:
+        description: Version for fac backup utility to use (ex. vX.Y.Z)
+        required: true
+        type: string
+      backup_operation:
+        description: Operation for fac-backup-utility
+        required: true
+        type: string
+jobs:
+  fac-backup-scheduled:
+    name: Perform Database Backup
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Backup FAC Database and Sync Media
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 7G -m 3G --name backup_util_scheduled --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+
