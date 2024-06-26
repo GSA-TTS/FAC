@@ -6,10 +6,11 @@ from django.utils.translation import gettext_lazy as _
 
 from audit.models import SingleAuditChecklist, Access
 from api.uei import get_uei_info_from_sam_gov
-
 from audit.validators import (
     validate_general_information_json,
 )
+from config.settings import CHARACTER_LIMITS_GENERAL
+
 
 # Eligibility step messages
 SPENDING_THRESHOLD = _(
@@ -197,29 +198,61 @@ class AccessSerializer(serializers.ModelSerializer):
 
 class AccessAndSubmissionSerializer(serializers.Serializer):
     # This serializer isn't tied to a model, so it's just input fields with the below layout
-    certifying_auditee_contact_fullname = serializers.CharField()
-    certifying_auditee_contact_email = serializers.EmailField()
-    certifying_auditor_contact_fullname = serializers.CharField()
-    certifying_auditor_contact_email = serializers.EmailField()
+    certifying_auditee_contact_fullname = serializers.CharField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditee_contact_name"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditee_contact_name"]["max"],
+    )
+    certifying_auditee_contact_email = serializers.EmailField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditee_email"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditee_email"]["max"],
+    )
+    certifying_auditor_contact_fullname = serializers.CharField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_contact_name"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_contact_name"]["max"],
+    )
+    certifying_auditor_contact_email = serializers.EmailField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_email"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_email"]["max"],
+    )
     auditor_contacts_email = serializers.ListField(
-        child=serializers.EmailField(required=False, allow_null=True, allow_blank=True),
+        child=serializers.EmailField(
+            required=False,
+            allow_null=True,
+            allow_blank=True,
+            min_length=CHARACTER_LIMITS_GENERAL["auditor_email"]["min"],
+            max_length=CHARACTER_LIMITS_GENERAL["auditor_email"]["max"],
+        ),
         allow_empty=True,
-        min_length=0,
     )
     auditee_contacts_email = serializers.ListField(
-        child=serializers.EmailField(required=False, allow_null=True, allow_blank=True),
+        child=serializers.EmailField(
+            required=False,
+            allow_null=True,
+            allow_blank=True,
+            min_length=CHARACTER_LIMITS_GENERAL["auditee_email"]["min"],
+            max_length=CHARACTER_LIMITS_GENERAL["auditee_email"]["max"],
+        ),
         allow_empty=True,
-        min_length=0,
     )
     auditor_contacts_fullname = serializers.ListField(
-        child=serializers.CharField(required=False, allow_null=True, allow_blank=True),
+        child=serializers.CharField(
+            required=False,
+            allow_null=True,
+            allow_blank=True,
+            min_length=CHARACTER_LIMITS_GENERAL["auditor_contact_name"]["min"],
+            max_length=CHARACTER_LIMITS_GENERAL["auditor_contact_name"]["max"],
+        ),
         allow_empty=True,
-        min_length=0,
     )
     auditee_contacts_fullname = serializers.ListField(
-        child=serializers.CharField(required=False, allow_null=True, allow_blank=True),
+        child=serializers.CharField(
+            required=False,
+            allow_null=True,
+            allow_blank=True,
+            min_length=CHARACTER_LIMITS_GENERAL["auditee_contact_name"]["min"],
+            max_length=CHARACTER_LIMITS_GENERAL["auditee_contact_name"]["max"],
+        ),
         allow_empty=True,
-        min_length=0,
     )
 
     def validate(self, data):
