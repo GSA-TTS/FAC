@@ -19,8 +19,8 @@ local AuditInformation = Types.object {
       oneOf: [
         Types.boolean,
         Types.string {
-            const: Base.Const.GSA_MIGRATION,
-          },
+          const: Base.Const.GSA_MIGRATION,
+        },
       ],
     },
     is_going_concern_included: Types.boolean,
@@ -32,8 +32,8 @@ local AuditInformation = Types.object {
       oneOf: [
         Types.boolean,
         Types.string {
-            const: Base.Const.GSA_MIGRATION,
-          },
+          const: Base.Const.GSA_MIGRATION,
+        },
       ],
     },
     agencies: Types.array {

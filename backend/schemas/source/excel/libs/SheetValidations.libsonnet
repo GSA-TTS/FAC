@@ -122,8 +122,7 @@ local AwardReferenceValidation = {
     custom_error: 'If the Program Name was provided, please, do not change it unless necessary or unknown. ' +
                   'The Program Name must be under 300 characters. ' +
                   'If the drop-down menu is empty, you may need to enter an Agency Prefix ' +
-                  'and ALN in columns B and C. ' +
-                  'Continue?',
+                  'and ALN in columns B and C.',
     custom_title: 'Unknown Federal Program Name',
   },
   YoNoBValidation: YoNoBValidation,

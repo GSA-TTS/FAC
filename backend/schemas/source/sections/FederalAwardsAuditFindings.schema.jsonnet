@@ -28,7 +28,7 @@ local Parts = {
     additionalProperties: false,
     properties: {
       award_reference: Base.Compound.AwardReference,
-      compliance_requirement:{
+      compliance_requirement: {
         oneOf: [
           Base.Compound.ComplianceRequirementTypes,
           Types.string {
