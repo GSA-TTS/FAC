@@ -15,12 +15,35 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+  db2:
+    image: "postgres:15"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    volumes:
+      - postgres-data2:/var/lib/postgresql/data/
+    ports:
+      - "5431:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      
+  historic-data:
+    image: ghcr.io/gsa-tts/fac-historic-public-csvs/load-historic-public-data:20230912
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
 
   web:
     image: ghcr.io/gsa-tts/fac/web-container:latest
     command: /src/run.sh
     depends_on:
       db:
+        condition: service_healthy
+      db2:
         condition: service_healthy
       minio:
         condition: service_started
@@ -72,6 +95,7 @@ services:
       - "3000"
     environment:
       PGRST_DB_URI: postgres://postgres@db:5432/postgres
+      PGRST2_DB_URI: postgres://postgres@db:5431/postgres
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
       PGRST_DB_ANON_ROLE: anon
       # See https://postgrest.org/en/stable/references/api/schemas.html#multiple-schemas for multiple schemas
@@ -83,4 +107,5 @@ services:
 
 volumes:
   postgres-data:
+  postgres-data2:
   minio-vol:

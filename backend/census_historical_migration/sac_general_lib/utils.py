@@ -2,6 +2,8 @@ import logging
 from datetime import datetime, timezone
 import sys
 
+from census_historical_migration.report_type_flag import AceFlag
+
 from ..transforms.xform_string_to_string import (
     string_to_string,
 )
@@ -22,7 +24,7 @@ def create_json_from_db_object(gobj, mappings):
             value = mapping.default
         # Fields with a value of None are skipped to maintain consistency with the logic
         # used in workbook data extraction and to prevent converting None into the string "None".
-        if value is None:
+        if value is None or (value == "" and AceFlag.get_ace_report_flag()):
             continue
         # Check for the type and apply the correct conversion method
         if mapping.type is str:

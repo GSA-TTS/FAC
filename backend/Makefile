@@ -90,7 +90,7 @@ docker-lint:
 ghcr-first-run:
 	docker compose -f docker-compose-web.yml run web python manage.py makemigrations
 	docker compose -f docker-compose-web.yml run web python manage.py migrate
-	docker compose -f docker-compose-web.yml run web python manage.py load_test_data
+	docker compose -f docker-compose-web.yml run web python manage.py loaddata
 
 # Run Django tests with docker
 ghcr-test:

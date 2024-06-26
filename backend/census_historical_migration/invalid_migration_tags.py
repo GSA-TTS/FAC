@@ -11,3 +11,5 @@ class INVALID_MIGRATION_TAGS:
         "extra_finding_reference_numbers_in_findingstext"
     )
     INCORRECT_FINDINGS_COUNT = "incorrect_findings_count"
+
+    ACE_AUDIT_REPORT = "ace_audit_report"

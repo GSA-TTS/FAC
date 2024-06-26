@@ -19,7 +19,14 @@ Typechecks fields, but allows for empty data as well. Contains conditional check
     auditee_fiscal_period_end: {
       format: 'date',
     },
-    audit_type: Base.Enum.AuditType,
+    audit_type: {
+      oneOf: [
+        Base.Enum.AuditType,
+        Types.string {
+          const: Base.Const.GSA_MIGRATION,
+        },
+      ],
+    },
     audit_period_covered: Base.Enum.AuditPeriod,
     audit_period_other_months: Base.Compound.MonthsOther,
 

@@ -1,11 +1,15 @@
 import re
 
 from django.conf import settings
+
+from census_historical_migration.invalid_migration_tags import INVALID_MIGRATION_TAGS
+from census_historical_migration.invalid_record import InvalidRecord
+from census_historical_migration.report_type_flag import AceFlag
 from ..transforms.xform_string_to_int import string_to_int
 from ..transforms.xform_string_to_bool import string_to_bool
 from ..transforms.xform_string_to_string import string_to_string
 from ..exception_utils import DataMigrationError
-from ..workbooklib.excel_creation_utils import get_audits
+from ..workbooklib.excel_creation_utils import get_audits, track_invalid_records
 from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
@@ -328,17 +332,63 @@ def xform_lowrisk(audit_header):
 
 def audit_information(audit_header):
     """Generates audit information JSON."""
-    xform_sp_framework_required(audit_header)
-    xform_lowrisk(audit_header)
-    results = xform_build_sp_framework_gaap_results(audit_header)
+    if AceFlag.get_ace_report_flag():
+        audit_info = ace_audit_information(audit_header)
+    else:
+        xform_sp_framework_required(audit_header)
+        xform_lowrisk(audit_header)
+        results = xform_build_sp_framework_gaap_results(audit_header)
+        audit_info = create_json_from_db_object(audit_header, mappings)
+        audit_info = {
+            key: results.get(key, audit_info.get(key))
+            for key in set(audit_info) | set(results)
+        }
+
     agencies_prefixes = _get_agency_prefixes(audit_header.DBKEY, audit_header.AUDITYEAR)
-    audit_info = create_json_from_db_object(audit_header, mappings)
-    audit_info = {
-        key: results.get(key, audit_info.get(key))
-        for key in set(audit_info) | set(results)
-    }
     audit_info["agencies"] = list(agencies_prefixes)
 
     audit.validators.validate_audit_information_json(audit_info)
 
     return audit_info
+
+
+def ace_audit_information(audit_header):
+    """Constructs the audit information JSON object for an ACE report."""
+    actual = create_json_from_db_object(audit_header, mappings)
+    default = {
+        "dollar_threshold": settings.GSA_MIGRATION_INT,
+        "gaap_results": [settings.GSA_MIGRATION],
+        "is_going_concern_included": settings.GSA_MIGRATION,
+        "is_internal_control_deficiency_disclosed": settings.GSA_MIGRATION,
+        "is_internal_control_material_weakness_disclosed": settings.GSA_MIGRATION,
+        "is_material_noncompliance_disclosed": settings.GSA_MIGRATION,
+        "is_aicpa_audit_guide_included": settings.GSA_MIGRATION,
+        "is_low_risk_auditee": settings.GSA_MIGRATION,
+        "agencies": [settings.GSA_MIGRATION],
+    }
+    if actual:
+        for key, value in actual.items():
+            if value:
+                default[key] = value
+    # Tracking invalid records
+    invalid_records = []
+    for mapping in mappings:
+        in_dissem = (
+            mapping.in_dissem
+            if mapping.in_dissem != FormFieldInDissem
+            else mapping.in_form
+        )
+        track_invalid_records(
+            [
+                (mapping.in_db, getattr(audit_header, mapping.in_db)),
+            ],
+            in_dissem,
+            default[mapping.in_form],
+            invalid_records,
+        )
+    if invalid_records:
+        InvalidRecord.append_invalid_migration_tag(
+            INVALID_MIGRATION_TAGS.ACE_AUDIT_REPORT,
+        )
+
+    return default

@@ -21,7 +21,7 @@ from ..sac_general_lib.utils import (
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from ..change_record import InspectionRecord, CensusRecord, GsaFacRecord
-
+from ..report_type_flag import AceFlag
 
 PERIOD_DICT = {"A": "annual", "B": "biennial", "O": "other"}
 AUDIT_TYPE_DICT = {
@@ -351,10 +351,8 @@ def xform_audit_type(general_information):
         value_in_db = general_information["audit_type"]
         audit_type = _census_audit_type(value_in_db.upper())
         if audit_type == AUDIT_TYPE_DICT["A"]:
-            raise DataMigrationError(
-                "Skipping ACE audit",
-                "skip_ace_audit",
-            )
+            audit_type = settings.GSA_MIGRATION
+            AceFlag.set_ace_report_flag(True)
         general_information["audit_type"] = audit_type
         track_transformations(
             "AUDITTYPE",

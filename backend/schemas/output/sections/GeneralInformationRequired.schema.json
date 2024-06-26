@@ -131,13 +131,21 @@
          "type": "string"
       },
       "audit_type": {
-         "description": "Type of audit being submitted",
-         "enum": [
-            "program-specific",
-            "single-audit"
-         ],
-         "title": "AuditType",
-         "type": "string"
+         "oneOf": [
+            {
+               "description": "Type of audit being submitted",
+               "enum": [
+                  "program-specific",
+                  "single-audit"
+               ],
+               "title": "AuditType",
+               "type": "string"
+            },
+            {
+               "const": "GSA_MIGRATION",
+               "type": "string"
+            }
+         ]
       },
       "auditee_address_line_1": {
          "maxLength": 100,
