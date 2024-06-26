@@ -13,23 +13,23 @@
   },
   "auditee_certify_name": {
     "min": 2,
-    "max": 76
+    "max": 100
   },
   "auditee_certify_title": {
     "min": 2,
-    "max": 81
+    "max": 100
   },
   "auditee_contact_name": {
-    "min": 1,
-    "max": 70
+    "min": 2,
+    "max": 100
   },
   "auditee_email": {
-    "min": 7,
-    "max": 51
+    "min": 6,
+    "max": 320
   },
   "auditee_name": {
-    "min": 3,
-    "max": 99
+    "min": 2,
+    "max": 100
   },
   "auditee_phone": {
     "min": 10,
@@ -37,15 +37,15 @@
   },
   "auditee_contact_title": {
     "min": 2,
-    "max": 97
+    "max": 100
   },
   "auditee_address_line_1": {
-    "min": 1,
-    "max": 80
+    "min": 2,
+    "max": 100
   },
   "auditee_city": {
-    "min": 1,
-    "max": 31
+    "min": 2,
+    "max": 100
   },
   "auditee_state": {
     "min": 2,
@@ -64,44 +64,44 @@
     "max": 10
   },
   "auditor_state": {
-    "min": 0,
+    "min": 2,
     "max": 2
   },
   "auditor_city": {
     "min": 0,
-    "max": 30
+    "max": 100
   },
   "auditor_contact_title": {
-    "min": 1,
-    "max": 55
+    "min": 2,
+    "max": 100
   },
   "auditor_address_line_1": {
     "min": 0,
-    "max": 75
+    "max": 100
   },
   "auditor_zip": {
     "min": 0,
     "max": 9
   },
   "auditor_country": {
-    "min": 3,
-    "max": 7
+    "min": 2,
+    "max": 56
   },
   "auditor_contact_name": {
-    "min": 1,
-    "max": 65
+    "min": 2,
+    "max": 100
   },
   "auditor_email": {
-    "min": 10,
-    "max": 47
+    "min": 6,
+    "max": 320
   },
   "auditor_firm_name": {
-    "min": 1,
-    "max": 86
+    "min": 2,
+    "max": 100
   },
   "auditor_foreign_address": {
     "min": 0,
-    "max": 76
+    "max": 100
   },
   "auditor_ein": {
     "min": 9,
@@ -152,7 +152,7 @@
     "max": 16
   },
   "gaap_results": {
-    "min": 8,
+    "min": 15,
     "max": 77
   },
   "sp_framework_basis": {

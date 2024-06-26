@@ -139,6 +139,7 @@
                                 <label class="usa-label usa-input--small__label"
                                        for="audit_period_other_months">months</label>
                             </div>
+                            <span class="usa-error-message" id="audit-period-error-message" role="alert">{{ errors.audit_period_other_months|striptags }}</span>
                         </fieldset>
                     </fieldset>
                     <fieldset class="usa-fieldset" id="auditee-information" navitem>
@@ -201,7 +202,8 @@
                                        name="auditee_name"
                                        aria-required="false"
                                        value="{{ auditee_name | default_if_none:'' }}" />
-                            </div>
+                                <span class="usa-error-message" id="auditee-name-error-message" role="alert">{{ errors.auditee_name|striptags }}</span>
+                        </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_address_line_1">Street</label>
                                 <input class="usa-input"
@@ -209,6 +211,7 @@
                                        name="auditee_address_line_1"
                                        aria-required="false"
                                        value="{{ auditee_address_line_1 | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditee-address-error-message" role="alert">{{ errors.auditee_address_line_1|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_city">City</label>
@@ -237,6 +240,7 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <span class="usa-error-message" id="auditee-state-error-message" role="alert">{{ errors.auditee_state|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_zip">ZIP code</label>
@@ -245,7 +249,7 @@
                                        name="auditee_zip"
                                        aria-required="false"
                                        value="{{ auditee_zip | default_if_none:'' }}" />
-                                <span class="usa-error-message" id="ein-error-message" role="alert">{{ errors.auditee_zip|striptags }}</span>
+                                <span class="usa-error-message" id="auditee-ZIP-error-message" role="alert">{{ errors.auditee_zip|striptags }}</span>
                             </div>
                         </fieldset>
                         <fieldset class="usa-fieldset">
@@ -259,6 +263,7 @@
                                        aria-required="false"
                                        hidden
                                        value="{{ auditee_uei | default_if_none:'' }}" />
+                                {% comment %} The UEI is a given from the previous steps, no error message necessary {% endcomment %}
                             </div>
                             <fieldset class="usa-fieldset radio">
                                 <legend class="usa-legend">Does this audit represent multiple entities with their own UEIs? (e.g., a statewide audit that covers many departments, each of which may have its own UEI)</legend>
@@ -292,6 +297,7 @@
                                        name="auditee_contact_name"
                                        aria-required="false"
                                        value="{{ auditee_contact_name | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditee-contact-name-error-message" role="alert">{{ errors.auditee_contact_name|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_contact_title">Auditee contact's title</label>
@@ -300,6 +306,7 @@
                                        name="auditee_contact_title"
                                        aria-required="false"
                                        value="{{ auditee_contact_title | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditee-contact-title-error-message" role="alert">{{ errors.auditee_contact_title|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_phone">Auditee phone number</label>
@@ -317,6 +324,7 @@
                                        name="auditee_email"
                                        aria-required="false"
                                        value="{{ auditee_email | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditee-email-error-message" role="alert">{{ errors.auditee_email|striptags }}</span>
                             </div>
                         </fieldset>
                     </fieldset>
@@ -362,6 +370,7 @@
                                        name="auditor_firm_name"
                                        aria-required="false"
                                        value="{{ auditor_firm_name | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditor-firm-name-error-message" role="alert">{{ errors.auditor_firm_name|striptags }}</span>
                             </div>
                             <fieldset class="usa-fieldset" id="audit-firm-organization-address">
                                 <legend class="usa-legend">Audit firm/organization address</legend>
@@ -370,18 +379,18 @@
                                         Country
                                     </label>
                                     <select class="usa-select"
-                                           id="auditor_country"
-                                           name="auditor_country"
-                                    >
-                                      <option id="USA" value="USA" 
-                                        {% if auditor_country == 'USA' %} selected {% endif %}>
-                                        USA
-                                      </option>
-                                      <option id="non-USA" value="non-USA" 
-                                        {% if auditor_country == 'non-USA' %} selected {% endif %}>
-                                        non-USA
-                                      </option>
+                                        id="auditor_country"
+                                        name="auditor_country">
+                                        <option id="USA" value="USA" 
+                                            {% if auditor_country == 'USA' %} selected {% endif %}>
+                                            USA
+                                        </option>
+                                        <option id="non-USA" value="non-USA" 
+                                            {% if auditor_country == 'non-USA' %} selected {% endif %}>
+                                            non-USA
+                                        </option>
                                     </select>
+                                    <span class="usa-error-message" id="auditor-country-error-message" role="alert">{{ errors.auditor_country|striptags }}</span>
                                 </div>
                                 <div name="foreign_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_international_address">
@@ -392,6 +401,7 @@
                                            name="auditor_international_address"
                                            aria-required="false"
                                            data-validate-not-null="">{{ auditor_international_address | default_if_none:'' }}</textarea>
+                                    <span class="usa-error-message" id="auditor-international-address-error-message" role="alert">{{ errors.auditor_international_address|striptags }}</span>
                                 </div>
                                 <div name="domestic_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_address_line_1">
@@ -402,6 +412,7 @@
                                            name="auditor_address_line_1"
                                            aria-required="false"
                                            value="{{ auditor_address_line_1 | default_if_none:'' }}" />
+                                    <span class="usa-error-message" id="auditor-address-error-message" role="alert">{{ errors.auditor_address_line_1|striptags }}</span>
                                 </div>
                                 <div name="domestic_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_city">
@@ -432,6 +443,7 @@
                                             {% endfor %}
                                         </select>
                                     </div>
+                                    <span class="usa-error-message" id="auditor-state-error-message" role="alert">{{ errors.auditor_state|striptags }}</span>
                                 </div>
                                 <div name="domestic_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_zip">
@@ -455,6 +467,7 @@
                                        name="auditor_contact_name"
                                        aria-required="false"
                                        value="{{ auditor_contact_name | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditor-contact-name-error-message" role="alert">{{ errors.auditor_contact_name|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditor_contact_title">Auditor title</label>
@@ -463,6 +476,7 @@
                                        name="auditor_contact_title"
                                        aria-required="false"
                                        value="{{ auditor_contact_title | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditor-contact-title-error-message" role="alert">{{ errors.auditor_contact_title|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditor_phone">Auditor phone number</label>
@@ -480,6 +494,7 @@
                                        name="auditor_email"
                                        aria-required="false"
                                        value="{{ auditor_email | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditor-email-error-message" role="alert">{{ errors.auditor_email|striptags }}</span>
                             </div>
                         </fieldset>
                         <fieldset class="usa-fieldset radio">

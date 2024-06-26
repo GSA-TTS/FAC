@@ -90,16 +90,16 @@ GeneralInformation {
         },
       },
       'then': {
-        allOf:[
+        allOf: [
           {
             not: {
               required: ['auditor_international_address'],
             },
           },
           {
-            required: ['auditor_address_line_1', 'auditor_city', 'auditor_state','auditor_zip'],
-          }
-        ]
+            required: ['auditor_address_line_1', 'auditor_city', 'auditor_state', 'auditor_zip'],
+          },
+        ],
       },
     },
     // If auditor is NOT from the USA, international things should be filled in.
@@ -117,13 +117,13 @@ GeneralInformation {
         allOf: [
           {
             not: {
-              required: ['auditor_address_line_1', 'auditor_city', 'auditor_state','auditor_zip'],
+              required: ['auditor_address_line_1', 'auditor_city', 'auditor_state', 'auditor_zip'],
             },
           },
           {
             required: ['auditor_international_address'],
-          }
-        ]
+          },
+        ],
       },
     },
   ],

@@ -4,6 +4,7 @@ local FederalProgramNames = import 'FederalProgramNames.json';
 local Func = import 'Functions.libsonnet';
 local GAAP = import 'GAAP.libsonnet';
 local States = import 'States.json';
+local GeneralCharacterLimits = import './character_limits/general.json';
 
 local Const = {
   Y: 'Y',
@@ -244,7 +245,9 @@ local email_regex = "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?
 
 local REGEX_ZIPCODE = '^[0-9]{5}(?:[0-9]{4})?$';
 local REGEX_DBKEY = '[1-9][0-9]+';
-local REGEX_MONTHS_OTHER = '^0[0-9]|1[0-8]$';
+// 0 to 9 ([0-9]) OR 01 - 09 (0[1-9]) OR 10 to 18 (1[0-8])
+// Allows single or double digit values - 7 vs 07
+local REGEX_MONTHS_OTHER = '^[0-9]|0[1-9]|1[0-8]$';
 local type_zipcode = Types.string {
   pattern: REGEX_ZIPCODE,
 };
@@ -333,6 +336,8 @@ local Compound = {
   Zip: type_zipcode,
   MonthsOther: Types.string {
     pattern: REGEX_MONTHS_OTHER,
+    minLength: GeneralCharacterLimits.number_months.min,
+    maxLength: GeneralCharacterLimits.number_months.max,
   },
   EmptyString: Types.string {
     const: Const.empty_string,
