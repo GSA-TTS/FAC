@@ -8,6 +8,7 @@ from django.db.transaction import TransactionManagementError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
+from django.utils import timezone
 
 from django.utils.translation import gettext_lazy as _
 
@@ -692,3 +693,35 @@ class SingleAuditReportFile(models.Model):
             )
 
         super().save(*args, **kwargs)
+
+
+class UeiValidationWaiver(models.Model):
+    """Records of UEIs that are permitted to be inactive."""
+
+    uei = models.TextField("UEI", unique=True)
+    timestamp = (
+        models.DateTimeField(
+            "When the waiver was created",
+            default=timezone.now,
+        ),
+    )
+    expiration = (
+        models.DateTimeField(
+            "When the waiver expires",
+        ),
+    )
+    approver_email = models.TextField(
+        "Email address of FAC staff member approving the waiver",
+    )
+    approver_name = models.TextField(
+        "Name of FAC staff member approving the waiver",
+    )
+    requester_email = models.TextField(
+        "Email address of NSAC/KSAML requesting the waiver",
+    )
+    requester_name = models.TextField(
+        "Name of NSAC/KSAML requesting the waiver",
+    )
+    justification = models.TextField(
+        "Brief plain-text justification for the waiver",
+    )
