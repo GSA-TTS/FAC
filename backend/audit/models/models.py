@@ -8,7 +8,6 @@ from django.db.transaction import TransactionManagementError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
-from django.utils import timezone
 
 from django.utils.translation import gettext_lazy as _
 
@@ -702,7 +701,7 @@ class UeiValidationWaiver(models.Model):
     timestamp = (
         models.DateTimeField(
             "When the waiver was created",
-            default=timezone.now,
+            default=datetime.now(timezone.utc),
         ),
     )
     expiration = (
