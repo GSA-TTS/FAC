@@ -1116,8 +1116,10 @@ class TestValidateGeneralInformation(SimpleTestCase):
         }
 
         self.too_long_emails = self.valid_general_information | {
-            "auditee_email": "a" * character_limits["auditee_email"]["max"] + "NowItIsDefinitelyTooLong",
-            "auditor_email": "a" * character_limits["auditor_email"]["max"] + "NowItIsDefinitelyTooLong",
+            "auditee_email": "a" * character_limits["auditee_email"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_email": "a" * character_limits["auditor_email"]["max"]
+            + "NowItIsDefinitelyTooLong",
         }
 
         self.too_short_addresses = self.valid_general_information | {
@@ -1126,8 +1128,11 @@ class TestValidateGeneralInformation(SimpleTestCase):
         }
 
         self.too_long_addresses = self.valid_general_information | {
-            "auditee_address_line_1": "a" * character_limits["auditee_address_line_1"]["max"] + "NowItIsDefinitelyTooLong",
-            "auditee_city": "a" * character_limits["auditee_city"]["max"] + "NowItIsDefinitelyTooLong",
+            "auditee_address_line_1": "a"
+            * character_limits["auditee_address_line_1"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_city": "a" * character_limits["auditee_city"]["max"]
+            + "NowItIsDefinitelyTooLong",
         }
 
         self.too_short_names = self.valid_general_information | {
@@ -1139,15 +1144,27 @@ class TestValidateGeneralInformation(SimpleTestCase):
             "auditor_contact_title": "a",
             "auditor_contact_name": "a",
         }
-        
+
         self.too_long_names = self.valid_general_information | {
-            "auditee_name": "a" * character_limits["auditee_name"]["max"] + "NowItIsDefinitelyTooLong",
-            "auditee_certify_name": "a" * character_limits["auditee_certify_name"]["max"] + "NowItIsDefinitelyTooLong",
-            "auditee_certify_title": "a" * character_limits["auditee_certify_title"]["max"] + "NowItIsDefinitelyTooLong",
-            "auditee_contact_name": "a" * character_limits["auditee_contact_name"]["max"] + "NowItIsDefinitelyTooLong",
-            "auditor_firm_name": "a" * character_limits["auditor_firm_name"]["max"] + "NowItIsDefinitelyTooLong",
-            "auditor_contact_title": "a" * character_limits["auditor_contact_title"]["max"] + "NowItIsDefinitelyTooLong",
-            "auditor_contact_name": "a" * character_limits["auditor_contact_name"]["max"] + "NowItIsDefinitelyTooLong",
+            "auditee_name": "a" * character_limits["auditee_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_certify_name": "a"
+            * character_limits["auditee_certify_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_certify_title": "a"
+            * character_limits["auditee_certify_title"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_contact_name": "a"
+            * character_limits["auditee_contact_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_firm_name": "a" * character_limits["auditor_firm_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_contact_title": "a"
+            * character_limits["auditor_contact_title"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_contact_name": "a"
+            * character_limits["auditor_contact_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
         }
 
     def test_validate_general_information_schema_with_valid_data(self):

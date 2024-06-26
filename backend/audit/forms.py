@@ -1,7 +1,6 @@
 from django import forms
 from config.settings import (
     AGENCY_NAMES,
-    CHARACTER_LIMITS_GENERAL,
     GAAP_RESULTS,
     SP_FRAMEWORK_BASIS,
     SP_FRAMEWORK_OPINIONS,
