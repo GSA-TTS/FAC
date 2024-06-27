@@ -85,11 +85,19 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       row    = 4
       column = 1
-      width  = 5
+      width  = 6
       height = 3
 
       nrql_query {
         query = "SELECT count(*) FROM Transaction FACET `request.uri` WHERE request.uri = '/openid/login/' and appName = 'gsa-fac-${var.cf_space_name}' SINCE 1 week AGO TIMESERIES"
+      }
+
+      colors {
+        color = "#ff0000"
+        series_overrides {
+          color       = "#ff0000"
+          series_name = "/openid/login"
+        }
       }
 
       legend_enabled = true
@@ -98,13 +106,20 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
     widget_stacked_bar {
       title = "Logout Requests"
 
-      row    = 4
-      column = 6
-      width  = 5
+      row    = 5
+      column = 1
+      width  = 6
       height = 3
 
       nrql_query {
         query = "SELECT count(*) FROM Transaction FACET `request.uri` WHERE request.uri = '/openid/login/' and appName = 'gsa-fac-${var.cf_space_name}' SINCE 1 week AGO TIMESERIES"
+      }
+      colors {
+        color = "#ff0000"
+        series_overrides {
+          color       = "#ff0000"
+          series_name = "/openid/logout"
+        }
       }
 
       legend_enabled = true
