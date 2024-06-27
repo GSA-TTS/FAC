@@ -995,3 +995,56 @@ class IssueDescriptionRecord(models.Model):
     issue_detail = models.TextField()
     issue_tag = models.TextField()
     skipped_validation_method = models.TextField()
+
+
+class WaiverType(models.TextChoices):
+    AUDITEE_CERTIFYING_OFFICIAL = (
+        "auditee_certifying_official",
+        "No auditee certifying official is available",
+    )
+    AUDITOR_CERTIFYING_OFFICIAL = (
+        "auditor_certifying_official",
+        "No auditor certifying official is available",
+    )
+    ACTIVE_UEI = (
+        "active_uei",
+        "The auditee cannot activate their SAM.gov UEI registration",
+    )
+
+
+class SacValidationWaiver(models.Model):
+    """Records of reports that have had a requirement waived."""
+
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
+    )
+    timestamp = (
+        models.DateTimeField(
+            "When the waiver was created",
+            default=timezone.now,
+        ),
+    )
+    approver_email = models.TextField(
+        "Email address of FAC staff member approving the waiver",
+    )
+    approver_name = models.TextField(
+        "Name of FAC staff member approving the waiver",
+    )
+    requester_email = models.TextField(
+        "Email address of NSAC/KSAML requesting the waiver",
+    )
+    requester_name = models.TextField(
+        "Name of NSAC/KSAML requesting the waiver",
+    )
+    justification = models.TextField(
+        "Brief plain-text justification for the waiver",
+    )
+    waiver_type = models.CharField(
+        "The waiver type",
+        max_length=100,
+        choices=WaiverType.choices,
+    )
