@@ -40,6 +40,18 @@
                     {% if errors %}
                         <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>
                     {% endif %}
+                    {% if unexpected_errors %}
+                        <span class="usa-error-message" role="alert">There was an unexpected error when attempting to submit the form. See below for more details, or reach out to our
+                            <a class="usa-nav__link text-primary-dark"
+                            href="https://support.fac.gov/hc"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                                <span class="text-primary-dark">Helpdesk</span>
+                            </a>
+                            .
+                        </span>
+                        <span class="usa-error-message" role="alert">Error: {{ errors }}</span>
+                    {% endif %}
                     <fieldset class="usa-fieldset" id="audit-type" navitem>
                         <fieldset class="usa-fieldset question" id="fiscal-period-dates">
                             <legend class="usa-legend usa-legend--large">Fiscal Period</legend>
