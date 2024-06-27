@@ -28,7 +28,8 @@ zip_validator = RegexValidator(
     r"^[0-9]{5}(?:[0-9]{4})?$", "Zip codes should be in the format 12345 or 12345-1234."
 )
 audit_period_other_months_validator = RegexValidator(
-    r"^0?[1-9]$|^1[0-8]$", "The audit period should be between 1 and 18 months, with an optional leading zero."
+    r"^0?[1-9]$|^1[0-8]$",
+    "The audit period should be between 1 and 18 months, with an optional leading zero.",
 )
 
 
@@ -77,7 +78,7 @@ class GeneralInformationForm(forms.Form):
         min_length=CHARACTER_LIMITS_GENERAL["number_months"]["min"],
         max_length=CHARACTER_LIMITS_GENERAL["number_months"]["max"],
         required=False,
-        validators=[audit_period_other_months_validator]
+        validators=[audit_period_other_months_validator],
     )
     ein = forms.CharField(
         required=False,
@@ -135,7 +136,7 @@ class GeneralInformationForm(forms.Form):
     auditor_international_address = forms.CharField(
         min_length=CHARACTER_LIMITS_GENERAL["auditor_foreign_address"]["min"],
         max_length=CHARACTER_LIMITS_GENERAL["auditor_foreign_address"]["max"],
-        required=False
+        required=False,
     )
     auditor_address_line_1 = forms.CharField(
         min_length=CHARACTER_LIMITS_GENERAL["auditor_address_line_1"]["min"],
