@@ -85,7 +85,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       row    = 4
       column = 1
-      width  = 6
+      width  = 5
       height = 3
 
       nrql_query {
@@ -100,7 +100,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       row    = 4
       column = 6
-      width  = 6
+      width  = 5
       height = 3
 
       nrql_query {
