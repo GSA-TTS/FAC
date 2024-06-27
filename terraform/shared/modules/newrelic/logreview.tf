@@ -1,4 +1,4 @@
-resource "newrelic_one_dashboard" "search_dashboard" {
+resource "newrelic_one_dashboard" "log_review_dashboard" {
   name        = "FAC Log Review (${var.cf_space_name})"
   permissions = "public_read_only"
 
