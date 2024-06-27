@@ -998,16 +998,16 @@ class IssueDescriptionRecord(models.Model):
 
 
 class WaiverType(models.TextChoices):
-    auditee_certifying_official = (
-        "AUDITEE_CERTIFYING_OFFICIAL",
+    AUDITEE_CERTIFYING_OFFICIAL = (
+        "auditee_certifying_official",
         "No auditee certifying official is available",
     )
-    auditor_certifying_official = (
-        "AUDITOR_CERTIFYING_OFFICIAL",
+    AUDITOR_CERTIFYING_OFFICIAL = (
+        "auditor_certifying_official",
         "No auditor certifying official is available",
     )
-    active_uei = (
-        "ACTIVE_UEI",
+    ACTIVE_UEI = (
+        "active_uei",
         "The auditee cannot activate their SAM.gov UEI registration",
     )
 
