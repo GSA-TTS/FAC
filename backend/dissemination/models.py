@@ -999,15 +999,15 @@ class IssueDescriptionRecord(models.Model):
 
 class WaiverType(models.TextChoices):
     auditee_certifying_official = (
-        "auditee_certifying_official",
+        "AUDITEE_CERTIFYING_OFFICIAL",
         "No auditee certifying official is available",
     )
     auditor_certifying_official = (
-        "auditor_certifying_official",
+        "AUDITOR_CERTIFYING_OFFICIAL",
         "No auditor certifying official is available",
     )
     active_uei = (
-        "active_uei",
+        "ACTIVE_UEI",
         "The auditee cannot activate their SAM.gov UEI registration",
     )
 
@@ -1043,7 +1043,8 @@ class SacValidationWaiver(models.Model):
     justification = models.TextField(
         "Brief plain-text justification for the waiver",
     )
-    waiver_type = models.TextField(
+    waiver_type = models.CharField(
         "The waiver type",
+        max_length=100,
         choices=WaiverType.choices,
     )
