@@ -134,7 +134,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       height = 3
 
       nrql_query {
-        query = "SELECT count(*) AS 'Infected Files FROM Log WHERE tags.space_name = '${var.cf_space_name}' and message LIKE '%ScanResult.INFECTED%'"
+        query = "SELECT count(*) AS 'Infected Files' FROM Log WHERE tags.space_name = '${var.cf_space_name}' and message LIKE '%ScanResult.INFECTED%'"
       }
 
       legend_enabled = true
