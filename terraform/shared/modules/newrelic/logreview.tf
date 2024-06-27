@@ -70,8 +70,8 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       row    = 3
       column = 1
-      width  = 9
-      height = 3
+      width  = 12
+      height = 4
 
       nrql_query {
         query = "SELECT count(*) FROM Transaction FACET `request.uri` WHERE response.status = '500' and appName = 'gsa-fac-${var.cf_space_name}' SINCE 1 week AGO TIMESERIES"
@@ -86,7 +86,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       row    = 4
       column = 1
       width  = 6
-      height = 3
+      height = 4
 
       nrql_query {
         query = "SELECT count(*) FROM Transaction FACET `request.uri` WHERE request.uri = '/openid/login/' and appName = 'gsa-fac-${var.cf_space_name}' SINCE 1 week AGO TIMESERIES"
@@ -109,7 +109,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       row    = 5
       column = 1
       width  = 6
-      height = 3
+      height = 4
 
       nrql_query {
         query = "SELECT count(*) FROM Transaction FACET `request.uri` WHERE request.uri = '/openid/logout/' and appName = 'gsa-fac-${var.cf_space_name}' SINCE 1 week AGO TIMESERIES"
