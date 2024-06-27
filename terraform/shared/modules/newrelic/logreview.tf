@@ -93,10 +93,10 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       }
 
       colors {
-        color = "#ff0000"
+        color = "#00ff04"
         series_overrides {
-          color       = "#ff0000"
-          series_name = "/openid/login"
+          color       = "#00ff04"
+          series_name = "/openid/login/"
         }
       }
 
@@ -118,7 +118,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
         color = "#ff0000"
         series_overrides {
           color       = "#ff0000"
-          series_name = "/openid/logout"
+          series_name = "/openid/logout/"
         }
       }
 
