@@ -27,6 +27,9 @@ phone_validator = RegexValidator(
 zip_validator = RegexValidator(
     r"^[0-9]{5}(?:[0-9]{4})?$", "Zip codes should be in the format 12345 or 12345-1234."
 )
+audit_period_other_months_validator = RegexValidator(
+    r"^0?[1-9]$|^1[0-8]$", "The audit period should be between 1 and 18 months, with an optional leading zero."
+)
 
 
 def validate_uei(value):
@@ -59,7 +62,6 @@ class AuditeeInfoForm(forms.Form):
 
 
 class GeneralInformationForm(forms.Form):
-    max_string_length = 100
     foreign_address_max_length = 500
     choices_state_abbrevs = list((i, i) for i in STATE_ABBREVS)
 
@@ -72,9 +74,10 @@ class GeneralInformationForm(forms.Form):
     )
     audit_period_covered = forms.CharField(required=False)
     audit_period_other_months = forms.CharField(
-        required=False,
         min_length=CHARACTER_LIMITS_GENERAL["number_months"]["min"],
         max_length=CHARACTER_LIMITS_GENERAL["number_months"]["max"],
+        required=False,
+        validators=[audit_period_other_months_validator]
     )
     ein = forms.CharField(
         required=False,
@@ -130,7 +133,9 @@ class GeneralInformationForm(forms.Form):
     auditor_ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     auditor_country = forms.CharField(required=False)
     auditor_international_address = forms.CharField(
-        max_length=foreign_address_max_length, required=False
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_foreign_address"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_foreign_address"]["max"],
+        required=False
     )
     auditor_address_line_1 = forms.CharField(
         min_length=CHARACTER_LIMITS_GENERAL["auditor_address_line_1"]["min"],
