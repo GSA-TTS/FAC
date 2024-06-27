@@ -18,7 +18,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       }
     }
 
-    widget_line {
+    widget_billboard {
       title = "Excel Uploads"
 
 
@@ -35,7 +35,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
     }
 
-    widget_line {
+    widget_billboard {
       title = "Single Audit Report Uploads"
 
       row    = 1
@@ -50,11 +50,11 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       legend_enabled = true
     }
 
-    widget_line {
+    widget_billboard {
       title = "Global Requests (Non-Upload)"
 
-      row    = 2
-      column = 1
+      row    = 1
+      column = 10
       width  = 3
       height = 3
 
@@ -65,7 +65,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       legend_enabled = true
     }
 
-    widget_line {
+    widget_stacked_bar {
       title = "500 Error Code"
 
       row    = 3
