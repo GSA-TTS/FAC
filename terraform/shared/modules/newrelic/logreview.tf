@@ -1,5 +1,5 @@
 resource "newrelic_one_dashboard" "search_dashboard" {
-  name        = "Log Review (${var.cf_space_name})"
+  name        = "FAC Log Review (${var.cf_space_name})"
   permissions = "public_read_only"
 
   page {
