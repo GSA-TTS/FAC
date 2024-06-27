@@ -112,7 +112,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       height = 3
 
       nrql_query {
-        query = "SELECT count(*) FROM Transaction FACET `request.uri` WHERE request.uri = '/openid/login/' and appName = 'gsa-fac-${var.cf_space_name}' SINCE 1 week AGO TIMESERIES"
+        query = "SELECT count(*) FROM Transaction FACET `request.uri` WHERE request.uri = '/openid/logout/' and appName = 'gsa-fac-${var.cf_space_name}' SINCE 1 week AGO TIMESERIES"
       }
       colors {
         color = "#ff0000"
@@ -120,6 +120,36 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
           color       = "#ff0000"
           series_name = "/openid/logout/"
         }
+      }
+
+      legend_enabled = true
+    }
+
+    widget_billboard {
+      title = "Infected Files Detected"
+
+      row    = 6
+      column = 1
+      width  = 3
+      height = 3
+
+      nrql_query {
+        query = "SELECT count(*) AS 'Infected Files FROM Log WHERE tags.space_name = '${var.cf_space_name}' and message LIKE '%ScanResult.INFECTED%'"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_billboard {
+      title = "Django /admin/login/ Count"
+
+      row    = 6
+      column = 4
+      width  = 3
+      height = 3
+
+      nrql_query {
+        query = "SELECT count(`message` as `/admin/login/ hits`) FROM Log WHERE `message` LIKE 'app.fac.gov%/admin/login%' SINCE 7 days ago"
       }
 
       legend_enabled = true
