@@ -27,40 +27,40 @@ local AuditInformation = Types.object {
       oneOf: [
         Types.boolean,
         Types.string {
-            const: Base.Const.GSA_MIGRATION,
-          },
+          const: Base.Const.GSA_MIGRATION,
+        },
       ],
     },
     is_internal_control_deficiency_disclosed: {
       oneOf: [
         Types.boolean,
         Types.string {
-            const: Base.Const.GSA_MIGRATION,
-          },
+          const: Base.Const.GSA_MIGRATION,
+        },
       ],
     },
     is_internal_control_material_weakness_disclosed: {
       oneOf: [
         Types.boolean,
         Types.string {
-            const: Base.Const.GSA_MIGRATION,
-          },
+          const: Base.Const.GSA_MIGRATION,
+        },
       ],
     },
     is_material_noncompliance_disclosed: {
       oneOf: [
         Types.boolean,
         Types.string {
-            const: Base.Const.GSA_MIGRATION,
-          },
+          const: Base.Const.GSA_MIGRATION,
+        },
       ],
     },
     is_aicpa_audit_guide_included: {
       oneOf: [
         Types.boolean,
         Types.string {
-            const: Base.Const.GSA_MIGRATION,
-          },
+          const: Base.Const.GSA_MIGRATION,
+        },
       ],
     },
     is_low_risk_auditee: {

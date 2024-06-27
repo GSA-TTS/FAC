@@ -127,7 +127,7 @@
       "audit_period_other_months": {
          "maxLength": 2,
          "minLength": 0,
-         "pattern": "^[0-9]|0[1-9]|1[0-8]$",
+         "pattern": "^[1-9]|0[1-9]|1[0-8]$",
          "type": "string"
       },
       "audit_type": {
