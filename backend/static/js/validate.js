@@ -152,10 +152,15 @@ export const validations = {
       : result;
   },
 
+  /**
+   * Determines if a field has satisfied its self-defined length requirements.
+   * @param  {String} field     The field, containing its id and value.
+   * @param  {String} compStr   The contraint, with space separated comparators and values.
+   * @return {Object}           A result object containing the error status.
+  */
   validateLength: (field, compStr) => {
-    const [comparator, compValue] = compStr.split(' ');
+    const splitCompStr = compStr.split(' ');
     const valueLength = field.value.length;
-    const compValueLength = parseInt(compValue);
 
     const result = {
       error: false,
@@ -163,12 +168,23 @@ export const validations = {
       validation: 'length',
     };
 
-    switch (comparator) {
-      case '==':
-        return valueLength != compValueLength
-          ? { ...result, error: true }
-          : result;
+    // The splitCompStr looks something like [">=", "2", "<=", "100"]
+    // So we loop over the array and use comparator [i] with comparator value [i + 1], against the field length.
+    for (let i = 0; i < splitCompStr.length; i += 2) {
+      let comparator = splitCompStr[i];
+      let compValue = splitCompStr[i + 1];
+      let compValueLength = parseInt(compValue);
+
+      if (comparator == '==' && valueLength != compValueLength) {
+        return { ...result, error: true };
+      } else if (comparator == '>=' && valueLength < compValueLength) {
+        return { ...result, error: true };
+      } else if (comparator == '<=' && valueLength > compValueLength) {
+        return { ...result, error: true };
+      }
     }
+
+    return result;
   },
 
   validateDateComesAfter: (field) => {
