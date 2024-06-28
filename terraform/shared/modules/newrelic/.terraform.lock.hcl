@@ -5,6 +5,7 @@ provider "registry.terraform.io/newrelic/newrelic" {
   version = "3.38.0"
   hashes = [
     "h1:+mJSDuRi8R1Plvgkr6LtfFwKSCP98pazqNt3Of2thZE=",
+    "h1:s00BVW0COl7DpyyJxoxc4jZIikiMcqFK6kzw/tLY7CA=",
     "zh:00ddd23b71aea83012a85819c2c41cc7ea9b13be1396f19c00392fe49d5ca965",
     "zh:074c2d073e6079587439f6eb27e01c160dd190993599f648950c1a521ea3fa20",
     "zh:16f8e6a90add8d794e72c63d9e3c149d6fa2ddef1cb3b151cf154da3a125028b",
