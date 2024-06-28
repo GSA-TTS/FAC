@@ -1,3 +1,11 @@
+locals {
+  dev       = var.cf_space_name == "dev" ? "fac-dev.app.cloud.gov" : ""
+  preview   = var.cf_space_name == "preview" ? "fac-preview.app.cloud.gov" : ""
+  staging   = var.cf_space_name == "staging" ? "fac-staging.app.cloud.gov" : ""
+  prod      = var.cf_space_name == "production" ? "app.fac.gov" : ""
+  admin_uri = coalesce(local.dev, local.preview, local.staging, local.prod)
+}
+
 resource "newrelic_one_dashboard" "log_review_dashboard" {
   name        = "FAC Log Review (${var.cf_space_name})"
   permissions = "public_read_only"
@@ -149,7 +157,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       height = 3
 
       nrql_query {
-        query = "SELECT count(`message` as `/admin/login/ hits`) FROM Log WHERE `message` LIKE 'app.fac.gov%/admin/login%' SINCE 7 days ago"
+        query = "SELECT count(`message` as `/admin/login/ hits`) FROM Log WHERE `message` LIKE '${local.admin_uri}%/admin/login%' SINCE 7 days ago"
       }
 
       legend_enabled = true
