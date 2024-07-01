@@ -1,0 +1,18 @@
+{
+  "report_id": {
+    "min": 25,
+    "max": 25
+  },
+  "auditee_uei": {
+    "min": 12,
+    "max": 12
+  },
+  "audit_year": {
+    "min": 4,
+    "max": 4
+  },
+  "additional_uei": {
+    "min": 12,
+    "max": 12
+  }
+}

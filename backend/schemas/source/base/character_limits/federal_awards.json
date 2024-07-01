@@ -1,0 +1,90 @@
+{
+  "report_id": {
+    "min": 25,
+    "max": 25
+  },
+  "auditee_uei": {
+    "min": 12,
+    "max": 13
+  },
+  "audit_year": {
+    "min": 4,
+    "max": 4
+  },
+  "award_reference": {
+    "min": 10,
+    "max": 10
+  },
+  "federal_agency_prefix": {
+    "min": 2,
+    "max": 2
+  },
+  "federal_award_extension": {
+    "min": 2,
+    "max": 13
+  },
+  "additional_award_identification": {
+    "min": 0,
+    "max": 241
+  },
+  "federal_program_name": {
+    "min": 0,
+    "max": 371
+  },
+  "amount_expended": {
+    "min": -447813896,
+    "max": 54873398849
+  },
+  "cluster_name": {
+    "min": 1,
+    "max": 75
+  },
+  "other_cluster_name": {
+    "min": 0,
+    "max": 111
+  },
+  "state_cluster_name": {
+    "min": 0,
+    "max": 75
+  },
+  "cluster_total": {
+    "min": -2963764,
+    "max": 54935748805
+  },
+  "federal_program_total": {
+    "min": -10726532,
+    "max": 54873398849
+  },
+  "is_major": {
+    "min": 1,
+    "max": 1
+  },
+  "is_loan": {
+    "min": 1,
+    "max": 1
+  },
+  "loan_balance": {
+    "min": 0,
+    "max": 12
+  },
+  "is_direct": {
+    "min": 1,
+    "max": 1
+  },
+  "audit_report_type": {
+    "min": 0,
+    "max": 1
+  },
+  "findings_count": {
+    "min": 0,
+    "max": 21
+  },
+  "is_passthrough_award": {
+    "min": 1,
+    "max": 1
+  },
+  "passthrough_amount": {
+    "min": 0,
+    "max": 0
+  }
+}

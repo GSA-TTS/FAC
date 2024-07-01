@@ -1,0 +1,38 @@
+{
+  "report_id": {
+    "min": 25,
+    "max": 25
+  },
+  "auditee_uei": {
+    "min": 12,
+    "max": 13
+  },
+  "audit_year": {
+    "min": 4,
+    "max": 4
+  },
+  "title": {
+    "min": 0,
+    "max": 822
+  },
+  "accounting_policies": {
+    "min": 1,
+    "max": 31439
+  },
+  "is_minimis_rate_used": {
+    "min": 1,
+    "max": 13
+  },
+  "rate_explained": {
+    "min": 0,
+    "max": 3800
+  },
+  "content": {
+    "min": 0,
+    "max": 18801
+  },
+  "contains_chart_or_table": {
+    "min": 0,
+    "max": 13
+  }
+}

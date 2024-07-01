@@ -15,7 +15,9 @@
          "type": "string"
       },
       "audit_period_other_months": {
-         "pattern": "^0[0-9]|1[0-8]$",
+         "maxLength": 2,
+         "minLength": 0,
+         "pattern": "^0?[1-9]$|^1[0-8]$",
          "type": "string"
       },
       "audit_type": {
@@ -37,25 +39,30 @@
       },
       "auditee_address_line_1": {
          "maxLength": 100,
+         "minLength": 2,
          "type": "string"
       },
       "auditee_city": {
          "maxLength": 100,
+         "minLength": 2,
          "type": "string"
       },
       "auditee_contact_name": {
          "maxLength": 100,
+         "minLength": 2,
          "type": "string"
       },
       "auditee_contact_title": {
          "maxLength": 100,
+         "minLength": 2,
          "type": "string"
       },
       "auditee_email": {
          "oneOf": [
             {
                "format": "email",
-               "maxLength": 100,
+               "maxLength": 320,
+               "minLength": 6,
                "type": "string"
             },
             {
@@ -73,6 +80,7 @@
       },
       "auditee_name": {
          "maxLength": 100,
+         "minLength": 2,
          "type": "string"
       },
       "auditee_phone": {
@@ -183,20 +191,22 @@
       },
       "auditor_address_line_1": {
          "maxLength": 100,
-         "minLength": 1,
+         "minLength": 0,
          "type": "string"
       },
       "auditor_city": {
          "maxLength": 100,
-         "minLength": 1,
+         "minLength": 0,
          "type": "string"
       },
       "auditor_contact_name": {
          "maxLength": 100,
+         "minLength": 2,
          "type": "string"
       },
       "auditor_contact_title": {
          "maxLength": 100,
+         "minLength": 2,
          "type": "string"
       },
       "auditor_country": {
@@ -227,7 +237,8 @@
          "oneOf": [
             {
                "format": "email",
-               "maxLength": 100,
+               "maxLength": 320,
+               "minLength": 6,
                "type": "string"
             },
             {
@@ -238,11 +249,12 @@
       },
       "auditor_firm_name": {
          "maxLength": 100,
+         "minLength": 2,
          "type": "string"
       },
       "auditor_international_address": {
-         "maxLength": 500,
-         "minLength": 1,
+         "maxLength": 100,
+         "minLength": 0,
          "type": "string"
       },
       "auditor_phone": {

@@ -240,10 +240,12 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
+            form.cleaned_data = self._dates_to_slashes(form.cleaned_data)
             context = form.cleaned_data | {
                 "errors": [err.message],
                 "report_id": report_id,
                 "state_abbrevs": STATE_ABBREVS,
+                "unexpected_errors": True,
             }
             return render(request, "report_submission/gen-form.html", context)
         except LateChangeError:

@@ -510,6 +510,9 @@ SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
 STATE_ABBREVS = json.load(open(f"{SCHEMA_BASE_DIR}/States.json"))[
     "UnitedStatesStateAbbr"
 ]
+CHARACTER_LIMITS_GENERAL = json.load(
+    open(f"{SCHEMA_BASE_DIR}/character_limits/general.json")
+)
 
 ENABLE_DEBUG_TOOLBAR = (
     env.bool("ENABLE_DEBUG_TOOLBAR", False) and ENVIRONMENT == "LOCAL" and not TEST_RUN
