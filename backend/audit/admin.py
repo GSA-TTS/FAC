@@ -1,4 +1,6 @@
-from django.contrib import admin
+from django.conf import settings
+from django.contrib import admin, messages
+from audit.forms import SacValidationWaiverForm
 from audit.models import (
     Access,
     DeletedAccess,
@@ -6,6 +8,11 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
     SubmissionEvent,
+    SacValidationWaiver,
+)
+from audit.validators import (
+    validate_auditee_certification_json,
+    validate_auditor_certification_json,
 )
 
 
@@ -86,9 +93,116 @@ class SubmissionEventAdmin(admin.ModelAdmin):
     search_fields = ("sac__report_id", "user__username")
 
 
+class SacValidationWaiverAdmin(admin.ModelAdmin):
+    form = SacValidationWaiverForm
+    list_display = (
+        "report_id",
+        "timestamp",
+        "approver_email",
+        "requester_email",
+    )
+    list_filter = ("timestamp", "waiver_types")
+    search_fields = (
+        "report_id__report_id",
+        "approver_email",
+        "requester_email",
+    )
+    autocomplete_fields = ["report_id"]
+
+    def save_model(self, request, obj, form, change):
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=obj.report_id_id)
+            if sac.submission_status in [
+                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+            ]:
+                self.handle_auditor_certification(request, obj, sac)
+                self.handle_auditee_certification(request, obj, sac)
+            else:
+                messages.set_level(request, messages.WARNING)
+                messages.warning(
+                    request,
+                    f"Cannot apply waiver to SAC with status {sac.submission_status}. Expected status to be one of {SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION}, {SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED}",
+                )
+
+            super().save_model(request, obj, form, change)
+
+        except Exception as e:
+            messages.set_level(request, messages.ERROR)
+            messages.error(request, str(e))
+
+    def handle_auditor_certification(self, request, obj, sac):
+        if SacValidationWaiver.TYPES.AUDITOR_CERTIFYING_OFFICIAL in obj.waiver_types:
+            auditor_certification = sac.auditor_certification or {}
+            auditor_certification.update(
+                {
+                    "auditor_certification": {
+                        "is_OMB_limited": True,
+                        "is_auditee_responsible": True,
+                        "has_used_auditors_report": True,
+                        "has_no_auditee_procedures": True,
+                        "is_accurate_and_complete": True,
+                        "is_FAC_releasable": True,
+                    },
+                    "auditor_signature": {
+                        "auditor_name": settings.GSA_FAC_WAIVER,
+                        "auditor_title": settings.GSA_FAC_WAIVER,
+                        "auditor_certification_date_signed": obj.timestamp.strftime(
+                            "%Y-%m-%d"
+                        ),
+                    },
+                }
+            )
+            if (
+                sac.submission_status
+                == SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+            ):
+                validated = validate_auditor_certification_json(auditor_certification)
+                sac.auditor_certification = validated
+                sac.transition_to_auditor_certified()
+                sac.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
+                )
+
+    def handle_auditee_certification(self, request, obj, sac):
+        if SacValidationWaiver.TYPES.AUDITEE_CERTIFYING_OFFICIAL in obj.waiver_types:
+            auditee_certification = sac.auditee_certification or {}
+            auditee_certification.update(
+                {
+                    "auditee_certification": {
+                        "has_no_PII": True,
+                        "has_no_BII": True,
+                        "meets_2CFR_specifications": True,
+                        "is_2CFR_compliant": True,
+                        "is_complete_and_accurate": True,
+                        "has_engaged_auditor": True,
+                        "is_issued_and_signed": True,
+                        "is_FAC_releasable": True,
+                    },
+                    "auditee_signature": {
+                        "auditee_name": settings.GSA_FAC_WAIVER,
+                        "auditee_title": settings.GSA_FAC_WAIVER,
+                        "auditee_certification_date_signed": obj.timestamp.strftime(
+                            "%Y-%m-%d"
+                        ),
+                    },
+                }
+            )
+            if sac.submission_status == SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+                validated = validate_auditee_certification_json(auditee_certification)
+                sac.auditee_certification = validated
+                sac.transition_to_auditee_certified()
+                sac.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+                )
+
+
 admin.site.register(Access, AccessAdmin)
 admin.site.register(DeletedAccess, DeletedAccessAdmin)
 admin.site.register(ExcelFile, ExcelFileAdmin)
 admin.site.register(SingleAuditChecklist, SACAdmin)
 admin.site.register(SingleAuditReportFile, AuditReportAdmin)
 admin.site.register(SubmissionEvent, SubmissionEventAdmin)
+admin.site.register(SacValidationWaiver, SacValidationWaiverAdmin)
