@@ -13,7 +13,6 @@ module "s3-logshipper-storage" {
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
   name             = "log-storage"
-  recursive_delete = false
   s3_plan_name     = "basic"
   tags             = ["logshipper-s3"]
 }
