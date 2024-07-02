@@ -1,0 +1,58 @@
+{
+  "report_id": {
+    "min": 25,
+    "max": 25
+  },
+  "auditee_uei": {
+    "min": 12,
+    "max": 13
+  },
+  "audit_year": {
+    "min": 4,
+    "max": 4
+  },
+  "award_reference": {
+    "min": 10,
+    "max": 11
+  },
+  "reference_number": {
+    "min": 8,
+    "max": 8
+  },
+  "is_material_weakness": {
+    "min": 1,
+    "max": 1
+  },
+  "is_modified_opinion": {
+    "min": 1,
+    "max": 1
+  },
+  "is_other_findings": {
+    "min": 1,
+    "max": 1
+  },
+  "is_other_matters": {
+    "min": 1,
+    "max": 1
+  },
+  "prior_finding_ref_numbers": {
+    "min": 3,
+    "max": 118
+  },
+  "is_questioned_costs": {
+    "min": 1,
+    "max": 1
+  },
+  "is_repeat_finding": {
+    "min": 1,
+    "max": 1
+  },
+  "is_significant_deficiency": {
+    "min": 1,
+    "max": 1
+  },
+  "type_requirement": {
+    "min": 1,
+    "max": 13
+  }
+}

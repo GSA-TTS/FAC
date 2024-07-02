@@ -1108,6 +1108,65 @@ class TestValidateGeneralInformation(SimpleTestCase):
             "audit_period_covered": "Invalid",
         }
 
+        character_limits = settings.CHARACTER_LIMITS_GENERAL
+
+        self.too_short_emails = self.valid_general_information | {
+            "auditee_email": "a@b",
+            "auditor_email": "a@b",
+        }
+
+        self.too_long_emails = self.valid_general_information | {
+            "auditee_email": "a" * character_limits["auditee_email"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_email": "a" * character_limits["auditor_email"]["max"]
+            + "NowItIsDefinitelyTooLong",
+        }
+
+        self.too_short_addresses = self.valid_general_information | {
+            "auditee_address_line_1": "a",
+            "auditee_city": "a",
+        }
+
+        self.too_long_addresses = self.valid_general_information | {
+            "auditee_address_line_1": "a"
+            * character_limits["auditee_address_line_1"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_city": "a" * character_limits["auditee_city"]["max"]
+            + "NowItIsDefinitelyTooLong",
+        }
+
+        self.too_short_names = self.valid_general_information | {
+            "auditee_name": "a",
+            "auditee_certify_name": "a",
+            "auditee_certify_title": "a",
+            "auditee_contact_name": "a",
+            "auditor_firm_name": "a",
+            "auditor_contact_title": "a",
+            "auditor_contact_name": "a",
+        }
+
+        self.too_long_names = self.valid_general_information | {
+            "auditee_name": "a" * character_limits["auditee_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_certify_name": "a"
+            * character_limits["auditee_certify_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_certify_title": "a"
+            * character_limits["auditee_certify_title"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_contact_name": "a"
+            * character_limits["auditee_contact_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_firm_name": "a" * character_limits["auditor_firm_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_contact_title": "a"
+            * character_limits["auditor_contact_title"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_contact_name": "a"
+            * character_limits["auditor_contact_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+        }
+
     def test_validate_general_information_schema_with_valid_data(self):
         """
         Test the validation method with valid general information data.
@@ -1139,6 +1198,18 @@ class TestValidateGeneralInformation(SimpleTestCase):
             validate_general_information_schema(self.invalid_email)
         with self.assertRaises(ValidationError):
             validate_general_information_schema(self.invalid_audit_period_covered)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_short_emails)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_long_emails)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_short_addresses)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_long_addresses)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_short_names)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_long_names)
 
     def test_validate_general_information_schema_rules_with_valid_data(self):
         """

@@ -97,17 +97,6 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             schema,
         )
 
-    def test_null_auditee_name(self):
-        """
-        If the auditee_name is null, validation should pass
-        """
-        schema = self.GENERAL_INFO_SCHEMA
-        instance = jsoncopy(self.SIMPLE_CASE)
-
-        instance["auditee_name"] = ""
-
-        validate(instance, schema)
-
     def test_invalid_ein(self):
         """
         If the EIN is not in a valid format, validation should fail

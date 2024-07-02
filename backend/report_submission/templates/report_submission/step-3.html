@@ -38,13 +38,15 @@
                                         id="certifying_auditee_contact_fullname-error-message"
                                         role="alert">
                                         <li id="certifying_auditee_contact_fullname-not-null" hidden>Please enter the certifying official's first and last names.</li>
+                                        <li id="certifying_auditee_contact_fullname-length" hidden>Please enter a name between two and 100 characters long.</li>
                                     </ul>
                                     <input class="usa-input"
                                            id="certifying_auditee_contact_fullname"
                                            name="certifying_auditee_contact_fullname"
                                            aria-required="true"
                                            required
-                                           data-validate-not-null=""/>
+                                           data-validate-not-null=""
+                                           data-validate-length="<= 100 >= 2"/>
                                 </div>
                             </div>
                             <div class="grid-row grid-gap">
@@ -62,6 +64,7 @@
                                                 An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                             </li>
                                             <li id="certifying_auditee_contact_email-must-not-match" hidden>{{ certifiers_emails_must_not_match }}</li>
+                                            <li id="certifying_auditee_contact_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                         </ul>
                                         <input class="usa-input"
                                                id="certifying_auditee_contact_email"
@@ -70,7 +73,8 @@
                                                required
                                                data-validate-not-null=""
                                                data-validate-email=""
-                                               data-validate-must-not-match="certifying_auditor_contact_email"/>
+                                               data-validate-must-not-match="certifying_auditor_contact_email"
+                                               data-validate-length="<= 340 >= 6"/>
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
@@ -83,13 +87,15 @@
                                             id="certifying_auditee_contact_re_email-error-message"
                                             role="alert">
                                             <li id="certifying_auditee_contact_re_email-must-match" hidden>This field should match the one before it</li>
+                                            <li id="certifying_auditee_contact_re_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                         </ul>
                                         <input class="usa-input"
                                                id="certifying_auditee_contact_re_email"
                                                name="certifying_auditee_contact_re_email"
                                                aria-required="true"
                                                required
-                                               data-validate-must-match="certifying_auditee_contact_email"/>
+                                               data-validate-must-match="certifying_auditee_contact_email"
+                                               data-validate-length="<= 340 >= 6"/>
                                     </div>
                                 </div>
                             </div>
@@ -116,13 +122,15 @@
                                         id="certifying_auditor_contact_fullname-error-message"
                                         role="alert">
                                         <li id="certifying_auditor_contact_fullname-not-null" hidden>Please enter the certifying official's first and last names.</li>
+                                        <li id="certifying_auditor_contact_fullname-length" hidden>Please enter a name between two and 100 characters long.</li>
                                     </ul>
                                     <input class="usa-input"
                                            id="certifying_auditor_contact_fullname"
                                            name="certifying_auditor_contact_fullname"
                                            aria-required="true"
                                            required
-                                           data-validate-not-null=""/>
+                                           data-validate-not-null=""
+                                           data-validate-length="<= 100 >= 2"/>
                                 </div>
                             </div>
                             <div class="grid-row grid-gap">
@@ -140,6 +148,7 @@
                                                 An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                             </li>
                                             <li id="certifying_auditor_contact_email-must-not-match" hidden>{{ certifiers_emails_must_not_match }}</li>
+                                            <li id="certifying_auditor_contact_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                         </ul>
                                         <input class="usa-input"
                                                id="certifying_auditor_contact_email"
@@ -148,7 +157,8 @@
                                                required
                                                data-validate-not-null=""
                                                data-validate-email=""
-                                               data-validate-must-not-match="certifying_auditee_contact_email"/>
+                                               data-validate-must-not-match="certifying_auditee_contact_email"
+                                               data-validate-length="<= 340 >= 6"/>
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
@@ -161,13 +171,15 @@
                                             id="certifying_auditor_contact_re_email-error-message"
                                             role="alert">
                                             <li id="certifying_auditor_contact_re_email-must-match" hidden>This field should match the one before it</li>
+                                            <li id="certifying_auditor_contact_re_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                         </ul>
                                         <input class="usa-input"
                                                id="certifying_auditor_contact_re_email"
                                                name="certifying_auditor_contact_re_email"
                                                aria-required="true"
                                                required
-                                               data-validate-must-match="certifying_auditor_contact_email"/>
+                                               data-validate-must-match="certifying_auditor_contact_email"
+                                               data-validate-length="<= 340 >= 6"/>
                                     </div>
                                 </div>
                             </div>
@@ -191,13 +203,15 @@
                                     <ul class="usa-error-message"
                                         id="auditee_contacts_fullname-error-message"
                                         role="alert">
-                                        <li id="auditee_contacts_fullname-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name. </li>
+                                        <li id="auditee_contacts_fullname-not-null" hidden>When adding an auditee contact, please provide both an email address and a first and last name. </li>
+                                        <li id="auditee_contacts_fullname-length" hidden>Please enter a name between two and 100 characters long.</li>
                                     </ul>
                                     <input class="usa-input"
                                            id="auditee_contacts_fullname"
                                            name="auditee_contacts_fullname"
-                                           data-validate-matched-field="auditee_contacts_email"/>
-                                </div>
+                                           data-validate-not-null=""
+                                           data-validate-length="<= 100 >= 2"/>
+                                    </div>
                             </div>
                             <div class="grid-row grid-gap">
                                 <div class="tablet:grid-col-fill">
@@ -211,13 +225,15 @@
                                             <li id="auditee_contacts_email-email" hidden>
                                                 An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                             </li>
-                                            <li id="auditee_contacts_email-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name.</li>
+                                            <li id="auditee_contacts_email-not-null" hidden>When adding an auditee contact, please provide both an email address and a first and last name.</li>
+                                            <li id="auditee_contacts_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                         </ul>
                                         <input class="usa-input"
                                                id="auditee_contacts_email"
                                                name="auditee_contacts_email"
+                                               data-validate-not-null=""
                                                data-validate-email=""
-                                               data-validate-matched-field="auditee_contacts_fullname"/>
+                                               data-validate-length="<= 340 >= 6"/>
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
@@ -229,11 +245,13 @@
                                             id="auditee_contacts_re_email-error-message"
                                             role="alert">
                                             <li id="auditee_contacts_re_email-must-match" hidden>This field should match the one before it</li>
+                                            <li id="auditee_contacts_re_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                         </ul>
                                         <input class="usa-input"
                                                id="auditee_contacts_re_email"
                                                name="auditee_contacts_re_email"
-                                               data-validate-must-match="auditee_contacts_email"/>
+                                               data-validate-must-match="auditee_contacts_email"
+                                               data-validate-length="<= 340 >= 6"/>
                                     </div>
                                 </div>
                             </div>
@@ -248,13 +266,15 @@
                                         <ul class="usa-error-message"
                                             id="auditee_contacts_fullname-error-message"
                                             role="alert">
-                                            <li id="auditee_contacts_fullname-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name. </li>
-                                        </ul>
+                                            <li id="auditee_contacts_fullname-not-null" hidden>When adding an auditee contact, please provide both an email address and a first and last name. </li>
+                                            <li id="auditee_contacts_fullname-length" hidden>Please enter a name between two and 100 characters long.</li>
+                                    </ul>
                                         <input class="usa-input"
                                             id="auditee_contacts_fullname"
                                             name="auditee_contacts_fullname"
-                                            data-validate-matched-field="auditee_contacts_email"/>
-                                    </div>
+                                            data-validate-not-null=""
+                                            data-validate-length="<= 100 >= 2"/>
+                                        </div>
                                 </div>
                                 <div class="grid-row grid-gap">
                                     <div class="tablet:grid-col-fill">
@@ -268,14 +288,16 @@
                                                 <li id="auditee_contacts_email-email" hidden>
                                                     An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                                 </li>
-                                                <li id="auditee_contacts_email-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name.</li>
+                                                <li id="auditee_contacts_email-not-null" hidden>When adding an auditee contact, please provide both an email address and a first and last name.</li>
+                                                <li id="auditee_contacts_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                             </ul>
                                             <input class="usa-input"
                                                 id="auditee_contacts_email"
                                                 name="auditee_contacts_email"
+                                                data-validate-not-null=""
                                                 data-validate-email=""
-                                                data-validate-matched-field="auditee_contacts_fullname"/>
-                                        </div>
+                                                data-validate-length="<= 340 >= 6"/>
+                                            </div>
                                     </div>
                                     <div class="tablet:grid-col-fill">
                                         <div class="usa-form-group">
@@ -286,11 +308,13 @@
                                                 id="auditee_contacts_re_email-error-message"
                                                 role="alert">
                                                 <li id="auditee_contacts_re_email-must-match" hidden>This field should match the one before it</li>
+                                                <li id="auditee_contacts_re_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                             </ul>
                                             <input class="usa-input"
-                                                id="auditee_contacts_re_email"
-                                                name="auditee_contacts_re_email"
-                                                data-validate-must-match="auditee_contacts_email"/>
+                                                   id="auditee_contacts_re_email"
+                                                   name="auditee_contacts_re_email"
+                                                   data-validate-must-match="auditee_contacts_email"
+                                                   data-validate-length="<= 340 >= 6"/>
                                         </div>
                                     </div>
                                 </div>
@@ -332,11 +356,13 @@
                                         id="auditor_contacts_fullname-error-message"
                                         role="alert">
                                         <li id="auditor_contacts_fullname-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name. </li>
+                                        <li id="auditor_contacts_fullname-length" hidden>Please enter a name between two and 100 characters long.</li>
                                     </ul>
                                     <input class="usa-input"
                                             id="auditor_contacts_fullname"
                                             name="auditor_contacts_fullname"
-                                            data-validate-matched-field="auditor_contacts_email"/>
+                                            data-validate-matched-field="auditor_contacts_email"
+                                            data-validate-length="<= 100 >= 2"/>
                                 </div>
                             </div>
                             <div class="grid-row grid-gap">
@@ -351,13 +377,14 @@
                                             <li id="auditor_contacts_email-email" hidden>
                                                 An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                             </li>
-                                            <li id="auditor_contacts_email-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name.</li>
+                                            <li id="auditor_contacts_email-not-null" hidden>When adding an auditor contact, please provide both an email address and a first and last name.</li>
+                                            <li id="auditor_contacts_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                         </ul>
                                         <input class="usa-input"
                                                 id="auditor_contacts_email"
                                                 name="auditor_contacts_email"
                                                 data-validate-email=""
-                                                data-validate-matched-field="auditor_contacts_fullname"/>
+                                                data-validate-length="<= 340 >= 6"/>
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
@@ -369,11 +396,13 @@
                                             id="auditor_contacts_re_email-error-message"
                                             role="alert">
                                             <li id="auditor_contacts_re_email-must-match" hidden>This field should match the one before it</li>
+                                            <li id="auditor_contacts_re_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                         </ul>
                                         <input class="usa-input"
                                                 id="auditor_contacts_re_email"
                                                 name="auditor_contacts_re_email"
-                                                data-validate-must-match="auditor_contacts_email"/>
+                                                data-validate-must-match="auditor_contacts_email"
+                                                data-validate-length="<= 340 >= 6"/>
                                     </div>
                                 </div>
                             </div>
@@ -389,11 +418,13 @@
                                             id="auditor_contacts_fullname-error-message"
                                             role="alert">
                                             <li id="auditor_contacts_fullname-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name. </li>
+                                            <li id="auditor_contacts_fullname-length" hidden>Please enter a name between two and 100 characters long.</li>
                                         </ul>
                                         <input class="usa-input"
                                                 id="auditor_contacts_fullname"
                                                 name="auditor_contacts_fullname"
-                                                data-validate-matched-field="auditor_contacts_email"/>
+                                                data-validate-matched-field="auditor_contacts_email"
+                                                data-validate-length="<= 100 >= 2"/>
                                     </div>
                                 </div>
                                 <div class="grid-row grid-gap">
@@ -408,13 +439,14 @@
                                                 <li id="auditor_contacts_email-email" hidden>
                                                     An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                                 </li>
-                                                <li id="auditor_contacts_email-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name.</li>
+                                                <li id="auditor_contacts_email-not-null" hidden>When adding an auditor contact, please provide both an email address and a first and last name.</li>
+                                                <li id="auditor_contacts_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                             </ul>
                                             <input class="usa-input"
                                                     id="auditor_contacts_email"
                                                     name="auditor_contacts_email"
                                                     data-validate-email=""
-                                                    data-validate-matched-field="auditor_contacts_fullname"/>
+                                                    data-validate-length="<= 340 >= 6"/>
                                         </div>
                                     </div>
                                     <div class="tablet:grid-col-fill">
@@ -426,11 +458,13 @@
                                                 id="auditor_contacts_re_email-error-message"
                                                 role="alert">
                                                 <li id="auditor_contacts_re_email-must-match" hidden>This field should match the one before it</li>
+                                                <li id="auditor_contacts_re_email-length" hidden>Please enter an email between six and 340 characters long.</li>
                                             </ul>
                                             <input class="usa-input"
                                                     id="auditor_contacts_re_email"
                                                     name="auditor_contacts_re_email"
-                                                    data-validate-must-match="auditor_contacts_email"/>
+                                                    data-validate-must-match="auditor_contacts_email"
+                                                    data-validate-length="<= 340 >= 6"/>
                                         </div>
                                     </div>
                                 </div>

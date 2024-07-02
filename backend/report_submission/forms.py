@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from config.settings import STATE_ABBREVS
+from config.settings import CHARACTER_LIMITS_GENERAL, STATE_ABBREVS
 
 from api.uei import get_uei_info_from_sam_gov
 
@@ -15,7 +15,7 @@ alpha_validator = RegexValidator(
 )
 date_validator = RegexValidator(
     r"^([0-9]{2}/[0-9]{2}/[0-9]{4})|([0-9]{4}-[0-9]{2}-[0-9]{4})$",
-    "Dates should be in the format 00/00/0000",
+    "Dates should be in the format MM/DD/YYYY",
 )
 ein_validator = RegexValidator(
     r"^[0-9]{9}$", "EINs should be nine characters long and be made up of only numbers."
@@ -26,6 +26,10 @@ phone_validator = RegexValidator(
 )
 zip_validator = RegexValidator(
     r"^[0-9]{5}(?:[0-9]{4})?$", "Zip codes should be in the format 12345 or 12345-1234."
+)
+audit_period_other_months_validator = RegexValidator(
+    r"^0?[1-9]$|^1[0-8]$",
+    "The audit period should be between 1 and 18 months, with an optional leading zero.",
 )
 
 
@@ -59,7 +63,6 @@ class AuditeeInfoForm(forms.Form):
 
 
 class GeneralInformationForm(forms.Form):
-    max_string_length = 100
     foreign_address_max_length = 500
     choices_state_abbrevs = list((i, i) for i in STATE_ABBREVS)
 
@@ -71,7 +74,12 @@ class GeneralInformationForm(forms.Form):
         required=False, validators=[date_validator]
     )
     audit_period_covered = forms.CharField(required=False)
-    audit_period_other_months = forms.CharField(required=False)
+    audit_period_other_months = forms.CharField(
+        min_length=CHARACTER_LIMITS_GENERAL["number_months"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["number_months"]["max"],
+        required=False,
+        validators=[audit_period_other_months_validator],
+    )
     ein = forms.CharField(
         required=False,
         validators=[ein_validator],  # validators are not run against empty fields
@@ -80,24 +88,45 @@ class GeneralInformationForm(forms.Form):
     multiple_eins_covered = forms.BooleanField(required=False)
     auditee_uei = forms.CharField(required=False)
     multiple_ueis_covered = forms.BooleanField(required=False)
-    auditee_name = forms.CharField(max_length=max_string_length, required=False)
+    auditee_name = forms.CharField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditee_name"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditee_name"]["max"],
+        required=False,
+    )
     auditee_address_line_1 = forms.CharField(
-        max_length=max_string_length, required=False
+        min_length=CHARACTER_LIMITS_GENERAL["auditee_address_line_1"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditee_address_line_1"]["max"],
+        required=False,
     )
     auditee_city = forms.CharField(
-        max_length=max_string_length,
+        min_length=CHARACTER_LIMITS_GENERAL["auditee_city"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditee_city"]["max"],
         required=False,
         validators=[alpha_validator],  # validators are not run against empty fields
     )
     auditee_state = forms.ChoiceField(choices=choices_state_abbrevs, required=False)
     auditee_zip = forms.CharField(required=False, validators=[zip_validator])
-    auditee_contact_name = forms.CharField(max_length=max_string_length, required=False)
+    auditee_contact_name = forms.CharField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditee_contact_name"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditee_contact_name"]["max"],
+        required=False,
+    )
     auditee_contact_title = forms.CharField(
-        max_length=max_string_length, required=False
+        min_length=CHARACTER_LIMITS_GENERAL["auditee_contact_title"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditee_contact_title"]["max"],
+        required=False,
     )
     auditee_phone = forms.CharField(required=False, validators=[phone_validator])
-    auditee_email = forms.CharField(max_length=max_string_length, required=False)
-    auditor_firm_name = forms.CharField(max_length=max_string_length, required=False)
+    auditee_email = forms.CharField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditee_email"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditee_email"]["max"],
+        required=False,
+    )
+    auditor_firm_name = forms.CharField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_firm_name"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_firm_name"]["max"],
+        required=False,
+    )
     auditor_ein = forms.CharField(
         required=False,
         validators=[ein_validator],  # validators are not run against empty fields
@@ -105,22 +134,37 @@ class GeneralInformationForm(forms.Form):
     auditor_ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     auditor_country = forms.CharField(required=False)
     auditor_international_address = forms.CharField(
-        max_length=foreign_address_max_length, required=False
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_foreign_address"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_foreign_address"]["max"],
+        required=False,
     )
     auditor_address_line_1 = forms.CharField(
-        max_length=max_string_length, required=False
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_address_line_1"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_address_line_1"]["max"],
+        required=False,
     )
     auditor_city = forms.CharField(
-        max_length=max_string_length,
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_city"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_city"]["max"],
         required=False,
         validators=[alpha_validator],  # validators are not run against empty fields
     )
     auditor_state = forms.ChoiceField(choices=choices_state_abbrevs, required=False)
     auditor_zip = forms.CharField(required=False, validators=[zip_validator])
-    auditor_contact_name = forms.CharField(max_length=max_string_length, required=False)
+    auditor_contact_name = forms.CharField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_contact_name"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_contact_name"]["max"],
+        required=False,
+    )
     auditor_contact_title = forms.CharField(
-        max_length=max_string_length, required=False
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_contact_title"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_contact_title"]["max"],
+        required=False,
     )
     auditor_phone = forms.CharField(required=False, validators=[phone_validator])
-    auditor_email = forms.CharField(max_length=max_string_length, required=False)
+    auditor_email = forms.CharField(
+        min_length=CHARACTER_LIMITS_GENERAL["auditor_email"]["min"],
+        max_length=CHARACTER_LIMITS_GENERAL["auditor_email"]["max"],
+        required=False,
+    )
     secondary_auditors_exist = forms.BooleanField(required=False)

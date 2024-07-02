@@ -20,9 +20,6 @@ locals {
     # TODO: Automate updates via GitHub's GraphQL API
     "bret.mogilefsky@gsa.gov",
     "james.person@gsa.gov",
-    "jeanmarie.mariadassou@gsa.gov",
-    "tadhg.ohiggins@gsa.gov",
-    "timothy.ballard@gsa.gov",
     "matthew.jadud@gsa.gov",
     "hassandeme.mamasambo@gsa.gov",
     "daniel.swick@gsa.gov",
@@ -41,10 +38,8 @@ locals {
     # TODO: Automate updates via GitHub's GraphQL API
     "bret.mogilefsky@gsa.gov",
     "daniel.swick@gsa.gov",
-    "jeanmarie.mariadassou@gsa.gov",
     "matthew.jadud@gsa.gov",
-    "tadhg.ohiggins@gsa.gov",
-    "timothy.ballard@gsa.gov",
+    "alexander.steel@gsa.gov",
   ]
 
   internal_asgs = [
