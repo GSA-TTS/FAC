@@ -30,6 +30,8 @@ jobs:
           apt-get update
           apt-get install -y zip python
 
+          terraform init -upgrade
+
           # Install CF CLI
           mkdir -p /etc/apt/keyrings/
           wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/cf.gpg > /dev/null
@@ -50,7 +52,7 @@ jobs:
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
-          auto_approve: ${{ inputs.autoapprove}}
+          auto_approve: ${{ inputs.autoapprove }}
           # These secrets grant access to the bucket with our remote Terraform
           # state. They're located in the "Secrets > Actions > Repository
           # Secrets" section of the repository settings, and are the same across
