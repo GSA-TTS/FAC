@@ -22,7 +22,7 @@ module "preview" {
 }
 
 module "preview-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v0.9.1"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.0.0"
 
   cf_org_name   = var.cf_org_name
   cf_space_name = "preview"
