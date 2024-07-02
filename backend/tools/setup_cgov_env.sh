@@ -31,6 +31,9 @@ function setup_cgov_env {
     # Logging level, (critical, error, warning, info and debug). Default to info
     export NEW_RELIC_LOG_LEVEL=info
 
+    # Used to enable New Relic High Security mode
+    export NEW_RELIC_HIGH_SECURITY=true
+
     # Used for configuring the logging details sent to new relic
     export NEW_RELIC_CONFIG_FILE=newrelic.ini
 
