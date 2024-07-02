@@ -13,7 +13,6 @@ module "preview" {
   smtp_proxy_instances  = 1
   clamav_instances      = 2
   clamav_fs_instances   = 1
-  recursive_delete      = true
   json_params = jsonencode(
     {
       "storage" : 50,
