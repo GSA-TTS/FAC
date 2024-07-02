@@ -21,7 +21,9 @@ class TestSacValidationWaiverAdmin(TestCase):
 
     def setUp(self):
 
-        self.user = User.objects.create_user(username="testuser", password="12345")
+        self.user = User.objects.create_user(
+            username="testuser", password="12345"
+        )  # nosec
         # Create a SingleAuditChecklist instance
         self.sac = baker.make(
             SingleAuditChecklist,
