@@ -30,8 +30,6 @@ jobs:
           apt-get update
           apt-get install -y zip python
 
-          terraform init -upgrade
-
           # Install CF CLI
           mkdir -p /etc/apt/keyrings/
           wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/cf.gpg > /dev/null
