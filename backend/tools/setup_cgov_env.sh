@@ -34,6 +34,9 @@ function setup_cgov_env {
     # Used for configuring the logging details sent to new relic
     export NEW_RELIC_CONFIG_FILE=newrelic.ini
 
+    # Used to enable High Security mode
+    export NEW_RELIC_HIGH_SECURITY=true
+
     # https://docs.newrelic.com/docs/security/security-privacy/compliance/fedramp-compliant-endpoints/
     export NEW_RELIC_HOST="gov-collector.newrelic.com"
     # https://docs.newrelic.com/docs/apm/agents/python-agent/configuration/python-agent-configuration/#proxy
