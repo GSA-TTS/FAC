@@ -55,6 +55,9 @@ jobs:
         with:
             coverageFile: ./coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
+            thresholdNew: 0.9
+            thresholdModified: 0.9
+            thresholdAll: 0.85
 
   a11y-testing:
     runs-on: ubuntu-latest
