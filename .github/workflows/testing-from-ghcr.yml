@@ -51,14 +51,12 @@ jobs:
 
       - name: Publish Coverage Report to Pull Request
         uses: 5monkeys/cobertura-action@master
-        if: github.event_name == 'pull_request'
         with:
           path: ./coverage.xml
           minimum_coverage: 85
           skip_covered: true # Set to true to remove 100% covered from report
           fail_below_threshold: false # Fails the action if 90% threshold is not met
           show_missing: true
-          only_changed_files: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   # a11y-testing:
