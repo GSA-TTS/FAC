@@ -47,7 +47,7 @@ jobs:
           pwd
           ls -al | grep 'coverage'
 
-      - name: Coverage Action
+      - name: Post Coverage Report to Pull Request
         if: github.event_name == 'pull_request'
         uses: orgoro/coverage@v3.1
         with:
