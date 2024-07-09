@@ -15,7 +15,7 @@ from api.serializers import (
     AccessAndSubmissionSerializer,
     CERTIFIERS_HAVE_DIFFERENT_EMAILS,
 )
-from audit.models import User, Access
+from audit.models import User, Access, UeiValidationWaiver
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -94,6 +94,18 @@ class UEIValidatorStepTests(TestCase):
 
         # Invalid
         self.assertFalse(UEISerializer(data=invalid).is_valid())
+    
+    def test_waived_uei_payload(self):
+        """
+        A UEI with an applicable validation waiver should still pass, regardless of the SAM result.
+        It should still meet the UEI Technical Specifications defined in the UEI validator.
+        """
+        valid = {"auditee_uei": "SUPERC00LUE1"}
+
+        baker.make(UeiValidationWaiver, uei=valid["auditee_uei"])
+        
+        # Valid, even if it's not a real UEI.
+        self.assertTrue(UEISerializer(data=valid).is_valid())
 
     def test_quirky_uei_payload(self):
         """
