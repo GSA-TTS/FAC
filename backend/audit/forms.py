@@ -148,7 +148,7 @@ class SacValidationWaiverForm(forms.ModelForm):
         fields = "__all__"
 
 
-class UeiValidationWaiverFrom(forms.ModelForm):
+class UeiValidationWaiverForm(forms.ModelForm):
     class Meta:
         model = UeiValidationWaiver
         fields = "__all__"

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import admin, messages
-from audit.forms import SacValidationWaiverForm, UeiValidationWaiverFrom
+from audit.forms import SacValidationWaiverForm, UeiValidationWaiverForm
 from audit.models import (
     Access,
     DeletedAccess,
@@ -201,7 +201,7 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
 
 
 class UeiValidationWaiverAdmin(admin.ModelAdmin):
-    form = UeiValidationWaiverFrom
+    form = UeiValidationWaiverForm
     list_display = (
         "id",
         "uei",
@@ -215,6 +215,7 @@ class UeiValidationWaiverAdmin(admin.ModelAdmin):
         "approver_email",
         "requester_email",
     )
+    readonly_fields = ('timestamp',)
 
 
 admin.site.register(Access, AccessAdmin)
