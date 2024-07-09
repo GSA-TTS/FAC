@@ -611,7 +611,7 @@ class UtilsTesting(TestCase):
             self.assertTrue(results["errors"])
             self.assertEquals(
                 results["errors"],
-                ["SAM.gov unexpected JSON shape"],
+                ["UEI was not found in SAM.gov"],
             )
 
     def test_get_uei_info_from_sam_gov_inactive_result(self):
