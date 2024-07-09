@@ -698,11 +698,15 @@ class SingleAuditReportFile(models.Model):
 class UeiValidationWaiver(models.Model):
     """Records of UEIs that are permitted to be inactive."""
 
+    # Method overrides:
+    def __str__(self):
+        return f"#{self.id}--{self.uei}"
+
     uei = models.TextField("UEI", unique=True)
     timestamp = (
         models.DateTimeField(
             "When the waiver was created",
-            default=datetime.now(timezone.utc),
+            default=django_timezone.now,
         ),
     )
     expiration = (

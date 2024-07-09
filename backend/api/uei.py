@@ -1,9 +1,13 @@
-from typing import Optional
-import ssl
-import urllib3
+import logging
 import requests
+import ssl
+from typing import Optional
+import urllib3
 
-from config.settings import SAM_API_URL, SAM_API_KEY
+from audit.models import UeiValidationWaiver
+from config.settings import SAM_API_URL, SAM_API_KEY, GSA_FAC_WAIVER
+
+logger = logging.getLogger(__name__)
 
 
 class CustomHttpAdapter(requests.adapters.HTTPAdapter):
@@ -57,59 +61,45 @@ def call_sam_api(
     return None, error
 
 
-def parse_sam_uei_json(response: dict) -> dict:
+def parse_sam_uei_json(response: dict, filter_field: str) -> dict:
     """
     Parse the SAM.gov response dictionary, which requires some vetting to get
     at the nested values we want to check.
 
-    Primarily we want to know that the totalRecords value is one, that there's
-    only one item in entityData, that item is a dictionary which can be
-    queried for an item["entityRegistration"]["ueiStatus"] value
-    case-insensitively equal to "active", and that entityData can be queried
-    for an item["coreData"]["entityInformation"]["fiscalYearEndCloseDate"] value.
+    Primarily we want to know that at least one record is found, and that it matches
+    our desired filters. A valid record is a dictionary which can be queried for an
+    item["entityRegistration"]["ueiStatus"] value case-insensitively equal to "active",
+    and that entityData can be queried for an
+    item["coreData"]["entityInformation"]["fiscalYearEndCloseDate"] value.
     """
-    # Ensure the UEI exists in SAM.gov
+    # Ensure at least one record was found
     if response.get("totalRecords", 0) < 1:
         return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
-    # Ensure there's only one entry:
-    # Nope! 2023-10-05: turns out you can get multiple valid entries.
     entries = response.get("entityData", [])
-    if len(entries) > 1:
-
-        def is_active(entry):
-            return entry["entityRegistration"]["registrationStatus"] == "Active"
-
-        actives = list(filter(is_active, entries))
-        if actives:
-            entry = actives[0]
-        else:
-            entry = entries[0]
-    elif len(entries) == 1:
-        entry = entries[0]
-    else:
+    if len(entries) == 0:
         return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
-    # Get the ueiStatus and catch errors if the JSON shape is unexpected:
+    # Separate out the entries that are "active" on the filter_field
+    def is_active(entry):
+        return entry["entityRegistration"][filter_field].upper() == "ACTIVE"
+
+    actives = list(filter(is_active, entries))
+
+    # If there are one or more "active" entries on the filter_field, take the first.
+    # Otherwise, take or reject the first non-active depending on the field.
+    if actives:
+        entry = actives[0]
+    elif filter_field == "registrationStatus":
+        entry = entries[0]
+    elif filter_field == "ueiStatus":
+        return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
+    elif filter_field == "_":
+        entry = entries[0]
+
+    # Make sure the ueiStatus and fiscalYearEndCloseDate exist and catch errors if the JSON shape is unexpected:
     try:
         _ = entry.get("entityRegistration", {}).get("ueiStatus", "").upper()
-    except AttributeError:
-        return {
-            "valid": False,
-            "errors": ["SAM.gov unexpected JSON shape"],
-        }
-
-    # 2023-10-05 comment out the following, as checking for this creates more
-    # problems for our users than it's worth.
-    # Ensure the status is active:
-    # if status != "ACTIVE":
-    #     return {
-    #         "valid": False,
-    #         "errors": ["UEI is not listed as active from SAM.gov response data"],
-    #     }
-
-    # Get the fiscalYearEndCloseDate and catch errors if the JSON shape is unexpected:
-    try:
         _ = (
             entry.get("coreData", {})
             .get("entityInformation", {})
@@ -128,9 +118,19 @@ def parse_sam_uei_json(response: dict) -> dict:
 def get_uei_info_from_sam_gov(uei: str) -> dict:
     """
     This utility function will query sam.gov to determine the status and
-    return information about a provided UEI (or throws an Exception)
-    """
+    return information about a provided UEI (or throws an Exception).
 
+    In the case of a UEI validation waiver, either takes the exisiting inactive
+    UEI or provides placeholder data.
+
+    UEI checks in order:
+    1. Best case. Check for samRegistered "Yes". If one exists, take it.
+    If there are several, use the first with registrationStatus "Active".
+    2. Check for samRegistered "No". Take it as long as the ueiStatus is "Active".
+    3. Check for a waiver:
+          a. Check for that possibly non-registered, inactive UEI.
+          b. Worst case: Let it through with a placeholder name.
+    """
     # SAM API Params
     api_params = {
         "ueiSAM": uei,
@@ -141,30 +141,56 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     # SAM API headers
     api_headers = {"X-Api-Key": SAM_API_KEY}
 
-    # Call the SAM API
+    # 1. Best case. samRegistered "Yes"
     resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
     if resp is None:
         return {"valid": False, "errors": [error]}
-
-    # Get the response status code
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
         return {"valid": False, "errors": [error]}
-
-    results = parse_sam_uei_json(resp.json())
+    results = parse_sam_uei_json(resp.json(), "registrationStatus")
     if results["valid"] and (not results.get("errors")):
         return results
 
-    # Try again with samRegistered set to No:
+    # 2. Check samRegistered "No"
     api_params = api_params | {"samRegistered": "No"}
-    # Call the SAM API
     resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
     if resp is None:
         return {"valid": False, "errors": [error]}
-
-    # Get the response status code
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
         return {"valid": False, "errors": [error]}
+    results = parse_sam_uei_json(resp.json(), "ueiStatus")
+    if results["valid"] and (not results.get("errors")):
+        return results
 
-    return parse_sam_uei_json(resp.json())
+    # 3. Check for a waiver.
+    waiver = UeiValidationWaiver.objects.filter(uei=uei).first()
+    if not waiver:
+        return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
+
+    logger.info(f"ueiValidationWaiver applied for {waiver}")
+
+    # 3a. Take the first samRegistered "No" from step 2, regardless of ueiStatus.
+    results = parse_sam_uei_json(resp.json(), "_")
+    if results["valid"] and (not results.get("errors")):
+        return results
+
+    # 3b. Worst case. Let it through with a placeholder name and no other data.
+    return get_placeholder_sam(uei)
+
+
+def get_placeholder_sam(uei: str) -> dict:
+    """
+    Return a dictionary with placeholder data as though it were parsed from SAM.gov.
+    Only provides placeholders for required fields, to unblock UEIs with waivers.
+    """
+    placeholder_entry = {
+        "coreData": {},
+        "entityRegistration": {
+            "legalBusinessName": GSA_FAC_WAIVER,
+            "ueiSAM": uei,
+        },
+    }
+
+    return {"valid": True, "response": placeholder_entry}
