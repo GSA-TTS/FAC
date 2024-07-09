@@ -64,7 +64,7 @@ class EligibilityStepTests(SimpleTestCase):
         self.assertFalse(EligibilitySerializer(data=organization_type_none).is_valid())
 
 
-class UEIValidatorStepTests(SimpleTestCase):
+class UEIValidatorStepTests(TestCase):
     def test_valid_uei_payload(self):
         """
         UEI should meet UEI Technical Specifications defined in the UEI validator
