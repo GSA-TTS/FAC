@@ -80,10 +80,17 @@ def parse_sam_uei_json(response: dict, filter_field: str) -> dict:
     if len(entries) == 0:
         return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
-    # Separate out the entries that are "active" on the filter_field
     def is_active(entry):
-        return entry["entityRegistration"][filter_field].upper() == "ACTIVE"
-
+        """
+        Filter function. Returns "True" if the value on the filter field is non-case sensitive "ACTIVE".
+        Returns "False" otherwise, or if the shape of the entry is wrong.
+        """
+        if isinstance(entry, dict):
+            return entry["entityRegistration"].get(filter_field, "").upper() == "ACTIVE"
+        else:
+            return False
+    
+    # Separate out the entries that are "active" on the filter_field
     actives = list(filter(is_active, entries))
 
     # If there are one or more "active" entries on the filter_field, take the first.
