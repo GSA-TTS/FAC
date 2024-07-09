@@ -215,7 +215,7 @@ class UeiValidationWaiverAdmin(admin.ModelAdmin):
         "approver_email",
         "requester_email",
     )
-    readonly_fields = ('timestamp',)
+    readonly_fields = ("timestamp",)
 
 
 admin.site.register(Access, AccessAdmin)

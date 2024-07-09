@@ -94,7 +94,7 @@ class UEIValidatorStepTests(TestCase):
 
         # Invalid
         self.assertFalse(UEISerializer(data=invalid).is_valid())
-    
+
     def test_waived_uei_payload(self):
         """
         A UEI with an applicable validation waiver should still pass, regardless of the SAM result.
@@ -103,7 +103,7 @@ class UEIValidatorStepTests(TestCase):
         valid = {"auditee_uei": "SUPERC00LUE1"}
 
         baker.make(UeiValidationWaiver, uei=valid["auditee_uei"])
-        
+
         # Valid, even if it's not a real UEI.
         self.assertTrue(UEISerializer(data=valid).is_valid())
 

@@ -80,18 +80,8 @@ def parse_sam_uei_json(response: dict, filter_field: str) -> dict:
     if len(entries) == 0:
         return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
-    def is_active(entry):
-        """
-        Filter function. Returns "True" if the value on the filter field is non-case sensitive "ACTIVE".
-        Returns "False" otherwise, or if the shape of the entry is wrong.
-        """
-        if isinstance(entry, dict):
-            return entry["entityRegistration"].get(filter_field, "").upper() == "ACTIVE"
-        else:
-            return False
-    
     # Separate out the entries that are "active" on the filter_field
-    actives = list(filter(is_active, entries))
+    actives = filter_actives(entries, filter_field)
 
     # If there are one or more "active" entries on the filter_field, take the first.
     # Otherwise, take or reject the first non-active depending on the field.
@@ -175,7 +165,7 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     # from datetime import date
     # today = date.today()
     # waiver = UeiValidationWaiver.objects.filter(uei=uei, expiration__gte=today).first()
-    
+
     # 3. Check for a waiver.
     waiver = UeiValidationWaiver.objects.filter(uei=uei).first()
     if not waiver:
@@ -206,3 +196,21 @@ def get_placeholder_sam(uei: str) -> dict:
     }
 
     return {"valid": True, "response": placeholder_entry}
+
+
+def filter_actives(entries, filter_field):
+    """
+    Filter function. Given a list of entries and a filter field, returns a list of
+    entries that are "Active" on that field.
+
+    An entry is kept if the value on the filter field is non-case sensitive "ACTIVE".
+    An entry is not kept otherwise, or if the shape of the entry is wrong.
+    """
+
+    def is_active(entry):
+        if isinstance(entry, dict):
+            return entry["entityRegistration"].get(filter_field, "").upper() == "ACTIVE"
+        else:
+            return False
+
+    return list(filter(is_active, entries))
