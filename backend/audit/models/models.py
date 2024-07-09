@@ -702,7 +702,8 @@ class UeiValidationWaiver(models.Model):
     def __str__(self):
         return f"#{self.id}--{self.uei}"
 
-    uei = models.TextField("UEI", unique=True)
+    # Not unique, in the case that one UEI needs to be waived several times with different expiration dates.
+    uei = models.TextField("UEI")
     timestamp = (
         models.DateTimeField(
             "When the waiver was created",
