@@ -164,6 +164,11 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     if results["valid"] and (not results.get("errors")):
         return results
 
+    # To honor expiration dates:
+    # from datetime import date
+    # today = date.today()
+    # waiver = UeiValidationWaiver.objects.filter(uei=uei, expiration__gte=today).first()
+    
     # 3. Check for a waiver.
     waiver = UeiValidationWaiver.objects.filter(uei=uei).first()
     if not waiver:
