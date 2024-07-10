@@ -1,4 +1,8 @@
-vcap_services='{
+#!/bin/bash
+
+source util_startup.sh
+
+fake_vcap_services='{
   "aws-rds": [
     {
       "label": "aws-rds",
@@ -27,6 +31,7 @@ vcap_services='{
 
 # Sets up a fake VCAP_SERVICES environment variable when testing locally
 function setup_fake_vcap_services {
+    startup_log "######## setup_fake_vcap_services"
     if [[ -n "${ENV}" ]]; then
         startup_log "LOCAL_ENV" "Environment set as: ${ENV}"
     else
@@ -36,7 +41,8 @@ function setup_fake_vcap_services {
 
     local result=0
     if [[ "${ENV}" == "LOCAL" || "${ENV}" == "TESTING" ]]; then
-        export VCAP_SERVICES="${vcap_services}"
+        export FAKE_VCAP_SERVICES="${fake_vcap_services}"
+        echo $FAKE_VCAP_SERVICES
         result=$?
         startup_log "${result}"
     else
@@ -45,3 +51,5 @@ function setup_fake_vcap_services {
     fi;
     return $result
 }
+
+setup_fake_vcap_services
