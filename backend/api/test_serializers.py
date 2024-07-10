@@ -5,7 +5,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from model_bakery import baker
 
-from api.test_uei import valid_uei_results
+from api.test_uei import missing_uei_results, valid_uei_results
 from api.serializers import (
     EligibilitySerializer,
     UEISerializer,
@@ -104,8 +104,13 @@ class UEIValidatorStepTests(TestCase):
 
         baker.make(UeiValidationWaiver, uei=valid["auditee_uei"])
 
-        # Valid, even if it's not a real UEI.
-        self.assertTrue(UEISerializer(data=valid).is_valid())
+        # Valid, even if it's not a real UEI. Mock the SAM call as though the entity doesnt exist.
+        with patch("api.uei.SESSION.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            mock_get.return_value.json.return_value = json.loads(
+                missing_uei_results
+            )
+            self.assertTrue(UEISerializer(data=valid).is_valid())
 
     def test_quirky_uei_payload(self):
         """
