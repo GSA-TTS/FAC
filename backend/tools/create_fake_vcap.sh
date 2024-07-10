@@ -23,12 +23,10 @@ vcap_services='{
       "volume_mounts": []
     }
   ]
-}
-'
+}'
 
-# Sets up the VCAP_SERVICES environment variable when testing locally
+# Sets up a fake VCAP_SERVICES environment variable when testing locally
 function setup_fake_vcap_services {
-    startup_log "########### setup_fake_vcap_services"
     if [[ -n "${ENV}" ]]; then
         startup_log "LOCAL_ENV" "Environment set as: ${ENV}"
     else
@@ -38,9 +36,7 @@ function setup_fake_vcap_services {
 
     local result=0
     if [[ "${ENV}" == "LOCAL" || "${ENV}" == "TESTING" ]]; then
-        startup_log "########### in local"
         export VCAP_SERVICES="${vcap_services}"
-        startup_log "########### exported"
         result=$?
         startup_log "${result}"
     else
