@@ -162,5 +162,65 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       legend_enabled = true
     }
+
+    widget_log_table {
+      title = "${var.cf_space_name} api.sam.gov Connections"
+
+      row    = 7
+      column = 1
+      width  = 6
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message` FROM Log WHERE `entity.name` = 'gsa-fac-${var.cf_space_name}' AND allColumnSearch('api.sam.gov', insensitive: true) SINCE 7 DAYS AGO"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_billboard {
+      title = "${var.cf_space_name} api.sam.gov Connection Count"
+
+      row    = 6
+      column = 7
+      width  = 3
+      height = 3
+
+      nrql_query {
+        query = "SELECT count(*) AS 'api.sam.gov connections' FROM Log WHERE `entity.name` = 'gsa-fac-${var.cf_space_name}' AND allColumnSearch('api.sam.gov', insensitive: true) SINCE 7 DAYS AGO"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_log_table {
+      title = "${var.cf_space_name} login.gov Connections"
+
+      row    = 8
+      column = 1
+      width  = 6
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message` FROM Log WHERE `entity.name` = 'gsa-fac-${var.cf_space_name}' AND allColumnSearch('/api/openid_connect/userinfo', insensitive: true) SINCE 7 DAYS AGO"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_billboard {
+      title = "${var.cf_space_name} login.gov Connection Count"
+
+      row    = 8
+      column = 7
+      width  = 3
+      height = 3
+
+      nrql_query {
+        query = "SELECT count(*) AS 'login.gov connections' FROM Log WHERE `entity.name` = 'gsa-fac-${var.cf_space_name}' AND allColumnSearch('/api/openid_connect/userinfo', insensitive: true) SINCE 7 DAYS AGO"
+      }
+
+      legend_enabled = true
+    }
   }
 }
