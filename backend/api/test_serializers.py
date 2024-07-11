@@ -107,9 +107,7 @@ class UEIValidatorStepTests(TestCase):
         # Valid, even if it's not a real UEI. Mock the SAM call as though the entity doesnt exist.
         with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200
-            mock_get.return_value.json.return_value = json.loads(
-                missing_uei_results
-            )
+            mock_get.return_value.json.return_value = json.loads(missing_uei_results)
             self.assertTrue(UEISerializer(data=valid).is_valid())
 
     def test_quirky_uei_payload(self):
