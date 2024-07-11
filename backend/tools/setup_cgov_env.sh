@@ -6,6 +6,8 @@ function setup_cgov_env {
     export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
     export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
+    export DATABASE_URL="$(echo "$FAKE_VCAP_SERVICES" | jq --raw-output --arg service_name "fac-db" ".[][] | select(.name == \$service_name) | .credentials.uri")"
+
     export https_proxy="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.uri")"
     export smtp_proxy_domain="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "smtp-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.domain")"
     export smtp_proxy_port="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "smtp-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.port")"
