@@ -41,7 +41,7 @@ locals {
 }
 
 module "s3-backups" {
-  source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v0.9.1"
 
   cf_org_name = local.org_name
   # TODO: This should be the key for the first space that says "is_production =
@@ -49,6 +49,7 @@ module "s3-backups" {
   cf_space_name = "production"
   name          = "backups"
   s3_plan_name  = "basic"
+  tags          = ["s3"]
 }
 
 # TODO: We should have a corresponding "unshar-backup-from-spaces" resource, in

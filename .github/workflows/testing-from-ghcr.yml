@@ -49,15 +49,12 @@ jobs:
           pwd
           ls -al | grep 'coverage'
 
-      - name: Publish Coverage Report to Pull Request
-        uses: 5monkeys/cobertura-action@master
+      - name: Coverage Action
+        if: github.event_name == 'pull_request'
+        uses: orgoro/coverage@v3.1
         with:
-          path: ./coverage.xml
-          minimum_coverage: 85
-          skip_covered: true # Set to true to remove 100% covered from report
-          fail_below_threshold: false # Fails the action if 90% threshold is not met
-          show_missing: true
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+            coverageFile: ./coverage.xml
+            token: ${{ secrets.GITHUB_TOKEN }}
 
   # a11y-testing:
   #   runs-on: ubuntu-latest
@@ -80,9 +77,8 @@ jobs:
   #       run: |
   #         touch .env
   #         docker compose -f docker-compose.yml up -d
-  #     - name: Run Lighthouse CI and pa11y
+  #     - name: Run A11y tests
   #       working-directory: ./backend
   #       run: |
   #         sudo npm ci
-  #         npm run test:a11y:lighthouse
-  #         npm run test:a11y:pa11y
+  #         npx cypress run --spec "cypress/e2e/accessibility.cy.js"

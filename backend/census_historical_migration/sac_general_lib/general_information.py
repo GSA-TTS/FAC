@@ -18,9 +18,10 @@ from ..base_field_maps import FormFieldMap, FormFieldInDissem
 from ..sac_general_lib.utils import (
     create_json_from_db_object,
 )
-
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 from ..change_record import InspectionRecord, CensusRecord, GsaFacRecord
-
+from ..report_type_flag import AceFlag
 
 PERIOD_DICT = {"A": "annual", "B": "biennial", "O": "other"}
 AUDIT_TYPE_DICT = {
@@ -91,7 +92,7 @@ mappings = [
         "ZIPCODE",
         FormFieldInDissem,
         None,
-        xform_remove_hyphen_and_pad_zip,
+        str,
     ),
     FormFieldMap("auditor_address_line_1", "CPASTREET1", FormFieldInDissem, None, str),
     FormFieldMap("auditor_city", "CPACITY", FormFieldInDissem, None, str),
@@ -111,7 +112,7 @@ mappings = [
         "CPAZIPCODE",
         FormFieldInDissem,
         None,
-        xform_remove_hyphen_and_pad_zip,
+        str,
     ),
     FormFieldMap("ein", "EIN", "auditee_ein", None, str),
     FormFieldMap(
@@ -142,6 +143,32 @@ mappings = [
 ]
 
 
+def is_uei_valid(uei):
+    try:
+        with open(f"{settings.OUTPUT_BASE_DIR}/UeiSchema.json") as schema:
+            schema_json = json.load(schema)
+            uei_schema = schema_json.get("properties")["uei"]
+            validate(instance=uei, schema=uei_schema)
+            return True
+    except FileNotFoundError:
+        raise DataMigrationError(
+            f"UeiSchema.json file not found in {settings.OUTPUT_BASE_DIR}",
+            "missing_uei_schema_json",
+        )
+    except json.decoder.JSONDecodeError:
+        raise DataMigrationError(
+            "UeiSchema.json file contains invalid JSON.", "invalid_uei_schema_json"
+        )
+
+    except ValidationError:
+        return False
+
+    except Exception as e:
+        raise DataMigrationError(
+            f"Error validating Auditee UEI: {e}", "cannot_valid_auditee_uei"
+        )
+
+
 def xform_update_multiple_eins_flag(audit_header):
     """Updates the multiple_eins_covered flag.
     This updates does not propagate to the database, it only updates the object.
@@ -158,6 +185,25 @@ def xform_update_multiple_ueis_flag(audit_header):
     if not string_to_string(audit_header.MULTIPLEUEIS):
         ueis = get_ueis(audit_header.DBKEY, audit_header.AUDITYEAR)
         audit_header.MULTIPLEUEIS = "Y" if ueis else "N"
+
+
+def xform_update_entity_type(audit_header):
+    """Updates ENTITY_TYPE.
+    This updates does not propagate to the database, it only updates the object.
+    """
+    if string_to_string(audit_header.ENTITY_TYPE) == "":
+        audit_header.ENTITY_TYPE = (
+            "tribal"
+            if string_to_string(audit_header.SUPPRESSION_CODE).upper() == "IT"
+            else "unknown"
+        )
+        track_transformations(
+            "ENTITY_TYPE",
+            "",
+            "entity_type",
+            audit_header.ENTITY_TYPE,
+            "xform_update_entity_type",
+        )
 
 
 def _period_covered(s):
@@ -182,7 +228,7 @@ def _census_audit_type(s):
 
 
 def xform_country(general_information, audit_header):
-    """Transforms the country from Census format to FAC format."""
+    """Transforms the country from Census format to FAC format. This method is now deprecated."""
     # Transformation to be documented.
     auditor_country = string_to_string(
         general_information.get("auditor_country")
@@ -209,16 +255,49 @@ def xform_country(general_information, audit_header):
     return general_information
 
 
+def xform_country_v2(general_information, audit_header):
+    """Transforms the country from Census format to FAC format."""
+    auditor_country = string_to_string(
+        general_information.get("auditor_country")
+    ).upper()
+    if auditor_country in ["US", "USA"]:
+        general_information["auditor_country"] = "USA"
+    elif auditor_country == "NON-US" and not (
+        audit_header.CPAZIPCODE
+        or audit_header.CPASTATE
+        or audit_header.CPACITY
+        or audit_header.CPASTREET1
+    ):
+        general_information["auditor_country"] = "non-USA"
+        general_information["auditor_international_address"] = audit_header.CPAFOREIGN
+    elif auditor_country == "":
+        valid_file = open(f"{settings.SCHEMA_BASE_DIR}/States.json")
+        valid_json = json.load(valid_file)
+        auditor_state = string_to_string(audit_header.CPASTATE).upper()
+        if auditor_state in valid_json["UnitedStatesStateAbbr"]:
+            general_information["auditor_country"] = "USA"
+        else:
+            raise DataMigrationError(
+                f"Unable to determine auditor country. Invalid state: {auditor_state}",
+                "invalid_state",
+            )
+    else:
+        raise DataMigrationError(
+            f"Unable to determine auditor country. Unknown code: {auditor_country}",
+            "invalid_country",
+        )
+
+    return general_information
+
+
 def xform_auditee_fiscal_period_end(general_information):
     """Transforms the fiscal period end from Census format to FAC format."""
     # Transformation to be documented.
     if general_information.get("auditee_fiscal_period_end"):
-        general_information[
-            "auditee_fiscal_period_end"
-        ] = xform_census_date_to_datetime(
-            general_information.get("auditee_fiscal_period_end")
-        ).strftime(
-            "%Y-%m-%d"
+        general_information["auditee_fiscal_period_end"] = (
+            xform_census_date_to_datetime(
+                general_information.get("auditee_fiscal_period_end")
+            ).strftime("%Y-%m-%d")
         )
     else:
         raise DataMigrationError(
@@ -272,10 +351,8 @@ def xform_audit_type(general_information):
         value_in_db = general_information["audit_type"]
         audit_type = _census_audit_type(value_in_db.upper())
         if audit_type == AUDIT_TYPE_DICT["A"]:
-            raise DataMigrationError(
-                "Skipping ACE audit",
-                "skip_ace_audit",
-            )
+            audit_type = settings.GSA_MIGRATION
+            AceFlag.set_ace_report_flag(True)
         general_information["audit_type"] = audit_type
         track_transformations(
             "AUDITTYPE",
@@ -322,6 +399,52 @@ def xform_replace_empty_auditee_email(general_information):
     return general_information
 
 
+def xform_replace_empty_auditee_contact_name(general_information):
+    """Replaces empty auditee contact name with GSA Migration keyword"""
+    # Transformation recorded.
+    if not general_information.get("auditee_contact_name"):
+        general_information["auditee_contact_name"] = settings.GSA_MIGRATION
+        track_transformations(
+            "AUDITEECONTACT",
+            "",
+            "auditee_contact_name",
+            general_information["auditee_contact_name"],
+            "xform_replace_empty_auditee_contact_name",
+        )
+    return general_information
+
+
+def xform_replace_empty_auditee_contact_title(general_information):
+    """Replaces empty auditee contact title with GSA Migration keyword"""
+    # Transformation recorded.
+    if not general_information.get("auditee_contact_title"):
+        general_information["auditee_contact_title"] = settings.GSA_MIGRATION
+        track_transformations(
+            "AUDITEETITLE",
+            "",
+            "auditee_contact_title",
+            general_information["auditee_contact_title"],
+            "xform_replace_empty_auditee_contact_title",
+        )
+    return general_information
+
+
+def xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header):
+    """Replaces empty or invalid auditee UEI with GSA Migration keyword"""
+    # Transformation recorded.
+    if not (audit_header.UEI and is_uei_valid(audit_header.UEI)):
+        track_transformations(
+            "UEI",
+            audit_header.UEI,
+            "auditee_uei",
+            settings.GSA_MIGRATION,
+            "xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration",
+        )
+        audit_header.UEI = settings.GSA_MIGRATION
+
+    return audit_header
+
+
 def track_transformations(
     census_column, census_value, gsa_field, gsa_value, transformation_functions
 ):
@@ -338,23 +461,126 @@ def track_transformations(
     )
 
 
+def xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration(general_information):
+    """Replaces empty or invalid auditor EIN with GSA Migration keyword"""
+    # Transformation recorded.
+    if not (
+        general_information.get("auditor_ein")
+        and re.match(
+            settings.EMPLOYER_IDENTIFICATION_NUMBER,
+            general_information.get("auditor_ein"),
+        )
+    ):
+        track_transformations(
+            "AUDITOR_EIN",
+            general_information.get("auditor_ein"),
+            "auditor_ein",
+            settings.GSA_MIGRATION,
+            "xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration",
+        )
+        general_information["auditor_ein"] = settings.GSA_MIGRATION
+
+    return general_information
+
+
+def xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration(general_information):
+    """Replaces empty or invalid auditee EIN with GSA Migration keyword"""
+    # Transformation recorded.
+    if not (
+        general_information.get("ein")
+        and re.match(
+            settings.EMPLOYER_IDENTIFICATION_NUMBER, general_information.get("ein")
+        )
+    ):
+        track_transformations(
+            "EIN",
+            general_information.get("ein"),
+            "auditee_ein",
+            settings.GSA_MIGRATION,
+            "xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration",
+        )
+        general_information["ein"] = settings.GSA_MIGRATION
+
+    return general_information
+
+
+def xform_audit_period_other_months(general_information, audit_header):
+    """
+    This method addresses cases where the reporting period spans a non-standard duration, ensuring that
+    the total number of months covered is accurately accounted for. This is applicable in scenarios
+    where the covered period could span any number of months, rather than fixed annual or biennial periods.
+    """
+    if string_to_string(audit_header.PERIODCOVERED) == "O":
+        general_information["audit_period_other_months"] = str(
+            audit_header.NUMBERMONTHS
+        ).zfill(2)
+
+
+def xform_replace_empty_zips(general_information):
+    """Replaces empty auditor and auditee zipcodes with GSA Migration keyword"""
+    auditor_zip = general_information.get("auditor_zip")
+    is_usa_auditor = general_information.get("auditor_country") != "non-USA"
+
+    if is_usa_auditor:
+        if not auditor_zip:
+            new_auditor_zip = settings.GSA_MIGRATION
+        else:
+            new_auditor_zip = xform_remove_hyphen_and_pad_zip(auditor_zip)
+
+        if new_auditor_zip != auditor_zip:
+            track_transformations(
+                "CPAZIPCODE",
+                auditor_zip,
+                "auditor_zip",
+                new_auditor_zip,
+                "xform_replace_empty_zips",
+            )
+            general_information["auditor_zip"] = new_auditor_zip
+
+    auditee_zip = general_information.get("auditee_zip")
+    if not auditee_zip:
+        new_auditee_zip = settings.GSA_MIGRATION
+    else:
+        new_auditee_zip = xform_remove_hyphen_and_pad_zip(auditee_zip)
+
+    if new_auditee_zip != auditee_zip:
+        track_transformations(
+            "ZIPCODE",
+            auditee_zip,
+            "auditee_zip",
+            new_auditee_zip,
+            "xform_replace_empty_zips",
+        )
+        general_information["auditee_zip"] = new_auditee_zip
+
+    return general_information
+
+
 def general_information(audit_header):
     """Generates general information JSON."""
     xform_update_multiple_eins_flag(audit_header)
     xform_update_multiple_ueis_flag(audit_header)
+    xform_update_entity_type(audit_header)
+    xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(audit_header)
     general_information = create_json_from_db_object(audit_header, mappings)
+    xform_audit_period_other_months(general_information, audit_header)
     transformations = [
         xform_auditee_fiscal_period_start,
         xform_auditee_fiscal_period_end,
-        xform_country,
+        xform_country_v2,
         xform_audit_period_covered,
         xform_audit_type,
         xform_replace_empty_auditor_email,
         xform_replace_empty_auditee_email,
+        xform_replace_empty_or_invalid_auditor_ein_with_gsa_migration,
+        xform_replace_empty_or_invalid_auditee_ein_with_gsa_migration,
+        xform_replace_empty_zips,
+        xform_replace_empty_auditee_contact_name,
+        xform_replace_empty_auditee_contact_title,
     ]
 
     for transform in transformations:
-        if transform == xform_country:
+        if transform == xform_country_v2:
             general_information = transform(general_information, audit_header)
         else:
             general_information = transform(general_information)

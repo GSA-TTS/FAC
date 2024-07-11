@@ -51,7 +51,11 @@ DJANGO_SECRET_LOGIN_KEY =
 LOGIN_CLIENT_ID =
 DISABLE_AUTH = 
 ```
-If you are using a MacBook with Apple M1 hardware, you will probably also have to add `DOCKERFILE = Apple_M1_Dockerfile` to the file.
+
+For local testing, you may need to specify a few other variables:
+
+* A port other than `9000` for clamav-rest: add `CLAMAV_PORT = {port number}` to your `.env` file.
+* Cypress variables for running local end-to-end tests. See the [testing docs](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md#end-to-end-testing) for more.
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
@@ -272,18 +276,6 @@ It is possible, after many starts and stops, to end up filling your docker volum
 
 If you want to move past the test data, it is possible to download previous years' data and load it locally. This is important for dissemination API development and dissemination API testing.
 
-### Loading previous years
-
-The documentation on [data loading](data_loading.md) has much more detail. In short, you need to download all the data from a given year from Census (say, 2020), and then run
-
-
-```shell
-docker compose run web python manage.py public_data_loader -y 20
-```
-
-which will load the data from 2020 into your database. This is slow. Grab a cup of coffee, sit back, and watch the blinkenlights.
-
-See full documentation for loading data and keeping script up to date in [data_loading.md](https://github.com/GSA-TTS/FAC/blob/main/docs/data_loading.md). 
 ### Adding users
 
 Let's use this workflow to create a `superuser` in our development environment so we can access the Admin interface! However, you will need to first log in to the local environment using your sandbox login.gov account; if the user does not exist in the system, it cannot be promoted to a superuser or staff user.

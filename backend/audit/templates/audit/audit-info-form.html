@@ -209,7 +209,7 @@
                 <h1 class="margin-top-6">Federal programs</h1>
                 <fieldset class="usa-fieldset">
                     <legend>
-                        Does the auditor's report include a statement that the auditee's financial statements include departments, agencies, or other organizational units expending Federal awards which are not included in this audit? (AICPA Audit Guide) <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        Does the auditor's report include a statement that the auditee's financial statements include departments, agencies, or other organizational units expending Federal awards which are not included in this audit? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <div class="usa-radio">
                         <input id="is_aicpa_audit_guide_included--true"
@@ -234,13 +234,17 @@
                 </fieldset>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
-                        What is the dollar threshold to distinguish Type A and Type B programs? (Uniform Guidance § 200.518(b)(1)) <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        What is the dollar threshold to distinguish Type A and Type B programs? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
+                    <p class="margin-top-0">
+                        Refer to <a class="usa-link" href="https://www.ecfr.gov/current/title-2/subtitle-A/chapter-II/part-200/subpart-F/subject-group-ECFRea73e47c9a286e6/section-200.518#p-200.518(b)(1)" target="_blank">2 CFR 200.518(b)(1)</a>.
+                    </p>
                     <div class="grid-row">
                         <label class="margin-top-2 margin-right-1">$</label>
                         <input id="dollar_threshold"
                                name="dollar_threshold"
                                class="usa-input usa-input--medium tablet:grid-col-2"
+                               aria-label="Dollar threshold input"
                                min="1"
                                pattern="\d+"
                                required
@@ -253,6 +257,9 @@
                     <legend>
                         Did the auditee qualify as a low-risk auditee? (2 CFR 200.520) <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
+                    <p class="margin-top-0">
+                        Refer to <a class="usa-link" href="https://www.ecfr.gov/current/title-2/subtitle-A/chapter-II/part-200/subpart-F/subject-group-ECFRea73e47c9a286e6/section-200.520" target="_blank">2 CFR 200.520</a>.
+                    </p>
                     <div class="usa-radio">
                         <input id="is_low_risk_auditee--true"
                                name="is_low_risk_auditee"
@@ -278,7 +285,7 @@
                     <legend>
                         Indicate which federal agency(ies) have prior audit findings shown in the Summary Schedule of Prior Audit Findings related to direct funding. <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
-                    <p class="text-base">(shift-click or ctrl/cmd-click to select all that apply, or select '00 - None')</p>
+                    <p class="text-base">(command or control-click to select all that apply, or select 'None')</p>
                     <label class="usa-label" for="agencies">Agencies</label>
                     <select id="agencies"
                             name="agencies"
@@ -299,8 +306,7 @@
                 <button class="usa-button margin-top-2 margin-bottom-10"
                         id="continue"
                         name="continue">Save and continue to the next section</button>
-                <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-audit-info-form-link" href="{% url 'audit:SubmissionProgress' report_id %}"
-                    aria-controls="upload-cancel">Cancel</a>
+                <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-audit-info-form-link" href="{% url 'audit:SubmissionProgress' report_id %}">Cancel</a>
             </form>
         </div>
     </div>

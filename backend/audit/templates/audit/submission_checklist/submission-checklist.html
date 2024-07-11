@@ -39,7 +39,7 @@
                     {% endif %}
                     
                     {% comment %} Auditor Certification {% endcomment %}
-                    <li class="usa-icon-list__item padding-bottom-105"
+                    <li class="usa-icon-list__item padding-bottom-105 margin-top-5"
                         id="auditor-certification-completed">
                         {% if certification.auditor_certified %}
                             {% include './icon-list-icon.html' with completed=certification.auditor_certified %}
@@ -106,10 +106,10 @@
                     
                     {% comment %} Submit to the FAC for processing {% endcomment %}
                     {% if submission.enabled %}
-                    <div class="padding-bottom-3" id="submit-audit">
+                    <li class="padding-bottom-3" id="submit-audit">
                         <div class="usa-summary-box font-sans-md bg-success-lighter"
                              role="region"
-                             aria-labelledby="summary-box-key-information">
+                             aria-label="summary-box-submission">
                             <div class="usa-summary-box__body">
                                 <div class="usa-summary-box__text">
                                     <p class="text-bold margin-0">
@@ -121,12 +121,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </li>
                     {% else %}
-                    <div class="padding-bottom-3" id="submit-audit">
+                    <li class="padding-bottom-3" id="submit-audit">
                         <div class="usa-summary-box font-sans-md bg-success-lighter"
                              role="region"
-                             aria-labelledby="summary-box-key-information">
+                             aria-label="summary-box-submission">
                             <div class="usa-summary-box__body">
                                 <div class="usa-summary-box__text">
                                     <p class="text-bold margin-0">
@@ -138,7 +138,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </li>
                     {% endif %}
                 </ul>
             </div>

@@ -23,6 +23,6 @@ describe('login', () => {
       it('should not require authentication', () => {
         cy.url().should('match', /\/audit\/$/);
       });
-    }
+    };
   });
 });

@@ -3,8 +3,8 @@ name: Scheduled Deploy From Main to Staging
 on:
   # schedule:
     # Invoke every Mon-Sat
-    # - cron: '0 10 * * 1-6'
-  workflow_dispatch: null
+    - cron: '0 10 * * 1-6'
+  workflow_dispatch:
 
 jobs:
   trivy-scan:
@@ -31,7 +31,7 @@ jobs:
       work-dir: ./backend
 
   testing:
-    name: Run Django, Lighthouse, a11y and lint
+    name: Run Django and lint
     needs:
       - build-container
     uses: ./.github/workflows/testing-from-ghcr.yml

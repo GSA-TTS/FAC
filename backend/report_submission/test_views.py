@@ -2,13 +2,18 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.conf import settings
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
+from report_submission.views import DeleteFileView
 from model_bakery import baker
 
 from audit.models import Access, SingleAuditChecklist, SubmissionEvent
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.exceptions import PermissionDenied
+from django.contrib.messages import get_messages
 
 
 def omit(remove, d) -> dict:
@@ -105,9 +110,9 @@ class TestPreliminaryViews(TestCase):
     }
 
     step2_data = {
-        "auditee_uei": "Lw4MXE7SKMV1",
-        "auditee_fiscal_period_start": "01/01/2021",
-        "auditee_fiscal_period_end": "12/31/2021",
+        "auditee_uei": "D7A4J33FUMJ1",
+        "auditee_fiscal_period_start": "2021-01-01",
+        "auditee_fiscal_period_end": "2021-12-31",
     }
 
     step3_data = {
@@ -255,6 +260,8 @@ class TestPreliminaryViews(TestCase):
         }
 
         user = baker.make(User)
+        user.profile.entry_form_data = self.step1_data
+        user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
 
@@ -290,6 +297,8 @@ class TestPreliminaryViews(TestCase):
         mock_get_uei_info.return_value = {"valid": True}
 
         user = baker.make(User)
+        user.profile.entry_form_data = self.step1_data
+        user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
 
@@ -323,6 +332,12 @@ class TestPreliminaryViews(TestCase):
         Check that the POST succeeds with appropriate data.
         """
         user = baker.make(User)
+        user.profile.entry_form_data = {
+            **self.step1_data,
+            **self.step2_data,
+            **self.step3_data,
+        }
+        user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:accessandsubmission")
 
@@ -372,6 +387,35 @@ class TestPreliminaryViews(TestCase):
         # Should redirect to login page
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertTrue("openid/login" in response.url)
+
+    def test_auditeeinfo_no_eligibility(self):
+        user = baker.make(User)
+        user.profile.entry_form_data = {
+            **self.step1_data,
+            "is_usa_based": False,  # Ineligible
+        }
+        user.profile.save()
+        self.client.force_login(user)
+
+        url = reverse("report_submission:auditeeinfo")
+        response = self.client.get(url)
+
+        # Should redirect to step 1 page due to no eligibility
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("report_submission/eligibility" in response.url)
+
+    def test_accessandsubmission_no_auditee_info(self):
+        user = baker.make(User)
+        user.profile.entry_form_data = self.step1_data
+        user.profile.save()
+        self.client.force_login(user)
+
+        url = reverse("report_submission:accessandsubmission")
+        response = self.client.get(url)
+
+        # Should redirect to step 2 page since auditee info isn't present
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("report_submission/auditeeinfo" in response.url)
 
 
 class GeneralInformationFormViewTests(TestCase):
@@ -679,6 +723,7 @@ class GeneralInformationFormViewTests(TestCase):
             "auditee_city": "Chicago",
             "auditee_state": "IL",
             "auditee_zip": "60640",
+            "auditor_international_address": "",
             "auditee_contact_name": "Updated Designated Representative",
             "auditee_contact_title": "Lord of Windows",
             "auditee_phone": "5558675310",
@@ -694,7 +739,11 @@ class GeneralInformationFormViewTests(TestCase):
 
         response = self.client.post(url, data=data)
 
-        self.assertEqual(response.status_code, 400)
+        self.assertIn("errors", response.context)
+        self.assertIn(
+            "GSA_MIGRATION not permitted outside of migrations",
+            response.context["errors"],
+        )
 
     def test_post_validates_general_information(self):
         """When the general information form is submitted, the data should be validated against the general information schema"""
@@ -749,3 +798,109 @@ class GeneralInformationFormViewTests(TestCase):
         response = self.client.post(url, data=data)
 
         self.assertContains(response, "Dates should be in the format")
+        self.assertNotIn(
+            "GSA_MIGRATION not permitted outside of migrations",
+            response.context["errors"],
+        )
+
+
+def add_session_to_request(request):
+    """Middleware to add session to request."""
+    middleware = SessionMiddleware(lambda x: x)
+    middleware.process_request(request)
+    request.session.save()
+
+
+def add_messages_to_request(request):
+    """Attach a message storage to the request."""
+    setattr(request, "_messages", FallbackStorage(request))
+
+
+class DeleteFileViewTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create_user(
+            username="user", password="password"
+        )  # nosec
+        self.view = DeleteFileView()
+        self.report_id = "12345"
+        self.path_name = "delete-audit-findings"
+        self.url = reverse(
+            "report_submission:audit-findings-text",
+            kwargs={"report_id": self.report_id},
+        )
+
+    def make_request(self, method="get"):
+        if method.lower() == "post":
+            request = self.factory.post(self.url)
+        else:
+            request = self.factory.get(self.url)
+        request.user = self.user
+        request.path = "/delete/" + self.path_name + "/"
+        add_session_to_request(request)
+        add_messages_to_request(request)
+        return request
+
+    def test_get_no_access(self):
+        request = self.make_request("get")
+        with patch("audit.models.SingleAuditChecklist.objects.get") as mock_get:
+            mock_get.side_effect = SingleAuditChecklist.DoesNotExist
+            with self.assertRaises(PermissionDenied):
+                self.view.get(request, report_id=self.report_id)
+
+    def test_get_successful_render(self):
+        sac = MagicMock(report_id=self.report_id)
+        access = MagicMock(user=self.user)
+        request = self.make_request("get")
+
+        with patch("audit.models.SingleAuditChecklist.objects.get", return_value=sac):
+            with patch("audit.models.Access.objects.filter", return_value=[access]):
+                response = self.view.get(request, report_id=self.report_id)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn("delete-audit-findings", response.content.decode())
+
+    def test_post_no_access(self):
+        request = self.factory.post(self.url)
+        request.user = self.user
+        request.path = "/delete/" + self.path_name + "/"
+        request = self.make_request("get")
+
+        with patch("audit.models.SingleAuditChecklist.objects.get"):
+            with patch("audit.models.Access.objects.filter", return_value=[]):
+                response = self.view.post(request, report_id=self.report_id)
+                self.assertEqual(response.status_code, 302)
+
+        messages = [message.message for message in get_messages(request)]
+        self.assertIn("You do not have access to this audit.", messages)
+
+    def test_post_file_deletion_successful(self):
+        sac = MagicMock(report_id=self.report_id)
+        access = MagicMock(user=self.user)
+        request = self.factory.post(self.url)
+        request.user = self.user
+        request.path = "/delete/" + self.path_name + "/"
+        request = self.make_request("get")
+
+        with patch("audit.models.SingleAuditChecklist.objects.get", return_value=sac):
+            with patch("audit.models.Access.objects.filter", return_value=[access]):
+                with patch("audit.models.ExcelFile.objects.filter") as mock_filter:
+                    mock_files = MagicMock()
+                    mock_filter.return_value = mock_files
+                    mock_files.count.return_value = 1
+
+                    response = self.view.post(request, report_id=self.report_id)
+                    self.assertEqual(response.status_code, 302)
+                    mock_files.delete.assert_called_once()
+
+    def test_post_unexpected_error(self):
+        request = self.factory.post(self.url)
+        request.user = self.user
+        request.path = "/delete/" + self.path_name + "/"
+        request = self.make_request("get")
+
+        with patch("audit.models.SingleAuditChecklist.objects.get") as mock_get:
+            mock_get.side_effect = Exception("Unexpected error")
+            response = self.view.post(request, report_id=self.report_id)
+            self.assertEqual(response.status_code, 302)
+        messages = [message.message for message in get_messages(request)]
+        self.assertIn("An unexpected error occurred.", messages)

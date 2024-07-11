@@ -1,40 +1,43 @@
-FAC System Cloud boundary view
 ![FAC.gov  Cloud ATO boundary view]
+
 ```plantuml
-@startuml Context Diagram
+@startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 Person(User, "User", "GranteeOrAuditor")
 Person(Public, "User", "Public")
 Person(Staff, "User", "FAC Staff")
 Person(AgencyApp, "App", "Agency App")
+Person(SecOps, "App", "GSA Sec Ops")
 
 note as ConnectionNote
-All connections depicted are encrypted with TLS 1.2 unless otherwise noted. 
+All connections depicted are encrypted with TLS 1.2 unless otherwise noted.
 All connextions are on port 443 and use https unles otherwise noted.
-All connections use TCP. 
+All connections use TCP.
 end note
 
 
 Boundary(cloudgov, "Cloud.gov Boundary") {
     Boundary(atob, "ATO Boundary") {
         Boundary(backend, "FAC application", "egress-controlled-space") {
-            System(django, "FAC Web App", "Django") 
-            Boundary(services, "FAC Services") {
-                System(api, "REST API ", "PostgREST")
+            System(api, "REST API ", "PostgREST")
+            System(django, "FAC Web App", "Django")
+            Boundary(services, "FAC Internal Services") {
                 System(scan, "Virus Scanner", "ClamAV")
             }
+                System(scanner, "FAC File Scanner", "Python")
         }
         Boundary(proxy, "Proxy services", "egress-permitted-space"){
             System(https_proxy, "web egress proxy", "proxy for HTTP/S connections")
             System(mail_proxy, "mail egress proxy", "proxy for SMTPS connections")
         }
         Boundary(pages, "cloud.gov pages") {
-            System(static, "FAC Static Site", "CG Pages") 
+            System(static, "FAC Static Site", "CG Pages")
         }
         Boundary(cloudgov-services,"Cloud.gov services") {
             System(db, "Database", "Brokered postgreSQL")
             System(s3, "PDF/XLS storage", "Brokered S3")
+            System(Logs, "System Logs", "Brokered S3")
         }
     }
 }
@@ -58,7 +61,7 @@ Rel(Staff, django, "Manages audits, roles, content", $tags="authenticated")
 Rel(User, Login, "Authenticates with")
 Rel(Staff, Login, "Authenticates with")
 Rel(AgencyApp, datagov, "Routes requests through") api.fac.gov
-
+Rel(SecOps,Logs, "Retrieves logs for mining")
 
 
 Rel(datagov, api, "Searches, filters, requests audit", $tags="authenticated") port 3000
@@ -76,7 +79,11 @@ Rel(mail_proxy, Email, "Sends emails using") port 587
 Rel(django, scan, "Scans attachments")
 Rel(django, db, "read/write") port 5432
 Rel(django, s3, "Stores single audit packages/Excel files")
+Rel(django, Logs, "Gathers and stores logs")
 Rel(django, api, "Handles search requests") port 3000
-
+Rel(scanner, scan, "Scans files")
+Rel(scanner, s3, "Reads files from s3")
+Rel(scanner, db, "Writes scan results to table")
+Rel(scanner, https_proxy, "Reports logs to New Relic")
 @enduml
 ```

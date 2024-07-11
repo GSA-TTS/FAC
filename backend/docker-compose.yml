@@ -17,6 +17,19 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+  db2:
+    image: "postgres:15"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    volumes:
+      - postgres-data2:/var/lib/postgresql/data/
+    ports:
+      - "5431:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   #---------------------------------------------
   # Historic data
@@ -40,6 +53,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      db2:
+        condition: service_healthy
       minio:
         condition: service_started
       clamav-rest:
@@ -57,7 +72,7 @@ services:
       ENV: ${ENV}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: 0.0.0.0 127.0.0.1 localhost
-      AV_SCAN_URL: http://clamav-rest:9000/scan
+      AV_SCAN_URL: http://clamav-rest:${CLAMAV_PORT:-9000}/scan
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
       ENABLE_DEBUG_TOOLBAR: false
@@ -79,8 +94,9 @@ services:
     environment:
       MAX_FILE_SIZE: 30M
       SIGNATURE_CHECKS: 1
+      PORT: ${CLAMAV_PORT:-9000}
     ports:
-      - "9000:9000"
+      - ${CLAMAV_PORT:-9000}:${CLAMAV_PORT:-9000}
 
   #---------------------------------------------
   # Minio (S3 clone)
@@ -106,6 +122,7 @@ services:
       - "3000"
     environment:
       PGRST_DB_URI: postgres://postgres@db:5432/postgres
+      PGRST2_DB_URI: postgres://postgres@db:5431/postgres
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
       PGRST_DB_ANON_ROLE: anon
       # See https://postgrest.org/en/stable/references/api/schemas.html#multiple-schemas for multiple schemas
@@ -118,4 +135,5 @@ services:
         condition: service_healthy
 volumes:
   postgres-data:
+  postgres-data2:
   minio-vol:

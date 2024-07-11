@@ -5,7 +5,6 @@ labels: ["helpdesk"]
 projects: ["GSA-TTS/11"]
 assignees:
   - jadudm
-  - carley-sullivan
 body:
   - type: markdown
     attributes:

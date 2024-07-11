@@ -1,14 +1,18 @@
 from django.core.exceptions import ValidationError
 import logging
 
+from census_historical_migration.invalid_record import InvalidRecord
+
 from .check_finding_award_references_pattern import award_references_pattern
 from .check_cluster_names import check_cluster_names
 from audit.fixtures.excel import FORM_SECTIONS
 from .check_gsa_migration_keyword import check_for_gsa_migration_keyword
-
+from .check_data_row_range_in_form_sheet import validate_ranges
 
 ############
 # General checks
+from .check_uei_schema import verify_auditee_uei_schema
+from .check_uei_match import verify_auditee_uei_match
 from .check_uei_exists import uei_exists
 from .check_is_a_workbook import is_a_workbook
 from .check_look_for_empty_rows import look_for_empty_rows
@@ -59,8 +63,11 @@ general_checks = [
     is_a_workbook,
     validate_workbook_version,
     uei_exists,
+    verify_auditee_uei_schema,
+    verify_auditee_uei_match,
     look_for_empty_rows,
     start_and_end_rows_of_all_columns_are_same,
+    validate_ranges,
 ]
 
 federal_awards_checks = general_checks + [
@@ -68,6 +75,7 @@ federal_awards_checks = general_checks + [
     has_all_the_named_ranges(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     has_all_required_fields(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     has_invalid_yorn_field(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
+    award_references_pattern,
     federal_award_amount_passed_through_optional,
     check_cluster_names,
     state_cluster_names,
@@ -123,6 +131,7 @@ audit_findings_text_checks = general_checks + [
     has_all_the_named_ranges(FORM_SECTIONS.FINDINGS_TEXT),
     has_all_required_fields(FORM_SECTIONS.FINDINGS_TEXT),
     has_invalid_yorn_field(FORM_SECTIONS.FINDINGS_TEXT),
+    finding_reference_pattern,
 ]
 
 corrective_action_plan_checks = general_checks + [
@@ -130,6 +139,7 @@ corrective_action_plan_checks = general_checks + [
     has_all_the_named_ranges(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
     has_all_required_fields(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
     has_invalid_yorn_field(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
+    finding_reference_pattern,
 ]
 
 secondary_auditors_checks = general_checks + [
@@ -138,43 +148,104 @@ secondary_auditors_checks = general_checks + [
     has_all_required_fields(FORM_SECTIONS.SECONDARY_AUDITORS),
 ]
 
+skippable_checks = {
+    "cluster_total_is_correct": cluster_total_is_correct,
+    "federal_program_total_is_correct": federal_program_total_is_correct,
+}
 
-def run_all_checks(ir, list_of_checks, section_name=None, is_data_migration=False):
+require_gsa_migration_flag = [findings_grid_validation, finding_reference_pattern]
+
+
+def run_all_checks(
+    ir, list_of_checks, section_name=None, is_data_migration=False, auditee_uei=None
+):
+    """Run all the checks in the list_of_checks on the IR.
+    If a section_name is provided, run the section check as well.
+    If this is a data migration, then there are some checks we do not want to run.
+    If this is not a data migration, then we want to make sure no one put in a GSA_MIGRATION keyword.
+    """
     errors = []
-    if section_name:
-        res = is_right_workbook(section_name)(ir)
-        if res:
-            errors.append(res)
 
-    # If this is a data migration, then there are some checks we do not want to run.
-    #
-    if is_data_migration:
-        if list_of_checks == federal_awards_checks:
-            list_of_checks = list(
-                filter(lambda f: f != check_cluster_names, list_of_checks)
-            )
-    else:
-        # This is not a data migration.
-        # We want to make sure no one put in a GSA_MIGRATION keyword.
-        check_for_gsa_migration_keyword(ir)
+    errors += run_section_check(ir, section_name)
+    list_of_checks = filter_checks_for_data_migration(list_of_checks, is_data_migration)
+    check_for_gsa_migration_keyword_if_needed(ir, is_data_migration)
 
     for fun in list_of_checks:
-        res = fun(ir)
-        if isinstance(res, list) and all(map(lambda v: isinstance(v, tuple), res)):
-            errors = errors + res
-        elif isinstance(res, tuple):
-            errors.append(res)
-        else:
-            pass
-    logger.info(f"Found {len(errors)} errors in the IR passes.")
-    if len(errors) > 0:
-        logger.info("Raising a validation error.")
+        res = run_check(fun, ir, is_data_migration, auditee_uei)
+        errors += process_check_result(res)
+
+    log_errors(errors)
+    if errors:
         raise ValidationError(errors)
 
 
-def run_all_general_checks(ir, section_name, is_data_migration=False):
+def run_section_check(ir, section_name):
+    """Run the section check if it is provided."""
+    if section_name:
+        res = is_right_workbook(section_name)(ir)
+        if res:
+            return [res]
+    return []
+
+
+def filter_checks_for_data_migration(list_of_checks, is_data_migration):
+    """If this is a data migration, then there are some checks we do not want to run."""
+    if is_data_migration and list_of_checks == federal_awards_checks:
+        return list(filter(lambda f: f != check_cluster_names, list_of_checks))
+    return list_of_checks
+
+
+def check_for_gsa_migration_keyword_if_needed(ir, is_data_migration):
+    """If this is not a data migration, then we want to make sure no one put in a GSA_MIGRATION keyword."""
+    if not is_data_migration:
+        check_for_gsa_migration_keyword(ir)
+
+
+def get_key_by_value(d, target_value):
+    keys = [key for key, value in d.items() if value == target_value]
+    return keys[0] if keys else None
+
+
+def run_check(fun, ir, is_data_migration, auditee_uei):
+    """Run the validation check if it is not skippable, or if it is skippable, only run if this is not a data migration."""
+    fun_name = get_key_by_value(skippable_checks, fun)
+    if (
+        is_data_migration
+        and fun_name
+        and fun_name in InvalidRecord.fields["validations_to_skip"]
+    ):
+        return None
+    elif fun == verify_auditee_uei_match:
+        return fun(ir, auditee_uei)
+    elif fun in require_gsa_migration_flag:
+        return fun(ir, is_data_migration)
+    else:
+        return fun(ir)
+
+
+def process_check_result(res):
+    """Process the result of a validation check and return a list of errors."""
+    if isinstance(res, list) and all(map(lambda v: isinstance(v, tuple), res)):
+        return res
+    elif isinstance(res, tuple):
+        return [res]
+    return []
+
+
+def log_errors(errors):
+    """Log the number of errors found in the IR passes."""
+    logger.info(f"Found {len(errors)} errors in the IR passes.")
+    if errors:
+        logger.info("Raising a validation error.")
+
+
+def run_all_general_checks(ir, section_name, is_data_migration=False, auditee_uei=None):
     run_all_checks(
-        ir, general_checks, section_name, is_data_migration=is_data_migration
+        ir,
+        general_checks,
+        section_name,
+        is_data_migration=is_data_migration,
+        auditee_uei=auditee_uei,
     )
 
 

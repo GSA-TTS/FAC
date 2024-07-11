@@ -12,6 +12,7 @@ local AuditorCertification = Types.object {
         is_auditee_responsible: Types.boolean,
         has_used_auditors_report: Types.boolean,
         has_no_auditee_procedures: Types.boolean,
+        is_accurate_and_complete: Types.boolean,
         is_FAC_releasable: Types.boolean,
       },
       required: [
@@ -19,6 +20,7 @@ local AuditorCertification = Types.object {
         'is_auditee_responsible',
         'has_used_auditors_report',
         'has_no_auditee_procedures',
+        'is_accurate_and_complete',
         'is_FAC_releasable',
       ],
     },

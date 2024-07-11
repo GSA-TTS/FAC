@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
 
 from .models import Access, SingleAuditChecklist
 
@@ -50,7 +51,7 @@ class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
 
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
-            if not has_access(sac, request.user):
+            if not has_access(sac, request.user) and not settings.DISABLE_AUTH:
                 raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied(PERMISSION_DENIED_MESSAGE)

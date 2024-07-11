@@ -1,5 +1,6 @@
 locals {
-  clam_name = "fac-av-${var.cf_space_name}"
+  clam_name    = "fac-av-${var.cf_space_name}"
+  fs_clam_name = "fac-av-${var.cf_space_name}-fs"
 }
 
 data "docker_registry_image" "clamav" {
@@ -7,7 +8,7 @@ data "docker_registry_image" "clamav" {
 }
 
 module "clamav" {
-  source = "github.com/18f/terraform-cloudgov//clamav?ref=v0.8.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//clamav?ref=v0.9.0"
 
   # This generates eg "fac-av-staging.apps.internal", avoiding collisions with routes for other projects and spaces
   name           = local.clam_name
@@ -24,5 +25,27 @@ module "clamav" {
   proxy_port     = module.https-proxy.port
   proxy_username = module.https-proxy.username
   proxy_password = module.https-proxy.password
+}
+
+module "file_scanner_clamav" {
+  source = "github.com/gsa-tts/terraform-cloudgov//clamav?ref=v0.9.0"
+
+  # This generates eg "fac-av-staging-fs.apps.internal", avoiding collisions with routes for other projects and spaces
+  name           = local.fs_clam_name
+  app_name_or_id = "fac-file-scanner"
+
+  cf_org_name   = var.cf_org_name
+  cf_space_name = var.cf_space_name
+  clamav_image  = "ghcr.io/gsa-tts/fac/clamav@${data.docker_registry_image.clamav.sha256_digest}"
+  max_file_size = "30M"
+  instances     = var.clamav_fs_instances
+  clamav_memory = var.clamav_memory
+
+  proxy_server   = module.https-proxy.domain
+  proxy_port     = module.https-proxy.port
+  proxy_username = module.https-proxy.username
+  proxy_password = module.https-proxy.password
+
+  depends_on = [module.fac-file-scanner.id]
 }
 

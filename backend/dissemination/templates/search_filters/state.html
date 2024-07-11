@@ -1,0 +1,18 @@
+{% comment %} State {% endcomment %}
+<button type="button"
+        class="usa-accordion__button"
+        aria-expanded={% if form_user_input.auditee_state %}"true"{% else %}"false"{% endif %}
+        aria-controls="state">State</button>
+<div id="state" class="usa-form-group">
+    <label class="usa-label" for="auditee_state">
+        State
+    </label>
+    <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
+        <option value id="state--none">- Select -</option>
+        {% for state in state_abbrevs %}
+        <option value="{{ state }}" {% if form_user_input.auditee_state == state %}selected{% endif %}>
+            {{ state }}
+        </option>
+        {% endfor %}
+    </select>
+</div>

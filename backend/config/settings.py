@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+
 from base64 import b64decode
 import os
 import sys
@@ -125,7 +126,6 @@ INSTALLED_APPS += [
     "api",
     "users",
     "report_submission",
-    # "data_distro",
     "dissemination",
     "census_historical_migration",
     "support",
@@ -436,6 +436,7 @@ DATA_FIXTURES = BASE_DIR / "data_fixtures"
 AUDIT_TEST_DATA_ENTRY_DIR = DATA_FIXTURES / "audit" / "test_data_entries"
 AUDIT_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "audit"
 SECTION_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "sections"
+OUTPUT_BASE_DIR = BASE_DIR / "schemas" / "output" / "base"
 SCHEMA_BASE_DIR = BASE_DIR / "schemas" / "source" / "base"
 XLSX_TEMPLATE_JSON_DIR = BASE_DIR / "schemas" / "output" / "excel" / "json"
 XLSX_TEMPLATE_SHEET_DIR = BASE_DIR / "schemas" / "output" / "excel" / "xlsx"
@@ -508,6 +509,9 @@ SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
 STATE_ABBREVS = json.load(open(f"{SCHEMA_BASE_DIR}/States.json"))[
     "UnitedStatesStateAbbr"
 ]
+CHARACTER_LIMITS_GENERAL = json.load(
+    open(f"{SCHEMA_BASE_DIR}/character_limits/general.json")
+)
 
 ENABLE_DEBUG_TOOLBAR = (
     env.bool("ENABLE_DEBUG_TOOLBAR", False) and ENVIRONMENT == "LOCAL" and not TEST_RUN
@@ -534,17 +538,29 @@ OMB_EXP_DATE = "09/30/2026"
 CENSUS_DATA_SOURCE = "CENSUS"
 DOLLAR_THRESHOLD = 750000
 SUMMARY_REPORT_DOWNLOAD_LIMIT = 1000
+DEFAULT_MAX_ROWS = (
+    10000  # A version of this constant also exists in schemas.scrpits.render.py
+)
+MAX_ROWS = 20000
 
 # A version of these regexes also exists in Base.libsonnet
 REGEX_ALN_PREFIX = r"^([0-9]{2})$"
 REGEX_RD_EXTENSION = r"^RD[0-9]?$"
 REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
 REGEX_U_EXTENSION = r"^U[0-9]{2}$"
+EMPLOYER_IDENTIFICATION_NUMBER = r"^[0-9]{9}$"
 GSA_MIGRATION = "GSA_MIGRATION"  # There is a copy of `GSA_MIGRATION` in Base.libsonnet. If you change it here, change it there too.
 GSA_MIGRATION_INT = -999999999
 # A copy of theses constants exists in schema/source/base/Base.libsonnet
 STATE_CLUSTER = "STATE CLUSTER"
 OTHER_CLUSTER = "OTHER CLUSTER NOT LISTED ABOVE"
 NOT_APPLICABLE = "N/A"
-
+GSA_FAC_WAIVER = "GSA_FAC_WAIVER"
 ONE_TIME_ACCESS_TTL_SECS = 60
+
+# Expire sessions after 30 minutes
+# https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-age
+SESSION_COOKIE_AGE = 30 * 60
+# Keep sessions alive if the user is active
+# https://docs.djangoproject.com/en/dev/ref/settings/#session-save-every-request
+SESSION_SAVE_EVERY_REQUEST = True

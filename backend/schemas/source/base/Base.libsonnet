@@ -4,6 +4,7 @@ local FederalProgramNames = import 'FederalProgramNames.json';
 local Func = import 'Functions.libsonnet';
 local GAAP = import 'GAAP.libsonnet';
 local States = import 'States.json';
+local GeneralCharacterLimits = import './character_limits/general.json';
 
 local Const = {
   Y: 'Y',
@@ -174,8 +175,6 @@ local Enum = {
     enum: [
       'program-specific',
       'single-audit',
-      // Include after we are able to recieve ACEE submissions.
-      // 'alternative-compliance-engagement',
     ],
     title: 'AuditType',
   },
@@ -224,6 +223,10 @@ local Enum = {
     description: 'GAAP Results (Audit Information)',
     enum: std.map(function(pair) pair.key, GAAP.gaap_results),
   },
+  GAAPResults_GSAMigration: Types.string {
+    description: 'GAAP Results (Audit Information)',
+    enum: std.map(function(pair) pair.key, GAAP.gaap_results) + [Const.GSA_MIGRATION],
+  },
   SP_Framework_Basis: Types.string {
     description: 'SP Framework Basis (Audit Information)',
     enum: std.map(function(pair) pair.key, GAAP.sp_framework_basis),
@@ -246,7 +249,9 @@ local email_regex = "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?
 
 local REGEX_ZIPCODE = '^[0-9]{5}(?:[0-9]{4})?$';
 local REGEX_DBKEY = '[1-9][0-9]+';
-local REGEX_MONTHS_OTHER = '^0[0-9]|1[0-8]$';
+// 0?[1-9] --> (1-9 or 01-09) OR 1[1-8] --> 10-18
+// Allows single or double digit values - 7 vs 07
+local REGEX_MONTHS_OTHER = '^0?[1-9]$|^1[0-8]$';
 local type_zipcode = Types.string {
   pattern: REGEX_ZIPCODE,
 };
@@ -296,17 +301,17 @@ local Compound = {
   AwardReference: Types.string {
     title: 'AwardReference',
     description: 'Award Reference',
-    pattern: '^AWARD-(?!0000)[0-9]{4}$',
+    pattern: '^AWARD-(?!0{4,5}$)[0-9]{4,5}$',
   },
   PriorReferences: Types.string {
     title: 'PriorReferences',
     description: 'Prior references',
-    pattern: '^20[1-9][0-9]-[0-9]{3}(,\\s*20[1-9][0-9]-[0-9]{3})*$',
+    pattern: '^[1-2][0-9]{3}-[0-9]{3}(,\\s*[1-2][0-9]{3}-[0-9]{3})*$',
   },
   ReferenceNumber: Types.string {
     title: 'ReferenceNumber',
     description: 'Reference Number',
-    pattern: '^20[1-9][0-9]-[0-9]{3}$',
+    pattern: '^[1-2][0-9]{3}-[0-9]{3}$',
   },
   ComplianceRequirement: {
     title: 'ComplianceRequirement',
@@ -315,8 +320,10 @@ local Compound = {
   },
   NonEmptyString: Types.string {
     minLength: 1,
+    maxLength: 500,
   },
   EmployerIdentificationNumber: Types.string {
+    # A python version of these regexes also exists in settings.py
     pattern: '^[0-9]{9}$',
   },
   UniqueEntityIdentifier: {
@@ -333,6 +340,8 @@ local Compound = {
   Zip: type_zipcode,
   MonthsOther: Types.string {
     pattern: REGEX_MONTHS_OTHER,
+    minLength: GeneralCharacterLimits.number_months.min,
+    maxLength: GeneralCharacterLimits.number_months.max,
   },
   EmptyString: Types.string {
     const: Const.empty_string,
@@ -381,6 +390,14 @@ local SchemaBase = Types.object {
       enum: ClusterNames.cluster_names + [Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
     },
     ALNPrefixes: type_aln_prefix,
+    ALNPrefixesWithGsaMigration:  {
+      oneOf: [
+        type_aln_prefix,
+        Types.string {
+          const: Const.GSA_MIGRATION,
+        },
+      ],
+    },
     ThreeDigitExtension: {
       oneOf: [
         type_three_digit_extension,

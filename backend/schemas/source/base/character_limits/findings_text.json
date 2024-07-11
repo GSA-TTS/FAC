@@ -1,0 +1,26 @@
+{
+  "report_id": {
+    "min": 25,
+    "max": 25
+  },
+  "auditee_uei": {
+    "min": 12,
+    "max": 13
+  },
+  "audit_year": {
+    "min": 4,
+    "max": 4
+  },
+  "finding_ref_number": {
+    "min": 8,
+    "max": 8
+  },
+  "contains_chart_or_table": {
+    "min": 1,
+    "max": 13
+  },
+  "finding_text": {
+    "min": 1,
+    "max": 31991
+  }
+}

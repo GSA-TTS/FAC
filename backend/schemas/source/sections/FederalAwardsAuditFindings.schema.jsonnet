@@ -28,16 +28,30 @@ local Parts = {
     additionalProperties: false,
     properties: {
       award_reference: Base.Compound.AwardReference,
-      compliance_requirement: Base.Compound.ComplianceRequirementTypes,
+      compliance_requirement: {
+        oneOf: [
+          Base.Compound.ComplianceRequirementTypes,
+          Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+        ],
+      },
     },
     required: ['award_reference', 'compliance_requirement'],
   },
   Findings: Types.object {
     additionalProperties: false,
     properties: {
-      reference_number: Base.Compound.ReferenceNumber,
-      is_valid: Base.Enum.YorN,
-      repeat_prior_reference: Base.Enum.YorN,
+      reference_number: {
+        oneOf: [
+          Base.Compound.ReferenceNumber,
+          Types.string {
+            const: Base.Const.GSA_MIGRATION,
+          },
+        ],
+      },
+      is_valid: Base.Enum.YorNorGsaMigration,
+      repeat_prior_reference: Base.Enum.YorNorGsaMigration,
       prior_references: Types.string,
     },
     required: [
@@ -54,12 +68,12 @@ local FindingsUniformGuidanceEntry = {
   properties: {
     program: Parts.Program,
     findings: Parts.Findings,
-    modified_opinion: Base.Enum.YorN,
-    other_matters: Base.Enum.YorN,
-    material_weakness: Base.Enum.YorN,
-    significant_deficiency: Base.Enum.YorN,
-    other_findings: Base.Enum.YorN,
-    questioned_costs: Base.Enum.YorN,
+    modified_opinion: Base.Enum.YorNorGsaMigration,
+    other_matters: Base.Enum.YorNorGsaMigration,
+    material_weakness: Base.Enum.YorNorGsaMigration,
+    significant_deficiency: Base.Enum.YorNorGsaMigration,
+    other_findings: Base.Enum.YorNorGsaMigration,
+    questioned_costs: Base.Enum.YorNorGsaMigration,
 
   },
   required: [

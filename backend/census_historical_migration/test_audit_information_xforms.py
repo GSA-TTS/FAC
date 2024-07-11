@@ -1,10 +1,15 @@
+from unittest.mock import MagicMock, patch
 from django.test import SimpleTestCase
 
 from .sac_general_lib.audit_information import (
+    ace_audit_information,
     xform_build_sp_framework_gaap_results,
     xform_framework_basis,
+    xform_sp_framework_required,
+    xform_lowrisk,
 )
 from .exception_utils import DataMigrationError
+from django.conf import settings
 
 
 class TestXformBuildSpFrameworkGaapResults(SimpleTestCase):
@@ -123,3 +128,155 @@ class TestXformFrameworkBasis(SimpleTestCase):
         """Test that the function raises an exception when the basis has extra words."""
         with self.assertRaises(DataMigrationError):
             xform_framework_basis("Something with cash basis")
+
+
+class TestXformSpFrameworkRequired(SimpleTestCase):
+    class MockAuditHeader:
+        def __init__(
+            self,
+            DBKEY,
+            TYPEREPORT_FS,
+            SP_FRAMEWORK_REQUIRED,
+        ):
+            self.DBKEY = DBKEY
+            self.TYPEREPORT_FS = TYPEREPORT_FS
+            self.SP_FRAMEWORK_REQUIRED = SP_FRAMEWORK_REQUIRED
+
+    def _mock_audit_header(self):
+        """Returns a mock audit header with all necessary fields."""
+        return self.MockAuditHeader(
+            DBKEY="123456789",
+            TYPEREPORT_FS="AS",
+            SP_FRAMEWORK_REQUIRED="Y",
+        )
+
+    def test_sp_framework_required_Y(self):
+        """Test that the function returns 'Y' for SP_FRAMEWORK_REQUIRED."""
+        audit_header = self._mock_audit_header()
+        xform_sp_framework_required(audit_header)
+        self.assertEqual(audit_header.SP_FRAMEWORK_REQUIRED, "Y")
+
+    def test_sp_framework_required_N(self):
+        """Test that the function returns 'N' for SP_FRAMEWORK_REQUIRED."""
+        audit_header = self._mock_audit_header()
+        audit_header.SP_FRAMEWORK_REQUIRED = "N"
+        xform_sp_framework_required(audit_header)
+        self.assertEqual(audit_header.SP_FRAMEWORK_REQUIRED, "N")
+
+    def test_sp_framework_required_blank(self):
+        """Test that the function returns GSA_MIGRATION for SP_FRAMEWORK_REQUIRED."""
+        audit_header = self._mock_audit_header()
+        audit_header.SP_FRAMEWORK_REQUIRED = ""
+        xform_sp_framework_required(audit_header)
+        self.assertEqual(audit_header.SP_FRAMEWORK_REQUIRED, settings.GSA_MIGRATION)
+
+
+class TestXformLowrisk(SimpleTestCase):
+    class MockAuditHeader:
+        def __init__(
+            self,
+            DBKEY,
+            LOWRISK,
+        ):
+            self.DBKEY = DBKEY
+            self.LOWRISK = LOWRISK
+
+    def _mock_audit_header(self):
+        """Returns a mock audit header with all necessary fields."""
+        return self.MockAuditHeader(
+            DBKEY="123456789",
+            LOWRISK="Y",
+        )
+
+    def test_lowrisk_Y(self):
+        """Test that the function returns 'Y' for LOWRISK."""
+        audit_header = self._mock_audit_header()
+        xform_lowrisk(audit_header)
+        self.assertEqual(audit_header.LOWRISK, "Y")
+
+    def test_lowrisk_N(self):
+        """Test that the function returns 'N' for LOWRISK."""
+        audit_header = self._mock_audit_header()
+        audit_header.LOWRISK = "N"
+        xform_lowrisk(audit_header)
+        self.assertEqual(audit_header.LOWRISK, "N")
+
+    def test_lowrisk_blank(self):
+        """Test that the function returns GSA_MIGRATION for LOWRISK."""
+        audit_header = self._mock_audit_header()
+        audit_header.LOWRISK = ""
+        xform_lowrisk(audit_header)
+        self.assertEqual(audit_header.LOWRISK, settings.GSA_MIGRATION)
+
+
+class TestAceAuditInformation(SimpleTestCase):
+
+    def setUp(self):
+        self.audit_header = MagicMock()
+        self.audit_header.some_field = "test_value"
+
+        self.default_values = {
+            "dollar_threshold": settings.GSA_MIGRATION_INT,
+            "gaap_results": [settings.GSA_MIGRATION],
+            "is_going_concern_included": settings.GSA_MIGRATION,
+            "is_internal_control_deficiency_disclosed": settings.GSA_MIGRATION,
+            "is_internal_control_material_weakness_disclosed": settings.GSA_MIGRATION,
+            "is_material_noncompliance_disclosed": settings.GSA_MIGRATION,
+            "is_aicpa_audit_guide_included": settings.GSA_MIGRATION,
+            "is_low_risk_auditee": settings.GSA_MIGRATION,
+            "agencies": [settings.GSA_MIGRATION],
+        }
+
+    @patch(
+        "census_historical_migration.sac_general_lib.audit_information.create_json_from_db_object"
+    )
+    def test_ace_audit_information_with_actual_values(self, mock_create_json):
+        """Test that the function returns the correct values when all fields are present."""
+        mock_create_json.return_value = {
+            "dollar_threshold": 1000,
+            "is_low_risk_auditee": True,
+            "new_field": "new_value",
+        }
+
+        result = ace_audit_information(self.audit_header)
+
+        expected_result = self.default_values.copy()
+        expected_result.update(
+            {
+                "dollar_threshold": 1000,
+                "is_low_risk_auditee": True,
+                "new_field": "new_value",
+            }
+        )
+
+        self.assertEqual(result, expected_result)
+
+    @patch(
+        "census_historical_migration.sac_general_lib.audit_information.create_json_from_db_object"
+    )
+    def test_ace_audit_information_with_default_values(self, mock_create_json):
+        """Test that the function returns the correct values when all fields are missing."""
+        mock_create_json.return_value = {}
+
+        result = ace_audit_information(self.audit_header)
+
+        expected_result = self.default_values
+
+        self.assertEqual(result, expected_result)
+
+    @patch(
+        "census_historical_migration.sac_general_lib.audit_information.create_json_from_db_object"
+    )
+    def test_ace_audit_information_with_mixed_values(self, mock_create_json):
+        """Test that the function returns the correct values when some fields are missing."""
+        mock_create_json.return_value = {
+            "dollar_threshold": None,
+            "is_low_risk_auditee": True,
+        }
+
+        result = ace_audit_information(self.audit_header)
+
+        expected_result = self.default_values.copy()
+        expected_result.update({"is_low_risk_auditee": True})
+
+        self.assertEqual(result, expected_result)

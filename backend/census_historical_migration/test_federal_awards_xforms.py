@@ -1,25 +1,36 @@
 from unittest.mock import patch
 from django.conf import settings
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
+from .invalid_migration_tags import INVALID_MIGRATION_TAGS
+from .invalid_record import InvalidRecord
 from .transforms.xform_string_to_string import (
     string_to_string,
 )
-
 from .exception_utils import DataMigrationError
 from .workbooklib.federal_awards import (
     is_valid_prefix,
+    track_invalid_federal_program_total,
+    track_invalid_number_of_audit_findings,
     xform_match_number_passthrough_names_ids,
     xform_missing_amount_expended,
     xform_missing_program_total,
-    xform_missing_cluster_total,
+    xform_missing_cluster_total_v2,
     xform_populate_default_award_identification_values,
     xform_populate_default_loan_balance,
     xform_constructs_cluster_names,
     xform_populate_default_passthrough_amount,
     xform_populate_default_passthrough_names_ids,
+    xform_replace_invalid_direct_award_flag,
     xform_replace_invalid_extension,
+    xform_program_name,
+    xform_is_passthrough_award,
+    xform_missing_major_program,
     is_valid_extension,
+    xform_cluster_names,
+    xform_replace_missing_prefix,
+    xform_replace_required_values_with_gsa_migration_when_empty,
+    xform_sanitize_additional_award_identification,
 )
 
 
@@ -305,6 +316,71 @@ class TestXformPopulateDefaultPassthroughAmount(SimpleTestCase):
         expected = [str(settings.GSA_MIGRATION_INT)]
         self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
 
+    def test_passthrough_award_gsa_non_empty_amount(self):
+        """Test the function with a passthrough award GSA_MIGRATION audit with non-empty amount."""
+        audits = [
+            self.MockAudit(
+                PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="100"
+            )
+        ]
+        expected = ["100"]
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
+
+    def test_passthrough_award_gsa_empty_amount(self):
+        """Test the function with a passthrough award GSA_MIGRATIONN audit with empty amount."""
+        audits = [
+            self.MockAudit(
+                PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT=""
+            )
+        ]
+        expected = [""]
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
+
+    def test_passthrough_award_gsa_zero_amount(self):
+        """Test the function with a passthrough award GSA_MIGRATION audit with zero amount."""
+        audits = [
+            self.MockAudit(
+                PASSTHROUGHAWARD=settings.GSA_MIGRATION, PASSTHROUGHAMOUNT="0"
+            )
+        ]
+        expected = [""]
+        self.assertEqual(xform_populate_default_passthrough_amount(audits), expected)
+
+
+class TestXformIsPassthroughAward(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, PASSTHROUGHAWARD, PASSTHROUGHAMOUNT):
+            self.PASSTHROUGHAWARD = PASSTHROUGHAWARD
+            self.PASSTHROUGHAMOUNT = PASSTHROUGHAMOUNT
+
+    def test_passthrough_award_Y(self):
+        """Test the function with a valid passthrough award."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="Y", PASSTHROUGHAMOUNT="0")]
+        expected = "Y"
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
+    def test_passthrough_award_empty_with_amount(self):
+        """Test the function with an empty passthrough award and truthy amount."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="", PASSTHROUGHAMOUNT="42")]
+        expected = settings.GSA_MIGRATION
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
+    def test_passthrough_award_empty_with_no_amount(self):
+        """Test the function with an empty passthrough award and 0 amount."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="", PASSTHROUGHAMOUNT="0")]
+        expected = settings.GSA_MIGRATION
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
+    def test_passthrough_award_empty_with_empty_amount(self):
+        """Test the function with an empty passthrough award and empty amount."""
+        audits = [self.MockAudit(PASSTHROUGHAWARD="", PASSTHROUGHAMOUNT="")]
+        expected = settings.GSA_MIGRATION
+        xform_is_passthrough_award(audits)
+        self.assertEqual(audits[0].PASSTHROUGHAWARD, expected)
+
 
 class TestCFDAFunctions(SimpleTestCase):
     def test_is_valid_prefix(self):
@@ -412,7 +488,7 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         state_cluster_names = ["", "", ""]
         expected_totals = ["250", "150", "250"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
@@ -444,7 +520,7 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         state_cluster_names = ["", "State Cluster A", "", "State Cluster A"]
         expected_totals = ["250", "300", "250", "300"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
@@ -476,12 +552,51 @@ class TestXformMissingClusterTotal(SimpleTestCase):
         other_cluster_names = ["", "Other Cluster A", "", "Other Cluster A"]
         expected_totals = ["250", "300", "250", "300"]
 
-        xform_missing_cluster_total(
+        xform_missing_cluster_total_v2(
             audits, cluster_names, other_cluster_names, state_cluster_names
         )
 
         for audit, expected in zip(audits, expected_totals):
             self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+    def test_xform_missing_cluster_total_invalid(self):
+        """Test for incorrect cluster total"""
+        audits = [
+            self.AuditMock("150", "Cluster A", cluster_total="33"),
+        ]
+        cluster_names = ["Cluster A"]
+        other_cluster_names = [""]
+        state_cluster_names = [""]
+        expected_totals = ["33"]
+
+        InvalidRecord.reset()
+        xform_missing_cluster_total_v2(
+            audits, cluster_names, other_cluster_names, state_cluster_names
+        )
+
+        for audit, expected in zip(audits, expected_totals):
+            self.assertEqual(str(audit.CLUSTERTOTAL), expected)
+
+        self.assertEqual(
+            InvalidRecord.fields["validations_to_skip"],
+            ["cluster_total_is_correct"],
+        )
+        self.assertEqual(
+            InvalidRecord.fields["federal_award"],
+            [
+                [
+                    {
+                        "census_data": [
+                            {"column": "CLUSTERTOTAL", "value": 33},
+                            {"column": "CLUSTERNAME", "value": "Cluster A"},
+                            {"column": "STATECLUSTERNAME", "value": ""},
+                            {"column": "OTHERCLUSTERNAME", "value": ""},
+                        ],
+                        "gsa_fac_data": {"field": "cluster_total", "value": 150},
+                    }
+                ]
+            ],
+        )
 
 
 class TestXformMissingAmountExpended(SimpleTestCase):
@@ -542,11 +657,21 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
 
     def test_match_numbers_mixed_empty_and_non_empty(self):
         """Test the function with mixed empty and non-empty names and ids."""
-        names = ["name1|name2|name3", "name4", ""]
-        ids = ["id1", "", ""]
+        names = ["name1|name2|name3", "name4", "", "name5", ""]
+        ids = ["id1", "", "id2", "id3|id4", ""]
         expected_ids = [
             f"id1|{settings.GSA_MIGRATION}|{settings.GSA_MIGRATION}",
+            f"{settings.GSA_MIGRATION}",
+            "id2",
+            "id3|id4",
             "",
+        ]
+
+        expected_names = [
+            "name1|name2|name3",
+            "name4",
+            f"{settings.GSA_MIGRATION}",
+            f"name5|{settings.GSA_MIGRATION}",
             "",
         ]
 
@@ -554,5 +679,322 @@ class TestXformMatchNumberPassthroughNamesIds(SimpleTestCase):
             names, ids
         )
 
-        self.assertEqual(transformed_names, names)
+        self.assertEqual(transformed_names, expected_names)
         self.assertEqual(transformed_ids, expected_ids)
+
+
+class TestXformMissingMajorProgram(SimpleTestCase):
+    class AuditMock:
+        def __init__(
+            self,
+            major_program,
+            audit_type,
+        ):
+            self.MAJORPROGRAM = major_program
+            self.TYPEREPORT_MP = audit_type
+
+    def test_xform_normal_major_program(self):
+        """Test for normal major program"""
+        audits = [self.AuditMock("Y", "U")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "Y")
+
+    def test_xform_missing_major_program_with_audit_type(self):
+        """Test for missing major program with audit type provided"""
+        audits = [self.AuditMock("", "U")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "Y")
+
+    def test_xform_missing_major_program_without_audit_type(self):
+        """Test for missing major program without audit type provided"""
+        audits = [self.AuditMock("", "")]
+
+        xform_missing_major_program(audits)
+
+        self.assertEqual(audits[0].MAJORPROGRAM, "N")
+
+
+class TestXformMissingProgramName(SimpleTestCase):
+    class AuditMock:
+        def __init__(self, program_name):
+            self.FEDERALPROGRAMNAME = program_name
+
+    def test_with_normal_program_name(self):
+        """Test for missing program name"""
+        audits = [self.AuditMock("Some fake name")]
+
+        xform_program_name(audits)
+
+        self.assertEqual(audits[0].FEDERALPROGRAMNAME, "Some fake name")
+
+    def test_with_missing_program_name(self):
+        """Test for missing program name"""
+        audits = [self.AuditMock("")]
+
+        xform_program_name(audits)
+
+        self.assertEqual(audits[0].FEDERALPROGRAMNAME, settings.GSA_MIGRATION)
+
+
+class TestXformClusterNames(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, cluster_name):
+            self.CLUSTERNAME = cluster_name
+
+    def test_cluster_name_not_other_cluster(self):
+        audits = []
+        audits.append(self.MockAudit("STUDENT FINANCIAL ASSISTANCE"))
+        audits.append(self.MockAudit("RESEARCH AND DEVELOPMENT"))
+        result = xform_cluster_names(audits)
+        for index in range(len(result)):
+            self.assertEqual(result[index].CLUSTERNAME, audits[index].CLUSTERNAME)
+
+    def test_cluster_name_other_cluster(self):
+        audits = []
+        audits.append(self.MockAudit("OTHER CLUSTER"))
+        audits.append(self.MockAudit("OTHER CLUSTER"))
+        result = xform_cluster_names(audits)
+        for audit in result:
+            self.assertEqual(audit.CLUSTERNAME, settings.OTHER_CLUSTER)
+
+
+class TestXformReplaceInvalidDirectAwardFlag(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, direct_flag):
+            self.DIRECT = direct_flag
+
+    def test_replace_invalid_direct_award_flag(self):
+        audits = [self.MockAudit("Y"), self.MockAudit("N"), self.MockAudit("Y")]
+        passthrough_names = [
+            "some name",
+            "some other name",
+            "",
+        ]
+
+        results = xform_replace_invalid_direct_award_flag(audits, passthrough_names)
+        # Expect first audit DIRECT flag to be replaced with default
+        self.assertEqual(results[0], settings.GSA_MIGRATION)
+        # Expect second audit DIRECT flag to remain unchanged
+        self.assertEqual(results[1], "N")
+        # Expect third audit DIRECT flag to remain unchanged
+        self.assertEqual(results[2], "Y")
+
+
+class TestXformSanitizeAdditionalAwardIdentification(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, value):
+            self.AWARDIDENTIFICATION = value
+
+    def test_sanitize_valid(self):
+        audits = [self.MockAudit('=""12345"'), self.MockAudit("text")]
+        identifications = ['=""12345"', "text"]
+        expected = ["12345", "text"]
+        result = xform_sanitize_additional_award_identification(audits, identifications)
+        self.assertEqual(result, expected)
+
+    def test_empty_and_none_identifications(self):
+        audits = [self.MockAudit(""), self.MockAudit(None), self.MockAudit('=""12345"')]
+        identifications = ["", None, '=""12345"']
+        expected = ["", None, "12345"]
+        result = xform_sanitize_additional_award_identification(audits, identifications)
+        self.assertEqual(result, expected)
+
+
+class TestTrackInvalidFederalProgramTotal(SimpleTestCase):
+    class MockAudit:
+        def __init__(self, PROGRAMTOTAL, AMOUNT):
+            self.PROGRAMTOTAL = PROGRAMTOTAL
+            self.AMOUNT = AMOUNT
+
+    def setUp(self):
+        self.audits = [
+            self.MockAudit(PROGRAMTOTAL="100", AMOUNT="50"),
+            self.MockAudit(PROGRAMTOTAL="200", AMOUNT="200"),
+            self.MockAudit(PROGRAMTOTAL="150", AMOUNT="100"),
+        ]
+        self.cfda_key_values = ["1234", "5678", "1234"]
+
+        # Reset InvalidRecord before each test
+        InvalidRecord.reset()
+
+    def test_track_invalid_federal_program_total(self):
+        """Test for invalid federal program total"""
+
+        track_invalid_federal_program_total(self.audits, self.cfda_key_values)
+
+        # Check the results in InvalidRecord
+        self.assertEqual(len(InvalidRecord.fields["federal_award"]), 1)
+        self.assertIn(
+            "federal_program_total_is_correct",
+            InvalidRecord.fields["validations_to_skip"],
+        )
+        self.assertIn(
+            INVALID_MIGRATION_TAGS.INVALID_FEDERAL_PROGRAM_TOTAL,
+            InvalidRecord.fields["invalid_migration_tag"],
+        )
+
+    def test_no_invalid_federal_program_total(self):
+        # Adjust mock data for no invalid records
+        self.audits = [
+            self.MockAudit(PROGRAMTOTAL="150", AMOUNT="50"),
+            self.MockAudit(PROGRAMTOTAL="200", AMOUNT="200"),
+            self.MockAudit(PROGRAMTOTAL="150", AMOUNT="100"),
+        ]
+
+        track_invalid_federal_program_total(self.audits, self.cfda_key_values)
+
+        # Check that no invalid records are added
+        self.assertEqual(len(InvalidRecord.fields["federal_award"]), 0)
+        self.assertNotIn(
+            "federal_program_total_is_correct",
+            InvalidRecord.fields["validations_to_skip"],
+        )
+        self.assertNotIn
+
+
+class TestTrackInvalidNumberOfAuditFindings(TestCase):
+
+    class MockAudit:
+        def __init__(self, elec_audits_id, findings_count):
+            self.ELECAUDITSID = elec_audits_id
+            self.FINDINGSCOUNT = findings_count
+
+    class MockFinding:
+        def __init__(self, elec_audits_id):
+            self.ELECAUDITSID = elec_audits_id
+
+    class MockAuditHeader:
+        def __init__(self, dbkey, audityear):
+            self.DBKEY = dbkey
+            self.AUDITYEAR = audityear
+
+    def setUp(self):
+
+        InvalidRecord.reset()
+
+    @patch("census_historical_migration.workbooklib.federal_awards.get_findings")
+    def test_track_invalid_number_of_audit_findings(self, mock_get_findings):
+        """Test tracking for invalid number of audit findings"""
+        # Mock the findings and audits data
+        mock_findings = [
+            self.MockFinding("audit1"),
+            self.MockFinding("audit1"),
+        ]
+
+        mock_audits = [
+            self.MockAudit("audit1", "2"),
+            self.MockAudit("audit2", "1"),
+        ]
+
+        mock_audit_header = self.MockAuditHeader("some_dbkey", "2024")
+
+        mock_get_findings.return_value = mock_findings
+
+        track_invalid_number_of_audit_findings(mock_audits, mock_audit_header)
+        mock_get_findings.assert_called_once_with("some_dbkey", "2024")
+        # Check if the invalid records were appended correctly
+        expected_invalid_records = [
+            [
+                {
+                    "census_data": [
+                        {"column": "ELECAUDITSID", "value": "audit1"},
+                        {"column": "FINDINGSCOUNT", "value": "2"},
+                    ],
+                    "gsa_fac_data": {"field": "findings_count", "value": "2"},
+                },
+                {
+                    "census_data": [
+                        {"column": "ELECAUDITSID", "value": "audit2"},
+                        {"column": "FINDINGSCOUNT", "value": "1"},
+                    ],
+                    "gsa_fac_data": {"field": "findings_count", "value": "0"},
+                },
+            ]
+        ]
+
+        for expected_record in expected_invalid_records:
+            self.assertIn(expected_record, InvalidRecord.fields["federal_award"])
+
+    @patch("census_historical_migration.workbooklib.federal_awards.get_findings")
+    def test_no_tracking_with_valid_number_of_audit_findings(self, mock_get_findings):
+        """Test no tracking for valid number of audit findings"""
+        # Mock the findings and audits data
+        mock_findings = [
+            self.MockFinding("audit1"),
+            self.MockFinding("audit1"),
+        ]
+
+        mock_audits = [
+            self.MockAudit("audit1", "2"),
+        ]
+
+        mock_audit_header = self.MockAuditHeader("some_dbkey", "2024")
+        mock_get_findings.return_value = mock_findings
+
+        track_invalid_number_of_audit_findings(mock_audits, mock_audit_header)
+
+        mock_get_findings.assert_called_once_with("some_dbkey", "2024")
+        self.assertEqual(len(InvalidRecord.fields["federal_award"]), 0)
+
+
+class TestXformMissingPrefix(SimpleTestCase):
+    class MockAudit:
+
+        def __init__(self, CFDA_PREFIX, CFDA):
+            self.CFDA_PREFIX = CFDA_PREFIX
+            self.CFDA = CFDA
+
+    def test_for_no_missing_prefix(self):
+        """Test for no missing prefix"""
+        audits = [self.MockAudit("01", "01.123"), self.MockAudit("02", "02.456")]
+
+        xform_replace_missing_prefix(audits)
+
+        self.assertEqual(audits[0].CFDA_PREFIX, "01")
+        self.assertEqual(audits[1].CFDA_PREFIX, "02")
+
+    def test_for_missing_prefix(self):
+        """Test for missing prefix"""
+        audits = [self.MockAudit("", "01.123"), self.MockAudit("02", "02.456")]
+
+        xform_replace_missing_prefix(audits)
+
+        self.assertEqual(audits[0].CFDA_PREFIX, "01")
+        self.assertEqual(audits[1].CFDA_PREFIX, "02")
+
+
+class TestXformReplaceMissingFields(SimpleTestCase):
+
+    class MockAudit:
+
+        def __init__(
+            self,
+            LOANS,
+            DIRECT,
+        ):
+            self.LOANS = LOANS
+            self.DIRECT = DIRECT
+
+    def test_replace_empty_fields(self):
+        audits = [
+            self.MockAudit(
+                LOANS="",
+                DIRECT="",
+            ),
+            self.MockAudit(
+                LOANS="Present",
+                DIRECT="Present",
+            ),
+        ]
+
+        xform_replace_required_values_with_gsa_migration_when_empty(audits)
+
+        self.assertEqual(audits[0].LOANS, settings.GSA_MIGRATION)
+        self.assertEqual(audits[0].DIRECT, settings.GSA_MIGRATION)
+
+        self.assertEqual(audits[1].LOANS, "Present")
+        self.assertEqual(audits[1].DIRECT, "Present")

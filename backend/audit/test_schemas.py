@@ -42,7 +42,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
     """
 
     GENERAL_INFO_SCHEMA = json.loads(
-        (SECTION_SCHEMA_DIR / "GeneralInformation.schema.json").read_text(
+        (SECTION_SCHEMA_DIR / "GeneralInformationRequired.schema.json").read_text(
             encoding="utf-8"
         )
     )
@@ -72,7 +72,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
         self.assertRaisesRegex(
             exceptions.ValidationError,
-            "'' was expected",  # Value also accepts a blank string, so this error comes back.
+            "'not a date' is not a 'date'",
             validate,
             simple_case,
             schema,
@@ -91,22 +91,11 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
         self.assertRaisesRegex(
             exceptions.ValidationError,
-            "'' was expected",  # Value also accepts a blank string, so this error comes back.
+            "'not a date' is not a 'date'",
             validate,
             simple_case,
             schema,
         )
-
-    def test_null_auditee_name(self):
-        """
-        If the auditee_name is null, validation should pass
-        """
-        schema = self.GENERAL_INFO_SCHEMA
-        instance = jsoncopy(self.SIMPLE_CASE)
-
-        instance["auditee_name"] = ""
-
-        validate(instance, schema)
 
     def test_invalid_ein(self):
         """
@@ -129,7 +118,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                 with self.assertRaisesRegex(
                     exceptions.ValidationError,
-                    "is not valid",
+                    "is not valid under any of the given schemas",
                     msg=f"ValidationError not raised with EIN = {bad_ein}",
                 ):
                     validate(instance, schema)
@@ -257,7 +246,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        "is not valid",
+                        "is not valid under any of the given schemas",
                         msg=f"ValidationError not raised with zip = {bad_zip}",
                     ):
                         validate(instance, schema)
@@ -290,7 +279,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        "is not valid",
+                        "is not valid under any of the given schemas",
                         msg=f"ValidationError not raised with zip = {bad_zip}",
                     ):
                         validate(instance, schema)
@@ -353,7 +342,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        "is not valid",
+                        "does not match",
                         msg=f"ValidationError not raised with phone = {bad_phone}",
                     ):
                         validate(instance, schema)

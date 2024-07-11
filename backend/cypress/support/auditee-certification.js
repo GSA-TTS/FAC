@@ -15,4 +15,4 @@ export function testAuditeeCertification() {
   cy.get('#auditee_title').type('Auditee');
   cy.get('#auditee_certification_date_signed').type("01/01/2022");
   cy.get('.usa-button').contains('Agree to auditee certification').click();
-}
+};

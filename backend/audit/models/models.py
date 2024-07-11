@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone as django_timezone
 
 from django_fsm import FSMField, RETURN_VALUE, transition
 
@@ -692,3 +693,88 @@ class SingleAuditReportFile(models.Model):
             )
 
         super().save(*args, **kwargs)
+
+
+class UeiValidationWaiver(models.Model):
+    """Records of UEIs that are permitted to be inactive."""
+
+    uei = models.TextField("UEI", unique=True)
+    timestamp = (
+        models.DateTimeField(
+            "When the waiver was created",
+            default=datetime.now(timezone.utc),
+        ),
+    )
+    expiration = (
+        models.DateTimeField(
+            "When the waiver expires",
+        ),
+    )
+    approver_email = models.TextField(
+        "Email address of FAC staff member approving the waiver",
+    )
+    approver_name = models.TextField(
+        "Name of FAC staff member approving the waiver",
+    )
+    requester_email = models.TextField(
+        "Email address of NSAC/KSAML requesting the waiver",
+    )
+    requester_name = models.TextField(
+        "Name of NSAC/KSAML requesting the waiver",
+    )
+    justification = models.TextField(
+        "Brief plain-text justification for the waiver",
+    )
+
+
+class SacValidationWaiver(models.Model):
+    """Records of reports that have had a requirement waived."""
+
+    class TYPES:
+        AUDITEE_CERTIFYING_OFFICIAL = "auditee_certifying_official"
+        AUDITOR_CERTIFYING_OFFICIAL = "auditor_certifying_official"
+
+    WAIVER_CHOICES = [
+        (
+            TYPES.AUDITEE_CERTIFYING_OFFICIAL,
+            "No auditee certifying official is available",
+        ),
+        (
+            TYPES.AUDITOR_CERTIFYING_OFFICIAL,
+            "No auditor certifying official is available",
+        ),
+    ]
+    report_id = models.ForeignKey(
+        "SingleAuditChecklist",
+        help_text="The report that the waiver applies to",
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
+    )
+    timestamp = models.DateTimeField(
+        "When the waiver was created",
+        default=django_timezone.now,
+    )
+    approver_email = models.TextField(
+        "Email address of FAC staff member approving the waiver",
+    )
+    approver_name = models.TextField(
+        "Name of FAC staff member approving the waiver",
+    )
+    requester_email = models.TextField(
+        "Email address of NSAC/KSAML requesting the waiver",
+    )
+    requester_name = models.TextField(
+        "Name of NSAC/KSAML requesting the waiver",
+    )
+    justification = models.TextField(
+        "Brief plain-text justification for the waiver",
+    )
+    waiver_types = ArrayField(
+        models.CharField(
+            max_length=50,
+            choices=WAIVER_CHOICES,
+        ),
+        verbose_name="The waiver type",
+        default=list,
+    )

@@ -79,6 +79,17 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
         ws.cell(row=row, column=col, value=converted_value)
 
 
+def get_range_values(in_db_name, records, default, conversion_fun):
+    """Helper to get a range of values."""
+    values = map(lambda r: getattr(r, in_db_name), records)
+    values_in_worksheet = []
+    for value in values:
+        converted_value = apply_conversion_function(value, default, conversion_fun)
+        values_in_worksheet.append(converted_value)
+
+    return values_in_worksheet
+
+
 def apply_conversion_function(value, default, conversion_function):
     """
     Helper to apply a conversion function to a value, or use a default value
@@ -218,6 +229,22 @@ def track_transformations(
             "census_data": census_data,
             "gsa_fac_data": gsa_fac_data,
             "transformation_functions": transformation_functions,
+        }
+    )
+
+
+def track_invalid_records(census_data_tuples, gsa_field, gsa_value, records):
+    """Track invalid records."""
+    census_data = []
+    for census_column, census_value in census_data_tuples:
+        census_data.append(
+            CensusRecord(column=census_column, value=census_value).to_dict()
+        )
+    gsa_fac_data = GsaFacRecord(field=gsa_field, value=gsa_value).to_dict()
+    records.append(
+        {
+            "census_data": census_data,
+            "gsa_fac_data": gsa_fac_data,
         }
     )
 

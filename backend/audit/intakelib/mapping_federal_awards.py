@@ -35,7 +35,7 @@ from .transforms import run_all_federal_awards_transforms
 logger = logging.getLogger(__name__)
 
 
-def extract_federal_awards(file, is_gsa_migration=False):
+def extract_federal_awards(file, is_gsa_migration=False, auditee_uei=None):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / FEDERAL_AWARDS_TEMPLATE_DEFINITION
     )
@@ -50,7 +50,9 @@ def extract_federal_awards(file, is_gsa_migration=False):
     )
 
     ir = extract_workbook_as_ir(file)
-    run_all_general_checks(ir, FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED, is_gsa_migration)
+    run_all_general_checks(
+        ir, FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED, is_gsa_migration, auditee_uei
+    )
     new_ir = run_all_federal_awards_transforms(ir)
     run_all_federal_awards_checks(new_ir, is_gsa_migration)
     result = _extract_generic_data(new_ir, params)

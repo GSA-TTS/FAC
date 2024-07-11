@@ -74,6 +74,12 @@ variable "clamav_instances" {
   default     = 1
 }
 
+variable "clamav_fs_instances" {
+  type        = number
+  description = "the number of instances of the clamav application to run (default: 1)"
+  default     = 1
+}
+
 variable "clamav_memory" {
   type        = number
   description = "memory in MB to allocate to clamav app"
@@ -88,4 +94,19 @@ variable "new_relic_license_key" {
 variable "pgrst_jwt_secret" {
   type        = string
   description = "the JWT signing secret for validating JWT tokens from api.data.gov"
+}
+
+variable "json_params" {
+  type        = string
+  description = "Optional parameters used for service instance (-c)"
+}
+
+variable "new_relic_account_id" {
+  type        = number
+  description = "New Relic Account ID"
+}
+
+variable "new_relic_api_key" {
+  type        = string
+  description = "New Relic API key"
 }

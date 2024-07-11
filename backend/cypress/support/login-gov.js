@@ -4,8 +4,8 @@ const LOGIN_TEST_PASSWORD = Cypress.env('LOGIN_TEST_PASSWORD');
 const LOGIN_TEST_OTP_SECRET = Cypress.env('LOGIN_TEST_OTP_SECRET');
 
 export function testLoginGovLogin(
-  email=LOGIN_TEST_EMAIL, password=LOGIN_TEST_PASSWORD, secret=LOGIN_TEST_OTP_SECRET) {
-  cy.get('a.usa-button.sign-in-button').click();
+  email = LOGIN_TEST_EMAIL, password = LOGIN_TEST_PASSWORD, secret = LOGIN_TEST_OTP_SECRET) {
+  cy.get('a.usa-link[href="/openid/login/"][role="button"]').click();
   cy.get('button.usa-button.sign-in-button')
     .should('contain.text', 'Authenticate with Login.gov')
     .click();
@@ -27,7 +27,10 @@ export function testLoginGovLogin(
       });
       cy.get('lg-submit-button > .usa-button').click();
       cy.url().then((url) => {
-        if (url.match(/\/sign_up\/completed$/)) {
+        if (url.match(/\/login\/piv_cac_recommended$/)) {
+          // Handle the case where the page redirects to piv_cac_recommended
+          cy.get('button.usa-button.usa-button--unstyled[type="submit"]:contains("Skip")').click();
+        } else if (url.match(/\/sign_up\/completed$/)) {
           // Login's additional data sharing consent
           cy.get('button:contains("Agree and continue")').click();
         }
@@ -35,4 +38,4 @@ export function testLoginGovLogin(
     }
   );
   cy.url().should('match', /\/audit\/$/);
-}
+};

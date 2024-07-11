@@ -63,8 +63,8 @@ local NumberValidation = {
 local ReferenceNumberValidation = {
   type: 'custom',
   //It is neccessary to allow blank otherwise user cannot delete the value
-  formula1: '=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = "20", (MID(FIRSTCELLREF, 3, 1) * 1) > 0, ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = "-", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))',
-  custom_error: 'Expecting a value in the format YYYY-NNN, where YYYY is a year after 2010 and NNN a three digit number (e.g. 2023-001)',
+  formula1: '=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, (LEFT(FIRSTCELLREF, 2)*1) > 18, ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = "-", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))',
+  custom_error: 'Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)',
   custom_title: 'Reference number',
 };
 
@@ -86,8 +86,8 @@ local LoanBalanceValidation = {
 
 local AwardReferenceValidation = {
   type: 'custom',
-  formula1: '=AND(LEN(FIRSTCELLREF)=10, LEFT(FIRSTCELLREF, 6)="AWARD-", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 4))), NOT(FIRSTCELLREF="AWARD-0000"))',
-  custom_error: 'The value should follow the pattern AWARD-#### (where #### is a four-digit number).',
+  formula1: '=AND(LEN(FIRSTCELLREF)=11, LEFT(FIRSTCELLREF, 6)="AWARD-", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 5))), NOT(FIRSTCELLREF="AWARD-00000"))',
+  custom_error: 'The value should follow the pattern AWARD-##### (where ##### is a five-digit number).',
   custom_title: 'Award Reference validation',
 };
 
@@ -107,11 +107,11 @@ local AwardReferenceValidation = {
   // These were expressed with a single `:`. I was getting errors.
   // I replaced the single with a `::`. There is a semantic difference.
   // (It means it is a hidden field.) I don't think we want functions
-  // manifested in the JSON. They... shouldn't be, but it was popping up. 
+  // manifested in the JSON. They... shouldn't be, but it was popping up.
   AuditReportTypeValidation(namedRange) :: {
     type: 'list',
-    allow_blank: 'True', 
-    formula1: '=IF(S{0}="Y",' + namedRange + ',"")', 
+    allow_blank: 'True',
+    formula1: '=IF(S{0}="Y",' + namedRange + ',"")',
     custom_error: 'The Audit Report Type must be empty if Major Program is "N"',
     custom_title: 'Invalid Audit Report Type',
   },
@@ -119,14 +119,12 @@ local AwardReferenceValidation = {
     type: 'list',
     formula1: '=Y{0}:Y{0}',
     errorStyle: 'warning',
-    custom_error: 'If known, the Program Name should have been provided for you. ' +
-                  'Please do not change the Program Name unless absolutely necessary ' +
-                  'or the Program Name is unknown. The Program Name must be 300 characters or less. ' +
+    custom_error: 'If the Program Name was provided, please, do not change it unless necessary or unknown. ' +
+                  'The Program Name must be under 300 characters. ' +
                   'If the drop-down menu is empty, you may need to enter an Agency Prefix ' +
-                  'and ALN in columns B and C.' +
-                  'Continue?',    
+                  'and ALN in columns B and C.',
     custom_title: 'Unknown Federal Program Name',
-  },  
+  },
   YoNoBValidation: YoNoBValidation,
   AwardReferenceValidation: AwardReferenceValidation,
 }

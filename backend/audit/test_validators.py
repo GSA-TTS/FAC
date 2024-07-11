@@ -31,6 +31,8 @@ from .validators import (
     MAX_EXCEL_FILE_SIZE_MB,
     validate_additional_ueis_json,
     validate_additional_eins_json,
+    validate_general_information_schema,
+    validate_general_information_schema_rules,
     validate_notes_to_sefa_json,
     validate_corrective_action_plan_json,
     validate_file_content_type,
@@ -882,7 +884,7 @@ class AuditInformationTests(SimpleTestCase):
     def test_no_errors_when_audit_information_is_valid(self):
         """No errors should be raised when audit information is valid"""
         for case in self.SIMPLE_CASES:
-            validate_audit_information_json(case)
+            validate_audit_information_json(case, False)
 
     def test_error_raised_for_missing_required_fields_with_not_gaap(self):
         """Test that missing certain fields raises a validation error when 'gaap_results' contains 'not_gaap'."""
@@ -893,14 +895,24 @@ class AuditInformationTests(SimpleTestCase):
         ]:
             case = jsoncopy(self.SIMPLE_CASES[1])
             del case[required_field]
-            self.assertRaises(ValidationError, validate_audit_information_json, case)
+            self.assertRaises(
+                ValidationError, validate_audit_information_json, case, False
+            )
 
     def test_error_raised_for_missing_required_fields(self):
         """Test that missing required fields raises a validation error."""
         for key in self.SIMPLE_CASES[0].keys():
             case = jsoncopy(self.SIMPLE_CASES[0])
             del case[key]
-            self.assertRaises(ValidationError, validate_audit_information_json, case)
+            self.assertRaises(
+                ValidationError, validate_audit_information_json, case, False
+            )
+
+    def test_gsa_migration(self):
+        case = jsoncopy(self.SIMPLE_CASES[1])
+        case["is_sp_framework_required"] = ""
+        case["is_low_risk_auditee"] = ""
+        self.assertRaises(ValidationError, validate_audit_information_json, case, True)
 
 
 class TribalAccessTests(SimpleTestCase):
@@ -930,9 +942,9 @@ class TribalAccessTests(SimpleTestCase):
         """Test that wrong value types raise a validation error."""
         for case in self.SIMPLE_CASES:
             case_copy = jsoncopy(case)
-            case_copy[
-                "is_tribal_information_authorized_to_be_public"
-            ] = "incorrect_type"
+            case_copy["is_tribal_information_authorized_to_be_public"] = (
+                "incorrect_type"
+            )
 
             with self.assertRaises(ValidationError):
                 validate_tribal_data_consent_json(case_copy)
@@ -994,3 +1006,248 @@ class GeneralInformationTests(SimpleTestCase):
 
         with self.assertRaises(ValidationError):
             validate_general_information_json(gen_info, False)
+
+
+class TestValidateGeneralInformation(SimpleTestCase):
+    def setUp(self):
+        """Set up common test data"""
+        # Example general information that matches the schema
+        self.valid_general_information = {
+            "audit_period_covered": "annual",
+            "auditor_country": "USA",
+            "ein": "123456789",
+            "audit_type": "single-audit",
+            "auditee_uei": "AQDDHJH47DW7",
+            "auditee_zip": "12345",
+            "auditor_ein": "123456789",
+            "auditor_zip": "12345",
+            "auditee_city": "Washington",
+            "auditee_name": "Auditee Name",
+            "auditor_city": "Washington",
+            "is_usa_based": True,
+            "auditee_email": "auditee@email.com",
+            "auditee_phone": "1234567890",
+            "auditee_state": "DC",
+            "auditor_email": "auditor@email.com",
+            "auditor_phone": "1234567890",
+            "auditor_state": "DC",
+            "auditor_country": "USA",
+            "auditor_firm_name": "Auditor Firm Name",
+            "audit_period_covered": "annual",
+            "auditee_contact_name": "Auditee Contact Name",
+            "auditor_contact_name": "Auditor Contact Name",
+            "auditee_contact_title": "Auditee Contact Title",
+            "auditor_contact_title": "Auditor Contact Title",
+            "multiple_eins_covered": False,
+            "multiple_ueis_covered": False,
+            "auditee_address_line_1": "Auditee Address Line 1",
+            "auditor_address_line_1": "Auditor Address Line 1",
+            "met_spending_threshold": True,
+            "secondary_auditors_exist": False,
+            "audit_period_other_months": "",
+            "auditee_fiscal_period_end": "2023-12-31",
+            "ein_not_an_ssn_attestation": False,
+            "auditee_fiscal_period_start": "2023-01-01",
+            "auditor_international_address": "",
+            "user_provided_organization_type": "state",
+            "auditor_ein_not_an_ssn_attestation": False,
+        }
+
+        self.invalid_fiscal_period_end = self.valid_general_information | {
+            "auditee_fiscal_period_end": "Not a date",
+        }
+
+        self.wrong_fiscal_period_end_format = self.valid_general_information | {
+            "auditee_fiscal_period_end": "2023-31-12",
+        }
+
+        self.invalid_auditee_uei = self.valid_general_information | {
+            "auditee_uei": "Invalid",
+        }
+
+        self.invalid_audit_period_other_months = self.valid_general_information | {
+            "audit_period_other_months": "Invalid",
+        }
+
+        self.unexpected_state_and_zip = self.valid_general_information | {
+            "auditor_state": "DC",
+            "auditor_zip": "12345",
+            "auditor_country": "",
+        }
+
+        self.unexpected_audit_period_other_months = self.valid_general_information | {
+            "audit_period_covered": "annual",
+            "audit_period_other_months": "12",
+        }
+
+        self.missing_audit_period_other_months = self.valid_general_information | {
+            "audit_period_covered": "other",
+            "audit_period_other_months": "",
+        }
+
+        self.missing_state_and_zip = self.valid_general_information | {
+            "auditor_state": "",
+            "auditor_zip": "",
+            "auditee_country": "USA",
+        }
+
+        self.invalid_state_and_zip = self.valid_general_information | {
+            "auditor_state": "Not a state",
+            "auditor_zip": "Not a zip",
+        }
+
+        self.invalid_phone = self.valid_general_information | {
+            "auditor_phone": "123-456-789",
+        }
+
+        self.invalid_email = self.valid_general_information | {
+            "auditor_email": "auditor.email.com",
+        }
+
+        self.invalid_audit_period_covered = self.valid_general_information | {
+            "audit_period_covered": "Invalid",
+        }
+
+        character_limits = settings.CHARACTER_LIMITS_GENERAL
+
+        self.too_short_emails = self.valid_general_information | {
+            "auditee_email": "a@b",
+            "auditor_email": "a@b",
+        }
+
+        self.too_long_emails = self.valid_general_information | {
+            "auditee_email": "a" * character_limits["auditee_email"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_email": "a" * character_limits["auditor_email"]["max"]
+            + "NowItIsDefinitelyTooLong",
+        }
+
+        self.too_short_addresses = self.valid_general_information | {
+            "auditee_address_line_1": "a",
+            "auditee_city": "a",
+        }
+
+        self.too_long_addresses = self.valid_general_information | {
+            "auditee_address_line_1": "a"
+            * character_limits["auditee_address_line_1"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_city": "a" * character_limits["auditee_city"]["max"]
+            + "NowItIsDefinitelyTooLong",
+        }
+
+        self.too_short_names = self.valid_general_information | {
+            "auditee_name": "a",
+            "auditee_certify_name": "a",
+            "auditee_certify_title": "a",
+            "auditee_contact_name": "a",
+            "auditor_firm_name": "a",
+            "auditor_contact_title": "a",
+            "auditor_contact_name": "a",
+        }
+
+        self.too_long_names = self.valid_general_information | {
+            "auditee_name": "a" * character_limits["auditee_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_certify_name": "a"
+            * character_limits["auditee_certify_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_certify_title": "a"
+            * character_limits["auditee_certify_title"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditee_contact_name": "a"
+            * character_limits["auditee_contact_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_firm_name": "a" * character_limits["auditor_firm_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_contact_title": "a"
+            * character_limits["auditor_contact_title"]["max"]
+            + "NowItIsDefinitelyTooLong",
+            "auditor_contact_name": "a"
+            * character_limits["auditor_contact_name"]["max"]
+            + "NowItIsDefinitelyTooLong",
+        }
+
+    def test_validate_general_information_schema_with_valid_data(self):
+        """
+        Test the validation method with valid general information data.
+        """
+        try:
+            validate_general_information_schema(self.valid_general_information)
+        except ValidationError:
+            self.fail(
+                "validate_general_information_schema raised ValidationError unexpectedly!"
+            )
+
+    def test_validate_general_information_schema_with_invalid_data(self):
+        """
+        Test the validation method with invalid general information data.
+        """
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.invalid_fiscal_period_end)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.wrong_fiscal_period_end_format)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.invalid_auditee_uei)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.invalid_audit_period_other_months)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.invalid_state_and_zip)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.invalid_phone)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.invalid_email)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.invalid_audit_period_covered)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_short_emails)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_long_emails)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_short_addresses)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_long_addresses)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_short_names)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema(self.too_long_names)
+
+    def test_validate_general_information_schema_rules_with_valid_data(self):
+        """
+        Test the validation method with valid general information data.
+        """
+        try:
+            validate_general_information_schema_rules(self.valid_general_information)
+        except ValidationError:
+            self.fail(
+                "validate_general_information_schema_rules raised ValidationError unexpectedly!"
+            )
+
+    def test_validate_general_information_schema_rules_with_invalid_data(self):
+        """
+        Test the validation method with invalid general information data.
+        """
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema_rules(self.unexpected_state_and_zip)
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema_rules(
+                self.unexpected_audit_period_other_months
+            )
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema_rules(
+                self.missing_audit_period_other_months
+            )
+        with self.assertRaises(ValidationError):
+            validate_general_information_schema_rules(self.missing_state_and_zip)
+
+    def tes_validate_general_information_json(self):
+        """
+        Test the validation method with valid general information data.
+        """
+        try:
+            validate_general_information_json(
+                self.valid_general_information, is_data_migration=False
+            )
+        except ValidationError:
+            self.fail(
+                "validate_general_information_json raised ValidationError unexpectedly!"
+            )

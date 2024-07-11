@@ -3,6 +3,7 @@
 We want to create a variety of SACs in different states of
 completion.
 """
+
 from datetime import timedelta
 import logging
 from pathlib import Path
@@ -146,6 +147,7 @@ def _fake_general_information(dbkey, auditee_name="DEFAULT AUDITEE"):
         "auditor_ein_not_an_ssn_attestation": True,
         "auditor_email": gobj.cpaemail if gobj.cpaemail else "noemailfound@noemail.com",
         "auditor_firm_name": gobj.cpafirmname,
+        "auditor_international_address": "",
         "auditor_phone": gobj.cpaphone,
         # TODO: when we include territories in our valid states, remove this restriction
         "auditor_state": gobj.cpastate,
@@ -196,23 +198,23 @@ def _fake_audit_information(dbkey, auditee_name=None):
         ),
         "dollar_threshold": 750000,
         "gaap_results": list(gaap_results.keys()),
-        "is_aicpa_audit_guide_included": True
-        if gobj.reportablecondition == "Y"
-        else False,
+        "is_aicpa_audit_guide_included": (
+            True if gobj.reportablecondition == "Y" else False
+        ),
         "is_going_concern_included": True if gobj.goingconcern == "Y" else False,
-        "is_internal_control_deficiency_disclosed": True
-        if gobj.materialweakness == "Y"
-        else False,
-        "is_internal_control_material_weakness_disclosed": True
-        if gobj.materialweakness_mp == "Y"
-        else False,
+        "is_internal_control_deficiency_disclosed": (
+            True if gobj.materialweakness == "Y" else False
+        ),
+        "is_internal_control_material_weakness_disclosed": (
+            True if gobj.materialweakness_mp == "Y" else False
+        ),
         "is_low_risk_auditee": False,
-        "is_material_noncompliance_disclosed": True
-        if gobj.materialnoncompliance == "Y"
-        else False,
+        "is_material_noncompliance_disclosed": (
+            True if gobj.materialnoncompliance == "Y" else False
+        ),
     }
 
-    audit.validators.validate_audit_information_json(audit_information)
+    audit.validators.validate_audit_information_json(audit_information, False)
 
     return audit_information
 

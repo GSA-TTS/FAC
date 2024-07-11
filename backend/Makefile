@@ -10,7 +10,7 @@ compile:
 	@pip-compile --generate-hashes ./requirements/requirements.in -o requirements.txt --allow-unsafe
 
 compile-assets:
-	@node build-assets.js
+	@node build-assets.mjs
 
 # Generate an updated dev-requirements.txt
 compile-dev:
@@ -39,7 +39,7 @@ lint:
 	@echo "djlint:"
 	@djlint .
 	@echo eslint
-	@npx eslint --ignore-path ../.gitignore static/js
+	@npx eslint
 
 # Run Django tests:
 test:
@@ -90,7 +90,7 @@ docker-lint:
 ghcr-first-run:
 	docker compose -f docker-compose-web.yml run web python manage.py makemigrations
 	docker compose -f docker-compose-web.yml run web python manage.py migrate
-	docker compose -f docker-compose-web.yml run web python manage.py load_test_data
+	docker compose -f docker-compose-web.yml run web python manage.py loaddata
 
 # Run Django tests with docker
 ghcr-test:

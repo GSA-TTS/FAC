@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.postgres.forms import SimpleArrayField
+from audit.models import SacValidationWaiver
 from config.settings import (
     AGENCY_NAMES,
     GAAP_RESULTS,
@@ -78,6 +80,7 @@ class AuditorCertificationStep1Form(forms.Form):
     has_used_auditors_report = forms.BooleanField()
     has_no_auditee_procedures = forms.BooleanField()
     is_FAC_releasable = forms.BooleanField()
+    is_accurate_and_complete = forms.BooleanField()
 
 
 class AuditorCertificationStep2Form(forms.Form):
@@ -125,3 +128,21 @@ class TribalAuditConsentForm(forms.Form):
 
 class UnlockAfterCertificationForm(forms.Form):
     unlock_after_certification = forms.BooleanField()
+
+
+class SacValidationWaiverForm(forms.ModelForm):
+    class MultiSelectArrayWidget(forms.SelectMultiple):
+        def __init__(self, *args, **kwargs):
+            choices = kwargs.pop("choices", [])
+            super().__init__(*args, **kwargs)
+            self.choices = choices
+
+    waiver_types = SimpleArrayField(
+        forms.ChoiceField(choices=SacValidationWaiver.WAIVER_CHOICES),
+        delimiter=",",
+        widget=MultiSelectArrayWidget(choices=SacValidationWaiver.WAIVER_CHOICES),
+    )
+
+    class Meta:
+        model = SacValidationWaiver
+        fields = "__all__"

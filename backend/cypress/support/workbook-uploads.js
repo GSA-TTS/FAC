@@ -9,13 +9,13 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
     }).as('uploadSuccess');
   } else {
     cy.intercept('POST', interceptUrl + '*').as('uploadSuccess');
-  }
+  };
 
   cy.get(uploadSelector).attachFile(filename);
   // Upload url (POST /audit/excel/workbookname) returns a redirect to "/" on successful upload. So, 302.
-  cy.wait('@uploadSuccess').should(({request, response}) => {
-    expect(response.statusCode, 'Response status code').to.equal(302);
-  });
+  cy.wait('@uploadSuccess').then((interception) => {
+    expect(interception.response.statusCode, 'Response status code').to.equal(302);
+  })
   cy.get('#info_box', { timeout: 10000 })
     .should(
       'have.text',
@@ -24,7 +24,7 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
 
   cy.get('#continue').click();
   cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
-}
+};
 
 export function testWorkbookFederalAwards(will_intercept = true) {
   testWorkbookUpload(
@@ -33,7 +33,7 @@ export function testWorkbookFederalAwards(will_intercept = true) {
     'test_workbooks/federal-awards-workbook.xlsx',
     will_intercept
   );
-}
+};
 
 export function testWorkbookNotesToSEFA(will_intercept = true) {
   testWorkbookUpload(
@@ -42,7 +42,7 @@ export function testWorkbookNotesToSEFA(will_intercept = true) {
     'test_workbooks/notes-to-sefa-workbook.xlsx',
     will_intercept
   );
-}
+};
 
 export function testWorkbookFindingsUniformGuidance(will_intercept = true) {
   testWorkbookUpload(
@@ -50,8 +50,8 @@ export function testWorkbookFindingsUniformGuidance(will_intercept = true) {
     '#file-input-audit-findings-xlsx',
     'test_workbooks/federal-awards-audit-findings-workbook.xlsx',
     will_intercept
-  )
-}
+  );
+};
 
 export function testWorkbookFindingsText(will_intercept = true) {
   testWorkbookUpload(
@@ -59,8 +59,8 @@ export function testWorkbookFindingsText(will_intercept = true) {
     '#file-input-audit-findings-text-xlsx',
     'test_workbooks/audit-findings-text-workbook.xlsx',
     will_intercept
-  )
-}
+  );
+};
 
 export function testWorkbookCorrectiveActionPlan(will_intercept = true) {
   testWorkbookUpload(
@@ -68,8 +68,8 @@ export function testWorkbookCorrectiveActionPlan(will_intercept = true) {
     '#file-input-cap-xlsx',
     'test_workbooks/corrective-action-plan-workbook.xlsx',
     will_intercept
-  )
-}
+  );
+};
 
 export function testWorkbookAdditionalUEIs(will_intercept = true) {
   testWorkbookUpload(
@@ -77,8 +77,8 @@ export function testWorkbookAdditionalUEIs(will_intercept = true) {
     '#file-input-additional-ueis-xlsx',
     'test_workbooks/additional-ueis-workbook.xlsx',
     will_intercept
-  )
-}
+  );
+};
 
 export function testWorkbookSecondaryAuditors(will_intercept = true) {
   testWorkbookUpload(
@@ -86,8 +86,8 @@ export function testWorkbookSecondaryAuditors(will_intercept = true) {
     '#file-input-secondary-auditors-xlsx',
     'test_workbooks/secondary-auditors-workbook.xlsx',
     will_intercept
-  )
-}
+  );
+};
 
 export function testWorkbookAdditionalEINs(will_intercept = true) {
   testWorkbookUpload(
@@ -95,5 +95,5 @@ export function testWorkbookAdditionalEINs(will_intercept = true) {
     '#file-input-additional-eins-xlsx',
     'test_workbooks/additional-eins-workbook.xlsx',
     will_intercept
-  )
-}
+  );
+};
