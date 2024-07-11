@@ -28,3 +28,9 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+  - package-ecosystem: "pip" # See documentation for possible values
+    directories:
+      - "/backend"
+      - "/backend/requirements"
+    schedule:
+      interval: "daily"
