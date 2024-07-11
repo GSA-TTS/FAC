@@ -29,8 +29,6 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "pip" # See documentation for possible values
-    directories:
-      - "/backend"
-      - "/backend/requirements"
+    directory: "/backend"
     schedule:
       interval: "daily"
