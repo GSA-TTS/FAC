@@ -93,8 +93,8 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       row    = 4
       column = 1
-      width  = 6
-      height = 4
+      width  = 8
+      height = 3
 
       nrql_query {
         query = "SELECT count(*) FROM Transaction FACET `request.uri` WHERE request.uri = '/openid/login/' and appName = 'gsa-fac-${var.cf_space_name}' SINCE 1 week AGO TIMESERIES"
@@ -116,8 +116,8 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       row    = 5
       column = 1
-      width  = 6
-      height = 4
+      width  = 8
+      height = 3
 
       nrql_query {
         query = "SELECT count(*) FROM Transaction FACET `request.uri` WHERE request.uri = '/openid/logout/' and appName = 'gsa-fac-${var.cf_space_name}' SINCE 1 week AGO TIMESERIES"
@@ -136,8 +136,8 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
     widget_billboard {
       title = "Infected Files Detected"
 
-      row    = 6
-      column = 1
+      row    = 4
+      column = 9
       width  = 3
       height = 3
 
@@ -151,8 +151,8 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
     widget_billboard {
       title = "Django /admin/login/ Count"
 
-      row    = 6
-      column = 4
+      row    = 5
+      column = 9
       width  = 3
       height = 3
 
@@ -166,9 +166,9 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
     widget_log_table {
       title = "${var.cf_space_name} api.sam.gov Connections"
 
-      row    = 7
+      row    = 6
       column = 1
-      width  = 6
+      width  = 8
       height = 3
 
       nrql_query {
@@ -182,7 +182,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       title = "${var.cf_space_name} api.sam.gov Connection Count"
 
       row    = 6
-      column = 7
+      column = 9
       width  = 3
       height = 3
 
@@ -196,9 +196,9 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
     widget_log_table {
       title = "${var.cf_space_name} login.gov Connections"
 
-      row    = 8
+      row    = 7
       column = 1
-      width  = 6
+      width  = 8
       height = 3
 
       nrql_query {
@@ -211,8 +211,8 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
     widget_billboard {
       title = "${var.cf_space_name} login.gov Connection Count"
 
-      row    = 8
-      column = 7
+      row    = 7
+      column = 9
       width  = 3
       height = 3
 
