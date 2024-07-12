@@ -15,6 +15,7 @@ import os
 import sys
 import logging
 import json
+from .database_url_watch_dog import check_vcap_services
 import environs
 from cfenv import AppEnv
 from audit.get_agency_names import get_agency_names, get_audit_info_lists
@@ -284,6 +285,9 @@ else:
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
+
+    check_vcap_services(vcap, env)
+
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
             # Public AWS S3 bucket for the app
