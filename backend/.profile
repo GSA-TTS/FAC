@@ -20,9 +20,6 @@ source tools/seed_cog_baseline.sh
 setup_env
 gonogo "setup_env"
 
-export DATABASE_URL="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "fac-db" ".[][] | select(.name == \$service_name) | .credentials.uri")"
-
-
 if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
 
     #####
