@@ -284,6 +284,18 @@ else:
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
+
+    uri = "postgres://postgres:password@0.0.0.0/backend"
+    for service in vcap["aws-rds"]:
+        if service["instance_name"] == "fac-db":
+            rds_creds = service["credentials"]
+            uri = rds_creds["uri"]
+            break
+
+    DATABASES = {
+        "default": uri,
+    }
+
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
             # Public AWS S3 bucket for the app
