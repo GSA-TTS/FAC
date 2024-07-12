@@ -14,10 +14,7 @@ def check_vcap_services(vcap, env):
             database_url = db_service["credentials"]["uri"]
             break
 
-    # Retrieve the app URL
-    app_url = env("DATABASE_URL")
-
-    if not database_url or database_url != app_url:
+    if not database_url or database_url != env("DATABASE_URL"):
         raise ImproperlyConfigured(
             "Database URL is not properly configured. Expected 'fac-db' URL."
         )
