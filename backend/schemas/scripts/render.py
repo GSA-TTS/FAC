@@ -557,8 +557,6 @@ def set_wb_security(wb, password):
     # I cannot prevent the sheets from unlocking.
     wb.security = WorkbookProtection(workbookPassword=password, lockStructure=True)
     wb.security.lockStructure = True
-    print(f"To unlock: {password}")
-
 
 def save_workbook(wb, basename):
     wb.save(f"{basename}")
