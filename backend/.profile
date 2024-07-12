@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Source everything; everything is now a function.
-# Remember: bash has no idea if a function exists, 
+# Remember: bash has no idea if a function exists,
 # so a typo in a function name will fail silently. Similarly,
-# bash has horrible scoping, so use of `local` in functions is 
+# bash has horrible scoping, so use of `local` in functions is
 # critical for cleanliness in the startup script.
 source tools/util_startup.sh
 # This will choose the correct environment
@@ -19,6 +19,9 @@ source tools/seed_cog_baseline.sh
 # SETUP THE CGOV ENVIRONMENT
 setup_env
 gonogo "setup_env"
+
+export DATABASE_URL="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "fac-db" ".[][] | select(.name == \$service_name) | .credentials.uri")"
+
 
 if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
 
