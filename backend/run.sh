@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Source everything; everything is now a function.
-# Remember: bash has no idea if a function exists,
+# Remember: bash has no idea if a function exists, 
 # so a typo in a function name will fail silently. Similarly,
-# bash has horrible scoping, so use of `local` in functions is
+# bash has horrible scoping, so use of `local` in functions is 
 # critical for cleanliness in the startup script.
 source tools/util_startup.sh
 # This will choose the correct environment
