@@ -126,7 +126,6 @@ INSTALLED_APPS += [
     "api",
     "users",
     "report_submission",
-    # "data_distro",
     "dissemination",
     "census_historical_migration",
     "support",
