@@ -18,8 +18,8 @@ applications:
       - route: fac-((env_name)).app.cloud.gov
     instances: ((instances))
     services:
-      - fac-snapshot-db
       - fac-db
+      - fac-snapshot-db
       - fac-public-s3
       - fac-private-s3
       - fac-key-service
