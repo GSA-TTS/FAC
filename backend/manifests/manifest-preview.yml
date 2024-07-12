@@ -18,6 +18,7 @@ applications:
       - route: fac-((env_name)).app.cloud.gov
     instances: ((instances))
     services:
+      - fac-snapshot-db
       - fac-db
       - fac-public-s3
       - fac-private-s3
@@ -26,5 +27,4 @@ applications:
       - https-proxy-creds
       - smtp-proxy-creds
       - fac-logdrain
-      - fac-snapshot-db
       - backups
