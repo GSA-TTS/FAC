@@ -13,12 +13,6 @@ source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
 source tools/seed_cog_baseline.sh
-source tools/create_fake_vcap.sh
-
-#####
-# SETUP VCAP_SERVICES
-setup_fake_vcap_services
-gonogo "setup_fake_vcap_services"
 
 #####
 # SETUP THE LOCAL ENVIRONMENT
