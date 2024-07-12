@@ -63,6 +63,7 @@ Here's a checklist to get you started and to make sure you've got access to :all
   - [ ] Practice deploying a [python application](https://github.com/cloud-gov/cf-hello-worlds/tree/main/python-flask) to Cloud.gov using the Cloud.gov command line interface (CLI): https://cloud.gov/docs/getting-started/your-first-deploy/.
   - [ ] Survey existing TTS projects which use Django+Cloud.gov like: [Tock](https://github.com/18F/tock) and the [DOJ CRT Portal](https://github.com/usdoj-crt/crt-portal).
 - [ ] Get set up for [local development](https://github.com/GSA-TTS/FAC/blob/main/docs/development.md#local-development) so you can start contributing
+- [ ] Review [NIST SP 800-161 Rev.1](https://csrc.nist.gov/pubs/sp/800/161/r1/final) on supply chain risk management. Reply to this onboarding ticket in a comment when you have completed this review.
 
 
 ## For your onboarding buddy
