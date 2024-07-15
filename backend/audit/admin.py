@@ -14,6 +14,8 @@ from audit.validators import (
     validate_auditee_certification_json,
     validate_auditor_certification_json,
 )
+from django.contrib.admin import SimpleListFilter
+from django.utils.translation import gettext_lazy as _
 
 
 class SACAdmin(admin.ModelAdmin):
@@ -93,6 +95,26 @@ class SubmissionEventAdmin(admin.ModelAdmin):
     search_fields = ("sac__report_id", "user__username")
 
 
+class WaiverTypesFilter(SimpleListFilter):
+    title = _("Waiver Types")
+    parameter_name = "waiver_types"
+
+    def lookups(self, request, model_admin):
+        waiver_types = set(
+            [
+                waiver_type
+                for waiver in SacValidationWaiver.objects.all()
+                for waiver_type in waiver.waiver_types
+            ]
+        )
+        return [(waiver_type, waiver_type) for waiver_type in waiver_types]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(waiver_types__contains=[self.value()])
+        return queryset
+
+
 class SacValidationWaiverAdmin(admin.ModelAdmin):
     form = SacValidationWaiverForm
     list_display = (
@@ -101,7 +123,7 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
         "approver_email",
         "requester_email",
     )
-    list_filter = ("timestamp", "waiver_types")
+    list_filter = ("timestamp", WaiverTypesFilter)
     search_fields = (
         "report_id__report_id",
         "approver_email",
