@@ -31,7 +31,7 @@
     "cypress-downloadfile": "^1.2.4",
     "cypress-file-upload": "^5.0.8",
     "cypress-otp": "^1.0.3",
-    "eslint": "^9.6.0",
+    "eslint": "^9.7.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-cypress": "^3.3.0",
     "eslint-plugin-prettier": "^5.1.3",
