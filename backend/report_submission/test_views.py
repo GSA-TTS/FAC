@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
@@ -323,6 +323,42 @@ class TestPreliminaryViews(TestCase):
             [
                 "Auditee fiscal period end date must be later than auditee fiscal period start date"
             ],
+        )
+
+    @patch("report_submission.forms.get_uei_info_from_sam_gov")
+    def test_step_two_auditeeinfo_future_enddate(self, mock_get_uei_info):
+        """
+        Check that the server validates that start date preceeds end date
+        """
+        mock_get_uei_info.return_value = {"valid": True}
+
+        user = baker.make(User)
+        user.profile.entry_form_data = self.step1_data
+        user.profile.save()
+        self.client.force_login(user)
+        url = reverse("report_submission:auditeeinfo")
+
+        get_response = self.client.get(url)
+        self.assertTrue(user.is_authenticated)
+        self.assertEqual(get_response.status_code, 200)
+        self.assertTemplateUsed(get_response, "report_submission/step-base.html")
+        self.assertTemplateUsed(get_response, "report_submission/step-2.html")
+
+        tomorrow = date.today() + timedelta(days=1)
+
+        data = {
+            "auditee_uei": "ZqGGHJH74DW7",
+            "auditee_fiscal_period_start": "2023-08-31",
+            "auditee_fiscal_period_end": tomorrow.strftime("%Y-%m-%d"),
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+
+        errors = response.context["form"].non_field_errors()
+        self.assertListEqual(
+            errors,
+            ["Auditee fiscal period end date must be earlier than today"],
         )
 
     def test_step_three_accessandsubmission_submission_fail(self):
