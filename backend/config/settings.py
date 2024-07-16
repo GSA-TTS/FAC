@@ -15,10 +15,11 @@ import os
 import sys
 import logging
 import json
+from .db_url import get_db_url_from_vcap_services
 import environs
 from cfenv import AppEnv
 from audit.get_agency_names import get_agency_names, get_audit_info_lists
-
+import dj_database_url
 import newrelic.agent
 
 newrelic.agent.initialize()
@@ -284,6 +285,10 @@ else:
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
+
+    DB_URL = get_db_url_from_vcap_services(vcap)
+    DATABASES = {"default": dj_database_url.parse(DB_URL)}
+
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
             # Public AWS S3 bucket for the app
