@@ -204,7 +204,7 @@ export const validations = {
   },
 
   validateDateBeforePresent: (field) => {
-    let endDate = new Date(field.value)
+    let endDate = new Date(field.value),
       currentDate = new Date();
     
     const result = {
