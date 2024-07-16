@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 import logging
 import math
 import time
@@ -42,6 +42,11 @@ from users.permissions import can_read_tribal
 import newrelic.agent
 
 logger = logging.getLogger(__name__)
+
+default_checked_audit_years = [
+    date.today().year,
+    date.today().year - 1,
+]  # Auto-check this and last year
 
 
 def _add_search_params_to_newrelic(search_parameters):
@@ -145,7 +150,7 @@ class AdvancedSearch(View):
             {
                 "advanced_search_flag": True,
                 "form": form,
-                "form_user_input": {"audit_year": ["2023"]},
+                "form_user_input": {"audit_year": default_checked_audit_years},
                 "state_abbrevs": STATE_ABBREVS,
                 "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
             },
@@ -242,7 +247,7 @@ class Search(View):
             {
                 "advanced_search_flag": False,
                 "form": form,
-                "form_user_input": {"audit_year": ["2023"]},
+                "form_user_input": {"audit_year": default_checked_audit_years},
                 "state_abbrevs": STATE_ABBREVS,
                 "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
             },
