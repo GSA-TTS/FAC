@@ -118,13 +118,15 @@
                                     aria-required="true"
                                     required
                                     data-validate-not-null=""
-                                    data-validate-date-comes-after="auditee_fiscal_period_start" />
+                                    data-validate-date-comes-after="auditee_fiscal_period_start"
+                                    data-validate-date-before-present="" />
                             </div>
                             <ul class="usa-error-message"
                                 id="auditee_fiscal_period_end-error-message"
                                 role="alert">
                                 <li id="auditee_fiscal_period_end-not-null" hidden>Can&#39;t be null</li>
                                 <li id="auditee_fiscal_period_end-date-order" hidden>End date must be later than start date</li>
+                                <li id="auditee_fiscal_period_end-date-before-present" hidden>End date must be earlier than today</li>
                             </ul>
                         </div>
                     </div>

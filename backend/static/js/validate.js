@@ -202,4 +202,17 @@ export const validations = {
 
     return startDate >= endDate ? { ...result, error: true } : result;
   },
+
+  validateDateBeforePresent: (field) => {
+    let endDate = new Date(field.value)
+      currentDate = new Date();
+    
+    const result = {
+      error: false,
+      fieldId: field.id,
+      validation: 'date-before-present',
+    };
+
+    return endDate >= currentDate ? { ...result, error: true } : result;
+  },
 };

@@ -1,8 +1,10 @@
+from datetime import date
+
 from django import forms
 from django.core.validators import RegexValidator
-from config.settings import CHARACTER_LIMITS_GENERAL, STATE_ABBREVS
 
 from api.uei import get_uei_info_from_sam_gov
+from config.settings import CHARACTER_LIMITS_GENERAL, STATE_ABBREVS
 
 
 # Regex for words, includes non-[A-Z] ASCII characters like ñ and ī.
@@ -54,6 +56,10 @@ class AuditeeInfoForm(forms.Form):
             if auditee_fiscal_period_start >= auditee_fiscal_period_end:
                 raise forms.ValidationError(
                     "Auditee fiscal period end date must be later than auditee fiscal period start date"
+                )
+            if auditee_fiscal_period_end >= date.today():
+                raise forms.ValidationError(
+                    "Auditee fiscal period end date must be earlier than today"
                 )
 
 
