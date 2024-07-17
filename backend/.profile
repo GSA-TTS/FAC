@@ -55,4 +55,3 @@ fi
 
 # Make psql usable by scripts, for debugging, etc.
 alias psql='/home/vcap/deps/0/apt/usr/lib/postgresql/*/bin/psql'
-unset $DATABASE_URL
