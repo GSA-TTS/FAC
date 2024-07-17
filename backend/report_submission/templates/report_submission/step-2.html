@@ -91,12 +91,14 @@
                                     aria-describedby="auditee_fiscal_period_start-hint"
                                     aria-required="true"
                                     required
-                                    data-validate-not-null=""/>
+                                    data-validate-not-null=""
+                                    data-validate-date-before-present="" />
                             </div>
                             <ul class="usa-error-message"
                                 id="auditee_fiscal_period_start-error-message"
                                 role="alert">
                                 <li id="auditee_fiscal_period_start-not-null" hidden>Can&#39;t be null</li>
+                                <li id="auditee_fiscal_period_start-date-before-present" hidden>Start date must be earlier than today</li>
                             </ul>
                         </div>
                     </div>

@@ -328,7 +328,7 @@ class TestPreliminaryViews(TestCase):
     @patch("report_submission.forms.get_uei_info_from_sam_gov")
     def test_step_two_auditeeinfo_future_enddate(self, mock_get_uei_info):
         """
-        Check that the server validates that start date preceeds end date
+        Check that the server validates that end date preceeds current date
         """
         mock_get_uei_info.return_value = {"valid": True}
 
@@ -358,7 +358,7 @@ class TestPreliminaryViews(TestCase):
         errors = response.context["form"].non_field_errors()
         self.assertListEqual(
             errors,
-            ["Auditee fiscal period end date must be earlier than today"],
+            ["Auditee fiscal period dates must be earlier than today"],
         )
 
     def test_step_three_accessandsubmission_submission_fail(self):
