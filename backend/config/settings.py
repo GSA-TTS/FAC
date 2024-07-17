@@ -15,7 +15,7 @@ import os
 import sys
 import logging
 import json
-from .db_url import get_db_url_from_vcap_services
+from .db_url import delete_env_var, get_db_url_from_vcap_services
 import environs
 from cfenv import AppEnv
 from audit.get_agency_names import get_agency_names, get_audit_info_lists
@@ -174,11 +174,6 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    "default": env.dj_db_url(
-        "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
-    ),
-}
 
 POSTGREST = {
     "URL": env.str("POSTGREST_URL", "http://api:3000"),
@@ -237,6 +232,13 @@ STATIC_URL = "/static/"
 # Environment specific configurations
 DEBUG = False
 if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
+
+    DATABASES = {
+        "default": env.dj_db_url(
+            "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
+        ),
+    }
+
     # Local environment and Testing environment (CI/CD/GitHub Actions)
 
     if ENVIRONMENT == "LOCAL":
@@ -284,6 +286,9 @@ else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
+
+    delete_env_var("DATABASE_URL")
+
     vcap = json.loads(env.str("VCAP_SERVICES"))
 
     DB_URL = get_db_url_from_vcap_services(vcap)
