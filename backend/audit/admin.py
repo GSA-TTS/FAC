@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import admin, messages
-from audit.forms import SacValidationWaiverForm
+from audit.forms import SacValidationWaiverForm, UeiValidationWaiverForm
 from audit.models import (
     Access,
     DeletedAccess,
@@ -9,6 +9,7 @@ from audit.models import (
     SingleAuditReportFile,
     SubmissionEvent,
     SacValidationWaiver,
+    UeiValidationWaiver,
 )
 from audit.validators import (
     validate_auditee_certification_json,
@@ -221,6 +222,24 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                 )
 
 
+class UeiValidationWaiverAdmin(admin.ModelAdmin):
+    form = UeiValidationWaiverForm
+    list_display = (
+        "id",
+        "uei",
+        "timestamp",
+        "approver_email",
+        "requester_email",
+    )
+    search_fields = (
+        "id",
+        "uei",
+        "approver_email",
+        "requester_email",
+    )
+    readonly_fields = ("timestamp",)
+
+
 admin.site.register(Access, AccessAdmin)
 admin.site.register(DeletedAccess, DeletedAccessAdmin)
 admin.site.register(ExcelFile, ExcelFileAdmin)
@@ -228,3 +247,4 @@ admin.site.register(SingleAuditChecklist, SACAdmin)
 admin.site.register(SingleAuditReportFile, AuditReportAdmin)
 admin.site.register(SubmissionEvent, SubmissionEventAdmin)
 admin.site.register(SacValidationWaiver, SacValidationWaiverAdmin)
+admin.site.register(UeiValidationWaiver, UeiValidationWaiverAdmin)
