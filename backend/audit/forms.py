@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.postgres.forms import SimpleArrayField
-from audit.models import SacValidationWaiver
+from audit.models import SacValidationWaiver, UeiValidationWaiver
 from config.settings import (
     AGENCY_NAMES,
     GAAP_RESULTS,
@@ -145,4 +145,10 @@ class SacValidationWaiverForm(forms.ModelForm):
 
     class Meta:
         model = SacValidationWaiver
+        fields = "__all__"
+
+
+class UeiValidationWaiverForm(forms.ModelForm):
+    class Meta:
+        model = UeiValidationWaiver
         fields = "__all__"
