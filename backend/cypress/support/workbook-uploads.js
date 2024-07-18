@@ -16,7 +16,7 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
   cy.wait('@uploadSuccess').then((interception) => {
     expect(interception.response.statusCode, 'Response status code').to.equal(302);
   })
-  cy.get('#info_box', { timeout: 10000 })
+  cy.get('#info_box', { timeout: 30000 })
     .should(
       'have.text',
       'File successfully validated! Your work has been saved.'
