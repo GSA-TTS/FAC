@@ -1233,9 +1233,9 @@ zope-interface==6.3 \
     # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==69.4.0 \
-    --hash=sha256:659e902e587e77fab8212358f5b03977b5f0d18d4724310d4a093929fee4ca1a \
-    --hash=sha256:b6df12d754b505e4ca283c61582d5578db83ae2f56a979b3bc9a8754705ae3bf
+setuptools==71.0.2 \
+    --hash=sha256:ca359bea0cd5c8ce267d7463239107e87f312f2e2a11b6ca6357565d82b6c0d7 \
+    --hash=sha256:f6640114f96be808024fbd1f721161215543796d3a68da4524349de700604ce8
     # via
     #   fs
     #   zope-event
