@@ -4,7 +4,7 @@
 <header class="usa-header usa-header--extended">
     <div class="usa-navbar">
         <div class="usa-logo" id="basic-logo">
-            <a class="usa-logo-link" href="/">
+            <a class="usa-logo-link" href="{% url 'Home' %}">
                 <em class="usa-logo__text grid-row">
                     <div class="font-sans-sm text-normal text-primary-dark width-15 margin-left-1 margin-top-05 display-grid grid-column">
                         <p class="margin-0">Federal Audit</p>
@@ -152,7 +152,7 @@
                     </form>
                 </div>
                 {% if request.user.is_authenticated %}
-                    <form action="/openid/logout" class="sign-out padding-left-2 margin-left-0 desktop:margin-left-2 border-left border-primary-dark">
+                    <form action="{% url 'logout' %}" class="sign-out padding-left-2 margin-left-0 desktop:margin-left-2 border-left border-primary-dark">
                         <button class="usa-button usa-button--unstyled">
                             <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
                                 {% uswds_sprite "logout" %}
@@ -169,7 +169,7 @@
                     <div class="padding-left-2 margin-left-2 border-left border-primary-dark">
                         <a class="sign-in display-flex flex-row"
                         aria-controls="login-modal"
-                        href="/openid/login/"
+                        href="{% url 'login' %}"
                         data-open-modal
                         tabindex="0"
                         role="button">
