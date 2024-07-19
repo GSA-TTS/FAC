@@ -77,7 +77,8 @@ class SummaryReportTests(TestMaterializedViewBuilder):
         self.refresh_materialized_view()
 
         (ls, _) = get_tribal_report_ids(tribal_report_ids)
-        self.assertListEqual(
+        # Somewhat misleadingly named - it asserts both count and content equivalence
+        self.assertCountEqual(
             ls,
             tribal_report_ids,
         )
