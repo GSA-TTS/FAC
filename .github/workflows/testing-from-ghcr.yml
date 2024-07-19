@@ -49,19 +49,25 @@ jobs:
           pwd
           ls -al | grep 'coverage'
 
-      - name: Pre-processing Coverage Report
-        run: sed -i 's#filename="#filename="backend-api/src/#g' ./*.xml
-
-      - name: Publish Coverage Report to Pull Request
-        uses: 5monkeys/cobertura-action@master
+      - name: Code Coverage Summary Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          path: ./coverage.xml
-          minimum_coverage: 85
-          skip_covered: true # Set to true to remove 100% covered from report
-          fail_below_threshold: false # Fails the action if 85% threshold is not met
-          show_missing: true
-          only_changed_files: true
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          filename: ./coverage.xml
+          badge: true
+          fail_below_min: false
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '85'
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md
 
   a11y-testing:
     runs-on: ubuntu-latest
