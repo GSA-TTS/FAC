@@ -558,6 +558,7 @@ def set_wb_security(wb, password):
     wb.security = WorkbookProtection(workbookPassword=password, lockStructure=True)
     wb.security.lockStructure = True
 
+
 def save_workbook(wb, basename):
     wb.save(f"{basename}")
 
