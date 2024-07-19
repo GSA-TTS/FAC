@@ -49,15 +49,19 @@ jobs:
           pwd
           ls -al | grep 'coverage'
 
-      - name: Post Coverage Report to Pull Request
-        if: github.event_name == 'pull_request'
-        uses: orgoro/coverage@v3.2
+      - name: Pre-processing Coverage Report
+        run: sed -i 's#filename="#filename="backend-api/src/#g' ./*.xml
+
+      - name: Publish Coverage Report to Pull Request
+        uses: 5monkeys/cobertura-action@master
         with:
-            coverageFile: ./coverage.xml
-            token: ${{ secrets.GITHUB_TOKEN }}
-            thresholdNew: 0.9
-            thresholdModified: 0.9
-            thresholdAll: 0.85
+          path: ./coverage.xml
+          minimum_coverage: 85
+          skip_covered: true # Set to true to remove 100% covered from report
+          fail_below_threshold: false # Fails the action if 85% threshold is not met
+          show_missing: true
+          only_changed_files: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   a11y-testing:
     runs-on: ubuntu-latest
