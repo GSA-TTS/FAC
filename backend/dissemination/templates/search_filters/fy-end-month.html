@@ -11,11 +11,11 @@
                     id="fy_end_month"
                     name="fy_end_month">
                 <option value id="fy-month--none">- Select -</option>
-                {% with '1 2 3 4 5 6 7 8 9 10 11 12' as list %}
+                {% with "1 2 3 4 5 6 7 8 9 10 11 12" as list %}
                     {% for i in list.split %}
-                        <option value="{{i}}"
+                        <option value="{{ i }}"
                                 {% if i in form_user_input.fy_end_month %}selected{% endif %}>
-                            {{i}} - {% cycle 'January' 'February' 'March' 'April' 'May' 'June' 'July' 'August' 'September' 'October' 'November' 'December' %}
+                            {{ i }} - {% cycle 'January' 'February' 'March' 'April' 'May' 'June' 'July' 'August' 'September' 'October' 'November' 'December' %}
                         </option>
                     {% endfor %}
                 {% endwith %}

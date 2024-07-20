@@ -16,8 +16,8 @@
 
                     <p>{{ instructions }}</p>
                     <ul class="margin-top-4">
-                        <li>Review the <a class="usa-link" id="instructions-link" href={{instructions_url}} target="_blank">instructions for this workbook.</a></li>
-                        <li><a class="usa-link" id="download-template-link" href={{workbook_url}} target="_blank">Download</a> the {{view_name}} workbook template.</li>
+                        <li>Review the <a class="usa-link" id="instructions-link" href={{ instructions_url }} target="_blank">instructions for this workbook.</a></li>
+                        <li><a class="usa-link" id="download-template-link" href={{ workbook_url }} target="_blank">Download</a> the {{ view_name }} workbook template.</li>
                     </ul>
 
                     {% if no_findings_disclaimer %}
@@ -47,12 +47,12 @@
                         <p class="text-green" id="already-submitted">
                             A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
                         </p>
-                        <p>Last uploaded by {{last_uploaded_by}} at {{last_uploaded_at}}
+                        <p>Last uploaded by {{ last_uploaded_by }} at {{ last_uploaded_at }}
                             <span class="display-flex">
-                                <a class="usa-link" href="{{existing_workbook_url}}" target="_blank">Download current workbook</a>
+                                <a class="usa-link" href="{{ existing_workbook_url }}" target="_blank">Download current workbook</a>
                                 {% if remove_existing_workbook %}
                                     <span>&nbsp;|&nbsp;</span>
-                                    <a class="usa-link" id="remove-workbook-link" href="{{remove_existing_workbook}}">Remove current workbook</a>
+                                    <a class="usa-link" id="remove-workbook-link" href="{{ remove_existing_workbook }}">Remove current workbook</a>
                                 {% endif %}
                             </span>
                         </p>
