@@ -39,6 +39,5 @@ function setup_cgov_env {
     # https://docs.newrelic.com/docs/apm/agents/python-agent/configuration/python-agent-configuration/#proxy
     export NEW_RELIC_PROXY_HOST="$https_proxy"
     
-    unset "$DATABASE_URL"
     return 0
 }
