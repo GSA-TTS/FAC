@@ -15,7 +15,7 @@ import os
 import sys
 import logging
 import json
-from .db_url import delete_env_var, get_db_url_from_vcap_services
+from .db_url import get_db_url_from_vcap_services
 import environs
 from cfenv import AppEnv
 from audit.get_agency_names import get_agency_names, get_audit_info_lists
@@ -286,8 +286,6 @@ else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
-
-    delete_env_var("DATABASE_URL")
 
     vcap = json.loads(env.str("VCAP_SERVICES"))
 
