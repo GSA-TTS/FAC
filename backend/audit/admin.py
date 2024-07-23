@@ -231,6 +231,7 @@ class UeiValidationWaiverAdmin(admin.ModelAdmin):
         "expiration",
         "approver_email",
         "requester_email",
+        "justification",
     )
     search_fields = (
         "id",
