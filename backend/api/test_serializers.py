@@ -129,7 +129,7 @@ class UEIValidatorStepTests(TestCase):
         with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = json.loads(missing_uei_results)
-            self.assertTrue(UEISerializer(data=expired).is_valid())
+            self.assertFalse(UEISerializer(data=expired).is_valid())
 
     def test_quirky_uei_payload(self):
         """
