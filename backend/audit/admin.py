@@ -228,6 +228,7 @@ class UeiValidationWaiverAdmin(admin.ModelAdmin):
         "id",
         "uei",
         "timestamp",
+        "expiration",
         "approver_email",
         "requester_email",
     )
