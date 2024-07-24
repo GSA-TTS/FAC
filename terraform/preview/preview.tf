@@ -19,6 +19,27 @@ module "preview" {
       "storage" : 50,
     }
   )
+  cors_json = jsonencode(
+    {
+      "CORSRules" : [
+        {
+          "AllowedHeaders" : [
+            "Authorization"
+          ],
+          "AllowedMethods" : [
+            "HEAD",
+            "GET"
+          ],
+          "AllowedOrigins" : [
+            "https://[ENV_DOMAIN]"
+          ],
+          "ExposeHeaders" : [
+            "ETag"
+          ]
+        }
+      ]
+    }
+  )
 }
 
 module "preview-backups-bucket" {
