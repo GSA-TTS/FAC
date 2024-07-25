@@ -14,7 +14,9 @@ export AWS_ACCESS_KEY_ID="$(echo "$S3_CREDENTIALS" | jq -r .credentials.access_k
 export AWS_SECRET_ACCESS_KEY="$(echo "$S3_CREDENTIALS" | jq -r .credentials.secret_access_key)";
 export BUCKET_NAME="$(echo "$S3_CREDENTIALS" | jq -r .credentials.bucket)";
 export AWS_DEFAULT_REGION="$(echo "$S3_CREDENTIALS" | jq -r .credentials.region)";
-echo "$BUCKET_NAME";
+echo "Bucket: $BUCKET_NAME";
+echo "INFO: Putting CORS config in bucket..."
 /github/home/bin/aws s3api put-bucket-cors --bucket "$BUCKET_NAME" --cors-configuration file://"$3";
+echo "INFO: aws s3api get-bucket-cors output..."
 /github/home/bin/aws s3api get-bucket-cors --bucket "$BUCKET_NAME";
 cf delete-service-key -f "${SERVICE_INSTANCE_NAME}" "${KEY_NAME}";
