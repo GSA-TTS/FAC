@@ -17,4 +17,4 @@ export AWS_DEFAULT_REGION="$(echo "${S3_CREDENTIALS}" | jq -r '.region')";
 echo "$BUCKET_NAME";
 /github/home/bin/aws s3api put-bucket-cors --bucket "$BUCKET_NAME" --cors-configuration "$3";
 /github/home/bin/aws s3api get-bucket-cors --bucket "$BUCKET_NAME";
-cf delete-service-key "${SERVICE_INSTANCE_NAME}" "${KEY_NAME}";
+cf delete-service-key -f "${SERVICE_INSTANCE_NAME}" "${KEY_NAME}";
