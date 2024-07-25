@@ -10,8 +10,3 @@ variable "cf_space_name" {
   # No default... The calling module knows which env is for which space and we
   # shouldn't assume it!
 }
-
-variable "decoded_json" {
-  type        = map(string)
-  description = "decoded json"
-}
