@@ -11,7 +11,7 @@ variable "cf_space_name" {
   # shouldn't assume it!
 }
 
-variable "string_json" {
+variable "cors_json" {
   type        = string
   description = "The JSON used for managing CORS headers."
 }
