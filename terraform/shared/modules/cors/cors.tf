@@ -1,7 +1,7 @@
 locals {
   script_path = "${var.cf_space_name}-cors.json"
 }
-resource "null_resource" "cors_script" {
+resource "null_resource" "cors_header" {
   provisioner "local-exec" {
     working_dir = path.module
     interpreter = ["/bin/bash", "-c"]
