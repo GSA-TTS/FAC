@@ -12,6 +12,6 @@ variable "cf_space_name" {
 }
 
 variable "decoded_json" {
-  type        = string
+  type        = map(string)
   description = "decoded json"
 }
