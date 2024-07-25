@@ -1,3 +1,4 @@
+from django.utils import timezone as django_timezone
 import logging
 import requests
 import ssl
@@ -161,13 +162,10 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     if results["valid"] and (not results.get("errors")):
         return results
 
-    # To honor expiration dates:
-    # from datetime import date
-    # today = date.today()
-    # waiver = UeiValidationWaiver.objects.filter(uei=uei, expiration__gte=today).first()
-
     # 3. Check for a waiver.
-    waiver = UeiValidationWaiver.objects.filter(uei=uei).first()
+    waiver = UeiValidationWaiver.objects.filter(
+        uei=uei, expiration__gte=django_timezone.now()
+    ).first()
     if not waiver:
         return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
