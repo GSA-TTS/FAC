@@ -5,7 +5,6 @@ unzip awscliv2.zip && rm awscliv2.zip
 ./aws/install -i ~/usr -b ~/bin
 /bin/aws --version
 
-
 cf t -o "$1" -s "$2"
 SERVICE_INSTANCE_NAME=fac-public-s3;
 KEY_NAME=fac-public-s3-key;
