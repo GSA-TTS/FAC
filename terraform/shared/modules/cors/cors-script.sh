@@ -9,6 +9,8 @@ cf t -o "$1" -s "$2"
 SERVICE_INSTANCE_NAME=fac-public-s3;
 KEY_NAME=fac-public-s3-key;
 cf create-service-key "${SERVICE_INSTANCE_NAME}" "${KEY_NAME}";
+echo "Sleeping for CF API"
+sleep 10
 S3_CREDENTIALS=$(cf service-key "${SERVICE_INSTANCE_NAME}" "${KEY_NAME}" | tail -n +2);
 export AWS_ACCESS_KEY_ID="$(echo "$S3_CREDENTIALS" | jq -r .credentials.access_key_id)";
 export AWS_SECRET_ACCESS_KEY="$(echo "$S3_CREDENTIALS" | jq -r .credentials.secret_access_key)";
