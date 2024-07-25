@@ -31,7 +31,7 @@ module "preview" {
             "GET"
           ],
           "AllowedOrigins" : [
-            "https://[ENV_DOMAIN]"
+            "https://fac-preview.app.cloud.gov"
           ],
           "ExposeHeaders" : [
             "ETag"
