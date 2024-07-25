@@ -7,4 +7,7 @@ resource "null_resource" "cors_script" {
     interpreter = ["/bin/bash", "-c"]
     command     = "./cors-script.sh ${var.cf_org_name} ${var.cf_space_name} ${local.script_path}"
   }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 }
