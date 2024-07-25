@@ -1,5 +1,5 @@
 locals {
-  script_path = "${path.module}/${var.cf_space_name}-cors.json"
+  script_path = "${var.cf_space_name}-cors.json"
 }
 resource "null_resource" "cors_script" {
   provisioner "local-exec" {
