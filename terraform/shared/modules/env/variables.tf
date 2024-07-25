@@ -110,9 +110,3 @@ variable "new_relic_api_key" {
   type        = string
   description = "New Relic API key"
 }
-
-variable "cors_json" {
-  type        = string
-  description = "The JSON used for managing CORS headers."
-
-}

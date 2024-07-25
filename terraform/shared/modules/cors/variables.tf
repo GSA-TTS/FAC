@@ -10,9 +10,3 @@ variable "cf_space_name" {
   # No default... The calling module knows which env is for which space and we
   # shouldn't assume it!
 }
-
-variable "cors_json" {
-  type        = string
-  description = "The JSON used for managing CORS headers."
-}
-

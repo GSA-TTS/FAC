@@ -19,27 +19,6 @@ module "preview" {
       "storage" : 50,
     }
   )
-  cors_json = jsonencode(
-    {
-      "CORSRules" : [
-        {
-          "AllowedHeaders" : [
-            "Authorization"
-          ],
-          "AllowedMethods" : [
-            "HEAD",
-            "GET"
-          ],
-          "AllowedOrigins" : [
-            "https://fac-preview.app.cloud.gov"
-          ],
-          "ExposeHeaders" : [
-            "ETag"
-          ]
-        }
-      ]
-    }
-  )
 }
 
 module "preview-backups-bucket" {
