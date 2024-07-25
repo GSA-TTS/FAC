@@ -1,3 +1,6 @@
+locals {
+  decoded_json = jsondecode(var.string_json)
+}
 resource "null_resource" "cors_script" {
   provisioner "local-exec" {
     working_dir = path.module
