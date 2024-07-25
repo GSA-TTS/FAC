@@ -1,7 +1,7 @@
 #!/bin/sh
 
 curl -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip && rm awscliv2.zip
+unzip -q awscliv2.zip && rm awscliv2.zip
 ./aws/install -i ~/usr -b ~/bin
 /github/home/bin/aws --version
 
