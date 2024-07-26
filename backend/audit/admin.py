@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 from django.contrib import admin, messages
 from audit.forms import SacValidationWaiverForm, UeiValidationWaiverForm
@@ -17,6 +18,8 @@ from audit.validators import (
 )
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext_lazy as _
+
+logger = logging.getLogger(__name__)
 
 
 class SACAdmin(admin.ModelAdmin):
@@ -139,20 +142,32 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
                 SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
             ]:
+                logger.info(
+                    f"User {request.user.email} is applying waiver for SAC with status: {sac.submission_status}"
+                )
                 self.handle_auditor_certification(request, obj, sac)
                 self.handle_auditee_certification(request, obj, sac)
+                super().save_model(request, obj, form, change)
+                logger.info(
+                    f"SAC {sac.report_id} updated successfully with waiver by user: {request.user.email}."
+                )
             else:
                 messages.set_level(request, messages.WARNING)
                 messages.warning(
                     request,
                     f"Cannot apply waiver to SAC with status {sac.submission_status}. Expected status to be one of {SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION}, {SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED}",
                 )
-
-            super().save_model(request, obj, form, change)
+                logger.warning(
+                    f"User {request.user.email} attempted to apply waiver to SAC with invalid status: {sac.submission_status}"
+                )
 
         except Exception as e:
             messages.set_level(request, messages.ERROR)
             messages.error(request, str(e))
+            logger.error(
+                f"Error saving SAC waiver by user {request.user.email}: {str(e)}",
+                exc_info=True,
+            )
 
     def handle_auditor_certification(self, request, obj, sac):
         if SacValidationWaiver.TYPES.AUDITOR_CERTIFYING_OFFICIAL in obj.waiver_types:
@@ -187,6 +202,9 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                     event_user=request.user,
                     event_type=SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
                 )
+                logger.info(
+                    f"Auditor certification completed for SAC {sac.report_id} by user: {request.user.email}."
+                )
 
     def handle_auditee_certification(self, request, obj, sac):
         if SacValidationWaiver.TYPES.AUDITEE_CERTIFYING_OFFICIAL in obj.waiver_types:
@@ -219,6 +237,9 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                 sac.save(
                     event_user=request.user,
                     event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+                )
+                logger.info(
+                    f"Auditee certification completed for SAC {sac.report_id} by user: {request.user.email}."
                 )
 
 
