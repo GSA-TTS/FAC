@@ -19,6 +19,6 @@
 - [ ]   Manually test out the changes locally, or check this box to verify that it wasn’t applicable in this case.
 - [ ]   Check that the PR has appropriate tests. Look out for changes in HTML/JS/JSON Schema logic that may need to be captured in Python tests even though the logic isn’t in Python.
 - [ ]   Verify that no Git surgery is necessary at any point (such as during a merge party), or, if it was, repeat the testing after it’s finished.
-- [ ]   Ensure that prior to approving, the terraform plan is what we expect it to be. `-/+ resource "null_resource" "cors_header" ` should be destroying and recreating its self and ` ~ resource "cloudfoundry_app" "clamav_api" ` might be updating its `sha256` for the `fac-file-scanner` and `fac-av-dev` by default.
+- [ ]   Ensure that prior to approving, the terraform plan is what we expect it to be. `-/+ resource "null_resource" "cors_header" ` should be destroying and recreating its self and ` ~ resource "cloudfoundry_app" "clamav_api" ` might be updating its `sha256` for the `fac-file-scanner` and `fac-av-${ENV}` by default.
 
 The larger the PR, the stricter we should be about these points.
