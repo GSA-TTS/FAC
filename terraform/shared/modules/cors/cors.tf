@@ -12,9 +12,6 @@ resource "null_resource" "cors_header" {
   # an md5 hash, which, once this goes into the system, will rarely (if ever)
   # be updated
   triggers = {
-    always_run = "${timestamp()}"
-  }
-  lifecycle {
-    prevent_destroy = true
+    md5 = "${filemd5("${path.module}/cors-script.sh")}"
   }
 }
