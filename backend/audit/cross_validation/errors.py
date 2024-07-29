@@ -1,6 +1,7 @@
 from audit.fixtures.excel import (
     SECTION_NAMES,
 )
+from config.settings import DOLLAR_THRESHOLD
 from .utils import format_refs
 
 
@@ -50,6 +51,21 @@ def err_biennial_low_risk():
         "According to Uniform Guidance section 200.520(a), biennial audits cannot "
         "be considered 'low-risk.' Please make the necessary changes to the 'Audit "
         "Period Covered' or indicate that the auditee did NOT qualify as low-risk."
+    )
+
+
+def err_total_amount_expended(amount_expended):
+    # The UG states the exact dollar amount, but is potentially subject to change.
+    # So, we decouple the value from the quote and use the DOLLAR_THRESHOLD.
+    pretty_dollar_threshold = format(DOLLAR_THRESHOLD, ",")
+    pretty_amount_expended = format(amount_expended, ",")
+    return (
+        "According to Uniform Guidance section 200.501(d), a non-Federal entity "
+        "that expends less than the threshold during the non-Federal entity's "
+        "fiscal year in Federal awards is exempt from Federal audit requirements "
+        "for that year. "
+        f"The current threshold is ${pretty_dollar_threshold}. "
+        f"The amount expended is ${pretty_amount_expended}. "
     )
 
 
