@@ -14,4 +14,7 @@ resource "null_resource" "cors_header" {
   triggers = {
     always_run = "${timestamp()}"
   }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
