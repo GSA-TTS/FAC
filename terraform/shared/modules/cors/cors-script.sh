@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # Modifying this file will cause terraform to update it in the system and re-apply the cors headers,
-# since the md5 will be changing.
+# since the md5 will be changing. To force a reapply of the cors headers, change the below value.
+# v0.001
 
 curl -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip -q awscliv2.zip && rm awscliv2.zip
