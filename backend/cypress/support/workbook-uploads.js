@@ -1,6 +1,6 @@
 // re-usable code for workbook uploads
 
-// testWorkbookUpload('/audit/excel/federal-awards-expended/*', '#file-input-federal-awards-xlsx', 'federal-awards-expended-UPDATE.xlsx')
+// testWorkbookUpload('/audit/excel/federal-awards/*', '#file-input-federal-awards-xlsx', 'federal-awards-expended-UPDATE.xlsx')
 // assumes you are on the appropriate upload page already
 function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_intercept = true) {
   if (will_intercept) {
@@ -28,7 +28,7 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
 
 export function testWorkbookFederalAwards(will_intercept = true) {
   testWorkbookUpload(
-    '/audit/excel/federal-awards-expended/*',
+    '/audit/excel/federal-awards/*',
     '#file-input-federal-awards-xlsx',
     'test_workbooks/federal-awards-workbook.xlsx',
     will_intercept

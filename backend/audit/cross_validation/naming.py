@@ -2,6 +2,7 @@ from types import new_class
 from typing import NamedTuple
 
 from audit.models.submission_event import SubmissionEvent
+from audit.fixtures.excel import FORM_SECTIONS
 
 # We need a canonical source of the different versions of each name.
 
@@ -33,7 +34,7 @@ class SectionBabelFish(NamedTuple):
 SECTION_NAMES = {
     "additional_eins": SectionBabelFish(
         all_caps="ADDITIONAL_EINS",
-        camel_case="AdditionalEINs",
+        camel_case=FORM_SECTIONS.ADDITIONAL_EINS,
         friendly="Additional EINs",
         friendly_title="Additional EINs",
         reverse_url_for_file_upload="report_submission:additional-eins",
@@ -46,7 +47,7 @@ SECTION_NAMES = {
     ),
     "additional_ueis": SectionBabelFish(
         all_caps="ADDITIONAL_UEIS",
-        camel_case="AdditionalUEIs",
+        camel_case=FORM_SECTIONS.ADDITIONAL_UEIS,
         friendly="Additional UEIs",
         friendly_title="Additional UEIs",
         reverse_url_for_file_upload="report_submission:additional-ueis",
@@ -72,7 +73,7 @@ SECTION_NAMES = {
     ),
     "corrective_action_plan": SectionBabelFish(
         all_caps="CORRECTIVE_ACTION_PLAN",
-        camel_case="CorrectiveActionPlan",
+        camel_case=FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
         friendly="Corrective Action Plan",
         friendly_title="Corrective Action Plan",
         snake_case="corrective_action_plan",
@@ -85,7 +86,7 @@ SECTION_NAMES = {
     ),
     "federal_awards": SectionBabelFish(
         all_caps="FEDERAL_AWARDS",
-        camel_case="FederalAwards",
+        camel_case=FORM_SECTIONS.FEDERAL_AWARDS,
         friendly="Federal Awards",
         friendly_title="Federal Awards",
         reverse_url_for_file_upload="report_submission:federal-awards",
@@ -98,7 +99,7 @@ SECTION_NAMES = {
     ),
     "findings_text": SectionBabelFish(
         all_caps="FINDINGS_TEXT",
-        camel_case="FindingsText",
+        camel_case=FORM_SECTIONS.FINDINGS_TEXT,
         friendly="Federal Awards Audit Findings Text",
         friendly_title="Federal Awards Audit Findings Text",
         reverse_url_for_file_upload="report_submission:audit-findings-text",
@@ -111,7 +112,7 @@ SECTION_NAMES = {
     ),
     "findings_uniform_guidance": SectionBabelFish(
         all_caps="FINDINGS_UNIFORM_GUIDANCE",
-        camel_case="FindingsUniformGuidance",
+        camel_case=FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
         friendly="Findings Uniform Guidance",
         friendly_title="Federal Awards Audit Findings",
         reverse_url_for_file_upload="report_submission:audit-findings",
@@ -137,7 +138,7 @@ SECTION_NAMES = {
     ),
     "notes_to_sefa": SectionBabelFish(
         all_caps="NOTES_TO_SEFA",
-        camel_case="NotesToSefa",
+        camel_case=FORM_SECTIONS.NOTES_TO_SEFA,
         friendly="Notes to SEFA",
         friendly_title="Notes to SEFA",
         reverse_url_for_file_upload="report_submission:notes-to-sefa",
@@ -163,7 +164,7 @@ SECTION_NAMES = {
     ),
     "secondary_auditors": SectionBabelFish(
         all_caps="SECONDARY_AUDITORS",
-        camel_case="SecondaryAuditors",
+        camel_case=FORM_SECTIONS.SECONDARY_AUDITORS,
         friendly="Secondary Auditors",
         friendly_title="Secondary Auditors",
         reverse_url_for_file_upload="report_submission:secondary-auditors",
