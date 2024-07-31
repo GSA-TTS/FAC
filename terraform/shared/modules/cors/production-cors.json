@@ -9,7 +9,7 @@
              "GET"
           ],
           "AllowedOrigins": [
-             "https://app.cloud.gov"
+             "https://app.fac.gov"
           ],
           "ExposeHeaders": [
              "ETag"
