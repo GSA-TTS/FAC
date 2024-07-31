@@ -31,6 +31,7 @@ from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
     OneTimeAccess,
+    DisseminationCombined,
 )
 
 from dissemination.summary_reports import generate_summary_report
@@ -347,6 +348,7 @@ class AuditSummaryView(View):
         include_private = include_private_results(request)
         include_private_and_public = include_private or general_data["is_public"]
         data = self.get_audit_content(report_id, include_private_and_public)
+        is_sf_sac_downloadable = DisseminationCombined.objects.filter(report_id=report_id).exists()
 
         # Add entity name and UEI to the context, for the footer.
         context = {
@@ -356,6 +358,7 @@ class AuditSummaryView(View):
             "general": general_data,
             "include_private": include_private,
             "data": data,
+            "is_sf_sac_downloadable": is_sf_sac_downloadable,
         }
 
         return render(request, "summary.html", context)
