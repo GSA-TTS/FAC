@@ -125,7 +125,7 @@ class UEIValidatorStepTests(TestCase):
             expiration=expired["expiration"],
         )
 
-        # Invalid due to the waiver being expired. Mock the SAM call as though the entity doesnt exist.
+        # Invalid due to the waiver being expired. Mock the SAM call as though the entity does not exist.
         with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = json.loads(missing_uei_results)

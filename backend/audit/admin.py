@@ -262,6 +262,12 @@ class UeiValidationWaiverAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("timestamp",)
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        logger.info(
+            f'Validation Waiver for UEI "{obj.uei}" successfully added by user: {request.user.email}.'
+        )
+
 
 admin.site.register(Access, AccessAdmin)
 admin.site.register(DeletedAccess, DeletedAccessAdmin)
