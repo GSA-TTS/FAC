@@ -126,7 +126,7 @@ class EditSubmission(LoginRequiredMixin, generic.View):
 
 class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     FORM_SECTION_HANDLERS = {
-        FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: {
+        FORM_SECTIONS.FEDERAL_AWARDS: {
             "extractor": extract_federal_awards,
             "field_name": "federal_awards",
             "validator": validate_federal_award_json,
@@ -185,7 +185,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             FORM_SECTIONS.ADDITIONAL_EINS: SubmissionEvent.EventType.ADDITIONAL_EINS_UPDATED,
             FORM_SECTIONS.ADDITIONAL_UEIS: SubmissionEvent.EventType.ADDITIONAL_UEIS_UPDATED,
             FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: SubmissionEvent.EventType.CORRECTIVE_ACTION_PLAN_UPDATED,
-            FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
+            FORM_SECTIONS.FEDERAL_AWARDS: SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
             FORM_SECTIONS.FINDINGS_TEXT: SubmissionEvent.EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED,
             FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: SubmissionEvent.EventType.FINDINGS_UNIFORM_GUIDANCE_UPDATED,
             FORM_SECTIONS.NOTES_TO_SEFA: SubmissionEvent.EventType.NOTES_TO_SEFA_UPDATED,

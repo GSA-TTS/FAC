@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_field_by_section(sac, section):
-    if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
+    if section == FORM_SECTIONS.FEDERAL_AWARDS:
         return sac.federal_awards
     elif section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:
         return sac.findings_uniform_guidance
@@ -58,7 +58,7 @@ def get_field_by_section(sac, section):
 
 
 extract_mapping = {
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: extract_federal_awards,
+    FORM_SECTIONS.FEDERAL_AWARDS: extract_federal_awards,
     FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: extract_findings_uniform_guidance,
     FORM_SECTIONS.FINDINGS_TEXT: extract_findings_text,
     FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: extract_corrective_action_plan,
@@ -69,7 +69,7 @@ extract_mapping = {
 }
 
 validator_mapping = {
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: audit.validators.validate_federal_award_json,
+    FORM_SECTIONS.FEDERAL_AWARDS: audit.validators.validate_federal_award_json,
     FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: audit.validators.validate_findings_uniform_guidance_json,
     FORM_SECTIONS.FINDINGS_TEXT: audit.validators.validate_findings_text_json,
     FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: audit.validators.validate_corrective_action_plan_json,
@@ -381,7 +381,7 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file, store_files=T
 
 
 def _post_upload_workbook_assign_data(section, this_sac, audit_data):
-    if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
+    if section == FORM_SECTIONS.FEDERAL_AWARDS:
         this_sac.federal_awards = audit_data
     elif section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:
         this_sac.findings_uniform_guidance = audit_data

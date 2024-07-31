@@ -71,10 +71,10 @@ general_checks = [
 ]
 
 federal_awards_checks = general_checks + [
-    is_right_workbook(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
-    has_all_the_named_ranges(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
-    has_all_required_fields(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
-    has_invalid_yorn_field(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
+    is_right_workbook(FORM_SECTIONS.FEDERAL_AWARDS),
+    has_all_the_named_ranges(FORM_SECTIONS.FEDERAL_AWARDS),
+    has_all_required_fields(FORM_SECTIONS.FEDERAL_AWARDS),
+    has_invalid_yorn_field(FORM_SECTIONS.FEDERAL_AWARDS),
     award_references_pattern,
     federal_award_amount_passed_through_optional,
     check_cluster_names,
