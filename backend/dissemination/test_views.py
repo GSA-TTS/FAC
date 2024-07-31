@@ -11,6 +11,7 @@ from audit.models import (
     generate_sac_report_id,
 )
 
+from audit.fixtures.excel import FORM_SECTIONS
 from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
     General,
@@ -388,7 +389,7 @@ class XlsxDownloadViewTests(TestCase):
     def test_bad_report_id_returns_404(self):
         url = reverse(
             "dissemination:XlsxDownload",
-            kwargs={"report_id": "not-real", "file_type": "FederalAwardsExpended"},
+            kwargs={"report_id": "not-real", "file_type": FORM_SECTIONS.FEDERAL_AWARDS},
         )
 
         response = self.client.get(url)
@@ -402,7 +403,7 @@ class XlsxDownloadViewTests(TestCase):
             "dissemination:XlsxDownload",
             kwargs={
                 "report_id": general.report_id,
-                "file_type": "FederalAwardsExpended",
+                "file_type": FORM_SECTIONS.FEDERAL_AWARDS,
             },
         )
 
@@ -417,7 +418,7 @@ class XlsxDownloadViewTests(TestCase):
             "dissemination:XlsxDownload",
             kwargs={
                 "report_id": general.report_id,
-                "file_type": "FederalAwardsExpended",
+                "file_type": FORM_SECTIONS.FEDERAL_AWARDS,
             },
         )
 
@@ -431,13 +432,13 @@ class XlsxDownloadViewTests(TestCase):
 
         sac, general = self._make_sac_and_general()
 
-        file = baker.make(ExcelFile, sac=sac, form_section="FederalAwardsExpended")
+        file = baker.make(ExcelFile, sac=sac, form_section=FORM_SECTIONS.FEDERAL_AWARDS)
 
         url = reverse(
             "dissemination:XlsxDownload",
             kwargs={
                 "report_id": general.report_id,
-                "file_type": "FederalAwardsExpended",
+                "file_type": FORM_SECTIONS.FEDERAL_AWARDS,
             },
         )
 
@@ -456,7 +457,7 @@ class XlsxDownloadViewTests(TestCase):
             "dissemination:XlsxDownload",
             kwargs={
                 "report_id": general.report_id,
-                "file_type": "FederalAwardsExpended",
+                "file_type": FORM_SECTIONS.FEDERAL_AWARDS,
             },
         )
 
@@ -476,7 +477,7 @@ class XlsxDownloadViewTests(TestCase):
             "dissemination:XlsxDownload",
             kwargs={
                 "report_id": general.report_id,
-                "file_type": "FederalAwardsExpended",
+                "file_type": FORM_SECTIONS.FEDERAL_AWARDS,
             },
         )
 
@@ -499,13 +500,13 @@ class XlsxDownloadViewTests(TestCase):
             user=user,
             permission=permission,
         )
-        file = baker.make(ExcelFile, sac=sac, form_section="FederalAwardsExpended")
+        file = baker.make(ExcelFile, sac=sac, form_section=FORM_SECTIONS.FEDERAL_AWARDS)
 
         url = reverse(
             "dissemination:XlsxDownload",
             kwargs={
                 "report_id": general.report_id,
-                "file_type": "FederalAwardsExpended",
+                "file_type": FORM_SECTIONS.FEDERAL_AWARDS,
             },
         )
 

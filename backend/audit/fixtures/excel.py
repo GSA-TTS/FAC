@@ -98,7 +98,7 @@ FormSections = namedtuple(
 # Note: we turn these into hyphenated lowercase for URLs, e.g. federal-awards-expended
 FORM_SECTIONS = FormSections(
     CORRECTIVE_ACTION_PLAN="CorrectiveActionPlan",
-    FEDERAL_AWARDS="FederalAwardsExpended",
+    FEDERAL_AWARDS="FederalAwards",
     FINDINGS_TEXT="FindingsText",
     FINDINGS_UNIFORM_GUIDANCE="FindingsUniformGuidance",
     ADDITIONAL_UEIS="AdditionalUeis",
