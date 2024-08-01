@@ -516,8 +516,9 @@ class XlsxDownloadViewTests(TestCase):
         self.assertIn(file.filename, response.url)
 
 
-class SummaryViewTests(TestCase):
+class SummaryViewTests(TestMaterializedViewBuilder):
     def setUp(self):
+        super().setUp()
         self.client = Client()
 
     def test_public_summary(self):
