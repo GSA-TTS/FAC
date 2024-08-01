@@ -7,7 +7,7 @@
     <meta property="og:site_name" content="Federal Audit Clearinghouse" />
     <meta property="og:description" content="{{ post.meta_description }}" />
     <meta property="og:type" content="website" />
-{% endblock %}
+{% endblock metatags %}
 {% block content %}
     <div class="grid-container">
         <h1>Create new audit</h1>
@@ -38,6 +38,6 @@
             </ol>
         </div>
     </div>
-    {% block step-content %}{% endblock %}
+    {% block step-content %}{% endblock step-content %}
 {% endblock content %}
 <script>//const authToken = "aGV5bWF0dDpmYWNzYWMyMDIy"</script>

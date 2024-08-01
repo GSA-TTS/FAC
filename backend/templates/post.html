@@ -5,7 +5,7 @@
     <meta property="og:title" content="{{ object.title }}" />
     <meta property="og:url" content="{% url 'post_detail' object.slug %}" />
     <meta property="og:type" content="article" />
-{% endblock %}
+{% endblock metatags %}
 {% block content %}
     <h1>{{ object.title }}</h1>
     <div>{{ object.content | safe }}</div>

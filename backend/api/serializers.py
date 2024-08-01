@@ -95,9 +95,9 @@ class UEISerializer(serializers.Serializer):
             api.uei.call_sam_api
             api.uei.parse_sam_uei_json
         +   If we don't have errors by that point, flatten the data.
-            api.serializsers.UEISerializer.validate_auditee_uei
+            api.serializers.UEISerializer.validate_auditee_uei
         +   If we don't encounter errors at that point, return the flattened data.
-            api.serializsers.UEISerializer.validate_auditee_uei
+            api.serializers.UEISerializer.validate_auditee_uei
 
     """
 

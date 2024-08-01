@@ -1,0 +1,19 @@
+{
+    "CORSRules": [
+       {
+          "AllowedHeaders": [
+             "Authorization"
+          ],
+          "AllowedMethods": [
+             "HEAD",
+             "GET"
+          ],
+          "AllowedOrigins": [
+             "https://app.fac.gov"
+          ],
+          "ExposeHeaders": [
+             "ETag"
+          ]
+       }
+    ]
+ }

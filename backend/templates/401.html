@@ -5,9 +5,9 @@
             <h1 class="font-sans-2xl">401 Error: Unauthorized</h1>
             <div class="font-sans-lg">
                 <p>
-                    Please <a href="/openid/login/" class="usa-link">sign in</a> to view this page
+                    Please <a href="{% url 'login' %}" class="usa-link">sign in</a> to view this page
                 </p>
-                <a href="/openid/login/" class="usa-button">Sign in</a>
+                <a href="{% url 'login' %}" class="usa-button">Sign in</a>
             </div>
             {% if exception %}<p class="text-base">Error code: {{ exception }}</p>{% endif %}
         </div>

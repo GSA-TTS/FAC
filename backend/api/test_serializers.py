@@ -2,10 +2,12 @@ import json
 from unittest import TestCase
 
 from unittest.mock import patch
+from django.utils import timezone as django_timezone
+from datetime import timedelta
 from django.test import SimpleTestCase
 from model_bakery import baker
 
-from api.test_uei import valid_uei_results
+from api.test_uei import missing_uei_results, valid_uei_results
 from api.serializers import (
     EligibilitySerializer,
     UEISerializer,
@@ -15,7 +17,7 @@ from api.serializers import (
     AccessAndSubmissionSerializer,
     CERTIFIERS_HAVE_DIFFERENT_EMAILS,
 )
-from audit.models import User, Access
+from audit.models import User, Access, UeiValidationWaiver
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -64,7 +66,7 @@ class EligibilityStepTests(SimpleTestCase):
         self.assertFalse(EligibilitySerializer(data=organization_type_none).is_valid())
 
 
-class UEIValidatorStepTests(SimpleTestCase):
+class UEIValidatorStepTests(TestCase):
     def test_valid_uei_payload(self):
         """
         UEI should meet UEI Technical Specifications defined in the UEI validator
@@ -94,6 +96,40 @@ class UEIValidatorStepTests(SimpleTestCase):
 
         # Invalid
         self.assertFalse(UEISerializer(data=invalid).is_valid())
+
+    def test_waived_uei_payload(self):
+        """
+        A UEI with an applicable validation waiver should still pass, regardless of the SAM result.
+        It should still meet the UEI Technical Specifications defined in the UEI validator.
+        """
+        valid = {"auditee_uei": "SUPERC00LUE1"}
+
+        baker.make(UeiValidationWaiver, uei=valid["auditee_uei"])
+
+        # Valid, even if it's not a real UEI. Mock the SAM call as though the entity doesnt exist.
+        with patch("api.uei.SESSION.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            mock_get.return_value.json.return_value = json.loads(missing_uei_results)
+            self.assertTrue(UEISerializer(data=valid).is_valid())
+
+    def test_expired_waived_uei_payload(self):
+        """
+        A UEI with an expired validation waiver should not pass.
+        """
+        yesterday = django_timezone.now() - timedelta(days=1)
+        expired = {"auditee_uei": "SUPERC00LUE1", "expiration": yesterday}
+
+        baker.make(
+            UeiValidationWaiver,
+            uei=expired["auditee_uei"],
+            expiration=expired["expiration"],
+        )
+
+        # Invalid due to the waiver being expired. Mock the SAM call as though the entity does not exist.
+        with patch("api.uei.SESSION.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            mock_get.return_value.json.return_value = json.loads(missing_uei_results)
+            self.assertFalse(UEISerializer(data=expired).is_valid())
 
     def test_quirky_uei_payload(self):
         """

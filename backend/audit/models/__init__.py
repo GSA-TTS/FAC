@@ -9,6 +9,7 @@ from .models import (
     SingleAuditChecklistManager,
     SingleAuditReportFile,
     SacValidationWaiver,
+    UeiValidationWaiver,
     User,
     excel_file_path,
     generate_sac_report_id,
@@ -28,6 +29,7 @@ _models = [
     SingleAuditChecklistManager,
     SingleAuditReportFile,
     SacValidationWaiver,
+    UeiValidationWaiver,
     User,
 ]
 _functions = [

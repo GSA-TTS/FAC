@@ -41,8 +41,12 @@ exclude_dirs = [
     "audit/test_validators.py",
     "node_modules",
     "dissemination/test_search.py",
+    "dissemination/tests.py",
+    ".venv"
 ]
 
 [tool.djlint]
 ignore="H006,H022,H023,H019,H031"
+profile="django"
+use_gitignore=true
 # img_height,https,entity,javascript,lang

@@ -12,13 +12,13 @@
     <div class="grid-row">
         <div class="grid-container margin-top-6 margin-bottom-6">
             
-            {% include './title.html'  with auditee_name=auditee_name %}
+            {% include "./title.html" with auditee_name=auditee_name %}
             
             <div id="submission-checklist-content">
                 <ul class="usa-icon-list usa-icon-list--size-sm tablet:grid-col-11 font-sans-md">
 
                     {% if not pre_submission_validation.completed %}
-                        {% include './key-info-preliminary.html' %}
+                        {% include "./key-info-preliminary.html" %}
                         {% section_block report_id general_information %}
                         {% section_block report_id audit_information %}
                         {% section_block report_id single_audit_report %}
@@ -30,19 +30,19 @@
                         {% section_block report_id additional_ueis %}
                         {% section_block report_id secondary_auditors %}
                         {% section_block report_id additional_eins %}
-                        {% include './key-info-pre-validation.html' %}
-                        {% include './tribal-data-release.html' %}
-                        {% include './validation.html' %}
+                        {% include "./key-info-pre-validation.html" %}
+                        {% include "./tribal-data-release.html" %}
+                        {% include "./validation.html" %}
                     {% else %}
-                        {% include './key-info-certification.html' %}
-                        {% include './preview-button-group.html' %}
+                        {% include "./key-info-certification.html" %}
+                        {% include "./preview-button-group.html" %}
                     {% endif %}
                     
                     {% comment %} Auditor Certification {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105 margin-top-5"
                         id="auditor-certification-completed">
                         {% if certification.auditor_certified %}
-                            {% include './icon-list-icon.html' with completed=certification.auditor_certified %}
+                            {% include "./icon-list-icon.html" with completed=certification.auditor_certified %}
                             <div class="text-success-darker">
                                 <p class="text-bold text-underline margin-0">Auditor Certification (Complete)</p>
                                 <p class="margin-0">
@@ -50,7 +50,7 @@
                                 </p>
                             </div>
                         {% elif certification.auditor_enabled %}
-                            {% include './icon-list-icon.html' with completed=certification.auditor_certified %}
+                            {% include "./icon-list-icon.html" with completed=certification.auditor_certified %}
                             <div>
                                 <p class="text-bold margin-0">
                                     <a class="usa-link"
@@ -61,7 +61,7 @@
                                 </p>
                             </div>
                         {% else %}
-                            {% include './icon-list-icon.html' with completed=certification.auditor_certified %}
+                            {% include "./icon-list-icon.html" with completed=certification.auditor_certified %}
                             <div>
                                 <p class="text-bold margin-0">Auditor Certification</p>
                                 <p class="margin-0">
@@ -75,7 +75,7 @@
                     <li class="usa-icon-list__item padding-bottom-3"
                         id="auditee-certification-completed">
                         {% if certification.auditee_certified %}
-                            {% include './icon-list-icon.html' with completed=certification.auditee_certified %}
+                            {% include "./icon-list-icon.html" with completed=certification.auditee_certified %}
                             <div class="text-success-darker">
                                 <p class="text-bold text-underline margin-0">Auditee Certification (Complete)</p>
                                 <p class="margin-0">
@@ -83,7 +83,7 @@
                                 </p>
                             </div>
                         {% elif certification.auditee_enabled %}
-                            {% include './icon-list-icon.html' with completed=certification.auditee_certified %}
+                            {% include "./icon-list-icon.html" with completed=certification.auditee_certified %}
                             <div>
                                 <p class="text-bold margin-0">
                                     <a class="usa-link"
@@ -94,7 +94,7 @@
                                 </p>
                             </div>
                         {% else %}
-                            {% include './icon-list-icon.html' with completed=certification.auditee_certified %}
+                            {% include "./icon-list-icon.html" with completed=certification.auditee_certified %}
                             <div>
                                 <p class="text-bold margin-0">Auditee Certification</p>
                                 <p class="margin-0">

@@ -11,7 +11,7 @@ The three states for a section block:
 {% load sprite_helper %}
 <li class="usa-icon-list__item padding-bottom-105" id="{{ url_tail }}">
     
-	{% include './icon-list-icon.html' with completed=completed display=display %}
+	{% include "./icon-list-icon.html" with completed=completed display=display %}
     
 	{% comment %} 1. Completed {% endcomment %}
 	{% if completed %}
@@ -22,7 +22,7 @@ The three states for a section block:
                 {% if text_nb %}<strong>{{ text_nb }}</strong>{% endif %}
             </p>
 
-			{% include './created-by.html' with name=completed_by time=completed_date %}
+			{% include "./created-by.html" with name=completed_by time=completed_date %}
 
             <p class="margin-0">
                 <a class="usa-link" href="{% url reverse_url_for_file_upload report_id %}">{{ edit_text }}</a>

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from itertools import chain
 import json
 import logging
@@ -69,6 +69,10 @@ def generate_sac_report_id(end_date=None, source="GSAFAC", count=None):
     separator = "-"
     report_id = separator.join([year, month, source, count])
     return report_id
+
+
+def one_month_from_today():
+    return django_timezone.now() + timedelta(days=30)
 
 
 class SingleAuditChecklistManager(models.Manager):
@@ -698,17 +702,19 @@ class SingleAuditReportFile(models.Model):
 class UeiValidationWaiver(models.Model):
     """Records of UEIs that are permitted to be inactive."""
 
-    uei = models.TextField("UEI", unique=True)
-    timestamp = (
-        models.DateTimeField(
-            "When the waiver was created",
-            default=datetime.now(timezone.utc),
-        ),
+    # Method overrides:
+    def __str__(self):
+        return f"#{self.id}--{self.uei}"
+
+    # Not unique, in the case that one UEI needs to be waived several times with different expiration dates.
+    uei = models.TextField("UEI")
+    timestamp = models.DateTimeField(
+        "When the waiver was created",
+        default=django_timezone.now,
     )
-    expiration = (
-        models.DateTimeField(
-            "When the waiver expires",
-        ),
+    expiration = models.DateTimeField(
+        "When the waiver will expire",
+        default=one_month_from_today,
     )
     approver_email = models.TextField(
         "Email address of FAC staff member approving the waiver",
