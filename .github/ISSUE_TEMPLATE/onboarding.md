@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-**Instructions for the issue creator:** 
-1. Fill in the GitHub username of the new person (if known) and the name of the onboarding buddy. 
+**Instructions for the issue creator:**
+1. Fill in the GitHub username of the new person (if known) and the name of the onboarding buddy.
 1. Remove irrelevant checklists (eg designers should never see the engineer checklist.]
 1. Remove the horizontal line below and everything above it (these instructions).
 
@@ -37,14 +37,14 @@ Here's a checklist to get you started and to make sure you've got access to :all
     Please add my GitHub account (https://github.com/myusername) to the following GitHub organizations:
     - https://github.com/GSA
     - https://github.com/GSA-TTS
-    
+
     I will be working on the FAC project:
     - https://github.com/GSA-TTS/FAC
-    
+
     I have cc'd the FAC Product Lead for awareness.
-        
+
     Thank you!
-    ```        
+    ```
     - (Note this step could take a few days; humans handle these requests.)
   - [ ] Once you are added to the GSA-TTS org, ask [the person(s) with the "Maintainer" role to add you to the `FAC-team` team](https://github.com/orgs/GSA-TTS/teams/fac-team/members). This will grant you read/write access to our repositories.
   - [ ] Have the team calendar owner (@jadudm) share the calendar invite link to our new team member.
@@ -52,14 +52,14 @@ Here's a checklist to get you started and to make sure you've got access to :all
 **For designers, also...**
 - [ ] Review the [design onboarding document](https://docs.google.com/document/d/1EILl0nZr59T4PFJJMtFbmnQDJPksgzIFPuoFDN0bk0g/edit#heading=h.bhu3dgydlbvr)
 - [ ] Visit https://touchpoints.digital.gov/ and set up a touchpoints account
-- [ ] If you don't already have a Figma license, request one from your supervisor. 
+- [ ] If you don't already have a Figma license, request one from your supervisor.
 - [ ] If you don't already have a Mural ccount, follow the instructions to get one [here](https://handbook.tts.gsa.gov/tools/mural/).
 
 **For engineers, also...**
 - [ ] Familiarize yourself with Python, Django, and Cloud.gov—all tools used in this project.
   - [ ] If you need to catch up on the latest in Python development, check out the [Python developer's guide](https://devguide.python.org/).
   - [ ] Work through the [Django Tutorial](https://docs.djangoproject.com/en/4.0/intro/tutorial01/) and writing your first Django app.
-  - [ ] If it's not already set up on your machine & account, enable [commit signing](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits). Also see the pinned messages in the Slack development channel.
+  - [ ] If it's not already set up on your machine & account, enable [commit signing](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits). Also see the pinned messages in the Slack development channel. (test)
   - [ ] If you're not already, get [setup with Cloud.gov](https://cloud.gov/docs/getting-started/setup/)
     - [ ] Once your account exists, make a PR to [add yourself to the list of developers](https://github.com/GSA-TTS/FAC/tree/main/terraform/meta/config.tf) with access to our spaces.
   - [ ] Practice deploying a [python application](https://github.com/cloud-gov/cf-hello-worlds/tree/main/python-flask) to Cloud.gov using the Cloud.gov command line interface (CLI): https://cloud.gov/docs/getting-started/your-first-deploy/.
