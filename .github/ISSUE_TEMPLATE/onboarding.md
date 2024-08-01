@@ -59,7 +59,7 @@ Here's a checklist to get you started and to make sure you've got access to :all
 - [ ] Familiarize yourself with Python, Django, and Cloud.gov—all tools used in this project.
   - [ ] If you need to catch up on the latest in Python development, check out the [Python developer's guide](https://devguide.python.org/).
   - [ ] Work through the [Django Tutorial](https://docs.djangoproject.com/en/4.0/intro/tutorial01/) and writing your first Django app.
-  - [ ] If it's not already set up on your machine & account, enable [commit signing](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits). Also see the pinned messages in the Slack development channel. (test)
+  - [ ] If it's not already set up on your machine & account, enable [commit signing](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits). Also see the pinned messages in the Slack development channel.
   - [ ] If you're not already, get [setup with Cloud.gov](https://cloud.gov/docs/getting-started/setup/)
     - [ ] Once your account exists, make a PR to [add yourself to the list of developers](https://github.com/GSA-TTS/FAC/tree/main/terraform/meta/config.tf) with access to our spaces.
   - [ ] Practice deploying a [python application](https://github.com/cloud-gov/cf-hello-worlds/tree/main/python-flask) to Cloud.gov using the Cloud.gov command line interface (CLI): https://cloud.gov/docs/getting-started/your-first-deploy/.
