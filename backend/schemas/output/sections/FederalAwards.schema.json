@@ -571,7 +571,8 @@
          "properties": {
             "section_name": {
                "enum": [
-                  "FederalAwards"
+                  "FederalAwards",
+                  "FederalAwardsExpended"
                ],
                "type": "string"
             },

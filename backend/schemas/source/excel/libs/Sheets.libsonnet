@@ -32,6 +32,7 @@ local y_or_n_range = open_range {
 local section_names = {
   CORRECTIVE_ACTION_PLAN: 'CorrectiveActionPlan',
   FEDERAL_AWARDS: 'FederalAwards',
+  FEDERAL_AWARDS_EXPENDED: 'FederalAwardsExpended', // Added to allow backaward compatibility with workbooks versions from 1.0.0 to 1.1.1
   AUDIT_FINDINGS_TEXT: 'FindingsText',
   FEDERAL_AWARDS_AUDIT_FINDINGS: 'FindingsUniformGuidance',
   ADDITIONAL_UEIS: 'AdditionalUeis',

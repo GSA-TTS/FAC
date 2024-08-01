@@ -373,8 +373,9 @@ local FederalAwardEntry = Types.object {
 local Meta = Types.object {
   additionalProperties: false,
   properties: {
+    //FEDERAL_AWARDS_EXPENDED was added to the enum to allow backaward compatibility with versions prior to 1.1.1.
     section_name: Types.string {
-      enum: [Sheets.section_names.FEDERAL_AWARDS],
+      enum: [Sheets.section_names.FEDERAL_AWARDS, Sheets.section_names.FEDERAL_AWARDS_EXPENDED],
     },
     // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
     // Once we establish a versioning pattern, we can update this and enforce it accordingly.
