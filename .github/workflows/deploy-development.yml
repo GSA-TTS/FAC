@@ -1,6 +1,12 @@
 ---
 name: Deploy to Development and Management Environment
 on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '.github/ISSUE_TEMPLATE/**'
   workflow_dispatch: null
 
 jobs:
