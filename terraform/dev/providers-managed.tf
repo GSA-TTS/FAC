@@ -7,7 +7,7 @@ terraform {
   required_providers {
     cloudfoundry = {
       source  = "cloudfoundry-community/cloudfoundry"
-      version = "~>0.51.3"
+      version = "~>0.53.1"
     }
   }
 
@@ -23,7 +23,8 @@ terraform {
 }
 
 provider "cloudfoundry" {
-  api_url  = "https://api.fr.cloud.gov"
-  user     = var.cf_user
-  password = var.cf_password
+  api_url                  = "https://api.fr.cloud.gov"
+  user                     = var.cf_user
+  password                 = var.cf_password
+  delete_recursive_allowed = false
 }
