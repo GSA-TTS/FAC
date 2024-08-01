@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - main
-    paths:
-      - '!docs/**'
-      - '!.github/ISSUE_TEMPLATE/**'
+    paths-ignore:
+      - 'docs/**'
+      - '.github/ISSUE_TEMPLATE/**'
 
 jobs:
   # ensure that every time a push to main occurs, the container is built and published to ghcr
