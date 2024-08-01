@@ -49,23 +49,23 @@
                             </a>
 
                             {% if not is_sf_sac_downloadable %}
-                            <a class="flex-align-self-center margin-bottom-2"
+                            <a class="tooltip flex-align-self-center margin-bottom-2"
                                 href="https://support.fac.gov/hc/en-us"
-                                target="_blank"
-                                title="SF-SACs are typically available for download a day after submission. Click here to learn more.">
+                                target="_blank">
                                 <svg class="usa-icon"
                                     aria-hidden="true"
                                     role="img">
                                     {% uswds_sprite "help" %}
                                 </svg>
+                                <span class="tooltiptext">SF-SACs are typically available for download a day after submission. Click to learn more.</span>
                             </a>
                             {% endif %}
                         </div>
 
                         {% if general.is_public or include_private %}
                             <a class="usa-button display-flex font-sans-xl"
-                            href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                            target="_blank">
+                                href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
+                                target="_blank">
                                 <svg class="usa-icon margin-right-1 flex-align-self-center"
                                     aria-hidden="true"
                                     role="img">
