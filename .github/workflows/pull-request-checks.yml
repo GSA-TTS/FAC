@@ -5,9 +5,11 @@ on:
     branches:
       - main
       - prod
-    paths-ignore:
-      - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
+    paths:
+      - '**'
+      - '!docs/**'
+      - 'docs/bpmn-workflow-models/**'
+      - '!.github/ISSUE_TEMPLATE/**'
   workflow_dispatch: null
 
 jobs:
