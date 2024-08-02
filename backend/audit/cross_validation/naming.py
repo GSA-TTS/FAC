@@ -34,7 +34,7 @@ class SectionBabelFish(NamedTuple):
 SECTION_NAMES = {
     "additional_eins": SectionBabelFish(
         all_caps="ADDITIONAL_EINS",
-        camel_case=FORM_SECTIONS.ADDITIONAL_EINS,
+        camel_case="AdditionalEINs",  # We can't use FORM_SECTIONS.ADDITIONAL_EINS here because "AdditionalEINs" is used as a field name in the JSON schema
         friendly="Additional EINs",
         friendly_title="Additional EINs",
         reverse_url_for_file_upload="report_submission:additional-eins",
@@ -47,7 +47,7 @@ SECTION_NAMES = {
     ),
     "additional_ueis": SectionBabelFish(
         all_caps="ADDITIONAL_UEIS",
-        camel_case=FORM_SECTIONS.ADDITIONAL_UEIS,
+        camel_case="AdditionalUEIs",  # We can't use FORM_SECTIONS.ADDITIONAL_UEIS here because "AdditionalUEIs" is used as a field name in the JSON schema
         friendly="Additional UEIs",
         friendly_title="Additional UEIs",
         reverse_url_for_file_upload="report_submission:additional-ueis",
