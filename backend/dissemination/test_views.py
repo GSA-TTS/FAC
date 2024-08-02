@@ -20,6 +20,7 @@ from dissemination.models import (
     CapText,
     Note,
     OneTimeAccess,
+    DisseminationCombined,
 )
 from users.models import Permission, UserPermission
 
@@ -602,6 +603,37 @@ class SummaryViewTests(TestMaterializedViewBuilder):
             response.context["data"]["Notes to SEFA"][0]["accounting_policies"],
             note.accounting_policies,
         )
+
+    def test_sac_download_available(self):
+        """
+        Ensures is_sf_sac_downloadable is True when a submission's SF-SAC is downloadable
+        """
+        gen_object = baker.make(
+            General, is_public=True, report_id="2022-12-GSAFAC-0000000001"
+        )
+        baker.make(
+            FederalAward,
+            report_id=gen_object,
+        )
+        self.refresh_materialized_view()
+        url = reverse(
+            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
+        )
+
+        response = self.client.get(url)
+        self.assertEquals(response.context["is_sf_sac_downloadable"], True)
+
+    def test_sac_download_not_available(self):
+        """
+        Ensures is_sf_sac_downloadable is False when a submission's SF-SAC is not downloadable
+        """
+        baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
+        url = reverse(
+            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
+        )
+
+        response = self.client.get(url)
+        self.assertEquals(response.context["is_sf_sac_downloadable"], False)
 
 
 class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
