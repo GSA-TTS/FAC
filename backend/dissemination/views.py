@@ -360,7 +360,7 @@ class AuditSummaryView(View):
             "general": general_data,
             "include_private": include_private,
             "data": data,
-            "is_sf_sac_downloadable": is_sf_sac_downloadable,
+            "is_sf_sac_downloadable": False,
         }
 
         return render(request, "summary.html", context)

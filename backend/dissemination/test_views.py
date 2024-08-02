@@ -20,7 +20,6 @@ from dissemination.models import (
     CapText,
     Note,
     OneTimeAccess,
-    DisseminationCombined,
 )
 from users.models import Permission, UserPermission
 
