@@ -167,7 +167,7 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                 messages.set_level(request, messages.WARNING)
                 messages.warning(
                     request,
-                    f"Cannot apply waiver to SAC with status {sac.submission_status}. Expected status to be one of {SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION}, {SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED}",
+                    f"Cannot apply waiver to SAC with status {sac.submission_status}. Expected status to be one of {SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION}, {SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED}, or {SingleAuditChecklist.STATUS.IN_PROGRESS}.",
                 )
                 logger.warning(
                     f"User {request.user.email} attempted to apply waiver to SAC with invalid status: {sac.submission_status}"
