@@ -48,7 +48,7 @@ See [editorconfig.org](https://editorconfig.org/) for more information.
 
 **NOTE** - For Windows developers
 
-By default, your IDE will acknowledge `CRLF` as the denotation for newlines. The bash scripts (.sh files) in this application require `LF` denotation. Make sure your IDE uses `LF` denotation for newlines when reading through each of these scripts.
+By default, your IDE will acknowledge `CRLF` as the denotation for newlines. Many scripts in this repository **require** `LF` denotation (noticeably the .sh files when you first try to run and test the application). Make sure your IDE uses `LF` denotation for newlines when reading through each of these scripts.
 
 You can use the Git commands below BEFORE cloning the repository to your local computer to prevent files from using `CRLF` by default.
 ```
