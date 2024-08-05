@@ -34,6 +34,7 @@
                         <div class="display-flex flex-row">
                             <a class="usa-button display-flex flex-fill font-sans-xl margin-bottom-2"
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 {% if is_sf_sac_downloadable %}
                                     href="{% url 'dissemination:SummaryReportDownload' report_id=report_id %}"
                                 {% else %}
@@ -51,7 +52,8 @@
                             {% if not is_sf_sac_downloadable %}
                             <a class="tooltip flex-align-self-center margin-bottom-2"
                                 href="https://support.fac.gov/hc/en-us"
-                                target="_blank">
+                                target="_blank"
+                                rel="noopener noreferrer">
                                 <svg class="usa-icon"
                                     aria-hidden="true"
                                     role="img">
@@ -65,7 +67,8 @@
                         {% if general.is_public or include_private %}
                             <a class="usa-button display-flex font-sans-xl"
                                 href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                                target="_blank">
+                                target="_blank"
+                                rel="noopener noreferrer">
                                 <svg class="usa-icon margin-right-1 flex-align-self-center"
                                     aria-hidden="true"
                                     role="img">
