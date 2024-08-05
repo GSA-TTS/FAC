@@ -22,7 +22,6 @@ See [the pull request template](../.github/pull_request_template.md) for steps t
 * [Docker](https://docker.com)
 * [Node.js](https://nodejs.org/en/download/package-manager) for end-to-end testing with Cypress.
 * [CF8](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) for access to the cloud.gov CLI.
-* [GnuPG](https://gnupg.org/download/index.html) for encryption of your git commits.
 * Local dev
   * [Pyenv](https://github.com/pyenv) for managing Python versions
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments

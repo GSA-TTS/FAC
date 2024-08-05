@@ -39,7 +39,7 @@ graph TD
 ```
 
 ### Steps:
-1. Start a branch from `main` for new work commit changes. When your work is ready, rebase to `main` and clean your commit history. When acceptance criteria is met and tests pass, create a pull request that targets the `main` branch. The terraform plan for the dev environmnet will be created as part of the PR. Tag one or more relevant people for review.
+1. Start a branch from `main` for new work commit changes. When your work is ready, rebase to `main` and clean your commit history. When acceptance criteria is met and tests pass, create a pull request that targets the `main` branch. Make sure that the commits in your pull request are **signed** ([follow these steps](#signed-commits)). The terraform plan for the dev environment will be created as part of the PR. Tag one or more relevant people for review.
 2. Branch is ready for review. The reviewer will test locally for acceptance criteria, readability, security considerations, and good testing practices. Don't review your own PR. Once the PR is merged into the `main` branch, after tests pass, any changes to the management or dev spaces via terraform will be applied, and the code will deployed to the dev environment.
 3. When its time to create a release for review, we will add those changes to `prod` via PR. Merging to the `prod` branch will deploy the code to staging after tests pass.
 4. The release is reviewed by stakeholders. When it is ready for production, an OROS approver will add a version tag starting with "v". The tag will trigger an automated deploy to production. There is a GitHub rule to enforce that only "maintainer" role are allowed to add tags starting with "v." 
@@ -81,3 +81,80 @@ graph TD
 2. When the branch is ready for review. Test locally for acceptance criteria, look for readability, security considerations, and good testing practices. Don't review your own PR. Once merged into `prod` This will auto deploy to the staging environment after tests pass.
 3. The hotfix is reviewed by stakeholders in the staging environment. When it is ready for production, a GitHub maintainer will add a version tag starting with "v".  The tag will trigger an automated deploy to production. There is a GitHub rule to enforce that only `maintainer` role are allowed to add tags starting with "v."
 4. Changes need to be merged back into the `main` branch.
+
+## Signed Commits
+
+Commits are required to be signed prior to being formed into a PR and merged into `main`. We use GPG keys to verify these commits. You can complete the following steps to ensure your commits are verified.
+
+### Setup
+
+You can install GnuPG [here](https://gnupg.org/download/index.html) to gain access to the CLI commands below.
+
+### CLI Instructions
+
+```
+1. Generate a new GPG Key
+gpg --full-generate-key
+Press Enter for Default key
+Press Enter for default keysize
+Enter Expiration (0)
+Enter your name
+Enter your github @noreply email to keep your account email private (https://github.com/settings/emails)
+
+2. Get your GPG key
+gpg --list-secret-keys --keyid-format=long
+gpg --armor --export <keyid>
+
+3. Copy your Key and add it to git gpg keys (https://github.com/settings/keys)
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+....
+-----END PGP PUBLIC KEY BLOCK-----
+
+4. Tell git about your key
+git config --global --unset gpg.format
+gpg --list-secret-keys --keyid-format=long
+Get your keyid (should be the same as step 2)
+git config --global user.signingkey <keyid>
+git config --global commit.gpgsign true
+
+# For windows users only:
+git config --global gpg.program "C:\Program Files (x86)\GnuPG\bin\gpg.exe"
+
+NOTE: You will now have to enter your gpg passcode in order to do a commit (Yes, even git fork prompts for a pass now). Keep it handy or easy for you to remember while still being complex
+```
+
+---
+**NOTE**
+
+Before doing anything with git, use gpg --sign on some file to make sure that the signing machinery is currently working for you. This should only apply if you have already created some commits without completing the above steps to configure your GPG key.
+```
+gpg --sign <some file>
+git checkout <your branch>
+git log --reverse --show-signature
+git rebase -i HEAD~<numeral indicating number of commits you need to sign>
+```
+This is sample output:
+```
+pick d3381defc Change backend so that it converts user-submitted UEIs to uppercase.
+pick 679acdde6 Really unsubtle approach to uppercasing the UEI on the frontend.
+pick 45eeb61bb Prettier linting.
+pick 5d676ca90 Prettier linting.
+```
+Add `exec git commit --amend --no-edit -s` after every pick line, changing it to something like this:
+```
+pick d3381defc Change backend so that it converts user-submitted UEIs to uppercase.
+exec git commit --amend --no-edit -s
+pick 679acdde6 Really unsubtle approach to uppercasing the UEI on the frontend.
+exec git commit --amend --no-edit -s
+pick 45eeb61bb Prettier linting.
+exec git commit --amend --no-edit -s
+pick 5d676ca90 Prettier linting.
+exec git commit --amend --no-edit -s
+```
+This will rebase your branch; if there are errors you’ll end up in an intermediate state and will need to do git rebase --continue after fixing them.
+Once that’s done, push the branch again:
+```
+git push --force origin <your branch>
+```
+
+Your existing commits should now be signed as well as your new commits moving forward.
