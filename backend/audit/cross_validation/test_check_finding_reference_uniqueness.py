@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.test import TestCase
-from audit.models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist, SacValidationWaiver
 from census_historical_migration.invalid_record import InvalidRecord
 from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
 from .sac_validation_shape import sac_validation_shape
@@ -106,5 +106,30 @@ class CheckFindingReferenceUniquenessTests(TestCase):
         InvalidRecord.reset()
         InvalidRecord.append_validations_to_skip("check_finding_reference_uniqueness")
 
+        errors = check_finding_reference_uniqueness(sac_validation_shape(sac))
+        self.assertEqual(errors, [])
+
+    def test_duplicate_finding_reference_numbers_with_waivers(self):
+        """
+        Check that errors are not returned for report with duplicate reference numbers when the validation is waived.
+        """
+        range_size = generate_random_integer(2, 4)
+        sac = baker.make(SingleAuditChecklist)
+        baker.make(
+            SacValidationWaiver,
+            report_id=sac,
+            waiver_types=[SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER],
+        )
+        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
+            [self._award_reference() for _ in range(range_size)],
+            [
+                [
+                    self._reference_number(self.REF_MIN),
+                    self._reference_number(self.REF_MIN),
+                    self._reference_number(self.REF_MAX),
+                ]
+            ],
+        )
+        sac.waiver_types = [SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER]
         errors = check_finding_reference_uniqueness(sac_validation_shape(sac))
         self.assertEqual(errors, [])

@@ -13,6 +13,7 @@ def check_finding_reference_uniqueness(sac_dict, *_args, **_kwargs):
 
     all_sections = sac_dict.get("sf_sac_sections", {})
     data_source = sac_dict.get("sf_sac_meta", {}).get("data_source", "")
+    waiver_types = sac_dict.get("waiver_types", [])
     findings_uniform_guidance_section = (
         all_sections.get("findings_uniform_guidance") or {}
     )
@@ -30,6 +31,11 @@ def check_finding_reference_uniqueness(sac_dict, *_args, **_kwargs):
         in InvalidRecord.fields["validations_to_skip"]
     ):
         # Skip this validation if it is an historical audit report with duplicate reference numbers
+        return errors
+
+    from audit.models import SacValidationWaiver
+
+    if SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER in waiver_types:
         return errors
 
     for finding in findings_uniform_guidance:

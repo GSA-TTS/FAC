@@ -151,11 +151,23 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                 logger.info(
                     f"SAC {sac.report_id} updated successfully with waiver by user: {request.user.email}."
                 )
+            elif (
+                SingleAuditChecklist.STATUS.IN_PROGRESS
+                and SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER
+                in obj.waiver_types
+            ):
+                logger.info(
+                    f"User {request.user.email} is applying waiver for SAC with status: {sac.submission_status}"
+                )
+                super().save_model(request, obj, form, change)
+                logger.info(
+                    f"Duplicate finding reference number waiver applied to SAC {sac.report_id} by user: {request.user.email}."
+                )
             else:
                 messages.set_level(request, messages.WARNING)
                 messages.warning(
                     request,
-                    f"Cannot apply waiver to SAC with status {sac.submission_status}. Expected status to be one of {SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION}, {SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED}",
+                    f"Cannot apply waiver to SAC with status {sac.submission_status}. Expected status to be one of {SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION}, {SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED}, or {SingleAuditChecklist.STATUS.IN_PROGRESS}.",
                 )
                 logger.warning(
                     f"User {request.user.email} attempted to apply waiver to SAC with invalid status: {sac.submission_status}"

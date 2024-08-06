@@ -62,10 +62,11 @@ def sac_validation_shape(sac):
             ...
         },
         "sf_sac_meta": { ... },
+        "waiver_types": [ ... ],
     }
 
     """
-    from audit.models import Access
+    from audit.models import Access, SacValidationWaiver
 
     shape = {
         "sf_sac_sections": {k: get_shaped_section(sac, k) for k in SECTION_NAMES},
@@ -80,6 +81,16 @@ def sac_validation_shape(sac):
             "data_source": sac.data_source,
         },
     }
+
+    # Querying the SacValidationWaiver table for waivers
+    waivers = SacValidationWaiver.objects.filter(report_id=sac.report_id)
+
+    # Extracting waiver types from waivers
+    waiver_types = [
+        waiver_type for waiver in waivers for waiver_type in waiver.waiver_types
+    ]
+
+    shape["waiver_types"] = waiver_types
 
     certifying_auditee = Access.objects.filter(
         sac=sac, role="certifying_auditee_contact"
