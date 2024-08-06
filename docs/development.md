@@ -68,7 +68,6 @@ Add and define the following environment variables using the instructions below.
 ENV = 'LOCAL'
 DISABLE_AUTH = False
 SECRET_KEY = YourSecretKey
-CLAMAV_PORT = 
 SAM_API_KEY = 
 DJANGO_SECRET_LOGIN_KEY = 
 LOGIN_CLIENT_ID = 
@@ -91,10 +90,7 @@ In the Dev/Staging/Production environments, it will be set to `False` and requir
 In GitHub Actions (the CI/CD pipeline), it will be set to `True` to complete unit testing and frontend testing properly.
 
 #### SECRET_KEY
-Generate your own random secret key for local development. Django uses this to provide cryptographic signing.
-
-#### CLAMAV_PORT
-A port other than `9000` for the clamav-rest image.
+Create your own secret key for local development. Django uses this to provide cryptographic signing.
 
 #### SAM_API_KEY
 We use the `SAM_API_KEY` environment variable to interact with the SAM.gov API.
@@ -117,6 +113,7 @@ The `LOGIN_CLIENT_ID` environment variable is our unique application identifier 
 
 ---
 For local testing, you may need to specify a few other variables:
+* The clamav-rest service looks at port `9000` by default - which is already in use. You can change this to a different port if preferred by using `CLAMAV_PORT = {new port number}`.
 * Cypress variables for running local end-to-end tests. See the [testing docs](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md#end-to-end-testing) for more.
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
@@ -205,18 +202,6 @@ likely not need to do anything with these.
 However, if you edit any files in `/backend/static` you will need to either re-up docker or manually collect static. This is done via `python manage.py collectstatic`.
 
 Try to avoid pushing frequent edits to files in `/backend/static` (more than once every few days), as each change causes a rebuild of the ghcr image for use in the automatic PR tests.
-
-
-<!-- ### Load test data
-
-It would be nice to run tests, but in order to do so, we need test data. 
-
-
-```shell
-docker compose run web python manage.py load_test_data
-```
-
-If you want to load more data, see the section on loading previous years. -->
 
 #### Load SingleAuditChecklist fixtures
 
