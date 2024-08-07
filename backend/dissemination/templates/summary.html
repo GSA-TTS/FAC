@@ -31,22 +31,44 @@
                 </div>
                 <div class="grid-col-12 tablet:grid-col-5 tablet:display-flex flex-column tablet:flex-justify-end">
                     <div class="margin-0 flex-align-self-end margin-top-2">
-                        
-                        <a class="usa-button display-flex font-sans-xl margin-bottom-2"
-                           href="{% url 'dissemination:SummaryReportDownload' report_id=report_id %}"
-                           target="_blank">
-                            <svg class="usa-icon margin-right-1 flex-align-self-center"
-                                 aria-hidden="true"
-                                 role="img">
-                                {% uswds_sprite "file_download" %}
-                            </svg>
-                            <p class="margin-0">SF-SAC</p>
-                        </a>
-                        
+                        <div class="display-flex flex-row">
+                            <a class="usa-button display-flex flex-fill font-sans-xl margin-bottom-2"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                {% if is_sf_sac_downloadable %}
+                                    href="{% url 'dissemination:SummaryReportDownload' report_id=report_id %}"
+                                {% else %}
+                                    aria-disabled="true"
+                                {% endif %}
+                            >
+                                <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                    aria-hidden="true"
+                                    role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                                <p class="margin-0">SF-SAC</p>
+                            </a>
+
+                            {% if not is_sf_sac_downloadable %}
+                            <a class="tooltip flex-align-self-center margin-bottom-2"
+                                href="https://support.fac.gov/hc/en-us/articles/29043839561869-I-just-submitted-my-audit-report-Why-can-t-I-download-my-report-from-Search-Is-there-an-error-with-my-submission"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                <svg class="usa-icon"
+                                    aria-hidden="true"
+                                    role="img">
+                                    {% uswds_sprite "help" %}
+                                </svg>
+                                <span class="tooltiptext">SF-SACs are typically available for download a day after submission. Click to learn more.</span>
+                            </a>
+                            {% endif %}
+                        </div>
+
                         {% if general.is_public or include_private %}
                             <a class="usa-button display-flex font-sans-xl"
-                            href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                            target="_blank">
+                                href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
+                                target="_blank"
+                                rel="noopener noreferrer">
                                 <svg class="usa-icon margin-right-1 flex-align-self-center"
                                     aria-hidden="true"
                                     role="img">
