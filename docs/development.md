@@ -11,53 +11,67 @@ See [the pull request template](../.github/pull_request_template.md) for steps t
   * [Environment Variables](#environment-variables)
   * [Docker](#docker)
   * [Local Development](#local-development)
-* [Django setup](#django-setup)
+* [Development in principle](#development-in-principle)
 * [Python code quality tooling](#python-code-quality-tooling) 
 * [Frontend code quality tooling](#frontend-code-quality-tooling) 
 
 ## Tools
 
+* [Python](https://www.python.org/)
+  * Target python version is defined in [../backend/runtime.txt](../backend/runtime.txt).
 * [Docker](https://docker.com)
+* [Node.js](https://nodejs.org/en/download/package-manager) for end-to-end testing with Cypress.
+* [CF8](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) for access to the cloud.gov CLI.
 * Local dev
   * [Pyenv](https://github.com/pyenv) for managing Python versions
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments
   * [Postgres](https://www.postgresql.org/)
   * [SAM.gov](https://sam.gov/content/home) to validate UEI's
 
+---
+**NOTE** - Windows users *may* need the following tools installed in addition to the above tools.
+* [Chocolatey](https://chocolatey.org/install) - a package manager that will allow for installation of tools that are not available on Windows, such as GNU make (used for running Makefile operations).
+  * Here is an example of how you would use Chocolatey in the terminal to install GNU make:
+    ```
+    choco install make
+    ```
+---
+
 ## Setting up your dev environment
 
----
-**NOTE**
-
-Target python version is defined in [../backend/runtime.txt](../backend/runtime.txt)
-
----
-
-## EditorConfig
+### EditorConfig
 
 We have a `.editorconfig` file at the root directory with basic settings.
 See [editorconfig.org](https://editorconfig.org/) for more information.
 
-## Environment Variables
+---
+
+**NOTE** - For Windows developers
+
+By default, your IDE will acknowledge `CRLF` as the denotation for newlines. Many scripts in this repository **require** `LF` denotation (noticeably the .sh files when you first try to run and test the application). Make sure your IDE uses `LF` denotation for newlines when reading through each of these scripts.
+
+You can use the Git commands below BEFORE cloning the repository to your local computer to prevent files from using `CRLF` by default.
+```
+# don't use --global if you only want this behavior for a specific repository.
+git config --global core.autocrlf false
+# this ensures all files use LF.
+git config --global core.eol lf
+```
+---
+
+### Environment Variables
 
 Create a .env file in the `/backend` directory.
 Add and define the following environment variables using the instructions below.
 
 ```
 ENV = 'LOCAL'
-SAM_API_KEY =
-SECRET_KEY =
-DJANGO_SECRET_LOGIN_KEY =
-LOGIN_CLIENT_ID =
-DISABLE_AUTH = 
+DISABLE_AUTH = False
+SECRET_KEY = YourSecretKey
+SAM_API_KEY = 
+DJANGO_SECRET_LOGIN_KEY = 
+LOGIN_CLIENT_ID = 
 ```
-
-For local testing, you may need to specify a few other variables:
-
-* A port other than `9000` for clamav-rest: add `CLAMAV_PORT = {port number}` to your `.env` file.
-* Cypress variables for running local end-to-end tests. See the [testing docs](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md#end-to-end-testing) for more.
-
-If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
 #### ENV
 The `ENV` environment variable specifies the set of configuration settings to use while running. For local development, it should be `LOCAL`, which will enable settings that should work on your local machine with Docker.
@@ -66,28 +80,7 @@ On our Dev/Staging/Production environments, it will be set to `DEVELOPMENT`/`STA
 
 In GitHub Actions and our CI/CD pipeline, it is set to `TESTING`.  It will enable settings expected to make unit tests complete properly while still trying to emulate a Cloud.gov situation.
 
-While you can change this, you generally shouldn't need to.
-
-#### SAM_API_KEY
-We use the `SAM_API_KEY` environment variable to interact with the SAM.gov API.
-To test UEI validation using the SAM.gov API with a personal API key, follow these steps on (https://SAM.gov):
-
-* Registered users can request for a public API on ‘Account Details’ page. This page can be accessed here: [Account Details page on SAM.gov](https://sam.gov/profile/details)
-* Users must enter their password on ‘Account Details’ page to view the API Key information. If an incorrect password is entered, an error will be returned.
-* After the API Key is generated on ‘Account Details’ page, the API Key can be viewed on the Account Details page immediately. The API Key is visible until users navigate to a different page.
-* If an error is encountered during the API Key generation/retrieval, then users will receive an error message and they can try again.
-
-#### SECRET_KEY
-Generate a random secret key for local development. Django uses this to provide cryptographic signing.
-
-#### DJANGO_SECRET_LOGIN_KEY
-The `DJANGO_SECRET_LOGIN_KEY` environment variable is used to interact with Login.gov. For local development, you have three options:
-*  (Recommended) If you wish to use the shared Login.gov sandbox client application and credentials, you can obtain a valid  `DJANGO_SECRET_LOGIN_KEY` from our shared [dev secrets document](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0)
-*  If you wish to use the shared Login.gov sandbox client application, but create your own client credentials, you must first be granted access to the GSA-FAC Login.gov sandbox team. Once you can access the GSA-FAC client application, follow [Login.gov's documentation for creating a public certificate](https://developers.login.gov/testing/#creating-a-public-certificate). Once created, you can add the newly-generated public key to the GSA-FAC app, and set `DJANGO_SECRET_LOGIN_KEY` to the base64-encoded value of the corresponding private key.
-*  If you wish to use your own Login.gov sandbox client application, follow [Login.gov's documentation for setting up a test application](https://developers.login.gov/testing/). Once completed, open `settings.py` and set `OIDC_PROVIDERS.login.gov.client_registration.client_id` so that it matches the `issuer` string for your newly-created client application. NOTE: changes to the `client_id` should __not__ be checked into version control!
-
-#### LOGIN_CLIENT_ID
-The `LOGIN_CLIENT_ID` environment variable is our unique application identifier at Login.gov. Each environment has its own client ID. You can obtain the client ID that should be used during local development from our shared [dev secrets document](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0)
+While you **could** change this, you generally shouldn't need to.
 
 #### DISABLE_AUTH
 The `DISABLE_AUTH` variable tells Django to disable the Login.gov authorization. This should almost always be `False` unless you need to temporarily disable it for your local development. 
@@ -96,12 +89,44 @@ In the Dev/Staging/Production environments, it will be set to `False` and requir
 
 In GitHub Actions (the CI/CD pipeline), it will be set to `True` to complete unit testing and frontend testing properly.
 
+#### SECRET_KEY
+Create your own secret key for local development. Django uses this to provide cryptographic signing.
 
-## Docker
+#### SAM_API_KEY
+We use the `SAM_API_KEY` environment variable to interact with the SAM.gov API.
+To test UEI validation using the SAM.gov API with a personal API key, follow these steps on (https://SAM.gov):
+
+* (Recommended) If you wish to use the shared API key, you can obtain a valid `SAM_API_KEY` from our shared [dev secrets document](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0).
+* Registered users can request for a public API on ‘Account Details’ page. This page can be accessed here: [Account Details page on SAM.gov](https://sam.gov/profile/details)
+* Users must enter their password on ‘Account Details’ page to view the API Key information. If an incorrect password is entered, an error will be returned.
+* After the API Key is generated on ‘Account Details’ page, the API Key can be viewed on the Account Details page immediately. The API Key is visible until users navigate to a different page.
+* If an error is encountered during the API Key generation/retrieval, then users will receive an error message and they can try again.
+
+#### DJANGO_SECRET_LOGIN_KEY
+The `DJANGO_SECRET_LOGIN_KEY` environment variable is used to interact with Login.gov. For local development, you have three options:
+*  (Recommended) If you wish to use the shared Login.gov sandbox client application and credentials, you can obtain a valid  `DJANGO_SECRET_LOGIN_KEY` from our shared [dev secrets document](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0).
+*  If you wish to use the shared Login.gov sandbox client application, but create your own client credentials, you must first be granted access to the GSA-FAC Login.gov sandbox team. Once you can access the GSA-FAC client application, follow [Login.gov's documentation for creating a public certificate](https://developers.login.gov/testing/#creating-a-public-certificate). Once created, you can add the newly-generated public key to the GSA-FAC app, and set `DJANGO_SECRET_LOGIN_KEY` to the base64-encoded value of the corresponding private key.
+*  If you wish to use your own Login.gov sandbox client application, follow [Login.gov's documentation for setting up a test application](https://developers.login.gov/testing/). Once completed, open `settings.py` and set `OIDC_PROVIDERS.login.gov.client_registration.client_id` so that it matches the `issuer` string for your newly-created client application. NOTE: changes to the `client_id` should __not__ be checked into version control!
+
+#### LOGIN_CLIENT_ID
+The `LOGIN_CLIENT_ID` environment variable is our unique application identifier at Login.gov. Each environment has its own client ID. You can obtain the client ID that should be used during local development from our shared [dev secrets document](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0)
+
+---
+For local testing, you may need to specify a few other variables:
+* The clamav-rest service looks at port `9000` by default - which is already in use. You can change this to a different port if preferred by using `CLAMAV_PORT = {new port number}`.
+* Cypress variables for running local end-to-end tests. See the [testing docs](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md#end-to-end-testing) for more.
+
+If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
+
+---
+
+### Docker
 
 We **STRONGLY** recommend you use Docker for development and testing as it enables the fastest and easiest set up of all of the components you need to get up and running quickly.
 
 An application and database are configured in [../backend/docker-compose.yml](../backend/docker-compose.yml), we create a volume to persist the development database, and we mount our `./backend` working directory to the `web` container so that changes made in development are reflected in the container without needing to re-build.
+
+#### Checklist
 
 1. Install Docker
 2. Build and start using [../backend/docker-compose.yml](../backend/docker-compose.yml)
@@ -112,9 +137,16 @@ An application and database are configured in [../backend/docker-compose.yml](..
     docker compose up
     ```
 
-3. The application will start and be accessible @ http://localhost:8000/
+3. The application will start and be accessible @ http://localhost:8000/. The following statements **should** appear at the bottom of your shell output:
 
-## Setting up the stack
+    ```shell
+    web-1         | Starting development server at http://0.0.0.0:8000/
+    web-1         | Quit the server with CONTROL-C.
+    ```
+
+    To confirm that everything is running properly, you can check the state of each image in the stack through the shell or Docker Desktop. Every image except for `historic-data` should be running by the time the application starts.
+
+#### Setting up the stack
 
 Once you have the stack running, you will want to run commands against it to further configure your environment for development and testing. Specifically, you'll need to run Django's `manage.py` and specific commands like `makemigrations`, `createsuperuser`, and more.
 
@@ -126,7 +158,8 @@ To run via `compose`:
 docker compose run web python manage.py $COMMAND $ARGS
 ```
 
-As a convenience, you can create an alias in your shell following this or a similar pattern
+As a convenience, you can create an alias in your shell following this or a similar pattern:
+
 ```shell
 fac ()
 {
@@ -148,20 +181,20 @@ python manage.py test
 
 Now, you're ready to start doing some work.
 
-### Running migrations
+#### Running migrations
 
 Although the migrations are run automatically, try running the migrations. This should not fail on a clean build. You will need to do this before you do anything else.
 
 
 ```shell
-  docker compose run web python manage.py makemigrations
+docker compose run web python manage.py makemigrations
 ```
 
 ```shell
 docker compose run web python manage.py migrate
 ```
 
-### Staticfiles
+#### Staticfiles
 
 Files that fall under the `/backend/static` directory need to be collected into the untracked directory `/backend/staticfiles`. This is done automatically when docker comes up, so you will 
 likely not need to do anything with these.
@@ -170,21 +203,9 @@ However, if you edit any files in `/backend/static` you will need to either re-u
 
 Try to avoid pushing frequent edits to files in `/backend/static` (more than once every few days), as each change causes a rebuild of the ghcr image for use in the automatic PR tests.
 
+#### Load SingleAuditChecklist fixtures
 
-### Load test data
-
-It would be nice to run tests, but in order to do so, we need test data. 
-
-
-```shell
-docker compose run web python manage.py load_test_data
-```
-
-If you want to load more data, see the section on loading previous years.
-
-### Load SingleAuditChecklist fixtures
-
-You can also load fake fixture data for single audit checklists. There is a list
+You can load fake fixture data for single audit checklists. There is a list
 of users in
 [`backend/users/fixtures/user_fixtures.py`](/backend/users/fixtures/user_fixtures.py)
 that will be created by default. If you are a new developer, you can add your
@@ -225,7 +246,7 @@ fake submission.
 
 Note that all of these fake submissions use the same UEI.
 
-### Run tests
+#### Run tests
 
 If everything is set up correctly, you should now be able to run tests. You will want to make sure that your `.env` is set so that auth is not diabled.
 
@@ -245,7 +266,7 @@ and in another shell, run the tests:
 docker compose run web python manage.py test
 ```
 
-## The short version
+#### The short version
 
 The above steps are the bare minimum. To reduce the likelihood of errors, you can also do the following in the `backend` directory:
 
@@ -257,8 +278,7 @@ make docker-test
 
 The `Makefile` makes clear what these do. In short, the first command builds the container (in case there are changes), runs migrations, loads test data, and creates the S3 mock bucket. The second runs tests.
 
-
-### Full cleanup
+#### Full cleanup
 
 When switching branches, working with migrations, or generally trying to move between versions of the application, you will likely find that a full cleanup of your docker environment is important.
 
@@ -272,11 +292,11 @@ make docker-first-run
 
 It is possible, after many starts and stops, to end up filling your docker volumes. This sequence removes *everything*, and gives you a clean docker state. It is likely that doing this *at least once per day* is a good idea. When switching between branches to test features (especially features involving changes to models) it is a good idea to do a full clean before switching branches and launching the stack locally.
 
-## Adding data and users
+#### Adding data and users
 
 If you want to move past the test data, it is possible to download previous years' data and load it locally. This is important for dissemination API development and dissemination API testing.
 
-### Adding users
+#### Adding users
 
 Let's use this workflow to create a `superuser` in our development environment so we can access the Admin interface! However, you will need to first log in to the local environment using your sandbox login.gov account; if the user does not exist in the system, it cannot be promoted to a superuser or staff user.
 
@@ -297,7 +317,7 @@ docker compose run web python manage.py make_staff email@address
 Now, you can open [http://localhost:8000/admin](http://localhost:8000/admin) in your browser. (Use local host and not 0.0.0.0, to work with local login.gov auth.)
 
 
-### Doing a clean set of tests
+#### Doing a clean set of tests
 
 If you want to take everything back to a squeaky-clean start, you'll need to get rid of some things.
 
@@ -331,7 +351,8 @@ and then up.
 docker compose up
 ```
 
-These are also available as 
+---
+**NOTE** - the above commands are also available through the Makefile: 
 
 ```
 make docker-clean
@@ -343,8 +364,9 @@ At this point, you'll need to re-run migrations, load test, and recreate your te
 make docker-first-run
 make docker-test
 ```
+---
 
-### What to do if your local tests fail
+#### What to do if your local tests fail
 
 The most likely explanation is that one of the services (such as MinIO or ClamAV) didn’t finish startup before the tests reached a point that was reliant on that service.
 
@@ -356,6 +378,7 @@ The most efficient way to run tests is to run them in the same container, via so
 docker compose exec web /bin/bash -c "python manage.py test; /bin/bash"
 ```
 
+If any of the services (with the exception of `historic-data`) are not running or have erroneous looking outputs after running `docker compose up`, revisit [the above instructions](#setting-up-your-dev-environment) to make sure that all the steps have been followed.
 
 ## Development, in principle
 
@@ -369,11 +392,15 @@ The tests (plus coverage report) can be run locally with `make test`.
 
 The linting/formatting/security scanning/type checking can be run all together locally with `make lint`.
 
+---
+
 ### Testing
 
 We use the Django native test framework plus [coverage.py](https://coverage.readthedocs.io/).
 
 The tests and the coverage report are run as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml). Minimum test coverage is currently set at 90%.
+
+---
 
 ### Linting
 
@@ -393,11 +420,15 @@ We use `djlint` to lint html template files. When developing locally:
 * Use `djlint --reformat <path_to_html_files>` to format the files. 
 * Use the `--lint` option to get a list of linter errors.
 
+---
+
 ### Formatting
 
 As stated, we use [black](https://black.readthedocs.io/en/stable/index.html) with the default settings for formatting.
 
 Formatting is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml), and will fail if code is not formatted as `black`  expects it to be.
+
+---
 
 ### Security scanning
 
@@ -405,11 +436,15 @@ We use [bandit](https://bandit.readthedocs.io/en/latest/) for automated security
 
 Security scanning is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
 
+---
+
 ### Type checking
 
 We use [mypy](https://mypy.readthedocs.io/en/stable/) for static type checking. We currently configure it (in  [backend/pyproject.toml](https://github.com/GSA-TTS/FAC/blob/main/backend/pyproject.toml)) to [ignore missing imports](https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports) because type annotation support for Django isn't yet mature.
 
 Type checking is done as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
+
+---
 
 ### Frontend code quality tooling
 
@@ -419,9 +454,10 @@ To lint and format JavaScript, we use [eslint](https://eslint.org/). eslint conf
 
 These tools run automatically as a part of our CI workflow in GitHub actions, but to run these tools locally to check formatting or automatically fix formatting errors before committing, just run: `npm run check-all` or `npm run fix-all`, respectively.
 
+---
 
 ## Local Development
 
-You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead. It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned!
+You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead ([here](#docker)). It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned!
 
 See [local-development.md](local-development.md) for additional warnings and details. 
