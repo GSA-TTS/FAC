@@ -84,6 +84,10 @@ jobs:
         working-directory: ./backend
         run: touch .env
 
+      - name: Load fixtures
+        working-directory: ./backend
+        run: docker compose run web python manage.py load_fixtures
+
       - name: Start services
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
