@@ -76,7 +76,7 @@ jobs:
 
       - name: Install Node dependencies
         working-directory: ./backend
-        run: sudo npm i
+        run: npm ci
 
       - name: Create .env file
         working-directory: ./backend
