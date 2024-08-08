@@ -74,13 +74,13 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install Node dependencies
+        working-directory: ./backend
+        run: sudo npm i
+
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
-
-      - name: Install Node dependencies
-        working-directory: ./backend
-        run: sudo npm ci
 
       - name: Start services
         working-directory: ./backend
