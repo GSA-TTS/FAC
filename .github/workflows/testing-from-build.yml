@@ -75,7 +75,12 @@ jobs:
           node-version: 20
 
       - name: Create .env file
-        run: touch ./backend/.env
+        working-directory: ./backend
+        run: touch .env
+
+      - name: Install Node dependencies
+        working-directory: ./backend
+        run: sudo npm ci
 
       - name: Start services
         working-directory: ./backend
