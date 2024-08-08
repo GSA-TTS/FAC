@@ -77,6 +77,10 @@ jobs:
       - name: Create .env file
         run: touch .env
 
+      - name: Start services
+        working-directory: ./backend
+        run: docker compose -f docker-compose.yml up -d
+
       - name: Run A11y tests
         uses: cypress-io/github-action@v6
         with:
