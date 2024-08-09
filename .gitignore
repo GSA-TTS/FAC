@@ -116,6 +116,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Added by MSHD for local development
+backend/my_env
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -150,15 +153,6 @@ cython_debug/
 backend/.idea/
 
 backend/census_historical_migration/data/
-
-# Data loading artifacts
-backend/data_distro/data_to_load/run_logs/Results_*
-backend/data_distro/data_to_load/run_logs/Lines_*
-backend/data_distro/data_to_load/run_logs/Errors_*
-backend/data_distro/data_to_load/run_logs/Exceptions_*
-# And, data people download to load locally
-backend/data_distro/data_to_load/*.txt
-
 
 # Assets
 node_modules/
