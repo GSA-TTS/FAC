@@ -1,6 +1,6 @@
 {
   "Meta": {
-    "section_name":"FederalAwardsExpended"
+    "section_name":"FederalAwards"
   },
   "FederalAwards": {
     "auditee_uei": "GSA_MIGRATION",

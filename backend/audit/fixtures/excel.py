@@ -86,7 +86,7 @@ FormSections = namedtuple(
     "FormSections",
     (
         "CORRECTIVE_ACTION_PLAN",
-        "FEDERAL_AWARDS_EXPENDED",
+        "FEDERAL_AWARDS",
         "FINDINGS_TEXT",
         "FINDINGS_UNIFORM_GUIDANCE",
         "ADDITIONAL_UEIS",
@@ -95,10 +95,10 @@ FormSections = namedtuple(
         "NOTES_TO_SEFA",
     ),
 )
-# Note: we turn these into hyphenated lowercase for URLs, e.g. federal-awards-expended
+# Note: we turn these into hyphenated lowercase for URLs, e.g. federal-awards
 FORM_SECTIONS = FormSections(
     CORRECTIVE_ACTION_PLAN="CorrectiveActionPlan",
-    FEDERAL_AWARDS_EXPENDED="FederalAwardsExpended",
+    FEDERAL_AWARDS="FederalAwards",
     FINDINGS_TEXT="FindingsText",
     FINDINGS_UNIFORM_GUIDANCE="FindingsUniformGuidance",
     ADDITIONAL_UEIS="AdditionalUeis",

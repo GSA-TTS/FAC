@@ -919,9 +919,7 @@ def generate_federal_awards(audit_header, outfile):
         f"--- generate federal awards {audit_header.DBKEY} {audit_header.AUDITYEAR} ---"
     )
 
-    wb = pyxl.load_workbook(
-        sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
-    )
+    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS])
     uei = xform_retrieve_uei(audit_header.UEI)
     set_workbook_uei(wb, uei)
     audits = get_audits(audit_header.DBKEY, audit_header.AUDITYEAR)

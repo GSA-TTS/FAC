@@ -45,13 +45,13 @@ def extract_federal_awards(file, is_gsa_migration=False, auditee_uei=None):
         federal_awards_field_mapping,
         federal_awards_column_mapping,
         meta_mapping,
-        FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+        FORM_SECTIONS.FEDERAL_AWARDS,
         template["title_row"],
     )
 
     ir = extract_workbook_as_ir(file)
     run_all_general_checks(
-        ir, FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED, is_gsa_migration, auditee_uei
+        ir, FORM_SECTIONS.FEDERAL_AWARDS, is_gsa_migration, auditee_uei
     )
     new_ir = run_all_federal_awards_transforms(ir)
     run_all_federal_awards_checks(new_ir, is_gsa_migration)

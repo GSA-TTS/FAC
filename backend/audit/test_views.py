@@ -798,7 +798,7 @@ class ExcelFileHandlerViewTests(TestCase):
     #     workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
     #     _set_by_name(workbook, "total_amount_expended", test_data[0]["amount_expended"])
     #     _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
-    #     _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
+    #     _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS)
     #     _add_entry(workbook, 0, test_data[0])
 
     #     with NamedTemporaryFile(suffix=".xlsx") as tmp:
@@ -808,10 +808,10 @@ class ExcelFileHandlerViewTests(TestCase):
     #         with open(tmp.name, "rb") as excel_file:
     #             response = self.client.post(
     #                 reverse(
-    #                     f"audit:{FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED}",
+    #                     f"audit:{FORM_SECTIONS.FEDERAL_AWARDS}",
     #                     kwargs={
     #                         "report_id": sac.report_id,
-    #                         "form_section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+    #                         "form_section": FORM_SECTIONS.FEDERAL_AWARDS,
     #                     },
     #                 ),
     #                 data={"FILES": excel_file},
@@ -1270,7 +1270,7 @@ class ExcelFileHandlerViewTests(TestCase):
             (
                 FEDERAL_AWARDS_ENTRY_FIXTURES,
                 FEDERAL_AWARDS_TEMPLATE,
-                FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+                FORM_SECTIONS.FEDERAL_AWARDS,
             ),
             (
                 CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,

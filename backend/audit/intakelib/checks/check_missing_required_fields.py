@@ -6,7 +6,7 @@ from audit.fixtures.excel import FORM_SECTIONS
 logger = logging.getLogger(__name__)
 
 map_required_field_ranges_to_workbook = {
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: {
+    FORM_SECTIONS.FEDERAL_AWARDS: {
         "award_reference": "check_missing_award_numbers",
         "federal_agency_prefix": "check_missing_federal_agency_prefix",
         "three_digit_extension": "check_missing_aln_three_digit_extension",

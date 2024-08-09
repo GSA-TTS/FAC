@@ -82,7 +82,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         Empty Federal Awards should fail, simple case should pass.
         """
         invalid = json.loads(
-            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED}"}},"FederalAwards":{{}}}}'
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.FEDERAL_AWARDS}"}},"FederalAwards":{{}}}}'
         )
         expected_msg = "[\"'Federal Awards' is a required property.\"]"
         self.assertRaisesRegex(

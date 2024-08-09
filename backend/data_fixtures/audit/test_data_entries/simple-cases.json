@@ -38,51 +38,34 @@
   "AuditInformationCases": [
     {
       "dollar_threshold": 1000000,
-      "gaap_results": [
-        "unmodified_opinion"
-      ],
+      "gaap_results": ["unmodified_opinion"],
       "is_going_concern_included": true,
       "is_internal_control_deficiency_disclosed": false,
       "is_internal_control_material_weakness_disclosed": true,
       "is_material_noncompliance_disclosed": true,
       "is_aicpa_audit_guide_included": true,
       "is_low_risk_auditee": false,
-      "agencies": [
-        "31",
-        "44"
-      ]
+      "agencies": ["31", "44"]
     },
     {
       "dollar_threshold": 1000000,
-      "gaap_results": [
-        "not_gaap"
-      ],
+      "gaap_results": ["not_gaap"],
       "is_going_concern_included": true,
       "is_sp_framework_required": true,
-      "sp_framework_basis": [
-        "cash_basis",
-        "tax_basis",
-        "contractual_basis"
-      ],
-      "sp_framework_opinions": [
-        "unmodified_opinion",
-        "qualified_opinion"
-      ],
+      "sp_framework_basis": ["cash_basis", "tax_basis", "contractual_basis"],
+      "sp_framework_opinions": ["unmodified_opinion", "qualified_opinion"],
       "is_internal_control_deficiency_disclosed": false,
       "is_internal_control_material_weakness_disclosed": true,
       "is_material_noncompliance_disclosed": true,
       "is_aicpa_audit_guide_included": true,
       "is_low_risk_auditee": false,
-      "agencies": [
-        "32",
-        "45"
-      ]
+      "agencies": ["32", "45"]
     }
   ],
   "FederalAwardsCases": [
     {
       "Meta": {
-        "section_name": "FederalAwardsExpended"
+        "section_name": "FederalAwards"
       },
       "FederalAwards": {
         "auditee_uei": "AAA123456BBB",
@@ -123,7 +106,7 @@
     },
     {
       "Meta": {
-        "section_name": "FederalAwardsExpended"
+        "section_name": "FederalAwards"
       },
       "FederalAwards": {
         "auditee_uei": "AAA123456BBB",
@@ -282,7 +265,7 @@
             "note_title": "Note one",
             "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus nec tortor ut ligula sollicitudin euismod.",
             "contains_chart_or_table": "Y",
-            "seq_number":1
+            "seq_number": 1
           }
         ]
       }
