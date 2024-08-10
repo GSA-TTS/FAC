@@ -571,12 +571,13 @@
          "properties": {
             "section_name": {
                "enum": [
+                  "FederalAwards",
                   "FederalAwardsExpended"
                ],
                "type": "string"
             },
             "version": {
-               "const": "1.1.1",
+               "const": "1.1.2",
                "type": "string"
             }
          },

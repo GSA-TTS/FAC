@@ -44,7 +44,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "value": "1.1.1",
+               "value": "1.1.2",
                "width": 48
             },
             {
@@ -62,7 +62,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "value": "FederalAwardsExpended",
+               "value": "FederalAwards",
                "width": 48
             },
             {
@@ -186,7 +186,7 @@
                "title_cell": "E1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "If the Program Name was provided, please, do not change it unless necessary or unknown. The Program Name must be under 300 characters. If the drop-down menu is empty, you may need to enter an Agency Prefix and ALN in columns B and C. Continue?",
+                  "custom_error": "If the Program Name was provided, please, do not change it unless necessary or unknown. The Program Name must be under 300 characters. If the drop-down menu is empty, you may need to enter an Agency Prefix and ALN in columns B and C.",
                   "custom_title": "Unknown Federal Program Name",
                   "errorStyle": "warning",
                   "formula1": "=Y{0}:Y{0}",

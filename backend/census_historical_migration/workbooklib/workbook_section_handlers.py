@@ -26,7 +26,7 @@ sections_to_handlers = {
     FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,
     FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,
     FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: generate_corrective_action_plan,
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: generate_federal_awards,
+    FORM_SECTIONS.FEDERAL_AWARDS: generate_federal_awards,
     FORM_SECTIONS.FINDINGS_TEXT: generate_findings_text,
     FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: generate_findings,
     FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
