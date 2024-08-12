@@ -328,7 +328,7 @@
                                        name="auditee_phone"
                                        aria-required="false"
                                        value="{{ auditee_phone | default_if_none:'' }}" />
-                                <span class="usa-error-message" id="auditee-phone-error-message" role="alert">{{ errors.auditee_phone|space_before_striptags }}</span>
+                                <span class="usa-error-message" id="auditee-phone-error-message" role="alert">{{ errors.auditee_phone|space_before_striptags|safe }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_email">Auditee email</label>
@@ -498,7 +498,7 @@
                                        name="auditor_phone"
                                        aria-required="false"
                                        value="{{ auditor_phone | default_if_none:'' }}" />
-                                <span class="usa-error-message" id="auditor-phone-error-message" role="alert">{{ errors.auditor_phone|space_before_striptags }}</span>
+                                <span class="usa-error-message" id="auditor-phone-error-message" role="alert">{{ errors.auditor_phone|space_before_striptags|safe }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditor_email">Auditor email</label>
