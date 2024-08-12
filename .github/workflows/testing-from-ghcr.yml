@@ -88,6 +88,13 @@ jobs:
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
 
+      - name: Run Cypress login test to create auth_users table
+        uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          working-directory: ./backend
+          spec: cypress/e2e/login.cy.js
+
       - name: Load fixtures
         working-directory: ./backend
         run: docker compose run web python manage.py load_fixtures
