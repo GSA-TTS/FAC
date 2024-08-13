@@ -74,78 +74,78 @@ describe('A11y Testing on pre-submission pages', () => {
   );
 });
 
-// describe('A11y tests on an in progress report', () => {
-//   before(() => {
-//     cy.visit('/audit');
-//     cy.get('tr')
-//       .contains('In Progress')
-//       .parent()
-//       .parent()
-//       .contains('GSAFAC')
-//       .invoke('text')
-//       .as('report_id');
-//   });
+describe('A11y tests on an in progress report', () => {
+  before(() => {
+    cy.visit('/audit');
+    cy.get('tr')
+      .contains('In Progress')
+      .parent()
+      .parent()
+      .contains('GSAFAC')
+      .invoke('text')
+      .as('report_id');
+  });
 
-//   it(`Tests submission pages for all screen sizes`, () => {
-//     cy.get('@report_id').then((val) => {
-//       // Submission items:
-//       check_a11y(`/audit/submission-progress/${val}`);
-//       check_a11y(`/report_submission/general-information/${val}`);
-//       check_a11y(`/audit/audit-info/${val}`);
-//       check_a11y(`/audit/upload-report/${val}`);
-//       check_a11y(`/report_submission/federal-awards/${val}`);
-//       // Cross validation:
-//       check_a11y(`/audit/cross-validation/${val}`);
-//       check_a11y(`/audit/ready-for-certification/${val}`);
-//       // Access Management:
-//       check_a11y(`/audit/manage-submission/${val}`);
-//       check_a11y(`/audit/manage-submission/add-editor/${val}`);
-//       check_a11y(`/audit/manage-submission/auditee-certifying-official/${val}`);
-//       check_a11y(`/audit/manage-submission/auditor-certifying-official/${val}`);
-//     });
-//   });
-// });
+  it(`Tests submission pages for all screen sizes`, () => {
+    cy.get('@report_id').then((val) => {
+      // Submission items:
+      check_a11y(`/audit/submission-progress/${val}`);
+      check_a11y(`/report_submission/general-information/${val}`);
+      check_a11y(`/audit/audit-info/${val}`);
+      check_a11y(`/audit/upload-report/${val}`);
+      check_a11y(`/report_submission/federal-awards/${val}`);
+      // Cross validation:
+      check_a11y(`/audit/cross-validation/${val}`);
+      check_a11y(`/audit/ready-for-certification/${val}`);
+      // Access Management:
+      check_a11y(`/audit/manage-submission/${val}`);
+      check_a11y(`/audit/manage-submission/add-editor/${val}`);
+      check_a11y(`/audit/manage-submission/auditee-certifying-official/${val}`);
+      check_a11y(`/audit/manage-submission/auditor-certifying-official/${val}`);
+    });
+  });
+});
 
-// describe('A11y tests on a ready for certification report', () => {
-//   before(() => {
-//     cy.visit('/audit');
-//     cy.get('tr')
-//       .contains('Ready for Certification')
-//       .parent()
-//       .parent()
-//       .contains('GSAFAC')
-//       .invoke('text')
-//       .as('report_id');
-//   });
+describe('A11y tests on a ready for certification report', () => {
+  before(() => {
+    cy.visit('/audit');
+    cy.get('tr')
+      .contains('Ready for Certification')
+      .parent()
+      .parent()
+      .contains('GSAFAC')
+      .invoke('text')
+      .as('report_id');
+  });
 
-//   it(`Tests submission pages for all screen sizes after locking for certification`, () => {
-//     cy.get('@report_id').then((val) => {
-//       // Check checklist after locking for certification:
-//       check_a11y(`/audit/submission-progress/${val}`);
-//       // Certification and final submission pages:
-//       check_a11y(`/audit/auditor-certification/${val}`);
-//       check_a11y(`/audit/auditee-certification/${val}`);
-//       check_a11y(`/audit/submission/${val}`);
-//     });
-//   });
-// });
+  it(`Tests submission pages for all screen sizes after locking for certification`, () => {
+    cy.get('@report_id').then((val) => {
+      // Check checklist after locking for certification:
+      check_a11y(`/audit/submission-progress/${val}`);
+      // Certification and final submission pages:
+      check_a11y(`/audit/auditor-certification/${val}`);
+      check_a11y(`/audit/auditee-certification/${val}`);
+      check_a11y(`/audit/submission/${val}`);
+    });
+  });
+});
 
-// describe('A11y tests on a fully submitted report', () => {
-//   before(() => {
-//     cy.visit('/audit');
-//     cy.get('tr')
-//       .contains('Accepted')
-//       .parent()
-//       .parent()
-//       .contains('GSAFAC')
-//       .invoke('text')
-//       .as('report_id');
-//   });
+describe('A11y tests on a fully submitted report', () => {
+  before(() => {
+    cy.visit('/audit');
+    cy.get('tr')
+      .contains('Accepted')
+      .parent()
+      .parent()
+      .contains('GSAFAC')
+      .invoke('text')
+      .as('report_id');
+  });
 
-//   it(`Tests submission checklist for all screen sizes after submission`, () => {
-//     cy.get('@report_id').then((val) => {
-//       // Check the checklist after submission:
-//       check_a11y(`/audit/submission-progress/${val}`);
-//     });
-//   });
-// });
+  it(`Tests submission checklist for all screen sizes after submission`, () => {
+    cy.get('@report_id').then((val) => {
+      // Check the checklist after submission:
+      check_a11y(`/audit/submission-progress/${val}`);
+    });
+  });
+});
