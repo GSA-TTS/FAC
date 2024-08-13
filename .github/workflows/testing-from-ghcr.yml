@@ -67,6 +67,7 @@ jobs:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
       CYPRESS_DISABLE_AUTH: False
+      DISABLE_AUTH: False
     steps:
       - name: Checkout
         uses: actions/checkout@v4
