@@ -3,7 +3,7 @@ from unittest.mock import patch
 from audit.models.models import ExcelFile, SingleAuditChecklist
 from model_bakery import baker
 
-from dissemination.remove_workbook_artifacts import removed_workbook_artifacts
+from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 
 
 class RemovedWorkbookArtifactsTestCase(TestCase):
@@ -22,7 +22,7 @@ class RemovedWorkbookArtifactsTestCase(TestCase):
             ExcelFile, sac=sac, form_section="another_fake_section"
         )
 
-        removed_workbook_artifacts(sac)
+        remove_workbook_artifacts(sac)
 
         # Assert that the ExcelFile instances are deleted
         self.assertFalse(ExcelFile.objects.filter(sac=sac).exists())
@@ -47,7 +47,7 @@ class RemovedWorkbookArtifactsTestCase(TestCase):
         # Ensure no ExcelFile instances exist for this SAC
         ExcelFile.objects.filter(sac=sac).delete()
 
-        removed_workbook_artifacts(sac)
+        remove_workbook_artifacts(sac)
 
         # Assert that no ExcelFile instances exist
         self.assertFalse(ExcelFile.objects.filter(sac=sac).exists())
