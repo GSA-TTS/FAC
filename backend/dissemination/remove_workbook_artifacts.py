@@ -65,7 +65,7 @@ def delete_files_in_bulk(filenames, sac):
         if errors:
             for error in errors:
                 logger.error(
-                    f"Failed to delete {error['Key']} from S3 for report: {sac.report_id}. Error: {error['Message']}"
+                    f"Failed to delete {error['Key']} from S3 for report: {sac.report_id}. Error: {error['Message']}"  # nosec B608
                 )
 
     except ClientError as e:
