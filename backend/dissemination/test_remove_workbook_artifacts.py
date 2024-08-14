@@ -1,4 +1,3 @@
-import logging
 from django.test import TestCase
 from unittest.mock import patch
 from audit.models.models import ExcelFile, SingleAuditChecklist
@@ -10,9 +9,7 @@ from dissemination.remove_workbook_artifacts import removed_workbook_artifacts
 class RemovedWorkbookArtifactsTestCase(TestCase):
 
     @patch("dissemination.remove_workbook_artifacts.delete_files_in_bulk")
-    def test_removed_workbook_artifacts_success(
-        self, mock_delete_files_in_bulk
-    ):
+    def test_removed_workbook_artifacts_success(self, mock_delete_files_in_bulk):
         sac = baker.make(
             SingleAuditChecklist,
             submission_status=SingleAuditChecklist.STATUS.IN_PROGRESS,
@@ -57,5 +54,3 @@ class RemovedWorkbookArtifactsTestCase(TestCase):
 
         # Assert S3 bulk delete was not called
         mock_delete_files_in_bulk.assert_not_called()
-
-

@@ -1,7 +1,6 @@
 import logging
 
 from django.conf import settings
-from django.http import Http404
 from audit.models.models import ExcelFile
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
@@ -35,8 +34,9 @@ def removed_workbook_artifacts(sac):
             f"Failed to delete files from fac-db and S3 for report: {sac.report_id}. Error: {e}"
         )
 
+
 def delete_files_in_bulk(filenames, sac):
-    """ Delete files from S3 in bulk. """
+    """Delete files from S3 in bulk."""
     # This client uses the internal endpoint URL because we're making a request to S3 from within the app
     s3_client = boto3_client(
         service_name="s3",
