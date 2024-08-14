@@ -68,9 +68,6 @@ jobs:
       ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
       CYPRESS_DISABLE_AUTH: False
       DISABLE_AUTH: False
-      CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
-      CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
-      CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -95,13 +92,6 @@ jobs:
       - name: Perform first run steps
         working-directory: ./backend
         run: make docker-first-run
-
-      # - name: Run Cypress login test to create auth_users table
-      #   uses: cypress-io/github-action@v6
-      #   with:
-      #     browser: chrome
-      #     working-directory: ./backend
-      #     spec: cypress/e2e/login.cy.js
 
       - name: Load fixtures
         working-directory: ./backend
