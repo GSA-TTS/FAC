@@ -8,7 +8,7 @@ from botocore.client import ClientError, Config
 logger = logging.getLogger(__name__)
 
 
-def removed_workbook_artifacts(sac):
+def remove_workbook_artifacts(sac):
     """
     Remove all workbook artifacts associated with the given sac.
     """
