@@ -96,7 +96,7 @@ jobs:
 
       - name: Create materialized view
         working-directory: ./backend
-        run: python manage.py materialized_views --create
+        run: docker compose run web python manage.py materialized_views --create
 
       - name: Run A11y tests
         uses: cypress-io/github-action@v6
