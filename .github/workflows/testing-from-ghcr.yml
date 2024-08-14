@@ -1,8 +1,8 @@
 ---
 name: Run Django and A11y Tests
 on:
-  workflow_dispatch:
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   django-test:
@@ -56,29 +56,61 @@ jobs:
             coverageFile: ./coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
 
-  # a11y-testing:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     ENV: TESTING
-  #     SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
-  #     DJANGO_BASE_URL: "http://localhost:8000"
-  #     DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
-  #     LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
-  #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
-  #     ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
-  #     DISABLE_AUTH: True
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 16
-  #     - name: Start services
-  #       working-directory: ./backend
-  #       run: |
-  #         touch .env
-  #         docker compose -f docker-compose.yml up -d
-  #     - name: Run A11y tests
-  #       working-directory: ./backend
-  #       run: |
-  #         sudo npm ci
-  #         npx cypress run --spec "cypress/e2e/accessibility.cy.js"
+  a11y-testing:
+    runs-on: ubuntu-latest
+    env:
+      ENV: TESTING
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+      DJANGO_BASE_URL: "http://localhost:8000"
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+      LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
+      DISABLE_AUTH: True
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Node dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Create .env file
+        working-directory: ./backend
+        run: touch .env
+
+      - name: Start services
+        working-directory: ./backend
+        run: docker compose -f docker-compose-web.yml up -d
+
+      - name: Perform first run steps
+        working-directory: ./backend
+        run: make docker-first-run
+
+      - name: Load fixtures
+        working-directory: ./backend
+        run: docker compose run web python manage.py load_fixtures
+
+      - name: Create materialized view
+        working-directory: ./backend
+        run: docker compose run web python manage.py materialized_views --create
+
+      - name: Run A11y tests
+        uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          working-directory: ./backend
+          spec: cypress/e2e/accessibility.cy.js
+
+      - uses: actions/upload-artifact@v4
+        # add the line below to store screenshots only on failures
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: backend/cypress/screenshots
+          if-no-files-found: warn # 'warn' or 'error' are also available, defaults to `warn`
