@@ -44,7 +44,7 @@ describe('Workbook upload successful', () => {
 
   describe('Workbook upload fail', () => {
     it('unsuccessful upload Federal Awards', () => {
-      cy.intercept('POST', '/audit/excel/federal-awards-expended/*', {
+      cy.intercept('POST', '/audit/excel/federal-awards/*', {
         statusCode: 400,
         fixture: 'fail-res.json',
       }).as('uploadFail');

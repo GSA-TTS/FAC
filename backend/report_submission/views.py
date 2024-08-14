@@ -337,7 +337,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "workbook_url": workbook_base_url + "federal-awards-workbook.xlsx",
                 # below URL handled as a special case because of inconsistent name usage in audit/urls.py and audit/cross_validation/naming.py
                 "existing_workbook_url": reverse(
-                    "audit:FederalAwardsExpended", args=[report_id]
+                    f"audit:{SN[NC.FEDERAL_AWARDS].camel_case}", args=[report_id]
                 ),
             },
             "notes-to-sefa": {

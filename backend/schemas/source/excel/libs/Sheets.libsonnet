@@ -31,7 +31,8 @@ local y_or_n_range = open_range {
 // TODO: import from audits.fixtures.excel. Ref: https://github.com/GSA-TTS/FAC/issues/1673
 local section_names = {
   CORRECTIVE_ACTION_PLAN: 'CorrectiveActionPlan',
-  FEDERAL_AWARDS: 'FederalAwardsExpended',
+  FEDERAL_AWARDS: 'FederalAwards',
+  FEDERAL_AWARDS_EXPENDED: 'FederalAwardsExpended', // Added to allow backaward compatibility with workbooks versions from 1.0.0 to 1.1.1
   AUDIT_FINDINGS_TEXT: 'FindingsText',
   FEDERAL_AWARDS_AUDIT_FINDINGS: 'FindingsUniformGuidance',
   ADDITIONAL_UEIS: 'AdditionalUeis',
@@ -42,7 +43,7 @@ local section_names = {
 
 // All workbooks should get the same version number.
 // When bumping, also add the new version to AUTHORIZED_VERSIONS in check_version_number.py
-local WORKBOOKS_VERSION = '1.1.1';
+local WORKBOOKS_VERSION = '1.1.2';
 
 {
   single_cell: single_cell,

@@ -12,7 +12,7 @@ jsonnet
 model_bakery
 mypy
 pandas
-pip-tools
+pip-tools>=7.4.1
 tblib
 toml
 types-python-slugify

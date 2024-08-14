@@ -161,7 +161,7 @@ def _post_create_federal_awards(this_sac, this_user):
 
     if (
         ExcelFile.objects.filter(
-            sac_id=this_sac.id, form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED
+            sac_id=this_sac.id, form_section=FORM_SECTIONS.FEDERAL_AWARDS
         ).exists()
         and this_sac.federal_awards is not None
     ):
@@ -183,7 +183,7 @@ def _post_create_federal_awards(this_sac, this_user):
         filename="temp",
         user=this_user,
         sac_id=this_sac.id,
-        form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+        form_section=FORM_SECTIONS.FEDERAL_AWARDS,
     )
     excel_file.full_clean()
     excel_file.save()

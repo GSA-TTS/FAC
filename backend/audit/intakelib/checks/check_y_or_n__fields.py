@@ -5,7 +5,7 @@ from audit.fixtures.excel import FORM_SECTIONS
 logger = logging.getLogger(__name__)
 
 map_yorn_field_ranges_to_workbook = {
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: [
+    FORM_SECTIONS.FEDERAL_AWARDS: [
         "is_guaranteed",
         "is_direct",
         "is_passed",

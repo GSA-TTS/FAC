@@ -20,7 +20,10 @@ def _extract_generic_data(ir, params) -> dict:
     result: dict = {}
     try:
         _extract_generic_meta_and_field_data(ir, params, result)
-        if result.get("Meta", {}).get(SECTION_NAME) == params.section:
+        if result.get("Meta", {}).get(SECTION_NAME) in [
+            params.section,
+            "FederalAwardsExpended",  # This is necessary to maintain compatibility with the old template
+        ]:
             _extract_generic_column_data(ir, result, params)
         return result
 
