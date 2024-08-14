@@ -115,9 +115,9 @@ coverage==7.4.0 \
 cssbeautifier==1.14.11 \
     --hash=sha256:40544c2b62bbcb64caa5e7f37a02df95654e5ce1bcacadac4ca1f3dc89c31513
     # via djlint
-django==5.0.4 \
-    --hash=sha256:4bd01a8c830bb77a8a3b0e7d8b25b887e536ad17a81ba2dce5476135c73312bd \
-    --hash=sha256:916423499d75d62da7aa038d19aef23d23498d8df229775eb0a6309ee1013775
+django==5.1 \
+    --hash=sha256:848a5980e8efb76eea70872fb0e4bc5e371619c70fffbe48e3e1b50b2c09455d \
+    --hash=sha256:d3b811bf5371a26def053d7ee42a9df1267ef7622323fe70a601936725aa4557
     # via
     #   -c ./requirements\../requirements.txt
     #   django-debug-toolbar

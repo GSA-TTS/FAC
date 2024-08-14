@@ -5,7 +5,7 @@ django-cors-headers
 django-csp
 django-dbbackup
 django-storages[boto3]
-Django>=5.0.7
+Django>=5.0.8
 djangorestframework>=3.15.2
 djangorestframework-simplejwt
 django-fsm
