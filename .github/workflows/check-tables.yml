@@ -1,0 +1,46 @@
+---
+name: Check existing tables in an environment
+### Common Commands:
+# ./fac-backup-util.sh v0.1.5 check_tables
+on:
+#   workflow_dispatch:
+#     inputs:
+#       environment:
+#         required: true
+#         type: choice
+#         options:
+#           - 'dev'
+#           - 'preview'
+#           - 'staging'
+#           - 'production'
+#       util_version:
+#         description: Version for fac backup utility to use (ex. vX.Y.Z)
+#         required: true
+#         type: string
+#       backup_operation:
+#         description: Operation for fac-backup-utility
+#         required: true
+#         type: choice
+#         options:
+#           - 'check_tables'
+  push:
+    branches: [new-relic-logs-update]
+jobs:
+  fac-check-tables:
+    name: Perform Database Backup
+    runs-on: ubuntu-latest
+    # environment: ${{ inputs.environment }}
+    environment: preview
+    env:
+      # space: ${{ inputs.environment }}
+      space: preview
+    steps:
+      - name: Check tables in ${{ env.space }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          # command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          command: cf run-task gsa-fac -k 2G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh v0.1.5 check_tables"
