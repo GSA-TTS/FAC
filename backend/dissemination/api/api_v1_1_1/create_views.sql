@@ -299,8 +299,8 @@ create view api_v1_1_1.additional_eins as
     order by ein.id
 ;
 
--- Specify every field in dissemination_combined, omitting the id
--- Generated fields like ALN are done so in the creation of the table
+-- Specify every field in dissemination_combined, omitting the id.
+-- Generated fields like ALN are done in the creation of the table, not here.
 create view api_v1_1_1.combined as
     select
         combined.report_id,

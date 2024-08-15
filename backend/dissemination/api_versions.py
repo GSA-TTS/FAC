@@ -6,7 +6,10 @@ import os
 logger = logging.getLogger(__name__)
 
 # These are API versions we want live.
-live = {"dissemination": ["api_v1_0_3", "api_v1_1_0", "api_v1_1_1"], "support": ["admin_api_v1_1_0"]}
+live = {
+    "dissemination": ["api_v1_0_3", "api_v1_1_0", "api_v1_1_1"],
+    "support": ["admin_api_v1_1_0"],
+}
 
 # These are API versions we have deprecated.
 # They will be removed. It should be safe to leave them
@@ -53,7 +56,7 @@ def create_materialized_view(location):
     conn.autocommit = True
     with conn.cursor() as curs:
         path = f"{location}/sql/create_materialized_views.sql"
-        logger.info(f"EXEC SQL create_materialized_views.sql")
+        logger.info("EXEC SQL create_materialized_views.sql")
         sql = open(path, "r").read()
         curs.execute(sql)
 
