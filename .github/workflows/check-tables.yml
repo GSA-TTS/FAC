@@ -27,7 +27,7 @@ on:
     branches: [new-relic-logs-update]
 jobs:
   fac-check-tables:
-    name: Perform Database Backup
+    name: Check tables in fac database
     runs-on: ubuntu-latest
     # environment: ${{ inputs.environment }}
     environment: preview
@@ -43,4 +43,4 @@ jobs:
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
           # command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
-          command: cf run-task gsa-fac -k 2G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh v0.1.5 check_tables"
+          command: cf run-task gsa-fac -k 2G -m 3G --name check_tables --command "./fac-backup-util.sh v0.1.5 check_tables"
