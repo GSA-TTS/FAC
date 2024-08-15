@@ -31,7 +31,7 @@ RDSToRDS() {
     ./gov.gsa.fac.cgov-util db_to_db --src_db "$1" --dest_db "$2" --operation "$3"
 }
 CheckTables() {
-    ./gov.gsa.fac.cgov-util check_tables --source_database "$1"
+    ./gov.gsa.fac.cgov-util check_db --db "$1"
 }
 
 if [ "$run_option" == "initial_backup" ]; then
