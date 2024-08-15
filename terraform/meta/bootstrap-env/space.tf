@@ -10,9 +10,10 @@ data "cloudfoundry_asg" "asgs" {
 
 # Ensure the space exists and is configured as expected
 resource "cloudfoundry_space" "space" {
-  name      = var.name
-  org       = data.cloudfoundry_org.org.id
-  allow_ssh = var.allow_ssh
+  name                     = var.name
+  org                      = data.cloudfoundry_org.org.id
+  allow_ssh                = var.allow_ssh
+  delete_recursive_allowed = false
 }
 
 resource "cloudfoundry_space_asgs" "space_asgs" {
