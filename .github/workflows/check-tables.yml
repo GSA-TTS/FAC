@@ -27,7 +27,7 @@ on:
     branches: [new-relic-logs-update]
 jobs:
   fac-check-tables:
-    name: Check tables in fac database
+    name: Check tables in FAC Database
     runs-on: ubuntu-latest
     # environment: ${{ inputs.environment }}
     environment: preview
