@@ -1,15 +1,21 @@
 locals {
   org_name = "gsa-tts-oros-fac"
   spaces = {
-    "dev"     = {},
-    "preview" = {},
+    "dev" = {
+      delete_recursive_allowed = false
+    },
+    "preview" = {
+      delete_recursive_allowed = false
+    },
     "staging" = {
-      uses_backups = true
+      uses_backups             = true,
+      delete_recursive_allowed = false
     },
     "production" = {
-      allow_ssh     = false,
-      uses_backups  = true,
-      is_production = true
+      allow_ssh                = false,
+      uses_backups             = true,
+      is_production            = true,
+      delete_recursive_allowed = false
     },
   }
 
