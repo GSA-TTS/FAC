@@ -58,6 +58,7 @@ from audit.validators import (
     validate_secondary_auditors_json,
 )
 
+from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.models import General
 
@@ -741,6 +742,8 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     event_user=request.user,
                     event_type=SubmissionEvent.EventType.DISSEMINATED,
                 )
+                # Remove workbook artifacts after the report has been disseminated.
+                remove_workbook_artifacts(sac)
             else:
                 pass
                 # FIXME: We should now provide a reasonable error to the user.

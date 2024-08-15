@@ -135,6 +135,21 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
     )
     autocomplete_fields = ["report_id"]
 
+    def has_add_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
+
     def save_model(self, request, obj, form, change):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=obj.report_id_id)
@@ -273,6 +288,21 @@ class UeiValidationWaiverAdmin(admin.ModelAdmin):
         "requester_email",
     )
     readonly_fields = ("timestamp",)
+
+    def has_add_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
