@@ -222,5 +222,65 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       legend_enabled = true
     }
+
+    widget_log_table {
+      title = "${var.cf_space_name} Check Tables Logs"
+
+      row    = 8
+      column = 1
+      width  = 8
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message`,`newrelic.source`,`tags.app_name`,`tags.space_name` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('CHECKTABLESPASS', insensitive: true) SINCE 7 days ago"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_billboard {
+      title = "${var.cf_space_name} Table Check Count - Pass"
+
+      row    = 8
+      column = 9
+      width  = 3
+      height = 3
+
+      nrql_query {
+        query = "SELECT count(*) FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('CHECKTABLESPASS', insensitive: true) SINCE 7 days ago"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_log_table {
+      title = "${var.cf_space_name} Missing Tables Logs"
+
+      row    = 9
+      column = 1
+      width  = 8
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message`,`newrelic.source`,`tags.app_name`,`tags.space_name` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('DBMISSINGTABLES', insensitive: true) SINCE 7 days ago"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_billboard {
+      title = "${var.cf_space_name} Table Check Count - Fail"
+
+      row    = 9
+      column = 9
+      width  = 3
+      height = 3
+
+      nrql_query {
+        query = "SELECT count(*) FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('DBMISSINGTABLES', insensitive: true) SINCE 7 days ago"
+      }
+
+      legend_enabled = true
+    }
   }
 }
