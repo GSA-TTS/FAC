@@ -2,8 +2,8 @@
 name: Check Tables Daily
 on:
   schedule:
-    # Invoke at 5 am
-    - cron: '0 9 * * *'
+    # Invoke every 12 hours
+    - cron: '0 */12 * * *'
   workflow_dispatch: null
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
           - name: staging
           - name: production
           - name: preview
-    uses: ./.github/workflows/fac-backup-util-scheduled.yml
+    uses: ./.github/workflows/fac-check-tables.yml
     secrets: inherit
     with:
       environment: ${{ matrix.environment.name }}
