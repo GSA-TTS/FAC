@@ -1,5 +1,27 @@
 from django.conf import settings
 
+from audit.fixtures.excel import FORM_SECTIONS
+from audit.intakelib import (
+    extract_additional_ueis,
+    extract_additional_eins,
+    extract_federal_awards,
+    extract_corrective_action_plan,
+    extract_audit_findings_text,
+    extract_audit_findings,
+    extract_secondary_auditors,
+    extract_notes_to_sefa,
+)
+from audit.validators import (
+    validate_additional_ueis_json,
+    validate_additional_eins_json,
+    validate_corrective_action_plan_json,
+    validate_federal_award_json,
+    validate_findings_text_json,
+    validate_findings_uniform_guidance_json,
+    validate_notes_to_sefa_json,
+    validate_secondary_auditors_json,
+)
+
 
 class Util:
     @staticmethod
@@ -63,3 +85,47 @@ class ExcelExtractionError(Exception):
 
     def __str__(self):
         return f"{self.message} (Error Key: {self.error_key})"
+
+
+FORM_SECTION_HANDLERS = {
+    FORM_SECTIONS.FEDERAL_AWARDS: {
+        "extractor": extract_federal_awards,
+        "field_name": "federal_awards",
+        "validator": validate_federal_award_json,
+    },
+    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: {
+        "extractor": extract_corrective_action_plan,
+        "field_name": "corrective_action_plan",
+        "validator": validate_corrective_action_plan_json,
+    },
+    FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: {
+        "extractor": extract_audit_findings,
+        "field_name": "findings_uniform_guidance",
+        "validator": validate_findings_uniform_guidance_json,
+    },
+    FORM_SECTIONS.FINDINGS_TEXT: {
+        "extractor": extract_audit_findings_text,
+        "field_name": "findings_text",
+        "validator": validate_findings_text_json,
+    },
+    FORM_SECTIONS.ADDITIONAL_UEIS: {
+        "extractor": extract_additional_ueis,
+        "field_name": "additional_ueis",
+        "validator": validate_additional_ueis_json,
+    },
+    FORM_SECTIONS.ADDITIONAL_EINS: {
+        "extractor": extract_additional_eins,
+        "field_name": "additional_eins",
+        "validator": validate_additional_eins_json,
+    },
+    FORM_SECTIONS.SECONDARY_AUDITORS: {
+        "extractor": extract_secondary_auditors,
+        "field_name": "secondary_auditors",
+        "validator": validate_secondary_auditors_json,
+    },
+    FORM_SECTIONS.NOTES_TO_SEFA: {
+        "extractor": extract_notes_to_sefa,
+        "field_name": "notes_to_sefa",
+        "validator": validate_notes_to_sefa_json,
+    },
+}

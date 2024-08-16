@@ -8,6 +8,8 @@ from django.db.transaction import TransactionManagementError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone as django_timezone
@@ -34,6 +36,7 @@ from audit.validators import (
     validate_audit_information_json,
     validate_component_page_numbers,
 )
+from audit.utils import FORM_SECTION_HANDLERS
 from support.cog_over import compute_cog_over, record_cog_assignment
 from .submission_event import SubmissionEvent
 
@@ -430,13 +433,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """
         Full validation, intended for use when the user indicates that the
         submission is finished.
-
-        Currently a stub, but eventually will call each of the individual
-        section validation routines and then validate_cross.
         """
+        errors = []
 
-        validation_methods = []
-        errors = [f(self) for f in validation_methods]
+        # Reruns the individual workbook validations
+        for _, section_handlers in FORM_SECTION_HANDLERS.items():
+            try:
+                validation_method = section_handlers["validator"]
+                audit_data = getattr(self, section_handlers["field_name"])
+                validation_method(audit_data)
+            except ValidationError as err:
+                errors.extend(JsonResponse({"errors": list(err), "type": "error_row"}, status=400))
 
         if errors:
             return {"errors": errors}
