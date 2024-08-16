@@ -56,8 +56,8 @@ $log_admin_api_event$ LANGUAGE plpgsql;
 
 
 -- has_admin_data_access :: permission -> bool
--- The permissions (insert, select, delete) allow us to have users who can 
--- read administrative data in addition to users who can (say) update 
+-- The permissions (insert, select, delete) allow us to have users who can
+-- read administrative data in addition to users who can (say) update
 -- select tables like the tribal access lists.
 create or replace function admin_api_v1_1_0_functions.has_admin_data_access(perm TEXT) returns boolean
 as $has_admin_data_access$
