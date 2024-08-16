@@ -126,3 +126,11 @@ jobs:
           cf_space: ${{ env.space }}
           command: cf restart logshipper
 
+  check-tables:
+    needs: [push-with-creds]
+    uses: ./.github/workflows/fac-check-tables.yml
+    secrets: inherit
+    with:
+      environment: ${{ inputs.environment }}
+      util_version: "v0.1.6"
+      backup_operation: "check_tables"
