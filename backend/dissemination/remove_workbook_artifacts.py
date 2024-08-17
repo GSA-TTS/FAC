@@ -21,13 +21,6 @@ def remove_workbook_artifacts(sac):
         files = [f"excel/{excel_file.filename}" for excel_file in excel_files]
 
         if files:
-            # Delete the records from the database
-            count = excel_files.count()
-            excel_files.delete()
-            logger.info(
-                f"Deleted {count} excelfile records from fac-db for report: {sac.report_id}"
-            )
-
             # Delete the files from S3 in bulk
             delete_files_in_bulk(files, sac)
 
@@ -35,7 +28,7 @@ def remove_workbook_artifacts(sac):
         logger.info(f"No files found to delete for report: {sac.report_id}")
     except Exception as e:
         logger.error(
-            f"Failed to delete files from fac-db and S3 for report: {sac.report_id}. Error: {e}"
+            f"Failed to delete files from S3 for report: {sac.report_id}. Error: {e}"
         )
 
 

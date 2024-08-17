@@ -6,7 +6,10 @@ import os
 logger = logging.getLogger(__name__)
 
 # These are API versions we want live.
-live = {"dissemination": ["api_v1_0_3", "api_v1_1_0"], "support": ["admin_api_v1_1_0"]}
+live = {
+    "dissemination": ["api_v1_0_3", "api_v1_1_0", "api_v1_1_1"],
+    "support": ["admin_api_v1_1_0"],
+}
 
 # These are API versions we have deprecated.
 # They will be removed. It should be safe to leave them
@@ -40,6 +43,20 @@ def exec_sql(location, version, filename):
     with conn.cursor() as curs:
         path = f"{location}/api/{version}/{filename}"
         logger.info(f"EXEC SQL {location} {version} {filename}")
+        sql = open(path, "r").read()
+        curs.execute(sql)
+
+
+def create_materialized_view(location):
+    """
+    Create or recreate the dissemination_combined materialized view.
+    We only want this done once on startup, regardless of the API version.
+    """
+    conn = connection(get_conn_string())
+    conn.autocommit = True
+    with conn.cursor() as curs:
+        path = f"{location}/sql/create_materialized_views.sql"
+        logger.info("EXEC SQL create_materialized_views.sql")
         sql = open(path, "r").read()
         curs.execute(sql)
 
