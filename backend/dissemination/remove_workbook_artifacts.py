@@ -1,4 +1,5 @@
 import logging
+import math
 
 from django.conf import settings
 from audit.models.models import ExcelFile, SingleAuditChecklist
@@ -79,26 +80,22 @@ def delete_files_in_bulk(filenames, sac):
 
 def clean_artifacts(sac_list):
     """
-    Remove all workbook artifacts associated with the given list of sac values.
+    Perform necessary cleanup associated with the given list of sac values.
     """
     try:
         excel_files = ExcelFile.objects.filter(sac__in=sac_list)
         files = [f"excel/{excel_file.filename}" for excel_file in excel_files]
-        sac_to_file_map = {
-            excel_file.filename: excel_file.sac for excel_file in excel_files
-        }
 
         if files:
-            # Delete the records from the database
-            count = excel_files.count()
-            excel_files.delete()
             logger.info(
-                f"Deleted {count} ExcelFile records from fac-db for reports: {[sac.report_id for sac in sac_list]}"
+                f"Found {len(files)} ExcelFile records for reports: {[sac.report_id for sac in sac_list]}"
             )
 
-            # Delete the files from S3 in bulk and track results
-            successful_deletes, failed_deletes = delete_files_in_bulk(
-                files, sac_list, sac_to_file_map
+            # Track results but do not delete the ExcelFile records from the database
+            successful_deletes, failed_deletes = batch_removal(
+                files,
+                sac_list,
+                {excel_file.filename: excel_file.sac for excel_file in excel_files},
             )
 
             if failed_deletes:
@@ -110,12 +107,8 @@ def clean_artifacts(sac_list):
                     f"Successfully deleted the following files from S3: {successful_deletes}"
                 )
 
-    except ExcelFile.DoesNotExist:
-        logger.info("No files found to delete for the provided sac reports.")
     except Exception as e:
-        logger.error(
-            f"Failed to delete files from fac-db and S3 for the provided sac values. Error: {e}"
-        )
+        logger.error(f"Failed to process files for the provided sac values. Error: {e}")
 
 
 def batch_removal(filenames, sac_list, sac_to_file_map):
@@ -171,19 +164,40 @@ def batch_removal(filenames, sac_list, sac_to_file_map):
         return [], [{"error_message": str(e)}]
 
 
-def delete_workbooks(audit_year, page_size=10, pages=None):
-    """Iterates over disseminated reports for the given audit year."""
+def delete_workbooks(partition_number, total_partitions, page_size=10, pages=None):
+    """Iterates over disseminated reports for the specified partition."""
 
-    sacs = SingleAuditChecklist.objects.filter(
-        AUDITYEAR=audit_year, submission_status=SingleAuditChecklist.STATUS.DISSEMINATED
-    ).order_by("id")
+    if partition_number < 1 or partition_number > total_partitions:
+        raise ValueError(
+            "Invalid partition number. It must be between 1 and the total number of partitions."
+        )
+
+    all_ids = (
+        SingleAuditChecklist.objects.filter(
+            submission_status=SingleAuditChecklist.STATUS.DISSEMINATED
+        )
+        .values_list("id", flat=True)
+        .order_by("id")
+    )
+
+    total_ids = len(all_ids)
+    ids_per_partition = math.ceil(total_ids / total_partitions)
+
+    start_index = (partition_number - 1) * ids_per_partition
+    end_index = min(partition_number * ids_per_partition, total_ids)
+
+    ids_to_process = all_ids[start_index:end_index]
+
+    sacs = SingleAuditChecklist.objects.filter(id__in=ids_to_process).order_by("id")
+
     paginator = Paginator(sacs, page_size)
-
     total_pages = (
         paginator.num_pages if pages is None else min(pages, paginator.num_pages)
     )
 
-    logger.info(f"Retrieving {sacs.count()} reports for audit year {audit_year}")
+    logger.info(
+        f"Retrieving {sacs.count()} reports for partition {partition_number} of {total_partitions}"
+    )
 
     for page_number in range(1, total_pages + 1):
         try:

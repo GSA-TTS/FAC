@@ -8,14 +8,20 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Delete workbook artifacts for specified years"
+    help = "Delete workbook artifacts for a specific partition of disseminated reports."
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--year",
+            "--partition_number",
             type=int,
             required=True,
-            help="Comma-separated list of audit years to process",
+            help="The partition number to process (e.g., 1, 2, 3).",
+        )
+        parser.add_argument(
+            "--total_partitions",
+            type=int,
+            required=True,
+            help="The total number of partitions (e.g., 4 if splitting the load into four parts).",
         )
         parser.add_argument(
             "--page_size",
@@ -28,14 +34,21 @@ class Command(BaseCommand):
             "--pages",
             type=int,
             required=False,
-            default=100,
+            default=None,
             help="Maximum number of pages to process",
         )
 
     def handle(self, *args, **options):
-        year = options["year"]
+        partition_number = options["partition_number"]
+        total_partitions = options["total_partitions"]
         page_size = options["page_size"]
         pages = options["pages"]
 
-        self.stdout.write(self.style.SUCCESS(f"Processing audit year {year}"))
-        delete_workbooks(year, page_size=page_size, pages=pages)
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Processing partition {partition_number} of {total_partitions}"
+            )
+        )
+        delete_workbooks(
+            partition_number, total_partitions, page_size=page_size, pages=pages
+        )
