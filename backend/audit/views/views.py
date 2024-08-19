@@ -423,7 +423,7 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
             # Return to checklist, the Audit is not in the correct state.
             if sac.get_current_status() != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
-            
+
             return render(request, "audit/auditor-certification-step-1.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -497,7 +497,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
             # Return to checklist, the Audit is not in the correct state.
             if sac.get_current_status() != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
-            
+
             return render(request, "audit/auditor-certification-step-2.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -578,7 +578,7 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
             # Return to checklist, the Audit is not in the correct state.
             if sac.get_current_status() != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
-            
+
             return render(request, "audit/auditee-certification-step-1.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -652,7 +652,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
             # Return to checklist, the Audit is not in the correct state.
             if sac.get_current_status() != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
-            
+
             return render(request, "audit/auditee-certification-step-2.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
