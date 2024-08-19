@@ -473,7 +473,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """
         section_errors = []
 
-        for _, section_handlers in FORM_SECTION_HANDLERS.items():
+        for section, section_handlers in FORM_SECTION_HANDLERS.items():
             validation_method = section_handlers["validator"]
             section_name = section_handlers["field_name"]
             audit_data = getattr(self, section_name)
