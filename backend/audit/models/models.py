@@ -434,10 +434,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         Full validation, intended for use when the user indicates that the
         submission is finished.
         """
-        result = self.validate_cross()
-        result["errors"].extend(self.validate_individually())
+        cross_result = self.validate_cross()
+        individual_result = self.validate_individually()
+        full_result = {}
 
-        return result
+        if "errors" in cross_result:
+            full_result = cross_result
+            full_result["errors"].extend(individual_result["errors"])
+        elif "errors" in individual_result:
+            full_result = individual_result
+
+        return full_result
 
     def validate_cross(self):
         """
@@ -470,7 +477,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         Runs the individual workbook validations, returning generic errors as a
         list of strings. Ignores workbooks that haven't been uploaded yet.
         """
-        section_errors = []
+        errors = []
+        result = {}
 
         for section, section_handlers in FORM_SECTION_HANDLERS.items():
             validation_method = section_handlers["validator"]
@@ -482,7 +490,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             except ValidationError as err:
                 # err.error_list will be [] if the workbook wasn't uploaded yet
                 if err.error_list:
-                    section_errors.append(
+                    errors.append(
                         {
                             "error": f"""
                             The {SECTION_NAMES[section_name].friendly} workbook
@@ -494,7 +502,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                         }
                     )
 
-        return section_errors
+        if errors:
+            result = {"errors": errors}
+
+        return result
 
     @transition(
         field="submission_status",
