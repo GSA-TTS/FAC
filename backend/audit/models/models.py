@@ -277,6 +277,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     def get_current_status(self) -> str:
         """Return the most recent status."""
+        if len(self.transition_name) == 0:
+            return None
         return self.transition_name[len(self.transition_name) - 1]
 
     # Constants:
