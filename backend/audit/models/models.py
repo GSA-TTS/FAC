@@ -9,7 +9,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
 
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone as django_timezone
