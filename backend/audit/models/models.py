@@ -17,6 +17,7 @@ from django.utils import timezone as django_timezone
 from django_fsm import FSMField, RETURN_VALUE, transition
 
 import audit.cross_validation
+from audit.cross_validation.naming import SECTION_NAMES
 from audit.intake_to_dissemination import IntakeToDissemination
 from audit.validators import (
     validate_additional_ueis_json,
@@ -434,21 +435,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         Full validation, intended for use when the user indicates that the
         submission is finished.
         """
-        errors = []
+        result = self.validate_cross()
+        result["errors"].extend(self.validate_individually())
 
-        # Reruns the individual workbook validations
-        for _, section_handlers in FORM_SECTION_HANDLERS.items():
-            try:
-                validation_method = section_handlers["validator"]
-                audit_data = getattr(self, section_handlers["field_name"])
-                validation_method(audit_data)
-            except ValidationError as err:
-                errors.extend(JsonResponse({"errors": list(err), "type": "error_row"}, status=400))
-
-        if errors:
-            return {"errors": errors}
-
-        return self.validate_cross()
+        return result
 
     def validate_cross(self):
         """
@@ -475,6 +465,36 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         if errors:
             return {"errors": errors, "data": shaped_sac}
         return {}
+
+    def validate_individually(self):
+        """
+        Runs the individual workbook validations, returning generic errors as a
+        list of strings. Ignores workbooks that haven't been uploaded yet.
+        """
+        section_errors = []
+
+        for _, section_handlers in FORM_SECTION_HANDLERS.items():
+            validation_method = section_handlers["validator"]
+            section_name = section_handlers["field_name"]
+            audit_data = getattr(self, section_name)
+
+            try:
+                validation_method(audit_data)
+            except ValidationError as err:
+                # err.error_list will be [] if the workbook wasn't uploaded yet
+                if err.error_list:
+                    section_errors.append({
+                        "error":
+                        f"""
+                            The {SECTION_NAMES[section_name].friendly} workbook
+                            contains validation errors and will need to be
+                            reuploaded. This is likely caused by changes made
+                            to our validations in the time since it was
+                            originally uploaded.
+                        """
+                    })
+
+        return section_errors
 
     @transition(
         field="submission_status",
