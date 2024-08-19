@@ -589,10 +589,7 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if (
-                sac.submission_status
-                != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED
-            ):
+            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             return render(request, "audit/auditee-certification-step-1.html", context)
@@ -619,10 +616,7 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if (
-                sac.submission_status
-                != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED
-            ):
+            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form.is_valid():
@@ -669,10 +663,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if (
-                sac.submission_status
-                != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED
-            ):
+            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             return render(request, "audit/auditee-certification-step-2.html", context)
@@ -697,10 +688,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if (
-                sac.submission_status
-                != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED
-            ):
+            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form2.is_valid():
