@@ -170,11 +170,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-
 POSTGREST = {
     "URL": env.str("POSTGREST_URL", "http://api:3000"),
     "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),
@@ -238,6 +233,14 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
             "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
         ),
     }
+    STORAGES = {
+        "default": {
+            "BACKEND": "report_submission.storages.S3PrivateStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        },
+    }
 
     # Local environment and Testing environment (CI/CD/GitHub Actions)
 
@@ -248,9 +251,7 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
-    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
@@ -284,8 +285,14 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
 else:
     # One of the Cloud.gov environments
-    STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
-    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
+    STORAGES = {
+        "default": {
+            "BACKEND": "report_submission.storages.S3PrivateStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "storages.backends.s3boto3.S3ManifestStaticStorage",
+        },
+    }
 
     vcap = json.loads(env.str("VCAP_SERVICES"))
 
