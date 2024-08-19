@@ -483,16 +483,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             except ValidationError as err:
                 # err.error_list will be [] if the workbook wasn't uploaded yet
                 if err.error_list:
-                    section_errors.append({
-                        "error":
-                        f"""
+                    section_errors.append(
+                        {
+                            "error": f"""
                             The {SECTION_NAMES[section_name].friendly} workbook
                             contains validation errors and will need to be
                             reuploaded. This is likely caused by changes made
                             to our validations in the time since it was
                             originally uploaded.
                         """
-                    })
+                        }
+                    )
 
         return section_errors
 
