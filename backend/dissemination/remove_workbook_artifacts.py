@@ -88,7 +88,7 @@ def clean_artifacts(sac_list):
             successful_deletes, failed_deletes = batch_removal(
                 files,
                 sac_list,
-                {excel_file.filename: excel_file.sac for excel_file in excel_files},
+                {f"excel/{excel_file.filename}": excel_file.sac.report_id for excel_file in excel_files},
             )
 
             if failed_deletes:
@@ -104,7 +104,7 @@ def clean_artifacts(sac_list):
         logger.error(f"Failed to process files for the provided sac values. Error: {e}")
 
 
-def batch_removal(filenames, sac_list, sac_to_file_map):
+def batch_removal(filenames, sac_list, sac_to_report_id_map):
     """Delete files from S3 in bulk and return the results."""
     s3_client = boto3_client(
         service_name="s3",
@@ -117,7 +117,6 @@ def batch_removal(filenames, sac_list, sac_to_file_map):
 
     try:
         delete_objects = [{"Key": filename} for filename in filenames]
-
         response = s3_client.delete_objects(
             Bucket=settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
             Delete={"Objects": delete_objects},
@@ -125,14 +124,13 @@ def batch_removal(filenames, sac_list, sac_to_file_map):
 
         successful_deletes = []
         failed_deletes = []
-
         deleted_files = response.get("Deleted", [])
         for deleted in deleted_files:
             filename = deleted["Key"]
             successful_deletes.append(
                 {
                     "filename": filename,
-                    "sac_report_id": sac_to_file_map[filename].report_id,
+                    "sac_report_id": sac_to_report_id_map[filename],
                 }
             )
 
@@ -143,7 +141,7 @@ def batch_removal(filenames, sac_list, sac_to_file_map):
                 failed_deletes.append(
                     {
                         "filename": filename,
-                        "sac_report_id": sac_to_file_map[filename].report_id,
+                        "sac_report_id": sac_to_report_id_map[filename],
                         "error_message": error["Message"],
                     }
                 )
@@ -154,6 +152,9 @@ def batch_removal(filenames, sac_list, sac_to_file_map):
         logger.error(
             f"Failed to delete files from S3 for sac values: {[sac.report_id for sac in sac_list]}. Error: {e}"
         )
+        return [], [{"error_message": str(e)}]
+    except Exception as e:
+        logger.error(f"Failed to delete files from S3. Error: {e}") 
         return [], [{"error_message": str(e)}]
 
 
