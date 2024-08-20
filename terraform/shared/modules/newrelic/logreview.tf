@@ -282,5 +282,23 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       legend_enabled = true
     }
+
+    widget_table {
+      title = "${var.cf_space_name} Backups and Submissions"
+
+      row    = 10
+      column = 1
+      width  = 8
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message` FROM Log WHERE allColumnSearch('POST', insensitive: true) AND allColumnSearch('/submission/', insensitive: true) AND `newrelic.source` = 'logs.APM' AND `entity.name` = 'gsa-fac-${var.cf_space_name}' SINCE 3 hours ago"
+      }
+      nrql_query {
+        query = "SELECT `message`,`timestamp`FROM Log WHERE allColumnSearch('APP/TASK/BACKUP_UTIL_SCHEDULED', insensitive: true) AND `message` LIKE '%Exit status 0%' AND `tags.space_name` = '${var.cf_space_name}' SINCE 3 hours ago"
+      }
+
+      legend_enabled = true
+    }
   }
 }
