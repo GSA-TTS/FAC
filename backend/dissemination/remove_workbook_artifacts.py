@@ -88,7 +88,10 @@ def clean_artifacts(sac_list):
             successful_deletes, failed_deletes = batch_removal(
                 files,
                 sac_list,
-                {f"excel/{excel_file.filename}": excel_file.sac.report_id for excel_file in excel_files},
+                {
+                    f"excel/{excel_file.filename}": excel_file.sac.report_id
+                    for excel_file in excel_files
+                },
             )
 
             if failed_deletes:
@@ -154,7 +157,7 @@ def batch_removal(filenames, sac_list, sac_to_report_id_map):
         )
         return [], [{"error_message": str(e)}]
     except Exception as e:
-        logger.error(f"Failed to delete files from S3. Error: {e}") 
+        logger.error(f"Failed to delete files from S3. Error: {e}")
         return [], [{"error_message": str(e)}]
 
 
