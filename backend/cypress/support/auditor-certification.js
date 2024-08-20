@@ -11,6 +11,7 @@ export function testAuditorCertification() {
   // 2. Sign and date, submit and go back to checklist
   cy.get('#auditor_name').type('Jane Doe');
 	cy.get('#auditor_title').type('Auditor');
-  cy.get('#auditor_certification_date_signed').type("01/01/2022");
+  cy.get('.usa-date-picker__button').click();
+  cy.get('.usa-date-picker__calendar__date--today').click();
   cy.get('.usa-button').contains('Agree to auditor certification').click();
 };
