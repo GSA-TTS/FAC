@@ -668,6 +668,14 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
+            errors = sac.validate_full()
+            if errors:
+                context = {"report_id": report_id, "errors": errors}
+
+                return render(
+                    request, "audit/cross-validation/cross-validation-results.html", context
+                )
+
             sac.transition_to_submitted()
             sac.save(
                 event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
