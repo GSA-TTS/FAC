@@ -227,7 +227,6 @@ STATIC_URL = "/static/"
 # Environment specific configurations
 DEBUG = False
 if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
-
     DATABASES = {
         "default": env.dj_db_url(
             "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
@@ -241,6 +240,9 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
         },
     }
+    # Per whitenoise docs, insert into middleware list directly after Django
+    # security middleware: https://whitenoise.readthedocs.io/en/stable/django.html#enable-whitenoise
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
     # Local environment and Testing environment (CI/CD/GitHub Actions)
 
@@ -250,8 +252,6 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
         DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
-
-    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
