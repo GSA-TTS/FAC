@@ -28,8 +28,8 @@ class RemovedWorkbookArtifactsTestCase(TestCase):
 
         remove_workbook_artifacts(sac)
 
-        # Assert that the ExcelFile instances are deleted
-        self.assertFalse(ExcelFile.objects.filter(sac=sac).exists())
+        # Assert that the ExcelFile instances are not deleted
+        self.assertTrue(ExcelFile.objects.filter(sac=sac).exists())
 
         # Assert S3 bulk delete was called with the correct filenames
         mock_delete_files_in_bulk.assert_called_once_with(
@@ -86,8 +86,8 @@ class CleanArtifactsTestCase(TestCase):
             ],
             sac_list,
             {
-                f"{sac_1.report_id}--{excel_file_1.form_section}.xlsx": sac_1,
-                f"{sac_2.report_id}--{excel_file_2.form_section}.xlsx": sac_2,
+                f"excel/{sac_1.report_id}--{excel_file_1.form_section}.xlsx": sac_1.report_id,
+                f"excel/{sac_2.report_id}--{excel_file_2.form_section}.xlsx": sac_2.report_id,
             },
         )
 
