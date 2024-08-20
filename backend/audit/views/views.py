@@ -673,7 +673,9 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                 context = {"report_id": report_id, "errors": errors}
 
                 return render(
-                    request, "audit/cross-validation/cross-validation-results.html", context
+                    request,
+                    "audit/cross-validation/cross-validation-results.html",
+                    context,
                 )
 
             sac.transition_to_submitted()
