@@ -232,7 +232,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       height = 3
 
       nrql_query {
-        query = "SELECT `message`,`newrelic.source`,`tags.app_name`,`tags.space_name` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('CHECKTABLESPASS', insensitive: true) SINCE 7 days ago"
+        query = "SELECT `message` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('CHECKTABLESPASS', insensitive: true) SINCE 7 days ago"
       }
 
       legend_enabled = true
@@ -262,7 +262,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       height = 3
 
       nrql_query {
-        query = "SELECT `message`,`newrelic.source`,`tags.app_name`,`tags.space_name` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('DBMISSINGTABLES', insensitive: true) SINCE 7 days ago"
+        query = "SELECT `message` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('DBMISSINGTABLES', insensitive: true) SINCE 7 days ago"
       }
 
       legend_enabled = true
