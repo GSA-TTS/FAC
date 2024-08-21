@@ -7,17 +7,15 @@
         "program": {
           "federal_agency_prefix": "42",
           "three_digit_extension": "RD",
-          "additional_award_identification": 1234,
+          "additional_award_identification": "1234",
           "program_name": "FLOWER DREAMING",
           "is_major": "N",
-          "audit_report_type": "",
           "number_of_audit_findings": 0,
           "amount_expended": 5000000,
           "federal_program_total": 5000000
         },
         "loan_or_loan_guarantee": {
-          "is_guaranteed": "N",
-          "loan_balance_at_audit_period_end": 0
+          "is_guaranteed": "N"
         },
         "direct_or_indirect_award": {
           "is_direct": "N",

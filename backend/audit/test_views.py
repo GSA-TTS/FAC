@@ -293,11 +293,12 @@ class SubmissionViewTests(TestCase):
             "audit_information": _fake_audit_information(),
             "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
             "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
-            "submission_status": STATUSES.AUDITEE_CERTIFIED,
+            "submission_status": STATUSES.IN_PROGRESS,  # Temporarily required for SAR creation below
         }
         sac_data["notes_to_sefa"]["NotesToSefa"]["accounting_policies"] = "Exhaustive"
         sac_data["notes_to_sefa"]["NotesToSefa"]["is_minimis_rate_used"] = "Y"
         sac_data["notes_to_sefa"]["NotesToSefa"]["rate_explained"] = "At great length"
+        sac_data["report_id"] = _mock_gen_report_id()
         user, sac = _make_user_and_sac(**sac_data)
 
         required_statuses = (
@@ -311,8 +312,10 @@ class SubmissionViewTests(TestCase):
             sac.transition_name.append(rs)
             sac.transition_date.append(datetime.now(timezone.utc))
 
-        sac.save()
+        baker.make(SingleAuditReportFile, sac=sac)
         baker.make(Access, user=user, sac=sac, role="certifying_auditee_contact")
+        sac.submission_status = STATUSES.AUDITEE_CERTIFIED
+        sac.save()
 
         response = _authed_post(
             Client(),
