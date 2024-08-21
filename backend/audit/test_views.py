@@ -433,7 +433,10 @@ class SubmissionStatusTests(TransactionTestCase):
             "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
             "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
         }
-
+        sac_data["notes_to_sefa"]["NotesToSefa"]["accounting_policies"] = "Exhaustive"
+        sac_data["notes_to_sefa"]["NotesToSefa"]["is_minimis_rate_used"] = "Y"
+        sac_data["notes_to_sefa"]["NotesToSefa"]["rate_explained"] = "At great length"
+        
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         for field, value in sac_data.items():
             setattr(sac, field, value)
