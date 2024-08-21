@@ -420,6 +420,14 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
                 "submission_status": sac.submission_status,
                 "form": form,
             }
+
+            # Return to checklist, the Audit is not in the correct state.
+            if (
+                sac.submission_status
+                != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+            ):
+                return redirect(f"/audit/submission-progress/{sac.report_id}")
+
             return render(request, "audit/auditor-certification-step-1.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -442,6 +450,13 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
             }
+
+            # Return to checklist, the Audit is not in the correct state.
+            if (
+                sac.submission_status
+                != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+            ):
+                return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form.is_valid():
                 # Save to session. Retrieved and saved after step 2.
@@ -485,6 +500,14 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
                 "submission_status": sac.submission_status,
                 "form": form,
             }
+
+            # Return to checklist, the Audit is not in the correct state.
+            if (
+                sac.submission_status
+                != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+            ):
+                return redirect(f"/audit/submission-progress/{sac.report_id}")
+
             return render(request, "audit/auditor-certification-step-2.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -506,6 +529,13 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
             }
+
+            # Return to checklist, the Audit is not in the correct state.
+            if (
+                sac.submission_status
+                != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+            ):
+                return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form2.is_valid():
                 form_cleaned = {
@@ -557,6 +587,11 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
                 "submission_status": sac.submission_status,
                 "form": form,
             }
+
+            # Return to checklist, the Audit is not in the correct state.
+            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+                return redirect(f"/audit/submission-progress/{sac.report_id}")
+
             return render(request, "audit/auditee-certification-step-1.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -579,6 +614,10 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
             }
+
+            # Return to checklist, the Audit is not in the correct state.
+            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+                return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form.is_valid():
                 # Save to session. Retrieved and saved after step 2.
@@ -622,6 +661,11 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
                 "submission_status": sac.submission_status,
                 "form": form,
             }
+
+            # Return to checklist, the Audit is not in the correct state.
+            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+                return redirect(f"/audit/submission-progress/{sac.report_id}")
+
             return render(request, "audit/auditee-certification-step-2.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -636,13 +680,16 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
                 "AuditeeCertificationStep1Session", None
             )
             form2 = AuditeeCertificationStep2Form(request.POST or None)
-
             context = {
                 "auditee_uei": sac.auditee_uei,
                 "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
             }
+
+            # Return to checklist, the Audit is not in the correct state.
+            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+                return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form2.is_valid():
                 form_cleaned = {
