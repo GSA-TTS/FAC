@@ -440,7 +440,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
         if "errors" in cross_result:
             full_result = cross_result
-            full_result["errors"].extend(individual_result["errors"])
+            if "errors" in individual_result:
+                full_result["errors"].extend(individual_result["errors"])
         elif "errors" in individual_result:
             full_result = individual_result
 
