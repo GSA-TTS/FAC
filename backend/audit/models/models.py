@@ -493,8 +493,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 if err.error_list:
                     errors.append(
                         {
-                            "error":
-                                f"The {SECTION_NAMES[section_name].friendly} workbook contains validation errors and will need to be reuploaded. This is likely caused by changes made to our validations in the time since it was originally uploaded."
+                            "error": f"The {SECTION_NAMES[section_name].friendly} workbook contains validation errors and will need to be reuploaded. This is likely caused by changes made to our validations in the time since it was originally uploaded."
                         }
                     )
 
