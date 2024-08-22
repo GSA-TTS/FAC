@@ -332,11 +332,11 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
                     event_type=SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
                 )
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
-
-            context = {"report_id": report_id, "errors": errors}
-            return render(
-                request, "audit/cross-validation/cross-validation-results.html", context
-            )
+            else:
+                context = {"report_id": report_id, "errors": errors}
+                return render(
+                    request, "audit/cross-validation/cross-validation-results.html", context
+                )
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
