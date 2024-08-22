@@ -335,7 +335,9 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
             else:
                 context = {"report_id": report_id, "errors": errors}
                 return render(
-                    request, "audit/cross-validation/cross-validation-results.html", context
+                    request,
+                    "audit/cross-validation/cross-validation-results.html",
+                    context,
                 )
 
         except SingleAuditChecklist.DoesNotExist:
