@@ -13,7 +13,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone as django_timezone
 
-from django_fsm import FSMField, RETURN_VALUE, transition
+from django_fsm import FSMField, transition
 
 import audit.cross_validation
 from audit.cross_validation.naming import SECTION_NAMES
