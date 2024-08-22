@@ -1,3 +1,4 @@
+import calendar
 import json
 import re
 from datetime import timedelta
@@ -310,10 +311,20 @@ def xform_auditee_fiscal_period_end(general_information):
 
 def xform_auditee_fiscal_period_start(general_information):
     """Constructs the fiscal period start from the fiscal period end"""
-    # Transformation to be documented.
-    fiscal_start_date = xform_census_date_to_datetime(
+    fiscal_end_date = xform_census_date_to_datetime(
         general_information.get("auditee_fiscal_period_end")
-    ) - timedelta(days=365)
+    )
+
+    # handle leap year if applicable.
+    if calendar.isleap(fiscal_end_date.year):
+        days_to_subtract = 366
+    else:
+        days_to_subtract = 365
+
+    # Transformation to be documented.
+    fiscal_start_date = (
+        fiscal_end_date - timedelta(days=days_to_subtract) + timedelta(days=1)
+    )
     general_information["auditee_fiscal_period_start"] = fiscal_start_date.strftime(
         "%Y-%m-%d"
     )
