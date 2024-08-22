@@ -505,23 +505,15 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     @transition(
         field="submission_status",
         source=STATUS.IN_PROGRESS,
-        target=RETURN_VALUE(STATUS.IN_PROGRESS, STATUS.READY_FOR_CERTIFICATION),
+        target=STATUS.READY_FOR_CERTIFICATION,
     )
     def transition_to_ready_for_certification(self):
         """
-        Pretend we're doing multi-sheet validation here.
-        This probably won't be the first time this validation is done;
-        there's likely to be a step in one of the views that does cross-sheet
-        validation and reports back to the user.
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will be done at the view level.
         """
-        errors = self.validate_full()
-        if not errors:
-            self.transition_name.append(
-                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-            )
-            self.transition_date.append(datetime.now(timezone.utc))
-            return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-        return SingleAuditChecklist.STATUS.IN_PROGRESS
+        self.transition_name.append(SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION)
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
