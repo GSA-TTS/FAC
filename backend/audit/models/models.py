@@ -8,6 +8,7 @@ from django.db.transaction import TransactionManagementError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
 
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone as django_timezone
@@ -15,6 +16,7 @@ from django.utils import timezone as django_timezone
 from django_fsm import FSMField, RETURN_VALUE, transition
 
 import audit.cross_validation
+from audit.cross_validation.naming import SECTION_NAMES
 from audit.intake_to_dissemination import IntakeToDissemination
 from audit.validators import (
     validate_additional_ueis_json,
@@ -34,6 +36,7 @@ from audit.validators import (
     validate_audit_information_json,
     validate_component_page_numbers,
 )
+from audit.utils import FORM_SECTION_HANDLERS
 from support.cog_over import compute_cog_over, record_cog_assignment
 from .submission_event import SubmissionEvent
 
@@ -430,18 +433,19 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """
         Full validation, intended for use when the user indicates that the
         submission is finished.
-
-        Currently a stub, but eventually will call each of the individual
-        section validation routines and then validate_cross.
         """
+        cross_result = self.validate_cross()
+        individual_result = self.validate_individually()
+        full_result = {}
 
-        validation_methods = []
-        errors = [f(self) for f in validation_methods]
+        if "errors" in cross_result:
+            full_result = cross_result
+            if "errors" in individual_result:
+                full_result["errors"].extend(individual_result["errors"])
+        elif "errors" in individual_result:
+            full_result = individual_result
 
-        if errors:
-            return {"errors": errors}
-
-        return self.validate_cross()
+        return full_result
 
     def validate_cross(self):
         """
@@ -468,6 +472,35 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         if errors:
             return {"errors": errors, "data": shaped_sac}
         return {}
+
+    def validate_individually(self):
+        """
+        Runs the individual workbook validations, returning generic errors as a
+        list of strings. Ignores workbooks that haven't been uploaded yet.
+        """
+        errors = []
+        result = {}
+
+        for section, section_handlers in FORM_SECTION_HANDLERS.items():
+            validation_method = section_handlers["validator"]
+            section_name = section_handlers["field_name"]
+            audit_data = getattr(self, section_name)
+
+            try:
+                validation_method(audit_data)
+            except ValidationError as err:
+                # err.error_list will be [] if the workbook wasn't uploaded yet
+                if err.error_list:
+                    errors.append(
+                        {
+                            "error": f"The {SECTION_NAMES[section_name].friendly} workbook contains validation errors and will need to be re-uploaded. This is likely caused by changes made to our validations in the time since it was originally uploaded."
+                        }
+                    )
+
+        if errors:
+            result = {"errors": errors}
+
+        return result
 
     @transition(
         field="submission_status",
