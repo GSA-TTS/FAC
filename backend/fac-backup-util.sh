@@ -33,6 +33,9 @@ RDSToRDS() {
 CheckTables() {
     ./gov.gsa.fac.cgov-util check_db --db "$1"
 }
+RowCount() {
+    ./gov.gsa.fac.cgov-util row_count --db "$1"
+}
 
 if [ "$run_option" == "initial_backup" ]; then
     GetUtil
@@ -80,4 +83,6 @@ elif [ "$run_option" == "check_tables" ]; then
     gonogo "install_aws"
     CheckTables "$db_name"
     gonogo "check_tables"
+    RowCount "$db_name"
+    gonogo "row_count"
 fi
