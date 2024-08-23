@@ -20,5 +20,5 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ matrix.environment.name }}
-      util_version: "v0.1.6"
+      util_version: "v0.1.7"
       backup_operation: "check_tables"
