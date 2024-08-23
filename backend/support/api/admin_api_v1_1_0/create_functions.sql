@@ -126,7 +126,7 @@ BEGIN
         -- Are they already in the table?
         SELECT count(up.email) 
             FROM public.users_userpermission as up
-            WHERE email = params->>'email' INTO already_exists;
+            WHERE LOWER(email) = LOWER(params->>'email') INTO already_exists;
 
         -- If they are, we're going to exit.
         IF already_exists <> 0
@@ -146,7 +146,7 @@ BEGIN
             -- Can we make the 1 not magic... do a select into.
             INSERT INTO public.users_userpermission
                 (email, permission_id, user_id)
-                VALUES (params->>'email', read_tribal_id, null);
+                VALUES (LOWER(params->>'email'), read_tribal_id, null);
 
             RAISE INFO 'ADMIN_API add_tribal_access_email OK %', params->>'email';
             RETURN admin_api_v1_1_0_functions.log_admin_api_event('tribal-access-email-added', 
