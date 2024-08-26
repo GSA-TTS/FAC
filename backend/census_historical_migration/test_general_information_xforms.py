@@ -1,9 +1,9 @@
-import calendar
 from datetime import datetime, timedelta
 import json
 from unittest.mock import mock_open, patch
 from django.conf import settings
 from django.test import SimpleTestCase
+from audit.utils import Util
 
 from .sac_general_lib.general_information import (
     AUDIT_TYPE_DICT,
@@ -191,19 +191,12 @@ class TestXformAuditeeFiscalPeriodStart(SimpleTestCase):
     def test_when_auditee_fiscal_period_end_is_valid(self):
         """Test that the function returns the correct results when the fiscal period end is valid."""
         result = xform_auditee_fiscal_period_start(self.general_information)
-        fiscal_end_date = datetime.strptime(
+        fiscal_end = datetime.strptime(
             self.general_information["auditee_fiscal_period_end"],
             "%m/%d/%Y %H:%M:%S",
         )
-
-        # handle leap year if applicable.
-        if calendar.isleap(fiscal_end_date.year):
-            days_to_subtract = 366
-        else:
-            days_to_subtract = 365
-
         expected_date = (
-            fiscal_end_date - timedelta(days=days_to_subtract) + timedelta(days=1)
+            fiscal_end - timedelta(days=Util.check_leap_year(fiscal_end.year)) + timedelta(days=1)
         ).strftime("%Y-%m-%d")
         self.assertEqual(result["auditee_fiscal_period_start"], expected_date)
 

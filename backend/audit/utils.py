@@ -1,3 +1,4 @@
+import calendar
 from django.conf import settings
 
 from audit.fixtures.excel import FORM_SECTIONS
@@ -71,6 +72,15 @@ class Util:
         if general_information_data.get("audit_period_covered") != "other":
             general_information_data.pop("audit_period_other_months", None)
         return general_information_data
+
+    @staticmethod
+    def check_leap_year(year):
+        """Get number of days in the year."""
+        if calendar.isleap(year):
+            return 366
+        else:
+            return 365
+        
 
 
 class ExcelExtractionError(Exception):
