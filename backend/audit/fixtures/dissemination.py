@@ -31,7 +31,7 @@ def load_dissemination():
         report_id=report_id_no_findings,
     ).first()
     if sac_no_findings is None:
-        general_no_findings = baker.make(General, **sac_info_without_findings)
+        general_no_findings = baker.make(General, **sac_info_without_findings, is_public=True)
         baker.make(FederalAward, report_id=general_no_findings)
         logger.info("Created SAC example %s", report_id_no_findings)
     else:
