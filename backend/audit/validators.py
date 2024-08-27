@@ -663,6 +663,7 @@ def validate_single_audit_report_file_extension(file):
 def validate_pdf_file_integrity(file):
     """Files must be readable PDFs"""
     MIN_CHARARACTERS_IN_PDF = 6000
+    MIN_PERCENT_READABLE_PAGES = .50
 
     try:
         reader = PdfReader(file)
@@ -672,17 +673,27 @@ def validate_pdf_file_integrity(file):
                 "We were unable to process the file you uploaded because it is encrypted."
             )
 
-        text_length = 0
+        total_chars = 0
+        num_pages_with_text = 0
+
         for page in reader.pages:
             page_text = page.extract_text()
-            text_length += len(page_text)
-            # If we find enough characters, we're content.
-            if text_length >= MIN_CHARARACTERS_IN_PDF:
-                break
+            total_chars += len(page_text)
+            num_pages_with_text += 1 if len(page_text) else 0
 
-        if text_length < MIN_CHARARACTERS_IN_PDF:
+        percent_readable_pages = num_pages_with_text / len(reader.pages)
+
+        if total_chars == 0:
             raise ValidationError(
-                "We were unable to process the file you uploaded because it contains no readable text or too little text."
+                "We were unable to process the file you uploaded because it contains no readable text."
+            )
+        elif total_chars < MIN_CHARARACTERS_IN_PDF:
+            raise ValidationError(
+                "We were unable to process the file you uploaded because it contains too little readable text."
+            )
+        elif percent_readable_pages < MIN_PERCENT_READABLE_PAGES:
+            raise ValidationError(
+                f"We were unable to process the file you uploaded because only {percent_readable_pages:.0%} of the pages contain readable text (minimum {MIN_PERCENT_READABLE_PAGES:.0%} required.)"
             )
 
     except ValidationError:
