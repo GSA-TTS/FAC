@@ -47,18 +47,9 @@ def exec_sql(location, version, filename):
         curs.execute(sql)
 
 
-def create_materialized_view(location):
-    """
-    Create or recreate the dissemination_combined materialized view.
-    We only want this done once on startup, regardless of the API version.
-    """
-    conn = connection(get_conn_string())
-    conn.autocommit = True
-    with conn.cursor() as curs:
-        path = f"{location}/sql/create_materialized_views.sql"
-        logger.info("EXEC SQL create_materialized_views.sql")
-        sql = open(path, "r").read()
-        curs.execute(sql)
+def create_functions(location):
+    for version in live[location]:
+        exec_sql(location, version, "create_functions.sql")
 
 
 def create_views(location, version):
@@ -77,39 +68,50 @@ def drop_schema(location, version):
     exec_sql(location, version, "drop_schema.sql")
 
 
-def create_live_schemas(location):
+def create_live_views(location):
+    """
+    Call 'create_views' for each live API version
+    """
     for version in live[location]:
-        drop_schema(location, version)
+        create_views(location, version)
+
+
+def drop_live_views(location):
+    """
+    Call 'drop_views' for each live API version
+    """
+    for version in live[location]:
+        drop_views(location, version)
+
+
+def create_live_schemas(location):
+    """
+    Execute 'base.sql' then call 'create_schema' for each live API version
+    """
+    for version in live[location]:
         exec_sql(location, version, "base.sql")
         create_schema(location, version)
 
 
 def drop_live_schema(location):
+    """
+    Call 'drop_schema' for each live API version
+    """
     for version in live[location]:
         drop_schema(location, version)
 
 
-def drop_live_views(location):
-    for version in live[location]:
-        drop_views(location, version)
-
-
-def create_live_views(location):
-    for version in live[location]:
-        drop_views(location, version)
-        create_views(location, version)
-
-
-def create_functions(location):
-    for version in live[location]:
-        exec_sql(location, version, "create_functions.sql")
-
-
 def deprecate_schemas_and_views(location):
+    """
+    Execute 'drop_schema.sql' for all deprecated API versions
+    """
     for version in deprecated[location]:
         exec_sql(location, version, "drop_schema.sql")
 
 
 def create_access_tables(location):
+    """
+    Execute 'create_access_tables.sql' for each live API version
+    """
     for version in live[location]:
         exec_sql(location, version, "create_access_tables.sql")
