@@ -148,9 +148,9 @@ BEGIN
                 (email, permission_id, user_id)
                 VALUES (LOWER(params->>'email'), read_tribal_id, null);
 
-            RAISE INFO 'ADMIN_API add_tribal_access_email OK %', params->>'email';
+            RAISE INFO 'ADMIN_API add_tribal_access_email OK %', LOWER(params->>'email');
             RETURN admin_api_v1_1_0_functions.log_admin_api_event('tribal-access-email-added', 
-                                                        json_build_object('email', params->>'email'));
+                                                        json_build_object('email', LOWER(params->>'email')));
         END IF;
     ELSE
         RETURN 0;
@@ -222,7 +222,7 @@ BEGIN
     THEN 
         -- Delete rows where the email address matches
         DELETE FROM public.users_userpermission as up
-            WHERE up.email = params->>'email';
+            WHERE LOWER(up.email) = LOWER(params->>'email');
         -- This is the Postgres way to find out how many rows
         -- were affected by a DELETE.
         GET DIAGNOSTICS affected_rows = ROW_COUNT;
@@ -230,7 +230,7 @@ BEGIN
         IF affected_rows > 0
         THEN
             RETURN admin_api_v1_1_0_functions.log_admin_api_event('tribal-access-email-removed', 
-                                                        json_build_object('email', params->>'email'));
+                                                        json_build_object('email', LOWER(params->>'email')));
         ELSE
             RETURN 0;
         END IF;
@@ -297,14 +297,14 @@ BEGIN
         SELECT EXISTS (
             SELECT 1 
             FROM public.dissemination_TribalApiAccessKeyIds
-            WHERE email = params->>'email'
+            WHERE LOWER(email) = LOWER(params->>'email')
         )
         INTO user_exists;
 
         -- If the user already exists, it means they have access.
         -- For purposes of this function, lets call that "succses", and return true.
         IF user_exists THEN
-            RAISE INFO 'ADMIN_API add_tribal_api_key_access ALREADY_EXISTS %', params->>'email';
+            RAISE INFO 'ADMIN_API add_tribal_api_key_access ALREADY_EXISTS %', LOWER(params->>'email');
             RETURN json_build_object(
                 'result', 'success',
                 'message', 'User with this key already exists')::JSON;
@@ -313,8 +313,8 @@ BEGIN
 
         -- If the user does not exist, add a new record
         INSERT INTO public.dissemination_TribalApiAccessKeyIds (email, key_id, date_added)
-        VALUES (params->>'email', params->>'key_id', CURRENT_TIMESTAMP);
-        RAISE INFO 'ADMIN_API add_tribal_api_key_access ACCESS_GRANTED % %', params->>'email', params->>'key_id';
+        VALUES (LOWER(params->>'email'), params->>'key_id', CURRENT_TIMESTAMP);
+        RAISE INFO 'ADMIN_API add_tribal_api_key_access ACCESS_GRANTED % %', LOWER(params->>'email'), params->>'key_id';
         RETURN json_build_object(
             'result', 'success', 
             'message', 'User access granted')::JSON;
@@ -328,7 +328,7 @@ BEGIN
     END IF;
 
     -- Return false by default.
-    RAISE INFO 'ADMIN_API add_tribal_api_key_access WAT %', params->>'email';
+    RAISE INFO 'ADMIN_API add_tribal_api_key_access WAT %', LOWER(params->>'email');
     RETURN json_build_object(
         'result', 'failure', 
         'message', 'Unknown error in access addition')::JSON;
@@ -352,20 +352,20 @@ BEGIN
         SELECT EXISTS (
             SELECT 1 
             FROM public.dissemination_TribalApiAccessKeyIds
-            WHERE email = params->>'email'
+            WHERE LOWER(email) = LOWER(params->>'email')
         )
         INTO user_exists;
 
         -- If the user exists, remove the record
         IF user_exists THEN
             DELETE FROM public.dissemination_TribalApiAccessKeyIds
-            WHERE email = params->>'email';
-            RAISE INFO 'ADMIN_API remove_tribal_api_key_access ACCESS_REMOVED %', params->>'email';
+            WHERE LOWER(email) = LOWER(params->>'email');
+            RAISE INFO 'ADMIN_API remove_tribal_api_key_access ACCESS_REMOVED %', LOWER(params->>'email');
             RETURN json_build_object(
                 'result', 'success', 
                 'message', 'Removed record')::JSON; 
         ELSE
-            RAISE INFO 'ADMIN_API remove_tribal_api_key_access DID_NOT_EXIST %', params->>'email';
+            RAISE INFO 'ADMIN_API remove_tribal_api_key_access DID_NOT_EXIST %', LOWER(params->>'email');
             RETURN json_build_object(
                 'result', 'failure', 
                 'message', 'User did not exist in table')::JSON;
@@ -376,7 +376,7 @@ BEGIN
             'result', 'failure', 
             'message', 'Admin user lacks DELETE permissions')::JSON; -- Return false if the API user doesn't have read permissions
     END IF;
-    RAISE INFO 'ADMIN_API add_tribal_api_key_access WAT %', params->>'email';
+    RAISE INFO 'ADMIN_API add_tribal_api_key_access WAT %', LOWER(params->>'email');
     RETURN json_build_object(
         'result', 'failure', 
         'message', 'Uknown error in access removal')::JSON;
