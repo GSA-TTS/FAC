@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         environments: ["dev", "staging", "production"]
-    name: Run materialized views create on ${{ inputs.environment }}
+    name: Run materialized views refresh on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ matrix.environments }}
     env:
@@ -39,7 +39,7 @@ jobs:
 
   dispatch-materialized-views:
     if: ${{ github.event.inputs.environment != '' }}
-    name: Run materialized views create on ${{ inputs.environment }}
+    name: Run materialized views refresh on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
