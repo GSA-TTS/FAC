@@ -41,7 +41,7 @@ function api_standup {
 
     startup_log "API_STANDUP" "END"
 
-    result=$(((((($d1 + $d2) + $d3) + $d4) + $d5) + $d6))
+    result=`expr $d1 + $d2 + $d3 + $d4 + $d5 + $d6`
     # If these are all zero, we're all good.
     return $result
 }
