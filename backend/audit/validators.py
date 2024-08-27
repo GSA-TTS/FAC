@@ -663,7 +663,7 @@ def validate_single_audit_report_file_extension(file):
 def validate_pdf_file_integrity(file):
     """Files must be readable PDFs"""
     MIN_CHARARACTERS_IN_PDF = 6000
-    MIN_PERCENT_READABLE_PAGES = .50
+    MIN_PERCENT_READABLE_PAGES = 0.50
 
     try:
         reader = PdfReader(file)
