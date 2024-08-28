@@ -11,7 +11,7 @@ module "production" {
   postgrest_instances   = 4
   json_params = jsonencode(
     {
-      "storage" : 50,
+      "storage" : 250,
     }
   )
 }
