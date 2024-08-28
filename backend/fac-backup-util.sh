@@ -59,6 +59,8 @@ elif [ "$run_option" == "scheduled_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
+    RowCount "$db_name"
+    gonogo "row_count"
     RDSToS3Dump "$db_name" "$backup_s3_name" "scheduled/$scheduled_date"
     gonogo "db_to_s3"
     AWSS3Sync "$s3_name" "$backup_s3_name"
