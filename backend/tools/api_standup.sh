@@ -25,7 +25,7 @@ function api_standup {
     startup_log "DROP_API_VIEWS" "BEGIN"
     python manage.py drop_api_views &&
     local d4=$?
-    startup_log "CREATE_API_VIEWS" "END"
+    startup_log "DROP_API_VIEWS" "END"
 
     # Create/recreate the materialized views. The 'combined' view is the important one for the API.
     startup_log "CREATE_MATERIALIZED_VIEWS" "BEGIN"
@@ -41,8 +41,7 @@ function api_standup {
 
     startup_log "API_STANDUP" "END"
 
-    result=`expr $d1 + $d2 + $d3 + $d4 + $d5 + $d6`
+    result=$(($d1 + $d2 + $d3 + $d4 + $d5 + $d6))
     # If these are all zero, we're all good.
     return $result
 }
-
