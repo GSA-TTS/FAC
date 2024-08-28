@@ -196,7 +196,7 @@ class TestXformAuditeeFiscalPeriodStart(SimpleTestCase):
             "%m/%d/%Y %H:%M:%S",
         )
         expected_date = (
-            fiscal_end - timedelta(days=Util.check_leap_year(fiscal_end.year)) + timedelta(days=1)
+            fiscal_end - timedelta(days=Util.check_leap_year(fiscal_end))
         ).strftime("%Y-%m-%d")
         self.assertEqual(result["auditee_fiscal_period_start"], expected_date)
 

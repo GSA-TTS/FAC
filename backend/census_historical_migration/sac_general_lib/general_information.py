@@ -315,13 +315,12 @@ def xform_auditee_fiscal_period_start(general_information):
         general_information.get("auditee_fiscal_period_end")
     )
     # Transformation to be documented.
-    fiscal_start_date = (
-        fiscal_end_date - timedelta(days=Util.check_leap_year(fiscal_end_date.year)) + timedelta(days=1)
+    fiscal_start_date = fiscal_end_date - timedelta(
+        days=Util.check_leap_year(fiscal_end_date)
     )
     general_information["auditee_fiscal_period_start"] = fiscal_start_date.strftime(
         "%Y-%m-%d"
     )
-
     return general_information
 
 
