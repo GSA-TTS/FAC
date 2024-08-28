@@ -15,10 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         path = "dissemination/sql"
         if options["create"]:
-            # Other API views may rely on the materialized view. So, drop and recreate them.
-            api_versions.drop_live_views("dissemination")
             api_versions.exec_sql_at_path(path, "create_materialized_views.sql")
-            api_versions.create_live_views("dissemination")
         elif options["drop"]:
             api_versions.exec_sql_at_path(path, "drop_materialized_views.sql")
         elif options["refresh"]:
