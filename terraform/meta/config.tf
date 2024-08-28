@@ -18,6 +18,7 @@ locals {
     # Mirrors @GSA-TTS/FAC-team (developers)
     # https://github.com/orgs/GSA-TTS/teams/fac-team/members
     # TODO: Automate updates via GitHub's GraphQL API
+    "anastasia.gradova@gsa.gov",
     "bret.mogilefsky@gsa.gov",
     "james.person@gsa.gov",
     "matthew.jadud@gsa.gov",
@@ -27,7 +28,6 @@ locals {
     "sudha.kumar@gsa.gov",
     "philip.dominguez@gsa.gov",
     "robert.novak@gsa.gov",
-    "anastasia.gradova@gsa.gov"
   ]
 
   # All spaces have the same SpaceManagers for now
