@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import View
 
@@ -33,7 +34,11 @@ class PredisseminationSummaryReportDownloadView(
         )
         i2d_data = intake_to_dissem.load_all()
 
-        filename = generate_presubmission_report(i2d_data)
-        download_url = get_download_url(filename)
+        filename, workbook_bytes = generate_presubmission_report(i2d_data)
+        response = HttpResponse(
+            workbook_bytes,
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = f"attachment; filename={filename}"
 
-        return redirect(download_url)
+        return response

@@ -6,7 +6,7 @@ import time
 from django.conf import settings
 from django.core.exceptions import BadRequest, ValidationError
 from django.core.paginator import Paginator
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -478,10 +478,18 @@ class SingleSummaryReportDownloadView(View):
         """
         sac = get_object_or_404(General, report_id=report_id)
         include_private = include_private_results(request)
-        filename = generate_summary_report([sac.report_id], include_private)
-        download_url = get_download_url(filename)
+        filename, workbook_bytes = generate_summary_report(
+            [sac.report_id], include_private
+        )
 
-        return redirect(download_url)
+        # Create an HTTP response with the workbook file for download
+        response = HttpResponse(
+            workbook_bytes,
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = f"attachment; filename={filename}"
+
+        return response
 
 
 class MultipleSummaryReportDownloadView(View):
@@ -508,10 +516,17 @@ class MultipleSummaryReportDownloadView(View):
             if len(results) == 0:
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
-            filename = generate_summary_report(report_ids, include_private)
-            download_url = get_download_url(filename)
+            filename, workbook_bytes = generate_summary_report(
+                report_ids, include_private
+            )
+            # Create an HTTP response with the workbook file for download
+            response = HttpResponse(
+                workbook_bytes,
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+            response["Content-Disposition"] = f"attachment; filename={filename}"
 
-            return redirect(download_url)
+            return response
 
         except Http404 as err:
             logger.info(
@@ -520,6 +535,6 @@ class MultipleSummaryReportDownloadView(View):
             raise Http404 from err
         except Exception as err:
             logger.info(
-                "Enexpected error in MultipleSummaryReportDownloadView post:\n%s", err
+                "Unexpected error in MultipleSummaryReportDownloadView post:\n%s", err
             )
             raise BadRequest(err)

@@ -5,11 +5,7 @@ import uuid
 import time
 import openpyxl as pyxl
 
-from boto3 import client as boto3_client
-from botocore.client import ClientError, Config
-
 from django.conf import settings
-from fs.memoryfs import MemoryFS
 
 from openpyxl.workbook.defined_name import DefinedName
 from openpyxl.utils import quote_sheetname
@@ -606,40 +602,19 @@ def create_workbook(data, protect_sheets=False):
     return (workbook, t1 - t0)
 
 
-def persist_workbook(workbook):
+def prepare_workbook_for_download(workbook):
+
     t0 = time.time()
-    s3_client = boto3_client(
-        service_name="s3",
-        region_name=settings.AWS_S3_PRIVATE_REGION_NAME,
-        aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
-        endpoint_url=settings.AWS_S3_PRIVATE_INTERNAL_ENDPOINT,
-        config=Config(signature_version="s3v4"),
-    )
+    now = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+    filename = f"fac-summary-report-{now}.xlsx"
 
-    with MemoryFS() as mem_fs:
-        now = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-        filename = f"fac-summary-report-{now}.xlsx"
-        s3_dir = "temp"
+    # Save the workbook directly to a BytesIO object
+    workbook_bytes = io.BytesIO()
+    workbook.save(workbook_bytes)
+    workbook_bytes.seek(0)
 
-        workbook_write_fp = mem_fs.openbin(filename, mode="w")
-        workbook.save(workbook_write_fp)
-        workbook_read_fp = mem_fs.openbin(filename, mode="r")
-        workbook_read_fp.seek(0)
-        content = workbook_read_fp.read()
-        workbook_bytes = io.BytesIO(content)
-
-        try:
-            s3_client.put_object(
-                Body=workbook_bytes,
-                Bucket=settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
-                Key=f"{s3_dir}/{filename}",
-            )
-        except ClientError:
-            logger.warn(f"Unable to put summary report file {filename} in S3!")
-            raise
     t1 = time.time()
-    return (f"temp/{filename}", t1 - t0)
+    return (filename, workbook_bytes, t1 - t0)
 
 
 def generate_summary_report(report_ids, include_private=False):
@@ -651,12 +626,12 @@ def generate_summary_report(report_ids, include_private=False):
     data = separate_notes_single_fields_from_array_fields(data)
     (workbook, tcw) = create_workbook(data)
     insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
-    (filename, tpw) = persist_workbook(workbook)
+    (filename, workbook_bytes, tpw) = prepare_workbook_for_download(workbook)
     t1 = time.time()
     logger.info(
         f"SUMMARY_REPORTS generate_summary_report\n\ttotal: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}"
     )
-    return filename
+    return (filename, workbook_bytes)
 
 
 # Ignore performance profiling for the presub.
@@ -667,9 +642,9 @@ def generate_presubmission_report(i2d_data):
     insert_precert_coversheet(workbook)
     workbook.security.workbookPassword = str(uuid.uuid4())
     workbook.security.lockStructure = True
-    (filename, _) = persist_workbook(workbook)
+    (filename, workbook_bytes, _) = prepare_workbook_for_download(workbook)
 
-    return filename
+    return (filename, workbook_bytes)
 
 
 def separate_notes_single_fields_from_array_fields(data):

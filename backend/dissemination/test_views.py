@@ -1,3 +1,4 @@
+import io
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
@@ -672,8 +673,8 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
     def _mock_download_url(self):
         return "http://example.com/gsa-fac-private-s3/temp/some-report-name.xlsx"
 
-    @patch("dissemination.summary_reports.persist_workbook")
-    def test_bad_search_returns_400(self, mock_persist_workbook):
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
+    def test_bad_search_returns_400(self, mock_prepare_workbook_for_download):
         """
         Submitting a form with bad parameters should throw a BadRequest.
         """
@@ -682,8 +683,8 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         )
         self.assertEquals(response.status_code, 400)
 
-    @patch("dissemination.summary_reports.persist_workbook")
-    def test_empty_results_returns_404(self, mock_persist_workbook):
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
+    def test_empty_results_returns_404(self, mock_prepare_workbook_for_download):
         """
         Searches with no results should return a 404, not an empty excel file.
         """
@@ -695,89 +696,162 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         )
         self.assertEquals(response.status_code, 404)
 
-    @patch("dissemination.views.get_download_url")
-    @patch("dissemination.summary_reports.persist_workbook")
-    def test_no_permissions_returns_404_on_private(
-        self, mock_persist_workbook, mock_get_download_url
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
+    def test_authorized_user_with_private_data(
+        self, mock_prepare_workbook_for_download
     ):
-        """
-        Non-permissioned users can access private audits through the summary report post.
-        """
-        mock_persist_workbook.return_value = self._mock_filename()
-        mock_get_download_url.return_value = self._mock_download_url()
-
-        general = self._make_general(is_public=False)
-        baker.make(FederalAward, report_id=general)
-        self.refresh_materialized_view()
-        response = self.anon_client.post(self._summary_report_url(), {})
-        mock_persist_workbook.assert_called_once()
-        self.assertRedirects(
-            response,
-            self._mock_download_url(),
-            status_code=302,
-            target_status_code=200,
-            fetch_redirect_response=False,
+        """Test that an authorized user can access private data."""
+        mock_filename = "mocked-report.xlsx"
+        mock_workbook_bytes = io.BytesIO(b"fake file content")
+        mock_prepare_workbook_for_download.return_value = (
+            mock_filename,
+            mock_workbook_bytes,
+            1.0,
         )
 
-    @patch("dissemination.views.get_download_url")
-    @patch("dissemination.summary_reports.persist_workbook")
-    def test_permissions_returns_file_on_private(
-        self, mock_persist_workbook, mock_get_download_url
-    ):
-        """
-        Permissioned users receive a file if there are private results.
-        """
-        mock_persist_workbook.return_value = self._mock_filename()
-        mock_get_download_url.return_value = self._mock_download_url()
-
         general = self._make_general(is_public=False)
         baker.make(FederalAward, report_id=general)
+        baker.make(FindingText, report_id=general)
         self.refresh_materialized_view()
+
         response = self.perm_client.post(self._summary_report_url(), {})
-        mock_persist_workbook.assert_called_once()
-        self.assertRedirects(
-            response,
-            self._mock_download_url(),
-            status_code=302,
-            target_status_code=200,
-            fetch_redirect_response=False,
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        self.assertIn(
+            f"attachment; filename={mock_filename}", response["Content-Disposition"]
+        )
+        self.assertEqual(response.content, b"fake file content")
+
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
+    def test_unauthorized_user_with_private_data(
+        self, mock_prepare_workbook_for_download
+    ):
+        """Test that an unauthorized user can still receive a file, but without private data."""
+        mock_filename = "mocked-report.xlsx"
+        mock_workbook_bytes = io.BytesIO(b"fake file content")
+        mock_prepare_workbook_for_download.return_value = (
+            mock_filename,
+            mock_workbook_bytes,
+            1.0,
         )
 
-    @patch("dissemination.views.get_download_url")
-    @patch("dissemination.summary_reports.persist_workbook")
-    def test_empty_search_params_returns_file(
-        self, mock_persist_workbook, mock_get_download_url
+        general = self._make_general(is_public=False)
+        baker.make(FederalAward, report_id=general)
+        baker.make(FindingText, report_id=general)
+        self.refresh_materialized_view()
+
+        response = self.anon_client.post(self._summary_report_url(), {})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        self.assertIn(
+            f"attachment; filename={mock_filename}", response["Content-Disposition"]
+        )
+        self.assertEqual(response.content, b"fake file content")
+
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
+    def test_authorized_user_with_public_data(self, mock_prepare_workbook_for_download):
+        """Test that an authorized user can access public data."""
+        mock_filename = "mocked-report.xlsx"
+        mock_workbook_bytes = io.BytesIO(b"fake file content")
+        mock_prepare_workbook_for_download.return_value = (
+            mock_filename,
+            mock_workbook_bytes,
+            1.0,
+        )
+
+        general = self._make_general(is_public=True)
+        baker.make(FederalAward, report_id=general)
+        baker.make(FindingText, report_id=general)
+        self.refresh_materialized_view()
+
+        response = self.perm_client.post(self._summary_report_url(), {})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        self.assertIn(
+            f"attachment; filename={mock_filename}", response["Content-Disposition"]
+        )
+        self.assertEqual(response.content, b"fake file content")
+
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
+    def test_unauthorized_user_with_public_data(
+        self, mock_prepare_workbook_for_download
     ):
+        """Test that an unauthorized user can access public data."""
+        mock_filename = "mocked-report.xlsx"
+        mock_workbook_bytes = io.BytesIO(b"fake file content")
+        mock_prepare_workbook_for_download.return_value = (
+            mock_filename,
+            mock_workbook_bytes,
+            1.0,
+        )
+
+        general = self._make_general(is_public=True)
+        baker.make(FederalAward, report_id=general)
+        baker.make(FindingText, report_id=general)
+        self.refresh_materialized_view()
+
+        response = self.anon_client.post(self._summary_report_url(), {})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        self.assertIn(
+            f"attachment; filename={mock_filename}", response["Content-Disposition"]
+        )
+        self.assertEqual(response.content, b"fake file content")
+
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
+    def test_empty_search_params_returns_file(self, mock_prepare_workbook_for_download):
         """
         File should be generated on empty search parameters ("search all").
         """
-        mock_persist_workbook.return_value = self._mock_filename()
-        mock_get_download_url.return_value = self._mock_download_url()
-
+        mock_filename = "mocked-report.xlsx"
+        mock_workbook_bytes = io.BytesIO(b"fake file content")
+        mock_prepare_workbook_for_download.return_value = (
+            mock_filename,
+            mock_workbook_bytes,
+            1.0,
+        )
         general = self._make_general(is_public=True)
         baker.make(FederalAward, report_id=general)
         self.refresh_materialized_view()
 
         response = self.anon_client.post(self._summary_report_url(), {})
-        mock_persist_workbook.assert_called_once()
-        self.assertRedirects(
-            response,
-            self._mock_download_url(),
-            status_code=302,
-            target_status_code=200,
-            fetch_redirect_response=False,
-        )
 
-    @patch("dissemination.views.get_download_url")
-    @patch("dissemination.summary_reports.persist_workbook")
-    def test_many_results_returns_file(
-        self, mock_persist_workbook, mock_get_download_url
-    ):
+        mock_prepare_workbook_for_download.assert_called_once()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        self.assertIn(
+            f"attachment; filename={mock_filename}", response["Content-Disposition"]
+        )
+        self.assertEqual(response.content, b"fake file content")
+
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
+    def test_many_results_returns_file(self, mock_prepare_workbook_for_download):
         """
         File should still be generated if there are above SUMMARY_REPORT_DOWNLOAD_LIMIT total results.
         """
-        mock_persist_workbook.return_value = self._mock_filename()
-        mock_get_download_url.return_value = self._mock_download_url()
+        mock_filename = "mocked-report.xlsx"
+        mock_workbook_bytes = io.BytesIO(b"fake file content")
+        mock_prepare_workbook_for_download.return_value = (
+            mock_filename,
+            mock_workbook_bytes,
+            1.0,
+        )
 
         for i in range(4):
             general = self._make_general(
@@ -789,11 +863,15 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
 
         with self.settings(SUMMARY_REPORT_DOWNLOAD_LIMIT=2):
             response = self.anon_client.post(self._summary_report_url(), {})
-            mock_persist_workbook.assert_called_once()
-            self.assertRedirects(
-                response,
-                self._mock_download_url(),
-                status_code=302,
-                target_status_code=200,
-                fetch_redirect_response=False,
+            mock_prepare_workbook_for_download.assert_called_once()
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response["Content-Type"],
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
+            self.assertIn(
+                f"attachment; filename={mock_filename}", response["Content-Disposition"]
+            )
+
+            self.assertEqual(response.content, b"fake file content")
