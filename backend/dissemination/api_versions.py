@@ -40,8 +40,9 @@ def exec_sql_at_path(dir, filename):
         except DependentObjectsStillExist as DOS_err:
             logger.info(f"SQL DEPENDENCY ERR {str(DOS_err)}")
             raise DOS_err
-        except Exception:
-            logger.info(f"SQL UNKNOWN ERR {str(DOS_err)}")
+        except Exception as err:
+            logger.info(f"SQL UNKNOWN ERR {str(err)}")
+            raise err
 
 
 def exec_sql(location, version, filename):
@@ -56,8 +57,9 @@ def exec_sql(location, version, filename):
         except DependentObjectsStillExist as DOS_err:
             logger.info(f"SQL DEPENDENCY ERR {str(DOS_err)}")
             raise DOS_err
-        except Exception:
-            logger.info(f"SQL UNKNOWN ERR {str(DOS_err)}")
+        except Exception as err:
+            logger.info(f"SQL UNKNOWN ERR {str(err)}")
+            raise err
 
 
 def create_functions(location):
