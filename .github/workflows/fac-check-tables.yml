@@ -1,7 +1,7 @@
 ---
 name: Check existing tables in an environment
 ### Common Commands:
-# ./fac-backup-util.sh v0.1.7 check_tables
+# ./fac-backup-util.sh v0.1.8 check_tables
 on:
   workflow_dispatch:
     inputs:
