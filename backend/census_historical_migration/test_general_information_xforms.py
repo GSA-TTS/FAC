@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import json
 from unittest.mock import mock_open, patch
 from django.conf import settings
 from django.test import SimpleTestCase
-from audit.utils import Util
 
 from .sac_general_lib.general_information import (
     AUDIT_TYPE_DICT,
@@ -196,7 +196,7 @@ class TestXformAuditeeFiscalPeriodStart(SimpleTestCase):
             "%m/%d/%Y %H:%M:%S",
         )
         expected_date = (
-            fiscal_end - timedelta(days=Util.check_leap_year(fiscal_end))
+            fiscal_end - relativedelta(years=1) + timedelta(days=1)
         ).strftime("%Y-%m-%d")
         self.assertEqual(result["auditee_fiscal_period_start"], expected_date)
 

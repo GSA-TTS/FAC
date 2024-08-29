@@ -1,11 +1,11 @@
 import json
 import re
-from datetime import timedelta
+import datetime
+from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 
 import audit.validators
-from audit.utils import Util
 from ..workbooklib.additional_ueis import get_ueis
 from ..workbooklib.additional_eins import get_eins
 from ..transforms.xform_retrieve_uei import xform_retrieve_uei
@@ -314,9 +314,8 @@ def xform_auditee_fiscal_period_start(general_information):
     fiscal_end_date = xform_census_date_to_datetime(
         general_information.get("auditee_fiscal_period_end")
     )
-    # Transformation to be documented.
-    fiscal_start_date = fiscal_end_date - timedelta(
-        days=Util.check_leap_year(fiscal_end_date)
+    fiscal_start_date = (
+        fiscal_end_date - relativedelta(years=1) + datetime.timedelta(days=1)
     )
     general_information["auditee_fiscal_period_start"] = fiscal_start_date.strftime(
         "%Y-%m-%d"

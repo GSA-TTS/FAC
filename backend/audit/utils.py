@@ -73,23 +73,6 @@ class Util:
             general_information_data.pop("audit_period_other_months", None)
         return general_information_data
 
-    @staticmethod
-    def check_leap_year(end_date):
-        """Get number of days of a fiscal period."""
-        if calendar.isleap(end_date.year):
-            if end_date.month > 2 or (end_date.month == 2 and end_date.day == 29):
-                return 366
-            else:
-                return 365
-        elif calendar.isleap(end_date.year - 1):
-            if end_date.month < 2 or (end_date.month == 2 and end_date.day < 29):
-                return 366
-            else:
-                return 365
-        else:
-            return 365
-
-
 class ExcelExtractionError(Exception):
     def __init__(
         self,
