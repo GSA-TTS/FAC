@@ -72,6 +72,7 @@ class Util:
             general_information_data.pop("audit_period_other_months", None)
         return general_information_data
 
+
 class ExcelExtractionError(Exception):
     def __init__(
         self,
