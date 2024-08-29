@@ -13,7 +13,7 @@ export function testAuditeeCertification() {
   // 2. Sign and date, submit and go back to checklist
   cy.get('#auditee_name').type('John Doe');
   cy.get('#auditee_title').type('Auditee');
-  cy.get('.usa-date-picker__button').click();
+  cy.get('.usa-date-picker__button').trigger('click');
   cy.get('.usa-date-picker__calendar__date--today').click();
   cy.get('.usa-button').contains('Agree to auditee certification').click();
 };
