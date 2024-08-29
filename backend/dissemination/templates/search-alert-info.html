@@ -5,20 +5,20 @@
         <h2 class="usa-alert__heading">Searching the FAC database</h2>
         {% if advanced_search_flag %}
           <p class="usa-alert__text padding-bottom-2">
-              Learn more about how our advanced search flters work on <a href='https://www.fac.gov/search-resources/advanced/' target='_blank'>our resources page</a>.
+              Learn more about how our advanced search filters work on <a href='https://www.fac.gov/search-resources/advanced/' target='_blank'>our resources page</a>.
           </p>
         {% else %}
           <p class="usa-alert__text padding-bottom-2">
-            Learn more about how our search flters work on <a href='https://www.fac.gov/search-resources/filters/' target='_blank'>our resources page</a>.
+            Learn more about how our search filters work on <a href='https://www.fac.gov/search-resources/filters/' target='_blank'>our resources page</a>.
           </p>
         {% endif %}
 
         <h2 class="usa-alert__heading">Summary reports</h2>
         <p class="usa-alert__text padding-bottom-2">
-            For search results of {{ summary_report_download_limit|intcomma }} submissions or less, you can download a combined spreadsheet of all data. 
+            For search results of {{ summary_report_download_limit|intcomma }} submissions or less, you can download a combined spreadsheet of all data.
             If you need to download more than {{ summary_report_download_limit|intcomma }} submissions, try limiting your search parameters to download in batches.
         </p>
-        
+
         {% if advanced_search_flag %}
           <h2 class="usa-alert__heading">Basic search</h2>
           <p class="usa-alert__text">
