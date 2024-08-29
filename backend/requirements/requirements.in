@@ -28,6 +28,7 @@ pycryptodomex>=3.19.1
 pydash
 pyjwt
 pypdf>=3.17.0
+python-dateutil==2.9.0.post0
 python-json-logger
 python-slugify
 pyyaml
