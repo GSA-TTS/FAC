@@ -34,5 +34,6 @@ pyyaml
 requests>=2.32.3
 sqlalchemy
 sqlparse>=0.5.0
+types-python-dateutil==2.9.0.20240821
 uritemplate
 urllib3>=2.2.2
