@@ -1,4 +1,3 @@
-import calendar
 from django.conf import settings
 
 from audit.fixtures.excel import FORM_SECTIONS
