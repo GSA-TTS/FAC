@@ -91,30 +91,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         form = ChangeAccessForm(request.POST)
-        context = {
-            "role": self.role,
-            "friendly_role": None,
-            "auditee_uei": sac.general_information["auditee_uei"],
-            "auditee_name": sac.general_information.get("auditee_name"),
-            "certifier_name": None,
-            "email": None,
-            "report_id": report_id,
-            "errors": [],
-        }
-
-        if self.role != "editor":
-            try:
-                access = Access.objects.get(sac=sac, role=self.role)
-            except Access.DoesNotExist:
-                access = SimpleNamespace(
-                    fullname="UNASSIGNED ROLE", email="UNASSIGNED ROLE", role=self.role
-                )
-
-            context = context | {
-                "friendly_role": _get_friendly_role(access.role),
-                "certifier_name": access.fullname,
-                "email": access.email,
-            }
+        context = self.get_user_role_management_context(sac)
 
         form.full_clean()
         if not form.is_valid():
@@ -182,6 +159,34 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             _create_and_save_access(sac, self.role, fullname, email)
 
         return redirect(url)
+
+    def get_user_role_management_context(self, sac):
+        context = {
+            "role": self.role,
+            "friendly_role": None,
+            "auditee_uei": sac.general_information["auditee_uei"],
+            "auditee_name": sac.general_information.get("auditee_name"),
+            "certifier_name": None,
+            "email": None,
+            "report_id": sac.report_id,
+            "errors": [],
+        }
+
+        if self.role != "editor":
+            try:
+                access = Access.objects.get(sac=sac, role=self.role)
+            except Access.DoesNotExist:
+                access = SimpleNamespace(
+                    fullname="UNASSIGNED ROLE", email="UNASSIGNED ROLE", role=self.role
+                )
+
+            context = context | {
+                "friendly_role": _get_friendly_role(access.role),
+                "certifier_name": access.fullname,
+                "email": access.email,
+            }
+
+        return context
 
 
 class ChangeAuditorCertifyingOfficialView(ChangeOrAddRoleView):
