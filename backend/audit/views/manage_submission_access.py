@@ -1,3 +1,4 @@
+import logging
 from types import SimpleNamespace
 from django import forms
 from django.db import transaction
@@ -12,6 +13,8 @@ from audit.models import (
     Access,
     SingleAuditChecklist,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _get_friendly_role(role):
@@ -88,7 +91,46 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         form = ChangeAccessForm(request.POST)
+        context = {
+            "role": self.role,
+            "friendly_role": None,
+            "auditee_uei": sac.general_information["auditee_uei"],
+            "auditee_name": sac.general_information.get("auditee_name"),
+            "certifier_name": None,
+            "email": None,
+            "report_id": report_id,
+            "errors": [],
+        }
+
+        if self.role != "editor":
+            try:
+                access = Access.objects.get(sac=sac, role=self.role)
+            except Access.DoesNotExist:
+                access = SimpleNamespace(
+                    fullname="UNASSIGNED ROLE", email="UNASSIGNED ROLE", role=self.role
+                )
+
+            context = context | {
+                "friendly_role": _get_friendly_role(access.role),
+                "certifier_name": access.fullname,
+                "email": access.email,
+            }
+
         form.full_clean()
+        if not form.is_valid():
+            context = (
+                context
+                | form.cleaned_data
+                | {
+                    "errors": form.errors,
+                }
+            )
+
+            for field, errors in form.errors.items():
+                logger.warning(f"Error {field}: {errors}")
+
+            return render(request, self.template, context, status=400)
+
         url = reverse("audit:ManageSubmission", kwargs={"report_id": report_id})
         fullname = form.cleaned_data["fullname"]
         email = form.cleaned_data["email"]
@@ -122,9 +164,9 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
                 "certifier_name": access.fullname,
                 "email": access.email,
                 "report_id": report_id,
-                "errors": [
-                    "Cannot use the same email address for both certifying officials."
-                ],
+                "errors": {
+                    "email": "Cannot use the same email address for both certifying officials."
+                },
             }
             return render(request, self.template, context, status=400)
 
