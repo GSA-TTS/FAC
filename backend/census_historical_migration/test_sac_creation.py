@@ -36,7 +36,7 @@ class TestSacTribalConsent(TestCase):
             self.DOLLARTHRESHOLD = "750000"
             self.EIN = "134278617"
             self.ENTITY_TYPE = entity_type
-            self.FYENDDATE = "01/01/2022 00:00:00"
+            self.FYENDDATE = "06/30/2022 00:00:00"
             self.GOINGCONCERN = "N"
             self.LOWRISK = "N"
             self.MATERIALNONCOMPLIANCE = "N"

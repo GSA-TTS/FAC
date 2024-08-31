@@ -61,7 +61,9 @@ jobs:
 
       - name: Run type checking
         working-directory: ./backend
-        run: mypy .
+        run: |
+          mypy . --install-types --non-interactive
+          mypy .
 
       - name: Run HTML template linting
         working-directory: ./backend
