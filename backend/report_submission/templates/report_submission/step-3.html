@@ -99,6 +99,9 @@
                                     </div>
                                 </div>
                             </div>
+                            {% if errors.certifying_auditee_contact_email %}
+                            <span class="usa-error-message" id="certifying_auditee_contact_email-error-message" role="alert">Enter a valid email address.</span>
+                            {% endif %}
                         </div>
                     </fieldset>
 
@@ -183,9 +186,12 @@
                                     </div>
                                 </div>
                             </div>
+                            {% if errors.certifying_auditor_contact_email %}
+                            <span class="usa-error-message" id="certifying_auditor_contact_email-error-message" role="alert">Enter a valid email address.</span>
+                            {% endif %}
                         </div>
                     </fieldset>
-                    
+
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="auditee_contacts_legend dynamic_fieldset_instruction_auditee">
                         <legend id="auditee_contacts_legend" class="usa-legend">
@@ -255,6 +261,9 @@
                                     </div>
                                 </div>
                             </div>
+                            {% if errors.auditee_contacts_email %}
+                            <span class="usa-error-message" id="auditee_contacts_email-error-message" role="alert">Enter a valid email address.</span>
+                            {% endif %}
                         </div>
                         <template id="auditee_contacts-template">
                             <div id="auditee_contacts" class="grid-container auditee_contacts additional_contacts">
@@ -406,6 +415,9 @@
                                     </div>
                                 </div>
                             </div>
+                            {% if errors.auditor_contacts_email %}
+                            <span class="usa-error-message" id="auditor_contacts_email-error-message" role="alert">Enter a valid email address.</span>
+                            {% endif %}
                         </div>
                         <template id="auditor_contacts-template">
                             <div id="auditor_contacts" class="grid-container auditor_contacts additional_contacts">
