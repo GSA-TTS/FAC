@@ -776,7 +776,7 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.assertIn("errors", response.context)
         self.assertIn(
-            "GSA_MIGRATION not permitted outside of migrations",
+            "Enter a valid email address.",
             response.context["errors"],
         )
 
