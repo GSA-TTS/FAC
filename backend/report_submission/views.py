@@ -115,19 +115,17 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
             return render(request, "report_submission/step-3.html", args)
 
     def post(self, request):
-        result = api.views.access_and_submission_check(
-            request.user, request.POST
-        )
+        result = api.views.access_and_submission_check(request.user, request.POST)
 
         report_id = result.get("report_id")
 
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
         else:
-            context = {
-                "errors": result["errors"]
-            }
-            return render(request, "report_submission/step-3.html", context=context, status=400)
+            context = {"errors": result["errors"]}
+            return render(
+                request, "report_submission/step-3.html", context=context, status=400
+            )
 
 
 class GeneralInformationFormView(LoginRequiredMixin, View):
