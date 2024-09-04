@@ -49,7 +49,8 @@
                                            aria-required="true"
                                            required
                                            data-validate-not-null=""
-                                           data-validate-length="<= 100 >= 2"/>
+                                           data-validate-length="<= 100 >= 2"
+                                           value="{{ certifying_auditee_contact_fullname | default_if_none:'' }}" />
                                 </div>
                             </div>
                             <div class="grid-row grid-gap">
@@ -77,7 +78,8 @@
                                                data-validate-not-null=""
                                                data-validate-email=""
                                                data-validate-must-not-match="certifying_auditor_contact_email"
-                                               data-validate-length="<= 340 >= 6"/>
+                                               data-validate-length="<= 340 >= 6"
+                                               value="{{ certifying_auditee_contact_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
@@ -98,7 +100,8 @@
                                                aria-required="true"
                                                required
                                                data-validate-must-match="certifying_auditee_contact_email"
-                                               data-validate-length="<= 340 >= 6"/>
+                                               data-validate-length="<= 340 >= 6"
+                                               value="{{ certifying_auditee_contact_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                             </div>
@@ -136,7 +139,8 @@
                                            aria-required="true"
                                            required
                                            data-validate-not-null=""
-                                           data-validate-length="<= 100 >= 2"/>
+                                           data-validate-length="<= 100 >= 2"
+                                           value="{{ certifying_auditor_contact_fullname | default_if_none:'' }}" />
                                 </div>
                             </div>
                             <div class="grid-row grid-gap">
@@ -164,7 +168,8 @@
                                                data-validate-not-null=""
                                                data-validate-email=""
                                                data-validate-must-not-match="certifying_auditee_contact_email"
-                                               data-validate-length="<= 340 >= 6"/>
+                                               data-validate-length="<= 340 >= 6"
+                                               value="{{ certifying_auditee_contact_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
@@ -185,7 +190,8 @@
                                                aria-required="true"
                                                required
                                                data-validate-must-match="certifying_auditor_contact_email"
-                                               data-validate-length="<= 340 >= 6"/>
+                                               data-validate-length="<= 340 >= 6"
+                                               value="{{ certifying_auditor_contact_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                             </div>
