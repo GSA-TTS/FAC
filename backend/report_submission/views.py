@@ -122,9 +122,8 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
         else:
-            context = {"errors": result["errors"]}
             return render(
-                request, "report_submission/step-3.html", context=context, status=400
+                request, "report_submission/step-3.html", context=result, status=400
             )
 
 
