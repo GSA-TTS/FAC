@@ -31,6 +31,9 @@
                             For the changes to take effect, users must log out and log back in to their account.
                         </p>
                     {% endif %}
+                    {% if errors %}
+                        <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>
+                    {% endif %}
 
                     <hr />
 
