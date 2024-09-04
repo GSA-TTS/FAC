@@ -101,7 +101,7 @@
                                                required
                                                data-validate-must-match="certifying_auditee_contact_email"
                                                data-validate-length="<= 340 >= 6"
-                                               value="{{ certifying_auditee_contact_email | default_if_none:'' }}" />
+                                               value="{{ certifying_auditee_contact_re_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                             </div>
@@ -169,7 +169,7 @@
                                                data-validate-email=""
                                                data-validate-must-not-match="certifying_auditee_contact_email"
                                                data-validate-length="<= 340 >= 6"
-                                               value="{{ certifying_auditee_contact_email | default_if_none:'' }}" />
+                                               value="{{ certifying_auditor_contact_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
@@ -191,7 +191,7 @@
                                                required
                                                data-validate-must-match="certifying_auditor_contact_email"
                                                data-validate-length="<= 340 >= 6"
-                                               value="{{ certifying_auditor_contact_email | default_if_none:'' }}" />
+                                               value="{{ certifying_auditor_contact_re_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                             </div>
