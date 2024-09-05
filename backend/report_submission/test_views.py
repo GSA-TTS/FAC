@@ -385,8 +385,7 @@ class TestPreliminaryViews(TestCase):
 
         data = {}
         response = self.client.post(url, data=data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/report_submission/accessandsubmission/")
+        self.assertEqual(response.status_code, 400)
 
     def test_reportsubmissionredirectview_get_redirects(self):
         url = reverse("report_submission:report_submission")
@@ -777,7 +776,7 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.assertIn("errors", response.context)
         self.assertIn(
-            "GSA_MIGRATION not permitted outside of migrations",
+            "Enter a valid email address.",
             response.context["errors"],
         )
 

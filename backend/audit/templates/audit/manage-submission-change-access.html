@@ -31,23 +31,26 @@
                             For the changes to take effect, users must log out and log back in to their account.
                         </p>
                     {% endif %}
-                    
-                    <hr />
-                    
                     {% if errors %}
-                        <ul>
-                            {% for error in errors %}<li class="usa-error-message">{{ error }}</li>{% endfor %}
-                        </ul>
+                        <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>
                     {% endif %}
-                    
+
+                    <hr />
+
                     <label class="usa-label" for="fullname">New name:</label>
-                    <input class="usa-input" id="name" name="fullname" placeholder="[name]" />
-                    
+                    <input class="usa-input"
+                           id="name"
+                           name="fullname"
+                           placeholder="[name]"
+                           value="{{ certifier_name }}"/>
+
                     <label class="usa-label" for="email">New email address:</label>
                     <input class="usa-input"
                            id="email"
                            name="email"
-                           placeholder="[email address]" />
+                           placeholder="[email address]"
+                           value="{{ email }}"/>
+                    <span class="usa-error-message" id="email-error-message" role="alert">{{ errors.email }}</span>
                 </fieldset>
                 <button class="usa-button margin-top-5" id="continue">Submit</button>
                 <a class="usa-button usa-button--unstyled margin-left-2"

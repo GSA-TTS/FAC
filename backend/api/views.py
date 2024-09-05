@@ -183,7 +183,27 @@ def access_and_submission_check(user, data):
 
         return {"report_id": sac.report_id, "next": "TBD"}
 
-    return {"errors": serializer.errors}
+    return {
+        "errors": serializer.errors,
+        "certifying_auditee_contact_fullname": data.get(
+            "certifying_auditee_contact_fullname"
+        ),
+        "certifying_auditee_contact_email": data.get(
+            "certifying_auditee_contact_email"
+        ),
+        "certifying_auditee_contact_re_email": data.get(
+            "certifying_auditee_contact_re_email"
+        ),
+        "certifying_auditor_contact_fullname": data.get(
+            "certifying_auditor_contact_fullname"
+        ),
+        "certifying_auditor_contact_email": data.get(
+            "certifying_auditor_contact_email"
+        ),
+        "certifying_auditor_contact_re_email": data.get(
+            "certifying_auditor_contact_re_email"
+        ),
+    }
 
 
 class Sprite(generic.View):
