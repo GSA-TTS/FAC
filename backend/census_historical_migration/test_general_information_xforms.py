@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import json
 from unittest.mock import mock_open, patch
 from django.conf import settings
@@ -190,12 +191,12 @@ class TestXformAuditeeFiscalPeriodStart(SimpleTestCase):
     def test_when_auditee_fiscal_period_end_is_valid(self):
         """Test that the function returns the correct results when the fiscal period end is valid."""
         result = xform_auditee_fiscal_period_start(self.general_information)
+        fiscal_end = datetime.strptime(
+            self.general_information["auditee_fiscal_period_end"],
+            "%m/%d/%Y %H:%M:%S",
+        )
         expected_date = (
-            datetime.strptime(
-                self.general_information["auditee_fiscal_period_end"],
-                "%m/%d/%Y %H:%M:%S",
-            )
-            - timedelta(days=365)
+            fiscal_end - relativedelta(years=1) + timedelta(days=1)
         ).strftime("%Y-%m-%d")
         self.assertEqual(result["auditee_fiscal_period_start"], expected_date)
 

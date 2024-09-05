@@ -681,7 +681,13 @@ class PdfFileIntegrityValidatorTests(SimpleTestCase):
             self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
 
     def test_scanned_pdf_file(self):
+        """PDF files that have too few parsable characters are invalid"""
         with open("audit/fixtures/scanned.pdf", "rb") as file:
+            self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_not_enough_readable_pages_pdf_file(self):
+        """PDF files whose percentage of readable pages is too low are invalid"""
+        with open("audit/fixtures/not-enough-readable-pages.pdf", "rb") as file:
             self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
 
     def test_valid_pdf_file(self):
