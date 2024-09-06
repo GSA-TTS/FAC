@@ -16,8 +16,8 @@ assignees: ''
 - [ ] Remove from the private channels #oros-fac-private and #fac-helpdesk in Slack (“/remove @[person]”)
 - [ ] Remove from active Figma projects
 - [ ] Remove from Mural
-- [ ] Remove from Zendesk [here](https://app.fac.gov/admin/users/staffuser/).
-- [ ] Remove from the list of staff users in the Django Admin app [here](https://fac-gov.zendesk.com/admin/people/team/members).
+- [ ] Remove from Zendesk [here](https://fac-gov.zendesk.com/admin/people/team/members).
+- [ ] Remove from the list of staff users in the Django Admin app [here](https://app.fac.gov/admin/users/staffuser/).
 - [ ] Check for and remove admin access in the FAC application: this may include designated permissions and/or checked-in API  access ([for example](https://github.com/GSA-TTS/FAC/blob/fb0e7bdf1cb1807291e6b6eef068e97b4574078c/backend/support/api/admin_api_v1_1_0/create_access_tables.sql#L21))
 
 ## For GitHub contributors
