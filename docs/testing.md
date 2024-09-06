@@ -17,6 +17,7 @@ We use [Django's test execution framework](https://docs.djangoproject.com/en/4.0
   - [Linting](#linting)
 - [End-to-end testing](#end-to-end-testing)
   - [Testing behind Login.gov](#testing-behind-logingov)
+- [Admin API testing](#admin-api-testing)
 
 ## Packages
  - [model_bakery](https://model-bakery.readthedocs.io/en/latest/), to help create data and instances within our tests
@@ -184,3 +185,30 @@ in files in [backend/cypress/e2e/](/backend/cypress/e2e). To run these tests:
  Github repository. To use them in a Github Actions workflow, use the [Github
  Actions secrets
  store](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+
+# Admin API Testing
+For interfacing the admin API locally, we will need to account for a few things.
+
+## Resources
+
+For communicating with the Postgrest API, you could use one of the following extensions if you are using Visual Studio Code:
+- [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
+- [Postman](https://marketplace.visualstudio.com/items?itemName=Postman.postman-for-vscode)
+
+Though keep in mind you should be able to use whatever API service you prefer to run.
+
+## Checklist
+
+1. When running `docker compose up`, make sure the `web-1` service completes the startup procedures.
+    - E.G., `STARTUP STARTUP_CHECK seed_cog_baseline PASS` should be one of the last startup logs. If this passes, then the API tables are up.
+2. Make sure you prepare your request headers with the following:
+    - `Authorization: Bearer {JWT}` is important for authenticating your requests.
+    - `x-api-user-id: {uuid}` should be populated with a user ID from the `support_administrative_key_uuids` table. You can create your own row in this table for local testing purposes.
+    - `x-api-key: {key}`
+    - `content-profile: {api-version}` is required for POST requests.
+    - `accept-profile: {api-version}` is required for GET requests.
+    - `Prefer: params=single-object` is needed for the API to read your payload. In most if not all cases, it is set to `params=single-object`.
+
+## "Cheat-sheet" for testing
+
+We have a `.rest` file in `/backend/support/api/admin_api_vX_X_X` that contains many of the admin API endpoints, as well the headers/parameters/payload that are needed to run it successfully.

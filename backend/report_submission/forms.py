@@ -127,7 +127,7 @@ class GeneralInformationForm(forms.Form):
         required=False,
     )
     auditee_phone = forms.CharField(required=False, validators=[phone_validator])
-    auditee_email = forms.CharField(
+    auditee_email = forms.EmailField(
         min_length=CHARACTER_LIMITS_GENERAL["auditee_email"]["min"],
         max_length=CHARACTER_LIMITS_GENERAL["auditee_email"]["max"],
         required=False,
@@ -172,7 +172,7 @@ class GeneralInformationForm(forms.Form):
         required=False,
     )
     auditor_phone = forms.CharField(required=False, validators=[phone_validator])
-    auditor_email = forms.CharField(
+    auditor_email = forms.EmailField(
         min_length=CHARACTER_LIMITS_GENERAL["auditor_email"]["min"],
         max_length=CHARACTER_LIMITS_GENERAL["auditor_email"]["max"],
         required=False,

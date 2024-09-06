@@ -1,6 +1,7 @@
 import json
 import re
-from datetime import timedelta
+import datetime
+from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 
@@ -310,14 +311,18 @@ def xform_auditee_fiscal_period_end(general_information):
 
 def xform_auditee_fiscal_period_start(general_information):
     """Constructs the fiscal period start from the fiscal period end"""
-    # Transformation to be documented.
-    fiscal_start_date = xform_census_date_to_datetime(
+    # As of 8/30/2024 this logic has been adjusted to handle invalid start dates of the fiscal year.
+    # Previously, fiscal_start date was subtracting 365 days from the end date.
+    # All migrations of historical census records had been completed prior to this change.
+    fiscal_end_date = xform_census_date_to_datetime(
         general_information.get("auditee_fiscal_period_end")
-    ) - timedelta(days=365)
+    )
+    fiscal_start_date = (
+        fiscal_end_date - relativedelta(years=1) + datetime.timedelta(days=1)
+    )
     general_information["auditee_fiscal_period_start"] = fiscal_start_date.strftime(
         "%Y-%m-%d"
     )
-
     return general_information
 
 
