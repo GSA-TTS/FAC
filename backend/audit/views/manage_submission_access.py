@@ -144,8 +144,8 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             "friendly_role": None,
             "auditee_uei": sac.general_information["auditee_uei"],
             "auditee_name": sac.general_information.get("auditee_name"),
-            "certifier_name": None,
-            "email": None,
+            "certifier_name": "",
+            "email": "",
             "report_id": sac.report_id,
             "errors": [],
         }
