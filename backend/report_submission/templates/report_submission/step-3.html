@@ -18,6 +18,9 @@
                     <p class="required-explanation">
                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr> Indicates a required field.
                     </p>
+                    {% if errors %}
+                        <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>
+                    {% endif %}
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="certifying_auditee_contact_legend certifying_auditee_contact_instruction">
                         <legend id="certifying_auditee_contact_legend" class="usa-legend">
@@ -46,7 +49,8 @@
                                            aria-required="true"
                                            required
                                            data-validate-not-null=""
-                                           data-validate-length="<= 100 >= 2"/>
+                                           data-validate-length="<= 100 >= 2"
+                                           value="{{ certifying_auditee_contact_fullname | default_if_none:'' }}" />
                                 </div>
                             </div>
                             <div class="grid-row grid-gap">
@@ -74,7 +78,8 @@
                                                data-validate-not-null=""
                                                data-validate-email=""
                                                data-validate-must-not-match="certifying_auditor_contact_email"
-                                               data-validate-length="<= 340 >= 6"/>
+                                               data-validate-length="<= 340 >= 6"
+                                               value="{{ certifying_auditee_contact_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
@@ -95,10 +100,14 @@
                                                aria-required="true"
                                                required
                                                data-validate-must-match="certifying_auditee_contact_email"
-                                               data-validate-length="<= 340 >= 6"/>
+                                               data-validate-length="<= 340 >= 6"
+                                               value="{{ certifying_auditee_contact_re_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                             </div>
+                            {% if errors.certifying_auditee_contact_email %}
+                            <span class="usa-error-message" id="certifying_auditee_contact_email-error-message" role="alert">Enter a valid email address.</span>
+                            {% endif %}
                         </div>
                     </fieldset>
 
@@ -130,7 +139,8 @@
                                            aria-required="true"
                                            required
                                            data-validate-not-null=""
-                                           data-validate-length="<= 100 >= 2"/>
+                                           data-validate-length="<= 100 >= 2"
+                                           value="{{ certifying_auditor_contact_fullname | default_if_none:'' }}" />
                                 </div>
                             </div>
                             <div class="grid-row grid-gap">
@@ -158,7 +168,8 @@
                                                data-validate-not-null=""
                                                data-validate-email=""
                                                data-validate-must-not-match="certifying_auditee_contact_email"
-                                               data-validate-length="<= 340 >= 6"/>
+                                               data-validate-length="<= 340 >= 6"
+                                               value="{{ certifying_auditor_contact_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
@@ -179,13 +190,17 @@
                                                aria-required="true"
                                                required
                                                data-validate-must-match="certifying_auditor_contact_email"
-                                               data-validate-length="<= 340 >= 6"/>
+                                               data-validate-length="<= 340 >= 6"
+                                               value="{{ certifying_auditor_contact_re_email | default_if_none:'' }}" />
                                     </div>
                                 </div>
                             </div>
+                            {% if errors.certifying_auditor_contact_email %}
+                            <span class="usa-error-message" id="certifying_auditor_contact_email-error-message" role="alert">Enter a valid email address.</span>
+                            {% endif %}
                         </div>
                     </fieldset>
-                    
+
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="auditee_contacts_legend dynamic_fieldset_instruction_auditee">
                         <legend id="auditee_contacts_legend" class="usa-legend">
@@ -255,6 +270,9 @@
                                     </div>
                                 </div>
                             </div>
+                            {% if errors.auditee_contacts_email %}
+                            <span class="usa-error-message" id="auditee_contacts_email-error-message" role="alert">Enter a valid email address.</span>
+                            {% endif %}
                         </div>
                         <template id="auditee_contacts-template">
                             <div id="auditee_contacts" class="grid-container auditee_contacts additional_contacts">
@@ -406,6 +424,9 @@
                                     </div>
                                 </div>
                             </div>
+                            {% if errors.auditor_contacts_email %}
+                            <span class="usa-error-message" id="auditor_contacts_email-error-message" role="alert">Enter a valid email address.</span>
+                            {% endif %}
                         </div>
                         <template id="auditor_contacts-template">
                             <div id="auditor_contacts" class="grid-container auditor_contacts additional_contacts">
