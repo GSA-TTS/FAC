@@ -28,6 +28,8 @@ env = environs.Env()
 
 ENVIRONMENT = env.str("ENV", "UNDEFINED").upper()
 
+TEST_RUNNER = 'runner.PytestTestRunner'
+
 key_service = AppEnv().get_service(name="fac-key-service")
 if key_service and key_service.credentials:
     secret = key_service.credentials.get

@@ -28,6 +28,10 @@ pycryptodomex>=3.19.1
 pydash
 pyjwt
 pypdf>=3.17.0
+pytest
+pytest-cov
+pytest-django
+pytest-xdist
 python-json-logger
 python-slugify
 pyyaml

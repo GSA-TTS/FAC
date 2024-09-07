@@ -12,3 +12,6 @@ exclude_lines =
 omit =
     # Skip settings, these are environment specific
     config/settings.py
+    # */test_*
+    # */config.py
+    # */__init__.py
