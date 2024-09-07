@@ -27,7 +27,7 @@ export function testValidGeneralInfo() {
 	cy.get('#auditee_contact_name').type('John Doe');
 	cy.get('#auditee_contact_title').type('Keymaster');
 	cy.get('#auditee_phone').type('5558675309');
-	cy.get('#auditee_email').type('va@test');
+	cy.get('#auditee_email').type('va@test.com');
 
 	// Auditor information
 	cy.get('#auditor_ein').type('987654321');
@@ -44,7 +44,7 @@ export function testValidGeneralInfo() {
 	cy.get('#auditor_contact_name').type('Jane Doe');
 	cy.get('#auditor_contact_title').type('Auditor');
 	cy.get('#auditor_phone').type('5555555555');
-	cy.get('#auditor_email').type('qualified.human.accountant@auditor');
+	cy.get('#auditor_email').type('qualified.human.accountant@auditor.com');
 
 	cy.get('label[for=secondary_auditors-yes]').click();
 

@@ -25,7 +25,7 @@ class SummaryReportTests(TestMaterializedViewBuilder):
             baker.make(FederalAward, report_id=g)
         self.refresh_materialized_view()
 
-        filename = generate_summary_report(report_ids)
+        filename, _ = generate_summary_report(report_ids)
 
         self.assertTrue(filename.startswith, "fac-summary-report-")
         self.assertTrue(filename.endswith, ".xlsx")
