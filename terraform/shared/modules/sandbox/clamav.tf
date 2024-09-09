@@ -25,6 +25,6 @@ module "clamav" {
   # proxy_port     = module.https-proxy.port
   # proxy_username = module.https-proxy.username
   # proxy_password = module.https-proxy.password
-  depends_on = [cloudfoundry_app.fac_app]
+  depends_on = [module.fac-app.app_id]
 }
 
