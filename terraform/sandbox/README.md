@@ -5,3 +5,15 @@ The script will output the `username` (as `cf_user`) and `password` (as `cf_pass
 
 `cf create-service s3 basic workspace-terraform-state`
 `cf create-service-key <key-name> workspace-terraform-state`
+`cf service-key workspace-terraform-state <key-name>`
+Copy `access_key_id`, `secret_access_key`, `bucket`, `region` and `endpoint` values into `shared/condig/sandbox.tfvars`
+
+Make sure to have CF CLI on WSL2 Ubuntu
+```
+# ...first add the Cloud Foundry Foundation public key and package repository to your system
+wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+# ...then, update your local package index, then finally install the cf CLI
+sudo apt-get update
+sudo apt-get install cf8-cli
+```
