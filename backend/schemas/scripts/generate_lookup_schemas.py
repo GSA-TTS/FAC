@@ -13,6 +13,7 @@ JSON, and it can be run using `make source_data`. Input files are found in
 where "item to process" is either "cfda-lookup" or "cluster-names".
 """
 
+
 def cleanup_string(s):
     s = str(s).strip()
     # Replace two spaces with one
@@ -25,7 +26,7 @@ def lmap(fun, ls):
 
 
 def process_cfda_lookup(file_path):
-    df = pd.read_csv(file_path, encoding='utf-8', converters={"Program Number": str})
+    df = pd.read_csv(file_path, encoding="utf-8", converters={"Program Number": str})
 
     # Build a couple of Python objects to render as
     # JSON, and then as Jsonnet
