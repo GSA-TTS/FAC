@@ -96,6 +96,50 @@ When adding a new API version:
       - This is likely true of TESTED patch version bumps (v1_0_0 to v1_0_1), and *maybe* minor version bumps (v1_0_0 to v1_1_0). MAJOR bumps require change management messaging.
 5. If previous versions of the API are needed, `APIViewTests` will need to be updated. At the time of writing this, it only tests the default API.
 
+# Using VS Code REST Client Plugin to Test API
+
+## Installation:
+1. In your Visual Studio Code, go to the Extensions Marketplace and search for **REST Client**.
+4. Click **Install** and follow the steps to install one of the "REST Client".
+
+## How to Use:
+Once the REST Client extension is installed, you can create a `.http` or `.rest` file in your project and write your API queries directly within that file.
+
+## Sample API Request:
+
+Here’s an example of how to query your API using the REST Client:
+
+```http
+GET {{scheme}}://{{api_url}}/function_name_or_view_name_plus_params_if_any
+authorization: Bearer {{YOUR_JWT_TOKEN}}     
+x-api-user-id: {{your_api_user_id}}
+accept-profile: target_api_profile
+x-api-key: {{YOUR_API_GOV_KEY}}
+```
+
+## Key Details:
+- **`authorization`**: The `Bearer {{YOUR_JWT_TOKEN}}` token is mandatory. Use the same JWT token used in Cypress tests from the code base. Without this token, the request will be flagged as anonymous and require extra steps to create an anonymous role in the local environment.
+  
+- **`x-api-user-id`**: Mandatory in some cases, depending on the API function. Search for the function in the code base to find where to get the correct value for `x-api-user-id`. Check keys like `support_administrative_key_uuids` and `dissemination_tribalapiaccesskeyids` for reference.
+
+- **`accept-profile`**: Specifies the API version/profile. The current default is `api_v1_0_3`. You can check available profiles and deprecated versions in `backend/dissemination/api_versions.py`.
+
+- **`x-api-key`**: An API key can be requested by following the steps described [here](https://www.fac.gov/api/).
+
+## Example:
+
+```http
+GET http://localhost:3000/general?limit=1&is_public=eq.false
+authorization: Bearer {{CYPRESS_API_GOV_JWT}}
+x-api-user-id: 00112233-4455-6677-8899-aabbccddeeff
+accept-profile: admin_api_v1_1_0
+x-api-key: abcdefghijklmnop
+```
+
+This will send a request to `http://localhost:3000/general` with the provided headers and params.
+Check `backend/support/api/admin_api_v1_1_0/` for more examples.
+
+
 # End-to-end workbook testing
 
 ### How to run the end-to-end test data generator:
