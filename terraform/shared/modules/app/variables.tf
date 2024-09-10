@@ -38,9 +38,24 @@ variable "disk_quota" {
   default     = 512
 }
 
-variable "s3_id" {
+variable "private_s3_id" {
   type        = string
-  description = "the full string of the s3 resource id"
+  description = "the full string of the private s3 resource id"
+}
+
+variable "public_s3_id" {
+  type        = string
+  description = "the full string of the public s3 resource id"
+}
+
+variable "db_id" {
+  type        = string
+  description = "the full string of the core db resource id"
+}
+
+variable "backup_db_id" {
+  type        = string
+  description = "the full string of the backup db resource id"
 }
 
 # Can't be created before the app exists

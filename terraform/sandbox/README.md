@@ -17,3 +17,10 @@ echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/
 sudo apt-get update
 sudo apt-get install cf8-cli
 ```
+
+In order to get the app to even attempt to startup, we have to disable collectstatic on the droplet.
+1. In **terminal 1**, generate your plan with `./plan.sh`
+2. In **terminal 1** type `./apply.sh` **but do not run**
+3. In **terminal 2** paste `cf set-env gsa-fac DISABLE_COLLECTSTATIC 1`
+4. In **terminal 1** press enter and run the apply
+5. Wait until terminal **1** says `module.sandbox.module.fac-app.cloudfoundry_app.fac_app: Creating...` in the output, and then press enter in **terminal 2**

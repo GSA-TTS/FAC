@@ -36,12 +36,12 @@ locals {
 }
 
 resource "cloudfoundry_app" "fac_app" {
-  name       = var.name
-  space      = data.cloudfoundry_space.app_space.id
-  buildpacks = ["https://github.com/cloudfoundry/python-buildpack", "https://github.com/cloudfoundry/apt-buildpack"]
-  path       = "${path.module}/${data.external.app_zip.result.path}"
-  #source_code_hash  = filesha256("${path.module}/${data.external.appzip.result.path}")
-  command           = "./Procfile"
+  name             = var.name
+  space            = data.cloudfoundry_space.app_space.id
+  buildpacks       = ["https://github.com/cloudfoundry/apt-buildpack.git", "https://github.com/cloudfoundry/python-buildpack.git"]
+  path             = "${path.module}/${data.external.app_zip.result.path}"
+  source_code_hash = filesha256("${path.module}/${data.external.app_zip.result.path}")
+  #command           = "./Procfile"
   timeout           = 180
   disk_quota        = var.disk_quota
   memory            = var.app_memory
@@ -54,7 +54,17 @@ resource "cloudfoundry_app" "fac_app" {
   }
 
   service_binding {
-    service_instance = var.s3_id
+    service_instance = var.private_s3_id
+  }
+  service_binding {
+    service_instance = var.public_s3_id
+  }
+
+  service_binding {
+    service_instance = var.db_id
+  }
+  service_binding {
+    service_instance = var.backup_db_id
   }
 
   routes {
