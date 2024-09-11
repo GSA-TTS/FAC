@@ -3,7 +3,8 @@
 Follow these steps to version bump the workbook templates:
 - `backend/schemas/source/excel/libs/Sheets.libsonnet`: Update the `WORKBOOKS_VERSION` variable
 - `backend/audit/intakelib/checks/check_version_number.py`: Update the `AUTHORIZED_VERSIONS` variable
-- Run `make all`
+- Run `make all` to generate new schemas and tempaltes
+- Once your PR is merged, don't forget to copy the new templates, found in `backend/schemas/output/excel/xlsx/`, into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
 
 # Updating the CFDA listings
 
