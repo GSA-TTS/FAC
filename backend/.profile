@@ -26,13 +26,13 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # API TEARDOWN
     # API has to be deprecated/removed before migration, because
     # of tight coupling between schema/views and the dissemination tables
-    # api_teardown
-    # gonogo "api_teardown"
+    api_teardown
+    gonogo "api_teardown"
 
     #####
     # MIGRATE APP TABLES
-    # migrate_app_tables
-    # gonogo "migrate_app_tables"
+    migrate_app_tables
+    gonogo "migrate_app_tables"
 
     #####
     # API STANDUP
@@ -43,14 +43,14 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     #####
     # COLLECT STATIC
     # Do Django things with static files.
-    run_collectstatic
-    gonogo "run_collectstatic"
+    # run_collectstatic
+    # gonogo "run_collectstatic"
 
     #####
     # SEED COG/OVER TABLES
     # Setup tables for cog/over assignments
-    # seed_cog_baseline
-    # gonogo "seed_cog_baseline"
+    seed_cog_baseline
+    gonogo "seed_cog_baseline"
 fi
 
 # Make psql usable by scripts, for debugging, etc.
