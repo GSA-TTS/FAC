@@ -24,3 +24,6 @@ In order to get the app to even attempt to startup, we have to disable collectst
 3. In **terminal 2** paste `cf set-env gsa-fac DISABLE_COLLECTSTATIC 1`
 4. In **terminal 1** press enter and run the apply
 5. Wait until terminal **1** says `module.sandbox.module.fac-app.cloudfoundry_app.fac_app: Creating...` in the output, and then press enter in **terminal 2**
+
+Pre-Req for proxy:
+1. You must navigate to /terraform/shared/modules/https-proxy, run `terraform init` and `terraform plan` in order to generate a `proxy.zip` for the module to have a reference on what it will use as source for the app when it attempts to deploy
