@@ -1,4 +1,6 @@
 import logging
+# FIXME MCJ REMOVE
+import os, time
 
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -698,7 +700,7 @@ class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
 class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
-
+        logger.info("%s for the SubmissionView...", os.getenv("FAC_VERSION"))
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
@@ -727,27 +729,41 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     context,
                 )
 
-            sac.transition_to_submitted()
-            sac.save(
-                event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
-            )
+            # sac.transition_to_submitted()
+            # sac.save(
+            #     event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
+            # )
 
+            # Only change this value if things work...
+            disseminated = "DID NOT DISSEMINATE"
+
+            # Atomically:
+            # 1. Disseminate the data
+            # 2. Update the state machine to "disseminated"
             with transaction.atomic():
+                if os.getenv("FAC_VERSION") == "web1":
+                    logger.info("WEB1 going to sleep for a long time...")
+                    time.sleep(3000)
+                # This value is None if dissemination succeeds.
+                # This value will take on a truthy value (*not* None) 
+                #  if dissemination fails.
                 disseminated = sac.disseminate()
 
-            # disseminated is None if there were no errors.
-            if disseminated is None:
-                sac.transition_to_disseminated()
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.DISSEMINATED,
-                )
-                # Remove workbook artifacts after the report has been disseminated.
-                remove_workbook_artifacts(sac)
-            else:
-                pass
+                # `disseminated` is None if there were no errors.
+                if disseminated is None:
+                    sac.transition_to_disseminated()
+                    sac.save(
+                        event_user=request.user,
+                        event_type=SubmissionEvent.EventType.DISSEMINATED,
+                    )
+                    # Remove workbook artifacts after the report has been disseminated.
+                    remove_workbook_artifacts(sac)
+            
+            if disseminated is not None:
                 # FIXME: We should now provide a reasonable error to the user.
+                logger.info("%s in the disseminated is not none state...", os.getenv("FAC_VERSION"))
 
+            # Always log this; if we don't see it, we crashed.
             logger.info(
                 "Dissemination errors: %s, report_id: %s", disseminated, report_id
             )
