@@ -167,6 +167,9 @@ terraform/**/*.tfstate*
 terraform/**/*.tfvars
 terraform/shared/modules/egress-proxy/proxy.zip
 terraform/shared/modules/egress-proxy/test/client.zip
+terraform/shared/modules/app/app.zip
+terraform/shared/modules/https-proxy/proxy.zip
+terraform/shared/modules/https-proxy/.terraform.lock.hcl
 
 # XLSX ignores
 .~*#
