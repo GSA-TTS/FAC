@@ -15,6 +15,7 @@ module "fac-app" {
   app_instances = 1
   app_memory    = 512
   disk_quota    = 3072
+  gitref        = "refs/heads/workstation-bootstrap"
 }
 
 resource "cloudfoundry_network_policy" "app-network-policy" {

@@ -1,5 +1,5 @@
-data "cloudfoundry_domain" "internal" {
-  name = "apps.internal"
+data "cloudfoundry_domain" "public" {
+  name = "app.cloud.gov"
 }
 
 data "cloudfoundry_space" "app_space" {
@@ -9,7 +9,7 @@ data "cloudfoundry_space" "app_space" {
 
 resource "cloudfoundry_route" "app_route" {
   space    = data.cloudfoundry_space.app_space.id
-  domain   = data.cloudfoundry_domain.internal.id
+  domain   = data.cloudfoundry_domain.public.id
   hostname = "${var.name}-${replace(var.cf_space_name, ".", "-")}"
   # Yields something like: fac-file-scanner-spacename.apps.internal
 }
@@ -71,7 +71,8 @@ resource "cloudfoundry_app" "fac_app" {
     route = cloudfoundry_route.app_route.id
   }
 
-  #   environment = {
-  #     PROXYROUTE = var.https_proxy
-  #   }
+  environment = {
+    # PROXYROUTE = var.https_proxy
+    ENV        = "SANDBOX"
+  }
 }
