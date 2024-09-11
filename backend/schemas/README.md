@@ -1,3 +1,10 @@
+# Bumping workbook template version
+
+Follow these steps to version bump the workbook templates:
+- `backend/schemas/source/excel/libs/Sheets.libsonnet`: Update the `WORKBOOKS_VERSION` variable
+- `backend/audit/intakelib/checks/check_version_number.py`: Update the `AUTHORIZED_VERSIONS` variable
+- Run `make all`
+
 # Updating the CFDA listings
 
 The current CFDA assistance listings are in the CSV found [here](https://sam.gov/data-services/Assistance%20Listings/datagov?privacy=Public). When downloading the file, save it in the format `cfda-lookup-YYYYMMDD.csv` in the `/schemas/source/data` directory. Running `make all` should be sufficent to regenerate the lookup schemas and the Excel templates.
