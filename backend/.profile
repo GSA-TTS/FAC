@@ -31,8 +31,8 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
 
     #####
     # MIGRATE APP TABLES
-    migrate_app_tables
-    gonogo "migrate_app_tables"
+    # migrate_app_tables
+    # gonogo "migrate_app_tables"
 
     #####
     # API STANDUP
@@ -49,8 +49,8 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     #####
     # SEED COG/OVER TABLES
     # Setup tables for cog/over assignments
-    seed_cog_baseline
-    gonogo "seed_cog_baseline"
+    # seed_cog_baseline
+    # gonogo "seed_cog_baseline"
 fi
 
 # Make psql usable by scripts, for debugging, etc.
