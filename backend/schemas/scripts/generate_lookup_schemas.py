@@ -30,7 +30,7 @@ def process_cfda_lookup(file_path):
 
     # Build a couple of Python objects to render as
     # JSON, and then as Jsonnet
-    program_names = list(df["Federal Agency (030)"])
+    program_names = list(df["Program Title"])
     program_numbers = list(df["Program Number"])
 
     unique_prefixes_dict = {}
