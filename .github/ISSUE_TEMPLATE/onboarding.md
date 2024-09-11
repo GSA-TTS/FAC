@@ -86,3 +86,7 @@ Note: If you're not able to do any of these yourself, you're still responsible f
 - [ ] Make them Owner of [the various Google Groups in the project README](https://docs.google.com/document/d/1g8nYqYS_ifFlZB-DBgfeSoJRMB__EqWsmLnacyk-bDI/edit#heading=h.81zynabayrrg)
 - [ ] Add them to [the FAC-admins team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-admins/members) and make them a Maintainer.
 - [ ] Also give them the `Maintainer` role in [the FAC-team team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members).
+
+**For helpdesk, also...**
+- [ ] Add them to the list of staff users for [Django Admin](https://app.fac.gov/admin/users/staffuser/).
+- [ ] Give them access to the [Help Desk](https://fac-gov.zendesk.com/admin/people/team/members) as a team member.
