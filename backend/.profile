@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Source everything; everything is now a function.
-# Remember: bash has no idea if a function exists, 
+# Remember: bash has no idea if a function exists,
 # so a typo in a function name will fail silently. Similarly,
-# bash has horrible scoping, so use of `local` in functions is 
+# bash has horrible scoping, so use of `local` in functions is
 # critical for cleanliness in the startup script.
 source tools/util_startup.sh
 # This will choose the correct environment
@@ -26,19 +26,19 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # API TEARDOWN
     # API has to be deprecated/removed before migration, because
     # of tight coupling between schema/views and the dissemination tables
-    api_teardown
-    gonogo "api_teardown"
+    # api_teardown
+    # gonogo "api_teardown"
 
     #####
     # MIGRATE APP TABLES
-    migrate_app_tables
-    gonogo "migrate_app_tables"
+    # migrate_app_tables
+    # gonogo "migrate_app_tables"
 
     #####
     # API STANDUP
     # Standup the API, which may depend on migration changes
-    api_standup
-    gonogo "api_standup"
+    # api_standup
+    # gonogo "api_standup"
 
     #####
     # COLLECT STATIC
@@ -49,8 +49,8 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     #####
     # SEED COG/OVER TABLES
     # Setup tables for cog/over assignments
-    seed_cog_baseline
-    gonogo "seed_cog_baseline"
+    # seed_cog_baseline
+    # gonogo "seed_cog_baseline"
 fi
 
 # Make psql usable by scripts, for debugging, etc.
