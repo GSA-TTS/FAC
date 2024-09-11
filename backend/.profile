@@ -20,18 +20,18 @@ source tools/seed_cog_baseline.sh
 setup_env
 gonogo "setup_env"
 
-# if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
+if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
 
     #####
     # API TEARDOWN
     # API has to be deprecated/removed before migration, because
     # of tight coupling between schema/views and the dissemination tables
-    # api_teardown
-    # gonogo "api_teardown"
+    api_teardown
+    gonogo "api_teardown"
 
     #####
     # MIGRATE APP TABLES
-    # migrate_app_tables
+    #migrate_app_tables
     # gonogo "migrate_app_tables"
 
     #####
@@ -51,7 +51,7 @@ gonogo "setup_env"
     # Setup tables for cog/over assignments
     # seed_cog_baseline
     # gonogo "seed_cog_baseline"
-# fi
+fi
 
 # Make psql usable by scripts, for debugging, etc.
 alias psql='/home/vcap/deps/0/apt/usr/lib/postgresql/*/bin/psql'
