@@ -1,6 +1,5 @@
 locals {
-  clam_name    = "fac-av-sandbox"
-  fs_clam_name = "fac-av-sandbox-fs"
+  clam_name = "fac-av-sandbox"
 }
 
 data "docker_registry_image" "clamav" {

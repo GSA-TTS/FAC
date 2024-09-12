@@ -71,8 +71,17 @@ resource "cloudfoundry_app" "fac_app" {
     route = cloudfoundry_route.app_route.id
   }
 
+  # Uncomment when you have everything built, but its crashed
+  # environment = {
+  #   PROXYROUTE = var.https_proxy
+  #   ENV                   = "SANDBOX"
+  #   DISABLE_COLLECTSTATIC = 1
+  # }
+
+  # Use for the first deployment
   environment = {
     # PROXYROUTE = var.https_proxy
-    ENV        = "SANDBOX"
+    ENV                   = "SANDBOX"
+    DISABLE_COLLECTSTATIC = 1
   }
 }

@@ -18,12 +18,6 @@ sudo apt-get update
 sudo apt-get install cf8-cli
 ```
 
-In order to get the app to even attempt to startup, we have to disable collectstatic on the droplet.
-1. In **terminal 1**, generate your plan with `./plan.sh`
-2. In **terminal 1** type `./apply.sh` **but do not run**
-3. In **terminal 2** paste `cf set-env gsa-fac DISABLE_COLLECTSTATIC 1`
-4. In **terminal 1** press enter and run the apply
-5. Wait until terminal **1** says `module.sandbox.module.fac-app.cloudfoundry_app.fac_app: Creating...` in the output, and then press enter in **terminal 2**
 
 Pre-Req for proxy:
 1. You must navigate to /terraform/shared/modules/https-proxy, run `terraform init` and `terraform plan` in order to generate a `proxy.zip` for the module to have a reference on what it will use as source for the app when it attempts to deploy
@@ -33,4 +27,33 @@ Security Groups:
 cf bind-security-group public_networks_egress <ORGNAME> --lifecycle running --space <SPACENAME>
 cf bind-security-group trusted_local_networks_egress <ORGNAME> --lifecycle running --space <SPACENAME>
 cf bind-security-group trusted_local_networks <ORGNAME> --lifecycle running --space <SPACENAME>
+```
+
+Getting it to run the first time:
+```terraform
+#### ClamAV ####
+# terraform\shared\modules\sandbox\clamav.tf
+#proxy_server   = module.https-proxy.domain
+#proxy_port     = module.https-proxy.port
+#proxy_username = module.https-proxy.username
+#proxy_password = module.https-proxy.password
+depends_on = [module.fac-app.app_id]
+
+#### Proxy ####
+# terraform\shared\modules\sandbox\https-proxy.tf
+depends_on = [module.fac-app.app_id, module.clamav.app_id]
+
+#### App ####
+# terraform\shared\modules\app\app.tf
+environment = {
+  # PROXYROUTE = var.https_proxy
+  ENV        = "SANDBOX"
+}
+
+# terraform\shared\modules\app\variables.tf
+# Can't be created before the app exists
+# variable "https_proxy" {
+#   type        = string
+#   description = "the full string of the https proxy for use with the logshipper app"
+# }
 ```

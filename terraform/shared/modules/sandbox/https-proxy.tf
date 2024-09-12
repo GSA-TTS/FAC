@@ -29,6 +29,7 @@ module "https-proxy" {
       # This is thanks to Ryan Ahearn at 18F for pointing us in this direction
       # https://gsa-tts.slack.com/archives/C09CR1Q9Z/p1699394487090859
       "${var.cf_org_name}-${var.cf_space_name}-egress-https-proxy.apps.internal",
+      "${var.cf_org_name}-${var.cf_space_name}-https-proxy.apps.internal",
 
       # Login.gov sandbox
       "idp.int.identitysandbox.gov:443",
@@ -50,5 +51,6 @@ module "https-proxy" {
     (local.clam_name) = ["database.clamav.net:443"],
   }
   denylist   = {}
-  depends_on = [module.fac-app.app_id]
+  depends_on = [module.fac-app.app_id, module.clamav.app_id]
+  # depends_on = [ module.clamav.app_id ]
 }
