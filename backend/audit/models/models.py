@@ -563,23 +563,23 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         self.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
         self.transition_date.append(datetime.now(timezone.utc))
 
-    # @transition(
-    #     field="submission_status",
-    #     source=STATUS.AUDITEE_CERTIFIED,
-    #     target=STATUS.SUBMITTED,
-    # )
-    # def transition_to_submitted(self):
-    #     """
-    #     The permission checks verifying that the user attempting to do this has
-    #     the appropriate privileges will be done at the view level.
-    #     """
-
-    #     self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-    #     self.transition_date.append(datetime.now(timezone.utc))
-
     @transition(
         field="submission_status",
         source=STATUS.AUDITEE_CERTIFIED,
+        target=STATUS.SUBMITTED,
+    )
+    def transition_to_submitted(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will be done at the view level.
+        """
+
+        self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
+        self.transition_date.append(datetime.now(timezone.utc))
+
+    @transition(
+        field="submission_status",
+        source=STATUS.SUBMITTED,
         target=STATUS.DISSEMINATED,
     )
     def transition_to_disseminated(self):

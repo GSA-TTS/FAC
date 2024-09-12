@@ -713,10 +713,20 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
+    def simulate_delay(self, instance, duration):
+        running_version = os.getenv("FAC_VERSION")
+        if running_version == instance:
+            logger.info("{} sleeping for {}s".format(running_version, duration))
+            time.sleep(duration)
+        else:
+            logger.info("{} continuing...".format(running_version))
+            
+
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
+            running_version = os.getenv("FAC_VERSION")
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             errors = sac.validate_full()
@@ -729,28 +739,64 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     context,
                 )
 
+            # LOCATION 1
+            # If "transition_to_submitted" is here, we could end up 
+            # in a state where it is "submitted," but not "disseminated."
             # sac.transition_to_submitted()
             # sac.save(
             #     event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
             # )
+            # All further experiments move the `transition_to_submitted` into the
+            # `atomic` block.
 
             # Only change this value if things work...
             disseminated = "DID NOT DISSEMINATE"
 
-            # Atomically:
-            # 1. Disseminate the data
-            # 2. Update the state machine to "disseminated"
             with transaction.atomic():
-                if os.getenv("FAC_VERSION") == "web1":
-                    logger.info("WEB1 going to sleep for a long time...")
-                    time.sleep(3000)
-                # This value is None if dissemination succeeds.
-                # This value will take on a truthy value (*not* None) 
-                #  if dissemination fails.
+                # LOCATION 2
+                # A delay here allows for the following.
+                # web1 enters the atomic region, and delays
+                # web2 enters the atomic region, and succeeds to completion
+                # web1 then re-runs the transition_to_submitted, but
+                #      fails to disseminate, because of the key constraints on `general`
+                # self.simulate_delay("web1", 20)
+                logger.info("{} about to transition_to_submitted".format(running_version))
+                sac.transition_to_submitted()
+                sac.save(
+                    event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
+                )
+
+                # LOCATION 3
+                # If we simulate a delay here...
+                # web1 enters the atomic region, changes the state to `submitted`
+                # web1 delays
+                # web2 enters the atomic region, and blocks on the attempt
+                #      to transition to `submitted`. Specifically, the `.save()`.
+                #      ODDLY: web2 does not fail at this point. `transition_to_submitted`
+                #             seems to "work." This is... because web2 is in the `auditee_certified`
+                #             state *in memory*. Therefore, it successfully can go through the FSM
+                #             transition. The save action halts/waits, because of the atomic block.
+                # web1 completes its delay, and completes the submission to success
+                # web2 is now unblocked, because of the atomaticity. web2 fails because of 
+                #      the uniqueness constraint on `general`. Specifically:
+                #  web2-1           | WARNING An error occurred during bulk creation for 
+                #                   | Generals: duplicate key value violates unique constraint 
+                #                   | "dissemination_general_report_id_key"
+                # self.simulate_delay("web1", 20)
+                logger.info("{} about to disseminate".format(running_version))
+
+                # `disseminated` will take on the value `None` if the dissemination
+                # action succeeds.
                 disseminated = sac.disseminate()
 
                 # `disseminated` is None if there were no errors.
                 if disseminated is None:
+                    logger.info("{} about to transition_to_disseminated".format(running_version))
+                    # LOCATION 4
+                    # A delay here has the same effect as LOCATION 3.
+                    # The point where web2 attempts to save to the DB for the purpose
+                    # of FSM update causes it to pause, because it is in an atomic block.
+                    self.simulate_delay("web1", 20)
                     sac.transition_to_disseminated()
                     sac.save(
                         event_user=request.user,
@@ -761,7 +807,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             
             if disseminated is not None:
                 # FIXME: We should now provide a reasonable error to the user.
-                logger.info("%s in the disseminated is not none state...", os.getenv("FAC_VERSION"))
+                logger.info("{} has a `not None` value for `disseminated`: {}".format(running_version, disseminated))
 
             # Always log this; if we don't see it, we crashed.
             logger.info(
