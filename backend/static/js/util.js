@@ -1,7 +1,7 @@
 /**
  * Attach an event handler to every button with attribute "disable-submit-after-click".
- * This will disable the button after clicking it, and submit the form.
- * This is intended to prevent duplicate form submissions where it would be very inconvenient.
+ * This will disable the button after clicking it, enable the sibling spinning icon
+ * (if it exists), and submit the form.
  */
 function disableSubmitAfterClick() {
   const matching_buttons = document.querySelectorAll(
@@ -9,12 +9,16 @@ function disableSubmitAfterClick() {
   );
 
   matching_buttons.forEach((button) => {
-    var form = button.closest('form');
+    const form = button.closest('form'); // Parent form
+    const loader = button.parentElement.querySelector(`div[id='loader']`); // Sibling loader
 
     button.addEventListener('click', () => {
       button.disabled = true;
-      button.value = 'Submitting...';
-      form.submit()
+      button.textContent = 'Submitting...';
+      if (loader) {
+        loader.hidden = false;
+      }
+      form.submit();
     });
   });
 }
