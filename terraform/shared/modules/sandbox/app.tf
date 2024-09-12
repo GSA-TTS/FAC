@@ -13,9 +13,10 @@ module "fac-app" {
   db_id         = module.database.instance_id
   backup_db_id  = module.snapshot-database.instance_id
   app_instances = 1
-  app_memory    = 512
+  app_memory    = 896
   disk_quota    = 3072
   gitref        = "refs/heads/workstation-bootstrap"
+  # depends_on = [ module.https-proxy.https_proxy ]
 }
 
 resource "cloudfoundry_network_policy" "app-network-policy" {
