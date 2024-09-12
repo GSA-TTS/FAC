@@ -31,12 +31,6 @@ jobs:
           apt-get install -y zip python
 
           # Install CF CLI
-          # mkdir -p /etc/apt/keyrings/
-          # wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/cf.gpg > /dev/null
-          # echo "deb https://packages.cloudfoundry.org/debian stable main" | tee /etc/apt/sources.list.d/cloudfoundry-cli.list
-          # apt-get update && DEBIAN_FRONTEND=noninteractive
-          # apt-get install --assume-yes cf8-cli
-
           curl -k -O -L https://github.com/cloudfoundry/cli/releases/download/v8.8.0/cf8-cli-installer_8.8.0_x86-64.deb
           apt-get install --assume-yes ./cf8-cli-installer_8.8.0_x86-64.deb
 
