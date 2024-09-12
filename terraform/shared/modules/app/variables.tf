@@ -58,7 +58,7 @@ variable "backup_db_id" {
   description = "the full string of the backup db resource id"
 }
 
-# Can't be created before the app exists
+# # Can't be created before the app exists
 # variable "https_proxy" {
 #   type        = string
 #   description = "the full string of the https proxy for use with the logshipper app"

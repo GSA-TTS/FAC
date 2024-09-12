@@ -48,9 +48,9 @@ module "https-proxy" {
     ],
     # The parens here make Terraform understand that the key below is a reference
     # Solution from https://stackoverflow.com/a/57401750
-    (local.clam_name) = ["database.clamav.net:443"],
+    # (local.clam_name) = ["database.clamav.net:443"],
   }
   denylist   = {}
-  depends_on = [module.fac-app.app_id, module.clamav.app_id]
+  depends_on = [module.fac-app.app_id]
   # depends_on = [ module.clamav.app_id ]
 }
