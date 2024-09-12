@@ -32,7 +32,7 @@ jobs:
           # apt-get update && DEBIAN_FRONTEND=noninteractive
           # apt-get install --assume-yes cf8-cli
 
-          wget -q -O --no-check-certificate https://github.com/cloudfoundry/cli/releases/download/v8.8.0/cf8-cli-installer_8.8.0_x86-64.deb
+          curl -k -O -L https://github.com/cloudfoundry/cli/releases/download/v8.8.0/cf8-cli-installer_8.8.0_x86-64.deb
           apt-get install --assume-yes ./cf8-cli-installer_8.8.0_x86-64.deb
 
           cf api api.fr.cloud.gov
