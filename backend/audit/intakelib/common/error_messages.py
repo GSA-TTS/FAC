@@ -85,4 +85,5 @@ messages = {
     "check_cluster_names": "Invalid cluster name",
     "check_award_references_len_4_or_5": "Award references must all follow the pattern AWARD-#### or AWARD-#####; {} does not fit either",
     "check_max_rows": "The number of rows in the {} named range exceeds the maximum allowed for this version of the workbook",
+    "check_finding_uniqueness": "On row {}, you reported {} as {}, and on row {}, you reported it as {}. The FAC cannot accept one finding reference with different finding details",
 }
