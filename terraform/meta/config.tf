@@ -27,6 +27,7 @@ locals {
     "alexander.steel@gsa.gov",
     "sudha.kumar@gsa.gov",
     "philip.dominguez@gsa.gov",
+    "ranye.mclendon@gsa.gov",
     "robert.novak@gsa.gov",
   ]
 
