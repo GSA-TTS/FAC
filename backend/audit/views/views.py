@@ -1,6 +1,4 @@
 import logging
-# FIXME MCJ REMOVE
-import os, time
 
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -713,22 +711,15 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
-    def simulate_delay(self, instance, duration):
-        running_version = os.getenv("FAC_VERSION")
-        if running_version == instance:
-            logger.info("{} sleeping for {}s".format(running_version, duration))
-            time.sleep(duration)
-        else:
-            logger.info("{} continuing...".format(running_version))
-            
-
     def post(self, request, *args, **kwargs):
+        # RACE HAZARD WARNING
+        # It is possible for a user to enter the submission multiple times,
+        # from multiple FAC instances. This race hazard is documented in
+        # backend/audit/views/README-fac-views-race-hazard-postmortem.md
         report_id = kwargs["report_id"]
-
         try:
-            running_version = os.getenv("FAC_VERSION")
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
+            
             errors = sac.validate_full()
             if errors:
                 context = {"report_id": report_id, "errors": errors}
@@ -739,86 +730,46 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     context,
                 )
 
-            # LOCATION 1
-            # If "transition_to_submitted" is here, we could end up 
-            # in a state where it is "submitted," but not "disseminated."
-            # sac.transition_to_submitted()
-            # sac.save(
-            #     event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
-            # )
-            # All further experiments move the `transition_to_submitted` into the
-            # `atomic` block.
-
             # Only change this value if things work...
             disseminated = "DID NOT DISSEMINATE"
 
+            ########### BEGIN ATOMIC BLOCK ###########
             with transaction.atomic():
-                # LOCATION 2
-                # A delay here allows for the following.
-                # web1 enters the atomic region, and delays
-                # web2 enters the atomic region, and succeeds to completion
-                # web1 then re-runs the transition_to_submitted, but
-                #      fails to disseminate, because of the key constraints on `general`
-                # self.simulate_delay("web1", 20)
-                logger.info("{} about to transition_to_submitted".format(running_version))
                 sac.transition_to_submitted()
                 sac.save(
                     event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
                 )
-
-                # LOCATION 3
-                # If we simulate a delay here...
-                # web1 enters the atomic region, changes the state to `submitted`
-                # web1 delays
-                # web2 enters the atomic region, and blocks on the attempt
-                #      to transition to `submitted`. Specifically, the `.save()`.
-                #      ODDLY: web2 does not fail at this point. `transition_to_submitted`
-                #             seems to "work." This is... because web2 is in the `auditee_certified`
-                #             state *in memory*. Therefore, it successfully can go through the FSM
-                #             transition. The save action halts/waits, because of the atomic block.
-                # web1 completes its delay, and completes the submission to success
-                # web2 is now unblocked, because of the atomaticity. web2 fails because of 
-                #      the uniqueness constraint on `general`. Specifically:
-                #  web2-1           | WARNING An error occurred during bulk creation for 
-                #                   | Generals: duplicate key value violates unique constraint 
-                #                   | "dissemination_general_report_id_key"
-                # self.simulate_delay("web1", 20)
-                logger.info("{} about to disseminate".format(running_version))
-
-                # `disseminated` will take on the value `None` if the dissemination
-                # action succeeds.
                 disseminated = sac.disseminate()
-
                 # `disseminated` is None if there were no errors.
                 if disseminated is None:
-                    logger.info("{} about to transition_to_disseminated".format(running_version))
-                    # LOCATION 4
-                    # A delay here has the same effect as LOCATION 3.
-                    # The point where web2 attempts to save to the DB for the purpose
-                    # of FSM update causes it to pause, because it is in an atomic block.
-                    self.simulate_delay("web1", 20)
                     sac.transition_to_disseminated()
                     sac.save(
                         event_user=request.user,
                         event_type=SubmissionEvent.EventType.DISSEMINATED,
                     )
-                    # Remove workbook artifacts after the report has been disseminated.
-                    remove_workbook_artifacts(sac)
-            
-            if disseminated is not None:
-                # FIXME: We should now provide a reasonable error to the user.
-                logger.info("{} has a `not None` value for `disseminated`: {}".format(running_version, disseminated))
+            ########### END ATOMIC BLOCK ###########
 
-            # Always log this; if we don't see it, we crashed.
-            logger.info(
-                "Dissemination errors: %s, report_id: %s", disseminated, report_id
-            )
+            # IF THE DISSEMINATION SUCCEEDED
+            # `disseminated` is None if there were no errors.
+            if disseminated is None:
+                # Remove workbook artifacts after the report has been disseminated.
+                # We do this outside of the atomic block. No race between
+                # two instances of the FAC should be able to get to this point.
+                # If we do, something will fail.
+                remove_workbook_artifacts(sac)
+            
+            # IF THE DISSEMINATION FAILED
+            # If disseminated has a value, it is an error 
+            # object returned from `sac.disseminate()`
+            if disseminated is not None:
+                logger.info("{} has a `not None` value report_id[{}] for `disseminated`: {}".format(running_version, report_id, disseminated))
 
             return redirect(reverse("audit:MySubmissions"))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except TransactionManagementError:
+            # ORIGINAL COMMENT
             # This is most likely the result of a race condition, where the user hits
             # the submit button multiple times and the requests get round-robined to
             # different instances, and the second attempt tries to insert an existing
@@ -827,6 +778,10 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # wouldn't be an entry with that report_id to cause the error), and that we
             # should log this but not report it to the user.
             # See https://github.com/GSA-TTS/FAC/issues/3347
+            # UPDATED 2024-09-13
+            # We have not been able to trigger this error in the most recent race 
+            # debugging. However, that does not mean it is impossible.
+            # Therefore, leaving this exception handler in place.
             logger.info("IntegrityError on disseminating report_id: %s", report_id)
             if General.objects.get(report_id=sac.report_id):
                 return redirect(reverse("audit:MySubmissions"))

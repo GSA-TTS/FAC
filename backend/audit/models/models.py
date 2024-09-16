@@ -573,7 +573,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will be done at the view level.
         """
-
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(datetime.now(timezone.utc))
 
@@ -583,7 +582,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         target=STATUS.DISSEMINATED,
     )
     def transition_to_disseminated(self):
-        logger.info("Transitioning to DISSEMINATED")
         self.transition_name.append(SingleAuditChecklist.STATUS.DISSEMINATED)
         self.transition_date.append(datetime.now(timezone.utc))
 
@@ -597,6 +595,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         ],
         target=STATUS.AUDITEE_CERTIFIED,
     )
+    
     def transition_to_in_progress(self):
         """
         Any edit to a submission in the following states should result in it

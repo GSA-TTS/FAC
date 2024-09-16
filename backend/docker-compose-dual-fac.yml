@@ -76,7 +76,7 @@ services:
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
       ENABLE_DEBUG_TOOLBAR: false
-      FAC_VERSION: web1
+      FAC_INSTANCE_NAME: web1
     env_file:
       - ".env"
     ports:
@@ -119,7 +119,7 @@ services:
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
       ENABLE_DEBUG_TOOLBAR: false
-      FAC_VERSION: web2
+      FAC_INSTANCE_NAME: web2
     env_file:
       - ".env"
     ports:
