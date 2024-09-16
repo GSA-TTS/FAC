@@ -1,4 +1,4 @@
-from ..common.util import build_cell_error_tuple, get_message
+from ..common.util import build_cell_error_tuple, get_message, get_range_start_row
 from ..intermediate_representation import get_range_by_name, get_range_values_by_name
 
 
@@ -24,6 +24,8 @@ def check_finding_uniqueness(ir, is_gsa_migration=False):
     repeat_prior_reference = get_range_values_by_name(ir, "repeat_prior_reference")
     prior_references = get_range_values_by_name(ir, "prior_references")
 
+    reference_number_range = get_range_by_name(ir, "reference_number")
+    range_start = int(get_range_start_row(reference_number_range))
     # Iterate through the data rows
     for ndx, (fr, cr, mo, om, mw, sd, of, qc, rr, pr) in enumerate(
         zip(
@@ -49,14 +51,13 @@ def check_finding_uniqueness(ir, is_gsa_migration=False):
                 errors.append(
                     build_cell_error_tuple(
                         ir,
-                        get_range_by_name(ir, "reference_number"),
+                        reference_number_range,
                         ndx,
                         get_message("check_finding_uniqueness").format(
-                            previous_row,
-                            fr,
-                            f"{findings_by_reference[fr]['values']}",
-                            current_row,
-                            f"{finding_set}",
+                            range_start + previous_row,
+                            f'|{" | ".join(findings_by_reference[fr]["values"])}|',
+                            range_start + current_row,
+                            f'|{" | ".join(finding_set)}|',
                         ),
                     )
                 )

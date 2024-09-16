@@ -155,7 +155,11 @@ skippable_checks = {
     "federal_program_total_is_correct": federal_program_total_is_correct,
 }
 
-require_gsa_migration_flag = [findings_grid_validation, finding_reference_pattern]
+require_gsa_migration_flag = [
+    findings_grid_validation,
+    finding_reference_pattern,
+    check_finding_uniqueness,
+]
 
 
 def run_all_checks(
