@@ -110,6 +110,7 @@ locals {
   protocol    = "https"
   port        = 61443
   app_id      = cloudfoundry_app.egress_app.id
+  creds_id    = cloudfoundry_user_provided_service.credentials.id
 }
 
 resource "cloudfoundry_user_provided_service" "credentials" {
