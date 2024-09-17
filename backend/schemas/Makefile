@@ -14,8 +14,8 @@ xlsx = $(wildcard output/excel/xlsx/*-workbook*.xlsx)
 json = $(wildcard output/excel/json/*.json)
 
 source_data:
-	python scripts/generate_lookup_schemas.py source/data/cfda-lookup-20230626.csv source/base/FederalProgramNames.json
-	python scripts/generate_lookup_schemas.py source/data/cluster-names-20230626.csv source/base/ClusterNames.json
+	python scripts/generate_lookup_schemas.py cfda-lookup source/base/FederalProgramNames.json
+	python scripts/generate_lookup_schemas.py cluster-names source/base/ClusterNames.json
 
 clean:
 	for f in $(xlsx); do \
@@ -25,7 +25,7 @@ clean:
 		rm $$f; \
 	done
 
-build_audit_json: 
+build_audit_json:
 	for jsonnet_file in $(audit_specs); do \
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
 		jsonnet -o output/audit/"$$base_name.json" "$$jsonnet_file"; \

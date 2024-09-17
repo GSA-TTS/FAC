@@ -1,6 +1,7 @@
 locals {
   org_name = "gsa-tts-oros-fac"
   spaces = {
+    "sandbox" = {},
     "dev"     = {},
     "preview" = {},
     "staging" = {
@@ -27,6 +28,7 @@ locals {
     "alexander.steel@gsa.gov",
     "sudha.kumar@gsa.gov",
     "philip.dominguez@gsa.gov",
+    "ranye.mclendon@gsa.gov",
     "robert.novak@gsa.gov",
   ]
 
