@@ -1,4 +1,8 @@
-from .access import Access, remove_email_from_submission_access
+from .access import (
+    Access,
+    delete_access_and_create_record,
+    remove_email_from_submission_access,
+)
 from .deleted_access import DeletedAccess
 from .access_roles import ACCESS_ROLES
 from .models import (
@@ -33,6 +37,7 @@ _models = [
     User,
 ]
 _functions = [
+    delete_access_and_create_record,
     excel_file_path,
     generate_sac_report_id,
     remove_email_from_submission_access,
