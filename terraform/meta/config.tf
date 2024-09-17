@@ -1,6 +1,7 @@
 locals {
   org_name = "gsa-tts-oros-fac"
   spaces = {
+    "sandbox" = {},
     "dev"     = {},
     "preview" = {},
     "staging" = {
