@@ -30,6 +30,20 @@ resource "cloudfoundry_user_provided_service" "clam" {
   }
 }
 
+
+resource "cloudfoundry_user_provided_service" "credentials" {
+  name             = "fac-key-service"
+  space            = data.cloudfoundry_space.app_space.id
+  credentials_json = <<JSON
+  {
+    "SAM_API_KEY": "${var.sam_api_key}",
+    "DJANGO_SECRET_LOGIN_KEY": "${var.django_secret_login_key}",
+    "LOGIN_CLIENT_ID": "${var.login_client_id}",
+    "SECRET_KEY":"${var.login_secret_key}"
+  }
+  JSON
+}
+
 locals {
   app_id   = cloudfoundry_app.fac_app.id
   scan_url = "https://fac-av-${var.cf_space_name}-fs.apps.internal:61443/scan"
@@ -70,6 +84,10 @@ resource "cloudfoundry_app" "fac_app" {
 
   service_binding {
     service_instance = var.new_relic_creds_id
+  }
+
+  service_binding {
+    service_instance = cloudfoundry_user_provided_service.credentials.id
   }
 
   routes {
