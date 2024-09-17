@@ -595,7 +595,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         ],
         target=STATUS.AUDITEE_CERTIFIED,
     )
-    
     def transition_to_in_progress(self):
         """
         Any edit to a submission in the following states should result in it

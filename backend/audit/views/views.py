@@ -698,7 +698,6 @@ class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
 class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
-        logger.info("%s for the SubmissionView...", os.getenv("FAC_VERSION"))
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
@@ -719,7 +718,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            
+
             errors = sac.validate_full()
             if errors:
                 context = {"report_id": report_id, "errors": errors}
@@ -733,11 +732,12 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # Only change this value if things work...
             disseminated = "DID NOT DISSEMINATE"
 
-            ########### BEGIN ATOMIC BLOCK ###########
+            # BEGIN ATOMIC BLOCK
             with transaction.atomic():
                 sac.transition_to_submitted()
                 sac.save(
-                    event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.SUBMITTED,
                 )
                 disseminated = sac.disseminate()
                 # `disseminated` is None if there were no errors.
@@ -747,7 +747,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                         event_user=request.user,
                         event_type=SubmissionEvent.EventType.DISSEMINATED,
                     )
-            ########### END ATOMIC BLOCK ###########
+            # END ATOMIC BLOCK
 
             # IF THE DISSEMINATION SUCCEEDED
             # `disseminated` is None if there were no errors.
@@ -757,12 +757,16 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                 # two instances of the FAC should be able to get to this point.
                 # If we do, something will fail.
                 remove_workbook_artifacts(sac)
-            
+
             # IF THE DISSEMINATION FAILED
-            # If disseminated has a value, it is an error 
+            # If disseminated has a value, it is an error
             # object returned from `sac.disseminate()`
             if disseminated is not None:
-                logger.info("{} has a `not None` value report_id[{}] for `disseminated`: {}".format(running_version, report_id, disseminated))
+                logger.info(
+                    "{} is a `not None` value report_id[{}] for `disseminated`".format(
+                        report_id, disseminated
+                    )
+                )
 
             return redirect(reverse("audit:MySubmissions"))
 
@@ -779,7 +783,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # should log this but not report it to the user.
             # See https://github.com/GSA-TTS/FAC/issues/3347
             # UPDATED 2024-09-13
-            # We have not been able to trigger this error in the most recent race 
+            # We have not been able to trigger this error in the most recent race
             # debugging. However, that does not mean it is impossible.
             # Therefore, leaving this exception handler in place.
             logger.info("IntegrityError on disseminating report_id: %s", report_id)
