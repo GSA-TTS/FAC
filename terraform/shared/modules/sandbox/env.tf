@@ -10,18 +10,6 @@ module "database" {
   json_params      = var.json_params
 }
 
-module "snapshot-database" {
-  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v0.9.1"
-
-  cf_org_name      = var.cf_org_name
-  cf_space_name    = var.cf_space_name
-  name             = "fac-snapshot-db"
-  recursive_delete = var.recursive_delete
-  tags             = ["rds"]
-  rds_plan_name    = var.database_plan
-  json_params      = var.json_params
-}
-
 module "s3-public" {
   source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v0.9.1"
 

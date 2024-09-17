@@ -21,7 +21,7 @@
 variable "cf_org_name" {
   type        = string
   description = "name of the organization to configure"
-  default     = "sandbox-gsa"
+  default     = "gsa-tts-oros-fac"
 }
 
 variable "cf_space_name" {
@@ -83,7 +83,7 @@ variable "clamav_fs_instances" {
 variable "clamav_memory" {
   type        = number
   description = "memory in MB to allocate to clamav app"
-  default     = 256
+  default     = 2048
 }
 
 variable "pgrst_jwt_secret" {

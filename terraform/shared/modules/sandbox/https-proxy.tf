@@ -50,7 +50,7 @@ module "https-proxy" {
     # Solution from https://stackoverflow.com/a/57401750
     # (local.clam_name) = ["database.clamav.net:443"],
   }
-  denylist   = {}
-  depends_on = [module.fac-app.app_id]
+  denylist = {}
+  # depends_on = [module.fac-app.app_id]
   # depends_on = [ module.clamav.app_id ]
 }

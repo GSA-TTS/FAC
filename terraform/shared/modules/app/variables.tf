@@ -53,16 +53,21 @@ variable "db_id" {
   description = "the full string of the core db resource id"
 }
 
-variable "backup_db_id" {
+# # Can't be created before the app exists
+variable "https_proxy" {
   type        = string
-  description = "the full string of the backup db resource id"
+  description = "the full string of the https proxy for use with the logshipper app"
 }
 
-# # Can't be created before the app exists
-# variable "https_proxy" {
-#   type        = string
-#   description = "the full string of the https proxy for use with the logshipper app"
-# }
+variable "https_proxy_creds_id" {
+  type        = string
+  description = "the id of the credentials for the proxy to bind to the app"
+}
+
+variable "new_relic_creds_id" {
+  type        = string
+  description = "the id of the credentials for newrelic to bind to the app"
+}
 
 variable "recursive_delete" {
   type        = bool
