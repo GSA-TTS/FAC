@@ -74,3 +74,16 @@ variable "recursive_delete" {
   description = "when true, deletes service bindings attached to the resource (not recommended for production)"
   default     = false
 }
+
+variable "sam_api_key" {
+  type = string
+}
+variable "django_secret_login_key" {
+  type = string
+}
+variable "login_client_id" {
+  type = string
+}
+variable "login_secret_key" {
+  type = string
+}

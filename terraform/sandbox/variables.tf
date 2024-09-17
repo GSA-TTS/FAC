@@ -30,3 +30,15 @@ variable "new_relic_license_key" {
   description = "the license key to use when setting up the New Relic agent"
 }
 
+variable "sam_api_key" {
+  type = string
+}
+variable "django_secret_login_key" {
+  type = string
+}
+variable "login_client_id" {
+  type = string
+}
+variable "login_secret_key" {
+  type = string
+}

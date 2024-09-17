@@ -107,3 +107,16 @@ variable "gitref" {
   default     = "refs/heads/main"
   # You can also specify a specific commit, eg "7487f882903b9e834a5133a883a88b16fb8b16c9"
 }
+
+variable "sam_api_key" {
+  type = string
+}
+variable "django_secret_login_key" {
+  type = string
+}
+variable "login_client_id" {
+  type = string
+}
+variable "login_secret_key" {
+  type = string
+}

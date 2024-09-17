@@ -121,3 +121,8 @@ If all done correctly, the plan should look something like:
 
 Plan: 0 to add, 1 to change, 0 to destroy.
 ```
+
+
+### Lessons Learned:
+- If you are attempting to do a deployment and terraform fails because of inflight prior failed deploys, run `cf cancel-deployment gsa-fac` to get it back to a stable state to ensure it can attempt to deploy a new revision
+- Because we are wrapped around newrelic, and subsequently gunicorn is, we need to use the current `Procfile` to wrap the gunicorn threads in newrelic.

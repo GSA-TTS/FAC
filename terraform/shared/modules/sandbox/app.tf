@@ -14,10 +14,15 @@ module "fac-app" {
   public_s3_id         = module.s3-public.bucket_id
   db_id                = module.database.instance_id
   # backup_db_id  = module.snapshot-database.instance_id
-  app_instances = 1
-  app_memory    = 3072
-  disk_quota    = 3072
-  gitref        = "refs/heads/workstation-bootstrap"
+  app_instances           = 1
+  app_memory              = 3072
+  disk_quota              = 3072
+  gitref                  = "refs/heads/workstation-bootstrap"
+  django_secret_login_key = var.django_secret_login_key
+  sam_api_key             = var.sam_api_key
+  login_client_id         = var.login_client_id
+  login_secret_key        = var.login_secret_key
+
   # depends_on = [ module.https-proxy.https_proxy ]
 }
 
