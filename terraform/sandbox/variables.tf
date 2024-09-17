@@ -1,12 +1,12 @@
 variable "cf_org_name" {
   type        = string
   description = "name of the organization to configure"
-  default     = "sandbox-gsa"
+  default     = "gsa-tts-oros-fac"
 }
 
 variable "cf_space_name" {
   type        = string
-  description = "name of the sandbox space (ex firstname.lastname)"
+  description = "name of the sandbox space (ex sandbox)"
 }
 
 variable "cf_user" {

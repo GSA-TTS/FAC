@@ -25,3 +25,7 @@ output "app_id" {
 output "port" {
   value = local.port
 }
+
+output "creds_id" {
+  value = local.creds_id
+}
