@@ -50,7 +50,7 @@ class Command(BaseCommand):
             sys.exit(0)
 
         limit = options.get("limit")
-        if limit != None:
+        if limit is not None:
             logger.info(f"Deletion limit: {limit}")
 
         deleted_count = 0
