@@ -20,13 +20,20 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--count", action="store_true", help="Only logs the blank Accesses count without deleting",
+            "--count",
+            action="store_true",
+            help="Only logs the blank Accesses count without deleting",
         )
         parser.add_argument(
-            "--verbose", action="store_true", help="Prints the report_ids that the Accesses are being deleted from",
+            "--verbose",
+            action="store_true",
+            help="Prints the report_ids that the Accesses are being deleted from",
         )
         parser.add_argument(
-            "--limit", type=int, help="Limits the number of blank Accesses to delete", default=None,
+            "--limit",
+            type=int,
+            help="Limits the number of blank Accesses to delete",
+            default=None,
         )
 
     def handle(self, *args, **options):
@@ -54,7 +61,9 @@ class Command(BaseCommand):
                 break
 
             if options.get("verbose"):
-                logger.info(f"Deleting blank Access for {blank_access.sac.report_id}, {blank_access.fullname}")
+                logger.info(
+                    f"Deleting blank Access for {blank_access.sac.report_id}, {blank_access.fullname}"
+                )
 
             _, deletion_record = delete_access_and_create_record(blank_access)
             if options.get("verbose"):
