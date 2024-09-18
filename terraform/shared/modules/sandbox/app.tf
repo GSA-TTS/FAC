@@ -23,3 +23,12 @@ module "fac-app" {
   login_client_id         = var.login_client_id
   login_secret_key        = var.login_secret_key
 }
+
+resource "cloudfoundry_network_policy" "app-network-policy" {
+  policy {
+    source_app      = module.fac-app.app_id
+    destination_app = module.https-proxy.app_id
+    port            = "61443"
+    protocol        = "tcp"
+  }
+}
