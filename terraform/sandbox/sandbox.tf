@@ -1,6 +1,6 @@
 module "sandbox" {
   source                  = "../shared/modules/sandbox"
-  cf_space_name           = var.cf_space_name
+  cf_space_name           = "sandbox"
   pgrst_jwt_secret        = var.pgrst_jwt_secret
   new_relic_license_key   = var.new_relic_license_key
   django_secret_login_key = var.django_secret_login_key
