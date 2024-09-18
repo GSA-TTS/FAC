@@ -4,11 +4,6 @@ variable "cf_org_name" {
   default     = "gsa-tts-oros-fac"
 }
 
-variable "cf_space_name" {
-  type        = string
-  description = "name of the sandbox space (ex sandbox)"
-}
-
 variable "cf_user" {
   type        = string
   description = "cloud.gov deployer account user"

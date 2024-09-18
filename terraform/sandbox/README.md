@@ -32,9 +32,13 @@ The keys will be managed by the meta module, so all you have to do is `cf servic
 
 Security Groups:
 ```
-cf bind-security-group public_networks_egress <ORGNAME> --lifecycle running --space <SPACENAME>
+cf bind-security-group public_networks_egress gsa-tts-oros-fac --lifecycle running --space sandbox-egress
+
 cf bind-security-group trusted_local_networks_egress <ORGNAME> --lifecycle running --space <SPACENAME>
 cf bind-security-group trusted_local_networks <ORGNAME> --lifecycle running --space <SPACENAME>
+
+cf bind-security-group trusted_local_networks_egress gsa-tts-oros-fac --lifecycle running --space sandbox-egress
+cf bind-security-group trusted_local_networks gsa-tts-oros-fac --lifecycle running --space sandbox
 ```
 
 **Getting it to run the first time:**
@@ -59,6 +63,26 @@ environment = {
 # variable "https_proxy" {
 #   type        = string
 #   description = "the full string of the https proxy for use with the logshipper app"
+# }
+
+# terraform/shared/modules/https-proxy/https-proxy.tf
+# Comment this out. We do this since the proxy can't connect to the clients that don't exist.
+# Once Clamav and FAC App have been built, uncomment this block and rerun an apply so the proxy can
+# get an updated list of clients.
+
+# data "cloudfoundry_app" "clients" {
+#   for_each   = local.clients
+#   name_or_id = each.key
+#   space      = data.cloudfoundry_space.client_space.id
+# }
+
+# resource "cloudfoundry_network_policy" "client_routing" {
+#   for_each = local.clients
+#   policy {
+#     source_app      = data.cloudfoundry_app.clients[each.key].id
+#     destination_app = cloudfoundry_app.egress_app.id
+#     port            = "61443"
+#   }
 # }
 ```
 
