@@ -15,24 +15,26 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Django management command for deleting Access entries with blank email fields.
+    Django management command for deleting Access entries with blank email
+    fields. A DeletedAccess entry is created for each deleted Access entry by
+    using audit.models.delete_access_and_create_record.
     """
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--count",
             action="store_true",
-            help="Only logs the blank Accesses count without deleting",
+            help="Only logs the blank Access entries count without deleting",
         )
         parser.add_argument(
             "--verbose",
             action="store_true",
-            help="Prints the report_ids that the Accesses are being deleted from",
+            help="Logs info for each Access and DeletedAccess entry being deleted/created",
         )
         parser.add_argument(
             "--limit",
             type=int,
-            help="Limits the number of blank Accesses to delete",
+            help="Limits the number of blank Access entries to delete",
             default=None,
         )
 
@@ -66,6 +68,7 @@ class Command(BaseCommand):
                 )
 
             _, deletion_record = delete_access_and_create_record(blank_access)
+
             if options.get("verbose"):
                 logger.info(f"Created DeletedAccess {deletion_record.id}")
 
