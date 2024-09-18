@@ -1,5 +1,5 @@
 # used by cloud.gov
-web: newrelic-admin run-program gunicorn config.wsgi -c gunicorn.conf.py --preload
+web: newrelic-admin run-program gunicorn config.wsgi -c gunicorn.conf.py
 # web: gunicorn config.wsgi -c gunicorn.conf.py --preload
 # web: gunicorn config.wsgi -c gunicorn.conf.py
 
