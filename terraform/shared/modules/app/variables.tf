@@ -56,7 +56,7 @@ variable "db_id" {
 # # Can't be created before the app exists
 variable "https_proxy" {
   type        = string
-  description = "the full string of the https proxy for use with the logshipper app"
+  description = "the full string of the https proxy for use with the app"
 }
 
 variable "https_proxy_creds_id" {

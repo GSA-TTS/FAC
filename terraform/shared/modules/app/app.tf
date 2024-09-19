@@ -11,7 +11,7 @@ resource "cloudfoundry_route" "app_route" {
   space    = data.cloudfoundry_space.app_space.id
   domain   = data.cloudfoundry_domain.public.id
   hostname = "fac-${replace(var.cf_space_name, ".", "-")}"
-  # Yields something like: fac-file-scanner-spacename.apps.internal
+  # Yields something like: fac-sandbox.app.cloud.gov
 }
 
 data "external" "app_zip" {
@@ -59,9 +59,9 @@ resource "cloudfoundry_app" "fac_app" {
   memory                          = var.app_memory
   instances                       = var.app_instances
   strategy                        = "rolling"
-  timeout                         = 300
+  timeout                         = 600
   health_check_type               = "port"
-  health_check_invocation_timeout = 300
+  health_check_timeout            = 180
   service_binding {
     service_instance = cloudfoundry_user_provided_service.clam.id
   }
