@@ -1,5 +1,6 @@
 begin;
     drop table if exists api_v1_1_1.metadata;
+    drop table if exists dissemination_combined cascade;
     drop view if exists api_v1_1_1.general;
     drop view if exists api_v1_1_1.auditor;
     drop view if exists api_v1_1_1.federal_awards;
@@ -11,7 +12,7 @@ begin;
     drop view if exists api_v1_1_1.passthrough;
     drop view if exists api_v1_1_1.secondary_auditors;
     drop view if exists api_v1_1_1.additional_eins;
-    drop view if exists api_v1_1_1.combined;
+    drop view if exists api_v1_1_1.combined cascade;
 commit;
 
 notify pgrst,
