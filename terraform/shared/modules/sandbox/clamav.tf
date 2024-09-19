@@ -27,3 +27,12 @@ module "clamav" {
   # depends_on = [ module.fac-app.app_id ]
   # depends_on     = [ module.https-proxy.https_proxy ]
 }
+
+# resource "cloudfoundry_network_policy" "clamav-network-policy" {
+#   policy {
+#     source_app      = module.clamav.app_id
+#     destination_app = module.https-proxy.app_id
+#     port            = "61443"
+#     protocol        = "tcp"
+#   }
+# }
