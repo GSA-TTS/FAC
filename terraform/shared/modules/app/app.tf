@@ -50,19 +50,18 @@ locals {
 }
 
 resource "cloudfoundry_app" "fac_app" {
-  name             = var.name
-  space            = data.cloudfoundry_space.app_space.id
-  buildpacks       = ["https://github.com/cloudfoundry/apt-buildpack.git", "https://github.com/cloudfoundry/python-buildpack.git"]
-  path             = "${path.module}/${data.external.app_zip.result.path}"
-  source_code_hash = filesha256("${path.module}/${data.external.app_zip.result.path}")
-  # command           = "gunicorn config.wsgi -c gunicorn.conf.py --preload"
-  timeout           = 180
-  disk_quota        = var.disk_quota
-  memory            = var.app_memory
-  instances         = var.app_instances
-  strategy          = "rolling"
-  health_check_type = "port"
-
+  name                            = var.name
+  space                           = data.cloudfoundry_space.app_space.id
+  buildpacks                      = ["https://github.com/cloudfoundry/apt-buildpack.git", "https://github.com/cloudfoundry/python-buildpack.git"]
+  path                            = "${path.module}/${data.external.app_zip.result.path}"
+  source_code_hash                = filesha256("${path.module}/${data.external.app_zip.result.path}")
+  disk_quota                      = var.disk_quota
+  memory                          = var.app_memory
+  instances                       = var.app_instances
+  strategy                        = "rolling"
+  timeout                         = 300
+  health_check_type               = "port"
+  health_check_invocation_timeout = 300
   service_binding {
     service_instance = cloudfoundry_user_provided_service.clam.id
   }
@@ -70,6 +69,7 @@ resource "cloudfoundry_app" "fac_app" {
   service_binding {
     service_instance = var.private_s3_id
   }
+
   service_binding {
     service_instance = var.public_s3_id
   }
@@ -104,11 +104,12 @@ resource "cloudfoundry_app" "fac_app" {
   # }
 
   # Use for the first deployment
-    environment = {
-      # PROXYROUTE            = var.https_proxy
-      ENV                   = "SANDBOX"
-      DISABLE_COLLECTSTATIC = 1
-      DJANGO_BASE_URL = "https://fac-${var.cf_space_name}.app.cloud.gov"
-      AV_SCAN_URL = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
-    }
+  environment = {
+    # PROXYROUTE            = var.https_proxy
+    ENV = "SANDBOX"
+    # DISABLE_COLLECTSTATIC = 0
+    DJANGO_BASE_URL = "https://fac-${var.cf_space_name}.app.cloud.gov"
+    AV_SCAN_URL     = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
+    ALLOWED_HOSTS   = "fac-${var.cf_space_name}.app.cloud.gov"
+  }
 }
