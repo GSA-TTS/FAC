@@ -43,8 +43,8 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     #####
     # COLLECT STATIC
     # Do Django things with static files.
-    run_collectstatic
-    gonogo "run_collectstatic"
+    # run_collectstatic
+    # gonogo "run_collectstatic"
 
     #####
     # SEED COG/OVER TABLES
