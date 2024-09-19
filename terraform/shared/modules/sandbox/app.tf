@@ -22,6 +22,7 @@ module "fac-app" {
   sam_api_key             = var.sam_api_key
   login_client_id         = var.login_client_id
   login_secret_key        = var.login_secret_key
+  depends_on = [ cloudfoundry_network_policy.app-network-policy.id ]
 }
 
 resource "cloudfoundry_network_policy" "app-network-policy" {

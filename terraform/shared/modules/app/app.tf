@@ -10,7 +10,7 @@ data "cloudfoundry_space" "app_space" {
 resource "cloudfoundry_route" "app_route" {
   space    = data.cloudfoundry_space.app_space.id
   domain   = data.cloudfoundry_domain.public.id
-  hostname = "${var.name}-${replace(var.cf_space_name, ".", "-")}"
+  hostname = "fac-${replace(var.cf_space_name, ".", "-")}"
   # Yields something like: fac-file-scanner-spacename.apps.internal
 }
 
@@ -99,6 +99,8 @@ resource "cloudfoundry_app" "fac_app" {
   #   PROXYROUTE            = var.https_proxy
   #   ENV                   = "SANDBOX"
   #   DISABLE_COLLECTSTATIC = 1
+  #   DJANGO_BASE_URL = "https://fac-${var.cf_space_name}.app.cloud.gov"
+  #   AV_SCAN_URL = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
   # }
 
   # Use for the first deployment
@@ -106,5 +108,7 @@ resource "cloudfoundry_app" "fac_app" {
       # PROXYROUTE            = var.https_proxy
       ENV                   = "SANDBOX"
       DISABLE_COLLECTSTATIC = 1
+      DJANGO_BASE_URL = "https://fac-${var.cf_space_name}.app.cloud.gov"
+      AV_SCAN_URL = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
     }
 }
