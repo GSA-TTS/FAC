@@ -35,6 +35,8 @@ from audit.models import (
     SingleAuditReportFile,
     SubmissionEvent,
 )
+from audit.models.models import STATUS
+from audit.models.viewflow import sac_transition
 from audit.intakelib.exceptions import ExcelExtractionError
 from audit.validators import (
     validate_auditee_certification_json,
@@ -326,10 +328,8 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
 
             errors = sac.validate_full()
             if not errors:
-                sac.transition_to_ready_for_certification()
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
+                sac_transition(
+                    request, sac, transition_to=STATUS.READY_FOR_CERTIFICATION
                 )
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
@@ -365,10 +365,7 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if (
-                sac.submission_status
-                != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-            ):
+            if sac.submission_status != STATUS.READY_FOR_CERTIFICATION:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             return render(request, "audit/auditor-certification-step-1.html", context)
@@ -395,10 +392,7 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if (
-                sac.submission_status
-                != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-            ):
+            if sac.submission_status != STATUS.READY_FOR_CERTIFICATION:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form.is_valid():
@@ -445,10 +439,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if (
-                sac.submission_status
-                != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-            ):
+            if sac.submission_status != STATUS.READY_FOR_CERTIFICATION:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             return render(request, "audit/auditor-certification-step-2.html", context)
@@ -474,10 +465,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if (
-                sac.submission_status
-                != SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-            ):
+            if sac.submission_status != STATUS.READY_FOR_CERTIFICATION:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form2.is_valid():
@@ -496,12 +484,8 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
                 auditor_certification.update(form_cleaned)
                 validated = validate_auditor_certification_json(auditor_certification)
                 sac.auditor_certification = validated
-                sac.transition_to_auditor_certified()
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
-                )
-                logger.info("Auditor certification saved.", auditor_certification)
+                if sac_transition(request, sac, transition_to=STATUS.AUDITOR_CERTIFIED):
+                    logger.info("Auditor certification saved.", auditor_certification)
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
             context["form"] = form2
@@ -532,7 +516,7 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+            if sac.submission_status != STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             return render(request, "audit/auditee-certification-step-1.html", context)
@@ -559,7 +543,7 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+            if sac.submission_status != STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form.is_valid():
@@ -606,7 +590,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+            if sac.submission_status != STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             return render(request, "audit/auditee-certification-step-2.html", context)
@@ -631,7 +615,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
             }
 
             # Return to checklist, the Audit is not in the correct state.
-            if sac.submission_status != SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+            if sac.submission_status != STATUS.AUDITOR_CERTIFIED:
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
 
             if form2.is_valid():
@@ -650,12 +634,8 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
                 auditee_certification.update(form_cleaned)
                 validated = validate_auditee_certification_json(auditee_certification)
                 sac.auditee_certification = validated
-                sac.transition_to_auditee_certified()
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
-                )
-                logger.info("Auditee certification saved.", auditee_certification)
+                if sac_transition(request, sac, transition_to=STATUS.AUDITEE_CERTIFIED):
+                    logger.info("Auditee certification saved.", auditee_certification)
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
             context["form"] = form2
@@ -727,24 +707,23 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     context,
                 )
 
-            sac.transition_to_submitted()
-            sac.save(
-                event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
-            )
+            sac_transition(request, sac, transition_to=STATUS.SUBMITTED)
 
             with transaction.atomic():
                 disseminated = sac.disseminate()
 
+            print("Disseminated result =-=-=-=-=-=-=")
+            print(disseminated)
+            print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+
             # disseminated is None if there were no errors.
             if disseminated is None:
-                sac.transition_to_disseminated()
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.DISSEMINATED,
-                )
+                print("DONE! This is now disseminated.")
+                sac_transition(request, sac, transition_to=STATUS.DISSEMINATED)
                 # Remove workbook artifacts after the report has been disseminated.
                 remove_workbook_artifacts(sac)
             else:
+                print("Dissemination... has failed.")
                 pass
                 # FIXME: We should now provide a reasonable error to the user.
 

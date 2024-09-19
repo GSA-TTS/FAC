@@ -46,6 +46,7 @@ from audit.models import (
     SubmissionEvent,
     generate_sac_report_id,
 )
+from audit.models.models import STATUS
 from audit.cross_validation.naming import SECTION_NAMES as SN
 from audit.views import MySubmissions
 from dissemination.models import FederalAward, General
@@ -55,7 +56,7 @@ User = get_user_model()
 ACCESS_AND_SUBMISSION_PATH = reverse("report_submission:accessandsubmission")
 AUDIT_JSON_FIXTURES = Path(__file__).parent / "fixtures" / "json"
 EDIT_PATH = "audit:EditSubmission"
-STATUSES = SingleAuditChecklist.STATUS
+STATUSES = STATUS
 SUBMISSIONS_PATH = reverse("audit:MySubmissions")
 
 VALID_ELIGIBILITY_DATA = {

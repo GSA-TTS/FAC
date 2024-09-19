@@ -2,7 +2,7 @@ import logging
 import math
 
 from django.conf import settings
-from audit.models.models import ExcelFile, SingleAuditChecklist
+from audit.models.models import ExcelFile, SingleAuditChecklist, STATUS
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 from django.core.paginator import Paginator
@@ -170,9 +170,7 @@ def delete_workbooks(partition_number, total_partitions, page_size=10, pages=Non
         )
 
     all_ids = (
-        SingleAuditChecklist.objects.filter(
-            submission_status=SingleAuditChecklist.STATUS.DISSEMINATED
-        )
+        SingleAuditChecklist.objects.filter(submission_status=STATUS.DISSEMINATED)
         .values_list("id", flat=True)
         .order_by("id")
     )
