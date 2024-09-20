@@ -111,5 +111,6 @@ resource "cloudfoundry_app" "fac_app" {
     DJANGO_BASE_URL = "https://fac-${var.cf_space_name}.app.cloud.gov"
     AV_SCAN_URL     = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
     ALLOWED_HOSTS   = "fac-${var.cf_space_name}.app.cloud.gov"
+    REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
   }
 }

@@ -84,20 +84,20 @@ data "cloudfoundry_space" "client_space" {
   name     = var.client_space
 }
 
-# data "cloudfoundry_app" "clients" {
-#   for_each   = local.clients
-#   name_or_id = each.key
-#   space      = data.cloudfoundry_space.client_space.id
-# }
+data "cloudfoundry_app" "clients" {
+  for_each   = local.clients
+  name_or_id = each.key
+  space      = data.cloudfoundry_space.client_space.id
+}
 
-# resource "cloudfoundry_network_policy" "client_routing" {
-#   for_each = local.clients
-#   policy {
-#     source_app      = data.cloudfoundry_app.clients[each.key].id
-#     destination_app = cloudfoundry_app.egress_app.id
-#     port            = "61443"
-#   }
-# }
+resource "cloudfoundry_network_policy" "client_routing" {
+  for_each = local.clients
+  policy {
+    source_app      = data.cloudfoundry_app.clients[each.key].id
+    destination_app = cloudfoundry_app.egress_app.id
+    port            = "61443"
+  }
+}
 
 ###
 ### Create a credential service for bound clients to use when make requests of the proxy

@@ -15,7 +15,7 @@ module "fac-app" {
   db_id                = module.database.instance_id
   # backup_db_id  = module.snapshot-database.instance_id
   app_instances           = 1
-  app_memory              = 3072
+  app_memory              = 4096
   disk_quota              = 3072
   gitref                  = "refs/heads/workstation-bootstrap"
   django_secret_login_key = var.django_secret_login_key
