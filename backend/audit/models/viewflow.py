@@ -168,7 +168,6 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         target=STATUS.DISSEMINATED,
     )
     def transition_to_disseminated(self):
-        logger.info("Transitioning to DISSEMINATED")
         self.sac.transition_name.append(STATUS.DISSEMINATED)
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
 
@@ -179,7 +178,7 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
             STATUS.AUDITEE_CERTIFIED,
             STATUS.CERTIFIED,
         ],
-        target=STATUS.SUBMITTED,
+        target=STATUS.AUDITEE_CERTIFIED,
     )
     def transition_to_in_progress(self):
         """

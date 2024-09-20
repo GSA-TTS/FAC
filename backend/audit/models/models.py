@@ -514,7 +514,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         return self.submission_status in [
             STATUS.AUDITEE_CERTIFIED,
             STATUS.CERTIFIED,
-            STATUS.SUBMITTED,
         ]
 
     @property
