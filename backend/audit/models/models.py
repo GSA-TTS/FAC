@@ -523,12 +523,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             STATUS.AUDITEE_CERTIFIED,
             STATUS.AUDITOR_CERTIFIED,
             STATUS.CERTIFIED,
-            STATUS.SUBMITTED,
         ]
 
     @property
     def is_submitted(self):
-        return self.submission_status in [STATUS.SUBMITTED]
+        return self.submission_status in [STATUS.DISSEMINATED]
 
     def get_transition_date(self, status):
         index = self.transition_name.index(status)

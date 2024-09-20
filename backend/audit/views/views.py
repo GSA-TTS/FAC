@@ -678,7 +678,6 @@ class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
 class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
-
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
@@ -692,8 +691,11 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
     def post(self, request, *args, **kwargs):
+        # RACE HAZARD WARNING
+        # It is possible for a user to enter the submission multiple times,
+        # from multiple FAC instances. This race hazard is documented in
+        # backend/audit/views/README-fac-views-race-hazard-postmortem.md
         report_id = kwargs["report_id"]
-
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
@@ -707,35 +709,43 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     context,
                 )
 
-            sac_transition(request, sac, transition_to=STATUS.SUBMITTED)
+            # Only change this value if things work...
+            disseminated = "DID NOT DISSEMINATE"
 
+            # BEGIN ATOMIC BLOCK
             with transaction.atomic():
+                sac_transition(request, sac, transition_to=STATUS.SUBMITTED)
                 disseminated = sac.disseminate()
+                # `disseminated` is None if there were no errors.
+                if disseminated is None:
+                    sac_transition(request, sac, transition_to=STATUS.DISSEMINATED)
+            # END ATOMIC BLOCK
 
-            print("Disseminated result =-=-=-=-=-=-=")
-            print(disseminated)
-            print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
-
-            # disseminated is None if there were no errors.
+            # IF THE DISSEMINATION SUCCEEDED
+            # `disseminated` is None if there were no errors.
             if disseminated is None:
-                print("DONE! This is now disseminated.")
-                sac_transition(request, sac, transition_to=STATUS.DISSEMINATED)
                 # Remove workbook artifacts after the report has been disseminated.
+                # We do this outside of the atomic block. No race between
+                # two instances of the FAC should be able to get to this point.
+                # If we do, something will fail.
                 remove_workbook_artifacts(sac)
-            else:
-                print("Dissemination... has failed.")
-                pass
-                # FIXME: We should now provide a reasonable error to the user.
 
-            logger.info(
-                "Dissemination errors: %s, report_id: %s", disseminated, report_id
-            )
+            # IF THE DISSEMINATION FAILED
+            # If disseminated has a value, it is an error
+            # object returned from `sac.disseminate()`
+            if disseminated is not None:
+                logger.info(
+                    "{} is a `not None` value report_id[{}] for `disseminated`".format(
+                        report_id, disseminated
+                    )
+                )
 
             return redirect(reverse("audit:MySubmissions"))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except TransactionManagementError:
+            # ORIGINAL COMMENT
             # This is most likely the result of a race condition, where the user hits
             # the submit button multiple times and the requests get round-robined to
             # different instances, and the second attempt tries to insert an existing
@@ -744,6 +754,10 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # wouldn't be an entry with that report_id to cause the error), and that we
             # should log this but not report it to the user.
             # See https://github.com/GSA-TTS/FAC/issues/3347
+            # UPDATED 2024-09-13
+            # We have not been able to trigger this error in the most recent race
+            # debugging. However, that does not mean it is impossible.
+            # Therefore, leaving this exception handler in place.
             logger.info("IntegrityError on disseminating report_id: %s", report_id)
             if General.objects.get(report_id=sac.report_id):
                 return redirect(reverse("audit:MySubmissions"))
