@@ -48,7 +48,7 @@ describe('A11y Testing on search pages', () => {
   before(() => {
     cy.visit('/dissemination/search/');
     cy.get('label').contains('All years').click();
-    cy.get('[id="search-form"]').submit();
+    cy.get('[id="audit-search-form"]').submit();
     cy.get('tbody > :nth-child(1) > td > a')
       .invoke('attr', 'href')
       .as('summary_url');
