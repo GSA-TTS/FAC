@@ -172,6 +172,9 @@ terraform/shared/modules/https-proxy/proxy.zip
 terraform/shared/modules/https-proxy/.terraform.lock.hcl
 terraform/shared/modules/stream-proxy/proxy.zip
 terraform/shared/modules/https-proxy/.terraform.lock.hcl
+terraform/shared/modules/sandbox-proxy/proxy.zip
+terraform/shared/modules/sandbox-proxy/.terraform.lock.hcl
+
 
 # XLSX ignores
 .~*#
