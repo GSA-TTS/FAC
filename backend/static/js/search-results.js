@@ -1,4 +1,4 @@
-var FORM = document.getElementById('search-form');
+var FORM = document.getElementById('audit-search-form');
 const pagination_links = document.querySelectorAll('[aria-label^="Page"]');
 const next_page_link = document.querySelectorAll('[aria-label="Next page"]');
 const search_submit_buttons = document.querySelectorAll('[type="submit"]');
@@ -120,7 +120,7 @@ function attachEventHandlersSorting() {
         i. In this case, we wipe both the order_by and order_direction fields. Or, it will maintain the values and sort anyway.
     In any case, we want to reset the page number to one.
   */
-  var FORM = document.getElementById('search-form');
+  var FORM = document.getElementById('audit-search-form');
   var table_headers = document.querySelectorAll('th[id]');
 
   table_headers.forEach((header) => {
