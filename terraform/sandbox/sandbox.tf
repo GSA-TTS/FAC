@@ -7,6 +7,7 @@ module "sandbox" {
   sam_api_key             = var.sam_api_key
   login_client_id         = var.login_client_id
   login_secret_key        = var.login_secret_key
+  branch_name             = var.branch_name
 
   database_plan         = "medium-gp-psql"
   https_proxy_instances = 1

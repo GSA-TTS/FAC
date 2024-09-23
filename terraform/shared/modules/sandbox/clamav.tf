@@ -24,7 +24,7 @@ module "clamav" {
   proxy_port     = module.https-proxy.port
   proxy_username = module.https-proxy.username
   proxy_password = module.https-proxy.password
-  depends_on = [ module.fac-app.app_id ]
+  depends_on     = [module.fac-app.app_id]
   # depends_on     = [ module.https-proxy.https_proxy ]
 }
 
