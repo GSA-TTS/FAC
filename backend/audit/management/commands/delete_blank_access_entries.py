@@ -27,11 +27,6 @@ class Command(BaseCommand):
             help="Only logs the blank Access entries count without deleting",
         )
         parser.add_argument(
-            "--verbose",
-            action="store_true",
-            help="Logs info for each Access and DeletedAccess entry being deleted/created",
-        )
-        parser.add_argument(
             "--limit",
             type=int,
             help="Limits the number of blank Access entries to delete",
@@ -62,15 +57,13 @@ class Command(BaseCommand):
                 logger.info("Deletion limit reached")
                 break
 
-            if options.get("verbose"):
-                logger.info(
-                    f"Deleting blank Access for {blank_access.sac.report_id}, {blank_access.fullname}"
-                )
+            logger.info(
+                f"Deleting blank Access for {blank_access.sac.report_id}, {blank_access.fullname}"
+            )
 
             _, deletion_record = delete_access_and_create_record(blank_access)
 
-            if options.get("verbose"):
-                logger.info(f"Created DeletedAccess {deletion_record.id}")
+            logger.info(f"Created DeletedAccess {deletion_record.id}")
 
             deleted_count += 1
 
