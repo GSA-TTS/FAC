@@ -120,3 +120,23 @@ variable "login_client_id" {
 variable "login_secret_key" {
   type = string
 }
+
+variable "allowlist" {
+  description = "Allowed egress for apps (applied first). A map where keys are app names, and the values are sets of acl strings."
+  # See the upstream documentation for possible acl strings:
+  #   https://github.com/caddyserver/forwardproxy/blob/caddy2/README.md#caddyfile-syntax-server-configuration
+  type = map(set(string))
+  default = {
+    # appname    = [ "*.example.com:443", "example2.com:443" ]
+  }
+}
+
+variable "denylist" {
+  description = "Denied egress for apps (applied second). A map where keys are app names, and the values are sets of host:port strings."
+  # See the upstream documentation for possible acl strings:
+  #   https://github.com/caddyserver/forwardproxy/blob/caddy2/README.md#caddyfile-syntax-server-configuration
+  type = map(set(string))
+  default = {
+    # appname    = [ "bad.example.com:443" ]
+  }
+}
