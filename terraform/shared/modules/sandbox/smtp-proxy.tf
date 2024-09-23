@@ -8,4 +8,5 @@ module "smtp-proxy" {
 
   upstream = "smtp-relay.gmail.com:587"
   clients  = ["gsa-fac"]
+  depends_on = [ module.fac-app ]
 }

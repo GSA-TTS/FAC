@@ -1,5 +1,5 @@
 module "https-proxy" {
-  source        = "../https-proxy"
+  source        = "../sandbox-proxy"
   name          = "https-proxy"
   cf_org_name   = var.cf_org_name               # gsa-tts-oros-fac
   cf_space_name = "${var.cf_space_name}-egress" # eg prod-egress

@@ -17,7 +17,7 @@ module "fac-app" {
   app_instances           = 1
   app_memory              = 4096
   disk_quota              = 3072
-  gitref                  = "refs/heads/workstation-bootstrap"
+  gitref                  = "refs/heads/${var.branch_name}"
   django_secret_login_key = var.django_secret_login_key
   sam_api_key             = var.sam_api_key
   login_client_id         = var.login_client_id

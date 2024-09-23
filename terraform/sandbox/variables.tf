@@ -37,3 +37,9 @@ variable "login_client_id" {
 variable "login_secret_key" {
   type = string
 }
+
+variable "branch_name" {
+  type        = string
+  description = "the heads value for the branch you wish to deploy (default would be main)"
+  # We don't specify a default here because we want to specify a branch to deploy
+}
