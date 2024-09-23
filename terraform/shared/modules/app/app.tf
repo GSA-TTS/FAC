@@ -50,18 +50,18 @@ locals {
 }
 
 resource "cloudfoundry_app" "fac_app" {
-  name                            = var.name
-  space                           = data.cloudfoundry_space.app_space.id
-  buildpacks                      = ["https://github.com/cloudfoundry/apt-buildpack.git", "https://github.com/cloudfoundry/python-buildpack.git"]
-  path                            = "${path.module}/${data.external.app_zip.result.path}"
-  source_code_hash                = filesha256("${path.module}/${data.external.app_zip.result.path}")
-  disk_quota                      = var.disk_quota
-  memory                          = var.app_memory
-  instances                       = var.app_instances
-  strategy                        = "rolling"
-  timeout                         = 600
-  health_check_type               = "port"
-  health_check_timeout            = 180
+  name                 = var.name
+  space                = data.cloudfoundry_space.app_space.id
+  buildpacks           = ["https://github.com/cloudfoundry/apt-buildpack.git", "https://github.com/cloudfoundry/python-buildpack.git"]
+  path                 = "${path.module}/${data.external.app_zip.result.path}"
+  source_code_hash     = filesha256("${path.module}/${data.external.app_zip.result.path}")
+  disk_quota           = var.disk_quota
+  memory               = var.app_memory
+  instances            = var.app_instances
+  strategy             = "rolling"
+  timeout              = 600
+  health_check_type    = "port"
+  health_check_timeout = 180
   service_binding {
     service_instance = cloudfoundry_user_provided_service.clam.id
   }
@@ -108,9 +108,9 @@ resource "cloudfoundry_app" "fac_app" {
     # PROXYROUTE            = var.https_proxy
     ENV = "SANDBOX"
     # DISABLE_COLLECTSTATIC = 0
-    DJANGO_BASE_URL = "https://fac-${var.cf_space_name}.app.cloud.gov"
-    AV_SCAN_URL     = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
-    ALLOWED_HOSTS   = "fac-${var.cf_space_name}.app.cloud.gov"
+    DJANGO_BASE_URL    = "https://fac-${var.cf_space_name}.app.cloud.gov"
+    AV_SCAN_URL        = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
+    ALLOWED_HOSTS      = "fac-${var.cf_space_name}.app.cloud.gov"
     REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
   }
 }
