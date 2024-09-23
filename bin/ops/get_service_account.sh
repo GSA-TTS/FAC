@@ -53,11 +53,8 @@ fi
 >&2 echo "Targeting org $org and space $space"
 cf target -o $org -s $space 1>&2
 
-# create user account service
-cf create-service cloud-gov-service-account $role $service 1>&2
-
-# create service key
-cf create-service-key $service ${service}-key 1>&2
+# get service key
+cf service-key $service ${service}-key 1>&2
 
 # output service key to stdout in secrets.auto.tfvars format
 creds=`cf service-key $service ${service}-key | tail -n 7`
