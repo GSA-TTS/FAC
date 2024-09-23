@@ -101,11 +101,10 @@ variable "new_relic_license_key" {
   description = "the license key to use when setting up the New Relic agent"
 }
 
-variable "gitref" {
+variable "branch_name" {
   type        = string
-  description = "gitref for the specific version of scanner that you want to use"
-  default     = "refs/heads/main"
-  # You can also specify a specific commit, eg "7487f882903b9e834a5133a883a88b16fb8b16c9"
+  description = "the heads value for the branch you wish to deploy (default would be main)"
+  # We don't specify a default here because we want to specify a branch to deploy
 }
 
 variable "sam_api_key" {
