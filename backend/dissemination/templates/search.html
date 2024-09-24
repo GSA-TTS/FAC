@@ -9,13 +9,16 @@
             <div class="grid-col-auto audit-search-form">
                 <h3>Filters</h3>
                 <form class="usa-form"
-                      id="search-form"
+                      id="audit-search-form"
                       enctype='multipart/form-data'
                       method="post">
                     {% csrf_token %}
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
-                        <input class="usa-button" type="submit" value="Search" />
+                        <input class="usa-button"
+                               type="submit"
+                               value="Search"
+                               form="audit-search-form" />
                         <input class="usa-button usa-button--unstyled"
                                type="reset"
                                value="Reset Search" />
@@ -54,7 +57,10 @@
 
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
-                        <input class="usa-button" type="submit" value="Search" />
+                        <input class="usa-button"
+                               type="submit"
+                               value="Search"
+                               form="audit-search-form" />
                         <input class="usa-button usa-button--unstyled"
                                type="reset"
                                value="Reset Search" />
@@ -98,8 +104,7 @@
                         {% if results_count <= summary_report_download_limit %}
                             <button class="usa-button display-flex"
                                     formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
-                                    form="search-form"
-                                    value="Search">
+                                    form="audit-search-form">
                                 <svg class="usa-icon margin-right-1 flex-align-self-center"
                                     aria-hidden="true"
                                     role="img">
