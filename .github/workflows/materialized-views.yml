@@ -2,8 +2,8 @@
 name: Run the Materialized Views Function
 on:
   schedule:
-    # Invoke at 6 UTC EST every day
-    - cron: '0 6 * * *'
+    # Invoke at 7 UTC, 2 EST every day
+    - cron: '0 7 * * *'
   workflow_dispatch:
     inputs:
       environment:
