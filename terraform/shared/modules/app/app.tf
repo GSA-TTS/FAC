@@ -59,7 +59,7 @@ resource "cloudfoundry_app" "fac_app" {
   memory               = var.app_memory
   instances            = var.app_instances
   strategy             = "rolling"
-  timeout              = 600
+  timeout              = 900
   health_check_type    = "port"
   health_check_timeout = 180
   service_binding {
