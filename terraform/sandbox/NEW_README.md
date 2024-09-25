@@ -67,3 +67,6 @@ django_secret_login_key = ""
 
 Next, run `./plan.sh` script. You should see it creating ~20 resources.
 Finally, run `./apply.sh` script and wait.
+
+### Discoveries:
+- It was discovered that the compiled css assets in the public s3 must be in the `backend/static/` folder when collectstatic is being run. Due to this, when it is run via github actions.. the `/static/compiled/` folder exists on the local file system, since the github runner does these steps, and handles keeping them in the local file system. To mitigate this for the terraform, we handle this in the `prepare_app.sh` script.
