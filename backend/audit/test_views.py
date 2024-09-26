@@ -223,7 +223,7 @@ class MySubmissionsViewTests(TestCase):
 
     def test_redirect_if_not_logged_in(self):
         result = self.client.get(SUBMISSIONS_PATH)
-        self.assertAlmostEquals(result.status_code, 302)
+        self.assertAlmostEqual(result.status_code, 302)
 
     def test_no_submissions_returns_empty_list(self):
         self.client.force_login(user=self.user)
