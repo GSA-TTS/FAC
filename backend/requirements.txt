@@ -247,7 +247,9 @@ django==5.1 \
     #   django-cors-headers
     #   django-csp
     #   django-dbbackup
+    #   django-filter
     #   django-storages
+    #   django-viewflow
     #   djangorestframework
     #   djangorestframework-simplejwt
 django-cache-url==3.4.5 \
@@ -266,6 +268,12 @@ django-dbbackup==4.1.0 \
     --hash=sha256:c411d38d0f8e60ab3254017278c14ebd75d4001b5634fc73be7fbe8a5260583b \
     --hash=sha256:c539b5246b429a22a8efadbab3719ee6b8eda45c66c4ff6592056c590d51c782
     # via -r ./requirements/requirements.in
+django-filter==24.3 \
+    --hash=sha256:c4852822928ce17fb699bcfccd644b3574f1a2d80aeb2b4ff4f16b02dd49dc64 \
+    --hash=sha256:d8ccaf6732afd21ca0542f6733b11591030fa98669f8d15599b358e24a2cd9c3
+    # via
+    #   -r ./requirements/requirements.in
+    #   django-viewflow
 django-fsm==3.0.0 \
     --hash=sha256:0112bcac573ad14051cf8ebe73bf296b6d5409f093e5f1677eb16e2196e263b3 \
     --hash=sha256:fa28f84f47eae7ce9247585ac6c1895e4ada08efff93fb243a59e9ff77b2d4ec
@@ -273,6 +281,10 @@ django-fsm==3.0.0 \
 django-storages[boto3]==1.14.2 \
     --hash=sha256:1db759346b52ada6c2efd9f23d8241ecf518813eb31db9e2589207174f58f6ad \
     --hash=sha256:51b36af28cc5813b98d5f3dfe7459af638d84428c8df4a03990c7d74d1bea4e5
+    # via -r ./requirements/requirements.in
+django-viewflow==2.2.7 \
+    --hash=sha256:38c8493dc25efc49df2003777b951980b773b8bb8e31926dd591e9fe0e8acb91 \
+    --hash=sha256:c81a91d55e235c9bd75dc26bbc26dcfdda5f21eb97a381537040d9b7b07221cc
     # via -r ./requirements/requirements.in
 djangorestframework==3.15.2 \
     --hash=sha256:2b8871b062ba1aefc2de01f773875441a961fefbf79f5eed1e32b2f096944b20 \

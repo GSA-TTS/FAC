@@ -10,8 +10,9 @@ from audit.mixins import (
 )
 from audit.models import (
     SingleAuditChecklist,
-    SubmissionEvent,
 )
+from audit.models.models import STATUS
+from audit.models.viewflow import sac_transition
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +31,9 @@ class UnlockAfterCertificationView(
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             target_statuses = [
-                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-                SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
-                SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                STATUS.READY_FOR_CERTIFICATION,
+                STATUS.AUDITOR_CERTIFIED,
+                STATUS.AUDITEE_CERTIFIED,
             ]
             context = {
                 "auditee_uei": sac.auditee_uei,
@@ -61,12 +62,8 @@ class UnlockAfterCertificationView(
                 form.data.get("unlock_after_certification") in acceptable
             )
             if form.is_valid() and should_go_to_in_progress:
-                sac.transition_to_in_progress_again()
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.UNLOCKED_AFTER_CERTIFICATION,
-                )
-                logger.info("Submission unlocked after certification")
+                if sac_transition(request, sac, transition_to=STATUS.IN_PROGRESS):
+                    logger.info("Submission unlocked after certification")
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 

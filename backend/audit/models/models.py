@@ -1,4 +1,4 @@
-from datetime import datetime, timezone, timedelta
+from datetime import timedelta
 from itertools import chain
 import json
 import logging
@@ -12,8 +12,6 @@ from django.core.exceptions import ValidationError
 
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone as django_timezone
-
-from django_fsm import FSMField, transition
 
 import audit.cross_validation
 from audit.cross_validation.naming import SECTION_NAMES
@@ -161,6 +159,20 @@ class LateChangeError(Exception):
     """
 
 
+class STATUS:
+    """
+    The possible states of a submission.
+    """
+
+    IN_PROGRESS = "in_progress"
+    READY_FOR_CERTIFICATION = "ready_for_certification"
+    AUDITOR_CERTIFIED = "auditor_certified"
+    AUDITEE_CERTIFIED = "auditee_certified"
+    CERTIFIED = "certified"
+    SUBMITTED = "submitted"
+    DISSEMINATED = "disseminated"
+
+
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
     """
     Monolithic Single Audit Checklist.
@@ -185,7 +197,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         in progress isn't being altered; skip this if we know this submission is
         in progress.
         """
-        if self.submission_status != self.STATUS.IN_PROGRESS:
+        if self.submission_status != STATUS.IN_PROGRESS:
             try:
                 self._reject_late_changes()
             except LateChangeError as err:
@@ -278,18 +290,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """Return the friendly version of submission_status."""
         return dict(self.STATUS_CHOICES)[self.submission_status]
 
+    def get_statuses(self) -> type[STATUS]:
+        """Return all possible statuses."""
+        return STATUS
+
     # Constants:
-    class STATUS:
-        """The states that a submission can be in."""
-
-        IN_PROGRESS = "in_progress"
-        READY_FOR_CERTIFICATION = "ready_for_certification"
-        AUDITOR_CERTIFIED = "auditor_certified"
-        AUDITEE_CERTIFIED = "auditee_certified"
-        CERTIFIED = "certified"
-        SUBMITTED = "submitted"
-        DISSEMINATED = "disseminated"
-
     STATUS_CHOICES = (
         (STATUS.IN_PROGRESS, "In Progress"),
         (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
@@ -324,7 +329,9 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # 0. Meta data
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
-    submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
+    submission_status = models.CharField(
+        default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES
+    )
     data_source = models.CharField(default="GSAFAC")
 
     # implement an array of tuples as two arrays since we can only have simple fields inside an array
@@ -502,134 +509,24 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
         return result
 
-    @transition(
-        field="submission_status",
-        source=STATUS.IN_PROGRESS,
-        target=STATUS.READY_FOR_CERTIFICATION,
-    )
-    def transition_to_ready_for_certification(self):
-        """
-        The permission checks verifying that the user attempting to do this has
-        the appropriate privileges will be done at the view level.
-        """
-        self.transition_name.append(SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION)
-        self.transition_date.append(datetime.now(timezone.utc))
-
-    @transition(
-        field="submission_status",
-        source=[
-            STATUS.READY_FOR_CERTIFICATION,
-            STATUS.AUDITOR_CERTIFIED,
-            STATUS.AUDITEE_CERTIFIED,
-        ],
-        target=STATUS.IN_PROGRESS,
-    )
-    def transition_to_in_progress_again(self):
-        """
-        The permission checks verifying that the user attempting to do this has
-        the appropriate privileges will be done at the view level.
-        """
-
-        # null out any existing certifications on this submission
-        self.auditor_certification = None
-        self.auditee_certification = None
-
-        self.transition_name.append(SingleAuditChecklist.STATUS.IN_PROGRESS)
-        self.transition_date.append(datetime.now(timezone.utc))
-
-    @transition(
-        field="submission_status",
-        source=STATUS.READY_FOR_CERTIFICATION,
-        target=STATUS.AUDITOR_CERTIFIED,
-    )
-    def transition_to_auditor_certified(self):
-        """
-        The permission checks verifying that the user attempting to do this has
-        the appropriate privileges will be done at the view level.
-        """
-        self.transition_name.append(SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED)
-        self.transition_date.append(datetime.now(timezone.utc))
-
-    @transition(
-        field="submission_status",
-        source=STATUS.AUDITOR_CERTIFIED,
-        target=STATUS.AUDITEE_CERTIFIED,
-    )
-    def transition_to_auditee_certified(self):
-        """
-        The permission checks verifying that the user attempting to do this has
-        the appropriate privileges will be done at the view level.
-        """
-        self.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
-        self.transition_date.append(datetime.now(timezone.utc))
-
-    @transition(
-        field="submission_status",
-        source=STATUS.AUDITEE_CERTIFIED,
-        target=STATUS.SUBMITTED,
-    )
-    def transition_to_submitted(self):
-        """
-        The permission checks verifying that the user attempting to do this has
-        the appropriate privileges will be done at the view level.
-        """
-        self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(datetime.now(timezone.utc))
-
-    @transition(
-        field="submission_status",
-        source=STATUS.SUBMITTED,
-        target=STATUS.DISSEMINATED,
-    )
-    def transition_to_disseminated(self):
-        self.transition_name.append(SingleAuditChecklist.STATUS.DISSEMINATED)
-        self.transition_date.append(datetime.now(timezone.utc))
-
-    @transition(
-        field="submission_status",
-        source=[
-            STATUS.READY_FOR_CERTIFICATION,
-            STATUS.AUDITOR_CERTIFIED,
-            STATUS.AUDITEE_CERTIFIED,
-            STATUS.CERTIFIED,
-        ],
-        target=STATUS.AUDITEE_CERTIFIED,
-    )
-    def transition_to_in_progress(self):
-        """
-        Any edit to a submission in the following states should result in it
-        moving back to STATUS.IN_PROGRESS:
-
-        +   STATUS.READY_FOR_CERTIFICATION
-        +   STATUS.AUDITOR_CERTIFIED
-        +   STATUS.AUDITEE_CERTIFIED
-        +   STATUS.CERTIFIED
-
-        For the moment we're not trying anything fancy like catching changes at
-        the model level, and will again leave it up to the views to track that
-        changes have been made at that point.
-        """
-        self.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
-        self.transition_date.append(datetime.now(timezone.utc))
-
     @property
     def is_auditee_certified(self):
         return self.submission_status in [
-            SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
-            SingleAuditChecklist.STATUS.CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.CERTIFIED,
         ]
 
     @property
     def is_auditor_certified(self):
         return self.submission_status in [
-            SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
-            SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
-            SingleAuditChecklist.STATUS.CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.CERTIFIED,
         ]
 
     @property
     def is_submitted(self):
-        return self.submission_status in [SingleAuditChecklist.STATUS.DISSEMINATED]
+        return self.submission_status in [STATUS.DISSEMINATED]
 
     def get_transition_date(self, status):
         index = self.transition_name.index(status)
@@ -659,7 +556,7 @@ class ExcelFile(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        if self.sac.submission_status != SingleAuditChecklist.STATUS.IN_PROGRESS:
+        if self.sac.submission_status != STATUS.IN_PROGRESS:
             raise LateChangeError("Attemtped Excel file upload")
 
         self.filename = f"{self.sac.report_id}--{self.form_section}.xlsx"
@@ -706,7 +603,7 @@ class SingleAuditReportFile(models.Model):
     def save(self, *args, **kwargs):
         report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
         self.filename = f"{report_id}.pdf"
-        if self.sac.submission_status != self.sac.STATUS.IN_PROGRESS:
+        if self.sac.submission_status != STATUS.IN_PROGRESS:
             raise LateChangeError("Attempted PDF upload")
 
         event_user = kwargs.pop("event_user", None)

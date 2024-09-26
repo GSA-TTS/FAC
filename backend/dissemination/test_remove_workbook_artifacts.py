@@ -1,6 +1,6 @@
 from django.test import TestCase
 from unittest.mock import patch
-from audit.models.models import ExcelFile, SingleAuditChecklist
+from audit.models.models import ExcelFile, SingleAuditChecklist, STATUS
 from model_bakery import baker
 
 from dissemination.remove_workbook_artifacts import (
@@ -16,7 +16,7 @@ class RemovedWorkbookArtifactsTestCase(TestCase):
     def test_removed_workbook_artifacts_success(self, mock_delete_files_in_bulk):
         sac = baker.make(
             SingleAuditChecklist,
-            submission_status=SingleAuditChecklist.STATUS.IN_PROGRESS,
+            submission_status=STATUS.IN_PROGRESS,
             report_id="test_report_id",
         )
 
@@ -44,7 +44,7 @@ class RemovedWorkbookArtifactsTestCase(TestCase):
     def test_removed_workbook_artifacts_no_files(self, mock_delete_files_in_bulk):
         sac = baker.make(
             SingleAuditChecklist,
-            submission_status=SingleAuditChecklist.STATUS.IN_PROGRESS,
+            submission_status=STATUS.IN_PROGRESS,
             report_id="test_report_id",
         )
 
@@ -121,8 +121,8 @@ class DeleteWorkbooksTestCase(TestCase):
             ExcelFile, sac=self.sac_2, form_section="section_2"
         )
         # Update submission status to DISSEMINATED
-        self.sac_1.submission_status = SingleAuditChecklist.STATUS.DISSEMINATED
-        self.sac_2.submission_status = SingleAuditChecklist.STATUS.DISSEMINATED
+        self.sac_1.submission_status = STATUS.DISSEMINATED
+        self.sac_2.submission_status = STATUS.DISSEMINATED
         self.sac_1.save()
         self.sac_2.save()
 
