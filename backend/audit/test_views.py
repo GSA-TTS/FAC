@@ -228,7 +228,7 @@ class MySubmissionsViewTests(TestCase):
     def test_no_submissions_returns_empty_list(self):
         self.client.force_login(user=self.user)
         data = MySubmissions.fetch_my_submissions(self.user)
-        self.assertEquals(len(data), 0)
+        self.assertEqual(len(data), 0)
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
         self.client.force_login(user=self.user)
@@ -259,7 +259,7 @@ class MySubmissionsViewTests(TestCase):
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
         data = MySubmissions.fetch_my_submissions(self.user2)
-        self.assertEquals(len(data), 0)
+        self.assertEqual(len(data), 0)
 
 
 class EditSubmissionViewTests(TestCase):

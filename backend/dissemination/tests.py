@@ -29,12 +29,12 @@ class APIViewTests(TestCase):
         response = requests.get(
             self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_api_fails_without_jwt(self):
         # We must pass a properly signed JWT to access the API
         response = requests.get(self.api_url, timeout=10)
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_api_fails_with_bad_jwt(self):
         # We must pass a properly signed JWT to access the API
@@ -46,7 +46,7 @@ class APIViewTests(TestCase):
         response = requests.get(
             self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
         )
-        self.assertEquals(response.status_code, 401)
+        self.assertEqual(response.status_code, 401)
 
     def test_api_fails_with_wrong_role(self):
         # We must pass a properly signed JWT to access the API
@@ -58,7 +58,7 @@ class APIViewTests(TestCase):
         response = requests.get(
             self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
         )
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
 
 class TemplateTagTests(TestCase):
@@ -69,8 +69,8 @@ class TemplateTagTests(TestCase):
         """
         sample_field = "report_id"
         converted_sample_field = field_name_to_label(sample_field)
-        self.assertEquals(converted_sample_field, "Report Id")
+        self.assertEqual(converted_sample_field, "Report Id")
 
         sample_field = "auditee_contact_title"
         converted_sample_field = field_name_to_label(sample_field)
-        self.assertEquals(converted_sample_field, "Auditee Contact Title")
+        self.assertEqual(converted_sample_field, "Auditee Contact Title")
