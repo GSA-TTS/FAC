@@ -14,6 +14,7 @@ source tools/migrate_app_tables.sh
 source tools/api_standup.sh
 source tools/run_collectstatic.sh
 source tools/seed_cog_baseline.sh
+source tools/materialized_views.sh
 
 #####
 # SETUP THE CGOV ENVIRONMENT
@@ -51,6 +52,9 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # Setup tables for cog/over assignments
     seed_cog_baseline
     gonogo "seed_cog_baseline"
+
+    materialized_views
+    gonogo "materialized_views"
 
     echo "SANDBOX APP DEPLOYMENT TEST"
 fi
