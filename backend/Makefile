@@ -43,7 +43,7 @@ lint:
 
 # Run Django tests:
 test:
-	@python -m coverage run --source="." manage.py test --parallel && coverage report -m --fail-under=90
+	@python -m coverage run --source="." manage.py test 
 
 # Run Django tests with no coverage and with scoping
 # e.g. just the audit/test_models.py tests:

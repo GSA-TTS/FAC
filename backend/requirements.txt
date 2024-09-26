@@ -324,6 +324,7 @@ django==5.1 \
     #   django-storages
     #   djangorestframework
     #   djangorestframework-simplejwt
+    #   model-bakery
 django-cache-url==3.4.5 \
     --hash=sha256:5f350759978483ab85dc0e3e17b3d53eed3394a28148f6bf0f53d11d0feb5b3c \
     --hash=sha256:eb9fb194717524348c95cad9905b70b647452741c1d9e481fac6d2125f0ad917
@@ -591,6 +592,10 @@ marshmallow==3.21.1 \
     --hash=sha256:4e65e9e0d80fc9e609574b9983cf32579f305c718afb30d7233ab818571768c3 \
     --hash=sha256:f085493f79efb0644f270a9bf2892843142d80d7174bbbd2f3713f2a589dc633
     # via environs
+model-bakery==1.19.5 \
+    --hash=sha256:09ecbbf124d32614339581b642c82ac4a73147442f598c7bad23eece24187e5c \
+    --hash=sha256:37cece544a33f8899ed8f0488cd6a9d2b0b6925e7b478a4ff2786dece8c63745
+    # via -r ./requirements/requirements.in
 newrelic==9.11.0 \
     --hash=sha256:02eab15af4a08b870bcfdbc56390ecbb9dcacd144fe77f39a26d1be207bd30f0 \
     --hash=sha256:0d43a0891bf71333f6a6253cf87dea2c9009e22699a2acfd93608125a33b1936 \
