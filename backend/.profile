@@ -26,8 +26,8 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # API TEARDOWN
     # API has to be deprecated/removed before migration, because
     # of tight coupling between schema/views and the dissemination tables
-    #api_teardown
-    #gonogo "api_teardown"
+    api_teardown
+    gonogo "api_teardown"
 
     #####
     # MIGRATE APP TABLES
@@ -37,8 +37,8 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     #####
     # API STANDUP
     # Standup the API, which may depend on migration changes
-    #api_standup
-    #gonogo "api_standup"
+    api_standup
+    gonogo "api_standup"
 
     #####
     # COLLECT STATIC
