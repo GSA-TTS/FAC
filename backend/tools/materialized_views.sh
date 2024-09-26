@@ -1,6 +1,6 @@
 source tools/util_startup.sh
 
-function run_collectstatic {
+function materialized_views {
     startup_log "RUN_MATERIALIZEDVIEWS" "BEGIN"
     python manage.py materialized_views --create &&
     local result=$?
