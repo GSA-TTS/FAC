@@ -11,4 +11,4 @@ class MigrationInspectionRecordTests(TestCase):
         self.assertIsNotNone(migration_inspection_record)
         baker.make(MigrationInspectionRecord).save()
         migration_inspection_record = MigrationInspectionRecord.objects.all()
-        self.assertEquals(len(migration_inspection_record), 1)
+        self.assertEqual(len(migration_inspection_record), 1)

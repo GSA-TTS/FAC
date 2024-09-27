@@ -49,7 +49,7 @@ class TestAdminAPI(TestCase):
                 added = True
             if "removed" in o["event"]:
                 removed = True
-        self.assertEquals(added and removed, True)
+        self.assertEqual(added and removed, True)
 
     # https://stackoverflow.com/questions/2511679/python-number-of-rows-affected-by-cursor-executeselect
     def test_users_exist_in_perms_table(self):
@@ -82,7 +82,7 @@ class TestAdminAPI(TestCase):
         response = requests.get(
             self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_assert_fails_with_bad_user_id(self):
         # We must pass a properly signed JWT to access the API
@@ -104,8 +104,8 @@ class TestAdminAPI(TestCase):
             json={"email": "not.a.test.user@fac.gsa.gov"},
         )
         print("response", response.text)
-        self.assertEquals(response.text, "false")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.text, "false")
+        self.assertEqual(response.status_code, 200)
 
     def test_cannot_find_without_access(self):
         # We must pass a properly signed JWT to access the API
@@ -126,8 +126,8 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"email": "test.user@fac.gsa.gov"},
         )
-        self.assertEquals(response.text, "true")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.text, "true")
+        self.assertEqual(response.status_code, 200)
 
         # With the right permissions, I can check if things are present
         # via the associated view.
@@ -146,8 +146,8 @@ class TestAdminAPI(TestCase):
         for o in objects:
             if "test.user@fac.gsa.gov" in o["email"]:
                 found = True
-        self.assertEquals(objects, [])
-        self.assertEquals(found, False)
+        self.assertEqual(objects, [])
+        self.assertEqual(found, False)
 
         # Now, remove the user, and find them absent.
         query_url = self.api_url + "/rpc/remove_tribal_access_email"
@@ -163,8 +163,8 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"email": "test.user@fac.gsa.gov"},
         )
-        self.assertEquals(response.text, "true")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.text, "true")
+        self.assertEqual(response.status_code, 200)
 
     def test_find_gsa_users_in_table(self):
         # We must pass a properly signed JWT to access the API
@@ -185,8 +185,8 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"email": "test.user@fac.gsa.gov"},
         )
-        self.assertEquals(response.text, "true")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.text, "true")
+        self.assertEqual(response.status_code, 200)
 
         # With the right permissions, I can check if things are present
         # via the associated view.
@@ -204,7 +204,7 @@ class TestAdminAPI(TestCase):
         for o in response.json():
             if "test.user@fac.gsa.gov" in o["email"]:
                 found = True
-        self.assertEquals(found, True)
+        self.assertEqual(found, True)
 
         # Now, remove the user, and find them absent.
         query_url = self.api_url + "/rpc/remove_tribal_access_email"
@@ -220,7 +220,7 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"email": "test.user@fac.gsa.gov"},
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         query_url = self.api_url + "/tribal_access"
         response = requests.get(
@@ -236,7 +236,7 @@ class TestAdminAPI(TestCase):
         for o in response.json():
             if "test.user@fac.gsa.gov" in o["email"]:
                 found = True
-        self.assertEquals(found, False)
+        self.assertEqual(found, False)
 
     def test_find_many_gsa_users_in_table(self):
         all_emails = [
@@ -261,8 +261,8 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"emails": all_emails},
         )
-        self.assertEquals(response.text, "true")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.text, "true")
+        self.assertEqual(response.status_code, 200)
 
         # With the right permissions, I can check if things are present
         # via the associated view.
@@ -282,7 +282,7 @@ class TestAdminAPI(TestCase):
             for o in response.json():
                 if email in o["email"]:
                     found += 1
-        self.assertEquals(found, len(all_emails))
+        self.assertEqual(found, len(all_emails))
 
         # Now, remove the user, and find them absent.
         query_url = self.api_url + "/rpc/remove_tribal_access_emails"
@@ -298,7 +298,7 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"emails": all_emails},
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         query_url = self.api_url + "/tribal_access"
         response = requests.get(
@@ -316,7 +316,7 @@ class TestAdminAPI(TestCase):
             for o in response.json():
                 if email in o["email"]:
                     found += 1
-        self.assertEquals(found, 0)
+        self.assertEqual(found, 0)
 
         self.admin_api_events_exist()
 
@@ -339,8 +339,8 @@ class TestAdminAPI(TestCase):
                 "key_id": str(uuid.uuid4()),
             },
         )
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json()["result"], "success")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["result"], "success")
 
     def test_remove_tribal_api_key_access(self):
         flynn_email = f"{uuid.uuid4()}@fac.gsa.gov"
@@ -361,8 +361,8 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"email": flynn_email, "key_id": flynn_id},
         )
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json()["result"], "success")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["result"], "success")
 
         # Try removing the person we just added
         query_url = self.api_url + "/rpc/remove_tribal_api_key_access"
@@ -380,8 +380,8 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"email": flynn_email, "key_id": flynn_id},
         )
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json()["result"], "success")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["result"], "success")
 
         # Try removing them again
         query_url = self.api_url + "/rpc/remove_tribal_api_key_access"
@@ -399,5 +399,5 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"email": flynn_email, "key_id": flynn_id},
         )
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json()["result"], "failure")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["result"], "failure")
