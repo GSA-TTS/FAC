@@ -63,6 +63,7 @@ services:
         condition: service_started
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
+      SNAPSHOT_URL: postgres://postgres@db2/postgres
       POSTGREST_URL: http://api:3000
       DJANGO_DEBUG: true
       SAM_API_KEY: ${SAM_API_KEY}
@@ -129,7 +130,7 @@ services:
       PGRST_DB_SCHEMAS: "api_v1_0_3, api_v1_1_0, admin_api_v1_1_0"
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
       # Enable this to inspect the DB plans for queries via EXPLAIN
-      PGRST_DB_PLAN_ENABLED: ${PGRST_DB_PLAN_ENABLED:-false}
+      PGRST_DB_PLAN_ENABLED: 1
     depends_on:
       db:
         condition: service_healthy

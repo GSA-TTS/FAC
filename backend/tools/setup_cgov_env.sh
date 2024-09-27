@@ -1,5 +1,7 @@
 source tools/util_startup.sh
 
+# Aliases need to be outside of function scope
+
 function setup_cgov_env {
     set -e
 
@@ -38,5 +40,12 @@ function setup_cgov_env {
     export NEW_RELIC_HOST="gov-collector.newrelic.com"
     # https://docs.newrelic.com/docs/apm/agents/python-agent/configuration/python-agent-configuration/#proxy
     export NEW_RELIC_PROXY_HOST="$https_proxy"
+
+    # For database work
+    export FAC_DB_URI="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "fac-db" ".[][] | select(.name == \$service_name) | .credentials.uri")"
+    export FAC_SNAPSHOT_URI="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "fac-snapshot-db" ".[][] | select(.name == \$service_name) | .credentials.uri")"
+    # https://stackoverflow.com/questions/37072245/check-return-status-of-psql-command-in-unix-shell-scripting
+    export PSQL_EXE='/home/vcap/deps/0/apt/usr/lib/postgresql/*/bin/psql'
+
     return 0
 }

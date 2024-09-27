@@ -1,0 +1,316 @@
+# This uses an env var called PG to 
+# set the connection string.
+source: PG
+target: PG
+env:
+  SLING_ALLOW_EMPTY: true
+
+streams:
+  # The first table we create is the general table. All of the 
+  # general table is public data, so we copy it wholesale.
+  public.dissemination_general:
+    mode: full-refresh
+    object: public_data.general
+    sql: |
+      -- All of the general table is public data.
+      SELECT
+        -- every table starts with report_id, UEI, and year
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        gen.agencies_with_prior_findings,
+        gen.audit_period_covered,
+        gen.audit_type,
+        gen.auditee_address_line_1,
+        gen.auditee_certified_date,
+        gen.auditee_certify_name,
+        gen.auditee_certify_title,
+        gen.auditee_city,
+        gen.auditee_contact_name,
+        gen.auditee_contact_title,
+        gen.auditee_ein,
+        gen.auditee_email,
+        gen.auditee_name,
+        gen.auditee_phone,
+        gen.auditee_state,
+        gen.auditee_zip,
+        gen.auditor_address_line_1,
+        gen.auditor_certified_date,
+        gen.auditor_certify_name,
+        gen.auditor_certify_title,
+        gen.auditor_city,
+        gen.auditor_contact_name,
+        gen.auditor_contact_title,
+        gen.auditor_country,
+        gen.auditor_ein,
+        gen.auditor_email,
+        gen.auditor_firm_name,
+        gen.auditor_foreign_address,
+        gen.auditor_phone,
+        gen.auditor_state,
+        gen.auditor_zip,
+        gen.cognizant_agency,
+        gen.data_source,
+        gen.date_created,
+        gen.dollar_threshold,
+        gen.entity_type,
+        gen.fac_accepted_date,
+        gen.fy_end_date,
+        gen.fy_start_date,
+        gen.gaap_results,
+        gen.is_additional_ueis,
+        gen.is_aicpa_audit_guide_included,
+        gen.is_going_concern_included,
+        gen.is_internal_control_deficiency_disclosed,
+        gen.is_internal_control_material_weakness_disclosed,
+        gen.is_low_risk_auditee,
+        gen.is_material_noncompliance_disclosed,
+        CASE EXISTS
+          (
+            SELECT 
+              ein.report_id 
+            FROM 
+              dissemination_additionalein ein 
+            WHERE 
+            ein.report_id = gen.report_id
+          )
+          WHEN FALSE THEN 'No'
+          ELSE 'Yes'
+        END AS is_multiple_eins,
+        gen.is_public,
+        CASE EXISTS
+          (
+            SELECT 
+              aud.report_id 
+            FROM 
+              dissemination_secondaryauditor aud 
+            WHERE 
+              aud.report_id = gen.report_id
+          )
+          WHEN FALSE THEN 'No'
+          ELSE 'Yes'
+        END AS is_secondary_auditors,
+        gen.is_sp_framework_required,
+        gen.number_months,
+        gen.oversight_agency,
+        gen.ready_for_certification_date,
+        gen.sp_framework_basis,
+        gen.sp_framework_opinions,
+        gen.submitted_date,
+        gen.total_amount_expended,
+        gen.type_audit_code
+      FROM
+          public.dissemination_general gen
+      ORDER BY gen.id
+
+  # All additional EINs are public.
+  public.additional_eins:
+    mode: full-refresh
+    object: public_data.additional_eins
+    sql: |
+      SELECT
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        gen.fac_accepted_date,
+        ---
+        ein.additional_ein
+      FROM
+          public_data.general gen,
+          public.dissemination_additionalein ein
+      WHERE
+          gen.report_id = ein.report_id
+      ORDER BY ein.id
+
+  # All of the additional UEI info is public info.
+  public.dissemination_additional_ueis:
+    mode: full-refresh
+    object: public_data.additional_ueis
+    sql: |
+      SELECT
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        gen.fac_accepted_date,
+        ---
+        uei.additional_uei
+      FROM
+        public_data.general gen,
+        public.dissemination_additionaluei uei
+      WHERE
+        gen.report_id = uei.report_id
+      ORDER BY uei.id
+
+  # Corrective action plans are NOT always public.
+  public.dissemination_corrective_action_plan:
+    mode: full-refresh
+    object: public_data.corrective_action_plans
+    sql: |
+      SELECT
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        gen.fac_accepted_date,
+        ---
+        ct.contains_chart_or_table,
+        ct.finding_ref_number,
+        ct.planned_action
+      FROM
+        public.dissemination_captext ct,
+        public_data.general gen
+      WHERE
+        ct.report_id = gen.report_id
+        AND
+        -- Only include the public corrective action plans.
+        gen.is_public = true
+      ORDER BY ct.id
+
+  # All Federal award data is public.
+  public.dissemination_federalaward:
+    mode: full-refresh
+    object: public_data.federal_awards
+    sql: |
+      SELECT 
+        dg.report_id,
+        dg.auditee_uei,
+        dg.audit_year,
+        dg.fac_accepted_date,
+        ---
+        award.additional_award_identification,
+        award.amount_expended,
+        award.audit_report_type,
+        award.award_reference,
+        award.cluster_name,
+        award.cluster_total,
+        award.federal_agency_prefix,
+        award.federal_award_extension,
+        award.federal_program_name,
+        award.federal_program_total,
+        award.findings_count,
+        award.is_direct,
+        award.is_loan,
+        award.is_major,
+        award.is_passthrough_award,
+        award.loan_balance,
+        award.other_cluster_name,
+        award.passthrough_amount,
+        award.state_cluster_name
+      FROM
+        public.dissemination_federalaward award,
+        public_data.general dg
+      WHERE
+        award.report_id = dg.report_id
+      ORDER BY award.id
+
+  # The findings table is public.
+  public.dissemination_findings:
+    mode: full-refresh
+    object: public_data.findings
+    sql: |
+      SELECT
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        gen.fac_accepted_date,
+        ---
+        finding.award_reference,
+        finding.is_material_weakness,
+        finding.is_modified_opinion,
+        finding.is_other_findings,
+        finding.is_other_matters,
+        finding.is_questioned_costs,
+        finding.is_repeat_finding,
+        finding.is_significant_deficiency,
+        finding.prior_finding_ref_numbers,
+        finding.reference_number,
+        finding.type_requirement
+      FROM
+        public.dissemination_finding finding,
+        public_data.general gen
+      WHERE
+        finding.report_id = gen.report_id
+      ORDER BY finding.id
+
+  # The notes to SEFA are NOT all public.
+  public.dissemination_notes:
+    mode: full-refresh
+    object: public_data.notes_to_sefa
+    sql: |
+      SELECT
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        gen.fac_accepted_date,
+        ---
+        note.accounting_policies,
+        note.contains_chart_or_table,
+        note.content,
+        note.is_minimis_rate_used,
+        note.note_title as title,
+        note.rate_explained
+      FROM
+          public_data.general gen,
+          public.dissemination_note note
+      WHERE
+          note.report_id = gen.report_id
+          AND
+          -- Some notes are not public.
+          gen.is_public = true
+      ORDER BY note.id
+
+  # All passthrough information is public.
+  public.dissemination_passthrough:
+    mode: full-refresh
+    object: public_data.passthrough
+    sql: |
+      SELECT
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        gen.fac_accepted_date,
+        ---
+        pass.award_reference,
+        pass.passthrough_id,
+        pass.passthrough_name
+      FROM
+          public_data.general gen,
+          public.dissemination_passthrough pass
+      WHERE
+          gen.report_id = pass.report_id
+      ORDER BY pass.id
+
+  # All secondary auditor info is public.
+  public.secondary_auditors:
+    mode: full-refresh
+    object: public_data.secondary_auditors
+    sql: |
+      SELECT
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        gen.fac_accepted_date,
+        ---
+        sa.address_city,
+        sa.address_state,
+        sa.address_street,
+        sa.address_zipcode,
+        sa.auditor_ein,
+        sa.auditor_name,
+        sa.contact_email,
+        sa.contact_name,
+        sa.contact_phone,
+        sa.contact_title
+      FROM
+          public_data.general gen,
+          public.dissemination_secondaryauditor sa
+      WHERE
+          sa.report_id = gen.report_id
+      ORDER BY sa.id
+
+
+
+# SELECT column_name
+# FROM information_schema.columns
+# WHERE table_schema = 'public'
+# AND table_name = 'dissemination_general'
+# AND column_name NOT IN ('id');
