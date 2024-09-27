@@ -574,14 +574,14 @@ class AccessListSerializerTests(TestCase):
 
         serializer = AccessListSerializer(access)
 
-        self.assertEquals(serializer.data["auditee_uei"], access.sac.auditee_uei)
-        self.assertEquals(
+        self.assertEqual(serializer.data["auditee_uei"], access.sac.auditee_uei)
+        self.assertEqual(
             serializer.data["auditee_fiscal_period_end"],
             access.sac.auditee_fiscal_period_end,
         )
-        self.assertEquals(serializer.data["auditee_name"], access.sac.auditee_name)
-        self.assertEquals(serializer.data["report_id"], access.sac.report_id)
-        self.assertEquals(
+        self.assertEqual(serializer.data["auditee_name"], access.sac.auditee_name)
+        self.assertEqual(serializer.data["report_id"], access.sac.report_id)
+        self.assertEqual(
             serializer.data["submission_status"], access.sac.submission_status
         )
-        self.assertEquals(serializer.data["role"], access.role)
+        self.assertEqual(serializer.data["role"], access.role)

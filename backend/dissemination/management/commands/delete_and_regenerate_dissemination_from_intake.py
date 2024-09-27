@@ -13,6 +13,7 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 from audit.models import SingleAuditChecklist
+from audit.models.models import STATUS
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +57,8 @@ class Command(BaseCommand):
         # Now, re-run dissemination for everything
         # in the intake tables.
         regen_statuses = (
-            SingleAuditChecklist.STATUS.DISSEMINATED,
-            SingleAuditChecklist.STATUS.SUBMITTED,
+            STATUS.DISSEMINATED,
+            STATUS.SUBMITTED,
         )
 
         for sac in SingleAuditChecklist.objects.all():

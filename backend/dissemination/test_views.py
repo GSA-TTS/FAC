@@ -533,7 +533,7 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         )
 
         response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_private_summary(self):
         """
@@ -545,7 +545,7 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         )
 
         response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_permissioned_private_summary(self):
         """
@@ -562,7 +562,7 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         self.client.force_login(user)
         response = self.client.get(url)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_summary_context(self):
         """
@@ -582,25 +582,25 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         )
 
         response = self.client.get(url)
-        self.assertEquals(
+        self.assertEqual(
             response.context["data"]["Awards"][0]["additional_award_identification"],
             award.additional_award_identification,
         )
-        self.assertEquals(
+        self.assertEqual(
             response.context["data"]["Audit Findings"][0]["reference_number"],
             finding.reference_number,
         )
-        self.assertEquals(
+        self.assertEqual(
             response.context["data"]["Audit Findings Text"][0]["finding_ref_number"],
             finding_text.finding_ref_number,
         )
-        self.assertEquals(
+        self.assertEqual(
             response.context["data"]["Corrective Action Plan"][0][
                 "contains_chart_or_table"
             ],
             cap_text.contains_chart_or_table,
         )
-        self.assertEquals(
+        self.assertEqual(
             response.context["data"]["Notes to SEFA"][0]["accounting_policies"],
             note.accounting_policies,
         )
@@ -622,7 +622,7 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         )
 
         response = self.client.get(url)
-        self.assertEquals(response.context["is_sf_sac_downloadable"], True)
+        self.assertEqual(response.context["is_sf_sac_downloadable"], True)
 
     def test_sac_download_not_available(self):
         """
@@ -634,7 +634,7 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         )
 
         response = self.client.get(url)
-        self.assertEquals(response.context["is_sf_sac_downloadable"], False)
+        self.assertEqual(response.context["is_sf_sac_downloadable"], False)
 
 
 class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
@@ -681,7 +681,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         response = self.anon_client.post(
             self._summary_report_url(), {"start_date": "Not a date"}
         )
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     @patch("dissemination.summary_reports.prepare_workbook_for_download")
     def test_empty_results_returns_404(self, mock_prepare_workbook_for_download):
@@ -694,7 +694,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         response = self.anon_client.post(
             self._summary_report_url(), {"uei_or_ein": "NotTheOther1"}
         )
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     @patch("dissemination.summary_reports.prepare_workbook_for_download")
     def test_authorized_user_with_private_data(

@@ -12,6 +12,8 @@ from audit.models import (
     SacValidationWaiver,
     UeiValidationWaiver,
 )
+from audit.models.models import STATUS
+from audit.models.viewflow import sac_transition
 from audit.validators import (
     validate_auditee_certification_json,
     validate_auditor_certification_json,
@@ -154,8 +156,8 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=obj.report_id_id)
             if sac.submission_status in [
-                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-                SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                STATUS.READY_FOR_CERTIFICATION,
+                STATUS.AUDITOR_CERTIFIED,
             ]:
                 logger.info(
                     f"User {request.user.email} is applying waiver for SAC with status: {sac.submission_status}"
@@ -167,7 +169,7 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                     f"SAC {sac.report_id} updated successfully with waiver by user: {request.user.email}."
                 )
             elif (
-                SingleAuditChecklist.STATUS.IN_PROGRESS
+                STATUS.IN_PROGRESS
                 and SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER
                 in obj.waiver_types
             ):
@@ -182,7 +184,7 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                 messages.set_level(request, messages.WARNING)
                 messages.warning(
                     request,
-                    f"Cannot apply waiver to SAC with status {sac.submission_status}. Expected status to be one of {SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION}, {SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED}, or {SingleAuditChecklist.STATUS.IN_PROGRESS}.",
+                    f"Cannot apply waiver to SAC with status {sac.submission_status}. Expected status to be one of {STATUS.READY_FOR_CERTIFICATION}, {STATUS.AUDITOR_CERTIFIED}, or {STATUS.IN_PROGRESS}.",
                 )
                 logger.warning(
                     f"User {request.user.email} attempted to apply waiver to SAC with invalid status: {sac.submission_status}"
@@ -218,20 +220,13 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                     },
                 }
             )
-            if (
-                sac.submission_status
-                == SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-            ):
+            if sac.submission_status == STATUS.READY_FOR_CERTIFICATION:
                 validated = validate_auditor_certification_json(auditor_certification)
                 sac.auditor_certification = validated
-                sac.transition_to_auditor_certified()
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
-                )
-                logger.info(
-                    f"Auditor certification completed for SAC {sac.report_id} by user: {request.user.email}."
-                )
+                if sac_transition(request, sac, transition_to=STATUS.AUDITOR_CERTIFIED):
+                    logger.info(
+                        f"Auditor certification completed for SAC {sac.report_id} by user: {request.user.email}."
+                    )
 
     def handle_auditee_certification(self, request, obj, sac):
         if SacValidationWaiver.TYPES.AUDITEE_CERTIFYING_OFFICIAL in obj.waiver_types:
@@ -257,17 +252,14 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                     },
                 }
             )
-            if sac.submission_status == SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED:
+            if sac.submission_status == STATUS.AUDITOR_CERTIFIED:
                 validated = validate_auditee_certification_json(auditee_certification)
                 sac.auditee_certification = validated
-                sac.transition_to_auditee_certified()
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
-                )
-                logger.info(
-                    f"Auditee certification completed for SAC {sac.report_id} by user: {request.user.email}."
-                )
+
+                if sac_transition(request, sac, transition_to=STATUS.AUDITEE_CERTIFIED):
+                    logger.info(
+                        f"Auditee certification completed for SAC {sac.report_id} by user: {request.user.email}."
+                    )
 
 
 class UeiValidationWaiverAdmin(admin.ModelAdmin):

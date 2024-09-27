@@ -46,6 +46,7 @@ from audit.models import (
     SubmissionEvent,
     generate_sac_report_id,
 )
+from audit.models.models import STATUS
 from audit.cross_validation.naming import SECTION_NAMES as SN
 from audit.views import MySubmissions
 from dissemination.models import FederalAward, General
@@ -55,7 +56,7 @@ User = get_user_model()
 ACCESS_AND_SUBMISSION_PATH = reverse("report_submission:accessandsubmission")
 AUDIT_JSON_FIXTURES = Path(__file__).parent / "fixtures" / "json"
 EDIT_PATH = "audit:EditSubmission"
-STATUSES = SingleAuditChecklist.STATUS
+STATUSES = STATUS
 SUBMISSIONS_PATH = reverse("audit:MySubmissions")
 
 VALID_ELIGIBILITY_DATA = {
@@ -223,12 +224,12 @@ class MySubmissionsViewTests(TestCase):
 
     def test_redirect_if_not_logged_in(self):
         result = self.client.get(SUBMISSIONS_PATH)
-        self.assertAlmostEquals(result.status_code, 302)
+        self.assertAlmostEqual(result.status_code, 302)
 
     def test_no_submissions_returns_empty_list(self):
         self.client.force_login(user=self.user)
         data = MySubmissions.fetch_my_submissions(self.user)
-        self.assertEquals(len(data), 0)
+        self.assertEqual(len(data), 0)
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
         self.client.force_login(user=self.user)
@@ -259,7 +260,7 @@ class MySubmissionsViewTests(TestCase):
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
         data = MySubmissions.fetch_my_submissions(self.user2)
-        self.assertEquals(len(data), 0)
+        self.assertEqual(len(data), 0)
 
 
 class EditSubmissionViewTests(TestCase):

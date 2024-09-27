@@ -5,6 +5,7 @@ from django.db.models import BigIntegerField, Q
 
 from dissemination.models import General, FederalAward
 from audit.models import SingleAuditChecklist, User
+from audit.models.models import STATUS
 from support.models import CognizantAssignment
 
 from config.settings import ENVIRONMENT
@@ -44,7 +45,7 @@ class Command(BaseCommand):
 
         for gen in gens:
             sac = self.make_sac(gen)
-            sac.submission_status = sac.STATUS.SUBMITTED
+            sac.submission_status = STATUS.SUBMITTED
             sac.save()
             if not sac.cognizant_agency and not sac.oversight_agency:
                 sac.assign_cog_over()

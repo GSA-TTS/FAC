@@ -4,7 +4,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
-from django_fsm import TransitionNotAllowed
+from viewflow.fsm import TransitionNotAllowed
 from model_bakery import baker
 
 from .models import (
@@ -17,6 +17,8 @@ from .models import (
     User,
     generate_sac_report_id,
 )
+from .models.models import STATUS
+from .models.viewflow import sac_transition, SingleAuditChecklistFlow
 
 
 class SingleAuditChecklistTests(TestCase):
@@ -69,29 +71,29 @@ class SingleAuditChecklistTests(TestCase):
         """
         cases = (
             (
-                [SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION],
-                SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                [STATUS.READY_FOR_CERTIFICATION],
+                STATUS.AUDITOR_CERTIFIED,
                 "transition_to_auditor_certified",
             ),
             (
-                [SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED],
-                SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                [STATUS.AUDITOR_CERTIFIED],
+                STATUS.AUDITEE_CERTIFIED,
                 "transition_to_auditee_certified",
             ),
             (
                 [
-                    SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                    STATUS.AUDITEE_CERTIFIED,
                 ],
-                SingleAuditChecklist.STATUS.SUBMITTED,
+                STATUS.SUBMITTED,
                 "transition_to_submitted",
             ),
             (
                 [
-                    SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-                    SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
-                    SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                    STATUS.READY_FOR_CERTIFICATION,
+                    STATUS.AUDITOR_CERTIFIED,
+                    STATUS.AUDITEE_CERTIFIED,
                 ],
-                SingleAuditChecklist.STATUS.IN_PROGRESS,
+                STATUS.IN_PROGRESS,
                 "transition_to_in_progress_again",
             ),
         )
@@ -101,8 +103,10 @@ class SingleAuditChecklistTests(TestCase):
             for status_from in statuses_from:
                 sac = baker.make(SingleAuditChecklist, submission_status=status_from)
 
-                transition_method = getattr(sac, transition_name)
-                transition_method()
+                transition_method = getattr(
+                    SingleAuditChecklistFlow(sac), transition_name
+                )
+                sac_transition(None, sac, transition_to=status_to)
 
                 self.assertEqual(sac.submission_status, status_to)
                 self.assertGreaterEqual(sac.get_transition_date(status_to), now)
@@ -127,7 +131,7 @@ class SingleAuditChecklistTests(TestCase):
         bad_statuses = [
             status[0]
             for status in SingleAuditChecklist.STATUS_CHOICES
-            if status[0] != SingleAuditChecklist.STATUS.IN_PROGRESS
+            if status[0] != STATUS.IN_PROGRESS
         ]
 
         for status_from in bad_statuses:
@@ -283,7 +287,7 @@ class SingleAuditReportFileTests(TestCase):
         bad_statuses = [
             status[0]
             for status in SingleAuditChecklist.STATUS_CHOICES
-            if status[0] != SingleAuditChecklist.STATUS.IN_PROGRESS
+            if status[0] != STATUS.IN_PROGRESS
         ]
 
         for status_from in bad_statuses:

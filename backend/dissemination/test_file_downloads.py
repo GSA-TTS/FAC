@@ -62,7 +62,7 @@ class GetFilenameTests(TestCase):
 
         filename = get_filename(report_id, "report")
 
-        self.assertEquals(f"singleauditreport/{report_id}.pdf", filename)
+        self.assertEqual(f"singleauditreport/{report_id}.pdf", filename)
 
     def test_gsafac_no_excelfile(self):
         """
@@ -91,7 +91,7 @@ class GetFilenameTests(TestCase):
             baker.make(ExcelFile, sac=sac, form_section=form_section)
 
             filename = get_filename(report_id, form_section)
-            self.assertEquals(f"excel/{report_id}--{form_section}.xlsx", filename)
+            self.assertEqual(f"excel/{report_id}--{form_section}.xlsx", filename)
 
     def test_census_no_singleauditchecklist(self):
         """
@@ -103,7 +103,7 @@ class GetFilenameTests(TestCase):
 
         filename = get_filename(report_id, "report")
 
-        self.assertEquals(f"singleauditreport/{report_id}.pdf", filename)
+        self.assertEqual(f"singleauditreport/{report_id}.pdf", filename)
 
     def test_census_no_singleauditreportfile(self):
         """
@@ -130,7 +130,7 @@ class GetFilenameTests(TestCase):
 
         filename = get_filename(report_id, "report")
 
-        self.assertEquals(f"singleauditreport/{report_id}.pdf", filename)
+        self.assertEqual(f"singleauditreport/{report_id}.pdf", filename)
 
     def test_census_no_excelfile(self):
         """
@@ -159,4 +159,4 @@ class GetFilenameTests(TestCase):
             baker.make(ExcelFile, sac=sac, form_section=form_section)
 
             filename = get_filename(report_id, form_section)
-            self.assertEquals(f"excel/{report_id}--{form_section}.xlsx", filename)
+            self.assertEqual(f"excel/{report_id}--{form_section}.xlsx", filename)

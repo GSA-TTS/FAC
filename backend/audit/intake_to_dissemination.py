@@ -284,7 +284,7 @@ class IntakeToDissemination(object):
         oversight_agency = self.single_audit_checklist.oversight_agency
 
         dates_by_status = self._get_dates_from_sac()
-        status = self.single_audit_checklist.STATUS
+        status = self.single_audit_checklist.get_statuses()
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
         if self.mode == IntakeToDissemination.DISSEMINATION:
             submitted_date = self._convert_utc_to_american_samoa_zone(
