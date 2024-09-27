@@ -1,7 +1,7 @@
 # This uses an env var called PG to 
 # set the connection string.
 source: FAC_DB_URI
-target: FAC_DB_URI
+target: FAC_SNAPSHOT_URI
 env:
   SLING_ALLOW_EMPTY: true
 
