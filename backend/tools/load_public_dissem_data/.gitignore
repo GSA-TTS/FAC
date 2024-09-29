@@ -1,0 +1,6 @@
+*.csv
+*.zip
+*.tar
+*.gz
+*.json
+db_dissem_dump*
