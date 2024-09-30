@@ -1,13 +1,4 @@
-declare -a public_api_versions=(
-    "api_v1_0_3" 
-    "api_v1_1_0" 
-    "public_api_v2_0_0_alpha"
-    )
-
-declare -a admin_api_versions=(
-    "admin_api_v1_1_0"
-    "admin_api_v1_1_1"
-    )
+source tools/variables.sh
 
 function startup_log {
     local tag="$1"
@@ -34,6 +25,17 @@ function check_table_exists() {
     return $result
 }
 
+function check_schema_exists () {
+    local db_uri="$1"
+    local schema_name="$2"
+    local result=$(psql $db_uri -qtAX -c "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '$schema_name');")
+    if [ "$result" = "t" ]; then
+      return 0;
+    else
+      return 1;
+    fi
+}
+
 function run_sql () {
     local db_uri="$1"
     local base_path="$2"
@@ -43,31 +45,4 @@ function run_sql () {
 
     $PSQL_EXE $db_uri < ${base_path}/${location}/${api_version}/${sql_file}
     gonogo "run_sql < ${base_path}/${location}/${api_version}/${sql_file}"
-}
-
-function run_sql_for_public_apis () {
-    local location="$1"
-    local sql_file="$2"
-    local base_path='dissemination/sql'
-
-    for api_version in "${public_api_versions[@]}"
-    do
-        if [ -f ${base_path}/${location}/${api_version}/${sql_file} ]; then
-          # $PSQL_EXE $FAC_DB_URI < ${base_path}/${location}/${api_version}/${sql_file}
-          run_sql $FAC_DB_URI $base_path $location $api_version $sql_file
-        else
-          echo "API FILE NOT FOUND/SKIPPED ${location}/${api_version}/${sql_file}"
-        fi
-      done
-  
-    # for api_version in "${admin_api_versions[@]}"
-    # do
-    #     echo "VERSION $api_version"
-    #     if [ -f ${base_path}/${location}/${api_version}/${sql_file} ]; then
-    #       $PSQL_EXE $FAC_DB_URI < ${base_path}/${location}/${api_version}/${sql_file}
-    #       gonogo "psql < ${location}/${api_version}/${sql_file}"
-    #     else
-    #       echo "API FILE NOT FOUND/SKIPPED ${location}/${api_version}/${sql_file}"
-    #     fi
-    #   done
 }
