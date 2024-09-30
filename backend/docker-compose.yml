@@ -1,5 +1,3 @@
-version: "3.7"
-
 services:
   #---------------------------------------------
   # Postgres DB
@@ -34,13 +32,13 @@ services:
   #---------------------------------------------
   # Historic data
   #---------------------------------------------
-  historic-data:
-    image: ghcr.io/gsa-tts/fac-historic-public-csvs/load-historic-public-data:20230912
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgres://postgres@db/postgres
+  # historic-data:
+  #   image: ghcr.io/gsa-tts/fac-historic-public-csvs/load-historic-public-data:20230912
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     DATABASE_URL: postgres://postgres@db/postgres
 
   #---------------------------------------------
   # Django app
@@ -122,17 +120,18 @@ services:
     expose:
       - "3000"
     environment:
-      PGRST_DB_URI: postgres://postgres@db:5432/postgres
-      PGRST2_DB_URI: postgres://postgres@db:5431/postgres
+      # This now requires us to `sling` data to db2 for local API testing.
+      PGRST_DB_URI: postgres://postgres@db2:5432/postgres
+      # PGRST2_DB_URI: postgres://postgres@db:5431/postgres
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
       PGRST_DB_ANON_ROLE: anon
       # See https://postgrest.org/en/stable/references/api/schemas.html#multiple-schemas for multiple schemas
-      PGRST_DB_SCHEMAS: "api_v1_0_3, api_v1_1_0, admin_api_v1_1_0"
+      PGRST_DB_SCHEMAS: "api_v1_0_3,api_v1_1_0,admin_api_v1_1_0,public_api_v2_0_0_alpha"
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
       # Enable this to inspect the DB plans for queries via EXPLAIN
       PGRST_DB_PLAN_ENABLED: 1
     depends_on:
-      db:
+      db2:
         condition: service_healthy
 volumes:
   postgres-data:

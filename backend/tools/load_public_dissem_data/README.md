@@ -1,6 +1,34 @@
 # loading public data
 
-This script loads public data.
+This provides a containerized data loading process that sets up your local FAC in a manner that duplicates the live/production app.
+
+The data we are using is public, historic data. It can be replaced, at a later point, with data that is more current.
+
+## Full clean
+
+You might want a completely clean local stack to start. It is not strictly necessary. If you get key conflicts, it means you already have some of this historic data loaded.
+
+### Wipe the stack
+
+From the backend folder
+
+```
+make -i docker-full-clean
+```
+
+Note the `-i` flag. This means `make` should ignore errors. You want it to, so it will keep going and wipe everything.
+
+```
+make docker-first-run
+```
+
+and then
+
+```
+docker compose up
+```
+
+We need the stack running for this whole process.
 
 ## Grab the ZIP
 
@@ -12,39 +40,38 @@ which is cleaned/historic public data, fit for our dissem_* tables.
 
 Compressed, it is 330MB. Uncompressed, around 3GB.
 
-Put it in dissemination/tools/load_public_dissem_data (this directory)
+Put it in dissemination/tools/load_public_dissem_data/data (a child of this directory)
 
-## Run the script
+## Build the container
 
-```
-./load_public_data_locally.sh
-```
-
-Note you need to run it from within that directory.
-
-## Or, run the Dockerfile
-
-If you're on a Mac, you may want to run the docker container to do the load.
-
-First, build the container.
+This is containerized, so it should work on all platforms. To build the container, run
 
 ```
-docker build -t facloaddata .
+make build
 ```
 
-Then, with the zipfile of data in the current directory:
+Then, to run the container, 
 
 ```
-docker run -i --rm -v ${PWD}:/app \
-    --network container:backend-web-1 \
-    -t facloaddata
+make run
 ```
 
-The `--network` flag tells Docker to run this container on the same network as your currently running stack. It assumes that you did a `docker compose up` on the FAC stack, and that the web container has the default name of `backend-web-1`. If this does not work, you will need to do a 
+You need to run this from the current directory.
+
+NOTE: The docker command in the Makefile uses the `--network` flag. The `--network` flag tells Docker to run this container on the same network as your currently running stack. It assumes that you did a `docker compose up` on the FAC stack, and that the web container has the default name of `backend-web-1`. If this does not work, you will need to... 
 
 ```
-docker ps
+make NETWORK=<container-name> run
 ```
 
-and discover the name of a container running in your FAC stack. Once you do this, it will be possible for the loader script to find the Postgres databases.
+where `<container-name>` is the name of your web container. This should allow this container to correctly talk to our databases.
 
+## When to rebuild this container
+
+Note this is pinned to v0.1.8 of the cgov-util.
+
+https://github.com/GSA-TTS/fac-backup-utility
+
+If that gets updated, you'll need to update the dockerfile.
+
+It also copies in the YAML for sling from `dissemination/sql/sling`. If that changes, you'll want to 

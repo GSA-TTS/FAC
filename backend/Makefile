@@ -88,9 +88,9 @@ docker-lint:
 	docker compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
 
 ghcr-first-run:
-	docker compose -f docker-compose-web.yml run web python manage.py makemigrations
-	docker compose -f docker-compose-web.yml run web python manage.py migrate
-	docker compose -f docker-compose-web.yml run web python manage.py loaddata
+	-docker compose -f docker-compose-web.yml run web python manage.py makemigrations
+	-docker compose -f docker-compose-web.yml run web python manage.py migrate
+	-docker compose -f docker-compose-web.yml run web python manage.py loaddata
 
 # Run Django tests with docker
 ghcr-test:
@@ -110,14 +110,32 @@ ghcr-lint:
 	docker compose -f docker-compose-web.yml run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && python -m pip install types-pytz && mypy . && djlint .'
 
 docker-clean:
-	docker compose down
-	docker rm -f $(shell docker ps -a -q)
-	docker volume rm $(shell docker volume ls -q)
+	-docker compose down
+	-docker rm -f $(shell docker ps -a -q)
+	-docker volume rm $(shell docker volume ls -q)
 
-docker-full-clean:
-	rm -f .coverage.*
+remove-coverage:
+	-rm -f .coverage.*
+
+compose-down:
 	docker compose down
+
+remove-processes:
 	docker rm -f $(docker ps -a -q)
-	docker volume rm $(docker volume ls -q)
-	docker system prune -f
-	docker volume prune -f
+
+remove-volumes:
+	-docker volume ls -q | docker volume rm 
+
+remove-dangling-volumes: remove-volumes
+	-docker volume ls -q --filter dangling=true | docker volume rm 
+
+system-prune:
+	-docker system prune -f
+
+volume-prune:
+	-docker volume prune -f 
+
+# Proceed past errors.
+# We want all of these commands to run, even if one fails.
+# make -i docker-full-clean
+docker-full-clean: remove-coverage compose-down remove-processes remove-dangling-volumes system-prune volume-prune

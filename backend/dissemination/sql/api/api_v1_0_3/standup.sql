@@ -1,3 +1,6 @@
+------------------------------------------------------------------
+-- authenticator role
+------------------------------------------------------------------
 DO
 $do$
 BEGIN
@@ -11,6 +14,9 @@ BEGIN
 END
 $do$;
 
+------------------------------------------------------------------
+-- api_fac_gov role
+------------------------------------------------------------------
 DO
 $do$
 BEGIN
@@ -27,74 +33,49 @@ $do$;
 GRANT api_fac_gov TO authenticator;
 
 NOTIFY pgrst, 'reload schema';
-begin;
 
-do
-$$
-begin
-    DROP SCHEMA IF EXISTS api_v1_0_3 CASCADE;
-    DROP SCHEMA IF EXISTS api_v1_0_3_functions CASCADE;
 
-    if not exists (select schema_name from information_schema.schemata where schema_name = 'api_v1_0_3') then
-        create schema api_v1_0_3;
-        create schema api_v1_0_3_functions;
-        
-        grant usage on schema api_v1_0_3_functions to api_fac_gov;
+BEGIN;
 
-        -- Grant access to tables and views
-        alter default privileges
-            in schema api_v1_0_3
-            grant select
-        -- this includes views
-        on tables
-        to api_fac_gov;
+DO
+$APIV103$
+    BEGIN
+        DROP SCHEMA IF EXISTS api_v1_0_3 CASCADE;
+        DROP SCHEMA IF EXISTS api_v1_0_3_functions CASCADE;
 
-        -- Grant access to sequences, if we have them
-        grant usage on schema api_v1_0_3 to api_fac_gov;
-        grant select, usage on all sequences in schema api_v1_0_3 to api_fac_gov;
-        alter default privileges
-            in schema api_v1_0_3
-            grant select, usage
-        on sequences
-        to api_fac_gov;
-    end if;
-end
-$$
+        IF NOT EXISTS (select schema_name from information_schema.schemata where schema_name = 'api_v1_0_3') then
+            CREATE SCHEMA api_v1_0_3;
+            CREATE SCHEMA api_v1_0_3_functions;
+            
+            GRANT USAGE ON SCHEMA api_v1_0_3_functions to api_fac_gov;
+
+            -- Grant access to tables and views
+            alter default privileges
+                in schema api_v1_0_3
+                grant select
+            -- this includes views
+            on tables
+            to api_fac_gov;
+
+            -- Grant access to sequences, if we have them
+            grant usage on schema api_v1_0_3 to api_fac_gov;
+            grant select, usage on all sequences in schema api_v1_0_3 to api_fac_gov;
+            alter default privileges
+                in schema api_v1_0_3
+                grant select, usage
+            on sequences
+            to api_fac_gov;
+        end if;
+    END
+$APIV103$
 ;
 
--- This is the description
-COMMENT ON SCHEMA api_v1_0_3 IS
-    'The FAC dissemation API version 1.0.3.'
-;
+COMMIT;
+NOTIFY pgrst, 'reload schema';
 
--- https://postgrest.org/en/stable/references/api/openapi.html
--- This is the title
-COMMENT ON SCHEMA api_v1_0_3 IS
-$$v1.0.3
-
-A RESTful API that serves data from the SF-SAC.$$;
-
-commit;
-
-notify pgrst,
-       'reload schema';
-
--- WARNING
--- Under PostgreSQL 12, the functions below work.
--- Under PostgreSQL 14, these will break.
---
--- Note the differences:
---
--- raise info 'Works under PostgreSQL 12';
--- raise info 'request.header.x-magic %', (SELECT current_setting('request.header.x-magic', true));
--- raise info 'request.jwt.claim.expires %', (SELECT current_setting('request.jwt.claim.expires', true));
--- raise info 'Works under PostgreSQL 14';
--- raise info 'request.headers::json->>x-magic %', (SELECT current_setting('request.headers', true)::json->>'x-magic');
--- raise info 'request.jwt.claims::json->expires %', (SELECT current_setting('request.jwt.claims', true)::json->>'expires');
---
--- To quote the work of Dav Pilkey, "remember this now."
-
--- We don't grant tribal access (yet)
+------------------------------------------------------------------
+-- functions
+------------------------------------------------------------------
 create or replace function api_v1_0_3_functions.has_tribal_data_access() returns boolean
 as $has_tribal_data_access$
 BEGIN
@@ -103,8 +84,11 @@ END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
 
 NOTIFY pgrst, 'reload schema';
-begin;
 
+------------------------------------------------------------------
+-- VIEWs
+------------------------------------------------------------------
+BEGIN;
 ---------------------------------------
 -- finding_text
 ---------------------------------------
