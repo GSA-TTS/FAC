@@ -10,9 +10,9 @@ source tools/util_startup.sh
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
 source tools/api_teardown.sh
+source tools/build_indexes.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
-source tools/run_collectstatic.sh
 source tools/seed_cog_baseline.sh
 
 #####
@@ -39,6 +39,12 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # Standup the API, which may depend on migration changes
     api_standup
     gonogo "api_standup"
+
+    #####
+    # BUILD INDEXES
+    # Builds indexes on the API tables in fac-snapshot-db
+    build_indexes
+    gonogo "build_indexes"
 
     #####
     # COLLECT STATIC

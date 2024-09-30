@@ -109,11 +109,6 @@ ghcr-nctest:
 ghcr-lint:
 	docker compose -f docker-compose-web.yml run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && python -m pip install types-pytz && mypy . && djlint .'
 
-docker-clean:
-	-docker compose down
-	-docker rm -f $(shell docker ps -a -q)
-	-docker volume rm $(shell docker volume ls -q)
-
 remove-coverage:
 	-rm -f .coverage.*
 
@@ -121,13 +116,13 @@ compose-down:
 	docker compose down
 
 remove-processes:
-	docker rm -f $(docker ps -a -q)
+	docker rm -f $$(docker ps -a -q)
 
 remove-volumes:
-	-docker volume ls -q | docker volume rm 
+	-docker volume rm $$(docker volume ls -q)  
 
 remove-dangling-volumes: remove-volumes
-	-docker volume ls -q --filter dangling=true | docker volume rm 
+	-docker volume rm $$(docker volume ls -q --filter dangling=true)
 
 system-prune:
 	-docker system prune -f

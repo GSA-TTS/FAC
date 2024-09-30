@@ -10,7 +10,6 @@ source tools/util_startup.sh
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
 source tools/api_teardown.sh
-source tools/setup_public_table_placeholders.sh
 source tools/build_indexes.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
@@ -40,8 +39,8 @@ api_standup
 gonogo "api_standup"
 
 #####
-# API STANDUP
-# Standup the API, which may depend on migration changes
+# BUILD INDEXES
+# Builds indexes on the API tables in fac-snapshot-db
 build_indexes
 gonogo "build_indexes"
 
