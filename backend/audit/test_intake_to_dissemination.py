@@ -427,7 +427,7 @@ class IntakeToDisseminationTests(TestCase):
             general.total_amount_expended,
             self.sac.federal_awards["FederalAwards"].get("total_amount_expended"),
         )
-        self.assertEquals(
+        self.assertEqual(
             Util.json_array_to_str(self.sac.audit_information["gaap_results"]),
             general.gaap_results,
         )
@@ -439,7 +439,7 @@ class IntakeToDisseminationTests(TestCase):
         with mock.patch.object(logger, "warning") as mock_warning:
             self.intake_to_dissemination.save_dissemination_objects()
             mock_warning.assert_called()
-        self.assertEquals(1, len(self.intake_to_dissemination.errors))
+        self.assertEqual(1, len(self.intake_to_dissemination.errors))
 
     def test_submitted_date(self):
         """
@@ -560,7 +560,7 @@ class IntakeToDisseminationTests(TestCase):
         sec_auditor = SecondaryAuditor.objects.first()
         print(self.sac.report_id)
         print(sec_auditor.report_id)
-        self.assertEquals(self.sac.report_id, sec_auditor.report_id.report_id)
+        self.assertEqual(self.sac.report_id, sec_auditor.report_id.report_id)
 
     def test_load_additional_ueis(self):
         self.intake_to_dissemination.load_general()

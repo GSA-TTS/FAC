@@ -504,7 +504,7 @@ class UtilsTesting(TestCase):
 
             self.assertFalse(results["valid"])
             self.assertTrue(results["errors"])
-            self.assertEquals(
+            self.assertEqual(
                 results["errors"],
                 ["SAM.gov API response status code invalid: 400"],
             )
@@ -520,7 +520,7 @@ class UtilsTesting(TestCase):
 
             self.assertFalse(results["valid"])
             self.assertTrue(results["errors"])
-            self.assertEquals(results["errors"], ["SAM.gov API timeout"])
+            self.assertEqual(results["errors"], ["SAM.gov API timeout"])
 
         # TooManyRedirects
         with patch("api.uei.SESSION.get") as mock_get:
@@ -533,7 +533,7 @@ class UtilsTesting(TestCase):
 
             self.assertFalse(results["valid"])
             self.assertTrue(results["errors"])
-            self.assertEquals(
+            self.assertEqual(
                 results["errors"], ["SAM.gov API error - too many redirects"]
             )
 
@@ -548,7 +548,7 @@ class UtilsTesting(TestCase):
 
             self.assertFalse(results["valid"])
             self.assertTrue(results["errors"])
-            self.assertEquals(
+            self.assertEqual(
                 results["errors"],
                 ["Unable to make SAM.gov API request, error: "],
             )
@@ -574,7 +574,7 @@ class UtilsTesting(TestCase):
 
             self.assertFalse(results["valid"])
             self.assertTrue(results["errors"])
-            self.assertEquals(
+            self.assertEqual(
                 results["errors"],
                 ["UEI was not found in SAM.gov"],
             )
@@ -609,7 +609,7 @@ class UtilsTesting(TestCase):
 
             self.assertFalse(results["valid"])
             self.assertTrue(results["errors"])
-            self.assertEquals(
+            self.assertEqual(
                 results["errors"],
                 ["UEI was not found in SAM.gov"],
             )

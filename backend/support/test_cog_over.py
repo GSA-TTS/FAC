@@ -435,18 +435,18 @@ class CogOverTests(TestCase):
             cognizant_agency=BASE_COG,
         )
         cbs = CognizantBaseline.objects.all()
-        self.assertEquals(len(cbs), 1)
+        self.assertEqual(len(cbs), 1)
 
         cog_agency, _ = compute_cog_over(
             sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
         )
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         cas = CognizantAssignment.objects.all()
-        self.assertEquals(len(cas), 1)
+        self.assertEqual(len(cas), 1)
         cbs = CognizantBaseline.objects.all()
-        self.assertEquals(len(cbs), 1)
+        self.assertEqual(len(cbs), 1)
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
-        self.assertEquals(sac.cognizant_agency, cog_agency)
+        self.assertEqual(sac.cognizant_agency, cog_agency)
 
         oberride_cog = "01"
         CognizantAssignment(
@@ -456,11 +456,11 @@ class CogOverTests(TestCase):
             override_comment="test_cog_over",
         ).save()
         cas = CognizantAssignment.objects.all()
-        self.assertEquals(len(cas), 2)
+        self.assertEqual(len(cas), 2)
         cbs = CognizantBaseline.objects.all()
-        self.assertEquals(len(cbs), 2)
+        self.assertEqual(len(cbs), 2)
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
-        self.assertEquals(sac.cognizant_agency, oberride_cog)
+        self.assertEqual(sac.cognizant_agency, oberride_cog)
 
         # a re-run ahould create a third assignmenet
         sac.cognizant_agency = None
@@ -470,4 +470,4 @@ class CogOverTests(TestCase):
         )
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
-        self.assertEquals(sac.cognizant_agency, cog_agency)
+        self.assertEqual(sac.cognizant_agency, cog_agency)
