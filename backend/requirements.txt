@@ -278,19 +278,15 @@ django-dbbackup==4.2.1 \
     --hash=sha256:157a2ec10d482345cd75092e510ac40d6e2ee6084604a1d17abe178c2f06bc69 \
     --hash=sha256:b23265600ead0780ca781b1b4b594949aaa8a20d74f08701f91ee9d7eb1f08cd
     # via -r ./requirements/requirements.in
-django-fsm==3.0.0 \
-    --hash=sha256:0112bcac573ad14051cf8ebe73bf296b6d5409f093e5f1677eb16e2196e263b3 \
-    --hash=sha256:fa28f84f47eae7ce9247585ac6c1895e4ada08efff93fb243a59e9ff77b2d4ec
-    # via -r ./requirements/requirements.in
+django-filter==24.3 \
+    --hash=sha256:c4852822928ce17fb699bcfccd644b3574f1a2d80aeb2b4ff4f16b02dd49dc64 \
+    --hash=sha256:d8ccaf6732afd21ca0542f6733b11591030fa98669f8d15599b358e24a2cd9c3
+    # via
+    #   -r ./requirements/requirements.in
+    #   django-viewflow
 django-storages[boto3]==1.14.2 \
     --hash=sha256:1db759346b52ada6c2efd9f23d8241ecf518813eb31db9e2589207174f58f6ad \
     --hash=sha256:51b36af28cc5813b98d5f3dfe7459af638d84428c8df4a03990c7d74d1bea4e5
-    # via
-    #   -r ./requirements/requirements.in
-    #   django-storages
-django-viewflow==2.2.7 \
-    --hash=sha256:38c8493dc25efc49df2003777b951980b773b8bb8e31926dd591e9fe0e8acb91 \
-    --hash=sha256:c81a91d55e235c9bd75dc26bbc26dcfdda5f21eb97a381537040d9b7b07221cc
     # via -r ./requirements/requirements.in
 django-viewflow==2.2.7 \
     --hash=sha256:38c8493dc25efc49df2003777b951980b773b8bb8e31926dd591e9fe0e8acb91 \
@@ -454,9 +450,7 @@ greenlet==3.1.1 \
 gunicorn[gevent]==23.0.0 \
     --hash=sha256:ec400d38950de4dfd418cff8328b2c8faed0edb0d517d3394e457c317908ca4d \
     --hash=sha256:f014447a0101dc57e294f6c18ca6b40227a4c90e9bdb586042628030cba004ec
-    # via
-    #   -r ./requirements/requirements.in
-    #   gunicorn
+    # via -r ./requirements/requirements.in
 idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
     --hash=sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3
@@ -1257,12 +1251,10 @@ typing-extensions==4.12.2 \
     --hash=sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d \
     --hash=sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8
     # via
-    #   asgiref
     #   dj-database-url
     #   pydantic
     #   pydantic-core
     #   pydash
-    #   pypdf
     #   sqlalchemy
 tzdata==2024.2 \
     --hash=sha256:7d85cc416e9382e69095b7bdf4afd9e3880418a2413feec7069d533d6b4e31cc \
