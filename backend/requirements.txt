@@ -284,6 +284,10 @@ django-filter==24.3 \
     # via
     #   -r ./requirements/requirements.in
     #   django-viewflow
+django-fsm==3.0.0 \
+    --hash=sha256:0112bcac573ad14051cf8ebe73bf296b6d5409f093e5f1677eb16e2196e263b3 \
+    --hash=sha256:fa28f84f47eae7ce9247585ac6c1895e4ada08efff93fb243a59e9ff77b2d4ec
+    # via -r ./requirements/requirements.in
 django-storages[boto3]==1.14.2 \
     --hash=sha256:1db759346b52ada6c2efd9f23d8241ecf518813eb31db9e2589207174f58f6ad \
     --hash=sha256:51b36af28cc5813b98d5f3dfe7459af638d84428c8df4a03990c7d74d1bea4e5
