@@ -102,6 +102,12 @@ notify pgrst,
 --
 -- To quote the work of Dav Pilkey, "remember this now."
 
+-----------------------------------------------------
+-- FUNCTIONS
+-----------------------------------------------------
+
+
+notify pgrst, 'reload schema';
 
 CREATE OR REPLACE FUNCTION api_v1_1_0_functions.get_header(item text) RETURNS text
     AS $get_header$

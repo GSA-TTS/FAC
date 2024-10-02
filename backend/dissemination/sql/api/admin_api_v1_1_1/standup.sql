@@ -1,17 +1,87 @@
--- WARNING
--- Under PostgreSQL 12, the functions below work.
--- Under PostgreSQL 14, these will break.
---
--- Note the differences:
---
--- raise info 'Works under PostgreSQL 12';
--- raise info 'request.header.x-magic %', (SELECT current_setting('request.header.x-magic', true));
--- raise info 'request.jwt.claim.expires %', (SELECT current_setting('request.jwt.claim.expires', true));
--- raise info 'Works under PostgreSQL 14';
--- raise info 'request.headers::json->>x-magic %', (SELECT current_setting('request.headers', true)::json->>'x-magic');
--- raise info 'request.jwt.claims::json->expires %', (SELECT current_setting('request.jwt.claims', true)::json->>'expires');
---
--- To quote the work of Dav Pilkey, "remember this now."
+DO
+$do$
+BEGIN
+   IF EXISTS (
+      SELECT FROM pg_catalog.pg_roles
+      WHERE  rolname = 'authenticator') THEN
+      RAISE NOTICE 'Role "authenticator" already exists. Skipping.';
+   ELSE
+      CREATE ROLE authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
+   END IF;
+END
+$do$;
+
+DO
+$do$
+BEGIN
+   IF EXISTS (
+      SELECT FROM pg_catalog.pg_roles
+      WHERE  rolname = 'api_fac_gov') THEN
+      RAISE NOTICE 'Role "api_fac_gov" already exists. Skipping.';
+   ELSE
+      CREATE ROLE api_fac_gov NOLOGIN;
+   END IF;
+END
+$do$;
+
+GRANT api_fac_gov TO authenticator;
+
+NOTIFY pgrst, 'reload schema';
+begin;
+
+do
+$$
+begin
+    DROP SCHEMA IF EXISTS admin_api_v1_1_1 CASCADE;
+    DROP SCHEMA IF EXISTS admin_api_v1_1_1_functions CASCADE;
+
+    if not exists (select schema_name from information_schema.schemata where schema_name = 'admin_api_v1_1_1') then
+        create schema admin_api_v1_1_1;
+        create schema admin_api_v1_1_1_functions;
+
+        grant usage on schema admin_api_v1_1_1_functions to api_fac_gov;
+
+        -- Grant access to tables and views
+        alter default privileges
+            in schema admin_api_v1_1_1
+            grant select
+        -- this includes views
+        on tables
+        to api_fac_gov;
+                
+        -- Grant access to sequences, if we have them
+        grant usage on schema admin_api_v1_1_1 to api_fac_gov;
+        grant select, usage on all sequences in schema admin_api_v1_1_1 to api_fac_gov;
+        alter default privileges
+            in schema admin_api_v1_1_1
+            grant select, usage
+        on sequences
+        to api_fac_gov;
+
+        -- The admin API needs to be able to write user permissions.
+        -- This is so we can add and remove people who will have tribal data access
+        -- via the administrative API.
+        GRANT INSERT, SELECT, DELETE on public.users_userpermission to api_fac_gov;
+        -- We need to be able to look up slugs and turn them into permission IDs.
+        GRANT SELECT on public.users_permission to api_fac_gov;
+        -- It also needs to be able to log events.
+        GRANT INSERT on public.support_adminapievent to api_fac_gov;
+        -- And, it wants to read the UUIDs of administrative keys
+        GRANT SELECT ON public.support_administrative_key_uuids TO api_fac_gov;
+        -- We want to see data in flight as admins.
+        GRANT SELECT ON public.audit_singleauditchecklist TO api_fac_gov;
+
+        GRANT INSERT, SELECT, DELETE on public.dissemination_tribalapiaccesskeyids to api_fac_gov;
+        GRANT INSERT on public.dissemination_onetimeaccess to api_fac_gov;
+    end if;
+end
+$$
+;
+
+commit;
+
+notify pgrst,
+       'reload schema';
 
 begin;
 
@@ -387,3 +457,95 @@ $remove_tribal_api_key_access$ LANGUAGE plpgsql;
 commit;
 
 NOTIFY pgrst, 'reload schema';
+
+begin;
+
+
+---------------------------------------
+-- accesses
+---------------------------------------
+-- public.audit_access definition
+
+-- Drop table
+
+-- DROP TABLE public.audit_access;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_access AS
+    SELECT
+        aa.role,
+        aa.fullname,
+        aa.email,
+        aa.sac_id,
+        aa.user_id
+    FROM
+        public.audit_access aa
+    WHERE
+        admin_api_v1_1_1_functions.has_admin_data_access('READ')
+    ORDER BY aa.id
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.singleauditchecklist AS
+    SELECT
+        sac.id,
+        sac.date_created,
+        sac.submission_status,
+        sac.data_source,
+        sac.transition_name,
+        sac.transition_date,
+        sac.report_id,
+        sac.audit_type,
+        sac.general_information,
+        sac.audit_information,
+        sac.federal_awards,
+        sac.corrective_action_plan,
+        sac.findings_text,
+        sac.findings_uniform_guidance,
+        sac.additional_ueis,
+        sac.additional_eins,
+        sac.secondary_auditors,
+        sac.notes_to_sefa,
+        sac.auditor_certification,
+        sac.auditee_certification,
+        sac.tribal_data_consent,
+        sac.cognizant_agency,
+        sac.oversight_agency,
+        sac.submitted_by_id
+    from
+        public.audit_singleauditchecklist sac
+    where
+        admin_api_v1_1_1_functions.has_admin_data_access('READ')
+    order by sac.id
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.tribal_access AS
+    SELECT
+        uup.email,
+        up.slug as permission
+    FROM
+        users_userpermission uup,
+        users_permission up
+    WHERE
+        (uup.permission_id = up.id)
+        AND (up.slug = 'read-tribal')
+        AND admin_api_v1_1_1_functions.has_admin_data_access('READ')
+    ORDER BY uup.id
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.admin_api_events AS
+    SELECT
+        ae.timestamp,
+        ae.api_key_uuid,
+        ae.event,
+        ae.event_data
+    FROM
+        public.support_adminapievent ae
+    WHERE
+        admin_api_v1_1_1_functions.has_admin_data_access('READ')
+    ORDER BY ae.id
+;
+
+
+commit;
+
+notify pgrst,
+       'reload schema';
