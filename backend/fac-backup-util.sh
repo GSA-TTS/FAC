@@ -30,6 +30,12 @@ RDSToS3Dump() {
 RDSToRDS() {
     ./gov.gsa.fac.cgov-util db_to_db --src_db "$1" --dest_db "$2" --operation "$3"
 }
+CheckTables() {
+    ./gov.gsa.fac.cgov-util check_db --db "$1"
+}
+RowCount() {
+    ./gov.gsa.fac.cgov-util row_count --db "$1"
+}
 
 if [ "$run_option" == "initial_backup" ]; then
     GetUtil
@@ -53,6 +59,8 @@ elif [ "$run_option" == "scheduled_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
+    RowCount "$db_name"
+    gonogo "row_count"
     RDSToS3Dump "$db_name" "$backup_s3_name" "scheduled/$scheduled_date"
     gonogo "db_to_s3"
     AWSS3Sync "$s3_name" "$backup_s3_name"
@@ -71,4 +79,12 @@ elif [ "$run_option" == "media_sync" ]; then
     gonogo "install_aws"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
+elif [ "$run_option" == "check_tables" ]; then
+    GetUtil
+    InstallAWS
+    gonogo "install_aws"
+    CheckTables "$db_name"
+    gonogo "check_tables"
+    RowCount "$db_name"
+    gonogo "row_count"
 fi
