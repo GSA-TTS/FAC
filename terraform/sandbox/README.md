@@ -9,19 +9,26 @@ sudo apt-get install cf8-cli
 ```
 
 ### Create a deployer account
-If a deployer account has not been created, then simply run the following:
+If a deployer account **has not been created**, then simply run the following:
 ```
 cd terraform/sandbox
 ../../bin/ops/create_service_account.sh -o gsa-tts-oros-fac -s sandbox -u sandbox-deployer >> secrets.auto.tfvars
 ```
 This will create a `secrets.auto.tfvars` in the directory for use with terraform.
 
-In the event that a deployer account has already been created:
+In the event that a deployer account **has already been created**:
 ```
 cd terraform/sandbox
 ../../bin/ops/get_service_account.sh -o gsa-tts-oros-fac -s sandbox -u sandbox-deployer >> secrets.auto.tfvars
 ```
 This will update a `secrets.auto.tfvars` in the directory for use with terraform.
+
+### Generate a template for sandbox.tfvars
+Since this is operating under the belief that you do not have a `shared/config/sandbox.tfvars` file, a helper script in `terraform/sandbox` has been provided. You are responsible for populating those secrets.
+```
+cd terraform/sandbox/helper/
+./create_tfvars.sh
+```
 
 ### Give the deployer account permissions in the ${ENV}-egress space
 You must have a role of SpaceManager to assign the deployer service account. Ask Alex, Bret or Matt to do this for you (but the assumption is it will be done for you. The space will only have this service account and will not need to be done more than once, unless the account gets deleted from the sandbox space)
