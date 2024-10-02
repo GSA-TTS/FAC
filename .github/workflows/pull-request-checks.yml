@@ -10,6 +10,7 @@ on:
       - '!docs/**'
       - 'docs/bpmn-workflow-models/**'
       - '!.github/ISSUE_TEMPLATE/**'
+      - '!.github/workflows/**'
   workflow_dispatch: null
 
 jobs:
@@ -57,9 +58,11 @@ jobs:
     secrets: inherit
 
   # Update BPMN Diagrams
-  sync-BPMN:
-    uses: ./.github/workflows/add-bpmn-renders.yml
-    secrets: inherit
+  # We are removing this as we are not editing, and we do not wish for it to run with lib updates.
+  # Uncomment if changes to models are necessary
+  # sync-BPMN:
+  #   uses: ./.github/workflows/add-bpmn-renders.yml
+  #   secrets: inherit
 
   # Generate Terraform Plans
   terraform-plan:
