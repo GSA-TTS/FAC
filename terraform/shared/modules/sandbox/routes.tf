@@ -13,7 +13,7 @@ data "cloudfoundry_app" "clients" {
   for_each   = local.clients
   name_or_id = each.key
   space      = data.cloudfoundry_space.client_space.id
-  depends_on = [ module.fac-app, module.clamav, cloudfoundry_app.postgrest, module.https-proxy ]
+  depends_on = [module.fac-app, module.clamav, cloudfoundry_app.postgrest, module.https-proxy]
 }
 
 resource "cloudfoundry_network_policy" "client_routing" {
@@ -23,5 +23,5 @@ resource "cloudfoundry_network_policy" "client_routing" {
     destination_app = module.https-proxy.https_proxy
     port            = "61443"
   }
-  depends_on = [ module.fac-app, module.clamav, cloudfoundry_app.postgrest, module.https-proxy ]
+  depends_on = [module.fac-app, module.clamav, cloudfoundry_app.postgrest, module.https-proxy]
 }
