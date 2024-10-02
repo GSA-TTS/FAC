@@ -1,3 +1,6 @@
+-----------------------------------------------------
+-- ROLES
+-----------------------------------------------------
 DO
 $do$
 BEGIN
@@ -29,6 +32,9 @@ GRANT api_fac_gov TO authenticator;
 NOTIFY pgrst, 'reload schema';
 begin;
 
+-----------------------------------------------------
+-- PERMISSIONS
+-----------------------------------------------------
 do
 $$
 BEGIN
@@ -61,13 +67,68 @@ $$
 
 COMMIT;
 
-notify pgrst,
-       'reload schema';
+notify pgrst, 'reload schema';
 
--- Under the new approach, we don't need 
--- any functions here.
+-----------------------------------------------------
+-- FUNCTIONS
+-----------------------------------------------------
+CREATE OR REPLACE FUNCTION public_api_v2_0_0_alpha.rows_per_batch()
+    RETURNS integer
+    LANGUAGE sql IMMUTABLE PARALLEL SAFE AS
+    'SELECT 20000';
 
-NOTIFY pgrst, 'reload schema';
+create or replace function public_api_v2_0_0_alpha_functions.batches (diss_table text) 
+returns integer 
+as $batches$
+declare count integer;
+declare RPB integer;
+begin 
+    select public_api_v2_0_0_alpha.rows_per_batch() into RPB;
+	case
+	   	when diss_table = 'additional_eins' then  
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.additional_eins;
+	   	when diss_table = 'additional_ueis' then  
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.additional_ueis;
+	   	when diss_table = 'combined' then  
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.combined;
+	   	when diss_table = 'corrective_action_plans' then  
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.corrective_action_plans;
+	   	when diss_table = 'federal_awards' then
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.federal_awards;
+	   	when diss_table = 'findings_text' then
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.findings_text;
+	   	when diss_table = 'findings' then
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.findings;
+	   	when diss_table = 'general' then  
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.general;
+	   	when diss_table = 'notes_to_sefa' then  
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.notes_to_sefa;
+	   	when diss_table = 'passthrough' then  
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.passthrough;
+	   	when diss_table = 'secondary_auditors' then  
+	   		select div(count(*), RPB) into count 
+	   		from public_data_v1_0_0.secondary_auditors;
+	else
+		count := 0;
+	end case;
+	RETURN count;
+end
+$batches$   
+language plpgsql;
+
+notify pgrst, 'reload schema';
+
+
 BEGIN;
 
 CREATE VIEW public_api_v2_0_0_alpha.additional_eins AS

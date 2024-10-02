@@ -4,3 +4,4 @@
 *.gz
 db_dissem_dump*
 __MACOSX
+data/sling.yaml

@@ -1,7 +1,10 @@
 # These are our active APIs
+# admin_api_access_tables must run before
+# the admin API can be stood up.
 declare -a api_versions=(
     "api_v1_0_3" 
-    "api_v1_1_0" 
+    "api_v1_1_0"
+    "admin_api_access_tables"
     "admin_api_v1_1_0"
     "admin_api_v1_1_1"
     "public_api_v2_0_0_alpha"
@@ -12,7 +15,8 @@ declare -a api_required_tables=(
   "public.dissemination_general"
   "public.dissemination_general"
   "public.support_adminapievent"
-  "public.support_adminapievent"
+  "public.support_administrative_key_uuids"
+  "public.support_administrative_key_uuids"
   "public_data_v1_0_0.general"
 )
 

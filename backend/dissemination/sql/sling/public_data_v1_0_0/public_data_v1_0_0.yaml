@@ -497,3 +497,50 @@ streams:
       LEFT JOIN public.dissemination_passthrough dp
         ON dfa.report_id = dp.report_id 
         AND dfa.award_reference = dp.award_reference
+
+  # This looks at the tables after they have been updated, and 
+  # generates metadata that agencies use to determine if they
+  # have completely pulled all of the data in their systems.
+  public_data_v1_0_0.metadata:
+    mode: full-refresh
+    object: public_data_v1_0_0.metadata_v2_0_0_a
+    sql: |
+      SELECT 'additional_eins' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('additional_eins') 
+        FROM public_data_v1_0_0.additional_eins
+      UNION
+      SELECT 'additional_ueis' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('additional_ueis')  
+        FROM public_data_v1_0_0.additional_ueis
+      UNION
+      SELECT 'combined' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('combined')  
+        FROM public_data_v1_0_0.combined
+      UNION
+      SELECT 'federal_awards' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('federal_awards')  
+        FROM public_data_v1_0_0.federal_awards
+      UNION
+      SELECT 'findings_text' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('findings_text')  
+        FROM public_data_v1_0_0.findings_text
+      UNION
+      SELECT 'findings' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('findings')  
+        FROM public_data_v1_0_0.findings
+      UNION
+      SELECT 'general' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('general')  
+        FROM public_data_v1_0_0.general
+      UNION
+      SELECT 'notes_to_sefa' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('notes_to_sefa')  
+        FROM public_data_v1_0_0.notes_to_sefa
+      UNION
+      SELECT 'passthrough' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('passthrough')  
+        FROM public_data_v1_0_0.passthrough
+      UNION
+      SELECT 'secondary_auditors' 
+        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('secondary_auditors')  
+        FROM public_data_v1_0_0.secondary_auditors
