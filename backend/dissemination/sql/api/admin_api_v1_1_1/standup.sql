@@ -470,53 +470,6 @@ begin;
 
 -- DROP TABLE public.audit_access;
 
-CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_access AS
-    SELECT
-        aa.role,
-        aa.fullname,
-        aa.email,
-        aa.sac_id,
-        aa.user_id
-    FROM
-        public.audit_access aa
-    WHERE
-        admin_api_v1_1_1_functions.has_admin_data_access('READ')
-    ORDER BY aa.id
-;
-
-CREATE OR REPLACE VIEW admin_api_v1_1_1.singleauditchecklist AS
-    SELECT
-        sac.id,
-        sac.date_created,
-        sac.submission_status,
-        sac.data_source,
-        sac.transition_name,
-        sac.transition_date,
-        sac.report_id,
-        sac.audit_type,
-        sac.general_information,
-        sac.audit_information,
-        sac.federal_awards,
-        sac.corrective_action_plan,
-        sac.findings_text,
-        sac.findings_uniform_guidance,
-        sac.additional_ueis,
-        sac.additional_eins,
-        sac.secondary_auditors,
-        sac.notes_to_sefa,
-        sac.auditor_certification,
-        sac.auditee_certification,
-        sac.tribal_data_consent,
-        sac.cognizant_agency,
-        sac.oversight_agency,
-        sac.submitted_by_id
-    from
-        public.audit_singleauditchecklist sac
-    where
-        admin_api_v1_1_1_functions.has_admin_data_access('READ')
-    order by sac.id
-;
-
 CREATE OR REPLACE VIEW admin_api_v1_1_1.tribal_access AS
     SELECT
         uup.email,
@@ -544,6 +497,74 @@ CREATE OR REPLACE VIEW admin_api_v1_1_1.admin_api_events AS
     ORDER BY ae.id
 ;
 
+-----------------
+-- Expose more of the internal tables for analysis/trouble-shooting.
+-----------------
+CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_access AS
+    SELECT * FROM admin_api_v1_1_1.audit_access
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_deletedaccess AS
+    SELECT * FROM admin_api_v1_1_1.audit_deletedaccess
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_excelfile AS
+    SELECT * FROM admin_api_v1_1_1.audit_excelfile
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.singleauditchecklist AS
+    SELECT *
+    FROM public.audit_singleauditchecklist sac
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_sacvalidationwaiver AS
+    SELECT * FROM admin_api_v1_1_1.audit_sacvalidationwaiver
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_singleauditreportfile AS
+    SELECT * FROM admin_api_v1_1_1.audit_singleauditreportfile
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_submissionevent AS
+    SELECT * FROM admin_api_v1_1_1.audit_submissionevent
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.auth_user AS
+    SELECT * FROM admin_api_v1_1_1.auth_user
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.django_migrations AS
+    SELECT * FROM admin_api_v1_1_1.django_migrations
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.support_adminapievent AS
+    SELECT * FROM admin_api_v1_1_1.support_adminapievent
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.support_cognizantassignment AS
+    SELECT * FROM admin_api_v1_1_1.support_cognizantassignment
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.support_cognizantbaseline AS
+    SELECT * FROM admin_api_v1_1_1.support_cognizantbaseline
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_1_1.users_userpermission AS
+    SELECT * FROM admin_api_v1_1_1.users_userpermission
+    WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
+;
 
 commit;
 
