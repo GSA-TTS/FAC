@@ -70,6 +70,18 @@ Finally, run `./apply.sh` script and wait.
 
 ### Discoveries:
 - It was discovered that the compiled css assets in the public s3 must be in the `backend/static/` folder when collectstatic is being run. Due to this, when it is run via github actions.. the `/static/compiled/` folder exists on the local file system, since the github runner does these steps, and handles keeping them in the local file system. To mitigate this for the terraform, we handle this in the `prepare_app.sh` script.
+- When registering the application with login.gov, perform the following:
+```
+# Generate a public and private key
+openssl req -nodes -x509 -days 365 -newkey rsa:2048 -keyout private.pem -out public.crt
+
+# Upload the public.crt to login.gov application page
+
+# Convert the private key to base64
+cat private.pem | base64 -w 0 > django_key.txt
+
+# The value in the django_key.txt will be your DJANGO_SECRET_LOGIN_KEY for shared/modules/config/sandbox.tfvars
+```
 
 ### Investigate Further:
 - It appears, that after getting the successful generation of the `compiled` staticfiles, we are running into an issue where the boot sequence collectstatic is taking > 3 minutes to process. I would imagine that under normal sequences, there are no updates, so it simply skips over everything. But, if for some reason it is actually processing and uploading them to the s3 bucket every time, this operation is causing us to trigger the "3 minute timeout" on cloud.gov. Since an operation is "hanging" and the health check fails due to the 3 minutes, it gets caught in a crash loop.
