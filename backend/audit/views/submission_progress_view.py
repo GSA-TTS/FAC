@@ -10,6 +10,7 @@ from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access
+from audit.models.models import STATUS
 
 
 # Turn the named tuples into dicts because Django templates work with dicts:
@@ -137,11 +138,11 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "pre_submission_validation": {
                     "completed": sac.submission_status
                     in [
-                        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-                        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
-                        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
-                        SingleAuditChecklist.STATUS.SUBMITTED,
-                        SingleAuditChecklist.STATUS.DISSEMINATED,
+                        STATUS.READY_FOR_CERTIFICATION,
+                        STATUS.AUDITOR_CERTIFIED,
+                        STATUS.AUDITEE_CERTIFIED,
+                        STATUS.SUBMITTED,
+                        STATUS.DISSEMINATED,
                     ],
                     "completed_date": None,
                     "completed_by": None,
@@ -151,21 +152,20 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
                     "auditor_enabled": sac.submission_status
-                    == SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                    == STATUS.READY_FOR_CERTIFICATION,
                     "auditee_certified": bool(sac.auditee_certification),
                     "auditee_enabled": sac.submission_status
-                    == SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                    == STATUS.AUDITOR_CERTIFIED,
                 },
                 "submission": {
                     "completed": sac.submission_status
                     in [
-                        SingleAuditChecklist.STATUS.SUBMITTED,
-                        SingleAuditChecklist.STATUS.DISSEMINATED,
+                        STATUS.SUBMITTED,
+                        STATUS.DISSEMINATED,
                     ],
                     "completed_date": None,
                     "completed_by": None,
-                    "enabled": sac.submission_status
-                    == SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                    "enabled": sac.submission_status == STATUS.AUDITEE_CERTIFIED,
                 },
                 "report_id": report_id,
                 "auditee_name": sac.auditee_name,

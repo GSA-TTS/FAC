@@ -17,7 +17,8 @@ from .models import (
     MigrationErrorDetail,
 )
 from audit.intake_to_dissemination import IntakeToDissemination
-from audit.models import SingleAuditChecklist
+from audit.models.models import STATUS
+from audit.models.viewflow import SingleAuditChecklistFlow
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -54,15 +55,16 @@ parser = argparse.ArgumentParser()
 
 
 def step_through_certifications(sac, audit_header):
-    sac.transition_to_ready_for_certification()
-    sac.transition_to_auditor_certified()
-    sac.transition_to_auditee_certified()
+    flow = SingleAuditChecklistFlow(sac)
+    flow.transition_to_ready_for_certification()
+    flow.transition_to_auditor_certified()
+    flow.transition_to_auditee_certified()
 
-    sac.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
+    sac.transition_name.append(STATUS.CERTIFIED)
     sac.transition_date.append(datetime.now(timezone.utc))
 
-    sac.transition_to_submitted()
-    sac.transition_to_disseminated()
+    flow.transition_to_submitted()
+    flow.transition_to_disseminated()
 
     # Patch for transition date
 

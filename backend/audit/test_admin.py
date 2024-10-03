@@ -3,6 +3,7 @@ from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from .models import SacValidationWaiver, SingleAuditChecklist
+from .models.models import STATUS
 from .admin import SacValidationWaiverAdmin
 from django.utils import timezone
 from model_bakery import baker
@@ -27,7 +28,7 @@ class TestSacValidationWaiverAdmin(TestCase):
         # Create a SingleAuditChecklist instance
         self.sac = baker.make(
             SingleAuditChecklist,
-            submission_status=SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+            submission_status=STATUS.READY_FOR_CERTIFICATION,
         )
 
         # Create a request object
@@ -72,14 +73,12 @@ class TestSacValidationWaiverAdmin(TestCase):
 
         # Checking results
         self.sac.refresh_from_db()
-        self.assertEqual(
-            self.sac.submission_status, SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED
-        )
+        self.assertEqual(self.sac.submission_status, STATUS.AUDITOR_CERTIFIED)
 
     def test_save_model_auditee_certification(self):
         """Test the save_model method of the SacValidationWaiverAdmin class when the waiver is for auditee certification"""
         # Set the SAC status to AUDITOR_CERTIFIED
-        self.sac.submission_status = SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED
+        self.sac.submission_status = STATUS.AUDITOR_CERTIFIED
         self.sac.save()
 
         # Create a SacValidationWaiver instance
@@ -100,9 +99,7 @@ class TestSacValidationWaiverAdmin(TestCase):
 
         # Checking results
         self.sac.refresh_from_db()
-        self.assertEqual(
-            self.sac.submission_status, SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED
-        )
+        self.assertEqual(self.sac.submission_status, STATUS.AUDITEE_CERTIFIED)
 
     def test_save_model_invalid_status(self):
         # Set SAC status to an invalid one
@@ -143,15 +140,13 @@ class TestSacValidationWaiverAdmin(TestCase):
 
         # Checking results
         self.sac.refresh_from_db()
-        self.assertEqual(
-            self.sac.submission_status, SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED
-        )
+        self.assertEqual(self.sac.submission_status, STATUS.AUDITOR_CERTIFIED)
 
     def test_handle_auditee_certification(self):
         """Test the handle_auditee_certification method of the SacValidationWaiverAdmin class."""
 
         # Set SAC status to AUDITOR_CERTIFIED
-        self.sac.submission_status = SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED
+        self.sac.submission_status = STATUS.AUDITOR_CERTIFIED
         self.sac.save()
 
         # Simulating auditee certification
@@ -165,6 +160,4 @@ class TestSacValidationWaiverAdmin(TestCase):
 
         # Checking results
         self.sac.refresh_from_db()
-        self.assertEqual(
-            self.sac.submission_status, SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED
-        )
+        self.assertEqual(self.sac.submission_status, STATUS.AUDITEE_CERTIFIED)

@@ -2,14 +2,14 @@
 # FOUNDATION
 ###############################
 
-FROM python:3.11-slim AS foundation
+FROM python:3.12-slim AS foundation
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get -yq update && \
     apt install -y \
-        apt-transport-https \ 
+        apt-transport-https \
         build-essential \
         ca-certificates \
         chromium \
@@ -19,7 +19,7 @@ RUN apt-get -yq update && \
         gnupg \
         gnupg2 \
         postgresql-client \
-        wget 
+        wget
 
 ###############################
 # STORAGE
@@ -62,7 +62,7 @@ RUN npm ci && \
 
 COPY . /src/
 
-RUN npm run build 
+RUN npm run build
 
 ###############################
 # DEV

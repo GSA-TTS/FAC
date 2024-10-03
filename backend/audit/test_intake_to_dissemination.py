@@ -7,6 +7,7 @@ from model_bakery import baker
 from faker import Faker
 
 from audit.models import SingleAuditChecklist, User
+from audit.models.models import STATUS
 from audit.intake_to_dissemination import IntakeToDissemination
 from audit.test_views import AUDIT_JSON_FIXTURES, _load_json
 from audit.utils import Util
@@ -26,10 +27,10 @@ from dissemination.models import (
 
 def _set_transitions_hour(sac, hour):
     statuses = [
-        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
-        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
-        SingleAuditChecklist.STATUS.SUBMITTED,
+        STATUS.READY_FOR_CERTIFICATION,
+        STATUS.AUDITOR_CERTIFIED,
+        STATUS.AUDITEE_CERTIFIED,
+        STATUS.SUBMITTED,
     ]
     # Get the current time in UTC
     current = datetime.now(timezone.utc).date()
@@ -59,10 +60,10 @@ class IntakeToDisseminationTests(TestCase):
 
     def _run_state_transition(self, sac):
         statuses = [
-            SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-            SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
-            SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
-            SingleAuditChecklist.STATUS.SUBMITTED,
+            STATUS.READY_FOR_CERTIFICATION,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.SUBMITTED,
         ]
         # Get the current time in UTC
         transition_date = datetime.now(timezone.utc)
@@ -426,7 +427,7 @@ class IntakeToDisseminationTests(TestCase):
             general.total_amount_expended,
             self.sac.federal_awards["FederalAwards"].get("total_amount_expended"),
         )
-        self.assertEquals(
+        self.assertEqual(
             Util.json_array_to_str(self.sac.audit_information["gaap_results"]),
             general.gaap_results,
         )
@@ -438,7 +439,7 @@ class IntakeToDisseminationTests(TestCase):
         with mock.patch.object(logger, "warning") as mock_warning:
             self.intake_to_dissemination.save_dissemination_objects()
             mock_warning.assert_called()
-        self.assertEquals(1, len(self.intake_to_dissemination.errors))
+        self.assertEqual(1, len(self.intake_to_dissemination.errors))
 
     def test_submitted_date(self):
         """
@@ -460,7 +461,7 @@ class IntakeToDisseminationTests(TestCase):
                 general = generals.first()
 
                 # Get the sac submitted date
-                subdate = self.sac.get_transition_date(self.sac.STATUS.SUBMITTED)
+                subdate = self.sac.get_transition_date(STATUS.SUBMITTED)
                 # Calculate the date at UTC-11 (the American Samoa timezone does not do DST)
                 date_in_american_samoa = (subdate - timedelta(hours=11)).date()
 
@@ -559,7 +560,7 @@ class IntakeToDisseminationTests(TestCase):
         sec_auditor = SecondaryAuditor.objects.first()
         print(self.sac.report_id)
         print(sec_auditor.report_id)
-        self.assertEquals(self.sac.report_id, sec_auditor.report_id.report_id)
+        self.assertEqual(self.sac.report_id, sec_auditor.report_id.report_id)
 
     def test_load_additional_ueis(self):
         self.intake_to_dissemination.load_general()

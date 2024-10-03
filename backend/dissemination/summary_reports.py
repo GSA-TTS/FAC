@@ -147,6 +147,8 @@ field_name_ordered = {
         "auditor_email",
         "auditor_foreign_address",
         "auditor_certified_date",
+        "auditor_certify_name",
+        "auditor_certify_title",
         "cognizant_agency",
         "oversight_agency",
         "type_audit_code",
