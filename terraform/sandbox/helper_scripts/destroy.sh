@@ -38,7 +38,7 @@ DestroyPrivateS3() {
 }
 
 TerraformDestroy() {
-    terraform plan \
+  terraform plan \
     -var-file="../shared/config/sandbox.tfvars" \
     -out sandbox-destroy.tfplan \
     -destroy
