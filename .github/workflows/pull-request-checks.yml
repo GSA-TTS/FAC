@@ -10,7 +10,6 @@ on:
       - '!docs/**'
       - 'docs/bpmn-workflow-models/**'
       - '!.github/ISSUE_TEMPLATE/**'
-      - '!.github/workflows/**'
   workflow_dispatch: null
 
 jobs:

@@ -7,7 +7,6 @@ on:
     paths-ignore:
       - 'docs/**'
       - '.github/ISSUE_TEMPLATE/**'
-      - '.github/workflows/**'
 
 jobs:
   # ensure that every time a push to main occurs, the container is built and published to ghcr
