@@ -8,6 +8,20 @@ sudo apt-get update
 sudo apt-get install cf8-cli
 ```
 
+### Make sure to have awscli installed
+```
+curl -x $https_proxy -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip && rm awscliv2.zip
+./aws/install -i ~/usr -b ~/bin
+
+
+# Alerternative
+pip install awscli --upgrade --user
+
+# aws doesnt work with an x509 error? This fixed it on my WSL2 Ubuntu
+pip install --upgrade cryptography==36.0.2
+```
+
 ### Create a deployer account
 If a deployer account **has not been created**, then simply run the following:
 ```
