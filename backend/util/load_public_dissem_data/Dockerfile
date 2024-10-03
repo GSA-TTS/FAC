@@ -9,6 +9,7 @@ RUN apt-get install -y \
 
 WORKDIR /layered
 COPY data/sling.yaml .
+COPY data/tribal_sling.yaml .
 COPY data/config.json .
 
 # Curl in `sling`

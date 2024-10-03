@@ -88,3 +88,4 @@ fi
 # data from fac-snapshot-db (in the dissem_* tables) to a set of 
 # tables that the API will point at. 
 sling run -r /layered/sling.yaml
+sling run -r /layered/tribal_sling.yaml

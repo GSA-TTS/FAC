@@ -51,3 +51,6 @@ CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_ein_idx
 
 CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_audit_year_idx 
 	on public_data_v1_0_0.general (audit_year);
+
+CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_batch_general_idx
+    ON public_data_v1_0_0.general (batch_number);

@@ -40,25 +40,36 @@ $$
 BEGIN
     DROP SCHEMA IF EXISTS public_api_v2_0_0_alpha CASCADE;
     DROP SCHEMA IF EXISTS public_api_v2_0_0_alpha_functions CASCADE;
-
     CREATE SCHEMA IF NOT EXISTS public_api_v2_0_0_alpha;
     CREATE SCHEMA IF NOT EXISTS public_api_v2_0_0_alpha_functions;
+    -- Functions are loaded before sling comes up.
         
     GRANT USAGE ON SCHEMA public_api_v2_0_0_alpha_functions TO api_fac_gov;
+    GRANT USAGE ON SCHEMA public_api_v2_0_0_alpha TO api_fac_gov;
+    GRANT USAGE ON SCHEMA public_data_v1_0_0 TO api_fac_gov;
 
     -- Grant access to tables and views
     ALTER DEFAULT PRIVILEGES
         IN SCHEMA public_api_v2_0_0_alpha
         GRANT SELECT
-    -- this includes views
-    ON tables
-    TO api_fac_gov;
+        ON tables
+        TO api_fac_gov;
+
+    ALTER DEFAULT PRIVILEGES 
+        IN SCHEMA public_data_v1_0_0  
+        GRANT SELECT 
+        ON TABLES
+        TO api_fac_gov;
 
     -- Grant access to sequences, if we have them
-    GRANT USAGE ON SCHEMA public_api_v2_0_0_alpha to api_fac_gov;
     GRANT SELECT, USAGE 
     ON ALL SEQUENCES 
     IN SCHEMA public_api_v2_0_0_alpha 
+    TO api_fac_gov;
+
+    GRANT SELECT, USAGE 
+    ON ALL SEQUENCES 
+    IN SCHEMA public_data_v1_0_0 
     TO api_fac_gov;
     
 END
@@ -69,21 +80,35 @@ COMMIT;
 
 notify pgrst, 'reload schema';
 
------------------------------------------------------
+---
 -- FUNCTIONS
------------------------------------------------------
-CREATE OR REPLACE FUNCTION public_api_v2_0_0_alpha.rows_per_batch()
+--
+
+CREATE OR REPLACE FUNCTION public_api_v2_0_0_alpha_functions.rows_per_batch()
     RETURNS integer
     LANGUAGE sql IMMUTABLE PARALLEL SAFE AS
     'SELECT 20000';
 
-create or replace function public_api_v2_0_0_alpha_functions.batches (diss_table text) 
+CREATE OR REPLACE FUNCTION public_api_v2_0_0_alpha_functions.batch (id bigint) 
+    RETURNS bigint
+    AS $batch$
+    DECLARE result bigint;
+    DECLARE RPB integer;
+    BEGIN 
+        SELECT public_api_v2_0_0_alpha_functions.rows_per_batch() INTO RPB;
+        SELECT div(id, RPB) INTO result;
+        RETURN result;
+    END
+    $batch$
+    LANGUAGE plpgsql IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION public_api_v2_0_0_alpha_functions.batches (diss_table text) 
 returns integer 
 as $batches$
 declare count integer;
 declare RPB integer;
 begin 
-    select public_api_v2_0_0_alpha.rows_per_batch() into RPB;
+    select public_api_v2_0_0_alpha_functions.rows_per_batch() into RPB;
 	case
 	   	when diss_table = 'additional_eins' then  
 	   		select div(count(*), RPB) into count 
@@ -126,8 +151,28 @@ end
 $batches$   
 language plpgsql;
 
-notify pgrst, 'reload schema';
+CREATE OR REPLACE FUNCTION public_api_v2_0_0_alpha.compute_batch(row_id bigint)
+    RETURNS BIGINT
+    AS $$
+        DECLARE result bigint;
+        BEGIN
+            SELECT public_api_v2_0_0_alpha_functions.batch(row_id) INTO result;
+            return result;
+        END
+    $$ LANGUAGE plpgsql;
 
+
+create or replace function public_api_v2_0_0_alpha.get_federal_award_batch (batch_no bigint) 
+RETURNS SETOF record
+as $batches$
+	SELECT * 
+    FROM public_data_v1_0_0.federal_awards 
+    WHERE batch_number = batch_no;
+$batches$   
+language sql;
+
+
+NOTIFY pgrst, 'reload schema';
 
 BEGIN;
 
@@ -214,6 +259,12 @@ CREATE VIEW public_api_v2_0_0_alpha.combined AS
     SELECT * FROM public_data_v1_0_0.combined comb
     ;
 
+---------------------------------------
+-- metadata
+---------------------------------------
+CREATE VIEW public_api_v2_0_0_alpha.metadata AS
+    SELECT * FROM public_data_v1_0_0.metadata
+    ;
 
 
 COMMIT;

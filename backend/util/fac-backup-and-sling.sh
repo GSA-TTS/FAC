@@ -30,6 +30,7 @@ GetSling() {
 
 RunSling() {
     ./sling run -r dissemination/sql/sling/public_data_v1_0_0/public_data_v1_0_0.yaml
+    ./sling run -r dissemination/sql/sling/public_data_v1_0_0/tribal_data_v1_0_0.yaml
 }
 
 InstallAWS() {
@@ -52,6 +53,8 @@ if [ "$run_option" == "initial_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
+    GetSling
+    gonogo "insall_sling"
     RDSToS3Dump "$db_name" "$backup_s3_name" "initial/$initial_date"
     gonogo "db_to_s3"
     RDSToRDS "$db_name" "$backup_db_name" "initial"
@@ -59,17 +62,19 @@ if [ "$run_option" == "initial_backup" ]; then
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
     RunSling
-    gonogo "sling"
+    gonogo "run_sling"
 elif [ "$run_option" == "deploy_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
+    GetSling
+    gonogo "insall_sling"
     RDSToRDS "$db_name" "$backup_db_name" "backup"
     gonogo "db_to_db"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
     RunSling
-    gonogo "sling"
+    gonogo "run_sling"
 elif [ "$run_option" == "scheduled_backup" ]; then
     GetUtil
     InstallAWS
@@ -78,24 +83,24 @@ elif [ "$run_option" == "scheduled_backup" ]; then
     gonogo "db_to_s3"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
-    RunSling
-    gonogo "sling"
 elif [ "$run_option" == "daily_backup" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
+    GetSling
+    gonogo "insall_sling"
+    RDSToRDS "$db_name" "$backup_db_name" "backup"
+    gonogo "db_to_db"
     RDSToS3Dump "$db_name" "$backup_s3_name" "daily/$daily_date"
     gonogo "db_to_s3"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
     RunSling
-    gonogo "sling"
+    gonogo "run_sling"
 elif [ "$run_option" == "media_sync" ]; then
     GetUtil
     InstallAWS
     gonogo "install_aws"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
-    RunSling
-    gonogo "sling"
 fi

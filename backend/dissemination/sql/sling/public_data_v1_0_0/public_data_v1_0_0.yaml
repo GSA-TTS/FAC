@@ -16,13 +16,13 @@ streams:
   # The first table we create is the general table. All of the 
   # general table is public data, so we copy it wholesale.
   public.dissemination_general:
-    mode: incremental
-    update_key: id
+    mode: full-refresh
     object: public_data_v1_0_0.general
     sql: |
       -- All of the general table is public data.
       SELECT
-        gen.id,
+        gen.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_general'), 20000) as batch_number,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -109,17 +109,16 @@ streams:
         gen.type_audit_code
       FROM
           public.dissemination_general gen
-      WHERE {incremental_where_cond}
       ORDER BY gen.id
 
   # All additional EINs are public.
   public.additional_eins:
-    mode: incremental
-    update_key: ein.id
+    mode: full-refresh
     object: public_data_v1_0_0.additional_eins
     sql: |
       SELECT
-        ein.id,
+        ein.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_additional_eins'), 20000) as batch_number,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -131,18 +130,16 @@ streams:
           public.dissemination_additionalein ein
       WHERE
           gen.report_id = ein.report_id
-          AND
-          {incremental_where_cond}
       ORDER BY ein.id
 
   # All of the additional UEI info is public info.
   public.dissemination_additional_ueis:
-    mode: incremental
-    update_key: uei.id
+    mode: full-refresh
     object: public_data_v1_0_0.additional_ueis
     sql: |
       SELECT
-        uei.id,
+        uei.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_additional_ueis'), 20000) as batch_number,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -154,18 +151,16 @@ streams:
         public.dissemination_additionaluei uei
       WHERE
         gen.report_id = uei.report_id
-        AND
-        {incremental_where_cond}
       ORDER BY uei.id
 
   # Corrective action plans are NOT always public.
   public.dissemination_corrective_action_plan:
-    mode: incremental
-    update_key: cap.id
+    mode: full-refresh
     object: public_data_v1_0_0.corrective_action_plans
     sql: |
       SELECT
-        cap.id,
+        cap.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_corrective_action_plans'), 20000) as batch_number,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -182,18 +177,16 @@ streams:
         AND
         -- Only include the public corrective action plans.
         gen.is_public = true
-        AND
-        {incremental_where_cond}
       ORDER BY cap.id
 
   # All Federal award data is public.
   public.dissemination_federalaward:
-    mode: incremental
-    update_key: award.id
+    mode: full-refresh
     object: public_data_v1_0_0.federal_awards
     sql: |
       SELECT
-        award.id,
+        award.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_federal_awards'), 20000) as batch_number,
         dg.report_id,
         dg.auditee_uei,
         dg.audit_year,
@@ -224,18 +217,16 @@ streams:
         public.dissemination_federalaward award
       WHERE
         award.report_id = dg.report_id
-        AND
-        {incremental_where_cond}
       ORDER BY award.id
 
   # The findings table is public.
   public.dissemination_findings:
-    mode: incremental
-    update_key: finding.id
+    mode: full-refresh
     object: public_data_v1_0_0.findings
     sql: |
       SELECT
-        finding.id,
+        finding.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_findings'), 20000) as batch_number,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -257,18 +248,16 @@ streams:
         public.dissemination_finding finding
       WHERE
         finding.report_id = gen.report_id
-        AND
-        {incremental_where_cond}
       ORDER BY finding.id
 
   # Findings text is NOT always public.
   public.dissemination_findingstext:
-    mode: incremental
-    update_key: ft.id
+    mode: full-refresh
     object: public_data_v1_0_0.findings_text
     sql: |
       SELECT
-        ft.id,
+        ft.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_findings_text'), 20000) as batch_number,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -283,18 +272,16 @@ streams:
           ft.report_id = gen.report_id
           AND
           gen.is_public = true
-          AND
-          {incremental_where_cond}
       ORDER BY ft.id
 
   # The notes to SEFA are NOT all public.
   public.dissemination_notes:
-    mode: incremental
-    update_key: note.id
+    mode: full-refresh
     object: public_data_v1_0_0.notes_to_sefa
     sql: |
       SELECT
-        note.id,
+        note.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_notes_to_sefa'), 20000) as batch_number,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -314,18 +301,16 @@ streams:
           AND
           -- Some notes are not public.
           gen.is_public = true
-          AND
-          {incremental_where_cond}
       ORDER BY note.id
 
   # All passthrough information is public.
   public.dissemination_passthrough:
-    mode: incremental
-    update_key: pass.id
+    mode: full-refresh
     object: public_data_v1_0_0.passthrough
     sql: |
       SELECT
-        pass.id,
+        pass.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_passthrough'), 20000) as batch_number,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -339,18 +324,16 @@ streams:
           public.dissemination_passthrough pass
       WHERE
           gen.report_id = pass.report_id
-          AND
-          {incremental_where_cond}
       ORDER BY pass.id
 
   # All secondary auditor info is public.
   public.secondary_auditors:
-    mode: incremental
-    update_key: sa.id
+    mode: full-refresh
     object: public_data_v1_0_0.secondary_auditors
     sql: |
       SELECT
-        sa.id,
+        sa.id as id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_secondary_auditors'), 20000) as batch_number,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -371,8 +354,6 @@ streams:
           public.dissemination_secondaryauditor sa
       WHERE
           sa.report_id = gen.report_id
-          AND
-          {incremental_where_cond}
       ORDER BY sa.id
 
   public.combined:
@@ -380,14 +361,15 @@ streams:
     object: public_data_v1_0_0.combined
     sql: |
       SELECT
-        nextval('public_data_v1_0_0.seq_combined') AS id,
         dg.report_id,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_combined'), 20000) as batch_number,
         dfa.award_reference,
         df.reference_number,
         concat(dfa.federal_agency_prefix,'.',dfa.federal_award_extension) as aln,
         --
         -- general
         --
+        dg.id as general_row_id,
         dg.auditee_uei,
         dg.audit_year,
         dg.agencies_with_prior_findings,
@@ -452,6 +434,7 @@ streams:
         --
         -- federal_award
         --
+        dfa.id as federal_award_row_id,
         dfa.additional_award_identification,
         dfa.amount_expended,
         dfa.audit_report_type,
@@ -473,6 +456,7 @@ streams:
         --
         -- finding
         --
+        df.id as finding_row_id,
         df.is_material_weakness,
         df.is_modified_opinion,
         df.is_other_findings,
@@ -485,6 +469,7 @@ streams:
         --
         -- passthrough
         --
+        dp.id as passthrough_row_id,
         dp.passthrough_id,
         dp.passthrough_name
       FROM 
@@ -497,50 +482,3 @@ streams:
       LEFT JOIN public.dissemination_passthrough dp
         ON dfa.report_id = dp.report_id 
         AND dfa.award_reference = dp.award_reference
-
-  # This looks at the tables after they have been updated, and 
-  # generates metadata that agencies use to determine if they
-  # have completely pulled all of the data in their systems.
-  public_data_v1_0_0.metadata:
-    mode: full-refresh
-    object: public_data_v1_0_0.metadata_v2_0_0_a
-    sql: |
-      SELECT 'additional_eins' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('additional_eins') 
-        FROM public_data_v1_0_0.additional_eins
-      UNION
-      SELECT 'additional_ueis' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('additional_ueis')  
-        FROM public_data_v1_0_0.additional_ueis
-      UNION
-      SELECT 'combined' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('combined')  
-        FROM public_data_v1_0_0.combined
-      UNION
-      SELECT 'federal_awards' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('federal_awards')  
-        FROM public_data_v1_0_0.federal_awards
-      UNION
-      SELECT 'findings_text' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('findings_text')  
-        FROM public_data_v1_0_0.findings_text
-      UNION
-      SELECT 'findings' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('findings')  
-        FROM public_data_v1_0_0.findings
-      UNION
-      SELECT 'general' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('general')  
-        FROM public_data_v1_0_0.general
-      UNION
-      SELECT 'notes_to_sefa' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('notes_to_sefa')  
-        FROM public_data_v1_0_0.notes_to_sefa
-      UNION
-      SELECT 'passthrough' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('passthrough')  
-        FROM public_data_v1_0_0.passthrough
-      UNION
-      SELECT 'secondary_auditors' 
-        AS table, COUNT(*), public_api_v2_0_0_alpha_functions.batches('secondary_auditors')  
-        FROM public_data_v1_0_0.secondary_auditors

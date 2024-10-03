@@ -8,6 +8,7 @@ declare -a api_versions=(
     "admin_api_v1_1_0"
     "admin_api_v1_1_1"
     "public_api_v2_0_0_alpha"
+    "public_data_v1_0_0"
     )
 # These are the tables that must be present
 # in order to stand up that API.
@@ -18,6 +19,7 @@ declare -a api_required_tables=(
   "public.support_administrative_key_uuids"
   "public.support_administrative_key_uuids"
   "public_data_v1_0_0.general"
+  "public.dissemination_general"
 )
 
 declare -a db2_indexes=(

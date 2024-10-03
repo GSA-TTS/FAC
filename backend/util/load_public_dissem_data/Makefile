@@ -2,6 +2,7 @@ NETWORK?=backend-web-1
 
 build:
 	cp ../../dissemination/sql/sling/public_data_v1_0_0/public_data_v1_0_0.yaml data/sling.yaml
+	cp ../../dissemination/sql/sling/public_data_v1_0_0/tribal_data_v1_0_0.yaml data/tribal_sling.yaml
 	docker build -t facloaddata .
 
 run:

@@ -10,9 +10,11 @@ source tools/util_startup.sh
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
 source tools/api_teardown.sh
-source tools/build_indexes.sh
 source tools/migrate_app_tables.sh
+source tools/sling_support_functions.sh
+source tools/sling_first_run.sh
 source tools/api_standup.sh
+source tools/build_indexes.sh
 source tools/seed_cog_baseline.sh
 
 #####
@@ -31,6 +33,13 @@ gonogo "api_teardown"
 # MIGRATE APP TABLES
 # migrate_app_tables
 gonogo "migrate_app_tables"
+
+#####
+# PREP API TABLES
+# This runs sling and preps tables in the snapshot DB.
+# Only runs if the tables are not present (e.g. first deploy)
+sling_first_run
+gonogo "sling_first_run"
 
 #####
 # API STANDUP

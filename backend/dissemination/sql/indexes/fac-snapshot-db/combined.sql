@@ -73,3 +73,6 @@ CREATE INDEX IF NOT EXISTS fac_snapshot_db_combined_audit_year_idx
 
 CREATE INDEX IF NOT EXISTS fac_snapshot_db_combined_aln_idx 
 	on public_data_v1_0_0.combined (aln);
+
+CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_batch_combined 
+    ON public_data_v1_0_0.combined (batch_number);

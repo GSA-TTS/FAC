@@ -6,3 +6,6 @@ CREATE INDEX IF NOT EXISTS fac_snapshot_db_passthrough_report_id_idx
 
 CREATE INDEX IF NOT EXISTS fac_snapshot_db_passthrough_report_id_fad
 	on public_data_v1_0_0.passthrough (report_id, fac_accepted_date);
+
+CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_batch_passthrough_idx
+    ON public_data_v1_0_0.passthrough (batch_number);

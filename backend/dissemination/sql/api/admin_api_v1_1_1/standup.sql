@@ -501,17 +501,17 @@ CREATE OR REPLACE VIEW admin_api_v1_1_1.admin_api_events AS
 -- Expose more of the internal tables for analysis/trouble-shooting.
 -----------------
 CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_access AS
-    SELECT * FROM admin_api_v1_1_1.audit_access
+    SELECT * FROM public.audit_access
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_deletedaccess AS
-    SELECT * FROM admin_api_v1_1_1.audit_deletedaccess
+    SELECT * FROM public.audit_deletedaccess
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_excelfile AS
-    SELECT * FROM admin_api_v1_1_1.audit_excelfile
+    SELECT * FROM public.audit_excelfile
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
@@ -522,47 +522,47 @@ CREATE OR REPLACE VIEW admin_api_v1_1_1.singleauditchecklist AS
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_sacvalidationwaiver AS
-    SELECT * FROM admin_api_v1_1_1.audit_sacvalidationwaiver
+    SELECT * FROM public.audit_sacvalidationwaiver
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_singleauditreportfile AS
-    SELECT * FROM admin_api_v1_1_1.audit_singleauditreportfile
+    SELECT * FROM public.audit_singleauditreportfile
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_submissionevent AS
-    SELECT * FROM admin_api_v1_1_1.audit_submissionevent
+    SELECT * FROM public.audit_submissionevent
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.auth_user AS
-    SELECT * FROM admin_api_v1_1_1.auth_user
+    SELECT * FROM public.auth_user
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.django_migrations AS
-    SELECT * FROM admin_api_v1_1_1.django_migrations
+    SELECT * FROM public.django_migrations
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.support_adminapievent AS
-    SELECT * FROM admin_api_v1_1_1.support_adminapievent
+    SELECT * FROM public.support_adminapievent
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.support_cognizantassignment AS
-    SELECT * FROM admin_api_v1_1_1.support_cognizantassignment
+    SELECT * FROM public.support_cognizantassignment
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.support_cognizantbaseline AS
-    SELECT * FROM admin_api_v1_1_1.support_cognizantbaseline
+    SELECT * FROM public.support_cognizantbaseline
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.users_userpermission AS
-    SELECT * FROM admin_api_v1_1_1.users_userpermission
+    SELECT * FROM public.users_userpermission
     WHERE admin_api_v1_1_1_functions.has_admin_data_access('READ')
 ;
 

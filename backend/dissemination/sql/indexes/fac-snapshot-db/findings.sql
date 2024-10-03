@@ -13,4 +13,7 @@ CREATE INDEX IF NOT EXISTS fac_snapshot_db_findings_rid_aref
 CREATE INDEX IF NOT EXISTS fac_snapshot_db_findings_rid_aref_fad
 	on public_data_v1_0_0.findings (report_id, award_reference, fac_accepted_date);
 
+CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_batch_findings_idx
+    ON public_data_v1_0_0.findings (batch_number);
+
 

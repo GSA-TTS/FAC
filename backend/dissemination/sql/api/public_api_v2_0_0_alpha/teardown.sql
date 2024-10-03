@@ -7,5 +7,6 @@ BEGIN;
 
 COMMIT;
 
+
 notify pgrst,
        'reload schema';

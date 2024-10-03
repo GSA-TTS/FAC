@@ -1,6 +1,9 @@
 ---------------------------------------
 -- INDEXES on federal_awards
 ---------------------------------------
+CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_awards_id_idx 
+	on public_data_v1_0_0.federal_awards (id);
+
 CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_awards_report_id_idx 
 	on public_data_v1_0_0.federal_awards (report_id);
 
@@ -27,3 +30,6 @@ CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_awards_rid_aln_fad
 
 CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_awards_aln_cnt
     ON public_data_v1_0_0.federal_awards (aln,findings_count);
+
+CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_batch_fa 
+    ON public_data_v1_0_0.federal_awards (batch_number);
