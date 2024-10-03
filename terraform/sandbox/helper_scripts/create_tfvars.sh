@@ -18,8 +18,7 @@ read -p "Enter the name of your working branch: " branch
 
 cat > $FILE << EOM
 # Generated with ./create_tfvars.sh
-# You are responsible for populating the secrets. None of them will be supplied to you.
-# Please reference the drive doc for the sandbox secrets!
+# You are responsible for populating the secrets. Please reference the drive doc for the sandbox secrets!
 
 branch_name             = "$branch"
 new_relic_license_key   = ""

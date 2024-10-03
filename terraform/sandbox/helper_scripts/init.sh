@@ -4,6 +4,10 @@
 # in ../meta/bootstrap-env/templates.
 
 set -e
+dir=$(pwd)
+cd ..
 terraform init \
   --backend-config=../shared/config/sandbox.tfvars \
   --backend-config=key=terraform.tfstate.$(basename "$(pwd)")
+
+cd "$dir"
