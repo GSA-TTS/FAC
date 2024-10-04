@@ -51,6 +51,7 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 "role": _get_friendly_role(access.role),
                 "user_exists": bool(access.user),
                 "never_logged_in_flag": "" if bool(access.user) else "*",
+                "id": access.id,
             }
 
         def _get_url_from_viewname(viewname: str, report_id: str | None = None) -> str:
@@ -91,6 +92,7 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             "change_cert_auditee_url": _url("ChangeAuditeeCertifyingOfficial"),
             "change_cert_auditor_url": _url("ChangeAuditorCertifyingOfficial"),
             "add_editor_url": _url("ChangeOrAddRoleView"),
+            "remove_editor_url": _url("RemoveEditorView"),
         }
 
         return render(request, "audit/manage-submission.html", context)

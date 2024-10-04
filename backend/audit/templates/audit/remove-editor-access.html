@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6 margin-bottom-8">
+        <div class="grid-row">
+            <form class="tablet:grid-col-8 tablet:grid-offset-2"
+                  id="remove-editor-access"
+                  method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                        <h1 id="role-management">Remove Editor</h1>
+                        <p class="font-sans-md">
+                            Are you sure you want to remove audit access for this editor?
+                        </p>
+                        <p>
+                            <strong>Name: </strong>{{ name }}
+                        </p>
+                        <p>
+                            <strong>Email: </strong>{{ email }}
+                        </p>
+                        <input class="usa-input"
+                            id="editor_id"
+                            name="editor_id"
+                            type="hidden"
+                            value="{{ editor_id }}"
+                        />
+                        <span class="usa-error-message" id="email-error-message" role="alert">{{ errors.email }}</span>
+                </fieldset>
+                <button class="usa-button margin-top-5" id="continue">Remove access</button>
+                <a class="usa-button usa-button--unstyled margin-left-2"
+                   href="{% url 'audit:ManageSubmission' report_id %}">Cancel</a>
+            </form>
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}

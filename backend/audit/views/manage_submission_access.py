@@ -4,6 +4,7 @@ from django import forms
 from django.db import transaction
 from django.shortcuts import redirect, render, reverse
 from django.views import generic
+from django.http import Http404
 
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
@@ -165,6 +166,67 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             }
 
         return context
+
+
+class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    """
+    View for removing the audit access of an editor.
+    """
+
+    template = "audit/remove-editor-access.html"
+    role = "editor"
+
+    def get(self, request, *args, **kwargs):
+        """
+        Show the current editor and the form.
+        """
+        report_id = kwargs["report_id"]
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        id = request.GET.get("id", None)
+
+        try:
+            access = Access.objects.get(id=id)
+        except Access.DoesNotExist as e:
+            raise Http404() from e
+
+        context = {
+            "editor_id": access.id,
+            "name": access.fullname,
+            "email": access.email,
+            "report_id": sac.report_id,
+            "errors": [],
+        }
+
+        return render(request, "audit/remove-editor-access.html", context)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Remove the editor and redirect to manage submission.
+        """
+        report_id = kwargs["report_id"]
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        editor_id = request.POST.get('editor_id')
+
+        try:
+            access = Access.objects.get(id=editor_id)
+        except Access.DoesNotExist as e:
+            raise Http404() from e
+
+        if request.user.email != access.email:
+            access.delete()
+        else:
+            context = {
+                "editor_id": access.id,
+                "name": access.fullname,
+                "email": access.email,
+                "report_id": sac.report_id,
+                "errors": {"email": "You cannot remove your own audit access"},
+            }
+
+            return render(request, "audit/remove-editor-access.html", context)
+
+        url = reverse("audit:ManageSubmission", kwargs={"report_id": report_id})
+        return redirect(url)
 
 
 class ChangeAuditorCertifyingOfficialView(ChangeOrAddRoleView):
