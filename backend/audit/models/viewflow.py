@@ -163,6 +163,8 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         self.sac.transition_name.append(STATUS.SUBMITTED)
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
 
+    # WIP
+    # to add - source=[STATUS.SUBMITTED, STATUS.DISSEMINATED]
     @state.transition(
         source=STATUS.SUBMITTED,
         target=STATUS.DISSEMINATED,

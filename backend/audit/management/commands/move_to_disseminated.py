@@ -30,6 +30,8 @@ class Command(BaseCommand):
             help="The ID of the SAC.",
             default=None,
         )
+        # WIP
+        # to add - an argument for re-disseminating audits that have already been disseminated.
 
     def handle(self, *args, **options):
         report_id = options.get("report_id")
@@ -51,7 +53,9 @@ class Command(BaseCommand):
             disseminated = sac.disseminate()
             # `disseminated` is None if there were no errors.
             if disseminated is None:
+                # WIP -- enable audit tracking.
                 sac_transition(None, sac, transition_to=STATUS.DISSEMINATED)
+                # WIP -- disable audit tracking.
         # END ATOMIC BLOCK
 
         # IF THE DISSEMINATION SUCCEEDED
