@@ -1,6 +1,7 @@
 """
 Allows the manual transition of an audit to dissemination.
 """
+
 from audit.models import (
     SingleAuditChecklist,
 )
@@ -35,14 +36,14 @@ class Command(BaseCommand):
 
         # no parameter passed.
         if report_id is None:
-            logger.error('You need to enter a report_id (--report_id ID_OF_REPORT).')
+            logger.error("You need to enter a report_id (--report_id ID_OF_REPORT).")
             exit(0)
 
         sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
 
         # must be stuck as 'submitted'.
         if sac.submission_status != STATUS.SUBMITTED:
-            logger.error('This report is not stuck in the submitted state.')
+            logger.error("This report is not stuck in the submitted state.")
             exit(0)
 
         # BEGIN ATOMIC BLOCK
@@ -71,5 +72,5 @@ class Command(BaseCommand):
                     disseminated, report_id
                 )
             )
-            
+
         logger.info(f"Disseminated report: {report_id}")
