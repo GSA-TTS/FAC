@@ -73,6 +73,7 @@ terraform init \
 terraform plan \
   --backend-config=../shared/config/sandbox.tfvars
 ```
+Alternatively, you can run `./prepare-proxy` in each folder.
 
 ### First Deployment
 Navigate to `terraform/sandbox` and run the `./init.sh` script. This assumes you have a `sandbox.tfvars` in `terraform/shared/config/`. Below is an example of values that will need to have values inside the file:
