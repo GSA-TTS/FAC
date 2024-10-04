@@ -1,6 +1,11 @@
 #!/bin/bash
 
 set -e
+
+# Force the user of the script into the sanbox environment.
+# This way, we don't accidentally operate on something else.
+cf t -s sandbox
+
 dir=$(pwd)
 cd ..
 DestroyPublicS3() {
