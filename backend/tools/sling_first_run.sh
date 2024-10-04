@@ -17,6 +17,8 @@ function sling_first_run() {
     # If the metadata table exists, it means sling has run to completion.
     check_table_exists $FAC_SNAPSHOT_URI 'public_data_v1_0_0.metadata'
     local is_metadata_table=$?
+    echo "check_table_exists public_data_v1_0_0.metadata $is_metadata_table"
+    
     # We need to load some functions for sling to complete, because
     # we use those functions as part of the metadata table generation.
     local base_path='dissemination/sql'

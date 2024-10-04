@@ -9,7 +9,7 @@ declare -a api_versions=(
     "admin_api_v1_1_1"
     "public_api_v2_0_0_alpha"
     "public_data_v1_0_0"
-    )
+    )    
 # These are the tables that must be present
 # in order to stand up that API.
 declare -a api_required_tables=(

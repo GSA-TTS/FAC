@@ -13,8 +13,7 @@ function api_teardown {
 
     for index in "${!api_versions[@]}"
     do
-      local api_version="${api_versions[index]}"
-      local required_table="${api_required_tables[index]}"      
+      local api_version="${api_versions[index]}"      
       if [ -f ${base_path}/${location}/${api_version}/${sql_file} ]; then
           run_sql $FAC_SNAPSHOT_URI $base_path $location $api_version $sql_file
           gonogo "$api_version teardown.sql"

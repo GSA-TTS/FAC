@@ -58,34 +58,38 @@ else
     echo "Loaded lots of data without error, apparently."
 fi
 
-# Download cgov-util.
-# This will let us do a backup from the main database (fac-db)
-# to the secondary database (fac-snapshot-db). This mirrors what
-# happens in production.
-pushd /app/data
+# We'll stop here. Now, on first boot, the FAC should see if things are
+# in place in DB2. If not, the app startup process will take
+# care of creating new tables, etc.
 
-# Run the backup of the dissemination_ tables from
-# fac-db to fac-snapshot-db.
-check_table_exists $FAC_SNAPSHOT_URI "public.dissemination_general"
-result=$?
-# cgov-util wants to know the environment it is in.
-export ENV="LOCAL"
-if [ $result -ne 0 ]; then
-    # First run if it does not exist.
-    /layered/cgov-util db_to_db \
-        --src_db fac-db \
-        --dest_db fac-snapshot-db \
-        --operation initial
-else
-    /layered/cgov-util db_to_db \
-        --src_db fac-db \
-        --dest_db fac-snapshot-db \
-        --operation backup
-fi
+# # Download cgov-util.
+# # This will let us do a backup from the main database (fac-db)
+# # to the secondary database (fac-snapshot-db). This mirrors what
+# # happens in production.
+# pushd /app/data
 
-# Now, we're going to run sling.
-# This will create the API tables. It essentially does a copy of
-# data from fac-snapshot-db (in the dissem_* tables) to a set of 
-# tables that the API will point at. 
-sling run -r /layered/sling.yaml
-sling run -r /layered/tribal_sling.yaml
+# # Run the backup of the dissemination_ tables from
+# # fac-db to fac-snapshot-db.
+# check_table_exists $FAC_SNAPSHOT_URI "public.dissemination_general"
+# result=$?
+# # cgov-util wants to know the environment it is in.
+# export ENV="LOCAL"
+# if [ $result -ne 0 ]; then
+#     # First run if it does not exist.
+#     /layered/cgov-util db_to_db \
+#         --src_db fac-db \
+#         --dest_db fac-snapshot-db \
+#         --operation initial
+# else
+#     /layered/cgov-util db_to_db \
+#         --src_db fac-db \
+#         --dest_db fac-snapshot-db \
+#         --operation backup
+# fi
+
+# # Now, we're going to run sling.
+# # This will create the API tables. It essentially does a copy of
+# # data from fac-snapshot-db (in the dissem_* tables) to a set of 
+# # tables that the API will point at. 
+# sling run -r /layered/sling.yaml
+# sling run -r /layered/tribal_sling.yaml

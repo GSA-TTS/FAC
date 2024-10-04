@@ -113,7 +113,11 @@ if __name__ == "__main__":
     for k, v in results3.items():
         results4[k] = math.floor(v / min)
 
+    # results1 is the raw EXPLAIN cost of downloading all of federal_awards
     pprint(results1)
+    # results2 is the ratio
     pprint(results2)
+    # results3 is the raw timing
     pprint(results3)
+    # results4 is the ratio for timings
     pprint(results4)

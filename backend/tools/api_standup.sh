@@ -19,7 +19,7 @@ function api_standup {
             echo "check_table_exists $required_table $result"
             if [ $result -eq 0 ]; then
                 run_sql $FAC_SNAPSHOT_URI $base_path $location $api_version 'standup.sql'
-                gonogo "$api_version teardown.sql"
+                gonogo "$api_version standup.sql"
             else 
                 echo "API TABLE NOT FOUND/SKIPPED $required_table not found for $api_version"
             fi
