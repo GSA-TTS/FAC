@@ -1,4 +1,13 @@
 ### Make sure to have CF CLI on WSL2 Ubuntu
+
+You must be running version 8+ of the CF client for the helper scripts to work. 
+
+```
+cf --version
+```
+
+Will likely report v8.8 or higher. Version 7 will not work.
+
 ```
 # ...first add the Cloud Foundry Foundation public key and package repository to your system
 wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
@@ -39,6 +48,9 @@ This will update a `secrets.auto.tfvars` in the directory for use with terraform
 
 
 ### Give the deployer account permissions in the ${ENV}-egress space
+
+*This has already been done. This section is for documentation only.*
+
 You must have a role of SpaceManager to assign the deployer service account. Ask Alex, Bret or Matt to do this for you (but the assumption is it will be done for you. The space will only have this service account and will not need to be done more than once, unless the account gets deleted from the sandbox space)
 ```
 cf space-users gsa-tts-oros-fac sandbox
@@ -46,7 +58,10 @@ cf set-space-role <uaa_unique_id> gsa-tts-oros-fac sandbox-egress SpaceDeveloper
 ```
 
 ### ASGS
-Since we do not rely on the github meta workflow (yet) to handle ASGS, we must explictly ensure they are there. This operation will only need to be done once, but documenting for documentation purposes.
+
+*This has already been done. This section is for documentation only.*
+
+Since we do not rely on the github meta workflow (yet) to handle ASGS, we must explictly ensure they are there. This operation will only need to be done once.
 
 Security Groups:
 ```
@@ -74,20 +89,45 @@ login_secret_key        = ""
 django_secret_login_key = ""
 ```
 
-Navigate to the following folders in cli:
-`terraform/shared/modules/sandbox-proxy` & `terraform/shared/modules/stream-proxy`
-Run the following commands to generate a local `proxy.zip` so the module is able to see the zip artifact to deploy the applications with
-```
-terraform init \
-  --backend-config=../shared/config/sandbox.tfvars
+Navigate to `terraform/shared/modules/sandbox-proxy`, and run the following two commands.
 
-terraform plan \
-  --backend-config=../shared/config/sandbox.tfvars
 ```
-Alternatively, you can run `./prepare-proxy` in each folder.
+terraform init --backend-config=../shared/config/sandbox.tfvars
+```
+
+This will issue a warning. Then run:
+
+```
+terraform plan
+```
+
+You'll be prompted for values; hit enter to leave them blank. When you are done, you should have `proxy.zip` in your current folder.
+
+Then, navigate to `terraform/shared/modules/stream-proxy` (or `cd ../../modules/stream-proxy`) and run the same two commands:
+
+```
+terraform init --backend-config=../shared/config/sandbox.tfvars
+
+terraform plan 
+```
+
+Again, leave the prompts blank. Check you have a `proxy.zip`.
 
 ### First Deployment
-Navigate to `terraform/sandbox/helper_scripts` and populate the secrets file, and then run the `./init.sh` script. This assumes you have a `sandbox.tfvars` in `terraform/shared/config/`. Next, run `./plan.sh` script. You should see it creating ~20 resources.
+
+Make sure you are in the sandbox environment.
+
+```
+cf t -s sandbox
+```
+
+... FIXME ... destroy on clean environment?
+
+Navigate to `terraform/sandbox/helper_scripts` and then run the `./init.sh` script. This assumes you have a `sandbox.tfvars` in `terraform/shared/config/` from previous steps. 
+
+Now, run `./destroy.sh`. This tears down anything in the `sandbox` environment that may have been left from previous deploys (by you or others).
+
+Next, run `./plan.sh` script. You should see it creating ~20 resources.
 Finally, run `./apply.sh` script and wait.
 
 ### Discoveries:
