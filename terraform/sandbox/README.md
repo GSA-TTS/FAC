@@ -58,10 +58,20 @@ cf bind-security-group public_networks_egress gsa-tts-oros-fac --lifecycle runni
 
 ### Pre-Configuration
 
-Since this is operating under the belief that you do not have a `shared/config/sandbox.tfvars` file, a helper script in `terraform/sandbox` has been provided. This will create a secrets file that we will edit in the next step.
+Since this is operating under the belief that you do not have a `shared/config/sandbox.tfvars` file, a helper script in `terraform/sandbox` has been provided. This will create a secrets file that we will edit before attempting a deployment.
 ```
 cd terraform/sandbox/helper/
 ./create_tfvars.sh
+```
+
+```
+branch_name             = "" # There is no default branch. This value should be the name of your branch. (ex <initials>/<feature> [as/terraform-work])
+new_relic_license_key   = ""
+pgrst_jwt_secret        = ""
+sam_api_key             = ""
+login_client_id         = ""
+login_secret_key        = ""
+django_secret_login_key = ""
 ```
 
 Navigate to the following folders in cli:
@@ -77,18 +87,7 @@ terraform plan \
 Alternatively, you can run `./prepare-proxy` in each folder.
 
 ### First Deployment
-Navigate to `terraform/sandbox` and populate the secrets file, and then run the `./init.sh` script. This assumes you have a `sandbox.tfvars` in `terraform/shared/config/`. Below is an example of secrets that will need to have values inside the file:
-```
-branch_name             = "" # There is no default branch. This value should be the name of your branch. (ex <initials>/<feature> [as/terraform-work])
-new_relic_license_key   = ""
-pgrst_jwt_secret        = ""
-sam_api_key             = ""
-login_client_id         = ""
-login_secret_key        = ""
-django_secret_login_key = ""
-```
-
-Next, run `./plan.sh` script. You should see it creating ~20 resources.
+Navigate to `terraform/sandbox/helper_scripts` and populate the secrets file, and then run the `./init.sh` script. This assumes you have a `sandbox.tfvars` in `terraform/shared/config/`. Next, run `./plan.sh` script. You should see it creating ~20 resources.
 Finally, run `./apply.sh` script and wait.
 
 ### Discoveries:
