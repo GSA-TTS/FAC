@@ -37,12 +37,6 @@ cd terraform/sandbox
 ```
 This will update a `secrets.auto.tfvars` in the directory for use with terraform.
 
-### Generate a template for sandbox.tfvars
-Since this is operating under the belief that you do not have a `shared/config/sandbox.tfvars` file, a helper script in `terraform/sandbox` has been provided. You are responsible for populating those secrets.
-```
-cd terraform/sandbox/helper/
-./create_tfvars.sh
-```
 
 ### Give the deployer account permissions in the ${ENV}-egress space
 You must have a role of SpaceManager to assign the deployer service account. Ask Alex, Bret or Matt to do this for you (but the assumption is it will be done for you. The space will only have this service account and will not need to be done more than once, unless the account gets deleted from the sandbox space)
@@ -75,8 +69,15 @@ terraform plan \
 ```
 Alternatively, you can run `./prepare-proxy` in each folder.
 
+### Generate a template for sandbox.tfvars
+Since this is operating under the belief that you do not have a `shared/config/sandbox.tfvars` file, a helper script in `terraform/sandbox` has been provided. This will create a secrets file that we will edit in the next step.
+```
+cd terraform/sandbox/helper/
+./create_tfvars.sh
+```
+
 ### First Deployment
-Navigate to `terraform/sandbox` and run the `./init.sh` script. This assumes you have a `sandbox.tfvars` in `terraform/shared/config/`. Below is an example of values that will need to have values inside the file:
+Navigate to `terraform/sandbox` and populate the secrets file, and then run the `./init.sh` script. This assumes you have a `sandbox.tfvars` in `terraform/shared/config/`. Below is an example of secrets that will need to have values inside the file:
 ```
 branch_name             = "" # There is no default branch. This value should be the name of your branch. (ex <initials>/<feature> [as/terraform-work])
 new_relic_license_key   = ""
