@@ -57,6 +57,13 @@ cf bind-security-group public_networks_egress gsa-tts-oros-fac --lifecycle runni
 ```
 
 ### Pre-Configuration
+
+Since this is operating under the belief that you do not have a `shared/config/sandbox.tfvars` file, a helper script in `terraform/sandbox` has been provided. This will create a secrets file that we will edit in the next step.
+```
+cd terraform/sandbox/helper/
+./create_tfvars.sh
+```
+
 Navigate to the following folders in cli:
 `terraform/shared/modules/sandbox-proxy` & `terraform/shared/modules/stream-proxy`
 Run the following commands to generate a local `proxy.zip` so the module is able to see the zip artifact to deploy the applications with
@@ -68,13 +75,6 @@ terraform plan \
   --backend-config=../shared/config/sandbox.tfvars
 ```
 Alternatively, you can run `./prepare-proxy` in each folder.
-
-### Generate a template for sandbox.tfvars
-Since this is operating under the belief that you do not have a `shared/config/sandbox.tfvars` file, a helper script in `terraform/sandbox` has been provided. This will create a secrets file that we will edit in the next step.
-```
-cd terraform/sandbox/helper/
-./create_tfvars.sh
-```
 
 ### First Deployment
 Navigate to `terraform/sandbox` and populate the secrets file, and then run the `./init.sh` script. This assumes you have a `sandbox.tfvars` in `terraform/shared/config/`. Below is an example of secrets that will need to have values inside the file:
