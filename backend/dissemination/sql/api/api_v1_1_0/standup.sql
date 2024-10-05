@@ -1,33 +1,31 @@
-DO
-$do$
-BEGIN
-   IF EXISTS (
-      SELECT FROM pg_catalog.pg_roles
-      WHERE  rolname = 'authenticator') THEN
-      RAISE NOTICE 'Role "authenticator" already exists. Skipping.';
-   ELSE
-      CREATE ROLE authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
-   END IF;
-END
-$do$;
-
-DO
-$do$
-BEGIN
-   IF EXISTS (
-      SELECT FROM pg_catalog.pg_roles
-      WHERE  rolname = 'api_fac_gov') THEN
-      RAISE NOTICE 'Role "api_fac_gov" already exists. Skipping.';
-   ELSE
-      CREATE ROLE api_fac_gov NOLOGIN;
-   END IF;
-END
-$do$;
-
-GRANT api_fac_gov TO authenticator;
-
-NOTIFY pgrst, 'reload schema';
-begin;
+------------------------------------------------------------------
+-- GATE
+------------------------------------------------------------------
+-- We only want the API to run if certain conditions are met.
+-- We could try and encode that in the `bash` portion of the code.
+-- Or, we could just gate things at the top of our SQL. 
+-- If the conditions are not met, we should exit noisily.
+-- A cast to regclass will fail with an exception if the table
+-- does not exist.
+DO LANGUAGE plpgsql
+$GATE$
+    DECLARE
+        the_schema varchar := 'public';
+        the_table  varchar := 'dissemination_general';
+        api_ver    varchar := 'API_v1_1_0';
+    BEGIN
+        IF EXISTS (
+            SELECT FROM pg_tables
+            WHERE  schemaname = the_schema
+            AND    tablename  = the_table
+            )
+        THEN
+            RAISE info '% Gate condition met. Continuing.', api_ver;
+        ELSE
+            RAISE exception '% %.% not found.', api_ver, the_schema, the_table;
+        END IF;
+    END
+$GATE$;
 
 do
 $$
@@ -74,40 +72,9 @@ end
 $$
 ;
 
--- https://postgrest.org/en/stable/references/api/openapi.html
--- This is the title (version number) and description (text).
-COMMENT ON SCHEMA api_v1_1_0 IS
-$$v1.1.0
-
-A RESTful API that serves data from the SF-SAC.$$;
-
-
-commit;
-
-notify pgrst,
-       'reload schema';
-
--- WARNING
--- Under PostgreSQL 12, the functions below work.
--- Under PostgreSQL 14, these will break.
---
--- Note the differences:
---
--- raise info 'Works under PostgreSQL 12';
--- raise info 'request.header.x-magic %', (SELECT current_setting('request.header.x-magic', true));
--- raise info 'request.jwt.claim.expires %', (SELECT current_setting('request.jwt.claim.expires', true));
--- raise info 'Works under PostgreSQL 14';
--- raise info 'request.headers::json->>x-magic %', (SELECT current_setting('request.headers', true)::json->>'x-magic');
--- raise info 'request.jwt.claims::json->expires %', (SELECT current_setting('request.jwt.claims', true)::json->>'expires');
---
--- To quote the work of Dav Pilkey, "remember this now."
-
 -----------------------------------------------------
 -- FUNCTIONS
 -----------------------------------------------------
-
-
-notify pgrst, 'reload schema';
 
 CREATE OR REPLACE FUNCTION api_v1_1_0_functions.get_header(item text) RETURNS text
     AS $get_header$
@@ -216,10 +183,6 @@ GRANT EXECUTE ON FUNCTION api_v1_1_0.get_federal_award_batch(bigint) TO api_fac_
 create index IF NOT EXISTS batch_by_id_dfa 
     on public.dissemination_federalaward 
     using btree(api_v1_1_0_functions.batch(public.dissemination_federalaward.id));
-
-
-NOTIFY pgrst, 'reload schema';
-begin;
 
 ---------------------------------------
 -- finding_text
@@ -519,11 +482,3 @@ create view api_v1_1_0.additional_eins as
         gen.report_id = ein.report_id
     order by ein.id
 ;
-
-commit;
-
-
-
-notify pgrst,
-       'reload schema';
-

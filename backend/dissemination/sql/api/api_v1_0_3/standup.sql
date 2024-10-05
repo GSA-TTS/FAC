@@ -1,41 +1,33 @@
 ------------------------------------------------------------------
--- authenticator role
+-- GATE
 ------------------------------------------------------------------
-DO
-$do$
-BEGIN
-   IF EXISTS (
-      SELECT FROM pg_catalog.pg_roles
-      WHERE  rolname = 'authenticator') THEN
-      RAISE NOTICE 'Role "authenticator" already exists. Skipping.';
-   ELSE
-      CREATE ROLE authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
-   END IF;
-END
-$do$;
+-- We only want the API to run if certain conditions are met.
+-- We could try and encode that in the `bash` portion of the code.
+-- Or, we could just gate things at the top of our SQL. 
+-- If the conditions are not met, we should exit noisily.
+-- A cast to regclass will fail with an exception if the table
+-- does not exist.
+DO LANGUAGE plpgsql
+$GATE$
+    DECLARE
+        the_schema varchar := 'public';
+        the_table  varchar := 'dissemination_general';
+        api_ver    varchar := 'API_v1_0_3';
+    BEGIN
+        IF EXISTS (
+            SELECT FROM pg_tables
+            WHERE  schemaname = the_schema
+            AND    tablename  = the_table
+            )
+        THEN
+            RAISE info '% Gate condition met. Continuing.', api_ver;
+        ELSE
+            RAISE exception '% %.% not found.', api_ver, the_schema, the_table;
+        END IF;
+    END
+$GATE$;
 
-------------------------------------------------------------------
--- api_fac_gov role
-------------------------------------------------------------------
-DO
-$do$
-BEGIN
-   IF EXISTS (
-      SELECT FROM pg_catalog.pg_roles
-      WHERE  rolname = 'api_fac_gov') THEN
-      RAISE NOTICE 'Role "api_fac_gov" already exists. Skipping.';
-   ELSE
-      CREATE ROLE api_fac_gov NOLOGIN;
-   END IF;
-END
-$do$;
-
-GRANT api_fac_gov TO authenticator;
-
-NOTIFY pgrst, 'reload schema';
-
-
-BEGIN;
+SELECT 'public.dissemination_general'::regclass;
 
 DO
 $APIV103$
@@ -43,7 +35,9 @@ $APIV103$
         DROP SCHEMA IF EXISTS api_v1_0_3 CASCADE;
         DROP SCHEMA IF EXISTS api_v1_0_3_functions CASCADE;
 
-        IF NOT EXISTS (select schema_name from information_schema.schemata where schema_name = 'api_v1_0_3') then
+        IF NOT EXISTS (select schema_name 
+                        from information_schema.schemata 
+                        where schema_name = 'api_v1_0_3') then
             CREATE SCHEMA api_v1_0_3;
             CREATE SCHEMA api_v1_0_3_functions;
             
@@ -70,9 +64,6 @@ $APIV103$
 $APIV103$
 ;
 
-COMMIT;
-NOTIFY pgrst, 'reload schema';
-
 ------------------------------------------------------------------
 -- functions
 ------------------------------------------------------------------
@@ -83,12 +74,9 @@ BEGIN
 END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
 
-NOTIFY pgrst, 'reload schema';
-
 ------------------------------------------------------------------
 -- VIEWs
 ------------------------------------------------------------------
-BEGIN;
 ---------------------------------------
 -- finding_text
 ---------------------------------------
@@ -416,9 +404,3 @@ create view api_v1_0_3.additional_eins as
         (gen.is_public = false and api_v1_0_3_functions.has_tribal_data_access()))
     order by ein.id
 ;
-
-commit;
-
-notify pgrst,
-       'reload schema';
-

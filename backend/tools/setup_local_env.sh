@@ -16,7 +16,7 @@ function setup_local_env {
         # For database work
         export FAC_DB_URI=${DATABASE_URL}?sslmode=disable
         export FAC_SNAPSHOT_URI=${SNAPSHOT_URL}?sslmode=disable
-        export PSQL_EXE='psql -v ON_ERROR_STOP=on'
+        export PSQL_EXE='psql --single-transaction -v ON_ERROR_STOP=on'
         export SLING_EXE='/bin/sling'
         export CGOV_UTIL_EXE='/bin/cgov-util'
         

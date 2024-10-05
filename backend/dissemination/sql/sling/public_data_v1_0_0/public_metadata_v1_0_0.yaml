@@ -21,53 +21,53 @@ streams:
     object: public_data_v1_0_0.metadata
     sql: |
       SELECT 'additional_eins' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('additional_eins') 
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('additional_eins') 
         FROM public_data_v1_0_0.additional_eins
       UNION
       SELECT 'additional_ueis' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('additional_ueis')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('additional_ueis')  
         FROM public_data_v1_0_0.additional_ueis
       UNION
       SELECT 'combined' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('combined')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('combined')  
         FROM public_data_v1_0_0.combined
       UNION
       SELECT 'federal_awards' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('federal_awards')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('federal_awards')  
         FROM public_data_v1_0_0.federal_awards
       UNION
       SELECT 'findings_text' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('findings_text')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('findings_text')  
         FROM public_data_v1_0_0.findings_text
       UNION
       SELECT 'findings' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('findings')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('findings')  
         FROM public_data_v1_0_0.findings
       UNION
       SELECT 'general' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('general')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('general')  
         FROM public_data_v1_0_0.general
       UNION
       SELECT 'notes_to_sefa' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('notes_to_sefa')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('notes_to_sefa')  
         FROM public_data_v1_0_0.notes_to_sefa
       UNION
       SELECT 'passthrough' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('passthrough')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('passthrough')  
         FROM public_data_v1_0_0.passthrough
       UNION
       SELECT 'secondary_auditors' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('secondary_auditors')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('secondary_auditors')  
         FROM public_data_v1_0_0.secondary_auditors
       UNION
       SELECT 'tribal_corrective_action_plans' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('tribal_corrective_action_plans')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('tribal_corrective_action_plans')  
         FROM public_data_v1_0_0.tribal_corrective_action_plans
       UNION
       SELECT 'tribal_findings_text' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('tribal_findings_text')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('tribal_findings_text')  
         FROM public_data_v1_0_0.tribal_findings_text
       UNION
       SELECT 'tribal_notes_to_sefa' 
-        AS table, COUNT(*) --, public_api_v2_0_0_alpha_functions.batches('tribal_notes_to_sefa')  
+        AS table, COUNT(*) --, public_api_v1_0_0_functions.batches('tribal_notes_to_sefa')  
         FROM public_data_v1_0_0.tribal_notes_to_sefa

@@ -11,6 +11,7 @@ function startup_log {
 function gonogo {
   if [ $? -eq 0 ]; then
     startup_log "STARTUP_CHECK" "$1 PASS"
+    return 0
   else
     startup_log "STARTUP_CHECK" "$1 FAIL"
     exit -1
@@ -38,11 +39,8 @@ function check_schema_exists () {
 
 function run_sql () {
     local db_uri="$1"
-    local base_path="$2"
-    local location="$3"
-    local api_version="$4"
-    local sql_file="$5"
-
-    $PSQL_EXE $db_uri < ${base_path}/${location}/${api_version}/${sql_file}
-    gonogo "run_sql < ${base_path}/${location}/${api_version}/${sql_file}"
+    local path="$2"
+    echo "BEGIN run_sql < $path"
+    $PSQL_EXE $db_uri < $path
+    gonogo "GONOGO run_sql < $path"
 }

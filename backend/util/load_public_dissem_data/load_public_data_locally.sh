@@ -68,24 +68,24 @@ fi
 # # happens in production.
 # pushd /app/data
 
-# # Run the backup of the dissemination_ tables from
-# # fac-db to fac-snapshot-db.
-# check_table_exists $FAC_SNAPSHOT_URI "public.dissemination_general"
-# result=$?
-# # cgov-util wants to know the environment it is in.
-# export ENV="LOCAL"
-# if [ $result -ne 0 ]; then
-#     # First run if it does not exist.
-#     /layered/cgov-util db_to_db \
-#         --src_db fac-db \
-#         --dest_db fac-snapshot-db \
-#         --operation initial
-# else
-#     /layered/cgov-util db_to_db \
-#         --src_db fac-db \
-#         --dest_db fac-snapshot-db \
-#         --operation backup
-# fi
+# Run the backup of the dissemination_ tables from
+# fac-db to fac-snapshot-db.
+check_table_exists $FAC_SNAPSHOT_URI "public.dissemination_general"
+result=$?
+# cgov-util wants to know the environment it is in.
+export ENV="LOCAL"
+if [ $result -ne 0 ]; then
+    # First run if it does not exist.
+    /layered/cgov-util db_to_db \
+        --src_db fac-db \
+        --dest_db fac-snapshot-db \
+        --operation initial
+else
+    /layered/cgov-util db_to_db \
+        --src_db fac-db \
+        --dest_db fac-snapshot-db \
+        --operation backup
+fi
 
 # # Now, we're going to run sling.
 # # This will create the API tables. It essentially does a copy of

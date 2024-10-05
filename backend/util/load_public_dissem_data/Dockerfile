@@ -8,8 +8,6 @@ RUN apt-get install -y \
     unzip
 
 WORKDIR /layered
-COPY data/sling.yaml .
-COPY data/tribal_sling.yaml .
 COPY data/config.json .
 
 # Curl in `sling`
@@ -24,11 +22,9 @@ RUN curl -L -O https://github.com/GSA-TTS/fac-backup-utility/releases/download/v
     && chmod 755 gov.gsa.fac.cgov-util \ 
     && mv gov.gsa.fac.cgov-util /layered/cgov-util
 
-# This grabs a config file from the repo
-# that is intended for local devleopment. Therefore, it has all the right values
-# for talking to our stack.
+# Where do we need the config? Try home?
 WORKDIR /root/.fac
-RUN curl -L -O https://raw.githubusercontent.com/GSA-TTS/fac-backup-utility/refs/heads/main/config.json 
+COPY data/config.json .
 
 WORKDIR /app
 ENTRYPOINT [ "./load_public_data_locally.sh" ]

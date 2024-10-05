@@ -3,6 +3,9 @@ source tools/util_startup.sh
 function sling_first_run() {
     startup_log "SLING_FIRST_RUN" "Slinging data to fac-snapshot if needed"
 
+    # FIXME. We could do a clean bring-up, and have no data. 
+    # This would end up creating tables, and subsequent runs pass.
+    # So.
     check_table_exists $FAC_SNAPSHOT_URI 'public.dissemination_general'
     local is_general_table=$?
     if [ $is_general_table -ne 0 ]; then
@@ -26,6 +29,7 @@ function sling_first_run() {
 
     # Only run sling if the tables in the secondary DB do not exist.
     if [ $is_metadata_table -ne 0 ]; then 
+        SLING_ALLOW_EMPTY=1
         startup_log "SLING_FIRST_RUN" "API tables don't exist; running sling."
         $SLING_EXE run -r dissemination/sql/sling/public_data_v1_0_0/public_data_v1_0_0.yaml
         gonogo "sling public data for API tables"
