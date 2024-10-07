@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from audit.fixtures.excel import (
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     FORM_SECTIONS,
@@ -40,7 +41,17 @@ def extract_corrective_action_plan(file, is_gsa_migration=False, auditee_uei=Non
         template["title_row"],
     )
 
-    ir = extract_workbook_as_ir(file)
+    _, file_extension = os.path.splitext(file)
+    if file_extension == ".xlsx":
+        ir = extract_workbook_as_ir(file)
+    elif file_extension == ".json":
+        try:
+            with open(file, "r", encoding="utf-8") as f:
+                ir = json.load(f)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error loading JSON file {file}: {e}")
+    else:
+        raise ValueError("File must be a JSON file or an XLSX file")
     run_all_general_checks(
         ir, FORM_SECTIONS.CORRECTIVE_ACTION_PLAN, is_gsa_migration, auditee_uei
     )
