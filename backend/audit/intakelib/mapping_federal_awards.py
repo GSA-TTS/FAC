@@ -61,7 +61,7 @@ def extract_federal_awards(file, is_gsa_migration=False, auditee_uei=None):
             raise ValueError(f"Error loading JSON file {file}: {e}")
     else:
         raise ValueError("File must be a JSON file or an XLSX file")
-    
+
     run_all_general_checks(
         ir, FORM_SECTIONS.FEDERAL_AWARDS, is_gsa_migration, auditee_uei
     )
