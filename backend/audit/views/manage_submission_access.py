@@ -194,6 +194,7 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             "name": access.fullname,
             "email": access.email,
             "report_id": sac.report_id,
+            "is_editor_removing_self": request.user.email == access.email,
             "errors": [],
         }
 
@@ -220,6 +221,7 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "name": access.fullname,
                 "email": access.email,
                 "report_id": sac.report_id,
+                "is_editor_removing_self": True,
                 "errors": {"email": "You cannot remove your own audit access"},
             }
 

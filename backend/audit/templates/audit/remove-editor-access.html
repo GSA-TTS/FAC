@@ -10,7 +10,11 @@
                 <fieldset class="usa-fieldset">
                         <h1 id="role-management">Remove Editor</h1>
                         <p class="font-sans-md">
+                            {% if is_editor_removing_self %}
+                            You do not have permission to remove audit access for this editor:
+                            {% else %}
                             Are you sure you want to remove audit access for this editor?
+                            {% endif %}
                         </p>
                         <p>
                             <strong>Name: </strong>{{ name }}
@@ -26,7 +30,10 @@
                         />
                         <span class="usa-error-message" id="email-error-message" role="alert">{{ errors.email }}</span>
                 </fieldset>
-                <button class="usa-button margin-top-5" id="continue">Remove access</button>
+                <p class="font-sans-md">
+                    In order to avoid an audit from become inaccesible to an organization, editors do not have permission to remove their own access.
+                </p>
+                <button class="usa-button margin-top-5" id="continue" {% if is_editor_removing_self %} disabled {% endif %}>Remove access</button>
                 <a class="usa-button usa-button--unstyled margin-left-2"
                    href="{% url 'audit:ManageSubmission' report_id %}">Cancel</a>
             </form>
