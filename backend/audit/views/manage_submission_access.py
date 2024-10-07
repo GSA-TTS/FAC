@@ -206,7 +206,7 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        editor_id = request.POST.get('editor_id')
+        editor_id = request.POST.get("editor_id")
 
         try:
             access = Access.objects.get(id=editor_id)
