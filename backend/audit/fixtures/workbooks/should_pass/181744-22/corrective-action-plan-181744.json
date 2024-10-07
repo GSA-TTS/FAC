@@ -1,0 +1,90 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "CorrectiveActionPlan"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "MKEJWVSEURF3"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "planned_action",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "1"
+                },
+                "values": []
+            }
+        ]
+    }
+]

@@ -1,0 +1,183 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "CorrectiveActionPlan"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "JCJBPTJXYXH9"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "31"
+                },
+                "values": [
+                    "2022-020",
+                    "2022-027",
+                    "2022-006",
+                    "2022-008",
+                    "2022-015",
+                    "2022-001",
+                    "2022-004",
+                    "2022-013",
+                    "2022-017",
+                    "2022-005",
+                    "2022-009",
+                    "2022-012",
+                    "2022-007",
+                    "2022-014",
+                    "2022-011",
+                    "2022-101",
+                    "2022-021",
+                    "2022-010",
+                    "2022-022",
+                    "2022-003",
+                    "2022-029",
+                    "2022-025",
+                    "2022-023",
+                    "2022-026",
+                    "2022-002",
+                    "2022-018",
+                    "2022-024",
+                    "2022-028",
+                    "2022-016",
+                    "2022-019"
+                ]
+            },
+            {
+                "name": "planned_action",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "31"
+                },
+                "values": [
+                    "Corrective action plan: TDA maintains an internal policy that requires SOC reports to be reviewed annually and document complementary user entity controls included in each SOC report. TDAs contract with Colyar LLC requires the vendor to produce a SOC report annually. The vendor was late in providing the SOC report as a 2022 contract deliverable. TDA took actions to ensure vendor accountability for submitting the late contract deliverable and the vendor was required to complete a corrective action plan. TDA will review and assess the SOC report as soon as it is delivered by the vendor to ensure CLAs recommendations can be followed and will consider additional procedures to ensure internal controls are assessed in the absence of a SOC report. Implementation date(s): June 2023 Responsible persons: Chief Information Officer and the Director for Food and Nutrition Program Support",
+                    "Corrective action plan: TWC has already reviewed all ACF-196R and ACF-204 Report queries and made the appropriate criteria modifications to appropriately reflect and report Agency activities. The query review and modifications were completed in October 2022, and subsequent Federal Financial Reports, for active TWC grants, were modified to reflect accurate cumulative activities. Implementation date(s): October 31, 2022 Responsible persons: Teri Goodwin, Financial Reporting Manager",
+                    "Corrective action plan: To strengthen requirements related to unique disaster funding, DSHS will amend DSHS Policy AA-3301: Monitoring and Management of the Operating Budget to establish roles and responsibilities for ensuring expenditures are reviewed and within grant parameters. We anticipate policy revisions to be drafted by July 31, 2023. Implementation date(s): July 31, 2023 Responsible persons: Chief Financial Officer",
+                    "Corrective action plan: DSHS will continue to utilize the updated procedure and FFATA checklist that was implemented on March 1, 2022 to ensure the verification of FFATA reports are formally documented prior to submission. DSHS will continue to maintain all relevant documentation to support that the key data elements were reported within the required timeframes. Implementation date(s): March 1, 2022 Responsible persons: FFATA Coordinator ",
+                    "Corrective action plan: HHSC  Medicaid and CHIP Services - FRAC identified the missing requirements and updated the MLR report template and instructions in August 2022. Unfortunately, work was not completed in time for the Managed Care Organizations (MCO) to use the new template for reports submitted in August 2022. MCOs will use the new template with reports submitted in August 2023. Implementation date(s): Fully implemented August 2022. Responsible persons: Director, Medicaid and CHIP Services  FRAC",
+                    "Corrective action plan: Management will strengthen agencys existing internal control over the review of project IDs to ensure all approvals are obtained on the project allocation percentage forms. Implementation date(s): May 31, 2023 Responsible persons: Maura Flores",
+                    "Corrective action plan: DPS will update the profile setup process in CAPPS to ensure the Service/Receipt Date Indicator box is checked in CAPPS on all profile setups relating to Grants. DPS Grants staff will receive training on how to fill out a Profile Setup Form to ensure the Service/Receipt Date Indicator Box is checked at the time the project is setup in CAPPS. The Grants staff will run a monthly report from CAPPS to see if all active projects have the service date indicator box checked. Implementation date(s): March 1, 2023 Responsible persons: Grants Manager, Deputy Administrator, Financial Reporting ",
+                    "Corrective action plan: In December 2022, the Federal Funds Office (FFO) identified all prime awards with a potential subaward action date of 10/1/2021 or later. FFO is in the process of determining which of these have issued subawards for which no Federal Funding Accountability and Transparency Act (FFATA) reporting has been received from the program areas. In addition, FFO has revised the subaward reporting templates for programs. The goal of the revised templates is to 1) clearly state instructions for the information requested and 2) delineate between a) earlier subawards that are being reported late and b) subawards that fall into the current reporting period. These changes will assist FFO in maintaining current reporting and bringing all past due reporting up to date. The goal is to have all past due subawards from 10/1/2021 forward submitted to FFATA Subaward Reporting System (FSRS) by 12/31/2023. Implementation date(s): December 1, 2022 Responsible persons: Director, Federal Funds",
+                    "Corrective action plan: The four IDs referenced in this finding did not have access to the BAMS application; the BAMS application is only accessible to agency staff with Oracle database user accounts. The report listing these IDs was from the applications record of roles. Access to BAMS was terminated when the users database accounts were removed. Implementation date(s): March 28, 2023 for refresher training to staff. CAPPS: September 1, 2023. Responsible Persons: Lynn Varian, Deputy Director of Information Resources Division",
+                    "Corrective action plan: DPS will ensure booking of year-end accruals for all outstanding expenses for the Homeland Security Grant Program according to the Financial Reporting Requirements established by the Comptroller of Public Accounts. Implementation date(s): September 1, 2023 Responsible persons: Grants Manager, Deputy Administrator, Financial Reporting",
+                    "Corrective action plan: Texas Integrated Eligibility Redesign System (TIERS) - In order to bring password settings into compliance with the HHSC Information Security (IS) Security Policy, the TIERS Operations team released tool/method (113.0) successfully into production without any adverse impact. This release was completed on 09/24/2022 and contained the security requirements to restrict minimum allowed password changes from zero (unlimited) to one meaning users are allowed \"only\" one password change a day. This was verified by CliftonLarsonAllen LLP (CLA) auditors on 12/21/22. Screenshots were also provided to CLA auditors. Implementation date(s): September 24, 2022 Responsible Persons: Director, Information Technology (IT) Infrastructure Services",
+                    "Corrective action plan: HHSC Accounting has implemented the reporting of Early Childhood Intervention (ECI) expenditures on Line 16 of the Administration for Children and Families (ACF) 196R. The HHSC Accounting policies and procedures related to the ACF 196R were revised and corrected for all open years. Implementation date(s): August 31, 2022 Responsible persons: Manager, State and Federal Reporting",
+                    "Corrective action plan: To strengthen requirements related to unique disaster funding, DSHS will amend DSHS Policy AA-3301: Monitoring and Management of the Operating Budget to establish roles and responsibilities for ensuring expenditures are reviewed and within grant parameters. We anticipate policy revisions to be drafted by July 31, 2023. Implementation date(s): July 31, 2023 Responsible persons: Chief Financial Officer",
+                    "Corrective action plan: In December 2021, HHSC implemented the Texas Medicaid & Healthcare Partnership (TMHP) Provider Enrollment Management System (PEMS), an automated system that is the single tool for provider enrollment, re-enrollment, revalidation, and maintenance requests (maintaining and updating provider enrollment record information). HHSC is confident that as the LTC providers are enrolled and re-validated through PEMS, the errors for documentation will be corrected. The LTC process will mirror the sampled acute care providers which were found to be 100 percent compliant during this review, further supporting that the process is working. Implementation date(s): December 2021 Responsible persons: Deputy Associate Commissioner, Operations Management",
+                    "Corrective action plan: The Office of Data Analytics and Performance (DAP) will continue to work with IT - Social Services Applications (IT SSA) to determine the root cause of the errors. Once that has been established, corrective action will be implemented to correct that root cause. After corrections are made, DAP will continue to work with IT SSA to ensure the corrective action has eliminated the errors. Implementation date(s): August 31, 2024 Responsible persons: Director, Strategic Decision Support Director, DAP Aging & Disability",
+                    "Corrective Action Plan: The Cancer Center will establish the following processes to enhance security procedures surrounding user access:  IT personnel at the Cancer Center will review server admin groups on an annual basis per existing policiesand procedures Annual reviews will coincide with the Cancer Centers fiscal year start every September as part of our existingGRC reviews During the year, automated notifications will be setup to alert the proper IT teams when server admin groupchanges occur during the year that need to be reviewed prior to the annual review Outcomes from each annual review will be documented for historical reference as neededThe finding concerning user access settings has been mitigated through the additional step to user profiles in the system. All admin group security access profiles are now in compliance with the Cancer Centers policies. No additional steps are necessary to mitigate this finding. The team will continue to monitor per policy. Implementation Date: August 2023 Responsible Person: Craig Owen",
+                    "Corrective action plan: Although the Department performed a partial review of service accounts during the review period and has current policies in place, a review and update of its policies will ensure the completeness and timeliness of future reviews and allow for improved documentation. Management intends to implement a list of all applicable systems to be reviewed, an associated scheduled timeline and allow for the documentation of its review and approval. SOP 1264.03 which is the policy that management intended to address the review of service accounts will be revised to better define the systems that are to be reviewed. In the SOP, the term System accounts was intended to include all accounts not directly assigned to an employee, which are required for the functionality of TDHCA Information Technology (IT) systems. System accounts could be used synonymously with the term Service accounts and the agency will modify the policy to specifically refer to service accounts. Implementation date(s): August 2023 Responsible Persons: Director of Information Systems",
+                    "Corrective action plan: The formula error was identified, corrected and reallocations are now correct. Also, the outdated reallocation journal tool is no longer used. The new journal reallocation tool includes edits to identify discrepancies before a reallocation journal is posted. As an additional verification step, which began with March 2022 reallocations, a new verification report (Fund Source Allocation Compare Report) is run that compares the date the factor was updated to the date the reallocation journal was entered to ensure no changes have been made to the factor. HHSC Accounting will work with Chief Financial Officer (CFO) Operation Support to establish an automated process to strengthen existing verifications. Implementation date(s): August, 31, 2023 Responsible persons: Director, Funds Management",
+                    "Corrective action plan: To prevent similar errors from occurring until program closure, TRR management shared these findings with the external application review vendor on January 26, 2023, reiterating the processes for reviewing and approving rental assistance according to all program policies and procedures and ensuring that appropriate documentation related to review of applications is maintained in the files. Eligibility errors are expected in all programs, and TRR has developed different processes to address errors when identified. For these particular cases, TRR management requested the vendor take corrective action for each case as applicable (e.g., by requesting a return of funds for overpayment or by requesting additional information from applicants). Implementation date(s): January 26, 2023 Responsible persons: Danny Shea, TRR Senior Program Manager ",
+                    "Corrective action plan: DFPS will revise its policies and procedures related to the ACF-196R report review process to ensure all expenditure amounts are being properly classified. Implementation date(s): May 31, 2023 Responsible persons: Maura Flores ",
+                    "Corrective action plan: FDCM/OI investigators will review PIRTS reports on a regularly scheduled basis to ensure that Boards are uploading all required documentation related to childcare improper payments and taking collection efforts. The PIRTS system is in the process of being updated and is currently undergoing User Acceptance Testing. The updated system should allow for more robust reporting and controls. Additionally, FDCM/OI will provide more robust training and retraining to Boards that fall out of compliance. FDCM/OI will also develop an escalation policy in cases where Boards are not responsive to investigators requests for status updates or document uploads into PIRTS. FDCM/OI investigators will ensure that SRM monitors are fully briefed on childcare improper payment cases at a Board as part of SRMs annual monitoring review of the Board. Finally, FDCM/OI will ensure that all relevant controlling documents, e.g. Workforce Development Letter 21-16, Change 3 and its attached Child Care Fact-Finders Desk Aid; and the TWCs Child Care Services Guide are updated to incorporate these new procedures. Implementation date(s): June 1, 2023 Responsible Persons: Jason Stalinsky, Deputy Division Director, Division of Fraud Deterrence and Compliance Monitoring",
+                    "Corrective action plan: Program management adopted policies and procedures to ensure supporting documentation for federal submissions are maintained, including any reconciling calculations or adjustments to support information. Implementation date(s): Implemented as of February 8, 2023 Responsible persons: Mariana Salazar, Texas Rent Relief Director",
+                    "Corrective action plan:  For Source Data, the program has developed policies and procedures to document source data.  For Cumulative Calculations, auditors specifically requested from TDHCA reports submitted to the Treasury from different periods to specifically be able to calculate cumulative figures for obligations and expenditures. TDHCA explained that the methodology the Treasury has requested for grantees to use will not allow the quarterly obligations and expenditures reported to be summed to equal the current cumulative amount due to adjustments for recaptured funds. This is an unavoidable reality of the Emergency Rental Assistance (ERA) program and federal reporting system and can only be rectified in the final report to Treasury. Certain aspects of the Treasurys design of the program, most significantly the recapture of funds from beneficiaries, can cause the draw/transaction data for a given period, e.g. Q3 2022, to change after that quarter is complete. Per Treasury guidance, TDHCA will be able to resubmit expenditure and obligation figures for each quarter in the final report.For the December 2021 ERA 1 Monthly Compliance Report and November 2021 ERA 2 Monthly Compliance Report, the total number of households served were off by 0.4% and 0.05% due to inadvertently including households who were initially served but later had all of the funds recaptured and therefore should have been excluded. TDHCA has updated internal procedures for calculating these reports to ensure these are excluded from future reports. Implementation date(s): Implemented as of February 8, 2023 Responsible persons: David Johnson, Project Manager  Process Mgmt. /Data Analytics",
+                    "Corrective action plan: For the annual UI access review, TWC will monitor the annual CAPPS Systems Access Privileges Certification in CAPPS to ensure timely completion. For the code developer/promoter system roles, IT will implement a new quarterly review of developer roles to ensure no staff member has both roles assigned to ensure separation of duties in the system roles. We are also looking at potential technical solutions that would automate and prevent staff being assigned certain roles based on separation of duties. Implementation date(s): February 28,2023 Responsible Persons: Heather Hall, CIO",
+                    "EA Application/DeterminationCorrective action plan: DFPS will ensure that INV/AR staff receive ongoing communication/training regarding EA and how to correctly document and record income within the IMPACT. DFPS will update the current EA policy and publishing a new resource guide for staff. DFPS staff will be provided training, tip sheets and ongoing support regarding the new policy and resource guide. The policy will be published by April 1, 2023. DFPS will continue to strengthen our internal quality assurance review of cases eligible for EA to ensure that INV/AR staff are complying with federal guidelines and internal policies. DFPS has submitted an IT ticket request to resolve the condition for the participant that had the incorrect income range of $0-$10,000 selected to the correct income range of $20,550 to $40,549 to align with the investigation report. The participant remains eligible for assistance regardless as the family unit makes less than $63,000. CPI will initiate a request for an IT project to conduct analysis of any limitations with verifying Emergency Assistance eligibility in the IMPACT system regarding why two of the three EA statements now show not answered. DFPS staff will be researching the issue to determine next steps by 2nd quarter FY 2024. Implementation date(s): Ongoing communication  will vary, first communication by April 1, 2023; IMPACT research January 31, 2024. Responsible persons: Jerome GreenPEAF Corrective action plan: DFPS uses an established recoupment process to address overpayments. A Kinship Development Worker writes a letter to the kinship caregiver regarding the overpayment and details the steps needed to return funds. This letter is also sent to accounting for follow up. DFPS maintains a proactive approach to strengthening/enhancing IMPACT limitations to ensure accurate data is maintained for accurate payments/disbursements through continuous program improvement. Implementation date(s): On January 13, 2023  staff initiated the above described recoupment process to recoup the second payment for the subject children. Responsible persons: Debbie Bouldin",
+                    "Corrective action plan: TCEQ will provide refresher training to staff and supervisors and review its standard operating procedures to ensure that staff record time and charge to grants accurately, and that calculated allocations of staff time are accurate. The overall objective will be to ensure that salaries and wages are based on records that correctly reflect the work performed. Implementation date(s): March 1,2023 Responsible persons: Yolanda Davis, Deputy Director of Financial Administration Division",
+                    "Corrective action plan: For FFATA, Community Affairs Division (CAD) is currently updating Standard Operating Procedure (SOP) to include two review and approval processes that will take place prior to the submission in the FSFR system. The two additional review and approval process will be performed by the Team Lead, Laura White in CAD and Elizabeth Yevich, Director of Housing Resource Center (HRC). The two additional reviews will strengthen the process to ensure accurate and timely submission of monthly FFATA reporting.  For Annual Financial Report, CAD is currently working with the Information System Division (IS) to correct issues identified in the data pulls to the summary sheets used for the submission of the Annual Report. CAD has identified that these issues emerged when federal funding sources began requesting data by individual grants. In order to address the identified issues, CAD and IS will continue to correct and test the data queries and formulas to ensure accurate reporting is achieved. Implementation date(s): For FFATA, March 2023  For Annual Financial Report, August 2023 Responsible persons: For FFATA, Director of Housing Resource Center and Team Leader of Community Affairs.  For Annual Financial Report, Manager of Fiscal & Reporting and Team Leader of Community Affairs.",
+                    "Corrective action plan: The Texas Workforce Commission will initiate a formal and documented review procedure to ensure that FFATA reports are submitted timely. Implementation date(s): March 1, 2023 Responsible persons: Teri Goodwin, Financial Reporting Manager",
+                    "Corrective action plan: The OOGs Public Safety Office (PSO) Performance and Records Coordinator staff position, which is the position responsible for submitting the FFATA reports into the federal reporting system, was vacant at the time the May 2022 report was due. This position is now filled and PSO updated the written policy and procedure to include additional staff positions that will prepare the FFATA report in the event the Coordinator is unavailable. In addition, the FFATA policy has been updated to include dates by which certain steps in the process should be met. See excerpt from revised PSO Policy 5.40 FFATA: FFATA Reports are prepared by the Grants Administration Performance and Records Coordinator and will be reviewed by the appropriate Program Manager(s). The Grants Administration Director will review and approve reports prior to submission in the FFATA Subaward Reporting System (FSRS). In the event the Performance and Records Coordinator is not available to prepare the FFATA reports, either the Grants Administration Business Operations Specialist or the Grants Administration Compliance and Operations Administrator will prepare and route the reports for review. On or about the 5th day of the month in which the report is due, the Performance and Records Coordinator, or backup, will pull new award data and grant adjustment data from eGrants. On or about the 10th day of the month in which the report is due, the Records and Performance Coordinator, or backup, will route the report to the appropriate Program Manager(s) for review. On or about the 15th day of the month the report will be routed to the Grants Administration Director for review and approval. Monthly reports will be prepared and submitted at https://www.fsrs.gov/ no later than the last day of the current month for awards made during the prior month.Implementation date(s): The vacant Performance and Records Coordinator position was filled in July 2022. The FFATA policy was updated February 3, 2023. Responsible persons: Zach Lohbauer, Performance and Records CoordinatorAngie Martin, Director of Grants Administration ",
+                    "Corrective action plan: The Federal Funds Instruction Guide will be revised to require that PCAs associated with closed grants are inactivated by the end of the approved close-out period. Budget and Planning management will discuss the revised guidance with staff to ensure proper implementation. TCEQ will implement the Centralized Accounting and Payroll/Personnel System (CAPPS) in September of 2023; grant numbers will include beginning and ending dates at the time the grant is created and will not require inactivation. TCEQ will ensure thorough documentation of its internal controls and the associated staff roles and responsibilities and will conduct periodic reviews of its controls. Implementation date(s): April 11. 2023 for update of the Federal Funds Instruction Guide and training staff. CAPPS: September 1, 2023. Responsible Persons: TBD, Federal Funds Section Manager; Stephanie Robinson, Assistant Deputy Director of Budget and Planning Division; Jen Bearse, Deputy Director of Budget and Planning Division"
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "31"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

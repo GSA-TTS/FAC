@@ -1,0 +1,99 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.1.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "FindingsText"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "LBNNLRDE8793"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "3"
+                },
+                "values": [
+                    "2022-002",
+                    "2022-001"
+                ]
+            },
+            {
+                "name": "text_of_finding",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "Health Center Program Cluster\nAssistance Listing Number(s) 93.224 and 93.527\nU.S. Department of Health and Human Services\nAward No. H80CS00438\nCriteria or Specific Requirement: Special Tests and Provisions\nType of Finding: Significant Deficiency in Internal Control Over Compliance\nCondition: The Health Center must prepare and apply a sliding fee discount schedule (SFDS) so that the amounts owed for health center services by eligible participants are adjusted based on the patient\u2019s ability to pay. \nQuestioned costs: n/a\nContext: The auditor selected a sample of 60 encounters. After the auditor tested selection #49, enough errors had been identified that the auditor stopped testing because the sample results could not support a low assessed level of control risk. The errors were a result of the misapplication of the sliding fee discount. The sliding fee discounts are based on the slide level code. In these instances, the sliding fee discount that was applied was not in accordance with the SFDS. \nEffect or Potential Effect: Either the Health Center or the patients may be paying more than required under the contract.\nCause: The Health Center applied its SFDS inconsistently to the patients selected for testing. \nRecommendation: The Health Center should adopt an internal control procedure that allows them to consistently apply its SFDS to all eligible patients. \nRepeat Finding: 2021-001\nViews of Responsible Officials: See page 12.",
+                    "Health Center Program Cluster\nAssistance Listing Number(s) 93.224 and 93.527\nU.S. Department of Health and Human Services\nCriteria or Specific Requirement: Reporting\nType of Finding: Significant Deficiency in Internal Control Over Compliance                                            \nCondition: The Health Center must timely file its SF-425 Federal Financial Reports for each of its awards.\nQuestioned costs: n/a\nContext: The auditor found that some of the Health Center\u2019s Forms SF-425 were filed after their respective due dates.\nEffect or Potential Effect: Information about the awards is not communicated timely to the awarding agency. \nCause: The Health Center had inadequate controls that would prevent them from missing reporting due dates. \nRecommendation: The Health Center should adopt an internal control procedure that allows them to consistently file its reports on a timely basis. \nRepeat Finding: n/a\nViews of Responsible Officials: See page 12."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "3"
+                },
+                "values": [
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]
