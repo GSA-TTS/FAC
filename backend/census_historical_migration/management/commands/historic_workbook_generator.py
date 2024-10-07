@@ -77,7 +77,9 @@ class Command(BaseCommand):
                 wb_path = os.path.join(out_dir, f"{filename}.json")
 
                 # Save the workbook to a temporary file to ensure formulas are evaluated
-                with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp_file:
+                with tempfile.NamedTemporaryFile(
+                    suffix=".xlsx", delete=False
+                ) as tmp_file:
                     tmp_path = tmp_file.name
                     wb.save(tmp_path)
                 try:

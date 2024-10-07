@@ -3,18 +3,6 @@ import tempfile
 
 from openpyxl import load_workbook
 from audit.intakelib.intermediate_representation import extract_workbook_as_ir
-from census_historical_migration.workbooklib.excel_creation_utils import (
-    get_audit_header,
-)
-from census_historical_migration.sac_general_lib.utils import (
-    normalize_year_string_or_exit,
-)
-from census_historical_migration.workbooklib.workbook_builder import (
-    generate_workbook,
-)
-from census_historical_migration.workbooklib.workbook_section_handlers import (
-    sections_to_handlers,
-)
 from django.core.management.base import BaseCommand
 
 import os
