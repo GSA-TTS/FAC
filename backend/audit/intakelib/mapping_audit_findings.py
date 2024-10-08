@@ -42,7 +42,9 @@ def extract_audit_findings(file, is_gsa_migration=False, auditee_uei=None):
         template["title_row"],
     )
 
-    _, file_extension = os.path.splitext(file)
+    _, file_extension = (
+        os.path.splitext(file.name) if hasattr(file, "name") else os.path.splitext(file)
+    )
     if file_extension == ".xlsx":
         ir = extract_workbook_as_ir(file)
     elif file_extension == ".json":
