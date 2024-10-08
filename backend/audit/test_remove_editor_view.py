@@ -155,7 +155,7 @@ class RemoveEditorViewTests(TestCase):
         }
         url = reverse(self.view, kwargs={"report_id": sac.report_id})
         response = self.client.post(url, data=data)
-        
+
         self.assertEqual(302, response.status_code)
 
         deleted_access = DeletedAccess.objects.get(
