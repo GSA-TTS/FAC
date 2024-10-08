@@ -31,5 +31,5 @@ class Maintenance(generic.View):
     """
 
     def get(self, request, *args, **kwargs):
-        template_name = "500.html"
+        template_name = "503.html"
         return render(request, template_name)
