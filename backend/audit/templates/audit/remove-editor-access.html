@@ -33,7 +33,12 @@
                 <p class="font-sans-md">
                     In order to avoid an audit from become inaccesible to an organization, editors do not have permission to remove their own access.
                 </p>
-                <button class="usa-button margin-top-5" id="continue" {% if is_editor_removing_self %} disabled {% endif %}>Remove access</button>
+                <button class="usa-button margin-top-5"
+                    id="remove-access-button"
+                    {% if is_editor_removing_self %} disabled {% endif %}
+                >
+                    Remove access
+                </button>
                 <a class="usa-button usa-button--unstyled margin-left-2"
                    href="{% url 'audit:ManageSubmission' report_id %}">Cancel</a>
             </form>
