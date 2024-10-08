@@ -182,6 +182,30 @@ class RemoveEditorViewTests(TestCase):
         post_response = self.client.post(url)
         self.assertEqual(post_response.status_code, 404)
 
+    def test_403(self):
+        """
+        Should 403 when a non-editor tries to reach or remove an Access.
+        """
+        user = baker.make(User, email="editor@example.com")
+        sac = baker.make(SingleAuditChecklist)
+        baker.make(
+            Access, user=user, email=user.email, sac=sac, role="foobar"
+        )  # Non-editor role
+        sac.save()
+        self.client.force_login(user)
+        access_to_remove = baker.make(
+            Access,
+            sac=sac,
+            role="editor",
+        )
+        url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id={access_to_remove.id}"
+
+        get_response = self.client.get(url)
+        self.assertEqual(get_response.status_code, 403)
+
+        post_response = self.client.post(url)
+        self.assertEqual(post_response.status_code, 403)
+
     def test_invalid_post(self):
         """
         Submitting the form for yourself should error.
@@ -209,7 +233,7 @@ class RemoveEditorViewTests(TestCase):
         """
         user = baker.make(User, email="removing_user@example.com")
         sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=user, sac=sac, role="editor")
+        baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         access_to_remove = baker.make(
             Access,
             sac=sac,

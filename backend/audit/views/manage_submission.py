@@ -93,6 +93,9 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             "change_cert_auditor_url": _url("ChangeAuditorCertifyingOfficial"),
             "add_editor_url": _url("ChangeOrAddRoleView"),
             "remove_editor_url": _url("RemoveEditorView"),
+            "user_is_editor": Access.objects.filter(
+                sac=sac, email=request.user.email, role="editor"
+            ),
         }
 
         return render(request, "audit/manage-submission.html", context)

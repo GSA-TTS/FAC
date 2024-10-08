@@ -49,7 +49,9 @@
                         <th>Role</th>
                         <th>Email address</th>
                         <th>Manage</th>
+                        {% if user_is_editor %}
                         <th>Remove</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -66,10 +68,10 @@
                                 {% endif %}
                             </td>
                             <td class="user-management-td">
-                                {% if entry.role == 'Audit Editor' %}
-                                    <a href="{{ remove_editor_url }}?id={{ entry.id }}">
-                                       Remove
-                                    </a>
+                                {% if user_is_editor and entry.role == 'Audit Editor' %}
+                                <a href="{{ remove_editor_url }}?id={{ entry.id }}">
+                                    Remove
+                                </a>
                                 {% endif %}
                             </td>
                         </tr>

@@ -5,6 +5,7 @@ from django.db import transaction
 from django.shortcuts import redirect, render, reverse
 from django.views import generic
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
 
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
@@ -182,19 +183,27 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        id = request.GET.get("id", None)
 
         try:
-            access = Access.objects.get(id=id, role=self.role)
+            Access.objects.get(email=request.user.email, sac=sac, role=self.role)
+        except Access.DoesNotExist as e:
+            raise PermissionDenied(
+                "Only Audit Editors may remove audit access for other Audit Editors."
+            )
+
+        editor_id = request.GET.get("id", None)
+
+        try:
+            access_to_remove = Access.objects.get(id=editor_id, sac=sac, role=self.role)
         except Access.DoesNotExist as e:
             raise Http404() from e
 
         context = {
-            "editor_id": access.id,
-            "name": access.fullname,
-            "email": access.email,
+            "editor_id": access_to_remove.id,
+            "name": access_to_remove.fullname,
+            "email": access_to_remove.email,
             "report_id": sac.report_id,
-            "is_editor_removing_self": request.user.email == access.email,
+            "is_editor_removing_self": request.user.email == access_to_remove.email,
             "errors": [],
         }
 
@@ -206,20 +215,28 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+        try:
+            Access.objects.get(email=request.user.email, sac=sac, role=self.role)
+        except Access.DoesNotExist as e:
+            raise PermissionDenied(
+                "Only Audit Editors may remove audit access for other Audit Editors."
+            )
+
         editor_id = request.POST.get("editor_id")
 
         try:
-            access = Access.objects.get(id=editor_id, role=self.role)
+            access_to_remove = Access.objects.get(id=editor_id, sac=sac, role=self.role)
         except Access.DoesNotExist as e:
             raise Http404() from e
 
-        if request.user.email != access.email:
-            access.delete()
+        if request.user.email != access_to_remove.email:
+            access_to_remove.delete()
         else:
             context = {
-                "editor_id": access.id,
-                "name": access.fullname,
-                "email": access.email,
+                "editor_id": access_to_remove.id,
+                "name": access_to_remove.fullname,
+                "email": access_to_remove.email,
                 "report_id": sac.report_id,
                 "is_editor_removing_self": True,
                 "errors": {"email": "You cannot remove your own audit access"},
