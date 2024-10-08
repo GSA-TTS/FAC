@@ -51,21 +51,11 @@ TerraformDestroy() {
   terraform apply sandbox-destroy.tfplan
 }
 
-LooseFileCleanup() {
-  echo "Cleaning up loose files..."
-  rm sandbox-destroy.tfplan
-  rm sandbox.tfplan
-  rm terraform.tfstate
-  rm terraform.tfstate.backup
-}
-
 echo "Deleting contents of fac-public-s3"
 DestroyPublicS3
 echo "Deleting contents of fac-private-s3"
 DestroyPrivateS3
 echo "Performing Terraform Destroy"
-TerraformDestroy
-echo "Cleaning up loose files"
-LooseFileCleanup
+# TerraformDestroy
 
 cd "$dir"
