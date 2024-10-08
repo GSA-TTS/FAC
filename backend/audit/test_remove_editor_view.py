@@ -20,14 +20,15 @@ class RemoveEditorViewTests(TestCase):
 
     def test_basic_get(self):
         """
-        A user should be able to access this page for a SAC they're associated
+        An editor should be able to access this page for a SAC they're associated
         with, but they can't remove their own access.
         """
         user = baker.make(User, email="editor@example.com")
+        self.client.force_login(user)
+
         sac = baker.make(SingleAuditChecklist)
         access = baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         sac.save()
-        self.client.force_login(user)
 
         url = (
             f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id={access.id}"
@@ -41,13 +42,15 @@ class RemoveEditorViewTests(TestCase):
 
     def test_id_404(self):
         """
-        Should 404 when you try to reach or remove an Access for an editor that doesn't exist.
+        Should 404 when an editor tries to reach or remove access for an editor
+        that doesn't exist.
         """
         user = baker.make(User, email="editor@example.com")
+        self.client.force_login(user)
+
         sac = baker.make(SingleAuditChecklist)
         baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         sac.save()
-        self.client.force_login(user)
 
         url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id=999999999"  # Fake id
 
@@ -59,18 +62,21 @@ class RemoveEditorViewTests(TestCase):
 
     def test_role_404(self):
         """
-        Should 404 when you try to reach or remove an Access for some that isn't an editor.
+        Should 404 when an editor tries to reach or remove access for someone
+        that isn't an editor.
         """
         user = baker.make(User, email="editor@example.com")
+        self.client.force_login(user)
+
         sac = baker.make(SingleAuditChecklist)
         baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
-        sac.save()
-        self.client.force_login(user)
         access_to_remove = baker.make(
             Access,
             sac=sac,
             role="foobar",  # Non-editor role
         )
+        sac.save()
+
         url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id={access_to_remove.id}"
 
         get_response = self.client.get(url)
@@ -84,17 +90,19 @@ class RemoveEditorViewTests(TestCase):
         Should 403 when a non-editor tries to reach or remove an Access.
         """
         user = baker.make(User, email="editor@example.com")
+        self.client.force_login(user)
+
         sac = baker.make(SingleAuditChecklist)
         baker.make(
             Access, user=user, email=user.email, sac=sac, role="foobar"
         )  # Non-editor role
-        sac.save()
-        self.client.force_login(user)
         access_to_remove = baker.make(
             Access,
             sac=sac,
             role="editor",
         )
+        sac.save()
+
         url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id={access_to_remove.id}"
 
         get_response = self.client.get(url)
@@ -108,10 +116,11 @@ class RemoveEditorViewTests(TestCase):
         Submitting the form for yourself should error.
         """
         user = baker.make(User, email="editor@example.com")
+        self.client.force_login(user)
+
         sac = baker.make(SingleAuditChecklist)
         access = baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         sac.save()
-        self.client.force_login(user)
 
         data = {
             "editor_id": access.id,
@@ -129,6 +138,8 @@ class RemoveEditorViewTests(TestCase):
         Submitting the form should delete the existing Access and create a DeletedAccess.
         """
         user = baker.make(User, email="removing_user@example.com")
+        self.client.force_login(user)
+
         sac = baker.make(SingleAuditChecklist)
         baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         access_to_remove = baker.make(
@@ -138,13 +149,13 @@ class RemoveEditorViewTests(TestCase):
             email="contact@example.com",
         )
         sac.save()
-        self.client.force_login(user)
 
         data = {
             "editor_id": access_to_remove.id,
         }
         url = reverse(self.view, kwargs={"report_id": sac.report_id})
         response = self.client.post(url, data=data)
+        
         self.assertEqual(302, response.status_code)
 
         deleted_access = DeletedAccess.objects.get(
