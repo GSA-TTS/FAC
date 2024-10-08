@@ -30,15 +30,9 @@ class Command(BaseCommand):
         )
         if options.get("off"):
             middleware.change_maintenance(False)
-            logger.info(
-                "MAINTENANCE_MODE OFF"
-            )
+            logger.info("MAINTENANCE_MODE OFF")
         elif options.get("on"):
             middleware.change_maintenance(True)
-            logger.info(
-                "MAINTENANCE_MODE ON"
-            )
+            logger.info("MAINTENANCE_MODE ON")
         else:
-            print(
-                "Invalid syntax. Please enter this command with --on or --off."
-            )
+            print("Invalid syntax. Please enter this command with --on or --off.")
