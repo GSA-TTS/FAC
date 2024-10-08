@@ -67,13 +67,15 @@
                                     <a href="{{ change_cert_auditor_url }}">Edit</a>
                                 {% endif %}
                             </td>
+                            {% if user_is_editor %}
                             <td class="user-management-td">
-                                {% if user_is_editor and entry.role == 'Audit Editor' %}
+                                {% if entry.role == 'Audit Editor' %}
                                 <a href="{{ remove_editor_url }}?id={{ entry.id }}">
                                     Remove
                                 </a>
                                 {% endif %}
                             </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>
