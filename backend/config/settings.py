@@ -227,9 +227,6 @@ STATIC_URL = "/static/"
 # Environment specific configurations
 DEBUG = False
 
-# Renders a maintenance page for every request.
-MAINTENANCE = False
-
 if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     DATABASES = {
         "default": env.dj_db_url(

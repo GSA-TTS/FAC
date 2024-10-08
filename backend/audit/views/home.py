@@ -20,3 +20,16 @@ class Home(generic.View):
         template_name = "home.html"
         extra_context = {"DISABLE_AUTH": settings.DISABLE_AUTH}
         return render(request, template_name, extra_context)
+
+
+class Maintenance(generic.View):
+    """
+    This is the redirected path for Maintenance mode.
+
+    It will return the home template with an error status for every single request
+    so long as maintenance is enabled.
+    """
+
+    def get(self, request, *args, **kwargs):
+        template_name = "500.html"
+        return render(request, template_name)

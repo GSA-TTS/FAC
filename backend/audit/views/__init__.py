@@ -1,5 +1,6 @@
 from .audit_info_form_view import AuditInfoFormView
 from .home import Home
+from .home import Maintenance
 from .manage_submission import ManageSubmissionView
 from .manage_submission_access import (
     ChangeOrAddRoleView,
@@ -50,6 +51,7 @@ views_list = [
     EditSubmission,
     ExcelFileHandlerView,
     Home,
+    Maintenance,
     ManageSubmissionView,
     MySubmissions,
     no_robots,
