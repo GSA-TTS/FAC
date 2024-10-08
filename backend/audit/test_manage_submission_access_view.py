@@ -142,9 +142,9 @@ class RemoveEditorViewTests(TestCase):
             response.content.decode("utf-8"),
         )
 
-    def test_404(self):
+    def test_id_404(self):
         """
-        Should 404 when you try to reach or remove an Access for an audit that doesn't exist.
+        Should 404 when you try to reach or remove an Access for an editor that doesn't exist.
         """
         user = baker.make(User, email="editor@example.com")
         sac = baker.make(SingleAuditChecklist)
@@ -153,6 +153,28 @@ class RemoveEditorViewTests(TestCase):
         self.client.force_login(user)
 
         url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id=42"  # Fake id
+
+        get_response = self.client.get(url)
+        self.assertEqual(get_response.status_code, 404)
+
+        post_response = self.client.post(url)
+        self.assertEqual(post_response.status_code, 404)
+
+    def test_role_404(self):
+        """
+        Should 404 when you try to reach or remove an Access for some that isn't an editor.
+        """
+        user = baker.make(User, email="editor@example.com")
+        sac = baker.make(SingleAuditChecklist)
+        baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
+        sac.save()
+        self.client.force_login(user)
+        access_to_remove = baker.make(
+            Access,
+            sac=sac,
+            role="foobar",  # Non-editor role
+        )
+        url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id={access_to_remove.id}"
 
         get_response = self.client.get(url)
         self.assertEqual(get_response.status_code, 404)

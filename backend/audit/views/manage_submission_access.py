@@ -185,7 +185,7 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         id = request.GET.get("id", None)
 
         try:
-            access = Access.objects.get(id=id)
+            access = Access.objects.get(id=id, role=self.role)
         except Access.DoesNotExist as e:
             raise Http404() from e
 
@@ -209,7 +209,7 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         editor_id = request.POST.get("editor_id")
 
         try:
-            access = Access.objects.get(id=editor_id)
+            access = Access.objects.get(id=editor_id, role=self.role)
         except Access.DoesNotExist as e:
             raise Http404() from e
 
