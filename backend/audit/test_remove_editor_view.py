@@ -49,7 +49,7 @@ class RemoveEditorViewTests(TestCase):
         sac.save()
         self.client.force_login(user)
 
-        url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id=42"  # Fake id
+        url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id=999999999"  # Fake id
 
         get_response = self.client.get(url)
         self.assertEqual(get_response.status_code, 404)
