@@ -148,7 +148,7 @@ class RemoveEditorViewTests(TestCase):
         """
         user = baker.make(User, email="editor@example.com")
         sac = baker.make(SingleAuditChecklist)
-        access = baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
+        baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         sac.save()
         self.client.force_login(user)
 
