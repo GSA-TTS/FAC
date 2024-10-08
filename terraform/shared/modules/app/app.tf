@@ -79,6 +79,10 @@ resource "cloudfoundry_app" "fac_app" {
   }
 
   service_binding {
+    service_instance = var.backup_db_id
+  }
+
+  service_binding {
     service_instance = var.https_proxy_creds_id
   }
 

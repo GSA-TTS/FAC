@@ -53,6 +53,10 @@ variable "db_id" {
   description = "the full string of the core db resource id"
 }
 
+variable "backup_db_id" {
+  type        = string
+  description = "the full string of the backup db resource id"
+}
 # # Can't be created before the app exists
 variable "https_proxy" {
   type        = string
