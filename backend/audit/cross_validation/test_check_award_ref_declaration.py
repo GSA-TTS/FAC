@@ -22,6 +22,8 @@ class CheckAwardRefDeclarationTests(TestCase):
         self.award3 = {
             "award_reference": f"AWARD-{generate_random_integer(self.AWARD_MIN * 3, self.AWARD_MAX * 3)}"
         }
+        self.award_with_longer_ref = {"award_reference": "AWARD-00123"}
+        self.award_with_shorter_ref = {"award_reference": "AWARD-0123"}
 
     def _make_federal_awards(self, award_refs) -> dict:
         return {
@@ -82,3 +84,21 @@ class CheckAwardRefDeclarationTests(TestCase):
         self.assertEqual(len(errors), 1)
         expected_error = err_award_ref_not_declared([self.award2["award_reference"]])
         self.assertIn({"error": expected_error}, errors)
+
+    def test_padding_when_declared_award_ref_max_length_greater(self):
+        """Test case where declared award reference length is greater than reported award reference length."""
+        sac = self._make_sac(
+            [self.award_with_longer_ref], [self.award_with_shorter_ref]
+        )
+        errors = check_award_ref_declaration(sac_validation_shape(sac))
+        # No errors expected
+        self.assertEqual(errors, [])
+
+    def test_padding_when_reported_award_ref_max_length_greater(self):
+        """Test case where reported award reference length is greater than declared award reference length."""
+        sac = self._make_sac(
+            [self.award_with_shorter_ref], [self.award_with_longer_ref]
+        )
+        errors = check_award_ref_declaration(sac_validation_shape(sac))
+        # No errors expected
+        self.assertEqual(errors, [])
