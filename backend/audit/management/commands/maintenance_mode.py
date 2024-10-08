@@ -25,23 +25,20 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-
-        # NOTE - This goes to NewRelic. Tweak the logs to be a little more clear.
-        # I.E., "MAINTENANCE_MODE ON"
-        logger.info(
+        print(
             f"Starting switch... Maintenance mode is currently set to {middleware.is_maintenance_on()}."
         )
         if options.get("off"):
             middleware.change_maintenance(False)
             logger.info(
-                "Maintenance mode has been set to False. The application is now open to all users."
+                "MAINTENANCE_MODE OFF"
             )
         elif options.get("on"):
             middleware.change_maintenance(True)
             logger.info(
-                "Maintenance mode has been set to True. The application is now closed off to all users."
+                "MAINTENANCE_MODE ON"
             )
         else:
-            logger.error(
+            print(
                 "Invalid syntax. Please enter this command with --on or --off."
             )
