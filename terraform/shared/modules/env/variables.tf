@@ -50,6 +50,12 @@ variable "postgrest_instances" {
   default     = 2
 }
 
+variable "postgrest_memory" {
+  type        = number
+  description = "the number of instances of the postgrest application to run (default: 2)"
+  default     = 1024
+}
+
 variable "swagger_instances" {
   type        = number
   description = "the number of instances of the swagger application to run (default: 2)"
