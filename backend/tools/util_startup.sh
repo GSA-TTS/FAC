@@ -21,20 +21,24 @@ function gonogo {
 function check_table_exists() {
     local db_uri="$1"
     local dbname="$2"
+    set +e
     echo "CHECK_TABLE_EXISTS: $dbname"
     # >/dev/null 2>&1
     $PSQL_EXE $db_uri -c "SELECT '$dbname'::regclass"  
     result=$?
     echo "CHECK_TABLE_EXISTS $dbname: $result"
+    set -e
     return $result
 }
 
 function check_schema_exists () {
     local db_uri="$1"
     local schema_name="$2"
+    set +e
     echo "CHECK_SCHEMA_EXISTS $schema_name"
     local result=$($PSQL_EXE $db_uri -qtAX -c "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '$schema_name');")
     echo "CHECK_SCHEMA_EXISTS $schema_name: $result"
+    set -e
     if [ "$result" = "t" ]; then
       return 0;
     else
