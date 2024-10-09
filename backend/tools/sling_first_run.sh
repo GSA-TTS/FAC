@@ -3,9 +3,9 @@ source tools/util_startup.sh
 function sling_first_run() {
     startup_log "SLING_FIRST_RUN" "Slinging data to fac-snapshot if needed"
 
-    # FIXME. We could do a clean bring-up, and have no data. 
-    # This would end up creating tables, and subsequent runs pass.
-    # So.
+    # The deploy action does a DB->DB backup with cgov-util.
+    # This should only ever actually run when testing locally.
+    # In the cloud environment, it will skip the actul run.
     check_table_exists $FAC_SNAPSHOT_URI 'public.dissemination_general'
     local is_general_table=$?
     if [ $is_general_table -ne 0 ]; then
