@@ -13,7 +13,6 @@ module "dev" {
   smtp_proxy_instances  = 1
   clamav_instances      = 1
   clamav_fs_instances   = 1
-  recursive_delete      = true
   json_params = jsonencode(
     {
       "storage" : 50,
@@ -22,7 +21,7 @@ module "dev" {
 }
 
 module "dev-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v0.9.1"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.0.0"
 
   cf_org_name   = var.cf_org_name
   cf_space_name = "dev"
