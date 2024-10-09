@@ -21,13 +21,11 @@ function gonogo {
 function check_table_exists() {
     local db_uri="$1"
     local dbname="$2"
-    set +e
     echo "CHECK_TABLE_EXISTS: $dbname"
     # >/dev/null 2>&1
-    $PSQL_EXE $db_uri -c "SELECT '$dbname'::regclass"  
+    $PSQL_EXE $db_uri -c "SELECT '$dbname'::regclass" || true
     result=$?
     echo "CHECK_TABLE_EXISTS $dbname: $result"
-    set -e
     return $result
 }
 
