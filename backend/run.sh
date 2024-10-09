@@ -11,7 +11,6 @@ source tools/util_startup.sh
 source tools/setup_env.sh
 source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
-source tools/sling_support_functions.sh
 source tools/sling_first_run.sh
 source tools/api_standup.sh
 source tools/build_indexes.sh

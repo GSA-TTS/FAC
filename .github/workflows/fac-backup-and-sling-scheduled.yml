@@ -32,5 +32,5 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 7G -m 3G --name backup_util_scheduled --command "./tools/fac-backup-and-sling.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          command: cf run-task gsa-fac -k 7G -m 3G --name backup_and_sling_scheduled --command "./util/fac-backup-and-sling-scheduled.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
 

@@ -35,6 +35,13 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     gonogo "migrate_app_tables"
 
     #####
+    # PREP API TABLES
+    # This runs sling and preps tables in the snapshot DB.
+    # Only runs if the tables are not present (e.g. first deploy)
+    sling_first_run
+    gonogo "sling_first_run"
+
+    #####
     # API STANDUP
     # Standup the API, which may depend on migration changes
     api_standup
