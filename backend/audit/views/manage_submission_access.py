@@ -199,6 +199,8 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             raise Http404() from e
 
         context = {
+            "auditee_uei": sac.general_information["auditee_uei"],
+            "auditee_name": sac.general_information.get("auditee_name"),
             "editor_id": access_to_remove.id,
             "name": access_to_remove.fullname,
             "email": access_to_remove.email,
@@ -234,6 +236,8 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             access_to_remove.delete()
         else:
             context = {
+                "auditee_uei": sac.general_information["auditee_uei"],
+                "auditee_name": sac.general_information.get("auditee_name"),
                 "editor_id": access_to_remove.id,
                 "name": access_to_remove.fullname,
                 "email": access_to_remove.email,
