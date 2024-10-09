@@ -1,6 +1,6 @@
 [
   {
-    "award_reference": "AWARD-0001",
+    "award_reference": "AWARD-00001",
     "compliance_requirement": "AB",
     "reference_number": "2023-001",
     "repeat_prior_reference": "Y",
@@ -14,7 +14,7 @@
     "material_weakness": "N"
   },
   {
-    "award_reference": "AWARD-0002",
+    "award_reference": "AWARD-00002",
     "compliance_requirement": "E",
     "reference_number": "2023-001",
     "repeat_prior_reference": "N",
