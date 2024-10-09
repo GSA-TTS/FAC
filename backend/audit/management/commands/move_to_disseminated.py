@@ -6,7 +6,7 @@ from audit.models import (
     SingleAuditChecklist,
 )
 from audit.models.models import STATUS
-from audit.models.viewflow import sac_transition
+from audit.models.viewflow import sac_revert_from_submitted, sac_transition
 from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -38,14 +38,26 @@ class Command(BaseCommand):
 
         # no parameter passed.
         if report_id is None:
-            logger.error("You need to enter a report_id (--report_id ID_OF_REPORT).")
+            print("You need to enter a report_id (--report_id ID_OF_REPORT).")
             exit(0)
 
         sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
 
         # must be stuck as 'submitted'.
         if sac.submission_status != STATUS.SUBMITTED:
-            logger.error("This report is not stuck in the submitted state.")
+            print(f"This report ({sac.report_id}) is not stuck in the submitted state.")
+            exit(0)
+
+        # check for validation errors.
+        errors = sac.validate_full()
+        if errors:
+            print(
+                f"Unable to disseminate. There are some validation errors for report ({sac.report_id}):"
+            )
+            for error in errors["errors"]:
+                print(f" - {error['error']}")
+            # return to auditee_certified.
+            sac_revert_from_submitted(sac)
             exit(0)
 
         # BEGIN ATOMIC BLOCK
@@ -77,4 +89,8 @@ class Command(BaseCommand):
                 )
             )
 
-        logger.info(f"Disseminated report: {report_id}")
+            # return to auditee_certified.
+            sac_revert_from_submitted(sac)
+            exit(0)
+
+        logger.info(f"DISSEMINATED REPORT: {report_id}")
