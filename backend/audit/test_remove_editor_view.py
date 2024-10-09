@@ -27,6 +27,7 @@ class RemoveEditorViewTests(TestCase):
         self.client.force_login(user)
 
         sac = baker.make(SingleAuditChecklist)
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         access = baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         sac.save()
 
@@ -49,6 +50,7 @@ class RemoveEditorViewTests(TestCase):
         self.client.force_login(user)
 
         sac = baker.make(SingleAuditChecklist)
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         sac.save()
 
@@ -69,6 +71,7 @@ class RemoveEditorViewTests(TestCase):
         self.client.force_login(user)
 
         sac = baker.make(SingleAuditChecklist)
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         access_to_remove = baker.make(
             Access,
@@ -93,6 +96,7 @@ class RemoveEditorViewTests(TestCase):
         self.client.force_login(user)
 
         sac = baker.make(SingleAuditChecklist)
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         baker.make(
             Access, user=user, email=user.email, sac=sac, role="foobar"
         )  # Non-editor role
@@ -119,6 +123,7 @@ class RemoveEditorViewTests(TestCase):
         self.client.force_login(user)
 
         sac = baker.make(SingleAuditChecklist)
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         access = baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         sac.save()
 
@@ -141,6 +146,7 @@ class RemoveEditorViewTests(TestCase):
         self.client.force_login(user)
 
         sac = baker.make(SingleAuditChecklist)
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
         access_to_remove = baker.make(
             Access,
