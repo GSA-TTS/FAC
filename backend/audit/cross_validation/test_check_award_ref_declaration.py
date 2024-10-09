@@ -14,13 +14,13 @@ class CheckAwardRefDeclarationTests(TestCase):
         self.AWARD_MAX = 1500
         self.AUDITEE_UEI = "AAA123456BBB"
         self.award1 = {
-            "award_reference": f"AWARD-{generate_random_integer(self.AWARD_MIN,self.AWARD_MAX)}"
+            "award_reference": f"AWARD-{generate_random_integer(self.AWARD_MIN, self.AWARD_MAX)}"
         }
         self.award2 = {
-            "award_reference": f"AWARD-{generate_random_integer(self.AWARD_MIN *2,self.AWARD_MAX *2)}"
+            "award_reference": f"AWARD-{generate_random_integer(self.AWARD_MIN * 2, self.AWARD_MAX * 2)}"
         }
         self.award3 = {
-            "award_reference": f"AWARD-{generate_random_integer(self.AWARD_MIN *3,self.AWARD_MAX *3)}"
+            "award_reference": f"AWARD-{generate_random_integer(self.AWARD_MIN * 3, self.AWARD_MAX * 3)}"
         }
         self.award_with_longer_ref = {"award_reference": "AWARD-00123"}
         self.award_with_shorter_ref = {"award_reference": "AWARD-0123"}
