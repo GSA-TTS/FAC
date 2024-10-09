@@ -10,6 +10,7 @@ source tools/util_startup.sh
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
 source tools/api_teardown.sh
+source tools/sling_first_run.sh
 source tools/build_indexes.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
