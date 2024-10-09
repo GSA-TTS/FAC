@@ -8,10 +8,12 @@ module "preview" {
 
   database_plan         = "medium-gp-psql"
   postgrest_instances   = 1
+  postgrest_memory      = 512
   swagger_instances     = 1
   https_proxy_instances = 1
   smtp_proxy_instances  = 1
-  clamav_instances      = 2
+  clamav_instances      = 1
+  clamav_memory         = 2048
   clamav_fs_instances   = 1
   recursive_delete      = true
   json_params = jsonencode(
