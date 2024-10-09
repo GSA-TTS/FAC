@@ -14,14 +14,16 @@ def sac_revert_from_submitted(sac):
     This should only be executed via management command.
     """
 
-    flow = SingleAuditChecklistFlow(sac)
+    if sac.submission_status == STATUS.SUBMITTED:
+        flow = SingleAuditChecklistFlow(sac)
 
-    flow.transition_to_auditee_certified()
-    sac.save(
-        event_user=None,
-        event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
-    )
-    return True
+        flow.transition_to_auditee_certified()
+        sac.save(
+            event_user=None,
+            event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+        )
+        return True
+    return False
 
 
 def sac_transition(request, sac, **kwargs):
