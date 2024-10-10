@@ -24,8 +24,7 @@ function check_table_exists() {
     echo "CHECK_TABLE_EXISTS: $dbname"
     # >/dev/null 2>&1
     set +e
-    $PSQL_EXE $db_uri -c "SELECT '$dbname'::regclass" || false
-    local result=$?
+    $PSQL_EXE $db_uri -c "SELECT '$dbname'::regclass" || result=1
     echo "CHECK_TABLE_EXISTS $dbname: $result"
     set -e
     return $result
