@@ -1,19 +1,7 @@
 # These are our active APIs
 # admin_api_access_tables must run before
 # the admin API can be stood up.
-declare -a standup_scripts=(
-    "api_v1_0_3" 
-    "api_v1_1_0"
-    "admin_api_access_tables"
-    "admin_api_v1_1_0"
-    "admin_api_v1_1_1"
-    "public_api_v1_0_0"
-    "public_data_v1_0_0"
-    "permissions"
-    "finalize"
-    )    
-
-declare -a teardown_scripts=(
+declare -a sql_pre_scripts=(
     "api_v1_0_3" 
     "api_v1_1_0"
     "admin_api_access_tables"
@@ -30,6 +18,19 @@ declare -a teardown_scripts=(
     "sequences"
     "finalize"
 )
+
+declare -a sql_post_scripts=(
+    "api_v1_0_3" 
+    "api_v1_1_0"
+    "admin_api_access_tables"
+    "admin_api_v1_1_0"
+    "admin_api_v1_1_1"
+    "public_api_v1_0_0"
+    "public_data_v1_0_0"
+    "permissions"
+    "finalize"
+    )    
+
 
 # # These are the tables that must be present
 # # in order to stand up that API.

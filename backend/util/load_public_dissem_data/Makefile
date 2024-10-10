@@ -1,4 +1,4 @@
-NETWORK?=backend-web-1  
+NETWORK?=backend-db2-1
 
 build:
 	docker build -t facloaddata .

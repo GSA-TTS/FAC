@@ -22,7 +22,11 @@ streams:
       -- All of the general table is public data.
       SELECT
         gen.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_general'), 20000) as batch_number,
+        NEXTVAL('public_data_v1_0_0.seq_v1_0_0_general') AS seq,
+        -- Add in post
+        -- DIV(seq, 20000) AS batch_number,
+        -- What if we use this for partitioning, instead?
+        -- mod((gen.id - min(gen.id)), 20000) AS batch_number_2,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -110,6 +114,107 @@ streams:
       FROM
           public.dissemination_general gen
       ORDER BY gen.id
+    target_options:
+      pre_sql: |
+        -- DROP SCHEMA IF EXISTS public_data_v1_0_0 CASCADE;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_additional_eins;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_additional_ueis;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_combined;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_corrective_action_plans;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_federal_awards;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_findings_text;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_findings;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_general;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_notes_to_sefa;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_passthrough;
+        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_secondary_auditors;
+        -- Now, create them. We get a start at 1 for every refresh this way.
+        CREATE SCHEMA IF NOT EXISTS public_data_v1_0_0;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_additional_eins         START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_additional_ueis         START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_combined                START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_corrective_action_plans START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_federal_awards          START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_findings_text           START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_findings                START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_general                 START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_notes_to_sefa           START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_passthrough             START 1;
+        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_secondary_auditors      START 1;
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.general
+        ADD COLUMN batch_number INTEGER;
+        -- Update that batch number as a modulus of 20K, our response
+        -- size limit in PostgREST.
+        UPDATE public_data_v1_0_0.general SET batch_number=DIV(seq, 20000);
+        -- -- Create a temporary table that is a copy of the general table, but partition it.
+        -- CREATE TABLE public_data_v1_0_0.tmp_general
+        -- (LIKE public_data_v1_0_0.general)
+        -- PARTITION BY hash(seq); 
+        -- -- Drop our existing general table.
+        -- DROP TABLE public_data_v1_0_0.general;
+        -- SET search_path TO public_data_v1_0_0; --?
+        -- -- Rename that temporary table to the general table. Why?
+        -- -- We cannot create the table with a PARTITION, because it is a SELECT.
+        -- -- This works around that.
+        -- ALTER TABLE public_data_v1_0_0.tmp_general RENAME TO general;
+        -- -- Create the partition tables.
+        -- CREATE TABLE public_data_v1_0_0.part_general_0
+        -- PARTITION OF public_data_v1_0_0.general 
+        -- FOR VALUES WITH (modulus 5, remainder 0);
+        -- CREATE TABLE public_data_v1_0_0.part_general_1
+        -- PARTITION OF public_data_v1_0_0.general 
+        -- FOR VALUES WITH (modulus 5, remainder 1);
+        -- CREATE TABLE public_data_v1_0_0.part_general_2
+        -- PARTITION OF public_data_v1_0_0.general 
+        -- FOR VALUES WITH (modulus 5, remainder 2);
+        -- CREATE TABLE public_data_v1_0_0.part_general_3
+        -- PARTITION OF public_data_v1_0_0.general 
+        -- FOR VALUES WITH (modulus 5, remainder 3);
+        -- CREATE TABLE public_data_v1_0_0.part_general_4
+        -- PARTITION OF public_data_v1_0_0.general 
+        -- FOR VALUES WITH (modulus 5, remainder 4);
+        -- Create the indexes on the table.
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_report_id_idx 
+          on public_data_v1_0_0.general (report_id);
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_report_id_fad
+          on public_data_v1_0_0.general (report_id, fac_accepted_date);
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_report_id_fad
+          on public_data_v1_0_0.general (report_id, fac_accepted_date);
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_certify_name_idx 
+          ON public_data_v1_0_0.general 
+          ((lower(auditee_certify_name)));
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_name_idx 
+          ON public_data_v1_0_0.general 
+          ((lower(auditee_name)));
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditor_certify_name_idx 
+          ON public_data_v1_0_0.general 
+          ((lower(auditor_certify_name)));
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditor_contact_name_idx 
+          ON public_data_v1_0_0.general 
+          ((lower(auditor_contact_name)));
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditor_firm_name_idx 
+          ON public_data_v1_0_0.general 
+          ((lower(auditor_firm_name)));
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_email_idx 
+          on public_data_v1_0_0.general ((lower(auditee_email)));
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditor_email_idx 
+          on public_data_v1_0_0.general ((lower(auditor_email)));
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_start_date_idx 
+          ON public_data_v1_0_0.general (fy_start_date);
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_end_date_idx 
+          ON public_data_v1_0_0.general (fy_end_date);
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_uei_idx 
+          ON public_data_v1_0_0.general (auditee_uei);
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_ein_idx
+          ON public_data_v1_0_0.general (auditee_ein);
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_audit_year_idx 
+          on public_data_v1_0_0.general (audit_year);
+        CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_batch_general_idx
+            ON public_data_v1_0_0.general (batch_number);
+
+
 
   # All additional EINs are public.
   public.additional_eins:

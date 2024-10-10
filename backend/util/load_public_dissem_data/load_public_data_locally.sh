@@ -25,19 +25,20 @@ sleep 4
 rm -f /app/data/db_dissem_dump
 rm -rf /app/data/__MACOSX
 
-# Next, we drop the public_data schema.
-# This is because we want to make sure it is
-# regenerated fresh.
-psql $FAC_SNAPSHOT_URI -c "DROP SCHEMA IF EXISTS public_data_v1_0_0 CASCADE"
+# # Next, we drop the public_data schema.
+# # This is because we want to make sure it is
+# # regenerated fresh.
+# psql $FAC_SNAPSHOT_URI -c "DROP SCHEMA IF EXISTS public_data_v1_0_0 CASCADE"
 
-# Now, the schema for the public_data is
-# created. This provies a place for the tables to
-# land when we run sling
-psql $FAC_SNAPSHOT_URI -c "CREATE SCHEMA IF NOT EXISTS public_data_v1_0_0"
-psql $FAC_SNAPSHOT_URI -c "CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_combined START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE"
+# # Now, the schema for the public_data is
+# # created. This provies a place for the tables to
+# # land when we run sling
+# psql $FAC_SNAPSHOT_URI -c "CREATE SCHEMA IF NOT EXISTS public_data_v1_0_0"
+# psql $FAC_SNAPSHOT_URI -c "CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_combined START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE"
 
 # Unzip the compressed historical data dump.
 pushd /app/data
+echo "Unzipping data."
 unzip db_dissem_dump.zip
 popd
 
