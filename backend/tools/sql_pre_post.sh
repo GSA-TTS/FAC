@@ -31,6 +31,9 @@ function sql_pre {
 
 function sql_post {
   run_sql_files $FAC_SNAPSHOT_URI "SQL_POST" "post"
+}
+
+function vacuum_snapshot_db {
   # Vacuum things when we're done.
   # Cannot run inside a transaction.
   $PSQL_EXE_NO_TXN $FAC_SNAPSHOT_URI -c "VACUUM (FULL, VERBOSE, ANALYZE);"

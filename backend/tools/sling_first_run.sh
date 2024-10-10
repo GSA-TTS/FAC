@@ -6,7 +6,7 @@ function sling_first_run() {
     # The deploy action does a DB->DB backup with cgov-util.
     # This should only ever actually run when testing locally.
     # In the cloud environment, it will skip the actul run.
-    check_table_exists $FAC_SNAPSHOT_URI 'public.dissemination_general'
+    check_table_exists $FAC_SNAPSHOT_URI 'public' 'dissemination_general'
     local is_general_table=$?
     if [ $is_general_table -ne 0 ]; then
         # This is the first run.
@@ -18,7 +18,7 @@ function sling_first_run() {
     fi
 
     # If the metadata table exists, it means sling has run to completion.
-    check_table_exists $FAC_SNAPSHOT_URI 'public_data_v1_0_0.metadata'
+    check_table_exists $FAC_SNAPSHOT_URI 'public_data_v1_0_0' 'metadata'
     local is_metadata_table=$?
     echo "check_table_exists public_data_v1_0_0.metadata $is_metadata_table"
     

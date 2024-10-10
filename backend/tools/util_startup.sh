@@ -20,25 +20,29 @@ function gonogo {
 
 function check_table_exists() {
     local db_uri="$1"
-    local dbname="$2"
-    echo "CHECK_TABLE_EXISTS: $dbname"
+    local schema="$2"
+    local table="$3"
+
+    echo "CHECK_TABLE_EXISTS: $schema.$table"
     # >/dev/null 2>&1
-    set +e
-    $PSQL_EXE $db_uri -c "SELECT '$dbname'::regclass" || result=1
-    echo "CHECK_TABLE_EXISTS $dbname: $result"
-    set -e
-    return $result
+    # The qtAX incantation lets us pass the PSQL result value back to bash.
+    result=`$PSQL_EXE $db_uri -qtAX -c "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = '$schema' AND tablename = '$table');"`
+    echo "CHECK_TABLE_EXISTS $schema.$table: $result"
+    # Flip TRUE to a 0, because UNIX considers a 0 exit code to be good. 
+    if [ "$result" = "t" ]; then
+      return 0;
+    else
+      return 1;
+    fi;
 }
 
 function check_schema_exists () {
     local db_uri="$1"
     local schema_name="$2"
-    set +e
     echo "CHECK_SCHEMA_EXISTS $schema_name"
-    $PSQL_EXE $db_uri -qtAX -c "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '$schema_name');" || false
-    local result=$?
+    result=`$PSQL_EXE $db_uri -qtAX -c "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '$schema_name');"`
     echo "CHECK_SCHEMA_EXISTS $schema_name: $result"
-    set -e
+    # Flip TRUE to a 0, because UNIX considers a 0 exit code to be good. 
     if [ "$result" = "t" ]; then
       return 0;
     else

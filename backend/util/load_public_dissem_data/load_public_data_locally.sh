@@ -71,7 +71,7 @@ fi
 
 # Run the backup of the dissemination_ tables from
 # fac-db to fac-snapshot-db.
-check_table_exists $FAC_SNAPSHOT_URI "public.dissemination_general"
+check_table_exists $FAC_SNAPSHOT_URI "public" "dissemination_general"
 result=$?
 # cgov-util wants to know the environment it is in.
 export ENV="LOCAL"
