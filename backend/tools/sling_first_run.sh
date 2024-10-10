@@ -2,7 +2,10 @@ source tools/util_startup.sh
 
 function sling_first_run() {
     startup_log "SLING_FIRST_RUN" "Slinging data to fac-snapshot if needed"
-
+    # check_table_exists might return 1.
+    # It is possible set -e is kicking us out when the function
+    # returns an error? So, try set +e.
+    set +e
     # The deploy action does a DB->DB backup with cgov-util.
     # This should only ever actually run when testing locally.
     # In the cloud environment, it will skip the actul run.
