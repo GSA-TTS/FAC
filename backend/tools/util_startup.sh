@@ -47,13 +47,14 @@ function check_table_exists() {
 function check_schema_exists () {
   local db_uri="$1"
   local schema_name="$2"
-  echo "CHECK_SCHEMA_EXISTS $schema_name"
+  echo "CHECK_SCHEMA_EXISTS START: $schema_name"
   result=`$PSQL_EXE $db_uri -qtAX -c "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '$schema_name');"`
-  echo "CHECK_SCHEMA_EXISTS $schema_name: $result"
   # Flip TRUE to a 0, because UNIX considers a 0 exit code to be good. 
   if [ "$result" = "t" ]; then
+    echo "CHECK_SCHEMA_EXISTS END: $schema_name = 0"
     return 0
   else
+    echo "CHECK_SCHEMA_EXISTS END: $schema_name = 1"
     return 1
   fi
 }
