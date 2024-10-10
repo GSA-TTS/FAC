@@ -1,0 +1,102 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.1.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "FindingsText"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "GM27HGUL61B5"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "4"
+                },
+                "values": [
+                    "2022-003",
+                    "2022-004",
+                    "2022-002"
+                ]
+            },
+            {
+                "name": "text_of_finding",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "Finding 2022-003 \u2013 Significant Deficiency \nAssistance Listing:  21.027 \u2013 Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)\nFederal Grantor:  Department of the Treasury\nCompliance Requirement:  Reporting\nCondition:  The Project and Expenditure Reports were not filed.\nCriteria:  The Subrecipient Agreement between the City of Elk Grove and the District. Section 10 states Subrecipient shall comply with any applicable reporting obligations established by the Department of the Treasury as they relate to this Agreement.  Department of Treasury Compliance and Reporting Guidance for CSLFRF, Part 2, Section B outlines reporting requirements.  Reports on projects funded, expenditures, and contracts and subawards equal to or greater than $50,000, and other information are required annually for recipients serving populations under 250,000 and receiving less than $10 million in CSLFRF funding.\nCause:  The District believed that as a subrecipient of funds the funding provider would prepare and file the required reporting.\nEffect:  Treasury may impose additional conditions on the receipt of a subsequent tranche of future award funds, if any, or take other available remedies as set forth in 2 C.F.R. \u00a7 200.339.\nRecommendation:  We recommend the District file the initial Project and Expenditures Report for the period covering March 3, 2021 to March 31,2022 as soon as possible.  Subsequent annual reports should be filed by the April 30, 2023 deadline.\nViews of Responsible Officials and Planned Corrective Actions:  Management\u2019s response and planned corrective action is included in the Corrective Action Plan included at the end of the report.",
+                    "Finding 2022-004 \u2013 Significant Deficiency \nAssistance Listing:  21.027 \u2013 Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)\nFederal Grantor:  Department of the Treasury \nCompliance Requirement:  Procurement and Suspension and Debarment\nCondition:  The District used a sole source authorization for the procurement of a Type-1 Fire Engine but a competitive bid process should have been used to comply with Uniform Guidance.\nCriteria:  Non-state entities under the program, must follow the procurement standards in 2 CFR sections 200.318 through 200.327, including ensuring that the procurement method used for the contracts are appropriate based on the dollar amount and conditions specified in 2 CFR section 200.320.  Specifically, procurements in excess of $250,000 be conducted using a competitive procurement method such as bids or proposals. Further, the District\u2019s Purchasing Policy Sec 2112.13 requires staff obtain competitive bids for the purchase of supplies, equipment or service that are $15,000 or greater.\nInteragency or cooperative purchasing agreements may be leveraged, but they must comply with the Unform Standards, and 2 CFR section 200.320(c) states noncompetitive procurement can only be awarded if one or more of the following circumstances apply:\n1)\tThe acquisition of property or services, the aggregate dollar amount of which does not exceed the micro-purchase threshold (see paragraph (a)(1) of this section);\n2)\tThe item is available only from a single source;\n3)\tThe public exigency or emergency for the requirement will not permit a delay resulting from publicizing a competitive solicitation;\n4)\tThe Federal awarding agency or pass-through entity expressly authorizes a noncompetitive procurement in response to a written request from the non-Federal entity; or\n5)\tAfter solicitation of a number of sources, competition is determined inadequate.\nCause:  The District\u2019s Purchasing Policy allows for a sole source vendor with the approval of the Chief Administrative Officer.  In addition, the Policy allows the District to purchase through a purchasing alliance, such as a cooperative agreement.  The sole source vendor has a cooperative purchasing agreement through National Purchasing Partners (NPP) cooperative, contract number PS20240.  The District\u2019s justification for sole source vendor was uniformity of vendors across safety equipment which fosters ease of operator training and emergency scene efficiency.  The approval indicated standardization also supports ongoing maintenance of the fleet.  \nWhile permitted by internal policy, this justification does not appear to meet any of the noncompetitive procurement exceptions allowed by the Uniform Standards outlined above.  The District was also unable to provide documentation that the vendor purchasing agreement through NPP complies with the Uniform Standards for procurement.\nEffect:  Treasury may impose additional conditions on the receipt of a subsequent tranche of future award funds, if any, or take other available remedies as set forth in 2 C.F.R. \u00a7 200.339.\nRecommendation:  We recommend the District work with FEMA to obtain written approval for the sole source procurement, which is one of the exceptions to noncompetitive procurements.\nViews of Responsible Officials and Planned Corrective Actions:  Management\u2019s response and planned corrective action is included in the Corrective Action Plan included at the end of the report.",
+                    "Finding 2022-002 \u2013 Significant Deficiency \nAward No.:  97.083, Staffing for Adequate Fire and Emergency Response\nFederal Grantor:  U.S.  Department of Homeland Security, Federal Emergency Management Agency\nCompliance Requirement:  Other compliance requirements.\nCondition:  The schedule of Expenditures of Federal Awards (SEFA) was not complete, and expenditures reported on the SEFA were revised during the single audit.\nCriteria:  2 CFR Part 200, Subpart F (Uniform Guidance) Section 200.502 states, \u201cThe auditee should prepare a Schedule of Expenditures of Federal Awards for the period covered by the auditee\u2019s financial statements.\u201d  Internal controls over the SEFA should be in place ensure accrual basis expenses incurred under the federal program are properly reported as expenses on the SEFA and are properly reported as revenue in the financial statements prior to the start of the single audit.\nCause:  SEFA was not fully reconciled and finalized until after the single audit began.\nEffect:  The expenses included on the SEFA were revised during the single audit, which could have resulted in the auditor not selecting the correct major program or expenses for testing and could have resulted in the single audit not satisfying the requirements of the Uniform Guidance.\nRecommendation:  We recommend additional review procedures be implemented to ensure the SEFA is complete and accurate when the single audit begins.\nViews of Responsible Officials and Planned Corrective Actions:  Management\u2019s response and planned corrective action is included in the Corrective Action Plan included at the end of the report."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "4"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

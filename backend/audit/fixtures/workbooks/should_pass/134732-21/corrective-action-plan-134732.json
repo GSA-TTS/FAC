@@ -1,0 +1,102 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "CorrectiveActionPlan"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "BADBADBADBAD"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "4"
+                },
+                "values": [
+                    "2021-002",
+                    "2021-004",
+                    "2021-003"
+                ]
+            },
+            {
+                "name": "planned_action",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "Foster Care Title IV-E  Assistance Listing No. 93.658Recommendation: We recommend that the County document ninety-day reviews within Trails in a timely manner to provide an accurate audit trail.Explanation of disagreement with audit finding: There is no disagreement with the audit finding.Action taken in response to finding: CFS staff are all trained in how to complete a ninety-day review in Trails.We will work with supervisors and division leaders to implement a data driven supervision model that will ensure that these reviews are completed timely.Name of the contact person responsible for corrective action: Tiffany SewellPlanned completion date for corrective action plan: December 31, 2022",
+                    "Coronavirus State and Local Fiscal Recovery Funds  Assistance Listing No. 21.027Recommendation: We recommend that the County have a review process of subrecipient agreements to ensure that all required information is included within the document.Explanation of disagreement with audit finding: There is no disagreement with the audit finding.Action taken in response to finding:. Subsequent to year end, the County modified the subaward to include the required information and ensured it was part of all future CSLFRF agreements. In addition, the County will create a standard subrecipient monitoring policy that will cover all programs, and will include standard forms and templates. This policy will require a secondary review that will confirm all required documentation has been provided to subrecipients.Name of the contact person responsible for corrective action: Tyra LitzauPlanned completion date for corrective action plan: April 30, 2023",
+                    "Emergency Rental Assistance Program (ERA)  Assistance Listing No. 21.023Recommendation: We recommend that the County utilize standard forms or templates to document verification that parties are not suspended or debarred prior to entering into a transaction with a subrecipient.Explanation of disagreement with audit finding: There is no disagreement with the audit finding.Action taken in response to finding: The County will create a standard subrecipient monitoring policy that will cover all County federal programs.Standard forms and templates will be included in the policy.Name of the contact person responsible for corrective action: Tyra LitzauPlanned completion date for corrective action plan: April 30, 2023"
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "4"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

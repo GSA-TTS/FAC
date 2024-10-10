@@ -1,0 +1,141 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.1.0"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "NotesToSefa"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "M1LVPE5GLSD9"
+                ]
+            },
+            {
+                "name": "accounting_policies",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "values": [
+                    "The purpose of the schedule of expenditures of Federal awards (the Schedule) is to present a summary of those activities of Rutgers, The State University of New Jersey (the University) for the year ended June 30, 2022, which have been funded by the U.S. Government (Federal awards). For purposes of the Schedule, Federal awards include all Federal assistance and procurement relationships entered into directly between the University and the Federal Government and sub awards from non Federal organizations made under Federally sponsored agreements. The information in this schedule is presented in accordance with the requirements of Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Therefore, some amounts presented in this schedule may differ from amounts presented in, or used in the preparation of, the 2022 basic financial statements. Because the Schedule presents only a selected portion of the activities of the University, it is not intended to and does not present either the financial position, changes in financial position, or cash flows of the University. The accounting principles followed by the University in each of these areas and used in preparing the accompanying schedule are as follows:Student Financial AidDisbursements are recognized on the accrual basis of accounting for awards made to students and for allowable administrative expenses of running such programs.Awards Other Than Student Financial AidDisbursements (expenditures) for direct costs are recognized as incurred using the accrual method of accounting and the cost accounting principles contained in the Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Under those cost principles, certain types of expenditures are not allowable or are limited as to reimbursement. Moreover, expenditures include a portion of costs associated with general University activities which are allocated to Federal expenditures under negotiated formulas commonly referred to as facilities and administrative (F&A) costs rates. F&A costs applicable to these cost recoveries are classified as unrestricted expenses in the statements of revenues, expenses, and changes in net position. Credit disbursement amounts typically result from grant or contract closing adjustments or transfers."
+                ]
+            },
+            {
+                "name": "is_minimis_rate_used",
+                "start_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "values": [
+                    "N"
+                ]
+            },
+            {
+                "name": "rate_explained",
+                "start_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "The auditee did not use the de minimis cost rate."
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "note_title",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "3"
+                },
+                "values": [
+                    "(4)Federal Perkins Loan Program and Nursing Student Loan Program",
+                    "(3)Federal Direct Student Loan Program"
+                ]
+            },
+            {
+                "name": "note_content",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "FEDERAL PERKINS LOAN (84.038) - Balances outstanding at the end of the audit period were 25143296. FEDERAL DIRECT STUDENT LOANS (84.268) - Balances outstanding at the end of the audit period were N/A. NURSE FACULTY LOAN PROGRAM (NFLP) (93.264) - Balances outstanding at the end of the audit period were 2104738.",
+                    "The University is responsible only for the performance of certain administrative duties with respect to the Federal Direct Student Loan Program and, accordingly, these loans are not included in the Universitys basic financial statements. It is not practical to determine the balance of loans outstanding to students of the University under this program as of June 30, 2022."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "3"
+                },
+                "values": [
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

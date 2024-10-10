@@ -1,0 +1,102 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.1.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "CorrectiveActionPlan"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "GM27HGUL61B5"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "4"
+                },
+                "values": [
+                    "2022-004",
+                    "2022-002",
+                    "2022-003"
+                ]
+            },
+            {
+                "name": "planned_action",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "Finding 2022-004 \u2013 Significant Deficiency \nAssistance Listing:  21.027 \u2013 Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)\n\tFederal Grantor:  Department of the Treasury \nCompliance Requirement:  Procurement and Suspension and Debarment\nCondition:  The District used a sole source authorization for the procurement of a Type-1 Fire Engine but a competitive bid process should have been used to comply with Uniform Guidance.\nRecommendation:  We recommend the District work with FEMA to obtain written approval for the sole source procurement, which is one of the exceptions to noncompetitive procurements.\nManagement Response and Corrective Action Plan: The District shall revise policies and procedures to incorporate the requirements in the Uniform Guidance in its sole source approval process when it comes to selecting and approving vendors for expenditures that relates to a federal grant. The District will also work with the awarding agency to ensure written approval are obtained for sole source purchases.",
+                    "Finding 2022-002 \u2013 Significant Deficiency \nAward No.:  97.083, Staffing for Adequate Fire and Emergency Response\nFederal Grantor:  U.S.  Department of Homeland Security, Federal Emergency Management Agency\nCompliance Requirement:  Other compliance requirements.\nCondition:  The schedule of Expenditures of Federal Awards (SEFA) was not complete, and expenditures reported on the SEFA were revised during the single audit.\nRecommendation:  We recommend additional review procedures be implemented to ensure the SEFA is complete and accurate when the single audit begins.\nManagement Response and Corrective Action Plan: The Finance division will work with other departments to ensure that data provided in the SEFA are complete and accounted for on an accrual basis. We will also implement efficiencies in our accounting systems to ensure expenditures are captured correctly to prevent errors and omissions. Additional review will be completed by the Finance Director for completeness.",
+                    "Finding 2022-003 \u2013 Significant Deficiency \nAssistance Listing:  21.027 \u2013 Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)\nFederal Grantor:  Department of the Treasury\nCompliance Requirement:  Reporting\nCondition:  The Project and Expenditure Reports were not filed.\nRecommendation:  We recommend the District file the initial Project and Expenditures Report for the period covering March 3, 2021 to March 31,2022 as soon as possible.  Subsequent annual reports should be filed by the April 30, 2023 deadline.\nManagement Response and Corrective Action Plan: The District has confirmed with the City of Elk Grove that as the main recipient of the grant, the City has filed the project and expenditure reports with the Treasury Department. In addition to what has already been report, the District will establish the proper authority to report the project and expenditure reports to the Treasury Department for period covering March 3, 2021 to March 31, 2022. The District will ensure that going forward projects and expenditures are reported in accordance with the schedule set forth by the guidance issued by the Treasury."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "4"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

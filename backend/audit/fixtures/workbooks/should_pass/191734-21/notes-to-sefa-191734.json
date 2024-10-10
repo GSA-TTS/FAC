@@ -1,0 +1,141 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "NotesToSefa"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "BADBADBADBAD"
+                ]
+            },
+            {
+                "name": "accounting_policies",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "values": [
+                    "Exemption for Indian Tribes."
+                ]
+            },
+            {
+                "name": "is_minimis_rate_used",
+                "start_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "values": [
+                    "Both"
+                ]
+            },
+            {
+                "name": "rate_explained",
+                "start_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "Exemption for Indian Tribes."
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "note_title",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "3"
+                },
+                "values": [
+                    "Provider Relief Fund ",
+                    "Reconciliation to the Financial Statements "
+                ]
+            },
+            {
+                "name": "note_content",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "3"
+                },
+                "values": [
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

@@ -1,0 +1,102 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "FindingsText"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "BADBADBADBAD"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "4"
+                },
+                "values": [
+                    "2021-003",
+                    "2021-002",
+                    "2021-004"
+                ]
+            },
+            {
+                "name": "text_of_finding",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "Criteria or specific requirement: Non-Federal entities are prohibited from contracting with or making subawards under covered transactions to parties that are suspended or debarred. Covered transactions include contracts for goods and services awarded under a non-procurement transaction (e.g., grant or cooperative agreement) that are expected to equal or exceed $25,000 or meet certain other criteria as specified in 2 CFR section 180.220. All non-procurement transactions entered into by a passthrough entity (i.e., subawards to subrecipients), irrespective of award amount, are considered covered transactions, unless they are exempt as provided in 2 CFR section 180.215. When a non-Federal entity enters into a covered transaction with an entity at a lower tier, the non-Federal entity must verify that the entity, as defined in 2 CFR section 180.995 and agency adopting regulations, is not suspended or debarred or otherwise excluded from participating in the transaction. This verification may be accomplished by (1) checking SAM exclusions, (2) collecting a certification from the entity, or (3) adding a clause or condition to the covered transaction with that entity (2 CFR section 180.300). Condition: During our testing of internal control over suspension and debarment for ERA, we noted the County did not have effective control over compliance. Questioned costs: None noted Context: When entering into a covered transaction with an entity, the County is required to verify that the entity is not suspended or debarred prior to entering into the transaction. In our sample of four cases, there were three instances where the County did not have evidence of verification the entity was not suspended or debarred prior to entering into a covered transaction. The County did provide evidence that the verification occurred subsequent to payment and prior to year-end. Cause: The County did not have adequate controls in place to prevent it from entering into covered transactions with entities that may be suspended or debarred. Effect: The County could inappropriately disburse program funds to an entity that is suspended or disbarred. Repeat Finding: No Recommendation: We recommend that the County utilize standard forms or templates to document verification that parties are not suspended or debarred prior to entering into a covered transaction with a subrecipient. Views of responsible officials: There is no disagreement with the audit finding. ",
+                    "Criteria or specific requirement: Recipients of federal awards are required to establish and maintain effective internal control over the federal award that provides reasonable assurance that the non-federal entity is managing the federal award in compliance with federal statutes, regulations, and the terms and conditions of the federal award (2 CFR 200.303). Condition: During our testing of internal control over eligibility for Foster Care, we noted the County did not have effective control over compliance. Questioned costs: None noted Context: The internal control process for Adams County is that supervisors meet with case managers every 90 days. The case workers then record the review date in Trails (Colorados statewide automatic child welfare information system) and include relevant case data (completeness, any open notes, etc). From a sample of forty cases, there were six instances within five cases where the ninety-day reviews were not being performed timely. Non-timely reviews ranged from 2 days to 6 months. Cause: Case workers are not entering documentation of ninety-day reviews into Trails in a timely manner. Effect: If cases are not reviewed timely, Adams County is at risk to pay foster care benefits to an ineligible recipient. Repeat Finding: No Recommendation: We recommend that the County document ninety-day reviews within Trails in a timely manner to provide an accurate audit trail. Views of responsible officials: There is no disagreement with the audit finding. ",
+                    "Criteria or specific requirement: All pass-through entities must: (a) Ensure that every subaward is clearly identified to the subrecipient as a subaward and includes the following information at the time of the subaward and if any of these data elements change, include the changes in subsequent subaward modification. When some of this information is not available, the pass-through entity must provide the best information available to describe the Federal award and subaward. Required information includes: (1) Federal award identification. (i) Subrecipient name (which must match the name associated with its unique entity identifier); (ii) Subrecipient's unique entity identifier; (iii) Federal Award Identification Number (FAIN); (iv) Federal Award Date (see the definition of Federal award date in  200.1 of this part) of award to the recipient by the Federal agency; (v) Subaward Period of Performance Start and End Date; (vi) Subaward Budget Period Start and End Date; (vii) Amount of Federal Funds Obligated by this action by the pass-through entity to the subrecipient; (viii) Total Amount of Federal Funds Obligated to the subrecipient by the pass-through entity including the current financial obligation; (ix) Total Amount of the Federal Award committed to the subrecipient by the pass-through entity; (x) Federal award project description, as required to be responsive to the Federal Funding Accountability and Transparency Act (FFATA); (xi) Name of Federal awarding agency, pass-through entity, and contact information for awarding official of the Pass-through entity; (xii) Assistance Listings number and Title; the pass-through entity must identify the dollar amount made available under each Federal award and the Assistance Listings Number at time of disbursement; (xiii) Identification of whether the award is R&D; and (xiv) Indirect cost rate for the Federal award (including if the de minimis rate is charged) per  200.414. (2 CFR 200.332)Condition: During our testing of internal control over subrecipient monitoring for CSLFRF, we noted the County did not have effective control over compliance. Questioned costs: None noted Context: When entering into an agreement with a subrecipient, the County is required to make the subrecipient aware of the award information and requirements imposed by laws, regulations, and the provisions of contracts or grant agreements. In our testing of one subrecipient agreement, it was missing all the required subaward information. The County did provide evidence that an amended subaward was made subsequent to year-end that had all of the required subaward information. Cause: The County did not have adequate controls in place to ensure all required information is included in subrecipient agreements. Effect: The Countys subrecipient could be unaware the award is made with federal dollars and not fully understand the requirements that need to be met. Repeat Finding: No Recommendation: We recommend that the County have a review process of subrecipient agreements to ensure that all required information is included within the document. Views of responsible officials: There is no disagreement with the audit finding. "
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "4"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

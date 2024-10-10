@@ -1,0 +1,132 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.1.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "NotesToSefa"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "GSA_MIGRATION"
+                ]
+            },
+            {
+                "name": "accounting_policies",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "values": [
+                    "GSA_MIGRATION"
+                ]
+            },
+            {
+                "name": "is_minimis_rate_used",
+                "start_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "values": [
+                    "GSA_MIGRATION"
+                ]
+            },
+            {
+                "name": "rate_explained",
+                "start_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "GSA_MIGRATION"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "note_title",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "note_content",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "1"
+                },
+                "values": []
+            }
+        ]
+    }
+]

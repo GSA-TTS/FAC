@@ -1,0 +1,96 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "FindingsText"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "BADBADBADBAD"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "values": [
+                    "2021-002"
+                ]
+            },
+            {
+                "name": "text_of_finding",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "2021-002 Information on the Federal Program - Research and Development Cluster, Multple FederalGrantors, Multiple Award PeriodsCriteria or Specific Requirement - Program costs must be paid by non-federal entityfunds before submitting a payment request (2 CFR Section 200.305(b)(3)) (i.e., the non-federalentity must disburse funds for program purposes before requesting payment).Condition  In February 2021, RI processed a duplicate draw relating to numerous researchand development grants from the payment management system and did not detect or correct theerror until August 2021.Questioned Costs  The total amount of the duplicate draw was $1,039,895 and encompassedthe following awards:Federal Federal Award Federal Federal Award Federal Federal AwardAssistance Identification Assistance Identification Assistance IdentificationListing Number Amount Listing Number Amount Listing Number Amount93.110 T73MC06623 $ 1 75 93.847 NIH R01DK102142 $ 1 6,082 93.859 2P20GM103418 20 $ 6 8,11593.113 R01ES029203 6 ,816 93.847 K23DK109294 5 0 93.859 R01GM128241 67993.113 1R21ES028957-01A1 1 2 93.847 R01DK098414 5 ,276 93.859 R01GM115340 93393.121 R01DE026955 3 05 93.847 DK099611-06 8 ,522 93.859 5R01GM077336-11 12,69493.121 R01DE026172 1 2,120 93.847 5K01DK113048-02 5 22 93.859 5P30GM12273104 8693.134 U1333878 1 18,498 93.847 K01DK112967 3 ,276 93.865 5T32HD057850-12 41293.226 1R01HS026134-01A1 1 53 93.847 1R01DK123590-01 1 1 93.865 R01HD020676 15,90693.273 U01AA024733 1 ,340 93.847 5R01DK108433-05 9 78 93.865 1K99HD099269-01 12193.273 1R21AA026904-01 5 60 93.847 1R01DK122212-02 4 ,101 93.865 R01HD083292 393.273 5R01AA027586-03 4 ,760 93.847 R01DK121497 4 6 93.865 R01HD094545 5,40693.273 5R01AA012863-18 6 ,701 93.847 5R01DK113111-05 5 1,316 93.865 R21HD099364 6,47893.279 5 R01 DA042715-05 1 6,613 93.847 5R01DK115727-02 2 ,458 93.865 R01HD101319 57,04093.279 R01DA046576 5 ,990 93.847 1R01DK119131-01A1 6 ,992 93.866 R01AG052954 5,77293.310 UL1TR002366 4 43,642 93.853 5R01NS030853-27 2 ,520 93.866 1R21AG066488 2493.350 KL2TR002367 6 ,332 93.853 5R01NS043314-15 6 19 93.866 R24AG063724 9,63693.350 TL1TR002368 1 7,656 93.855 1R01AI121073-01A1 1 ,125 93.866 1R01AG060050-01A1 12,15893.350 5UL1TR002366-04 4 0,044 93.855 R21Al142028 1 ,664 93.866 R01AG062548 5093.361 R01NR16255 01A1 8 0 93.855 R21AI144883 5 30 93.866 R01AG060157 1,73693.393 R01CA185322 5 51 93.855 1R01AI150877-01 1 ,316 93.866 R01AG061194 43793.393 R01CA201309 3 6 93.855 R21AI151542 3 47 93.866 R01AG060733 1,69893.395 R37CA218118 1 ,991 93.855 1R21AI144698-01 1 3,733 93.866 R01AG064227 3,53893.396 1R01CA227838-01A1 7 ,502 93.855 5R01AI147276-03 4 ,457 93.866 R21AG061548 12,81993.397 P30CA168524 5 40 93.855 R21AI144624 3 ,611 93.866 F30AG058397 12093.838 R01HL139365 1 ,944 93.859 4R01GM029764-33 7 8 93.866 R61AG068483 2393.982 1H79FG000177-01 2 0$ 1 ,039,895Context  During the year-end closing procedures, management identified a duplicate drawthat occurred during February 2021. The error was corrected in the payment managementsystem in August 2021 and disclosed to us during the audit process.Effect  Federal funds were improperly held by RI for approximately seven months.Cause  After the original draw occurred, the payment was not posted against the invoicesand costs included in the request. As a result, the same invoices and costs were includedagain in the immediately following draw down which resulted in the overpayment.Recommendation  We recommend that management review the current processes andinternal controls for cash management and manke necessary changes to ensure federal drawsare processed accurately and reconciled timely.Views of Responsible Officials and Planned Corrective Actions  Managementagrees with the stated finding and has implemented a corrective action plan."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "values": [
+                    "N"
+                ]
+            }
+        ]
+    }
+]

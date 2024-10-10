@@ -1,0 +1,141 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "NotesToSefa"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "BADBADBADBAD"
+                ]
+            },
+            {
+                "name": "accounting_policies",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "values": [
+                    "Expenditures reported on the Schedule are reported on the accrual basis of accounting. Such expenditures are recognized following the cost principles contained in the Uniform Guidance for all awards with the exception of assistance listing number (ALN) 21.019, which follows criteria determined by the Department of Treasury for allowability of costs. Under these principles, certain types of expenditures are not allowable or are limited as to reimbursement. Negative amounts shown on the Schedule represent adjustments or credits made in the normal course of business to amounts reported as expenditures in prior years. Amounts reported in the Schedule are recognized on a modified accrual basis when they become a demand on current available federal resources and eligibility requirements are met, except in the following programs, which are reported in the Schedule on a cash basis:Guardianship Assistance (IVE Relative) 93.090Promoting Safe and Stable Families 93.556Temporary Assistance for Needy Families 93.558Child Support Enforcement93.563LowIncome Home Energy Assistance 93.568Child Care and Development Fund Cluster 93.575, 93.596Child Welfare Services Program 93.645Foster CareTitle IVE 93.658Adoption Assistance 93.659Social Services Block Grant 93.667John H. Chafee Foster Care Program 93.674 COVID19 Elder Abuse Prevention Interventions Program 93.747 Medicaid Cluster 93.778Supplemental Nutrition Assistance Program Cluster 10.551, 10.561"
+                ]
+            },
+            {
+                "name": "is_minimis_rate_used",
+                "start_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "values": [
+                    "N"
+                ]
+            },
+            {
+                "name": "rate_explained",
+                "start_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "The County has not elected to use the 10% de minimis indirect cost rate except for ALN 93.569, as allowed under the Uniform Guidance."
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "note_title",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "3"
+                },
+                "values": [
+                    "BASIS OF PRESENTATION",
+                    "OTHER INFORMATION"
+                ]
+            },
+            {
+                "name": "note_content",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "The accompanying schedule of expenditures of federal awards (the Schedule) includes the federal award activity of the County under programs of the federal government for the year ended December 31, 2021. The information in this Schedule is presented in accordance with the requirements of 2 CFR Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Because the Schedule presents only a selected portion of the operations of the County, it is not intended to and does not represent the financial position, changes in net position, or cash flows of the County.",
+                    "The County participates in the Food Assistance Benefits / EBT program under ALN 10.551. The County performs some administrative duties on behalf of the State. The State distributes $217,125,754 in benefits, which are not reflected on the Schedule of the County, as the programs compliance requirements are the responsibility of the State."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "3"
+                },
+                "values": [
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

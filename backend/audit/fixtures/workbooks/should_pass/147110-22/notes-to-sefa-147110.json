@@ -1,0 +1,153 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "NotesToSefa"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "ZUFJEU4NMK52"
+                ]
+            },
+            {
+                "name": "accounting_policies",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "values": [
+                    "A. Reporting EntityThe reporting entity is defined in Note 1 to the BFS.The accompanying Schedule includes all federal financial assistance programs of the State of Maine reporting entity for the fiscal year ended June 30, 2022, with the exception of the discrete component units identified in Note 1 to the BFS.The discrete component units engaged other auditors.B. Basis of PresentationThe information in the accompanying Schedule of Expenditures of Federal Awards is presented in accordance with the Uniform Guidance.1) Federal AwardsA federal award is defined by the Uniform Guidance as federal financial assistance and federal cost-reimbursement contracts that non-federal agencies receive directly or indirectly from federal agencies or pass-through entities.Federal financial assistance is defined as assistance that non-federal entities receive or administer in the form of grants, loans, loan guarantees, property, cooperative agreements, interest subsidies, insurance, food commodities, direct appropriations and other assistance.Accordingly, non-cash federal assistance is included in federal financial assistance and, therefore, is reported on the Schedule of Expenditures of Federal Awards.Federal financial assistance does not include direct federal cash assistance to individuals.2) Type A and Type B ProgramsLevels of expenditures to be used in defining Type A and Type B federal financial assistance programs are specified by the Uniform Guidance.Type A programs for the State of Maine are those programs that equal or exceed $17.1 million in expenditures, distributions, or issuances for the year ended June 30, 2022.Programs audited as major programs are marked with asterisks in the accompanying schedule.C. Basis of AccountingThe information presented in the Schedule of Expenditures of Federal Awards is presented primarily on the cash basis of accounting, which is consistent with the other Federal grant reports.The fund level financial statements are reported on the modified accrual basis of accounting. Consequently, the schedules data may not be directly traceable to the financial statements."
+                ]
+            },
+            {
+                "name": "is_minimis_rate_used",
+                "start_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "values": [
+                    "Both"
+                ]
+            },
+            {
+                "name": "rate_explained",
+                "start_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "The State of Maine did not elect to use the 10% de minimis indirect cost rate with the exception of the following program:20.700 Pipeline Safety Program State Base Grant"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "note_title",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "7"
+                },
+                "values": [
+                    "3. Unemployment Insurance Program",
+                    "4. Supplemental Nutrition Assistance Program",
+                    "5. Child Nutrition Cluster",
+                    "6. Noncash Awards",
+                    "7. Donated Personal Protective Equipment",
+                    "8. Prior Period Expenditures"
+                ]
+            },
+            {
+                "name": "note_content",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "The expenditures reported on the Schedule for Unemployment Insurance (ALN 17.225) include:State Funds $10,414,896Federal Funds 193,163,104ALN 17.225 Total 203,578,000Subsidy from ALN 21.019 Coronavirus Relief Fund8,000,000Subsidy from ALN 21.027 Coronavirus State and Local Fiscal Recovery Funds80,000,000Maines UI Program Total $291,578,000",
+                    "In response to the COVID-19 pandemic, the Supplemental Nutrition Assistance Program (SNAP, ALN 10.551) issued emergency allotment benefits. However, the State of Maine is unable to identify the amount of emergency allotment expenditures.Therefore, emergency allotment expenditures are included in regular SNAP expenditures on the Schedule of Expenditures of Federal Awards.",
+                    "In response to the COVID-19 pandemic, the Child Nutrition Cluster had increased funding as a result of Families First Coronavirus Response Act (FFCRA) waivers. However, the State of Maine is unable to isolate the amount of expenditures due to the waivers.Therefore, COVID-19 pandemic expenditures are included in the regular Child Nutrition Cluster expenditures on the Schedule of Expenditures of Federal Awards.",
+                    "The State of Maine is the recipient of federal financial assistance programs that do not result in cash receipts or disbursements.Noncash awards received by the State are included in the Schedule of Expenditures of Federal Awards as follows:ALNAssistance ListingNoncashAwards10.542Pandemic EBT Food Benefits$61,507,55810.551SNAP (Supplemental Nutrition Assistance Program)$465,587,04610.555National School Lunch Program$4,320,71610.559Summer Food Service Program for Children$428,69310.565Commodity Supplemental Food Program$1,898,15510.569Emergency Food Assistance Program$4,999,51010.664Cooperative Forestry Assistance$76,31393.268Immunization Cooperative Agreements$15,006,90697.067Homeland Security Grant Program$282,896",
+                    "In response to the COVID 19 pandemic, the federal government donated PPE with an estimated fair market value of $4,348,000 to the State of Maine. Per the 2022 Compliance Supplement, this amount is not included in the Schedule of Expenditures of Federal Awards and is not subject to Audit. Therefore, this amount is unaudited.",
+                    "Credits to related to prior year program expenditures not netted with current year expenditures reported in the Schedule of Expenditures of Federal Awards include:84.425CEducation Stabilization FundGovernors Emergency Education Relief Fund$206,323.84.425D Education Stabilization Fund - Elementary and Secondary School Emergency Relief Fund $1,462,290.93.323 Epidemiology and Laboratory Capacity for Infectious Diseases $14,212,400"
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "7"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

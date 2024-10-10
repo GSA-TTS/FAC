@@ -1,0 +1,180 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "NotesToSefa"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "JCJBPTJXYXH9"
+                ]
+            },
+            {
+                "name": "accounting_policies",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "values": [
+                    "(a) Reporting Entity The State of Texas Schedule of Expenditures of Federal Awards (Schedule) includes the activity of all federal award programs administered by the primary government except for the federal activity of the Texas A&M Research Foundation (TAMRF), a blended component unit of the Texas A&M University System. TAMRF is excluded from the Schedule and is subject to a separate audit in compliance with the audit requirements of Title 2, U.S. Code of Federal Regulations, Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). The Schedule does not include the federal activity of discrete component units. These entities are legally separate from the State and are responsible for undergoing separate audits as needed to comply with the OMB Uniform Guidance. The federal activity of the following discrete component units is excluded from the Schedule: OneStar National Service Commission Teacher Retirement System of Texas Texas Appraiser Licensing and Certification Board Texas Boll Weevil Eradication Foundation Inc. Texas Health Insurance Risk Pool Texas State Affordable Housing Corporation (b) Basis of Presentation The Schedule presents total federal awards expended for each individual federal program during the fiscal year ended August 31, 2022. The information in the Schedule is presented in accordance with the requirements of OMB Uniform Guidance. Federal award program titles are reported as presented by Assistance Listing Number (ALN) in the System for Award Management (SAM). Federal award program titles not presented in the SAM are identified by federal agency number followed by (.XXX). U.S. Department of Education (ED) subprograms are identified by a subprogram alpha character after the ALN and presented by ED subprogram title. Federal award programs and subprograms include expenditures, pass-throughs to non-state agencies (i.e. payments to subrecipients), non-monetary assistance and loan programs. (c) Basis of Accounting The expenditures for each of the federal financial assistance programs are presented in the Schedule on the accounting basis as presented on the fund financial statements. For entities with governmental funds, expenditures are presented on a modified accrual basis. For entities with proprietary or fiduciary funds, expenditures are presented on the full accrual basis. Such expenditures are generally recognized following the cost principles contained in Title 2 U.S. Code of Federal Regulations, Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards, wherein certain types of expenditures are not allowable or are limited as to reimbursement for all awards with the exception of the Coronavirus Relief Fund (ALN 21.019) and those programs identified in Appendix I of the 2022 Compliance Supplement. ALN 21.019 follows criteria determined by the U.S. Department of Treasury for allowability of costs. Programs identified in Appendix I of the 2022 Compliance Supplement follow the cost principles contained in the Texas Grant Management Standards (TXGMS) issued by the Texas Comptroller of Public Accounts for allowability of costs. The expenditures in the Student Financial Assistance Cluster that meet the qualification for continuing compliance requirements include the beginning balance of outstanding loans from previous reporting periods, new loans processed in the current reporting period and the administrative cost recovered. Additional information on all loan expenditures can be seen in Note 5. Both the modified accrual and accrual basis of accounting incorporate an estimation approach to determine the amount of expenditures incurred if not yet billed by a vendor. Thus, those federal programs presenting negative amounts on the Schedule are the result of prior year estimates being overstated and/or reimbursements due back to the grantor."
+                ]
+            },
+            {
+                "name": "is_minimis_rate_used",
+                "start_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "values": [
+                    "Both"
+                ]
+            },
+            {
+                "name": "rate_explained",
+                "start_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "The following state agencies elected to use the 10-percent de minimis indirect cost rate allowed under the Uniform Guidance: Commission on State Emergency Communications Soil and Water Conservation Board"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "note_title",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "16"
+                },
+                "values": [
+                    "NOTE 6: NONMONETARY ASSISTANCE",
+                    "NOTE 7: REBATES FROM THE SPECIAL SUPPLEMENTAL NUTRITION PROGRAM FOR WIC",
+                    "NOTE 8: PROGRAMS NOT SUBJECT TO OMB UNIFORM GUIDANCE ",
+                    "NOTE 9: DISASTER GRANTS  PUBLIC ASSISTANCE (ALN 97.036) ",
+                    "NOTE 10: PROVIDER RELIEF FUND (ALN 93.498) AUDITED ENTITIES ",
+                    "NOTE 11: EMERGENCY HOUSING VOUCHER (EHV) PROGRAM FUNDING ",
+                    "NOTE 12: DONATED PERSONAL PROTECTIVE EQUIPMENT (PPE) (UNAUDITED) ",
+                    "NOTE 13: CHILD CARE AND DEVELOPMENT FUND (CDDF) CLUSTER FUNDING",
+                    "Note 1: SUMMARY OF SIGNIFICANT ACCOUNTING POLICIES (CONTINUED)",
+                    "Note 2: RELATIONSHIP TO FEDERAL FINANCIAL REPORTS",
+                    "NOTE 3: RELATIONS TO REVENUE IN THE STATE OF TEXAS' FUND FINANCIAL STATEMEN",
+                    "NOTE 4: UNEMPLOYMENT INSURANCE FUNDS",
+                    "NOTE 5: FEDERALLY FUNDED LOAN/CREDIT ENHANCEMENT PROGRAMS",
+                    "NOTE 5: FEDERALLY FUNDED LOAN/CREDIT ENHANCEMENT PROGRAMS (CONTINUED)",
+                    "NOTE 5: FEDERALLY FUNDED LOAN/CREDIT ENHANCEMENT PROGRAMS (CONTINUED)"
+                ]
+            },
+            {
+                "name": "note_content",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "16"
+                },
+                "values": [
+                    "The State is the recipient of federal financial assistance programs that do not result in cash receipts or disbursements and are therefore not recorded in the States fund financial statements. Awards received by the State which includes cash and non-cash amounts are included in the Schedule as follows: ALN Grant Award10.555 $ 276,346,87510.559 1,377,50110.565 26,279,08210.569 169,031,64939.003 29,179,60193.268 575,481,065Total Grant Awards 1,077,695,773",
+                    "During fiscal year 2022, the State received cash rebates from infant formula manufacturers in the amount of approximately $183.6 million on sales of formula to participants in the WIC program (ALN 10.557), which are netted against total expenditures included in the Schedule. Rebate contracts with infant formula manufacturers are authorized by Code of Federal Regulations, Title 7: Agriculture, Subtitle B, Chapter II, Subchapter A, Part 246.16a as a cost containment measure. Rebates represent a reduction of expenditures previously incurred for WIC food benefit costs. Applying the rebates received to such costs enabled the State to extend program benefits to more participants than could have been serviced this fiscal year in the absence of the rebate contract.",
+                    "The fund financial statements include federal funding received from certain programs which are not subject to continuing compliance requirements. For the year ended August 31, 2022, the fund financial statements include $240.3 million of federal funds which are not subject to the continuing compliance requirements of OMB Uniform Guidance and are not included in the Schedule. Medicare Part D is not subject to OMB Uniform Guidance. Reimbursements of $163.8 million were received related to the Medicare Part D program by the administrators of postemployment health care plans. Administrators include the Employees Retirement System of Texas, University of Texas System and Texas A&M University System. The Build America Bonds are taxable municipal bonds that carry special tax credits and federal subsidies for either the bond issuer or the bondholder. The revenue generated is excluded from the Schedule. The State recognized federal revenues of $76.5 million related to the program.",
+                    "After a Presidential-Declared Disaster, FEMA provides a Public Assistance Grant to reimburse eligible costs associated with repair, replacement, or restoration of disaster-damaged facilities. The federal government reimburses in the form of cost-shared grants which requires state matching funds. For the year ended August 31, 2022, $49.3 million of approved eligible expenditures that were incurred in a prior year are included on the Schedule.",
+                    "The State of Texas Statewide Single Audit for the year ended August 31, 2022, included a series of audits of state agencies that administered the Provider Relief Fund (PRF) and American Rescue Plan (ARP) Rural Distribution program. The following state agencies, by taxpayer identification number (TIN), are included in the audit of the Provider Relief Fund (PRF) and American Rescue Plan (ARP) Rural Distribution program: TIN746001118746000949756002868 State AgencyThe University of Texas MD Anderson Cancer CenterThe University of Texas Medical Branch at GalvestonThe University of Texas Southwestern Medical Center",
+                    "During fiscal year 2022, the State received EHV program funding in the amount of approximately $175.3 thousand as part of the Section 8 Housing Choice Vouchers (ALN 14.871) program. The EHV program expenditures are included in the Schedule as ALN 14.871 program expenditures.",
+                    "The State is the recipient of federally donated PPE. The fair market value of the PPE at the time of receipt was $500.",
+                    "The Child Care and Development Fund (CCDF) provided the State federal funding to increase availability, affordability, and quality of childcare services. The CCDF cluster are federal programs that have similar compliance requirements although the programs are administered as separate programs. During fiscal year 2022, the State received approximately $2.6 billion in direct revenues and Non-State Entity (NSE) pass through funding. The CCDF program revenues are included in the Schedule as discretionary funding ALN 93.575, in the amount of approximately $2.3 billion and matching funding from ALN 93.596, in the amount of approximately $281.8 million. ALN Program Name NSE Revenues Direct Revenues Total93.575 Child Care and DevelopmentBlock Grant 10,145 $ 2,300,081,392 $ 2,300,091,537 $ 93.596 Child Care Mandatory and Matching Funds of the Child Care and Development Fund 48,816 281,754,121 281,802,937 Total CCDF Cluster Programs 58,961 $ 2,581,835,513 $ 2,581,894,474",
+                    "(d) Matching Costs Matching costs, the nonfederal share of certain program costs, are not included in the Schedule, except for the States share of unemployment insurance (See Note 4).",
+                    "The regulations and guidelines governing the preparation of federal financial reports vary by federal agency and among programs administered by the same agency. Accordingly, the amounts reported in the federal financial reports do not necessarily agree with the amounts reported in the accompanying Schedule which is prepared on the basis explained in Note 1(c).",
+                    "The following is a reconciliation of total federal awards expended as reported in the Schedule to federal revenues reported in the fund financial statements. FEDERAL REVENUESStatement of Revenues, Expenditures, and Changes in Fund Balances - Governmental Funds, Federal Revenue $93,869,334,902Statement of Revenues, Expenses, and Changes in Net Position - Proprietary Funds, Federal Revenue 9,699,771,623 Statement of Revenues, Expenses, and Changes in Net Position - Proprietary Funds, Capital Contributions - Federal 932,081 Statement of Changes in Fiduciary Net Position 117,205,493 Total Federal Revenue per Fund Financial Statements 103,687,244,099 RECONCILING ITEMSNoncash Federal Commodities/Vaccines/Surplus Property/ Other (Note 6) 1,077,695,773Various Loans Processed by Universities and Agencies (Note 5) 2,801,560,119Beginning Balance of Loans as of September 1, 2021 for Various Loan Programs (Note 5) 80,795,159State Unemployment Funds (Note 4) 582,789,819Programs Not Subject to OMB Uniform Guidance (Note 8) (240,266,921)Other* 202,116,347Blended Component Unit Not Included in the Schedule of Expenditures of Federal Awards (Note 1(a)) (72,485,812)Expenditures per Schedule of Expenditures of Federal Awards $108,119,448,583 *This amount includes deductions of $8,307,050 for fixed fee contracts; deductions of $3,218,130 for vendor transactions; additions of $204,606,749 for the timing differences between Provider Relief Fund payments and expenditure recognition; addition of $2,654,520 for the Smith-Lever Act Federal Appropriation; and additions of $12,603,207 for Credit Enhancement for Charter School Facilities; deductions of $6,222,948 for other transactions in the Schedule.",
+                    "State unemployment tax revenues and the government and non-profit contributions in lieu of state taxes (State UI funds) must be deposited into the Unemployment Trust Fund in the U.S. Treasury. Use of these funds is restricted to pay benefits under the federally approved State Unemployment Law. State UI funds as well as federal funds are reported in the Schedule under ALN 17.225. The State portion in the amount of $582.8 million is a reconciling item in the reconciliation of the Schedule to revenues in the fund financial statements (See Note 3).",
+                    "The State participates in various federally funded loan and credit enhancement programs. The programs can be grouped into three broad categories: Federally Funded Student Loan Programs Other Federally Funded Loan Programs Federally Funded Credit Enhancement Program (a) Federally Funded Student Loan Programs The State participates in student loan programs on which the federal government imposes continuing compliance requirements. Additionally, the State participates in other student loan programs that do not require continuing compliance. The charts below summarize activity by the State for federally funded student loan programs: Student Loan Programs with Continuing Compliance Requirements Beginning EndingBalance of Balance ofLoans as of Loans as ofSeptember 1, August 31, New LoansALN Program Name 2021 2022 ProcessedFederal Family Education Loan84.032-L Program (FFELP) 2,789,427 $ 2,305,283 $ - $ Federal Perkins Loan (FPL) - Federal84.038 Capital Contributions 57,732,292 42,293,762 - Health Education Assistance Loan93.108 Program (HEAL) 631,307 471,552 - 93.264 Nurse Faculty Loan Program (NFLP) 1,348,639 555,478 84,977 Health Professions Student Loans, Including Primary Care Loans/ Loans for Disadvantaged Students93.342 (HPSL/PCL/LDS) 17,340,408 17,776,855 2,675,516 93.364 Nursing Student Loans (NSL) 868,943 973,407 34,326 93.408 ARRA - Nurse Faculty Loan Program 84,142 84,142 - $ 64,460,479 80,795,158 $ 2,794,819 Other Student Loan Programs New LoansALN Processed84.268 $ 2,827,678,762Program NameFederal Direct Student Loans (Direct Loan)New student loans processed totaling $2.8 billion are included in the Schedule and are part of a reconciling item on Note 3. The Federal Direct Student Loans Program (Direct Loan, ALN 84.268) do not require universities to disburse funds. The proceeds are disbursed by the federal government for Direct Loans.",
+                    "(b) Other Federally Funded Loan Programs Clean Water State Revolving Funds (CWSRF, ALN 66.458) The Texas Water Development Board receives capitalization grants to create and maintain Clean Water State Revolving Funds programs (CWSRF, ALN 66.458). The State can use capitalization grant funds to provide a long-term source of state financing for construction of wastewater treatment facilities and implementation of other water quality management activities. The CWSRF provides loans at interest rates lower than what can be obtained through commercial markets. Mainstream funds offer a net long-term fixed interest rate below market rate for those applicants financing the origination fee. The maximum repayment period for most CWSRF loans is 30 years from completion of construction. Capitalization loans processed for CWSRF for the year ended August 31, 2022, were approximately $36.6 million and are included in the Schedule. CWSRF outstanding loans, with no continuing audit requirements, at August 31, 2022, were approximately $3.2 billion. Drinking Water State Revolving Funds (DWSRF, ALN 66.468) The Texas Water Development Board receives capitalization grants to create and maintain Drinking Water State Revolving Funds programs (DWSRF, ALN 66.468). The State can use capitalization grant funds to establish a revolving loan fund. The revolving loan fund can assist public water systems in financing the costs of infrastructure needed to achieve or maintain compliance with the Safe Drinking Water Act. These compliance requirements ensure the public health objectives of the Safe Drinking Water Act. The DWSRF can provide loans at interest rates lower than the market or provide other types of financial assistance for qualified communities, local agencies and private entities. Mainstream funds offer a net long-term fixed interest rate below market rate for those applicants financing the origination fee. The maximum repayment period for most DWSRF loans is 30 years from the completion of construction. Capitalization loans processed for DWSRF for the year ended August 31, 2022, were approximately $69.0 million and are included in the Schedule. DWSRF outstanding loans, with no continuing audit requirements, at August 31, 2022, were approximately $1.8 billion.",
+                    "(b) Other Federally Funded Loan Programs (Continued) Drinking Water State Revolving Funds (DWSRF, ALN 66.468) (Continued) The chart below summarizes activity by the State for the two revolving loan programs.New Loans ALN Processed 66.458 $ 36,606,10566.468 68,992,600 Total New Loans Processed $105,598,705 Drinking Water State Revolving Funds (DWSRF)Program Name Clean Water State Revolving Funds (CWSRF) State Energy Program (SEP, ALN 81.041) The State Energy Conservation Office receives an annual grant from the U.S. Department of Energy (DOE) to provide funds for the State Energy Program (SEP). These low interest loans enable the municipalities to maximize their energy efficiency through building retrofits. The loans are paid back with funds saved from the reduction of energy costs. Also, The State Energy Conservation Office has chosen to continue the administration of the American Recovery and Reinvestment Act (ARRA) revolving loan program made available through the Department of Energy in 2009. The program will still offer low interest loans intended to assist governmental entities in financing their energy related cost reduction efforts. No dollars have been transferred from the now discontinued ARRA award to the annual SEP award and all monitoring will follow the same guidelines as the SEP annual grant. State Energy Program loans processed for the year ended August 31, 2022, were approximately $54.0 thousand and are included in the Schedule. SEP outstanding loans, with no continuing audit requirements, at August 31, 2022, were approximately $43.0 million. The chart below summarizes activity by the State for the SEP loan program. New Loans ALN Processed 81.041 State Energy Program $53,965 Program Name(c) Federally Funded Credit Enhancement ProgramCredit Enhancement for Charter School Facilities (ALN 84.354A) In 2005, the Texas Public Finance Authority Charter School Finance Corporation formed a consortium with the Texas Education Agency and the Texas Charter School Resource Center to apply for a federal grant to assist charter schools. In 2006, the consortium received $10 million in federal grants, to which the Texas Education agency added $100,000, to establish the Texas Credit Enhancement Program (TCEP). The $12.6 million of federal grants received are subject to continuing audit requirements and are included in the Schedule. In addition, approximately $63.3 thousand of interest earned on the federal grant monies drawn down in fiscal 2022 is also included in the Schedule. The TCEP provides credit enhancement grants to eligible charter schools by funding debt service reserve funds for bonds issued on behalf of the schools to finance education facilities. As of August 31, 2022, approximately $12.4 million of the grant funds and related interest earnings were allocated in the form of credit enhancements to various charter schools."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "16"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

@@ -111,6 +111,7 @@ docker compose run --rm web python manage.py historic_workbook_generator \
   --year 22 \
   --output <your_output_directory> \
   --dbkey 177310
+  --output_type xlsx
 ```
 
 - `year` is optional and defaults to `22`.
@@ -122,3 +123,10 @@ docker compose run --rm web python manage.py historic_workbook_generator \
 - Next, click on `Run workflow` on top right and
 - Provide the target `environment` along with optional parameters such as `dbkeys` and `years`
 - Click `Run`
+
+### How to generate Intermediary Representation (IR) files from workbooks:
+
+```
+  docker compose run --rm web python manage.py convert_xlsx_to_json \
+  --output <your_output_directory>
+```

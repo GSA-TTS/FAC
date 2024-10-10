@@ -1,0 +1,96 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "CorrectiveActionPlan"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "BADBADBADBAD"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "values": [
+                    "2021-002"
+                ]
+            },
+            {
+                "name": "planned_action",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "2021-002Personnel Responsible for Corrective Action: Paul Toler, Matt WoolleyAnticipated Completion Date: 11/1/2021Corrective Action Plan:The conditions noted above resulted in the duplicate draw not being identified in a timely manner. Duties have been segregated between the Controller and Accounting Manager to develop a preventative control such that a draw will not occur without being reflected in the RIs general ledger. Also, the new processes noted previously are a detective control that will identify errors in a timely manner and result in immediate correction.The business process changes noted above have been implemented as of 11/1/2021."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "values": [
+                    "N"
+                ]
+            }
+        ]
+    }
+]

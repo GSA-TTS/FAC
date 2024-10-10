@@ -1,0 +1,123 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "CorrectiveActionPlan"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "BADBADBADBAD"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "11"
+                },
+                "values": [
+                    "2021-005",
+                    "2021-009",
+                    "2021-012",
+                    "2021-010",
+                    "2021-007",
+                    "2021-006",
+                    "2021-011",
+                    "2021-013",
+                    "2021-008",
+                    "2021-014"
+                ]
+            },
+            {
+                "name": "planned_action",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "11"
+                },
+                "values": [
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes.",
+                    "Exemption for Indian Tribes."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "11"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

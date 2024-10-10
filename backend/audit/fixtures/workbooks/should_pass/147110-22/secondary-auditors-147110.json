@@ -1,0 +1,251 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "SecondaryAuditors"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "ZUFJEU4NMK52"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "secondary_auditor_name",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "secondary_auditor_ein",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "secondary_auditor_address_street",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "secondary_auditor_address_city",
+                "start_cell": {
+                    "column": "D",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "D",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "secondary_auditor_address_state",
+                "start_cell": {
+                    "column": "E",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "E",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "secondary_auditor_address_zipcode",
+                "start_cell": {
+                    "column": "F",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "F",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "secondary_auditor_contact_name",
+                "start_cell": {
+                    "column": "G",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "G",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "secondary_auditor_contact_title",
+                "start_cell": {
+                    "column": "H",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "H",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "secondary_auditor_contact_phone",
+                "start_cell": {
+                    "column": "I",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "I",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "secondary_auditor_contact_email",
+                "start_cell": {
+                    "column": "J",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "J",
+                    "row": "1"
+                },
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "StateCodeLookup",
+        "ranges": [
+            {
+                "name": "state_code_lookup",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "60"
+                },
+                "values": [
+                    "AL",
+                    "AK",
+                    "AS",
+                    "AZ",
+                    "AR",
+                    "CA",
+                    "CO",
+                    "CT",
+                    "DE",
+                    "DC",
+                    "FM",
+                    "FL",
+                    "GA",
+                    "GU",
+                    "HI",
+                    "ID",
+                    "IL",
+                    "IN",
+                    "IA",
+                    "KS",
+                    "KY",
+                    "LA",
+                    "ME",
+                    "MH",
+                    "MD",
+                    "MA",
+                    "MI",
+                    "MN",
+                    "MS",
+                    "MO",
+                    "MT",
+                    "NE",
+                    "NV",
+                    "NH",
+                    "NJ",
+                    "NM",
+                    "NY",
+                    "NC",
+                    "ND",
+                    "MP",
+                    "OH",
+                    "OK",
+                    "OR",
+                    "PW",
+                    "PA",
+                    "PR",
+                    "RI",
+                    "SC",
+                    "SD",
+                    "TN",
+                    "TX",
+                    "UT",
+                    "VT",
+                    "VI",
+                    "VA",
+                    "WA",
+                    "WV",
+                    "WI",
+                    "WY"
+                ]
+            }
+        ]
+    }
+]
