@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set +e
+
 # Source everything; everything is now a function.
 # Remember: bash has no idea if a function exists, 
 # so a typo in a function name will fail silently. Similarly,
