@@ -116,7 +116,6 @@ streams:
       ORDER BY gen.id
     target_options:
       pre_sql: |
-        -- DROP SCHEMA IF EXISTS public_data_v1_0_0 CASCADE;
         DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_additional_eins;
         DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_additional_ueis;
         DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_combined;
@@ -129,7 +128,6 @@ streams:
         DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_passthrough;
         DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_secondary_auditors;
         -- Now, create them. We get a start at 1 for every refresh this way.
-        CREATE SCHEMA IF NOT EXISTS public_data_v1_0_0;
         CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_additional_eins         START 1;
         CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_additional_ueis         START 1;
         CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_combined                START 1;
@@ -148,33 +146,6 @@ streams:
         -- Update that batch number as a modulus of 20K, our response
         -- size limit in PostgREST.
         UPDATE public_data_v1_0_0.general SET batch_number=DIV(seq, 20000);
-        -- -- Create a temporary table that is a copy of the general table, but partition it.
-        -- CREATE TABLE public_data_v1_0_0.tmp_general
-        -- (LIKE public_data_v1_0_0.general)
-        -- PARTITION BY hash(seq); 
-        -- -- Drop our existing general table.
-        -- DROP TABLE public_data_v1_0_0.general;
-        -- SET search_path TO public_data_v1_0_0; --?
-        -- -- Rename that temporary table to the general table. Why?
-        -- -- We cannot create the table with a PARTITION, because it is a SELECT.
-        -- -- This works around that.
-        -- ALTER TABLE public_data_v1_0_0.tmp_general RENAME TO general;
-        -- -- Create the partition tables.
-        -- CREATE TABLE public_data_v1_0_0.part_general_0
-        -- PARTITION OF public_data_v1_0_0.general 
-        -- FOR VALUES WITH (modulus 5, remainder 0);
-        -- CREATE TABLE public_data_v1_0_0.part_general_1
-        -- PARTITION OF public_data_v1_0_0.general 
-        -- FOR VALUES WITH (modulus 5, remainder 1);
-        -- CREATE TABLE public_data_v1_0_0.part_general_2
-        -- PARTITION OF public_data_v1_0_0.general 
-        -- FOR VALUES WITH (modulus 5, remainder 2);
-        -- CREATE TABLE public_data_v1_0_0.part_general_3
-        -- PARTITION OF public_data_v1_0_0.general 
-        -- FOR VALUES WITH (modulus 5, remainder 3);
-        -- CREATE TABLE public_data_v1_0_0.part_general_4
-        -- PARTITION OF public_data_v1_0_0.general 
-        -- FOR VALUES WITH (modulus 5, remainder 4);
         -- Create the indexes on the table.
         CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_report_id_idx 
           on public_data_v1_0_0.general (report_id);

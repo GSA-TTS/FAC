@@ -4,6 +4,7 @@ services:
   #---------------------------------------------
   db:
     image: "postgres:15"
+    shm_size: 1g
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
@@ -17,6 +18,7 @@ services:
       retries: 10
   db2:
     image: "postgres:15"
+    shm_size: 1g
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:

@@ -33,3 +33,6 @@ CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_awards_aln_cnt
 
 CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_batch_fa 
     ON public_data_v1_0_0.federal_awards (batch_number);
+
+CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_ay
+    ON public_data_v1_0_0.federal_awards (audit_year);

@@ -46,6 +46,8 @@ function setup_cgov_env {
     export FAC_SNAPSHOT_URI="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "fac-snapshot-db" ".[][] | select(.name == \$service_name) | .credentials.uri")"
     # https://stackoverflow.com/questions/37072245/check-return-status-of-psql-command-in-unix-shell-scripting
     export PSQL_EXE='/home/vcap/deps/0/apt/usr/lib/postgresql/*/bin/psql --single-transaction -v ON_ERROR_STOP=on'
+    export PSQL_EXE_NO_TXN='/home/vcap/deps/0/apt/usr/lib/postgresql/*/bin/psql -v ON_ERROR_STOP=on'
+
     export SLING_EXE='/home/vcap/app/sling'
 
     return 0

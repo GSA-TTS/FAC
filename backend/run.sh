@@ -9,10 +9,9 @@ source tools/util_startup.sh
 # This will choose the correct environment
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
-source tools/api_teardown.sh
+source tools/sql_pre_post.sh
 source tools/migrate_app_tables.sh
 source tools/sling_first_run.sh
-source tools/api_standup.sh
 source tools/build_indexes.sh
 source tools/seed_cog_baseline.sh
 
@@ -22,11 +21,11 @@ setup_env
 gonogo "setup_env"
 
 #####
-# API TEARDOWN
-# API has to be deprecated/removed before migration, because
-# of tight coupling between schema/views and the dissemination tables
-api_teardown
-gonogo "api_teardown"
+# SQL PRE
+# We have SQL that we want to run before the migrations and sling are run.
+# This tears down things that would conflict with migrations, etc.
+sql_pre
+gonogo "sql_pre"
 
 #####
 # MIGRATE APP TABLES
@@ -41,16 +40,11 @@ sling_first_run
 gonogo "sling_first_run"
 
 #####
-# API STANDUP
-# Standup the API, which may depend on migration changes
-api_standup
-gonogo "api_standup"
-
-#####
-# BUILD INDEXES
-# Builds indexes on the API tables in fac-snapshot-db
-build_indexes
-gonogo "build_indexes"
+# SQL POST
+# Rebuild the API and prepare the system for execution.
+# Runs after migrations.
+sql_post
+gonogo "sql_post"
 
 #####
 # SEED COG/OVER TABLES
