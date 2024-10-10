@@ -10,7 +10,7 @@ function sling_first_run() {
     # This should only ever actually run when testing locally.
     # In the cloud environment, it will skip the actul run.
     check_table_exists $FAC_SNAPSHOT_URI 'public' 'dissemination_general'
-    local is_general_table=$?
+    local is_general_table=$FUNCTION_RESULT
     if [ $is_general_table -ne 0 ]; then
         # This is the first run.
         startup_log "SLING_FIRST_RUN" "Running cgov-util INITIAL."
@@ -22,7 +22,7 @@ function sling_first_run() {
 
     # If the metadata table exists, it means sling has run to completion.
     check_table_exists $FAC_SNAPSHOT_URI 'public_data_v1_0_0' 'metadata'
-    local is_metadata_table=$?
+    local is_metadata_table=$FUNCTION_RESULT
     echo "SLING_FIRST_RUN public_data_v1_0_0.metadata = $is_metadata_table"
     
     # We need to load some functions for sling to complete, because

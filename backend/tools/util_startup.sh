@@ -3,7 +3,7 @@ source tools/variables.sh
 function startup_log {
     local tag="$1"
     local msg="$2"
-    echo STARTUP $tag $msg
+    echo "STARTUP" "$tag" "$msg"
 }
 
 # gonogo
@@ -14,7 +14,7 @@ function gonogo {
     return 0
   else
     startup_log "STARTUP_CHECK" "$1 FAIL"
-    exit -1
+    exit 1
   fi
 }
 
@@ -33,15 +33,16 @@ function check_table_exists() {
   echo "CHECK_TABLE_EXISTS START: $schema.$table"
   # >/dev/null 2>&1
   # The qtAX incantation lets us pass the PSQL result value back to bash.
-  result=`$PSQL_EXE $db_uri -qtAX -c "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = '$schema' AND tablename = '$table');"`
+  result=`$PSQL_EXE "$db_uri" -qtAX -c "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = '$schema' AND tablename = '$table');"`
   # Flip TRUE to a 0, because UNIX considers a 0 exit code to be good. 
   if [ "$result" = "t" ]; then
     echo "CHECK_TABLE_EXISTS END: $schema.$table = 0"
-    return 0
+    FUNCTION_RESULT=0
   else
     echo "CHECK_TABLE_EXISTS END: $schema.$table = 1"
-    return 1
+    FUNCTION_RESULT=1
   fi
+  return 0
 }
 
 function check_schema_exists () {
@@ -52,11 +53,12 @@ function check_schema_exists () {
   # Flip TRUE to a 0, because UNIX considers a 0 exit code to be good. 
   if [ "$result" = "t" ]; then
     echo "CHECK_SCHEMA_EXISTS END: $schema_name = 0"
-    return 0
+    FUNCTION_RESULT=0
   else
     echo "CHECK_SCHEMA_EXISTS END: $schema_name = 1"
-    return 1
+    FUNCTION_RESULT=1
   fi
+  return 0
 }
 
 function run_sql () {
