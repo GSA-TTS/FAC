@@ -104,7 +104,7 @@ secret_key = "" # secret_access_key value
 Navigate to `terraform/shared/modules/sandbox-proxy`, and run the following two commands.
 
 ```bash
-terraform init --backend-config=../shared/config/sandbox.tfvars
+terraform init
 ```
 
 This will issue a warning. Then run:
@@ -115,32 +115,32 @@ terraform plan
 
 You'll be prompted for values; hit enter to leave them blank. When you are done, you should have `proxy.zip` in your current folder.
 
-Then, navigate to `terraform/shared/modules/stream-proxy` (or `cd ../../modules/stream-proxy`) and run the same two commands:
-
-```bash
-terraform init --backend-config=../shared/config/sandbox.tfvars
-
-terraform plan
-```
-
-Again, leave the prompts blank. Check you have a `proxy.zip`.
-
 ### First Deployment
 
-Make sure you are in the sandbox environment.
+Due to the incorporation of partial s3 configuration, the `terraform.tfstate` will be stored in the s3 bucket. Due to this, when you run `./init.sh` and `./plan.sh` for the first time, you may not find a "clean" environment. You can, should you choose, run `terraform/sandbox/helper_scripts/destroy.sh` after running `terraform/sandbox/helper_scripts/init.sh`. This script will clean out both the `fac-private-s3` and `fac-public-s3` buckets, and then tear down the environment completely. It is completely safe to do this should you choose, and want to work in an immutable environment where you are certain every resource has been created from scratch. The catch to this, is a longer deployment time, as well as loss of data. This module was designed to have zero data at any given time, and should not be considered safe for storage regarding submissions, database entries, pdfs, excels, or staticfiles in `fac-private-s3`, `fac-public-s3`, `fac-db` or `fac-snapshot-db`. If you want to have reusable data, it is highly encouraged to have a repeatable way to load data into the database.
 
+If resources are already existing, and you wish to view changes on your branch, see below.
+
+Make sure you are in the sandbox environment.
 ```bash
 cf t -s sandbox
 ```
 
-... FIXME ... destroy on clean environment?
+Navigate to `terraform/sandbox/helper_scripts` and then run the `./init.sh` script. This assumes you have a `sandbox.tfvars` and `backend.tfvars` in `terraform/shared/config/` from previous steps.
 
-Navigate to `terraform/sandbox/helper_scripts` and then run the `./init.sh` script. This assumes you have a `sandbox.tfvars` in `terraform/shared/config/` from previous steps.
-
-Now, run `./destroy.sh`. This tears down anything in the `sandbox` environment that may have been left from previous deploys (by you or others).
-
-Next, run `./plan.sh` script. You should see it creating ~20 resources.
+Next, run `./plan.sh` script. You should see it creating ~20 resources in a clean environment, or updating a few.
 Finally, run `./apply.sh` script and wait.
+
+### What is missing/omitted from Sandbox
+The following resources were intentionally left out from the sandbox environment. Part of that is the lack of necessity for such things, and an attempt to have a more lightweight environment, that only runs the bare minimum to bring up the system.
+- Logshipper Module
+- smtp-proxy Module
+- fac-file-scanner Module
+- backups s3 bucket
+- Connection to newrelic (though this might just be a bug/misconfiguration, we don't really care if this env reports to new relic)
+- Full implementation of postgrest and API
+    - This is subject to a data.gov key, and still being considered. Functionally, everything works as expected, but we cannot use the api without a valid `sam_api_key` and configuration.
+    - WIP? TBD? Ask Matt.
 
 ### Discoveries:
 - It was discovered that the compiled css assets in the public s3 must be in the `backend/static/` folder when collectstatic is being run. Due to this, when it is run via github actions.. the `/static/compiled/` folder exists on the local file system, since the github runner does these steps, and handles keeping them in the local file system. To mitigate this for the terraform, we handle this in the `prepare_app.sh` script.
