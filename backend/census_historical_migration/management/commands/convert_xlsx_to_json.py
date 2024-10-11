@@ -1,5 +1,4 @@
 import json
-import tempfile
 
 from openpyxl import load_workbook
 from audit.intakelib.intermediate_representation import extract_workbook_as_ir
@@ -50,11 +49,6 @@ class Command(BaseCommand):
             )
 
             try:
-                with tempfile.NamedTemporaryFile(
-                    suffix=".xlsx", delete=False
-                ) as tmp_file:
-                    tmp_path = tmp_file.name
-
                 # Load the workbook to ensure formulas are evaluated
                 wb = load_workbook(xlsx_file_path, data_only=True)
 
@@ -69,8 +63,3 @@ class Command(BaseCommand):
             except Exception as e:
                 logger.error(f"Failed to convert {xlsx_file}: {str(e)}")
                 sys.exit(-1)
-
-            finally:
-                if os.path.exists(tmp_path):
-                    os.remove(tmp_path)
-                    logger.info(f"Deleted temporary file {tmp_path}")
