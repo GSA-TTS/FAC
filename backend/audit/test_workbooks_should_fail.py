@@ -72,7 +72,9 @@ class FailingWorkbooks(SimpleTestCase):
                     os.path.join(dirpath, workbook_set)
                 ):
                     for file in wb_files:
-                        if re.search("xlsx$", str(file)):
+                        if re.search("xlsx$", str(file)) or re.search(
+                            r"json$", str(file)
+                        ):
                             full_path = os.path.join(wb_path, file)
                             (extractor, validator) = map_file_to_extractor_validator(
                                 full_path

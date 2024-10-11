@@ -1,0 +1,170 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.1.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "AdditionalUeis"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "KVLYDC1KL4W7"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "additional_uei",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "104"
+                },
+                "values": [
+                    "JNV6EANHXKS6",
+                    "L2WSAZYJWHL8",
+                    "Y8V2Z7GMQNA6",
+                    "GWZKVAJTLR32",
+                    "EMZLK98FCKC5",
+                    "MKMSFE3FTU15",
+                    "CQAQB3BXT937",
+                    "CJPVZPBT2P93",
+                    "VGP7WT58HM73",
+                    "F9EJW2M64PQ8",
+                    "M3GMKMZ47AH4",
+                    "N7CTWFSM8KM9",
+                    "JZW3FXQRNNV9",
+                    "M9E9SHYN6JA7",
+                    "HWDDBYUF94H4",
+                    "UPWNL2S7ZSW3",
+                    "HJ7DHD51ZYS5",
+                    "Q1LQMB9Y92J5",
+                    "CNU3LQSG6JE9",
+                    "LH8ZV8QY5JY5",
+                    "Y8JYQ33G9LU3",
+                    "MEUDB7ARJF23",
+                    "KB6GAV7KBEA9",
+                    "X94LLZMC8CK6",
+                    "G1A1SEZ2NAJ3",
+                    "LJ35MVVFNLQ3",
+                    "ZYDSKLSEP8C3",
+                    "MUUJKH6KKM29",
+                    "EMWMCNT3HJA9",
+                    "JDCPBD6K32X5",
+                    "PAJNMHKPKML6",
+                    "WMKBUWQQ3KH3",
+                    "KM3LJMLEN9L3",
+                    "WU58Q4C48265",
+                    "NNQBJN6XFKM1",
+                    "NRCEM34UBAY8",
+                    "D5NNSVNJ2PA5",
+                    "PZKXP3EK9YM4",
+                    "ML2SCN16HKD4",
+                    "S9BLJD1KG8X8",
+                    "N5BEJ9PNHNQ1",
+                    "MYJ3Q8B5WMM1",
+                    "GXYULZ37DM93",
+                    "EM9RF3G279T5",
+                    "GEA7EJ3AQ1J1",
+                    "V1F7LCWHLDJ3",
+                    "ENWBKZ2BF3Y8",
+                    "U7M9GP6LNWG9",
+                    "KHS8TQPAAWJ7",
+                    "DSWNR4LL3KB5",
+                    "KJCVLR24HA84",
+                    "TNLDYJXNAAD9",
+                    "CFM3FKKTR8K7",
+                    "MDQKPLF5E5K7",
+                    "KBCVSR8VMWG9",
+                    "KYJ6Q89L6E91",
+                    "EC57MWGRR2J7",
+                    "DA3LCSM8WYR5",
+                    "XPKKLJJA6U63",
+                    "J4BXMG1BAJR8",
+                    "NBK5LCS5S9Z5",
+                    "FD4HBC8KZSQ2",
+                    "VPEFQHWCPLW8",
+                    "SDL9MMF19U43",
+                    "CMD9T4M5R755",
+                    "GAHUL6VT1ZT2",
+                    "QYCXPZSSB6C8",
+                    "LLVSN3Y9VHZ7",
+                    "K5AHVKG62N29",
+                    "TQJSBLAWNMM5",
+                    "N7A9C4V84NH1",
+                    "M53MAXM4N4H7",
+                    "JFMSHFXGAEW9",
+                    "N5UKP9DN7PC1",
+                    "H4FJK9QB6AF4",
+                    "E4EPLCDBCEZ3",
+                    "YF74XRMF6T11",
+                    "V4HWA7TN9NM7",
+                    "MBEMUHYFP2N8",
+                    "DKVTWF4HD4Q4",
+                    "C6J3MMW1DM64",
+                    "NAVBJ6MLVGD3",
+                    "H4LSFJH8JD71",
+                    "HDMWF29Y8643",
+                    "U2WJU6HFLUY9",
+                    "ESCJLC9ARM91",
+                    "ZLSKXWMVCW33",
+                    "NLZWNZ5ZUML3",
+                    "RB2AKLXUUFB7",
+                    "NNU8WL1KA5Q1",
+                    "D5MPZTPKJ134",
+                    "S5LZV1QKX797",
+                    "XDLFCG81Z3G9",
+                    "P8CHDLUJCQD3",
+                    "WF4KAPFPX1H6",
+                    "CZBSJ28DBAK7",
+                    "K96EPDBLJEH1",
+                    "W69JQHAF6PN1",
+                    "MAYGKM86LZQ3",
+                    "S4HDZ34UMM79",
+                    "UNLCRBWJ55C3",
+                    "DYM3ZYZHNH79",
+                    "MSXPK6CDHZ28"
+                ]
+            }
+        ]
+    }
+]
