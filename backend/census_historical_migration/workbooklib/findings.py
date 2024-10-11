@@ -153,7 +153,7 @@ def xform_construct_award_references(audits, findings):
     # Transformation recorded.
     e2a = {}
     for index, audit in enumerate(audits):
-        e2a[audit.ELECAUDITSID] = f"AWARD-{index+1:04d}"
+        e2a[audit.ELECAUDITSID] = f"AWARD-{index + 1:04d}"
     award_references = []
     change_records = []
     for find in findings:
