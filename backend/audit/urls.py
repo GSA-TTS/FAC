@@ -106,6 +106,11 @@ urlpatterns = [
         name="ChangeOrAddRoleView",
     ),
     path(
+        "manage-submission/remove-editor/<str:report_id>",
+        views.RemoveEditorView.as_view(),
+        name="RemoveEditorView",
+    ),
+    path(
         "workbook/xlsx/<str:file_type>/<str:report_id>",
         views.PredisseminationXlsxDownloadView.as_view(),
         name="PredisseminationXlsxDownload",
