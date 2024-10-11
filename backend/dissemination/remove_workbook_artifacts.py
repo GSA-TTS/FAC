@@ -54,16 +54,18 @@ def delete_files_in_bulk(filenames, sac):
 
         deleted_files = response.get("Deleted", [])
         for deleted in deleted_files:
-            logger.info(
-                f"Successfully deleted {deleted['Key']} from S3 for report: {sac.report_id}"
-            )
+            if deleted.get("Key", None):
+                logger.info(
+                    f"Successfully deleted {deleted['Key']} from S3 for report: {sac.report_id}"
+                )
 
         errors = response.get("Errors", [])
         if errors:
             for error in errors:
-                logger.error(
-                    f"Failed to delete {error['Key']} from S3 for report: {sac.report_id}. Error: {error['Message']}"  # nosec B608
-                )
+                if error.get("Key", None):
+                    logger.error(
+                        f"Failed to delete {error['Key']} from S3 for report: {sac.report_id}. Error: {error['Message']}"  # nosec B608
+                    )
 
     except ClientError as e:
         logger.error(

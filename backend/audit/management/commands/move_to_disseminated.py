@@ -7,13 +7,14 @@ from audit.models import (
 )
 from audit.models.models import STATUS
 from audit.models.viewflow import sac_revert_from_submitted, sac_transition
+from curation.curationlib.curation_audit_tracking import (
+    enable_audit_curation,
+    disable_audit_curation,
+)
 from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.shortcuts import get_object_or_404
-
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -30,45 +31,52 @@ class Command(BaseCommand):
             help="The ID of the SAC.",
             default=None,
         )
-        # WIP
-        # to add - an argument for re-disseminating audits that have already been disseminated.
 
     def handle(self, *args, **options):
         report_id = options.get("report_id")
 
         # no parameter passed.
         if report_id is None:
-            print("You need to enter a report_id (--report_id ID_OF_REPORT).")
-            exit(0)
+            logger.info(
+                "No report_id supplied. (move_to_disseminated --report_id ID_OF_REPORT)"
+            )
+            exit(-1)
 
-        sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except SingleAuditChecklist.DoesNotExist:
+            logger.info(f"No report with report_id found: {report_id}")
+            exit(-1)
 
         # must be stuck as 'submitted'.
         if sac.submission_status != STATUS.SUBMITTED:
-            print(f"This report ({sac.report_id}) is not stuck in the submitted state.")
-            exit(0)
+            logger.info(
+                f"Unable to disseminate report that is not in submitted state: {report_id}"
+            )
+            exit(-1)
 
         # check for validation errors.
         errors = sac.validate_full()
         if errors:
-            print(
-                f"Unable to disseminate. There are some validation errors for report ({sac.report_id}):"
+            logger.info(
+                f"Unable to disseminate report with validation errors: {report_id}."
             )
-            for error in errors["errors"]:
-                print(f" - {error['error']}")
+            logger.info(errors["errors"])
+
             # return to auditee_certified.
             sac_revert_from_submitted(sac)
+            logger.info(f"Returned report to auditee_certified state: {report_id}")
             exit(0)
 
         # BEGIN ATOMIC BLOCK
+        enable_audit_curation()
         with transaction.atomic():
             disseminated = sac.disseminate()
             # `disseminated` is None if there were no errors.
             if disseminated is None:
-                # WIP -- enable audit tracking.
                 sac_transition(None, sac, transition_to=STATUS.DISSEMINATED)
-                # WIP -- disable audit tracking.
         # END ATOMIC BLOCK
+        disable_audit_curation()
 
         # IF THE DISSEMINATION SUCCEEDED
         # `disseminated` is None if there were no errors.
@@ -94,3 +102,4 @@ class Command(BaseCommand):
             exit(0)
 
         logger.info(f"DISSEMINATED REPORT: {report_id}")
+        exit(0)
