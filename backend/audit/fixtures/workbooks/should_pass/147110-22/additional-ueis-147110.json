@@ -1,0 +1,94 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "AdditionalUeis"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "ZUFJEU4NMK52"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "additional_uei",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "28"
+                },
+                "values": [
+                    "HWK9GECMCWE5",
+                    "NQ1FPAA8XSQ9",
+                    "YYZBXVF3JK55",
+                    "NGMZTEWW6G49",
+                    "FAABAXF9D9E3",
+                    "SMUBL99CK218",
+                    "VAKSGF6BA5J1",
+                    "GJEPWTMKF5A3",
+                    "KF1PLGNW85K3",
+                    "ZK7LLWZTMPE2",
+                    "TTNBFK7CDK83",
+                    "KQWCK42PT545",
+                    "XDJMJL19GHU3",
+                    "XDJMJL19GHU4",
+                    "MP59EXMVEMJ7",
+                    "NJQMLNG5L8A5",
+                    "QWNRL7NH2LN7",
+                    "H898UDKRG4N5",
+                    "JNNMDL9K4517",
+                    "LWMWBM9QMHK6",
+                    "EUPZG1KE87J9",
+                    "DF52UQWQLW85",
+                    "X7BNZNBUF9N5",
+                    "E2E7F7B2A3P8",
+                    "UCSMYF2XN9F7",
+                    "V7QHVF712SB3",
+                    "N3QJEHVL7N91"
+                ]
+            }
+        ]
+    }
+]

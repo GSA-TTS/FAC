@@ -1,0 +1,102 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.1.0"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "CorrectiveActionPlan"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "M1LVPE5GLSD9"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "4"
+                },
+                "values": [
+                    "2022-002",
+                    "2022-001",
+                    "2022-003"
+                ]
+            },
+            {
+                "name": "planned_action",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "Concerning the HEERF Student Aid quarterly report, the reporting responsibility for the quarter closing December 31, 2021 was assigned to two individuals who have since separated from university employment.The reporting requirements were understood and while there is no reason to believe that the quarterly report in question was not uploaded, there are no emails or retained backup information for that report.On February 9, 2021, the final Student Aid report was uploaded to the website and that documentation has been provided.The responsibility for quarterly reporting has been moved to the Associate Director for Communications, University Enrollment Services.She has setup an automatic calendar alert to several senior staff members as well as the staff person responsible for the upload so establish multiple points of contact so there is backup immediately in place should we experience additional staff turnover or another unplanned disruption.Regarding the Institutional Aid report, the University acknowledges the deadline was missed by one day.Research Financial Services oversees the institutional aid reporting. The quarterly reporting period through June 30, 2022, had a reporting due date of July 10, 2023. Within those 10 days, four were weekend dates (7/2-7/3) and (7/9-7/10), and 7/4 was observed for a national holiday. We submitted the report for posting Monday morning, in which it landed on our website less than 24 hours after the original due date which fell on a weekend date. In the future we will ensure the public posting of this quarterly report occurs by the deadline.",
+                    "Management agrees with the finding. The noted PI circumvented existing internal controls, all of which performed as designed to ensure financial compliance and grants stewardship. Management recognizes the opportunity to ensure that PIs are aware of the Universitys grant accounting policies and practices as well as federal policies through formal trainings. Research Financial Services, and the Office for Research will work closely with the Chancellor led units to create and enforce trainings for our university faculty and researchers. Management will also investigate opportunities to reduce opportunities to circumvent controls.",
+                    "Rutgers University-Newark made the decision to use some of their institutional HEERF funds as direct payments to student accounts in order to both reduce the burden on students and as a reimbursement to the University for outstanding student receivables.The Universitys understanding was that funds used in this manner from the institutional portion of HEERF funds did not require student consent. The finding has pointed out that information did exist in an FAQ, which clarifies that when using institutional HEERF funds in this manner student consent is required.Going forward we will change our policy so when applying any HEERF funds to student receivables as a direct grant to the student, a consent process will be in place that allows students to authorize the University to reduce their outstanding charges.Moving forward, the consent and distribution process for any direct student grants, including institutional HEERF funds, will be moved under University Enrollment Services which will ensure that the proper distribution of funds occurs and that internal controls are in place so that the awarding criteria are adhered to across all student recipients."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "4"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

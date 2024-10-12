@@ -1,0 +1,141 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.1.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "NotesToSefa"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "GM27HGUL61B5"
+                ]
+            },
+            {
+                "name": "accounting_policies",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "values": [
+                    "Expenses reported on the Schedule are reported on the accrual basis of accounting. Such expenses are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenses are not allowable or are limited as to reimbursement.The amounts passed through to subrecipients, if any, are reported on in this schedule when disbursed in accordance with 2 CFR \u00a7200.502(a), which differs from the accrual basis of accounting used under generally accepted accounting principles."
+                ]
+            },
+            {
+                "name": "is_minimis_rate_used",
+                "start_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "values": [
+                    "N"
+                ]
+            },
+            {
+                "name": "rate_explained",
+                "start_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "The District did not charge indirect costs to its federal programs."
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "note_title",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "3"
+                },
+                "values": [
+                    "Basis of Presentation",
+                    "Subrecipients"
+                ]
+            },
+            {
+                "name": "note_content",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "The accompanying schedule of expenditures of federal awards includes the federal grant activity of the Cosumnes Community Services District (the District) under programs of the federal government for the year ended June 30, 2021. The information in this schedule is presented in accordance with the requirements of Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Because the Schedule presents only a selected portion of the Districts operations, it is not intended to be and does not present the financial position, changes in net position, or cash flows of the District. Therefore, some amounts presented in this schedule may differ from amounts presented in, or used in the preparation of, the basic financial statements.",
+                    "The District did not have any subrecipients of its federal programs."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "3"
+                },
+                "values": [
+                    "GSA_MIGRATION",
+                    "GSA_MIGRATION"
+                ]
+            }
+        ]
+    }
+]
