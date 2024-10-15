@@ -59,7 +59,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        context = self.get_user_role_management_context(sac)
+        context = self._get_user_role_management_context(sac)
 
         return render(request, self.template, context)
 
@@ -71,7 +71,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         form = ChangeAccessForm(request.POST)
-        context = self.get_user_role_management_context(sac)
+        context = self._get_user_role_management_context(sac)
 
         form.full_clean()
         if not form.is_valid():
@@ -139,7 +139,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
         return redirect(url)
 
-    def get_user_role_management_context(self, sac):
+    def _get_user_role_management_context(self, sac):
         context = {
             "role": self.role,
             "friendly_role": None,
