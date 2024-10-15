@@ -63,7 +63,7 @@ def process_workbook_set(workbook_set_path, is_gsa_migration=True):
     """Process each workbook set in the given path."""
     for wb_path, _, wb_files in os.walk(workbook_set_path):
         for file in wb_files:
-            if re.search("xlsx$", str(file)):
+            if re.search("xlsx$", str(file)) or re.search(r"json$", str(file)):
                 full_path = os.path.join(wb_path, file)
                 (extractor, validator) = map_file_to_extractor_validator(full_path)
                 if extractor:

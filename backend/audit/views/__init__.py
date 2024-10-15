@@ -6,6 +6,7 @@ from .manage_submission_access import (
     ChangeOrAddRoleView,
     ChangeAuditeeCertifyingOfficialView,
     ChangeAuditorCertifyingOfficialView,
+    RemoveEditorView,
 )
 from .no_robots import no_robots
 from .pre_dissemination_download_view import (
@@ -47,6 +48,7 @@ views_list = [
     ChangeOrAddRoleView,
     ChangeAuditeeCertifyingOfficialView,
     ChangeAuditorCertifyingOfficialView,
+    RemoveEditorView,
     CrossValidationView,
     EditSubmission,
     ExcelFileHandlerView,

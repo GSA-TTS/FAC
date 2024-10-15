@@ -1,0 +1,138 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "NotesToSefa"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "MKEJWVSEURF3"
+                ]
+            },
+            {
+                "name": "accounting_policies",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "values": [
+                    "Expenditures reported on the Schedule includes the federal and state grant activity of certain funds and departments of the County, as described above, and is presented on the modified accrual basis of accounting for grants which are accounted for in the governmental fund types and on the accrual basis of accounting for grants which are accounted for in the proprietary fund types. Such expenditures are reported following the cost principles contained in Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance) and Chapter 10.550, Rules of the Auditor General of the State of Florida, wherein certain types of expenditures are not allowable or are limited as to reimbursement. Therefore, some amounts presented in this Schedule may differ from amounts presented or used in the preparation of the basic financial statements. Negative amounts shown on the Schedules represent adjustments or credits made in the normal course of business to amounts reported as expenditures in prior years."
+                ]
+            },
+            {
+                "name": "is_minimis_rate_used",
+                "start_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "values": [
+                    "Both"
+                ]
+            },
+            {
+                "name": "rate_explained",
+                "start_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "The County recovered its indirect costs using the 10% de minimis indirect cost rate provided under Section 200.414 of the Uniform Guidance for federal grants received from the U.S. Department of Human and Health Services for A.L.N. #93.914,A.L.N. #93.243 and A.L.N. 93.686, the U.S. Department of Transportation for A.L.N. #20.205 (Transportation Planning Organization only) and A.L.N. #20.505, but not for other federal grants."
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "note_title",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "values": [
+                    "Note 3. Subrecipients"
+                ]
+            },
+            {
+                "name": "note_content",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "Certain program funds are passed through the County to subrecipient organizations. Subrecipients are noted on the schedule as provided to subrecipients."
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "values": [
+                    "N"
+                ]
+            }
+        ]
+    }
+]
