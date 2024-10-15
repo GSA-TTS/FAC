@@ -1,5 +1,6 @@
 from audit.models import SingleAuditChecklist, SubmissionEvent
 from audit.models.models import STATUS
+from curation.curationlib.curation_audit_tracking import CurationTracking
 import datetime
 import logging
 import viewflow.fsm
@@ -18,10 +19,12 @@ def sac_revert_from_submitted(sac):
         flow = SingleAuditChecklistFlow(sac)
 
         flow.transition_to_auditee_certified()
-        sac.save(
-            event_user=None,
-            event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
-        )
+
+        with CurationTracking():
+            sac.save(
+                event_user=None,
+                event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+            )
         return True
     return False
 

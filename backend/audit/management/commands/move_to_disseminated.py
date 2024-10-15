@@ -7,10 +7,7 @@ from audit.models import (
 )
 from audit.models.models import STATUS
 from audit.models.viewflow import sac_revert_from_submitted, sac_transition
-from curation.curationlib.curation_audit_tracking import (
-    enable_audit_curation,
-    disable_audit_curation,
-)
+from curation.curationlib.curation_audit_tracking import CurationTracking
 from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -68,15 +65,14 @@ class Command(BaseCommand):
             logger.info(f"Returned report to auditee_certified state: {report_id}")
             exit(0)
 
-        # BEGIN ATOMIC BLOCK
-        enable_audit_curation()
-        with transaction.atomic():
-            disseminated = sac.disseminate()
-            # `disseminated` is None if there were no errors.
-            if disseminated is None:
-                sac_transition(None, sac, transition_to=STATUS.DISSEMINATED)
-        # END ATOMIC BLOCK
-        disable_audit_curation()
+        with CurationTracking():
+            # BEGIN ATOMIC BLOCK
+            with transaction.atomic():
+                disseminated = sac.disseminate()
+                # `disseminated` is None if there were no errors.
+                if disseminated is None:
+                    sac_transition(None, sac, transition_to=STATUS.DISSEMINATED)
+            # END ATOMIC BLOCK
 
         # IF THE DISSEMINATION SUCCEEDED
         # `disseminated` is None if there were no errors.
@@ -90,7 +86,7 @@ class Command(BaseCommand):
         # IF THE DISSEMINATION FAILED
         # If disseminated has a value, it is an error
         # object returned from `sac.disseminate()`
-        if disseminated is not None:
+        else:
             logger.info(
                 "{} is a `not None` value report_id[{}] for `disseminated`".format(
                     disseminated, report_id
