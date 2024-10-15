@@ -80,7 +80,7 @@ class Util:
         if url_has_allowed_host_and_scheme(url, allowed_hosts=None):
             return redirect(url)
         else:
-            return redirect('/')
+            return redirect("/")
 
 
 class ExcelExtractionError(Exception):
