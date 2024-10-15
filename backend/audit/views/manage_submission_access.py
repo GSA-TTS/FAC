@@ -94,25 +94,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
         # Only if we have self.other_role do we need further checks:
         if not self.other_role:
-            # Avoid editors with duplicate emails
-            if Access.objects.filter(sac=sac, role=self.role, email=email).exists():
-                context = {
-                    "role": self.role,
-                    "friendly_role": _get_friendly_role(self.role),
-                    "auditee_uei": sac.general_information["auditee_uei"],
-                    "auditee_name": sac.general_information.get("auditee_name"),
-                    "certifier_name": fullname,
-                    "email": email,
-                    "report_id": report_id,
-                    "errors": {
-                        "email": f"{email} is already in use by another editor."
-                    },
-                }
-
-                return render(request, self.template, context, status=400)
-            else:
-                _create_and_save_access(sac, self.role, fullname, email)
-                return redirect(url)
+            return self._handle_add_editor(request, url, sac, report_id, email, fullname)
 
         # We need the existing role assignment, if any, to delete it:
         try:
@@ -184,6 +166,27 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             }
 
         return context
+
+    def _handle_add_editor(self, request, url, sac, report_id, email, fullname):
+        # Avoid editors with duplicate emails
+        if Access.objects.filter(sac=sac, role=self.role, email=email).exists():
+            context = {
+                "role": self.role,
+                "friendly_role": _get_friendly_role(self.role),
+                "auditee_uei": sac.general_information["auditee_uei"],
+                "auditee_name": sac.general_information.get("auditee_name"),
+                "certifier_name": fullname,
+                "email": email,
+                "report_id": report_id,
+                "errors": {
+                    "email": f"{email} is already in use by another editor."
+                },
+            }
+
+            return render(request, self.template, context, status=400)
+        else:
+            _create_and_save_access(sac, self.role, fullname, email)
+            return redirect(url)
 
 
 class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
