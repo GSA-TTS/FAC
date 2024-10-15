@@ -61,10 +61,10 @@ creds=`cf service-key $service ${service}-key | tail -n 7`
 username=`echo $creds | jq '.credentials.username'`
 password=`echo $creds | jq '.credentials.password'`
 
-cat <<BLARGH
+cat <<EOM
 # generated with $0 -s $space -u $service -r $role -o $org
 # revoke with $(dirname $0)/destroy_service_account.sh -s $space -u $service -o $org
 
 cf_user = $username
 cf_password = $password
-BLARGH
+EOM
