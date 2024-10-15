@@ -73,7 +73,7 @@ class Util:
         if general_information_data.get("audit_period_covered") != "other":
             general_information_data.pop("audit_period_other_months", None)
         return general_information_data
-    
+
     @staticmethod
     def validate_redirect_url(url):
         """Ensure that the url received is safe to redirect to."""
