@@ -56,6 +56,6 @@ DestroyPublicS3
 echo "Deleting contents of fac-private-s3"
 DestroyPrivateS3
 echo "Performing Terraform Destroy"
-# TerraformDestroy
+TerraformDestroy
 
 cd "$dir"
