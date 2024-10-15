@@ -586,7 +586,7 @@ class DeleteFileView(LoginRequiredMixin, View):
 
             if not accesses:
                 messages.error(request, "You do not have access to this audit.")
-                return redirect(redirect_uri)
+                return Util.validate_redirect_url(redirect_uri)
 
             try:
                 excel_files = ExcelFile.objects.filter(
@@ -599,7 +599,7 @@ class DeleteFileView(LoginRequiredMixin, View):
                 sac.save()
             except ExcelFile.DoesNotExist:
                 messages.error(request, "File not found.")
-                return redirect(redirect_uri)
+                return Util.validate_redirect_url(redirect_uri)
 
             SubmissionEvent.objects.create(
                 sac_id=sac.id,
@@ -613,9 +613,9 @@ class DeleteFileView(LoginRequiredMixin, View):
         except SingleAuditChecklist.DoesNotExist:
             logger.error(f"Audit: {report_id} not found")
             messages.error(request, "Audit not found.")
-            return redirect(redirect_uri)
+            return Util.validate_redirect_url(redirect_uri)
 
         except Exception as e:
             logger.error(f"Unexpected error in DeleteFileView post: {str(e)}")
             messages.error(request, "An unexpected error occurred.")
-            return redirect(redirect_uri)
+            return Util.validate_redirect_url(redirect_uri)
