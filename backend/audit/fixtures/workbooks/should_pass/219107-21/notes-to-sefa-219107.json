@@ -1,0 +1,132 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "NotesToSefa"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "BADBADBADBAD"
+                ]
+            },
+            {
+                "name": "accounting_policies",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "values": [
+                    "1.The accompanying schedule of expenditures of federal awards (Schedule) includes the federal award activity of RI under programs of the federal government for the year ended June 30, 2021.The information in this Schedule is presented in accordance with the requirements of Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles and Audit Requirements for Federal Awards (Uniform Guidance).Because the Schedule presents only a selected portion of the operations of RI, it is not intended to and does not present the financial position, changes in net assets or cash flows of RI. Expenditures reported on the Schedule are reported on the accrual basis of accounting.Such expenditures are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenditures are not allowable or are limited as to reimbursement.Negative amounts shown on the Schedule represent adjustments or credits made in the normal course of business to amounts reported as expenditures in prior years."
+                ]
+            },
+            {
+                "name": "is_minimis_rate_used",
+                "start_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "6"
+                },
+                "values": [
+                    "N"
+                ]
+            },
+            {
+                "name": "rate_explained",
+                "start_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "7"
+                },
+                "values": [
+                    "The auditee did not use the de minimis cost rate."
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "note_title",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "note_content",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "1"
+                },
+                "values": []
+            }
+        ]
+    }
+]

@@ -90,7 +90,7 @@ def process_spec(WBNT):
     password = generate_password()
     for ndx, sheet in enumerate(WBNT.sheets):
         print("########################")
-        print(f"## Processing sheet {ndx+1}")
+        print(f"## Processing sheet {ndx + 1}")
         print("########################")
         ws = create_protected_sheet(wb, sheet, password, ndx)
         if sheet.hide_col_from is not None:

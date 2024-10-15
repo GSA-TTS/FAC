@@ -1,0 +1,187 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "AdditionalUeis"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "JCJBPTJXYXH9"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "additional_uei",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "121"
+                },
+                "values": [
+                    "C1DEGMMKC7W7",
+                    "C1HKXLMX6M65",
+                    "C3KXNLTAAY98",
+                    "C7E3GM85JC66",
+                    "CARNQUWDBRP7",
+                    "D7Q8JLAJU3M4",
+                    "DBEDWRMSZ5A5",
+                    "DGE6L9T3CW25",
+                    "DJPXLZAE9931",
+                    "DLTMRQ54MZ25",
+                    "DM2CDWR8LAG3",
+                    "E3KAU5L3YTY5",
+                    "E4Z2NUYUMHF9",
+                    "EGLKRQ5JBCZ7",
+                    "EJCVPNN1WFS5",
+                    "EVA9NVGH2K85",
+                    "FCK4Z3D3CH48",
+                    "FCLVDQ128E69",
+                    "FL2TDZMNL4T1",
+                    "FMLYYM3GNG81",
+                    "FPCUDWBE7DX2",
+                    "FQM9FGN98L29",
+                    "FRCKHD9EKUY9",
+                    "FTAAW94S6LC6",
+                    "FVQCEMUWLTJ3",
+                    "G259P4JNCHG5",
+                    "G47WN1XZNWX9",
+                    "G5RCUVNLCLR7",
+                    "G6JLG3FANUA9",
+                    "G73MUVS5DL59",
+                    "G8Y3L8JV2588",
+                    "GGFBMCXBJLY1",
+                    "GHNGAZ1C6LT7",
+                    "GMKZCPHGJUX6",
+                    "H28VJDA3H4C5",
+                    "H2LGMCHVLSA8",
+                    "H6CNYQBUK6N3",
+                    "HFT7XTHB6563",
+                    "HH6VX5XDL284",
+                    "HS5HWWK1AAU5",
+                    "HYYJJ5ZP7CR9",
+                    "J6KWAEL5EHR1",
+                    "JE8AKPCR2KA4",
+                    "JF6XLNB4CDJ5",
+                    "JKHNZG2U4F51",
+                    "JS4YHZJ695Z3",
+                    "JZFMT39LKH51",
+                    "K8D3M5BXYL74",
+                    "KB7KMZD3GF51",
+                    "KGMNKRVCT8L7",
+                    "KKDRB4TXHYH6",
+                    "KNHTCUCMELZ5",
+                    "KU3DCFJJTVN3",
+                    "KXKDXF9XV5T3",
+                    "KXNRBQRMKPZ5",
+                    "L1KZHL6HXYS5",
+                    "L3ATVUT2KNK7",
+                    "L49BXYYWSL86",
+                    "L4XJEPDB3QJ9",
+                    "L667SNCL4135",
+                    "L7BDYMJW27P7",
+                    "LK8JTEM6PRH7",
+                    "LMLUKUPJJ9N3",
+                    "LR4GD6ZGM5B6",
+                    "LU9UFH3W1HB1",
+                    "M3PKNWAELNL8",
+                    "MDPTPNJ5MR81",
+                    "MEYGUN6CCN16",
+                    "MG1PPMPNS9G3",
+                    "MGD8NFJM79W1",
+                    "MGFWWN5YTHM6",
+                    "MKHPDJFRHNJ3",
+                    "MNGDPFC1X5E4",
+                    "MSPWVMXXMN76",
+                    "NFHJD7V9MGN3",
+                    "NH8EQJ1TJ7B9",
+                    "NHDYLF7NVWL6",
+                    "NMJNVZ72JC15",
+                    "NT4XL1YGLGC5",
+                    "NU7MDG85KWE8",
+                    "P1UAVVCB7Y41",
+                    "P4NXMC1R9HL3",
+                    "PH6HQZLPA687",
+                    "PKCCS8K4UCT4",
+                    "Q7APNYVYYN69",
+                    "QD1MX6N5YTN4",
+                    "QGAGLVKBM6C6",
+                    "QKWEF8XLMTT3",
+                    "QL36W4FUYLZ2",
+                    "R9KLKEKPSMJ4",
+                    "RATCEAKNBRW7",
+                    "RD74AUNCTZJ1",
+                    "RSP3X3U4SGU6",
+                    "RYLEHC85W7H7",
+                    "S3GMKS8ELA16",
+                    "SQ6VAWQ7YSZ4",
+                    "SZEWBKUMKPL4",
+                    "TM2NJF2AEEM7",
+                    "TRMGFQWVM1N8",
+                    "U44ZMVYU52U6",
+                    "UNDETERMNNED",
+                    "URXSAQ53EQG7",
+                    "UV7LJX3S86E1",
+                    "UXF9P9AMDBC6",
+                    "V6AFQPN18437",
+                    "VXJ5AMP428B3",
+                    "X5NKD2NFF2V3",
+                    "XFJUBFS7G7L4",
+                    "XHHLMNNVJ2H9",
+                    "XKHTJ63YJFG4",
+                    "XNQKY3828PL4",
+                    "Y3RET2XN41S5",
+                    "YGB4KL8NSHB9",
+                    "YR68LKG343L1",
+                    "YZJ6DKPM4W63",
+                    "Z5NFRAWZ77Z1",
+                    "ZFW7KJ6NUML9",
+                    "ZGV2NR2CRN87",
+                    "ZM3QVJ8ACN11",
+                    "ZUFBNVZ587D4"
+                ]
+            }
+        ]
+    }
+]

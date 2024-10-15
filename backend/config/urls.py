@@ -82,6 +82,7 @@ urlpatterns = [
     # home page & robots.txt
     path("", auditviews.Home.as_view(), name="Home"),
     path("robots.txt", auditviews.no_robots, name="no_robots"),
+    path("maintenance", auditviews.Maintenance.as_view(), name="Maintenance"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.ENABLE_DEBUG_TOOLBAR:
