@@ -21,11 +21,6 @@ setup_env
 gonogo "setup_env"
 
 #####
-# CURATION AUDIT TRACKING
-curation_audit_tracking_init
-gonogo "curation_audit_tracking_init"
-
-#####
 # API TEARDOWN
 # API has to be deprecated/removed before migration, because
 # of tight coupling between schema/views and the dissemination tables
@@ -42,6 +37,11 @@ gonogo "migrate_app_tables"
 # Standup the API, which may depend on migration changes
 api_standup
 gonogo "api_standup"
+
+#####
+# CURATION AUDIT TRACKING
+curation_audit_tracking_init
+gonogo "curation_audit_tracking_init"
 
 #####
 # SEED COG/OVER TABLES
