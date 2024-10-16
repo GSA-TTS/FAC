@@ -92,7 +92,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         fullname = form.cleaned_data["fullname"]
         email = form.cleaned_data["email"]
 
-        # Only if we have self.other_role do we need further checks:
+        # If self.other_role is not set then we're adding an editor:
         if not self.other_role:
             return self._handle_add_editor(
                 request, url, sac, report_id, email, fullname
@@ -180,7 +180,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
                 "certifier_name": fullname,
                 "email": email,
                 "report_id": report_id,
-                "errors": {"email": f"{email} is already in use by another editor."},
+                "errors": {"email": f"{email} is already in use by another editor for this audit."},
             }
 
             return render(request, self.template, context, status=400)
