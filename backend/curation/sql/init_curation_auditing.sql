@@ -293,12 +293,7 @@ declare
         $1
     );
 begin
-    if exists(select 1 from pg_trigger where tgrelid = $1 and tgname = 'curation_i_u_d') then
-        execute statement_row;
-    end if;
-
-    if exists(select 1 from pg_trigger where tgrelid = $1 and tgname = 'curation_t') then
-        execute statement_stmt;
-    end if;
+    execute statement_row;
+    execute statement_stmt;
 end;
 $$;
