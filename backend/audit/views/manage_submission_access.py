@@ -180,7 +180,9 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
                 "certifier_name": fullname,
                 "email": email,
                 "report_id": report_id,
-                "errors": {"email": f"{email} is already in use by another editor for this audit."},
+                "errors": {
+                    "email": f"{email} is already in use by another editor for this audit."
+                },
             }
 
             return render(request, self.template, context, status=400)
