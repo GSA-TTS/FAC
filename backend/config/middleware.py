@@ -12,7 +12,7 @@ def is_maintenance_on():
     Get current status of maintenance mode.
     """
 
-    return file_exists(S3_FILENAME)
+    return file_exists(S3_FILENAME, show_warning=False)
 
 
 def change_maintenance(enabled):
@@ -37,7 +37,7 @@ def change_maintenance(enabled):
 
     # turn off.
     else:
-        if file_exists(S3_FILENAME):
+        if file_exists(S3_FILENAME, show_warning=False):
             s3_client.delete_object(
                 Bucket=settings.AWS_PRIVATE_STORAGE_BUCKET_NAME, Key=S3_FILENAME
             )
