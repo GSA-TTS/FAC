@@ -51,15 +51,14 @@ sudo apt-get install terraform
 ```
 If that fails, follow the setup guide from https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli for Linux > Ubuntu
 
-# Create a deployer account
-If a deployer account **has not been created**, then simply run the following:
-```bash
-cd terraform/sandbox
-../../bin/ops/create_service_account.sh -o gsa-tts-oros-fac -s sandbox -u sandbox-deployer >> secrets.auto.tfvars
+# Obtain access to the sandbox environment
+Ping Alex on slack for access to the sandbox environment.
 ```
-This will create a `secrets.auto.tfvars` in the directory for use with terraform.
+cf set-space-role <your.email@gsa.gov> gsa-tts-oros-fac sandbox SpaceDeveloper
+```
 
-In the event that a deployer account **has already been created**:
+# Get a deployer account credentials
+A deployer account will be provided.
 ```bash
 cd terraform/sandbox
 ../../bin/ops/get_service_account.sh -o gsa-tts-oros-fac -s sandbox -u sandbox-deployer >> secrets.auto.tfvars
@@ -111,7 +110,6 @@ terraform plan
 You'll be prompted for values; hit enter to leave them blank. When you are done, you should have `proxy.zip` in your current folder.
 
 # First Deployment
-
 Due to the incorporation of partial s3 configuration, the `terraform.tfstate` will be stored in the s3 bucket. Due to this, when you run `./init.sh` and `./plan.sh` for the first time, you may not find a "clean" environment. You can, should you choose, run `terraform/sandbox/helper_scripts/destroy.sh` after running `terraform/sandbox/helper_scripts/init.sh`. This script will clean out both the `fac-private-s3` and `fac-public-s3` buckets, and then tear down the environment completely. It is completely safe to do this should you choose, and want to work in an immutable environment where you are certain every resource has been created from scratch. The catch to this, is a longer deployment time, as well as loss of data. This module was designed to have zero data at any given time, and should not be considered safe for storage regarding submissions, database entries, pdfs, excels, or staticfiles in `fac-private-s3`, `fac-public-s3`, `fac-db` or `fac-snapshot-db`. If you want to have reusable data, it is highly encouraged to have a repeatable way to load data into the database.
 
 If resources are already existing, and you wish to view changes on your branch, see below.
@@ -121,10 +119,13 @@ Make sure you are in the sandbox environment.
 cf t -s sandbox
 ```
 
-Navigate to `terraform/sandbox/helper_scripts` and then run the `./init.sh` script. This assumes you have a `sandbox.tfvars` and `backend.tfvars` in `terraform/shared/config/` from previous steps.
+Navigate to `terraform/sandbox/helper_scripts` and then run the `./init.sh` script.
+This assumes you have a `sandbox.tfvars` and `backend.tfvars` in `terraform/shared/config/` from previous steps.
 
 Next, run `./plan.sh` script. You should see it creating ~20 resources in a clean environment, or updating a few.
 Finally, run `./apply.sh` script and wait.
+
+
 
 # What is missing/omitted from Sandbox
 The following resources were intentionally left out from the sandbox environment. Part of that is the lack of necessity for such things, and an attempt to have a more lightweight environment, that only runs the bare minimum to bring up the system.
