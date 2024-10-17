@@ -16,6 +16,15 @@ sudo apt update
 sudo apt full-upgrade -y
 ```
 
+If it fails to upgrade packages, run the following commands (Ref: https://stackoverflow.com/a/63578387)
+```
+netsh winsock reset
+netsh int ip reset all
+netsh winhttp reset proxy
+ipconfig /flushdns
+```
+And restart your computer once more.
+
 Next install cf-cli v8 on WSL2 Ubuntu:
 ```bash
 # ...first add the Cloud Foundry Foundation public key and package repository to your system
