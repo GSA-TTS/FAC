@@ -1,10 +1,32 @@
 from audit.models import SingleAuditChecklist, SubmissionEvent
 from audit.models.models import STATUS
+from curation.curationlib.curation_audit_tracking import CurationTracking
 import datetime
 import logging
 import viewflow.fsm
 
 logger = logging.getLogger(__name__)
+
+
+def sac_revert_from_submitted(sac):
+    """
+    Transitions the submission_state for a SingleAuditChecklist back
+    to "auditee_certified" so the user can re-address issues and submit.
+    This should only be executed via management command.
+    """
+
+    if sac.submission_status == STATUS.SUBMITTED:
+        flow = SingleAuditChecklistFlow(sac)
+
+        flow.transition_to_auditee_certified()
+
+        with CurationTracking():
+            sac.save(
+                event_user=None,
+                event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+            )
+        return True
+    return False
 
 
 def sac_transition(request, sac, **kwargs):
@@ -139,7 +161,7 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
 
     @state.transition(
-        source=STATUS.AUDITOR_CERTIFIED,
+        source=[STATUS.AUDITOR_CERTIFIED, STATUS.SUBMITTED],
         target=STATUS.AUDITEE_CERTIFIED,
     )
     def transition_to_auditee_certified(self):
@@ -163,6 +185,8 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         self.sac.transition_name.append(STATUS.SUBMITTED)
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
 
+    # WIP
+    # to add - source=[STATUS.SUBMITTED, STATUS.DISSEMINATED]
     @state.transition(
         source=STATUS.SUBMITTED,
         target=STATUS.DISSEMINATED,

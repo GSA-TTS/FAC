@@ -59,7 +59,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        context = self.get_user_role_management_context(sac)
+        context = self._get_user_role_management_context(sac)
 
         return render(request, self.template, context)
 
@@ -71,7 +71,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         form = ChangeAccessForm(request.POST)
-        context = self.get_user_role_management_context(sac)
+        context = self._get_user_role_management_context(sac)
 
         form.full_clean()
         if not form.is_valid():
@@ -92,10 +92,11 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         fullname = form.cleaned_data["fullname"]
         email = form.cleaned_data["email"]
 
-        # Only if we have self.other_role do we need further checks:
+        # If self.other_role is not set then we're adding an editor:
         if not self.other_role:
-            _create_and_save_access(sac, self.role, fullname, email)
-            return redirect(url)
+            return self._handle_add_editor(
+                request, url, sac, report_id, email, fullname
+            )
 
         # We need the existing role assignment, if any, to delete it:
         try:
@@ -140,7 +141,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
         return redirect(url)
 
-    def get_user_role_management_context(self, sac):
+    def _get_user_role_management_context(self, sac):
         context = {
             "role": self.role,
             "friendly_role": None,
@@ -167,6 +168,27 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             }
 
         return context
+
+    def _handle_add_editor(self, request, url, sac, report_id, email, fullname):
+        # Avoid editors with duplicate emails
+        if Access.objects.filter(sac=sac, role=self.role, email=email).exists():
+            context = {
+                "role": self.role,
+                "friendly_role": _get_friendly_role(self.role),
+                "auditee_uei": sac.general_information["auditee_uei"],
+                "auditee_name": sac.general_information.get("auditee_name"),
+                "certifier_name": fullname,
+                "email": email,
+                "report_id": report_id,
+                "errors": {
+                    "email": f"{email} is already in use by another editor for this audit."
+                },
+            }
+
+            return render(request, self.template, context, status=400)
+        else:
+            _create_and_save_access(sac, self.role, fullname, email)
+            return redirect(url)
 
 
 class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):

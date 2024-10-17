@@ -246,7 +246,14 @@ class IntakeToDissemination(object):
         self.loaded_objects["Passthroughs"] = pass_objects
         return pass_objects
 
-    def _get_dates_from_sac(self):
+    def _get_first_date_by_status_from_sac(self, status):
+        sac = self.single_audit_checklist
+        for i in range(len(sac.transition_name)):
+            if sac.transition_name[i] == status:
+                return sac.transition_date[i]
+        raise ValueError("This SAC does not have the requested status.")
+
+    def _get_most_recent_dates_from_sac(self):
         return_dict = dict()
         sac = self.single_audit_checklist
         for status_choice in sac.STATUS_CHOICES:
@@ -283,12 +290,12 @@ class IntakeToDissemination(object):
         cognizant_agency = self.single_audit_checklist.cognizant_agency
         oversight_agency = self.single_audit_checklist.oversight_agency
 
-        dates_by_status = self._get_dates_from_sac()
+        dates_by_status = self._get_most_recent_dates_from_sac()
         status = self.single_audit_checklist.get_statuses()
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
         if self.mode == IntakeToDissemination.DISSEMINATION:
             submitted_date = self._convert_utc_to_american_samoa_zone(
-                dates_by_status[status.SUBMITTED]
+                self._get_first_date_by_status_from_sac(status.SUBMITTED)
             )
             fac_accepted_date = submitted_date
             auditee_certify_name = auditee_certification["auditee_signature"][
