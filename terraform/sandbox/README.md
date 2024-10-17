@@ -1,5 +1,7 @@
-# Make sure to have CF CLI on WSL2 Ubuntu
-You must be running version 8+ of the CF client for the helper scripts to work and WSL2 Ubuntu for terraform.
+# WSL2 Ubuntu Installation
+If you don't already have it, download [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+You must be running version 8+ of the CF client for the helper scripts to work and WSL2 Ubuntu/Linux for terraform.
 
 Open command line or powershell as admin.
 ```
@@ -16,7 +18,7 @@ sudo apt update
 sudo apt full-upgrade -y
 ```
 
-If it fails to upgrade packages, run the following commands (Ref: https://stackoverflow.com/a/63578387)
+If it fails to upgrade packages, run the following commands (Ref: [Stack Overflow Page](https://stackoverflow.com/a/63578387))
 ```
 netsh winsock reset
 netsh int ip reset all
@@ -25,7 +27,9 @@ ipconfig /flushdns
 ```
 And restart your computer once more.
 
-Next install cf-cli v8 on WSL2 Ubuntu:
+# Core Dependencies
+
+Next install cf-cli v8 on WSL2 Ubuntu or Linux:
 ```bash
 # ...first add the Cloud Foundry Foundation public key and package repository to your system
 wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
@@ -35,7 +39,7 @@ sudo apt-get update
 sudo apt-get install cf8-cli
 ```
 
-Next install AWS CLI on WSL2 Ubuntu
+Next install AWS CLI on WSL2 Ubuntu or Linux:
 ```bash
 curl -x $https_proxy -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip && rm awscliv2.zip
@@ -45,7 +49,7 @@ unzip awscliv2.zip && rm awscliv2.zip
 pip install --upgrade cryptography==36.0.2
 ```
 
-Next install terraform on WSL2 Ubuntu:
+Next install terraform on WSL2 Ubuntu or Linux:
 ```
 sudo apt-get install terraform
 ```
@@ -95,19 +99,15 @@ secret_key = "" # secret_access_key value
 
 ```
 
-Navigate to `terraform/shared/modules/sandbox-proxy`, and run the following two commands.
+Navigate to `terraform/shared/modules/sandbox-proxy`, and run the following two commands. You'll be prompted for values; hit enter to leave them blank. When you are done, you should have `proxy.zip` in your current folder.
 
 ```bash
 terraform init
 ```
-
-This will issue a warning. Then run:
-
 ```bash
 terraform plan
 ```
-
-You'll be prompted for values; hit enter to leave them blank. When you are done, you should have `proxy.zip` in your current folder.
+We do not care about actually making changes with terraform, only generating a `proxy.zip` for the modules to reference.
 
 # First Deployment
 Due to the incorporation of partial s3 configuration, the `terraform.tfstate` will be stored in the s3 bucket. Due to this, when you run `./init.sh` and `./plan.sh` for the first time, you may not find a "clean" environment. You can, should you choose, run `terraform/sandbox/helper_scripts/destroy.sh` after running `terraform/sandbox/helper_scripts/init.sh`. This script will clean out both the `fac-private-s3` and `fac-public-s3` buckets, and then tear down the environment completely. It is completely safe to do this should you choose, and want to work in an immutable environment where you are certain every resource has been created from scratch. The catch to this, is a longer deployment time, as well as loss of data. This module was designed to have zero data at any given time, and should not be considered safe for storage regarding submissions, database entries, pdfs, excels, or staticfiles in `fac-private-s3`, `fac-public-s3`, `fac-db` or `fac-snapshot-db`. If you want to have reusable data, it is highly encouraged to have a repeatable way to load data into the database.
@@ -124,8 +124,6 @@ This assumes you have a `sandbox.tfvars` and `backend.tfvars` in `terraform/shar
 
 Next, run `./plan.sh` script. You should see it creating ~20 resources in a clean environment, or updating a few.
 Finally, run `./apply.sh` script and wait.
-
-
 
 # What is missing/omitted from Sandbox
 The following resources were intentionally left out from the sandbox environment. Part of that is the lack of necessity for such things, and an attempt to have a more lightweight environment, that only runs the bare minimum to bring up the system.
