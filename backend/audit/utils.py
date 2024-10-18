@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.shortcuts import redirect
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from audit.fixtures.excel import FORM_SECTIONS
 from audit.intakelib import (
@@ -71,6 +73,14 @@ class Util:
         if general_information_data.get("audit_period_covered") != "other":
             general_information_data.pop("audit_period_other_months", None)
         return general_information_data
+
+    @staticmethod
+    def validate_redirect_url(url):
+        """Ensure that the url received is safe to redirect to."""
+        if url_has_allowed_host_and_scheme(url, allowed_hosts=None):
+            return redirect(url)
+        else:
+            return redirect("/")
 
 
 class ExcelExtractionError(Exception):

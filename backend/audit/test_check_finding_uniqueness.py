@@ -1,8 +1,12 @@
+import unittest
 from django.test import SimpleTestCase
 
 from audit.intakelib.checks.check_finding_uniqueness import check_finding_uniqueness
 
 
+@unittest.skip(
+    "Skipping while finding uniqueness is disabled, see ticket #4385 for more information."
+)
 class TestCheckFindingUniqueness(SimpleTestCase):
     def setUp(self):
         self.ir = [
