@@ -9,6 +9,7 @@ source tools/util_startup.sh
 # This will choose the correct environment
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
+source tools/curation_audit_tracking_init.sh
 source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
@@ -36,6 +37,11 @@ gonogo "migrate_app_tables"
 # Standup the API, which may depend on migration changes
 api_standup
 gonogo "api_standup"
+
+#####
+# CURATION AUDIT TRACKING
+curation_audit_tracking_init
+gonogo "curation_audit_tracking_init"
 
 #####
 # SEED COG/OVER TABLES

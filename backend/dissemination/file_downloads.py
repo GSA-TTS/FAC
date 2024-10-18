@@ -38,7 +38,7 @@ def get_filename(report_id, file_type):
             raise Http404()
 
 
-def file_exists(filename):
+def file_exists(filename, show_warning=True):
     # this client uses the internal endpoint url because we're making a request to S3 from within the app
     s3_client = boto3_client(
         service_name="s3",
@@ -57,7 +57,8 @@ def file_exists(filename):
 
         return True
     except ClientError:
-        logger.warn(f"Unable to locate file {filename} in S3!")
+        if show_warning:
+            logger.warn(f"Unable to locate file {filename} in S3!")
         return False
 
 
