@@ -51,23 +51,20 @@ if [[ $space = "" || $service = "" ]]; then
 fi
 
 >&2 echo "Targeting org $org and space $space"
-cf target -o $org -s $space 1>&2
+cf target -o $org -s $space > /dev/null 2>&1
 
-# create user account service
-cf create-service cloud-gov-service-account $role $service 1>&2
-
-# create service key
-cf create-service-key $service ${service}-key 1>&2
+# get service key
+cf service-key $service ${service}-key > /dev/null 2>&1
 
 # output service key to stdout in secrets.auto.tfvars format
 creds=`cf service-key $service ${service}-key | tail -n 7`
 username=`echo $creds | jq '.credentials.username'`
 password=`echo $creds | jq '.credentials.password'`
 
-cat << EOF
+cat <<EOM
 # generated with $0 -s $space -u $service -r $role -o $org
 # revoke with $(dirname $0)/destroy_service_account.sh -s $space -u $service -o $org
 
 cf_user = $username
 cf_password = $password
-EOF
+EOM
