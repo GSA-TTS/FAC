@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 import logging
 
-from .check_finding_uniqueness import check_finding_uniqueness
+# from .check_finding_uniqueness import check_finding_uniqueness
 from census_historical_migration.invalid_record import InvalidRecord
 
 from .check_finding_award_references_pattern import award_references_pattern
@@ -113,7 +113,8 @@ audit_findings_checks = general_checks + [
     finding_reference_pattern,
     no_repeat_findings,
     findings_grid_validation,
-    check_finding_uniqueness,
+    # See ticket #4385 for more information on why this check is disabled
+    # check_finding_uniqueness,
 ]
 
 additional_eins_checks = general_checks + [
@@ -158,7 +159,8 @@ skippable_checks = {
 require_gsa_migration_flag = [
     findings_grid_validation,
     finding_reference_pattern,
-    check_finding_uniqueness,
+    # See ticket #4385 for more information on why this check is disabled
+    # check_finding_uniqueness,
 ]
 
 
