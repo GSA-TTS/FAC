@@ -41,7 +41,7 @@ sudo apt-get install cf8-cli
 
 Next install AWS CLI on WSL2 Ubuntu or Linux:
 ```bash
-curl -x $https_proxy -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+curl -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip && rm awscliv2.zip
 ./aws/install -i ~/usr -b ~/bin
 
