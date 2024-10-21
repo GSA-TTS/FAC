@@ -45,13 +45,18 @@ curl -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.
 unzip awscliv2.zip && rm awscliv2.zip
 ./aws/install -i ~/usr -b ~/bin
 
+# or
+sudo snap install aws-cli --classic
+
 # aws doesnt work with an x509 error? This fixed it on my WSL2 Ubuntu
 pip install --upgrade cryptography==36.0.2
 ```
 
 Next install terraform on WSL2 Ubuntu or Linux:
-```
+```bash
 sudo apt-get install terraform
+# or
+sudo snap install terraform --classic
 ```
 If that fails, follow the setup guide from https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli for Linux > Ubuntu
 
