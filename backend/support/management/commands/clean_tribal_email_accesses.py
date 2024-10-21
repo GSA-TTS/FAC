@@ -16,7 +16,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--count",
             action="store_true",
-            help="Only logs the number of duplicates without deleting",
+            help="Only logs the number of duplicates without modifying the database.",
         )
 
     def handle(self, *args, **options):
