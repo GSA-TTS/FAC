@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Count
+from django.db.models.functions import Lower
 import logging
 from users.models import UserPermission
 
@@ -24,15 +25,11 @@ class Command(BaseCommand):
         fixed_emails = 0
         removed_duplicates = 0
 
-        # first, check how many duplicates exist.
+        # first, gather number of duplicate emails that exist.
         duplicates = (
-            UserPermission.objects.values(
-                "email"
-            )  # Specify the field to check for duplicates
-            .annotate(email_count=Count("id"))  # Count the occurrences of each email
-            .filter(
-                email_count__gt=1
-            )  # Filter to only include those with more than 1 occurrence
+            UserPermission.objects.values(loweremail=Lower("email"))
+            .annotate(ecount=Count("id"))
+            .filter(ecount__gt=1)
         )
         logger.info(
             f"Identified {duplicates.count()} duplicate emails for tribal access."
@@ -45,9 +42,10 @@ class Command(BaseCommand):
         userpermissions = UserPermission.objects.all()
         for userpermission in userpermissions:
             if userpermission.email:
-                userpermission.email = userpermission.email.lower()
-                userpermission.save()
-                fixed_emails += 1
+                if userpermission.email != userpermission.email.lower():
+                    userpermission.email = userpermission.email.lower()
+                    userpermission.save()
+                    fixed_emails += 1
         logger.info(f"Removed uppercasing on {fixed_emails} tribal access emails.")
 
         # finally, remove duplicates (that have a null user field).
