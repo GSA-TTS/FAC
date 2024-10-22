@@ -39,6 +39,7 @@ class EligibilityFormView(LoginRequiredMixin, View):
             "step": 1,
         }
 
+        # Used for populating the expenditure criteria bulletpoints
         dollar_thresholds = []
         for dollar_threshold in DOLLAR_THRESHOLDS:
             start = dollar_threshold["start"]
@@ -58,9 +59,7 @@ class EligibilityFormView(LoginRequiredMixin, View):
                     f"${minimum} or more with a Fiscal Year starting before {end.strftime("%B %d, %Y")}"
                 )
 
-        args = {
-            "dollar_thresholds": dollar_thresholds,
-        }
+        args["dollar_thresholds"] = dollar_thresholds
 
         return render(request, "report_submission/step-1.html", args)
 

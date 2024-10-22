@@ -583,6 +583,7 @@ SESSION_COOKIE_AGE = 30 * 60
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-save-every-request
 SESSION_SAVE_EVERY_REQUEST = True
 
+# Minimum expenditure thresholds
 DOLLAR_THRESHOLDS = [
     {
         "start": None,
