@@ -48,15 +48,15 @@ class EligibilityFormView(LoginRequiredMixin, View):
 
             if start and not end:
                 dollar_thresholds.append(
-                    f"${minimum} or more with a Fiscal Year starting on or after {start.strftime("%B %d, %Y")}"
+                    f"${minimum} or more with a Fiscal Year starting on or after {start.strftime('%B %d, %Y')}"
                 )
             elif start and end:
                 dollar_thresholds.append(
-                    f"${minimum} or more with a Fiscal Year starting after {start.strftime("%B %d, %Y")} and before {end.strftime("%B %d, %Y")}"
+                    f"${minimum} or more with a Fiscal Year starting after {start.strftime('%B %d, %Y')} and before {end.strftime('%B %d, %Y')}"
                 )
             elif not start and end:
                 dollar_thresholds.append(
-                    f"${minimum} or more with a Fiscal Year starting before {end.strftime("%B %d, %Y")}"
+                    f"${minimum} or more with a Fiscal Year starting before {end.strftime('%B %d, %Y')}"
                 )
 
         args["dollar_thresholds"] = dollar_thresholds
