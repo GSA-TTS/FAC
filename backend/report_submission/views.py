@@ -20,7 +20,7 @@ from audit.validators import validate_general_information_json
 from audit.utils import Util
 from audit.models.models import ExcelFile
 from audit.fixtures.excel import FORM_SECTIONS
-from config.settings import STATIC_SITE_URL, STATE_ABBREVS
+from config.settings import STATIC_SITE_URL, STATE_ABBREVS, DOLLAR_THRESHOLDS
 
 from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
@@ -35,8 +35,33 @@ class ReportSubmissionRedirectView(View):
 # Step 1
 class EligibilityFormView(LoginRequiredMixin, View):
     def get(self, request):
-        args = {}
-        args["step"] = 1
+        args = {
+            "step": 1,
+        }
+
+        dollar_thresholds = []
+        for dollar_threshold in DOLLAR_THRESHOLDS:
+            start = dollar_threshold["start"]
+            end = dollar_threshold["end"]
+            minimum = format(dollar_threshold["minimum"], ",d")
+
+            if start and not end:
+                dollar_thresholds.append(
+                    f"${minimum} or more with a Fiscal Year starting on or after {start.strftime("%B %d, %Y")}"
+                )
+            elif start and end:
+                dollar_thresholds.append(
+                    f"${minimum} or more with a Fiscal Year starting after {start.strftime("%B %d, %Y")} and before {end.strftime("%B %d, %Y")}"
+                )
+            elif not start and end:
+                dollar_thresholds.append(
+                    f"${minimum} or more with a Fiscal Year starting before {end.strftime("%B %d, %Y")}"
+                )
+
+        args = {
+            "dollar_thresholds": dollar_thresholds,
+        }
+
         return render(request, "report_submission/step-1.html", args)
 
     # render eligibility form

@@ -94,10 +94,13 @@
                 </fieldset>
                 <fieldset class="usa-fieldset question">
                     <legend class="usa-legend">
-                        Did this entity spend $750,000 or more in federal awards during its audit period in accordance with
-                        Uniform
-                        Guidance?
+                        Did this entity spend an amount of federal awards meeting one of the following criteria during its audit period, in accordance with Uniform Guidance?
                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        <ul>
+                            {% for dollar_threshold in dollar_thresholds %}
+                            <li>{{dollar_threshold}}</li>
+                            {% endfor %}
+                        </ul>
                     </legend>
                     <div class="usa-radio">
                         <input class="usa-radio__input"
@@ -118,9 +121,7 @@
                                aria-required="true"
                                required/>
                         <label class="usa-radio__label" for="spend-no">No</label>
-                        <span class="usa-error-message">You only need to submit a report for an entity that spent $750,000
-                            or more in federal awards during its audit period (fiscal period beginning dates on or after
-                        12/26/2014).</span>
+                        <span class="usa-error-message">You only need to submit a report for an entity that meets one of the criteria listed above.</span>
                     </div>
                 </fieldset>
                 <fieldset class="usa-fieldset question">
