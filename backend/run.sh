@@ -9,6 +9,7 @@ source tools/migrate_app_tables.sh
 source tools/seed_cog_baseline.sh
 source tools/setup_env.sh
 source tools/sling_first_run.sh
+source tools/sling_to_sqlite_in_s3.sh
 source tools/sql_pre_post.sh
 source tools/util_startup.sh
 
@@ -30,7 +31,7 @@ gonogo "sql_pre"
 gonogo "migrate_app_tables"
 
 #####
-# PREP API TABLES
+# MOVE DATA TO SECOND DB
 # This runs sling and preps tables in the snapshot DB.
 # Only runs if the tables are not present (e.g. first deploy)
 sling_first_run

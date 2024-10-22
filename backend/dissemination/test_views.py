@@ -671,7 +671,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         return "some-report-name.xlsx", None
 
     def _mock_download_url(self):
-        return "http://example.com/gsa-fac-private-s3/temp/some-report-name.xlsx"
+        return "http://example.com/fac-private-s3/temp/some-report-name.xlsx"
 
     @patch("dissemination.summary_reports.prepare_workbook_for_download")
     def test_bad_search_returns_400(self, mock_prepare_workbook_for_download):

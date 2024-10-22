@@ -4,18 +4,33 @@ function setup_local_env {
 
     if [[ "${ENV}" == "LOCAL" || "${ENV}" == "TESTING" ]]; then
         startup_log "LOCAL_ENV" "We are in a local envirnoment."
-        export AWS_PRIVATE_ACCESS_KEY_ID=longtest
-        export AWS_PRIVATE_SECRET_ACCESS_KEY=longtest
-        export AWS_S3_PRIVATE_ENDPOINT="http://minio:9000"
+        
+        export AWS_PUBLIC_BUCKET_NAME="fac-public-s3"
+        export AWS_PRIVATE_BUCKET_NAME="fac-public-s3"
+
+        export AWS_PRIVATE_ACCESS_KEY_ID="longtest"
+        export AWS_PRIVATE_SECRET_ACCESS_KEY="longtest"
+        export AWS_PRIVATE_ENDPOINT="http://minio:9001"
+
+        export AWS_PUBLIC_ACCESS_KEY_ID="longtest"
+        export AWS_PUBLIC_SECRET_ACCESS_KEY="longtest"
+        export AWS_PUBLIC_ENDPOINT="http://minio:9001"
+
         mc alias set myminio "${AWS_S3_PRIVATE_ENDPOINT}" minioadmin minioadmin
         # Do nothing if the bucket already exists.
         # https://min.io/docs/minio/linux/reference/minio-mc/mc-mb.html
-        mc mb --ignore-existing myminio/gsa-fac-private-s3
-        mc admin user svcacct add --access-key="${AWS_PRIVATE_ACCESS_KEY_ID}" --secret-key="${AWS_PRIVATE_SECRET_ACCESS_KEY}" myminio minioadmin
+        mc mb --ignore-existing myminio/fac-private-s3
+        mc mb --ignore-existing myminio/fac-public-s3
+        
+        # MCJ 20241016 FIXME: Is this even needed locally? I don't think so.
+        # mc admin user svcacct add \
+        #     --access-key="${AWS_PRIVATE_ACCESS_KEY_ID}" \
+        #     --secret-key="${AWS_PRIVATE_SECRET_ACCESS_KEY}" \
+        #     myminio minioadmin
         
         # For database work
-        export FAC_DB_URI=${DATABASE_URL}?sslmode=disable
-        export FAC_SNAPSHOT_URI=${SNAPSHOT_URL}?sslmode=disable
+        export FAC_DB_URI=${DATABASE_URL} #?sslmode=disable
+        export FAC_SNAPSHOT_URI=${SNAPSHOT_URL}
         export PSQL_EXE='psql --single-transaction -v ON_ERROR_STOP=on'
         export PSQL_EXE_NO_TXN='psql -v ON_ERROR_STOP=on'
 
@@ -29,11 +44,13 @@ function setup_local_env {
         rm -f sling_linux_amd64.tar.gz
         chmod +x sling
         mv sling /bin/sling
+
         # And we need cgov-util
         curl -L -O https://github.com/GSA-TTS/fac-backup-utility/releases/download/v0.1.8/gov.gsa.fac.cgov-util-v0.1.8-linux-amd64.tar.gz
         tar xvzf gov.gsa.fac.cgov-util-v0.1.8-linux-amd64.tar.gz gov.gsa.fac.cgov-util
         chmod 755 gov.gsa.fac.cgov-util
         mv gov.gsa.fac.cgov-util /bin/cgov-util
+        
         # We need a config.json in the directory we are running
         # things from (or PWD).
         cp util/load_public_dissem_data/data/config.json .

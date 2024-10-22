@@ -254,7 +254,8 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 
     # Private bucket
-    AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
+    AWS_PRIVATE_STORAGE_BUCKET_NAME = "fac-private-s3"
+    AWS_PUBLIC_STORAGE_BUCKET_NAME = "fac-public-s3"
 
     AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
         "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"

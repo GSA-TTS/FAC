@@ -2,8 +2,49 @@ source tools/util_startup.sh
 
 # Aliases need to be outside of function scope
 
+export _GET_AWS_RESULT="NONE"
+
+function get_aws_s3() {
+    local bucket="$1"
+    local key="$2"
+    _GET_AWS_RESULT=$(echo $VCAP_SERVICES | \
+        jq --arg bucket "$bucket" '.s3 | map(select(.instance_name==$bucket))' | \
+        jq .[] | \
+        jq --arg key "$key" '.credentials | .[$key]')
+    return 0
+}
+
 function setup_cgov_env {
-    set -e
+    startup_log "CGOV_ENV" "We are in a cloud.gov envirnoment."
+
+    # https://stackoverflow.com/questions/48712545/break-jq-query-string-into-lines
+    # jq is fine with line breaks in strings. Just don't escape them.
+    # Makes long queries more readable. Maybe.
+    export AWS_PRIVATE_BUCKET_NAME=$(echo $VCAP_SERVICES \
+        | jq '.s3 
+            | map(select(.instance_name 
+                         | contains("fac-private-s3"))) 
+            | .[] .credentials.bucket')
+    export AWS_PUBLIC_BUCKET_NAME=$(echo $VCAP_SERVICES \
+        | jq '.s3 
+            | map(select(.instance_name 
+                         | contains("fac-public-s3"))) 
+            | .[] .credentials.bucket')
+
+    get_aws_s3 "fac-private-s3" "access_key_id"
+    export AWS_PRIVATE_ACCESS_KEY_ID=$_GET_AWS_RESULT
+    get_aws_s3 "fac-private-s3" "secret_access_key"
+    export AWS_PRIVATE_SECRET_ACCESS_KEY=$_GET_AWS_RESULT
+    get_aws_s3 "fac-private-s3" "endpoint"
+    export AWS_S3_PRIVATE_ENDPOINT=$_GET_AWS_RESULT
+
+    get_aws_s3 "fac-public-s3" "access_key_id"
+    export AWS_PUBLIC_ACCESS_KEY_ID=$_GET_AWS_RESULT
+    get_aws_s3 "fac-public-s3" "secret_access_key"
+    export AWS_PUBLIC_SECRET_ACCESS_KEY=$_GET_AWS_RESULT
+    get_aws_s3 "fac-public-s3" "endpoint"
+    export AWS_S3_PUBLIC_ENDPOINT=$_GET_AWS_RESULT
+
 
     export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
     export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt

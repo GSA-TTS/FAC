@@ -4,6 +4,13 @@
 ------------------------------------------------------
 -- python create_partition_statements.py general
 
+-- 20241016 SKIPPED
+-- This code demonstrates how to partition the tables that are slung over for
+-- use in the API. We do this *post* because it happens after migration, but
+-- before we sling data in.
+-- This represents a large change, and is not strictly needed right now.
+-- But, it serves as a good example of how to do it. 
+
 SET search_path TO public_data_v1_0_0;
 ALTER TABLE public_data_v1_0_0.general RENAME TO general_to_be_removed;
 CREATE TABLE public_data_v1_0_0.general
