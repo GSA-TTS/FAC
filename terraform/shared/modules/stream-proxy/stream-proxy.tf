@@ -59,7 +59,7 @@ resource "cloudfoundry_app" "egress_app" {
   }
 }
 
-### 
+###
 ### Set up network policies so that the clients can reach the proxy
 ###
 
@@ -83,7 +83,7 @@ resource "cloudfoundry_network_policy" "client_routing" {
   }
 }
 
-### 
+###
 ### Create a credential service for bound clients to use when make requests of the proxy
 ###
 
