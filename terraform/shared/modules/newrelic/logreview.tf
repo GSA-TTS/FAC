@@ -222,5 +222,114 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
 
       legend_enabled = true
     }
+
+    widget_log_table {
+      title = "${var.cf_space_name} Check Tables Logs"
+
+      row    = 8
+      column = 1
+      width  = 8
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('CHECKTABLESPASS', insensitive: true) SINCE 7 days ago"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_billboard {
+      title = "${var.cf_space_name} Table Check Count - Pass"
+
+      row    = 8
+      column = 9
+      width  = 3
+      height = 3
+
+      nrql_query {
+        query = "SELECT count(*) FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('CHECKTABLESPASS', insensitive: true) SINCE 7 days ago"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_log_table {
+      title = "${var.cf_space_name} Missing Tables Logs"
+
+      row    = 9
+      column = 1
+      width  = 8
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('DBMISSINGTABLES', insensitive: true) SINCE 7 days ago"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_billboard {
+      title = "${var.cf_space_name} Table Check Count - Fail"
+
+      row    = 9
+      column = 9
+      width  = 3
+      height = 3
+
+      nrql_query {
+        query = "SELECT count(*) FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('DBMISSINGTABLES', insensitive: true) SINCE 7 days ago"
+      }
+
+      legend_enabled = true
+    }
+
+    widget_table {
+      title = "${var.cf_space_name} Backups and Submissions"
+
+      row    = 10
+      column = 1
+      width  = 8
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message` FROM Log WHERE allColumnSearch('POST', insensitive: true) AND allColumnSearch('/submission/', insensitive: true) AND `newrelic.source` = 'logs.APM' AND entity.name ='${var.cf_space_name}' SINCE 2 hours ago"
+      }
+      nrql_query {
+        query = "SELECT `message`,`timestamp` FROM Log WHERE allColumnSearch('STARTUP_CHECK', insensitive: true) AND `message` LIKE '%db_to_s3%' AND `message` LIKE '%PASS%' AND tags.space_name ='${var.cf_space_name}' SINCE 2 hours ago"
+      }
+
+      legend_enabled = true
+    }
+    widget_table {
+      title = "${var.cf_space_name} Backup and Row Count"
+
+      row    = 11
+      column = 1
+      width  = 8
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('\"TABLEROWCOUNT\"', insensitive: true) SINCE 2 hours ago"
+      }
+      nrql_query {
+        query = "SELECT `message`,`timestamp` FROM Log WHERE allColumnSearch('STARTUP_CHECK', insensitive: true) AND `message` LIKE '%db_to_s3%' AND `message` LIKE '%PASS%' AND tags.space_name ='${var.cf_space_name}' SINCE 2 hours ago"
+      }
+
+      legend_enabled = true
+    }
+    widget_table {
+      title = "${var.cf_space_name} Row Count"
+
+      row    = 12
+      column = 1
+      width  = 8
+      height = 3
+
+      nrql_query {
+        query = "SELECT `message` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('\"TABLEROWCOUNT\"', insensitive: true) SINCE 7 days ago"
+      }
+
+      legend_enabled = true
+    }
   }
 }
