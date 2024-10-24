@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 # A version of this regex also exists in Base.libsonnet
 AWARD_REFERENCES_REGEX = r"^AWARD-(?!0{4,5}$)[0-9]{4,5}$"
-AWARD_REFERENCES_REGEX5 = r"^AWARD-(?!0{5}$)[0-9]{5}$"
 
 AWARD_LEN_4_DIGITS = 10
 AWARD_LEN_5_DIGITS = 11

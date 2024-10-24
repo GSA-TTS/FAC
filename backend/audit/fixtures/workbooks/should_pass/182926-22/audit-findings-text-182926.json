@@ -1,0 +1,102 @@
+[
+    {
+        "name": "Coversheet",
+        "ranges": [
+            {
+                "name": "version",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "values": [
+                    "1.0.3"
+                ]
+            },
+            {
+                "name": "section_name",
+                "start_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "3"
+                },
+                "values": [
+                    "FindingsText"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "M1LVPE5GLSD9"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Form",
+        "ranges": [
+            {
+                "name": "reference_number",
+                "start_cell": {
+                    "column": "A",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "A",
+                    "row": "4"
+                },
+                "values": [
+                    "2022-003",
+                    "2022-002",
+                    "2022-001"
+                ]
+            },
+            {
+                "name": "text_of_finding",
+                "start_cell": {
+                    "column": "B",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "4"
+                },
+                "values": [
+                    "2022 003 Activities Allowed or UnallowedEducation Stabilization Fund:U.S. Department of Education:COVID-19 - Higher Education Emergency Relief Fund (ALN 84.425F, 84.425L)Federal Grant Numbers:P425F200193 and P425L200605Statistically Valid Sample: No, and it was not intended to bePrior Year Finding: Not a repeat finding.Finding Type: Significant Deficiency and NoncomplianceCriteria:Institutions may use the Institutional Portion of HEERF to discharge student debt or provide additional emergency financial aid grants. However, Institutions cannot discharge a students outstanding account balance or provide additional emergency financial aid grants by crediting the students account without the written consent from the student. As always, students have discretion about how they receive their grants, and institutions must receive affirmative written consent from students before applying the funds to the students account. In obtaining such affirmative written consent, the Department encourages institutions to include a disclaimer whereby students are expressly notified that they have the ability to decline the emergency financial aid grant to pay off debts and instead may use the funds for any component of the students cost of attendance or for emergency costs that arise due to coronavirus, such as tuition, food, housing, health care (including mental health care), or child care.As it relates to expenditures under the HEERF II and HEERF III (a)(1) Student Aid Portion or for additional emergency financial aid grants made using other HEERF grant funds, auditors should determine (1) the institution had a documented plan to distribute funds to students, (2) that institutions prioritized grants to students with exceptional need, (3) that the institution did not place any restrictions on the expenditure of those funds beyond what is in the statute, above, (4) the institution expended the entirety of the Student Aid Portion grant on Emergency financial aid grants to students, and (5) that the institution did not reimburse itself for any costs or expenses previously issued to students.Institutions may use funds under the Institutional Portion to provide additional emergency financial aid grants to students. If an institution chooses to do so, then those funds are subject to the requirements described in the institutions applicable Student Aid Portion (ALN 84.425E) Certification and Agreement and/or Supplemental Agreement and the Emergency Financial Aid Grants to Students (Student Aid Portion).Condition and Context:We selected 25 students for testwork. For 12 of these 25 students, the discharging of student debt or the awarding of the emergency grant was applied directly to the students account without obtaining written consent from the student. In total, the portion of the funds that were awarded through a credit to the students account was approximately $9.5 million out of the total amount provided to students in the amount of $87.6 million.Additionally, one of the 25 students selected for testwork received an award in excess of the maximum award as outlined in the documented planCause:The University had an understanding that if the Institutional Portion of HEERF funds were used they did not need the students consent to credit his/her account.The University did not document the reasons the one student received an award in excess of the amount included in the documented plan.Effect:Students outstanding balances were reduced inappropriately. Additionally, the one student was overawarded.Questioned Costs:Questioned costs were $500 as the one student was awarded $8,500 when the maximum award, per the documented plan, was $8,000.Recommendation:We recommend that the University adapt their policy on reducing student accounts with HEERF funds to ensure they always receive the students consent before apply the funds to their outstanding balance and to ensure they follow the documented plan for each disbursement.We also recommend that the University ensures that internal controls in place surrounding the reporting process are performing as designed.",
+                    "2022 002 Special ReportingEducation Stabilization Fund:U.S. Department of Education:COVID-19 - Higher Education Emergency Relief Fund (ALN 84.425E, 84.425F, 84.425L)Federal Grant Numbers:P425E200365, P425F200193, P425L200605Statistically Valid Sample: No, and it was not intended to bePrior Year Finding: 2021-001Finding Type: Significant Deficiency and NoncomplianceCriteria:The Department of Education requires that institutions who received the Section 18004(a)(1) Student Aid Portion of higher education emergency relief funding (HEERF) to publicly post certain information on their website every calendar quarter.The report must be updated no later than 10 days after the end of each calendar quarter (October 10, January 10, April 10, and July 10).Auditors are required to determine if an institution was both timely and accurate in publicly posting its Student Aid Portion reports.The Department of Education requires that institutions who received the Section (a)(1) Institutional Portion to submit a quarterly report over institutional expenditures.Institutions of higher education must post this quarterly report form no later than 10 days after the end of each calendar quarter (October 10, January 10, April 10, and July 10). Auditors should determine if an institution was both timely and accurate in publicly posting its Quarterly Reporting Form.Condition and Context:We selected two HEERF Student Aid quarterly reports for testwork.For the December 31, 2021 HEERF III Student Aid quarterly report, the required information in the report agreed to the underlying records of the University.However, the University was not able to provide support that the report was publicly posted timely. Rather, the evidence provided supports a posting date of February 9, 2022. Additionally, the University was unable to evidence managements review of this report prior to its posting.We selected two HEERF Institutional Aid quarterly reports for testwork.For the June 30, 2022 HEERF III Institutional quarterly report, the University uploaded this report on July 11, 2022, which falls outside of the 10 day requirement. We noted that all reports (84.425E, 84.425F and 84.425L) uploaded for the June 30, 2022, were uploaded on July 11, 2022.Cause:For the HEERF Student Aid quarterly report, support for managements review and the timely posting of the HEERF III Student Aid quarterly report was not retained by the University.For the HEERF Institutional Aid quarterly report, the University thought they had an additional day as July 10, 2022 fell on a weekend.Effect:For the HEERF Student Aid quarterly report, the University was not able to provide support that the required information for the HEERF III Student Aid portion was posted within 10 days of the end of the December 31, 2021 quarter.For the HEERF Institutional Aid quarterly report, the University submitted the report late.Questioned Costs:No questioned costs were noted as a result of the audit procedures performed.Recommendation:For the HEERF Student Aid quarterly report, we recommend the University retain records to support the date on which the required quarterly reports are publicly posted to confirm that they were posted within the required timeframe.For the HEERF Institutional Aid quarterly report, we recommend the University have an understanding of all reporting deadlines associated with the HEERF grants to ensure they are met.We also recommend that the University ensures that internal controls in place surrounding the reporting process are performing as designed.",
+                    "2022-001 Allowable CostsResearch and Development Cluster: U.S. Department of Health and Human Services:Predictive Index for Elder Self-Neglect in Diverse Populations, Assistance Listing 93.734 (award number: 90EJIG0016-01-00)Leveraging Surveillance Technology to Reduce Elder Abuse Recidivism in Community Populations, Assistance Listing 93.747 (award number: 90EJIG0015-01-02)National Institutes of Health:Cultural and Caregiving Need for Chinese Elderly with Cognitive Impairment, Assistance Listing 93.361 (award number: 5R01NR014846-05)Statistically valid sample: No and it was not intended to be.Repeat finding: Not a repeat finding.Finding Type: NoncomplianceCriteria:Non-federal entities should ensure that costs are reasonable and necessary for the performance of the Research and Development effort identified in the applicable award. In accordance with the documentation standards of 2 CFR section 200.430(i), costs of compensation for personal services are allowable to the extent the total compensation for individual employees: a. Is reasonable for the services rendered and conforms to the established written policy of the non-federal entity consistently applied to both federal and non-federal activities; b. Follows an appointment made in accordance with a non-federal entitys rules or written policies and meets the requirements of federal statute, where applicable; and c. Is determined and supported as provided in 2 CFR section 200.430(i), including that charges to federal awards for salaries and wages must be based on records that accurately reflect the work performed. Condition and Context:In December of 2021, University management became aware that certain employees salaries working under one principal investigator (PI) were not being charged to the correct grants based on the employees time and effort on such grants. Rather, the PI requested cost transfers to move salaries to other grants that were in jeopardy of ending with unused budget dollars.University management performed a detailed review of all fiscal year 2022 salaries that were charged to this PIs grants. Based on this review, University management determined that salaries in the amount of $199,214 were inappropriately charged to four different grants. In total, $408,775, which included the salaries and the related fringe benefit and indirect costs, were either reallocated to the correct grant, or returned to the grant sponsor before the end of fiscal year 2022.These grants are included in the research and development cluster which has approximately 3,100 grants with approximately $113 million of salaries. Cause:The PI was inappropriately reallocating the employees time and effort through cost transfers.Effect:The salaries and related fringe benefit and indirect costs were unallowable as the employees salaries were not supported by records that accurately reflect the work performed. Questioned Costs:Questioned costs were $408,775, however, the University refunded grantors or reallocated these costs to the correct grant during fiscal year 2022.Recommendation:The University should provide additional training to PIs to reinforce the Universitys grant accounting policies and federal policies over the use of cost transfers and time and effort reporting. "
+                ]
+            },
+            {
+                "name": "contains_chart_or_table",
+                "start_cell": {
+                    "column": "C",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "C",
+                    "row": "4"
+                },
+                "values": [
+                    "N",
+                    "N",
+                    "N"
+                ]
+            }
+        ]
+    }
+]

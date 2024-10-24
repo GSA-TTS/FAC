@@ -130,6 +130,7 @@ INSTALLED_APPS += [
     "dissemination",
     "census_historical_migration",
     "support",
+    "curation",
 ]
 
 MIDDLEWARE = [
@@ -141,6 +142,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "config.middleware.MaintenanceCheck",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -223,9 +225,9 @@ CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 STATIC_URL = "/static/"
 
-
 # Environment specific configurations
 DEBUG = False
+
 if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     DATABASES = {
         "default": env.dj_db_url(

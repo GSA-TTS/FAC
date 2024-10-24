@@ -5,6 +5,11 @@
 # so a typo in a function name will fail silently. Similarly,
 # bash has horrible scoping, so use of `local` in functions is 
 # critical for cleanliness in the startup script.
+source tools/util_startup.sh
+# This will choose the correct environment
+# for local envs (LOCAL or TESTING) and cloud.gov
+source tools/setup_env.sh
+source tools/curation_audit_tracking_init.sh
 source tools/migrate_app_tables.sh
 source tools/seed_cog_baseline.sh
 source tools/setup_env.sh
@@ -30,18 +35,16 @@ gonogo "sql_pre"
 gonogo "migrate_app_tables"
 
 #####
-# MOVE DATA TO SECOND DB
-# This runs sling and preps tables in the snapshot DB.
-# Only runs if the tables are not present (e.g. first deploy)
-# sling_first_run
-# gonogo "sling_first_run"
-
-#####
 # SQL POST
 # Rebuild the API and prepare the system for execution.
 # Runs after migrations.
 sql_post
 gonogo "sql_post"
+
+#####
+# CURATION AUDIT TRACKING
+curation_audit_tracking_init
+gonogo "curation_audit_tracking_init"
 
 #####
 # SEED COG/OVER TABLES

@@ -65,7 +65,7 @@ class Command(BaseCommand):
                 for file in files:
                     full_path = os.path.join(subdir, file)
                     s3_client.upload_file(full_path, bucket_name, object_name + file)
-                    print(f"Copied {full_path} to {bucket_name} {object_name+file}.")
+                    print(f"Copied {full_path} to {bucket_name} {object_name + file}.")
             return
 
         if options["download"]:

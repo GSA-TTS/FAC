@@ -55,13 +55,6 @@ jobs:
         working-directory: ./backend
         run: npm run build
 
-      - name: Grab sling for copying data from DB1 to DB2
-        working-directory: ./backend
-        run: |
-          curl -L -O https://github.com/slingdata-io/sling-cli/releases/download/v1.2.20/sling_linux_amd64.tar.gz
-          tar xzf sling_linux_amd64.tar.gz
-          chmod 755 sling
-
       - name: Update service keys
         uses: cloud-gov/cg-cli-tools@main
         env:
@@ -133,3 +126,11 @@ jobs:
           cf_space: ${{ env.space }}
           command: cf restart logshipper
 
+  check-tables:
+    needs: [push-with-creds]
+    uses: ./.github/workflows/fac-check-tables.yml
+    secrets: inherit
+    with:
+      environment: ${{ inputs.environment }}
+      util_version: "v0.1.8"
+      backup_operation: "check_tables"

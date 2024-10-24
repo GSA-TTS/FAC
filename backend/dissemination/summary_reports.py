@@ -147,6 +147,8 @@ field_name_ordered = {
         "auditor_email",
         "auditor_foreign_address",
         "auditor_certified_date",
+        "auditor_certify_name",
+        "auditor_certify_title",
         "cognizant_agency",
         "oversight_agency",
         "type_audit_code",
@@ -629,7 +631,7 @@ def generate_summary_report(report_ids, include_private=False):
     (filename, workbook_bytes, tpw) = prepare_workbook_for_download(workbook)
     t1 = time.time()
     logger.info(
-        f"SUMMARY_REPORTS generate_summary_report\n\ttotal: {t1-t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}"
+        f"SUMMARY_REPORTS generate_summary_report\n\ttotal: {t1 - t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}"
     )
     return (filename, workbook_bytes)
 

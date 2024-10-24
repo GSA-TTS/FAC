@@ -1,6 +1,10 @@
 import logging
 from copy import deepcopy
 
+from .xform_clean_version_value import remove_equals_and_quotes
+
+from .xform_resize_award_references import resize_award_reference
+
 from .xform_all_amount_expended_need_to_be_integers import (
     convert_amount_expended_to_integers,
 )
@@ -91,6 +95,7 @@ def run_all_secondary_auditors_transforms(ir):
 
 general_transforms = [
     convert_to_stripped_string,
+    remove_equals_and_quotes,
 ]
 
 notes_to_sefa_transforms = general_transforms + [
@@ -112,9 +117,11 @@ federal_awards_transforms = general_transforms + [
     regenerate_uniform_cluster_names,
     reformat_federal_agency_prefix,
     generate_cfda_keys,
+    resize_award_reference,
 ]
 
 audit_findings_transforms = general_transforms + [
     reformat_award_reference,
     reformat_prior_references,
+    resize_award_reference,
 ]

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="grid-container grid-row margin-y-15">
+        <div class="tablet:grid-col-10 tablet:grid-offset-1">
+            <h1 class="font-sans-2xl">503 Error: Service Unavailable</h1>
+            <div class="font-sans-lg">
+                <p>The server is temporarily busy. Please try again later.</p>
+            </div>
+            {% if exception %}<p class="text-base">Error code: {{ exception }}</p>{% endif %}
+        </div>
+    </div>
+{% endblock content %}

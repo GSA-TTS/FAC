@@ -1,10 +1,12 @@
 from .audit_info_form_view import AuditInfoFormView
 from .home import Home
+from .home import Maintenance
 from .manage_submission import ManageSubmissionView
 from .manage_submission_access import (
     ChangeOrAddRoleView,
     ChangeAuditeeCertifyingOfficialView,
     ChangeAuditorCertifyingOfficialView,
+    RemoveEditorView,
 )
 from .no_robots import no_robots
 from .pre_dissemination_download_view import (
@@ -46,10 +48,12 @@ views_list = [
     ChangeOrAddRoleView,
     ChangeAuditeeCertifyingOfficialView,
     ChangeAuditorCertifyingOfficialView,
+    RemoveEditorView,
     CrossValidationView,
     EditSubmission,
     ExcelFileHandlerView,
     Home,
+    Maintenance,
     ManageSubmissionView,
     MySubmissions,
     no_robots,

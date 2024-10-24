@@ -29,10 +29,12 @@ class CheckFindingsCountConsistencyTests(TestCase):
             }
         }
 
-    def _make_findings_uniform_guidance(self, awards, mismatch) -> dict:
+    def _make_findings_uniform_guidance(self, awards, mismatch, padding) -> dict:
         entries = []
         for award in awards["FederalAwards"]["federal_awards"]:
             award_reference = award["award_reference"]
+            if padding:
+                award_reference = f"{award_reference.split('-')[0]}-{padding}{award_reference.split('-')[1]}"
             count = award["program"]["number_of_audit_findings"]
             for _ in range(count + mismatch):
                 entries.append({"program": {"award_reference": award_reference}})
@@ -48,11 +50,11 @@ class CheckFindingsCountConsistencyTests(TestCase):
 
         return {"FindingsUniformGuidance": findings}
 
-    def _make_sac(self, findings_count, mismatch=0) -> SingleAuditChecklist:
+    def _make_sac(self, findings_count, mismatch=0, padding="") -> SingleAuditChecklist:
         sac = baker.make(SingleAuditChecklist)
         sac.federal_awards = self._make_federal_awards(findings_count)
         sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
-            sac.federal_awards, mismatch
+            sac.federal_awards, mismatch, padding
         )
         return sac
 
@@ -101,3 +103,14 @@ class CheckFindingsCountConsistencyTests(TestCase):
         self._test_findings_count_mismatch(
             generate_random_integer(2, 4), generate_random_integer(-2, -1)
         )
+
+    def test_normalize_award_ref_lengths_with_padding(self):
+        """
+        Ensure that award reference normalization occurs when declared and reported
+        award reference lengths differ. Leading zeros are added appropriately.
+        """
+        sac = self._make_sac(
+            generate_random_integer(self.FINDINGS_MIN, self.FINDINGS_MAX), 0, "0"
+        )
+        errors = check_findings_count_consistency(sac_validation_shape(sac))
+        self.assertEqual(errors, [])
