@@ -95,7 +95,7 @@ BEGIN
       gen.total_amount_expended,
       gen.type_audit_code
     FROM
-        public.dissemination_general gen
+        copy.dissemination_general gen
     ORDER BY gen.id;
 
   -- Add a clean batch number after the table is created.
@@ -126,7 +126,7 @@ BEGIN
       ein.additional_ein
     FROM
         public_data_v1_0_0.general gen,
-        public.dissemination_additionalein ein
+        copy.dissemination_additionalein ein
     WHERE
         gen.report_id = ein.report_id
     ORDER BY ein.id;
@@ -159,7 +159,7 @@ BEGIN
       uei.additional_uei
     FROM
       public_data_v1_0_0.general gen,
-      public.dissemination_additionaluei uei
+      copy.dissemination_additionaluei uei
     WHERE
       gen.report_id = uei.report_id
     ORDER BY uei.id;
@@ -195,7 +195,7 @@ BEGIN
       cap.planned_action
     FROM
       public_data_v1_0_0.general gen,
-      public.dissemination_captext cap
+      copy.dissemination_captext cap
     WHERE
       cap.report_id = gen.report_id
       AND
@@ -250,7 +250,7 @@ BEGIN
       award.state_cluster_name
     FROM
       public_data_v1_0_0.general dg,
-      public.dissemination_federalaward award
+      copy.dissemination_federalaward award
     WHERE
       award.report_id = dg.report_id
     ORDER BY award.id;
@@ -293,7 +293,7 @@ BEGIN
       finding.type_requirement
     FROM
       public_data_v1_0_0.general gen,
-      public.dissemination_finding finding
+      copy.dissemination_finding finding
     WHERE
       finding.report_id = gen.report_id
     ORDER BY finding.id;
@@ -327,7 +327,7 @@ BEGIN
       ft.finding_text
     FROM
         public_data_v1_0_0.general gen,
-        public.dissemination_findingtext ft
+        copy.dissemination_findingtext ft
     WHERE
         ft.report_id = gen.report_id
         AND
@@ -367,7 +367,7 @@ BEGIN
       note.rate_explained
     FROM
         public_data_v1_0_0.general gen,
-        public.dissemination_note note
+        copy.dissemination_note note
     WHERE
         note.report_id = gen.report_id
         AND
@@ -405,7 +405,7 @@ BEGIN
       pass.passthrough_name
     FROM
         public_data_v1_0_0.general gen,
-        public.dissemination_passthrough pass
+        copy.dissemination_passthrough pass
     WHERE
         gen.report_id = pass.report_id
     ORDER BY pass.id;
@@ -447,7 +447,7 @@ BEGIN
       sa.contact_title
     FROM
         public_data_v1_0_0.general gen,
-        public.dissemination_secondaryauditor sa
+        copy.dissemination_secondaryauditor sa
     WHERE
         sa.report_id = gen.report_id
     ORDER BY sa.id;
@@ -582,13 +582,13 @@ BEGIN
       dp.passthrough_id,
       dp.passthrough_name
     FROM 
-      public.dissemination_federalaward dfa
+      copy.dissemination_federalaward dfa
     LEFT JOIN public_data_v1_0_0.general dg 
       ON dfa.report_id = dg.report_id
-    LEFT JOIN public.dissemination_finding df 
+    LEFT JOIN copy.dissemination_finding df 
       ON dfa.report_id = df.report_id 
       AND dfa.award_reference = df.award_reference
-    LEFT JOIN public.dissemination_passthrough dp
+    LEFT JOIN copy.dissemination_passthrough dp
       ON dfa.report_id = dp.report_id 
       AND dfa.award_reference = dp.award_reference
     ORDER BY seq

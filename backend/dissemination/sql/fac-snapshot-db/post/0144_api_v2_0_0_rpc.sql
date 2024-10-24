@@ -11,19 +11,19 @@ BEGIN
     
     SELECT api_v2_0_0_functions.get_api_key_uuid() INTO v_uuid_header;
 
-    -- Check if the provided API key exists in public.dissemination_TribalApiAccessKeyIds
+    -- Check if the provided API key exists in copy.dissemination_TribalApiAccessKeyIds
     SELECT 
         EXISTS(
             SELECT 1
-            FROM public.dissemination_tribalapiaccesskeyids
+            FROM copy.dissemination_tribalapiaccesskeyids
             WHERE key_id = v_uuid_header
         ) INTO v_key_exists;
     
 
-    -- Get the added date of the key from public.dissemination_TribalApiAccessKeyIds
+    -- Get the added date of the key from copy.dissemination_TribalApiAccessKeyIds
     SELECT date_added
     INTO v_key_added_date
-    FROM public.dissemination_tribalapiaccesskeyids
+    FROM copy.dissemination_tribalapiaccesskeyids
     WHERE key_id = v_uuid_header;
     
 
@@ -33,7 +33,7 @@ BEGIN
         SELECT gen_random_uuid() INTO v_access_uuid;  
               
         -- Inserting data into the one_time_access table
-        INSERT INTO public.dissemination_onetimeaccess (uuid, api_key_id, timestamp, report_id)
+        INSERT INTO copy.dissemination_onetimeaccess (uuid, api_key_id, timestamp, report_id)
         VALUES (v_access_uuid::UUID, v_uuid_header, CURRENT_TIMESTAMP, report_id);
 
         -- Return the UUID to the user

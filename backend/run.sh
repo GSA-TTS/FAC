@@ -9,6 +9,7 @@ source tools/util_startup.sh
 # This will choose the correct environment
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
+source tools/cgov_util_local_only.sh
 source tools/curation_audit_tracking_init.sh
 source tools/migrate_app_tables.sh
 source tools/seed_cog_baseline.sh
@@ -23,6 +24,14 @@ setup_env
 gonogo "setup_env"
 
 #####
+# SIMULATE DEPLOY BACKUP
+# Before we deploy, we always get a copy of dissemination_*
+# tables into fac-snapshot-db. We need to simulate this locally
+# so that we can run SQL pre/post operations on fac-snapshot-db.
+cgov_util_local_only
+gonogo "cgov_util_local_only"
+
+#####
 # SQL PRE
 # We have SQL that we want to run before the migrations and sling are run.
 # This tears down things that would conflict with migrations, etc.
@@ -31,7 +40,7 @@ gonogo "sql_pre"
 
 #####
 # MIGRATE APP TABLES
-# migrate_app_tables
+migrate_app_tables
 gonogo "migrate_app_tables"
 
 #####

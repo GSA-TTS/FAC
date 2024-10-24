@@ -26,10 +26,12 @@ function run_sql_files {
 
 
 function sql_pre {
+  run_sql_files $FAC_DB_URI "SQL_PRE" "pre"
   run_sql_files $FAC_SNAPSHOT_URI "SQL_PRE" "pre"
 }
 
 function sql_post {
+  run_sql_files $FAC_DB_URI "SQL_POST" "post"
   run_sql_files $FAC_SNAPSHOT_URI "SQL_POST" "post"
 }
 

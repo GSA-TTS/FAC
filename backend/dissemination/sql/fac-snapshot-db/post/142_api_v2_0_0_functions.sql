@@ -41,7 +41,7 @@ BEGIN
     SELECT 
         CASE WHEN EXISTS (
             SELECT key_id 
-            FROM public.dissemination_tribalapiaccesskeyids taaki
+            FROM copy.dissemination_tribalapiaccesskeyids taaki
             WHERE taaki.key_id = uuid_header::TEXT)
             THEN 1::BOOLEAN
             ELSE 0::BOOLEAN

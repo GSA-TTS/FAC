@@ -19,7 +19,7 @@ BEGIN
       cap.planned_action
     FROM
       public_data_v1_0_0.general gen,
-      public.dissemination_captext cap
+      copy.dissemination_captext cap
     WHERE
       cap.report_id = gen.report_id
       AND
@@ -50,7 +50,7 @@ BEGIN
       ft.finding_text
     FROM
         public_data_v1_0_0.general gen,
-        public.dissemination_findingtext ft
+        copy.dissemination_findingtext ft
     WHERE
         ft.report_id = gen.report_id
         AND
@@ -85,7 +85,7 @@ BEGIN
       note.rate_explained
     FROM
         public_data_v1_0_0.general gen,
-        public.dissemination_note note
+        copy.dissemination_note note
     WHERE
         note.report_id = gen.report_id
         AND
