@@ -5,30 +5,25 @@ from pprint import pprint
 import math
 import json
 
-URI = "http://localhost:8080"
+URI = "http://localhost:3000"
 
 # GET {{scheme}}://{{apiUrl}}/general?report_id=eq.2021-12-CENSUS-0000250449
 # authorization: {{authorization}}
 # x-api-user-id: {{xApiUserId}}
-# accept-profile: public_api_v1_0_0
+# accept-profile: api_v2_0_0
 # Accept: application/vnd.pgrst.plan
-
-NOT_ACTUALLY_SECRET = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.zJrV44Lhr1Ck4vg1dMnldql0adLgut241jo0FbFXMlI"
-MORE_SECRET = os.getenv("CYPRESS_API_GOV_JWT")
-SEKRET = NOT_ACTUALLY_SECRET
 
 
 def fetch_fa_exp(api_version):
     total_cost = 0
     for offset in range(0, 4000000, 20000):
         print(f"fetch_fa_exp api {api_version} offset {offset}")
-        query = f"{URI}/federal_awards"  # ?limit=20000&offset={offset}
+        query = f"{URI}/federal_awards?limit=20000&offset={offset}"
         headers = {
             "accept-profile": api_version,
             "accept": "application/vnd.pgrst.plan+json",
             "x-api-user-id": os.getenv("API_KEY_ID"),
-            "authorization": f"bearer {SEKRET}",
-            "range": f"{offset}-{offset+19999}",
+            "authorization": f"bearer {os.getenv('CYPRESS_API_GOV_JWT')}",
         }
 
         resp = requests.get(query, headers=headers)
@@ -45,17 +40,15 @@ def fetch_fa_by_year_exp(api_version):
             print(
                 f"fetch_fa_by_year_exp api {api_version} ay {audit_year} offset {offset}"
             )
-            query = f"{URI}/federal_awards?audit_year=eq.{audit_year}"  # &limit=20000&offset={offset}"
+            query = f"{URI}/federal_awards?audit_year=eq.{audit_year}&limit=20000&offset={offset}"
             headers = {
                 "accept-profile": api_version,
                 "accept": "application/vnd.pgrst.plan+json",
                 "x-api-user-id": os.getenv("API_KEY_ID"),
-                "authorization": f"bearer {SEKRET}",
-                "range": f"{offset}-{offset+19999}",
+                "authorization": f"bearer {os.getenv('CYPRESS_API_GOV_JWT')}",
             }
 
             resp = requests.get(query, headers=headers)
-            pprint(resp)
             # We get back a list of one plan, and we want the total cost.
             total_cost += resp.json()[0]["Plan"]["Total Cost"]
     return math.floor(total_cost)
@@ -68,7 +61,7 @@ def fetch_fa_time(api_version):
         headers = {
             "accept-profile": api_version,
             "x-api-user-id": os.getenv("API_KEY_ID"),
-            "authorization": f"bearer {SEKRET}",
+            "authorization": f"bearer {os.getenv('CYPRESS_API_GOV_JWT')}",
         }
         t0 = time.time()
         resp = requests.get(query, headers=headers)
@@ -84,12 +77,11 @@ def fetch_fa_time_by_year(api_version):
     for year in range(16, 24):
         for offset in range(0, 1000000, 20000):
             audit_year = f"20{year:02}"
-            query = f"{URI}/federal_awards?audit_year=eq.{audit_year}"  # &limit=20000&offset={offset}"
+            query = f"{URI}/federal_awards?audit_year=eq.{audit_year}&limit=20000&offset={offset}"
             headers = {
                 "accept-profile": api_version,
                 "x-api-user-id": os.getenv("API_KEY_ID"),
-                "authorization": f"bearer {SEKRET}",
-                "range": f"{offset}-{offset+19999}",
+                "authorization": f"bearer {os.getenv('CYPRESS_API_GOV_JWT')}",
             }
             t0 = time.time()
             resp = requests.get(query, headers=headers)
@@ -107,10 +99,10 @@ def fetch_fa_batches_exp():
     for batch_no in range(0, 235):
         query = f"{URI}/federal_awards?batch_number=eq.{batch_no}"
         headers = {
-            "accept-profile": "public_api_v1_0_0",
+            "accept-profile": "api_v2_0_0",
             "accept": "application/vnd.pgrst.plan+json",
             "x-api-user-id": os.getenv("API_KEY_ID"),
-            "authorization": f"bearer {SEKRET}",
+            "authorization": f"bearer {os.getenv('CYPRESS_API_GOV_JWT')}",
         }
 
         resp = requests.get(query, headers=headers)
@@ -125,9 +117,9 @@ def fetch_fa_batches_time():
         print(f"batch number: {batch_no}")
         query = f"{URI}/federal_awards?batch_number=eq.{batch_no}"
         headers = {
-            "accept-profile": "public_api_v1_0_0",
+            "accept-profile": "api_v2_0_0",
             "x-api-user-id": os.getenv("API_KEY_ID"),
-            "authorization": f"bearer {SEKRET}",
+            "authorization": f"bearer {os.getenv('CYPRESS_API_GOV_JWT')}",
         }
         t0 = time.time()
         resp = requests.get(query, headers=headers)
@@ -152,16 +144,16 @@ if __name__ == "__main__":
     results3 = {}
     results4 = {}
 
-    # results1["api110_by_year"] = fetch_fa_by_year_exp("api_v1_1_0")
-    # results1["ap110"] = fetch_fa_exp("api_v1_1_0")
-    # results1["public100"] = fetch_fa_exp("public_api_v1_0_0")
-    # results1["public100_batches"] = fetch_fa_batches_exp()
-    # results1["public100_by_year"] = fetch_fa_by_year_exp("public_api_v1_0_0")
+    results1["api110_by_year"] = fetch_fa_by_year_exp("api_v1_1_0")
+    results1["ap110"] = fetch_fa_exp("api_v1_1_0")
+    results1["public100"] = fetch_fa_exp("api_v2_0_0")
+    results1["public100_batches"] = fetch_fa_batches_exp()
+    results1["public100_by_year"] = fetch_fa_by_year_exp("api_v2_0_0")
 
     print("Running timing tests... ~5m")
 
-    results3["public100_by_year"] = fetch_fa_time_by_year("public_api_v1_0_0")
-    results3["public100"] = fetch_fa_time("public_api_v1_0_0")
+    results3["public100_by_year"] = fetch_fa_time_by_year("api_v2_0_0")
+    results3["public100"] = fetch_fa_time("api_v2_0_0")
     results3["public100_batches"] = fetch_fa_batches_time()
     results3["ap110"] = fetch_fa_time("api_v1_1_0")
     results3["ap110_by_year"] = fetch_fa_time_by_year("api_v1_1_0")

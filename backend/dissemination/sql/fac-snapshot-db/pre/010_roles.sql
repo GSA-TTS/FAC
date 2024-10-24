@@ -9,7 +9,9 @@ BEGIN
       WHERE  rolname = 'authenticator') THEN
       RAISE NOTICE 'ROLES Role "authenticator" already exists. Skipping.';
    ELSE
-      CREATE ROLE authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
+      CREATE ROLE authenticator 
+         LOGIN NOINHERIT NOCREATEDB 
+         NOCREATEROLE NOSUPERUSER;
    END IF;
 END
 $do$;
@@ -31,6 +33,3 @@ END
 $do$;
 
 GRANT api_fac_gov TO authenticator;
-
-NOTIFY pgrst, 'reload schema';
-

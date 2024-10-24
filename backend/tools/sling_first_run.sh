@@ -36,7 +36,7 @@ function sling_first_run() {
         startup_log "SLING_FIRST_RUN" "API tables don't exist; running sling."
         $SLING_EXE run -r dissemination/sql/sling/public_data_v1_0_0/public_data_v1_0_0.yaml
         gonogo "sling public data for API tables"
-        $SLING_EXE run -r dissemination/sql/sling/public_data_v1_0_0/tribal_data_v1_0_0.yaml
+        $SLING_EXE run -r dissemination/sql/sling/public_data_v1_0_0/suppressed_data_v1_0_0.yaml
         gonogo "sling tribal data for API tables"
         $SLING_EXE run -r dissemination/sql/sling/public_data_v1_0_0/public_metadata_v1_0_0.yaml
         gonogo "sling metadata table"

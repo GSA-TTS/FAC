@@ -23,10 +23,6 @@ streams:
       SELECT
         gen.id as id,
         NEXTVAL('public_data_v1_0_0.seq_v1_0_0_general') AS seq,
-        -- Add in post
-        -- DIV(seq, 20000) AS batch_number,
-        -- What if we use this for partitioning, instead?
-        -- mod((gen.id - min(gen.id)), 20000) AS batch_number_2,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -115,77 +111,11 @@ streams:
           public.dissemination_general gen
       ORDER BY gen.id
     target_options:
-      pre_sql: |
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_additional_eins;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_additional_ueis;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_combined;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_corrective_action_plans;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_federal_awards;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_findings_text;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_findings;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_general;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_notes_to_sefa;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_passthrough;
-        DROP SEQUENCE IF EXISTS public_data_v1_0_0.seq_v1_0_0_secondary_auditors;
-        -- Now, create them. We get a start at 1 for every refresh this way.
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_additional_eins         START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_additional_ueis         START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_combined                START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_corrective_action_plans START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_federal_awards          START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_findings_text           START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_findings                START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_general                 START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_notes_to_sefa           START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_passthrough             START 1;
-        CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_v1_0_0_secondary_auditors      START 1;
       post_sql: |
         -- Add a clean batch number after the table is created.
         ALTER TABLE public_data_v1_0_0.general
         ADD COLUMN batch_number INTEGER;
-        -- Update that batch number as a modulus of 20K, our response
-        -- size limit in PostgREST.
         UPDATE public_data_v1_0_0.general SET batch_number=DIV(seq, 20000);
-        -- Create the indexes on the table.
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_report_id_idx 
-          on public_data_v1_0_0.general (report_id);
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_report_id_fad
-          on public_data_v1_0_0.general (report_id, fac_accepted_date);
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_report_id_fad
-          on public_data_v1_0_0.general (report_id, fac_accepted_date);
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_certify_name_idx 
-          ON public_data_v1_0_0.general 
-          ((lower(auditee_certify_name)));
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_name_idx 
-          ON public_data_v1_0_0.general 
-          ((lower(auditee_name)));
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditor_certify_name_idx 
-          ON public_data_v1_0_0.general 
-          ((lower(auditor_certify_name)));
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditor_contact_name_idx 
-          ON public_data_v1_0_0.general 
-          ((lower(auditor_contact_name)));
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditor_firm_name_idx 
-          ON public_data_v1_0_0.general 
-          ((lower(auditor_firm_name)));
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_email_idx 
-          on public_data_v1_0_0.general ((lower(auditee_email)));
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditor_email_idx 
-          on public_data_v1_0_0.general ((lower(auditor_email)));
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_start_date_idx 
-          ON public_data_v1_0_0.general (fy_start_date);
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_end_date_idx 
-          ON public_data_v1_0_0.general (fy_end_date);
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_uei_idx 
-          ON public_data_v1_0_0.general (auditee_uei);
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_auditee_ein_idx
-          ON public_data_v1_0_0.general (auditee_ein);
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_general_audit_year_idx 
-          on public_data_v1_0_0.general (audit_year);
-        CREATE INDEX IF NOT EXISTS fac_snapshot_db_federal_batch_general_idx
-            ON public_data_v1_0_0.general (batch_number);
-
-
 
   # All additional EINs are public.
   public.additional_eins:
@@ -194,7 +124,7 @@ streams:
     sql: |
       SELECT
         ein.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_additional_eins'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_additional_eins'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -207,6 +137,12 @@ streams:
       WHERE
           gen.report_id = ein.report_id
       ORDER BY ein.id
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.additional_eins
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.additional_eins SET batch_number=DIV(seq, 20000);
 
   # All of the additional UEI info is public info.
   public.dissemination_additional_ueis:
@@ -215,7 +151,7 @@ streams:
     sql: |
       SELECT
         uei.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_additional_ueis'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_additional_ueis'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -228,6 +164,12 @@ streams:
       WHERE
         gen.report_id = uei.report_id
       ORDER BY uei.id
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.additional_eins
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.additional_eins SET batch_number=DIV(seq, 20000);
 
   # Corrective action plans are NOT always public.
   public.dissemination_corrective_action_plan:
@@ -236,7 +178,7 @@ streams:
     sql: |
       SELECT
         cap.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_corrective_action_plans'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_corrective_action_plans'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -254,6 +196,12 @@ streams:
         -- Only include the public corrective action plans.
         gen.is_public = true
       ORDER BY cap.id
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.corrective_action_plans
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.corrective_action_plans SET batch_number=DIV(seq, 20000);
 
   # All Federal award data is public.
   public.dissemination_federalaward:
@@ -262,7 +210,7 @@ streams:
     sql: |
       SELECT
         award.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_federal_awards'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_federal_awards'), 20000) as seq,
         dg.report_id,
         dg.auditee_uei,
         dg.audit_year,
@@ -294,6 +242,12 @@ streams:
       WHERE
         award.report_id = dg.report_id
       ORDER BY award.id
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.federal_awards
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.federal_awards SET batch_number=DIV(seq, 20000);
 
   # The findings table is public.
   public.dissemination_findings:
@@ -302,7 +256,7 @@ streams:
     sql: |
       SELECT
         finding.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_findings'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_findings'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -325,6 +279,12 @@ streams:
       WHERE
         finding.report_id = gen.report_id
       ORDER BY finding.id
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.findings
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.findings SET batch_number=DIV(seq, 20000);
 
   # Findings text is NOT always public.
   public.dissemination_findingstext:
@@ -333,7 +293,7 @@ streams:
     sql: |
       SELECT
         ft.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_findings_text'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_findings_text'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -349,6 +309,12 @@ streams:
           AND
           gen.is_public = true
       ORDER BY ft.id
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.findings_text
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.findings_text SET batch_number=DIV(seq, 20000);
 
   # The notes to SEFA are NOT all public.
   public.dissemination_notes:
@@ -357,7 +323,7 @@ streams:
     sql: |
       SELECT
         note.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_notes_to_sefa'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_notes_to_sefa'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -378,6 +344,12 @@ streams:
           -- Some notes are not public.
           gen.is_public = true
       ORDER BY note.id
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.notes_to_sefa
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.notes_to_sefa SET batch_number=DIV(seq, 20000);
 
   # All passthrough information is public.
   public.dissemination_passthrough:
@@ -386,7 +358,7 @@ streams:
     sql: |
       SELECT
         pass.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_passthrough'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_passthrough'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -401,6 +373,12 @@ streams:
       WHERE
           gen.report_id = pass.report_id
       ORDER BY pass.id
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.passthrough
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.passthrough SET batch_number=DIV(seq, 20000);
 
   # All secondary auditor info is public.
   public.secondary_auditors:
@@ -409,7 +387,7 @@ streams:
     sql: |
       SELECT
         sa.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_secondary_auditors'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_secondary_auditors'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -431,6 +409,12 @@ streams:
       WHERE
           sa.report_id = gen.report_id
       ORDER BY sa.id
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.secondary_auditors
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.secondary_auditors SET batch_number=DIV(seq, 20000);
 
   public.combined:
     mode: full-refresh
@@ -438,7 +422,7 @@ streams:
     sql: |
       SELECT
         dg.report_id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_combined'), 20000) as batch_number,
+        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_combined'), 20000) as seq,
         dfa.award_reference,
         df.reference_number,
         concat(dfa.federal_agency_prefix,'.',dfa.federal_award_extension) as aln,
@@ -558,3 +542,9 @@ streams:
       LEFT JOIN public.dissemination_passthrough dp
         ON dfa.report_id = dp.report_id 
         AND dfa.award_reference = dp.award_reference
+    target_options:
+      post_sql: |
+        -- Add a clean batch number after the table is created.
+        ALTER TABLE public_data_v1_0_0.combined
+        ADD COLUMN batch_number INTEGER;
+        UPDATE public_data_v1_0_0.combined SET batch_number=DIV(seq, 20000);

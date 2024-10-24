@@ -45,5 +45,12 @@ The API is torn down every time we deploy (`pre`). This is because the API has `
 * The *read* portion of tribal access (reading files) talks to fac-snapshot-db.
 * The admin API only talks to fac-db.
 
+# running tests
 
+```
+pytest -s --env local test_api.py
+```
 
+where the env can be `local`, `preview`, `dev`, `staging`, or `production` to run queries against the API in any of those environments.
+
+`FAC_API_KEY` and `CYPRESS_API_GOV_JWT` need to be set in the environment for this script to work.

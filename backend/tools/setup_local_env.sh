@@ -6,21 +6,22 @@ function setup_local_env {
         startup_log "LOCAL_ENV" "We are in a local envirnoment."
         
         export AWS_PUBLIC_BUCKET_NAME="fac-public-s3"
-        export AWS_PRIVATE_BUCKET_NAME="fac-public-s3"
+        export AWS_PRIVATE_BUCKET_NAME="fac-private-s3"
 
-        export AWS_PRIVATE_ACCESS_KEY_ID="longtest"
-        export AWS_PRIVATE_SECRET_ACCESS_KEY="longtest"
-        export AWS_PRIVATE_ENDPOINT="http://minio:9001"
+        export AWS_PRIVATE_ACCESS_KEY_ID="nutnutnut"
+        export AWS_PRIVATE_SECRET_ACCESS_KEY="nutnutnut"
+        export AWS_S3_PRIVATE_ENDPOINT="http://minio:9001"
 
-        export AWS_PUBLIC_ACCESS_KEY_ID="longtest"
-        export AWS_PUBLIC_SECRET_ACCESS_KEY="longtest"
-        export AWS_PUBLIC_ENDPOINT="http://minio:9001"
+        export AWS_PUBLIC_ACCESS_KEY_ID="nutnutnut"
+        export AWS_PUBLIC_SECRET_ACCESS_KEY="nutnutnut"
+        export AWS_S3_PUBLIC_ENDPOINT="http://minio:9001"
 
-        mc alias set myminio "${AWS_S3_PRIVATE_ENDPOINT}" minioadmin minioadmin
+        mc alias set myminio ${AWS_S3_PRIVATE_ENDPOINT} ${AWS_PRIVATE_ACCESS_KEY_ID} ${AWS_PRIVATE_ACCESS_KEY_ID}
+        # until (mc config host add myminio $AWS_PRIVATE_ENDPOINT nutnutnut nutnutnut) do echo '...waiting...' && sleep 1; done;
         # Do nothing if the bucket already exists.
         # https://min.io/docs/minio/linux/reference/minio-mc/mc-mb.html
-        mc mb --ignore-existing myminio/fac-private-s3
-        mc mb --ignore-existing myminio/fac-public-s3
+        mc mb --ignore-existing myminio/${AWS_PUBLIC_BUCKET_NAME}
+        mc mb --ignore-existing myminio/${AWS_PRIVATE_BUCKET_NAME}
         
         # MCJ 20241016 FIXME: Is this even needed locally? I don't think so.
         # mc admin user svcacct add \

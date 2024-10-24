@@ -78,7 +78,6 @@ services:
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
       ENABLE_DEBUG_TOOLBAR: false
-
     env_file:
       - ".env"
     ports:
@@ -103,15 +102,35 @@ services:
   #---------------------------------------------
   # Minio (S3 clone)
   #---------------------------------------------
+  # minio:
+  #   container_name: "minio"
+  #   image: minio/minio
+  #   command: server /tmp/minio --console-address ":9002"
+  #   ports:
+  #     - "9001:9000"
+  #     - "9002:9002"
+  #   volumes:
+  #     - "minio-vol:/tmp/minio"
   minio:
-    container_name: "minio"
-    image: minio/minio
-    command: server /tmp/minio --console-address ":9002"
+    image: minio/minio:latest
+    command: server /data --console-address ":9002" 
+    expose:
+      - "9001"
+      - "9002"
     ports:
-      - "9001:9000"
-      - "9002:9002"
+      - 9001:9000
+      - 9002:9002
+    environment:
+      MINIO_ROOT_USER: nutnutnut
+      MINIO_ROOT_PASSWORD: nutnutnut
+      MINIO_API_ROOT_ACCESS: on
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5    
     volumes:
-      - "minio-vol:/tmp/minio"
+      - minio-vol:/data
 
   #---------------------------------------------
   # PostgREST API provider
@@ -129,7 +148,7 @@ services:
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
       PGRST_DB_ANON_ROLE: anon
       # See https://postgrest.org/en/stable/references/api/schemas.html#multiple-schemas for multiple schemas
-      PGRST_DB_SCHEMAS: "api_v1_0_3,api_v1_1_0,admin_api_v1_1_0,public_api_v1_0_0"
+      PGRST_DB_SCHEMAS: "api_v1_0_3,api_v1_1_0,admin_api_v1_1_0,api_v2_0_0"
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
       # Enable this to inspect the DB plans for queries via EXPLAIN
       PGRST_DB_PLAN_ENABLED: 1

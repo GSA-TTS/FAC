@@ -263,7 +263,7 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     # MinIO only matters for local development and GitHub action environments.
     # These should match what we're setting in backend/run.sh
-    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "longtest")
+    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "nutnutnut")
     AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
         "AWS_PRIVATE_SECRET_ACCESS_KEY", "longtest"
     )
