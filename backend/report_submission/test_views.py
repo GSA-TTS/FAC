@@ -6,7 +6,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.conf import settings
 from unittest.mock import MagicMock, patch
-from report_submission.views import DeleteFileView
+from report_submission.views import DeleteFileView, EligibilityFormView
 from model_bakery import baker
 
 from audit.models import Access, SingleAuditChecklist, SubmissionEvent
@@ -163,6 +163,43 @@ class TestPreliminaryViews(TestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/report_submission/eligibility/")
+
+    def test_step_one_generate_dollar_thresholds(self):
+        """
+        /report_submissions/eligibility
+        Check that the correct threshold conditions are generated
+        """
+        view = EligibilityFormView()
+
+        # Empty case
+        dollar_thresholds = []
+        result = []
+        self.assertEqual(view._generate_dollar_thresholds(dollar_thresholds), result)
+
+        # Normal case
+        dollar_thresholds = [
+            {
+                "start": None,
+                "end": date(2024, 1, 1),
+                "minimum": 750000,
+            },
+            {
+                "start": date(2024, 6, 1),
+                "end": date(2024, 12, 1),
+                "minimum": 900000,
+            },
+            {
+                "start": date(2024, 12, 1),
+                "end": None,
+                "minimum": 1000000,
+            },
+        ]
+        result = [
+            "$750,000 or more with a Fiscal Year starting BEFORE January 01, 2024",
+            "$900,000 or more with a Fiscal Year starting ON or AFTER June 01, 2024 and BEFORE December 01, 2024",
+            "$1,000,000 or more with a Fiscal Year starting ON or AFTER December 01, 2024",
+        ]
+        self.assertEqual(view._generate_dollar_thresholds(dollar_thresholds), result)
 
     @patch("report_submission.forms.get_uei_info_from_sam_gov")
     def test_end_to_end_submission_pass(self, mock_get_uei_info):
