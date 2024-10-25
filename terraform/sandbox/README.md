@@ -5,11 +5,10 @@ You must be running version 8+ of the CF client for the helper scripts to work a
 
 Open command line or powershell as admin.
 ```
-wsl --install
 wsl --list --online
 wsl --install -d Ubuntu
 ```
-Next, enable WSL2 integration with Docker Desktop.
+**IMPORTANT**: Next, enable WSL2 integration with Docker Desktop.
 - Settings > Resources > WSL2 Integration > Ubuntu (enable)
 
 Once this happens, ensure that you fully reboot your computer. Once restarted, open Docker Desktop, and open your IDE of choice (VSCode for example.) When you select a new terminal window, you will see Ubuntu(WSL). Open that terminal and run
@@ -56,6 +55,7 @@ Finally, install necessary requirements:
 ```
 sudo apt install jq
 sudo apt install npm
+sudo apt install zip
 ```
 
 # Obtain access to the sandbox environment
@@ -92,7 +92,7 @@ django_secret_login_key = ""
 
 Next, navigate to `terraform/shared/config` and create a `backend.tfvars` file. This will be used for the s3 partial configuration to store the terraform state. This will alleviate storing the `terraform.tfstate` on any one local file system, and when you run `terraform init` for the first time, it will read from the state, and inform terraform what resources already exist.
 
-Populate these values from the output of `cf service-key sandbox-terraform-state sandbox-terraform-state-key`. This is a manually created s3 bucket, outside of terraforms knowledge, for the explicit purpose of storing the `terraform.tfstate`.
+Ensure that you are in the sandox space with `cf t -s sandbox` and populate these values from the output of `cf service-key sandbox-terraform-state sandbox-terraform-state-key`. This is a manually created s3 bucket, outside of terraforms knowledge, for the explicit purpose of storing the `terraform.tfstate`.
 ```t
 bucket     = "" # bucket value (non friendly name)
 key        = "/"
