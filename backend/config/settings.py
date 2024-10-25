@@ -554,7 +554,6 @@ OMB_EXP_DATE = "09/30/2026"
 
 # APP-level constants
 CENSUS_DATA_SOURCE = "CENSUS"
-DOLLAR_THRESHOLD = 750000
 SUMMARY_REPORT_DOWNLOAD_LIMIT = 1000
 DEFAULT_MAX_ROWS = (
     10000  # A version of this constant also exists in schemas.scrpits.render.py
