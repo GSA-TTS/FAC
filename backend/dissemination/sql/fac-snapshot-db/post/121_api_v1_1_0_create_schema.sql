@@ -1,3 +1,0 @@
-CREATE SCHEMA IF NOT EXISTS api_v1_1_0;
-CREATE SCHEMA IF NOT EXISTS api_v1_1_0_functions;
-        
