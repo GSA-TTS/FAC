@@ -22,8 +22,8 @@
         "secret_access_key": "singleauditclearinghouse",
         "region": "us-east-1",
         "bucket": "fac-private-s3",
-        "endpoint": "minio",
-        "fips_endpoint": "minio",
+        "endpoint": "http://minio:9000",
+        "fips_endpoint": "http://minio:9000",
         "additional_buckets": []
       },
       "syslog_drain_url": "https://ALPHA.drain.url",
@@ -53,8 +53,8 @@
         "secret_access_key": "singleauditclearinghouse",
         "region": "us-east-1",
         "bucket": "fac-public-s3",
-        "endpoint": "minio",
-        "fips_endpoint": "minio",
+        "endpoint": "http://minio:9000",
+        "fips_endpoint": "http://minio:9000",
         "additional_buckets": []
       },
       "syslog_drain_url": "https://ALPHA.drain.url",
@@ -74,7 +74,7 @@
         "docker"
       ],
       "instance_guid": "UUIDINDIA1",
-      "instance_name": "db",
+      "instance_name": "fac-db",
       "binding_guid": "UUIDINDIA2",
       "binding_name": null,
       "credentials": {
@@ -99,7 +99,7 @@
         "docker"
       ],
       "instance_guid": "UUIDJULIET1",
-      "instance_name": "db",
+      "instance_name": "fac-snapshot-db",
       "binding_guid": "UUIDJULIET2",
       "binding_name": null,
       "credentials": {

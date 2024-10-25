@@ -2,18 +2,6 @@ source tools/util_startup.sh
 
 # Aliases need to be outside of function scope
 
-export _GET_AWS_RESULT="NONE"
-
-function get_aws_s3() {
-    local bucket="$1"
-    local key="$2"
-    _GET_AWS_RESULT=$(echo $VCAP_SERVICES | \
-        jq --arg bucket "$bucket" '.s3 | map(select(.instance_name==$bucket))' | \
-        jq .[] | \
-        jq --arg key "$key" '.credentials | .[$key]')
-    return 0
-}
-
 function setup_cgov_env {
     startup_log "CGOV_ENV" "We are in a cloud.gov envirnoment."
 

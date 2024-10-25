@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Source everything; everything is now a function.
-# Remember: bash has no idea if a function exists, 
-# so a typo in a function name will fail silently. Similarly,
+# Remember: bash has no idea if a function exists. Similarly,
 # bash has horrible scoping, so use of `local` in functions is 
 # critical for cleanliness in the startup script.
 source tools/util_startup.sh
@@ -11,10 +10,10 @@ source tools/util_startup.sh
 source tools/setup_env.sh
 source tools/cgov_util_local_only.sh
 source tools/curation_audit_tracking_init.sh
+source tools/sling_bulk_export.sh
 source tools/migrate_app_tables.sh
 source tools/seed_cog_baseline.sh
 source tools/setup_env.sh
-# source tools/sling_first_run.sh
 source tools/sql_pre_post.sh
 source tools/util_startup.sh
 
@@ -49,6 +48,13 @@ gonogo "migrate_app_tables"
 # Runs after migrations.
 sql_post
 gonogo "sql_post"
+
+#####
+# BULK EXPORT
+# Creates CSV and XLSX exports of all of the 
+# public data in the fac-private-s3 bucket.
+sling_bulk_export
+gonogo "sling_bulk_export"
 
 #####
 # CURATION AUDIT TRACKING

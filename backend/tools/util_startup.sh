@@ -65,6 +65,41 @@ function run_sql () {
     local db_uri="$1"
     local path="$2"
     echo "BEGIN run_sql < $path"
-    $PSQL_EXE $db_uri < $path
-    gonogo "GONOGO run_sql < $path"
+    if [[ "$file" == *"notxn"* ]]; then
+      $PSQL_EXE_NO_TXN $db_uri < $path;
+      gonogo "GONOGO run_sql < $path"
+    else
+      $PSQL_EXE $db_uri < $path;
+      gonogo "GONOGO run_sql < $path"
+    fi
+}
+
+export _GET_AWS_RESULT="NONE"
+
+function get_aws_s3() {
+    local bucket="$1"
+    local key="$2"
+    _GET_AWS_RESULT=$(echo $VCAP_SERVICES | \
+        jq --arg bucket "$bucket" '.s3 | map(select(.instance_name==$bucket))' | \
+        jq .[] | \
+        jq --raw-output --arg key "$key" '.credentials | .[$key]')
+    return 0
+}
+
+function check_env_var_not_empty() {
+  local var_name="$1"
+  local var_value="${!var_name}"
+  if [ -z "${var_value}" ];
+  then
+    echo "CHECK_ENV_VAR ${var_name} has value '${var_value}'. Exiting.";
+    exit 255;
+  else
+    echo "CHECK_ENV_VAR ${var_name} is OK."
+  fi
+}
+
+function show_env_var() {
+  local var_name="$1"
+  local var_value="${!var_name}"
+  echo "SHOW_ENV_VAR ${var_name} has value '${var_value}'.";
 }

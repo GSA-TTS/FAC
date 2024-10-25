@@ -18,6 +18,7 @@ RUN apt-get -yq update && \
         gcc \
         gnupg \
         gnupg2 \
+        jq \
         postgresql-client \
         wget
 

@@ -121,8 +121,8 @@ services:
       - 9001:9000
       - 9002:9002
     environment:
-      MINIO_ROOT_USER: nutnutnut
-      MINIO_ROOT_PASSWORD: nutnutnut
+      MINIO_ROOT_USER: singleauditclearinghouse
+      MINIO_ROOT_PASSWORD: singleauditclearinghouse
       MINIO_API_ROOT_ACCESS: on
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
