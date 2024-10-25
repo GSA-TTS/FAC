@@ -88,23 +88,28 @@ function setup_local_env {
 
         # Locally, we need to pull in sling.
         # In production, it gets pulled in via the build/deploy process.
-        curl -LO 'https://github.com/slingdata-io/sling-cli/releases/latest/download/sling_linux_amd64.tar.gz'
-        tar xf sling_linux_amd64.tar.gz
-        rm -f sling_linux_amd64.tar.gz
-        chmod +x sling
-        mv sling /bin/sling
+        pushd /tmp
+            curl -LO 'https://github.com/slingdata-io/sling-cli/releases/latest/download/sling_linux_amd64.tar.gz'
+            tar xf sling_linux_amd64.tar.gz
+            rm -f sling_linux_amd64.tar.gz
+            chmod +x sling
+            mv sling /bin/sling
+        popd
 
         # And we need cgov-util
-        curl -L -O https://github.com/GSA-TTS/fac-backup-utility/releases/download/v0.1.8/gov.gsa.fac.cgov-util-v0.1.8-linux-amd64.tar.gz
-        tar xvzf gov.gsa.fac.cgov-util-v0.1.8-linux-amd64.tar.gz gov.gsa.fac.cgov-util
-        chmod 755 gov.gsa.fac.cgov-util
-        mv gov.gsa.fac.cgov-util /bin/cgov-util
-        
+        pushd /tmp
+            local CGOV_VERSION=v0.1.8
+            curl -L -O https://github.com/GSA-TTS/fac-backup-utility/releases/download/${CGOV_VERSION}/gov.gsa.fac.cgov-util-${CGOV_VERSION}-linux-amd64.tar.gz
+            tar xvzf gov.gsa.fac.cgov-util-${CGOV_VERSION}-linux-amd64.tar.gz gov.gsa.fac.cgov-util
+            chmod 755 gov.gsa.fac.cgov-util
+            mv gov.gsa.fac.cgov-util /bin/cgov-util
+        popd
+                
         export SLING_EXE='/bin/sling'
         export CGOV_UTIL_EXE='/bin/cgov-util'
 
         show_env_var "AWS_S3_PRIVATE_ENDPOINT"
-        
+
         $SLING_EXE conns set \
             BULK_DATA_EXPORT \
             type=s3 \
