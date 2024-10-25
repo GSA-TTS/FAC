@@ -10,7 +10,7 @@
 DO LANGUAGE plpgsql
 $GATE$
     DECLARE
-        the_schema varchar := 'public';
+        the_schema varchar := 'dissem_copy';
         the_table  varchar := 'dissemination_general';
         api_ver    varchar := 'api_v1_1_0';
     BEGIN
