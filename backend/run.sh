@@ -52,13 +52,6 @@ sql_post
 gonogo "sql_post"
 
 #####
-# BULK EXPORT
-# Creates CSV exports of all of the public data,
-# placing it in the fac-private-s3 bucket.
-sling_bulk_export
-gonogo "sling_bulk_export"
-
-#####
 # SEED COG/OVER TABLES
 # Setup tables for cog/over assignments
 seed_cog_baseline
@@ -73,3 +66,4 @@ python manage.py create_staffusers
 # LAUNCH THE APP
 # We will have died long ago if things didn't work.
 npm run dev & python manage.py runserver 0.0.0.0:8000
+
