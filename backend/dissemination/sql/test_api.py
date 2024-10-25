@@ -3,7 +3,6 @@
 # pytest -s --env local test_api.py
 #
 
-import click
 import os
 import requests
 import sys
@@ -37,10 +36,10 @@ def url(env):
 
 def headers(env):
     if env in ["local"]:
-        if EnvVars.FAC_AUTH_BEARER == None:
+        if EnvVars.FAC_AUTH_BEARER is None:
             print("FAC_AUTH_BEARER not set.")
             sys.exit()
-        if EnvVars.FAC_API_KEY_ID == None:
+        if EnvVars.FAC_API_KEY_ID is None:
             print("FAC_API_KEY_ID not set.")
             sys.exit()
         return {
@@ -48,7 +47,7 @@ def headers(env):
             "x-api-user-id": EnvVars.FAC_API_KEY_ID,
         }
     elif env in ["preview", "dev", "staging", "production"]:
-        if EnvVars.FAC_API_KEY == None:
+        if EnvVars.FAC_API_KEY is None:
             print("FAC_API_KEY not set.")
             sys.exit()
         return {

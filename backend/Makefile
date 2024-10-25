@@ -128,7 +128,12 @@ system-prune:
 	-docker system prune -f
 
 volume-prune:
-	-docker volume prune -f 
+	-docker volume prune -f
+
+docker-clean:
+	docker compose down
+	docker rm -f $(shell docker ps -a -q)
+	docker volume rm $(shell docker volume ls -q)
 
 # Proceed past errors.
 # We want all of these commands to run, even if one fails.

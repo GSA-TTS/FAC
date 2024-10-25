@@ -44,7 +44,7 @@ def partition_by_sequence_hash():
             f"""
     DROP TABLE IF EXISTS public_data_v1_0_0.part_{table_name}_{ndx:02};
     CREATE TABLE public_data_v1_0_0.part_{table_name}_{ndx:02}
-        PARTITION OF public_data_v1_0_0.{table_name} 
+        PARTITION OF public_data_v1_0_0.{table_name}
         FOR VALUES WITH (modulus {number_of_partitions}, remainder {ndx});
     """
         )
@@ -94,7 +94,7 @@ def partition_by_audit_year():
             f"""
     DROP TABLE IF EXISTS public_data_v1_0_0.part_{table_name}_20{ndx:02};
     CREATE TABLE public_data_v1_0_0.part_{table_name}_20{ndx:02}
-        PARTITION OF public_data_v1_0_0.{table_name} 
+        PARTITION OF public_data_v1_0_0.{table_name}
         FOR VALUES IN ('20{ndx:02}');
     """
         )
