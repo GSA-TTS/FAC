@@ -9,8 +9,8 @@ create view api_v1_1_0.additional_eins as
         ---
         ein.additional_ein
     from
-        dissemination_general gen,
-        dissemination_additionalein ein
+        dissem_copy.dissemination_general gen,
+        dissem_copy.dissemination_additionalein ein
     where
         gen.report_id = ein.report_id
     order by ein.id
@@ -27,8 +27,8 @@ create view api_v1_1_0.additional_ueis as
         ---
         uei.additional_uei
     from
-        dissemination_general gen,
-        dissemination_additionaluei uei
+        dissem_copy.dissemination_general gen,
+        dissem_copy.dissemination_additionaluei uei
     where
         gen.report_id = uei.report_id
     order by uei.id
@@ -48,8 +48,8 @@ create view api_v1_1_0.corrective_action_plans as
         ct.contains_chart_or_table,
         ct.planned_action
     from
-        dissemination_CAPText ct,
-        dissemination_General gen
+        dissem_copy.dissemination_CAPText ct,
+        dissem_copy.dissemination_General gen
     where
         ct.report_id = gen.report_id
         and
@@ -87,8 +87,8 @@ create view api_v1_1_0.federal_awards as
         award.is_passthrough_award,
         award.passthrough_amount
     from
-        dissemination_federalaward award,
-        dissemination_general gen
+        dissem_copy.dissemination_federalaward award,
+        dissem_copy.dissemination_general gen
     where
         award.report_id = gen.report_id
     order by award.id
@@ -114,8 +114,8 @@ create view api_v1_1_0.findings as
         finding.is_significant_deficiency,
         finding.type_requirement
     from
-        dissemination_finding finding,
-        dissemination_general gen
+        dissem_copy.dissemination_finding finding,
+        dissem_copy.dissemination_general gen
     where
         finding.report_id = gen.report_id
     order by finding.id
@@ -133,8 +133,8 @@ create view api_v1_1_0.findings_text as
         ft.contains_chart_or_table,
         ft.finding_text
     from
-        dissemination_findingtext ft,
-        dissemination_general gen
+        dissem_copy.dissemination_findingtext ft,
+        dissem_copy.dissemination_general gen
     where
         ft.report_id = gen.report_id
          and
@@ -222,7 +222,7 @@ create view api_v1_1_0.general as
             ELSE 'Yes'
         END AS is_secondary_auditors
     from
-        dissemination_general gen
+        dissem_copy.dissemination_general gen
     order by gen.id
 ;
 
@@ -242,8 +242,8 @@ create view api_v1_1_0.notes_to_sefa as
         note.content,
         note.contains_chart_or_table
     from
-        dissemination_general gen,
-        dissemination_note note
+        dissem_copy.dissemination_general gen,
+        dissem_copy.dissemination_note note
     where
         note.report_id = gen.report_id
         and
@@ -265,8 +265,8 @@ create view api_v1_1_0.passthrough as
         pass.passthrough_id,
         pass.passthrough_name
     from
-        dissemination_general as gen,
-        dissemination_passthrough as pass
+        dissem_copy.dissemination_general as gen,
+        dissem_copy.dissemination_passthrough as pass
     where
         gen.report_id = pass.report_id
     order by pass.id
@@ -292,8 +292,8 @@ create view api_v1_1_0.secondary_auditors as
         sa.address_state,
         sa.address_zipcode
     from
-        dissemination_General gen,
-        dissemination_SecondaryAuditor sa
+        dissem_copy.dissemination_General gen,
+        dissem_copy.dissemination_SecondaryAuditor sa
     where
         sa.report_id = gen.report_id
     order by sa.id

@@ -17,70 +17,165 @@
 -- CREATE TABLE [Table to copy To]
 -- AS [Table to copy From]
 
-CREATE OR REPLACE FUNCTION copy.create_copy_of_dissemination()
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_additionalein()
   RETURNS VOID
-AS
-$ct$
-BEGIN
-  CREATE TABLE copy.dissemination_additionalein
-  AS TABLE public.dissemination_additionalein;
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_additionalein
+    AS SELECT * FROM public.dissemination_additionalein;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_additionaluei
-  AS TABLE public.dissemination_additionaluei;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_additionaluei()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_additionaluei
+    AS SELECT * FROM public.dissemination_additionaluei;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_captext
-  AS TABLE public.dissemination_captext;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_captext()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_captext
+    AS SELECT * FROM public.dissemination_captext;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_federalaward
-  AS TABLE public.dissemination_federalaward;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_federalaward()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_federalaward
+    AS SELECT * FROM public.dissemination_federalaward;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_finding
-  AS TABLE public.dissemination_finding;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_finding()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_finding
+    AS SELECT * FROM public.dissemination_finding;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_findingtext
-  AS TABLE public.dissemination_findingtext;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_findingtext()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_findingtext
+    AS SELECT * FROM public.dissemination_findingtext;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_general
-  AS TABLE public.dissemination_general;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_general()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_general
+    AS SELECT * FROM public.dissemination_general;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_invalidauditrecord
-  AS TABLE public.dissemination_invalidauditrecord;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_invalidauditrecord()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_invalidauditrecord
+    AS SELECT * FROM public.dissemination_invalidauditrecord;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_issuedescriptionrecord
-  AS TABLE public.dissemination_issuedescriptionrecord;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_migrationinspectionrecord()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_migrationinspectionrecord
+    AS SELECT * FROM public.dissemination_migrationinspectionrecord;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_migrationinspectionrecord
-  AS TABLE public.dissemination_migrationinspectionrecord;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_note()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_note
+    AS SELECT * FROM public.dissemination_note;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_note
-  AS TABLE public.dissemination_note;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_passthrough()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_passthrough
+    AS SELECT * FROM public.dissemination_passthrough;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
-  CREATE TABLE copy.dissemination_passthrough
-  AS TABLE public.dissemination_passthrough;
-
-  CREATE TABLE copy.dissemination_secondaryauditor
-  AS TABLE public.dissemination_secondaryauditor;
-END
-$ct$
-LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_secondaryauditor()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_secondaryauditor
+    AS SELECT * FROM public.dissemination_secondaryauditor;
+  END
+  $ct$
+  LANGUAGE plpgsql;
 
 DO LANGUAGE plpgsql
 $GATE$
-    DECLARE
-        the_schema varchar := 'copy';
-        the_table  varchar := 'dissemination_general';
     BEGIN
-        IF EXISTS (
-            SELECT FROM pg_tables
-            WHERE  schemaname = the_schema
-            AND    tablename  = the_table
-            )
-        THEN
-          RAISE info 'We have a copy of dissem in fac-snapshot, so no need to make another.';
-        ELSE
-          RAISE info 'Making a copy of dissemination_* in fac-snapshot.';
-          PERFORM copy.create_copy_of_dissemination();
-        END IF;
+      RAISE info 'create_dissemination_additionalein';
+      PERFORM dissem_copy.create_dissemination_additionalein();
+      RAISE info 'create_dissemination_additionaluei';
+      PERFORM dissem_copy.create_dissemination_additionaluei();
+      RAISE info 'create_dissemination_captext';
+      PERFORM dissem_copy.create_dissemination_captext();
+      RAISE info 'create_dissemination_federalaward';
+      PERFORM dissem_copy.create_dissemination_federalaward();
+      RAISE info 'create_dissemination_finding';
+      PERFORM dissem_copy.create_dissemination_finding();
+      RAISE info 'create_dissemination_findingtext';
+      PERFORM dissem_copy.create_dissemination_findingtext();
+      RAISE info 'create_dissemination_general';
+      PERFORM dissem_copy.create_dissemination_general();
+      RAISE info 'create_dissemination_invalidauditrecord';
+      PERFORM dissem_copy.create_dissemination_invalidauditrecord();
+      RAISE info 'create_dissemination_migrationinspectionrecord';
+      PERFORM dissem_copy.create_dissemination_migrationinspectionrecord();
+      RAISE info 'create_dissemination_note';
+      PERFORM dissem_copy.create_dissemination_note();
+      RAISE info 'create_dissemination_passthrough';
+      PERFORM dissem_copy.create_dissemination_passthrough();
+      RAISE info 'create_dissemination_secondaryauditor';
+      PERFORM dissem_copy.create_dissemination_secondaryauditor();
     END
 $GATE$;
 

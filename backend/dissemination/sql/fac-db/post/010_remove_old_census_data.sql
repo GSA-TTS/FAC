@@ -5,6 +5,8 @@
 -- our own data for this. We have removed this from the deploy,
 -- Specifically, it was used in cog/over. However, we now use 
 -- This data was an early part of the data migration. 
+-- The cascade will get rid of any associated artifacts, which
+-- we certainly do not want.
 --------------------------------------
 --------------------------------------
 DROP TABLE IF EXISTS census_agency16 CASCADE;

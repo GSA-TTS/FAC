@@ -22,7 +22,7 @@ streams:
       -- All of the general table is public data.
       SELECT
         gen.id as id,
-        NEXTVAL('public_data_v1_0_0.seq_v1_0_0_general') AS seq,
+        NEXTVAL('public_data_v1_0_0.general') AS seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -124,7 +124,7 @@ streams:
     sql: |
       SELECT
         ein.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_additional_eins'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.additional_eins'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -151,7 +151,7 @@ streams:
     sql: |
       SELECT
         uei.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_additional_ueis'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.additional_ueis'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -178,7 +178,7 @@ streams:
     sql: |
       SELECT
         cap.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_corrective_action_plans'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.corrective_action_plans'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -210,7 +210,7 @@ streams:
     sql: |
       SELECT
         award.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_federal_awards'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.federal_awards'), 20000) as seq,
         dg.report_id,
         dg.auditee_uei,
         dg.audit_year,
@@ -256,7 +256,7 @@ streams:
     sql: |
       SELECT
         finding.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_findings'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.findings'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -293,7 +293,7 @@ streams:
     sql: |
       SELECT
         ft.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_findings_text'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.findings_text'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -323,7 +323,7 @@ streams:
     sql: |
       SELECT
         note.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_notes_to_sefa'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.notes_to_sefa'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -358,7 +358,7 @@ streams:
     sql: |
       SELECT
         pass.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_passthrough'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.passthrough'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -387,7 +387,7 @@ streams:
     sql: |
       SELECT
         sa.id as id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_secondary_auditors'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.secondary_auditors'), 20000) as seq,
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -422,7 +422,7 @@ streams:
     sql: |
       SELECT
         dg.report_id,
-        div(NEXTVAL('public_data_v1_0_0.seq_v1_0_0_combined'), 20000) as seq,
+        div(NEXTVAL('public_data_v1_0_0.combined'), 20000) as seq,
         dfa.award_reference,
         df.reference_number,
         concat(dfa.federal_agency_prefix,'.',dfa.federal_award_extension) as aln,
