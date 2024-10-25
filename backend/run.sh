@@ -9,7 +9,7 @@ source tools/util_startup.sh
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
 source tools/cgov_util_local_only.sh
-source tools/curation_audit_tracking_init.sh
+source tools/curation_audit_tracking_disable.sh
 source tools/sling_bulk_export.sh
 source tools/migrate_app_tables.sh
 source tools/seed_cog_baseline.sh
@@ -36,6 +36,8 @@ gonogo "cgov_util_local_only"
 # This tears down things that would conflict with migrations, etc.
 sql_pre
 gonogo "sql_pre"
+curation_audit_tracking_disable
+gonogo "curation_audit_tracking_disable"
 
 #####
 # MIGRATE APP TABLES
@@ -51,15 +53,10 @@ gonogo "sql_post"
 
 #####
 # BULK EXPORT
-# Creates CSV and XLSX exports of all of the 
-# public data in the fac-private-s3 bucket.
+# Creates CSV exports of all of the public data,
+# placing it in the fac-private-s3 bucket.
 sling_bulk_export
 gonogo "sling_bulk_export"
-
-#####
-# CURATION AUDIT TRACKING
-curation_audit_tracking_init
-gonogo "curation_audit_tracking_init"
 
 #####
 # SEED COG/OVER TABLES
