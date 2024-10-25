@@ -229,9 +229,18 @@ STATIC_URL = "/static/"
 DEBUG = False
 
 if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
+
+    # FIXME: This is now identical between local and cloud.gov, because we have
+    # a "fake" VCAP_SERVICES environment variable. Local DBs and S3 buckets
+    # can be configured the same way as their cloud equivalents. This can be
+    # refactored for simpler config loading in the app.
+
+    vcap = json.loads(env.str("VCAP_SERVICES"))
     DATABASES = {
-        "default": env.dj_db_url(
-            "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
+        "default": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
+        "fac-db": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
+        "fac-snapshot-db": dj_database_url.parse(
+            get_db_url_from_vcap_services(vcap, "fac-snapshot-db")
         ),
     }
     STORAGES = {
@@ -301,8 +310,14 @@ else:
 
     vcap = json.loads(env.str("VCAP_SERVICES"))
 
-    DB_URL = get_db_url_from_vcap_services(vcap)
-    DATABASES = {"default": dj_database_url.parse(DB_URL)}
+    # DB_URL = get_db_url_from_vcap_services(vcap)
+    DATABASES = {
+        "default": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
+        "fac-db": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
+        "fac-snapshot-db": dj_database_url.parse(
+            get_db_url_from_vcap_services(vcap, "fac-snapshot-db")
+        ),
+    }
 
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":

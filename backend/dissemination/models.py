@@ -627,7 +627,7 @@ class DisseminationCombined(models.Model):
     # Meta options
     class Meta:
         managed = False
-        db_table = "dissemination_combined"
+        db_table = 'public_data_v1_0_0"."combined'
 
     # General Information
     report_id = models.TextField(
@@ -968,6 +968,9 @@ class DisseminationCombined(models.Model):
         "Name of Pass-through Entity",
         help_text=docs.passthrough_name,
     )
+
+
+DisseminationCombined.objects = DisseminationCombined.objects.using("fac-snapshot-db")
 
 
 class InvalidAuditRecord(models.Model):
