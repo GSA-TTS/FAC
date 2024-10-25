@@ -1,3 +1,7 @@
+# DO NOT EDIT; THIS IS A GENERATED FILE
+# python create_stream_yaml.py > public_data_v1_0_0_single_csv.yaml
+# Last generated 2024-10-25
+
 defaults:
   target_options:
     compression: gzip
@@ -7,678 +11,1008 @@ source: FAC_SNAPSHOT_URI
 streams:
   public_data_v1_0_0.additional_eins.0:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2016.csv
+    object: bulk_export/{MM}/2016_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.1:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2017.csv
+    object: bulk_export/{MM}/2017_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.10:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2026.csv
+    object: bulk_export/{MM}/2026_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.11:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2027.csv
+    object: bulk_export/{MM}/2027_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.12:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2028.csv
+    object: bulk_export/{MM}/2028_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.13:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2029.csv
+    object: bulk_export/{MM}/2029_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.14:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2030.csv
+    object: bulk_export/{MM}/2030_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.2:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2018.csv
+    object: bulk_export/{MM}/2018_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.3:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2019.csv
+    object: bulk_export/{MM}/2019_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.4:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2020.csv
+    object: bulk_export/{MM}/2020_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.5:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2021.csv
+    object: bulk_export/{MM}/2021_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.6:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2022.csv
+    object: bulk_export/{MM}/2022_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.7:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2023.csv
+    object: bulk_export/{MM}/2023_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.8:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2024.csv
+    object: bulk_export/{MM}/2024_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_eins.9:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_eins_2025.csv
+    object: bulk_export/{MM}/2025_additional_eins.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_eins WHERE audit_year = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.0:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2016.csv
+    object: bulk_export/{MM}/2016_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.1:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2017.csv
+    object: bulk_export/{MM}/2017_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.10:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2026.csv
+    object: bulk_export/{MM}/2026_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.11:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2027.csv
+    object: bulk_export/{MM}/2027_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.12:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2028.csv
+    object: bulk_export/{MM}/2028_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.13:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2029.csv
+    object: bulk_export/{MM}/2029_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.14:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2030.csv
+    object: bulk_export/{MM}/2030_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.2:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2018.csv
+    object: bulk_export/{MM}/2018_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.3:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2019.csv
+    object: bulk_export/{MM}/2019_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.4:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2020.csv
+    object: bulk_export/{MM}/2020_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.5:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2021.csv
+    object: bulk_export/{MM}/2021_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.6:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2022.csv
+    object: bulk_export/{MM}/2022_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.7:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2023.csv
+    object: bulk_export/{MM}/2023_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.8:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2024.csv
+    object: bulk_export/{MM}/2024_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.additional_ueis.9:
     mode: full-refresh
-    object: bulk_export/{MM}/additional_ueis_2025.csv
+    object: bulk_export/{MM}/2025_additional_ueis.csv
     sql: SELECT * FROM public_data_v1_0_0.additional_ueis WHERE audit_year = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.0:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2016.csv
+    object: bulk_export/{MM}/2016_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.1:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2017.csv
+    object: bulk_export/{MM}/2017_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.10:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2026.csv
+    object: bulk_export/{MM}/2026_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.11:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2027.csv
+    object: bulk_export/{MM}/2027_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.12:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2028.csv
+    object: bulk_export/{MM}/2028_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.13:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2029.csv
+    object: bulk_export/{MM}/2029_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.14:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2030.csv
+    object: bulk_export/{MM}/2030_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.2:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2018.csv
+    object: bulk_export/{MM}/2018_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.3:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2019.csv
+    object: bulk_export/{MM}/2019_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.4:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2020.csv
+    object: bulk_export/{MM}/2020_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.5:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2021.csv
+    object: bulk_export/{MM}/2021_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.6:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2022.csv
+    object: bulk_export/{MM}/2022_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.7:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2023.csv
+    object: bulk_export/{MM}/2023_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.8:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2024.csv
+    object: bulk_export/{MM}/2024_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.combined.9:
     mode: full-refresh
-    object: bulk_export/{MM}/combined_2025.csv
+    object: bulk_export/{MM}/2025_combined.csv
     sql: SELECT * FROM public_data_v1_0_0.combined WHERE audit_year = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.0:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2016.csv
+    object: bulk_export/{MM}/2016_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.1:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2017.csv
+    object: bulk_export/{MM}/2017_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.10:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2026.csv
+    object: bulk_export/{MM}/2026_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.11:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2027.csv
+    object: bulk_export/{MM}/2027_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.12:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2028.csv
+    object: bulk_export/{MM}/2028_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.13:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2029.csv
+    object: bulk_export/{MM}/2029_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.14:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2030.csv
+    object: bulk_export/{MM}/2030_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.2:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2018.csv
+    object: bulk_export/{MM}/2018_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.3:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2019.csv
+    object: bulk_export/{MM}/2019_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.4:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2020.csv
+    object: bulk_export/{MM}/2020_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.5:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2021.csv
+    object: bulk_export/{MM}/2021_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.6:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2022.csv
+    object: bulk_export/{MM}/2022_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.7:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2023.csv
+    object: bulk_export/{MM}/2023_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.8:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2024.csv
+    object: bulk_export/{MM}/2024_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.corrective_action_plans.9:
     mode: full-refresh
-    object: bulk_export/{MM}/corrective_action_plans_2025.csv
+    object: bulk_export/{MM}/2025_corrective_action_plans.csv
     sql: SELECT * FROM public_data_v1_0_0.corrective_action_plans WHERE audit_year
       = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.0:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2016.csv
+    object: bulk_export/{MM}/2016_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.1:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2017.csv
+    object: bulk_export/{MM}/2017_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.10:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2026.csv
+    object: bulk_export/{MM}/2026_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.11:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2027.csv
+    object: bulk_export/{MM}/2027_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.12:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2028.csv
+    object: bulk_export/{MM}/2028_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.13:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2029.csv
+    object: bulk_export/{MM}/2029_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.14:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2030.csv
+    object: bulk_export/{MM}/2030_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.2:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2018.csv
+    object: bulk_export/{MM}/2018_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.3:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2019.csv
+    object: bulk_export/{MM}/2019_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.4:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2020.csv
+    object: bulk_export/{MM}/2020_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.5:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2021.csv
+    object: bulk_export/{MM}/2021_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.6:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2022.csv
+    object: bulk_export/{MM}/2022_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.7:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2023.csv
+    object: bulk_export/{MM}/2023_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.8:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2024.csv
+    object: bulk_export/{MM}/2024_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.federal_awards.9:
     mode: full-refresh
-    object: bulk_export/{MM}/federal_awards_2025.csv
+    object: bulk_export/{MM}/2025_federal_awards.csv
     sql: SELECT * FROM public_data_v1_0_0.federal_awards WHERE audit_year = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.0:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2016.csv
+    object: bulk_export/{MM}/2016_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.1:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2017.csv
+    object: bulk_export/{MM}/2017_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.10:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2026.csv
+    object: bulk_export/{MM}/2026_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.11:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2027.csv
+    object: bulk_export/{MM}/2027_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.12:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2028.csv
+    object: bulk_export/{MM}/2028_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.13:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2029.csv
+    object: bulk_export/{MM}/2029_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.14:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2030.csv
+    object: bulk_export/{MM}/2030_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.2:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2018.csv
+    object: bulk_export/{MM}/2018_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.3:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2019.csv
+    object: bulk_export/{MM}/2019_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.4:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2020.csv
+    object: bulk_export/{MM}/2020_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.5:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2021.csv
+    object: bulk_export/{MM}/2021_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.6:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2022.csv
+    object: bulk_export/{MM}/2022_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.7:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2023.csv
+    object: bulk_export/{MM}/2023_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.8:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2024.csv
+    object: bulk_export/{MM}/2024_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings.9:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_2025.csv
+    object: bulk_export/{MM}/2025_findings.csv
     sql: SELECT * FROM public_data_v1_0_0.findings WHERE audit_year = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.0:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2016.csv
+    object: bulk_export/{MM}/2016_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.1:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2017.csv
+    object: bulk_export/{MM}/2017_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.10:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2026.csv
+    object: bulk_export/{MM}/2026_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.11:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2027.csv
+    object: bulk_export/{MM}/2027_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.12:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2028.csv
+    object: bulk_export/{MM}/2028_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.13:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2029.csv
+    object: bulk_export/{MM}/2029_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.14:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2030.csv
+    object: bulk_export/{MM}/2030_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.2:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2018.csv
+    object: bulk_export/{MM}/2018_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.3:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2019.csv
+    object: bulk_export/{MM}/2019_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.4:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2020.csv
+    object: bulk_export/{MM}/2020_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.5:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2021.csv
+    object: bulk_export/{MM}/2021_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.6:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2022.csv
+    object: bulk_export/{MM}/2022_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.7:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2023.csv
+    object: bulk_export/{MM}/2023_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.8:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2024.csv
+    object: bulk_export/{MM}/2024_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.findings_text.9:
     mode: full-refresh
-    object: bulk_export/{MM}/findings_text_2025.csv
+    object: bulk_export/{MM}/2025_findings_text.csv
     sql: SELECT * FROM public_data_v1_0_0.findings_text WHERE audit_year = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.0:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2016.csv
+    object: bulk_export/{MM}/2016_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.1:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2017.csv
+    object: bulk_export/{MM}/2017_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.10:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2026.csv
+    object: bulk_export/{MM}/2026_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.11:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2027.csv
+    object: bulk_export/{MM}/2027_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.12:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2028.csv
+    object: bulk_export/{MM}/2028_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.13:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2029.csv
+    object: bulk_export/{MM}/2029_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.14:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2030.csv
+    object: bulk_export/{MM}/2030_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.2:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2018.csv
+    object: bulk_export/{MM}/2018_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.3:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2019.csv
+    object: bulk_export/{MM}/2019_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.4:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2020.csv
+    object: bulk_export/{MM}/2020_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.5:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2021.csv
+    object: bulk_export/{MM}/2021_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.6:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2022.csv
+    object: bulk_export/{MM}/2022_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.7:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2023.csv
+    object: bulk_export/{MM}/2023_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.8:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2024.csv
+    object: bulk_export/{MM}/2024_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.general.9:
     mode: full-refresh
-    object: bulk_export/{MM}/general_2025.csv
+    object: bulk_export/{MM}/2025_general.csv
     sql: SELECT * FROM public_data_v1_0_0.general WHERE audit_year = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.0:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2016.csv
+    object: bulk_export/{MM}/2016_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.1:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2017.csv
+    object: bulk_export/{MM}/2017_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.10:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2026.csv
+    object: bulk_export/{MM}/2026_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.11:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2027.csv
+    object: bulk_export/{MM}/2027_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.12:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2028.csv
+    object: bulk_export/{MM}/2028_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.13:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2029.csv
+    object: bulk_export/{MM}/2029_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.14:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2030.csv
+    object: bulk_export/{MM}/2030_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.2:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2018.csv
+    object: bulk_export/{MM}/2018_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.3:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2019.csv
+    object: bulk_export/{MM}/2019_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.4:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2020.csv
+    object: bulk_export/{MM}/2020_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.5:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2021.csv
+    object: bulk_export/{MM}/2021_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.6:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2022.csv
+    object: bulk_export/{MM}/2022_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.7:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2023.csv
+    object: bulk_export/{MM}/2023_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.8:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2024.csv
+    object: bulk_export/{MM}/2024_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.notes_to_sefa.9:
     mode: full-refresh
-    object: bulk_export/{MM}/notes_to_sefa_2025.csv
+    object: bulk_export/{MM}/2025_notes_to_sefa.csv
     sql: SELECT * FROM public_data_v1_0_0.notes_to_sefa WHERE audit_year = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.0:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2016.csv
+    object: bulk_export/{MM}/2016_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.1:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2017.csv
+    object: bulk_export/{MM}/2017_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.10:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2026.csv
+    object: bulk_export/{MM}/2026_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.11:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2027.csv
+    object: bulk_export/{MM}/2027_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.12:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2028.csv
+    object: bulk_export/{MM}/2028_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.13:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2029.csv
+    object: bulk_export/{MM}/2029_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.14:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2030.csv
+    object: bulk_export/{MM}/2030_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.2:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2018.csv
+    object: bulk_export/{MM}/2018_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.3:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2019.csv
+    object: bulk_export/{MM}/2019_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.4:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2020.csv
+    object: bulk_export/{MM}/2020_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.5:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2021.csv
+    object: bulk_export/{MM}/2021_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.6:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2022.csv
+    object: bulk_export/{MM}/2022_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.7:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2023.csv
+    object: bulk_export/{MM}/2023_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.8:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2024.csv
+    object: bulk_export/{MM}/2024_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.passthrough.9:
     mode: full-refresh
-    object: bulk_export/{MM}/passthrough_2025.csv
+    object: bulk_export/{MM}/2025_passthrough.csv
     sql: SELECT * FROM public_data_v1_0_0.passthrough WHERE audit_year = '2025'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.0:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2016.csv
+    object: bulk_export/{MM}/2016_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2016'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.1:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2017.csv
+    object: bulk_export/{MM}/2017_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2017'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.10:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2026.csv
+    object: bulk_export/{MM}/2026_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2026'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.11:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2027.csv
+    object: bulk_export/{MM}/2027_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2027'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.12:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2028.csv
+    object: bulk_export/{MM}/2028_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2028'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.13:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2029.csv
+    object: bulk_export/{MM}/2029_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2029'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.14:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2030.csv
+    object: bulk_export/{MM}/2030_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2030'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.2:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2018.csv
+    object: bulk_export/{MM}/2018_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2018'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.3:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2019.csv
+    object: bulk_export/{MM}/2019_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2019'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.4:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2020.csv
+    object: bulk_export/{MM}/2020_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2020'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.5:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2021.csv
+    object: bulk_export/{MM}/2021_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2021'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.6:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2022.csv
+    object: bulk_export/{MM}/2022_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2022'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.7:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2023.csv
+    object: bulk_export/{MM}/2023_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2023'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.8:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2024.csv
+    object: bulk_export/{MM}/2024_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2024'
+    target_options:
+      format: csv
   public_data_v1_0_0.secondary_auditors.9:
     mode: full-refresh
-    object: bulk_export/{MM}/secondary_auditors_2025.csv
+    object: bulk_export/{MM}/2025_secondary_auditors.csv
     sql: SELECT * FROM public_data_v1_0_0.secondary_auditors WHERE audit_year = '2025'
+    target_options:
+      format: csv
 target: BULK_DATA_EXPORT
 
