@@ -2,19 +2,13 @@
 
 set +e
 
-# Source everything; everything is now a function.
-# Remember: bash has no idea if a function exists, 
-# so a typo in a function name will fail silently. Similarly,
-# bash has horrible scoping, so use of `local` in functions is 
-# critical for cleanliness in the startup script.
-# This will choose the correct environment
-# for local envs (LOCAL or TESTING) and cloud.gov
+source tools/util_startup.sh
+source tools/setup_env.sh
+source tools/curation_audit_tracking_disable.sh
+source tools/sling_bulk_export.sh
 source tools/migrate_app_tables.sh
 source tools/seed_cog_baseline.sh
-source tools/setup_env.sh
-source tools/sling_first_run.sh
 source tools/sql_pre_post.sh
-source tools/util_startup.sh
 
 #####
 # SETUP THE CGOV ENVIRONMENT
