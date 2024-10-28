@@ -11,6 +11,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
+    replaces = [
+        ("audit", "0001_initial"),
+        ("audit", "0002_alter_singleauditchecklist_report_id"),
+        ("audit", "0003_alter_singleauditchecklist_data_source_and_more"),
+        ("audit", "0004_alter_singleauditchecklist_cognizant_agency_and_more"),
+        ("audit", "0005_alter_submissionevent_event"),
+        ("audit", "0006_deletedaccess"),
+        ("audit", "0007_alter_deletedaccess_options_and_more"),
+        ("audit", "0008_alter_submissionevent_event"),
+        ("audit", "0009_ueivalidationwaiver_sacvalidationwaiver"),
+        ("audit", "0010_alter_ueivalidationwaiver_uei"),
+        ("audit", "0011_ueivalidationwaiver_expiration_and_more"),
+        ("audit", "0012_alter_sacvalidationwaiver_waiver_types"),
+        ("audit", "0013_singleauditchecklistflow_and_more"),
+    ]
+
     initial = True
 
     dependencies = [
