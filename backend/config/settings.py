@@ -234,8 +234,11 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     # a "fake" VCAP_SERVICES environment variable. Local DBs and S3 buckets
     # can be configured the same way as their cloud equivalents. This can be
     # refactored for simpler config loading in the app.
+    #
+    # During a build, there won't be an environment variable. Load the
+    # fake VCAP from the filesystem.
+    vcap = json.load(open("config/vcap_services_for_containers.json"))
 
-    vcap = json.loads(env.str("VCAP_SERVICES"))
     DATABASES = {
         "default": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
         "fac-db": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
