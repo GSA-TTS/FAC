@@ -29,18 +29,13 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # This tears down things that would conflict with migrations, etc.
     sql_pre
     gonogo "sql_pre"
+    curation_audit_tracking_disable
+    gonogo "curation_audit_tracking_disable"
 
     #####
     # MIGRATE APP TABLES
     migrate_app_tables
     gonogo "migrate_app_tables"
-
-    #####
-    # PREP API TABLES
-    # This runs sling and preps tables in the snapshot DB.
-    # Only runs if the tables are not present (e.g. first deploy)
-    sling_first_run
-    gonogo "sling_first_run"
 
     #####
     # SQL POST
@@ -54,6 +49,17 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # Setup tables for cog/over assignments
     seed_cog_baseline
     gonogo "seed_cog_baseline"
+
+    #####
+    # CREATE STAFF USERS
+    # Prepares staff users for Django admin
+    python manage.py create_staffusers
+
+    #####
+    # LAUNCH THE APP
+    # We will have died long ago if things didn't work.
+    npm run dev & python manage.py runserver 0.0.0.0:8000
+
 fi
 
 # Make psql usable by scripts, for debugging, etc.
