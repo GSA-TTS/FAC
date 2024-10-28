@@ -53,10 +53,8 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     seed_cog_baseline
     gonogo "seed_cog_baseline"
 
-    materialized_views
-    gonogo "materialized_views"
-
-    echo "SANDBOX APP DEPLOYMENT TEST"
+    # materialized_views
+    # gonogo "materialized_views"
 fi
 
 # Make psql usable by scripts, for debugging, etc.
