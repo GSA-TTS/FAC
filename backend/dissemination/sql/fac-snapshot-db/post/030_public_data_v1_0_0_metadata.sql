@@ -71,21 +71,9 @@ $ct$
 LANGUAGE plpgsql;
 
 DO LANGUAGE plpgsql
-$GATE$
-    DECLARE
-        the_schema varchar := 'public_data_v1_0_0';
-        the_table  varchar := 'metadata';
-    BEGIN
-        IF EXISTS (
-            SELECT FROM pg_tables
-            WHERE  schemaname = the_schema
-            AND    tablename  = the_table
-            )
-        THEN
-            RAISE info 'Gate condition met. Skipping metadata table creation.';
-        ELSE
-            RAISE info 'Creating metadata table';
-            PERFORM public_data_v1_0_0.create_metadata();
-        END IF;
-    END
-$GATE$;
+$GO$
+  BEGIN
+    RAISE info 'Creating metadata table';
+    PERFORM public_data_v1_0_0.create_metadata();
+  END
+$GO$;

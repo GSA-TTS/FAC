@@ -704,47 +704,33 @@ CREATE OR REPLACE FUNCTION public_data_v1_0_0_functions.create_invalid_audit_rec
 -- need this to run.
 -----------------------------------------------------------
 DO LANGUAGE plpgsql
-$GATE$
-    DECLARE
-        the_schema varchar := 'public_data_v1_0_0';
-        the_table  varchar := 'metadata';
-        api_ver    varchar := 'api_v2_0_0';
-    BEGIN
-        IF EXISTS (
-            SELECT FROM pg_tables
-            WHERE  schemaname = the_schema
-            AND    tablename  = the_table
-            )
-        THEN
-            RAISE info '% Gate condition met. Skipping table creation.', api_ver;
-        ELSE
-            RAISE info '% %.% not found. Creating tables', api_ver, the_schema, the_table;
-            RAISE info 'Creating general';
-            PERFORM public_data_v1_0_0_functions.create_general();
-            RAISE info 'Creating additional_eins';
-            PERFORM public_data_v1_0_0_functions.create_additional_eins();
-            RAISE info 'Creating additional_ueis';
-            PERFORM public_data_v1_0_0_functions.create_additional_ueis();
-            RAISE info 'Creating corrective_action_plans';
-            PERFORM public_data_v1_0_0_functions.create_corrective_action_plans();
-            RAISE info 'Creating federal_awards';
-            PERFORM public_data_v1_0_0_functions.create_federal_awards();
-            RAISE info 'Creating findings';
-            PERFORM public_data_v1_0_0_functions.create_findings();
-            RAISE info 'Creating findings_text';
-            PERFORM public_data_v1_0_0_functions.create_findings_text();
-            RAISE info 'Creating notes_to_sefa';
-            PERFORM public_data_v1_0_0_functions.create_notes_to_sefa();
-            RAISE info 'Creating passthrough';
-            PERFORM public_data_v1_0_0_functions.create_passthrough();
-            RAISE info 'Creating secondary_auditors';
-            PERFORM public_data_v1_0_0_functions.create_secondary_auditors();
-            RAISE info 'Creating combined';
-            PERFORM public_data_v1_0_0_functions.create_combined();
-            RAISE info 'Creating migration_inspection_record';
-            PERFORM public_data_v1_0_0_functions.create_migration_inspection_record();
-            RAISE info 'Create invalid_audit_record';
-            PERFORM public_data_v1_0_0_functions.create_invalid_audit_record();
-        END IF;
-    END
-$GATE$;
+$GO$
+  BEGIN
+    RAISE info 'Creating general';
+    PERFORM public_data_v1_0_0_functions.create_general();
+    RAISE info 'Creating additional_eins';
+    PERFORM public_data_v1_0_0_functions.create_additional_eins();
+    RAISE info 'Creating additional_ueis';
+    PERFORM public_data_v1_0_0_functions.create_additional_ueis();
+    RAISE info 'Creating corrective_action_plans';
+    PERFORM public_data_v1_0_0_functions.create_corrective_action_plans();
+    RAISE info 'Creating federal_awards';
+    PERFORM public_data_v1_0_0_functions.create_federal_awards();
+    RAISE info 'Creating findings';
+    PERFORM public_data_v1_0_0_functions.create_findings();
+    RAISE info 'Creating findings_text';
+    PERFORM public_data_v1_0_0_functions.create_findings_text();
+    RAISE info 'Creating notes_to_sefa';
+    PERFORM public_data_v1_0_0_functions.create_notes_to_sefa();
+    RAISE info 'Creating passthrough';
+    PERFORM public_data_v1_0_0_functions.create_passthrough();
+    RAISE info 'Creating secondary_auditors';
+    PERFORM public_data_v1_0_0_functions.create_secondary_auditors();
+    RAISE info 'Creating combined';
+    PERFORM public_data_v1_0_0_functions.create_combined();
+    RAISE info 'Creating migration_inspection_record';
+    PERFORM public_data_v1_0_0_functions.create_migration_inspection_record();
+    RAISE info 'Create invalid_audit_record';
+    PERFORM public_data_v1_0_0_functions.create_invalid_audit_record();
+  END
+$GO$;

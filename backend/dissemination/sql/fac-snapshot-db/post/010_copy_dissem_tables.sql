@@ -150,7 +150,7 @@ CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_secondaryauditor()
   LANGUAGE plpgsql;
 
 DO LANGUAGE plpgsql
-$GATE$
+$go$
     BEGIN
       RAISE info 'create_dissemination_additionalein';
       PERFORM dissem_copy.create_dissemination_additionalein();
@@ -177,5 +177,5 @@ $GATE$
       RAISE info 'create_dissemination_secondaryauditor';
       PERFORM dissem_copy.create_dissemination_secondaryauditor();
     END
-$GATE$;
+$go$;
 

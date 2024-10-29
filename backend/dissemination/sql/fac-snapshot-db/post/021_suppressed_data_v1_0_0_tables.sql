@@ -189,30 +189,17 @@ CREATE OR REPLACE FUNCTION suppressed_data_v1_0_0.create_invalid_audit_record()
 -- CONDITIONAL TABLE CREATION
 -----------------------------------------------------------
 DO LANGUAGE plpgsql
-$GATE$
-    DECLARE
-        the_schema varchar := 'public_data_v1_0_0';
-        the_table  varchar := 'metadata';
-    BEGIN
-        IF EXISTS (
-            SELECT FROM pg_tables
-            WHERE  schemaname = the_schema
-            AND    tablename  = the_table
-            )
-        THEN
-            RAISE info 'Found the metadata table; skipping suppressed data table creation.';
-        ELSE
-            RAISE info 'Metadata table not found. Creating suppressed data tables.';
-            RAISE info 'Creating suppressed corrective_action_plans';
-            PERFORM suppressed_data_v1_0_0.create_corrective_action_plans();
-            RAISE info 'Creating suppressed findings_text';
-            PERFORM suppressed_data_v1_0_0.create_findings_text();
-            RAISE info 'Creating suppressed notes_to_sefa';
-            PERFORM suppressed_data_v1_0_0.create_notes_to_sefa();
-            RAISE info 'Creating migration_inspection_record';
-            PERFORM suppressed_data_v1_0_0.create_migration_inspection_record();
-            RAISE info 'Create invalid_audit_record';
-            PERFORM suppressed_data_v1_0_0.create_invalid_audit_record();
-        END IF;
-    END
-$GATE$;
+$GO$
+  BEGIN
+    RAISE info 'Creating suppressed corrective_action_plans';
+    PERFORM suppressed_data_v1_0_0.create_corrective_action_plans();
+    RAISE info 'Creating suppressed findings_text';
+    PERFORM suppressed_data_v1_0_0.create_findings_text();
+    RAISE info 'Creating suppressed notes_to_sefa';
+    PERFORM suppressed_data_v1_0_0.create_notes_to_sefa();
+    RAISE info 'Creating migration_inspection_record';
+    PERFORM suppressed_data_v1_0_0.create_migration_inspection_record();
+    RAISE info 'Create invalid_audit_record';
+    PERFORM suppressed_data_v1_0_0.create_invalid_audit_record();
+  END
+$GO$;

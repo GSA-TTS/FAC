@@ -21,8 +21,8 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # SQL PRE
     # We have SQL that we want to run before the migrations and sling are run.
     # This tears down things that would conflict with migrations, etc.
-    sql_pre
-    gonogo "sql_pre"
+    sql_pre_fac_db
+    gonogo "sql_pre_fac_db"
     curation_audit_tracking_disable
     gonogo "curation_audit_tracking_disable"
 
@@ -35,8 +35,8 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # SQL POST
     # Rebuild the API and prepare the system for execution.
     # Runs after migrations.
-    sql_post
-    gonogo "sql_post"
+    sql_post_fac_db
+    gonogo "sql_post_fac_db"
 
     #####
     # SEED COG/OVER TABLES
@@ -48,6 +48,7 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # CREATE STAFF USERS
     # Prepares staff users for Django admin
     python manage.py create_staffusers
+    gonogo "create_staffusers"
 
     #####
     # LAUNCH THE APP
