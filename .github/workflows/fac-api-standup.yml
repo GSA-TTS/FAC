@@ -1,8 +1,8 @@
 ---
-name: Backup the database with fac-backup-utility
+name: Standup the API
 ### Common Commands:
-# ./fac-backup-util.sh v0.1.5 scheduled_backup
-# ./fac-backup-util.sh v0.1.5 daily_backup
+# ./fac-backup-util.sh v0.1.8 scheduled_backup
+# ./fac-backup-util.sh v0.1.8 daily_backup
 on:
   workflow_call:
     inputs:
@@ -17,13 +17,17 @@ on:
         description: Operation for fac-backup-utility
         required: true
         type: string
+  # push:
+  #   branches: [jadudm/api-perf]
 jobs:
-  fac-backup-scheduled:
-    name: Perform Database Backup
+  api-standup:
+    name: Standup API
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    #environment: ${{ inputs.environment }}
+    environment: preview
     env:
-      space: ${{ inputs.environment }}
+      #space: ${{ inputs.environment }}
+      space: preview
     steps:
       - name: Backup FAC Database, Sync Media, and sling API tables
         uses: cloud-gov/cg-cli-tools@main
@@ -31,6 +35,7 @@ jobs:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
-          cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 7G -m 3G --name backup_and_sling_scheduled --command "./util/fac-backup-and-sling-scheduled.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
-
+          #cf_space: ${{ env.space }}
+          cf_space: preview
+          #command: cf run-task gsa-fac -k 3G -m 3G --name standup_api --command "./util/nightly_api_refresh.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          command: cf run-task gsa-fac -k 2G -m 2G --name standup_api --command "./util/nightly_api_refresh.sh v0.1.8 rds_backup"

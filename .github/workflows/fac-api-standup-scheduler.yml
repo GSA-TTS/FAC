@@ -3,11 +3,11 @@ name: Backup Environments
 on:
   schedule:
     # Invoke every 2 hours
-    - cron: '0 12,14,16,18,20,22/2 * * *'
+    - cron: '0 2 * * *'
   workflow_dispatch: null
 
 jobs:
-  backup-environment:
+  scheduled-api-standup:
     strategy:
       fail-fast: false
       matrix:
@@ -15,10 +15,11 @@ jobs:
           - name: dev
           - name: staging
           - name: production
-    uses: ./.github/workflows/fac-backup-util-scheduled.yml
+          - name: preview
+    uses: ./.github/workflows/fac-api-standup.yml
     secrets: inherit
     with:
       environment: ${{ matrix.environment.name }}
       util_version: "v0.1.8"
-      backup_operation: "scheduled_backup"
+      backup_operation: "rds_backup"
 
