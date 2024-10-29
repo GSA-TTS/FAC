@@ -24,12 +24,6 @@ function run_sql_files {
   return 0
 }
 
-
-function sql_pre {
-  run_sql_files $FAC_DB_URI "SQL_PRE" "pre"
-  run_sql_files $FAC_SNAPSHOT_URI "SQL_PRE" "pre"
-}
-
 function sql_pre_fac_db {
   run_sql_files $FAC_DB_URI "SQL_PRE" "pre"
 }
@@ -38,18 +32,9 @@ function sql_pre_fac_snapshot_db {
   run_sql_files $FAC_SNAPSHOT_URI "SQL_PRE" "pre"
 }
 
-
-
-function sql_post {
-  run_sql_files $FAC_DB_URI "SQL_POST" "post"
-  run_sql_files $FAC_SNAPSHOT_URI "SQL_POST" "post"
-}
-
-
 function sql_post_fac_db {
   run_sql_files $FAC_DB_URI "SQL_POST" "post"
 }
-
 
 function sql_post_fac_snapshot_db {
   run_sql_files $FAC_SNAPSHOT_URI "SQL_POST" "post"

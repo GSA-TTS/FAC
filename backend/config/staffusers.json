@@ -1,10 +1,10 @@
 {
   "readonly": [
-    "philip.dominguez@gsa.gov",
-    "robert.novak@gsa.gov",
     "alexander.steel@gsa.gov"
   ],
   "helpdesk": [
+    "philip.dominguez@gsa.gov",
+    "robert.novak@gsa.gov",
     "analyn.delossantos@gsa.gov",
     "hassandeme.mamasambo@gsa.gov",
     "iman.ali@gsa.gov",
@@ -16,6 +16,6 @@
   ],
   "superuser": [
     "matthew.jadud@gsa.gov",
-    "dan.swick@gsa.gov"
+    "daniel.swick@gsa.gov"
   ]
 }
