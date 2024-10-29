@@ -49,12 +49,6 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # Prepares staff users for Django admin
     python manage.py create_staffusers
     gonogo "create_staffusers"
-
-    #####
-    # LAUNCH THE APP
-    # We will have died long ago if things didn't work.
-    npm run dev & python manage.py runserver 0.0.0.0:8000
-
 fi
 
 # Make psql usable by scripts, for debugging, etc.

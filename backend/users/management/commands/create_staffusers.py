@@ -86,15 +86,9 @@ class Command(BaseCommand):
                     # create staff user for each role.
                     with transaction.atomic():
 
-                        try:
-                            StaffUser(
-                                staff_email=email,
-                            ).save()
-                        except Exception as e:
-                            transaction.set_rollback(True)
-                            logger.warning(
-                                f"Could not create new StaffUser for {email}"
-                            )
+                        StaffUser(
+                            staff_email=email,
+                        ).save()
 
                         # attempt to update the user.
                         try:
@@ -114,8 +108,8 @@ class Command(BaseCommand):
                             logger.info(f"Synced {email} to a StaffUser role.")
 
                         # for whatever reason, this failed. Revert staffuser creation.
-                        except Exception as e:
+                        except User.DoesNotExist:
                             transaction.set_rollback(True)
                             logger.warning(
-                                f"Failed to create a StaffUser for {email} ({e})."
+                                f"StaffUser not created for {email}, they have not logged in yet."
                             )
