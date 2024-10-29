@@ -73,7 +73,7 @@ CREATE VIEW api_v2_0_0.secondary_auditors AS
 ---------------------------------------
 CREATE VIEW api_v2_0_0.combined AS
     SELECT * FROM public_data_v1_0_0.combined comb
-    ORDER BY comb.seq;
+    ;
 
 ---------------------------------------
 -- metadata
