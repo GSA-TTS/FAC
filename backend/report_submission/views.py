@@ -608,7 +608,7 @@ class DeleteFileView(LoginRequiredMixin, View):
             )
 
             logger.info("The file has been successfully deleted.")
-            return redirect(f"/audit/submission-progress/{report_id}")
+            return Util.validate_redirect_url(f"/audit/submission-progress/{sac.report_id}")
 
         except SingleAuditChecklist.DoesNotExist:
             logger.error(f"Audit: {report_id} not found")
