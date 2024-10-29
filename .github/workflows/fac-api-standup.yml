@@ -17,8 +17,8 @@ on:
         description: Operation for fac-backup-utility
         required: true
         type: string
-  # push:
-  #   branches: [jadudm/api-perf]
+  push:
+    branches: [jadudm/api-perf]
 jobs:
   api-standup:
     name: Standup API
@@ -38,4 +38,4 @@ jobs:
           #cf_space: ${{ env.space }}
           cf_space: preview
           #command: cf run-task gsa-fac -k 3G -m 3G --name standup_api --command "./util/nightly_api_refresh.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
-          command: cf run-task gsa-fac -k 2G -m 2G --name standup_api --command "./util/nightly_api_refresh.sh v0.1.8 rds_backup"
+          command: cf run-task gsa-fac -k 2G -m 2G --name api_refresh --command "./util/nightly_api_refresh.sh v0.1.8 rds_backup"
