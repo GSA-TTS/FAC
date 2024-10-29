@@ -18,6 +18,7 @@ on:
         description: Version for fac backup utility to use (ex. vX.Y.Z)
         required: true
         type: string
+        default: "v0.1.8"
       backup_operation:
         description: Operation for fac-backup-utility
         required: true

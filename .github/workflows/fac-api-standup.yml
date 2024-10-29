@@ -17,6 +17,26 @@ on:
         description: Operation for fac-backup-utility
         required: true
         type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        options:
+          - 'dev'
+          - 'preview'
+          - 'staging'
+          - 'production'
+      util_version:
+        description: Version for fac backup utility to use (ex. vX.Y.Z)
+        required: true
+        type: string
+      backup_operation:
+        description: Operation for fac-backup-utility
+        required: true
+        type: choice
+        options:
+          - 'rds_backup'
   push:
     branches: [jadudm/api-perf]
 jobs:
