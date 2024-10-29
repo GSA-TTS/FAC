@@ -8,6 +8,7 @@ pushd ..
 
     # Run an RDS backup, to refresh dissemination_* in FAC_SNAPSHOT from FAC_DB
     #./../fac-backup-util.sh "v0.1.8" "rds_backup"
+    # Deploy test
     ./fac-backup-util.sh "$1" "$2"
     gonogo "fac-backup-util"
 
