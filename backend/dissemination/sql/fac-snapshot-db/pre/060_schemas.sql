@@ -22,6 +22,7 @@ DROP SCHEMA IF EXISTS api_v2_0_0_functions CASCADE;
 -------------
 DROP SCHEMA IF EXISTS dissem_copy CASCADE;
 DROP SCHEMA IF EXISTS public_data_v1_0_0 CASCADE;
+DROP SCHEMA IF EXISTS suppressed_data_v1_0_0 CASCADE;
 
 ---------------------------------
 -- CREATE

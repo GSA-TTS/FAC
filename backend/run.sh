@@ -31,10 +31,17 @@ cgov_util_local_only
 gonogo "cgov_util_local_only"
 
 #####
+# SIMULATE NIGHTLY DATA/API CREATION
+sql_pre_fac_snapshot_db
+gonogo "sql_pre_fac_snapshot_db"
+sql_post_fac_snapshot_db
+gonogo "sql_post_fac_snapshot_db"
+
+#####
 # SQL PRE
 # We have SQL that we want to run before the migrations and sling are run.
 # This tears down things that would conflict with migrations, etc.
-sql_pre
+sql_pre_fac_db
 gonogo "sql_pre"
 curation_audit_tracking_disable
 gonogo "curation_audit_tracking_disable"
@@ -48,7 +55,7 @@ gonogo "migrate_app_tables"
 # SQL POST
 # Rebuild the API and prepare the system for execution.
 # Runs after migrations.
-sql_post
+sql_post_fac_db
 gonogo "sql_post"
 
 #####
