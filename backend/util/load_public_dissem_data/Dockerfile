@@ -17,9 +17,9 @@ RUN curl -LO 'https://github.com/slingdata-io/sling-cli/releases/latest/download
   && chmod +x sling \
   && mv sling /bin/sling
 
-RUN curl -L -O https://github.com/GSA-TTS/fac-backup-utility/releases/download/v0.1.8/gov.gsa.fac.cgov-util-v0.1.8-linux-amd64.tar.gz \
-    && tar xvzf gov.gsa.fac.cgov-util-v0.1.8-linux-amd64.tar.gz gov.gsa.fac.cgov-util \
-    && chmod 755 gov.gsa.fac.cgov-util \ 
+RUN curl -L -O https://github.com/GSA-TTS/fac-backup-utility/releases/download/v0.1.9/gov.gsa.fac.cgov-util-v0.1.9-linux-amd64.tar.gz \
+    && tar xvzf gov.gsa.fac.cgov-util-v0.1.9-linux-amd64.tar.gz gov.gsa.fac.cgov-util \
+    && chmod 755 gov.gsa.fac.cgov-util \
     && mv gov.gsa.fac.cgov-util /layered/cgov-util
 
 # Where do we need the config? Try home?

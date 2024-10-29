@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export CGOV_UTIL_VERSION=v0.1.8
+export CGOV_UTIL_VERSION=v0.1.9
 export FAC_DB_URI=postgresql://postgres@db:5432/postgres?sslmode=disable
 export FAC_SNAPSHOT_URI=postgresql://postgres@db2:5432/postgres?sslmode=disable
 
@@ -42,7 +42,7 @@ echo "Unzipping data."
 unzip db_dissem_dump.zip
 popd
 
-# Truncate the dissemination_* tables if they exist. 
+# Truncate the dissemination_* tables if they exist.
 # CASCADE as well. This makes sure we don't duplicate data,
 # which causes PK/FK problems.
 echo "select 'TRUNCATE TABLE '||tablename||' CASCADE;' FROM pg_tables WHERE tablename LIKE 'dissemination_%'" | \

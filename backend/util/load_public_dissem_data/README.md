@@ -50,7 +50,7 @@ This is containerized, so it should work on all platforms. To build the containe
 make build
 ```
 
-Then, to run the container, 
+Then, to run the container,
 
 ```
 make run
@@ -58,7 +58,7 @@ make run
 
 You need to run this from the current directory.
 
-NOTE: The docker command in the Makefile uses the `--network` flag. The `--network` flag tells Docker to run this container on the same network as your currently running stack. It assumes that you did a `docker compose up` on the FAC stack, and that the web container has the default name of `backend-web-1`. If this does not work, you will need to... 
+NOTE: The docker command in the Makefile uses the `--network` flag. The `--network` flag tells Docker to run this container on the same network as your currently running stack. It assumes that you did a `docker compose up` on the FAC stack, and that the web container has the default name of `backend-web-1`. If this does not work, you will need to...
 
 ```
 make NETWORK=<container-name> run
@@ -68,10 +68,10 @@ where `<container-name>` is the name of your web container. This should allow th
 
 ## When to rebuild this container
 
-Note this is pinned to v0.1.8 of the cgov-util.
+Note this is pinned to v0.1.9 of the cgov-util.
 
 https://github.com/GSA-TTS/fac-backup-utility
 
 If that gets updated, you'll need to update the dockerfile.
 
-It also copies in the YAML for sling from `dissemination/sql/sling`. If that changes, you'll want to 
+It also copies in the YAML for sling from `dissemination/sql/sling`. If that changes, you'll want to

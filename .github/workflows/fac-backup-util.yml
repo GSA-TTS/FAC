@@ -1,8 +1,8 @@
 ---
 name: Backup the database with fac-backup-utility
 ### Common Commands:
-# ./fac-backup-util.sh v0.1.8 initial_backup
-# ./fac-backup-util.sh v0.1.8 deploy_backup
+# ./fac-backup-util.sh v0.1.9 initial_backup
+# ./fac-backup-util.sh v0.1.9 deploy_backup
 on:
   workflow_dispatch:
     inputs:
@@ -18,7 +18,7 @@ on:
         description: Version for fac backup utility to use (ex. vX.Y.Z)
         required: true
         type: string
-        default: "v0.1.8"
+        default: "v0.1.9"
       backup_operation:
         description: Operation for fac-backup-utility
         required: true
