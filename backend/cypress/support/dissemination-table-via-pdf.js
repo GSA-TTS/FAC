@@ -72,9 +72,12 @@ export function testSubmissionAccessViaPDF(reportId, isTribal, isPublic) {
     expect(isPublic).to.be.true
     // We should be able to grab the PDF by URL
     // https://app.fac.gov/dissemination/report/pdf/2023-04-GSAFAC-0000050825
-    cy.request('HEAD', '/dissemination/report/pdf/' + reportId); 
-
-
+    cy.request({
+      method: 'GET',
+      url: '/dissemination/report/pdf/' + reportId
+    }).should((response) => {
+      expect(response.isOkStatusCode).to.equal(true);
+    });
   }
   ////////////////////////////////////////
   // The audit IS tribal and IS NOT public
@@ -82,7 +85,14 @@ export function testSubmissionAccessViaPDF(reportId, isTribal, isPublic) {
   else if (isTribal && !isPublic) {
     expect(isTribal).to.be.true
     expect(isPublic).to.be.false
-    cy.request('HEAD', '/dissemination/report/pdf/' + reportId); 
+    cy.request({
+      method: 'GET',
+      url: '/dissemination/report/pdf/' + reportId,
+      failOnStatusCode: false,
+    }).should((response) => {
+      expect(response.isOkStatusCode).to.equal(false);
+    });
+
   }
   ////////////////////////////////////////
   // The audit IS NOT tribal and IS public
@@ -92,7 +102,12 @@ export function testSubmissionAccessViaPDF(reportId, isTribal, isPublic) {
     expect(isTribal).to.be.false
     expect(isPublic).to.be.true
     // We should always find it in all endpoints, priv or unpriv.
-    cy.request('HEAD', '/dissemination/report/pdf/' + reportId); 
+    cy.request({
+      method: 'GET',
+      url: '/dissemination/report/pdf/' + reportId
+    }).should((response) => {
+      expect(response.isOkStatusCode).to.equal(true);
+    });
   }
   ////////////////////////////////////////
   // The audit IS NOT tribal and IS NOT public
