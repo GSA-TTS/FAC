@@ -18,10 +18,10 @@ def update_census_sac_auditee_name(sac, audit_header):
 
     # Get auditee name and title from audit_header or default to settings.GSA_MIGRATION
     auditee_name = string_to_string(
-        getattr(audit_header, "AUDITEECERTIFYNAME", settings.GSA_MIGRATION)
+        getattr(audit_header, "AUDITEECERTIFYNAME", "") or settings.GSA_MIGRATION
     )
     auditee_title = string_to_string(
-        getattr(audit_header, "AUDITEECERTIFYTITLE", settings.GSA_MIGRATION)
+        getattr(audit_header, "AUDITEECERTIFYTITLE", "") or settings.GSA_MIGRATION
     )
     # Update auditee_signature with new auditee_name and auditee_title
     auditee_signature["auditee_name"] = auditee_name
