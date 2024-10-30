@@ -207,7 +207,9 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
         try:
-            Access.objects.get(email=request.user.email, sac=sac, role=self.role)
+            Access.objects.filter(
+                email=request.user.email, sac=sac, role=self.role
+            ).exists()
         except Access.DoesNotExist:
             raise PermissionDenied(
                 "Only Audit Editors may remove audit access for other Audit Editors."
@@ -241,7 +243,9 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
         try:
-            Access.objects.get(email=request.user.email, sac=sac, role=self.role)
+            Access.objects.filter(
+                email=request.user.email, sac=sac, role=self.role
+            ).exists()
         except Access.DoesNotExist:
             raise PermissionDenied(
                 "Only Audit Editors may remove audit access for other Audit Editors."
