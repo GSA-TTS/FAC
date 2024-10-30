@@ -38,8 +38,8 @@ on:
         type: choice
         options:
           - 'rds_backup'
-  # push:
-  #   branches: [jadudm/api-perf]
+  push:
+    branches: [jadudm/api-perf]
   # Uncomment above to do api refreshing
 jobs:
   api-standup:
