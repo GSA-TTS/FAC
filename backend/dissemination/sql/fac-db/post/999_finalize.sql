@@ -1,3 +1,2 @@
--- PostgREST likes to know when the schemas and things
--- attached to them change.
-NOTIFY pgrst, 'reload schema';
+-- Currently, there are no finalization actions for fac-db.
+-- They would go here.
