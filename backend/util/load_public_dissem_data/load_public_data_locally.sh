@@ -1,8 +1,20 @@
 #!/bin/bash
 
 export CGOV_UTIL_VERSION=v0.1.9
-export FAC_DB_URI=postgresql://postgres@db:5432/postgres?sslmode=disable
-export FAC_SNAPSHOT_URI=postgresql://postgres@db2:5432/postgres?sslmode=disable
+
+echo "FAC_DB_URI is [" $1 "]"
+
+if [ -z "$1" ]
+then
+    export FAC_DB_URI="postgresql://postgres@db:5432/postgres?sslmode=disable"
+else
+    export FAC_DB_URI="$1"
+    export RUNNING_LOCAL=1
+fi
+
+echo "FAC_DB_URI is now [" $FAC_DB_URI "] local [" $RUNNING_LOCAL "]"
+
+export FAC_SNAPSHOT_URI="postgresql://postgres@db2:5432/postgres?sslmode=disable"
 
 
 function check_table_exists() {
@@ -22,8 +34,14 @@ sleep 4
 # First, we cleanup the local filesystem.
 # This removes any temporary files from any
 # previous data loads
-rm -f /app/data/db_dissem_dump
-rm -rf /app/data/__MACOSX
+if [ "$RUNNING_LOCAL" -eq "1" ]; then
+    export BASE_PATH="."
+else
+    export BASE_PATH="/app"
+fi
+
+rm -f $BASE_PATH/data/db_dissem_dump
+rm -rf $BASE_PATH/data/__MACOSX
 
 # # Next, we drop the public_data schema.
 # # This is because we want to make sure it is
@@ -37,7 +55,8 @@ rm -rf /app/data/__MACOSX
 # psql $FAC_SNAPSHOT_URI -c "CREATE SEQUENCE IF NOT EXISTS public_data_v1_0_0.seq_combined START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE"
 
 # Unzip the compressed historical data dump.
-pushd /app/data
+
+pushd $BASE_PATH/data
 echo "Unzipping data."
 unzip db_dissem_dump.zip
 popd
@@ -50,7 +69,7 @@ echo "select 'TRUNCATE TABLE '||tablename||' CASCADE;' FROM pg_tables WHERE tabl
     psql $FAC_DB_URI
 
 # Load the large historic dataset.
-psql $FAC_DB_URI -v ON_ERROR_STOP=on < /app/data/db_dissem_dump
+psql $FAC_DB_URI -v ON_ERROR_STOP=on < $BASE_PATH/data/db_dissem_dump
 result=$?
 if [ $result -ne 0 ]; then
     echo "Something went wrong."

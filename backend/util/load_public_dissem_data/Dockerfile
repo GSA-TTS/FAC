@@ -25,6 +25,8 @@ RUN curl -L -O https://github.com/GSA-TTS/fac-backup-utility/releases/download/v
 # Where do we need the config? Try home?
 WORKDIR /root/.fac
 COPY data/config.json .
+ARG FAC_DB_URI="postgresql://postgres@db:5432/postgres?sslmode=disable"
+ARG RUNNING_LOCAL=0
 
 WORKDIR /app
 ENTRYPOINT [ "./load_public_data_locally.sh" ]
