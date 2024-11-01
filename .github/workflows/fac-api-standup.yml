@@ -1,8 +1,5 @@
 ---
 name: Standup the API
-### Common Commands:
-# ./fac-backup-util.sh v0.1.9 scheduled_backup
-# ./fac-backup-util.sh v0.1.9 daily_backup
 on:
   workflow_call:
     inputs:
@@ -38,18 +35,13 @@ on:
         type: choice
         options:
           - 'rds_backup'
-  push:
-    branches: [jadudm/api-perf]
-  # Uncomment above to do api refreshing
 jobs:
   api-standup:
     name: Standup API
     runs-on: ubuntu-latest
-    #environment: ${{ inputs.environment }}
-    environment: preview
+    environment: ${{ inputs.environment }}
     env:
-      #space: ${{ inputs.environment }}
-      space: preview
+      space: ${{ inputs.environment }}
     steps:
       - name: Backup FAC Database and refresh the api
         uses: cloud-gov/cg-cli-tools@main
@@ -57,7 +49,6 @@ jobs:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
-          #cf_space: ${{ env.space }}
-          cf_space: preview
-          #command: cf run-task gsa-fac -k 3G -m 3G --name standup_api --command "./util/nightly_api_refresh.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
-          command: cf run-task gsa-fac -k 2G -m 2G --name api_refresh --command "./util/nightly_api_refresh.sh v0.1.9 rds_backup"
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name standup_api --command "./util/nightly_api_refresh.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          # command: cf run-task gsa-fac -k 2G -m 2G --name api_refresh --command "./util/nightly_api_refresh.sh v0.1.9 rds_backup"
