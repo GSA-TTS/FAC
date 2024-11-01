@@ -2,6 +2,17 @@
 # Execute as a pytest.
 # pytest -s --env local test_api.py
 #
+# set environment variable
+#
+#  CAN_READ_SUPPRESSED=0
+#
+# if you are testing with a key that *should* be rejected for
+# suppressed audits, and
+#
+#  CAN_READ_SUPPRESSED=1
+#
+# if you have a key that should be able to read suppressed audits.
+# The default is 0.
 
 import os
 import requests
@@ -14,6 +25,11 @@ class EnvVars:
     FAC_API_KEY_ID = os.getenv("CYPRESS_API_GOV_USER_ID")
     FAC_AUTH_BEARER = os.getenv("CYPRESS_API_GOV_JWT")
     RECORDS_REQUESTED = 5
+    CAN_READ_SUPPRESSED = (
+        str(os.getenv("CAN_READ_SUPPRESSED"))
+        if os.getenv("CAN_READ_SUPPRESSED") != None
+        else "0"
+    )
 
 
 def url(env):
@@ -143,7 +159,8 @@ def test_suppressed_not_accessible_with_bad_key(env):
         try:
             thunk()
         except:
-            failed_count += 1
+            if EnvVars.CAN_READ_SUPPRESSED == "0":
+                failed_count += 1
     assert failed_count == 3
     # Restore it in case we need it in later tests.
     EnvVars.FAC_API_KEY_ID = TEMP_FAC_API_KEY_ID
@@ -167,5 +184,6 @@ def test_suppressed_accessible_with_good_key(env):
         try:
             thunk()
         except:
-            failed_count += 1
+            if EnvVars.CAN_READ_SUPPRESSED == "1":
+                failed_count += 1
     assert failed_count == 0
