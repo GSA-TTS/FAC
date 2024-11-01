@@ -1,9 +1,9 @@
 ---
-name: Backup Environments
+name: API Refresh Schedule
 on:
   schedule:
-    # Invoke every 2 hours
-    - cron: '0 2 * * *'
+    # Invoke at 12:30 EST
+    - cron: '30 4 * * *'
   workflow_dispatch: null
 
 jobs:
@@ -22,4 +22,3 @@ jobs:
       environment: ${{ matrix.environment.name }}
       util_version: "v0.1.9"
       backup_operation: "rds_backup"
-
