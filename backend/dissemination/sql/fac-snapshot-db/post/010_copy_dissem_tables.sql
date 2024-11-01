@@ -149,6 +149,29 @@ CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_secondaryauditor()
   $ct$
   LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_tribalapiaccesskeyids()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_tribalapiaccesskeyids
+    AS SELECT * FROM public.dissemination_tribalapiaccesskeyids;
+  END
+  $ct$
+  LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dissem_copy.create_dissemination_onetimeaccess()
+  RETURNS VOID
+  AS
+  $ct$
+  BEGIN
+    CREATE TABLE dissem_copy.dissemination_onetimeaccess
+    AS SELECT * FROM public.dissemination_onetimeaccess;
+  END
+  $ct$
+  LANGUAGE plpgsql;
+
+
 DO LANGUAGE plpgsql
 $go$
     BEGIN
@@ -176,6 +199,10 @@ $go$
       PERFORM dissem_copy.create_dissemination_passthrough();
       RAISE info 'create_dissemination_secondaryauditor';
       PERFORM dissem_copy.create_dissemination_secondaryauditor();
+      RAISE INFO 'dissemination_tribalapiaccesskeyids';
+      PERFORM dissem_copy.create_dissemination_tribalapiaccesskeyids();
+      RAISE info 'create_dissemination_onetimeaccess';
+      PERFORM dissem_copy.create_dissemination_onetimeaccess();
     END
 $go$;
 

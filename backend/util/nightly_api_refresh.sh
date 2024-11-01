@@ -17,3 +17,9 @@ gonogo "sql_pre_fac_snapshot_db"
 
 sql_post_fac_snapshot_db
 gonogo "sql_post_fac_snapshot_db"
+
+# We might, at some point, 
+# consider running a vacuum on DB1
+# as part of a nightly or weekly job.
+# Below is *representative* code. 
+# run_sql $FAC_DB_URI -c "VACUUM(FULL, ANALYZE)"
