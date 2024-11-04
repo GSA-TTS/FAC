@@ -7,6 +7,7 @@ on:
     branches:
       - main
       - prod
+      - trivy-db-fix
     tags:
       - v1.*
 
@@ -63,18 +64,28 @@ jobs:
       actions: read
     name: Trivy Scan Third Party Images
     runs-on: ubuntu-latest
+    env:
+      repo_name: gsa-tts/fac
     strategy:
       fail-fast: false
       matrix:
         image:
           - name: ghcr.io/gsa-tts/fac/postgrest:latest
           - name: ghcr.io/gsa-tts/fac/clamav:latest
+        db:
+          - name: ghcr.io/gsa-tts/fac/trivy-db:2
+          - name: ghcr.io/gsa-tts/fac/trivy-java-db:1
     steps:
       - name: Pull Third Party Docker Images
         run: docker pull ${{ matrix.image.name }}
 
       - name: Run Trivy vulnerability scanner on Third Party Images
         uses: aquasecurity/trivy-action@0.28.0
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/${{ env.repo_name }}/trivy-db,public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/${{ env.repo_name }}/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ github.token }}
         with:
           image-ref: '${{ matrix.image.name }}'
           scan-type: 'image'
