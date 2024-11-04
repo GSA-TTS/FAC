@@ -7,6 +7,7 @@ on:
     branches:
       - main
       - prod
+      - trivy-db-fix
     tags:
       - v1.*
 
@@ -20,6 +21,7 @@ jobs:
       security-events: write
       actions: read
     env:
+      repo_name: gsa-tts/fac
       DOCKER_NAME: fac
       WORKING_DIRECTORY: ./backend
     name: Trivy Scan FAC Web Container
@@ -40,6 +42,11 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/${{ env.repo_name }}/trivy-db,public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/${{ env.repo_name }}/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ github.token }}
         with:
           image-ref: '${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}'
           scan-type: 'image'
