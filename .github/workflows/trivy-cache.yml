@@ -1,0 +1,48 @@
+---
+name: Cache Trivy DBs
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  push:
+    branches: [trivy-db-fix]
+
+permissions:
+  packages: write
+  id-token: write
+
+jobs:
+  caching:
+    name: Cache Trivy DBs
+    runs-on: ubuntu-latest
+    env:
+      repo_name: gsa-tts/fac
+
+    steps:
+      - name: Install ORAS
+        id: oras
+        uses: oras-project/setup-oras@v1
+
+      - name: Authenticate to GHCR
+        id: ghcr
+        run: |
+          oras login ghcr.io \
+            -u ${{ github.actor }} \
+            -p ${{ github.token }}
+
+      - name: Pull Trivy Images
+        id: pull
+        run: |
+          oras pull ghcr.io/aquasecurity/trivy-db:2
+          oras pull ghcr.io/aquasecurity/trivy-java-db:1
+
+      - name: Push Trivy Images
+        id: push
+        run: |
+          oras push ghcr.io/${{ env.repo_name }}/trivy-db:2 \
+            db.tar.gz:application/vnd.aquasec.trivy.db.layer.v1.tar+gzip \
+            --artifact-type application/vnd.aquasec.trivy.config.v1+json
+
+          oras push ghcr.io/${{ env.repo_name }}/trivy-java-db:1 \
+            javadb.tar.gz:application/vnd.aquasec.trivy.javadb.layer.v1.tar+gzip \
+            --artifact-type application/vnd.aquasec.trivy.config.v1+json
