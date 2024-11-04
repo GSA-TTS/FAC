@@ -39,10 +39,10 @@ jobs:
       - name: Push Trivy Images
         id: push
         run: |
-          oras push ghcr.io/${{ env.repo_name }}/trivy-db:2 \
+          oras push ghcr.io/${{ env.repo_name }}/trivy-db:latest \
             db.tar.gz:application/vnd.aquasec.trivy.db.layer.v1.tar+gzip \
             --artifact-type application/vnd.aquasec.trivy.config.v1+json
 
-          oras push ghcr.io/${{ env.repo_name }}/trivy-java-db:1 \
+          oras push ghcr.io/${{ env.repo_name }}/trivy-java-db:latest \
             javadb.tar.gz:application/vnd.aquasec.trivy.javadb.layer.v1.tar+gzip \
             --artifact-type application/vnd.aquasec.trivy.config.v1+json
