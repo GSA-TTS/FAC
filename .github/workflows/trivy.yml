@@ -72,9 +72,6 @@ jobs:
         image:
           - name: ghcr.io/gsa-tts/fac/postgrest:latest
           - name: ghcr.io/gsa-tts/fac/clamav:latest
-        db:
-          - name: ghcr.io/gsa-tts/fac/trivy-db:2
-          - name: ghcr.io/gsa-tts/fac/trivy-java-db:1
     steps:
       - name: Pull Third Party Docker Images
         run: docker pull ${{ matrix.image.name }}
