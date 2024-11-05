@@ -3,7 +3,7 @@
 
 provider "registry.terraform.io/cloudfoundry-community/cloudfoundry" {
   version     = "0.53.1"
-  constraints = "~> 0.53.1"
+  constraints = ">= 0.15.0, ~> 0.53.1"
   hashes = [
     "h1:U6Cx0ZA1N8PlKPYOw2uxqWvSvU6zeEwSdmP6RzZ3eXw=",
     "zh:017a55cdbd444ccf8fe45a3c7cdbc08ddf4f0f13550fcd457c31df9b2cfdb767",
