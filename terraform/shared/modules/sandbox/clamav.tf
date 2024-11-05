@@ -7,7 +7,7 @@ data "docker_registry_image" "clamav" {
 }
 
 module "clamav" {
-  source = "github.com/gsa-tts/terraform-cloudgov//clamav?ref=v0.9.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//clamav?ref=v1.1.0"
 
   # This generates eg "fac-av-staging.apps.internal", avoiding collisions with routes for other projects and spaces
   name           = local.clam_name
@@ -24,7 +24,7 @@ module "clamav" {
   proxy_port     = module.https-proxy.port
   proxy_username = module.https-proxy.username
   proxy_password = module.https-proxy.password
-  depends_on     = [module.fac-app.app_id]
+  # depends_on     = [module.fac-app.app_id]
   # depends_on     = [ module.https-proxy.https_proxy ]
 }
 
