@@ -4,7 +4,6 @@ module "database" {
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
   name             = "fac-db"
-  recursive_delete = var.recursive_delete
   tags             = ["rds"]
   rds_plan_name    = var.database_plan
   json_params      = var.json_params
@@ -16,7 +15,6 @@ module "snapshot-database" {
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
   name             = "fac-snapshot-db"
-  recursive_delete = var.recursive_delete
   tags             = ["rds"]
   rds_plan_name    = var.database_plan
   json_params      = var.json_params
@@ -28,7 +26,6 @@ module "s3-public" {
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
   name             = "fac-public-s3"
-  recursive_delete = var.recursive_delete
   s3_plan_name     = "basic-public"
   tags             = ["s3"]
 }
@@ -39,7 +36,6 @@ module "s3-private" {
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
   name             = "fac-private-s3"
-  recursive_delete = var.recursive_delete
   s3_plan_name     = "basic"
   tags             = ["s3"]
 }

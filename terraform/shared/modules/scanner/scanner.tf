@@ -36,7 +36,6 @@ module "quarantine" {
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
   name             = "fac-file-scanner-quarantine"
-  recursive_delete = var.recursive_delete
   s3_plan_name     = "basic"
   tags             = ["s3"]
 }
