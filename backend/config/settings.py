@@ -227,8 +227,7 @@ STATIC_URL = "/static/"
 
 # Environment specific configurations
 DEBUG = False
-
-if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
+if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     DATABASES = {
         "default": env.dj_db_url(
             "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
