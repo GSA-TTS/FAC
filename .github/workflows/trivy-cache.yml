@@ -1,45 +1,38 @@
----
-name: Cache Trivy DBs
+# In your scan workflow, set TRIVY_SKIP_DB_UPDATE=true and TRIVY_SKIP_JAVA_DB_UPDATE=true.
+name: Update Trivy Cache
+
 on:
   schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
-
-permissions:
-  packages: write
-  id-token: write
+    - cron: '0 0 * * *'  # Run daily at midnight UTC
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
-  caching:
-    name: Cache Trivy DBs
+  update-trivy-db:
     runs-on: ubuntu-latest
-    env:
-      repo_name: gsa-tts/fac
     steps:
-      - name: Install ORAS
-        id: oras
+      - name: Setup oras
         uses: oras-project/setup-oras@v1
 
-      - name: Authenticate to GHCR
-        id: ghcr
-        run: |
-          oras login ghcr.io \
-            -u ${{ github.actor }} \
-            -p ${{ github.token }}
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
-      - name: Pull Trivy Images
-        id: pull
+      - name: Download and extract the vulnerability DB
         run: |
+          mkdir -p $GITHUB_WORKSPACE/.cache/trivy/db
           oras pull ghcr.io/aquasecurity/trivy-db:2
-          oras pull ghcr.io/aquasecurity/trivy-java-db:1
+          tar -xzf db.tar.gz -C $GITHUB_WORKSPACE/.cache/trivy/db
+          rm db.tar.gz
 
-      - name: Push Trivy Images
-        id: push
+      - name: Download and extract the Java DB
         run: |
-          oras push ghcr.io/${{ env.repo_name }}/trivy-db:2 \
-            db.tar.gz:application/vnd.aquasec.trivy.db.layer.v1.tar+gzip \
-            --artifact-type application/vnd.aquasec.trivy.config.v1+json
+          mkdir -p $GITHUB_WORKSPACE/.cache/trivy/java-db
+          oras pull ghcr.io/aquasecurity/trivy-java-db:1
+          tar -xzf javadb.tar.gz -C $GITHUB_WORKSPACE/.cache/trivy/java-db
+          rm javadb.tar.gz
 
-          oras push ghcr.io/${{ env.repo_name }}/trivy-java-db:1 \
-            javadb.tar.gz:application/vnd.aquasec.trivy.javadb.layer.v1.tar+gzip \
-            --artifact-type application/vnd.aquasec.trivy.config.v1+json
+      - name: Cache DBs
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/.cache/trivy
+          key: cache-trivy-${{ steps.date.outputs.date }}
