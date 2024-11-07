@@ -6,7 +6,9 @@ The first time you login to the application, a user record in the FAC database w
 
 ## Admin users
 
-To promote a user to either staff or superuser status, we'll use a Django management command. If you're running locally, the management command can be executed directly.
+### Local development
+
+To acquire admin access in the local environment, you can execute a management command directly.
 
 ```bash
 # Run make_staff to promote a user to staff status
@@ -16,23 +18,13 @@ python manage.py make_staff user@example.com
 python manage.py make_super user@example.com
 ```
 
-To run it against a deployed instance, we'll SSH into the app, [configure our session](https://cloud.gov/docs/management/using-ssh/#application-debugging-tips), and then run the command.
+### Deployed instances
 
-```bash
-# SSH to cloud.gov **instance**
-cf ssh gsa-fac-dev
+To add/remove/promote a user in the admin interface, you would modify the [staffusers.json](../backend/config/staffusers.json) list and submit a PR for this change.
 
-# Configure session per cloud.gov docs
-/tmp/lifecycle/shell
+Once the application starts up, it will adjust the user access to the admin site based on the updated list. If you are included in this list, you will be able to access the site via the `/admin` page.
 
-# Run make_staff to promote a user to staff status
-python manage.py make_staff user@example.com
-
-# Run make_super to promote a user to superuser status
-python manage.py make_super user@example.com
-```
-
-Once your user is promoted, you'll be able to access the admin site via the `/admin` page.
+**NOTE** - The email addresses included in this list MUST have a Login.gov account and have used it to log in to the application at least once. Otherwise, the application will ignore the email address on startup.
 
 ## Non-admin users
 
