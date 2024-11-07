@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Source everything; everything is now a function.
-# Remember: bash has no idea if a function exists, 
+# Remember: bash has no idea if a function exists,
 # so a typo in a function name will fail silently. Similarly,
-# bash has horrible scoping, so use of `local` in functions is 
+# bash has horrible scoping, so use of `local` in functions is
 # critical for cleanliness in the startup script.
 source tools/util_startup.sh
 # This will choose the correct environment
@@ -14,6 +14,7 @@ source tools/migrate_app_tables.sh
 source tools/api_standup.sh
 source tools/run_collectstatic.sh
 source tools/seed_cog_baseline.sh
+source tools/materialized_views.sh
 
 #####
 # SETUP THE CGOV ENVIRONMENT
@@ -43,14 +44,17 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     #####
     # COLLECT STATIC
     # Do Django things with static files.
-    run_collectstatic
-    gonogo "run_collectstatic"
+    # run_collectstatic
+    # gonogo "run_collectstatic"
 
     #####
     # SEED COG/OVER TABLES
     # Setup tables for cog/over assignments
     seed_cog_baseline
     gonogo "seed_cog_baseline"
+
+    # materialized_views
+    # gonogo "materialized_views"
 fi
 
 # Make psql usable by scripts, for debugging, etc.
