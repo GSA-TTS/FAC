@@ -3,7 +3,6 @@ import os
 import time
 from pprint import pprint
 import math
-import json
 
 URI = "http://localhost:3000"
 
@@ -64,11 +63,11 @@ def fetch_fa_time(api_version):
             "authorization": f"bearer {os.getenv('CYPRESS_API_GOV_JWT')}",
         }
         t0 = time.time()
-        resp = requests.get(query, headers=headers)
+        requests.get(query, headers=headers)
         t1 = time.time()
         # We get back a list of one plan, and we want the total cost.
         total_cost += t1 - t0
-        print(f"fetch_fa_time api {api_version} offset {offset} time {t1-t0}")
+        print(f"fetch_fa_time api {api_version} offset {offset} time {t1 - t0}")
     return math.floor(total_cost)
 
 
@@ -84,12 +83,12 @@ def fetch_fa_time_by_year(api_version):
                 "authorization": f"bearer {os.getenv('CYPRESS_API_GOV_JWT')}",
             }
             t0 = time.time()
-            resp = requests.get(query, headers=headers)
+            requests.get(query, headers=headers)
             t1 = time.time()
             # We get back a list of one plan, and we want the total cost.
             total_cost += t1 - t0
             print(
-                f"fetch_fa_time_by_year api {api_version} ay {audit_year} offset {offset} time {t1-t0}"
+                f"fetch_fa_time_by_year api {api_version} ay {audit_year} offset {offset} time {t1 - t0}"
             )
     return math.floor(total_cost)
 
@@ -122,7 +121,7 @@ def fetch_fa_batches_time():
             "authorization": f"bearer {os.getenv('CYPRESS_API_GOV_JWT')}",
         }
         t0 = time.time()
-        resp = requests.get(query, headers=headers)
+        requests.get(query, headers=headers)
         t1 = time.time()
         # We get back a list of one plan, and we want the total cost.
         total_cost += t1 - t0

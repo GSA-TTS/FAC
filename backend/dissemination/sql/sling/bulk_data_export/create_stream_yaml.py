@@ -5,7 +5,6 @@
 # to regenerate the sling file.
 
 import yaml
-from pprint import pprint
 from datetime import datetime
 
 obj = {"streams": dict()}

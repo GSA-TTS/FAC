@@ -27,7 +27,7 @@ class EnvVars:
     RECORDS_REQUESTED = 5
     CAN_READ_SUPPRESSED = (
         str(os.getenv("CAN_READ_SUPPRESSED"))
-        if os.getenv("CAN_READ_SUPPRESSED") != None
+        if os.getenv("CAN_READ_SUPPRESSED") is not None
         else "0"
     )
 
@@ -125,7 +125,7 @@ def test_api_v1_0_3_not_exist(env):
         common_tables(f)
         print("This schema/API should not exist.")
         assert False
-    except:
+    except Exception:
         pass
 
 
@@ -158,7 +158,7 @@ def test_suppressed_not_accessible_with_bad_key(env):
     ]:
         try:
             thunk()
-        except:
+        except Exception:
             if EnvVars.CAN_READ_SUPPRESSED == "0":
                 failed_count += 1
     assert failed_count == 3
@@ -183,7 +183,7 @@ def test_suppressed_accessible_with_good_key(env):
     ]:
         try:
             thunk()
-        except:
+        except Exception:
             if EnvVars.CAN_READ_SUPPRESSED == "1":
                 failed_count += 1
     assert failed_count == 0
