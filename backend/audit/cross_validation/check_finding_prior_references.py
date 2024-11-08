@@ -8,16 +8,20 @@ from dissemination.models import (
     General,
 )
 
+from datetime import date
+
 
 def check_finding_prior_references(sac_dict, *_args, **_kwargs):
     """
     Check that prior references point to reference numbers that actually exist
     in the previous year's report
     """
-    all_sections = sac_dict.get("sf_sac_sections", {})
-    general_information = all_sections.get("general_information", {})
-    previous_year = general_information["audit_year"] - 1
+    all_sections = sac_dict.get("sf_sac_sections")
+    general_information = all_sections.get("general_information")
     auditee_uei = general_information["auditee_uei"]
+    previous_year = (
+        date.fromisoformat(general_information["auditee_fiscal_period_start"]).year - 1
+    )
 
     try:
         previous_year_report = General.objects.get(
@@ -26,7 +30,9 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
         )
     except General.DoesNotExist:
         return [
-            err_prior_no_report(auditee_uei, previous_year),
+            {
+                "error": err_prior_no_report(auditee_uei, previous_year),
+            }
         ]
 
     findings_uniform_guidance_section = (
@@ -49,7 +55,9 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
         for prior_ref in prior_refs:
             if prior_ref == "N/A":
                 errors.append(
-                    err_bad_repeat_prior_reference(award_ref),
+                    {
+                        "error": err_bad_repeat_prior_reference(award_ref),
+                    }
                 )
 
             if not Finding.objects.filter(
@@ -57,7 +65,11 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
                 reference_number=prior_ref,
             ).exists():
                 errors.append(
-                    err_prior_ref_not_found(prior_ref, previous_year_report_id)
+                    {
+                        "error": err_prior_ref_not_found(
+                            prior_ref, previous_year_report_id
+                        ),
+                    }
                 )
 
     return errors

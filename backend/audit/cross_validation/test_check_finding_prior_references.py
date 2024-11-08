@@ -12,11 +12,13 @@ from dissemination.models import (
     General,
 )
 
+from datetime import date
+
 
 class CheckFindingPriorReferencesTests(TestCase):
     def _test_check_finding_prior_references(
         self,
-        audit_year,  # Int of audit year
+        auditee_fiscal_period_start,  # ISO date string
         awards_prior_refs,  # Dict of award # -> prior reference string
         prior_report_exists,  # Bool determining if prior report should exist in General
         repeat_prior_reference,  # Set 'Y' or 'N' in findings_uniform_guidance_entries
@@ -45,7 +47,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             SingleAuditChecklist,
             general_information={
                 "auditee_uei": AUDITEE_UEI,
-                "audit_year": audit_year,
+                "auditee_fiscal_period_start": auditee_fiscal_period_start,
             },
             findings_uniform_guidance={
                 "FindingsUniformGuidance": {
@@ -58,10 +60,11 @@ class CheckFindingPriorReferencesTests(TestCase):
 
         if prior_report_exists:
             # Create the prior report that was submitted last year
+            previous_year = date.fromisoformat(auditee_fiscal_period_start).year - 1
             prior_gen = baker.make(
                 General,
                 report_id="foo-report-id",
-                audit_year=audit_year - 1,
+                audit_year=previous_year,
                 auditee_uei=AUDITEE_UEI,
             )
             prior_gen.save()
@@ -86,7 +89,7 @@ class CheckFindingPriorReferencesTests(TestCase):
         One award having a single prior reference should pass
         """
         self._test_check_finding_prior_references(
-            audit_year=2001,
+            auditee_fiscal_period_start="2001-01-01",
             awards_prior_refs={
                 "AWARD-001": "2000-777",
             },
@@ -100,7 +103,7 @@ class CheckFindingPriorReferencesTests(TestCase):
         One award having multiple prior references should pass
         """
         self._test_check_finding_prior_references(
-            audit_year=2001,
+            auditee_fiscal_period_start="2001-01-01",
             awards_prior_refs={
                 "AWARD-001": "2000-777,2000-888",
             },
@@ -114,7 +117,7 @@ class CheckFindingPriorReferencesTests(TestCase):
         Multiple awards having prior references should pass
         """
         self._test_check_finding_prior_references(
-            audit_year=2001,
+            auditee_fiscal_period_start="2001-01-01",
             awards_prior_refs={
                 "AWARD-001": "2000-777",
                 "AWARD-002": "2000-888",
@@ -130,14 +133,16 @@ class CheckFindingPriorReferencesTests(TestCase):
         'Y' should fail
         """
         self._test_check_finding_prior_references(
-            audit_year=2001,
+            auditee_fiscal_period_start="2001-01-01",
             awards_prior_refs={
                 "AWARD-001": "N/A",
             },
             repeat_prior_reference="Y",
             prior_report_exists=True,
             expected_error_strs=[
-                "AWARD-001 field repeat_prior_reference is set to 'Y', but prior_references is set to 'N/A'.",
+                {
+                    "error": "AWARD-001 field repeat_prior_reference is set to 'Y', but prior_references is set to 'N/A'.",
+                }
             ],
         )
 
@@ -146,14 +151,16 @@ class CheckFindingPriorReferencesTests(TestCase):
         An award having a prior reference but no prior report exists should fail
         """
         self._test_check_finding_prior_references(
-            audit_year=2001,
+            auditee_fiscal_period_start="2001-01-01",
             awards_prior_refs={
                 "AWARD-001": "2000-777",
             },
             repeat_prior_reference="Y",
             prior_report_exists=False,
             expected_error_strs=[
-                "Findings uniform guidance contains prior reference numbers, but no report was found for UEI ABC123DEF456 in the previous year (2000).",
+                {
+                    "error": "Findings uniform guidance contains prior reference numbers, but no report was found for UEI ABC123DEF456 in the previous year (2000).",
+                }
             ],
         )
 
