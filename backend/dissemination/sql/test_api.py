@@ -1,19 +1,4 @@
-#
-# Execute as a pytest.
-# pytest -s --env local test_api.py
-#
-# set environment variable
-#
-#  CAN_READ_SUPPRESSED=0
-#
-# if you are testing with a key that *should* be rejected for
-# suppressed audits, and
-#
-#  CAN_READ_SUPPRESSED=1
-#
-# if you have a key that should be able to read suppressed audits.
-# The default is 0.
-
+from django.test import TestCase
 import os
 import requests
 import sys
@@ -82,108 +67,112 @@ def limit(start, end):
     return {"Range-Unit": "items", "Range": f"{start}-{end}"}
 
 
-# Asserts that an API response is:
-# * A list
-# * A list composed of objects that all contain the required keys
-def good_resp(objs, keys):
-    assert isinstance(objs, list)
-    assert len(objs) == EnvVars.RECORDS_REQUESTED
-    for k in keys:
-        for o in objs:
-            # print(f"Checking {k} in {o}")
-            assert k in o
-    return True
+class ApiTests(TestCase):
 
+    ENV = "local"
 
-# Constructs the base URL for making multiple API calls off of.
-def cons(env, api_version):
-    def _helper(endpoint, keys):
-        base = url(env)
-        h = headers(env) | limit(0, EnvVars.RECORDS_REQUESTED - 1) | api(api_version)
-        r = requests.get(base + f"/{endpoint}", headers=h)
-        # print(r.request.url)
-        # print(r.request.headers)
-        good_resp(r.json(), keys)
+    def good_resp(self, objs, keys):
+        """
+        Asserts that an API response is:
+        * A list
+        * A list composed of objects that all contain the required keys
+        """
+        self.assertIsInstance(objs, list)
+        self.assertEqual(len(objs), EnvVars.RECORDS_REQUESTED)
+        for k in keys:
+            for o in objs:
+                self.assertIn(k, o)
+        return True
 
-    return _helper
+    def cons(self, env, api_version):
+        """Constructs the base URL for making multiple API calls off of."""
 
+        # FIXME: currently, both tests that use this method fail over a "ConnectionRefusedError".
+        def _helper(endpoint, keys):
+            base = url(env)
+            h = (
+                headers(env)
+                | limit(0, EnvVars.RECORDS_REQUESTED - 1)
+                | api(api_version)
+            )
+            r = requests.get(base + f"/{endpoint}", headers=h)
+            self.good_resp(r.json(), keys)
 
-# These tables are common to both the old API and
-# the new public data API.
-def common_tables(f):
-    f("general", ["report_id", "audit_year", "auditee_name"])
-    f(
-        "federal_awards",
-        ["report_id", "amount_expended", "audit_report_type"],
-    )
-    f("corrective_action_plans", ["report_id", "finding_ref_number", "auditee_uei"])
+        return _helper
 
+    def common_tables(self, f):
+        """These tables are common to both the old API and the new public data API."""
 
-def test_api_v1_0_3_not_exist(env):
-    f = cons(env, "api_v1_0_3")
-    try:
-        common_tables(f)
-        print("This schema/API should not exist.")
-        assert False
-    except Exception:
-        pass
+        f("general", ["report_id", "audit_year", "auditee_name"])
+        f(
+            "federal_awards",
+            ["report_id", "amount_expended", "audit_report_type"],
+        )
+        f("corrective_action_plans", ["report_id", "finding_ref_number", "auditee_uei"])
 
-
-def test_api_v1_1_0(env):
-    f = cons(env, "api_v1_1_0")
-    common_tables(f)
-
-
-def test_api_v2_0_0(env):
-    f = cons(env, "api_v2_0_0")
-    common_tables(f)
-
-
-def test_suppressed_not_accessible_with_bad_key(env):
-    # Stash the token, and wipe it out, so the API
-    # calls will fail.
-    TEMP_FAC_API_KEY_ID = EnvVars.FAC_API_KEY_ID
-    EnvVars.FAC_API_KEY_ID = str(uuid.uuid4())
-    f = cons(env, "api_v2_0_0")
-    failed_count = 0
-    for thunk in [
-        lambda: f(
-            "suppressed_notes_to_sefa", ["report_id", "content", "is_minimis_rate_used"]
-        ),
-        lambda: f("suppressed_findings_text", ["report_id", "finding_ref_number"]),
-        lambda: f(
-            "suppressed_corrective_action_plans",
-            ["report_id", "finding_ref_number", "planned_action"],
-        ),
-    ]:
+    def test_api_v1_0_3_not_exist(self):
+        f = self.cons(self.ENV, "api_v1_0_3")
         try:
-            thunk()
+            self.common_tables(f)
+            print("This schema/API should not exist.")
+            self.assertTrue(False)
         except Exception:
-            if EnvVars.CAN_READ_SUPPRESSED == "0":
-                failed_count += 1
-    assert failed_count == 3
-    # Restore it in case we need it in later tests.
-    EnvVars.FAC_API_KEY_ID = TEMP_FAC_API_KEY_ID
+            pass
 
+    def test_api_v1_1_0(self):
+        f = self.cons(self.ENV, "api_v1_1_0")
+        self.common_tables(f)
 
-def test_suppressed_accessible_with_good_key(env):
-    # Stash the token, and wipe it out, so the API
-    # calls will fail.
-    f = cons(env, "api_v2_0_0")
-    failed_count = 0
-    for thunk in [
-        lambda: f(
-            "suppressed_notes_to_sefa", ["report_id", "content", "is_minimis_rate_used"]
-        ),
-        lambda: f("suppressed_findings_text", ["report_id", "finding_ref_number"]),
-        lambda: f(
-            "suppressed_corrective_action_plans",
-            ["report_id", "finding_ref_number", "planned_action"],
-        ),
-    ]:
-        try:
-            thunk()
-        except Exception:
-            if EnvVars.CAN_READ_SUPPRESSED == "1":
-                failed_count += 1
-    assert failed_count == 0
+    def test_api_v2_0_0(self):
+        f = self.cons(self.ENV, "api_v2_0_0")
+        self.common_tables(f)
+
+    def test_suppressed_not_accessible_with_bad_key(self):
+        # Stash the token, and wipe it out, so the API
+        # calls will fail.
+        TEMP_FAC_API_KEY_ID = EnvVars.FAC_API_KEY_ID
+        EnvVars.FAC_API_KEY_ID = str(uuid.uuid4())
+        f = self.cons(self.ENV, "api_v2_0_0")
+        failed_count = 0
+        for thunk in [
+            lambda: f(
+                "suppressed_notes_to_sefa",
+                ["report_id", "content", "is_minimis_rate_used"],
+            ),
+            lambda: f("suppressed_findings_text", ["report_id", "finding_ref_number"]),
+            lambda: f(
+                "suppressed_corrective_action_plans",
+                ["report_id", "finding_ref_number", "planned_action"],
+            ),
+        ]:
+            try:
+                thunk()
+            except Exception:
+                if EnvVars.CAN_READ_SUPPRESSED == "0":
+                    failed_count += 1
+        self.assertEqual(failed_count, 3)
+        # Restore it in case we need it in later tests.
+        EnvVars.FAC_API_KEY_ID = TEMP_FAC_API_KEY_ID
+
+    def test_suppressed_accessible_with_good_key(self):
+        # Stash the token, and wipe it out, so the API
+        # calls will fail.
+        f = self.cons(self.ENV, "api_v2_0_0")
+        failed_count = 0
+        for thunk in [
+            lambda: f(
+                "suppressed_notes_to_sefa",
+                ["report_id", "content", "is_minimis_rate_used"],
+            ),
+            lambda: f("suppressed_findings_text", ["report_id", "finding_ref_number"]),
+            lambda: f(
+                "suppressed_corrective_action_plans",
+                ["report_id", "finding_ref_number", "planned_action"],
+            ),
+        ]:
+            try:
+                thunk()
+            except Exception:
+                if EnvVars.CAN_READ_SUPPRESSED == "1":
+                    failed_count += 1
+        self.assertEqual(failed_count, 0)
