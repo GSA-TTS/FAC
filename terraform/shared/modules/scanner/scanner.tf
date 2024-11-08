@@ -33,11 +33,11 @@ resource "cloudfoundry_user_provided_service" "clam" {
 module "quarantine" {
   source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.1.0"
 
-  cf_org_name      = var.cf_org_name
-  cf_space_name    = var.cf_space_name
-  name             = "fac-file-scanner-quarantine"
-  s3_plan_name     = "basic"
-  tags             = ["s3"]
+  cf_org_name   = var.cf_org_name
+  cf_space_name = var.cf_space_name
+  name          = "fac-file-scanner-quarantine"
+  s3_plan_name  = "basic"
+  tags          = ["s3"]
 }
 
 locals {
