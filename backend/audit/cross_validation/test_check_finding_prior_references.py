@@ -3,7 +3,7 @@ from model_bakery import baker
 
 from .check_finding_prior_references import (
     check_finding_prior_references,
-    _get_prior_ref_numbers,
+    _get_prior_refs,
 )
 from .sac_validation_shape import sac_validation_shape
 from audit.models import SingleAuditChecklist
@@ -14,9 +14,9 @@ from dissemination.models import (
 
 
 class CheckFindingPriorReferencesTests(TestCase):
-    def test_get_prior_ref_numbers(self):
+    def test_get_prior_refs(self):
         """
-        Extracting the prior_references field from an award
+        Extracting prior_references from an award should pass
         """
         findings_uniform_guidance = [
             {
@@ -30,13 +30,13 @@ class CheckFindingPriorReferencesTests(TestCase):
             },
         ]
 
-        results = _get_prior_ref_numbers(findings_uniform_guidance)
+        results = _get_prior_refs(findings_uniform_guidance)
 
         self.assertEqual(results, {"AWARD-001": "2022-033"})
 
-    def test_get_prior_ref_numbers_multiple_awards(self):
+    def test_get_prior_refs_multiple_awards(self):
         """
-        Extracting the prior_references field from multiple awards
+        Extracting prior_references from multiple awards should pass
         """
         findings_uniform_guidance = [
             {
@@ -59,17 +59,17 @@ class CheckFindingPriorReferencesTests(TestCase):
             },
         ]
 
-        results = _get_prior_ref_numbers(findings_uniform_guidance)
+        results = _get_prior_refs(findings_uniform_guidance)
 
         self.assertEqual(results, {"AWARD-001": "2022-033", "AWARD-002": "2022-022"})
 
-    def test_get_prior_ref_numbers_empty(self):
+    def test_get_prior_refs_no_awards(self):
         """
-        Extracting the prior_references field from empty findings
+        Extracting prior_references when there are no awards should pass
         """
         findings_uniform_guidance = []
 
-        results = _get_prior_ref_numbers(findings_uniform_guidance)
+        results = _get_prior_refs(findings_uniform_guidance)
 
         self.assertEqual(results, {})
 
