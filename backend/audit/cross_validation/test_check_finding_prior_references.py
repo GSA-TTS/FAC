@@ -25,7 +25,7 @@ class CheckFindingPriorReferencesTests(TestCase):
         """
         Helper used for testing prior references
         """
-        EIN = "ABC123DEF456"
+        AUDITEE_UEI = "ABC123DEF456"
 
         # Set up the awards for the sac being validated
         findings_uniform_guidance_entries = []
@@ -44,7 +44,7 @@ class CheckFindingPriorReferencesTests(TestCase):
         new_sac = baker.make(
             SingleAuditChecklist,
             general_information={
-                "ein": EIN,
+                "auditee_uei": AUDITEE_UEI,
                 "audit_year": audit_year,
             },
             findings_uniform_guidance={
@@ -62,7 +62,7 @@ class CheckFindingPriorReferencesTests(TestCase):
                 General,
                 report_id="foo-report-id",
                 audit_year=audit_year - 1,
-                auditee_ein=EIN,
+                auditee_uei=AUDITEE_UEI,
             )
             prior_gen.save()
 
@@ -153,7 +153,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             repeat_prior_reference="Y",
             prior_report_exists=False,
             expected_error_strs=[
-                "Findings uniform guidance contains prior reference numbers, but no report was found for EIN ABC123DEF456 in the previous year (2000).",
+                "Findings uniform guidance contains prior reference numbers, but no report was found for UEI ABC123DEF456 in the previous year (2000).",
             ],
         )
 

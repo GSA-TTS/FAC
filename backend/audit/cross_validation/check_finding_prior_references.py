@@ -17,16 +17,16 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
     all_sections = sac_dict.get("sf_sac_sections", {})
     general_information = all_sections.get("general_information", {})
     previous_year = general_information["audit_year"] - 1
-    ein = general_information["ein"]
+    auditee_uei = general_information["auditee_uei"]
 
     try:
         previous_year_report = General.objects.get(
             audit_year=previous_year,
-            auditee_ein=ein,
+            auditee_uei=auditee_uei,
         )
     except General.DoesNotExist:
         return [
-            err_prior_no_report(ein, previous_year),
+            err_prior_no_report(auditee_uei, previous_year),
         ]
 
     findings_uniform_guidance_section = (
