@@ -2,17 +2,6 @@
   Re-useable code for testing the dissemination table.
 */
 
-const API_GOV_JWT = Cypress.env('API_GOV_JWT') || '';
-const API_GOV_KEY = Cypress.env('API_GOV_KEY') || '';
-const API_GOV_USER_ID = Cypress.env('API_GOV_USER_ID');
-const API_GOV_KEY_ADMIN = Cypress.env('API_GOV_KEY_ADMIN');
-const API_GOV_USER_ID_ADMIN = Cypress.env('API_GOV_USER_ID_ADMIN');
-const API_GOV_URL = Cypress.env('API_GOV_URL');
-const API_VERSION = Cypress.env('API_VERSION');
-const ADMIN_API_VERSION = Cypress.env('ADMIN_API_VERSION');
-
-const API_GOV_USER_EMAIL = `${API_GOV_USER_ID}@example.com`;
-
 // We're testing a 2x2. Actually, this would be better as a table, as this is a 3D test.
 //                    is tribal                           is not tribal             
 //           ┌────────────────────────────────┬────────────────────────────────┐    
