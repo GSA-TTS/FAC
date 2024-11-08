@@ -34,10 +34,8 @@ class CheckFindingPriorReferencesTests(TestCase):
                 {
                     "program": {"award_reference": award_ref},
                     "findings": {
-                        "is_valid": "N",
                         "repeat_prior_reference": repeat_prior_reference,
                         "prior_references": prior_refs_str,
-                        "reference_number": f"{audit_year}-001",
                     },
                 }
             )
@@ -167,10 +165,8 @@ class CheckFindingPriorReferencesTests(TestCase):
             {
                 "program": {"award_reference": "AWARD-001"},
                 "findings": {
-                    "is_valid": "N",
                     "repeat_prior_reference": "Y",
                     "prior_references": "2022-033",
-                    "reference_number": "2023-001",
                 },
             },
         ]
@@ -187,19 +183,15 @@ class CheckFindingPriorReferencesTests(TestCase):
             {
                 "program": {"award_reference": "AWARD-001"},
                 "findings": {
-                    "is_valid": "N",
                     "repeat_prior_reference": "Y",
                     "prior_references": "2022-033",
-                    "reference_number": "2023-001",
                 },
             },
             {
                 "program": {"award_reference": "AWARD-002"},
                 "findings": {
-                    "is_valid": "N",
                     "repeat_prior_reference": "Y",
                     "prior_references": "2022-022",
-                    "reference_number": "2023-002",
                 },
             },
         ]
@@ -217,19 +209,15 @@ class CheckFindingPriorReferencesTests(TestCase):
             {
                 "program": {"award_reference": "AWARD-001"},
                 "findings": {
-                    "is_valid": "N",
                     "repeat_prior_reference": "Y",
                     "prior_references": "2022-033",
-                    "reference_number": "2023-001",
                 },
             },
             {
                 "program": {"award_reference": "AWARD-002"},
                 "findings": {
-                    "is_valid": "N",
                     "repeat_prior_reference": "N",
                     "prior_references": "N/A",
-                    "reference_number": "2023-002",
                 },
             },
         ]
