@@ -14,65 +14,6 @@ from dissemination.models import (
 
 
 class CheckFindingPriorReferencesTests(TestCase):
-    def test_get_prior_refs(self):
-        """
-        Extracting prior_references from an award should pass
-        """
-        findings_uniform_guidance = [
-            {
-                "program": {"award_reference": "AWARD-001"},
-                "findings": {
-                    "is_valid": "N",
-                    "repeat_prior_reference": "Y",
-                    "prior_references": "2022-033",
-                    "reference_number": "2023-001",
-                },
-            },
-        ]
-
-        results = _get_prior_refs(findings_uniform_guidance)
-
-        self.assertEqual(results, {"AWARD-001": "2022-033"})
-
-    def test_get_prior_refs_multiple_awards(self):
-        """
-        Extracting prior_references from multiple awards should pass
-        """
-        findings_uniform_guidance = [
-            {
-                "program": {"award_reference": "AWARD-001"},
-                "findings": {
-                    "is_valid": "N",
-                    "repeat_prior_reference": "Y",
-                    "prior_references": "2022-033",
-                    "reference_number": "2023-001",
-                },
-            },
-            {
-                "program": {"award_reference": "AWARD-002"},
-                "findings": {
-                    "is_valid": "N",
-                    "repeat_prior_reference": "Y",
-                    "prior_references": "2022-022",
-                    "reference_number": "2023-002",
-                },
-            },
-        ]
-
-        results = _get_prior_refs(findings_uniform_guidance)
-
-        self.assertEqual(results, {"AWARD-001": "2022-033", "AWARD-002": "2022-022"})
-
-    def test_get_prior_refs_no_awards(self):
-        """
-        Extracting prior_references when there are no awards should pass
-        """
-        findings_uniform_guidance = []
-
-        results = _get_prior_refs(findings_uniform_guidance)
-
-        self.assertEqual(results, {})
-
     def _test_check_finding_prior_references(
         self,
         audit_year,  # Int of audit year
@@ -217,3 +158,92 @@ class CheckFindingPriorReferencesTests(TestCase):
                 "Findings uniform guidance contains prior reference numbers, but no report was found for EIN ABC123DEF456 in the previous year (2000).",
             ],
         )
+
+    def test_get_prior_refs(self):
+        """
+        Extracting prior_references from an award should pass
+        """
+        findings_uniform_guidance = [
+            {
+                "program": {"award_reference": "AWARD-001"},
+                "findings": {
+                    "is_valid": "N",
+                    "repeat_prior_reference": "Y",
+                    "prior_references": "2022-033",
+                    "reference_number": "2023-001",
+                },
+            },
+        ]
+
+        results = _get_prior_refs(findings_uniform_guidance)
+
+        self.assertEqual(results, {"AWARD-001": "2022-033"})
+
+    def test_get_prior_refs_multiple_awards(self):
+        """
+        Extracting prior_references from multiple awards should pass
+        """
+        findings_uniform_guidance = [
+            {
+                "program": {"award_reference": "AWARD-001"},
+                "findings": {
+                    "is_valid": "N",
+                    "repeat_prior_reference": "Y",
+                    "prior_references": "2022-033",
+                    "reference_number": "2023-001",
+                },
+            },
+            {
+                "program": {"award_reference": "AWARD-002"},
+                "findings": {
+                    "is_valid": "N",
+                    "repeat_prior_reference": "Y",
+                    "prior_references": "2022-022",
+                    "reference_number": "2023-002",
+                },
+            },
+        ]
+
+        results = _get_prior_refs(findings_uniform_guidance)
+
+        self.assertEqual(results, {"AWARD-001": "2022-033", "AWARD-002": "2022-022"})
+
+    def test_get_prior_refs_no_repeat_prior_reference(self):
+        """
+        Extracting prior_references should only occur when repeat_prior_reference
+        is 'Y'
+        """
+        findings_uniform_guidance = [
+            {
+                "program": {"award_reference": "AWARD-001"},
+                "findings": {
+                    "is_valid": "N",
+                    "repeat_prior_reference": "Y",
+                    "prior_references": "2022-033",
+                    "reference_number": "2023-001",
+                },
+            },
+            {
+                "program": {"award_reference": "AWARD-002"},
+                "findings": {
+                    "is_valid": "N",
+                    "repeat_prior_reference": "N",
+                    "prior_references": "N/A",
+                    "reference_number": "2023-002",
+                },
+            },
+        ]
+
+        results = _get_prior_refs(findings_uniform_guidance)
+
+        self.assertEqual(results, {"AWARD-001": "2022-033"})
+
+    def test_get_prior_refs_no_awards(self):
+        """
+        Extracting prior_references when there are no awards should pass
+        """
+        findings_uniform_guidance = []
+
+        results = _get_prior_refs(findings_uniform_guidance)
+
+        self.assertEqual(results, {})
