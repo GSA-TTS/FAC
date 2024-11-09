@@ -8,14 +8,13 @@ data "cloudfoundry_space" "apps" {
 }
 
 module "s3-logshipper-storage" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v0.9.1"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.1.0"
 
-  cf_org_name      = var.cf_org_name
-  cf_space_name    = var.cf_space_name
-  name             = "log-storage"
-  recursive_delete = false
-  s3_plan_name     = "basic"
-  tags             = ["logshipper-s3"]
+  cf_org_name   = var.cf_org_name
+  cf_space_name = var.cf_space_name
+  name          = "log-storage"
+  s3_plan_name  = "basic"
+  tags          = ["logshipper-s3"]
 }
 
 resource "cloudfoundry_service_key" "logshipper-s3-service-key" {
