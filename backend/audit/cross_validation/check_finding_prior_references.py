@@ -17,6 +17,17 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
     in the previous year's report
     """
     all_sections = sac_dict.get("sf_sac_sections")
+    findings_uniform_guidance_section = (
+        all_sections.get("findings_uniform_guidance") or {}
+    )
+    findings_uniform_guidance = findings_uniform_guidance_section.get(
+        "findings_uniform_guidance_entries", []
+    )
+    all_prior_refs = _get_prior_refs(findings_uniform_guidance)
+
+    if not all_prior_refs:
+        return []
+
     general_information = all_sections.get("general_information")
     auditee_uei = general_information["auditee_uei"]
     previous_year = (
@@ -34,17 +45,6 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
                 "error": err_prior_no_report(auditee_uei, previous_year),
             }
         ]
-
-    findings_uniform_guidance_section = (
-        all_sections.get("findings_uniform_guidance") or {}
-    )
-    findings_uniform_guidance = findings_uniform_guidance_section.get(
-        "findings_uniform_guidance_entries", []
-    )
-
-    all_prior_refs = _get_prior_refs(findings_uniform_guidance)
-    if not all_prior_refs:
-        return []
 
     previous_year_report_id = previous_year_report.report_id
     errors = []
