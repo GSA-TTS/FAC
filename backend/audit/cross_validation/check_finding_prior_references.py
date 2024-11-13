@@ -34,6 +34,11 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
         date.fromisoformat(general_information["auditee_fiscal_period_start"]).year - 1
     )
 
+    # UEIs only become reliable as of 2022, so don't bother validating
+    # prior references before that
+    if previous_year < 2022:
+        return []
+
     try:
         previous_year_report = General.objects.get(
             audit_year=previous_year,
@@ -59,6 +64,7 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
                         "error": err_bad_repeat_prior_reference(award_ref),
                     }
                 )
+                continue
 
             if not Finding.objects.filter(
                 report_id=previous_year_report_id,

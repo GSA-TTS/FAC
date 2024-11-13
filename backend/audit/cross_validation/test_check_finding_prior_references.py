@@ -86,26 +86,41 @@ class CheckFindingPriorReferencesTests(TestCase):
 
     def test_check_finding_prior_references_single_prior(self):
         """
-        One award having a single prior reference should pass
+        One award having a single prior reference that exists should pass
         """
         self._test_check_finding_prior_references(
-            auditee_fiscal_period_start="2001-01-01",
+            auditee_fiscal_period_start="2024-01-01",
             awards_prior_refs={
-                "AWARD-001": "2000-777",
+                "AWARD-001": "2023-777",
             },
             repeat_prior_reference="Y",
             prior_report_exists=True,
             expected_error_strs=[],
         )
 
-    def test_check_finding_prior_references_multiple_priors(self):
+    def test_check_finding_prior_references_before_2022(self):
         """
-        One award having multiple prior references should pass
+        One award having a non-existent prior reference that's before 2022 should
+        pass
         """
         self._test_check_finding_prior_references(
-            auditee_fiscal_period_start="2001-01-01",
+            auditee_fiscal_period_start="2022-01-01",
             awards_prior_refs={
-                "AWARD-001": "2000-777,2000-888",
+                "AWARD-001": "2021-777",
+            },
+            repeat_prior_reference="Y",
+            prior_report_exists=False,
+            expected_error_strs=[],
+        )
+
+    def test_check_finding_prior_references_multiple_priors(self):
+        """
+        One award having multiple prior references that exist should pass
+        """
+        self._test_check_finding_prior_references(
+            auditee_fiscal_period_start="2024-01-01",
+            awards_prior_refs={
+                "AWARD-001": "2023-777,2023-888",
             },
             repeat_prior_reference="Y",
             prior_report_exists=True,
@@ -114,13 +129,13 @@ class CheckFindingPriorReferencesTests(TestCase):
 
     def test_check_finding_prior_references_multiple_awards(self):
         """
-        Multiple awards having prior references should pass
+        Multiple awards having prior references that exist should pass
         """
         self._test_check_finding_prior_references(
-            auditee_fiscal_period_start="2001-01-01",
+            auditee_fiscal_period_start="2024-01-01",
             awards_prior_refs={
-                "AWARD-001": "2000-777",
-                "AWARD-002": "2000-888",
+                "AWARD-001": "2023-777",
+                "AWARD-002": "2023-888",
             },
             repeat_prior_reference="Y",
             prior_report_exists=True,
@@ -133,7 +148,7 @@ class CheckFindingPriorReferencesTests(TestCase):
         'Y' should fail
         """
         self._test_check_finding_prior_references(
-            auditee_fiscal_period_start="2001-01-01",
+            auditee_fiscal_period_start="2024-01-01",
             awards_prior_refs={
                 "AWARD-001": "N/A",
             },
@@ -151,15 +166,15 @@ class CheckFindingPriorReferencesTests(TestCase):
         An award having a prior reference but no prior report exists should fail
         """
         self._test_check_finding_prior_references(
-            auditee_fiscal_period_start="2001-01-01",
+            auditee_fiscal_period_start="2024-01-01",
             awards_prior_refs={
-                "AWARD-001": "2000-777",
+                "AWARD-001": "2023-777",
             },
             repeat_prior_reference="Y",
             prior_report_exists=False,
             expected_error_strs=[
                 {
-                    "error": "Findings uniform guidance contains prior reference numbers, but no report was found for UEI ABC123DEF456 in the previous year (2000).",
+                    "error": "Findings uniform guidance contains prior reference numbers, but no report was found for UEI ABC123DEF456 in the previous year (2023).",
                 }
             ],
         )
