@@ -113,12 +113,10 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 	LEFT JOIN dissemination_general dg 
 		ON dfa.report_id = dg.report_id
 	LEFT JOIN dissemination_finding df 
-		ON dfa.report_id = df.report_id 
-		AND (
-				dfa.award_reference = df.award_reference
-				OR
-				right(dfa.award_reference, 4) = right(df.award_reference, 4)
-			)
+		ON dfa.report_id = df.report_id
+		AND (dfa.award_reference = df.award_reference
+			OR
+			SPLIT_PART(dfa.award_reference, '-', 2)::INTEGER = SPLIT_PART(df.award_reference, '-', 2)::INTEGER)
 	LEFT JOIN dissemination_passthrough dp
 		ON dfa.report_id = dp.report_id 
 		AND dfa.award_reference = dp.award_reference
