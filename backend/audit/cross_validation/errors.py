@@ -58,7 +58,7 @@ def err_duplicate_finding_reference(award_ref, ref_number):
 
 
 def err_prior_no_report(auditee_uei, audit_year):
-    return f"Findings uniform guidance contains prior reference numbers, but no report was found for UEI {auditee_uei} in the previous year ({audit_year})."
+    return f"Findings uniform guidance contains prior reference numbers, but no related report was found for UEI {auditee_uei}."
 
 
 def err_bad_repeat_prior_reference(award_ref):

@@ -20,8 +20,9 @@ class CheckFindingPriorReferencesTests(TestCase):
         self,
         auditee_fiscal_period_start,  # ISO date string
         awards_prior_refs,  # Dict of award # -> prior reference string
-        prior_report_exists,  # Bool determining if prior report should exist in General
         repeat_prior_reference,  # Set 'Y' or 'N' in findings_uniform_guidance_entries
+        prior_report_exists,  # Bool for if prior report should exist in General
+        gen_reports_from_prior_ref_years,  # Bool for generating reports from prior reference years instead of the previous year
         expected_error_strs,  # List of error strings
     ):
         """
@@ -59,26 +60,47 @@ class CheckFindingPriorReferencesTests(TestCase):
         new_sac.save()
 
         if prior_report_exists:
-            # Create the prior report that was submitted last year
-            previous_year = date.fromisoformat(auditee_fiscal_period_start).year - 1
-            prior_gen = baker.make(
-                General,
-                report_id="foo-report-id",
-                audit_year=previous_year,
-                auditee_uei=AUDITEE_UEI,
-            )
-            prior_gen.save()
+            if gen_reports_from_prior_ref_years:
+                # Create the prior reports from the years indicated in the prior reference numbers
+                for award_ref, prior_refs_str in awards_prior_refs.items():
+                    prior_refs = prior_refs_str.split(",")
+                    for prior_ref in prior_refs:
+                        prior_ref_year = int(prior_ref[:4])
+                        prior_gen = baker.make(
+                            General,
+                            report_id=f"foo-report-id-{prior_ref}",
+                            audit_year=prior_ref_year,
+                            auditee_uei=AUDITEE_UEI,
+                        )
+                        prior_gen.save()
 
-            # Generate the findings needed to be associated with the report
-            for award_ref, prior_refs_str in awards_prior_refs.items():
-                prior_refs = prior_refs_str.split(",")
-                for prior_ref in prior_refs:
-                    prior_finding = baker.make(
-                        Finding,
-                        report_id=prior_gen,
-                        reference_number=prior_ref,
-                    )
-                    prior_finding.save()
+                        prior_finding = baker.make(
+                            Finding,
+                            report_id=prior_gen,
+                            reference_number=prior_ref,
+                        )
+                        prior_finding.save()
+            else:
+                # Create the prior report that was submitted last year
+                previous_year = date.fromisoformat(auditee_fiscal_period_start).year - 1
+                prior_gen = baker.make(
+                    General,
+                    report_id="foo-report-id",
+                    audit_year=previous_year,
+                    auditee_uei=AUDITEE_UEI,
+                )
+                prior_gen.save()
+
+                # Generate the findings needed to be associated with the report
+                for award_ref, prior_refs_str in awards_prior_refs.items():
+                    prior_refs = prior_refs_str.split(",")
+                    for prior_ref in prior_refs:
+                        prior_finding = baker.make(
+                            Finding,
+                            report_id=prior_gen,
+                            reference_number=prior_ref,
+                        )
+                        prior_finding.save()
 
         result = check_finding_prior_references(sac_validation_shape(new_sac))
 
@@ -95,6 +117,23 @@ class CheckFindingPriorReferencesTests(TestCase):
             },
             repeat_prior_reference="Y",
             prior_report_exists=True,
+            gen_reports_from_prior_ref_years=False,
+            expected_error_strs=[],
+        )
+
+    def test_check_finding_prior_references_use_prior_ref_years(self):
+        """
+        One award having prior references to an existing report that is older
+        than the previous year should pass
+        """
+        self._test_check_finding_prior_references(
+            auditee_fiscal_period_start="2024-01-01",
+            awards_prior_refs={
+                "AWARD-001": "2022-888,2021-999",
+            },
+            repeat_prior_reference="Y",
+            prior_report_exists=True,
+            gen_reports_from_prior_ref_years=True,
             expected_error_strs=[],
         )
 
@@ -110,6 +149,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             },
             repeat_prior_reference="Y",
             prior_report_exists=False,
+            gen_reports_from_prior_ref_years=False,
             expected_error_strs=[],
         )
 
@@ -124,6 +164,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             },
             repeat_prior_reference="Y",
             prior_report_exists=True,
+            gen_reports_from_prior_ref_years=False,
             expected_error_strs=[],
         )
 
@@ -139,6 +180,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             },
             repeat_prior_reference="Y",
             prior_report_exists=True,
+            gen_reports_from_prior_ref_years=False,
             expected_error_strs=[],
         )
 
@@ -154,6 +196,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             },
             repeat_prior_reference="Y",
             prior_report_exists=True,
+            gen_reports_from_prior_ref_years=False,
             expected_error_strs=[
                 {
                     "error": "AWARD-001 field repeat_prior_reference is set to 'Y', but prior_references is set to 'N/A'.",
@@ -172,9 +215,10 @@ class CheckFindingPriorReferencesTests(TestCase):
             },
             repeat_prior_reference="Y",
             prior_report_exists=False,
+            gen_reports_from_prior_ref_years=False,
             expected_error_strs=[
                 {
-                    "error": "Findings uniform guidance contains prior reference numbers, but no report was found for UEI ABC123DEF456 in the previous year (2023).",
+                    "error": "Findings uniform guidance contains prior reference numbers, but no related report was found for UEI ABC123DEF456.",
                 }
             ],
         )
