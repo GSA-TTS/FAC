@@ -65,8 +65,8 @@ def err_bad_repeat_prior_reference(award_ref):
     return f"{award_ref} field repeat_prior_reference is set to 'Y', but prior_references is set to 'N/A'."
 
 
-def err_prior_ref_not_found(prior_ref_number, previous_year_report_id):
-    return f"Prior reference {prior_ref_number} not found in report {previous_year_report_id}."
+def err_prior_ref_not_found(prior_ref_number):
+    return f"Prior reference {prior_ref_number} not found in previous reports."
 
 
 def err_findings_count_inconsistent(total_expected, total_counted, award_ref):

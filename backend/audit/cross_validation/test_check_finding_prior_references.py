@@ -100,8 +100,8 @@ class CheckFindingPriorReferencesTests(TestCase):
 
     def test_check_finding_prior_references_before_2022(self):
         """
-        One award having a non-existent prior reference that's before 2022 should
-        pass
+        One award having a non-existent prior prior reference that's before
+        2022 should still pass
         """
         self._test_check_finding_prior_references(
             auditee_fiscal_period_start="2022-01-01",

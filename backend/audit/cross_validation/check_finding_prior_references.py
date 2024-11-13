@@ -34,24 +34,15 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
         date.fromisoformat(general_information["auditee_fiscal_period_start"]).year - 1
     )
 
-    # UEIs only become reliable as of 2022, so don't bother validating
-    # prior references before that
-    if previous_year < 2022:
-        return []
-
     try:
         previous_year_report = General.objects.get(
             audit_year=previous_year,
             auditee_uei=auditee_uei,
         )
+        previous_year_report_id = previous_year_report.id
     except General.DoesNotExist:
-        return [
-            {
-                "error": err_prior_no_report(auditee_uei, previous_year),
-            }
-        ]
+        previous_year_report_id = None
 
-    previous_year_report_id = previous_year_report.report_id
     errors = []
 
     for award_ref, prior_refs_strings in all_prior_refs.items():
@@ -66,15 +57,37 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
                 )
                 continue
 
+            try:
+                prior_ref_year = int(prior_ref[:4])
+                prior_ref_report = General.objects.get(
+                    audit_year=prior_ref_year,
+                    auditee_uei=auditee_uei,
+                )
+                prior_ref_report_id = prior_ref_report.report_id
+            except General.DoesNotExist:
+                prior_ref_report_id = None
+
+            # UEIs only become reliable as of 2022, so don't bother invalidating
+            # prior references before that
+            if not previous_year_report_id and not prior_ref_report_id:
+                if prior_ref_year > 2021:
+                    errors.append(
+                        {
+                            "error": err_prior_no_report(auditee_uei, previous_year),
+                        }
+                    )
+
+                continue
+
+            # Try to find the prior ref in either last year's audit or the one
+            # indicated in the prior ref number
             if not Finding.objects.filter(
-                report_id=previous_year_report_id,
+                report_id__in=[previous_year_report_id, prior_ref_report_id],
                 reference_number=prior_ref,
             ).exists():
                 errors.append(
                     {
-                        "error": err_prior_ref_not_found(
-                            prior_ref, previous_year_report_id
-                        ),
+                        "error": err_prior_ref_not_found(prior_ref),
                     }
                 )
 
