@@ -138,10 +138,10 @@ def make_ratios(d1, d2):
 
 
 if __name__ == "__main__":
-    results1 = {}
-    results2 = {}
-    results3 = {}
-    results4 = {}
+    results1: dict = {}
+    results2: dict = {}
+    results3: dict = {}
+    results4: dict = {}
 
     results1["api110_by_year"] = fetch_fa_by_year_exp("api_v1_1_0")
     results1["ap110"] = fetch_fa_exp("api_v1_1_0")

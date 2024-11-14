@@ -7,21 +7,22 @@
 import yaml
 from datetime import datetime
 
-obj = {"streams": dict()}
-
-obj["source"] = "FAC_SNAPSHOT_URI"
-obj["target"] = "BULK_DATA_EXPORT"
-obj["defaults"] = {
-    "target_options": {
-        "format": "csv",
-        "compression": "gzip",
-        "file_max_rows": 0,
-    }
+obj: dict = {
+    "streams": {},
+    "source": "FAC_SNAPSHOT_URI",
+    "target": "BULK_DATA_EXPORT",
+    "defaults": {
+        "target_options": {
+            "format": "csv",
+            "compression": "gzip",
+            "file_max_rows": 0,
+        }
+    },
 }
 
-schema = "public_data_v1_0_0"
+SCHEMA = "public_data_v1_0_0"
 
-tables = [
+TABLES = [
     "additional_eins",
     "additional_ueis",
     "combined",
@@ -39,15 +40,15 @@ tables = [
 # it will not generate anything where data does not exist.
 # This future-proofs us for a year or two, so we don't have to worry
 # about updating the `sling` script that is created.
-years = range(2016, 2031)
+YEARS = range(2016, 2031)
 
 
-for t in tables:
+for t in TABLES:
     ndx = 0
-    for y in years:
-        obj["streams"][f"{schema}.{t}.{ndx}"] = {
+    for y in YEARS:
+        obj["streams"][f"{SCHEMA}.{t}.{ndx}"] = {
             "object": f"bulk_export/{{MM}}/{y}_{t}.csv",
-            "sql": f"SELECT * FROM {schema}.{t} WHERE audit_year = '{y}'",
+            "sql": f"SELECT * FROM {SCHEMA}.{t} WHERE audit_year = '{y}'",
             "mode": "full-refresh",
             "target_options": {
                 "format": "csv",

@@ -95,7 +95,7 @@ class ApiTests(TestCase):
                 | limit(0, EnvVars.RECORDS_REQUESTED - 1)
                 | api(api_version)
             )
-            r = requests.get(base + f"/{endpoint}", headers=h)
+            r = requests.get(base + f"/{endpoint}", headers=h, timeout=60)
             self.good_resp(r.json(), keys)
 
         return _helper
@@ -117,7 +117,7 @@ class ApiTests(TestCase):
             print("This schema/API should not exist.")
             self.assertTrue(False)
         except Exception:
-            pass
+            self.assertTrue(True)
 
     def test_api_v1_1_0(self):
         f = self.cons(self.ENV, "api_v1_1_0")
