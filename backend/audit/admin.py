@@ -182,8 +182,7 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                 )
             elif (
                 STATUS.IN_PROGRESS
-                and SacValidationWaiver.TYPES.PRIOR_REFERENCES
-                in obj.waiver_types
+                and SacValidationWaiver.TYPES.PRIOR_REFERENCES in obj.waiver_types
             ):
                 logger.info(
                     f"User {request.user.email} is applying waiver for SAC with status: {sac.submission_status}"
