@@ -658,6 +658,7 @@ class SacValidationWaiver(models.Model):
         AUDITEE_CERTIFYING_OFFICIAL = "auditee_certifying_official"
         AUDITOR_CERTIFYING_OFFICIAL = "auditor_certifying_official"
         FINDING_REFERENCE_NUMBER = "finding_reference_number"
+        PRIOR_REFERENCES = "prior_references"
 
     WAIVER_CHOICES = [
         (
@@ -671,6 +672,10 @@ class SacValidationWaiver(models.Model):
         (
             TYPES.FINDING_REFERENCE_NUMBER,
             "Report has duplicate finding reference numbers",
+        ),
+        (
+            TYPES.PRIOR_REFERENCES,
+            "Report has invalid prior reference numbers",
         ),
     ]
     report_id = models.ForeignKey(

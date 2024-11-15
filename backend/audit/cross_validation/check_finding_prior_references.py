@@ -16,6 +16,12 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
     Check that prior references numbers point to findings that actually exist
     in a previously submitted report
     """
+    # Importing here to avoid circular import
+    from audit.models import SacValidationWaiver
+
+    if SacValidationWaiver.TYPES.PRIOR_REFERENCES in sac_dict.get("waiver_types", []):
+        return []
+
     all_sections = sac_dict.get("sf_sac_sections")
     findings_uniform_guidance_section = (
         all_sections.get("findings_uniform_guidance") or {}

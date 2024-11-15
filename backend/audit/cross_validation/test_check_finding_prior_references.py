@@ -6,7 +6,7 @@ from .check_finding_prior_references import (
     _get_prior_refs,
 )
 from .sac_validation_shape import sac_validation_shape
-from audit.models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist, SacValidationWaiver
 from dissemination.models import (
     Finding,
     General,
@@ -20,9 +20,10 @@ class CheckFindingPriorReferencesTests(TestCase):
         self,
         auditee_fiscal_period_start,  # ISO date string
         awards_prior_refs,  # Dict of award # -> prior reference string
-        repeat_prior_reference,  # Set 'Y' or 'N' in findings_uniform_guidance_entries
+        repeat_prior_reference,  # Bool to set 'Y' or 'N' in findings_uniform_guidance_entries
         prior_report_exists,  # Bool for if prior report should exist in General
         gen_reports_from_prior_ref_years,  # Bool for generating reports from prior reference years instead of the previous year
+        use_waiver,  # Bool for using a validation waiver
         expected_error_strs,  # List of error strings
     ):
         """
@@ -57,6 +58,15 @@ class CheckFindingPriorReferencesTests(TestCase):
                 }
             },
         )
+
+        if use_waiver:
+            baker.make(
+                SacValidationWaiver,
+                report_id=new_sac,
+                waiver_types=[SacValidationWaiver.TYPES.PRIOR_REFERENCES],
+            )
+            new_sac.waiver_types = [SacValidationWaiver.TYPES.PRIOR_REFERENCES]
+
         new_sac.save()
 
         if prior_report_exists:
@@ -118,6 +128,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             repeat_prior_reference="Y",
             prior_report_exists=True,
             gen_reports_from_prior_ref_years=False,
+            use_waiver=False,
             expected_error_strs=[],
         )
 
@@ -134,6 +145,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             repeat_prior_reference="Y",
             prior_report_exists=True,
             gen_reports_from_prior_ref_years=True,
+            use_waiver=False,
             expected_error_strs=[],
         )
 
@@ -150,6 +162,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             repeat_prior_reference="Y",
             prior_report_exists=False,
             gen_reports_from_prior_ref_years=False,
+            use_waiver=False,
             expected_error_strs=[],
         )
 
@@ -165,6 +178,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             repeat_prior_reference="Y",
             prior_report_exists=True,
             gen_reports_from_prior_ref_years=False,
+            use_waiver=False,
             expected_error_strs=[],
         )
 
@@ -181,6 +195,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             repeat_prior_reference="Y",
             prior_report_exists=True,
             gen_reports_from_prior_ref_years=False,
+            use_waiver=False,
             expected_error_strs=[],
         )
 
@@ -197,6 +212,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             repeat_prior_reference="Y",
             prior_report_exists=True,
             gen_reports_from_prior_ref_years=False,
+            use_waiver=False,
             expected_error_strs=[
                 {
                     "error": "AWARD-001 field repeat_prior_reference is set to 'Y', but prior_references is set to 'N/A'.",
@@ -216,11 +232,28 @@ class CheckFindingPriorReferencesTests(TestCase):
             repeat_prior_reference="Y",
             prior_report_exists=False,
             gen_reports_from_prior_ref_years=False,
+            use_waiver=False,
             expected_error_strs=[
                 {
                     "error": "Findings uniform guidance contains prior reference numbers, but no related report was found for UEI ABC123DEF456.",
                 }
             ],
+        )
+
+    def test_check_finding_prior_references_waiver(self):
+        """
+        Invalid prior references should still pass when a waiver is present
+        """
+        self._test_check_finding_prior_references(
+            auditee_fiscal_period_start="2024-01-01",
+            awards_prior_refs={
+                "AWARD-001": "N/A",
+            },
+            repeat_prior_reference="Y",
+            prior_report_exists=False,
+            gen_reports_from_prior_ref_years=False,
+            use_waiver=True,
+            expected_error_strs=[],
         )
 
     def test_get_prior_refs(self):
