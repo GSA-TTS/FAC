@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 5 * * 0'
-  push:
-    branches: [ patch-trivy-db-v2 ]
 
 jobs:
   pull-and-scan:
@@ -54,7 +52,7 @@ jobs:
           ignore-unfixed: true
 
       # - name: Scan Image
-      #   run: docker run aquasec/trivy:latest image --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}
+      #   run: docker run aquasec/trivy:latest image --db-repository public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db --java-db-repository public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}
 
       - name: Tag Image
         run: |
