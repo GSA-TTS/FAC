@@ -42,6 +42,7 @@ jobs:
           TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
           TRIVY_SKIP_DB_UPDATE: true
           TRIVY_SKIP_JAVA_DB_UPDATE: true
+          TRIVY_DISABLE_VEX_NOTICE: true
         with:
           image-ref: '${{ matrix.image.name }}'
           scan-type: 'image'
