@@ -292,12 +292,11 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       height = 3
 
       nrql_query {
-        query = "SELECT `message` FROM Log WHERE allColumnSearch('POST', insensitive: true) AND allColumnSearch('/submission/', insensitive: true) AND `newrelic.source` = 'logs.APM' AND entity.name ='${var.cf_space_name}' SINCE 2 hours ago"
+        query = "SELECT `timestamp`,`message` FROM Log WHERE allColumnSearch('STARTUP_CHECK', insensitive: true) AND `message` LIKE '%db_to_s3%' AND `message` LIKE '%PASS%' AND `tags.space_name` = '${var.cf_space_name}' SINCE 2 hours ago"
       }
       nrql_query {
-        query = "SELECT `message`,`timestamp` FROM Log WHERE allColumnSearch('STARTUP_CHECK', insensitive: true) AND `message` LIKE '%db_to_s3%' AND `message` LIKE '%PASS%' AND tags.space_name ='${var.cf_space_name}' SINCE 2 hours ago"
+        query = "SELECT `message` FROM Log WHERE allColumnSearch('POST', insensitive: true) AND allColumnSearch('/submission/', insensitive: true) AND `newrelic.source` = 'logs.APM' AND `entity.name` = 'gsa-fac-${var.cf_space_name}' SINCE 2 hours ago"
       }
-
       legend_enabled = true
     }
     widget_table {
@@ -309,12 +308,11 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       height = 3
 
       nrql_query {
-        query = "SELECT `message` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('\"TABLEROWCOUNT\"', insensitive: true) SINCE 2 hours ago"
+        query = "SELECT `timestamp`,`message` FROM Log WHERE allColumnSearch('STARTUP_CHECK', insensitive: true) AND `message` LIKE '%db_to_s3%' AND `message` LIKE '%PASS%' AND `tags.space_name` = '${var.cf_space_name}' SINCE 2 hours ago"
       }
       nrql_query {
-        query = "SELECT `message`,`timestamp` FROM Log WHERE allColumnSearch('STARTUP_CHECK', insensitive: true) AND `message` LIKE '%db_to_s3%' AND `message` LIKE '%PASS%' AND tags.space_name ='${var.cf_space_name}' SINCE 2 hours ago"
+        query = "SELECT `message` FROM Log WHERE `tags.space_name` = '${var.cf_space_name}' AND allColumnSearch('\"TABLEROWCOUNT\"', insensitive: true) SINCE 2 hours ago"
       }
-
       legend_enabled = true
     }
     widget_table {
