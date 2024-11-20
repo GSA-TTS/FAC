@@ -587,6 +587,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 # Requires a 'start' and an 'end'.
 # 'template_name' is optional, and defines what will display if maintenance mode is enabled during this timeframe. If no name is given, the 503 error page is used.
 # 'message' is optional, and overrides the default banner message.
+# The default message states that maintenance will be ongoing for the duration of the banners uptime. This may be true in an emergency. Otherwise, be sure to set a custom message.
 MAINTENANCE_BANNER_DATES = [
     {
         # December 7th to 10th, noon UTC, uploading historical audits
