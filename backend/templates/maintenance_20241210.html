@@ -1,0 +1,15 @@
+{% comment %} Error message for use with maintenance on 2024/12/10. {% endcomment %}
+
+{% extends "base.html" %}
+{% load sprite_helper %}
+{% block content %}
+    <div class="display-flex flex-column flex-align-center margin-y-15">
+        <svg class="usa-icon usa-icon--size-7 text-error" focusable="false" role="img">
+            {% uswds_sprite "error" %}
+        </svg>
+        <h1 class="font-sans-2xl">Temporarily Down for System Maintenance</h1>
+        <p class="font-sans-lg margin-y-0">We are in the process of uploading historical audits to fac.gov.</p>
+        <p class="font-sans-lg margin-y-0">We should be back after December 12, 2024 at 6:00 p.m. ET.</p>
+        <p class="margin-top-10">Thank you for your patience. If you have any questions, please contact us via email at <a class="usa-link" href="mailto:FAC@gsa.gov">FAC@gsa.gov</a>.</p>
+    </div>
+{% endblock content %}
