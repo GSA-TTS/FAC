@@ -7,7 +7,7 @@
         {% if MAINTENANCE_BANNER_MESSAGE %}
             {{ MAINTENANCE_BANNER_MESSAGE }}
         {% else %}
-            FAC.gov will be doing a site upgrade from {{ MAINTENANCE_BANNER_START_TIME|date:"DATETIME_FORMAT" }} to {{ MAINTENANCE_BANNER_END_TIME|date:"DATETIME_FORMAT" }}
+            FAC.gov will be doing a site upgrade from {{ MAINTENANCE_BANNER_START_TIME|date:"N j, Y, f A" }} to {{ MAINTENANCE_BANNER_END_TIME|date:"N j, Y, f A" }}. 
             During this period, the entire website will be unavailable.
         {% endif %}
       </p>
