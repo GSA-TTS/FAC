@@ -305,7 +305,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       height = 3
 
       nrql_query {
-        query = "SELECT `timestamp`,`message` FROM Log WHERE allColumnSearch('STARTUP_CHECK', insensitive: true) AND `message` LIKE '%db_to_s3%' AND `message` LIKE '%PASS%' AND `tags.space_name` = '${var.cf_space_name}' SINCE 2 hours ago"
+        query = "SELECT `timestamp`,`message` FROM Log WHERE allColumnSearch('STARTUP_CHECK', insensitive: true) AND `message` LIKE '%db_to_s3%' OR `message` LIKE '%db_to_db%' AND `message` LIKE '%PASS%' AND `tags.space_name` = '${var.cf_space_name}' SINCE 2 hours ago"
       }
       legend_enabled = true
     }
