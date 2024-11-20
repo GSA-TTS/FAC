@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -32,4 +33,10 @@ class Maintenance(generic.View):
 
     def get(self, request, *args, **kwargs):
         template_name = "503.html"
+
+        current_time = datetime.now(timezone.utc)
+        for date_range in settings.MAINTENANCE_BANNER_DATES:
+            if current_time > date_range.get("start") and current_time < date_range.get("end"):
+                template_name = date_range.get("template_name", "503.html")
+        
         return render(request, template_name)

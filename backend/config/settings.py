@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from base64 import b64decode
+from datetime import datetime, timezone
 import os
 import sys
 import logging
@@ -161,6 +162,7 @@ TEMPLATES = [
                 "config.context_processors.static_site_url",
                 "config.context_processors.omb_num_exp_date",
                 "config.context_processors.current_environment",
+                "config.context_processors.maintenance_banner",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
@@ -580,3 +582,9 @@ SESSION_COOKIE_AGE = 30 * 60
 # Keep sessions alive if the user is active
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-save-every-request
 SESSION_SAVE_EVERY_REQUEST = True
+
+# Times for the maintenance banner to display.
+# Requires a 'start' and an 'end'.
+# 'template_name' is optional, and defines what will display if maintenance mode is enabled during this timeframe. If no name is given, the 503 error page is used.
+# 'message' is optional, and overrides the default banner message.
+MAINTENANCE_BANNER_DATES = []
