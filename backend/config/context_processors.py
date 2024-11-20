@@ -25,6 +25,7 @@ def current_environment(request):
     """
     return {"ENVIRONMENT": settings.ENVIRONMENT}
 
+
 def maintenance_banner(request):
     """
     Returns maintenance banner template context.
@@ -52,9 +53,9 @@ def maintenance_banner(request):
             context = context | {
                 "MAINTENANCE_BANNER_START_TIME": start_time,
                 "MAINTENANCE_BANNER_END_TIME": end_time,
-                "MAINTENANCE_BANNER_MESSAGE": date_range.get("message", "")
+                "MAINTENANCE_BANNER_MESSAGE": date_range.get("message", ""),
             }
             return context
-    
-    # Base case - we are not within any of the given timeframes. Disable the banner. 
+
+    # Base case - we are not within any of the given timeframes. Disable the banner.
     return context

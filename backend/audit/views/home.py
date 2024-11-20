@@ -36,7 +36,9 @@ class Maintenance(generic.View):
 
         current_time = datetime.now(timezone.utc)
         for date_range in settings.MAINTENANCE_BANNER_DATES:
-            if current_time > date_range.get("start") and current_time < date_range.get("end"):
+            if current_time > date_range.get("start") and current_time < date_range.get(
+                "end"
+            ):
                 template_name = date_range.get("template_name", "503.html")
-        
+
         return render(request, template_name)
