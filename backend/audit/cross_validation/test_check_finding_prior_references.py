@@ -12,8 +12,6 @@ from dissemination.models import (
     General,
 )
 
-from datetime import date
-
 
 class CheckFindingPriorReferencesTests(TestCase):
     def _test_check_finding_prior_references(
