@@ -37,21 +37,21 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
 
     general_information = all_sections.get("general_information")
     auditee_uei = general_information["auditee_uei"]
-    previous_year = (
-        date.fromisoformat(general_information["auditee_fiscal_period_start"]).year - 1
+    audit_year = date.fromisoformat(
+        general_information["auditee_fiscal_period_start"]
+    ).year
+
+    # UEIs only become reliable as of 2022, so don't bother invalidating
+    # prior references before that
+    if audit_year < 2023:
+        return []
+
+    # Get the report_ids for previous reports, excluding the current one
+    previous_report_ids = (
+        General.objects.filter(auditee_uei=auditee_uei)
+        .exclude(report_id=general_information["report_id"])
+        .values_list("report_id", flat=True)
     )
-
-    # Prior reference numbers usually refer to findings from the previous
-    # year's report
-    try:
-        previous_year_report = General.objects.get(
-            audit_year=previous_year,
-            auditee_uei=auditee_uei,
-        )
-        previous_year_report_id = previous_year_report.id
-    except General.DoesNotExist:
-        previous_year_report_id = None
-
     errors = []
 
     # Validate all prior reference numbers for each award
@@ -61,8 +61,7 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
             prior_refs,
             award_ref,
             auditee_uei,
-            previous_year,
-            previous_year_report_id,
+            previous_report_ids,
             errors,
         )
 
@@ -86,11 +85,20 @@ def _get_prior_refs(findings_uniform_guidance):
 
 
 def _validate_prior_refs(
-    prior_refs, award_ref, auditee_uei, previous_year, previous_year_report_id, errors
+    prior_refs, award_ref, auditee_uei, previous_report_ids, errors
 ):
     """
     Performs validation on the given list of prior reference numbers
     """
+    if not previous_report_ids:
+        errors.append(
+            {
+                "error": err_prior_no_report(auditee_uei),
+            }
+        )
+
+        return
+
     for prior_ref in prior_refs:
         if prior_ref == "N/A":
             errors.append(
@@ -98,35 +106,12 @@ def _validate_prior_refs(
                     "error": err_bad_repeat_prior_reference(award_ref),
                 }
             )
-            continue
-
-        try:
-            # The first four digits of a prior reference number are the year
-            prior_ref_year = int(prior_ref[:4])
-            prior_ref_report = General.objects.get(
-                audit_year=prior_ref_year,
-                auditee_uei=auditee_uei,
-            )
-            prior_ref_report_id = prior_ref_report.report_id
-        except General.DoesNotExist:
-            prior_ref_report_id = None
-
-        # UEIs only become reliable as of 2022, so don't bother invalidating
-        # prior references before that if we can't find it's report
-        if not previous_year_report_id and not prior_ref_report_id:
-            if prior_ref_year > 2021:
-                errors.append(
-                    {
-                        "error": err_prior_no_report(auditee_uei, previous_year),
-                    }
-                )
 
             continue
 
-        # Try to find the prior finding in either last year's audit or the one
-        # indicated in the prior ref number
+        # Try to find the prior finding in the previous reports
         if not Finding.objects.filter(
-            report_id__in=[previous_year_report_id, prior_ref_report_id],
+            report_id__in=previous_report_ids,
             reference_number=prior_ref,
         ).exists():
             errors.append(

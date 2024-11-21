@@ -57,16 +57,16 @@ def err_duplicate_finding_reference(award_ref, ref_number):
     return f"Award {award_ref} repeats reference {ref_number}. The reference {ref_number} should only appear once for award {award_ref}."
 
 
-def err_prior_no_report(auditee_uei, audit_year):
+def err_prior_no_report(auditee_uei):
     return f"Findings uniform guidance contains prior reference numbers, but no related report was found for UEI {auditee_uei}."
 
 
 def err_bad_repeat_prior_reference(award_ref):
-    return f"{award_ref} field repeat_prior_reference is set to 'Y', but prior_references is set to 'N/A'."
+    return f"Award {award_ref} field 'Repeat Findings from Prior Year' is set to 'Y', but the 'Prior Year Audit Finding Reference Number' is set to 'N/A'."
 
 
 def err_prior_ref_not_found(prior_ref_number):
-    return f"Prior reference {prior_ref_number} not found in previous reports."
+    return f"Prior reference number {prior_ref_number} not found in previous reports."
 
 
 def err_findings_count_inconsistent(total_expected, total_counted, award_ref):
