@@ -46,11 +46,9 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
     if audit_year < 2023:
         return []
 
-    # Get the report_ids for previous reports, excluding the current one
-    previous_report_ids = (
-        General.objects.filter(auditee_uei=auditee_uei)
-        .exclude(report_id=general_information["report_id"])
-        .values_list("report_id", flat=True)
+    # Get the report_ids for previous reports
+    previous_report_ids = General.objects.filter(auditee_uei=auditee_uei).values_list(
+        "report_id", flat=True
     )
     errors = []
 

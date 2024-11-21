@@ -47,7 +47,6 @@ class CheckFindingPriorReferencesTests(TestCase):
             general_information={
                 "auditee_uei": AUDITEE_UEI,
                 "auditee_fiscal_period_start": auditee_fiscal_period_start,
-                "report_id": "new_sac_report_id",
             },
             findings_uniform_guidance={
                 "FindingsUniformGuidance": {
