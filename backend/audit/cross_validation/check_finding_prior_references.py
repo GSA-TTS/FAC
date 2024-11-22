@@ -89,6 +89,8 @@ def _validate_prior_refs(
     Performs validation on the given list of prior reference numbers
     """
     for prior_ref in prior_refs:
+        prior_ref_year = prior_ref[:4]
+
         if prior_ref == "N/A":
             errors.append(
                 {
@@ -97,7 +99,7 @@ def _validate_prior_refs(
             )
 
             continue
-        elif int(prior_ref[:4]) < 2022:
+        elif prior_ref_year.isnumeric() and int(prior_ref_year) < 2022:
             # Skip validation for pre-UEI prior references
             continue
         elif not previous_report_ids:
