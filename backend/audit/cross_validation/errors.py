@@ -57,8 +57,8 @@ def err_duplicate_finding_reference(award_ref, ref_number):
     return f"Award {award_ref} repeats reference {ref_number}. The reference {ref_number} should only appear once for award {award_ref}."
 
 
-def err_prior_no_report(auditee_uei):
-    return f"Findings uniform guidance contains prior reference numbers, but no related report was found for UEI {auditee_uei}."
+def err_prior_no_report(auditee_uei, prior_ref_number):
+    return f"Findings uniform guidance contains prior reference {prior_ref_number}, but no previous reports were found for UEI {auditee_uei}."
 
 
 def err_bad_repeat_prior_reference(award_ref):

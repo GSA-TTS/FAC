@@ -112,11 +112,11 @@ class CheckFindingPriorReferencesTests(TestCase):
 
     def test_check_finding_prior_references_before_2022(self):
         """
-        One award having a non-existent prior prior reference that's before
+        One award having a non-existent prior reference that's before
         2022 should still pass
         """
         self._test_check_finding_prior_references(
-            auditee_fiscal_period_start="2022-01-01",
+            auditee_fiscal_period_start="2024-01-01",
             awards_prior_refs={
                 "AWARD-001": "2021-777",
             },
@@ -191,7 +191,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             use_waiver=False,
             expected_error_strs=[
                 {
-                    "error": "Findings uniform guidance contains prior reference numbers, but no related report was found for UEI ABC123DEF456.",
+                    "error": "Findings uniform guidance contains prior reference 2023-777, but no previous reports were found for UEI ABC123DEF456.",
                 }
             ],
         )

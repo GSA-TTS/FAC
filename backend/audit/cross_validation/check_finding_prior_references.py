@@ -88,15 +88,6 @@ def _validate_prior_refs(
     """
     Performs validation on the given list of prior reference numbers
     """
-    if not previous_report_ids:
-        errors.append(
-            {
-                "error": err_prior_no_report(auditee_uei),
-            }
-        )
-
-        return
-
     for prior_ref in prior_refs:
         if prior_ref == "N/A":
             errors.append(
@@ -106,12 +97,22 @@ def _validate_prior_refs(
             )
 
             continue
+        elif int(prior_ref[:4]) < 2022:
+            # Skip validation for pre-UEI prior references
+            continue
+        elif not previous_report_ids:
+            errors.append(
+                {
+                    "error": err_prior_no_report(auditee_uei, prior_ref),
+                }
+            )
 
-        # Try to find the prior finding in the previous reports
-        if not Finding.objects.filter(
+            continue
+        elif not Finding.objects.filter(
             report_id__in=previous_report_ids,
             reference_number=prior_ref,
         ).exists():
+            # Error if we can't find the prior finding in previous reports
             errors.append(
                 {
                     "error": err_prior_ref_not_found(prior_ref),
