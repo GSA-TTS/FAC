@@ -257,6 +257,7 @@ class SecondaryAuditorAdmin(admin.ModelAdmin):
 
     search_fields = ("report_id",)
 
+
 class TribalApiAccessKeyIdsAdmin(admin.ModelAdmin):
 
     list_display = (
