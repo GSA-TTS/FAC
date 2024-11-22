@@ -1,0 +1,15 @@
+<section class="usa-alert usa-alert--warning margin-top-0" aria-label="Site alert">
+    <div class="usa-alert__body">
+      <h4 class="usa-alert__heading">Scheduled system upgrade</h4>
+
+      {% comment %} If a message is given, use it. If not, display a generic message with the timeframe. {% endcomment %}
+      <p class="usa-alert__text">
+        {% if MAINTENANCE_BANNER_MESSAGE %}
+            {{ MAINTENANCE_BANNER_MESSAGE }}
+        {% else %}
+            FAC.gov will be doing a site upgrade from {{ MAINTENANCE_BANNER_START_TIME|date:"N j, Y, f A" }} to {{ MAINTENANCE_BANNER_END_TIME|date:"N j, Y, f A" }}. 
+            During this period, the entire website will be unavailable.
+        {% endif %}
+      </p>
+  </div>
+</section>
