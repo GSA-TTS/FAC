@@ -19,6 +19,7 @@ class CheckFindingPriorReferencesTests(TestCase):
         auditee_fiscal_period_start,  # ISO date string
         awards_prior_refs,  # Dict of award # -> prior reference string
         repeat_prior_reference,  # Bool to set 'Y' or 'N' in findings_uniform_guidance_entries
+        prior_refs_exist,  # Bool for if prior references should actually exist
         prior_report_years,  # List of years to make prior reports for
         use_waiver,  # Bool for using a validation waiver
         expected_error_strs,  # List of error strings
@@ -79,17 +80,18 @@ class CheckFindingPriorReferencesTests(TestCase):
             years_to_prior_gen[year] = prior_gen
 
         # Generate the findings needed to be associated with the reports
-        for award_ref, prior_refs_str in awards_prior_refs.items():
-            prior_refs = prior_refs_str.split(",")
-            for prior_ref in prior_refs:
-                year = prior_ref[:4]
-                if year in years_to_prior_gen:
-                    prior_finding = baker.make(
-                        Finding,
-                        report_id=years_to_prior_gen[year],
-                        reference_number=prior_ref,
-                    )
-                    prior_finding.save()
+        if prior_refs_exist:
+            for award_ref, prior_refs_str in awards_prior_refs.items():
+                prior_refs = prior_refs_str.split(",")
+                for prior_ref in prior_refs:
+                    year = prior_ref[:4]
+                    if year in years_to_prior_gen:
+                        prior_finding = baker.make(
+                            Finding,
+                            report_id=years_to_prior_gen[year],
+                            reference_number=prior_ref,
+                        )
+                        prior_finding.save()
 
         result = check_finding_prior_references(sac_validation_shape(new_sac))
 
@@ -105,6 +107,7 @@ class CheckFindingPriorReferencesTests(TestCase):
                 "AWARD-001": "2023-777",
             },
             repeat_prior_reference="Y",
+            prior_refs_exist=True,
             prior_report_years=["2023"],
             use_waiver=False,
             expected_error_strs=[],
@@ -121,6 +124,7 @@ class CheckFindingPriorReferencesTests(TestCase):
                 "AWARD-001": "2021-777",
             },
             repeat_prior_reference="Y",
+            prior_refs_exist=True,
             prior_report_years=[],
             use_waiver=False,
             expected_error_strs=[],
@@ -136,6 +140,7 @@ class CheckFindingPriorReferencesTests(TestCase):
                 "AWARD-001": "2023-777,2023-888",
             },
             repeat_prior_reference="Y",
+            prior_refs_exist=True,
             prior_report_years=["2023"],
             use_waiver=False,
             expected_error_strs=[],
@@ -152,9 +157,33 @@ class CheckFindingPriorReferencesTests(TestCase):
                 "AWARD-002": "2022-888",
             },
             repeat_prior_reference="Y",
+            prior_refs_exist=True,
             prior_report_years=["2022", "2023"],
             use_waiver=False,
             expected_error_strs=[],
+        )
+
+    def test_check_finding_prior_references_no_prior_ref(self):
+        """
+        An award having a prior reference that doesn't exist should fail
+        """
+        self._test_check_finding_prior_references(
+            auditee_fiscal_period_start="2024-01-01",
+            awards_prior_refs={
+                "AWARD-001": "2023-777",
+            },
+            repeat_prior_reference="Y",
+            prior_refs_exist=False,
+            prior_report_years=["2023"],
+            use_waiver=False,
+            expected_error_strs=[
+                {
+                    "error": "The Federal Awards Audit Findings workbook contains prior "
+                    + "reference 2023-777 (award AWARD-001, row 2.) However, that "
+                    + "reference was not found in any previous reports for UEI "
+                    + "ABC123DEF456.",
+                }
+            ],
         )
 
     def test_check_finding_prior_references_no_prior_report(self):
@@ -167,11 +196,15 @@ class CheckFindingPriorReferencesTests(TestCase):
                 "AWARD-001": "2023-777",
             },
             repeat_prior_reference="Y",
+            prior_refs_exist=True,
             prior_report_years=[],
             use_waiver=False,
             expected_error_strs=[
                 {
-                    "error": "Findings uniform guidance contains prior reference 2023-777, but no previous reports were found for UEI ABC123DEF456.",
+                    "error": "The Federal Awards Audit Findings workbook contains prior "
+                    + "reference 2023-777 (award AWARD-001, row 2.) However, that "
+                    + "reference was not found in any previous reports for UEI "
+                    + "ABC123DEF456.",
                 }
             ],
         )
@@ -186,6 +219,7 @@ class CheckFindingPriorReferencesTests(TestCase):
                 "AWARD-001": "N/A",
             },
             repeat_prior_reference="Y",
+            prior_refs_exist=False,
             prior_report_years=[],
             use_waiver=True,
             expected_error_strs=[],

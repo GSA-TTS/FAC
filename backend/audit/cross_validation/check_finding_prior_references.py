@@ -1,13 +1,16 @@
-from .errors import (
-    err_prior_no_report,
-    err_prior_ref_not_found,
+from audit.fixtures.excel import (
+    FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
 )
+from .errors import err_prior_ref_not_found
 from dissemination.models import (
     Finding,
     General,
 )
 
+from django.conf import settings
+
 from datetime import date
+import json
 
 
 def check_finding_prior_references(sac_dict, *_args, **_kwargs):
@@ -81,13 +84,22 @@ def _get_prior_refs(findings_uniform_guidance):
     return all_prior_refs
 
 
+TEMPLATE_DEFINITION_PATH = (
+    settings.XLSX_TEMPLATE_JSON_DIR / FINDINGS_UNIFORM_TEMPLATE_DEFINITION
+)
+FINDINGS_TEMPLATE = json.loads(TEMPLATE_DEFINITION_PATH.read_text(encoding="utf-8"))
+
+
 def _validate_prior_refs(
     prior_refs, award_ref, auditee_uei, previous_report_ids, errors
 ):
     """
     Performs validation on the given list of prior reference numbers
     """
-    for prior_ref in prior_refs:
+    first_row = FINDINGS_TEMPLATE["title_row"]
+
+    for index, prior_ref in enumerate(prior_refs):
+        current_row = first_row + index + 1
         prior_ref_year = prior_ref[:4]
 
         if prior_ref_year.isnumeric() and int(prior_ref_year) < 2022:
@@ -96,7 +108,9 @@ def _validate_prior_refs(
         elif not previous_report_ids:
             errors.append(
                 {
-                    "error": err_prior_no_report(auditee_uei, prior_ref),
+                    "error": err_prior_ref_not_found(
+                        auditee_uei, prior_ref, award_ref, current_row
+                    ),
                 }
             )
 
@@ -108,6 +122,8 @@ def _validate_prior_refs(
             # Error if we can't find the prior finding in previous reports
             errors.append(
                 {
-                    "error": err_prior_ref_not_found(prior_ref),
+                    "error": err_prior_ref_not_found(
+                        auditee_uei, prior_ref, award_ref, current_row
+                    ),
                 }
             )
