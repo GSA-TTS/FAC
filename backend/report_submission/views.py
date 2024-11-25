@@ -121,7 +121,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
 
         if report_id:
             return Util.validate_redirect_url(
-                redirect(f"/report_submission/general-information/{report_id}")
+                f"/report_submission/general-information/{report_id}"
             )
         else:
             return render(
@@ -235,9 +235,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
             )
 
-            return Util.validate_redirect_url(
-                redirect(f"/audit/submission-progress/{report_id}")
-            )
+            return Util.validate_redirect_url(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
@@ -498,9 +496,7 @@ class UploadPageView(LoginRequiredMixin, View):
 
         try:
             return Util.validate_redirect_url(
-                redirect(
-                    "/audit/submission-progress/{report_id}".format(report_id=report_id)
-                )
+                "/audit/submission-progress/{report_id}".format(report_id=report_id)
             )
 
         except Exception as e:
