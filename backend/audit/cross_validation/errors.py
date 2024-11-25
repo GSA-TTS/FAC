@@ -59,7 +59,7 @@ def err_duplicate_finding_reference(award_ref, ref_number):
 
 def err_prior_ref_not_found(auditee_uei, prior_ref, award_ref, row):
     return (
-        f"The {SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook contains prior reference {prior_ref} (award {award_ref}, row {row}.) "
+        f"The {SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook contains prior reference {prior_ref} (award {award_ref}, row {row}). "
         f"However, that reference was not found in any previous reports for UEI {auditee_uei}."
     )
 

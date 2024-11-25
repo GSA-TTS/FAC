@@ -179,7 +179,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             expected_error_strs=[
                 {
                     "error": "The Federal Awards Audit Findings workbook contains prior "
-                    + "reference 2023-777 (award AWARD-001, row 2.) However, that "
+                    + "reference 2023-777 (award AWARD-001, row 2). However, that "
                     + "reference was not found in any previous reports for UEI "
                     + "ABC123DEF456.",
                 }
@@ -202,7 +202,7 @@ class CheckFindingPriorReferencesTests(TestCase):
             expected_error_strs=[
                 {
                     "error": "The Federal Awards Audit Findings workbook contains prior "
-                    + "reference 2023-777 (award AWARD-001, row 2.) However, that "
+                    + "reference 2023-777 (award AWARD-001, row 2). However, that "
                     + "reference was not found in any previous reports for UEI "
                     + "ABC123DEF456.",
                 }
