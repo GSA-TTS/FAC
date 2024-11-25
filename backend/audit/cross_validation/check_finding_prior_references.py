@@ -1,6 +1,5 @@
 from .errors import (
     err_prior_no_report,
-    err_bad_repeat_prior_reference,
     err_prior_ref_not_found,
 )
 from dissemination.models import (
@@ -91,15 +90,7 @@ def _validate_prior_refs(
     for prior_ref in prior_refs:
         prior_ref_year = prior_ref[:4]
 
-        if prior_ref == "N/A":
-            errors.append(
-                {
-                    "error": err_bad_repeat_prior_reference(award_ref),
-                }
-            )
-
-            continue
-        elif prior_ref_year.isnumeric() and int(prior_ref_year) < 2022:
+        if prior_ref_year.isnumeric() and int(prior_ref_year) < 2022:
             # Skip validation for pre-UEI prior references
             continue
         elif not previous_report_ids:

@@ -157,26 +157,6 @@ class CheckFindingPriorReferencesTests(TestCase):
             expected_error_strs=[],
         )
 
-    def test_check_finding_prior_references_n_a_with_y(self):
-        """
-        An award having no prior references but repeat_prior_reference set to
-        'Y' should fail
-        """
-        self._test_check_finding_prior_references(
-            auditee_fiscal_period_start="2024-01-01",
-            awards_prior_refs={
-                "AWARD-001": "N/A",
-            },
-            repeat_prior_reference="Y",
-            prior_report_years=["2023"],
-            use_waiver=False,
-            expected_error_strs=[
-                {
-                    "error": "Award AWARD-001 field 'Repeat Findings from Prior Year' is set to 'Y', but the 'Prior Year Audit Finding Reference Number' is set to 'N/A'.",
-                }
-            ],
-        )
-
     def test_check_finding_prior_references_no_prior_report(self):
         """
         An award having a prior reference but no prior report exists should fail
