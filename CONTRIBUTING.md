@@ -10,7 +10,7 @@ We want to ensure a welcoming environment for all of our projects. Our staff fol
 
 We adhere to the [18F Open Source Policy](https://github.com/18f/open-source-policy). If you have any questions, just [send us an email](mailto:18f@gsa.gov).
 
-As part of a U.S. government agency, the General Services Administration (GSA)’s Technology Transformation Services (TTS) takes seriously our responsibility to protect the public’s information, including financial and personal information, from unwarranted disclosure. For more information about security and vulnerability disclosure for our projects, please read our [GSA Vulnerability Disclosure Policy](https://gsa.gov/vulnerability-disclosure-policy/).
+As part of a U.S. government agency, the General Services Administration (GSA)’s Technology Transformation Services (TTS) takes seriously our responsibility to protect the public’s information, including financial and personal information, from unwarranted disclosure. For more information about security and vulnerability disclosure for our projects, please read our [GSA Vulnerability Disclosure Policy](https://www.gsa.gov/vulnerability-disclosure-policy/).
 
 ## Public domain
 
