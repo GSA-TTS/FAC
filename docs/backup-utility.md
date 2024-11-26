@@ -38,6 +38,17 @@ Database backups occur in the following ways:
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 
+```mermaid
+flowchart TD
+    A(Invocation Script) -->|curl| UTIL(fac-backup-utility)
+    UTIL -->|curl| B(Install AWS CLI)
+    UTIL -->|psql| C[(fac-db)]
+    C -->|Database to Database Table Dump| E[(fac-snapshot-db)]
+    B --> D[/'fac-private-s3' AWS S3/]
+    D --> |AWS S3 Sync| F[/'backups' AWS S3/]
+    G{{Github Deployment Workflow}} --> A
+```
+
 3. A scheduled backup is run every two hours, across each environment, ensuring that we have a clean backup in s3, rds, and the bucket contents are in sync.
 ```bash
 ./fac-backup-util.sh ${version} scheduled_backup
@@ -45,6 +56,16 @@ Database backups occur in the following ways:
 # Install AWS
 # DB to S3 table dump (fac-db -> backups)
 # AWS S3 sync (fac-private-s3 -> backups)
+```
+```mermaid
+flowchart TD
+    A(Invocation Script) -->|curl| UTIL(fac-backup-utility)
+    UTIL -->|curl| B(Install AWS CLI)
+    UTIL -->|psql| C[(fac-db)]
+    C -->|Database to S3 Table Dump| E[/'backups' AWS S3/]
+    B --> D[/'fac-private-s3' AWS S3/]
+    D --> |AWS S3 Sync| F[/'backups' AWS S3/]
+    G(((Cron))) -->|Github Action| A
 ```
 
 # Reference Documentation On Restores
