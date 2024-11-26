@@ -34,7 +34,7 @@ Database backups occur in the following ways:
 ./fac-backup-util.sh ${version} deploy_backup
 # Curl the utility
 # Install AWS
-# DB to S3 table dump (backups)
+# DB to DB table dump (fac-db -> fac-snapshot-db)
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 
@@ -44,7 +44,6 @@ Database backups occur in the following ways:
 # Curl the utility
 # Install AWS
 # DB to S3 table dump (fac-db -> backups)
-# DB to DB table dump (fac-db -> fac-snapshot-db) [Truncate target table before dump]
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 
