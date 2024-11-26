@@ -1,8 +1,13 @@
 ### Background
-`${version}` refers to the latest version release from [FAC Backup Utility Releases](https://github.com/GSA-TTS/fac-backup-utility/releases), in format `vX.Y.Z`
+- The FAC team uses a lightweight go program to perform psql actions to backup the application database.
+  - We store these backups in 2 locations, in 2 formats.
+    - Format 1 is in a psql `.dump` format that is housed in an s3 bucket, taken during working hours of PST every 2 hours on a cron.
+    - Format 2 is in a second database, taken before an application deployment.
+- While normal operation of the backup utility is automated, events that require manual usage may occur. The tool can be run locally using docker containers, or on a cloud.gov application instance.
+- Operations for the backup utility can be added to the backup utility [here](https://github.com/GSA-TTS/fac-backup-utility/tree/main/cmd) with invocation for the FAC done [here](https://github.com/GSA-TTS/FAC/blob/main/backend/fac-backup-util.sh)
+- `${version}` refers to the latest version release from [FAC Backup Utility Releases](https://github.com/GSA-TTS/fac-backup-utility/releases), in format `vX.Y.Z`. The version is subject to change, but the most recent can always be found from the embedded link when attempting to use the utility.
 
 ### Database Backups
-
 Information regarding the fac-backup-utility can be found [at the repository](https://github.com/GSA-TTS/fac-backup-utility).
 Database backups occur in the following ways:
 1. An initial backup, where a backup has not been run in the target environment. This input of `initial_backup` is important, as when it does a the `db_to_db` command, it will not truncate the target table, as the table does not exist in the destination database.
@@ -33,10 +38,6 @@ Database backups occur in the following ways:
 # DB to DB table dump (fac-db -> fac-snapshot-db) [Truncate target table before dump]
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
-
-
-
-
 
 # Reference Documentation On Restores
 The following section is no longer applicable for general usage. At the time of incorporation of the backup utility, we the FAC team opted to not give the utility full autonomy on the restoration effort. The purpose of this was to class the main application database as a _protected_ database, and not allow the utility to perform operations targeting it. We determine any restoration effort to require some degree of manual intervention. While the [Backup Utility](https://github.com/GSA-TTS/fac-backup-utility) can be used for a restoration, we do need to agree to it as a team norm.
