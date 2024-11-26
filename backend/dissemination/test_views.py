@@ -605,6 +605,56 @@ class SummaryViewTests(TestMaterializedViewBuilder):
             note.accounting_policies,
         )
 
+    def test_distinct_findings_by_reference_number(self):
+        """
+        Test that the Audit Findings in the context only include distinct findings
+        based on the `reference_number` for a given report_id.
+        """
+        gen = baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
+
+        # Create multiple findings with the same reference_number
+        baker.make(Finding, report_id=gen, reference_number="REF001")
+        baker.make(Finding, report_id=gen, reference_number="REF001")
+        baker.make(Finding, report_id=gen, reference_number="REF002")
+
+        url = reverse(
+            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
+        )
+
+        response = self.client.get(url)
+
+        # Verify that the response contains only distinct reference_numbers
+        findings = response.context["data"]["Audit Findings"]
+        reference_numbers = [finding["reference_number"] for finding in findings]
+        self.assertEqual(len(reference_numbers), len(set(reference_numbers)))
+        self.assertIn("REF001", reference_numbers)
+        self.assertIn("REF002", reference_numbers)
+        self.assertEqual(len(reference_numbers), 2)  # Only 2 distinct reference numbers
+
+    def test_unique_findings_no_duplicates(self):
+        """
+        Test that the Audit Findings in the context include all findings
+        when all `reference_number` values are unique for a given report_id.
+        """
+        gen = baker.make(General, report_id="2022-12-GSAFAC-0000000002", is_public=True)
+
+        # findings with unique reference_numbers
+        baker.make(Finding, report_id=gen, reference_number="REF003")
+        baker.make(Finding, report_id=gen, reference_number="REF004")
+
+        url = reverse(
+            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000002"}
+        )
+
+        response = self.client.get(url)
+
+        # Verify that all unique reference_numbers are present
+        findings = response.context["data"]["Audit Findings"]
+        reference_numbers = [finding["reference_number"] for finding in findings]
+        self.assertEqual(len(reference_numbers), 2)  # all findings are returned
+        self.assertIn("REF003", reference_numbers)
+        self.assertIn("REF004", reference_numbers)
+
     def test_sac_download_available(self):
         """
         Ensures is_sf_sac_downloadable is True when a submission's SF-SAC is downloadable

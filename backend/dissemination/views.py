@@ -371,7 +371,11 @@ class AuditSummaryView(View):
         Wrap that data into a dict, and return it.
         """
         awards = FederalAward.objects.filter(report_id=report_id)
-        audit_findings = Finding.objects.filter(report_id=report_id)
+        audit_findings = (
+            Finding.objects.filter(report_id=report_id)
+            .order_by("reference_number")
+            .distinct("reference_number")
+        )
         audit_findings_text = FindingText.objects.filter(report_id=report_id)
         corrective_action_plan = CapText.objects.filter(report_id=report_id)
         notes_to_sefa = Note.objects.filter(report_id=report_id)
