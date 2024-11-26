@@ -7,6 +7,15 @@
 - Operations for the backup utility can be added to the backup utility [here](https://github.com/GSA-TTS/fac-backup-utility/tree/main/cmd) with invocation for the FAC done [here](https://github.com/GSA-TTS/FAC/blob/main/backend/fac-backup-util.sh)
 - `${version}` refers to the latest version release from [FAC Backup Utility Releases](https://github.com/GSA-TTS/fac-backup-utility/releases), in format `vX.Y.Z`. The version is subject to change, but the most recent can always be found from the embedded link when attempting to use the utility.
 
+### Available Commands
+The following commands are referenced in the [bash script](https://github.com/GSA-TTS/FAC/blob/main/backend/fac-backup-util.sh) and can be used with the Backup Utility. More information below.
+- initial_backup (Used if no backups have occured)
+- deploy_backup (Used before deploying the application)
+- scheduled_backup (Used every 2 hours on cron schedule)
+- daily_backup (Unused at this time)
+- media_sync (Available to explicitly sync 2 s3 buckets)
+- check_tables (Performs a row count and table check against a manifest of tables)
+
 ### Database Backups
 Information regarding the fac-backup-utility can be found [at the repository](https://github.com/GSA-TTS/fac-backup-utility).
 Database backups occur in the following ways:
