@@ -43,7 +43,11 @@ class UserPermissionAdmin(admin.ModelAdmin):
     fields = ["email", "permission"]
 
     def save_model(self, request, obj, form, change):
-        obj.user = User.objects.get(email=obj.email)
+        obj.email = obj.email.lower()
+        try:
+            obj.user = User.objects.get(email=obj.email)
+        except User.DoesNotExist:
+            pass
         super().save_model(request, obj, form, change)
 
 
