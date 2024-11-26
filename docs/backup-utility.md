@@ -28,6 +28,16 @@ Database backups occur in the following ways:
 # DB to DB table dump (fac-db -> fac-snapshot-db) [No Truncate, as tables dont exist]
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
+```mermaid
+flowchart LR
+    A(Invocation Script) -->|curl| UTIL(fac-backup-utility)
+    UTIL -->|curl| B(Install AWS CLI)
+    UTIL -->|psql| C[(fac-db)]
+    C -->|Database to S3 Table Dump| E[/'backups' AWS S3/]
+    B --> D[/'fac-private-s3' AWS S3/]
+    D --> |AWS S3 Sync| F[/'backups' AWS S3/]
+    C -->|Database to Database Table Dump| G[(fac-snapshot-db)]
+```
 
 2. A deploy backup, where the `db_to_db` function is not called. This is a standard backup strategy before the application deploys, to ensure the s3 contents of the primary s3 are sync'd to the backups bucket, and a table dump is stored in the backups bucket.
 ```bash
@@ -37,9 +47,8 @@ Database backups occur in the following ways:
 # DB to DB table dump (fac-db -> fac-snapshot-db)
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
-
 ```mermaid
-flowchart TD
+flowchart LR
     A(Invocation Script) -->|curl| UTIL(fac-backup-utility)
     UTIL -->|curl| B(Install AWS CLI)
     UTIL -->|psql| C[(fac-db)]
@@ -58,7 +67,7 @@ flowchart TD
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 ```mermaid
-flowchart TD
+flowchart LR
     A(Invocation Script) -->|curl| UTIL(fac-backup-utility)
     UTIL -->|curl| B(Install AWS CLI)
     UTIL -->|psql| C[(fac-db)]
