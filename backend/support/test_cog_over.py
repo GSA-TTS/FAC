@@ -167,6 +167,7 @@ class CogOverTests(TestCase):
             "auditee_fiscal_period_start": "2022-11-01",
             "user_provided_organization_type": "state",
             "auditor_ein_not_an_ssn_attestation": "true",
+            "audit_year": "2023",
         }
 
     @staticmethod
@@ -287,8 +288,6 @@ class CogOverTests(TestCase):
             general_information=self._fake_general(),
             federal_awards=self._fake_federal_awards(),
         )
-        audit_date = sac.general_information["auditee_fiscal_period_end"]
-        sac.audit_year = int(audit_date.split("-")[0])
         return sac
 
     def test_cog_assignment_from_hist(self):
@@ -299,7 +298,7 @@ class CogOverTests(TestCase):
         sac = self._fake_sac()
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.audit_year
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, "84")
         self.assertEqual(over_agency, None)
@@ -312,7 +311,7 @@ class CogOverTests(TestCase):
         sac = self._fake_sac()
         sac.general_information["ein"] = EIN_2023_ONLY
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.audit_year
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
@@ -326,7 +325,7 @@ class CogOverTests(TestCase):
         sac = self._fake_sac()
         sac.general_information["ein"] = DUP_EIN_WITHOUT_RESOLVER
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.audit_year
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
@@ -342,7 +341,7 @@ class CogOverTests(TestCase):
         sac.general_information["ein"] = RESOLVABLE_EIN_WITHOUT_BASELINE
         sac.general_information["auditee_uei"] = RESOLVABLE_UEI_WITHOUT_BASELINE
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.audit_year
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, "22")
         self.assertEqual(over_agency, None)
@@ -357,7 +356,7 @@ class CogOverTests(TestCase):
             federal_awards=self._fake_federal_awards_lt_cog_limit(),
         )
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.audit_year
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
@@ -374,7 +373,7 @@ class CogOverTests(TestCase):
         )
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.audit_year
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
@@ -414,7 +413,7 @@ class CogOverTests(TestCase):
             is_active=True,
         )
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.audit_year
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, BASE_COG)
         self.assertEqual(over_agency, None)
@@ -440,7 +439,7 @@ class CogOverTests(TestCase):
         self.assertEqual(len(cbs), 1)
 
         cog_agency, _ = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.audit_year
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
         )
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         cas = CognizantAssignment.objects.all()
@@ -468,7 +467,7 @@ class CogOverTests(TestCase):
         sac.cognizant_agency = None
         sac.save()
         cog_agency, _ = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.audit_year
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
         )
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
@@ -479,16 +478,24 @@ class CogOverTests(TestCase):
         sac.general_information["auditee_uei"] = "ZQGGHJH74DW7"
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
         sac.general_information["report_id"] = "1111-03-GSAFAC-0000202460"
-        sac.general_information["total_amount_expended"] = "210000000"
-        sac.general_information["audit_year"] = "2024"
         sac.general_information["auditee_fiscal_period_end"] = "2024-05-31"
-        sac.general_information["auditee_fiscal_period_start"] = "2023-06-01",
+        sac.general_information["auditee_fiscal_period_start"] = "2023-06-01"
         sac.report_id = "1111-03-GSAFAC-0000202460"
+
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202460",
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            total_amount_expended="210000000",
+            audit_year="2024",
+        )
+        gen.save()
 
         for i in range(6):
             cfda = baker.make(
                 FederalAward,
-                report_id=sac.report_id,
+                report_id=gen,
                 federal_agency_prefix="84",
                 federal_award_extension="032",
                 amount_expended=10_000_000 * i,
@@ -496,7 +503,6 @@ class CogOverTests(TestCase):
             )
             cfda.save()
 
-        sac.federal_awards = cfda
         sac.save()
 
         cog_agency, over_agency = compute_cog_over(
@@ -506,23 +512,80 @@ class CogOverTests(TestCase):
         self.assertEqual(cog_agency, "84")
         self.assertEqual(over_agency, None)
 
-    def test_cog_assignment_for_2024_no_baseline(self):
-        pass
-
     def test_cog_assignment_for_2027_w_baseline(self):
-        pass
+        sac = self._fake_sac()
+        sac.general_information["auditee_uei"] = "ZQGGHJH74DW7"
+        sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
+        sac.general_information["report_id"] = "1111-03-GSAFAC-0000202760"
+        sac.general_information["auditee_fiscal_period_end"] = "2027-05-31"
+        sac.general_information["auditee_fiscal_period_start"] = "2026-06-01"
+        sac.report_id = "1111-03-GSAFAC-0000202760"
+
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202760",
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            total_amount_expended="210000000",
+            audit_year="2027",
+        )
+        gen.save()
+
+        for i in range(6):
+            cfda = baker.make(
+                FederalAward,
+                report_id=gen,
+                federal_agency_prefix="14",
+                federal_award_extension="032",
+                amount_expended=10_000_000 * i,
+                is_direct="Y",
+            )
+            cfda.save()
+
+        sac.save()
+
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.general_information["ein"], 
+            sac.general_information["auditee_uei"], sac.general_information["audit_year"]
+        )
+        self.assertEqual(cog_agency, "84")
+        self.assertEqual(over_agency, None)
 
     def test_cog_assignment_for_2027_no_baseline(self):
-        pass
+        sac = self._fake_sac()
+        sac.general_information["auditee_uei"] = "ZQGGHJH74DW8"
+        sac.general_information["ein"] = "EI27NOBAS"
+        sac.general_information["report_id"] = "1111-03-GSAFAC-0000202761"
+        sac.general_information["auditee_fiscal_period_end"] = "2027-05-31"
+        sac.general_information["auditee_fiscal_period_start"] = "2026-06-01"
+        sac.report_id = "1111-03-GSAFAC-0000202761"
 
-    def test_cog_assignment_for_2029_w_baseline(self):
-        pass
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202761",
+            auditee_ein="EI27NOBAS",
+            auditee_uei="ZQGGHJH74DW8",
+            total_amount_expended="210000000",
+            audit_year="2027",
+        )
+        gen.save()
 
-    def test_cog_assignment_for_2029_no_baseline(self):
-        pass
+        for i in range(6):
+            cfda = baker.make(
+                FederalAward,
+                report_id=gen,
+                federal_agency_prefix="10",
+                federal_award_extension="032",
+                amount_expended=10_000_000 * i,
+                is_direct="Y",
+            )
+            cfda.save()
 
-    def test_cog_assignment_for_2031_w_baseline(self):
-        pass
+        sac.save()
 
-    def test_cog_assignment_for_2031_no_baseline(self):
-        pass
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.general_information["ein"], 
+            sac.general_information["auditee_uei"], sac.general_information["audit_year"]
+        )
+        self.assertEqual(cog_agency, "10")
+        self.assertEqual(over_agency, None)
