@@ -36,7 +36,7 @@ class AdditionalEinAdmin(admin.ModelAdmin):
         "additional_ein",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "additional_ein")
 
 
 class AdditionalUeiAdmin(admin.ModelAdmin):
@@ -60,7 +60,7 @@ class AdditionalUeiAdmin(admin.ModelAdmin):
         "additional_uei",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "additional_uei")
 
 
 class CapTextAdmin(admin.ModelAdmin):
@@ -84,7 +84,7 @@ class CapTextAdmin(admin.ModelAdmin):
         "finding_ref_number",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "finding_ref_number")
 
 
 class FederalAwardAdmin(admin.ModelAdmin):
@@ -108,7 +108,10 @@ class FederalAwardAdmin(admin.ModelAdmin):
         "award_reference",
     )
 
-    search_fields = ("report_id",)
+    search_fields = (
+        "report_id__report_id",
+        "award_reference",
+    )
 
 
 class FindingAdmin(admin.ModelAdmin):
@@ -133,7 +136,7 @@ class FindingAdmin(admin.ModelAdmin):
         "reference_number",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "award_reference", "reference_number")
 
 
 class FindingTextAdmin(admin.ModelAdmin):
@@ -157,7 +160,7 @@ class FindingTextAdmin(admin.ModelAdmin):
         "finding_ref_number",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "finding_ref_number")
 
 
 class GeneralAdmin(admin.ModelAdmin):
@@ -182,7 +185,7 @@ class GeneralAdmin(admin.ModelAdmin):
         "date_created",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id", "auditee_name", "date_created")
 
 
 class NoteAdmin(admin.ModelAdmin):
@@ -206,7 +209,7 @@ class NoteAdmin(admin.ModelAdmin):
         "note_title",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "note_title")
 
 
 class PassThroughAdmin(admin.ModelAdmin):
@@ -231,7 +234,7 @@ class PassThroughAdmin(admin.ModelAdmin):
         "passthrough_id",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "award_reference", "passthrough_id")
 
 
 class SecondaryAuditorAdmin(admin.ModelAdmin):
@@ -255,7 +258,7 @@ class SecondaryAuditorAdmin(admin.ModelAdmin):
         "auditor_ein",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "auditor_ein")
 
 
 class TribalApiAccessKeyIdsAdmin(admin.ModelAdmin):
