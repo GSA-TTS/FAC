@@ -29,7 +29,7 @@ Database backups occur in the following ways:
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 ```mermaid
-flowchart LR
+flowchart TD
     A(Invocation Script) -->|curl| UTIL(fac-backup-utility)
     UTIL -->|curl| B(Install AWS CLI)
     UTIL -->|psql| C[(fac-db)]
@@ -48,7 +48,7 @@ flowchart LR
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 ```mermaid
-flowchart LR
+flowchart TD
     A(Invocation Script) -->|curl| UTIL(fac-backup-utility)
     UTIL -->|curl| B(Install AWS CLI)
     UTIL -->|psql| C[(fac-db)]
@@ -67,7 +67,7 @@ flowchart LR
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 ```mermaid
-flowchart LR
+flowchart TD
     A(Invocation Script) -->|curl| UTIL(fac-backup-utility)
     UTIL -->|curl| B(Install AWS CLI)
     UTIL -->|psql| C[(fac-db)]
