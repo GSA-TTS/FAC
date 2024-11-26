@@ -61,6 +61,7 @@ from .auditee_ueis_match import auditee_ueis_match
 from .check_award_ref_declaration import check_award_ref_declaration
 from .check_award_ref_existence import check_award_ref_existence
 from .check_award_reference_uniqueness import check_award_reference_uniqueness
+from .check_finding_prior_references import check_finding_prior_references
 from .check_biennial_low_risk import check_biennial_low_risk
 from .check_certifying_contacts import check_certifying_contacts
 from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
@@ -82,6 +83,7 @@ functions = [
     check_biennial_low_risk,
     check_certifying_contacts,
     check_finding_reference_uniqueness,
+    check_finding_prior_references,
     check_findings_count_consistency,
     check_has_federal_awards,
     check_ref_number_in_cap,
