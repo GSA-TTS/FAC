@@ -585,7 +585,7 @@ class CogOverTests(TestCase):
 
         baker.make(
             CognizantBaseline,
-            uei=ZQGGHJH74DW7,
+            uei="ZQGGHJH74DW7",
             ein=UNIQUE_EIN_WITHOUT_DBKEY,
             cognizant_agency="24",
         )
