@@ -1,4 +1,4 @@
-@use '_header.scss';
+@use '_header';
 
 .usa-hero {
   background-image: none;
@@ -82,12 +82,12 @@
 }
 
 .home-image {
-  .usa-link:link, .usa-link:hover, .usa-link:active { 
-    text-decoration: none; 
+  .usa-link:link, .usa-link:hover, .usa-link:active {
+    text-decoration: none;
   }
 
-  .usa-link:visited { 
-    text-decoration: none; 
+  .usa-link:visited {
+    text-decoration: none;
     color: white;
-  } 
+  }
 }
