@@ -280,6 +280,7 @@ class TribalApiAccessKeyIdsAdmin(admin.ModelAdmin):
     ]
 
     def save_model(self, request, obj, form, change):
+        obj.email = obj.email.lower()
         obj.date_added = datetime.date.today()
         super().save_model(request, obj, form, change)
 
