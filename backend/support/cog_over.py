@@ -15,7 +15,9 @@ COG_LIMIT = 50_000_000
 DA_THRESHOLD_FACTOR = 0.25
 
 
-def compute_cog_over(federal_awards, submission_status, auditee_ein, auditee_uei, audit_year):
+def compute_cog_over(
+    federal_awards, submission_status, auditee_ein, auditee_uei, audit_year
+):
     """
     Compute cog or oversight agency for the sac.
     Return tuple (cog_agency, oversight_agency)
@@ -99,7 +101,9 @@ def determine_hist_agency(ein, uei, base_year):
     if cog_agency:
         return cog_agency
 
-    (gen_count, total_amount_expended, report_id_base_year) = get_base_gen(ein, uei, base_year)
+    (gen_count, total_amount_expended, report_id_base_year) = get_base_gen(
+        ein, uei, base_year
+    )
     if gen_count != 1:
         return None
     cfdas = get_base_cfdas(report_id_base_year)
