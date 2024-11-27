@@ -298,7 +298,11 @@ class CogOverTests(TestCase):
         sac = self._fake_sac()
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.ein,
+            sac.auditee_uei,
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, "84")
         self.assertEqual(over_agency, None)
@@ -311,7 +315,11 @@ class CogOverTests(TestCase):
         sac = self._fake_sac()
         sac.general_information["ein"] = EIN_2023_ONLY
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.ein,
+            sac.auditee_uei,
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
@@ -325,7 +333,11 @@ class CogOverTests(TestCase):
         sac = self._fake_sac()
         sac.general_information["ein"] = DUP_EIN_WITHOUT_RESOLVER
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.ein,
+            sac.auditee_uei,
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
@@ -341,7 +353,11 @@ class CogOverTests(TestCase):
         sac.general_information["ein"] = RESOLVABLE_EIN_WITHOUT_BASELINE
         sac.general_information["auditee_uei"] = RESOLVABLE_UEI_WITHOUT_BASELINE
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.ein,
+            sac.auditee_uei,
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, "22")
         self.assertEqual(over_agency, None)
@@ -356,7 +372,11 @@ class CogOverTests(TestCase):
             federal_awards=self._fake_federal_awards_lt_cog_limit(),
         )
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.ein,
+            sac.auditee_uei,
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
@@ -373,7 +393,11 @@ class CogOverTests(TestCase):
         )
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.ein,
+            sac.auditee_uei,
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
@@ -413,7 +437,11 @@ class CogOverTests(TestCase):
             is_active=True,
         )
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.ein,
+            sac.auditee_uei,
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, BASE_COG)
         self.assertEqual(over_agency, None)
@@ -439,7 +467,11 @@ class CogOverTests(TestCase):
         self.assertEqual(len(cbs), 1)
 
         cog_agency, _ = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.ein,
+            sac.auditee_uei,
+            sac.general_information["audit_year"],
         )
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         cas = CognizantAssignment.objects.all()
@@ -467,7 +499,11 @@ class CogOverTests(TestCase):
         sac.cognizant_agency = None
         sac.save()
         cog_agency, _ = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei, sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.ein,
+            sac.auditee_uei,
+            sac.general_information["audit_year"],
         )
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
@@ -506,8 +542,11 @@ class CogOverTests(TestCase):
         sac.save()
 
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.general_information["ein"],
-            sac.general_information["auditee_uei"], sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.general_information["ein"],
+            sac.general_information["auditee_uei"],
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, "84")
         self.assertEqual(over_agency, None)
@@ -545,8 +584,11 @@ class CogOverTests(TestCase):
         sac.save()
 
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.general_information["ein"],
-            sac.general_information["auditee_uei"], sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.general_information["ein"],
+            sac.general_information["auditee_uei"],
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, "84")
         self.assertEqual(over_agency, None)
@@ -584,8 +626,11 @@ class CogOverTests(TestCase):
         sac.save()
 
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.general_information["ein"],
-            sac.general_information["auditee_uei"], sac.general_information["audit_year"]
+            sac.federal_awards,
+            sac.submission_status,
+            sac.general_information["ein"],
+            sac.general_information["auditee_uei"],
+            sac.general_information["audit_year"],
         )
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
