@@ -1,19 +1,21 @@
 #!/bin/bash
 
 # Source everything; everything is now a function.
-# Remember: bash has no idea if a function exists, 
-# so a typo in a function name will fail silently. Similarly,
+# Remember: bash has no idea if a function exists. Similarly,
 # bash has horrible scoping, so use of `local` in functions is 
 # critical for cleanliness in the startup script.
 source tools/util_startup.sh
 # This will choose the correct environment
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
-source tools/curation_audit_tracking_init.sh
-source tools/api_teardown.sh
+source tools/cgov_util_local_only.sh
+source tools/curation_audit_tracking_disable.sh
+source tools/sling_bulk_export.sh
 source tools/migrate_app_tables.sh
-source tools/api_standup.sh
 source tools/seed_cog_baseline.sh
+source tools/setup_env.sh
+source tools/sql_pre_post.sh
+source tools/util_startup.sh
 
 #####
 # SETUP THE LOCAL ENVIRONMENT
@@ -21,11 +23,28 @@ setup_env
 gonogo "setup_env"
 
 #####
-# API TEARDOWN
-# API has to be deprecated/removed before migration, because
-# of tight coupling between schema/views and the dissemination tables
-api_teardown
-gonogo "api_teardown"
+# SIMULATE DEPLOY BACKUP
+# Before we deploy, we always get a copy of dissemination_*
+# tables into fac-snapshot-db. We need to simulate this locally
+# so that we can run SQL pre/post operations on fac-snapshot-db.
+cgov_util_local_only
+gonogo "cgov_util_local_only"
+
+#####
+# SIMULATE NIGHTLY DATA/API CREATION
+sql_pre_fac_snapshot_db
+gonogo "sql_pre_fac_snapshot_db"
+sql_post_fac_snapshot_db
+gonogo "sql_post_fac_snapshot_db"
+
+#####
+# SQL PRE
+# We have SQL that we want to run before the migrations and sling are run.
+# This tears down things that would conflict with migrations, etc.
+sql_pre_fac_db
+gonogo "sql_pre"
+curation_audit_tracking_disable
+gonogo "curation_audit_tracking_disable"
 
 #####
 # MIGRATE APP TABLES
@@ -33,15 +52,11 @@ migrate_app_tables
 gonogo "migrate_app_tables"
 
 #####
-# API STANDUP
-# Standup the API, which may depend on migration changes
-api_standup
-gonogo "api_standup"
-
-#####
-# CURATION AUDIT TRACKING
-curation_audit_tracking_init
-gonogo "curation_audit_tracking_init"
+# SQL POST
+# Rebuild the API and prepare the system for execution.
+# Runs after migrations.
+sql_post_fac_db
+gonogo "sql_post"
 
 #####
 # SEED COG/OVER TABLES
@@ -50,6 +65,12 @@ seed_cog_baseline
 gonogo "seed_cog_baseline"
 
 #####
+# CREATE STAFF USERS
+# Prepares staff users for Django admin
+python manage.py create_staffusers
+
+#####
 # LAUNCH THE APP
 # We will have died long ago if things didn't work.
 npm run dev & python manage.py runserver 0.0.0.0:8000
+

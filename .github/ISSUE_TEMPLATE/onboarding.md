@@ -80,6 +80,8 @@ Note: If you're not able to do any of these yourself, you're still responsible f
 - [ ] [Add as a form manager to the touchpoints recruitment intercept](https://touchpoints.app.cloud.gov/admin/forms/9412c559/permissions)
 
 **For engineers, also...**
+- [ ] Make sure you have a `login.gov` account and have logged into the FAC application at least once. 
+  - [ ] Then, add your email to the `readonly` list in [staffusers.json](../../backend/config/staffusers.json).
 - [ ] [Add as a member of the FAC group in New Relic](https://one.newrelic.com/admin-portal/organizations/users-list) (@GSA-TTS/fac-admins can do this)
 
 **For product leads/owners, also...**
@@ -88,5 +90,6 @@ Note: If you're not able to do any of these yourself, you're still responsible f
 - [ ] Also give them the `Maintainer` role in [the FAC-team team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members).
 
 **For helpdesk, also...**
-- [ ] Add them to the list of staff users for [Django Admin](https://app.fac.gov/admin/users/staffuser/).
+- [ ] Make sure you have a `login.gov` account and have logged into the FAC application at least once. 
+  - [ ] Then, add your email to the `helpdesk` list in [staffusers.json](../../backend/config/staffusers.json).
 - [ ] Give them access to the [Help Desk](https://fac-gov.zendesk.com/admin/people/team/members) as a team member.

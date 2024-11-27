@@ -229,10 +229,23 @@ STATIC_URL = "/static/"
 
 # Environment specific configurations
 DEBUG = False
+
 if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
+
+    # FIXME: This is now identical between local and cloud.gov, because we have
+    # a "fake" VCAP_SERVICES environment variable. Local DBs and S3 buckets
+    # can be configured the same way as their cloud equivalents. This can be
+    # refactored for simpler config loading in the app.
+    #
+    # During a build, there won't be an environment variable. Load the
+    # fake VCAP from the filesystem.
+    vcap = json.load(open("config/vcap_services_for_containers.json"))
+
     DATABASES = {
-        "default": env.dj_db_url(
-            "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
+        "default": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
+        "fac-db": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
+        "fac-snapshot-db": dj_database_url.parse(
+            get_db_url_from_vcap_services(vcap, "fac-snapshot-db")
         ),
     }
     STORAGES = {
@@ -257,7 +270,8 @@ if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTI
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 
     # Private bucket
-    AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
+    AWS_PRIVATE_STORAGE_BUCKET_NAME = "fac-private-s3"
+    AWS_PUBLIC_STORAGE_BUCKET_NAME = "fac-public-s3"
 
     AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
         "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
@@ -265,9 +279,11 @@ if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTI
 
     # MinIO only matters for local development and GitHub action environments.
     # These should match what we're setting in backend/run.sh
-    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "longtest")
+    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get(
+        "AWS_PRIVATE_ACCESS_KEY_ID", "singleauditclearinghouse"
+    )
     AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
-        "AWS_PRIVATE_SECRET_ACCESS_KEY", "longtest"
+        "AWS_PRIVATE_SECRET_ACCESS_KEY", "singleauditclearinghouse"
     )
     AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
         "AWS_S3_PRIVATE_ENDPOINT", "http://minio:9000"
@@ -299,8 +315,14 @@ else:
 
     vcap = json.loads(env.str("VCAP_SERVICES"))
 
-    DB_URL = get_db_url_from_vcap_services(vcap)
-    DATABASES = {"default": dj_database_url.parse(DB_URL)}
+    # DB_URL = get_db_url_from_vcap_services(vcap)
+    DATABASES = {
+        "default": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
+        "fac-db": dj_database_url.parse(get_db_url_from_vcap_services(vcap, "fac-db")),
+        "fac-snapshot-db": dj_database_url.parse(
+            get_db_url_from_vcap_services(vcap, "fac-snapshot-db")
+        ),
+    }
 
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":

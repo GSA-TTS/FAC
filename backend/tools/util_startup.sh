@@ -1,7 +1,9 @@
+source tools/variables.sh
+
 function startup_log {
     local tag="$1"
     local msg="$2"
-    echo STARTUP $tag $msg
+    echo "STARTUP" "$tag" "$msg"
 }
 
 # gonogo
@@ -9,8 +11,95 @@ function startup_log {
 function gonogo {
   if [ $? -eq 0 ]; then
     startup_log "STARTUP_CHECK" "$1 PASS"
+    return 0
   else
     startup_log "STARTUP_CHECK" "$1 FAIL"
-    exit -1
+    exit 1
   fi
+}
+
+# 2024-10-10T12:28:29.61-0400 [APP/PROC/WEB/0] OUT CHECK_TABLE_EXISTS START: public.dissemination_general
+# 2024-10-10T12:28:29.65-0400 [APP/PROC/WEB/0] OUT CHECK_TABLE_EXISTS END: public.dissemination_general = t
+# 2024-10-10T12:28:29.65-0400 [APP/PROC/WEB/0] OUT CHECK_TABLE_EXISTS: public_data_v1_0_0.metadata
+# 2024-10-10T12:28:29.68-0400 [APP/PROC/WEB/0] OUT CHECK_TABLE_EXISTS public_data_v1_0_0.metadata: f
+# 2024-10-10T12:28:29.68-0400 [APP/PROC/WEB/0] OUT Exit status 1
+# 2024-10-10T12:28:29.68-0400 [CELL/SSHD/0] OUT Exit status 0
+
+function check_table_exists() {
+  local db_uri="$1"
+  local schema="$2"
+  local table="$3"
+
+  echo "CHECK_TABLE_EXISTS START: $schema.$table"
+  # >/dev/null 2>&1
+  # The qtAX incantation lets us pass the PSQL result value back to bash.
+  result=`$PSQL_EXE "$db_uri" -qtAX -c "SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = '$schema' AND tablename = '$table');"`
+  # Flip TRUE to a 0, because UNIX considers a 0 exit code to be good. 
+  if [ "$result" = "t" ]; then
+    echo "CHECK_TABLE_EXISTS END: $schema.$table = 0"
+    FUNCTION_RESULT=0
+  else
+    echo "CHECK_TABLE_EXISTS END: $schema.$table = 1"
+    FUNCTION_RESULT=1
+  fi
+  return 0
+}
+
+function check_schema_exists () {
+  local db_uri="$1"
+  local schema_name="$2"
+  echo "CHECK_SCHEMA_EXISTS START: $schema_name"
+  result=`$PSQL_EXE $db_uri -qtAX -c "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '$schema_name');"`
+  # Flip TRUE to a 0, because UNIX considers a 0 exit code to be good. 
+  if [ "$result" = "t" ]; then
+    echo "CHECK_SCHEMA_EXISTS END: $schema_name = 0"
+    FUNCTION_RESULT=0
+  else
+    echo "CHECK_SCHEMA_EXISTS END: $schema_name = 1"
+    FUNCTION_RESULT=1
+  fi
+  return 0
+}
+
+function run_sql () {
+    local db_uri="$1"
+    local path="$2"
+    echo "BEGIN run_sql < $path"
+    if [[ "$file" == *"notxn"* ]]; then
+      $PSQL_EXE_NO_TXN $db_uri < $path;
+      gonogo "GONOGO run_sql < $path"
+    else
+      $PSQL_EXE $db_uri < $path;
+      gonogo "GONOGO run_sql < $path"
+    fi
+}
+
+export _GET_AWS_RESULT="NONE"
+
+function get_aws_s3() {
+    local bucket="$1"
+    local key="$2"
+    _GET_AWS_RESULT=$(echo $VCAP_SERVICES | \
+        jq --arg bucket "$bucket" '.s3 | map(select(.instance_name==$bucket))' | \
+        jq .[] | \
+        jq --raw-output --arg key "$key" '.credentials | .[$key]')
+    return 0
+}
+
+function check_env_var_not_empty() {
+  local var_name="$1"
+  local var_value="${!var_name}"
+  if [ -z "${var_value}" ];
+  then
+    echo "CHECK_ENV_VAR ${var_name} has value '${var_value}'. Exiting.";
+    exit 255;
+  else
+    echo "CHECK_ENV_VAR ${var_name} is OK."
+  fi
+}
+
+function show_env_var() {
+  local var_name="$1"
+  local var_value="${!var_name}"
+  echo "SHOW_ENV_VAR ${var_name} has value '${var_value}'.";
 }

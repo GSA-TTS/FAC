@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -11,7 +10,9 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
+    TribalApiAccessKeyIds,
 )
+import datetime
 
 
 class AdditionalEinAdmin(admin.ModelAdmin):
@@ -257,6 +258,29 @@ class SecondaryAuditorAdmin(admin.ModelAdmin):
     search_fields = ("report_id",)
 
 
+class TribalApiAccessKeyIdsAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "email",
+        "key_id",
+        "date_added",
+    )
+
+    search_fields = (
+        "email",
+        "key_id",
+    )
+
+    fields = [
+        "email",
+        "key_id",
+    ]
+
+    def save_model(self, request, obj, form, change):
+        obj.date_added = datetime.date.today()
+        super().save_model(request, obj, form, change)
+
+
 admin.site.register(AdditionalEin, AdditionalEinAdmin)
 admin.site.register(AdditionalUei, AdditionalUeiAdmin)
 admin.site.register(CapText, CapTextAdmin)
@@ -267,3 +291,4 @@ admin.site.register(General, GeneralAdmin)
 admin.site.register(Note, NoteAdmin)
 admin.site.register(Passthrough, PassThroughAdmin)
 admin.site.register(SecondaryAuditor, SecondaryAuditorAdmin)
+admin.site.register(TribalApiAccessKeyIds, TribalApiAccessKeyIdsAdmin)

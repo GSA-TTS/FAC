@@ -1,0 +1,201 @@
+{
+  "s3": [
+    {
+      "label": "s3",
+      "provider": "alpha-provider",
+      "plan": "basic",
+      "name": "backups",
+      "tags": [
+        "AWS",
+        "S3",
+        "object-storage"
+      ],
+      "instance_guid": "UUIDALPHA1",
+      "instance_name": "backups",
+      "binding_guid": "UUIDALPHA2",
+      "binding_name": null,
+      "credentials": {
+        "uri": "s3://ACCESSKEYIDALPHA:SECRETACCESSKEYALPHA@s3-us-gov-alpha-1.amazonaws.com/BROKEREDBUCKETALPHA",
+        "insecure_skip_verify": false,
+        "access_key_id": "ACCESSKEYIDALPHA",
+        "secret_access_key": "SECRETACCESSKEY+ALPHA",
+        "region": "us-gov-west-1",
+        "bucket": "BROKEREDBUCKETALPHA",
+        "endpoint": "s3-us-gov-alpha-1.amazonaws.com",
+        "fips_endpoint": "s3-fips.us-gov-alpha-1.amazonaws.com",
+        "additional_buckets": []
+      },
+      "syslog_drain_url": "https://ALPHA.drain.url",
+      "volume_mounts": [
+        "no_mounts"
+      ]
+    },
+    {
+      "label": "s3",
+      "provider": null,
+      "plan": "basic",
+      "name": "fac-private-s3",
+      "tags": [
+        "AWS",
+        "S3",
+        "object-storage"
+      ],
+      "instance_guid": "UUIDBRAVO1",
+      "instance_name": "fac-private-s3",
+      "binding_guid": "UUIDBRAVO2",
+      "binding_name": null,
+      "credentials": {
+        "uri": "s3://ACCESSKEYIDBRAVO:SECRETACCESSKEYBRAVO@s3-us-gov-bravo-1.amazonaws.com/BROKEREDBUCKETBRAVO1",
+        "insecure_skip_verify": false,
+        "access_key_id": "ACCESSKEYIDBRAVO",
+        "secret_access_key": "SECRETACCESSKEYBRAVO",
+        "region": "us-gov-bravo-1",
+        "bucket": "BROKEREDBUCKETBRAVO1",
+        "endpoint": "s3-us-gov-bravo-1.amazonaws.com",
+        "fips_endpoint": "s3-fips.us-gov-bravo-1.amazonaws.com",
+        "additional_buckets": [
+          "BROKEREDBUCKETBRAVO2"
+        ]
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": []
+    },
+    {
+      "label": "s3",
+      "provider": null,
+      "plan": "basic",
+      "name": "fac-public-s3",
+      "tags": [
+        "AWS",
+        "S3",
+        "object-storage"
+      ],
+      "instance_guid": "UUIDCHARLIE1",
+      "instance_name": "fac-public-s3",
+      "binding_guid": "UUIDCHARLIE2",
+      "binding_name": null,
+      "credentials": {
+        "uri": "s3://ACCESSKEYIDCHARLIE:SECRETACCESSKEYCHARLIE@s3-us-gov-charlie-1.amazonaws.com/BROKEREDBUCKETCHARLIE",
+        "insecure_skip_verify": false,
+        "access_key_id": "ACCESSKEYIDCHARLIE",
+        "secret_access_key": "SECRETACCESSKEYCHARLIE",
+        "region": "us-gov-west-1",
+        "bucket": "BROKEREDBUCKETCHARLIE",
+        "endpoint": "s3-us-gov-charlie-1.amazonaws.com",
+        "fips_endpoint": "s3-fips.us-gov-charlie-1.amazonaws.com",
+        "additional_buckets": []
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": []
+    }
+  ],
+  "user-provided": [
+    {
+      "label": "user-provided",
+      "name": "key-service",
+      "tags": [],
+      "instance_guid": "UUIDDELTA1",
+      "instance_name": "key-service",
+      "binding_guid": "UUIDDELTA2",
+      "binding_name": null,
+      "credentials": {
+        "DJANGO_SECRET_LOGIN_KEY": "DJANGOSECRETKEYDELTA",
+        "LOGIN_CLIENT_ID": "urn:gov:gsa:openidconnect.profiles:sp:sso:delta:jwt",
+        "SAM_API_KEY": "APIKEYDELTA",
+        "SECRET_KEY": "DJANGOSECRETKEYDELTA"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": []
+    },
+    {
+      "label": "user-provided",
+      "name": "https-proxy-creds",
+      "tags": [],
+      "instance_guid": "UUIDECHO1",
+      "instance_name": "https-proxy-creds",
+      "binding_guid": "UUIDECHO2",
+      "binding_name": null,
+      "credentials": {
+        "domain": "echo.egress-https-proxy.apps.internal",
+        "password": "PASSWORDECHO",
+        "port": "61443",
+        "protocol": "https",
+        "uri": "https://USERNAMEECHO:PASSWORDECHO@echo.egress-https-proxy.apps.internal:61443",
+        "username": "USERNAMEECHO"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": []
+    },
+    {
+      "label": "user-provided",
+      "name": "smtp-proxy-creds",
+      "tags": [],
+      "instance_guid": "UUIDFOXTROT1",
+      "instance_name": "smtp-proxy-creds",
+      "binding_guid": "UUIDFOXTROT2",
+      "binding_name": null,
+      "credentials": {
+        "domain": "echo.egress-smtp-proxy.apps.internal",
+        "port": "8080"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": []
+    },
+    {
+      "label": "user-provided",
+      "name": "newrelic-creds",
+      "tags": [
+        "newrelic-creds"
+      ],
+      "instance_guid": "UUIDGOLF1",
+      "instance_name": "newrelic-creds",
+      "binding_guid": "UUIDGOLF2",
+      "binding_name": null,
+      "credentials": {
+        "NEW_RELIC_LICENSE_KEY": "LICENCEKEYGOLF",
+        "NEW_RELIC_LOGS_ENDPOINT": "https://golf.newrelic.com/log/v1"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": []
+    },
+    {
+      "label": "user-provided",
+      "name": "logdrain",
+      "tags": [],
+      "instance_guid": "UUIDHOTEL1",
+      "instance_name": "logdrain",
+      "binding_guid": "UUIDHOTEL2",
+      "binding_name": null,
+      "credentials": null,
+      "syslog_drain_url": "https://HOTELUSERNAME:HOTELPASSWORD@hotel.app.cloud.gov/?drain-type=all",
+      "volume_mounts": []
+    }
+  ],
+  "aws-rds": [
+    {
+      "label": "aws-rds",
+      "provider": null,
+      "plan": "medium-gp-psql",
+      "name": "db",
+      "tags": [
+        "database",
+        "RDS"
+      ],
+      "instance_guid": "UUIDINDIA1",
+      "instance_name": "db",
+      "binding_guid": "UUIDINDIA2",
+      "binding_name": null,
+      "credentials": {
+        "db_name": "DBNAMEINDIA",
+        "host": "host.us-gov-india-1.rds.amazonaws.com",
+        "name": "DBNAMEINDIA",
+        "password": "PASSWORDINDIA",
+        "port": "5432",
+        "uri": "postgres://USERNAMEINDIA:PASSWORDINDIA@host.us-gov-india-1.rds.amazonaws.com:5432/DBNAMEINDIA",
+        "username": "USERNAMEINDIA"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": []
+    }
+  ]
+}

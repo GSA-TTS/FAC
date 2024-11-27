@@ -28,14 +28,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      
-  historic-data:
-    image: ghcr.io/gsa-tts/fac-historic-public-csvs/load-historic-public-data:20230912
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgres://postgres@db/postgres
 
   web:
     image: ghcr.io/gsa-tts/fac/web-container:latest
@@ -94,12 +86,11 @@ services:
     expose:
       - "3000"
     environment:
-      PGRST_DB_URI: postgres://postgres@db:5432/postgres
-      PGRST2_DB_URI: postgres://postgres@db:5431/postgres
+      PGRST_DB_URI: postgres://postgres@db2:5432/postgres
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
       PGRST_DB_ANON_ROLE: anon
       # See https://postgrest.org/en/stable/references/api/schemas.html#multiple-schemas for multiple schemas
-      PGRST_DB_SCHEMAS: "api_v1_0_3, api_v1_1_0, admin_api_v1_1_0"
+      PGRST_DB_SCHEMAS: "api_v1_1_0,api_v2_0_0"
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
     depends_on:
       db:

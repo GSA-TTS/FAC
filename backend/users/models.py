@@ -70,6 +70,7 @@ class StaffUser(models.Model):
         try:
             user = User.objects.get(email=self.staff_email)
             user.is_staff = False
+            user.is_superuser = False
             user.save()
         except User.DoesNotExist:
             pass  # silently ignore. Nothing to do.

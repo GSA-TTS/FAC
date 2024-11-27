@@ -1,0 +1,2 @@
+-- Currently, there are no finalization actions for fac-db.
+-- They would go here.

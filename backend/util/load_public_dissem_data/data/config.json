@@ -1,0 +1,118 @@
+{
+  "s3": [
+    {
+      "label": "s3",
+      "provider": "minio-local",
+      "plan": "basic",
+      "name": "fac-private-s3",
+      "tags": [
+        "AWS",
+        "S3",
+        "object-storage"
+      ],
+      "instance_guid": "UUIDALPHA1",
+      "instance_name": "fac-private-s3",
+      "binding_guid": "UUIDALPHA2",
+      "binding_name": null,
+      "credentials": {
+        "uri": "http://minio:9000",
+        "port": 9000,
+        "insecure_skip_verify": false,
+        "access_key_id": "singleauditclearinghouse",
+        "secret_access_key": "singleauditclearinghouse",
+        "region": "us-east-1",
+        "bucket": "fac-private-s3",
+        "endpoint": "minio",
+        "fips_endpoint": "minio",
+        "additional_buckets": []
+      },
+      "syslog_drain_url": "https://ALPHA.drain.url",
+      "volume_mounts": [
+        "no_mounts"
+      ]
+    },
+    {
+      "label": "s3",
+      "provider": "minio-local",
+      "plan": "basic",
+      "name": "fac-public-s3",
+      "tags": [
+        "AWS",
+        "S3",
+        "object-storage"
+      ],
+      "instance_guid": "UUIDALPHA1",
+      "instance_name": "fac-public-s3",
+      "binding_guid": "UUIDALPHA2",
+      "binding_name": null,
+      "credentials": {
+        "uri": "http://minio:9000",
+        "port": 9000,
+        "insecure_skip_verify": false,
+        "access_key_id": "singleauditclearinghouse",
+        "secret_access_key": "singleauditclearinghouse",
+        "region": "us-east-1",
+        "bucket": "fac-public-s3",
+        "endpoint": "minio",
+        "fips_endpoint": "minio",
+        "additional_buckets": []
+      },
+      "syslog_drain_url": "https://ALPHA.drain.url",
+      "volume_mounts": [
+        "no_mounts"
+      ]
+    }
+  ],
+  "aws-rds": [
+    {
+      "label": "fac-db",
+      "provider": null,
+      "plan": null,
+      "name": "fac-db",
+      "tags": [
+        "database",
+        "docker"
+      ],
+      "instance_guid": "UUIDINDIA1",
+      "instance_name": "db",
+      "binding_guid": "UUIDINDIA2",
+      "binding_name": null,
+      "credentials": {
+        "db_name": "postgres",
+        "host": "db",
+        "name": "postgres",
+        "password": "",
+        "port": "5432",
+        "uri": "postgres://postgres@db:5432/postgres?sslmode=disable",
+        "username": "postgres"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": []
+    },
+    {
+      "label": "fac-snapshot-db",
+      "provider": null,
+      "plan": null,
+      "name": "fac-snapshot-db",
+      "tags": [
+        "database",
+        "docker"
+      ],
+      "instance_guid": "UUIDJULIET1",
+      "instance_name": "db",
+      "binding_guid": "UUIDJULIET2",
+      "binding_name": null,
+      "credentials": {
+        "db_name": "postgres",
+        "host": "db2",
+        "name": "postgres",
+        "password": "",
+        "port": "5432",
+        "uri": "postgres://postgres@db2:5432/postgres?sslmode=disable",
+        "username": "postgres"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": []
+    }
+  ]
+}

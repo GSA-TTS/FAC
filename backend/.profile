@@ -1,20 +1,14 @@
 #!/bin/bash
 
-# Source everything; everything is now a function.
-# Remember: bash has no idea if a function exists,
-# so a typo in a function name will fail silently. Similarly,
-# bash has horrible scoping, so use of `local` in functions is
-# critical for cleanliness in the startup script.
+set +e
+
 source tools/util_startup.sh
-# This will choose the correct environment
-# for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
-source tools/api_teardown.sh
+source tools/curation_audit_tracking_disable.sh
+source tools/sling_bulk_export.sh
 source tools/migrate_app_tables.sh
-source tools/api_standup.sh
-source tools/run_collectstatic.sh
 source tools/seed_cog_baseline.sh
-source tools/materialized_views.sh
+source tools/sql_pre_post.sh
 
 #####
 # SETUP THE CGOV ENVIRONMENT
@@ -24,11 +18,13 @@ gonogo "setup_env"
 if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
 
     #####
-    # API TEARDOWN
-    # API has to be deprecated/removed before migration, because
-    # of tight coupling between schema/views and the dissemination tables
-    api_teardown
-    gonogo "api_teardown"
+    # SQL PRE
+    # We have SQL that we want to run before the migrations and sling are run.
+    # This tears down things that would conflict with migrations, etc.
+    sql_pre_fac_db
+    gonogo "sql_pre_fac_db"
+    curation_audit_tracking_disable
+    gonogo "curation_audit_tracking_disable"
 
     #####
     # MIGRATE APP TABLES
@@ -36,16 +32,11 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     gonogo "migrate_app_tables"
 
     #####
-    # API STANDUP
-    # Standup the API, which may depend on migration changes
-    api_standup
-    gonogo "api_standup"
-
-    #####
-    # COLLECT STATIC
-    # Do Django things with static files.
-    # run_collectstatic
-    # gonogo "run_collectstatic"
+    # SQL POST
+    # Rebuild the API and prepare the system for execution.
+    # Runs after migrations.
+    sql_post_fac_db
+    gonogo "sql_post_fac_db"
 
     #####
     # SEED COG/OVER TABLES
@@ -53,8 +44,11 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     seed_cog_baseline
     gonogo "seed_cog_baseline"
 
-    # materialized_views
-    # gonogo "materialized_views"
+    #####
+    # CREATE STAFF USERS
+    # Prepares staff users for Django admin
+    python manage.py create_staffusers
+    gonogo "create_staffusers"
 fi
 
 # Make psql usable by scripts, for debugging, etc.

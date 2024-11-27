@@ -35,11 +35,14 @@ disable = [
 
 [tool.bandit]
 # TDB 2022-12-07 - test_schemas and test_validators use random number generation, which bandit doesn't like
+# 2024-11-14 - create_stream_yaml and create_partition_statements will never be touched by users, yet bandit doesn't like the SQL injection risk.
 exclude_dirs = [
     "audit/cross_validation/test_check_has_federal_awards.py",
     "audit/test_schemas.py",
     "audit/test_validators.py",
     "node_modules",
+    "dissemination/sql/fac-snapshot-db/create_partition_statements.py",
+    "dissemination/sql/sling/bulk_data_export/create_stream_yaml.py",
     "dissemination/test_search.py",
     "dissemination/tests.py",
     ".venv"

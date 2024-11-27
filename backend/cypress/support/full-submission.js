@@ -5,7 +5,7 @@ import { testAuditInformationForm } from './audit-info-form.js';
 import { testPdfAuditReport } from './report-pdf.js';
 import { testAuditorCertification } from './auditor-certification.js';
 import { testAuditeeCertification } from './auditee-certification.js';
-import { testSubmissionAccess } from './dissemination-table.js';
+import { testSubmissionAccessViaPDF } from './dissemination-table-via-pdf.js';
 import { testTribalAuditPublic, testTribalAuditPrivate } from './tribal-audit-form.js';
 import { testInitializeAudit } from './initialize-audit.js';
 import { testUnlock } from './unlock-cert.js';
@@ -133,7 +133,8 @@ export function testFullSubmission(isTribal, isPublic) {
       /audits are complete/
     ).siblings().contains('td', reportId);
 
-    testSubmissionAccess(reportId, isTribal, isPublic);
+    // FIXME Ticketed as 
+    testSubmissionAccessViaPDF(reportId, isTribal, isPublic);
   });
 
   testLogoutGov();

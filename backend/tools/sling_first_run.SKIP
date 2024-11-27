@@ -1,0 +1,49 @@
+source tools/util_startup.sh
+
+function sling_first_run() {
+    startup_log "SLING_FIRST_RUN" "Slinging data to fac-snapshot if needed"
+    # check_table_exists might return 1.
+    # It is possible set -e is kicking us out when the function
+    # returns an error? So, try set +e.
+    set +e
+    # The deploy action does a DB->DB backup with cgov-util.
+    # This should only ever actually run when testing locally.
+    # In the cloud environment, it will skip the actul run.
+    check_table_exists $FAC_SNAPSHOT_URI 'public' 'dissemination_general'
+    local is_general_table=$FUNCTION_RESULT
+    if [ $is_general_table -ne 0 ]; then
+        # This is the first run.
+        startup_log "SLING_FIRST_RUN" "Running cgov-util INITIAL."
+        $CGOV_UTIL_EXE db_to_db \
+            --src_db fac-db \
+            --dest_db fac-snapshot-db \
+            --operation initial
+    fi
+
+    # If the metadata table exists, it means sling has run to completion.
+    check_table_exists $FAC_SNAPSHOT_URI 'public_data_v1_0_0' 'metadata'
+    local is_metadata_table=$FUNCTION_RESULT
+    echo "SLING_FIRST_RUN public_data_v1_0_0.metadata = $is_metadata_table"
+    
+    # We need to load some functions for sling to complete, because
+    # we use those functions as part of the metadata table generation.
+    local base_path='dissemination/sql'
+    local location='sling'
+
+    # Only run sling if the tables in the secondary DB do not exist.
+    if [ $is_metadata_table -ne 0 ]; then 
+        SLING_ALLOW_EMPTY=1
+        startup_log "SLING_FIRST_RUN" "API tables don't exist; running sling."
+        $SLING_EXE run -r dissemination/sql/sling/public_data_v1_0_0/public_data_v1_0_0.yaml
+        gonogo "sling public data for API tables"
+        $SLING_EXE run -r dissemination/sql/sling/public_data_v1_0_0/suppressed_data_v1_0_0.yaml
+        gonogo "sling tribal data for API tables"
+        $SLING_EXE run -r dissemination/sql/sling/public_data_v1_0_0/public_metadata_v1_0_0.yaml
+        gonogo "sling metadata table"
+        startup_log "SLING_FIRST_RUN" "Successfully ran sling to generate tables."
+    else
+        startup_log "SLING_FIRST_RUN" "API tables exist; skipping sling."
+    fi
+    startup_log "SLING_FIRST_RUN" "Done"
+    return 0
+}
