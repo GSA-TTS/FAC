@@ -583,6 +583,15 @@ class CogOverTests(TestCase):
 
         sac.save()
 
+        baker.make(
+            CognizantBaseline,
+            uei=ZQGGHJH74DW7,
+            ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            cognizant_agency="24",
+        )
+        cbs = CognizantBaseline.objects.all()
+        self.assertEqual(len(cbs), 1)
+
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards,
             sac.submission_status,
@@ -590,7 +599,7 @@ class CogOverTests(TestCase):
             sac.general_information["auditee_uei"],
             sac.general_information["audit_year"],
         )
-        self.assertEqual(cog_agency, "84")
+        self.assertEqual(cog_agency, "24")
         self.assertEqual(over_agency, None)
 
     def test_cog_assignment_for_2027_no_baseline(self):
