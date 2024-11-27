@@ -252,7 +252,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         audit_date = self.general_information["auditee_fiscal_period_end"]
         audit_year = int(audit_date.split("-")[0])
         cognizant_agency, oversight_agency = compute_cog_over(
-            self.federal_awards, self.submission_status, self.ein, self.auditee_uei, audit_year
+            self.federal_awards,
+            self.submission_status,
+            self.ein,
+            self.auditee_uei,
+            audit_year,
         )
         if oversight_agency:
             self.oversight_agency = oversight_agency
