@@ -506,7 +506,7 @@ class CogOverTests(TestCase):
         sac.save()
 
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.general_information["ein"], 
+            sac.federal_awards, sac.submission_status, sac.general_information["ein"],
             sac.general_information["auditee_uei"], sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, "84")
@@ -545,7 +545,7 @@ class CogOverTests(TestCase):
         sac.save()
 
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.general_information["ein"], 
+            sac.federal_awards, sac.submission_status, sac.general_information["ein"],
             sac.general_information["auditee_uei"], sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, "84")
@@ -584,7 +584,7 @@ class CogOverTests(TestCase):
         sac.save()
 
         cog_agency, over_agency = compute_cog_over(
-            sac.federal_awards, sac.submission_status, sac.general_information["ein"], 
+            sac.federal_awards, sac.submission_status, sac.general_information["ein"],
             sac.general_information["auditee_uei"], sac.general_information["audit_year"]
         )
         self.assertEqual(cog_agency, "10")
