@@ -13,7 +13,8 @@ from datetime import date
 
 
 class DateEncoder(json.JSONEncoder):
-    """ Encode date types in admin logs. """
+    """Encode date types in admin logs."""
+
     def default(self, obj):
         if isinstance(obj, date):
             return obj.isoformat()
