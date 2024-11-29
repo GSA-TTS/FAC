@@ -36,7 +36,7 @@
     "eslint-plugin-cypress": "^4.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "prettier": "^3.4.0",
-    "stylelint": "^16.1.0",
+    "stylelint": "^16.11.0",
     "stylelint-config-scss": "^1.0.0-security",
     "stylelint-config-standard": "^36.0.1",
     "stylelint-config-standard-scss": "^13.1.0"
