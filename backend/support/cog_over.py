@@ -129,7 +129,9 @@ def determine_hist_agency(ein, uei, base_year):
 def get_dbkey(ein, uei):
     try:
         report_id = General.objects.values_list("report_id", flat=True).get(
-            Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year=DBKEY_TO_UEI_TRANSITION_YEAR)
+            Q(auditee_ein=ein),
+            Q(auditee_uei=uei),
+            Q(audit_year=DBKEY_TO_UEI_TRANSITION_YEAR),
         )
     except (General.DoesNotExist, General.MultipleObjectsReturned):
         report_id = None
