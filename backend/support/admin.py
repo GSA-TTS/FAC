@@ -1,7 +1,24 @@
 from django.contrib import admin
+from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 from audit.models import SingleAuditChecklist
+from dissemination.models import TribalApiAccessKeyIds
+from users.models import UserPermission
 from .models import CognizantBaseline, CognizantAssignment, AssignmentTypeCode
+
+import json
+from datetime import date
+
+
+class DateEncoder(json.JSONEncoder):
+    """Encode date types in admin logs."""
+
+    def default(self, obj):
+        if isinstance(obj, date):
+            return obj.isoformat()
+        return super().default(obj)
 
 
 class SupportAdmin(admin.ModelAdmin):
@@ -106,3 +123,89 @@ class CognizantAssignmentAdmin(SupportAdmin):
 
     def has_add_permission(self, request, obj=None):
         return request.user.is_staff
+
+
+@admin.register(LogEntry)
+class LogEntryAdmin(SupportAdmin):
+    """
+    Displays the changelog for actions made from the Admin Panel.
+    """
+
+    date_hierarchy = "action_time"
+    ordering = ["-action_time"]
+    list_display = [
+        "action_time",
+        "staff_user",
+        "record_affected",
+        "event",
+        "content",
+    ]
+    search_fields = (
+        "action_time",
+        "user__email",
+        "object_repr",
+        "action_flag",
+        "change_message",
+    )
+
+    def staff_user(self, obj):
+        return obj.user.email
+
+    def record_affected(self, obj):
+        return obj.object_repr
+
+    def event(self, obj):
+        if obj.action_flag == ADDITION:
+            return "Created"
+        elif obj.action_flag == DELETION:
+            return "Deleted"
+        elif obj.action_flag == CHANGE:
+            res = "Updated"
+            if obj.change_message:
+                _json = json.loads(obj.change_message)[0]
+                if "changed" in _json:
+                    res = "Updated\n"
+                    for field in _json["changed"]["fields"]:
+                        res += f"\n- {field}"
+            return res
+        return "-"
+
+    def content(self, obj):
+        if obj.change_message:
+            _json = json.loads(obj.change_message)[0]
+            if "content" in _json:
+                return _json["content"]
+        return "-"
+
+
+@receiver([post_delete, post_save], sender=LogEntry)
+def add_custom_field_to_log(sender, instance, created, **kwargs):
+    """
+    Modify content of the log depending on what model(s) were changed.
+    """
+
+    if created:
+        model_class = instance.content_type.model_class()
+        qset = model_class.objects.filter(pk=instance.object_id)
+        if qset.exists():
+            obj = qset.first()
+
+        # update content of record after save occurred.
+        change_message_json = json.loads(instance.change_message)
+
+        if model_class == UserPermission:
+            change_message_json[0]["content"] = list(
+                qset.values("email", "permission__slug")
+            )
+        elif model_class == TribalApiAccessKeyIds:
+            change_message_json[0]["content"] = list(qset.values("email", "key_id"))
+        else:
+            change_message_json[0]["content"] = list(qset.values("id"))
+
+        # record still exists.
+        if obj:
+            change_message_json[0]["id"] = obj.pk
+
+        # write changes to instance.
+        instance.change_message = json.dumps(change_message_json, cls=DateEncoder)
+        instance.save()
