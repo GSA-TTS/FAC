@@ -174,7 +174,19 @@ class AdvancedSearch(View):
                 k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
             }
         else:
-            raise ValidationError(f"Form error in Search POST. {form.errors}")
+
+            # render with form errors.
+            return render(
+                request,
+                "search.html",
+                {
+                    "advanced_search_flag": False,
+                    "form": form,
+                    "form_user_input": {"audit_year": default_checked_audit_years},
+                    "state_abbrevs": STATE_ABBREVS,
+                    "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                },
+            )
 
         # Tells the backend we're running advanced search.
         form_data["advanced_search_flag"] = True
@@ -271,7 +283,19 @@ class Search(View):
                 k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
             }
         else:
-            raise ValidationError(f"Form error in Search POST. {form.errors}")
+
+            # render with form errors.
+            return render(
+                request,
+                "search.html",
+                {
+                    "advanced_search_flag": False,
+                    "form": form,
+                    "form_user_input": {"audit_year": default_checked_audit_years},
+                    "state_abbrevs": STATE_ABBREVS,
+                    "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                },
+            )
 
         # Tells the backend we're running basic search.
         form_data["advanced_search_flag"] = False
