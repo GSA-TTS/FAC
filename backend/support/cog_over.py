@@ -14,6 +14,11 @@ logger = logging.getLogger(__name__)
 COG_LIMIT = 50_000_000
 DA_THRESHOLD_FACTOR = 0.25
 
+FIRST_BASELINE_YEAR = 2019
+BASELINE_VALID_FOR_YEARS = 5
+
+DBKEY_TO_UEI_TRANSITION_YEAR = "2022"
+
 
 def compute_cog_over(
     federal_awards, submission_status, auditee_ein, auditee_uei, audit_year
@@ -28,7 +33,6 @@ def compute_cog_over(
     - sac.ein
     - sac.auditee_uei
     """
-    base_year = calc_base_year(audit_year)
     if not federal_awards:
         logger.warning(
             f"Trying to determine cog_over for a sac with zero awards with status = {submission_status}."
@@ -49,6 +53,7 @@ def compute_cog_over(
         oversight_agency = agency
         # logger.warning("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
+    base_year = calc_base_year(audit_year)
     cognizant_agency = determine_hist_agency(auditee_ein, auditee_uei, base_year)
     if cognizant_agency:
         return (cognizant_agency, oversight_agency)
@@ -63,7 +68,10 @@ def calc_base_year(audit_year):
     # For audit years 2029 through 2033, baseline year is 2029
     # For audit years 2034 through 2038, baseline year is 2034
     # and so on
-    base_year = (math.floor((int(audit_year) - 2019) / 5) * 5) + 2019
+    base_year = (
+        math.floor((int(audit_year) - FIRST_BASELINE_YEAR) / BASELINE_VALID_FOR_YEARS)
+        * BASELINE_VALID_FOR_YEARS
+    ) + FIRST_BASELINE_YEAR
     return str(base_year)
 
 
@@ -94,7 +102,7 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
 
 def determine_hist_agency(ein, uei, base_year):
     dbkey = None
-    if base_year == "2019":
+    if int(base_year) == FIRST_BASELINE_YEAR:
         dbkey = get_dbkey(ein, uei)
 
     cog_agency = lookup_baseline(ein, uei, dbkey)
@@ -121,7 +129,7 @@ def determine_hist_agency(ein, uei, base_year):
 def get_dbkey(ein, uei):
     try:
         report_id = General.objects.values_list("report_id", flat=True).get(
-            Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year="2022")
+            Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year=DBKEY_TO_UEI_TRANSITION_YEAR)
         )
     except (General.DoesNotExist, General.MultipleObjectsReturned):
         report_id = None
@@ -130,7 +138,7 @@ def get_dbkey(ein, uei):
 
     try:
         dbkey = MigrationInspectionRecord.objects.values_list("dbkey", flat=True).get(
-            Q(report_id=report_id), Q(audit_year="2022")
+            Q(report_id=report_id), Q(audit_year=DBKEY_TO_UEI_TRANSITION_YEAR)
         )
     except (
         MigrationInspectionRecord.DoesNotExist,
