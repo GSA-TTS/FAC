@@ -1898,12 +1898,14 @@ class AuditorCertificationStep1ViewTests(TestCase):
             "is_OMB_limited": True,
             "is_auditee_responsible": True,
             "has_used_auditors_report": True,
-            "has_no_auditee_procedures": False,
+            "has_no_auditee_procedures": True,
             "is_FAC_releasable": True,
             "is_accurate_and_complete": True,
         }
 
         response = self.client.post(self.url, form_data)
+
+        # print(response.content)
 
         self.assertEqual(response.status_code, 302)
         self.sac.refresh_from_db()
