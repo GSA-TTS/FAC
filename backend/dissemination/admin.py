@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -11,7 +10,9 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
+    TribalApiAccessKeyIds,
 )
+import datetime
 
 
 class AdditionalEinAdmin(admin.ModelAdmin):
@@ -35,7 +36,7 @@ class AdditionalEinAdmin(admin.ModelAdmin):
         "additional_ein",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "additional_ein")
 
 
 class AdditionalUeiAdmin(admin.ModelAdmin):
@@ -59,7 +60,7 @@ class AdditionalUeiAdmin(admin.ModelAdmin):
         "additional_uei",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "additional_uei")
 
 
 class CapTextAdmin(admin.ModelAdmin):
@@ -83,7 +84,7 @@ class CapTextAdmin(admin.ModelAdmin):
         "finding_ref_number",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "finding_ref_number")
 
 
 class FederalAwardAdmin(admin.ModelAdmin):
@@ -107,7 +108,10 @@ class FederalAwardAdmin(admin.ModelAdmin):
         "award_reference",
     )
 
-    search_fields = ("report_id",)
+    search_fields = (
+        "report_id__report_id",
+        "award_reference",
+    )
 
 
 class FindingAdmin(admin.ModelAdmin):
@@ -132,7 +136,7 @@ class FindingAdmin(admin.ModelAdmin):
         "reference_number",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "award_reference", "reference_number")
 
 
 class FindingTextAdmin(admin.ModelAdmin):
@@ -156,7 +160,7 @@ class FindingTextAdmin(admin.ModelAdmin):
         "finding_ref_number",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "finding_ref_number")
 
 
 class GeneralAdmin(admin.ModelAdmin):
@@ -181,7 +185,7 @@ class GeneralAdmin(admin.ModelAdmin):
         "date_created",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id", "auditee_name", "date_created")
 
 
 class NoteAdmin(admin.ModelAdmin):
@@ -205,7 +209,7 @@ class NoteAdmin(admin.ModelAdmin):
         "note_title",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "note_title")
 
 
 class PassThroughAdmin(admin.ModelAdmin):
@@ -230,7 +234,7 @@ class PassThroughAdmin(admin.ModelAdmin):
         "passthrough_id",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "award_reference", "passthrough_id")
 
 
 class SecondaryAuditorAdmin(admin.ModelAdmin):
@@ -254,7 +258,31 @@ class SecondaryAuditorAdmin(admin.ModelAdmin):
         "auditor_ein",
     )
 
-    search_fields = ("report_id",)
+    search_fields = ("report_id__report_id", "auditor_ein")
+
+
+class TribalApiAccessKeyIdsAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "email",
+        "key_id",
+        "date_added",
+    )
+
+    search_fields = (
+        "email",
+        "key_id",
+    )
+
+    fields = [
+        "email",
+        "key_id",
+    ]
+
+    def save_model(self, request, obj, form, change):
+        obj.email = obj.email.lower()
+        obj.date_added = datetime.date.today()
+        super().save_model(request, obj, form, change)
 
 
 admin.site.register(AdditionalEin, AdditionalEinAdmin)
@@ -267,3 +295,4 @@ admin.site.register(General, GeneralAdmin)
 admin.site.register(Note, NoteAdmin)
 admin.site.register(Passthrough, PassThroughAdmin)
 admin.site.register(SecondaryAuditor, SecondaryAuditorAdmin)
+admin.site.register(TribalApiAccessKeyIds, TribalApiAccessKeyIdsAdmin)
