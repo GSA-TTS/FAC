@@ -1,43 +1,36 @@
-from datetime import datetime, timezone
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from unittest.mock import patch
 
-from django.test import Client, TestCase, TransactionTestCase
-from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
-
-from faker import Faker
-
-from model_bakery import baker
-
-from openpyxl import load_workbook
-from openpyxl.cell import Cell
-
+from audit.cross_validation.naming import SECTION_NAMES as SN
 from audit.fixtures.excel import (
-    ADDITIONAL_UEIS_TEMPLATE,
-    ADDITIONAL_EINS_TEMPLATE,
-    FEDERAL_AWARDS_TEMPLATE,
-    CORRECTIVE_ACTION_PLAN_TEMPLATE,
-    FINDINGS_TEXT_TEMPLATE,
-    FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
-    SECONDARY_AUDITORS_TEMPLATE,
-    NOTES_TO_SEFA_TEMPLATE,
-    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
-    FINDINGS_TEXT_ENTRY_FIXTURES,
-    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
-    FEDERAL_AWARDS_ENTRY_FIXTURES,
-    ADDITIONAL_UEIS_ENTRY_FIXTURES,
     ADDITIONAL_EINS_ENTRY_FIXTURES,
-    SECONDARY_AUDITORS_ENTRY_FIXTURES,
-    NOTES_TO_SEFA_ENTRY_FIXTURES,
+    ADDITIONAL_EINS_TEMPLATE,
+    ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    ADDITIONAL_UEIS_TEMPLATE,
+    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+    CORRECTIVE_ACTION_PLAN_TEMPLATE,
+    FEDERAL_AWARDS_ENTRY_FIXTURES,
+    FEDERAL_AWARDS_TEMPLATE,
+    FINDINGS_TEXT_ENTRY_FIXTURES,
+    FINDINGS_TEXT_TEMPLATE,
+    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
+    FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
     FORM_SECTIONS,
+    NOTES_TO_SEFA_ENTRY_FIXTURES,
+    NOTES_TO_SEFA_TEMPLATE,
+    SECONDARY_AUDITORS_ENTRY_FIXTURES,
+    SECONDARY_AUDITORS_TEMPLATE,
 )
 from audit.fixtures.single_audit_checklist import (
-    fake_auditor_certification,
     fake_auditee_certification,
+    fake_auditor_certification,
+)
+from audit.forms import (
+    AuditeeCertificationStep2Form,
+    AuditorCertificationStep1Form,
 )
 from audit.models import (
     Access,
@@ -47,9 +40,17 @@ from audit.models import (
     generate_sac_report_id,
 )
 from audit.models.models import STATUS
-from audit.cross_validation.naming import SECTION_NAMES as SN
-from audit.views import MySubmissions
+from audit.views import AuditeeCertificationStep2View, MySubmissions
 from dissemination.models import FederalAward, General
+from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import Client, RequestFactory, TestCase, TransactionTestCase
+from django.urls import reverse
+from faker import Faker
+from model_bakery import baker
+from openpyxl import load_workbook
+from openpyxl.cell import Cell
 
 User = get_user_model()
 
@@ -264,15 +265,127 @@ class MySubmissionsViewTests(TestCase):
 
 
 class EditSubmissionViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = baker.make(User)
+        self.url_name = "audit:EditSubmission"
+        self.report_id = "TEST_REPORT_ID"
+
     def test_redirect_if_not_logged_in(self):
         result = self.client.get(reverse(EDIT_PATH, args=["SOME_REPORT_ID"]))
         self.assertAlmostEqual(result.status_code, 302)
+
+    def test_redirect_not_logged_in(self):
+        url = reverse(self.url_name, args=[self.report_id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
 
 
 class SubmissionViewTests(TestCase):
     """
     Testing for the final step: submitting.
     """
+
+    def setUp(self):
+        self.client = Client()
+        self.user = baker.make(User)
+        self.sac = baker.make(
+            SingleAuditChecklist, submission_status=STATUS.READY_FOR_CERTIFICATION
+        )
+        self.url = reverse("audit:Submission", kwargs={"report_id": self.sac.report_id})
+        self.client.force_login(self.user)
+        baker.make(
+            "audit.Access",
+            sac=self.sac,
+            user=self.user,
+            role="certifying_auditee_contact",
+        )
+
+    def test_get_renders_template(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "audit/submission.html")
+        self.assertIn("report_id", response.context)
+        self.assertIn("submission_status", response.context)
+        self.assertEqual(response.context["report_id"], self.sac.report_id)
+        self.assertEqual(
+            response.context["submission_status"], self.sac.submission_status
+        )
+
+    def test_get_permission_denied_if_no_sac(self):
+        invalid_url = reverse("audit:Submission", kwargs={"report_id": "INVALID"})
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_access_denied_for_unauthorized_user(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    @patch("audit.views.views.SingleAuditChecklist.validate_full")
+    @patch("audit.views.views.sac_transition")
+    @patch("audit.views.views.remove_workbook_artifacts")
+    @patch("audit.views.views.SingleAuditChecklist.disseminate")
+    def test_post_valid_submission(
+        self, mock_disseminate, mock_remove, mock_transition, mock_validate
+    ):
+        mock_validate.return_value = []
+        mock_disseminate.return_value = None
+
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("audit:MySubmissions"))
+
+        mock_transition.assert_any_call(
+            response.wsgi_request, self.sac, transition_to=STATUS.SUBMITTED
+        )
+        mock_transition.assert_any_call(
+            response.wsgi_request, self.sac, transition_to=STATUS.DISSEMINATED
+        )
+        mock_disseminate.assert_called_once()
+        mock_remove.assert_called_once_with(self.sac)
+
+    @patch("audit.views.views.SingleAuditChecklist.validate_full")
+    @patch("audit.views.views.sac_transition")
+    @patch("audit.views.views.SingleAuditChecklist.disseminate")
+    def test_post_validation_errors(
+        self, mock_disseminate, mock_transition, mock_validate
+    ):
+        mock_validate.return_value = ["Error 1", "Error 2"]
+
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "audit/cross-validation/cross-validation-results.html"
+        )
+        self.assertIn("errors", response.context)
+        self.assertListEqual(response.context["errors"], ["Error 1", "Error 2"])
+
+        mock_disseminate.assert_not_called()
+        mock_transition.assert_not_called()
+
+    @patch("audit.views.views.General.objects.get")
+    @patch("audit.views.views.SingleAuditChecklist.validate_full")
+    def test_post_transaction_error(self, mock_validate, mock_general_get):
+        self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
+        self.sac.save()
+
+        mock_validate.return_value = []
+        mock_general_get.return_value = True
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("audit:MySubmissions"))
+
+        print("this response", response)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("audit:MySubmissions"))
+
+    def test_post_permission_denied_if_no_sac(self):
+        invalid_url = reverse("audit:Submission", kwargs={"report_id": "INVALID"})
+        response = self.client.post(invalid_url)
+        self.assertEqual(response.status_code, 403)
 
     def test_post_redirect(self):
         """
@@ -328,6 +441,24 @@ class SubmissionViewTests(TestCase):
         sac_after = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(sac_after.submission_status, STATUSES.DISSEMINATED)
+
+
+class SubmissionGetTest(TestCase):
+    def setUp(self):
+        self.user = baker.make(User)
+        self.client = Client()
+        self.url = reverse("audit:MySubmissions")
+
+    def testValidSubmission(self):
+        self.client.force_login(self.user)
+        sac1 = baker.make(SingleAuditChecklist, submission_status=STATUS.IN_PROGRESS)
+        sac2 = baker.make(SingleAuditChecklist, submission_status=STATUS.DISSEMINATED)
+        baker.make(Access, user=self.user, sac=sac1)
+        baker.make(Access, user=self.user, sac=sac2)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "audit/my_submissions.html")
 
 
 class SubmissionStatusTests(TransactionTestCase):
@@ -1348,6 +1479,32 @@ class ExcelFileHandlerViewTests(TestCase):
                             "no_late_changes", response.content.decode("utf-8")
                         )
 
+    def test_get_login_required(self):
+        for form_section in FORM_SECTIONS:
+            response = self.client.get(
+                reverse(
+                    f"audit:{form_section}",
+                    kwargs={"report_id": "12345", "form_section": form_section},
+                )
+            )
+            self.assertEqual(response.status_code, 403)
+
+    def test_get_bad_report_id_returns_403(self):
+        user = baker.make(User)
+        self.client.force_login(user)
+
+        for form_section in FORM_SECTIONS:
+            response = self.client.get(
+                reverse(
+                    f"audit:{form_section}",
+                    kwargs={
+                        "report_id": "this is not a report id",
+                        "form_section": form_section,
+                    },
+                )
+            )
+            self.assertEqual(response.status_code, 403)
+
 
 class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_login_required(self):
@@ -1656,3 +1813,314 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
             submission_events[event_count - 1].event,
             SubmissionEvent.EventType.NOTES_TO_SEFA_UPDATED,
         )
+
+
+class EditSubmissionTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.client = Client()
+        self.user = baker.make(User)
+        self.sac = baker.make(
+            SingleAuditChecklist, submission_status=STATUS.READY_FOR_CERTIFICATION
+        )
+        self.url = reverse(
+            "audit:EditSubmission", kwargs={"report_id": self.sac.report_id}
+        )
+        self.client.force_login(self.user)
+        baker.make(
+            "audit.Access",
+            sac=self.sac,
+            user=self.user,
+            role="certifying_auditee_contact",
+        )
+        self.session = self.client.session
+
+    def test_redirects_to_singleauditchecklist(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(
+            response, reverse("singleauditchecklist", args=[self.sac.report_id])
+        )
+
+
+class AuditorCertificationStep1ViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = baker.make(User)
+        self.sac = baker.make(
+            SingleAuditChecklist, submission_status=STATUS.READY_FOR_CERTIFICATION
+        )
+        self.url = reverse(
+            "audit:AuditorCertification", kwargs={"report_id": self.sac.report_id}
+        )
+        self.client.force_login(self.user)
+        baker.make(
+            "audit.Access",
+            sac=self.sac,
+            user=self.user,
+            role="certifying_auditor_contact",
+        )
+        self.session = self.client.session
+
+    def test_get_redirects_if_status_not_ready_for_certification(self):
+        self.sac.submission_status = STATUS.IN_PROGRESS
+        self.sac.save()
+        response = self.client.get(self.url)
+        self.assertRedirects(
+            response, f"/audit/submission-progress/{self.sac.report_id}"
+        )
+
+    def test_get_renders_template_if_valid_state(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "audit/auditor-certification-step-1.html")
+        self.assertIn("form", response.context)
+        self.assertIsInstance(response.context["form"], AuditorCertificationStep1Form)
+
+    def test_get_permission_denied_if_sac_not_found(self):
+        response = self.client.get(
+            reverse("audit:AuditorCertification", kwargs={"report_id": "INVALID"})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_redirects_if_status_not_ready_for_certification(self):
+        self.sac.submission_status = STATUS.IN_PROGRESS
+        self.sac.save()
+        response = self.client.post(self.url, {"field": "value"})
+        self.assertRedirects(
+            response, f"/audit/submission-progress/{self.sac.report_id}"
+        )
+
+    def test_post_valid_form(self):
+        self.session["AuditorCertificationStep1Session"] = {"field": "value"}
+        self.session.save()
+
+        form_data = {
+            "is_OMB_limited": True,
+            "is_auditee_responsible": True,
+            "has_used_auditors_report": True,
+            "has_no_auditee_procedures": False,
+            "is_FAC_releasable": True,
+            "is_accurate_and_complete": True,
+        }
+
+        response = self.client.post(self.url, form_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.sac.refresh_from_db()
+
+        self.assertRedirects(
+            response,
+            reverse("audit:AuditorCertificationConfirm", args=[self.sac.report_id]),
+        )
+        self.assertIn("AuditorCertificationStep1Session", self.client.session)
+        self.assertEqual(
+            self.client.session["AuditorCertificationStep1Session"], form_data
+        )
+
+    def test_post_invalid_form(self):
+        response = self.client.post(self.url, {"invalid_field": ""})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "audit/auditor-certification-step-1.html")
+        self.assertIn("form", response.context)
+        self.assertIsInstance(response.context["form"], AuditorCertificationStep1Form)
+        self.assertTrue(response.context["form"].errors)
+
+    def test_post_permission_denied_if_sac_not_found(self):
+        response = self.client.post(
+            reverse("audit:AuditorCertification", kwargs={"report_id": "INVALID"})
+        )
+        self.assertEqual(response.status_code, 403)
+
+
+class AuditeeCertificationStep2ViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = baker.make(User)
+        self.sac = baker.make(
+            SingleAuditChecklist, submission_status=STATUS.AUDITOR_CERTIFIED
+        )
+        self.url = reverse(
+            "audit:AuditeeCertificationConfirm",
+            kwargs={"report_id": self.sac.report_id},
+        )
+        self.client.force_login(self.user)
+        baker.make(
+            "audit.Access",
+            sac=self.sac,
+            user=self.user,
+            role="certifying_auditee_contact",
+        )
+        self.session = self.client.session
+
+    def test_get_redirects_if_no_step_1(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(
+            response, reverse("audit:AuditeeCertification", args=[self.sac.report_id])
+        )
+
+    def test_get_renders_template_if_valid_session(self):
+        self.session["AuditeeCertificationStep1Session"] = {"field": "value"}
+        self.session.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "audit/auditee-certification-step-2.html")
+        self.assertIn("form", response.context)
+        self.assertIsInstance(response.context["form"], AuditeeCertificationStep2Form)
+
+    def test_get_redirects_if_not_auditor_certified(self):
+        self.sac.submission_status = STATUS.IN_PROGRESS
+        self.sac.save()
+        self.session["AuditeeCertificationStep1Session"] = {"field": "value"}
+        self.session.save()
+        response = self.client.get(self.url)
+        self.assertRedirects(
+            response, f"/audit/submission-progress/{self.sac.report_id}"
+        )
+
+    def test_redirects_if_no_step_1_session(self):
+        if "AuditeeCertificationStep1Session" in self.session:
+            del self.session["AuditeeCertificationStep1Session"]
+        self.session.save()
+        response = self.client.get(self.url, {})
+        self.assertRedirects(
+            response,
+            reverse(
+                "audit:AuditeeCertification", kwargs={"report_id": self.sac.report_id}
+            ),
+        )
+
+    @patch("audit.views.views.validate_auditee_certification_json")
+    @patch("audit.views.views.sac_transition")
+    def test_post_valid_form(self, mock_transition, mock_validate):
+        mock_transition.return_value = True
+        mock_validate.return_value = {"auditee_certification": "validated_data"}
+
+        self.session["AuditeeCertificationStep1Session"] = {"field": "value"}
+        self.session.save()
+
+        self.sac.submission_status = STATUS.AUDITOR_CERTIFIED
+        self.sac.save()
+
+        response = self.client.post(
+            self.url,
+            {
+                "auditee_certification_date_signed": "2024-01-01",
+                "auditee_name": "Test Auditee",
+                "auditee_title": "Auditor",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.sac.refresh_from_db()
+        mock_transition.assert_called_once_with(
+            response.wsgi_request, self.sac, transition_to=STATUS.AUDITEE_CERTIFIED
+        )
+        self.assertRedirects(
+            response, reverse("audit:SubmissionProgress", args=[self.sac.report_id])
+        )
+
+    def test_post_invalid_form(self):
+        self.session["AuditeeCertificationStep1Session"] = None
+        self.session.save()
+        response = self.client.post(self.url, {"auditee_certification_date_signed": ""})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "audit/auditee-certification-step-2.html")
+        self.assertIn("form", response.context)
+        self.assertIsInstance(response.context["form"], AuditeeCertificationStep2Form)
+        self.assertTrue(response.context["form"].errors)
+
+    def test_post_redirects_if_status_not_auditor_certified(self):
+        self.sac.submission_status = STATUS.IN_PROGRESS
+        self.sac.save()
+        self.session["AuditeeCertificationStep1Session"] = {"field": "value"}
+        self.session.save()
+        response = self.client.post(
+            self.url, {"auditee_certification_date_signed": "2024-01-01"}
+        )
+        self.assertRedirects(
+            response, f"/audit/submission-progress/{self.sac.report_id}"
+        )
+
+    def test_post_permission_denied_if_sac_not_found(self):
+        response = self.client.post(
+            reverse(
+                "audit:AuditeeCertificationConfirm", kwargs={"report_id": "INVALID"}
+            )
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_single_audit_checklist_does_not_exist_exception(self):
+        factory = RequestFactory()
+        request = factory.get(reverse("audit:AuditeeCertification", args=["12345"]))
+
+        with patch("audit.models.SingleAuditChecklist.objects.get") as mock_get:
+            mock_get.side_effect = SingleAuditChecklist.DoesNotExist
+
+            view = AuditeeCertificationStep2View.as_view()
+
+            with self.assertRaises(PermissionDenied) as context:
+                view(request, report_id="12345")
+
+            self.assertEqual(
+                str(context.exception), "You do not have access to this audit."
+            )
+
+
+class CrossValidationViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = baker.make(User)
+        self.sac = baker.make(
+            SingleAuditChecklist,
+            report_id="test-report-id",
+            submission_status=STATUS.AUDITOR_CERTIFIED,
+            general_information={"auditee_fiscal_period_end": "2024-12-31"},
+        )
+        self.url = reverse(
+            "audit:CrossValidation", kwargs={"report_id": self.sac.report_id}
+        )
+        self.client.force_login(self.user)
+        baker.make(
+            "audit.Access",
+            sac=self.sac,
+            user=self.user,
+            role="certifying_auditee_contact",
+        )
+
+    def test_get_view_renders_correct_template(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "audit/cross-validation/cross-validation.html"
+        )
+        self.assertEqual(response.context["report_id"], self.sac.report_id)
+        self.assertEqual(
+            response.context["submission_status"], self.sac.submission_status
+        )
+
+    def test_get_view_permission_denied(self):
+        url = reverse("audit:CrossValidation", args=["non-existent-id"])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)  # PermissionDenied results in 403
+
+    @patch("audit.models.SingleAuditChecklist.validate_full")
+    def test_post_view_renders_results_template(self, mock_validate_full):
+        mock_validate_full.return_value = ["Error 1", "Error 2"]
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "audit/cross-validation/cross-validation-results.html"
+        )
+        self.assertEqual(response.context["report_id"], self.sac.report_id)
+        self.assertEqual(response.context["errors"], ["Error 1", "Error 2"])
+        mock_validate_full.assert_called_once()
+
+    def test_post_view_permission_denied(self):
+        url = reverse("audit:CrossValidation", args=["non-existent-id"])
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 403)
