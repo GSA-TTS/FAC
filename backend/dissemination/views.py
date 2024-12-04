@@ -174,9 +174,7 @@ class AdvancedSearch(View):
         # Obtain cleaned form data.
         form.is_valid()
         form_data = form.cleaned_data
-        form_user_input = {
-            k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
-        }
+        form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
 
         # Tells the backend we're running advanced search.
         form_data["advanced_search_flag"] = True
@@ -275,9 +273,7 @@ class Search(View):
         # Obtain cleaned form data.
         form.is_valid()
         form_data = form.cleaned_data
-        form_user_input = {
-            k: v[0] if len(v) == 1 else v for k, v in form.data.lists()
-        }
+        form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
 
         # Tells the backend we're running basic search.
         form_data["advanced_search_flag"] = False
