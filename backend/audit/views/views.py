@@ -70,7 +70,7 @@ def verify_status(status):
     the submission progress page.
     """
 
-    def decorator_verify_status(req_method):
+    def decorator_verify_status(request_method):
         def verify(view, request, *args, **kwargs):
             report_id = kwargs["report_id"]
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
@@ -82,7 +82,7 @@ def verify_status(status):
                 )
                 return redirect(f"/audit/submission-progress/{sac.report_id}")
             else:
-                return req_method(view, request, *args, **kwargs)
+                return request_method(view, request, *args, **kwargs)
 
         return verify
 
