@@ -73,7 +73,11 @@ def verify_status(status):
     def decorator_verify_status(request_method):
         def verify(view, request, *args, **kwargs):
             report_id = kwargs["report_id"]
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            try:
+                sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            except SingleAuditChecklist.DoesNotExist:
+                raise PermissionDenied("You do not have access to this audit.")
 
             # Return to checklist, the Audit is not in the correct state.
             if sac.submission_status != status:
