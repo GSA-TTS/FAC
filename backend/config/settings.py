@@ -22,7 +22,6 @@ from cfenv import AppEnv
 from audit.get_agency_names import get_agency_names, get_audit_info_lists
 import dj_database_url
 import newrelic.agent
-import datetime
 
 newrelic.agent.initialize()
 
