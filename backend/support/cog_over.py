@@ -1,5 +1,6 @@
 from collections import defaultdict
 import logging
+import math
 
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
@@ -13,8 +14,15 @@ logger = logging.getLogger(__name__)
 COG_LIMIT = 50_000_000
 DA_THRESHOLD_FACTOR = 0.25
 
+FIRST_BASELINE_YEAR = 2019
+BASELINE_VALID_FOR_YEARS = 5
 
-def compute_cog_over(federal_awards, submission_status, auditee_ein, auditee_uei):
+DBKEY_TO_UEI_TRANSITION_YEAR = "2022"
+
+
+def compute_cog_over(
+    federal_awards, submission_status, auditee_ein, auditee_uei, audit_year
+):
     """
     Compute cog or oversight agency for the sac.
     Return tuple (cog_agency, oversight_agency)
@@ -45,11 +53,26 @@ def compute_cog_over(federal_awards, submission_status, auditee_ein, auditee_uei
         oversight_agency = agency
         # logger.warning("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
-    cognizant_agency = determine_hist_agency(auditee_ein, auditee_uei)
+    base_year = calc_base_year(audit_year)
+    cognizant_agency = determine_hist_agency(auditee_ein, auditee_uei, base_year)
     if cognizant_agency:
         return (cognizant_agency, oversight_agency)
     cognizant_agency = agency
     return (cognizant_agency, oversight_agency)
+
+
+def calc_base_year(audit_year):
+    # Note: 2019 is the first supported baseline year in GSAFAC
+    # For audit years 2019 through 2023, baseline year is 2019
+    # For audit years 2024 through 2028, baseline year is 2024
+    # For audit years 2029 through 2033, baseline year is 2029
+    # For audit years 2034 through 2038, baseline year is 2034
+    # and so on
+    base_year = (
+        math.floor((int(audit_year) - FIRST_BASELINE_YEAR) / BASELINE_VALID_FOR_YEARS)
+        * BASELINE_VALID_FOR_YEARS
+    ) + FIRST_BASELINE_YEAR
+    return str(base_year)
 
 
 def calc_award_amounts(awards):
@@ -77,18 +100,22 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
         return agency
 
 
-def determine_hist_agency(ein, uei):
-    dbkey = get_dbkey(ein, uei)
+def determine_hist_agency(ein, uei, base_year):
+    dbkey = None
+    if int(base_year) == FIRST_BASELINE_YEAR:
+        dbkey = get_dbkey(ein, uei)
 
     cog_agency = lookup_baseline(ein, uei, dbkey)
     if cog_agency:
         return cog_agency
-    (gen_count, total_amount_expended, report_id_2019) = get_2019_gen(ein, uei)
+
+    (gen_count, total_amount_expended, report_id_base_year) = get_base_gen(
+        ein, uei, base_year
+    )
     if gen_count != 1:
         return None
-    cfdas = get_2019_cfdas(report_id_2019)
+    cfdas = get_base_cfdas(report_id_base_year)
     if not cfdas:
-        # logger.warning("Found no cfda data for dbkey {dbkey} in 2019")
         return None
     (max_total_agency, max_da_agency) = calc_cfda_amounts(cfdas)
     cognizant_agency = determine_agency(
@@ -102,7 +129,9 @@ def determine_hist_agency(ein, uei):
 def get_dbkey(ein, uei):
     try:
         report_id = General.objects.values_list("report_id", flat=True).get(
-            Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year="2022")
+            Q(auditee_ein=ein),
+            Q(auditee_uei=uei),
+            Q(audit_year=DBKEY_TO_UEI_TRANSITION_YEAR),
         )
     except (General.DoesNotExist, General.MultipleObjectsReturned):
         report_id = None
@@ -111,7 +140,7 @@ def get_dbkey(ein, uei):
 
     try:
         dbkey = MigrationInspectionRecord.objects.values_list("dbkey", flat=True).get(
-            Q(report_id=report_id), Q(audit_year="2022")
+            Q(report_id=report_id), Q(audit_year=DBKEY_TO_UEI_TRANSITION_YEAR)
         )
     except (
         MigrationInspectionRecord.DoesNotExist,
@@ -136,10 +165,10 @@ def lookup_baseline(ein, uei, dbkey):
     return cognizant_agency
 
 
-def get_2019_gen(ein, uei):
+def get_base_gen(ein, uei, base_year):
     gens = General.objects.annotate(
         amt=Cast("total_amount_expended", output_field=BigIntegerField())
-    ).filter(Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year="2019"))
+    ).filter(Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year=base_year))
 
     if len(gens) != 1:
         return (len(gens), 0, None)
@@ -147,7 +176,7 @@ def get_2019_gen(ein, uei):
     return (1, gen.amt, gen.report_id)
 
 
-def get_2019_cfdas(report_id):
+def get_base_cfdas(report_id):
     cfdas = FederalAward.objects.annotate(
         amt=Cast("amount_expended", output_field=BigIntegerField())
     ).filter(Q(report_id=report_id))
@@ -188,7 +217,6 @@ def prune_dict_to_max_values(data: dict):
     for key, value in data.items():
         if value == max_value:
             pruned_dict[key] = value
-
     return pruned_dict
 
 
