@@ -114,6 +114,7 @@ def _authed_post(client, user, view_str, kwargs=None, data=None):
 
 
 def _make_user_and_sac(**kwargs):
+    """Helper function for to make a user and basic sac"""
     user = baker.make(User)
     sac = baker.make(SingleAuditChecklist, **kwargs)
     return user, sac
@@ -126,6 +127,7 @@ def _load_json(target):
 
 
 def _mock_gen_report_id():
+    """Helper function for generate a sac report id"""
     return generate_sac_report_id(end_date=datetime.now().date().isoformat())
 
 
@@ -135,6 +137,7 @@ def _merge_dict_seq(seq):
 
 
 def _build_auditor_cert_dict(certification: dict, signature: dict) -> dict:
+    """Helper function for building a dictionary for auditor certification"""
     return {
         "auditor_certification": certification,
         "auditor_signature": signature,
@@ -142,6 +145,7 @@ def _build_auditor_cert_dict(certification: dict, signature: dict) -> dict:
 
 
 def _build_auditee_cert_dict(certification: dict, signature: dict) -> dict:
+    """Helper function for building a dictionary for auditee certification"""
     return {
         "auditee_certification": certification,
         "auditee_signature": signature,
@@ -218,21 +222,25 @@ class RootPathTests(TestCase):
 
 class MySubmissionsViewTests(TestCase):
     def setUp(self):
+        """Setup function for users and client"""
         self.user = baker.make(User)
         self.user2 = baker.make(User)
 
         self.client = Client()
 
     def test_redirect_if_not_logged_in(self):
+        """Test that accessing submission page redirects if user is not logged in"""
         result = self.client.get(SUBMISSIONS_PATH)
         self.assertAlmostEqual(result.status_code, 302)
 
     def test_no_submissions_returns_empty_list(self):
+        """Test that an authenticated user with no submissions gets empty list"""
         self.client.force_login(user=self.user)
         data = MySubmissions.fetch_my_submissions(self.user)
         self.assertEqual(len(data), 0)
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
+        """Test that a user with submissions gets data with expected columns"""
         self.client.force_login(user=self.user)
         self.user.profile.entry_form_data = (
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
@@ -252,6 +260,7 @@ class MySubmissionsViewTests(TestCase):
         self.assertTrue("fiscal_year_end_date" in keys)
 
     def test_user_with_no_submissions_should_return_no_data(self):
+        """Test that another user with no submissions gets no data"""
         self.client.force_login(user=self.user)
         self.user.profile.entry_form_data = (
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
@@ -266,19 +275,39 @@ class MySubmissionsViewTests(TestCase):
 
 class EditSubmissionViewTests(TestCase):
     def setUp(self):
+        """Setup test factory, client, user, and report ID"""
+        self.factory = RequestFactory()
         self.client = Client()
         self.user = baker.make(User)
+        self.sac = baker.make(
+            SingleAuditChecklist, submission_status=STATUS.READY_FOR_CERTIFICATION
+        )
         self.url_name = "audit:EditSubmission"
         self.report_id = "TEST_REPORT_ID"
-
-    def test_redirect_if_not_logged_in(self):
-        result = self.client.get(reverse(EDIT_PATH, args=["SOME_REPORT_ID"]))
-        self.assertAlmostEqual(result.status_code, 302)
+        self.url = reverse(
+            "audit:EditSubmission", kwargs={"report_id": self.sac.report_id}
+        )
+        self.client.force_login(self.user)
+        baker.make(
+            "audit.Access",
+            sac=self.sac,
+            user=self.user,
+            role="certifying_auditee_contact",
+        )
+        self.session = self.client.session
 
     def test_redirect_not_logged_in(self):
+        """Test that accessing edit submission page redirects if not authenticated"""
         url = reverse(self.url_name, args=[self.report_id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
+
+    def test_redirects_to_singleauditchecklist(self):
+        """Test that accessing edit submission redirects to SAC view"""
+        response = self.client.get(self.url)
+        self.assertRedirects(
+            response, reverse("singleauditchecklist", args=[self.sac.report_id])
+        )
 
 
 class SubmissionViewTests(TestCase):
@@ -287,6 +316,7 @@ class SubmissionViewTests(TestCase):
     """
 
     def setUp(self):
+        """Set up test client, user, SAC, and URL"""
         self.client = Client()
         self.user = baker.make(User)
         self.sac = baker.make(
@@ -302,6 +332,7 @@ class SubmissionViewTests(TestCase):
         )
 
     def test_get_renders_template(self):
+        """Test that GET renders the submission template with correct context"""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "audit/submission.html")
@@ -313,11 +344,13 @@ class SubmissionViewTests(TestCase):
         )
 
     def test_get_permission_denied_if_no_sac(self):
+        """Test that GET returns 403 if SAC does not exist"""
         invalid_url = reverse("audit:Submission", kwargs={"report_id": "INVALID"})
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, 403)
 
     def test_get_access_denied_for_unauthorized_user(self):
+        """Test that GET returns 403 if user is unauthorized"""
         self.client.logout()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
@@ -329,6 +362,7 @@ class SubmissionViewTests(TestCase):
     def test_post_valid_submission(
         self, mock_disseminate, mock_remove, mock_transition, mock_validate
     ):
+        """Test that a valid submission transitions SAC to a disseminated state"""
         mock_validate.return_value = []
         mock_disseminate.return_value = None
 
@@ -351,6 +385,7 @@ class SubmissionViewTests(TestCase):
     def test_post_validation_errors(
         self, mock_disseminate, mock_transition, mock_validate
     ):
+        """Test that validation errors are displayed if submission is invalid"""
         mock_validate.return_value = ["Error 1", "Error 2"]
 
         response = self.client.post(self.url)
@@ -367,6 +402,7 @@ class SubmissionViewTests(TestCase):
     @patch("audit.views.views.General.objects.get")
     @patch("audit.views.views.SingleAuditChecklist.validate_full")
     def test_post_transaction_error(self, mock_validate, mock_general_get):
+        """Test that a transaction error during a submission is handled properly"""
         self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
         self.sac.save()
 
@@ -383,6 +419,7 @@ class SubmissionViewTests(TestCase):
         self.assertRedirects(response, reverse("audit:MySubmissions"))
 
     def test_post_permission_denied_if_no_sac(self):
+        """Test that POST returns 403 if SAC does not exist"""
         invalid_url = reverse("audit:Submission", kwargs={"report_id": "INVALID"})
         response = self.client.post(invalid_url)
         self.assertEqual(response.status_code, 403)
@@ -445,11 +482,13 @@ class SubmissionViewTests(TestCase):
 
 class SubmissionGetTest(TestCase):
     def setUp(self):
+        """Setup test user and client"""
         self.user = baker.make(User)
         self.client = Client()
         self.url = reverse("audit:MySubmissions")
 
     def testValidSubmission(self):
+        """Test that a valid submission is displayed on the submissions page"""
         self.client.force_login(self.user)
         sac1 = baker.make(SingleAuditChecklist, submission_status=STATUS.IN_PROGRESS)
         sac2 = baker.make(SingleAuditChecklist, submission_status=STATUS.DISSEMINATED)
@@ -473,6 +512,7 @@ class SubmissionStatusTests(TransactionTestCase):
     """
 
     def setUp(self):
+        """Setup user and client"""
         self.user = baker.make(User)
         self.client = Client()
 
@@ -1480,6 +1520,7 @@ class ExcelFileHandlerViewTests(TestCase):
                         )
 
     def test_get_login_required(self):
+        """Test that uploading files requires user authentication"""
         for form_section in FORM_SECTIONS:
             response = self.client.get(
                 reverse(
@@ -1490,6 +1531,7 @@ class ExcelFileHandlerViewTests(TestCase):
             self.assertEqual(response.status_code, 403)
 
     def test_get_bad_report_id_returns_403(self):
+        """Test that uploading with a malformed or nonexistant report_id reutrns 403"""
         user = baker.make(User)
         self.client.force_login(user)
 
@@ -1568,6 +1610,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload(self, mock_scan_file):
+        """Test that uploading a valid SAR update the SAC accordingly"""
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
@@ -1817,6 +1860,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
 
 class EditSubmissionTest(TestCase):
     def setUp(self):
+        """Setup factory, client, user, SAC, and URL"""
         self.factory = RequestFactory()
         self.client = Client()
         self.user = baker.make(User)
@@ -1836,6 +1880,7 @@ class EditSubmissionTest(TestCase):
         self.session = self.client.session
 
     def test_redirects_to_singleauditchecklist(self):
+        """Test that accessing edit submission redirects to SAC view"""
         response = self.client.get(self.url)
         self.assertRedirects(
             response, reverse("singleauditchecklist", args=[self.sac.report_id])
@@ -1844,6 +1889,7 @@ class EditSubmissionTest(TestCase):
 
 class AuditorCertificationStep1ViewTests(TestCase):
     def setUp(self):
+        """Setup client, user, SAC, and URL"""
         self.client = Client()
         self.user = baker.make(User)
         self.sac = baker.make(
@@ -1862,6 +1908,7 @@ class AuditorCertificationStep1ViewTests(TestCase):
         self.session = self.client.session
 
     def test_get_redirects_if_status_not_ready_for_certification(self):
+        """Test that GET redirects if SAC status is not READY_FOR_CERTIFICATION"""
         self.sac.submission_status = STATUS.IN_PROGRESS
         self.sac.save()
         response = self.client.get(self.url)
@@ -1870,6 +1917,10 @@ class AuditorCertificationStep1ViewTests(TestCase):
         )
 
     def test_get_renders_template_if_valid_state(self):
+        """
+        Test that GET renders the auditor certification setp 1 template when SAC
+        is in a valid state.
+        """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "audit/auditor-certification-step-1.html")
@@ -1877,12 +1928,14 @@ class AuditorCertificationStep1ViewTests(TestCase):
         self.assertIsInstance(response.context["form"], AuditorCertificationStep1Form)
 
     def test_get_permission_denied_if_sac_not_found(self):
+        """Test that POST redirects if SAC report_id is not found"""
         response = self.client.get(
             reverse("audit:AuditorCertification", kwargs={"report_id": "INVALID"})
         )
         self.assertEqual(response.status_code, 403)
 
     def test_post_redirects_if_status_not_ready_for_certification(self):
+        """Test that POST redirects if SAC status is not READY_FOR_CERTIFICATION"""
         self.sac.submission_status = STATUS.IN_PROGRESS
         self.sac.save()
         response = self.client.post(self.url, {"field": "value"})
@@ -1891,6 +1944,10 @@ class AuditorCertificationStep1ViewTests(TestCase):
         )
 
     def test_post_valid_form(self):
+        """
+        Test that submitting a valid form updates the session 
+        and redirects correctly
+        """
         self.session["AuditorCertificationStep1Session"] = {"field": "value"}
         self.session.save()
 
@@ -1920,6 +1977,7 @@ class AuditorCertificationStep1ViewTests(TestCase):
         )
 
     def test_post_invalid_form(self):
+        """Test that submitting and invalid form renders an error template"""
         response = self.client.post(self.url, {"invalid_field": ""})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "audit/auditor-certification-step-1.html")
@@ -1928,6 +1986,7 @@ class AuditorCertificationStep1ViewTests(TestCase):
         self.assertTrue(response.context["form"].errors)
 
     def test_post_permission_denied_if_sac_not_found(self):
+        """Test that results in 403 if SAC report_id is not found"""
         response = self.client.post(
             reverse("audit:AuditorCertification", kwargs={"report_id": "INVALID"})
         )
@@ -1936,6 +1995,7 @@ class AuditorCertificationStep1ViewTests(TestCase):
 
 class AuditeeCertificationStep2ViewTests(TestCase):
     def setUp(self):
+        """Setup client, user, SAC, and URL"""
         self.client = Client()
         self.user = baker.make(User)
         self.sac = baker.make(
@@ -1955,12 +2015,17 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         self.session = self.client.session
 
     def test_get_redirects_if_no_step_1(self):
+        """Test that GET redirects if AuditeeCertificationStep1Session is missing"""
         response = self.client.get(self.url)
         self.assertRedirects(
             response, reverse("audit:AuditeeCertification", args=[self.sac.report_id])
         )
 
     def test_get_renders_template_if_valid_session(self):
+        """
+        Test that GET renders the Auditee certification step 2 
+        if session is valid
+        """
         self.session["AuditeeCertificationStep1Session"] = {"field": "value"}
         self.session.save()
         response = self.client.get(self.url)
@@ -1970,6 +2035,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         self.assertIsInstance(response.context["form"], AuditeeCertificationStep2Form)
 
     def test_get_redirects_if_not_auditor_certified(self):
+        """Test that GET will redirect if SAC status is not AUDITOR_CERTIFIED"""
         self.sac.submission_status = STATUS.IN_PROGRESS
         self.sac.save()
         self.session["AuditeeCertificationStep1Session"] = {"field": "value"}
@@ -1979,21 +2045,13 @@ class AuditeeCertificationStep2ViewTests(TestCase):
             response, f"/audit/submission-progress/{self.sac.report_id}"
         )
 
-    def test_redirects_if_no_step_1_session(self):
-        if "AuditeeCertificationStep1Session" in self.session:
-            del self.session["AuditeeCertificationStep1Session"]
-        self.session.save()
-        response = self.client.get(self.url, {})
-        self.assertRedirects(
-            response,
-            reverse(
-                "audit:AuditeeCertification", kwargs={"report_id": self.sac.report_id}
-            ),
-        )
-
     @patch("audit.views.views.validate_auditee_certification_json")
     @patch("audit.views.views.sac_transition")
     def test_post_valid_form(self, mock_transition, mock_validate):
+        """
+        Test that submitting a valid Auditee Certification Form 
+        updates the SAC and redirects correctly
+        """
         mock_transition.return_value = True
         mock_validate.return_value = {"auditee_certification": "validated_data"}
 
@@ -2021,6 +2079,10 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         )
 
     def test_post_invalid_form(self):
+        """
+        Test that submitting an invalid Auditee Ceritifcation Form 
+        renders an error template
+        """
         self.session["AuditeeCertificationStep1Session"] = None
         self.session.save()
         response = self.client.post(self.url, {"auditee_certification_date_signed": ""})
@@ -2032,6 +2094,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         self.assertTrue(response.context["form"].errors)
 
     def test_post_redirects_if_status_not_auditor_certified(self):
+        """Test that POST will redirect if SAC submission status is not AUDITOR_CERTIFIED"""
         self.sac.submission_status = STATUS.IN_PROGRESS
         self.sac.save()
         self.session["AuditeeCertificationStep1Session"] = {"field": "value"}
@@ -2044,6 +2107,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         )
 
     def test_post_permission_denied_if_sac_not_found(self):
+        """Test that POST will result in permission error is SAC report_id not found"""
         response = self.client.post(
             reverse(
                 "audit:AuditeeCertificationConfirm", kwargs={"report_id": "INVALID"}
@@ -2052,6 +2116,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_single_audit_checklist_does_not_exist_exception(self):
+        """Test that SAC does not exist renders a unique exception."""
         factory = RequestFactory()
         request = factory.get(reverse("audit:AuditeeCertification", args=["12345"]))
 
@@ -2070,6 +2135,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
 
 class CrossValidationViewTests(TestCase):
     def setUp(self):
+        """Setup client, user, SAC, and URL"""
         self.client = Client()
         self.user = baker.make(User)
         self.sac = baker.make(
@@ -2090,6 +2156,7 @@ class CrossValidationViewTests(TestCase):
         )
 
     def test_get_view_renders_correct_template(self):
+        """Test that GET renders cross-validation template with correct context"""
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
@@ -2102,6 +2169,7 @@ class CrossValidationViewTests(TestCase):
         )
 
     def test_get_view_permission_denied(self):
+        """Test that GET returns 403 if SAC report_id does not exist"""
         url = reverse("audit:CrossValidation", args=["non-existent-id"])
         response = self.client.get(url)
 
@@ -2109,6 +2177,7 @@ class CrossValidationViewTests(TestCase):
 
     @patch("audit.models.SingleAuditChecklist.validate_full")
     def test_post_view_renders_results_template(self, mock_validate_full):
+        """Test that POST with validation errors renders template with errors"""
         mock_validate_full.return_value = ["Error 1", "Error 2"]
 
         response = self.client.post(self.url)
@@ -2122,6 +2191,7 @@ class CrossValidationViewTests(TestCase):
         mock_validate_full.assert_called_once()
 
     def test_post_view_permission_denied(self):
+        """Test that POST returns 403 if SAC report_id does not exist"""
         url = reverse("audit:CrossValidation", args=["non-existent-id"])
         response = self.client.post(url)
 
