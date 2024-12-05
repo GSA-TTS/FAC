@@ -414,7 +414,6 @@ class SubmissionViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("audit:MySubmissions"))
 
-        print("this response", response)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("audit:MySubmissions"))
 
@@ -1961,8 +1960,6 @@ class AuditorCertificationStep1ViewTests(TestCase):
         }
 
         response = self.client.post(self.url, form_data)
-
-        # print(response.content)
 
         self.assertEqual(response.status_code, 302)
         self.sac.refresh_from_db()
