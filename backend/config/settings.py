@@ -586,11 +586,11 @@ SESSION_SAVE_EVERY_REQUEST = True
 DOLLAR_THRESHOLDS = [
     {
         "start": None,
-        "end": datetime.date(2024, 10, 1),
+        "end": datetime(2024, 10, 1),
         "minimum": 750000,
     },
     {
-        "start": datetime.date(2024, 10, 1),
+        "start": datetime(2024, 10, 1),
         "end": None,
         "minimum": 1000000,
     },
