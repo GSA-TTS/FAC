@@ -14,8 +14,8 @@ export function testValidAuditeeInfo() {
   cy.get('button[data-close-modal]').contains('Continue').click();
 
   // Now fill in the audit dates
-  cy.get('#auditee_fiscal_period_start').type('01/01/2022');
-  cy.get('#auditee_fiscal_period_end').type('12/31/2022');
+  cy.get('#auditee_fiscal_period_start').type('01/01/2023');
+  cy.get('#auditee_fiscal_period_end').type('12/31/2023');
 
   // and click continue
   cy.get('.usa-button').contains('Continue').click();

@@ -13,7 +13,7 @@ tmpdir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
 cd "$tmpdir"
 
 # Grab a copy of the zip file for the specified ref
-curl -s -L https://github.com/GSA-TTS/cg-egress-proxy/archive/${GITREF}.zip --output local.zip 
+curl -s -L https://github.com/GSA-TTS/cg-egress-proxy/archive/${GITREF}.zip --output local.zip
 
 # Zip up just the proxy/ subdirectory for pushing
 unzip -q -u local.zip \*/proxy/\*

@@ -50,6 +50,11 @@ seed_cog_baseline
 gonogo "seed_cog_baseline"
 
 #####
+# CREATE STAFF USERS
+# Prepares staff users for Django admin
+python manage.py create_staffusers
+
+#####
 # LAUNCH THE APP
 # We will have died long ago if things didn't work.
 npm run dev & python manage.py runserver 0.0.0.0:8000

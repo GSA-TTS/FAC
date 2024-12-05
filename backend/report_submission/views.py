@@ -144,7 +144,9 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         report_id = result.get("report_id")
 
         if report_id:
-            return redirect(f"/report_submission/general-information/{report_id}")
+            return Util.validate_redirect_url(
+                f"/report_submission/general-information/{report_id}"
+            )
         else:
             return render(
                 request, "report_submission/step-3.html", context=result, status=400
@@ -257,7 +259,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
             )
 
-            return redirect(f"/audit/submission-progress/{report_id}")
+            return Util.validate_redirect_url(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
@@ -517,7 +519,7 @@ class UploadPageView(LoginRequiredMixin, View):
         report_id = kwargs["report_id"]
 
         try:
-            return redirect(
+            return Util.validate_redirect_url(
                 "/audit/submission-progress/{report_id}".format(report_id=report_id)
             )
 
@@ -632,7 +634,9 @@ class DeleteFileView(LoginRequiredMixin, View):
             )
 
             logger.info("The file has been successfully deleted.")
-            return redirect(f"/audit/submission-progress/{report_id}")
+            return Util.validate_redirect_url(
+                f"/audit/submission-progress/{sac.report_id}"
+            )
 
         except SingleAuditChecklist.DoesNotExist:
             logger.error(f"Audit: {report_id} not found")

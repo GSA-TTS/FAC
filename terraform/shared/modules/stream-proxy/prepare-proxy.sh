@@ -8,4 +8,3 @@ zip -q -j -r proxy.zip app
 cat << EOF
 { "path": "proxy.zip" }
 EOF
-
