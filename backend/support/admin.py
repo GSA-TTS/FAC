@@ -149,12 +149,16 @@ class LogEntryAdmin(SupportAdmin):
     )
 
     def staff_user(self, obj):
+        """The staffuser."""
         return obj.user.email
 
     def record_affected(self, obj):
+        """The record associated with the staffuser's action."""
         return obj.object_repr
 
     def event(self, obj):
+        """Shares the action taken by the staffuser."""
+
         if obj.action_flag == ADDITION:
             return "Created"
         elif obj.action_flag == DELETION:
@@ -162,19 +166,38 @@ class LogEntryAdmin(SupportAdmin):
         elif obj.action_flag == CHANGE:
             res = "Updated"
             if obj.change_message:
-                _json = json.loads(obj.change_message)[0]
-                if "changed" in _json:
-                    res = "Updated\n"
-                    for field in _json["changed"]["fields"]:
-                        res += f"\n- {field}"
+                _json = json.loads(obj.change_message)
+
+                # The LogEntry has recorded changes.
+                if len(_json) > 0:
+                    _json = _json[0]
+                    if "changed" in _json:
+                        res = "Updated\n"
+                        for field in _json["changed"]["fields"]:
+                            res += f"\n- {field}"
+
+                # No changes were actually made.
+                else:
+                    res += "\n- No changes"
             return res
         return "-"
 
     def content(self, obj):
+        """The raw contents of the record that was changed."""
+
         if obj.change_message:
-            _json = json.loads(obj.change_message)[0]
-            if "content" in _json:
-                return _json["content"]
+            _json = json.loads(obj.change_message)
+
+            # The LogEntry has recorded changes.
+            if len(_json) > 0:
+                _json = _json[0]
+                if "content" in _json:
+                    return _json["content"]
+
+            # No changes were actually made.
+            else:
+                return "No changes"
+
         return "-"
 
 
@@ -193,18 +216,19 @@ def add_custom_field_to_log(sender, instance, created, **kwargs):
         # update content of record after save occurred.
         change_message_json = json.loads(instance.change_message)
 
-        if model_class == UserPermission:
-            change_message_json[0]["content"] = list(
-                qset.values("email", "permission__slug")
-            )
-        elif model_class == TribalApiAccessKeyIds:
-            change_message_json[0]["content"] = list(qset.values("email", "key_id"))
-        else:
-            change_message_json[0]["content"] = list(qset.values("id"))
+        if len(change_message_json) > 0:
+            if model_class == UserPermission:
+                change_message_json[0]["content"] = list(
+                    qset.values("email", "permission__slug")
+                )
+            elif model_class == TribalApiAccessKeyIds:
+                change_message_json[0]["content"] = list(qset.values("email", "key_id"))
+            else:
+                change_message_json[0]["content"] = list(qset.values("id"))
 
-        # record still exists.
-        if obj:
-            change_message_json[0]["id"] = obj.pk
+            # record still exists.
+            if obj:
+                change_message_json[0]["id"] = obj.pk
 
         # write changes to instance.
         instance.change_message = json.dumps(change_message_json, cls=DateEncoder)
