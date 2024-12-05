@@ -128,6 +128,16 @@ This assumes you have a `sandbox.tfvars` and `backend.tfvars` in `terraform/shar
 Next, run `./plan.sh` script. You should see it creating ~20 resources in a clean environment, or updating a few.
 Finally, run `./apply.sh` script and wait.
 
+---
+
+**NOTE** - If you would like to monitor the deploy logs as `./apply.sh` is running, start up a new terminal and run:
+```
+cf t -s sandbox
+cf logs gsa-fac
+```
+
+---
+
 # What is missing/omitted from Sandbox
 The following resources were intentionally left out from the sandbox environment. Part of that is the lack of necessity for such things, and an attempt to have a more lightweight environment, that only runs the bare minimum to bring up the system.
 - Logshipper Module
