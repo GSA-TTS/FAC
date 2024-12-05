@@ -3,7 +3,7 @@
       <h4 class="usa-alert__heading">Scheduled system upgrade</h4>
 
       {% comment %} If a message is given, use it. If not, display a generic message with the timeframe. {% endcomment %}
-      <p class="usa-alert__text">
+      <p class="usa-alert__text grid-container">
         {% if MAINTENANCE_BANNER_MESSAGE %}
             {{ MAINTENANCE_BANNER_MESSAGE }}
         {% else %}
