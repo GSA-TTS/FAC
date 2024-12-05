@@ -1945,7 +1945,7 @@ class AuditorCertificationStep1ViewTests(TestCase):
 
     def test_post_valid_form(self):
         """
-        Test that submitting a valid form updates the session 
+        Test that submitting a valid form updates the session
         and redirects correctly
         """
         self.session["AuditorCertificationStep1Session"] = {"field": "value"}
@@ -2023,7 +2023,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
 
     def test_get_renders_template_if_valid_session(self):
         """
-        Test that GET renders the Auditee certification step 2 
+        Test that GET renders the Auditee certification step 2
         if session is valid
         """
         self.session["AuditeeCertificationStep1Session"] = {"field": "value"}
@@ -2049,7 +2049,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
     @patch("audit.views.views.sac_transition")
     def test_post_valid_form(self, mock_transition, mock_validate):
         """
-        Test that submitting a valid Auditee Certification Form 
+        Test that submitting a valid Auditee Certification Form
         updates the SAC and redirects correctly
         """
         mock_transition.return_value = True
@@ -2080,7 +2080,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
 
     def test_post_invalid_form(self):
         """
-        Test that submitting an invalid Auditee Ceritifcation Form 
+        Test that submitting an invalid Auditee Ceritifcation Form
         renders an error template
         """
         self.session["AuditeeCertificationStep1Session"] = None
