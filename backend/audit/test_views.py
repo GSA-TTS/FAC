@@ -388,6 +388,9 @@ class SubmissionViewTests(TestCase):
         """Test that validation errors are displayed if submission is invalid"""
         mock_validate.return_value = ["Error 1", "Error 2"]
 
+        self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
+        self.sac.save()
+
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(
