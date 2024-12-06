@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from audit.models import SingleAuditChecklist
 from dissemination.models import TribalApiAccessKeyIds
 from users.models import UserPermission
-from .models import CognizantBaseline, CognizantAssignment, AssignmentTypeCode
+from .models import CognizantAssignment, AssignmentTypeCode
 
 import json
 from datetime import date
