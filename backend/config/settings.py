@@ -594,6 +594,6 @@ MAINTENANCE_BANNER_DATES = [
         "start": datetime(2024, 12, 5, 17, tzinfo=timezone.utc),
         "end": datetime(2024, 12, 10, 17, tzinfo=timezone.utc),
         "template_name": "maintenance_20241210.html",
-        "message": "FAC.gov will be doing a site upgrade on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
+        "message": "FAC.gov will be performing maintenance on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
     },
 ]
