@@ -34,7 +34,6 @@ class Command(BaseCommand):
             "view_passthrough",
             "view_secondaryauditor",
             "view_cognizantassignment",
-            "view_cognizantbaseline",
             "view_staffuser",
             "view_userpermission",
             "view_tribalapiaccesskeyids",
