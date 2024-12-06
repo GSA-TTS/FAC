@@ -169,7 +169,7 @@ class LogEntryAdmin(SupportAdmin):
                 _json = json.loads(obj.change_message)
 
                 # The LogEntry has recorded changes.
-                if len(_json) > 0:
+                if _json:
                     _json = _json[0]
                     if "changed" in _json:
                         res = "Updated\n"
@@ -189,7 +189,7 @@ class LogEntryAdmin(SupportAdmin):
             _json = json.loads(obj.change_message)
 
             # The LogEntry has recorded changes.
-            if len(_json) > 0:
+            if _json:
                 _json = _json[0]
                 if "content" in _json:
                     return _json["content"]
@@ -216,7 +216,7 @@ def add_custom_field_to_log(sender, instance, created, **kwargs):
         # update content of record after save occurred.
         change_message_json = json.loads(instance.change_message)
 
-        if len(change_message_json) > 0:
+        if change_message_json:
             if model_class == UserPermission:
                 change_message_json[0]["content"] = list(
                     qset.values("email", "permission__slug")
