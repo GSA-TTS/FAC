@@ -5,11 +5,11 @@ from model_bakery import baker
 from faker import Faker
 
 from audit.models import SingleAuditChecklist
-from .models import CognizantBaseline, CognizantAssignment
+from .models import CognizantAssignment
 
 from .cog_over import compute_cog_over, record_cog_assignment
 
-# Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
+# Note:  Fake data is generated for SingleAuditChecklist.
 #        Using only the data fields that apply to cog / over assignment.
 
 UNIQUE_EIN_WITHOUT_DBKEY = "UEWOD1234"
@@ -168,16 +168,6 @@ class CogOverTests(TestCase):
             "user_provided_organization_type": "state",
             "auditor_ein_not_an_ssn_attestation": "true",
             "audit_year": "2023",
-        }
-
-    @staticmethod
-    def _fake_cognizantbaseline():
-        fake = Faker()
-        return {
-            "dbkey": 123456789,
-            "audit_year": 2019,
-            "ein": fake.ssn().replace("-", ""),
-            "cognizant_agency": "20",
         }
 
     def _fake_federal_awards(self):
@@ -418,6 +408,7 @@ class CogOverTests(TestCase):
             auditee_uei=BASE_UEI,
             total_amount_expended="210000000",
             audit_year="2022",
+            cognizant_agency=BASE_COG,
         )
         gen.save()
         migration_inspection_record = baker.make(
@@ -428,14 +419,14 @@ class CogOverTests(TestCase):
         )
         migration_inspection_record.save()
 
-        baker.make(
-            CognizantBaseline,
-            uei=BASE_UEI,
-            ein=BASE_EIN,
-            dbkey=RESOLVABLE_DBKEY_WITH_BASELINE,
-            cognizant_agency=BASE_COG,
-            is_active=True,
-        )
+        # baker.make(
+        #     CognizantBaseline,
+        #     uei=BASE_UEI,
+        #     ein=BASE_EIN,
+        #     dbkey=RESOLVABLE_DBKEY_WITH_BASELINE,
+        #     cognizant_agency=BASE_COG,
+        #     is_active=True,
+        # )
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards,
             sac.submission_status,
@@ -454,17 +445,18 @@ class CogOverTests(TestCase):
         sac = self._fake_sac()
         sac.general_information["auditee_uei"] = BASE_UEI
         sac.general_information["ein"] = BASE_EIN
+        sac.general_information["cognizant_agency"] = BASE_COG
         sac.report_id = "9991-09-GSAFAC-0000201851"
         sac.save()
 
-        baker.make(
-            CognizantBaseline,
-            uei=BASE_UEI,
-            ein=BASE_EIN,
-            cognizant_agency=BASE_COG,
-        )
-        cbs = CognizantBaseline.objects.all()
-        self.assertEqual(len(cbs), 1)
+        # baker.make(
+        #     CognizantBaseline,
+        #     uei=BASE_UEI,
+        #     ein=BASE_EIN,
+        #     cognizant_agency=BASE_COG,
+        # )
+        # cbs = CognizantBaseline.objects.all()
+        # self.assertEqual(len(cbs), 1)
 
         cog_agency, _ = compute_cog_over(
             sac.federal_awards,
@@ -476,8 +468,8 @@ class CogOverTests(TestCase):
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         cas = CognizantAssignment.objects.all()
         self.assertEqual(len(cas), 1)
-        cbs = CognizantBaseline.objects.all()
-        self.assertEqual(len(cbs), 1)
+        # cbs = CognizantBaseline.objects.all()
+        # self.assertEqual(len(cbs), 1)
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(sac.cognizant_agency, cog_agency)
 
@@ -490,8 +482,8 @@ class CogOverTests(TestCase):
         ).save()
         cas = CognizantAssignment.objects.all()
         self.assertEqual(len(cas), 2)
-        cbs = CognizantBaseline.objects.all()
-        self.assertEqual(len(cbs), 2)
+        # cbs = CognizantBaseline.objects.all()
+        # self.assertEqual(len(cbs), 2)
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(sac.cognizant_agency, oberride_cog)
 
@@ -567,6 +559,7 @@ class CogOverTests(TestCase):
             auditee_uei="ZQGGHJH74DW7",
             total_amount_expended="210000000",
             audit_year="2027",
+            cognizant_agency="24",
         )
         gen.save()
 
@@ -583,14 +576,14 @@ class CogOverTests(TestCase):
 
         sac.save()
 
-        baker.make(
-            CognizantBaseline,
-            uei="ZQGGHJH74DW7",
-            ein=UNIQUE_EIN_WITHOUT_DBKEY,
-            cognizant_agency="24",
-        )
-        cbs = CognizantBaseline.objects.all()
-        self.assertEqual(len(cbs), 1)
+        # baker.make(
+        #     CognizantBaseline,
+        #     uei="ZQGGHJH74DW7",
+        #     ein=UNIQUE_EIN_WITHOUT_DBKEY,
+        #     cognizant_agency="24",
+        # )
+        # cbs = CognizantBaseline.objects.all()
+        # self.assertEqual(len(cbs), 1)
 
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards,
