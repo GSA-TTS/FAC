@@ -51,3 +51,10 @@ class TestResizeAwardReference(SimpleTestCase):
         self.assertEqual(_format_reference("AWARD-12345"), "AWARD-12345")
         self.assertEqual(_format_reference(None), None)
         self.assertEqual(_format_reference(""), "")
+
+    def test_format_reference_malformed(self):
+        """Test the _format_reference function with malformed inputs"""
+        # Malformed cases should return as is, as the function does not raise exceptions
+        self.assertEqual(_format_reference("AWARD123"), "AWARD123")  # Missing dash
+        self.assertEqual(_format_reference("123-456"), "123-456")  # Incorrect prefix
+        self.assertEqual(_format_reference("AWARD-"), "AWARD-")  # Missing second part
