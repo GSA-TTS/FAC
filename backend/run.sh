@@ -14,6 +14,7 @@ source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
 source tools/seed_cog_baseline.sh
+source tools/create_staffusers.sh
 
 #####
 # SETUP THE LOCAL ENVIRONMENT
@@ -52,7 +53,8 @@ gonogo "seed_cog_baseline"
 #####
 # CREATE STAFF USERS
 # Prepares staff users for Django admin
-python manage.py create_staffusers
+create_staffusers
+gonogo "create_staffusers"
 
 #####
 # LAUNCH THE APP
