@@ -144,8 +144,8 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(
             get_response.context["dollar_thresholds"],
             [
-                '$750,000 or more with a Fiscal Year starting BEFORE October 01, 2024',
-                '$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024',
+                "$750,000 or more with a Fiscal Year starting BEFORE October 01, 2024",
+                "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
             ],
         )
 
