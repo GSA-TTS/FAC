@@ -32,30 +32,6 @@ class SupportAdmin(admin.ModelAdmin):
         return False
 
 
-@admin.register(CognizantBaseline)
-class CognizantBaselineAdmin(SupportAdmin):
-    list_display = [
-        "uei",
-        "cognizant_agency",
-        "date_assigned",
-        "ein",
-        "dbkey",
-        "is_active",
-        "source",
-    ]
-    list_filter = [
-        "source",
-        "is_active",
-        "cognizant_agency",
-    ]
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-
 @admin.register(CognizantAssignment)
 class CognizantAssignmentAdmin(SupportAdmin):
     date_hierarchy = "date_assigned"
