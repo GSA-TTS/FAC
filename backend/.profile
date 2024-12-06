@@ -47,12 +47,6 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # run_collectstatic
     # gonogo "run_collectstatic"
 
-    #####
-    # SEED COG/OVER TABLES
-    # Setup tables for cog/over assignments
-    seed_cog_baseline
-    gonogo "seed_cog_baseline"
-
     # materialized_views
     # gonogo "materialized_views"
 fi
