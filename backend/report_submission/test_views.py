@@ -141,6 +141,13 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
         self.assertTemplateUsed(get_response, "report_submission/step-1.html")
+        self.assertEqual(
+            get_response.context["dollar_thresholds"],
+            [
+                '$750,000 or more with a Fiscal Year starting BEFORE October 01, 2024',
+                '$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024',
+            ],
+        )
 
         response = self.client.post(url, data=self.step1_data)
         self.assertEqual(response.status_code, 302)
