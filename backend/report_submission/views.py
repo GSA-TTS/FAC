@@ -37,33 +37,12 @@ class EligibilityFormView(LoginRequiredMixin, View):
     def get(self, request):
         args = {
             "step": 1,
-            "dollar_thresholds": self._generate_dollar_thresholds(DOLLAR_THRESHOLDS),
+            "dollar_thresholds": [
+                dict_item["message"] for dict_item in DOLLAR_THRESHOLDS
+            ],
         }
 
         return render(request, "report_submission/step-1.html", args)
-
-    # Used for populating the expenditure criteria bulletpoints
-    def _generate_dollar_thresholds(self, dollar_thresholds):
-        result = []
-        for dollar_threshold in dollar_thresholds:
-            start = dollar_threshold["start"]
-            end = dollar_threshold["end"]
-            minimum = format(dollar_threshold["minimum"], ",d")
-
-            if not start and end:
-                result.append(
-                    f"${minimum} or more with a Fiscal Year starting BEFORE {end.strftime('%B %d, %Y')}"
-                )
-            elif start and end:
-                result.append(
-                    f"${minimum} or more with a Fiscal Year starting ON or AFTER {start.strftime('%B %d, %Y')} and BEFORE {end.strftime('%B %d, %Y')}"
-                )
-            elif start and not end:
-                result.append(
-                    f"${minimum} or more with a Fiscal Year starting ON or AFTER {start.strftime('%B %d, %Y')}"
-                )
-
-        return result
 
     # gather/save step 1 info, redirect to step 2
     def post(self, post_request):

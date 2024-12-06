@@ -588,11 +588,13 @@ DOLLAR_THRESHOLDS = [
         "start": None,
         "end": datetime(2024, 10, 1),
         "minimum": 750000,
+        "message": "$750,000 or more with a Fiscal Year starting BEFORE October 01, 2024",
     },
     {
         "start": datetime(2024, 10, 1),
         "end": None,
         "minimum": 1000000,
+        "message": "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
     },
 ]
 
