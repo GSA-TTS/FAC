@@ -554,7 +554,6 @@ OMB_EXP_DATE = "09/30/2026"
 
 # APP-level constants
 CENSUS_DATA_SOURCE = "CENSUS"
-DOLLAR_THRESHOLD = 750000
 SUMMARY_REPORT_DOWNLOAD_LIMIT = 1000
 DEFAULT_MAX_ROWS = (
     10000  # A version of this constant also exists in schemas.scrpits.render.py
@@ -582,6 +581,22 @@ SESSION_COOKIE_AGE = 30 * 60
 # Keep sessions alive if the user is active
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-save-every-request
 SESSION_SAVE_EVERY_REQUEST = True
+
+# Minimum expenditure thresholds
+DOLLAR_THRESHOLDS = [
+    {
+        "start": None,
+        "end": datetime(2024, 10, 1),
+        "minimum": 750000,
+        "message": "$750,000 or more with a Fiscal Year starting BEFORE October 01, 2024",
+    },
+    {
+        "start": datetime(2024, 10, 1),
+        "end": None,
+        "minimum": 1000000,
+        "message": "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
+    },
+]
 
 # Times for the maintenance banner to display.
 # Requires a 'start' and an 'end'.

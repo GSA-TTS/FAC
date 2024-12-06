@@ -20,7 +20,7 @@ from audit.validators import validate_general_information_json
 from audit.utils import Util
 from audit.models.models import ExcelFile
 from audit.fixtures.excel import FORM_SECTIONS
-from config.settings import STATIC_SITE_URL, STATE_ABBREVS
+from config.settings import STATIC_SITE_URL, STATE_ABBREVS, DOLLAR_THRESHOLDS
 
 from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
@@ -35,11 +35,14 @@ class ReportSubmissionRedirectView(View):
 # Step 1
 class EligibilityFormView(LoginRequiredMixin, View):
     def get(self, request):
-        args = {}
-        args["step"] = 1
-        return render(request, "report_submission/step-1.html", args)
+        args = {
+            "step": 1,
+            "dollar_thresholds": [
+                dict_item["message"] for dict_item in DOLLAR_THRESHOLDS
+            ],
+        }
 
-    # render eligibility form
+        return render(request, "report_submission/step-1.html", args)
 
     # gather/save step 1 info, redirect to step 2
     def post(self, post_request):
