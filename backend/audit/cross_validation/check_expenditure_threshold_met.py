@@ -1,7 +1,7 @@
 from config.settings import DOLLAR_THRESHOLDS
 from .errors import err_total_amount_expended
 
-import datetime
+from datetime import date
 
 
 def check_expenditure_threshold_met(
@@ -24,7 +24,7 @@ def check_expenditure_threshold_met(
         amount = award["program"]["amount_expended"]
         abs_total += abs(amount)
 
-    fy_start_date = datetime.date.fromisoformat(
+    fy_start_date = date.fromisoformat(
         general_information["auditee_fiscal_period_start"]
     )
     threshold_met = False

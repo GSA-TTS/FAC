@@ -10,8 +10,8 @@
   $theme-color-base-lighter: #efefef,
 );
 @forward 'uswds';
-@use '_home.scss';
-@use '_header.scss';
-@use '_form.scss';
-@use '_search.scss';
-@use '_workbook-upload.scss';
+@use '_home';
+@use '_header';
+@use '_form';
+@use '_search';
+@use '_workbook-upload';

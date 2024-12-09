@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from base64 import b64decode
+from datetime import date, datetime, timezone
 import os
 import sys
 import logging
@@ -21,7 +22,6 @@ from cfenv import AppEnv
 from audit.get_agency_names import get_agency_names, get_audit_info_lists
 import dj_database_url
 import newrelic.agent
-import datetime
 
 newrelic.agent.initialize()
 
@@ -162,6 +162,7 @@ TEMPLATES = [
                 "config.context_processors.static_site_url",
                 "config.context_processors.omb_num_exp_date",
                 "config.context_processors.current_environment",
+                "config.context_processors.maintenance_banner",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
@@ -228,8 +229,7 @@ STATIC_URL = "/static/"
 
 # Environment specific configurations
 DEBUG = False
-
-if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
+if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     DATABASES = {
         "default": env.dj_db_url(
             "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
@@ -586,12 +586,29 @@ SESSION_SAVE_EVERY_REQUEST = True
 DOLLAR_THRESHOLDS = [
     {
         "start": None,
-        "end": datetime.date(2024, 10, 1),
+        "end": date(2024, 10, 1),
         "minimum": 750000,
+        "message": "$750,000 or more with a Fiscal Year starting BEFORE October 01, 2024",
     },
     {
-        "start": datetime.date(2024, 10, 1),
+        "start": date(2024, 10, 1),
         "end": None,
         "minimum": 1000000,
+        "message": "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
+    },
+]
+
+# Times for the maintenance banner to display.
+# Requires a 'start' and an 'end'.
+# 'template_name' is optional, and defines what will display if maintenance mode is enabled during this timeframe. If no name is given, the 503 error page is used.
+# 'message' is optional, and overrides the default banner message.
+# The default message states that maintenance will be ongoing for the duration of the banners uptime. This may be true in an emergency. Otherwise, be sure to set a custom message.
+MAINTENANCE_BANNER_DATES = [
+    {
+        # December 5th to 10th, noon EST, uploading historical audits
+        "start": datetime(2024, 12, 5, 17, tzinfo=timezone.utc),
+        "end": datetime(2024, 12, 10, 17, tzinfo=timezone.utc),
+        "template_name": "maintenance_20241210.html",
+        "message": "FAC.gov will be performing maintenance on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
     },
 ]

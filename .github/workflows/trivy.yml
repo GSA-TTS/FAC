@@ -20,6 +20,7 @@ jobs:
       security-events: write
       actions: read
     env:
+      repo_name: gsa-tts/fac
       DOCKER_NAME: fac
       WORKING_DIRECTORY: ./backend
     name: Trivy Scan FAC Web Container
@@ -39,7 +40,12 @@ jobs:
         run: docker build -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.29.0
+        env:
+          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+          TRIVY_SKIP_DB_UPDATE: true
+          TRIVY_SKIP_JAVA_DB_UPDATE: true
         with:
           image-ref: '${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}'
           scan-type: 'image'
@@ -63,6 +69,8 @@ jobs:
       actions: read
     name: Trivy Scan Third Party Images
     runs-on: ubuntu-latest
+    env:
+      repo_name: gsa-tts/fac
     strategy:
       fail-fast: false
       matrix:
@@ -74,7 +82,12 @@ jobs:
         run: docker pull ${{ matrix.image.name }}
 
       - name: Run Trivy vulnerability scanner on Third Party Images
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.29.0
+        env:
+          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+          TRIVY_SKIP_DB_UPDATE: true
+          TRIVY_SKIP_JAVA_DB_UPDATE: true
         with:
           image-ref: '${{ matrix.image.name }}'
           scan-type: 'image'

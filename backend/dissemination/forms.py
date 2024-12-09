@@ -68,8 +68,8 @@ class AdvancedSearchForm(forms.Form):
     )
     entity_type_choices = list(zip(*entity_type_field_mapping.values()))
     major_program_choices = (
-        (True, "Y"),
-        (False, "N"),
+        ("True", "Y"),
+        ("False", "N"),
     )
 
     # Query params

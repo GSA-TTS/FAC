@@ -33,8 +33,26 @@ jobs:
       - name: Pull Docker Image
         run: docker pull ${{ matrix.image.name }}
 
-      - name: Scan Image
-        run: docker run aquasec/trivy:latest  image --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.29.0
+        env:
+          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+          TRIVY_SKIP_DB_UPDATE: true
+          TRIVY_SKIP_JAVA_DB_UPDATE: true
+          TRIVY_DISABLE_VEX_NOTICE: true
+        with:
+          image-ref: '${{ matrix.image.name }}'
+          scan-type: 'image'
+          hide-progress: false
+          exit-code: 1
+          severity: 'CRITICAL,HIGH'
+          scanners: 'vuln'
+          timeout: 15m0s
+          ignore-unfixed: true
+
+      # - name: Scan Image
+      #   run: docker run aquasec/trivy:latest image --db-repository public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db --java-db-repository public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}
 
       - name: Tag Image
         run: |

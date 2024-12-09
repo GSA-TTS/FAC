@@ -21,7 +21,7 @@ module "production" {
 # of Terraform. To address this, we should manage deployment of gsa-fac in
 # Terraform.
 module "domain" {
-  source = "github.com/18f/terraform-cloudgov//domain?ref=v0.7.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//domain?ref=v1.1.0"
 
   cf_org_name    = "gsa-tts-oros-fac"
   cf_space_name  = "production"

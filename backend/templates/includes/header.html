@@ -8,6 +8,11 @@
         </div>
     </section>
 {% endif %}
+
+{% if MAINTENANCE_BANNER %}
+    {% include "includes/maintenance_banner.html" %}
+{% endif %}
+
 <section class="usa-banner" aria-label="Official government website">
     <div class="usa-accordion">
         <header class="usa-banner__header">

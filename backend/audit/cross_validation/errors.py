@@ -57,6 +57,13 @@ def err_duplicate_finding_reference(award_ref, ref_number):
     return f"Award {award_ref} repeats reference {ref_number}. The reference {ref_number} should only appear once for award {award_ref}."
 
 
+def err_prior_ref_not_found(auditee_uei, prior_ref, award_ref, row):
+    return (
+        f"The {SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook contains prior reference {prior_ref} (award {award_ref}, row {row}). "
+        f"However, that reference was not found in any previous reports for UEI {auditee_uei}."
+    )
+
+
 def err_findings_count_inconsistent(total_expected, total_counted, award_ref):
     return (
         f"You reported {total_expected} findings for award {award_ref} in the {SECTION_NAMES.FEDERAL_AWARDS} workbook, "
