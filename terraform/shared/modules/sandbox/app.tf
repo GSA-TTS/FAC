@@ -26,6 +26,8 @@ module "fac-app" {
 }
 
 resource "cloudfoundry_network_policy" "app-network-policy" {
+  provider = cloudfoundry-community
+
   policy {
     source_app      = module.fac-app.app_id
     destination_app = module.https-proxy.app_id
