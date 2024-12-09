@@ -168,29 +168,41 @@ def get_dbkey(ein, uei):
 
 
 def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
-    query_years = [str(year) for year in range(base_year, audit_year+1)]
+    query_years = [str(year) for year in range(base_year, audit_year + 1)]
     if int(base_year) == FIRST_BASELINE_YEAR:
         try:
-            cognizant_agency = General.objects.values_list(
-                "cognizant_agency", flat=True
-            ).get(
-                Q(audit_year__in=query_years)
-                & (Q(auditee_ein=ein) & Q(report_id__icontains=dbkey) & Q(report_id__icontains='CENSUS'))
-            ).order_by('-audit_year').values()[:1]
-        except (General.DoesNotExist, General.MultipleObjectsReturned):
+            cognizant_agency = (
+                General.objects.filter(
+                    Q(audit_year__in=query_years)
+                    & (
+                        Q(auditee_ein=ein)
+                        & Q(report_id__icontains=dbkey)
+                        & Q(report_id__icontains="CENSUS")
+                    )
+                )
+                .exclude(cognizant_agency__isnull=True)
+                .exclude(cognizant_agency__exact="")
+                .order_by("-audit_year")
+                .values_list("cognizant_agency", flat=True)[0]
+            )
+        except General.DoesNotExist:
             cognizant_agency = None
         return cognizant_agency
-    else:
-        try:
-            cognizant_agency = General.objects.values_list(
-                "cognizant_agency", flat=True
-            ).get(
+
+    try:
+        cognizant_agency = (
+            General.objects.filter(
                 Q(audit_year__in=query_years)
                 & (Q(auditee_ein=ein) & Q(auditee_uei=uei))
-            ).order_by('-audit_year').values()[:1]
-        except (General.DoesNotExist, General.MultipleObjectsReturned):
-            cognizant_agency = None
-        return cognizant_agency
+            )
+            .exclude(cognizant_agency__isnull=True)
+            .exclude(cognizant_agency__exact="")
+            .order_by("-audit_year")
+            .values_list("cognizant_agency", flat=True)[0]
+        )
+    except General.DoesNotExist:
+        cognizant_agency = None
+    return cognizant_agency
 
 
 def get_base_gen(ein, uei, base_year):
