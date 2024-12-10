@@ -554,7 +554,6 @@ OMB_EXP_DATE = "09/30/2026"
 
 # APP-level constants
 CENSUS_DATA_SOURCE = "CENSUS"
-DOLLAR_THRESHOLD = 750000
 SUMMARY_REPORT_DOWNLOAD_LIMIT = 1000
 DEFAULT_MAX_ROWS = (
     10000  # A version of this constant also exists in schemas.scrpits.render.py
@@ -583,6 +582,22 @@ SESSION_COOKIE_AGE = 30 * 60
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-save-every-request
 SESSION_SAVE_EVERY_REQUEST = True
 
+# Minimum expenditure thresholds
+DOLLAR_THRESHOLDS = [
+    {
+        "start": None,
+        "end": datetime(2024, 10, 1),
+        "minimum": 750000,
+        "message": "$750,000 or more with a Fiscal Year starting BEFORE October 01, 2024",
+    },
+    {
+        "start": datetime(2024, 10, 1),
+        "end": None,
+        "minimum": 1000000,
+        "message": "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
+    },
+]
+
 # Times for the maintenance banner to display.
 # Requires a 'start' and an 'end'.
 # 'template_name' is optional, and defines what will display if maintenance mode is enabled during this timeframe. If no name is given, the 503 error page is used.
@@ -594,6 +609,6 @@ MAINTENANCE_BANNER_DATES = [
         "start": datetime(2024, 12, 5, 17, tzinfo=timezone.utc),
         "end": datetime(2024, 12, 10, 17, tzinfo=timezone.utc),
         "template_name": "maintenance_20241210.html",
-        "message": "FAC.gov will be doing a site upgrade on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
+        "message": "FAC.gov will be performing maintenance on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
     },
 ]
