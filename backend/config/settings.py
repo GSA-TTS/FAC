@@ -605,9 +605,9 @@ DOLLAR_THRESHOLDS = [
 # The default message states that maintenance will be ongoing for the duration of the banners uptime. This may be true in an emergency. Otherwise, be sure to set a custom message.
 MAINTENANCE_BANNER_DATES = [
     {
-        # December 5th to 10th, noon EST, uploading historical audits
+        # December 5th noon to December 10th 6 PM, EST, uploading historical audits
         "start": datetime(2024, 12, 5, 17, tzinfo=timezone.utc),
-        "end": datetime(2024, 12, 10, 17, tzinfo=timezone.utc),
+        "end": datetime(2024, 12, 10, 23, tzinfo=timezone.utc),
         "template_name": "maintenance_20241210.html",
         "message": "FAC.gov will be performing maintenance on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
     },
