@@ -283,50 +283,6 @@ class SearchGeneralTests(TestCase):
             self.assertGreaterEqual(r.fac_accepted_date, search_start_date)
             self.assertLessEqual(r.fac_accepted_date, search_end_date)
 
-    def test_cognizant_agency(self):
-        """
-        Given a cognizant agency name, search_general should return only records with a matching cognizant agency name (not oversight)
-        """
-
-        baker.make(General, is_public=True, cognizant_agency="01")
-        baker.make(General, is_public=True, cognizant_agency="02")
-
-        baker.make(General, is_public=True, oversight_agency="01")
-
-        results = search_general(
-            General,
-            {
-                "cog_or_oversight": "cog",
-                "agency_name": "01",
-            },
-        )
-
-        assert_all_results_public(self, results)
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].cognizant_agency, "01")
-
-    def test_oversight_agency(self):
-        """
-        Given an oversight agency name, search_general should return only records with a matching oversight agency name (not cognizant)
-        """
-
-        baker.make(General, is_public=True, cognizant_agency="01")
-
-        baker.make(General, is_public=True, oversight_agency="01")
-        baker.make(General, is_public=True, oversight_agency="02")
-
-        results = search_general(
-            General,
-            {
-                "cog_or_oversight": "oversight",
-                "agency_name": "01",
-            },
-        )
-
-        assert_all_results_public(self, results)
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].oversight_agency, "01")
-
     def test_audit_year(self):
         """
         Given a list of audit years, search_general should return only records where
@@ -671,6 +627,54 @@ class SearchALNTests(TestMaterializedViewBuilder):
 
 
 class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
+    def test_search_cog_or_oversight(self):
+        """
+        When making a search on major program, search_general should only return records with an award of that type.
+        """
+        general_cog = baker.make(
+            General,
+            cognizant_agency=42,
+            oversight_agency=None,
+        )
+        baker.make(FederalAward, report_id=general_cog)
+        general_over = baker.make(
+            General,
+            cognizant_agency=None,
+            oversight_agency=24,
+        )
+        baker.make(FederalAward, report_id=general_over)
+        self.refresh_materialized_view()
+
+        adv_params = {"advanced_search_flag": True}
+
+        # Either cog or over with no agency should return all
+        params = {"agency_name": None, "cog_or_oversight": "either", **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 2)
+
+        # Unused agency should return nothing
+        params = {"agency_name": 99, "cog_or_oversight": "either", **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 0)
+
+        # Either cog or over with valid agency
+        params = {"agency_name": 42, "cog_or_oversight": "either", **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].report_id, general_cog.report_id)
+
+        # Cog with valid agency
+        params = {"agency_name": 42, "cog_or_oversight": "cog", **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].report_id, general_cog.report_id)
+
+        # Over with valid agency
+        params = {"agency_name": 24, "cog_or_oversight": "oversight", **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].report_id, general_over.report_id)
+
     def test_search_findings(self):
         """
         When making a search on a particular type of finding, search_general should only return records with a finding of that type.
