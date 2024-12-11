@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 from .searchlib.search_constants import ORDER_BY, DIRECTION, DAS_LIMIT
@@ -147,3 +148,20 @@ def _make_distinct(results, params):
         results = results.distinct("report_id", order_by)
 
     return results
+
+
+def gather_errors(form):
+    """
+    Gather errors based on the form fields inputted by the user.
+    """
+    formatted_errors = []
+    if form.errors:
+        if not form.is_valid():
+            errors = json.loads(form.errors.as_json())
+            for error in reversed(errors):
+                if "start_date" in error:
+                    formatted_errors.append("The start date you entered is invalid.")
+                if "end_date" in error:
+                    formatted_errors.append("The end date you entered is invalid.")
+
+    return formatted_errors
