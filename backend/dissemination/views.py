@@ -18,7 +18,7 @@ from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import SearchForm
 from dissemination.forms import AdvancedSearchForm
-from dissemination.search import search
+from dissemination.search import search, gather_errors
 from dissemination.mixins import ReportAccessRequiredMixin
 from dissemination.models import (
     General,
@@ -169,12 +169,16 @@ class AdvancedSearch(View):
         results_count = None
         page = 1
         results = []
+        errors = []
         context = {}
 
         # Obtain cleaned form data.
         form.is_valid()
         form_data = form.cleaned_data
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
+
+        # build error list.
+        errors = gather_errors(form)
 
         # Tells the backend we're running advanced search.
         form_data["advanced_search_flag"] = True
@@ -214,6 +218,7 @@ class AdvancedSearch(View):
             "advanced_search_flag": True,
             "form_user_input": form_user_input,
             "form": form,
+            "errors": errors,
             "include_private": include_private,
             "limit": form_data["limit"],
             "order_by": form_data["order_by"],
@@ -268,12 +273,16 @@ class Search(View):
         results_count = None
         page = 1
         results = []
+        errors = []
         context = {}
 
         # Obtain cleaned form data.
         form.is_valid()
         form_data = form.cleaned_data
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
+
+        # build error list.
+        errors = gather_errors(form)
 
         # Tells the backend we're running basic search.
         form_data["advanced_search_flag"] = False
@@ -313,6 +322,7 @@ class Search(View):
             "advanced_search_flag": False,
             "form_user_input": form_user_input,
             "form": form,
+            "errors": errors,
             "include_private": include_private,
             "limit": form_data["limit"],
             "order_by": form_data["order_by"],

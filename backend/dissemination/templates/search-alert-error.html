@@ -3,6 +3,11 @@
 <div class="usa-alert usa-alert--error">
     <div class="usa-alert__body">
         <h2 class="usa-alert__heading">Error</h2>
-        <p>Oops! It looks like some of the information you entered is invalid. Please double-check your information for errors.</p>
+        <p>The information you entered is invalid. Please double-check your information for errors.</p>
+        <ul>
+          {% for error in errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
     </div>
 </div>
