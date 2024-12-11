@@ -61,6 +61,7 @@ def search(params):
 
     logger.info(params)
     if is_advanced_search(params):
+        logger.info("search Searching `DisseminationCombined`")
         results = search_general(DisseminationCombined, params)
         results = search_alns(results, params)
         results = search_cog_or_oversight(results, params)
