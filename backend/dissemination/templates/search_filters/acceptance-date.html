@@ -5,27 +5,29 @@
         aria-controls="fac-release-date">FAC acceptance date</button>
 <div id="fac-release-date">
     <div class="usa-form-group">
-        <label class="usa-label" id="start-date-label" for="start-date">Start date</label>
-        <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
+        <label class="usa-label" id="start_date-label" for="start_date">Start date</label>
+        <div class="usa-hint" id="start_date-hint">mm/dd/yyyy</div>
         <div class="usa-date-picker"
                 data-default-value="{{ form_user_input.start_date }}">
-            <input class="usa-input"
-                    id="start-date"
-                    name="start_date"
-                    aria-labelledby="start-date-label"
-                    aria-describedby="start-date-hint" />
+              <span class="usa-error-message margin-top-1">{{ form.start_date.errors|striptags }}</span>
+              <input class="usa-input"
+                  id="start_date"
+                  name="start_date"
+                  aria-labelledby="start_date-label"
+                  aria-describedby="start_date-hint" />
         </div>
     </div>
     <div class="usa-form-group">
-        <label class="usa-label" id="end-date-label" for="end-date">End date</label>
-        <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
+        <label class="usa-label" id="end_date-label" for="end_date">End date</label>
+        <div class="usa-hint" id="end_date-hint">mm/dd/yyyy</div>
         <div class="usa-date-picker"
                 data-default-value="{{ form_user_input.end_date }}">
+            <span class="usa-error-message margin-top-1">{{ form.end_date.errors|striptags }}</span>
             <input class="usa-input"
-                    id="end-date"
+                    id="end_date"
                     name="end_date"
-                    aria-labelledby="end-date-label"
-                    aria-describedby="end-date-hint" />
+                    aria-labelledby="end_date-label"
+                    aria-describedby="end_date-hint" />
         </div>
     </div>
 </div>
