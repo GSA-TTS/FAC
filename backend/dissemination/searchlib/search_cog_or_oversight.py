@@ -23,7 +23,7 @@ def search_cog_or_oversight(general_results, params):
 
 
 def _get_cog_or_oversight_match_query(agency_name, cog_or_oversight):
-    if cog_or_oversight.lower() == "either":
+    if cog_or_oversight.lower() in ["", "either"]:
         if agency_name:
             return Q(
                 Q(cognizant_agency__in=[agency_name])
