@@ -4,10 +4,12 @@
     <div class="usa-alert__body">
         <h2 class="usa-alert__heading">Error</h2>
         <p>The information you entered is invalid. Please double-check your information for errors.</p>
+        {% if errors %}
         <ul>
           {% for error in errors %}
           <li>{{ error }}</li>
           {% endfor %}
         </ul>
+        {% endif %}
     </div>
 </div>
