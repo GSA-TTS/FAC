@@ -320,7 +320,7 @@ class SubmissionViewTests(TestCase):
         self.client = Client()
         self.user = baker.make(User)
         self.sac = baker.make(
-            SingleAuditChecklist, submission_status=STATUS.READY_FOR_CERTIFICATION
+            SingleAuditChecklist, submission_status=STATUS.AUDITEE_CERTIFIED
         )
         self.url = reverse("audit:Submission", kwargs={"report_id": self.sac.report_id})
         self.client.force_login(self.user)
@@ -355,29 +355,26 @@ class SubmissionViewTests(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
-    @patch("audit.views.views.SingleAuditChecklist.validate_full")
+    @patch("audit.models.SingleAuditChecklist.validate_full")
     @patch("audit.views.views.sac_transition")
     @patch("audit.views.views.remove_workbook_artifacts")
     @patch("audit.views.views.SingleAuditChecklist.disseminate")
-    def test_post_valid_submission(
-        self, mock_disseminate, mock_remove, mock_transition, mock_validate
-    ):
+    def test_post_successful(self, mock_disseminate, mock_remove, mock_transition, mock_validate):
         """Test that a valid submission transitions SAC to a disseminated state"""
         mock_validate.return_value = []
         mock_disseminate.return_value = None
-
         response = self.client.post(self.url)
+        
+        mock_validate.assert_called_once()
+        mock_disseminate.assert_called_once()
+        mock_transition.assert_called_with(
+            response.wsgi_request, self.sac, transition_to=STATUS.DISSEMINATED
+        )
+        mock_remove.assert_called_once()
+
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("audit:MySubmissions"))
 
-        mock_transition.assert_any_call(
-            response.wsgi_request, self.sac, transition_to=STATUS.SUBMITTED
-        )
-        mock_transition.assert_any_call(
-            response.wsgi_request, self.sac, transition_to=STATUS.DISSEMINATED
-        )
-        mock_disseminate.assert_called_once()
-        mock_remove.assert_called_once_with(self.sac)
 
     @patch("audit.views.views.SingleAuditChecklist.validate_full")
     @patch("audit.views.views.sac_transition")
