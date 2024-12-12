@@ -5,40 +5,25 @@ from tempfile import NamedTemporaryFile
 from unittest.mock import patch
 
 from audit.cross_validation.naming import SECTION_NAMES as SN
-from audit.fixtures.excel import (
-    ADDITIONAL_EINS_ENTRY_FIXTURES,
-    ADDITIONAL_EINS_TEMPLATE,
-    ADDITIONAL_UEIS_ENTRY_FIXTURES,
-    ADDITIONAL_UEIS_TEMPLATE,
-    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
-    CORRECTIVE_ACTION_PLAN_TEMPLATE,
-    FEDERAL_AWARDS_ENTRY_FIXTURES,
-    FEDERAL_AWARDS_TEMPLATE,
-    FINDINGS_TEXT_ENTRY_FIXTURES,
-    FINDINGS_TEXT_TEMPLATE,
-    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
-    FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
-    FORM_SECTIONS,
-    NOTES_TO_SEFA_ENTRY_FIXTURES,
-    NOTES_TO_SEFA_TEMPLATE,
-    SECONDARY_AUDITORS_ENTRY_FIXTURES,
-    SECONDARY_AUDITORS_TEMPLATE,
-)
-from audit.fixtures.single_audit_checklist import (
-    fake_auditee_certification,
-    fake_auditor_certification,
-)
-from audit.forms import (
-    AuditeeCertificationStep2Form,
-    AuditorCertificationStep1Form,
-)
-from audit.models import (
-    Access,
-    SingleAuditChecklist,
-    SingleAuditReportFile,
-    SubmissionEvent,
-    generate_sac_report_id,
-)
+from audit.fixtures.excel import (ADDITIONAL_EINS_ENTRY_FIXTURES,
+                                  ADDITIONAL_EINS_TEMPLATE,
+                                  ADDITIONAL_UEIS_ENTRY_FIXTURES,
+                                  ADDITIONAL_UEIS_TEMPLATE,
+                                  CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+                                  CORRECTIVE_ACTION_PLAN_TEMPLATE,
+                                  FEDERAL_AWARDS_ENTRY_FIXTURES,
+                                  FEDERAL_AWARDS_TEMPLATE, FINDINGS_TEXT_ENTRY_FIXTURES,
+                                  FINDINGS_TEXT_TEMPLATE,
+                                  FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
+                                  FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, FORM_SECTIONS,
+                                  NOTES_TO_SEFA_ENTRY_FIXTURES, NOTES_TO_SEFA_TEMPLATE,
+                                  SECONDARY_AUDITORS_ENTRY_FIXTURES,
+                                  SECONDARY_AUDITORS_TEMPLATE)
+from audit.fixtures.single_audit_checklist import (fake_auditee_certification,
+                                                   fake_auditor_certification)
+from audit.forms import AuditeeCertificationStep2Form, AuditorCertificationStep1Form
+from audit.models import (Access, SingleAuditChecklist, SingleAuditReportFile,
+                          SubmissionEvent, generate_sac_report_id)
 from audit.models.models import STATUS
 from audit.views import AuditeeCertificationStep2View, MySubmissions
 from dissemination.models import FederalAward, General
@@ -359,12 +344,14 @@ class SubmissionViewTests(TestCase):
     @patch("audit.views.views.sac_transition")
     @patch("audit.views.views.remove_workbook_artifacts")
     @patch("audit.views.views.SingleAuditChecklist.disseminate")
-    def test_post_successful(self, mock_disseminate, mock_remove, mock_transition, mock_validate):
+    def test_post_successful(
+        self, mock_disseminate, mock_remove, mock_transition, mock_validate
+    ):
         """Test that a valid submission transitions SAC to a disseminated state"""
         mock_validate.return_value = []
         mock_disseminate.return_value = None
         response = self.client.post(self.url)
-        
+
         mock_validate.assert_called_once()
         mock_disseminate.assert_called_once()
         mock_transition.assert_called_with(
@@ -374,7 +361,6 @@ class SubmissionViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("audit:MySubmissions"))
-
 
     @patch("audit.views.views.SingleAuditChecklist.validate_full")
     @patch("audit.views.views.sac_transition")
