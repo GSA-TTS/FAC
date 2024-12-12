@@ -359,7 +359,8 @@ class SubmissionViewTests(TestCase):
     def test_post_successful(
         self, mock_disseminate, mock_remove, mock_transition, mock_validate
     ):
-        """Test that a valid submission transitions SAC to a disseminated state"""
+        """Test that a valid submission transitions 
+        SAC to a disseminated state"""
         mock_validate.return_value = []
         mock_disseminate.return_value = None
         response = self.client.post(self.url)
