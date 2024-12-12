@@ -301,6 +301,7 @@ class SingleAuditReportFileHandlerView(
 
 
 class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    @verify_status(STATUS.IN_PROGRESS)
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -317,6 +318,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
+    @verify_status(STATUS.IN_PROGRESS)
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -336,6 +338,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
 
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    @verify_status(STATUS.IN_PROGRESS)
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -352,6 +355,7 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
+    @verify_status(STATUS.IN_PROGRESS)
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
