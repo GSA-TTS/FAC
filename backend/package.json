@@ -25,21 +25,21 @@
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.2.5",
     "@babel/eslint-parser": "^7.25.9",
-    "@eslint/js": "^9.14.0",
-    "cypress": "^13.16.0",
+    "@eslint/js": "^9.16.0",
+    "cypress": "^13.16.1",
     "cypress-axe": "^1.5.0",
     "cypress-downloadfile": "^1.2.4",
     "cypress-file-upload": "^5.0.8",
     "cypress-otp": "^1.0.3",
-    "eslint": "^9.14.0",
+    "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-cypress": "^4.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "prettier": "^3.4.0",
-    "stylelint": "^16.1.0",
+    "prettier": "^3.4.2",
+    "stylelint": "^16.11.0",
     "stylelint-config-scss": "^1.0.0-security",
     "stylelint-config-standard": "^36.0.1",
-    "stylelint-config-standard-scss": "^13.1.0"
+    "stylelint-config-standard-scss": "^14.0.0"
   },
   "dependencies": {
     "@uswds/uswds": "3.10.0",
