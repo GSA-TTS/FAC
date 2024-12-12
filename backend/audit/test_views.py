@@ -5,25 +5,37 @@ from tempfile import NamedTemporaryFile
 from unittest.mock import patch
 
 from audit.cross_validation.naming import SECTION_NAMES as SN
-from audit.fixtures.excel import (ADDITIONAL_EINS_ENTRY_FIXTURES,
-                                  ADDITIONAL_EINS_TEMPLATE,
-                                  ADDITIONAL_UEIS_ENTRY_FIXTURES,
-                                  ADDITIONAL_UEIS_TEMPLATE,
-                                  CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
-                                  CORRECTIVE_ACTION_PLAN_TEMPLATE,
-                                  FEDERAL_AWARDS_ENTRY_FIXTURES,
-                                  FEDERAL_AWARDS_TEMPLATE, FINDINGS_TEXT_ENTRY_FIXTURES,
-                                  FINDINGS_TEXT_TEMPLATE,
-                                  FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
-                                  FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, FORM_SECTIONS,
-                                  NOTES_TO_SEFA_ENTRY_FIXTURES, NOTES_TO_SEFA_TEMPLATE,
-                                  SECONDARY_AUDITORS_ENTRY_FIXTURES,
-                                  SECONDARY_AUDITORS_TEMPLATE)
-from audit.fixtures.single_audit_checklist import (fake_auditee_certification,
-                                                   fake_auditor_certification)
+from audit.fixtures.excel import (
+    ADDITIONAL_EINS_ENTRY_FIXTURES,
+    ADDITIONAL_EINS_TEMPLATE,
+    ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    ADDITIONAL_UEIS_TEMPLATE,
+    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+    CORRECTIVE_ACTION_PLAN_TEMPLATE,
+    FEDERAL_AWARDS_ENTRY_FIXTURES,
+    FEDERAL_AWARDS_TEMPLATE,
+    FINDINGS_TEXT_ENTRY_FIXTURES,
+    FINDINGS_TEXT_TEMPLATE,
+    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
+    FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
+    FORM_SECTIONS,
+    NOTES_TO_SEFA_ENTRY_FIXTURES,
+    NOTES_TO_SEFA_TEMPLATE,
+    SECONDARY_AUDITORS_ENTRY_FIXTURES,
+    SECONDARY_AUDITORS_TEMPLATE,
+)
+from audit.fixtures.single_audit_checklist import (
+    fake_auditee_certification,
+    fake_auditor_certification,
+)
 from audit.forms import AuditeeCertificationStep2Form, AuditorCertificationStep1Form
-from audit.models import (Access, SingleAuditChecklist, SingleAuditReportFile,
-                          SubmissionEvent, generate_sac_report_id)
+from audit.models import (
+    Access,
+    SingleAuditChecklist,
+    SingleAuditReportFile,
+    SubmissionEvent,
+    generate_sac_report_id,
+)
 from audit.models.models import STATUS
 from audit.views import AuditeeCertificationStep2View, MySubmissions
 from dissemination.models import FederalAward, General
