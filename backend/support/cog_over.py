@@ -168,8 +168,9 @@ def get_dbkey(ein, uei):
 
 
 def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
-    query_years = [str(year) for year in range(base_year, audit_year + 1)]
-    if int(base_year) == FIRST_BASELINE_YEAR:
+    query_years = [str(year) for year in range(int(base_year), int(audit_year) + 1)]
+    cognizant_agency = None
+    if (int(base_year) == FIRST_BASELINE_YEAR) and (dbkey is not None):
         try:
             cognizant_agency = (
                 General.objects.filter(
@@ -183,8 +184,10 @@ def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
                 .exclude(cognizant_agency__isnull=True)
                 .exclude(cognizant_agency__exact="")
                 .order_by("-audit_year")
-                .values_list("cognizant_agency", flat=True)[0]
+                .values_list("cognizant_agency", flat=True)[:]
             )
+            if len(cognizant_agency) == 1:
+                return cognizant_agency[0]
         except General.DoesNotExist:
             cognizant_agency = None
         return cognizant_agency
@@ -198,8 +201,10 @@ def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
             .exclude(cognizant_agency__isnull=True)
             .exclude(cognizant_agency__exact="")
             .order_by("-audit_year")
-            .values_list("cognizant_agency", flat=True)[0]
+            .values_list("cognizant_agency", flat=True)[:]
         )
+        if len(cognizant_agency) == 1:
+            return cognizant_agency[0]
     except General.DoesNotExist:
         cognizant_agency = None
     return cognizant_agency

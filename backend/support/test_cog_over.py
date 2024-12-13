@@ -407,7 +407,7 @@ class CogOverTests(TestCase):
             auditee_ein=BASE_EIN,
             auditee_uei=BASE_UEI,
             total_amount_expended="210000000",
-            audit_year="2022",
+            audit_year="2019",
             cognizant_agency=BASE_COG,
         )
         gen.save()
@@ -509,6 +509,7 @@ class CogOverTests(TestCase):
         sac.general_information["auditee_fiscal_period_end"] = "2024-05-31"
         sac.general_information["auditee_fiscal_period_start"] = "2023-06-01"
         sac.report_id = "1111-03-GSAFAC-0000202460"
+        sac.general_information["audit_year"] = "2024"
 
         gen = baker.make(
             General,
@@ -551,6 +552,7 @@ class CogOverTests(TestCase):
         sac.general_information["auditee_fiscal_period_end"] = "2027-05-31"
         sac.general_information["auditee_fiscal_period_start"] = "2026-06-01"
         sac.report_id = "1111-03-GSAFAC-0000202760"
+        sac.general_information["audit_year"] = "2027"
 
         gen = baker.make(
             General,
@@ -603,6 +605,7 @@ class CogOverTests(TestCase):
         sac.general_information["auditee_fiscal_period_end"] = "2027-05-31"
         sac.general_information["auditee_fiscal_period_start"] = "2026-06-01"
         sac.report_id = "1111-03-GSAFAC-0000202761"
+        sac.general_information["audit_year"] = "2027"
 
         gen = baker.make(
             General,
