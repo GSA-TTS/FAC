@@ -2,7 +2,7 @@ terraform {
   required_version = "~> 1.0"
   required_providers {
     cloudfoundry = {
-      source = "cloudfoundry/cloudfoundry"
+      source  = "cloudfoundry/cloudfoundry"
       version = "1.1.0"
     }
     cloudfoundry-community = {
@@ -24,9 +24,9 @@ terraform {
 
 
 provider "cloudfoundry" {
-  api_url      = "https://api.fr.cloud.gov"
-  user         = var.cf_user
-  password     = var.cf_password
+  api_url  = "https://api.fr.cloud.gov"
+  user     = var.cf_user
+  password = var.cf_password
 }
 
 # Backwards compatability provider for all modules < v2.0.0
