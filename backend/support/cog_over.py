@@ -186,7 +186,7 @@ def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
                 .order_by("-audit_year")
                 .values_list("cognizant_agency", flat=True)[:]
             )
-            if len(cognizant_agency) == 1:
+            if len(cognizant_agency) >= 1:
                 return cognizant_agency[0]
         except General.DoesNotExist:
             cognizant_agency = None
@@ -203,7 +203,7 @@ def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
             .order_by("-audit_year")
             .values_list("cognizant_agency", flat=True)[:]
         )
-        if len(cognizant_agency) == 1:
+        if len(cognizant_agency) >= 1:
             return cognizant_agency[0]
     except General.DoesNotExist:
         cognizant_agency = None
