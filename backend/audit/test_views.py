@@ -2136,7 +2136,7 @@ class CrossValidationViewTests(TestCase):
         self.sac = baker.make(
             SingleAuditChecklist,
             report_id="test-report-id",
-            submission_status=STATUS.AUDITOR_CERTIFIED,
+            submission_status=STATUS.IN_PROGRESS,
             general_information={"auditee_fiscal_period_end": "2024-12-31"},
         )
         self.url = reverse(
@@ -2191,3 +2191,4 @@ class CrossValidationViewTests(TestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 403)
+        
