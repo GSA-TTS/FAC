@@ -75,9 +75,9 @@ variable "clamav_fs_instances" {
 }
 
 variable "clamav_memory" {
-  type        = number
+  type        = string
   description = "memory in MB to allocate to clamav app"
-  default     = 2048
+  default     = "2048M"
 }
 
 variable "pgrst_jwt_secret" {
