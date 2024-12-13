@@ -419,14 +419,6 @@ class CogOverTests(TestCase):
         )
         migration_inspection_record.save()
 
-        # baker.make(
-        #     CognizantBaseline,
-        #     uei=BASE_UEI,
-        #     ein=BASE_EIN,
-        #     dbkey=RESOLVABLE_DBKEY_WITH_BASELINE,
-        #     cognizant_agency=BASE_COG,
-        #     is_active=True,
-        # )
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards,
             sac.submission_status,
@@ -449,15 +441,6 @@ class CogOverTests(TestCase):
         sac.report_id = "9991-09-GSAFAC-0000201851"
         sac.save()
 
-        # baker.make(
-        #     CognizantBaseline,
-        #     uei=BASE_UEI,
-        #     ein=BASE_EIN,
-        #     cognizant_agency=BASE_COG,
-        # )
-        # cbs = CognizantBaseline.objects.all()
-        # self.assertEqual(len(cbs), 1)
-
         cog_agency, _ = compute_cog_over(
             sac.federal_awards,
             sac.submission_status,
@@ -468,8 +451,7 @@ class CogOverTests(TestCase):
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         cas = CognizantAssignment.objects.all()
         self.assertEqual(len(cas), 1)
-        # cbs = CognizantBaseline.objects.all()
-        # self.assertEqual(len(cbs), 1)
+
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(sac.cognizant_agency, cog_agency)
 
@@ -482,8 +464,7 @@ class CogOverTests(TestCase):
         ).save()
         cas = CognizantAssignment.objects.all()
         self.assertEqual(len(cas), 2)
-        # cbs = CognizantBaseline.objects.all()
-        # self.assertEqual(len(cbs), 2)
+
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(sac.cognizant_agency, oberride_cog)
 
@@ -577,15 +558,6 @@ class CogOverTests(TestCase):
             cfda.save()
 
         sac.save()
-
-        # baker.make(
-        #     CognizantBaseline,
-        #     uei="ZQGGHJH74DW7",
-        #     ein=UNIQUE_EIN_WITHOUT_DBKEY,
-        #     cognizant_agency="24",
-        # )
-        # cbs = CognizantBaseline.objects.all()
-        # self.assertEqual(len(cbs), 1)
 
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards,

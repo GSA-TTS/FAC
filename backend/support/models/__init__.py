@@ -3,7 +3,6 @@ from .cog_over import (
     CognizantAssignment,
 )
 from .cog_over import AssignmentTypeCode
-# from .cog_over import reset_baseline
 
 models = [AdminApiEvent, CognizantAssignment]
 _for_the_linter = [AssignmentTypeCode]

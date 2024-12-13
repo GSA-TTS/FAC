@@ -53,7 +53,7 @@ def compute_cog_over(
         oversight_agency = agency
         # logger.warning("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
-    # base_year = calc_base_year(audit_year)
+
     cognizant_agency = determine_hist_agency(auditee_ein, auditee_uei, audit_year)
     if cognizant_agency:
         return (cognizant_agency, oversight_agency)
@@ -106,7 +106,6 @@ def determine_hist_agency(ein, uei, audit_year):
     if int(base_year) == FIRST_BASELINE_YEAR:
         dbkey = get_dbkey(ein, uei)
 
-    # cog_agency = lookup_baseline(ein, uei, dbkey)
     cog_agency = lookup_latest_cog(ein, uei, dbkey, base_year, audit_year)
     if cog_agency:
         return cog_agency
@@ -150,21 +149,6 @@ def get_dbkey(ein, uei):
     ):
         dbkey = None
     return dbkey
-
-
-# def lookup_baseline(ein, uei, dbkey):
-#     try:
-#         cognizant_agency = CognizantBaseline.objects.values_list(
-#             "cognizant_agency", flat=True
-#         ).get(
-#             Q(is_active=True)
-#             & ((Q(ein=ein) & Q(dbkey=dbkey)) | (Q(ein=ein) & Q(uei=uei)))
-#         )[
-#             :
-#         ]
-#     except (CognizantBaseline.DoesNotExist, CognizantBaseline.MultipleObjectsReturned):
-#         cognizant_agency = None
-#     return cognizant_agency
 
 
 def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):

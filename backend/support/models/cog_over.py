@@ -1,7 +1,5 @@
 from django.apps import apps
 from django.db import models
-from django.db.models import Q
-from django.utils import timezone
 
 
 class AssignmentTypeCode:
@@ -49,8 +47,6 @@ class CognizantAssignment(models.Model):
             sac = sac_model.objects.get(report_id=self.report_id)
             sac.cognizant_agency = cognizant_agency
             sac.save()
-
-            uei, ein = sac.auditee_uei, sac.ein
 
             try:
                 gen_model = apps.get_model("dissemination.General")
