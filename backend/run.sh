@@ -45,7 +45,8 @@ gonogo "curation_audit_tracking_init"
 #####
 # CREATE STAFF USERS
 # Prepares staff users for Django admin
-python manage.py create_staffusers
+create_staffusers
+gonogo "create_staffusers"
 
 #####
 # LAUNCH THE APP

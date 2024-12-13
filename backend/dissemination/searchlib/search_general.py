@@ -45,13 +45,6 @@ def search_general(base_model, params=None):
     r_end_date = base_model.objects.filter(q_end_date)
 
     ##############
-    # Cog/Over
-    q_cogover = _get_cog_or_oversight_match_query(
-        params.get("agency_name", None), params.get("cog_or_oversight", None)
-    )
-    r_cogover = base_model.objects.filter(q_cogover)
-
-    ##############
     # Fiscal year end month
     q_fy_end_month = _get_fy_end_month_match_query(params.get("fy_end_month", None))
     r_fy_end_month = base_model.objects.filter(q_fy_end_month)
@@ -74,7 +67,6 @@ def search_general(base_model, params=None):
         & r_start_date
         & r_end_date
         & r_state
-        & r_cogover
         & r_names
         & r_uei
         & r_base
@@ -128,21 +120,6 @@ def _get_end_date_match_query(end_date):
         return Q()
 
     return Q(fac_accepted_date__lte=end_date)
-
-
-def _get_cog_or_oversight_match_query(agency_name, cog_or_oversight):
-    if not agency_name:
-        return Q()
-
-    if cog_or_oversight.lower() == "either":
-        return Q(
-            Q(cognizant_agency__in=[agency_name])
-            | Q(oversight_agency__in=[agency_name])
-        )
-    elif cog_or_oversight.lower() == "cog":
-        return Q(cognizant_agency__in=[agency_name])
-    elif cog_or_oversight.lower() == "oversight":
-        return Q(oversight_agency__in=[agency_name])
 
 
 def _get_audit_years_match_query(audit_years):
