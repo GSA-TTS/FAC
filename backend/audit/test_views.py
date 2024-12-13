@@ -2191,4 +2191,3 @@ class CrossValidationViewTests(TestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 403)
-        
