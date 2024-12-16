@@ -8,7 +8,7 @@ function handleUEIDResponse({ valid, response, errors }) {
   if (valid) {
     handleValidUei(response);
   } else {
-    handleInvalidUei(errors);
+    handleInvalidUei(errors, response);
   }
 }
 
@@ -17,9 +17,11 @@ function handleValidUei(response) {
   populateModal('success', response.auditee_name);
 }
 
-function handleInvalidUei(errors) {
+function handleInvalidUei(errors, response) {
   if (Object.keys(errors).includes('auditee_uei')) {
     populateModal('not-found');
+  } else if (errors.includes('duplicate-submission')) {
+    populateModal('duplicate-submission', undefined, response);
   }
 }
 
@@ -85,9 +87,11 @@ function resetModal() {
   document.querySelector('.uei-search-result').classList.add('loading');
 }
 
-// 'connection-error' | 'not-found' | 'success'
-function populateModal(formStatus, auditeeName) {
+// 'connection-error' | 'not-found' | 'success' | 'duplicate-submission'
+function populateModal(formStatus, auditeeName = '', response = {}) {
   const auditeeUei = document.getElementById('auditee_uei').value;
+  const auditee_fiscal_period_start = document.getElementById('auditee_fiscal_period_start').value;
+  const audit_year = (new Date(auditee_fiscal_period_start)).getFullYear()
   const modalContainerEl = document.querySelector(
     '#uei-search-result .usa-modal__main'
   );
@@ -150,11 +154,36 @@ function populateModal(formStatus, auditeeName) {
         },
       },
     },
+    'duplicate-submission': {
+      heading: 'Duplicate submission',
+      description: `
+        <dl>
+          <dt>UEI</dt>
+          <dd>${auditeeUei}</dd>
+          <dt>Audit Year</dt>
+          <dd>${audit_year}</dd>
+        </dl>
+      `,
+      buttons: {
+        primary: {
+          text: `Go back`,
+        },
+      },
+    },
   };
 
   const contentForStatus = modalContent[formStatus];
   modalHeadingEl.textContent = contentForStatus.heading;
   modalDescriptionEl.innerHTML = contentForStatus.description;
+
+  if (formStatus === "duplicate-submission"){
+    modalDescriptionEl.innerHTML += "<p>These submissions have the same UEI and audit year:</p><ul>"
+    response.duplicates.forEach((element) => 
+      modalDescriptionEl.innerHTML += `<li>${element.report_id}</li>`
+    );
+    modalDescriptionEl.innerHTML += "</ul>"
+  }
+
   modalButtonPrimaryEl.textContent = contentForStatus.buttons.primary.text;
 
   if (contentForStatus.buttons.secondary) {
@@ -173,10 +202,12 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
+  const auditee_fiscal_period_start = document.getElementById('auditee_fiscal_period_start').value;
+  const audit_year = (new Date(auditee_fiscal_period_start)).getFullYear()
 
   queryAPI(
     '/api/sac/ueivalidation',
-    { auditee_uei },
+    { auditee_uei, audit_year },
     {
       method: 'POST',
     },

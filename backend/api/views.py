@@ -22,6 +22,8 @@ from .serializers import (
     UEISerializer,
 )
 
+from dissemination.models import General
+
 UserModel = get_user_model()
 
 AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED = [
@@ -241,6 +243,27 @@ class UEIValidationFormView(APIView):
         data = request.data
         data["auditee_uei"] = data["auditee_uei"].upper()
         serializer = UEISerializer(data=data)
+
+
+        # Before checking the UEI, we want to see if this is a duplicate submission
+        print("ITS HAPPENING", data["audit_year"])
+        auditee_uei=data["auditee_uei"].upper()
+        audit_year=data["audit_year"]
+        duplicates = General.objects.filter(audit_year=audit_year, auditee_uei=auditee_uei).values("report_id")
+
+        if duplicates:
+            print("DUPLICATE(S) FOUND:", duplicates)
+            return Response(
+                {
+                    "valid": False,
+                    "response": {"duplicates": duplicates},
+                    "errors": ["duplicate-submission"]
+                }
+            )
+        else:
+            print(f"NO DUPLICATES FOR {audit_year}, {auditee_uei}")
+        
+
 
         if serializer.is_valid():
             return Response(

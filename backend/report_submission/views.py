@@ -22,6 +22,8 @@ from audit.models.models import ExcelFile
 from audit.fixtures.excel import FORM_SECTIONS
 from config.settings import STATIC_SITE_URL, STATE_ABBREVS, DOLLAR_THRESHOLDS
 
+from dissemination.models import General
+
 from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
 logger = logging.getLogger(__name__)
@@ -94,6 +96,24 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
                 "auditee_fiscal_period_end"
             ].strftime("%Y-%m-%d"),
         }
+
+        audit_year = form.cleaned_data["auditee_fiscal_period_start"].year
+        uei = form.cleaned_data["auditee_uei"].upper()
+
+        # check disseminated for duplicates
+        duplicates = General.objects.filter(audit_year=audit_year, auditee_uei=uei).values("report_id")
+
+        if duplicates:
+            form.add_error("auditee_uei", f"A record has already been submitted for UEI {uei} in Audit Year {audit_year}.")
+            return render(
+                request,
+                "report_submission/step-2.html",
+                {
+                    "form": form,
+                    "step": 2,
+                    "duplicate_report_ids": duplicates,
+                },
+            )
 
         info_check = api.views.auditee_info_check(request.user, formatted_post)
         if info_check.get("errors"):
