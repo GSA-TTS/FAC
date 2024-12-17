@@ -282,8 +282,8 @@ class CogOverTests(TestCase):
 
     def test_cog_assignment_from_hist(self):
         """
-        When we have a matching row in 2019 and nothing in the
-        baseline table, we should use the cog computed from 2019 data
+        When we have a matching row in 2019 and no cognizant agency,
+        we should use the cog computed from 2019 data
         """
         sac = self._fake_sac()
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
@@ -299,8 +299,7 @@ class CogOverTests(TestCase):
 
     def test_cog_assignment_with_no_hist(self):
         """
-        We have no match in the base sheet and we
-        have no match in 2019. So, assign from 2023"
+        We have no match in 2019. So, assign from 2023"
         """
         sac = self._fake_sac()
         sac.general_information["ein"] = EIN_2023_ONLY
@@ -316,8 +315,7 @@ class CogOverTests(TestCase):
 
     def test_cog_assignment_with_multiple_hist(self):
         """
-        We have no match in the base sheet and we
-        have duplicates in 2019. So, assign from 2023
+        We have duplicates in 2019. So, assign from 2023
         """
 
         sac = self._fake_sac()
@@ -335,8 +333,8 @@ class CogOverTests(TestCase):
     def test_cog_assignment_with_hist_resolution(self):
         """
         We have a unique dbkey for the given uei/eint in 2022,
-        and we have a match in 2019, but nothing in the baseline.
-        So, assign from 2019
+        and we have a match in 2019, but no cognizant agency in 2019 through 2022.
+        So, assign from 2019.
         """
         sac = self._fake_sac()
 
