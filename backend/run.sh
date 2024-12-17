@@ -13,6 +13,7 @@ source tools/curation_audit_tracking_init.sh
 source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
+source tools/create_staffusers.sh
 
 #####
 # SETUP THE LOCAL ENVIRONMENT
