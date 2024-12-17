@@ -57,14 +57,14 @@ def revert_to_in_progress(modeladmin, request, queryset):
     if successful_reverts:
         modeladmin.message_user(
             request,
-            f"Successfully reverted report(s) ({", ".join(successful_reverts)}) back to In Progress.",
+            f"Successfully reverted report(s) ({', '.join(successful_reverts)}) back to In Progress.",
             level=messages.SUCCESS,
         )
 
     if errors:
         modeladmin.message_user(
             request,
-            f"Unable to revert report(s) ({", ".join(errors)}) back to In Progress.",
+            f"Unable to revert report(s) ({', '.join(errors)}) back to In Progress.",
             level=messages.ERROR,
         )
 
@@ -86,14 +86,14 @@ def flag_for_removal(modeladmin, request, queryset):
     if flagged:
         modeladmin.message_user(
             request,
-            f"Successfully flagged report(s) ({", ".join(flagged)}) for removal.",
+            f"Successfully flagged report(s) ({', '.join(flagged)}) for removal.",
             level=messages.SUCCESS,
         )
 
     if already_flagged:
         modeladmin.message_user(
             request,
-            f"Report(s) ({", ".join(already_flagged)}) were already flagged.",
+            f"Report(s) ({', '.join(already_flagged)}) were already flagged.",
             level=messages.WARNING,
         )
 
