@@ -29,6 +29,41 @@ def sac_revert_from_submitted(sac):
     return False
 
 
+def sac_revert_from_flagged_for_removal(sac, user):
+    """
+    Transitions the submission_state for a SingleAuditChecklist back
+    to "in_progress" so the user can continue working on it.
+    This should be accessible to django admin.
+    """
+    if sac.submission_status == STATUS.FLAGGED_FOR_REMOVAL:
+        flow = SingleAuditChecklistFlow(sac)
+
+        flow.transition_to_in_progress_again()
+
+        with CurationTracking():
+            sac.save(
+                event_user=user,
+                event_type=SubmissionEvent.EventType.CANCEL_REMOVAL_FLAG,
+            )
+
+
+def sac_flag_for_removal(sac, user):
+    """
+    Transitions the submission_state for a SingleAuditChecklist to "flagged_for_removal".
+    This should be accessible to django admin.
+    """
+    if sac.submission_status == STATUS.IN_PROGRESS:
+        flow = SingleAuditChecklistFlow(sac)
+
+        flow.transition_to_flagged_for_removal()
+
+        with CurationTracking():
+            sac.save(
+                event_user=user,
+                event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
+            )
+
+
 def sac_transition(request, sac, **kwargs):
     """
     Transitions the submission_state for a SingleAuditChecklist (sac).
@@ -51,6 +86,14 @@ def sac_transition(request, sac, **kwargs):
         sac.save(
             event_user=user,
             event_type=SubmissionEvent.EventType.UNLOCKED_AFTER_CERTIFICATION,
+        )
+        return True
+
+    elif target == STATUS.FLAGGED_FOR_REMOVAL:
+        flow.transition_to_flagged_for_removal()
+        sac.save(
+            event_user=user,
+            event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
         )
         return True
 
@@ -128,10 +171,23 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
 
     @state.transition(
+        source=STATUS.IN_PROGRESS,
+        target=STATUS.FLAGGED_FOR_REMOVAL,
+    )
+    def transition_to_flagged_for_removal(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will be done at the view level.
+        """
+        self.sac.transition_name.append(STATUS.FLAGGED_FOR_REMOVAL)
+        self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
+
+    @state.transition(
         source=[
             STATUS.READY_FOR_CERTIFICATION,
             STATUS.AUDITOR_CERTIFIED,
             STATUS.AUDITEE_CERTIFIED,
+            STATUS.FLAGGED_FOR_REMOVAL,
         ],
         target=STATUS.IN_PROGRESS,
     )
