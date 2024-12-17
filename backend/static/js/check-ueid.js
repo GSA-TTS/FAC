@@ -22,6 +22,8 @@ function handleInvalidUei(errors, response) {
     populateModal('not-found');
   } else if (errors.includes('duplicate-submission')) {
     populateModal('duplicate-submission', undefined, response);
+  } else if (errors.includes('invalid-year')) {
+    populateModal('invalid-year');
   }
 }
 
@@ -45,6 +47,7 @@ function showValidUeiInfo() {
   const auditeeUei = document.getElementById('auditee_uei').value;
   const auditeeName = document.getElementById('auditee_name');
   const ueiInfoEl = document.createElement('div');
+  const noUeiWarning = document.getElementById('no-uei-warning');
 
   ueiInfoEl.innerHTML = `
     <dl data-testid="uei-info">
@@ -57,14 +60,14 @@ function showValidUeiInfo() {
 
   auditeeName.removeAttribute('disabled');
   auditeeName.parentNode.setAttribute('hidden', 'hidden');
-  document.getElementById('no-uei-warning').replaceWith(ueiInfoEl);
+  if (noUeiWarning) {
+    noUeiWarning.replaceWith(ueiInfoEl);
+  }
 }
 
 function setupFormWithValidUei() {
   hideUeiStuff();
   showValidUeiInfo();
-  isUEIValidated = true;
-  setFormDisabled(false);
 }
 
 function resetModal() {
@@ -170,6 +173,17 @@ function populateModal(formStatus, auditeeName = '', response = {}) {
         },
       },
     },
+    'invalid-year': {
+      heading: 'Invalid year',
+      description: `
+        <p>We can't proceed without a valid year. Please enter in a valid year for this audit.</p>
+      `,
+      buttons: {
+        primary: {
+          text: `Go back`,
+        },
+      },
+    }
   };
 
   const contentForStatus = modalContent[formStatus];
@@ -192,7 +206,9 @@ function populateModal(formStatus, auditeeName = '', response = {}) {
   }
 
   if (formStatus == 'success') {
+    isUEIValidated = true;
     modalButtonPrimaryEl.onclick = setupFormWithValidUei;
+    setFormDisabled(false);
   }
 
   document.querySelector('.uei-search-result').classList.remove('loading');
@@ -236,12 +252,11 @@ function validateFyStartDate(fyInput) {
   } else {
     fyFormGroup.classList.remove('usa-form-group--error');
   }
-
-  setFormDisabled(!allResponsesValid());
 }
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('continue');
+
   // If we want to disable the button, do it.
   if (shouldDisable) {
     continueBtn.disabled = true;
@@ -262,8 +277,10 @@ function allResponsesValid() {
 }
 
 function performValidations(field) {
-  const errors = checkValidity(field);
-  setFormDisabled(errors.length > 0);
+  checkValidity(field);
+  if (errors.length > 0) {
+    setFormDisabled(true);
+  }
 }
 
 function attachEventHandlers() {
@@ -303,6 +320,10 @@ function attachDatePickerHandlers() {
   dateInputsNeedingValidation.forEach((q) => {
     q.addEventListener('blur', (e) => {
       performValidations(e.target);
+      setFormDisabled(true);
+    });
+    q.addEventListener('input', (e) => {
+      setFormDisabled(true);
     });
   });
 }
