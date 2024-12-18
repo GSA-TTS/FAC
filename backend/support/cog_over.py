@@ -152,36 +152,28 @@ def get_dbkey(ein, uei):
 
 
 def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
+    # Note: In Census historical data,
+    #       From 2016 through 2022, (dbkey, ein) is the identifier for audits through 2021.
+    #       In 2022, entities transitioned from dbkey to uei.  2022 data contains dbkey, ein and uei.
+    #       From 2022 on, (ein, uei) is the identifier for audits.
     query_years = [str(year) for year in range(int(base_year), int(audit_year) + 1)]
     cognizant_agency = None
+
+    first_base_year_query_section = (
+        Q(auditee_ein=ein)
+        & Q(report_id__icontains=dbkey)
+        & Q(report_id__icontains="CENSUS")
+    )
+    other_year_query_section = Q(auditee_ein=ein) & Q(auditee_uei=uei)
+
     if (int(base_year) == FIRST_BASELINE_YEAR) and (dbkey is not None):
-        try:
-            cognizant_agency = (
-                General.objects.filter(
-                    Q(audit_year__in=query_years)
-                    & (
-                        Q(auditee_ein=ein)
-                        & Q(report_id__icontains=dbkey)
-                        & Q(report_id__icontains="CENSUS")
-                    )
-                )
-                .exclude(cognizant_agency__isnull=True)
-                .exclude(cognizant_agency__exact="")
-                .order_by("-audit_year")
-                .values_list("cognizant_agency", flat=True)[:]
-            )
-            if len(cognizant_agency) >= 1:
-                return cognizant_agency[0]
-        except General.DoesNotExist:
-            cognizant_agency = None
-        return cognizant_agency
+        query_subsection = first_base_year_query_section
+    else:
+        query_subsection = other_year_query_section
 
     try:
         cognizant_agency = (
-            General.objects.filter(
-                Q(audit_year__in=query_years)
-                & (Q(auditee_ein=ein) & Q(auditee_uei=uei))
-            )
+            General.objects.filter(Q(audit_year__in=query_years) & (query_subsection))
             .exclude(cognizant_agency__isnull=True)
             .exclude(cognizant_agency__exact="")
             .order_by("-audit_year")
