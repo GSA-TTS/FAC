@@ -166,10 +166,9 @@ def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
     )
     other_year_query_section = Q(auditee_ein=ein) & Q(auditee_uei=uei)
 
+    query_subsection = other_year_query_section
     if (int(base_year) == FIRST_BASELINE_YEAR) and (dbkey is not None):
         query_subsection = first_base_year_query_section
-    else:
-        query_subsection = other_year_query_section
 
     try:
         cognizant_agency = (
