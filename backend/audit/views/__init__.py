@@ -14,6 +14,7 @@ from .pre_dissemination_download_view import (
     PredisseminationPdfDownloadView,
     PredisseminationSummaryReportDownloadView,
 )
+from .remove_submission_in_progress import RemoveSubmissionView
 from .submission_progress_view import (  # noqa
     SubmissionProgressView,
     submission_progress_check,
@@ -67,4 +68,5 @@ views_list = [
     TribalDataConsent,
     UnlockAfterCertificationView,
     UploadReportView,
+    RemoveSubmissionView,
 ]

@@ -171,6 +171,7 @@ class STATUS:
     CERTIFIED = "certified"
     SUBMITTED = "submitted"
     DISSEMINATED = "disseminated"
+    FLAGGED_FOR_REMOVAL = "flagged_for_removal"
 
 
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
@@ -303,6 +304,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Constants:
     STATUS_CHOICES = (
         (STATUS.IN_PROGRESS, "In Progress"),
+        (STATUS.FLAGGED_FOR_REMOVAL, "Flagged for Removal"),
         (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
         (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
         (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),

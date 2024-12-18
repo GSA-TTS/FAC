@@ -4,7 +4,7 @@ from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Q
 from django.db.transaction import TransactionManagementError
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -125,7 +125,9 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         """
         accesses = Access.objects.filter(user=user)
         sac_ids = [access.sac.id for access in accesses]
-        data = SingleAuditChecklist.objects.filter(id__in=sac_ids).values(
+        data = SingleAuditChecklist.objects.filter(
+            Q(id__in=sac_ids) & ~Q(submission_status=STATUS.FLAGGED_FOR_REMOVAL)
+        ).values(
             "report_id",
             "submission_status",
             auditee_uei=F("general_information__auditee_uei"),

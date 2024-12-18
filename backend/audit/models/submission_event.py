@@ -42,6 +42,8 @@ class SubmissionEvent(models.Model):
         SUBMITTED = "submitted"
         DISSEMINATED = "disseminated"
         TRIBAL_CONSENT_UPDATED = "tribal-consent-updated"
+        FLAGGED_SUBMISSION_FOR_REMOVAL = "flagged-submission-for-removal"
+        CANCEL_REMOVAL_FLAG = "cancel-removal-flag"
 
     EVENT_TYPES = (
         (EventType.ACCESS_GRANTED, _("Access granted")),
@@ -96,6 +98,11 @@ class SubmissionEvent(models.Model):
         (EventType.SUBMITTED, _("Submitted to the FAC for processing")),
         (EventType.DISSEMINATED, _("Copied to dissemination tables")),
         (EventType.TRIBAL_CONSENT_UPDATED, _("Tribal audit consent updated")),
+        (
+            EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
+            _("Flagged submission for removal"),
+        ),
+        (EventType.CANCEL_REMOVAL_FLAG, _("Cancel removal flag")),
     )
 
     sac = models.ForeignKey("audit.SingleAuditChecklist", on_delete=models.CASCADE)

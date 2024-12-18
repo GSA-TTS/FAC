@@ -85,6 +85,8 @@
                 href="{{ add_editor_url }}">Add editor</a>
             <a class="usa-button usa-button--unstyled margin-left-2"
                 href="{{ progress_url }}">Return to checklist</a>
+            <a class="usa-button usa-button--unstyled margin-left-2"
+                href="{% url 'audit:MySubmissions' %}">Return to Submissions</a>
         </div>
     </div>
     {% include "audit-metadata.html" %}
