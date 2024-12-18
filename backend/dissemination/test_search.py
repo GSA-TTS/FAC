@@ -627,9 +627,46 @@ class SearchALNTests(TestMaterializedViewBuilder):
 
 
 class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
+    def test_search_federal_program_name(self):
+        """
+        When making a search on federal program name, search_federal_program_name
+        should only return records with an award of that type.
+        """
+        general_foo = baker.make(General)
+        baker.make(
+            FederalAward,
+            report_id=general_foo,
+            federal_program_name="Foo",
+        )
+        general_bar = baker.make(General)
+        baker.make(
+            FederalAward,
+            report_id=general_bar,
+            federal_program_name="Bar",
+        )
+        self.refresh_materialized_view()
+
+        adv_params = {"advanced_search_flag": True}
+
+        # Search for multiple program valid names
+        params = {"agency_name": None, "federal_program_name": ["Foo", "Bar"], **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 2)
+
+        # Search for a single valid program name
+        params = {"agency_name": None, "federal_program_name": ["Foo"], **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+
+        # Search for an invalid program name
+        params = {"agency_name": None, "federal_program_name": ["Baz"], **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 0)
+
     def test_search_cog_or_oversight(self):
         """
-        When making a search on major program, search_general should only return records with an award of that type.
+        When making a search on major program, search_cog_or_oversight should
+        only return records with an award of that type.
         """
         general_cog = baker.make(
             General,
@@ -674,6 +711,7 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         results = search(params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_over.report_id)
+
 
     def test_search_findings(self):
         """
