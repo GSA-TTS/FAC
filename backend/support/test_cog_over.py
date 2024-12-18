@@ -609,3 +609,69 @@ class CogOverTests(TestCase):
         )
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
+
+    def test_cog_assignment_for_2027_w_base_to_2026_cog(self):
+        sac = self._fake_sac()
+        sac.general_information["auditee_uei"] = "ZQGGHJH74DW7"
+        sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
+        sac.general_information["report_id"] = "1111-03-GSAFAC-0000202760"
+        sac.general_information["auditee_fiscal_period_end"] = "2027-05-31"
+        sac.general_information["auditee_fiscal_period_start"] = "2026-06-01"
+        sac.report_id = "1111-03-GSAFAC-0000202760"
+        sac.general_information["audit_year"] = "2027"
+
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202460",
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            total_amount_expended="210000000",
+            audit_year="2024",
+            cognizant_agency="24",
+        )
+        gen.save()
+
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202560",
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            total_amount_expended="200000000",
+            audit_year="2025",
+            cognizant_agency="14",
+        )
+        gen.save()
+
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202660",
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            total_amount_expended="200000000",
+            audit_year="2026",
+            cognizant_agency="04",
+        )
+        gen.save()
+
+        for i in range(6):
+            cfda = baker.make(
+                FederalAward,
+                report_id=gen,
+                federal_agency_prefix="14",
+                federal_award_extension="032",
+                amount_expended=10_000_000 * i,
+                is_direct="Y",
+            )
+            cfda.save()
+
+        sac.save()
+
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards,
+            sac.submission_status,
+            sac.general_information["ein"],
+            sac.general_information["auditee_uei"],
+            sac.general_information["audit_year"],
+        )
+        self.assertEqual(cog_agency, "04")
+        self.assertEqual(over_agency, None)
