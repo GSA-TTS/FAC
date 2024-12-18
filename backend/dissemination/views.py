@@ -122,6 +122,7 @@ def run_search(form_data):
             "alns": form_data["aln"],
             "cog_or_oversight": form_data["cog_or_oversight"],
             "direct_funding": form_data["direct_funding"],
+            "federal_program_name": form_data["federal_program_name"],
             "findings": form_data["findings"],
             "major_program": form_data["major_program"],
             "passthrough_name": form_data["passthrough_name"],
