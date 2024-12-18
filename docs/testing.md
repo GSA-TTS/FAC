@@ -200,7 +200,7 @@ Though keep in mind you should be able to use whatever API service you prefer to
 ## Checklist
 
 1. When running `docker compose up`, make sure the `web-1` service completes the startup procedures.
-    - E.G., `STARTUP STARTUP_CHECK seed_cog_baseline PASS` should be one of the last startup logs. If this passes, then the API tables are up.
+    - E.G., `STARTUP STARTUP_CHECK CREATE_STAFFUSERS PASS` should be one of the last startup logs. If this passes, then the API tables are up.
 2. Make sure you prepare your request headers with the following:
     - `Authorization: Bearer {JWT}` is important for authenticating your requests.
     - `x-api-user-id: {uuid}` should be populated with a user ID from the `support_administrative_key_uuids` table. You can create your own row in this table for local testing purposes.
