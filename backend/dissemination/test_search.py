@@ -723,7 +723,6 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_over.report_id)
 
-
     def test_search_findings(self):
         """
         When making a search on a particular type of finding, search_general should only return records with a finding of that type.
