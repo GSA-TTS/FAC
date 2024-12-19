@@ -1,8 +1,10 @@
 from datetime import timedelta
 from itertools import chain
+import datetime
 import json
 import logging
 
+from dissemination.models import General
 from django.db import models
 from django.db.transaction import TransactionManagementError
 from django.conf import settings
@@ -238,6 +240,27 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             return {"errors": [err]}
 
         return None
+
+    def is_duplicate(self):
+        """
+        Validates whether the SAC contains identical information to disseminated records.
+        """
+        general_information = self.general_information
+
+        audit_year = general_information.get("auditee_fiscal_period_end")
+        uei = general_information.get("auditee_uei")
+
+        if audit_year and uei:
+
+            # extract date from year.
+            audit_year = datetime.datetime.strptime(audit_year, "%Y-%m-%d").year
+
+            # check disseminated.
+            return General.objects.filter(
+                audit_year=audit_year, auditee_uei=uei
+            ).exists()
+
+        return False
 
     def assign_cog_over(self):
         """

@@ -33,34 +33,32 @@
                             <strong>Entity UEI <a>Unique Entity Identifier</a></strong><abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                         </p>
                         <div class="usa-hint margin-y-05" id="auditee_uei_hint">12-character alphanumeric ID</div>
-                        <div class="usa-search" role="search">
-                            <label class="usa-sr-only" for="auditee_uei">Search</label>
+                        <div class="usa-search">
                             <input class="usa-input"
                                 id="auditee_uei"
-                                type="search"
                                 name="auditee_uei"
                                 required
                                 data-validate-not-null=""
                                 data-validate-length="== 12"
                                 aria-autocomplete="inline"/>
-                            <button class="usa-button"
-                                id="auditee_uei-btn"
-                                type="submit"
-                                aria-controls="uei-search-result"
-                                data-open-modal>
-                                <span class="usa-search__submit-text">
-                                    <svg class="usa-icon usa-icon--size-3 margin-right-1" aria-hidden="true" focusable="false" role="img">
-                                        {% uswds_sprite "verified" %}
-                                    </svg>
-                                    <p class="margin-0 text-no-wrap">Validate UEI</p>
-                                </span>
-                            </button>
                         </div>
                         <ul class="usa-error-message" id="auditee_uei-error-message" role="alert">
                             <li id="auditee_uei-not-null" hidden>Can&#39;t be null</li>
                             <li id="auditee_uei-length" hidden>UEI is twelve characters long</li>
                         </ul>
                         <span class="usa-error-message margin-top-1">{{ form.auditee_uei.errors|striptags }}</span>
+                        {% if duplicate_report_ids %}
+                        <span class="usa-error-message margin-top-1">
+                            Here they are!
+                            <ul>
+                                {% for x in duplicate_report_ids %}
+                                    <li>
+                                        <a class="usa-link" href="{% url 'dissemination:Summary' report_id=x.report_id %}">{{ x.report_id }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </span>
+                        {% endif %}
                     </div>
                     <div class="usa-form-group">
                         <label for="auditee_name" hidden>Auditee name</label>
@@ -133,6 +131,18 @@
                         </div>
                     </div>
                 </fieldset>
+                <button class="usa-button"
+                    id="auditee_uei-btn"
+                    type="submit"
+                    aria-controls="uei-search-result"
+                    data-open-modal>
+                    <span class="usa-search__submit-text">
+                        <svg class="usa-icon usa-icon--size-3 margin-right-1" aria-hidden="true" focusable="false" role="img">
+                            {% uswds_sprite "verified" %}
+                        </svg>
+                        <p class="margin-0 text-no-wrap">Validate UEI</p>
+                    </span>
+                </button>
                 <ul class="usa-button-group">
                     <li class="usa-button-group__item">
                         <button class="usa-button" id="continue">Continue</button>
