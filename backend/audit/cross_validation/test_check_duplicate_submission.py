@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import timedelta
 from model_bakery import baker
 
 from django.test import TestCase

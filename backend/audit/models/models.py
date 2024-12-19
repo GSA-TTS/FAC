@@ -84,14 +84,14 @@ def is_resubmission(uei, ay):
     """
 
     # resubmission was permitted by a staff user.
-    if ResubmissionWaiver.objects.filter(uei=uei, audit_year=ay, expiration__lte=datetime.datetime.today()).exists():
+    if ResubmissionWaiver.objects.filter(
+        uei=uei, audit_year=ay, expiration__lte=datetime.datetime.today()
+    ).exists():
         return False
 
     # check if a duplicate disseminated record already exists.
     else:
-        return General.objects.filter(
-            audit_year=ay, auditee_uei=uei
-        ).exists()
+        return General.objects.filter(audit_year=ay, auditee_uei=uei).exists()
 
 
 class SingleAuditChecklistManager(models.Manager):
@@ -754,17 +754,12 @@ class SacValidationWaiver(models.Model):
         default=list,
     )
 
-class ResubmissionWaiver(models.Model):
-    """ Enables a disseminated record to be re-submitted. """
 
-    uei = models.TextField(
-        "UEI",
-        null=True
-    )
-    audit_year = models.TextField(
-        "Audit Year",
-        null=True
-    )
+class ResubmissionWaiver(models.Model):
+    """Enables a disseminated record to be re-submitted."""
+
+    uei = models.TextField("UEI", null=True)
+    audit_year = models.TextField("Audit Year", null=True)
     assigned_by = models.TextField(
         "Assigned by",
     )

@@ -329,11 +329,7 @@ class ResubmissionWaiverAdmin(admin.ModelAdmin):
         "timestamp",
         "expiration",
     )
-    fields = (
-        "uei",
-        "audit_year",
-        "expiration"
-    )
+    fields = ("uei", "audit_year", "expiration")
     readonly_fields = ("timestamp",)
 
     def has_add_permission(self, request, obj=None):
