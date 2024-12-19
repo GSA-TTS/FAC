@@ -8,7 +8,7 @@ function handleUEIDResponse({ valid, response, errors }) {
   if (valid) {
     handleValidUei(response);
   } else {
-    handleInvalidUei(errors);
+    handleInvalidUei(errors, response);
   }
 }
 
@@ -17,9 +17,13 @@ function handleValidUei(response) {
   populateModal('success', response.auditee_name);
 }
 
-function handleInvalidUei(errors) {
+function handleInvalidUei(errors, response) {
   if (Object.keys(errors).includes('auditee_uei')) {
     populateModal('not-found');
+  } else if (errors.includes('duplicate-submission')) {
+    populateModal('duplicate-submission', undefined, response);
+  } else if (errors.includes('invalid-year')) {
+    populateModal('invalid-year');
   }
 }
 
@@ -43,6 +47,7 @@ function showValidUeiInfo() {
   const auditeeUei = document.getElementById('auditee_uei').value;
   const auditeeName = document.getElementById('auditee_name');
   const ueiInfoEl = document.createElement('div');
+  const noUeiWarning = document.getElementById('no-uei-warning');
 
   ueiInfoEl.innerHTML = `
     <dl data-testid="uei-info">
@@ -55,14 +60,14 @@ function showValidUeiInfo() {
 
   auditeeName.removeAttribute('disabled');
   auditeeName.parentNode.setAttribute('hidden', 'hidden');
-  document.getElementById('no-uei-warning').replaceWith(ueiInfoEl);
+  if (noUeiWarning) {
+    noUeiWarning.replaceWith(ueiInfoEl);
+  }
 }
 
 function setupFormWithValidUei() {
   hideUeiStuff();
   showValidUeiInfo();
-  isUEIValidated = true;
-  setFormDisabled(false);
 }
 
 function resetModal() {
@@ -85,9 +90,11 @@ function resetModal() {
   document.querySelector('.uei-search-result').classList.add('loading');
 }
 
-// 'connection-error' | 'not-found' | 'success'
-function populateModal(formStatus, auditeeName) {
+// 'connection-error' | 'not-found' | 'success' | 'duplicate-submission'
+function populateModal(formStatus, auditeeName = '', response = {}) {
   const auditeeUei = document.getElementById('auditee_uei').value;
+  const auditee_fiscal_period_start = document.getElementById('auditee_fiscal_period_start').value;
+  const audit_year = (new Date(auditee_fiscal_period_start)).getFullYear()
   const modalContainerEl = document.querySelector(
     '#uei-search-result .usa-modal__main'
   );
@@ -150,11 +157,47 @@ function populateModal(formStatus, auditeeName) {
         },
       },
     },
+    'duplicate-submission': {
+      heading: 'Duplicate submission',
+      description: `
+        <dl>
+          <dt>UEI</dt>
+          <dd>${auditeeUei}</dd>
+          <dt>Audit Year</dt>
+          <dd>${audit_year}</dd>
+        </dl>
+      `,
+      buttons: {
+        primary: {
+          text: `Go back`,
+        },
+      },
+    },
+    'invalid-year': {
+      heading: 'Invalid year',
+      description: `
+        <p>We can't proceed without a valid year. Please enter in a valid year for this audit.</p>
+      `,
+      buttons: {
+        primary: {
+          text: `Go back`,
+        },
+      },
+    }
   };
 
   const contentForStatus = modalContent[formStatus];
   modalHeadingEl.textContent = contentForStatus.heading;
   modalDescriptionEl.innerHTML = contentForStatus.description;
+
+  if (formStatus === "duplicate-submission"){
+    modalDescriptionEl.innerHTML += "<p>These submissions have the same UEI and audit year:</p><ul>"
+    response.duplicates.forEach((element) => 
+      modalDescriptionEl.innerHTML += `<li>${element.report_id}</li>`
+    );
+    modalDescriptionEl.innerHTML += "</ul>"
+  }
+
   modalButtonPrimaryEl.textContent = contentForStatus.buttons.primary.text;
 
   if (contentForStatus.buttons.secondary) {
@@ -163,7 +206,9 @@ function populateModal(formStatus, auditeeName) {
   }
 
   if (formStatus == 'success') {
+    isUEIValidated = true;
     modalButtonPrimaryEl.onclick = setupFormWithValidUei;
+    setFormDisabled(false);
   }
 
   document.querySelector('.uei-search-result').classList.remove('loading');
@@ -173,10 +218,12 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
+  const auditee_fiscal_period_start = document.getElementById('auditee_fiscal_period_start').value;
+  const audit_year = (new Date(auditee_fiscal_period_start)).getFullYear()
 
   queryAPI(
     '/api/sac/ueivalidation',
-    { auditee_uei },
+    { auditee_uei, audit_year },
     {
       method: 'POST',
     },
@@ -205,12 +252,11 @@ function validateFyStartDate(fyInput) {
   } else {
     fyFormGroup.classList.remove('usa-form-group--error');
   }
-
-  setFormDisabled(!allResponsesValid());
 }
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('continue');
+
   // If we want to disable the button, do it.
   if (shouldDisable) {
     continueBtn.disabled = true;
@@ -232,7 +278,9 @@ function allResponsesValid() {
 
 function performValidations(field) {
   const errors = checkValidity(field);
-  setFormDisabled(errors.length > 0);
+  if (errors.length > 0) {
+    setFormDisabled(true);
+  }
 }
 
 function attachEventHandlers() {
@@ -272,7 +320,9 @@ function attachDatePickerHandlers() {
   dateInputsNeedingValidation.forEach((q) => {
     q.addEventListener('blur', (e) => {
       performValidations(e.target);
+      setFormDisabled(true);
     });
+    q.addEventListener('input', setFormDisabled(true));
   });
 }
 

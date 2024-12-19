@@ -141,8 +141,8 @@ class EligibilityViewTests(TestCase):
 
 class UEIValidationViewTests(TestCase):
     PATH = reverse("api-uei-validation")
-    SUCCESS = {"auditee_uei": "ZQGGHJH74DW7"}
-    INELIGIBLE = {"auditee_uei": "000000000OI*"}
+    SUCCESS = {"auditee_uei": "ZQGGHJH74DW7", "audit_year": "2024"}
+    INELIGIBLE = {"auditee_uei": "000000000OI*", "audit_year": "2024"}
 
     def test_auth_required(self):
         """

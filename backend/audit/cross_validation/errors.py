@@ -45,6 +45,10 @@ def err_certifying_contacts_should_not_match():
     return "The certifying auditor and auditee should not have the same email address."
 
 
+def err_duplicate_submission():
+    return "This is a duplicate submission."
+
+
 def err_biennial_low_risk():
     return (
         "According to Uniform Guidance section 200.520(a), biennial audits cannot "

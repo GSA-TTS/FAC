@@ -64,6 +64,7 @@ from .check_award_reference_uniqueness import check_award_reference_uniqueness
 from .check_finding_prior_references import check_finding_prior_references
 from .check_biennial_low_risk import check_biennial_low_risk
 from .check_certifying_contacts import check_certifying_contacts
+from .check_duplicate_submission import check_duplicate_submission
 from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
 from .check_findings_count_consistency import check_findings_count_consistency
 from .check_has_federal_awards import check_has_federal_awards
@@ -82,6 +83,7 @@ functions = [
     check_award_reference_uniqueness,
     check_biennial_low_risk,
     check_certifying_contacts,
+    check_duplicate_submission,
     check_finding_reference_uniqueness,
     check_finding_prior_references,
     check_findings_count_consistency,

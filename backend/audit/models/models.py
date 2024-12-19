@@ -1,5 +1,6 @@
 from datetime import timedelta
 from itertools import chain
+import datetime
 import json
 import logging
 
@@ -35,6 +36,7 @@ from audit.validators import (
     validate_component_page_numbers,
 )
 from audit.utils import FORM_SECTION_HANDLERS
+from dissemination.models import General
 from support.cog_over import compute_cog_over, record_cog_assignment
 from .submission_event import SubmissionEvent
 
@@ -74,6 +76,22 @@ def generate_sac_report_id(end_date=None, source="GSAFAC", count=None):
 
 def one_month_from_today():
     return django_timezone.now() + timedelta(days=30)
+
+
+def is_resubmission(uei, ay):
+    """
+    Validate that there is a disseminated record with matching UEI and audit year.
+    """
+
+    # resubmission was permitted by a staff user.
+    if ResubmissionWaiver.objects.filter(
+        uei=uei, audit_year=ay, expiration__lte=datetime.datetime.today()
+    ).exists():
+        return False
+
+    # check if a duplicate disseminated record already exists.
+    else:
+        return General.objects.filter(audit_year=ay, auditee_uei=uei).exists()
 
 
 class SingleAuditChecklistManager(models.Manager):
@@ -238,6 +256,23 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             return {"errors": [err]}
 
         return None
+
+    def is_duplicate(self):
+        """
+        Validates whether the SAC contains identical information to disseminated records.
+        """
+        general_information = self.general_information
+
+        # extract audit year from fiscal period start date.
+        fiscal_period_start = general_information.get("auditee_fiscal_period_start")
+        audit_year = datetime.datetime.strptime(fiscal_period_start, "%Y-%m-%d").year
+
+        uei = general_information.get("auditee_uei")
+
+        if audit_year and uei:
+            return is_resubmission(uei, audit_year)
+
+        return False
 
     def assign_cog_over(self):
         """
@@ -717,4 +752,22 @@ class SacValidationWaiver(models.Model):
         ),
         verbose_name="The waiver type",
         default=list,
+    )
+
+
+class ResubmissionWaiver(models.Model):
+    """Enables a disseminated record to be re-submitted."""
+
+    uei = models.TextField("UEI", null=True)
+    audit_year = models.TextField("Audit Year", null=True)
+    assigned_by = models.TextField(
+        "Assigned by",
+    )
+    expiration = models.DateTimeField(
+        "Expiration",
+        default=one_month_from_today,
+    )
+    timestamp = models.DateTimeField(
+        "Created",
+        default=django_timezone.now,
     )

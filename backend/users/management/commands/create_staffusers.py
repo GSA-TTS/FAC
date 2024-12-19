@@ -23,6 +23,7 @@ class Command(BaseCommand):
             "view_singleauditchecklist",
             "view_sacvalidationwaiver",
             "view_ueivalidationwaiver",
+            "view_resubmissionwaiver",
             "view_additionalein",
             "view_additionaluei",
             "view_captext",
@@ -55,6 +56,9 @@ class Command(BaseCommand):
             "delete_tribalapiaccesskeyids",
             "add_sacvalidationwaiver",
             "add_ueivalidationwaiver",
+            "add_resubmissionwaiver",
+            "change_resubmissionwaiver",
+            "delete_resubmissionwaiver",
             "add_cognizantassignment",
         ]
         group_helpdesk.permissions.clear()

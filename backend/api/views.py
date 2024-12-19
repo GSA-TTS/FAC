@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 
 from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
 from audit.models import Access, SingleAuditChecklist, SubmissionEvent
+from audit.models.models import is_resubmission
 from audit.permissions import SingleAuditChecklistPermission
 from .serializers import (
     AccessAndSubmissionSerializer,
@@ -21,6 +22,8 @@ from .serializers import (
     SingleAuditChecklistSerializer,
     UEISerializer,
 )
+
+from dissemination.models import General
 
 UserModel = get_user_model()
 
@@ -241,6 +244,27 @@ class UEIValidationFormView(APIView):
         data = request.data
         data["auditee_uei"] = data["auditee_uei"].upper()
         serializer = UEISerializer(data=data)
+
+        # Before checking the UEI, we want to see if this is a duplicate submission
+        auditee_uei = data["auditee_uei"].upper()
+        audit_year = data.get("audit_year")
+
+        # verify that there is an audit year.
+        if not audit_year:
+            return Response({"valid": False, "errors": ["invalid-year"]})
+
+        duplicates = General.objects.filter(
+            audit_year=audit_year, auditee_uei=auditee_uei
+        ).values("report_id")
+
+        if is_resubmission(auditee_uei, audit_year):
+            return Response(
+                {
+                    "valid": False,
+                    "response": {"duplicates": duplicates},
+                    "errors": ["duplicate-submission"],
+                }
+            )
 
         if serializer.is_valid():
             return Response(
