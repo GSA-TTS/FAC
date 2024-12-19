@@ -175,7 +175,7 @@ class AdvancedSearchForm(forms.Form):
 
     def clean_federal_program_name(self):
         """
-        Clean the federal p[rogram name field. We can't trust that separators aren't a part of
+        Clean the federal program name field. We can't trust that separators aren't a part of
         a name somewhere, so just split on newlines.
         """
         text_input = self.cleaned_data["federal_program_name"]

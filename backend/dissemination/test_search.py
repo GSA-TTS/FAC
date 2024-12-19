@@ -644,24 +644,35 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
             report_id=general_bar,
             federal_program_name="Bar",
         )
+        general_yub_nub = baker.make(General)
+        baker.make(
+            FederalAward,
+            report_id=general_yub_nub,
+            federal_program_name="Yub Nub",
+        )
         self.refresh_materialized_view()
 
         adv_params = {"advanced_search_flag": True}
 
         # Search for multiple program valid names
-        params = {"agency_name": None, "federal_program_name": ["Foo", "Bar"], **adv_params}
+        params = {"federal_program_name": ["Foo", "Bar"], **adv_params}
         results = search(params)
         self.assertEqual(len(results), 2)
 
         # Search for a single valid program name
-        params = {"agency_name": None, "federal_program_name": ["Foo"], **adv_params}
+        params = {"federal_program_name": ["Foo"], **adv_params}
         results = search(params)
         self.assertEqual(len(results), 1)
 
         # Search for an invalid program name
-        params = {"agency_name": None, "federal_program_name": ["Baz"], **adv_params}
+        params = {"federal_program_name": ["Baz"], **adv_params}
         results = search(params)
         self.assertEqual(len(results), 0)
+
+        # Handle delimiters, ignore case
+        params = {"federal_program_name": ["nub,yub"], **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 1)
 
     def test_search_cog_or_oversight(self):
         """
