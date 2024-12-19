@@ -247,15 +247,15 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """
         general_information = self.general_information
 
-        audit_year = general_information.get("auditee_fiscal_period_end")
+        # extract audit year from fiscal period start date.
+        fiscal_period_start = general_information.get("auditee_fiscal_period_start")
+        audit_year = datetime.datetime.strptime(fiscal_period_start, "%Y-%m-%d").year
+
         uei = general_information.get("auditee_uei")
 
         if audit_year and uei:
-
-            # extract date from year.
-            audit_year = datetime.datetime.strptime(audit_year, "%Y-%m-%d").year
-
             # check disseminated.
+            # TODO: also check for a waiver from admin
             return General.objects.filter(
                 audit_year=audit_year, auditee_uei=uei
             ).exists()
