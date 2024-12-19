@@ -3,7 +3,6 @@ from .search_constants import text_input_delimiters
 
 from django.db.models import Q
 
-import logging
 import time
 
 
