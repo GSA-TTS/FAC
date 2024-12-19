@@ -322,9 +322,7 @@ function attachDatePickerHandlers() {
       performValidations(e.target);
       setFormDisabled(true);
     });
-    q.addEventListener('input', (e) => {
-      setFormDisabled(true);
-    });
+    q.addEventListener('input', setFormDisabled(true));
   });
 }
 
