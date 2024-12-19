@@ -245,25 +245,22 @@ class UEIValidationFormView(APIView):
         serializer = UEISerializer(data=data)
 
         # Before checking the UEI, we want to see if this is a duplicate submission
-        auditee_uei=data["auditee_uei"].upper()
-        audit_year=data["audit_year"]
+        auditee_uei = data["auditee_uei"].upper()
+        audit_year = data["audit_year"]
 
         # verify that there is an audit year.
         if not audit_year:
-            return Response(
-                {
-                    "valid": False,
-                    "errors": ["invalid-year"]
-                }
-            )
+            return Response({"valid": False, "errors": ["invalid-year"]})
 
-        duplicates = General.objects.filter(audit_year=audit_year, auditee_uei=auditee_uei).values("report_id")
+        duplicates = General.objects.filter(
+            audit_year=audit_year, auditee_uei=auditee_uei
+        ).values("report_id")
         if duplicates:
             return Response(
                 {
                     "valid": False,
                     "response": {"duplicates": duplicates},
-                    "errors": ["duplicate-submission"]
+                    "errors": ["duplicate-submission"],
                 }
             )
 

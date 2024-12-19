@@ -101,10 +101,15 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
         uei = form.cleaned_data["auditee_uei"].upper()
 
         # check disseminated for duplicates
-        duplicates = General.objects.filter(audit_year=audit_year, auditee_uei=uei).values("report_id")
+        duplicates = General.objects.filter(
+            audit_year=audit_year, auditee_uei=uei
+        ).values("report_id")
 
         if duplicates:
-            form.add_error("auditee_uei", f"A record has already been submitted for UEI {uei} in Audit Year {audit_year}.")
+            form.add_error(
+                "auditee_uei",
+                f"A record has already been submitted for UEI {uei} in Audit Year {audit_year}.",
+            )
             return render(
                 request,
                 "report_submission/step-2.html",

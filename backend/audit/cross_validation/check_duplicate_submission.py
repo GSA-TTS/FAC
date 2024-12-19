@@ -11,7 +11,7 @@ def check_duplicate_submission(sac_dict, *_args, **_kwargs):
     """
     all_sections = sac_dict["sf_sac_sections"]
     general_information = all_sections.get("general_information", {})
-    
+
     fiscal_period_start = general_information.get("auditee_fiscal_period_start")
 
     audit_year = datetime.strptime(fiscal_period_start, "%Y-%m-%d").year
@@ -21,9 +21,7 @@ def check_duplicate_submission(sac_dict, *_args, **_kwargs):
         return []
 
     # check disseminated.
-    is_duplicate =  General.objects.filter(
-        audit_year=audit_year, auditee_uei=uei
-    )
+    is_duplicate = General.objects.filter(audit_year=audit_year, auditee_uei=uei)
 
     # Check for admin permission. Loop through duplicates and ensure there is admin permission for each report_id
     # Or just check the latest duplicate for permission, to try and prevent double-firing a resubmission
