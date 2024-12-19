@@ -14,7 +14,13 @@ from audit.cross_validation import sac_validation_shape
 from audit.cross_validation.naming import NC, SECTION_NAMES as SN
 from audit.cross_validation.submission_progress_check import section_completed_metadata
 
-from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
+from audit.models import (
+    Access,
+    SingleAuditChecklist,
+    LateChangeError,
+    SubmissionEvent,
+    is_resubmission,
+)
 from audit.validators import validate_general_information_json
 
 from audit.utils import Util
@@ -100,16 +106,15 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
         audit_year = form.cleaned_data["auditee_fiscal_period_start"].year
         uei = form.cleaned_data["auditee_uei"].upper()
 
-        # check disseminated for duplicates
-        duplicates = General.objects.filter(
-            audit_year=audit_year, auditee_uei=uei
-        ).values("report_id")
-
-        if duplicates:
+        # If there's duplicate submission and no waiver, get the duplicates and inform the user
+        if is_resubmission(uei, audit_year):
             form.add_error(
                 "auditee_uei",
                 f"A record has already been submitted for UEI {uei} in Audit Year {audit_year}.",
             )
+            duplicates = General.objects.filter(
+                audit_year=audit_year, auditee_uei=uei
+            ).values("report_id")
             return render(
                 request,
                 "report_submission/step-2.html",
