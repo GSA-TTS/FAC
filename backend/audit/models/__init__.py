@@ -9,6 +9,7 @@ from .models import (
     ExcelFile,
     GeneralInformationMixin,
     LateChangeError,
+    ResubmissionWaiver,
     SingleAuditChecklist,
     SingleAuditChecklistManager,
     SingleAuditReportFile,
@@ -17,6 +18,7 @@ from .models import (
     User,
     excel_file_path,
     generate_sac_report_id,
+    is_resubmission,
     single_audit_report_path,
 )
 from .submission_event import SubmissionEvent
@@ -29,6 +31,7 @@ _models = [
     GeneralInformationMixin,
     SubmissionEvent,
     LateChangeError,
+    ResubmissionWaiver,
     SingleAuditChecklist,
     SingleAuditChecklistManager,
     SingleAuditReportFile,
@@ -40,6 +43,7 @@ _functions = [
     delete_access_and_create_record,
     excel_file_path,
     generate_sac_report_id,
+    is_resubmission,
     remove_email_from_submission_access,
     single_audit_report_path,
 ]
