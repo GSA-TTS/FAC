@@ -247,7 +247,7 @@ class UEIValidationFormView(APIView):
 
         # Before checking the UEI, we want to see if this is a duplicate submission
         auditee_uei = data["auditee_uei"].upper()
-        audit_year = data["audit_year"]
+        audit_year = data.get("audit_year")
 
         # verify that there is an audit year.
         if not audit_year:
