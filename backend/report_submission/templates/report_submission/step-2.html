@@ -49,7 +49,7 @@
                         <span class="usa-error-message margin-top-1">{{ form.auditee_uei.errors|striptags }}</span>
                         {% if duplicate_report_ids %}
                         <span class="usa-error-message margin-top-1">
-                            Here they are!
+                            Report IDs of duplicate submissions:
                             <ul>
                                 {% for x in duplicate_report_ids %}
                                     <li>
