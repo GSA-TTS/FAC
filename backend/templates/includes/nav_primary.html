@@ -43,14 +43,14 @@
                                 rel="noopener noreferrer">Search resources</a>
                             </li>
                             <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}data-reliability/"
-                                target="_blank"
-                                rel="noopener noreferrer">Data reliability</a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
                                 <a href="{{ STATIC_SITE_URL }}api/"
                                 target="_blank"
                                 rel="noopener noreferrer">Developer resources</a>
+                            </li>
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}data-reliability/"
+                                target="_blank"
+                                rel="noopener noreferrer">Data reliability</a>
                             </li>
                             <li class="usa-nav__submenu-item">
                                 <a href="{{ STATIC_SITE_URL }}tribal/"
@@ -97,6 +97,11 @@
                                    target="_blank"
                                    rel="noopener noreferrer">OMB announcements</a>
                             </li>
+                            <li class="usa-nav__submenu-item">
+                                <a href="{{ STATIC_SITE_URL }}status/"
+                                   target="_blank"
+                                   rel="noopener noreferrer">System status</a>
+                            </li>
                         </ul>
                     </li>
                     <li class="usa-nav__primary-item">
@@ -126,10 +131,10 @@
                     </li>
                     <li class="usa-nav__primary-item">
                         <a class="usa-nav__link text-primary-dark"
-                           href="https://support.fac.gov/hc"
+                           href="{{ STATIC_SITE_URL }}contact-resources/"
                            target="_blank"
                            rel="noopener noreferrer">
-                            <span class="text-primary-dark">Helpdesk</span>
+                            <span class="text-primary-dark">Contact</span>
                         </a>
                     </li>
                     {% comment %}
