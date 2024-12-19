@@ -1,8 +1,29 @@
-from datetime import date, timedelta
 import logging
 import math
+import textwrap
 import time
+from datetime import date, timedelta
 
+import newrelic.agent
+from config.settings import AGENCY_NAMES, STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
+from dissemination.file_downloads import get_download_url, get_filename
+from dissemination.forms import AdvancedSearchForm, SearchForm
+from dissemination.mixins import ReportAccessRequiredMixin
+from dissemination.models import (
+    AdditionalEin,
+    AdditionalUei,
+    CapText,
+    DisseminationCombined,
+    FederalAward,
+    Finding,
+    FindingText,
+    General,
+    Note,
+    OneTimeAccess,
+    SecondaryAuditor,
+)
+from dissemination.search import gather_errors, search
+from dissemination.summary_reports import generate_summary_report
 from django.conf import settings
 from django.core.exceptions import BadRequest, ValidationError
 from django.core.paginator import Paginator
@@ -12,35 +33,8 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
-
-from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
-
-from dissemination.file_downloads import get_download_url, get_filename
-from dissemination.forms import SearchForm
-from dissemination.forms import AdvancedSearchForm
-from dissemination.search import search, gather_errors
-from dissemination.mixins import ReportAccessRequiredMixin
-from dissemination.models import (
-    General,
-    FederalAward,
-    Finding,
-    FindingText,
-    CapText,
-    Note,
-    SecondaryAuditor,
-    AdditionalEin,
-    AdditionalUei,
-    OneTimeAccess,
-    DisseminationCombined,
-)
-
-from dissemination.summary_reports import generate_summary_report
-
 from support.decorators import newrelic_timing_metric
-
 from users.permissions import can_read_tribal
-
-import newrelic.agent
 
 logger = logging.getLogger(__name__)
 
@@ -214,6 +208,23 @@ class AdvancedSearch(View):
         if form_data.get("end_date"):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
+        agency_names = AGENCY_NAMES
+        for result in paginator_results:
+            if result.oversight_agency:
+                agency_name = agency_names.get(
+                    result.oversight_agency, result.oversight_agency
+                )
+                result.agency_name = "\n".join(
+                    textwrap.wrap(agency_name + " (OVER)", width=20)
+                )
+            elif result.cognizant_agency:
+                agency_name = agency_names.get(
+                    result.cognizant_agency, result.cognizant_agency
+                )
+                result.agency_name = "\n".join(
+                    textwrap.wrap(agency_name + " (COG)", width=20)
+                )
+
         context = context | {
             "advanced_search_flag": True,
             "form_user_input": form_user_input,
@@ -317,6 +328,23 @@ class Search(View):
             form_user_input["start_date"] = form_data["start_date"].strftime("%Y-%m-%d")
         if form_data.get("end_date"):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
+
+        agency_names = AGENCY_NAMES
+        for result in paginator_results:
+            if result.oversight_agency:
+                agency_name = agency_names.get(
+                    result.oversight_agency, result.oversight_agency
+                )
+                result.agency_name = "\n".join(
+                    textwrap.wrap(agency_name + " (OVER)", width=20)
+                )
+            elif result.cognizant_agency:
+                agency_name = agency_names.get(
+                    result.cognizant_agency, result.cognizant_agency
+                )
+                result.agency_name = "\n".join(
+                    textwrap.wrap(agency_name + " (COG)", width=20)
+                )
 
         context = context | {
             "advanced_search_flag": False,
