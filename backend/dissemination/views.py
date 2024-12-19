@@ -128,6 +128,27 @@ def run_search(form_data):
     return search(search_parameters)
 
 
+# Function to do a dictionary lookup of the agency name to number
+def _populate_cog_over_name(results):
+    agency_names = AGENCY_NAMES
+    for result in results:
+        if result.oversight_agency:
+            agency_name = agency_names.get(
+                result.oversight_agency, result.oversight_agency
+            )
+            result.agency_name = "\n".join(
+                textwrap.wrap(agency_name + " (OVER)", width=20)
+            )
+        elif result.cognizant_agency:
+            agency_name = agency_names.get(
+                result.cognizant_agency, result.cognizant_agency
+            )
+            result.agency_name = "\n".join(
+                textwrap.wrap(agency_name + " (COG)", width=20)
+            )
+    return results
+
+
 class AdvancedSearch(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -208,22 +229,8 @@ class AdvancedSearch(View):
         if form_data.get("end_date"):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
-        agency_names = AGENCY_NAMES
-        for result in paginator_results:
-            if result.oversight_agency:
-                agency_name = agency_names.get(
-                    result.oversight_agency, result.oversight_agency
-                )
-                result.agency_name = "\n".join(
-                    textwrap.wrap(agency_name + " (OVER)", width=20)
-                )
-            elif result.cognizant_agency:
-                agency_name = agency_names.get(
-                    result.cognizant_agency, result.cognizant_agency
-                )
-                result.agency_name = "\n".join(
-                    textwrap.wrap(agency_name + " (COG)", width=20)
-                )
+        # populate the agency name in cog/over field
+        paginator_results = _populate_cog_over_name(paginator_results)
 
         context = context | {
             "advanced_search_flag": True,
@@ -329,22 +336,8 @@ class Search(View):
         if form_data.get("end_date"):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
-        agency_names = AGENCY_NAMES
-        for result in paginator_results:
-            if result.oversight_agency:
-                agency_name = agency_names.get(
-                    result.oversight_agency, result.oversight_agency
-                )
-                result.agency_name = "\n".join(
-                    textwrap.wrap(agency_name + " (OVER)", width=20)
-                )
-            elif result.cognizant_agency:
-                agency_name = agency_names.get(
-                    result.cognizant_agency, result.cognizant_agency
-                )
-                result.agency_name = "\n".join(
-                    textwrap.wrap(agency_name + " (COG)", width=20)
-                )
+        # populate the agency name in cog/over field
+        paginator_results = _populate_cog_over_name(paginator_results)
 
         context = context | {
             "advanced_search_flag": False,
