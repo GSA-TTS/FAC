@@ -133,18 +133,20 @@ def _populate_cog_over_name(results):
     agency_names = AGENCY_NAMES
     for result in results:
         if result.oversight_agency:
+            agency_code = result.oversight_agency
             agency_name = agency_names.get(
                 result.oversight_agency, result.oversight_agency
             )
             result.agency_name = "\n".join(
-                textwrap.wrap(agency_name + " (OVER)", width=20)
+                textwrap.wrap(agency_code + " - " + agency_name + " (OVER)", width=20)
             )
         elif result.cognizant_agency:
+            agency_code = result.cognizant_agency
             agency_name = agency_names.get(
                 result.cognizant_agency, result.cognizant_agency
             )
             result.agency_name = "\n".join(
-                textwrap.wrap(agency_name + " (COG)", width=20)
+                textwrap.wrap(agency_code + " - " + agency_name + " (COG)", width=20)
             )
     return results
 
