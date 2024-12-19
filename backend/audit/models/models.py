@@ -4,7 +4,6 @@ import datetime
 import json
 import logging
 
-from dissemination.models import General
 from django.db import models
 from django.db.transaction import TransactionManagementError
 from django.conf import settings
@@ -37,6 +36,7 @@ from audit.validators import (
     validate_component_page_numbers,
 )
 from audit.utils import FORM_SECTION_HANDLERS
+from dissemination.models import General
 from support.cog_over import compute_cog_over, record_cog_assignment
 from .submission_event import SubmissionEvent
 
@@ -76,6 +76,22 @@ def generate_sac_report_id(end_date=None, source="GSAFAC", count=None):
 
 def one_month_from_today():
     return django_timezone.now() + timedelta(days=30)
+
+
+def is_resubmission(uei, ay):
+    """
+    Validate that there is a disseminated record with matching UEI and audit year.
+    """
+
+    # resubmission was permitted by a staff user.
+    if ResubmissionWaiver.objects.filter(uei=uei, audit_year=ay, expiration__lte=datetime.datetime.today()).exists():
+        return False
+
+    # check if a duplicate disseminated record already exists.
+    else:
+        return General.objects.filter(
+            audit_year=ay, auditee_uei=uei
+        ).exists()
 
 
 class SingleAuditChecklistManager(models.Manager):
@@ -254,11 +270,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         uei = general_information.get("auditee_uei")
 
         if audit_year and uei:
-            # check disseminated.
-            # TODO: also check for a waiver from admin
-            return General.objects.filter(
-                audit_year=audit_year, auditee_uei=uei
-            ).exists()
+            return is_resubmission(uei, audit_year)
 
         return False
 
@@ -740,4 +752,27 @@ class SacValidationWaiver(models.Model):
         ),
         verbose_name="The waiver type",
         default=list,
+    )
+
+class ResubmissionWaiver(models.Model):
+    """ Enables a disseminated record to be re-submitted. """
+
+    uei = models.TextField(
+        "UEI",
+        null=True
+    )
+    audit_year = models.TextField(
+        "Audit Year",
+        null=True
+    )
+    assigned_by = models.TextField(
+        "Assigned by",
+    )
+    expiration = models.DateTimeField(
+        "Expiration",
+        default=one_month_from_today,
+    )
+    timestamp = models.DateTimeField(
+        "Created",
+        default=django_timezone.now,
     )

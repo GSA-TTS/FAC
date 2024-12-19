@@ -12,7 +12,7 @@ from audit.models import (
     SacValidationWaiver,
     UeiValidationWaiver,
 )
-from audit.models.models import STATUS
+from audit.models.models import STATUS, ResubmissionWaiver
 from audit.models.viewflow import sac_transition
 from audit.validators import (
     validate_auditee_certification_json,
@@ -314,6 +314,51 @@ class UeiValidationWaiverAdmin(admin.ModelAdmin):
         )
 
 
+class ResubmissionWaiverAdmin(admin.ModelAdmin):
+    list_display = (
+        "timestamp",
+        "uei",
+        "audit_year",
+        "assigned_by",
+        "expiration",
+    )
+    search_fields = (
+        "uei",
+        "audit_year",
+        "assigned_by",
+        "timestamp",
+        "expiration",
+    )
+    fields = (
+        "uei",
+        "audit_year",
+        "expiration"
+    )
+    readonly_fields = ("timestamp",)
+
+    def has_add_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def save_model(self, request, obj, form, change):
+        obj.assigned_by = request.user.email
+        super().save_model(request, obj, form, change)
+        logger.info(
+            f'Resubmission Waiver for UEI "{obj.uei}" for the year "{obj.audit_year}" successfully added by user: {request.user.email}.'
+        )
+
+
 admin.site.register(Access, AccessAdmin)
 admin.site.register(DeletedAccess, DeletedAccessAdmin)
 admin.site.register(ExcelFile, ExcelFileAdmin)
@@ -322,3 +367,4 @@ admin.site.register(SingleAuditReportFile, AuditReportAdmin)
 admin.site.register(SubmissionEvent, SubmissionEventAdmin)
 admin.site.register(SacValidationWaiver, SacValidationWaiverAdmin)
 admin.site.register(UeiValidationWaiver, UeiValidationWaiverAdmin)
+admin.site.register(ResubmissionWaiver, ResubmissionWaiverAdmin)

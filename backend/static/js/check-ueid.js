@@ -277,7 +277,7 @@ function allResponsesValid() {
 }
 
 function performValidations(field) {
-  checkValidity(field);
+  const errors = checkValidity(field);
   if (errors.length > 0) {
     setFormDisabled(true);
   }

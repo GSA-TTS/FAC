@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 
 from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
 from audit.models import Access, SingleAuditChecklist, SubmissionEvent
+from audit.models.models import is_resubmission
 from audit.permissions import SingleAuditChecklistPermission
 from .serializers import (
     AccessAndSubmissionSerializer,
@@ -255,7 +256,8 @@ class UEIValidationFormView(APIView):
         duplicates = General.objects.filter(
             audit_year=audit_year, auditee_uei=auditee_uei
         ).values("report_id")
-        if duplicates:
+
+        if is_resubmission(auditee_uei, audit_year):
             return Response(
                 {
                     "valid": False,
