@@ -332,21 +332,6 @@ class ResubmissionWaiverAdmin(admin.ModelAdmin):
     fields = ("uei", "audit_year", "expiration")
     readonly_fields = ("timestamp",)
 
-    def has_add_permission(self, request, obj=None):
-        return request.user.is_staff
-
-    def has_change_permission(self, request, obj=None):
-        return request.user.is_staff
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_staff
-
-    def has_module_permission(self, request, obj=None):
-        return request.user.is_staff
-
-    def has_view_permission(self, request, obj=None):
-        return request.user.is_staff
-
     def save_model(self, request, obj, form, change):
         obj.assigned_by = request.user.email
         super().save_model(request, obj, form, change)
