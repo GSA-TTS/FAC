@@ -85,7 +85,7 @@ def is_resubmission(uei, ay):
 
     # resubmission was permitted by a staff user.
     if ResubmissionWaiver.objects.filter(
-        uei=uei, audit_year=ay, expiration__lte=datetime.datetime.today()
+        uei=uei, audit_year=ay, expiration__gte=datetime.datetime.today()
     ).exists():
         return False
 
