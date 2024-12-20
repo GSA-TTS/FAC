@@ -5,7 +5,7 @@ import math
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
 
-from support.models import CognizantBaseline, CognizantAssignment
+from support.models import CognizantAssignment
 from dissemination.models import General, MigrationInspectionRecord, FederalAward
 
 logger = logging.getLogger(__name__)
@@ -53,8 +53,8 @@ def compute_cog_over(
         oversight_agency = agency
         # logger.warning("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
-    base_year = calc_base_year(audit_year)
-    cognizant_agency = determine_hist_agency(auditee_ein, auditee_uei, base_year)
+
+    cognizant_agency = determine_hist_agency(auditee_ein, auditee_uei, audit_year)
     if cognizant_agency:
         return (cognizant_agency, oversight_agency)
     cognizant_agency = agency
@@ -100,12 +100,13 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
         return agency
 
 
-def determine_hist_agency(ein, uei, base_year):
+def determine_hist_agency(ein, uei, audit_year):
+    base_year = calc_base_year(audit_year)
     dbkey = None
     if int(base_year) == FIRST_BASELINE_YEAR:
         dbkey = get_dbkey(ein, uei)
 
-    cog_agency = lookup_baseline(ein, uei, dbkey)
+    cog_agency = lookup_latest_cog(ein, uei, dbkey, base_year, audit_year)
     if cog_agency:
         return cog_agency
 
@@ -150,17 +151,36 @@ def get_dbkey(ein, uei):
     return dbkey
 
 
-def lookup_baseline(ein, uei, dbkey):
+def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
+    # Note: In Census historical data,
+    #       From 2016 through 2022, (dbkey, ein) is the identifier for audits through 2021.
+    #       In 2022, entities transitioned from dbkey to uei.  2022 data contains dbkey, ein and uei.
+    #       From 2022 on, (ein, uei) is the identifier for audits.
+    query_years = [str(year) for year in range(int(base_year), int(audit_year) + 1)]
+    cognizant_agency = None
+
+    first_base_year_query_section = (
+        Q(auditee_ein=ein)
+        & Q(report_id__icontains=dbkey)
+        & Q(report_id__icontains="CENSUS")
+    )
+    other_year_query_section = Q(auditee_ein=ein) & Q(auditee_uei=uei)
+
+    query_subsection = other_year_query_section
+    if (int(base_year) == FIRST_BASELINE_YEAR) and (dbkey is not None):
+        query_subsection = first_base_year_query_section
+
     try:
-        cognizant_agency = CognizantBaseline.objects.values_list(
-            "cognizant_agency", flat=True
-        ).get(
-            Q(is_active=True)
-            & ((Q(ein=ein) & Q(dbkey=dbkey)) | (Q(ein=ein) & Q(uei=uei)))
-        )[
-            :
-        ]
-    except (CognizantBaseline.DoesNotExist, CognizantBaseline.MultipleObjectsReturned):
+        cognizant_agency = (
+            General.objects.filter(Q(audit_year__in=query_years) & (query_subsection))
+            .exclude(cognizant_agency__isnull=True)
+            .exclude(cognizant_agency__exact="")
+            .order_by("-audit_year")
+            .values_list("cognizant_agency", flat=True)[:]
+        )
+        if len(cognizant_agency) >= 1:
+            return cognizant_agency[0]
+    except General.DoesNotExist:
         cognizant_agency = None
     return cognizant_agency
 
