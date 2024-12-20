@@ -218,7 +218,7 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
-  const auditee_fiscal_period_start = document.getElementById('auditee_fiscal_period_start').value;
+  const auditee_fiscal_period_start = document.getElementById('auditee_fiscal_period_end').value;
   const audit_year = (new Date(auditee_fiscal_period_start)).getFullYear()
 
   queryAPI(
