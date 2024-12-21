@@ -5,11 +5,11 @@ from model_bakery import baker
 from faker import Faker
 
 from audit.models import SingleAuditChecklist
-from .models import CognizantBaseline, CognizantAssignment
+from .models import CognizantAssignment
 
 from .cog_over import compute_cog_over, record_cog_assignment
 
-# Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
+# Note:  Fake data is generated for SingleAuditChecklist.
 #        Using only the data fields that apply to cog / over assignment.
 
 UNIQUE_EIN_WITHOUT_DBKEY = "UEWOD1234"
@@ -170,16 +170,6 @@ class CogOverTests(TestCase):
             "audit_year": "2023",
         }
 
-    @staticmethod
-    def _fake_cognizantbaseline():
-        fake = Faker()
-        return {
-            "dbkey": 123456789,
-            "audit_year": 2019,
-            "ein": fake.ssn().replace("-", ""),
-            "cognizant_agency": "20",
-        }
-
     def _fake_federal_awards(self):
         return {
             "FederalAwards": {
@@ -292,8 +282,8 @@ class CogOverTests(TestCase):
 
     def test_cog_assignment_from_hist(self):
         """
-        When we have a matching row in 2019 and nothing in the
-        baseline table, we should use the cog computed from 2019 data
+        When we have a matching row in 2019 and no cognizant agency,
+        we should use the cog computed from 2019 data
         """
         sac = self._fake_sac()
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
@@ -309,8 +299,7 @@ class CogOverTests(TestCase):
 
     def test_cog_assignment_with_no_hist(self):
         """
-        We have no match in the base sheet and we
-        have no match in 2019. So, assign from 2023"
+        We have no match in 2019. So, assign from 2023"
         """
         sac = self._fake_sac()
         sac.general_information["ein"] = EIN_2023_ONLY
@@ -326,8 +315,7 @@ class CogOverTests(TestCase):
 
     def test_cog_assignment_with_multiple_hist(self):
         """
-        We have no match in the base sheet and we
-        have duplicates in 2019. So, assign from 2023
+        We have duplicates in 2019. So, assign from 2023
         """
 
         sac = self._fake_sac()
@@ -345,8 +333,8 @@ class CogOverTests(TestCase):
     def test_cog_assignment_with_hist_resolution(self):
         """
         We have a unique dbkey for the given uei/eint in 2022,
-        and we have a match in 2019, but nothing in the baseline.
-        So, assign from 2019
+        and we have a match in 2019, but no cognizant agency in 2019 through 2022.
+        So, assign from 2019.
         """
         sac = self._fake_sac()
 
@@ -417,7 +405,8 @@ class CogOverTests(TestCase):
             auditee_ein=BASE_EIN,
             auditee_uei=BASE_UEI,
             total_amount_expended="210000000",
-            audit_year="2022",
+            audit_year="2019",
+            cognizant_agency=BASE_COG,
         )
         gen.save()
         migration_inspection_record = baker.make(
@@ -428,14 +417,6 @@ class CogOverTests(TestCase):
         )
         migration_inspection_record.save()
 
-        baker.make(
-            CognizantBaseline,
-            uei=BASE_UEI,
-            ein=BASE_EIN,
-            dbkey=RESOLVABLE_DBKEY_WITH_BASELINE,
-            cognizant_agency=BASE_COG,
-            is_active=True,
-        )
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards,
             sac.submission_status,
@@ -454,17 +435,9 @@ class CogOverTests(TestCase):
         sac = self._fake_sac()
         sac.general_information["auditee_uei"] = BASE_UEI
         sac.general_information["ein"] = BASE_EIN
+        sac.general_information["cognizant_agency"] = BASE_COG
         sac.report_id = "9991-09-GSAFAC-0000201851"
         sac.save()
-
-        baker.make(
-            CognizantBaseline,
-            uei=BASE_UEI,
-            ein=BASE_EIN,
-            cognizant_agency=BASE_COG,
-        )
-        cbs = CognizantBaseline.objects.all()
-        self.assertEqual(len(cbs), 1)
 
         cog_agency, _ = compute_cog_over(
             sac.federal_awards,
@@ -476,8 +449,7 @@ class CogOverTests(TestCase):
         record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         cas = CognizantAssignment.objects.all()
         self.assertEqual(len(cas), 1)
-        cbs = CognizantBaseline.objects.all()
-        self.assertEqual(len(cbs), 1)
+
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(sac.cognizant_agency, cog_agency)
 
@@ -490,8 +462,7 @@ class CogOverTests(TestCase):
         ).save()
         cas = CognizantAssignment.objects.all()
         self.assertEqual(len(cas), 2)
-        cbs = CognizantBaseline.objects.all()
-        self.assertEqual(len(cbs), 2)
+
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(sac.cognizant_agency, oberride_cog)
 
@@ -517,6 +488,7 @@ class CogOverTests(TestCase):
         sac.general_information["auditee_fiscal_period_end"] = "2024-05-31"
         sac.general_information["auditee_fiscal_period_start"] = "2023-06-01"
         sac.report_id = "1111-03-GSAFAC-0000202460"
+        sac.general_information["audit_year"] = "2024"
 
         gen = baker.make(
             General,
@@ -559,14 +531,16 @@ class CogOverTests(TestCase):
         sac.general_information["auditee_fiscal_period_end"] = "2027-05-31"
         sac.general_information["auditee_fiscal_period_start"] = "2026-06-01"
         sac.report_id = "1111-03-GSAFAC-0000202760"
+        sac.general_information["audit_year"] = "2027"
 
         gen = baker.make(
             General,
-            report_id="1111-03-GSAFAC-0000202760",
+            report_id="1111-03-GSAFAC-0000202460",
             auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
             auditee_uei="ZQGGHJH74DW7",
             total_amount_expended="210000000",
-            audit_year="2027",
+            audit_year="2024",
+            cognizant_agency="24",
         )
         gen.save()
 
@@ -582,15 +556,6 @@ class CogOverTests(TestCase):
             cfda.save()
 
         sac.save()
-
-        baker.make(
-            CognizantBaseline,
-            uei="ZQGGHJH74DW7",
-            ein=UNIQUE_EIN_WITHOUT_DBKEY,
-            cognizant_agency="24",
-        )
-        cbs = CognizantBaseline.objects.all()
-        self.assertEqual(len(cbs), 1)
 
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards,
@@ -610,6 +575,7 @@ class CogOverTests(TestCase):
         sac.general_information["auditee_fiscal_period_end"] = "2027-05-31"
         sac.general_information["auditee_fiscal_period_start"] = "2026-06-01"
         sac.report_id = "1111-03-GSAFAC-0000202761"
+        sac.general_information["audit_year"] = "2027"
 
         gen = baker.make(
             General,
@@ -626,6 +592,116 @@ class CogOverTests(TestCase):
                 FederalAward,
                 report_id=gen,
                 federal_agency_prefix="10",
+                federal_award_extension="032",
+                amount_expended=10_000_000 * i,
+                is_direct="Y",
+            )
+            cfda.save()
+
+        sac.save()
+
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards,
+            sac.submission_status,
+            sac.general_information["ein"],
+            sac.general_information["auditee_uei"],
+            sac.general_information["audit_year"],
+        )
+        self.assertEqual(cog_agency, "10")
+        self.assertEqual(over_agency, None)
+
+    def test_cog_assignment_for_2027_w_base_to_2026_cog(self):
+        sac = self._fake_sac()
+        sac.general_information["auditee_uei"] = "ZQGGHJH74DW7"
+        sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
+        sac.general_information["report_id"] = "1111-03-GSAFAC-0000202760"
+        sac.general_information["auditee_fiscal_period_end"] = "2027-05-31"
+        sac.general_information["auditee_fiscal_period_start"] = "2026-06-01"
+        sac.report_id = "1111-03-GSAFAC-0000202760"
+        sac.general_information["audit_year"] = "2027"
+
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202460",
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            total_amount_expended="210000000",
+            audit_year="2024",
+            cognizant_agency="24",
+        )
+        gen.save()
+
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202560",
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            total_amount_expended="200000000",
+            audit_year="2025",
+            cognizant_agency="14",
+        )
+        gen.save()
+
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202660",
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            total_amount_expended="200000000",
+            audit_year="2026",
+            cognizant_agency="04",
+        )
+        gen.save()
+
+        for i in range(6):
+            cfda = baker.make(
+                FederalAward,
+                report_id=gen,
+                federal_agency_prefix="14",
+                federal_award_extension="032",
+                amount_expended=10_000_000 * i,
+                is_direct="Y",
+            )
+            cfda.save()
+
+        sac.save()
+
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards,
+            sac.submission_status,
+            sac.general_information["ein"],
+            sac.general_information["auditee_uei"],
+            sac.general_information["audit_year"],
+        )
+        self.assertEqual(cog_agency, "04")
+        self.assertEqual(over_agency, None)
+
+    def test_cog_assignment_for_2027_no_base_to_2026(self):
+        sac = self._fake_sac()
+        sac.general_information["auditee_uei"] = "ZQGGHJH74DW7"
+        sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
+        sac.general_information["report_id"] = "1111-03-GSAFAC-0000202760"
+        sac.general_information["auditee_fiscal_period_end"] = "2027-05-31"
+        sac.general_information["auditee_fiscal_period_start"] = "2026-06-01"
+        sac.report_id = "1111-03-GSAFAC-0000202760"
+        sac.general_information["audit_year"] = "2027"
+
+        gen = baker.make(
+            General,
+            report_id="1111-03-GSAFAC-0000202060",
+            auditee_ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            auditee_uei="ZQGGHJH74DW7",
+            total_amount_expended="210000000",
+            audit_year="2020",
+            cognizant_agency="34",
+        )
+        gen.save()
+
+        for i in range(6):
+            cfda = baker.make(
+                FederalAward,
+                report_id=gen,
+                federal_agency_prefix="14",
                 federal_award_extension="032",
                 amount_expended=10_000_000 * i,
                 is_direct="Y",

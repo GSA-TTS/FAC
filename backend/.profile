@@ -13,7 +13,6 @@ source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
 source tools/run_collectstatic.sh
-source tools/seed_cog_baseline.sh
 source tools/materialized_views.sh
 source tools/create_staffusers.sh
 
@@ -47,12 +46,6 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # Do Django things with static files.
     # run_collectstatic
     # gonogo "run_collectstatic"
-
-    #####
-    # SEED COG/OVER TABLES
-    # Setup tables for cog/over assignments
-    seed_cog_baseline
-    gonogo "seed_cog_baseline"
 
     # materialized_views
     # gonogo "materialized_views"

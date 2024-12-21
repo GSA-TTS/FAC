@@ -13,7 +13,11 @@ from audit.models import (
     UeiValidationWaiver,
 )
 from audit.models.models import STATUS
-from audit.models.viewflow import sac_transition
+from audit.models.viewflow import (
+    sac_flag_for_removal,
+    sac_revert_from_flagged_for_removal,
+    sac_transition,
+)
 from audit.validators import (
     validate_auditee_certification_json,
     validate_auditor_certification_json,
@@ -22,6 +26,76 @@ from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
+
+
+@admin.action(description="Revert selected report(s) to In Progress")
+def revert_to_in_progress(modeladmin, request, queryset):
+    successful_reverts = []
+    errors = []
+
+    for sac in queryset:
+        if sac.submission_status == STATUS.FLAGGED_FOR_REMOVAL:
+            try:
+                sac_revert_from_flagged_for_removal(sac, request.user)
+                sac.save()
+                successful_reverts.append(sac.report_id)
+            except Exception as e:
+                modeladmin.message_user(
+                    request,
+                    f"Error reverting {sac.report_id}: {str(e)}",
+                    level=messages.ERROR,
+                )
+                errors.append(sac.report_id)
+        else:
+            modeladmin.message_user(
+                request,
+                f"Report {sac.report_id} is not flagged for removal.",
+                level=messages.WARNING,
+            )
+            errors.append(sac.report_id)
+
+    if successful_reverts:
+        modeladmin.message_user(
+            request,
+            f"Successfully reverted report(s) ({', '.join(successful_reverts)}) back to In Progress.",
+            level=messages.SUCCESS,
+        )
+
+    if errors:
+        modeladmin.message_user(
+            request,
+            f"Unable to revert report(s) ({', '.join(errors)}) back to In Progress.",
+            level=messages.ERROR,
+        )
+
+
+@admin.action(description="Flag selected report(s) for removal")
+def flag_for_removal(modeladmin, request, queryset):
+
+    flagged = []
+    already_flagged = []
+
+    for sac in queryset:
+        if sac.submission_status != STATUS.FLAGGED_FOR_REMOVAL:
+            sac_flag_for_removal(sac, request.user)
+            sac.save()
+            flagged.append(sac.report_id)
+        else:
+            already_flagged.append(sac.report_id)
+
+    if flagged:
+        modeladmin.message_user(
+            request,
+            f"Successfully flagged report(s) ({', '.join(flagged)}) for removal.",
+            level=messages.SUCCESS,
+        )
+
+    if already_flagged:
+        modeladmin.message_user(
+            request,
+            f"Report(s) ({', '.join(already_flagged)}) were already flagged.",
+            level=messages.WARNING,
+        )
 
 
 class SACAdmin(admin.ModelAdmin):
@@ -41,6 +115,7 @@ class SACAdmin(admin.ModelAdmin):
         "report_id",
         "cognizant_agency",
         "oversight_agency",
+        "submission_status",
     )
     list_filter = [
         "cognizant_agency",
@@ -50,6 +125,7 @@ class SACAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ("submitted_by",)
     search_fields = ("general_information__auditee_uei", "report_id")
+    actions = [revert_to_in_progress, flag_for_removal]
 
 
 class AccessAdmin(admin.ModelAdmin):
