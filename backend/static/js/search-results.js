@@ -152,9 +152,10 @@ function attachEventHandlersSorting() {
  * On clicking "Search", disable both search buttons and show the loader instead of the arrow image, then submit.
  */
 function attachEventHandlersSubmission() {
-  search_submit_buttons.forEach((button, index) => {
+  search_submit_buttons.forEach((button) => {
+
     // The first search button is always for searching all of fac.gov, we want to ignore that one hence skipping.
-    if (index === 0) return;
+    if (button.id  === 'fac-search') return;
 
     button.addEventListener('click', () => {
       // The arrow won't be there if results were previously populated
