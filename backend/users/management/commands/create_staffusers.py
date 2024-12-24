@@ -112,4 +112,3 @@ class Command(BaseCommand):
                             logger.warning(
                                 f"StaffUser not created for {email}, they have not logged in yet."
                             )
-                            
