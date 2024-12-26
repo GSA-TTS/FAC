@@ -1,6 +1,9 @@
+import datetime
 import logging
 from django.conf import settings
 from django.contrib import admin, messages
+from django.shortcuts import redirect
+from django.urls import reverse
 from audit.forms import SacValidationWaiverForm, UeiValidationWaiverForm
 from audit.models import (
     Access,
@@ -24,8 +27,72 @@ from audit.validators import (
 )
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext_lazy as _
+from django.utils.timezone import now
+
+from dissemination.remove_singleauditreport_pdf import remove_singleauditreport_pdf
+from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 
 logger = logging.getLogger(__name__)
+
+# As per ADR #0041, the retention period for flagged reports is 6 months. That is 180 days.
+FLAGGED_REPORT_RETENTION_DAYS = 180  # 6 months
+
+
+@admin.action(description="Delete reports flagged for removal for over 6 months")
+def delete_flagged_records(modeladmin, request, queryset):
+    """
+    Admin action to delete records flagged for removal older than the specified months.
+    """
+    cutoff_date = now() - datetime.timedelta(days=FLAGGED_REPORT_RETENTION_DAYS)
+
+    # Filter records for deletion
+    records_to_delete = queryset.filter(
+        submission_status=STATUS.FLAGGED_FOR_REMOVAL,
+    ).exclude(
+        transition_name__isnull=True,
+        transition_date__isnull=True,
+    )
+
+    filtered_records = []
+    for sac in records_to_delete:
+        try:
+            # Check if the last transition state is FLAGGED_FOR_REMOVAL
+            if sac.transition_name[-1] == STATUS.FLAGGED_FOR_REMOVAL:
+                # Get the corresponding transition_date
+                transition_datetime = sac.transition_date[-1]
+
+            if transition_datetime <= cutoff_date:
+                filtered_records.append(sac)
+        except (ValueError, IndexError, TypeError) as e:
+            logger.error(
+                f"Error filtering flagged records for deletion: {str(e)}",
+                exc_info=True,
+            )
+            continue
+
+    count = 0
+    report_ids = []
+    for sac in filtered_records:
+        auditee_uei = sac.general_information.get("auditee_uei")
+        if auditee_uei:
+            UeiValidationWaiver.objects.filter(uei=auditee_uei).delete()
+        SacValidationWaiver.objects.filter(report_id=sac).delete()
+        remove_singleauditreport_pdf(sac)
+        remove_workbook_artifacts(sac)
+        Access.objects.filter(sac=sac).delete()
+        SubmissionEvent.objects.filter(sac=sac).delete()
+        ExcelFile.objects.filter(sac=sac).delete()
+        SingleAuditReportFile.objects.filter(sac=sac).delete()
+        report_ids.append(sac.report_id)
+        sac.delete()
+        count += 1
+    logger.info(
+        f"Deleted {count} flagged records and their associated child records. Report IDs: {', '.join(report_ids)}"
+    )
+    modeladmin.message_user(
+        request,
+        f"Successfully deleted {count} flagged records and their associated child records. Report IDs: {', '.join(report_ids)}",
+    )
 
 
 @admin.action(description="Revert selected report(s) to In Progress")
@@ -125,7 +192,26 @@ class SACAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ("submitted_by",)
     search_fields = ("general_information__auditee_uei", "report_id")
-    actions = [revert_to_in_progress, flag_for_removal]
+    actions = [revert_to_in_progress, flag_for_removal, delete_flagged_records]
+
+    def changelist_view(self, request, extra_context=None):
+        """
+        Override changelist_view to allow running the action without selection.
+        """
+        if (
+            "action" in request.POST
+            and request.POST["action"] == "delete_flagged_records"
+        ):
+            queryset = self.get_queryset(request)
+            delete_flagged_records(self, request, queryset)
+            # Redirect to avoid Django's "No items selected" error and ensure a valid response
+            return redirect(
+                reverse(
+                    f"admin:{self.opts.app_label}_{self.opts.model_name}_changelist"
+                )
+            )
+
+        return super().changelist_view(request, extra_context=extra_context)
 
 
 class AccessAdmin(admin.ModelAdmin):
