@@ -27,6 +27,7 @@ from audit.validators import (
 )
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext_lazy as _
+from django.db import transaction
 from django.utils.timezone import now
 
 from dissemination.remove_singleauditreport_pdf import remove_singleauditreport_pdf
@@ -53,46 +54,57 @@ def delete_flagged_records(modeladmin, request, queryset):
         transition_date__isnull=True,
     )
 
-    filtered_records = []
+    count = 0
+    failed_count = 0
+    report_ids = []
+    failed_report_ids = []
     for sac in records_to_delete:
         try:
-            # Check if the last transition state is FLAGGED_FOR_REMOVAL
             if sac.transition_name[-1] == STATUS.FLAGGED_FOR_REMOVAL:
                 # Get the corresponding transition_date
                 transition_datetime = sac.transition_date[-1]
 
             if transition_datetime <= cutoff_date:
-                filtered_records.append(sac)
-        except (ValueError, IndexError, TypeError) as e:
+                with transaction.atomic():
+                    auditee_uei = sac.general_information.get("auditee_uei")
+                    if auditee_uei:
+                        UeiValidationWaiver.objects.filter(uei=auditee_uei).delete()
+                    SacValidationWaiver.objects.filter(report_id=sac).delete()
+                    remove_singleauditreport_pdf(sac)
+                    remove_workbook_artifacts(sac)
+                    Access.objects.filter(sac=sac).delete()
+                    DeletedAccess.objects.filter(sac=sac).delete()
+                    SubmissionEvent.objects.filter(sac=sac).delete()
+                    ExcelFile.objects.filter(sac=sac).delete()
+                    SingleAuditReportFile.objects.filter(sac=sac).delete()
+                    report_ids.append(sac.report_id)
+                    sac.delete()
+                    count += 1
+        except Exception as e:
             logger.error(
-                f"Error filtering flagged records for deletion: {str(e)}",
-                exc_info=True,
+                f"Failed to delete sac report with ID {sac.report_id}: {str(e)}"
             )
+            failed_count += 1
+            failed_report_ids.append(sac.report_id)
             continue
 
-    count = 0
-    report_ids = []
-    for sac in filtered_records:
-        auditee_uei = sac.general_information.get("auditee_uei")
-        if auditee_uei:
-            UeiValidationWaiver.objects.filter(uei=auditee_uei).delete()
-        SacValidationWaiver.objects.filter(report_id=sac).delete()
-        remove_singleauditreport_pdf(sac)
-        remove_workbook_artifacts(sac)
-        Access.objects.filter(sac=sac).delete()
-        SubmissionEvent.objects.filter(sac=sac).delete()
-        ExcelFile.objects.filter(sac=sac).delete()
-        SingleAuditReportFile.objects.filter(sac=sac).delete()
-        report_ids.append(sac.report_id)
-        sac.delete()
-        count += 1
-    logger.info(
-        f"Deleted {count} flagged records and their associated child records. Report IDs: {', '.join(report_ids)}"
-    )
-    modeladmin.message_user(
-        request,
-        f"Successfully deleted {count} flagged records and their associated child records. Report IDs: {', '.join(report_ids)}",
-    )
+    if count:
+        logger.info(
+            f"Deleted {count} flagged records and their associated child records. Report IDs: {', '.join(report_ids)}"
+        )
+        modeladmin.message_user(
+            request,
+            f"Successfully deleted {count} flagged records and their associated child records. Report IDs: {', '.join(report_ids)}",
+        )
+    if failed_count:
+        logger.error(
+            f"Failed to delete {failed_count} flagged records. Report IDs: {', '.join(failed_report_ids)}"
+        )
+        modeladmin.message_user(
+            request,
+            f"Failed to delete {failed_count} flagged records. Report IDs: {', '.join(failed_report_ids)}",
+            level=messages.ERROR,
+        )
 
 
 @admin.action(description="Revert selected report(s) to In Progress")
