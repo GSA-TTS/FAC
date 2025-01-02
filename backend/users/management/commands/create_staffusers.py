@@ -34,7 +34,6 @@ class Command(BaseCommand):
             "view_passthrough",
             "view_secondaryauditor",
             "view_cognizantassignment",
-            "view_cognizantbaseline",
             "view_staffuser",
             "view_userpermission",
             "view_tribalapiaccesskeyids",
@@ -91,9 +90,10 @@ class Command(BaseCommand):
                         ).save()
 
                         # attempt to update the user.
-                        try:
-                            user = User.objects.get(email=email, is_staff=True)
+                        user = User.objects.filter(email=email, is_staff=True)
 
+                        if user.exists():
+                            user = user.first()
                             user.groups.clear()
                             match role:
                                 case "readonly":
@@ -107,8 +107,7 @@ class Command(BaseCommand):
                             user.save()
                             logger.info(f"Synced {email} to a StaffUser role.")
 
-                        # for whatever reason, this failed. Revert staffuser creation.
-                        except User.DoesNotExist:
+                        else:
                             transaction.set_rollback(True)
                             logger.warning(
                                 f"StaffUser not created for {email}, they have not logged in yet."
