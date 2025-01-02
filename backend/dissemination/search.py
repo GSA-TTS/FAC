@@ -6,10 +6,11 @@ from .searchlib.search_general import report_timing, search_general
 from .searchlib.search_alns import search_alns
 from .searchlib.search_cog_or_oversight import search_cog_or_oversight
 from .searchlib.search_findings import search_findings
+from .searchlib.search_federal_program_name import search_federal_program_name
 from .searchlib.search_direct_funding import search_direct_funding
 from .searchlib.search_major_program import search_major_program
-from .searchlib.search_type_requirement import search_type_requirement
 from .searchlib.search_passthrough_name import search_passthrough_name
+from .searchlib.search_type_requirement import search_type_requirement
 from dissemination.models import DisseminationCombined, General
 
 logger = logging.getLogger(__name__)
@@ -66,11 +67,12 @@ def search(params):
         results = search_general(DisseminationCombined, params)
         results = search_alns(results, params)
         results = search_cog_or_oversight(results, params)
+        results = search_federal_program_name(results, params)
         results = search_findings(results, params)
         results = search_direct_funding(results, params)
         results = search_major_program(results, params)
-        results = search_type_requirement(results, params)
         results = search_passthrough_name(results, params)
+        results = search_type_requirement(results, params)
     else:
         logger.info("search Searching `General`")
         results = search_general(General, params)
