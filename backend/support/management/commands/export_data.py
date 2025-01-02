@@ -7,12 +7,13 @@ from django.core.management.base import BaseCommand, CommandError
 from sling import Replication, ReplicationStream
 
 from support.decorators import newrelic_timing_metric
+from dissemination.summary_reports import restricted_model_names
 
 logger = logging.getLogger(__name__)
 
 S3_CONNECTION = f"""{{
             "type": "s3",
-            "bucket": "export",
+            "bucket": "{settings.AWS_PRIVATE_STORAGE_BUCKET_NAME}",
             "access_key_id": "{settings.AWS_PRIVATE_ACCESS_KEY_ID}",
             "secret_access_key": "{settings.AWS_PRIVATE_SECRET_ACCESS_KEY}",
             "endpoint": "{settings.AWS_S3_ENDPOINT_URL}"
@@ -32,17 +33,29 @@ DEFAULT_OPTIONS = {
 
 
 class StreamGenerator:
-    COMMON_QUERY = (
+    PRIVATE_QUERY = (
         "select * from {table_name} where report_id in ("
         " select dg.report_id from public.dissemination_general dg"
-        " where dg.is_public = 'true'"
-        " and dg.audit_year = '{audit_year}' )"
+        " where dg.audit_year = '{audit_year}' and dg.is_public = 'true' )"
     )
 
-    def __init__(self, table_name, friendly_name, query=COMMON_QUERY):
+    PUBLIC_QUERY = (
+        "select * from {table_name} where report_id in ("
+        " select dg.report_id from public.dissemination_general dg"
+        " where dg.audit_year = '{audit_year}')"
+    )
+
+    def __init__(self, table_name, friendly_name, query_override=None):
         self.table_name = table_name
         self.friendly_name = friendly_name
-        self.query = query
+
+        restricted_tables = [
+            "dissemination_" + model for model in restricted_model_names
+        ]
+        default_query = (
+            self.PRIVATE_QUERY if table_name in restricted_tables else self.PUBLIC_QUERY
+        )
+        self.query = query_override or default_query
 
     def generate_stream(self, audit_year):
         return (
@@ -62,9 +75,7 @@ STREAM_GENERATORS = [
     StreamGenerator(
         friendly_name="General",
         table_name="dissemination_general",
-        query="select * from dissemination_general dg"
-        " where dg.is_public = 'true' and"
-        " dg.audit_year = '{audit_year}'",
+        query_override="select * from dissemination_general where audit_year = '{audit_year}'",
     ),
     StreamGenerator(
         friendly_name="AdditionalEIN", table_name="dissemination_additionalein"
@@ -72,7 +83,6 @@ STREAM_GENERATORS = [
     StreamGenerator(
         friendly_name="AdditionalUEI", table_name="dissemination_additionaluei"
     ),
-    StreamGenerator(friendly_name="Combined", table_name="dissemination_combined"),
     StreamGenerator(
         friendly_name="CorrectiveActionPlans", table_name="dissemination_captext"
     ),
@@ -110,6 +120,7 @@ def _run_data_export():
         streams=streams,
         defaults=DEFAULT_OPTIONS,
         env=dict(FAC_DB=FAC_DB_URL, BULK_DATA_EXPORT=S3_CONNECTION),
+        debug=settings.DEBUG,
     )
     logger.info(f"Exporting {len(streams)} streams")
     replication.run()
