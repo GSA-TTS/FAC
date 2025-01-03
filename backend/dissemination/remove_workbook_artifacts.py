@@ -2,7 +2,11 @@ import logging
 import math
 
 from django.conf import settings
-from audit.models.models import ExcelFile, SingleAuditChecklist, STATUS
+from audit.models.models import (
+    ExcelFile,
+    SingleAuditChecklist,
+    STATUS,
+)
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 from django.core.paginator import Paginator

@@ -1,12 +1,14 @@
+from unittest.mock import MagicMock, patch
 from django.test import TestCase, RequestFactory
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from .models import SacValidationWaiver, SingleAuditChecklist
-from .models.models import STATUS
+from .models.models import STATUS, UeiValidationWaiver
 from .admin import (
     SACAdmin,
     SacValidationWaiverAdmin,
+    delete_flagged_records,
     flag_for_removal,
     revert_to_in_progress,
 )
@@ -226,3 +228,75 @@ class TestAdminActions(TestCase):
         self.assertEqual(self.report1.submission_status, STATUS.FLAGGED_FOR_REMOVAL)
         messages = [m.message for m in self.request._messages]
         self.assertIn("Report(s) (RPT001) were already flagged.", messages)
+
+
+class TestDeleteFlaggedRecordsAdminAction(TestCase):
+
+    @patch("audit.admin.remove_workbook_artifacts")
+    @patch("audit.admin.remove_singleauditreport_pdf")
+    def test_delete_flagged_records_success(
+        self, mock_remove_workbook_artifacts, mock_remove_singleauditreport_pd
+    ):
+        sac = baker.make(
+            SingleAuditChecklist,
+            report_id="1900-01-GSAFAC-0000000001",
+            submission_status=STATUS.FLAGGED_FOR_REMOVAL,
+            transition_name=["in_progress", STATUS.FLAGGED_FOR_REMOVAL],
+            transition_date=[
+                "2024-01-01 15:19:20.403935-05",
+                "2023-06-01 15:19:20.403935-05",
+            ],
+            general_information={"auditee_uei": "ABCDHJH74DW7"},
+        )
+        baker.make(UeiValidationWaiver, uei="ABCDHJH74DW7")
+        baker.make(SacValidationWaiver, report_id=sac)
+
+        modeladmin = MagicMock()
+        queryset = SingleAuditChecklist.objects.filter(id=sac.id)
+
+        delete_flagged_records(modeladmin, None, queryset)
+
+        # Assert that related objects and SAC are deleted
+        self.assertFalse(
+            SingleAuditChecklist.objects.filter(
+                report_id="1900-01-GSAFAC-0000000001"
+            ).exists()
+        )
+        self.assertFalse(
+            UeiValidationWaiver.objects.filter(uei="ABCDHJH74DW7").exists()
+        )
+        self.assertFalse(
+            SacValidationWaiver.objects.filter(
+                report_id="1900-01-GSAFAC-0000000001"
+            ).exists()
+        )
+        mock_remove_singleauditreport_pd.assert_called_once()
+        mock_remove_workbook_artifacts.assert_called_once()
+
+    @patch("audit.admin.remove_workbook_artifacts")
+    @patch("audit.admin.remove_singleauditreport_pdf")
+    def test_delete_flagged_records_skips_non_flagged(
+        self, mock_remove_workbook_artifacts, mock_remove_singleauditreport_pd
+    ):
+        sac = baker.make(
+            SingleAuditChecklist,
+            report_id="1900-01-GSAFAC-0000000002",
+            submission_status="in_progress",
+            transition_name=["in_progress"],
+            transition_date=["2024-01-01 15:19:20.403935-05"],
+            general_information={"auditee_uei": "EFJHHJH74DW7"},
+        )
+
+        modeladmin = MagicMock()
+        queryset = SingleAuditChecklist.objects.filter(id=sac.id)
+
+        delete_flagged_records(modeladmin, None, queryset)
+
+        # Assert that SAC is not deleted
+        self.assertTrue(
+            SingleAuditChecklist.objects.filter(
+                report_id="1900-01-GSAFAC-0000000002"
+            ).exists()
+        )
+        mock_remove_workbook_artifacts.assert_not_called()
+        mock_remove_singleauditreport_pd.assert_not_called()

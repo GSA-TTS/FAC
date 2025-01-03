@@ -13,6 +13,7 @@ from audit.models import (
 from audit.views.views import verify_status
 from audit.models.models import STATUS
 from audit.models.viewflow import SingleAuditChecklistFlow
+from audit.models.submission_event import SubmissionEvent
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +59,10 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
         flow = SingleAuditChecklistFlow(sac)
         flow.transition_to_flagged_for_removal()
-        sac.save()
+        sac.save(
+            event_user=request.user,
+            event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
+        )
         url = reverse("audit:MySubmissions")
 
         return redirect(url)
