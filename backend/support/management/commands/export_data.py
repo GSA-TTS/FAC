@@ -33,13 +33,13 @@ DEFAULT_OPTIONS = {
 
 
 class StreamGenerator:
-    PRIVATE_QUERY = (
+    EXCLUDE_NONPUBLIC_QUERY = (
         "select * from {table_name} where report_id in ("
         " select dg.report_id from public.dissemination_general dg"
         " where dg.audit_year = '{audit_year}' and dg.is_public = 'true' )"
     )
 
-    PUBLIC_QUERY = (
+    UNRESTRICTED_QUERY = (
         "select * from {table_name} where report_id in ("
         " select dg.report_id from public.dissemination_general dg"
         " where dg.audit_year = '{audit_year}')"
@@ -53,7 +53,9 @@ class StreamGenerator:
             "dissemination_" + model for model in restricted_model_names
         ]
         default_query = (
-            self.PRIVATE_QUERY if table_name in restricted_tables else self.PUBLIC_QUERY
+            self.EXCLUDE_NONPUBLIC_QUERY
+            if table_name in restricted_tables
+            else self.UNRESTRICTED_QUERY
         )
         self.query = query_override or default_query
 
