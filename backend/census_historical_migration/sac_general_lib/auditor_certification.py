@@ -16,7 +16,6 @@ auditor_certification_mappings = [
     FormFieldMap("is_auditee_responsible", None, FormFieldInDissem, "Y", bool),
     FormFieldMap("has_used_auditors_report", None, FormFieldInDissem, "Y", bool),
     FormFieldMap("has_no_auditee_procedures", None, FormFieldInDissem, "Y", bool),
-    FormFieldMap("is_accurate_and_complete", None, FormFieldInDissem, "Y", bool),
     FormFieldMap("is_FAC_releasable", None, FormFieldInDissem, "Y", bool),
 ]
 

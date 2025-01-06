@@ -1954,7 +1954,6 @@ class AuditorCertificationStep1ViewTests(TestCase):
             "has_used_auditors_report": True,
             "has_no_auditee_procedures": True,
             "is_FAC_releasable": True,
-            "is_accurate_and_complete": True,
         }
 
         response = self.client.post(self.url, form_data)
