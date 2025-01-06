@@ -16,6 +16,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         """Create a group with readonly permissions."""
+        logger.info(f"Permission dump ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        logger.info(Permission.objects.all().values())
+
         group_readonly, created = Group.objects.get_or_create(name="Read-only")
         readonly_codenames = [
             "view_access",
@@ -40,7 +43,10 @@ class Command(BaseCommand):
         ]
         group_readonly.permissions.clear()
         for code in readonly_codenames:
-            group_readonly.permissions.add(Permission.objects.get(codename=code))
+            try:
+                group_readonly.permissions.add(Permission.objects.get(codename=code))
+            except Exception as e:
+                logger.error(f"1. Failed to get ({code}) -- {e}")
         group_readonly.save()
 
         """Create a group with helpdesk permissions."""
@@ -58,7 +64,10 @@ class Command(BaseCommand):
         ]
         group_helpdesk.permissions.clear()
         for code in helpdesk_codenames:
-            group_helpdesk.permissions.add(Permission.objects.get(codename=code))
+            try:
+                group_helpdesk.permissions.add(Permission.objects.get(codename=code))
+            except Exception as e:
+                logger.error(f"2. Failed to get ({code}) -- {e}")
         group_helpdesk.save()
 
         # read in staffusers JSON.
@@ -99,7 +108,6 @@ class Command(BaseCommand):
                                 case "readonly":
                                     user.groups.add(group_readonly)
                                 case "helpdesk":
-                                    user.groups.clear()
                                     user.groups.add(group_helpdesk)
                                 case "superuser":
                                     user.is_superuser = True
