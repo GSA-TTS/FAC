@@ -92,9 +92,17 @@ class SingleAuditChecklistTests(TestCase):
                     STATUS.READY_FOR_CERTIFICATION,
                     STATUS.AUDITOR_CERTIFIED,
                     STATUS.AUDITEE_CERTIFIED,
+                    STATUS.FLAGGED_FOR_REMOVAL,
                 ],
                 STATUS.IN_PROGRESS,
                 "transition_to_in_progress_again",
+            ),
+            (
+                [
+                    STATUS.IN_PROGRESS,
+                ],
+                STATUS.FLAGGED_FOR_REMOVAL,
+                "transition_to_flagged_for_removal",
             ),
         )
 

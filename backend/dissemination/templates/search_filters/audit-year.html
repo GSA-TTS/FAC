@@ -11,11 +11,7 @@
                   name="audit_year"
                   type="checkbox"
                   value={{ value }}
-                  {% for item in form_user_input.audit_year %}
-                    {% if item == value or item == text %}
-                      checked
-                    {% endif %}
-                  {% endfor %}
+                  {% if value in form_user_input.audit_year or text in form_user_input.audit_year %}checked{% endif %}
                   />
             <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
         </div>

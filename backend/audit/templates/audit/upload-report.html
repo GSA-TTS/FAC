@@ -3,11 +3,15 @@
 {% block content %}
     <div class="grid-container margin-y-6">
         <div class="grid-col grid-gap">
-            {% comment %} {% include "../sidenav.html" %} {% endcomment %}
             <div>
                 <h1>Upload single audit report package</h1>
                 <p>
-                    All components of the audit report package must be merged into a single PDF file and meet the uniform guidelines below. For more information on PDF formatting, please review our PDF guidelines.
+                    All components of the audit report package must be merged into a single PDF file and meet the uniform guidelines below. For more information on PDF formatting, please review our PDF guidelines. 
+                    For those completing program-specific audits, please refer to 
+                    <a class="usa-link"
+                       href="https://support.fac.gov/hc/en-us/articles/32700168226445-Program-specific-audits-how-to-upload-the-Audit-report-PDF"
+                       target="_blank"
+                       rel="noopener noreferrer">this guide</a>.
                 </p>
                 {% if form.errors %}
                     <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>

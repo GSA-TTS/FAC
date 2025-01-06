@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+{% load sprite_helper %}
+
+{% block content %}
+    <div class="grid-container margin-y-8">
+        <h1 class="font-sans-xl">Confirm Report Removal</h1>
+        <p class="text-base-darker margin-bottom-2">Are you sure you want to remove the following report?</p>
+
+        <div class="usa-card">
+            <div class="usa-card__body">
+                <ul class="usa-list usa-list--unstyled">
+                    <li><strong>Auditee UEI:</strong> {{ auditee_uei }}</li>
+                    <li><strong>Auditee Name:</strong> {{ auditee_name }}</li>
+                    <li><strong>Report ID:</strong> {{ report_id }}</li>
+                    <li><strong>Fiscal Period End Date:</strong> {{ fiscal_year_end_date }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <form method="post" class="margin-top-6">
+            {% csrf_token %}
+            <div class="usa-button-group">
+                <button type="submit" class="usa-button usa-button--danger">Remove Report</button>
+                <a href="{% url 'audit:MySubmissions' %}" class="usa-button usa-button--unstyled text-bold">Return to Submissions</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
