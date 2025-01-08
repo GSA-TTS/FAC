@@ -99,7 +99,6 @@ class Command(BaseCommand):
                                 case "readonly":
                                     user.groups.add(group_readonly)
                                 case "helpdesk":
-                                    user.groups.clear()
                                     user.groups.add(group_helpdesk)
                                 case "superuser":
                                     user.is_superuser = True
