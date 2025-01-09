@@ -263,7 +263,7 @@ class IntakeToDisseminationTests(TestCase):
                             "program_name": "N/A",
                             "federal_agency_prefix": "12",
                             "three_digit_extension": "123",
-                            "compliance_requirement": "A",
+                            "compliance_requirement": "asdfasdf",
                             "additional_award_identification": "egd",
                         },
                         "findings": {
