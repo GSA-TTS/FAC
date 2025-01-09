@@ -70,7 +70,7 @@ def _open_workbook(file):
 def _get_entries_by_path(dictionary, path):
     keys = path.split(".")
     val = dictionary
-    
+
     for key in keys:
         try:
             val = val[key]
@@ -140,9 +140,7 @@ def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
         keyFound = _extract_key_from_award_entities(path, named_ranges)
 
         if not keyFound:
-            keyFound = _extract_from_column_mapping(
-                path, column_mapping, match
-            )
+            keyFound = _extract_from_column_mapping(path, column_mapping, match)
 
         if not keyFound:
             keyFound = _extract_from_field_mapping(path, field_mapping, match)
