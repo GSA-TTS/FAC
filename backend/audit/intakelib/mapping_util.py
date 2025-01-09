@@ -70,23 +70,26 @@ def _open_workbook(file):
 def _get_entries_by_path(dictionary, path):
     keys = path.split(".")
     val = dictionary
+    
     for key in keys:
         try:
             val = val[key]
         except KeyError:
             return []
+
     return val
 
 
-def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
+def _extract_from_column_mapping(path, column_mapping, match=None):
     """Extract named ranges from column mapping"""
     for key, value in column_mapping.items():
         if len(value) > 2 and (
             value[0] + "." + value[1] == path
             or (match and value[0] + "." + value[1] == path + "." + match.group(1))
         ):
-            return key, row_index
-    return None, None
+            return key
+
+    return None
 
 
 def _extract_from_field_mapping(path, field_mapping, match=None):
@@ -95,58 +98,61 @@ def _extract_from_field_mapping(path, field_mapping, match=None):
         if len(value) == 2 and (
             value[0] == path or (match and value[0] == ".".join([path, match.group(1)]))
         ):
-            return key, None
-    return None, None
+            return key
+
+    return None
 
 
 def _extract_error_details(error):
     if not bool(error.path):
         logger.info("No path found in error object")
         return None, None, None
+
     row_index = next((item for item in error.path if isinstance(item, int)), None)
     path = ".".join([item for item in error.path if not isinstance(item, int)])
     match = re.search(r"'(\w+)'", error.message) if error.message else None
+
     return path, row_index, match
 
 
-def _extract_key_from_award_entities(path, row_index, named_ranges):
+def _extract_key_from_award_entities(path, named_ranges):
     if path in [AWARD_ENTITY_NAME_PATH, AWARD_ENTITY_ID_PATH]:
         key = (
             AWARD_ENTITY_NAME_KEY
             if path == AWARD_ENTITY_NAME_PATH
             else AWARD_ENTITY_ID_KEY
         )
-        named_ranges.append((key, row_index))
+
         return key
+
     return None
 
 
 def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
     """Extract named ranges from column mapping and errors"""
     named_ranges = []
+
     for error in errors:
         path, row_index, match = _extract_error_details(error)
         if not path:
             continue
 
-        # Extract named ranges from column mapping for award entities
-        keyFound = _extract_key_from_award_entities(path, row_index, named_ranges)
+        keyFound = _extract_key_from_award_entities(path, named_ranges)
 
         if not keyFound:
-            keyFound, row_index = _extract_from_column_mapping(
-                path, row_index, column_mapping, match
+            keyFound = _extract_from_column_mapping(
+                path, column_mapping, match
             )
-            if keyFound:
-                named_ranges.append((keyFound, row_index))
 
         if not keyFound:
-            keyFound, _ = _extract_from_field_mapping(path, field_mapping, match)
-            if not keyFound:
-                keyFound, _ = _extract_from_field_mapping(path, meta_mapping, match)
-            if keyFound:
-                named_ranges.append((keyFound, None))
+            keyFound = _extract_from_field_mapping(path, field_mapping, match)
 
         if not keyFound:
+            keyFound = _extract_from_field_mapping(path, meta_mapping, match)
+
+        if keyFound:
+            named_ranges.append((keyFound, row_index))
+        else:
             logger.info(f"No named range matches this error path: {error.path}")
 
     return named_ranges
