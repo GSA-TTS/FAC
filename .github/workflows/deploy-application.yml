@@ -132,5 +132,5 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ inputs.environment }}
-      util_version: "v0.1.8"
+      util_version: "v0.1.10"
       backup_operation: "check_tables"
