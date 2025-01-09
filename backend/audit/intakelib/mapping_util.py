@@ -95,12 +95,11 @@ def _extract_from_column_mapping(path, column_mapping, match=None):
 def _extract_from_field_mapping(path, field_mapping):
     """Extract named ranges from field mapping"""
     for key, value in field_mapping.items():
-        if len(value) >= 2 and (
-            path in [value[0], ".".join([value[0], value[1]])]
-        ):
+        if len(value) >= 2 and (path in [value[0], ".".join([value[0], value[1]])]):
             return key
 
     return None
+
 
 def _extract_from_meta_mapping(path, meta_mapping, match=None):
     """Extract named ranges from meta mapping"""
@@ -149,9 +148,7 @@ def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
 
         keyFound = _extract_key_from_award_entities(path, named_ranges)
         if not keyFound:
-            keyFound = _extract_from_column_mapping(
-                path, column_mapping, match
-            )
+            keyFound = _extract_from_column_mapping(path, column_mapping, match)
 
         if not keyFound:
             keyFound = _extract_from_field_mapping(path, field_mapping)
