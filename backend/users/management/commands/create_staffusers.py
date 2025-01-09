@@ -1,4 +1,3 @@
-# flake8: noqa
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
@@ -17,9 +16,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         """Create a group with readonly permissions."""
-        logger.info(f"Permission dump ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        logger.info(Permission.objects.all().values())
-
         group_readonly, created = Group.objects.get_or_create(name="Read-only")
         readonly_codenames = [
             "view_access",
@@ -44,10 +40,7 @@ class Command(BaseCommand):
         ]
         group_readonly.permissions.clear()
         for code in readonly_codenames:
-            try:
-                group_readonly.permissions.add(Permission.objects.get(codename=code))
-            except Exception as e:
-                logger.error(f"1. Failed to get ({code}) -- {e}")
+            group_readonly.permissions.add(Permission.objects.get(codename=code))
         group_readonly.save()
 
         """Create a group with helpdesk permissions."""
@@ -65,10 +58,7 @@ class Command(BaseCommand):
         ]
         group_helpdesk.permissions.clear()
         for code in helpdesk_codenames:
-            try:
-                group_helpdesk.permissions.add(Permission.objects.get(codename=code))
-            except Exception as e:
-                logger.error(f"2. Failed to get ({code}) -- {e}")
+            group_helpdesk.permissions.add(Permission.objects.get(codename=code))
         group_helpdesk.save()
 
         # read in staffusers JSON.
