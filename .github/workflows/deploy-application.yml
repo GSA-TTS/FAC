@@ -29,10 +29,10 @@ jobs:
             fac-build-npm-
             fac-build-
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Restore pip cache
         uses: actions/cache@v4
@@ -132,5 +132,5 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ inputs.environment }}
-      util_version: "v0.1.8"
+      util_version: "v0.1.10"
       backup_operation: "check_tables"
