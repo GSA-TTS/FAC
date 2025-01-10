@@ -137,19 +137,19 @@ def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
         if not path:
             continue
 
-        keyFound = _extract_key_from_award_entities(path, named_ranges)
+        key_found = _extract_key_from_award_entities(path, named_ranges)
 
-        if not keyFound:
-            keyFound = _extract_from_column_mapping(path, column_mapping, match)
+        if not key_found:
+            key_found = _extract_from_column_mapping(path, column_mapping, match)
 
-        if not keyFound:
-            keyFound = _extract_from_field_mapping(path, field_mapping, match)
+        if not key_found:
+            key_found = _extract_from_field_mapping(path, field_mapping, match)
 
-        if not keyFound:
-            keyFound = _extract_from_field_mapping(path, meta_mapping, match)
+        if not key_found:
+            key_found = _extract_from_field_mapping(path, meta_mapping, match)
 
-        if keyFound:
-            named_ranges.append((keyFound, row_index))
+        if key_found:
+            named_ranges.append((key_found, row_index))
         else:
             logger.info(f"No named range matches this error path: {error.path}")
 
