@@ -44,6 +44,7 @@ from audit.validators import (
 )
 from audit.utils import FORM_SECTION_HANDLERS
 
+from audit.context import set_sac_to_context
 from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.models import General
@@ -233,14 +234,14 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 and "auditee_uei" in sac.general_information
             ):
                 auditee_uei = sac.general_information["auditee_uei"]
+            with set_sac_to_context(sac):
+                audit_data = self._extract_and_validate_data(
+                    form_section, excel_file, auditee_uei
+                )
 
-            audit_data = self._extract_and_validate_data(
-                form_section, excel_file, auditee_uei
-            )
+                self._save_audit_data(sac, form_section, audit_data)
 
-            self._save_audit_data(sac, form_section, audit_data)
-
-            return redirect("/")
+                return redirect("/")
 
         except SingleAuditChecklist.DoesNotExist as err:
             logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
