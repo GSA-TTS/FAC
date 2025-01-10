@@ -3,6 +3,7 @@ from .search_constants import text_input_delimiters
 
 from django.db.models import Q
 
+import re
 import time
 
 
@@ -19,8 +20,9 @@ def search_federal_program_name(general_results, params):
 
     for name in names:
         q_sub = Q()
+        rsplit = re.compile("|".join(text_input_delimiters)).split
 
-        for sub in _split(name, text_input_delimiters):
+        for sub in [s.strip() for s in rsplit(name)]:
             q_sub.add(Q(federal_program_name__icontains=sub), Q.AND)
 
         q.add(q_sub, Q.OR)
