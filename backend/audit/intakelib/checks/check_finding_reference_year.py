@@ -23,9 +23,25 @@ def finding_reference_year(ir, is_gsa_migration=False):
     references = get_range_by_name(ir, "reference_number")
     range_start = int(get_range_start_row(references))
     errors = []
-    if is_gsa_migration:
-        return errors
     sac = get_sac_from_context()
+
+    if is_gsa_migration or sac and sac.general_information is None:
+        # In real use cases, no report can be created if auditee_uei is missing, as it is a required field.
+        # The condition sac.general_information is None can occur only in test cases
+        # where general_information has been ignored purposefully (like in test_workbooks_should_pass.py).
+        return
+    elif sac is None:
+        raise ValidationError(
+            (
+                "(O_o)",
+                "",
+                "Workbook Validation Failed",
+                {
+                    "text": "The workbook cannot be validated at the moment. Please contact the helpdesk for assistance.",
+                    "link": "Intake checks: no link defined",
+                },
+            )
+        )
     audit_date = sac.general_information["auditee_fiscal_period_end"]
     audit_year = int(audit_date.split("-")[0])
     for index, reference in enumerate(references["values"]):

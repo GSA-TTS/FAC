@@ -26,7 +26,10 @@ class TestFindingReferenceYear(SimpleTestCase):
         """
         Test case where all finding reference years match the audit year.
         """
-        self.mock_sac.general_information = {"auditee_fiscal_period_end": "2022-12-31"}
+        self.mock_sac.general_information = {
+            "auditee_fiscal_period_end": "2022-12-31",
+            "auditee_uei": "UEI",
+        }
         with set_sac_to_context(self.mock_sac):
 
             errors = finding_reference_year(self.ir)
@@ -37,7 +40,10 @@ class TestFindingReferenceYear(SimpleTestCase):
         """
         Test case where finding reference years do not match the audit year.
         """
-        self.mock_sac.general_information = {"auditee_fiscal_period_end": "2023-12-31"}
+        self.mock_sac.general_information = {
+            "auditee_fiscal_period_end": "2023-12-31",
+            "auditee_uei": "UEI",
+        }
         with set_sac_to_context(self.mock_sac):
             with self.assertRaises(ValidationError) as context:
                 finding_reference_year(self.ir)
@@ -54,4 +60,31 @@ class TestFindingReferenceYear(SimpleTestCase):
         """
         errors = finding_reference_year(self.ir, is_gsa_migration=True)
 
-        self.assertEqual(errors, [])
+        self.assertEqual(errors, None)
+
+    def test_auditee_uei_missing(self):
+        """
+        Test case where auditee_uei is None and the function returns without validation.
+        """
+        self.mock_sac.general_information = {
+            "auditee_fiscal_period_end": "2022-12-31",
+            "auditee_uei": None,
+        }
+        with set_sac_to_context(self.mock_sac):
+            errors = finding_reference_year(self.ir)
+            self.assertEqual(errors, None)
+
+    def test_sac_is_none(self):
+        """
+        Test case where sac is None and a ValidationError is raised.
+        """
+        with set_sac_to_context(None):
+            with self.assertRaises(ValidationError) as context:
+                finding_reference_year(self.ir)
+
+            error = context.exception.args[0]
+            self.assertEqual(error[2], "Workbook Validation Failed")
+            self.assertEqual(
+                error[3]["text"],
+                "The workbook cannot be validated at the moment. Please contact the helpdesk for assistance.",
+            )
