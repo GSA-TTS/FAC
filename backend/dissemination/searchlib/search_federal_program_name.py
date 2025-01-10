@@ -33,19 +33,3 @@ def search_federal_program_name(general_results, params):
     report_timing("federal_program_name", params, t0, t1)
 
     return filtered_general_results
-
-
-def _split(text, delimiters):
-    """
-    Functions the same as string.split, but accepts a list of delimiters
-    """
-    if not delimiters:
-        return text
-
-    default_delimiter = delimiters[0]
-
-    # Skip delimiters[0] because it splits on that at the end
-    for delimiter in delimiters[1:]:
-        text = text.replace(delimiter, default_delimiter)
-
-    return [i.strip() for i in text.split(default_delimiter)]
