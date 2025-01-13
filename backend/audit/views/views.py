@@ -14,7 +14,6 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
 from audit.fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
-
 from audit.forms import (
     AuditorCertificationStep1Form,
     AuditorCertificationStep2Form,
@@ -37,12 +36,12 @@ from audit.models import (
 from audit.models.models import STATUS
 from audit.models.viewflow import sac_transition
 from audit.intakelib.exceptions import ExcelExtractionError
+from audit.utils import FORM_SECTION_HANDLERS
 from audit.validators import (
     validate_auditee_certification_json,
     validate_auditor_certification_json,
 )
 from audit.verify_status import verify_status
-from audit.utils import FORM_SECTION_HANDLERS
 
 from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 from dissemination.file_downloads import get_download_url, get_filename
