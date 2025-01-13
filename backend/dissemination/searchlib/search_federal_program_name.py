@@ -1,35 +1,29 @@
-from .search_general import report_timing
 from .search_constants import text_input_delimiters
 
 from django.db.models import Q
 
 import re
-import time
 
 
 def search_federal_program_name(general_results, params):
     """
     Searches on Federal Award field 'federal_program_name'.
     """
-    t0 = time.time()
-    q = Q()
+    query = Q()
     names = params.get("federal_program_name", [])
 
     if not names:
         return general_results
 
     for name in names:
-        q_sub = Q()
+        sub_query = Q()
         rsplit = re.compile("|".join(text_input_delimiters)).split
 
         for sub in [s.strip() for s in rsplit(name)]:
-            q_sub.add(Q(federal_program_name__icontains=sub), Q.AND)
+            sub_query.add(Q(federal_program_name__icontains=sub), Q.AND)
 
-        q.add(q_sub, Q.OR)
+        query.add(sub_query, Q.OR)
 
-    filtered_general_results = general_results.filter(q).distinct()
-
-    t1 = time.time()
-    report_timing("federal_program_name", params, t0, t1)
+    filtered_general_results = general_results.filter(query).distinct()
 
     return filtered_general_results
