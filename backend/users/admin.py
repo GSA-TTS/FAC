@@ -39,7 +39,7 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(UserPermission)
 class UserPermissionAdmin(admin.ModelAdmin):
     list_display = ["user", "email", "permission"]
-    search_fields = ("email", "permission", "user")
+    search_fields = ("email", "permission__slug", "user__username")
     fields = ["email", "permission"]
 
     def save_model(self, request, obj, form, change):
