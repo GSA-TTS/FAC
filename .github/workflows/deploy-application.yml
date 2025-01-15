@@ -70,6 +70,7 @@ jobs:
           cf_command: update-user-provided-service fac-key-service -p '"{\"SAM_API_KEY\":\"${{ secrets.SAM_API_KEY }}\", \"DJANGO_SECRET_LOGIN_KEY\":\"${{ secrets.DJANGO_SECRET_LOGIN_KEY }}\", \"LOGIN_CLIENT_ID\":\"${{ secrets.LOGIN_CLIENT_ID }}\", \"SECRET_KEY\":\"${{ secrets.SECRET_KEY}}\"}"'
 
       - name: Backup the database
+        if: startsWith(github.ref, 'refs/tags/v1.')
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
