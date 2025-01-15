@@ -43,23 +43,20 @@ function showValidUeiInfo() {
   const auditeeUei = document.getElementById('auditee_uei').value;
   const auditeeName = document.getElementById('auditee_name');
   const ueiInfoEl = document.createElement('div');
-  const dl = document.createElement('dl');
-  const dtUei = document.createElement('dt');
-  const ddUei = document.createElement('dd');
-  const dtName = document.createElement('dt');
-  const ddName = document.createElement('dd');
- 
+  let dl; let dtUei; let ddUei; let dtName; let ddName;
+  dl = document.createElement('dl');
+  dtUei = document.createElement('dt');
+  ddUei = document.createElement('dd');
+  dtName = document.createElement('dt');
+  ddName = document.createElement('dd');
+
   dl.setAttribute('data-testid', 'uei-info');
   dtUei.textContent = 'Unique Entity ID';
   ddUei.textContent = auditeeUei;
   dtName.textContent = 'Auditee name';
   ddName.textContent = auditeeName.value;
 
-  dl.appendChild(dtUei);
-  dl.appendChild(ddUei);
-  dl.appendChild(dtName);
-  dl.appendChild(ddName);
-
+  dl.append(dtUei,ddUei,dtName,ddName);
   ueiInfoEl.appendChild(dl);
 
   auditeeName.removeAttribute('disabled');
