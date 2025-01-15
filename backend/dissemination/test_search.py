@@ -627,9 +627,62 @@ class SearchALNTests(TestMaterializedViewBuilder):
 
 
 class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
+    def test_search_federal_program_name(self):
+        """
+        When making a search on federal program name, search_federal_program_name
+        should only return records with an award of that type.
+        """
+        general_foo = baker.make(General)
+        baker.make(
+            FederalAward,
+            report_id=general_foo,
+            federal_program_name="Foo",
+        )
+        general_bar = baker.make(General)
+        baker.make(
+            FederalAward,
+            report_id=general_bar,
+            federal_program_name="Bar",
+        )
+        general_yub_nub = baker.make(General)
+        baker.make(
+            FederalAward,
+            report_id=general_yub_nub,
+            federal_program_name="Yub Nub",
+        )
+        self.refresh_materialized_view()
+
+        adv_params = {"advanced_search_flag": True}
+
+        # Search for multiple program valid names
+        params = {"federal_program_name": ["Foo", "Bar"], **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 2)
+        name_results = [result.federal_program_name for result in results]
+        self.assertIn("Foo", name_results)
+        self.assertIn("Bar", name_results)
+
+        # Search for a single valid program name
+        params = {"federal_program_name": ["Foo"], **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].federal_program_name, "Foo")
+
+        # Search for an invalid program name
+        params = {"federal_program_name": ["Baz"], **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 0)
+
+        # Handle delimiters, ignore case
+        params = {"federal_program_name": ["nub,yub"], **adv_params}
+        results = search(params)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].federal_program_name, "Yub Nub")
+
     def test_search_cog_or_oversight(self):
         """
-        When making a search on major program, search_general should only return records with an award of that type.
+        When making a search on major program, search_cog_or_oversight should
+        only return records with an award of that type.
         """
         general_cog = baker.make(
             General,
