@@ -1,5 +1,6 @@
 from config import settings
 from datetime import datetime, timezone
+from django.contrib.sessions.models import Session
 
 
 def static_site_url(request):
@@ -59,3 +60,35 @@ def maintenance_banner(request):
 
     # Base case - we are not within any of the given timeframes. Disable the banner.
     return context
+
+# Helper function to format time
+def format_time(seconds):
+    minutes, seconds = divmod(seconds, 60)
+    return f"{minutes} minutes, {seconds} seconds"
+
+# Update the context processor
+def session_timeout_warning(request, session_expired=None):
+    remaining_seconds = None
+    formatted_time = ""
+
+    if session_expired is not True and request.session.session_key:
+        try:
+            remaining_seconds = request.session.get_expiry_age()
+            session_expired = remaining_seconds <= 0
+            if not session_expired:
+                formatted_time = format_time(remaining_seconds)
+        except Exception:
+            session_expired = True
+    else:
+        session_expired = None
+
+    show_banner = remaining_seconds is not None and remaining_seconds <= 300
+
+    return {
+        "show_session_warning_banner": show_banner,
+        "session_expired": session_expired,
+        "remaining_seconds": max(remaining_seconds or 0, 0),
+        "formatted_time": formatted_time,
+    }
+
+

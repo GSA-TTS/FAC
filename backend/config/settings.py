@@ -143,7 +143,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "config.middleware.MaintenanceCheck",
+    "config.middleware.MaintenanceCheck"
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -162,6 +162,7 @@ TEMPLATES = [
                 "config.context_processors.static_site_url",
                 "config.context_processors.omb_num_exp_date",
                 "config.context_processors.current_environment",
+                "config.context_processors.session_timeout_warning",
                 "config.context_processors.maintenance_banner",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
@@ -577,7 +578,7 @@ ONE_TIME_ACCESS_TTL_SECS = 60
 
 # Expire sessions after 30 minutes
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-age
-SESSION_COOKIE_AGE = 30 * 60
+SESSION_COOKIE_AGE = 2 * 60
 # Keep sessions alive if the user is active
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-save-every-request
 SESSION_SAVE_EVERY_REQUEST = True
