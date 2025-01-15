@@ -69,6 +69,7 @@
 
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
                     <input class="usa-input"
+                        aria-label="Page"
                         id="page"
                         name="page"
                         type="number"
@@ -77,11 +78,13 @@
 
                     {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
                     <input class="usa-input"
+                        aria-label="Order by"
                         id="order_by"
                         name="order_by"
                         value="{{ order_by }}"
                         hidden />
                     <input class="usa-input"
+                        aria-label="Order direction"
                         id="order_direction"
                         name="order_direction"
                         value="{{ order_direction }}"
