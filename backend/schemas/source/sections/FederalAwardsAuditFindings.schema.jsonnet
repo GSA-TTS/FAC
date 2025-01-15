@@ -12,10 +12,10 @@ local Meta = Types.object {
     section_name: Types.string {
       enum: [Sheets.section_names.FEDERAL_AWARDS_AUDIT_FINDINGS],
     },
-    //Because we now pass the version to the SAC record, 
+    //Because we now pass the version to the SAC record,
     //we want to make sure we allow backwards compatibility
     version: Types.string {
-      enum: ["1.0.0", "1.0.1", "1.0.2", "1.0.3", "1.0.4", "1.0.5", "1.1.0", "1.1.1", "1.1.2", Sheets.WORKBOOKS_VERSION]
+      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.5', '1.1.0', '1.1.1', '1.1.2', Sheets.WORKBOOKS_VERSION],
     },
   },
   required: ['section_name'],

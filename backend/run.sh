@@ -13,7 +13,7 @@ source tools/curation_audit_tracking_init.sh
 source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
-source tools/seed_cog_baseline.sh
+source tools/create_staffusers.sh
 
 #####
 # SETUP THE LOCAL ENVIRONMENT
@@ -44,10 +44,10 @@ curation_audit_tracking_init
 gonogo "curation_audit_tracking_init"
 
 #####
-# SEED COG/OVER TABLES
-# Setup tables for cog/over assignments
-seed_cog_baseline
-gonogo "seed_cog_baseline"
+# CREATE STAFF USERS
+# Prepares staff users for Django admin
+create_staffusers
+gonogo "create_staffusers"
 
 #####
 # LAUNCH THE APP

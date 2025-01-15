@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse
+
 from audit.forms import UnlockAfterCertificationForm
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
@@ -13,6 +14,8 @@ from audit.models import (
 )
 from audit.models.models import STATUS
 from audit.models.viewflow import sac_transition
+from audit.verify_status import verify_status
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +28,7 @@ class UnlockAfterCertificationView(
     READY_FOR_CERTIFICATION.
     """
 
+    @verify_status(STATUS.READY_FOR_CERTIFICATION)
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -51,6 +55,7 @@ class UnlockAfterCertificationView(
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
+    @verify_status(STATUS.READY_FOR_CERTIFICATION)
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 

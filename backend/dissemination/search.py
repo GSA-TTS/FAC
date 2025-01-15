@@ -1,13 +1,16 @@
+import json
 import logging
 import time
 from .searchlib.search_constants import ORDER_BY, DIRECTION, DAS_LIMIT
 from .searchlib.search_general import report_timing, search_general
 from .searchlib.search_alns import search_alns
+from .searchlib.search_cog_or_oversight import search_cog_or_oversight
 from .searchlib.search_findings import search_findings
+from .searchlib.search_federal_program_name import search_federal_program_name
 from .searchlib.search_direct_funding import search_direct_funding
 from .searchlib.search_major_program import search_major_program
-from .searchlib.search_type_requirement import search_type_requirement
 from .searchlib.search_passthrough_name import search_passthrough_name
+from .searchlib.search_type_requirement import search_type_requirement
 from dissemination.models import DisseminationCombined, General
 
 logger = logging.getLogger(__name__)
@@ -63,11 +66,13 @@ def search(params):
         logger.info("search Searching `DisseminationCombined`")
         results = search_general(DisseminationCombined, params)
         results = search_alns(results, params)
+        results = search_cog_or_oversight(results, params)
+        results = search_federal_program_name(results, params)
         results = search_findings(results, params)
         results = search_direct_funding(results, params)
         results = search_major_program(results, params)
-        results = search_type_requirement(results, params)
         results = search_passthrough_name(results, params)
+        results = search_type_requirement(results, params)
     else:
         logger.info("search Searching `General`")
         results = search_general(General, params)
@@ -147,3 +152,20 @@ def _make_distinct(results, params):
         results = results.distinct("report_id", order_by)
 
     return results
+
+
+def gather_errors(form):
+    """
+    Gather errors based on the form fields inputted by the user.
+    """
+    formatted_errors = []
+    if form.errors:
+        if not form.is_valid():
+            errors = json.loads(form.errors.as_json())
+            for error in reversed(errors):
+                if "start_date" in error:
+                    formatted_errors.append("The start date you entered is invalid.")
+                if "end_date" in error:
+                    formatted_errors.append("The end date you entered is invalid.")
+
+    return formatted_errors

@@ -1,6 +1,9 @@
+import datetime
 import logging
 from django.conf import settings
 from django.contrib import admin, messages
+from django.shortcuts import redirect
+from django.urls import reverse
 from audit.forms import SacValidationWaiverForm, UeiValidationWaiverForm
 from audit.models import (
     Access,
@@ -13,15 +16,165 @@ from audit.models import (
     UeiValidationWaiver,
 )
 from audit.models.models import STATUS
-from audit.models.viewflow import sac_transition
+from audit.models.viewflow import (
+    sac_flag_for_removal,
+    sac_revert_from_flagged_for_removal,
+    sac_transition,
+)
 from audit.validators import (
     validate_auditee_certification_json,
     validate_auditor_certification_json,
 )
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext_lazy as _
+from django.db import transaction
+from django.utils.timezone import now
+
+from dissemination.remove_singleauditreport_pdf import remove_singleauditreport_pdf
+from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 
 logger = logging.getLogger(__name__)
+
+# As per ADR #0041, the retention period for flagged reports is 6 months. That is 180 days.
+FLAGGED_REPORT_RETENTION_DAYS = 180  # 6 months
+
+
+@admin.action(description="Delete reports flagged for removal for over 6 months")
+def delete_flagged_records(modeladmin, request, queryset):
+    """
+    Admin action to delete records flagged for removal older than the specified months.
+    """
+    cutoff_date = now() - datetime.timedelta(days=FLAGGED_REPORT_RETENTION_DAYS)
+
+    # Filter records for deletion
+    records_to_delete = queryset.filter(
+        submission_status=STATUS.FLAGGED_FOR_REMOVAL,
+    ).exclude(
+        transition_name__isnull=True,
+        transition_date__isnull=True,
+    )
+
+    count = 0
+    failed_count = 0
+    report_ids = []
+    failed_report_ids = []
+    for sac in records_to_delete:
+        try:
+            if sac.transition_name[-1] == STATUS.FLAGGED_FOR_REMOVAL:
+                # Get the corresponding transition_date
+                transition_datetime = sac.transition_date[-1]
+
+            if transition_datetime <= cutoff_date:
+                with transaction.atomic():
+                    auditee_uei = sac.general_information.get("auditee_uei")
+                    if auditee_uei:
+                        UeiValidationWaiver.objects.filter(uei=auditee_uei).delete()
+                    SacValidationWaiver.objects.filter(report_id=sac).delete()
+                    remove_singleauditreport_pdf(sac)
+                    remove_workbook_artifacts(sac)
+                    Access.objects.filter(sac=sac).delete()
+                    DeletedAccess.objects.filter(sac=sac).delete()
+                    SubmissionEvent.objects.filter(sac=sac).delete()
+                    ExcelFile.objects.filter(sac=sac).delete()
+                    SingleAuditReportFile.objects.filter(sac=sac).delete()
+                    report_ids.append(sac.report_id)
+                    sac.delete()
+                    count += 1
+        except Exception as e:
+            logger.error(
+                f"Failed to delete sac report with ID {sac.report_id}: {str(e)}"
+            )
+            failed_count += 1
+            failed_report_ids.append(sac.report_id)
+            continue
+
+    if count:
+        logger.info(
+            f"Deleted {count} flagged records and their associated child records. Report IDs: {', '.join(report_ids)}"
+        )
+        modeladmin.message_user(
+            request,
+            f"Successfully deleted {count} flagged records and their associated child records. Report IDs: {', '.join(report_ids)}",
+        )
+    if failed_count:
+        logger.error(
+            f"Failed to delete {failed_count} flagged records. Report IDs: {', '.join(failed_report_ids)}"
+        )
+        modeladmin.message_user(
+            request,
+            f"Failed to delete {failed_count} flagged records. Report IDs: {', '.join(failed_report_ids)}",
+            level=messages.ERROR,
+        )
+
+
+@admin.action(description="Revert selected report(s) to In Progress")
+def revert_to_in_progress(modeladmin, request, queryset):
+    successful_reverts = []
+    errors = []
+
+    for sac in queryset:
+        if sac.submission_status == STATUS.FLAGGED_FOR_REMOVAL:
+            try:
+                sac_revert_from_flagged_for_removal(sac, request.user)
+                sac.save()
+                successful_reverts.append(sac.report_id)
+            except Exception as e:
+                modeladmin.message_user(
+                    request,
+                    f"Error reverting {sac.report_id}: {str(e)}",
+                    level=messages.ERROR,
+                )
+                errors.append(sac.report_id)
+        else:
+            modeladmin.message_user(
+                request,
+                f"Report {sac.report_id} is not flagged for removal.",
+                level=messages.WARNING,
+            )
+            errors.append(sac.report_id)
+
+    if successful_reverts:
+        modeladmin.message_user(
+            request,
+            f"Successfully reverted report(s) ({', '.join(successful_reverts)}) back to In Progress.",
+            level=messages.SUCCESS,
+        )
+
+    if errors:
+        modeladmin.message_user(
+            request,
+            f"Unable to revert report(s) ({', '.join(errors)}) back to In Progress.",
+            level=messages.ERROR,
+        )
+
+
+@admin.action(description="Flag selected report(s) for removal")
+def flag_for_removal(modeladmin, request, queryset):
+
+    flagged = []
+    already_flagged = []
+
+    for sac in queryset:
+        if sac.submission_status != STATUS.FLAGGED_FOR_REMOVAL:
+            sac_flag_for_removal(sac, request.user)
+            sac.save()
+            flagged.append(sac.report_id)
+        else:
+            already_flagged.append(sac.report_id)
+
+    if flagged:
+        modeladmin.message_user(
+            request,
+            f"Successfully flagged report(s) ({', '.join(flagged)}) for removal.",
+            level=messages.SUCCESS,
+        )
+
+    if already_flagged:
+        modeladmin.message_user(
+            request,
+            f"Report(s) ({', '.join(already_flagged)}) were already flagged.",
+            level=messages.WARNING,
+        )
 
 
 class SACAdmin(admin.ModelAdmin):
@@ -41,6 +194,7 @@ class SACAdmin(admin.ModelAdmin):
         "report_id",
         "cognizant_agency",
         "oversight_agency",
+        "submission_status",
     )
     list_filter = [
         "cognizant_agency",
@@ -50,6 +204,26 @@ class SACAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ("submitted_by",)
     search_fields = ("general_information__auditee_uei", "report_id")
+    actions = [revert_to_in_progress, flag_for_removal, delete_flagged_records]
+
+    def changelist_view(self, request, extra_context=None):
+        """
+        Override changelist_view to allow running the action without selection.
+        """
+        if (
+            "action" in request.POST
+            and request.POST["action"] == "delete_flagged_records"
+        ):
+            queryset = self.get_queryset(request)
+            delete_flagged_records(self, request, queryset)
+            # Redirect to avoid Django's "No items selected" error and ensure a valid response
+            return redirect(
+                reverse(
+                    f"admin:{self.opts.app_label}_{self.opts.model_name}_changelist"
+                )
+            )
+
+        return super().changelist_view(request, extra_context=extra_context)
 
 
 class AccessAdmin(admin.ModelAdmin):
@@ -180,6 +354,17 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                 logger.info(
                     f"Duplicate finding reference number waiver applied to SAC {sac.report_id} by user: {request.user.email}."
                 )
+            elif (
+                STATUS.IN_PROGRESS
+                and SacValidationWaiver.TYPES.PRIOR_REFERENCES in obj.waiver_types
+            ):
+                logger.info(
+                    f"User {request.user.email} is applying waiver for SAC with status: {sac.submission_status}"
+                )
+                super().save_model(request, obj, form, change)
+                logger.info(
+                    f"Invalid prior reference waiver applied to SAC {sac.report_id} by user: {request.user.email}."
+                )
             else:
                 messages.set_level(request, messages.WARNING)
                 messages.warning(
@@ -208,7 +393,6 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
                         "is_auditee_responsible": True,
                         "has_used_auditors_report": True,
                         "has_no_auditee_procedures": True,
-                        "is_accurate_and_complete": True,
                         "is_FAC_releasable": True,
                     },
                     "auditor_signature": {

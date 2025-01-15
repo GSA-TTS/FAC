@@ -4,3 +4,4 @@
 */terraform.tfstate.backup
 */deployer-creds.auto.tfvars
 shared/config/backend.tfvars
+*/*.tfplan

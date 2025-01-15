@@ -153,6 +153,10 @@ function attachEventHandlersSorting() {
  */
 function attachEventHandlersSubmission() {
   search_submit_buttons.forEach((button) => {
+
+    // The first search button is always for searching all of fac.gov, we want to ignore that one hence skipping.
+    if (button.id  === 'fac-search') return;
+
     button.addEventListener('click', () => {
       // The arrow won't be there if results were previously populated
       if (search_arrow) {

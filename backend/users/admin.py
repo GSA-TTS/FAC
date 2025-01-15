@@ -17,20 +17,38 @@ class PermissionAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ["email", "can_read_tribal", "last_login", "date_joined"]
-    list_filter = ["is_staff", "is_superuser"]
-    exclude = ["groups", "user_permissions", "password"]
+    list_display = [
+        "email",
+        "can_read_tribal",
+        "last_login",
+        "date_joined",
+        "assigned_groups",
+    ]
+    list_filter = ["is_staff", "is_superuser", "groups"]
+    exclude = ["user_permissions", "password"]
     readonly_fields = ["date_joined", "last_login"]
     search_fields = ("email", "username")
 
     def can_read_tribal(self, obj):
         return _can_read_tribal(obj)
 
+    def assigned_groups(self, obj):
+        return ", ".join([g.name for g in obj.groups.all()])
+
 
 @admin.register(UserPermission)
 class UserPermissionAdmin(admin.ModelAdmin):
     list_display = ["user", "email", "permission"]
-    search_fields = ("email", "permission", "user")
+    search_fields = ("email", "permission__slug", "user__username")
+    fields = ["email", "permission"]
+
+    def save_model(self, request, obj, form, change):
+        obj.email = obj.email.lower()
+        try:
+            obj.user = User.objects.get(email=obj.email)
+        except User.DoesNotExist:
+            pass
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(StaffUserLog)
@@ -57,8 +75,7 @@ class StaffUserLogAdmin(admin.ModelAdmin):
 class StaffUserAdmin(admin.ModelAdmin):
     list_display = [
         "staff_email",
-        "added_by_email",
-        "date_added",
+        "privilege",
     ]
     fields = [
         "staff_email",
@@ -91,3 +108,9 @@ class StaffUserAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+    def privilege(self, obj):
+        user = User.objects.get(email=obj.staff_email, is_staff=True)
+        if user.is_superuser:
+            return "Superuser"
+        return ", ".join([g.name for g in user.groups.all()])

@@ -171,6 +171,7 @@ class STATUS:
     CERTIFIED = "certified"
     SUBMITTED = "submitted"
     DISSEMINATED = "disseminated"
+    FLAGGED_FOR_REMOVAL = "flagged_for_removal"
 
 
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
@@ -249,8 +250,14 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 self.submission_status,
             )
 
+        audit_date = self.general_information["auditee_fiscal_period_end"]
+        audit_year = int(audit_date.split("-")[0])
         cognizant_agency, oversight_agency = compute_cog_over(
-            self.federal_awards, self.submission_status, self.ein, self.auditee_uei
+            self.federal_awards,
+            self.submission_status,
+            self.ein,
+            self.auditee_uei,
+            audit_year,
         )
         if oversight_agency:
             self.oversight_agency = oversight_agency
@@ -297,6 +304,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Constants:
     STATUS_CHOICES = (
         (STATUS.IN_PROGRESS, "In Progress"),
+        (STATUS.FLAGGED_FOR_REMOVAL, "Flagged for Removal"),
         (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
         (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
         (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
@@ -658,6 +666,7 @@ class SacValidationWaiver(models.Model):
         AUDITEE_CERTIFYING_OFFICIAL = "auditee_certifying_official"
         AUDITOR_CERTIFYING_OFFICIAL = "auditor_certifying_official"
         FINDING_REFERENCE_NUMBER = "finding_reference_number"
+        PRIOR_REFERENCES = "prior_references"
 
     WAIVER_CHOICES = [
         (
@@ -671,6 +680,10 @@ class SacValidationWaiver(models.Model):
         (
             TYPES.FINDING_REFERENCE_NUMBER,
             "Report has duplicate finding reference numbers",
+        ),
+        (
+            TYPES.PRIOR_REFERENCES,
+            "Report has invalid prior reference numbers",
         ),
     ]
     report_id = models.ForeignKey(

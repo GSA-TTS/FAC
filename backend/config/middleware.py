@@ -60,6 +60,11 @@ class MaintenanceCheck:
         Check that maintenance mode is disabled before running request.
         """
 
+        # Let icons through
+        if request.path == "/icons/sprite.svg":
+            response = self.get_response(request)
+            return response
+
         # redirect to maintenance page.
         if is_maintenance_on():
             if request.path != "/maintenance":

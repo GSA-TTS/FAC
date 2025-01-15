@@ -68,8 +68,8 @@ class AdvancedSearchForm(forms.Form):
     )
     entity_type_choices = list(zip(*entity_type_field_mapping.values()))
     major_program_choices = (
-        (True, "Y"),
-        (False, "N"),
+        ("True", "Y"),
+        ("False", "N"),
     )
 
     # Query params
@@ -86,6 +86,7 @@ class AdvancedSearchForm(forms.Form):
     end_date = forms.DateField(required=False)
     entity_name = forms.CharField(required=False)
     entity_type = forms.MultipleChoiceField(choices=entity_type_choices, required=False)
+    federal_program_name = forms.CharField(required=False)
     findings = forms.MultipleChoiceField(choices=findings_choices, required=False)
     fy_end_month = forms.CharField(required=False)
     major_program = forms.MultipleChoiceField(
@@ -170,6 +171,14 @@ class AdvancedSearchForm(forms.Form):
         a name somewhere, so just split on newlines.
         """
         text_input = self.cleaned_data["passthrough_name"]
+        return text_input.splitlines()
+
+    def clean_federal_program_name(self):
+        """
+        Clean the federal program name field. We can't trust that separators aren't a part of
+        a name somewhere, so just split on newlines.
+        """
+        text_input = self.cleaned_data["federal_program_name"]
         return text_input.splitlines()
 
     def clean_page(self):

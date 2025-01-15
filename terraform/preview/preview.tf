@@ -15,7 +15,6 @@ module "preview" {
   clamav_instances      = 1
   clamav_memory         = 2048
   clamav_fs_instances   = 1
-  recursive_delete      = true
   json_params = jsonencode(
     {
       "storage" : 50,
@@ -24,7 +23,7 @@ module "preview" {
 }
 
 module "preview-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v0.9.1"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.1.0"
 
   cf_org_name   = var.cf_org_name
   cf_space_name = "preview"
