@@ -1,0 +1,11 @@
+{
+    "name": "FAC Monitoring - ${title(env)}",
+    "description": "FAC Monitoring",
+    "permissions": "PUBLIC_READ_ONLY",
+    "pages": [
+        %{~ for index, page in pages  ~}
+            %{if index!=0},%{ endif }
+            ${page}
+        %{ endfor ~}
+    ]
+}

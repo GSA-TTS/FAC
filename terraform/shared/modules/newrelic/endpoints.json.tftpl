@@ -1,0 +1,387 @@
+{
+  "name": "Endpoint Details",
+  "description": null,
+  "widgets": [
+    %{~ for index, endpoint in endpoint_config  ~}
+        %{if index!=0},%{ endif }
+        {
+          "title": "",
+          "layout": {
+            "column": 1,
+            "row": ${(index * 10) + 1 },
+            "width": 10,
+            "height": 1
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.markdown"
+          },
+          "rawConfiguration": {
+            "text": "# ${endpoint.name}"
+          }
+        },
+        {
+          "title": "Transactions (last hour)",
+          "layout": {
+            "column": 1,
+            "row": ${(index * 10) + 2 },
+            "width": 2,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  ${new_relic_account_id}
+                ],
+                "query": "FROM Transaction SELECT count(*) AS 'Transactions (last hour)' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 1 hour ago"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Transactions Target: ${endpoint.transactions_sla.critical} (per hour/past week)",
+          "description": "Average number of transactions per hour over the past week",
+          "layout": {
+            "column": 3,
+            "row": ${(index * 10) + 2 },
+            "width": 2,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "dataFormatters": [
+              {
+                "name": "Transactions Per Hour",
+                "precision": "0",
+                "type": "decimal"
+              }
+            ],
+            "linkedEntityGuids": [],
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  ${new_relic_account_id}
+                ],
+                "query": "FROM Transaction SELECT rate(count(*), 1 hour) AS 'Transactions (per hour)' WHERE appName ='gsa-fac-${env}' AND request.uri LIKE '${endpoint.uri}%' SINCE 7 days ago"
+              }
+            ],
+            "thresholds": [
+              {
+                "alertSeverity": "WARNING",
+                "value": ${endpoint.transactions_sla.warning}
+              },
+              {
+                "alertSeverity": "CRITICAL",
+                "value": ${endpoint.transactions_sla.critical}
+              }
+            ],
+            "vizcoConfiguration": {
+              "billboard": {
+                "thresholds": [
+                  {
+                    "limit": ${endpoint.transactions_sla.warning},
+                    "type": "warning"
+                  },
+                  {
+                    "limit": ${endpoint.transactions_sla.critical},
+                    "type": "critical"
+                  }
+                ]
+              },
+              "dataFormatters": [
+                {
+                  "name": "Transactions Per Hour",
+                  "precision": "0",
+                  "type": "decimal"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Transactions",
+          "layout": {
+            "column": 5,
+            "row": ${(index * 10) + 2 },
+            "width": 6,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountId": ${new_relic_account_id},
+                "query": "FROM Transaction SELECT count(*) AS 'Transactions' WHERE appName = 'gsa-fac-${env}' and request.uri LIKE '${endpoint.uri}%' SINCE 14 days ago TIMESERIES"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Errors (last hour)",
+          "layout": {
+            "column": 1,
+            "row": ${(index * 10) + 5 },
+            "width": 2,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  ${new_relic_account_id}
+                ],
+                "query": "FROM TransactionError SELECT count(*) AS 'Errors (last hour)' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 1 hour ago"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Success Rate Target: Above ${endpoint.success_rate_sla.critical * 100}%",
+          "layout": {
+            "column": 3,
+            "row": ${(index * 10) + 5 },
+            "width": 2,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "dataFormatters": [
+              {
+                "name": "Success Rate (%)",
+                "precision": "4",
+                "type": "decimal"
+              }
+            ],
+            "linkedEntityGuids": [],
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  ${new_relic_account_id}
+                ],
+                "query": "FROM Transaction SELECT 100 - percentage(count(*), WHERE error is true) AS 'Success Rate' WHERE appName ='gsa-fac-${env}' AND request.uri LIKE '${endpoint.uri}%' SINCE 7 days ago "
+              }
+            ],
+            "thresholds": [
+              {
+                "alertSeverity": "WARNING",
+                "value": ${endpoint.success_rate_sla.warning}
+              },
+              {
+                "alertSeverity": "CRITICAL",
+                "value": ${endpoint.success_rate_sla.critical}
+              }
+            ],
+            "vizcoConfiguration": {
+              "billboard": {
+                "thresholds": [
+                  {
+                    "limit": ${endpoint.success_rate_sla.warning},
+                    "type": "warning"
+                  },
+                  {
+                    "limit": ${endpoint.success_rate_sla.critical},
+                    "type": "critical"
+                  }
+                ]
+              },
+              "dataFormatters": [
+                {
+                  "name": "Success Rate (%)",
+                  "precision": "4",
+                  "type": "decimal"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Errors",
+          "layout": {
+            "column": 5,
+            "row": ${(index * 10) + 5 },
+            "width": 6,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountId": ${new_relic_account_id},
+                "query": "FROM TransactionError SELECT count(*) AS 'Errors (last hour)' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 14 days ago TIMESERIES"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Latency (last hour)",
+          "layout": {
+            "column": 1,
+            "row": ${(index * 10) + 8 },
+            "width": 2,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "dataFormatters": [
+              {
+                "name": "p95",
+                "type": "decimal"
+              },
+              {
+                "name": "p50",
+                "type": "decimal"
+              },
+              {
+                "name": "Average",
+                "type": "decimal"
+              }
+            ],
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  ${new_relic_account_id}
+                ],
+                "query": "FROM Transaction SELECT average(convert(duration, 's', 'ms')) AS 'Average', percentile(convert(duration, 's', 'ms'), 50) AS 'p50', percentile(convert(duration, 's', 'ms'), 95) AS 'p95' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 1 hour ago"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Average Latency Target (last week): ${endpoint.latency_sla.critical}ms",
+          "layout": {
+            "column": 3,
+            "row": ${(index * 10) + 8 },
+            "width": 2,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.billboard"
+          },
+          "rawConfiguration": {
+            "dataFormatters": [
+              {
+                "name": "Average Latency (ms)",
+                "precision": "0",
+                "type": "decimal"
+              }
+            ],
+            "linkedEntityGuids": [],
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  ${new_relic_account_id}
+                ],
+                "query": "FROM Transaction SELECT average(convert(duration, 's', 'ms')) AS 'Average' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 7 days ago "
+              }
+            ],
+            "thresholds": [
+              {
+                "alertSeverity": "CRITICAL",
+                "value": ${endpoint.latency_sla.critical}
+              },
+              {
+                "alertSeverity": "WARNING",
+                "value": ${endpoint.latency_sla.warning}
+              }
+            ],
+            "vizcoConfiguration": {
+              "billboard": {
+                "thresholds": [
+                  {
+                    "limit": ${endpoint.latency_sla.critical},
+                    "type": "critical"
+                  },
+                  {
+                    "limit": ${endpoint.latency_sla.warning},
+                    "type": "warning"
+                  }
+                ]
+              },
+              "dataFormatters": [
+                {
+                  "name": "Average Latency (ms)",
+                  "precision": "0",
+                  "type": "decimal"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Latency",
+          "layout": {
+            "column": 5,
+            "row": ${(index * 10) + 8 },
+            "width": 6,
+            "height": 3
+          },
+          "linkedEntityGuids": null,
+          "visualization": {
+            "id": "viz.line"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "legend": {
+              "enabled": true
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  ${new_relic_account_id}
+                ],
+                "query": "FROM Transaction SELECT average(convert(duration, 's', 'ms')) AS 'Average', percentile(convert(duration, 's', 'ms'), 50) AS 'p50', percentile(convert(duration, 's', 'ms'), 95) AS 'p95'  WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 14 days ago TIMESERIES"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            },
+            "thresholds": {
+              "isLabelVisible": true
+            },
+            "units": {
+              "unit": "MS"
+            },
+            "yAxisLeft": {
+              "zero": true
+            },
+            "yAxisRight": {
+              "zero": true
+            }
+          }
+        }
+    %{ endfor ~}
+  ]
+}
