@@ -31,7 +31,12 @@
         {% else %}
             {% if data.in_progress_audits %}
                 <h1 class="font-sans-xl display-inline-flex">
-                    {% include "../circular_icon.html" with icon_name="edit" circle_color="bg-primary-dark" %}
+                    <svg class="usa-icon margin-right-1"
+                            aria-hidden="true"
+                            focusable="false"
+                            role="img">
+                        {% uswds_sprite "fac_progress" %}
+                    </svg>
                     <span class="margin-left-1">In progress<span>
                 </h1>
                 <div class="grid-row" tabindex="0">
@@ -80,7 +85,7 @@
                                         </a>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{% url 'audit:RemoveSubmissionInProgress' report_id=item.report_id %}" title="Delete audit">
+                                        <a href="{% url 'audit:SubmissionProgress' report_id=item.report_id %}" title="Delete audit">
                                             <svg class="usa-icon usa-icon--size-3 text-red" aria-hidden="true" focusable="false" role="img">
                                                 {% uswds_sprite "delete" %}
                                             </svg>
@@ -116,7 +121,12 @@
             {% endif %}
             {% if data.completed_audits %}
                 <h1 class="font-sans-xl display-inline-flex">
-                    {% include "../circular_icon.html" with icon_name="check" circle_color="bg-primary-dark" %}
+                    <svg class="usa-icon margin-right-1"
+                        aria-hidden="true"
+                        focusable="false"
+                        role="img">
+                        {% uswds_sprite "fac_completed" %}
+                    </svg>
                     <span class="margin-left-1">Completed<span>
                 </h1>
                 <div class="grid-row" tabindex="0">
