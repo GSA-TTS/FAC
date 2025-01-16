@@ -1,5 +1,6 @@
-from config import settings
 from datetime import datetime, timezone
+
+from config import settings
 from django.contrib.sessions.models import Session
 
 
@@ -61,16 +62,20 @@ def maintenance_banner(request):
     # Base case - we are not within any of the given timeframes. Disable the banner.
     return context
 
+
 # Helper function to format time
 def format_time(seconds):
     minutes, seconds = divmod(seconds, 60)
     return f"{minutes} minutes, {seconds} seconds"
 
+
 # Update the context processor
 def session_timeout_warning(request=None, session_expired=False):
 
     if request is not None and not isinstance(request, bool):
-        session_expired = not (hasattr(request, "user") and request.user.is_authenticated)
+        session_expired = not (
+            hasattr(request, "user") and request.user.is_authenticated
+        )
 
     if not isinstance(session_expired, bool):
         raise ValueError("session_expired must be a boolean value.")
@@ -78,5 +83,3 @@ def session_timeout_warning(request=None, session_expired=False):
     return {
         "session_expired": session_expired,
     }
-
-

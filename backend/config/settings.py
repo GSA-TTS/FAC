@@ -10,18 +10,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from base64 import b64decode
-from datetime import datetime, timezone
+import json
+import logging
 import os
 import sys
-import logging
-import json
-from .db_url import get_db_url_from_vcap_services
-import environs
-from cfenv import AppEnv
-from audit.get_agency_names import get_agency_names, get_audit_info_lists
+from base64 import b64decode
+from datetime import datetime, timezone
+
 import dj_database_url
+import environs
 import newrelic.agent
+from audit.get_agency_names import get_agency_names, get_audit_info_lists
+from cfenv import AppEnv
+
+from .db_url import get_db_url_from_vcap_services
 
 newrelic.agent.initialize()
 
@@ -143,7 +145,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "config.middleware.MaintenanceCheck"
+    "config.middleware.MaintenanceCheck",
 ]
 
 ROOT_URLCONF = "config.urls"
