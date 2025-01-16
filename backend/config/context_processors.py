@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 
 from config import settings
-from django.contrib.sessions.models import Session
 
 
 def static_site_url(request):
