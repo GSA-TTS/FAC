@@ -23,9 +23,4 @@ function addEventHandlers(START_SUBMISSION_URL) {
   });
 }
 
-function triggerEvent(element, eventName) {
-  var event = new Event(eventName);
-  element.dispatchEvent(event);
-}
-
 init();
