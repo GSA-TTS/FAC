@@ -28,8 +28,8 @@ def check_authenticated(request):
     if not hasattr(request, "user") or not request.user:
         raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
     if not request.user.is_authenticated:
-        session_data = session_timeout_warning(request, session_expired=True)
-        return JsonResponse(session_data, status=401)
+        session_warning = session_timeout_warning(session_expired=True)
+        return JsonResponse(session_warning, status=401)
 
 
 def has_access(sac, user):
@@ -72,8 +72,10 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         role = "certifying_auditee_contact"
         try:
-            check_authenticated(request)
-
+            auth_check_response = check_authenticated(request)
+            if isinstance(auth_check_response, JsonResponse):
+                return render(request, 'home.html')
+            
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
@@ -104,7 +106,10 @@ class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         role = "certifying_auditor_contact"
         try:
-            check_authenticated(request)
+            
+            auth_check_response = check_authenticated(request)
+            if isinstance(auth_check_response, JsonResponse):
+                return render(request, 'home.html')
 
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 

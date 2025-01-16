@@ -67,28 +67,16 @@ def format_time(seconds):
     return f"{minutes} minutes, {seconds} seconds"
 
 # Update the context processor
-def session_timeout_warning(request, session_expired=None):
-    remaining_seconds = None
-    formatted_time = ""
+def session_timeout_warning(request=None, session_expired=False):
 
-    if session_expired is not True and request.session.session_key:
-        try:
-            remaining_seconds = request.session.get_expiry_age()
-            session_expired = remaining_seconds <= 0
-            if not session_expired:
-                formatted_time = format_time(remaining_seconds)
-        except Exception:
-            session_expired = True
-    else:
-        session_expired = None
+    if request is not None and not isinstance(request, bool):
+        session_expired = not (hasattr(request, "user") and request.user.is_authenticated)
 
-    show_banner = remaining_seconds is not None and remaining_seconds <= 300
+    if not isinstance(session_expired, bool):
+        raise ValueError("session_expired must be a boolean value.")
 
     return {
-        "show_session_warning_banner": show_banner,
         "session_expired": session_expired,
-        "remaining_seconds": max(remaining_seconds or 0, 0),
-        "formatted_time": formatted_time,
     }
 
 
