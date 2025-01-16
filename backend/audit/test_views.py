@@ -494,7 +494,7 @@ class SubmissionGetTest(TestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "audit/my_submissions.html")
+        self.assertTemplateUsed(response, "audit/audit_submissions.html")
 
 
 class SubmissionStatusTests(TransactionTestCase):

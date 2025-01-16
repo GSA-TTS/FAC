@@ -21,14 +21,6 @@ function addEventHandlers(START_SUBMISSION_URL) {
   terms_start_sub.addEventListener('click', () => {
     window.location.href = START_SUBMISSION_URL;
   });
-
-  // T&C modal
-  const button_accept = document.querySelector('#modal-terms-continue');
-  button_accept.addEventListener('click', () => {
-    terms_checkbox.checked = true;
-    triggerEvent(terms_checkbox, 'change');
-    window.location.href = START_SUBMISSION_URL;
-  });
 }
 
 function triggerEvent(element, eventName) {

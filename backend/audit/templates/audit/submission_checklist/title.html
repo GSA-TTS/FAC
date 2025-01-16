@@ -1,20 +1,102 @@
 {% load sprite_helper %}
-<div class="grid-row margin-bottom-3" id="submission-checklist-title">
-    <div class="grid-row width-full" id="submission-checklist-summary">
-        <h1 class="tablet:grid-col-8 font-sans-2xl margin-y-1">
-            Submission Checklist: {{ auditee_name | default_if_none:'N/A' }}
+<div class="grid-row margin-bottom-2" id="submission-checklist-title">
+    <div class="grid-col flex-12">
+        <span class="display-inline-flex">
+            {% include "circular_icon.html" with icon_name="list" circle_color="bg-primary-dark" %}
+            <span class="font-sans-3xs text-base-dark margin-top-1 margin-left-1">SUBMISSION CHECKLIST</span>
+        </span>
+        <h1 class="tablet:grid-col-8 font-sans-xl margin-y-1">
+            {{ auditee_name | default_if_none:'N/A' }}
         </h1>
-        <div>
+        <p class="font-sans-lg margin-y-1">
+            <span class="text-bold">Report ID: </span>
+            #{{ report_id | default_if_none:'N/A' }}
+        </p>
+        <p class="font-sans-lg margin-y-1">
+            <span class="text-bold">UEI: </span>
+            {{ auditee_uei | default_if_none:'N/A' }}
+        </p>
+    </div>
+    <div>
+        <div class="usa-button-group">
             <a class="usa-button grid-row margin-top-1"
                href="{% url 'audit:ManageSubmission' report_id=report_id %}">
                 <svg class="usa-icon usa-icon--size-3 margin-right-1"
-                     aria-hidden="true"
-                     focusable="false"
-                     role="img">
+                        aria-hidden="true"
+                        focusable="false"
+                        role="img">
                     {% uswds_sprite "person_add" %}
                 </svg>
-                <span class="padding-top-05">Manage report access</span>
+                <span>Manage report access</span>
             </a>
+            <button class="usa-button usa-button--secondary grid-row margin-top-1"
+                    href=""
+                    aria-controls="modal-delete-submission"
+                    data-open-modal>
+                <span>Delete</span>
+            </button>
+        </div>
+    </div>
+    <div class="usa-modal usa-modal--lg flex-justify-start"
+            id="modal-delete-submission"
+            aria-labelledby="modal-delete-submission-heading"
+            aria-describedby="modal-delete-submission-description">
+        <div class="usa-modal__content">
+            <div class="padding-x-6 padding-bottom-4">
+                <h2 class="usa-modal__heading margin-bottom-1" id="modal-delete-submission-heading">
+                    Confirm audit submission deletion
+                </h2>
+                <div id="modal-delete-submission-description">
+                    <p>Are you sure you want to permanently delete this audit submission?</p>
+                    <div class="grid-row" tabindex="0">
+                        <table class="usa-table margin-top-0">
+                            <thead>
+                                <tr>
+                                    <th class="status-column" role="columnheader">Status</th>
+                                    <th role="columnheader">Entity name</th>
+                                    <th role="columnheader">Report ID</th>
+                                    <th role="columnheader">Auditee UEI</th>
+                                    <th role="columnheader">Fiscal period end date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="font-sans-sm">
+                                    <td>{{ submission_status }}</td>
+                                    <td>{{ auditee_name }}</td>
+                                    <td>{{ report_id }}</td>
+                                    <td>{{ auditee_uei }}</td>
+                                    <td>{{ fiscal_year_end_date }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
+                        <div class="usa-alert usa-alert--warning width-full margin-top-0">
+                            <div class="usa-alert__body">
+                                <p class="usa-alert__text">
+                                    Deleting this cannot be undone.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form id="delete-audit-submission" class="usa-form usa-form--large" method="post" action="{% url 'audit:RemoveSubmissionInProgress' report_id=report_id %}">
+                    {% csrf_token %}
+                    <div class="usa-button-group">
+                        <input type="submit"
+                                id="delete-submission"
+                                class="usa-button usa-button--secondary"
+                                value="Permanently Delete" />
+                        <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-start-submission" aria-label="Close this window" data-close-modal>Cancel</a>
+                    </div>
+                </form>
+            </div>
+            <button class="usa-button usa-modal__close"
+                    aria-label="Close this window"
+                    data-close-modal>
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    {% uswds_sprite "close" %}
+                </svg>
+            </button>
         </div>
     </div>
 </div>

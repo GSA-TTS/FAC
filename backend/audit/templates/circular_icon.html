@@ -1,0 +1,22 @@
+{% load sprite_helper %}
+{% comment %}
+    Put an icon in a colored circle. Has strict size and positioning to avoid spacing problems.
+
+    Vars:
+    "icon_name" - required, uses any "uswds_sprite" compatible name
+    "circle_color" - optional, defaults to "bg-primary"
+    "icon_color" - optional, defaults to "text-base-lightest"
+
+    Example:
+    {% include "../circular_icon.html" with icon_name="edit" %}
+{% endcomment %}
+<div style="width: 32px; height: 32px; position: relative">
+    <div class="{% if circle_color %}{{ circle_color }}{% else %}bg-primary{% endif %} height-4 width-4 radius-pill"
+        style="left: 0px; top: 0px; position: absolute;"></div>
+    <div style="width: 19.20px; height: 19.20px; left: 6.40px; top: 6.40px; position: absolute">
+        <svg style="width: 16px; height: 16.80px; left: 1.60px; top: 0.80px; position: absolute" 
+            class="usa-icon {% if icon_color %}{{ icon_color }}{% else %}text-base-lightest{% endif %}" aria-hidden="true" focusable="false" role="img">
+            {% uswds_sprite icon_name %}
+        </svg>
+    </div>
+</div>

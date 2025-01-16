@@ -3,18 +3,42 @@
 {% load sprite_helper %}
 {% block content %}
     <div class="grid-container margin-y-8">
-        <h1 class="font-sans-2xl margin-bottom-1">Single audit submissions</h1>
-        <p class="text-base-darker margin-top-0 margin-bottom-6">The audit submissions below are associated with your email address.</p>
+        <div class="grid-row" id="submission-checklist-summary">
+            <div class="grid-col flex-12">
+                <h1 class="font-sans-2xl margin-y-1">
+                    Audit submissions
+                </h1>
+                <p class="text-base-darker margin-top-0">View the audit submissions associated with your profile.</p>
+            </div>
+            <div>
+                <button class="usa-button grid-row margin-top-1"
+                        href=""
+                        aria-controls="modal-terms-conditions"
+                        data-open-modal>
+                    <svg class="usa-icon usa-icon--size-3 margin-right-1"
+                         aria-hidden="true"
+                         focusable="false"
+                         role="img">
+                        {% uswds_sprite "add" %}
+                    </svg>
+                    <span>New Audit Submission</span>
+                </button>
+            </div>
+        </div>
 
         {% if data.in_progress_audits.len == 0 and data.completed_audits.len == 0 %}
             <p>No submissions found</p>
         {% else %}
             {% if data.in_progress_audits %}
-                <h1 class="font-sans-xl">Audits in progress</h1>
-                <div class="grid-row margin-bottom-6" tabindex="0">
+                <h1 class="font-sans-xl display-inline-flex">
+                    {% include "../circular_icon.html" with icon_name="edit" circle_color="bg-primary-dark" %}
+                    <span class="margin-left-1">In progress<span>
+                </h1>
+                <div class="grid-row" tabindex="0">
                     <table class="usa-table margin-top-0">
                         <caption class="text-normal">
-                            The audits listed below are in progress, and you are still able to edit them before submission. Select an audit by clicking on its Status to make changes and continue the submission process.</caption>
+                            The audit submissions listed below are in progress, and you are still able to edit them before submission. Select an audit submission by clicking on its Status to make changes and continue the submission process.
+                        </caption>
                         <thead>
                             <tr>
                                 <th class="status-column" data-sortable scope="col" role="columnheader">Status</th>
@@ -68,10 +92,34 @@
                     </table>
                     <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
                 </div>
+
+                <div class="usa-alert usa-alert--info margin-bottom-3">
+                    <div class="usa-alert__body">
+                        <h4 class="usa-alert__heading">Can't find a report listed here?</h2>
+
+                        <p class="usa-alert__text padding-bottom-2">
+                            Please have the user with access to the audit submission confirm your user access through the
+                            <a class="usa-link"
+                               href="{{ STATIC_SITE_URL }}audit-resources/user-access/"
+                               target="_blank"
+                               rel="noopener noreferrer">manage user access controls</a>
+                            on the audit submission in question.  It may mean that your email address listed on the audit submission doesn't match the email associated with your Login.gov account.
+                        </p>
+
+                        <a class="usa-button usa-button--outline"
+                           href="https://support.fac.gov/hc/en-us/sections/18797020894989-Submission-Access"
+                           target="_blank"
+                           rel="noopener noreferrer">View more support</a>
+                    </div>
+                </div>
+
             {% endif %}
             {% if data.completed_audits %}
-                <h1 class="font-sans-xl">Completed audits</h1>
-                <div class="grid-row margin-bottom-6" tabindex="0">
+                <h1 class="font-sans-xl display-inline-flex">
+                    {% include "../circular_icon.html" with icon_name="check" circle_color="bg-primary-dark" %}
+                    <span class="margin-left-1">Completed<span>
+                </h1>
+                <div class="grid-row" tabindex="0">
                     <table class="usa-table margin-top-0">
                         <caption class="text-normal">
                             <p class="margin-0">The audits listed below are with the FAC for processing and can't be edited.</p>
@@ -122,37 +170,6 @@
                 </div>
             {% endif %}
         {% endif %}
-        <div class="grid-row">
-            <h2 class="margin-top-0">Create a new audit</h2>
-            <p class="margin-top-0 margin-bottom-5">
-                Before you begin a new audit submission, check the list above to make sure it is not already in progress. Only audit submissions assigned to your email address will show above, therefore we also recommend confirming with your team.
-            </p>
-            <form id="start-new-submission" class="usa-form usa-form--large">
-                <div class="usa-checkbox">
-                    <input id="check-start-new-submission"
-                           class="usa-checkbox__input"
-                           type="checkbox"/>
-                    <label class="usa-checkbox__label" for="check-start-new-submission">
-                        I agree to the
-                        <button id="terms-conditions-trigger"
-                                class="usa-button--unstyled margin-top-0"
-                                aria-controls="modal-terms-conditions"
-                                data-open-modal>
-                            terms and
-                            conditions.
-                        </button>
-                        <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-                    </label>
-                </div>
-                <div class="usa-button-group">
-                    <input type="submit"
-                           id="start-submission"
-                           class="usa-button"
-                           value="Start a new submission"
-                           disabled/>
-                </div>
-            </form>
-        </div>
         <div class="usa-modal flex-justify-start"
              id="modal-uei-info"
              aria-labelledby="modal-uei-info-heading"
@@ -182,15 +199,17 @@
              aria-labelledby="modal-terms-conditions-heading"
              aria-describedby="modal-terms-conditions-description">
             <div class="usa-modal__content">
-                <div class="usa-modal__main">
+                <div class="padding-x-6 padding-bottom-4">
                     <h2 class="usa-modal__heading" id="modal-terms-conditions-heading">
-                        Federal Audit Clearinghouse terms and
-                        conditions
+                        New Audit Submission
                     </h2>
-                    <div class="usa-prose" id="modal-terms-conditions-description">
+                    <div id="modal-terms-conditions-description">
+                        <p class="text-bold">
+                            Please review the Federal Audit Clearinghouse Terms and Conditions before beginning a new audit submission:
+                        </p>
                         <p>
                             FAC.gov is a U.S. General Services Administration federal government service. This site collects
-                            required documentation from organizations that spend $750,000 or more in federal grant funds in
+                            required documentation from organizations that spend <span class="text-bold">$750,000 or more</span> in federal grant funds in
                             a given year.
                         </p>
                         <p>
@@ -206,23 +225,32 @@
                             If you have questions about these conditions, please email <a class="usa-link" href="mailto:fac-support@gsa.gov">fac-support@gsa.gov</a>.
                         </p>
                     </div>
-                    <div class="usa-modal__footer">
-                        <ul class="usa-button-group">
-                            <li class="usa-button-group__item">
-                                <button id="modal-terms-continue"
-                                        type="button"
-                                        class="usa-button"
-                                        data-close-modal>
-                                    Accept and start a new submission
+                    <form id="start-new-submission" class="usa-form usa-form--large">
+                        <div class="usa-checkbox margin-y-4">
+                            <input id="check-start-new-submission"
+                                   class="usa-checkbox__input"
+                                   type="checkbox"/>
+                            <label class="usa-checkbox__label" for="check-start-new-submission">
+                                I agree to the
+                                <button id="terms-conditions-trigger"
+                                        class="usa-button--unstyled margin-top-0"
+                                        aria-controls="modal-terms-conditions"
+                                        data-open-modal>
+                                    terms and
+                                    conditions.
                                 </button>
-                            </li>
-                            <li class="usa-button-group__item">
-                                <button type="button"
-                                        class="usa-button usa-button--unstyled padding-105 text-center"
-                                        data-close-modal>Go back</button>
-                            </li>
-                        </ul>
-                    </div>
+                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                            </label>
+                        </div>
+                        <div class="usa-button-group">
+                            <input type="submit"
+                                   id="start-submission"
+                                   class="usa-button"
+                                   value="Begin New Submission"
+                                   disabled/>
+                            <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-start-submission" aria-label="Close this window" data-close-modal>Cancel</a>
+                        </div>
+                    </form>
                 </div>
                 <button class="usa-button usa-modal__close"
                         aria-label="Close this window"
@@ -234,6 +262,6 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'compiled/js/my_submissions.js' %}"
+    <script src="{% static 'compiled/js/audit_submissions.js' %}"
             type="text/javascript"></script>
 {% endblock content %}
