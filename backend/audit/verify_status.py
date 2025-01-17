@@ -20,6 +20,7 @@ def verify_status(status):
     given status(es) do(es) not match the submission's, it will redirect them back to
     the submission progress page. Accepts either a str or a [str].
     """
+
     def decorator_verify_status(request_method):
         def verify(view, request, *args, **kwargs):
             report_id = kwargs["report_id"]
