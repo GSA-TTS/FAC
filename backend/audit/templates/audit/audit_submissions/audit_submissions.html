@@ -12,8 +12,8 @@
             </div>
             <div>
                 <button class="usa-button grid-row margin-top-1"
-                        href=""
                         aria-controls="modal-terms-conditions"
+                        id="button-new-audit-submission"
                         data-open-modal>
                     <svg class="usa-icon usa-icon--size-3 margin-right-1"
                          aria-hidden="true"
@@ -26,8 +26,9 @@
             </div>
         </div>
 
-        {% if data.in_progress_audits.len == 0 and data.completed_audits.len == 0 %}
-            <p>No submissions found</p>
+        {% if data.in_progress_audits|length == 0 and data.completed_audits|length == 0 %}
+            <p class="margin-bottom-4">No submissions associated with your email address were found.</p>
+            {% include "./find_report_alert.html" %}
         {% else %}
             {% if data.in_progress_audits %}
                 <h1 class="font-sans-xl display-inline-flex">
@@ -37,7 +38,7 @@
                             role="img">
                         {% uswds_sprite "fac_progress" %}
                     </svg>
-                    <span class="margin-left-1">In progress</span>
+                    <span>In progress</span>
                 </h1>
                 <div class="grid-row" tabindex="0">
                     <table class="usa-table margin-top-0">
@@ -101,27 +102,7 @@
                     </table>
                     <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
                 </div>
-
-                <div class="usa-alert usa-alert--info margin-bottom-3">
-                    <div class="usa-alert__body">
-                        <h2 class="usa-alert__heading">Can't find a report listed here?</h2>
-
-                        <p class="usa-alert__text padding-bottom-2">
-                            Please have the user with access to the audit submission confirm your user access through the
-                            <a class="usa-link"
-                               href="{{ STATIC_SITE_URL }}audit-resources/user-access/"
-                               target="_blank"
-                               rel="noopener noreferrer">manage user access controls</a>
-                            on the audit submission in question.  It may mean that your email address listed on the audit submission doesn't match the email associated with your Login.gov account.
-                        </p>
-
-                        <a class="usa-button usa-button--outline"
-                           href="https://support.fac.gov/hc/en-us/sections/18797020894989-Submission-Access"
-                           target="_blank"
-                           rel="noopener noreferrer">View more support</a>
-                    </div>
-                </div>
-
+                {% include "./find_report_alert.html" %}
             {% endif %}
             {% if data.completed_audits %}
                 <h1 class="font-sans-xl display-inline-flex">
@@ -131,7 +112,7 @@
                         role="img">
                         {% uswds_sprite "fac_completed" %}
                     </svg>
-                    <span class="margin-left-1">Completed</span>
+                    <span>Completed</span>
                 </h1>
                 <div class="grid-row" tabindex="0">
                     <table class="usa-table margin-top-0">
