@@ -142,15 +142,6 @@ Check `backend/support/api/admin_api_v1_1_0/` for more examples.
 
 # End-to-end workbook testing
 
-### How to run the end-to-end test data generator:
-```
-docker compose run web python manage.py end_to_end_test_data_generator --email any_email_in_the_system@woo.gov \
-  --year 22 \
-  --dbkey 100010
-```
-- The email address currently must be a User in the system. As this has only been run locally so far, it would often be a test account in my local sandbox env.
-- `year` and `dbkey` are optional. The script will use default values for these if they aren't provided.
-
 ### How to run the workbook generator:
 ```
 docker compose run web python manage.py generate_workbook_files
