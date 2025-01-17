@@ -28,7 +28,11 @@ class UnlockAfterCertificationView(
     READY_FOR_CERTIFICATION.
     """
 
-    @verify_status(STATUS.READY_FOR_CERTIFICATION)
+    @verify_status([
+        STATUS.READY_FOR_CERTIFICATION,
+        STATUS.AUDITOR_CERTIFIED,
+        STATUS.AUDITEE_CERTIFIED,
+    ])
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -55,7 +59,11 @@ class UnlockAfterCertificationView(
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
-    @verify_status(STATUS.READY_FOR_CERTIFICATION)
+    @verify_status([
+        STATUS.READY_FOR_CERTIFICATION,
+        STATUS.AUDITOR_CERTIFIED,
+        STATUS.AUDITEE_CERTIFIED,
+    ])
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 

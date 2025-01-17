@@ -17,10 +17,9 @@ def verify_status(status):
     Decorator to be applied to view request methods (i.e. get, post) to verify
     that the submission is in the correct state before allowing the user to
     proceed. An incorrect status usually happens via direct URL access. If the
-    given status does not match the submission's, it will redirect them back to
-    the submission progress page.
+    given status(es) do(es) not match the submission's, it will redirect them back to
+    the submission progress page. Accepts either a str or a [str].
     """
-
     def decorator_verify_status(request_method):
         def verify(view, request, *args, **kwargs):
             report_id = kwargs["report_id"]
@@ -30,8 +29,10 @@ def verify_status(status):
             except SingleAuditChecklist.DoesNotExist:
                 raise PermissionDenied("You do not have access to this audit.")
 
-            # Return to checklist, the Audit is not in the correct state.
-            if sac.submission_status != status:
+            statuses = status if type(status) == list else [status]
+
+            if sac.submission_status not in statuses:
+                # Return to checklist, the audit is not in the correct state
                 logger.warning(
                     f"Expected submission status {status} but it's currently {sac.submission_status}"
                 )
