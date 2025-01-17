@@ -14,6 +14,7 @@ from audit.views.views import verify_status
 from audit.models.models import STATUS
 from audit.models.viewflow import SingleAuditChecklistFlow
 from audit.models.submission_event import SubmissionEvent
+from audit.models.access_roles import ACCESS_ROLES
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +33,9 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
+        role_values = [role[0] for role in ACCESS_ROLES]
         if not Access.objects.filter(
-            email=request.user.email, sac=sac, role="editor"
+            email=request.user.email, sac=sac, role__in=role_values
         ).exists():
             raise PermissionDenied("Only authorized auditors can remove audits.")
 
