@@ -1,0 +1,140 @@
+---
+name: ALN File Merge
+
+on:
+  workflow_dispatch:  # Enables manual trigger
+
+jobs:
+  process_and_update:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: pip install pandas openpyxl
+
+      - name: Install Python Dependencies
+        run: pip install -r backend/schemas/requirements.txt
+
+      - name: Install Jsonnet and Python module
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jsonnet
+          pip install git+https://github.com/google/jsonnet.git 
+          
+      - name: Install Jsonnetfmt
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jsonnet
+
+      # Merge, clean, and standardize CSV files
+      - name: Merge, Clean, and Standardize CSV Files
+        run: |
+          python -c "
+          import os
+          import pandas as pd
+          import glob
+
+          folder = './backend/schemas/source/data/ALNs_raw_downloads'
+          date_suffix = pd.Timestamp.now().strftime('%Y%m%d')
+          output_file = f'./backend/schemas/source/data/cfda-lookup-{date_suffix}.csv'
+
+          print(f'Looking for CSV files in: {folder}')
+          csv_files = glob.glob(f'{folder}/*.csv')
+          print(f'CSV files found: {csv_files}')
+
+          if not csv_files:
+              print('No data found in the input files.')
+              exit(1)
+
+          all_data = []
+          for f in csv_files:
+              try:
+                  df = pd.read_csv(f, encoding='utf-8')
+              except UnicodeDecodeError:
+                  print(f'Warning: Could not read {f} with UTF-8. Trying ISO-8859-1.')
+                  df = pd.read_csv(f, encoding='ISO-8859-1')
+              all_data.append(df)
+
+          combined_data = pd.concat(all_data, ignore_index=True)
+          all_columns = combined_data.columns.unique()
+          standardized_data = combined_data.reindex(columns=all_columns, fill_value=None)
+
+          column_mapping = {
+              'Title': 'Program Title',
+              'Assistance Listings Number': 'Program Number',
+              'Date Published': 'Date Published',
+              'Department/Ind. Agency': 'Department/Ind. Agency',
+              'Funded': 'Funded',
+              'Last Date Modified': 'Last Date Modified',
+              'POC Information': 'POC Information',
+              'Related Federal Assistance': 'Related Federal Assistance',
+              'Sub-Tier': 'Sub-Tier',
+              'Types of Assistance': 'Types of Assistance'
+          }
+
+          standardized_data = standardized_data.rename(columns=column_mapping)
+          print(f'Saving merged and standardized CSV to: {output_file}')
+          standardized_data.to_csv(output_file, index=False, encoding='utf-8')
+          print('CSV processing completed successfully.')
+          "
+
+      # Update FederalProgramNames.json
+      - name: Update FederalProgramNames.json
+        run: |
+          python -c "
+          import pandas as pd
+          import json
+          import glob
+          import os
+
+          folder = './backend/schemas/source/data'
+          latest_file = max(glob.glob(f'{folder}/cfda-lookup-*.csv'), key=os.path.getmtime)
+          output_file = './backend/schemas/source/base/FederalProgramNames.json'
+
+          print(f'Loading CSV file: {latest_file}')
+          df = pd.read_csv(latest_file)
+
+          print('Processing Program Names and Numbers')
+          program_names = df['Program Title'].dropna().str.strip().str.upper().tolist()
+          program_numbers = df['Program Number'].dropna().str.strip().tolist()
+
+          unique_prefixes = {num.split('.')[0]: None for num in program_numbers if '.' in num}
+          unique_cfda = {num: None for num in program_numbers}
+
+          output_data = {
+              'program_names': program_names,
+              'all_alns': list(unique_cfda.keys()),
+              'aln_prefixes': list(unique_prefixes.keys()),
+          }
+
+          print(f'Writing JSON file to: {output_file}')
+          with open(output_file, 'w') as json_file:
+              json.dump(output_data, json_file, indent=2, sort_keys=True)
+          print('FederalProgramNames.json updated successfully')
+          "
+
+      # Commit and push merged CSV and updated JSON
+      - name: Commit and Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ./backend/schemas/source/data/cfda-lookup-*.csv
+          git add ./backend/schemas/source/base/FederalProgramNames.json
+          git diff --cached --quiet || git commit -m "Update merged CSV and FederalProgramNames.json"
+          git push
+
+      # Run make all
+      - name: Run Make All
+        run: make -C backend/schemas all
