@@ -41,6 +41,7 @@
                             {% include "search_filters/type-requirement.html" %}
                             {% include "search_filters/entity-type.html" %}
                             {% include "search_filters/passthrough-name.html" %}
+                            {% include "search_filters/federal-program-name.html" %}
                             {% include "search_filters/report-id.html" %}
                         {% else %}
                             {% comment %} Basic search contains filters only applicable to the general table. {% endcomment %}
@@ -68,6 +69,7 @@
 
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
                     <input class="usa-input"
+                        aria-label="Page"
                         id="page"
                         name="page"
                         type="number"
@@ -76,11 +78,13 @@
 
                     {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
                     <input class="usa-input"
+                        aria-label="Order by"
                         id="order_by"
                         name="order_by"
                         value="{{ order_by }}"
                         hidden />
                     <input class="usa-input"
+                        aria-label="Order direction"
                         id="order_direction"
                         name="order_direction"
                         value="{{ order_direction }}"
@@ -149,10 +153,8 @@
                                         </td>
                                         <td>{{ result.audit_year }}</td>
                                         <td>
-                                            {% if result.oversight_agency %}
-                                                OVER-{{ result.oversight_agency }}
-                                            {% elif result.cognizant_agency %}
-                                                COG-{{ result.cognizant_agency }}
+                                            {% if result.agency_name %}
+                                                {{ result.agency_name|linebreaksbr  }}
                                             {% else %}
                                                 N/A
                                             {% endif %}
