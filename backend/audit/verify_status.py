@@ -30,7 +30,7 @@ def verify_status(status):
             except SingleAuditChecklist.DoesNotExist:
                 raise PermissionDenied("You do not have access to this audit.")
 
-            statuses = status if type(status) == list else [status]
+            statuses = status if isinstance(status, list) else [status]
 
             if sac.submission_status not in statuses:
                 # Return to checklist, the audit is not in the correct state
