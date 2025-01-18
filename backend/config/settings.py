@@ -164,7 +164,6 @@ TEMPLATES = [
                 "config.context_processors.static_site_url",
                 "config.context_processors.omb_num_exp_date",
                 "config.context_processors.current_environment",
-                "config.context_processors.session_timeout_warning",
                 "config.context_processors.maintenance_banner",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],

@@ -66,19 +66,3 @@ def maintenance_banner(request):
 def format_time(seconds):
     minutes, seconds = divmod(seconds, 60)
     return f"{minutes} minutes, {seconds} seconds"
-
-
-# Update the context processor
-def session_timeout_warning(request=None, session_expired=False):
-
-    if request is not None and not isinstance(request, bool):
-        session_expired = not (
-            hasattr(request, "user") and request.user.is_authenticated
-        )
-
-    if not isinstance(session_expired, bool):
-        raise ValueError("session_expired must be a boolean value.")
-
-    return {
-        "session_expired": session_expired,
-    }

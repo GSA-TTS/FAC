@@ -55,9 +55,9 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
         request.user = AnonymousUser()
 
         view = self.ViewStub()
-        self.assertRaises(
-            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
-        )
+        response = view.dispatch(request, report_id="not-logged-in")
+        content = response.content.decode("utf-8")
+        self.assertIn("#session-expired-modal", content)
 
     def test_no_access_raises(self):
         user = baker.make(User)
@@ -121,9 +121,9 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
         request.user = AnonymousUser()
 
         view = self.ViewStub()
-        self.assertRaises(
-            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
-        )
+        response = view.dispatch(request, report_id="not-logged-in")
+        content = response.content.decode("utf-8")
+        self.assertIn("#session-expired-modal", content)
 
     def test_no_access_raises(self):
         user = baker.make(User)
@@ -216,9 +216,9 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
         request.user = AnonymousUser()
 
         view = self.ViewStub()
-        self.assertRaises(
-            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
-        )
+        response = view.dispatch(request, report_id="not-logged-in")
+        content = response.content.decode("utf-8")
+        self.assertIn("#session-expired-modal", content)
 
     def test_no_access_raises(self):
         user = baker.make(User)

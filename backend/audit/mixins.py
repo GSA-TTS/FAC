@@ -1,6 +1,5 @@
 from typing import Any
 
-from config.context_processors import session_timeout_warning
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -29,8 +28,7 @@ def check_authenticated(request):
     if not hasattr(request, "user") or not request.user:
         raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
     if not request.user.is_authenticated:
-        session_warning = session_timeout_warning(session_expired=True)
-        return JsonResponse(session_warning, status=401)
+        return {"session_expired": True}
 
 
 def has_access(sac, user):
@@ -51,8 +49,8 @@ class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
             auth_check_response = check_authenticated(request)
-            if isinstance(auth_check_response, JsonResponse):
-                return render(request, "home.html")
+            if auth_check_response:
+                return render(request, "home.html", auth_check_response)
 
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
@@ -74,8 +72,8 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
         role = "certifying_auditee_contact"
         try:
             auth_check_response = check_authenticated(request)
-            if isinstance(auth_check_response, JsonResponse):
-                return render(request, "home.html")
+            if auth_check_response:
+                return render(request, "home.html", auth_check_response)
 
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
@@ -109,8 +107,8 @@ class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
         try:
 
             auth_check_response = check_authenticated(request)
-            if isinstance(auth_check_response, JsonResponse):
-                return render(request, "home.html")
+            if auth_check_response:
+                return render(request, "home.html", auth_check_response)
 
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
