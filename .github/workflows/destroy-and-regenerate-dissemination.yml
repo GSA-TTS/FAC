@@ -28,4 +28,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name rebuild_dissemination --command "python manage.py delete_and_regenerate_dissemination_from_intake"
+          command: cf run-task gsa-fac -k 2G -m 2G --name rebuild_dissemination --command "python manage.py delete_and_regenerate_dissemination_from_intake" --wait
