@@ -68,8 +68,8 @@ def extract_audit_findings(file, is_gsa_migration=False, auditee_uei=None):
 def audit_findings_named_ranges(errors):
     return _extract_named_ranges(
         errors,
-        audit_findings_field_mapping,
         audit_findings_column_mapping,
+        audit_findings_field_mapping,
         meta_mapping,
     )
 
