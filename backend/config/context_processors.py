@@ -10,6 +10,129 @@ def static_site_url(request):
     return {"STATIC_SITE_URL": settings.STATIC_SITE_URL}
 
 
+def navigation_content(request):
+    """
+    Returns the tree of navigation links. This is added to the context of every template
+    request made on the site.
+    """
+    STATIC_URL = settings.STATIC_SITE_URL
+
+    return {
+        "STATIC_SITE_NAVIGATION": [
+            {
+                "id": "search",
+                "name": "Audit search",
+                "links": [
+                    {
+                        "name": "Basic search",
+                        "link": f"/dissemination/search",
+                    },
+                    {
+                        "name": "Advanced search",
+                        "link": f"/dissemination/search/advanced",
+                    },
+                    {
+                        "name": "Searching Tribal Audits",
+                        "link": f"{STATIC_URL}tribal/",
+                    },
+                    {
+                        "name": "Search filters",
+                        "link": f"{STATIC_URL}search-resources/filters/",
+                    },
+                    {
+                        "name": "Data reliability",
+                        "link": f"{STATIC_URL}data-reliability/",
+                    },
+                    {
+                        "name": "Developer API resources",
+                        "link": f"{STATIC_URL}api/",
+                    },
+                ],
+            },
+            {
+                "id": "submission",
+                "name": "Audit submission",
+                "links": [
+                    {
+                        "name": "Submission resources",
+                        "link": f"{STATIC_URL}audit-resources/",
+                    },
+                    {
+                        "name": "Submission home",
+                        "link": "/",
+                    },
+                    {
+                        "name": "Submission guide",
+                        "link": f"{STATIC_URL}audit-resources/how-to/",
+                    },
+                    {
+                        "name": "SF-SAC workbooks",
+                        "link": f"{STATIC_URL}audit-resources/sf-sac/",
+                    },
+                ],
+            },
+            {
+                "id": "updates",
+                "name": "Updates & News",
+                "links": [
+                    {
+                        "name": "FAC updates",
+                        "link": f"{STATIC_URL}updates/",
+                    },
+                    {
+                        "name": "OMB announcements",
+                        "link": f"{STATIC_URL}omb/",
+                    },
+                    {
+                        "name": "System status",
+                        "link": f"{STATIC_URL}status/",
+                    },
+                ],
+            },
+            {
+                "id": "policy",
+                "name": "Policy & Compliance",
+                "links": [
+                    {
+                        "name": "Compliance",
+                        "link": f"{STATIC_URL}compliance/",
+                    },
+                    {
+                        "name": "Uniform guidance",
+                        "link": f"{STATIC_URL}uniform-guidance/",
+                    },
+                    {
+                        "name": "FAC Burden statement",
+                        "link": f"{STATIC_URL}audit-resources/burden-statement/",
+                    },
+                ],
+            },
+            {
+                "id": "contact",
+                "name": "Contacts",
+                "links": [
+                    {
+                        "name": "FAC Helpdesk",
+                        "link": "https://support.fac.gov/hc/en-us",
+                    },
+                    {
+                        "name": "FAQ",
+                        "link": f"{STATIC_URL}faq/",
+                    },
+                    {
+                        "name": "Cognizant agency contacts",
+                        "link": f"{STATIC_URL}contact-resources/cognizant-agency-contacts/",
+                    },
+                    {
+                        "name": "NSAC and KMSAL contacts",
+                        "link": f"{STATIC_URL}assets/agency-contacts/2024-agency-contacts.pdf",
+                    },
+                ],
+            },
+        ]
+    }
+
+
 def omb_num_exp_date(request):
     """
     Returns the OMB_NUMBER (str) and OMB_EXP_DATE (str) in template context form.

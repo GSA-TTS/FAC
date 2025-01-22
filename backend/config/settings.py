@@ -160,6 +160,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.static_site_url",
+                "config.context_processors.navigation_content",
                 "config.context_processors.omb_num_exp_date",
                 "config.context_processors.current_environment",
                 "config.context_processors.maintenance_banner",
