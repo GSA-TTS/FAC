@@ -56,6 +56,7 @@ from .check_no_repeat_findings import no_repeat_findings
 from .check_findings_grid_validation import findings_grid_validation
 from .check_finding_prior_references_pattern import prior_references_pattern
 from .check_finding_reference_pattern import finding_reference_pattern
+from .check_finding_reference_year import finding_reference_year
 from .check_aln_prefix_pattern import aln_agency_prefix
 
 logger = logging.getLogger(__name__)
@@ -111,6 +112,7 @@ audit_findings_checks = general_checks + [
     award_references_pattern,
     prior_references_pattern,
     finding_reference_pattern,
+    finding_reference_year,
     no_repeat_findings,
     findings_grid_validation,
     # See ticket #4385 for more information on why this check is disabled
