@@ -8,7 +8,6 @@ Follow these steps to version bump the workbook templates:
 
 # Updating the ALN (formerly CFDA) listings
 
-The current CFDA assistance listings are in the CSV found [here](https://sam.gov/data-services/Assistance%20Listings/datagov?privacy=Public). 
 
 To download ALN listings, login to Sam.gov with your GSA account and go to https://sam.gov/search/. Select "Assistance Listings" as domain. Under "key word" search, choose simple and "any words" and then "active" listings. Click "Actions" on the upper-right and then "download" to get the CSV file of active listings. Repeat the process, and choose "inactive" listings to get the CSV file for inactive ALN listings. These have to be done separately due to a limit on the amount of records that can be downloaded into a CSV file. Open up both files, copy the data from one into the other and save it as a single file in the format `cfda-lookup-YYYYMMDD.csv` in the `/schemas/source/data` directory. Running `make all` should be sufficent to regenerate the lookup schemas and the Excel templates. To verify that the "make all" command has run correctly, check to see that backend/schemas/source/base/FederalProgramNames.json file has been updated.
 
