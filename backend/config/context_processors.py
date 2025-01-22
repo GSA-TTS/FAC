@@ -25,11 +25,11 @@ def navigation_content(request):
                 "links": [
                     {
                         "name": "Basic search",
-                        "link": f"/dissemination/search",
+                        "link": "/dissemination/search",
                     },
                     {
                         "name": "Advanced search",
-                        "link": f"/dissemination/search/advanced",
+                        "link": "/dissemination/search/advanced",
                     },
                     {
                         "name": "Searching Tribal Audits",
