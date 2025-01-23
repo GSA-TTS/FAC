@@ -78,6 +78,7 @@ jobs:
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup --command "./fac-backup-util.sh v0.1.10 deploy_backup" --wait
+
       - name: Deploy Preview to cloud.gov
         if: ${{ inputs.environment == 'preview' }}
         uses: cloud-gov/cg-cli-tools@main
