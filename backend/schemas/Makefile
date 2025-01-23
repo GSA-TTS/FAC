@@ -1,7 +1,7 @@
 SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
 PYTHON=${SYSTEM_PYTHON}
 
-all: clean merge_csv_alns source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json
+all: clean merge_aln_csvs source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json
 
 json: format_jsonnet build_templates build_templates build_audit_json
 
@@ -13,9 +13,9 @@ base_specs = $(wildcard source/base/*.jsonnet)
 xlsx = $(wildcard output/excel/xlsx/*-workbook*.xlsx)
 json = $(wildcard output/excel/json/*.json)
 
-merge_csv_alns:
+merge_aln_csvs:
 	@echo "Merging and cleaning ALNs CSV files..."
-	@${PYTHON} scripts/merge-csv-alns.py
+	@${PYTHON} scripts/merge_aln_csvs.py
 	@echo "Merged CSV generated successfully."
 
 source_data:

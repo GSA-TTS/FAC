@@ -1,31 +1,22 @@
-import os
 import pandas as pd
-import glob
 from datetime import datetime
 
+
 def merge_alns():
-    folder = './source/data/ALNs_raw_downloads'
     date_suffix = datetime.now().strftime('%Y%m%d')
     output_file = f'./source/data/cfda-lookup-{date_suffix}.csv'
 
+    folder = './source/data/aln_csvs_to_be_merged'
     print(f'Looking for CSV files in: {folder}')
-    csv_files = glob.glob(f'{folder}/*.csv')
-    print(f'CSV files found: {csv_files}')
 
-    if not csv_files:
-        print('No data found in the input files.')
-        return False
+    csv_files = ['active-alns.csv', 'inactive-alns.csv']
+    all_aln_rows = []
 
-    all_data = []
-    for f in csv_files:
-        try:
-            df = pd.read_csv(f, encoding='utf-8')
-        except UnicodeDecodeError:
-            print(f'Warning: Could not read {f} with UTF-8. Trying ISO-8859-1.')
-            df = pd.read_csv(f, encoding='ISO-8859-1')
-        all_data.append(df)
+    for csv_file in csv_files:
+        aln_rows = pd.read_csv(f'{folder}/{csv_file}', encoding='ISO-8859-1')
+        all_aln_rows.append(aln_rows)
 
-    combined_data = pd.concat(all_data, ignore_index=True)
+    combined_data = pd.concat(all_aln_rows, ignore_index=True)
     all_columns = combined_data.columns.unique()
     standardized_data = combined_data.reindex(columns=all_columns, fill_value=None)
 
@@ -47,6 +38,7 @@ def merge_alns():
     standardized_data.to_csv(output_file, index=False, encoding='utf-8')
     print('CSV processing completed successfully.')
     return output_file
+
 
 if __name__ == "__main__":
     merge_alns()
