@@ -1,9 +1,10 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 import os
 from functools import reduce
 import re
-
-
+from audit.context import set_sac_to_context
+from model_bakery import baker
+from .models import SingleAuditChecklist
 from audit.intakelib import (
     extract_additional_eins,
     extract_additional_ueis,
@@ -76,12 +77,14 @@ def process_workbook_set(workbook_set_path, is_gsa_migration=True):
                     raise Exception(msg)
 
 
-class PassingWorkbooks(SimpleTestCase):
+class PassingWorkbooks(TestCase):
     def test_passing_workbooks(self):
         workbook_sets = reduce(
             os.path.join, ["audit", "fixtures", "workbooks", "should_pass"]
         )
-        for dirpath, dirnames, _ in os.walk(workbook_sets):
-            for workbook_set in dirnames:
-                print("Walking ", workbook_set)
-                process_workbook_set(os.path.join(dirpath, workbook_set))
+        sac = baker.make(SingleAuditChecklist)
+        with set_sac_to_context(sac):
+            for dirpath, dirnames, _ in os.walk(workbook_sets):
+                for workbook_set in dirnames:
+                    print("Walking ", workbook_set)
+                    process_workbook_set(os.path.join(dirpath, workbook_set))
