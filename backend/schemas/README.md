@@ -16,7 +16,7 @@ To download ALN listings:
 3. Under "key word" search, choose simple and "any words" and then "active" listings.
 4. Click "Actions" on the upper-right and then "download" to get the CSV file of active listings. Save this as `/schemas/source/data/alns_to_be_merged/active-alns.csv`.
 5. Repeat the process, choosing "inactive" listings to get the CSV file for inactive ALN listings. Save this as `/schemas/source/data/alns_to_be_merged/inactive-alns.csv`. These have to be done separately due to a limit on the amount of records that can be downloaded into a CSV file.
-7. Finally, run `make all`. This will merge the CSVs and generate the lookup schemas and the Excel templates. To verify that the "make all" command has run correctly, check to see that the`backend/schemas/source/base/FederalProgramNames.json` file has been updated.
+7. Finally, activate your virtual env inside 'backend/schemas' and run `make all`. This will merge the CSVs and generate the lookup schemas and the Excel templates. To verify that the "make all" command has run correctly, check to see that the`backend/schemas/source/base/FederalProgramNames.json` file has been updated.
 
 More specifically, `make all` executes `make source_data`, which, calls `generate_lookup_schemas.py`. This script can generate either cluster names or CFDA listings or agencies, depending on the args given (see docstring in the script.) The script will automatically used the latest-dated CSV file for processing. This way, the Makefile doesn't have to be repeatedly changed and we can retain the historic files. The format of the CSVs can change (and have), so changes to `generate_lookup_schemas.py` may be necessary may be necessary in the future and non-current files may no longer be processable.
 
