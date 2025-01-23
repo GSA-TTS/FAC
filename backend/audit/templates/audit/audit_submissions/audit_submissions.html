@@ -94,7 +94,7 @@
                                                 {% uswds_sprite "delete" %}
                                             </svg>
                                         </button>
-                                        {% include "./confirm_deletion_modal.html" with submission_status=item.submission_status auditee_name=item.auditee_name report_id=item.report_id auditee_uei=item.auditee_uei fiscal_year_end_date=item.fiscal_year_end_date %}
+                                        {% include "../confirm_deletion_modal.html" with submission_status=item.submission_status auditee_name=item.auditee_name report_id=item.report_id auditee_uei=item.auditee_uei fiscal_year_end_date=item.fiscal_year_end_date %}
                                     </td>
                                 </tr>
                             {% endfor %}
