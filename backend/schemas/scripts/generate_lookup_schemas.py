@@ -28,7 +28,7 @@ def lmap(fun, ls):
 def process_cfda_lookup(file_path):
     print(f"Processing CFDA lookup file: {file_path}")
     df = pd.read_csv(file_path, encoding="utf-8", converters={"Program Number": str})
-    
+
     program_names = list(df["Program Title"])
     program_numbers = list(df["Program Number"])
 
