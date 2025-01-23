@@ -4,9 +4,9 @@ import glob
 from datetime import datetime
 
 def merge_alns():
-    folder = './backend/schemas/source/data/ALNs_raw_downloads'
+    folder = './source/data/ALNs_raw_downloads'
     date_suffix = datetime.now().strftime('%Y%m%d')
-    output_file = f'./backend/schemas/source/data/cfda-lookup-{date_suffix}.csv'
+    output_file = f'./source/data/cfda-lookup-{date_suffix}.csv'
 
     print(f'Looking for CSV files in: {folder}')
     csv_files = glob.glob(f'{folder}/*.csv')
