@@ -1,0 +1,34 @@
+{% load static %}
+<script src="{% static 'session-timeout-modal.js' %}"></script> 
+<div class="usa-modal"
+id="session-expired-modal"
+aria-labelledby="session-expired-modal-heading"
+aria-describedby="session-expired-modal-description">
+    <div class="usa-modal__content">
+        <div class="usa-modal__main">
+            <h2 class="usa-modal__heading" id="session-expire-modal-heading">Your session has expired</h2>
+            <div id="session-expired-modal-description">
+                <p class="text-base">To protect your account, you have been automatically signed out.</p>
+            </div>
+            <div class="usa-modal__footer">
+                <ul class="usa-button-group">
+                    <li class="usa-button-group__item">
+                        <a href="{% url 'login' %}?next={{ request.path }}">
+                            <button type="button"
+                                    class="usa-button sign-in-button"
+                                    id="sign-in-expired"
+                                    data-close-modal>Authenticate with Login.gov</button>
+                        </a>
+                    </li>
+                    <li class="usa-button-group__item">
+                        <a href="{% url 'Home' %}">
+                            <button type="button"
+                                    class="usa-button usa-button--unstyled padding-105 text-center"
+                                    data-close-modal>Cancel</button>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

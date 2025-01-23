@@ -1,0 +1,51 @@
+{% load static %}
+<script src="{% static 'session-warning-modal.js' %}"></script> 
+<div class="usa-modal usa-modal"
+             id="session-warning-modal"
+             aria-labelledby="session-warning-heading"
+             aria-describedby="session-warning-description">
+    <div class="usa-modal__content">
+        <div class="usa-modal__main">
+            <h2 class="usa-modal__heading" id="session-warning-heading">You will be signed out soon</h2>
+            <div id="session-warning-description">
+                <p class="text-base">Your session is about to expire due to inactivity.</p> 
+                <li class="usa-icon-list__item">
+                    <div class="usa-icon-list__icon text-warning-dark">
+                        <svg class="usa-icon" aria-hidden="true" role="img">
+                            {% uswds_sprite "error" %}
+                        </svg>
+                    </div>
+                    <div class="usa-icon-list__content">
+                        Time Remaining: {{ formatted_time }}
+                    </div>
+                </li>
+            </div>
+            <div class="usa-modal__footer">
+                <ul class="usa-button-group">
+                    <li class="usa-button-group__item">
+                        <a href="#">
+                            <button type="button"
+                                    class="usa-button sign-in-button"
+                                    id="continue-session"
+                                    data-close-modal>Continue Session</button>
+                        </a>
+                    </li>
+                    <li class="usa-button-group__item">
+                        <a href="{% url 'logout' %}">
+                            <button type="button"
+                                    class="usa-button usa-button--unstyled padding-105 text-center"
+                                    data-close-modal>Sign out now</button>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <button class="usa-button usa-modal__close"
+                aria-label="Close this window"
+                data-close-modal>
+            <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                {% uswds_sprite "close" %}
+            </svg>
+        </button>
+    </div>
+</div>
