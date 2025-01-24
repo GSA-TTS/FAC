@@ -196,7 +196,7 @@
                                 <div class="usa-modal__main">
                                     <h2 class="usa-modal__heading" id="login-modal-heading">You must log in to continue</h2>
                                     <div id="login-modal-description">
-                                        <p>
+                                        <p class="text-base">
                                             Submitting information to the Federal Audit Clearinghouse requires authentication
                                             which will now be handled by <a href="http://login.gov">Login.gov</a>.
                                             <strong>You cannot use your old Census FAC credentials to access the new GSA
@@ -235,5 +235,10 @@
                 {% endif %}
             </div>
         </div>
+        {% if session_expired %}
+            {% include "includes/session_expired_modal.html" %}
+        {% elif show_session_warning_banner %}
+            {% include "includes/session_warning_modal.html" %}
+        {% endif %}
     </nav>
 </header>
