@@ -26,7 +26,14 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
     template = "audit/remove-submission-in-progress.html"
 
-    @verify_status([STATUS.IN_PROGRESS, STATUS.AUDITOR_CERTIFIED, STATUS.AUDITEE_CERTIFIED, STATUS.CERTIFIED])
+    @verify_status(
+        [
+            STATUS.IN_PROGRESS,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.CERTIFIED,
+        ]
+    )
     def get(self, request, *args, **kwargs):
         """
         Show the audit to be removed and confirmation form.
@@ -50,7 +57,14 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
         return render(request, self.template, context)
 
-    @verify_status([STATUS.IN_PROGRESS, STATUS.AUDITOR_CERTIFIED, STATUS.AUDITEE_CERTIFIED, STATUS.CERTIFIED])
+    @verify_status(
+        [
+            STATUS.IN_PROGRESS,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.CERTIFIED,
+        ]
+    )
     def post(self, request, *args, **kwargs):
         """
         Remove the audit and redirect to the audits list.
