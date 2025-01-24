@@ -20,6 +20,7 @@ env:
 
 jobs:
   check-for-changes:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
@@ -46,6 +47,7 @@ jobs:
               - './backend/static/**'
 
   check-if-branch-is-ahead-of-main:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
