@@ -33,10 +33,6 @@ jobs:
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
 
-      - name: Load historical data
-        working-directory: ./backend
-        run: docker compose run web ./load_data.sh
-
       - name: Run Django test suite
         working-directory: ./backend
         run: docker compose -f docker-compose.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=85 && coverage xml -o coverage.xml'

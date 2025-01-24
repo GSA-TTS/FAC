@@ -1,7 +1,7 @@
 ---
 name: Check existing tables in an environment
 ### Common Commands:
-# ./fac-backup-util.sh v0.1.8 check_tables
+# ./fac-backup-util.sh v0.1.10 check_tables
 on:
   workflow_dispatch:
     inputs:
@@ -51,4 +51,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 3G --name check_tables --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          command: cf run-task gsa-fac -k 2G -m 3G --name check_tables --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}" --wait
