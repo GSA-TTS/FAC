@@ -1,5 +1,16 @@
+# If VIRTUAL_ENV is set, use its Python binary; otherwise, fall back to system Python
 SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
-PYTHON=${SYSTEM_PYTHON}
+
+# Cross-platform Python selection (macOS/Linux/Windows)
+ifeq ($(OS), Windows_NT)
+    PYTHON = $(if $(VIRTUAL_ENV), $(subst \,/,$(VIRTUAL_ENV))/Scripts/python.exe, \
+              $(if $(wildcard venv/Scripts/python.exe), venv/Scripts/python.exe, \
+              ${SYSTEM_PYTHON}))
+else
+    PYTHON = $(if $(VIRTUAL_ENV), $(VIRTUAL_ENV)/bin/python, \
+              $(if $(wildcard venv/bin/python), venv/bin/python, \
+              ${SYSTEM_PYTHON}))
+endif
 
 all: clean merge_aln_csvs source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json
 
