@@ -11,6 +11,7 @@ on:
       - 'docs/bpmn-workflow-models/**'
       - '!.github/ISSUE_TEMPLATE/**'
   workflow_dispatch: null
+  merge_group:
 
 env:
   GH_TOKEN: ${{ github.token }}
