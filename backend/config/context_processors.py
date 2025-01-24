@@ -60,9 +60,3 @@ def maintenance_banner(request):
 
     # Base case - we are not within any of the given timeframes. Disable the banner.
     return context
-
-
-# Helper function to format time
-def format_time(seconds):
-    minutes, seconds = divmod(seconds, 60)
-    return f"{minutes} minutes, {seconds} seconds"
