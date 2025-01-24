@@ -6890,8 +6890,6 @@
                      "MOTION PICTURE FILM LIBRARIES",
                      "UNIVERSITY-LABORATORY COOPERATIVE PROGRAM",
                      "TEACHER DEVELOPMENT PROJECTS IN ENERGY",
-                     "ENVIRONMENTAL RESTORATION",
-                     "ACADEMIC PARTNERSHIPS",
                      "UNIVERSITY REACTOR SHARING AND FUEL ASSISTANCE",
                      "TRAINEESHIPS FOR GRADUATE STUDENTS IN ENERGY RELATED FIELDS",
                      "INFORMATION SERVICES_EXHIBITS, PUBLIC SPEAKERS, AND PUBLICATIONS",
@@ -7458,8 +7456,7 @@
                      "ALCOHOL AND DRUG ABUSE AND MENTAL HEALTH SERVICES BLOCK GRANT",
                      "LITERACY CORPS",
                      "CRIME PREVENTION_OUNCE OF PREVENTION GRANTS",
-                     "AGRICULTURE INSPECTION",
-                     "INTELLIGENCE COMMUNITY CENTERS FOR ACADEMIC EXCELLENCE"
+                     "AGRICULTURE INSPECTION"
                   ],
                   "type": "string"
                },
@@ -14338,8 +14335,7 @@
                      "93.992",
                      "94.010",
                      "95.002",
-                     "97.003",
-                     "null.001"
+                     "97.003"
                   ],
                   "type": "string"
                },

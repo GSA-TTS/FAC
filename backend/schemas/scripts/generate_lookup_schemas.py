@@ -37,12 +37,9 @@ def process_cfda_lookup(file_path):
 
     for program_number in program_numbers:
         program_number = cleanup_string(program_number)
-        if "." in program_number:
-            prefix, _ = program_number.split(".", 1)
-            unique_prefixes_dict[prefix] = None
-            unique_cfda_dict[program_number] = None
-        else:
-            print(f"Warning: Invalid Program Number '{program_number}'. Skipping.")
+        prefix, _ = program_number.split(".", 1)
+        unique_prefixes_dict[prefix] = None
+        unique_cfda_dict[program_number] = None
 
     unique_prefix_list = list(unique_prefixes_dict.keys())
     unique_cfda_list = list(unique_cfda_dict.keys())
