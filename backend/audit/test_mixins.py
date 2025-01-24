@@ -7,9 +7,12 @@ from django.test.client import RequestFactory
 from django.views import generic
 from model_bakery import baker
 
-from .mixins import (CertificationPermissionDenied, CertifyingAuditeeRequiredMixin,
-                     CertifyingAuditorRequiredMixin,
-                     SingleAuditChecklistAccessRequiredMixin)
+from .mixins import (
+    CertificationPermissionDenied,
+    CertifyingAuditeeRequiredMixin,
+    CertifyingAuditorRequiredMixin,
+    SingleAuditChecklistAccessRequiredMixin,
+)
 from .models import Access, SingleAuditChecklist
 
 User = get_user_model()
