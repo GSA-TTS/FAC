@@ -68,29 +68,26 @@
                     </div>
 
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
-                    <input class="usa-input"
+                    <input class="usa-input audit-search-pagination-hidden"
                         id="page"
                         name="page"
                         type="number"
                         value="{{ page }}"
                         aria-hidden="true"
-                        style="display:none"
                         hidden />
 
                     {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
-                    <input class="usa-input"
+                    <input class="usa-input audit-search-pagination-hidden"
                         id="order_by"
                         name="order_by"
                         value="{{ order_by }}"
                         aria-hidden="true"
-                        style="display:none"
                         hidden />
-                    <input class="usa-input"
+                    <input class="usa-input audit-search-pagination-hidden"
                         id="order_direction"
                         name="order_direction"
                         value="{{ order_direction }}"
                         aria-hidden="true"
-                        style="display:none"
                         hidden />
                 </form>
             </div>
