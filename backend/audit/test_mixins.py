@@ -1,3 +1,4 @@
+from audit.exceptions import SessionExpiredException
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
@@ -6,12 +7,9 @@ from django.test.client import RequestFactory
 from django.views import generic
 from model_bakery import baker
 
-from .mixins import (
-    CertificationPermissionDenied,
-    CertifyingAuditeeRequiredMixin,
-    CertifyingAuditorRequiredMixin,
-    SingleAuditChecklistAccessRequiredMixin,
-)
+from .mixins import (CertificationPermissionDenied, CertifyingAuditeeRequiredMixin,
+                     CertifyingAuditorRequiredMixin,
+                     SingleAuditChecklistAccessRequiredMixin)
 from .models import Access, SingleAuditChecklist
 
 User = get_user_model()
@@ -55,9 +53,9 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
         request.user = AnonymousUser()
 
         view = self.ViewStub()
-        response = view.dispatch(request, report_id="not-logged-in")
-        content = response.content.decode("utf-8")
-        self.assertIn("#session-expired-modal", content)
+        self.assertRaises(
+            SessionExpiredException, view.dispatch, request, report_id="not-logged-in"
+        )
 
     def test_no_access_raises(self):
         user = baker.make(User)
@@ -121,9 +119,9 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
         request.user = AnonymousUser()
 
         view = self.ViewStub()
-        response = view.dispatch(request, report_id="not-logged-in")
-        content = response.content.decode("utf-8")
-        self.assertIn("#session-expired-modal", content)
+        self.assertRaises(
+            SessionExpiredException, view.dispatch, request, report_id="not-logged-in"
+        )
 
     def test_no_access_raises(self):
         user = baker.make(User)
@@ -216,9 +214,9 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
         request.user = AnonymousUser()
 
         view = self.ViewStub()
-        response = view.dispatch(request, report_id="not-logged-in")
-        content = response.content.decode("utf-8")
-        self.assertIn("#session-expired-modal", content)
+        self.assertRaises(
+            SessionExpiredException, view.dispatch, request, report_id="not-logged-in"
+        )
 
     def test_no_access_raises(self):
         user = baker.make(User)

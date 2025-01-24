@@ -236,7 +236,7 @@
             </div>
         </div>
         {% if session_expired %}
-            {% include "includes/session_timeout_modal.html" %}
+            {% include "includes/session_expired_modal.html" %}
         {% elif show_session_warning_banner %}
             {% include "includes/session_warning_modal.html" %}
         {% endif %}
