@@ -11,16 +11,12 @@ on:
       - 'docs/bpmn-workflow-models/**'
       - '!.github/ISSUE_TEMPLATE/**'
   workflow_dispatch: null
-  merge_group:
-    branches:
-      - main
 
 env:
   GH_TOKEN: ${{ github.token }}
 
 jobs:
   check-for-changes:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
@@ -47,7 +43,6 @@ jobs:
               - './backend/static/**'
 
   check-if-branch-is-ahead-of-main:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
