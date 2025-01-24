@@ -1,8 +1,8 @@
+import boto3
+from audit.exceptions import SessionExpiredException, SessionWarningException
 from dissemination.file_downloads import file_exists
 from django.conf import settings
 from django.shortcuts import redirect, render
-import boto3
-from audit.exceptions import SessionExpiredException, SessionWarningException
 
 LOCAL_FILENAME = "./runtime/MAINTENANCE_MODE"
 S3_FILENAME = "runtime/MAINTENANCE_MODE"
@@ -79,14 +79,15 @@ class MaintenanceCheck:
         response = self.get_response(request)
         return response
 
-class HandleSessionException: 
+
+class HandleSessionException:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         response = self.get_response(request)
         return response
-    
+
     def process_exception(self, request, exception):
         if isinstance(exception, SessionExpiredException):
             context = {"session_expired": True}
@@ -95,4 +96,3 @@ class HandleSessionException:
             context = {"show_session_warning_banner": True}
             return render(request, "home.html", context)
         return None
-
