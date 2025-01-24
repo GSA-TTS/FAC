@@ -74,6 +74,7 @@
                         type="number"
                         value="{{ page }}"
                         aria-hidden="true"
+                        style="display:none"
                         hidden />
 
                     {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
@@ -82,12 +83,14 @@
                         name="order_by"
                         value="{{ order_by }}"
                         aria-hidden="true"
+                        style="display:none"
                         hidden />
                     <input class="usa-input"
                         id="order_direction"
                         name="order_direction"
                         value="{{ order_direction }}"
                         aria-hidden="true"
+                        style="display:none"
                         hidden />
                 </form>
             </div>
