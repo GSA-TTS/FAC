@@ -5,6 +5,7 @@ Follow these steps to version bump the workbook templates:
 2. `backend/audit/intakelib/checks/check_version_number.py`: Update the `AUTHORIZED_VERSIONS` variable.
 3. Activate your virtual env inside `backend/schemas` and run `make all`. This will generate new schemas and templates in `/schemas/output/`.
 4. The JSON files that were generated in `backend/schemas/output/sections/` require some modification. For each file, locate the version enum found in `properties.Meta.properties.version.enum`. `make all` will have replaced the trailing version number with the new one. Instead, restore the previous version AND append the new one to the end of the list.
+    * Note: Some of these files don't have version enums. These can be skipped.
 5. Once your PR is merged, don't forget to copy the new templates, found in `backend/schemas/output/excel/xlsx/`, into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
 
 # Updating the ALN (formerly CFDA) listings
