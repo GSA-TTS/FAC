@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 def has_valid_aln(row):
-    aln = str(row['Assistance Listings Number'])
+    aln = str(row["Assistance Listings Number"])
 
     if "." in aln:
         prefix, extension = aln.split(".", 1)
