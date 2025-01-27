@@ -34,13 +34,15 @@
                 </svg>
                 <span>Manage report access</span>
             </a>
-            <button class="usa-button usa-button--secondary grid-row margin-top-1 margin-left-1"
-                    aria-controls="modal-delete-submission-{{ report_id }}"
-                    title="Delete audit"
-                    data-open-modal>
-                <span>Delete</span>
-            </button>
+            {% if submission_status != 'Accepted' and submission_status != 'Disseminated' %}
+                <button class="usa-button usa-button--secondary grid-row margin-top-1 margin-left-1"
+                        aria-controls="modal-delete-submission-{{ report_id }}"
+                        title="Delete audit"
+                        data-open-modal>
+                    <span>Delete</span>
+                </button>
+                {% include "../modal_confirm_deletion.html" with submission_status=submission_status auditee_name=auditee_name report_id=report_id auditee_uei=auditee_uei fiscal_year_end_date=fiscal_year_end_date %}
+            {% endif %}
         </div>
     </div>
-    {% include "../confirm_deletion_modal.html" with submission_status=submission_status auditee_name=auditee_name report_id=report_id auditee_uei=auditee_uei fiscal_year_end_date=fiscal_year_end_date %}
 </div>
