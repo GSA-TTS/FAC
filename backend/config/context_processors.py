@@ -107,7 +107,7 @@ def navigation_content(request):
                     },
                     {
                         "name": "Submission home",
-                        "link": "/",
+                        "link": "/openid/login",
                     },
                 ],
             },
