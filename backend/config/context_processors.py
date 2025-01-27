@@ -75,28 +75,24 @@ def navigation_content(request):
                 "name": "Audit search",
                 "links": [
                     {
-                        "name": "Basic search",
+                        "name": "Search",
                         "link": "/dissemination/search",
                     },
                     {
-                        "name": "Advanced search",
-                        "link": "/dissemination/search/advanced",
+                        "name": "Search resources",
+                        "link": f"{STATIC_URL}search-resources",
                     },
                     {
-                        "name": "Searching Tribal Audits",
-                        "link": f"{STATIC_URL}tribal/",
-                    },
-                    {
-                        "name": "Search filters",
-                        "link": f"{STATIC_URL}search-resources/filters/",
+                        "name": "Developer resources",
+                        "link": f"{STATIC_URL}api/",
                     },
                     {
                         "name": "Data reliability",
                         "link": f"{STATIC_URL}data-reliability/",
                     },
                     {
-                        "name": "Developer API resources",
-                        "link": f"{STATIC_URL}api/",
+                        "name": "Tribal Audits",
+                        "link": f"{STATIC_URL}tribal/",
                     },
                 ],
             },
@@ -111,14 +107,6 @@ def navigation_content(request):
                     {
                         "name": "Submission home",
                         "link": "/",
-                    },
-                    {
-                        "name": "Submission guide",
-                        "link": f"{STATIC_URL}audit-resources/how-to/",
-                    },
-                    {
-                        "name": "SF-SAC workbooks",
-                        "link": f"{STATIC_URL}audit-resources/sf-sac/",
                     },
                 ],
             },
@@ -153,7 +141,7 @@ def navigation_content(request):
                         "link": f"{STATIC_URL}uniform-guidance/",
                     },
                     {
-                        "name": "FAC Burden statement",
+                        "name": "Burden statement",
                         "link": f"{STATIC_URL}audit-resources/burden-statement/",
                     },
                 ],
