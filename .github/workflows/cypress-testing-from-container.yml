@@ -12,6 +12,7 @@ jobs:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
       DJANGO_BASE_URL: "http://localhost:8000"
+      CYPRESS_API_GOV_URL: "http://localhost:3000"
       DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
       LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
