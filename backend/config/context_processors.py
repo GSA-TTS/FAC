@@ -85,7 +85,7 @@ def navigation_content(request):
                     },
                     {
                         "name": "Tribal audit search",
-                        "link": f"{STATIC_URL}tribal/",
+                        "link": f"{STATIC_URL}tribal",
                     },
                     {
                         "name": "Search resources",
@@ -93,11 +93,11 @@ def navigation_content(request):
                     },
                     {
                         "name": "Developer API resources",
-                        "link": f"{STATIC_URL}api/",
+                        "link": f"{STATIC_URL}api",
                     },
                     {
                         "name": "Data reliability",
-                        "link": f"{STATIC_URL}data-reliability/",
+                        "link": f"{STATIC_URL}data-reliability",
                     },
                 ],
             },
@@ -115,7 +115,7 @@ def navigation_content(request):
                     },
                     {
                         "name": "Submission guide",
-                        "link": "audit-resources/how-to",
+                        "link": f"{STATIC_URL}audit-resources/how-to",
                     },
                     {
                         "name": "SF-SAC workbooks",
@@ -129,15 +129,15 @@ def navigation_content(request):
                 "links": [
                     {
                         "name": "FAC updates",
-                        "link": f"{STATIC_URL}updates/",
+                        "link": f"{STATIC_URL}updates",
                     },
                     {
                         "name": "OMB announcements",
-                        "link": f"{STATIC_URL}omb/",
+                        "link": f"{STATIC_URL}omb",
                     },
                     {
                         "name": "System status",
-                        "link": f"{STATIC_URL}status/",
+                        "link": f"{STATIC_URL}status",
                     },
                 ],
             },
@@ -147,15 +147,15 @@ def navigation_content(request):
                 "links": [
                     {
                         "name": "Compliance",
-                        "link": f"{STATIC_URL}compliance/",
+                        "link": f"{STATIC_URL}compliance",
                     },
                     {
                         "name": "Uniform guidance",
-                        "link": f"{STATIC_URL}uniform-guidance/",
+                        "link": f"{STATIC_URL}uniform-guidance",
                     },
                     {
                         "name": "FAC Burden statement",
-                        "link": f"{STATIC_URL}audit-resources/burden-statement/",
+                        "link": f"{STATIC_URL}audit-resources/burden-statement",
                     },
                 ],
             },
@@ -165,7 +165,7 @@ def navigation_content(request):
                 "links": [
                     {
                         "name": "Contact resources",
-                        "link": f"{STATIC_URL}contact-resources/",
+                        "link": f"{STATIC_URL}contact-resources",
                     },
                     {
                         "name": "FAC Helpdesk",
@@ -173,7 +173,7 @@ def navigation_content(request):
                     },
                     {
                         "name": "Cognizant agency contacts",
-                        "link": f"{STATIC_URL}contact-resources/cognizant-agency-contacts/",
+                        "link": f"{STATIC_URL}contact-resources/cognizant-agency-contacts",
                     },
                     {
                         "name": "NSAC and KMSAL contacts",
