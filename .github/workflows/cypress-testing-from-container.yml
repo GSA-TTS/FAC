@@ -7,6 +7,7 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-22.04
+    environment: staging
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
