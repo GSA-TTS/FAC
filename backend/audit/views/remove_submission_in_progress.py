@@ -29,6 +29,7 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
     @verify_status(
         [
             STATUS.IN_PROGRESS,
+            STATUS.READY_FOR_CERTIFICATION,
             STATUS.AUDITOR_CERTIFIED,
             STATUS.AUDITEE_CERTIFIED,
             STATUS.CERTIFIED,
@@ -60,6 +61,7 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
     @verify_status(
         [
             STATUS.IN_PROGRESS,
+            STATUS.READY_FOR_CERTIFICATION,
             STATUS.AUDITOR_CERTIFIED,
             STATUS.AUDITEE_CERTIFIED,
             STATUS.CERTIFIED,
@@ -71,6 +73,11 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        role_values = [role[0] for role in ACCESS_ROLES]
+        if not Access.objects.filter(
+            email=request.user.email, sac=sac, role__in=role_values
+        ).exists():
+            raise PermissionDenied("Only authorized auditors can remove audits.")
 
         flow = SingleAuditChecklistFlow(sac)
         flow.transition_to_flagged_for_removal()
