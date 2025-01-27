@@ -1,5 +1,6 @@
-from config import settings
 from datetime import datetime, timezone
+
+from config import settings
 
 
 def static_site_url(request):

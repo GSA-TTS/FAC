@@ -41,4 +41,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}"
+          command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}" --wait

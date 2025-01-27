@@ -44,14 +44,21 @@ function showValidUeiInfo() {
   const auditeeName = document.getElementById('auditee_name');
   const ueiInfoEl = document.createElement('div');
 
-  ueiInfoEl.innerHTML = `
-    <dl data-testid="uei-info">
-      <dt>Unique Entity ID</dt>
-      <dd>${auditeeUei}</dd>
-      <dt>Auditee name</dt>
-      <dd>${auditeeName.value}</dd>
-    </dl>
-  `;
+  let dl; let dtUei; let ddUei; let dtName; let ddName;
+  dl = document.createElement('dl');
+  dtUei = document.createElement('dt');
+  ddUei = document.createElement('dd');
+  dtName = document.createElement('dt');
+  ddName = document.createElement('dd');
+
+  dl.setAttribute('data-testid', 'uei-info');
+  dtUei.textContent = 'Unique Entity ID';
+  ddUei.textContent = auditeeUei;
+  dtName.textContent = 'Auditee name';
+  ddName.textContent = auditeeName.value;
+
+  dl.append(dtUei,ddUei,dtName,ddName);
+  ueiInfoEl.appendChild(dl);
 
   auditeeName.removeAttribute('disabled');
   auditeeName.parentNode.setAttribute('hidden', 'hidden');

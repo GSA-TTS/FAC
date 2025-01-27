@@ -1,10 +1,12 @@
 from typing import Any
+
+from audit.exceptions import SessionExpiredException
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
-from django.core.exceptions import PermissionDenied
-from django.conf import settings
 
 from .models import Access, SingleAuditChecklist
 
@@ -22,12 +24,10 @@ class CertificationPermissionDenied(PermissionDenied):
 
 
 def check_authenticated(request):
-    if not hasattr(request, "user"):
-        raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-    if not request.user:
+    if not hasattr(request, "user") or not request.user:
         raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
     if not request.user.is_authenticated:
-        raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        raise SessionExpiredException()
 
 
 def has_access(sac, user):
@@ -100,6 +100,7 @@ class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         role = "certifying_auditor_contact"
         try:
+
             check_authenticated(request)
 
             sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
