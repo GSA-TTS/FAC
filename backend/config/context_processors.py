@@ -156,8 +156,8 @@ def navigation_content(request):
                         "link": "https://support.fac.gov/hc/en-us",
                     },
                     {
-                        "name": "FAQ",
-                        "link": f"{STATIC_URL}faq/",
+                        "name": "Contact resources",
+                        "link": f"{STATIC_URL}contact-resources/",
                     },
                     {
                         "name": "Cognizant agency contacts",
