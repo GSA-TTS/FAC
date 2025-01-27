@@ -27,146 +27,19 @@
         </div>
 
         {% if data.in_progress_audits|length == 0 and data.completed_audits|length == 0 %}
-            <p class="margin-bottom-4">No submissions associated with your email address were found.</p>
+            <p class="margin-bottom-4">No submissions associated with your email address were found. Trichotillomania</p>
             {% include "./find_report_alert.html" %}
         {% else %}
             {% if data.in_progress_audits %}
-                <h1 class="font-sans-xl display-inline-flex">
-                    <svg class="usa-icon margin-right-1"
-                            aria-hidden="true"
-                            focusable="false"
-                            role="img">
-                        {% uswds_sprite "fac_progress" %}
-                    </svg>
-                    <span>In progress</span>
-                </h1>
-                <div class="grid-row" tabindex="0">
-                    <table class="usa-table margin-top-0">
-                        <caption class="text-normal">
-                            The audit submissions listed below are in progress, and you are still able to edit them before submission. Select an audit submission by clicking on its Status to make changes and continue the submission process.
-                        </caption>
-                        <thead>
-                            <tr>
-                                <th class="status-column" data-sortable scope="col" role="columnheader">Status</th>
-                                <th data-sortable scope="col" role="columnheader">Entity name</th>
-                                <th data-sortable scope="col" role="columnheader">Report ID</th>
-                                <th data-sortable scope="col" role="columnheader">
-                                    Auditee
-                                    <button class="usa-button--unstyled margin-top-0"
-                                            aria-controls="modal-uei-info"
-                                            data-open-modal>UEI</button>
-                                </th>
-                                <th data-sortable scope="col" role="columnheader">Fiscal period end date</th>
-                                <th scope="col" role="columnheader">User Access</th>
-                                <th scope="col" role="columnheader">Delete</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in data.in_progress_audits %}
-                                <tr>
-                                    <td>
-                                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
-                                        {% if item.submission_status in "Ready for Certification,Auditor Certified,Auditee Certified" %}
-                                            <p class="margin-0">
-                                                <a class="usa-link" href="{% url 'audit:UnlockAfterCertification' item.report_id %}">
-                                                    (Unlock)
-                                                </a>
-                                            </p>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ item.auditee_name }}</td>
-                                    <td>{{ item.report_id }}</td>
-                                    <td>{{ item.auditee_uei }}</td>
-                                    <td>{{ item.fiscal_year_end_date }}</td>
-                                    <td class="text-center">
-                                        <a href="{% url 'audit:ManageSubmission' report_id=item.report_id %}" title="Manage report access">
-                                            <svg class="usa-icon usa-icon--size-3 text-blue" aria-hidden="true" focusable="false" role="img">
-                                                {% uswds_sprite "person_add" %}
-                                            </svg>
-                                        </a>
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="usa-button usa-button--unstyled"
-                                                aria-controls="modal-delete-submission-{{ item.report_id }}"
-                                                data-open-modal
-                                                title="Delete audit">
-                                            <svg class="usa-icon usa-icon--size-3 text-red" aria-hidden="true" focusable="false" role="img">
-                                                {% uswds_sprite "delete" %}
-                                            </svg>
-                                        </button>
-                                        {% include "../confirm_deletion_modal.html" with submission_status=item.submission_status auditee_name=item.auditee_name report_id=item.report_id auditee_uei=item.auditee_uei fiscal_year_end_date=item.fiscal_year_end_date %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
-                </div>
-                {% include "./find_report_alert.html" %}
+                {% include "./table_in_progress.html" %}
+                {% include "./alert_find_report.html" %}
             {% endif %}
             {% if data.completed_audits %}
-                <h1 class="font-sans-xl display-inline-flex">
-                    <svg class="usa-icon margin-right-1"
-                        aria-hidden="true"
-                        focusable="false"
-                        role="img">
-                        {% uswds_sprite "fac_completed" %}
-                    </svg>
-                    <span>Completed</span>
-                </h1>
-                <div class="grid-row" tabindex="0">
-                    <table class="usa-table margin-top-0">
-                        <caption class="text-normal">
-                            <p class="margin-0">The audits listed below are with the FAC for processing and can't be edited.</p>
-                            <ul>
-                                <li>
-                                    "Accepted" audits are complete and don't require further action by the auditee or auditor.
-                                </li>
-                                <li>
-                                    "Submitted" audits are being processed for dissemination. If an audit's status remains at "Submitted" for more than 24 hours, please <a class="usa-link" href="https://support.fac.gov/hc/en-us/requests/new" target="_blank">submit a helpdesk ticket</a>.
-                                </li>
-                            </ul>
-                        </caption>
-                        <thead>
-                            <tr>
-                                <th data-sortable scope="col" role="columnheader">Status</th>
-                                <th data-sortable scope="col" role="columnheader">Entity name</th>
-                                <th data-sortable scope="col" role="columnheader">Report ID</th>
-                                <th data-sortable scope="col" role="columnheader">
-                                    Auditee
-                                    <button class="usa-button--unstyled margin-top-0"
-                                            aria-controls="modal-uei-info"
-                                            data-open-modal>UEI</button>
-                                </th>
-                                <th data-sortable scope="col" role="columnheader">Fiscal period end date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in data.completed_audits %}
-                                <tr>
-                                    <td>
-                                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">
-                                            {% if item.submission_status == "Disseminated" %}
-                                                Accepted
-                                            {% else %}
-                                                {{ item.submission_status }}
-                                            {% endif %}
-                                        </a>
-                                    </td>
-                                    <td>{{ item.auditee_name }}</td>
-                                    <td>{{ item.report_id }}</td>
-                                    <td>{{ item.auditee_uei }}</td>
-                                    <td>{{ item.fiscal_year_end_date }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
-                </div>
+                {% include "./table_completed.html" %}
             {% endif %}
         {% endif %}
-        {% include "./uei_modal.html" %}
-        {% include "./new_audit_submission_modal.html" %}
+        {% include "./modal_uei.html" %}
+        {% include "./modal_new_audit_submission.html" %}
     </div>
     <script src="{% static 'compiled/js/audit_submissions.js' %}"
             type="text/javascript"></script>
