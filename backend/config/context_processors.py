@@ -76,24 +76,28 @@ def navigation_content(request):
                 "name": "Audit search",
                 "links": [
                     {
-                        "name": "Search",
+                        "name": "Basic search",
                         "link": "/dissemination/search",
+                    },
+                    {
+                        "name": "Advanced search",
+                        "link": "/dissemination/search/advanced",
+                    },
+                    {
+                        "name": "Tribal audit search",
+                        "link": f"{STATIC_URL}tribal/",
                     },
                     {
                         "name": "Search resources",
                         "link": f"{STATIC_URL}search-resources",
                     },
                     {
-                        "name": "Developer resources",
+                        "name": "Developer API resources",
                         "link": f"{STATIC_URL}api/",
                     },
                     {
                         "name": "Data reliability",
                         "link": f"{STATIC_URL}data-reliability/",
-                    },
-                    {
-                        "name": "Tribal Audits",
-                        "link": f"{STATIC_URL}tribal/",
                     },
                 ],
             },
@@ -108,6 +112,14 @@ def navigation_content(request):
                     {
                         "name": "Submission home",
                         "link": "/openid/login",
+                    },
+                    {
+                        "name": "Submission guide",
+                        "link": "audit-resources/how-to",
+                    },
+                    {
+                        "name": "SF-SAC workbooks",
+                        "link": f"{STATIC_URL}audit-resources/sf-sac",
                     },
                 ],
             },
@@ -142,7 +154,7 @@ def navigation_content(request):
                         "link": f"{STATIC_URL}uniform-guidance/",
                     },
                     {
-                        "name": "Burden statement",
+                        "name": "FAC Burden statement",
                         "link": f"{STATIC_URL}audit-resources/burden-statement/",
                     },
                 ],
@@ -152,12 +164,12 @@ def navigation_content(request):
                 "name": "Contacts",
                 "links": [
                     {
-                        "name": "FAC Helpdesk",
-                        "link": "https://support.fac.gov/hc/en-us",
-                    },
-                    {
                         "name": "Contact resources",
                         "link": f"{STATIC_URL}contact-resources/",
+                    },
+                    {
+                        "name": "FAC Helpdesk",
+                        "link": "https://support.fac.gov/hc/en-us",
                     },
                     {
                         "name": "Cognizant agency contacts",
