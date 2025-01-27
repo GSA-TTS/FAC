@@ -31,12 +31,6 @@ jobs:
       CYPRESS_LOGIN_TEST_EMAIL_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL_AUDITEE }}
       CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE }}
       CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE }}
-
-      # Cypress Docker image from https://hub.docker.com/r/cypress
-      # with browsers pre-installed
-    container:
-      image: cypress/browsers:latest
-      options: --user 1001
     steps:
       - name: Checkout
         uses: actions/checkout@v4
