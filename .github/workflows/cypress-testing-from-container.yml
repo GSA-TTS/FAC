@@ -55,5 +55,3 @@ jobs:
           browser: chrome
           working-directory: ./backend
           spec: cypress/e2e/full-submission.cy.js
-        env:
-          CYPRESS_INSTALL_BINARY: 0
