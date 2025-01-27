@@ -53,17 +53,17 @@ jobs:
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
 
-      - name: Perform first run steps
-        working-directory: ./backend
-        run: make docker-first-run
+    #   - name: Perform first run steps
+    #     working-directory: ./backend
+    #     run: make docker-first-run
 
-      - name: Load fixtures
-        working-directory: ./backend
-        run: docker compose run web python manage.py load_fixtures
+    #   - name: Load fixtures
+    #     working-directory: ./backend
+    #     run: docker compose run web python manage.py load_fixtures
 
-      - name: Create materialized view
-        working-directory: ./backend
-        run: docker compose run web python manage.py materialized_views --create
+    #   - name: Create materialized view
+    #     working-directory: ./backend
+    #     run: docker compose run web python manage.py materialized_views --create
 
       - uses: browser-actions/setup-chrome@v1
         with:
