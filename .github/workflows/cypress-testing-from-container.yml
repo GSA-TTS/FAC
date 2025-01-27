@@ -1,0 +1,59 @@
+---
+name: Run Cypress on Container
+on:
+  push:
+    branches: [cypress-container-testing]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-24.04
+    env:
+      ENV: TESTING
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+      DJANGO_BASE_URL: "http://localhost:8000"
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+      LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
+      DISABLE_AUTH: False
+
+      CYPRESS_API_GOV_KEY: ${{ secrets.CYPRESS_API_GOV_KEY }}
+      CYPRESS_API_GOV_USER_ID: ${{ secrets.CYPRESS_API_GOV_USER_ID }}
+      CYPRESS_API_GOV_KEY_ADMIN: ${{ secrets.CYPRESS_API_GOV_KEY_ADMIN }}
+      CYPRESS_API_GOV_USER_ID_ADMIN: ${{ secrets.CYPRESS_API_GOV_USER_ID_ADMIN }}
+      CYPRESS_API_GOV_URL: ${{ secrets.CYPRESS_API_GOV_URL }}
+      CYPRESS_API_VERSION: "api_v1_1_0"
+      CYPRESS_ADMIN_API_VERSION: "admin_api_v1_1_0"
+      CYPRESS_BASE_URL: "http://localhost:8000"
+      CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
+      CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
+      CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
+      CYPRESS_LOGIN_TEST_EMAIL_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL_AUDITEE }}
+      CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE }}
+      CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE }}
+
+      # Cypress Docker image from https://hub.docker.com/r/cypress
+      # with browsers pre-installed
+    container:
+      image: cypress/browsers:latest
+      options: --user 1001
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Create .env
+        working-directory: ./backend
+        run: touch .env
+
+      - uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          working-directory: ./backend
+          spec: cypress/e2e/full-submission.cy.js
+        env:
+          CYPRESS_INSTALL_BINARY: 0
