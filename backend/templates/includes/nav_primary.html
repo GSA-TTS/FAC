@@ -24,119 +24,25 @@
             </button>
             <div class="usa-nav-container padding-0">
                 <ul class="usa-nav__primary usa-accordion">
+                    {% for category in STATIC_SITE_NAVIGATION %}
                     <li class="usa-nav__primary-item">
                         <button
                             class="usa-accordion__button usa-nav__link"
                             aria-expanded="false"
-                            aria-controls="basic-nav-search" >
-                            <span>Audit search</span>
+                            aria-controls="basic-nav-{{ category.id }}" >
+                            <span>{{ category.name }}</span>
                         </button>
-                        <ul id="basic-nav-search" class="usa-nav__submenu">
+                        <ul id="basic-nav-{{ category.id }}" class="usa-nav__submenu">
+                            {% for link in category.links %}
                             <li class="usa-nav__submenu-item">
-                                <a href="{% url 'dissemination:Search' %}">
-                                    Search
-                                </a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}search-resources/"
+                                <a href="{{ link.link }}"
                                 target="_blank"
-                                rel="noopener noreferrer">Search resources</a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}api/"
-                                target="_blank"
-                                rel="noopener noreferrer">Developer resources</a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}data-reliability/"
-                                target="_blank"
-                                rel="noopener noreferrer">Data reliability</a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}tribal/"
-                                target="_blank"
-                                rel="noopener noreferrer">Tribal audits</a>
-                            </li>
+                                rel="noopener noreferrer">{{ link.name }}</a>
+                              </li>
+                            {% endfor %}
                         </ul>
                     </li>
-                    <li class="usa-nav__primary-item">
-                        <button
-                            class="usa-accordion__button usa-nav__link"
-                            aria-expanded="false"
-                            aria-controls="basic-nav-submission" >
-                            <span>Audit submission</span>
-                        </button>
-                        <ul id="basic-nav-submission" class="usa-nav__submenu">
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}audit-resources/"
-                                   target="_blank"
-                                   rel="noopener noreferrer">Submission resources</a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
-                                <a href="{% url 'audit:MySubmissions' %}">
-                                    Submission home
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="usa-nav__primary-item">
-                        <button
-                            class="usa-accordion__button usa-nav__link"
-                            aria-expanded="false"
-                            aria-controls="basic-nav-updates" >
-                            <span>Updates &#38; News</span>
-                        </button>
-                        <ul id="basic-nav-updates" class="usa-nav__submenu">
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}updates/"
-                                   target="_blank"
-                                   rel="noopener noreferrer">FAC updates</a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}omb/"
-                                   target="_blank"
-                                   rel="noopener noreferrer">OMB announcements</a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}status/"
-                                   target="_blank"
-                                   rel="noopener noreferrer">System status</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="usa-nav__primary-item">
-                        <button
-                            class="usa-accordion__button usa-nav__link"
-                            aria-expanded="false"
-                            aria-controls="basic-nav-policy" >
-                            <span>Policy &#38; Compliance</span>
-                        </button>
-                        <ul id="basic-nav-policy" class="usa-nav__submenu">
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}compliance/"
-                                   target="_blank"
-                                   rel="noopener noreferrer">Compliance</a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}uniform-guidance/"
-                                   target="_blank"
-                                   rel="noopener noreferrer">Uniform guidance</a>
-                            </li>
-                            <li class="usa-nav__submenu-item">
-                                <a href="{{ STATIC_SITE_URL }}audit-resources/burden-statement/"
-                                   target="_blank"
-                                   rel="noopener noreferrer">Burden statement</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="usa-nav__primary-item">
-                        <a class="usa-nav__link text-primary-dark"
-                           href="{{ STATIC_SITE_URL }}contact-resources/"
-                           target="_blank"
-                           rel="noopener noreferrer">
-                            <span class="text-primary-dark">Contact</span>
-                        </a>
-                    </li>
+                    {% endfor %}
                     {% comment %}
                         OMB_NUMBER and OMB_EXP_DATE are global.
                         Added in /config/settings, passed in /config/context_processors.py
@@ -196,7 +102,7 @@
                                 <div class="usa-modal__main">
                                     <h2 class="usa-modal__heading" id="login-modal-heading">You must log in to continue</h2>
                                     <div id="login-modal-description">
-                                        <p>
+                                        <p class="text-base">
                                             Submitting information to the Federal Audit Clearinghouse requires authentication
                                             which will now be handled by <a href="http://login.gov">Login.gov</a>.
                                             <strong>You cannot use your old Census FAC credentials to access the new GSA
@@ -235,5 +141,10 @@
                 {% endif %}
             </div>
         </div>
+        {% if session_expired %}
+            {% include "includes/session_expired_modal.html" %}
+        {% elif show_session_warning_banner %}
+            {% include "includes/session_warning_modal.html" %}
+        {% endif %}
     </nav>
 </header>

@@ -10,18 +10,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from base64 import b64decode
-from datetime import datetime, timezone
+import json
+import logging
 import os
 import sys
-import logging
-import json
-from .db_url import get_db_url_from_vcap_services
-import environs
-from cfenv import AppEnv
-from audit.get_agency_names import get_agency_names, get_audit_info_lists
+from base64 import b64decode
+from datetime import datetime, timezone
+
 import dj_database_url
+import environs
 import newrelic.agent
+from audit.get_agency_names import get_agency_names, get_audit_info_lists
+from cfenv import AppEnv
+
+from .db_url import get_db_url_from_vcap_services
 
 newrelic.agent.initialize()
 
@@ -141,6 +143,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "config.middleware.HandleSessionException",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "config.middleware.MaintenanceCheck",
@@ -160,6 +163,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.static_site_url",
+                "config.context_processors.navigation_content",
                 "config.context_processors.omb_num_exp_date",
                 "config.context_processors.current_environment",
                 "config.context_processors.maintenance_banner",

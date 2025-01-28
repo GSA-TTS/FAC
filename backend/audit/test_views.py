@@ -350,7 +350,8 @@ class SubmissionViewTests(TestCase):
         """Test that GET returns 403 if user is unauthorized"""
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "home.html")
+        self.assertTrue(response.context["session_expired"])
 
     @patch("audit.models.SingleAuditChecklist.validate_full")
     @patch("audit.views.views.sac_transition")
@@ -889,7 +890,8 @@ class ExcelFileHandlerViewTests(TestCase):
                 )
             )
 
-            self.assertEqual(response.status_code, 403)
+            self.assertTemplateUsed(response, "home.html")
+            self.assertTrue(response.context["session_expired"])
 
     def test_bad_report_id_returns_403(self):
         """When a request is made for a malformed or nonexistent report_id, a 403 error should be returned"""
@@ -1526,7 +1528,8 @@ class ExcelFileHandlerViewTests(TestCase):
                     kwargs={"report_id": "12345", "form_section": form_section},
                 )
             )
-            self.assertEqual(response.status_code, 403)
+            self.assertTemplateUsed(response, "home.html")
+            self.assertTrue(response.context["session_expired"])
 
     def test_get_bad_report_id_returns_403(self):
         """Test that uploading with a malformed or nonexistant report_id reutrns 403"""
@@ -1628,7 +1631,8 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "home.html")
+        self.assertTrue(response.context["session_expired"])
 
     def test_bad_report_id_returns_403(self):
         """When a request is made for a malformed or nonexistent report_id, a 403 error should be returned"""
