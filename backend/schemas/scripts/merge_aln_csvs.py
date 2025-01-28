@@ -3,11 +3,15 @@ from datetime import datetime
 
 
 def has_valid_aln(row):
+    """
+    Check if the Assistance Listings Number (ALN) is valid.
+    Valid formats include ##.###, ##.##, and ##.#.
+    """
     aln = str(row["Assistance Listings Number"])
 
     if "." in aln:
         prefix, extension = aln.split(".", 1)
-        if prefix.isdigit() and extension:
+        if prefix.isdigit() and extension.isdigit():
             return True
 
     print(f"Warning: Invalid Program Number '{aln}'. Skipping.")
@@ -25,30 +29,35 @@ def merge_alns():
     all_aln_rows = []
 
     for csv_file in csv_files:
+        print(f"Processing file: {csv_file}")
         aln_rows = pd.read_csv(f"{folder}/{csv_file}", encoding="ISO-8859-1")
+
+        # Filter rows with valid ALN
         aln_rows_filtered = aln_rows[aln_rows.apply(has_valid_aln, axis=1)]
         all_aln_rows.append(aln_rows_filtered)
 
+    # Combine all data into a single DataFrame
     combined_data = pd.concat(all_aln_rows, ignore_index=True)
-    all_columns = combined_data.columns.unique()
-    standardized_data = combined_data.reindex(columns=all_columns, fill_value=None)
 
+    # Keep only necessary columns
+    final_columns = ["Program Title", "Assistance Listings Number"]
+    if not all(col in combined_data.columns for col in final_columns):
+        raise ValueError(f"Expected columns {final_columns} not found in the merged data.")
+    reduced_data = combined_data[final_columns]
+
+    # Rename columns for the final output
     column_mapping = {
-        "Title": "Program Title",
+        "Program Title": "Program Title",
         "Assistance Listings Number": "Program Number",
-        "Date Published": "Date Published",
-        "Department/Ind. Agency": "Department/Ind. Agency",
-        "Funded": "Funded",
-        "Last Date Modified": "Last Date Modified",
-        "POC Information": "POC Information",
-        "Related Federal Assistance": "Related Federal Assistance",
-        "Sub-Tier": "Sub-Tier",
-        "Types of Assistance": "Types of Assistance",
     }
+    reduced_data = reduced_data.rename(columns=column_mapping)
 
-    standardized_data = standardized_data.rename(columns=column_mapping)
+    # Sort data by Program Number
+    reduced_data = reduced_data.sort_values(by="Program Number")
+
+    # Save the final merged and sorted file
     print(f"Saving merged and standardized CSV to: {output_file}")
-    standardized_data.to_csv(output_file, index=False, encoding="utf-8")
+    reduced_data.to_csv(output_file, index=False, encoding="utf-8")
     print("CSV processing completed successfully.")
     return output_file
 
