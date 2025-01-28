@@ -37,4 +37,8 @@ resource "cloudfoundry_app" "postgrest" {
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
     PGRST_DB_MAX_ROWS : 20000
   }
+
+  service_binding {
+    service_instance = module.cg-logshipper.logdrain_service_id
+  }
 }
