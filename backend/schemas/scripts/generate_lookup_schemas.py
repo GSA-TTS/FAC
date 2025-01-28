@@ -32,27 +32,28 @@ def process_cfda_lookup(file_path):
     program_names = list(df["Program Title"])
     program_numbers = list(df["Program Number"])
 
-    unique_prefixes_dict = {}
-    unique_cfda_dict = {}
+    prefixes = []
+    numbers = []
 
     for program_number in program_numbers:
         program_number = cleanup_string(program_number)
-        prefix, _ = program_number.split(".", 1)
-        unique_prefixes_dict[prefix] = None
-        unique_cfda_dict[program_number] = None
+        prefix = ""
 
-    unique_prefix_list = list(unique_prefixes_dict.keys())
-    unique_cfda_list = list(unique_cfda_dict.keys())
+        if "." in program_number:
+            prefix, _ = program_number.split(".", 1)
+
+        prefixes.append(prefix)
+        numbers.append(program_number)
 
     program_names = lmap(cleanup_string, program_names)
-    unique_prefix_list = lmap(cleanup_string, unique_prefix_list)
-    unique_cfda_list = lmap(cleanup_string, unique_cfda_list)
+    prefixes = lmap(cleanup_string, prefixes)
+    numbers = lmap(cleanup_string, numbers)
     program_names = lmap(lambda s: s.upper(), program_names)
 
     return {
         "program_names": program_names,
-        "all_alns": unique_cfda_list,
-        "aln_prefixes": unique_prefix_list,
+        "all_alns": numbers,
+        "aln_prefixes": prefixes,
     }
 
 

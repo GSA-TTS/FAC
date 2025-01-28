@@ -2,22 +2,6 @@ import pandas as pd
 from datetime import datetime
 
 
-def has_valid_aln(row):
-    """
-    Check if the Assistance Listings Number (ALN) is valid.
-    Valid formats include ##.###, ##.##, and ##.#.
-    """
-    aln = str(row["Program Number"])
-
-    if "." in aln:
-        prefix, extension = aln.split(".", 1)
-        if prefix.isdigit() and extension:
-            return True
-
-    print(f"Warning: Invalid Program Number '{aln}'. Skipping.")
-    return False
-
-
 def merge_alns():
     date_suffix = datetime.now().strftime("%Y%m%d")
     output_file = f"./source/data/cfda-lookup-{date_suffix}.csv"
@@ -36,8 +20,7 @@ def merge_alns():
         print(f"Processing file: {csv_file}")
         aln_rows = pd.read_csv(f"{folder}/{csv_file}", encoding="ISO-8859-1")
         aln_rows = aln_rows.rename(columns=column_mapping)
-        aln_rows_filtered = aln_rows[aln_rows.apply(has_valid_aln, axis=1)]
-        all_aln_rows.append(aln_rows_filtered)
+        all_aln_rows.append(aln_rows)
 
     # Combine all data into a single DataFrame
     combined_data = pd.concat(all_aln_rows, ignore_index=True)
