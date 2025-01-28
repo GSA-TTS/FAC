@@ -27,7 +27,7 @@
         </div>
 
         {% if data.in_progress_audits|length == 0 and data.completed_audits|length == 0 %}
-            <p class="margin-bottom-4">No submissions associated with your email address were found. Trichotillomania</p>
+            <p class="margin-bottom-4">No submissions associated with your email address were found.</p>
             {% include "./find_report_alert.html" %}
         {% else %}
             {% if data.in_progress_audits %}
