@@ -7,11 +7,11 @@ def has_valid_aln(row):
     Check if the Assistance Listings Number (ALN) is valid.
     Valid formats include ##.###, ##.##, and ##.#.
     """
-    aln = str(row["Assistance Listings Number"])
+    aln = str(row["Program Number"])
 
     if "." in aln:
         prefix, extension = aln.split(".", 1)
-        if prefix.isdigit() and extension.isdigit():
+        if prefix.isdigit() and extension:
             return True
 
     print(f"Warning: Invalid Program Number '{aln}'. Skipping.")
@@ -27,12 +27,15 @@ def merge_alns():
 
     csv_files = ["active-alns.csv", "inactive-alns.csv"]
     all_aln_rows = []
+    column_mapping = {
+        "Title": "Program Title",
+        "Assistance Listings Number": "Program Number",
+    }
 
     for csv_file in csv_files:
         print(f"Processing file: {csv_file}")
         aln_rows = pd.read_csv(f"{folder}/{csv_file}", encoding="ISO-8859-1")
-
-        # Filter rows with valid ALN
+        aln_rows = aln_rows.rename(columns=column_mapping)
         aln_rows_filtered = aln_rows[aln_rows.apply(has_valid_aln, axis=1)]
         all_aln_rows.append(aln_rows_filtered)
 
@@ -40,20 +43,12 @@ def merge_alns():
     combined_data = pd.concat(all_aln_rows, ignore_index=True)
 
     # Keep only necessary columns
-    final_columns = ["Program Title", "Assistance Listings Number"]
+    final_columns = ["Program Title", "Program Number"]
     if not all(col in combined_data.columns for col in final_columns):
-        raise ValueError(f"Expected columns {final_columns} not found in the merged data.")
+        raise ValueError(
+            f"Expected columns {final_columns} not found in {combined_data.columns}."
+        )
     reduced_data = combined_data[final_columns]
-
-    # Rename columns for the final output
-    column_mapping = {
-        "Program Title": "Program Title",
-        "Assistance Listings Number": "Program Number",
-    }
-    reduced_data = reduced_data.rename(columns=column_mapping)
-
-    # Sort data by Program Number
-    reduced_data = reduced_data.sort_values(by="Program Number")
 
     # Save the final merged and sorted file
     print(f"Saving merged and standardized CSV to: {output_file}")
