@@ -1,0 +1,41 @@
+@use 'uswds-core' as *;
+
+@media (max-width: 1024px) {
+  .usa-logo__footer {
+    display: none;
+  }
+}
+
+@media (max-width: 30em) {
+  .usa-footer--big .usa-footer__primary-content--collapsible .usa-list--unstyled {
+    margin: 0;
+    padding-top: 1rem;
+    background: white;
+  }
+}
+
+.usa-footer__primary-section {
+  background: #f3f9fe;
+}
+
+.usa-logo__footer {
+  em {
+    &::before {
+      content: url('../img/fac-logo-full.svg');
+    }
+  }
+
+  p {
+    font-size: 0.85rem;
+  }
+}
+
+.usa-footer--big .usa-footer__primary-link {
+  font-family: "Public Sans Web", sans-serif;
+  font-size: 0.85rem;
+  background: #f3f9fe;
+}
+
+.usa-footer__secondary-link a {
+  font-size: 0.85rem;
+}
