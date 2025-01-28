@@ -1,34 +1,12 @@
 {% load humanize %}
 {% load sprite_helper %}
-<div class="usa-alert usa-alert--info">
-    <div class="usa-alert__body">
-        <h2 class="usa-alert__heading">Searching the FAC database</h2>
-        {% if advanced_search_flag %}
-          <p class="usa-alert__text padding-bottom-2">
-              Learn more about how our advanced search filters work on <a href='https://www.fac.gov/search-resources/advanced/' target='_blank'>our resources page</a>.
-          </p>
-        {% else %}
-          <p class="usa-alert__text padding-bottom-2">
-            Learn more about how our search filters work on <a href='https://www.fac.gov/search-resources/filters/' target='_blank'>our resources page</a>.
-          </p>
-        {% endif %}
-
-        <h2 class="usa-alert__heading">Summary reports</h2>
-        <p class="usa-alert__text padding-bottom-2">
-            For search results of {{ summary_report_download_limit|intcomma }} submissions or less, you can download a combined spreadsheet of all data.
-            If you need to download more than {{ summary_report_download_limit|intcomma }} submissions, try limiting your search parameters to download in batches.
+<div class="">
+    <div class="text-family-public-sans">
+        <p>
+          <a href="{% url 'dissemination:Search' %}">Basic Search</a> is updated in real time and can be used to confirm that an audit submission has been accepted. <a href="{% url 'dissemination:AdvancedSearch' %}">Advanced Search</a> is updated once daily at 12am EST and includes additional filters to support our Federal partners.
         </p>
-
-        {% if advanced_search_flag %}
-          <h2 class="usa-alert__heading">Basic search</h2>
-          <p class="usa-alert__text">
-            We update advanced search nightly with new submissions. <a href="{% url 'dissemination:Search' %}">Basic search</a> is always up-to-date. This is best for users wanting to confirm their submissions are complete.
-          </p>
-        {% else %}
-          <h2 class="usa-alert__heading">Advanced search</h2>
-          <p class="usa-alert__text">
-            Audit resolution officials may want to use the <a href="{% url 'dissemination:AdvancedSearch' %}">advanced search</a> for additional filters.
-          </p>
-        {% endif %}
+        <p class="text-bold">
+          Learn how Basic and Advanced search filters work on our <a href='https://www.fac.gov/search-resources/filters/' target='_blank'>Search resources page</a>.
+        </p>
     </div>
 </div>

@@ -92,7 +92,11 @@
                 </form>
             </div>
             <div class="grid-col audit-search-results">
-                <h1 class="font-sans-2xl">Search single audit reports</h1>
+                {% if advanced_search_flag %}
+                <h1 class="font-sans-2xl">Advanced Audit submission search </h1>
+                {% else %}
+                <h1 class="font-sans-2xl">Basic Audit submission search </h1>
+                {% endif %}
                 {% include "search-alert-info.html" %}
                 {% if form.errors %}
                   {% include "search-alert-error.html" %}
@@ -248,7 +252,7 @@
                         <img hidden id="loader"
                             src="{% static 'img/loader.svg' %}"
                             alt="spinner for processing search" />
-                        <p>
+                        <p class="text-gray-30">
                             Enter your filters and select <em>Search</em> to begin
                         </p>
                     </div>
