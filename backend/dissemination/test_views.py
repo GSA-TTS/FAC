@@ -179,7 +179,7 @@ class SearchViewTests(TestMaterializedViewBuilder):
 
     def test_search(self):
         response = self.anon_client.post(self._search_url(), {})
-        self.assertContains(response, "Search single audit reports")
+        self.assertContains(response, "is updated in real time and can be used to confirm")
         # If there are results, we'll see "results in x seconds" somewhere.
         self.assertNotContains(response, "results in")
 
