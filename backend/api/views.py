@@ -1,5 +1,6 @@
 import json
 from typing import List
+import logging
 
 from django.http import Http404, HttpResponse, JsonResponse
 from django.urls import reverse
@@ -10,8 +11,11 @@ from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from audit.models.constants import STATUS, AUDIT_TYPE_CODES, AUDIT_TYPE
 from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
-from audit.models import Access, SingleAuditChecklist, SubmissionEvent
+from audit.models import Access, SingleAuditChecklist, SubmissionEvent, Audit
+from audit.models.schema import Schema
+
 from audit.permissions import SingleAuditChecklistPermission
 from .serializers import (
     AccessAndSubmissionSerializer,
@@ -21,6 +25,8 @@ from .serializers import (
     SingleAuditChecklistSerializer,
     UEISerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 UserModel = get_user_model()
 
@@ -117,6 +123,18 @@ def access_and_submission_check(user, data):
             general_information=all_steps_user_form_data,
             event_user=user,
             event_type=SubmissionEvent.EventType.CREATED,
+        )
+
+        logger.error(f"=====FART===== Before")
+        current_schema = Schema.objects.get_current_schema(audit_type=AUDIT_TYPE.SINGLE_AUDIT)
+        logger.error(f"=====FART===== {current_schema}")
+        audit = Audit.objects.create(
+            submission_status=STATUS.IN_PROGRESS,
+            audit_type=AUDIT_TYPE.SINGLE_AUDIT,
+            schema=current_schema,
+            audit=all_steps_user_form_data,
+            event_user=user,
+            event_type=SubmissionEvent.EventType.CREATED
         )
 
         # Create all contact Access objects
