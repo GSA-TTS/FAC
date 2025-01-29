@@ -60,3 +60,126 @@ def maintenance_banner(request):
 
     # Base case - we are not within any of the given timeframes. Disable the banner.
     return context
+
+
+def navigation_content(request):
+    """
+    Returns the tree of navigation links. This is added to the context of every template
+    request made on the site.
+    """
+    STATIC_URL = settings.STATIC_SITE_URL
+
+    return {
+        "STATIC_SITE_NAVIGATION": [
+            {
+                "id": "search",
+                "name": "Audit search",
+                "links": [
+                    {
+                        "name": "Basic search",
+                        "link": "/dissemination/search",
+                    },
+                    {
+                        "name": "Advanced search",
+                        "link": "/dissemination/search/advanced",
+                    },
+                    {
+                        "name": "Tribal audit search",
+                        "link": f"{STATIC_URL}tribal",
+                    },
+                    {
+                        "name": "Search resources",
+                        "link": f"{STATIC_URL}search-resources",
+                    },
+                    {
+                        "name": "Developer API resources",
+                        "link": f"{STATIC_URL}api",
+                    },
+                    {
+                        "name": "Data reliability",
+                        "link": f"{STATIC_URL}data-reliability",
+                    },
+                ],
+            },
+            {
+                "id": "submission",
+                "name": "Audit submission",
+                "links": [
+                    {
+                        "name": "Submission resources",
+                        "link": f"{STATIC_URL}audit-resources/",
+                    },
+                    {
+                        "name": "Submission home",
+                        "link": "/openid/login",
+                    },
+                    {
+                        "name": "Submission guide",
+                        "link": f"{STATIC_URL}audit-resources/how-to",
+                    },
+                    {
+                        "name": "SF-SAC workbooks",
+                        "link": f"{STATIC_URL}audit-resources/sf-sac",
+                    },
+                ],
+            },
+            {
+                "id": "updates",
+                "name": "Updates & News",
+                "links": [
+                    {
+                        "name": "FAC updates",
+                        "link": f"{STATIC_URL}updates",
+                    },
+                    {
+                        "name": "OMB announcements",
+                        "link": f"{STATIC_URL}omb",
+                    },
+                    {
+                        "name": "System status",
+                        "link": f"{STATIC_URL}status",
+                    },
+                ],
+            },
+            {
+                "id": "policy",
+                "name": "Policy & Compliance",
+                "links": [
+                    {
+                        "name": "Compliance",
+                        "link": f"{STATIC_URL}compliance",
+                    },
+                    {
+                        "name": "Uniform guidance",
+                        "link": f"{STATIC_URL}uniform-guidance",
+                    },
+                    {
+                        "name": "FAC Burden statement",
+                        "link": f"{STATIC_URL}audit-resources/burden-statement",
+                    },
+                ],
+            },
+            {
+                "id": "contact",
+                "name": "Contacts",
+                "links": [
+                    {
+                        "name": "Contact resources",
+                        "link": f"{STATIC_URL}contact-resources",
+                    },
+                    {
+                        "name": "FAC Helpdesk",
+                        "link": "https://support.fac.gov/hc/en-us",
+                    },
+                    {
+                        "name": "Cognizant agency contacts",
+                        "link": f"{STATIC_URL}contact-resources/cognizant-agency-contacts",
+                    },
+                    {
+                        "name": "NSAC and KMSAL contacts",
+                        "link": f"{STATIC_URL}assets/agency-contacts/2024-agency-contacts.pdf",
+                    },
+                ],
+            },
+        ]
+    }
