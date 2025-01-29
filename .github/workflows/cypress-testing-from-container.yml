@@ -1,13 +1,16 @@
 ---
 name: Run Cypress on Container
 on:
-  push:
-    branches: [cypress-container-testing]
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
 
 jobs:
   cypress-run:
     runs-on: ubuntu-22.04
-    environment: testing
+    environment: ${{ inputs.environment }}
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
