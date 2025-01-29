@@ -20,15 +20,21 @@ from .models import (
     single_audit_report_path,
 )
 from .submission_event import SubmissionEvent
+from .audit import Audit
+from .history import History
+from .schema import Schema
 
 # In case we want to iterate through all the models for some reason:
 _models = [
+    Audit,
     Access,
     DeletedAccess,
     ExcelFile,
     GeneralInformationMixin,
+    History,
     SubmissionEvent,
     LateChangeError,
+    Schema,
     SingleAuditChecklist,
     SingleAuditChecklistManager,
     SingleAuditReportFile,
