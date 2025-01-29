@@ -12,6 +12,9 @@ on:
       - '!.github/ISSUE_TEMPLATE/**'
   workflow_dispatch: null
 
+env:
+  GH_TOKEN: ${{ github.token }}
+
 jobs:
   check-for-changes:
     runs-on: ubuntu-latest
@@ -39,20 +42,44 @@ jobs:
             staticfiles:
               - './backend/static/**'
 
+  check-if-branch-is-ahead-of-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if branch is ahead of main
+        run: |
+          if ! git merge-base --is-ancestor origin/main ${{ github.event.pull_request.head.sha }};
+          then echo "This branch is not up to date with main";
+          gh pr comment ${{ github.event.pull_request.number }} \
+          --body "This pull request is not up to date with main. Please merge main into this brach or rebase this branch onto main. This PR should not be approved until all status checks pass. If you see this message, please rerun all status checks before merging."
+          exit 1; fi
+
   # Tests and Linting invoked on a Pull Request
   testing-from-build:
-    needs: [check-for-changes]
+    needs: [check-for-changes, check-if-branch-is-ahead-of-main]
     if: ${{ needs.check-for-changes.outputs.requirements == 'true' || needs.check-for-changes.outputs.dev-requirements == 'true' || needs.check-for-changes.outputs.docker == 'true' || needs.check-for-changes.outputs.package == 'true' || needs.check-for-changes.outputs.staticfiles == 'true' }}
     uses: ./.github/workflows/testing-from-build.yml
     secrets: inherit
 
   testing-from-ghcr:
-    needs: [check-for-changes]
+    needs: [check-for-changes, check-if-branch-is-ahead-of-main]
     if: ${{ needs.check-for-changes.outputs.requirements != 'true' && needs.check-for-changes.outputs.dev-requirements != 'true' && needs.check-for-changes.outputs.docker != 'true' && needs.check-for-changes.outputs.package != 'true' && needs.check-for-changes.outputs.staticfiles != 'true'  }}
     uses: ./.github/workflows/testing-from-ghcr.yml
     secrets: inherit
 
+  cypress-from-container:
+    needs: [check-if-branch-is-ahead-of-main]
+    uses: ./.github/workflows/cypress-testing-from-container.yml
+    with:
+      environment: testing
+    secrets: inherit
+
   linting:
+    needs: [check-if-branch-is-ahead-of-main]
     uses: ./.github/workflows/linting.yml
     secrets: inherit
 
@@ -65,6 +92,7 @@ jobs:
 
   # Generate Terraform Plans
   terraform-plan:
+    needs: [check-if-branch-is-ahead-of-main]
     if: ${{ github.base_ref == 'main' }}
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
@@ -72,6 +100,7 @@ jobs:
     secrets: inherit
 
   terraform-plan-meta:
+    needs: [check-if-branch-is-ahead-of-main]
     if: ${{ github.base_ref == 'main' }}
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
