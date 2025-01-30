@@ -47,6 +47,7 @@ exclude_dirs = [
 
 [tool.djlint]
 ignore="H006,H022,H023,H019,H031"
+include="H035"
 profile="django"
 use_gitignore=true
 # img_height,https,entity,javascript,lang
