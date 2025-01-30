@@ -125,9 +125,7 @@ def access_and_submission_check(user, data):
             event_type=SubmissionEvent.EventType.CREATED,
         )
 
-        logger.error(f"=====FART===== Before")
         current_schema = Schema.objects.get_current_schema(audit_type=AUDIT_TYPE.SINGLE_AUDIT)
-        logger.error(f"=====FART===== {current_schema}")
         audit = Audit.objects.create(
             submission_status=STATUS.IN_PROGRESS,
             audit_type=AUDIT_TYPE.SINGLE_AUDIT,
