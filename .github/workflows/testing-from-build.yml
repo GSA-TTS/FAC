@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 23
+          node-version: 20
 
       - name: Create .env
         working-directory: ./backend
@@ -81,7 +81,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 23
+          node-version: 20
 
       - name: Install Node dependencies
         working-directory: ./backend
