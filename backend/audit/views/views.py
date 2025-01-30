@@ -65,7 +65,7 @@ class MySubmissions(LoginRequiredMixin, generic.View):
     redirect_field_name = "Home"
 
     def get(self, request, *args, **kwargs):
-        template_name = "audit/my_submissions.html"
+        template_name = "audit/audit_submissions/audit_submissions.html"
         new_link = "report_submission"
         edit_link = "audit:EditSubmission"
 
@@ -191,10 +191,6 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
             excel_file = self._create_excel_file(file, sac.id, form_section)
 
-            excel_file.save(
-                event_user=request.user, event_type=self._event_type(form_section)
-            )
-
             auditee_uei = None
             if (
                 sac.general_information is not None
@@ -205,7 +201,9 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 audit_data = self._extract_and_validate_data(
                     form_section, excel_file, auditee_uei
                 )
-
+                excel_file.save(
+                    event_user=request.user, event_type=self._event_type(form_section)
+                )
                 self._save_audit_data(sac, form_section, audit_data)
 
                 return redirect("/")

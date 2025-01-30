@@ -1,0 +1,75 @@
+{% comment %} 
+Table component. Lists all unsubmitted records. Contains Links to each record, as well as modals and their triggers for audit deletion.
+{% endcomment %}
+{% load sprite_helper %}
+<h1 class="font-sans-xl display-inline-flex">
+    <svg class="usa-icon margin-right-1"
+            aria-hidden="true"
+            focusable="false"
+            role="img">
+        {% uswds_sprite "fac_progress" %}
+    </svg>
+    <span>In progress</span>
+</h1>
+<div class="grid-row" tabindex="0">
+    <table class="usa-table margin-top-0">
+        <caption class="text-normal">
+            The audit submissions listed below are in progress, and you are still able to edit them before submission. Select an audit submission by clicking on its Status to make changes and continue the submission process.
+        </caption>
+        <thead>
+            <tr>
+                <th class="status-column" data-sortable scope="col" role="columnheader">Status</th>
+                <th data-sortable scope="col" role="columnheader">Entity name</th>
+                <th data-sortable scope="col" role="columnheader">Report ID</th>
+                <th data-sortable scope="col" role="columnheader">
+                    Auditee
+                    <button class="usa-button--unstyled margin-top-0"
+                            aria-controls="modal-uei-info"
+                            data-open-modal>UEI</button>
+                </th>
+                <th data-sortable scope="col" role="columnheader">Fiscal period end date</th>
+                <th scope="col" role="columnheader">User Access</th>
+                <th scope="col" role="columnheader">Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data.in_progress_audits %}
+                <tr>
+                    <td>
+                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
+                        {% if item.submission_status in "Ready for Certification,Auditor Certified,Auditee Certified" %}
+                            <p class="margin-0">
+                                <a class="usa-link" href="{% url 'audit:UnlockAfterCertification' item.report_id %}">
+                                    (Unlock)
+                                </a>
+                            </p>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.auditee_name }}</td>
+                    <td>{{ item.report_id }}</td>
+                    <td>{{ item.auditee_uei }}</td>
+                    <td>{{ item.fiscal_year_end_date }}</td>
+                    <td class="text-center">
+                        <a href="{% url 'audit:ManageSubmission' report_id=item.report_id %}" title="Manage report access">
+                            <svg class="usa-icon usa-icon--size-3 text-blue" aria-hidden="true" focusable="false" role="img">
+                                {% uswds_sprite "person_add" %}
+                            </svg>
+                        </a>
+                    </td>
+                    <td class="text-center">
+                        <button class="usa-button usa-button--unstyled"
+                                aria-controls="modal-delete-submission-{{ item.report_id }}"
+                                data-open-modal
+                                title="Delete audit">
+                            <svg class="usa-icon usa-icon--size-3 text-red" aria-hidden="true" focusable="false" role="img">
+                                {% uswds_sprite "delete" %}
+                            </svg>
+                        </button>
+                        {% include "../modal_confirm_deletion.html" with submission_status=item.submission_status auditee_name=item.auditee_name report_id=item.report_id auditee_uei=item.auditee_uei fiscal_year_end_date=item.fiscal_year_end_date %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
+</div>

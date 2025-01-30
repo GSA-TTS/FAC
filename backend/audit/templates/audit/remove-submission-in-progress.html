@@ -22,7 +22,8 @@
             {% csrf_token %}
             <div class="usa-button-group">
                 <button type="submit" class="usa-button usa-button--danger">Remove Report</button>
-                <a href="{% url 'audit:MySubmissions' %}" class="usa-button usa-button--unstyled text-bold">Return to Submissions</a>
+                <a href="{% url 'audit:MySubmissions' %}" class="usa-button usa-button--outline margin-left-2">Return to Submissions</a>
+                <a href="{% url 'audit:SubmissionProgress' report_id=report_id %}" class="usa-button usa-button--outline margin-left-2">Return to Checklist</a>
             </div>
         </form>
     </div>

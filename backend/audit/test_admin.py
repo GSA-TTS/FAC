@@ -192,6 +192,9 @@ class TestAdminActions(TestCase):
         )
 
     def test_revert_to_in_progress_success(self):
+        """
+        When reverting to in progress, a report that is flagged_for_removal should become in_progress.
+        """
         queryset = SingleAuditChecklist.objects.filter(report_id="RPT001")
         revert_to_in_progress(self.admin, self.request, queryset)
 
@@ -203,6 +206,9 @@ class TestAdminActions(TestCase):
         )
 
     def test_revert_to_in_progress_failure(self):
+        """
+        When reverting to in progress, a report that is already in_progress should stay that way.
+        """
         queryset = SingleAuditChecklist.objects.filter(report_id="RPT002")
         revert_to_in_progress(self.admin, self.request, queryset)
 
@@ -212,6 +218,9 @@ class TestAdminActions(TestCase):
         self.assertIn("Report RPT002 is not flagged for removal.", messages)
 
     def test_flag_for_removal_success(self):
+        """
+        When flagging a report for removal, a report that is in_progress should become flagged_for_removal.
+        """
         queryset = SingleAuditChecklist.objects.filter(report_id="RPT002")
         flag_for_removal(self.admin, self.request, queryset)
 
@@ -221,6 +230,9 @@ class TestAdminActions(TestCase):
         self.assertIn("Successfully flagged report(s) (RPT002) for removal.", messages)
 
     def test_flag_for_removal_already_flagged(self):
+        """
+        When flagging a report for removal, a report that is already flagged should stay that way.
+        """
         queryset = SingleAuditChecklist.objects.filter(report_id="RPT001")
         flag_for_removal(self.admin, self.request, queryset)
 

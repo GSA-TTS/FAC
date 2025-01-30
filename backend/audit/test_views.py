@@ -36,7 +36,7 @@ from audit.models import (
     SubmissionEvent,
     generate_sac_report_id,
 )
-from audit.models.models import STATUS
+from audit.models.models import STATUS, ExcelFile
 from audit.views import AuditeeCertificationStep2View, MySubmissions
 from dissemination.models import FederalAward, General
 from django.contrib.auth import get_user_model
@@ -495,7 +495,9 @@ class SubmissionGetTest(TestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "audit/my_submissions.html")
+        self.assertTemplateUsed(
+            response, "audit/audit_submissions/audit_submissions.html"
+        )
 
 
 class SubmissionStatusTests(TransactionTestCase):
@@ -877,6 +879,7 @@ def _add_entry(workbook, row_offset, entry):
 
 class ExcelFileHandlerViewTests(TestCase):
     GOOD_UEI = "AAA123456BBB"
+    BAD_UEI = "THIS_IS_NOT_A_VALID_UEI"
 
     def test_login_required(self):
         """When an unauthenticated request is made"""
@@ -1547,6 +1550,77 @@ class ExcelFileHandlerViewTests(TestCase):
             )
             self.assertEqual(response.status_code, 403)
 
+    def test_excel_file_not_saved_on_validation_failure(self):
+        """Ensure that the Excel file is not saved to the database if validation fails."""
+
+        user, sac = _make_user_and_sac()
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        test_cases = [
+            (
+                FEDERAL_AWARDS_ENTRY_FIXTURES,
+                FEDERAL_AWARDS_TEMPLATE,
+                FORM_SECTIONS.FEDERAL_AWARDS,
+            ),
+            (
+                CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+                CORRECTIVE_ACTION_PLAN_TEMPLATE,
+                FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
+            ),
+            (
+                FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
+                FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
+                FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
+            ),
+            (
+                FINDINGS_TEXT_ENTRY_FIXTURES,
+                FINDINGS_TEXT_TEMPLATE,
+                FORM_SECTIONS.FINDINGS_TEXT,
+            ),
+            (
+                SECONDARY_AUDITORS_ENTRY_FIXTURES,
+                SECONDARY_AUDITORS_TEMPLATE,
+                FORM_SECTIONS.SECONDARY_AUDITORS,
+            ),
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                fixtures, template, section = test_case
+
+                test_data = json.loads(fixtures.read_text(encoding="utf-8"))
+
+                # add valid data to the workbook
+                workbook = load_workbook(template, data_only=True)
+                _set_by_name(workbook, "section_name", section)
+                _add_entry(workbook, 0, test_data[0])
+                # add invalid UEI to the workbook
+                workbook = load_workbook(template, data_only=True)
+                _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.BAD_UEI)
+                with NamedTemporaryFile(suffix=".xlsx") as tmp:
+                    workbook.save(tmp.name)
+                    tmp.seek(0)
+
+                    with open(tmp.name, "rb") as excel_file:
+                        response = self.client.post(
+                            reverse(
+                                f"audit:{section}",
+                                kwargs={
+                                    "report_id": sac.report_id,
+                                    "form_section": section,
+                                },
+                            ),
+                            data={"FILES": excel_file},
+                        )
+
+                        self.assertEqual(response.status_code, 400)
+                        self.assertIn(
+                            "The auditee UEI is not valid", response.json()["errors"][0]
+                        )
+                        self.assertFalse(ExcelFile.objects.exists())
+
 
 class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_login_required(self):
@@ -2194,3 +2268,128 @@ class CrossValidationViewTests(TestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 403)
+
+
+class RemoveSubmissionViewTests(TestCase):
+    def setUp(self):
+        """Setup client, user, valid/invalid statuses, and a report for each status"""
+        self.client = Client()
+        self.user = baker.make(User)
+        self.client.force_login(self.user)
+
+        # Static info
+        self.template = "audit/remove-submission-in-progress.html"
+        self.general_information = {
+            "auditee_uei": "auditee_uei",
+            "auditee_name": "auditee_name",
+            "fiscal_year_end_date": "01/01/2022",
+            "auditee_fiscal_period_end": "01/01/2022",
+        }
+
+        # Valid/invalid statuses. Create one report per status. Create one access per report.
+        self.valid_removal_statuses = [
+            STATUS.IN_PROGRESS,
+            STATUS.READY_FOR_CERTIFICATION,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.CERTIFIED,
+        ]
+        self.invalid_removal_statuses = [
+            STATUS.SUBMITTED,
+            STATUS.DISSEMINATED,
+            STATUS.FLAGGED_FOR_REMOVAL,
+        ]
+        self.reports = [
+            baker.make(
+                SingleAuditChecklist,
+                report_id=f"test-report-id--{status}",
+                submission_status=status,
+                general_information=self.general_information,
+            )
+            for status in self.valid_removal_statuses + self.invalid_removal_statuses
+        ]
+        for report in self.reports:
+            baker.make(
+                "audit.Access",
+                email=self.user.email,
+                sac=report,
+                user=self.user,
+                role="certifying_auditor_contact",
+            )
+
+    def test_get_view_permission_denied(self):
+        url = reverse(
+            "audit:RemoveSubmissionInProgress", kwargs={"report_id": "non-existent-id"}
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_view_permission_denied(self):
+        """Test that POST returns 403 if SAC report_id does not exist"""
+        url = reverse(
+            "audit:RemoveSubmissionInProgress", kwargs={"report_id": "non-existent-id"}
+        )
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_view_renders_correct_template(self):
+        """
+        Test that GET correctly filters out reports of invalid status.
+        """
+        # For all possible report statuses, get the associated report and report_id. Make a GET request to the removal URL.
+        for status in self.valid_removal_statuses + self.invalid_removal_statuses:
+            report = next(
+                (x for x in self.reports if x.submission_status == status), None
+            )
+            report_id = report.report_id
+            url_removal = reverse(
+                "audit:RemoveSubmissionInProgress", kwargs={"report_id": report_id}
+            )
+            response = self.client.get(url_removal, follow=True)
+            url_after = response.request.get("PATH_INFO")
+
+            # If the GET request was made with valid report status, expect the correct template to load.
+            # Otherwise, expect to be redirected to the submission checklist.
+            if status in self.valid_removal_statuses:
+                self.assertEqual(response.status_code, 200)
+                self.assertTemplateUsed(response, self.template)
+            else:
+                url_checklist = reverse(
+                    "audit:SubmissionProgress", kwargs={"report_id": report_id}
+                )
+                self.assertEqual(url_after, url_checklist)
+
+    def test_post_view_flags_correct_reports(self):
+        """
+        Test that POST correctly filters out reports of invalid status, and flags reports of valid status for removal.
+        """
+        url_audit_submisisons = reverse("audit:MySubmissions")
+
+        # For all possible report statuses, get the associated report and report_id. Make a POST request to the removal URL.
+        for status in self.valid_removal_statuses + self.invalid_removal_statuses:
+            report = next(
+                (x for x in self.reports if x.submission_status == status), None
+            )
+            report_id = report.report_id
+            url_removal = reverse(
+                "audit:RemoveSubmissionInProgress", kwargs={"report_id": report_id}
+            )
+            response = self.client.post(url_removal, follow=True)
+            report_after = SingleAuditChecklist.objects.get(report_id=report_id)
+            url_after = response.request.get("PATH_INFO")
+
+            # If the POST request was made with valid report status, expect the audit submisisons page to load. Verify that the report has been flagged.
+            # Otherwise, expect to be redirected to the submission checklist. Verify the report was not flagged.
+            if status in self.valid_removal_statuses:
+                self.assertEqual(url_after, url_audit_submisisons)
+                self.assertEqual(
+                    report_after.submission_status, STATUS.FLAGGED_FOR_REMOVAL
+                )
+            else:
+                url_checklist = reverse(
+                    "audit:SubmissionProgress", kwargs={"report_id": report_id}
+                )
+                self.assertEqual(url_after, url_checklist)
+                self.assertEqual(report_after.submission_status, status)
