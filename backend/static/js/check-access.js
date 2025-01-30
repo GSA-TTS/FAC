@@ -9,7 +9,7 @@ function setFormDisabled(shouldDisable) {
 }
 
 function allResponsesValid() {
-  const inputsWithErrors = document.querySelectorAll('[class *="-error"]');
+  const inputsWithErrors = document.querySelectorAll('[class *="-error"]:not([hidden])');
   return inputsWithErrors.length === 0;
 }
 
@@ -91,10 +91,12 @@ function attachFocusoutMulti(elements) {
 }
 
 function attachEventHandlers() {
-  FORM.addEventListener('submit', (e) => {
+
+  const continueBtn = document.getElementById('create');
+  continueBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    if (!allResponsesValid()) return;
-    FORM.submit();
+    setFormDisabled(true);
+    document.getElementById('grant-access').submit();
   });
 
   const certifyingInputs = Array.from(
