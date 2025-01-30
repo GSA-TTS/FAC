@@ -36,7 +36,7 @@ from audit.models import (
     SubmissionEvent,
     generate_sac_report_id,
 )
-from audit.models.models import STATUS
+from audit.models.models import STATUS, ExcelFile
 from audit.views import AuditeeCertificationStep2View, MySubmissions
 from dissemination.models import FederalAward, General
 from django.contrib.auth import get_user_model
@@ -877,6 +877,7 @@ def _add_entry(workbook, row_offset, entry):
 
 class ExcelFileHandlerViewTests(TestCase):
     GOOD_UEI = "AAA123456BBB"
+    BAD_UEI = "THIS_IS_NOT_A_VALID_UEI"
 
     def test_login_required(self):
         """When an unauthenticated request is made"""
@@ -1546,6 +1547,77 @@ class ExcelFileHandlerViewTests(TestCase):
                 )
             )
             self.assertEqual(response.status_code, 403)
+
+    def test_excel_file_not_saved_on_validation_failure(self):
+        """Ensure that the Excel file is not saved to the database if validation fails."""
+
+        user, sac = _make_user_and_sac()
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        test_cases = [
+            (
+                FEDERAL_AWARDS_ENTRY_FIXTURES,
+                FEDERAL_AWARDS_TEMPLATE,
+                FORM_SECTIONS.FEDERAL_AWARDS,
+            ),
+            (
+                CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+                CORRECTIVE_ACTION_PLAN_TEMPLATE,
+                FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
+            ),
+            (
+                FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
+                FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
+                FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
+            ),
+            (
+                FINDINGS_TEXT_ENTRY_FIXTURES,
+                FINDINGS_TEXT_TEMPLATE,
+                FORM_SECTIONS.FINDINGS_TEXT,
+            ),
+            (
+                SECONDARY_AUDITORS_ENTRY_FIXTURES,
+                SECONDARY_AUDITORS_TEMPLATE,
+                FORM_SECTIONS.SECONDARY_AUDITORS,
+            ),
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                fixtures, template, section = test_case
+
+                test_data = json.loads(fixtures.read_text(encoding="utf-8"))
+
+                # add valid data to the workbook
+                workbook = load_workbook(template, data_only=True)
+                _set_by_name(workbook, "section_name", section)
+                _add_entry(workbook, 0, test_data[0])
+                # add invalid UEI to the workbook
+                workbook = load_workbook(template, data_only=True)
+                _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.BAD_UEI)
+                with NamedTemporaryFile(suffix=".xlsx") as tmp:
+                    workbook.save(tmp.name)
+                    tmp.seek(0)
+
+                    with open(tmp.name, "rb") as excel_file:
+                        response = self.client.post(
+                            reverse(
+                                f"audit:{section}",
+                                kwargs={
+                                    "report_id": sac.report_id,
+                                    "form_section": section,
+                                },
+                            ),
+                            data={"FILES": excel_file},
+                        )
+
+                        self.assertEqual(response.status_code, 400)
+                        self.assertIn(
+                            "The auditee UEI is not valid", response.json()["errors"][0]
+                        )
+                        self.assertFalse(ExcelFile.objects.exists())
 
 
 class SingleAuditReportFileHandlerViewTests(TestCase):
