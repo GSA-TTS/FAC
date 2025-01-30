@@ -65,7 +65,7 @@ class MySubmissions(LoginRequiredMixin, generic.View):
     redirect_field_name = "Home"
 
     def get(self, request, *args, **kwargs):
-        template_name = "audit/my_submissions.html"
+        template_name = "audit/audit_submissions/audit_submissions.html"
         new_link = "report_submission"
         edit_link = "audit:EditSubmission"
 
