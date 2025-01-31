@@ -133,3 +133,8 @@ variable "denylist" {
     # appname    = [ "bad.example.com:443" ]
   }
 }
+
+variable "backups_s3_id" {
+  type        = string
+  description = "the full string of the backups s3 resource id"
+}
