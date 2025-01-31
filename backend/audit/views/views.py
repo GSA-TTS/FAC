@@ -337,11 +337,11 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
+            audit = Audit.objects.get(report_id=report_id)
             errors = sac.validate_full()
             if not errors:
                 sac_transition(
-                    request, sac, transition_to=STATUS.READY_FOR_CERTIFICATION
+                    request, sac, audit=audit, transition_to=STATUS.READY_FOR_CERTIFICATION
                 )
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
@@ -500,7 +500,9 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
                 auditor_certification.update(form_cleaned)
                 validated = validate_auditor_certification_json(auditor_certification)
                 sac.auditor_certification = validated
-                if sac_transition(request, sac, transition_to=STATUS.AUDITOR_CERTIFIED):
+                audit = Audit.objects.get(report_id=report_id)
+                audit.audit.update({"auditor_certification": validated})
+                if sac_transition(request, sac, audit=audit, transition_to=STATUS.AUDITOR_CERTIFIED):
                     logger.info("Auditor certification saved.", auditor_certification)
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
@@ -638,7 +640,9 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
                 auditee_certification.update(form_cleaned)
                 validated = validate_auditee_certification_json(auditee_certification)
                 sac.auditee_certification = validated
-                if sac_transition(request, sac, transition_to=STATUS.AUDITEE_CERTIFIED):
+                audit = Audit.objects.get(report_id=report_id)
+                audit.audit.update({"auditee_certification": validated })
+                if sac_transition(request, sac, audit=audit, transition_to=STATUS.AUDITEE_CERTIFIED):
                     logger.info("Auditee certification saved.", auditee_certification)
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 

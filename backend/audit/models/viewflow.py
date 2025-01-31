@@ -7,7 +7,7 @@ import viewflow.fsm
 
 logger = logging.getLogger(__name__)
 
-
+# TODO: Relook at this file.
 def sac_revert_from_submitted(sac):
     """
     Transitions the submission_state for a SingleAuditChecklist back
@@ -68,9 +68,9 @@ def sac_transition(request, sac, **kwargs):
     """
     Transitions the submission_state for a SingleAuditChecklist (sac).
     """
-
+    audit = kwargs.get("audit", None)
     user = None
-    flow = SingleAuditChecklistFlow(sac)
+    flow = SingleAuditChecklistFlow(sac, audit)
     target = kwargs.get("transition_to", None)
 
     # optional - only needed when a user is involved.
@@ -87,6 +87,11 @@ def sac_transition(request, sac, **kwargs):
             event_user=user,
             event_type=SubmissionEvent.EventType.UNLOCKED_AFTER_CERTIFICATION,
         )
+        if audit:
+            audit.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.UNLOCKED_AFTER_CERTIFICATION,
+            )
         return True
 
     elif target == STATUS.FLAGGED_FOR_REMOVAL:
@@ -95,6 +100,11 @@ def sac_transition(request, sac, **kwargs):
             event_user=user,
             event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
         )
+        if audit:
+            audit.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
+            )
         return True
 
     elif target == STATUS.READY_FOR_CERTIFICATION:
@@ -103,6 +113,11 @@ def sac_transition(request, sac, **kwargs):
             event_user=user,
             event_type=SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
         )
+        if audit:
+            audit.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
+            )
         return True
 
     elif target == STATUS.AUDITEE_CERTIFIED:
@@ -111,6 +126,11 @@ def sac_transition(request, sac, **kwargs):
             event_user=user,
             event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
         )
+        if audit:
+            audit.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+            )
         return True
 
     elif target == STATUS.AUDITOR_CERTIFIED:
@@ -119,6 +139,11 @@ def sac_transition(request, sac, **kwargs):
             event_user=user,
             event_type=SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
         )
+        if audit:
+            audit.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
+            )
         return True
 
     elif target == STATUS.SUBMITTED:
@@ -127,6 +152,11 @@ def sac_transition(request, sac, **kwargs):
             event_user=user,
             event_type=SubmissionEvent.EventType.SUBMITTED,
         )
+        if audit:
+            audit.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.SUBMITTED,
+            )
         return True
 
     elif target == STATUS.DISSEMINATED:
@@ -135,6 +165,11 @@ def sac_transition(request, sac, **kwargs):
             event_user=user,
             event_type=SubmissionEvent.EventType.DISSEMINATED,
         )
+        if audit:
+            audit.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.DISSEMINATED,
+            )
         return True
 
     return False
@@ -147,12 +182,15 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
 
     state = viewflow.fsm.State(STATUS, default=STATUS.IN_PROGRESS)
 
-    def __init__(self, sac):
+    def __init__(self, sac, audit=None):
         self.sac = sac
+        self.audit = audit
 
     @state.setter()
     def _set_sac_state(self, value):
         self.sac.submission_status = value
+        if self.audit:
+            self.audit.submission_status = value
 
     @state.getter()
     def _get_sac_state(self):
@@ -206,6 +244,9 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         # null out any existing certifications on this submission
         self.sac.auditor_certification = None
         self.sac.auditee_certification = None
+        if self.audit:
+            del self.audit.audit["auditor_certification"]
+            del self.audit.audit["auditee_certification"]
 
         self.sac.transition_name.append(STATUS.IN_PROGRESS)
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
