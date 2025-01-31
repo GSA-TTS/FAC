@@ -53,13 +53,20 @@ See [editorconfig.org](https://editorconfig.org/) for more information.
 
 By default, your IDE will acknowledge `CRLF` as the denotation for newlines. Many scripts in this repository **require** `LF` denotation (noticeably the .sh files when you first try to run and test the application). Make sure your IDE uses `LF` denotation for newlines when reading through each of these scripts.
 
-You can use the Git commands below BEFORE cloning the repository to your local computer to prevent files from using `CRLF` by default.
+You can use the Git commands below BEFORE cloning the repository to your local computer to prevent files from using `CRLF` by default. If you've already cloned it with incorrect line endings, you should reclone the repository.
 ```
 # don't use --global if you only want this behavior for a specific repository.
 git config --global core.autocrlf false
 # this ensures all files use LF.
 git config --global core.eol lf
+
+# If the repo was cloned before setting this, reclone it:
+rm -rf your-repo
+git clone https://github.com/your-org/your-repo.git
 ```
+
+
+
 ---
 
 ### Windows Setup
@@ -117,8 +124,8 @@ cd your-repo/backend
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate  # (Linux/macOS)
-venv\Scripts\activate    # (Windows Git Bash)
+source venv/bin/activate  # (Linux/macOS, WSL)
+source venv/Scripts/activate  # (Windows Git Bash)
 ```
 
 ### **3. Install Dependencies**
@@ -578,18 +585,10 @@ You _can_ run the application locally, however, we **STRONGLY** recommend using 
   sudo usermod -aG docker $USER
   newgrp docker
   ```
+If using Windows, ensure that WSL 2 integration is enabled in Docker Desktop > Settings > Resources > WSL Integration.
 
-## Summary
+#### **Error: Docker Daemon Not Running**
 
-| Task                     | Command                                           |
-| ------------------------ | ------------------------------------------------- |
-| **Activate Virtual Env** | `source venv/bin/activate`                        |
-| **Install Dependencies** | `pip install -r requirements.txt`                 |
-| **Run Makefile**         | `make all`                                        |
-| **Run Migrations**       | `docker compose run web python manage.py migrate` |
-| **Check Git Status**     | `git status`                                      |
-| **Commit Changes**       | `git add . && git commit -m "message"`            |
-| **Push to GitHub**       | `git push origin main`                            |
-| **Exit Virtual Env**     | `deactivate`                                      |
-
+- If using Docker Desktop, ensure it is running before executing any docker commands.
+  
 ---
