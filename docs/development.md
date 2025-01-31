@@ -555,7 +555,7 @@ You _can_ run the application locally, however, we **STRONGLY** recommend using 
 
 #### **"ModuleNotFoundError" for Python Packages**
 
-- Ensure the virtual environment is activated (`source venv/bin/activate`).
+- Ensure the virtual environment is activated (`source venv/bin/activate` or for Windows 'source venv/Scripts/activate').
 - Reinstall dependencies: `pip install -r requirements.txt`.
 
 #### **"Command Not Found" for Make**
