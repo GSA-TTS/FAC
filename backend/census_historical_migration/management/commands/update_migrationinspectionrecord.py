@@ -46,10 +46,22 @@ class Command(BaseCommand):
         )
         print(f"Count of {year} submissions: {len(migrationinspectionrecords)}")
 
+        count = 0
         for migrationinspectionrecord in migrationinspectionrecords:
+            print("\nmigrationinspectionrecord.note = ", migrationinspectionrecord.note)
+            notes = []
+            is_updated = False
             for note in migrationinspectionrecord.note:
                 if (
                     note[0]["transformation_functions"][0]
                     == "xform_missing_notes_records"
                 ) & (note[0]["census_data"][0]["value"] == "GSA_MIGRATION"):
                     note[0]["census_data"][0]["value"] = ""
+                    is_updated = True
+                notes += [note]
+            if is_updated:
+                migrationinspectionrecord.note = notes
+                print("Updated notes = ", migrationinspectionrecord.note)
+                count += 1
+
+        print("Number of records updated = ", count)
