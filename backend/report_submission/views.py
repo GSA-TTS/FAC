@@ -249,7 +249,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             if audit_type and audit.audit_type != audit_type:
                 audit.audit_type = audit_type
                 audit.schema = Schema.objects.get_current_schema(audit_type = audit_type)
-            audit.audit.update(general_information)
+            audit.audit.update({"general_information": general_information})
             audit.save(
                 event_user=request.user,
                 event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
