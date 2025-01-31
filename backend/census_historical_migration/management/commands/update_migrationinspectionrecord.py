@@ -1,8 +1,9 @@
 from django.core.management.base import BaseCommand
 from dissemination.models import MigrationInspectionRecord
+from config.settings import ENVIRONMENT
+from django.db.models import Q
 
 import logging
-import sys
 
 
 logger = logging.getLogger(__name__)
@@ -47,4 +48,8 @@ class Command(BaseCommand):
 
         for migrationinspectionrecord in migrationinspectionrecords:
             for note in migrationinspectionrecord.note:
-                print(note)
+                if (
+                    note[0]["transformation_functions"][0]
+                    == "xform_missing_notes_records"
+                ) & (note[0]["census_data"][0]["value"] == "GSA_MIGRATION"):
+                    note[0]["census_data"][0]["value"] = ""
