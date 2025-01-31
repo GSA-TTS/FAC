@@ -536,6 +536,7 @@ These tools run automatically as a part of our CI workflow in GitHub actions, bu
 
 You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead ([here](#docker)). It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned! This method requires **PostgreSQL** and additional setup. See [local-development.md](local-development.md) for additional warnings and details. 
 
+---
 ## Troubleshooting
 
 ### **Common Issues**
