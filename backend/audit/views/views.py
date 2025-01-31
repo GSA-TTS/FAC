@@ -710,7 +710,8 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
+            audit = Audit.objects.get(report_id=report_id)
+            ## TODO!~!!
             errors = sac.validate_full()
             if errors:
                 context = {"report_id": report_id, "errors": errors}
@@ -726,11 +727,11 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
             # BEGIN ATOMIC BLOCK
             with transaction.atomic():
-                sac_transition(request, sac, transition_to=STATUS.SUBMITTED)
+                sac_transition(request, sac, audit=audit, transition_to=STATUS.SUBMITTED)
                 disseminated = sac.disseminate()
                 # `disseminated` is None if there were no errors.
                 if disseminated is None:
-                    sac_transition(request, sac, transition_to=STATUS.DISSEMINATED)
+                    sac_transition(request, sac,  audit=audit, transition_to=STATUS.DISSEMINATED)
             # END ATOMIC BLOCK
 
             # IF THE DISSEMINATION SUCCEEDED
