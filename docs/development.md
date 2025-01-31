@@ -38,6 +38,11 @@ Windows users *may* need the following tools installed in addition to the above 
     ```
     choco install make
     ```
+
+  * If make doesn’t run in Git Bash, prepend commands with winpty, e.g.:
+    ```
+    winpty make all
+    ```
 ---
 
 ## Setting up your dev environment
