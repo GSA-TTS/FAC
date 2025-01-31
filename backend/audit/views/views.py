@@ -31,7 +31,7 @@ from audit.models import (
     LateChangeError,
     SingleAuditChecklist,
     SingleAuditReportFile,
-    SubmissionEvent,
+    SubmissionEvent, Audit,
 )
 from audit.models.models import STATUS
 from audit.models.viewflow import sac_transition
@@ -149,11 +149,19 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             validator(audit_data)
         return audit_data
 
-    def _save_audit_data(self, sac, form_section, audit_data):
+    def _save_audit_data(self, sac, form_section, audit_data, user=None):
         handler_info = FORM_SECTION_HANDLERS.get(form_section)
         if handler_info is not None:
             setattr(sac, handler_info["field_name"], audit_data)
             sac.save()
+
+            #TODO Audit Rework
+            audit = Audit.objects.get(report_id=sac.report_id)
+            audit.audit.update({str(handler_info["field_name"]): audit_data})
+            audit.save(
+                event_user=user,
+                event_type=self._event_type(form_section),
+            )
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -204,7 +212,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 excel_file.save(
                     event_user=request.user, event_type=self._event_type(form_section)
                 )
-                self._save_audit_data(sac, form_section, audit_data)
+                self._save_audit_data(sac, form_section, audit_data, user)
 
                 return redirect("/")
 
