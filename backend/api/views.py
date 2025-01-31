@@ -127,6 +127,7 @@ def access_and_submission_check(user, data):
 
         current_schema = Schema.objects.get_current_schema(audit_type=AUDIT_TYPE.SINGLE_AUDIT)
         audit = Audit.objects.create(
+            report_id=sac.report_id,  # TODO Temporarily use the current id to mirror
             submission_status=STATUS.IN_PROGRESS,
             audit_type=AUDIT_TYPE.SINGLE_AUDIT,
             schema=current_schema,
