@@ -243,11 +243,11 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
             )
 
-            # Audit Path
+            # Audit Path TODO: Clean-up post POC
             audit = Audit.objects.get(report_id=report_id)
-            audit_type = general_information.get("audit_type")
+            audit_type = general_information.get("audit_type").replace("-","_")
             if audit_type and audit.audit_type != audit_type:
-                audit.audit_type = general_information["audit_type"]
+                audit.audit_type = audit_type
                 audit.schema = Schema.objects.get_current_schema(audit_type = audit_type)
             audit.audit.update(general_information)
             audit.save(
