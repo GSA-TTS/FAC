@@ -1,0 +1,7 @@
+# Custom rules for HTML linting.
+- rule:
+    name: C001
+    message: Use spaces, not tabs
+    flags: re.DOTALL|re.I
+    patterns:
+      - \t

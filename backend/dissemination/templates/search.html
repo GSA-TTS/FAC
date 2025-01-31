@@ -92,7 +92,11 @@
                 </form>
             </div>
             <div class="grid-col audit-search-results">
-                <h1 class="font-sans-2xl">Search single audit reports</h1>
+                {% if advanced_search_flag %}
+                <h1 class="font-sans-2xl">Audit Submissions Advanced Search </h1>
+                {% else %}
+                <h1 class="font-sans-2xl">Audit Submissions Basic Search </h1>
+                {% endif %}
                 {% include "search-alert-info.html" %}
                 {% if form.errors %}
                   {% include "search-alert-error.html" %}

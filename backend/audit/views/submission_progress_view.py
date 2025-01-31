@@ -170,6 +170,12 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "report_id": report_id,
                 "auditee_name": sac.auditee_name,
                 "auditee_uei": sac.auditee_uei,
+                "fiscal_year_end_date": (
+                    sac.general_information.get("auditee_fiscal_period_end")
+                    if sac.general_information
+                    else "N/A"
+                ),
+                "submission_status": sac.get_friendly_status(),
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "is_user_auditee_certifier": is_user_auditee_certifier,
                 "is_tribal_data_consent_complete": is_tribal_data_consent_complete,

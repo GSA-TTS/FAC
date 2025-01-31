@@ -1,20 +1,48 @@
 {% load sprite_helper %}
-<div class="grid-row margin-bottom-3" id="submission-checklist-title">
-    <div class="grid-row width-full" id="submission-checklist-summary">
-        <h1 class="tablet:grid-col-8 font-sans-2xl margin-y-1">
-            Submission Checklist: {{ auditee_name | default_if_none:'N/A' }}
+<div class="grid-row margin-bottom-2" id="submission-checklist-title">
+    <div class="grid-col flex-12">
+        <span class="display-inline-flex">
+            <svg class="usa-icon usa-icon--size-3"
+                aria-hidden="true"
+                focusable="false"
+                role="img">
+                {% uswds_sprite "fac_community" %}
+            </svg>
+            <span class="font-sans-3xs text-base-dark margin-top-05 margin-left-1">SUBMISSION CHECKLIST</span>
+        </span>
+        <h1 class="tablet:grid-col-8 font-sans-xl margin-y-1">
+            {{ auditee_name | default_if_none:'N/A' }}
         </h1>
-        <div>
+        <p class="font-sans-lg margin-y-1">
+            <span class="text-bold">Report ID: </span>
+            #{{ report_id | default_if_none:'N/A' }}
+        </p>
+        <p class="font-sans-lg margin-y-1">
+            <span class="text-bold">UEI: </span>
+            {{ auditee_uei | default_if_none:'N/A' }}
+        </p>
+    </div>
+    <div>
+        <div class="usa-button-group">
             <a class="usa-button grid-row margin-top-1"
                href="{% url 'audit:ManageSubmission' report_id=report_id %}">
-                <svg class="usa-icon usa-icon--size-3 margin-right-1"
+                <svg class="usa-icon usa-icon--size-3"
                      aria-hidden="true"
                      focusable="false"
                      role="img">
                     {% uswds_sprite "person_add" %}
                 </svg>
-                <span class="padding-top-05">Manage report access</span>
+                <span>Manage report access</span>
             </a>
+            {% if submission_status != 'Accepted' and submission_status != 'Disseminated' %}
+                <button class="usa-button usa-button--secondary grid-row margin-top-1 margin-left-1"
+                        aria-controls="modal-delete-submission-{{ report_id }}"
+                        title="Delete audit"
+                        data-open-modal>
+                    <span>Delete</span>
+                </button>
+                {% include "../modal_confirm_deletion.html" with submission_status=submission_status auditee_name=auditee_name report_id=report_id auditee_uei=auditee_uei fiscal_year_end_date=fiscal_year_end_date %}
+            {% endif %}
         </div>
     </div>
 </div>

@@ -1,0 +1,67 @@
+{% comment %} 
+Modal content, triggered outside the component. Displays terms and conditions, contains a form post to accept the conditions and start a new audit.
+{% endcomment %}
+{% load sprite_helper %}
+<div class="usa-modal usa-modal--lg flex-justify-start"
+        id="modal-terms-conditions"
+        aria-labelledby="modal-terms-conditions-heading"
+        aria-describedby="modal-terms-conditions-description">
+    <div class="usa-modal__content">
+        <div class="padding-x-6 padding-bottom-4">
+            <h2 class="usa-modal__heading" id="modal-terms-conditions-heading">
+                New Audit Submission
+            </h2>
+            <div id="modal-terms-conditions-description">
+                <p class="text-bold">
+                    Please review the Federal Audit Clearinghouse Terms and Conditions before beginning a new audit submission:
+                </p>
+                <p>
+                    FAC.gov is a U.S. General Services Administration federal government service. This site collects
+                    required documentation from organizations that spend <span class="text-bold">$750,000 or more</span> in federal grant funds in
+                    a given year.
+                </p>
+                <p>
+                    All use of FAC.gov will be monitored, recorded, and subject to audit by GSA staff and other
+                    federal government authorities. By using this system, you consent to your use being monitored
+                    and recorded.
+                </p>
+                <p>
+                    Unauthorized use is prohibited, and individuals found performing unauthorized activities are
+                    subject to disciplinary action including criminal prosecution.
+                </p>
+                <p>
+                    If you have questions about these conditions, please email <a class="usa-link" href="mailto:fac-support@gsa.gov">fac-support@gsa.gov</a>.
+                </p>
+            </div>
+            <form id="start-new-submission" class="usa-form usa-form--large">
+                <div class="usa-checkbox margin-y-4">
+                    <input id="check-start-new-submission"
+                            class="usa-checkbox__input"
+                            type="checkbox"/>
+                    <label class="usa-checkbox__label display-inline-flex" for="check-start-new-submission">
+                        I agree to the&nbsp;
+                        <p id="terms-conditions-trigger" class="margin-0 text-underline">
+                            terms and conditions.
+                        </p>
+                        <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </label>
+                </div>
+                <div class="usa-button-group">
+                    <input type="submit"
+                            id="start-submission"
+                            class="usa-button"
+                            value="Begin New Submission"
+                            disabled/>
+                    <a class="usa-button usa-button--outline tablet:margin-left-2" id="cancel-start-submission" aria-label="Close this window" data-close-modal>Cancel</a>
+                </div>
+            </form>
+        </div>
+        <button class="usa-button usa-modal__close"
+                aria-label="Close this window"
+                data-close-modal>
+            <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                {% uswds_sprite "close" %}
+            </svg>
+        </button>
+    </div>
+</div>
