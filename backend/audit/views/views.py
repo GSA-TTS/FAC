@@ -212,7 +212,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 excel_file.save(
                     event_user=request.user, event_type=self._event_type(form_section)
                 )
-                self._save_audit_data(sac, form_section, audit_data, user)
+                self._save_audit_data(sac, form_section, audit_data, request.user)
 
                 return redirect("/")
 
