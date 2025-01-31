@@ -5,6 +5,10 @@ import time
 from datetime import date, timedelta
 
 import newrelic.agent
+from django.db.models import Q
+
+from audit.models import Audit
+from audit.models.constants import STATUS
 from config.settings import AGENCY_NAMES, STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import AdvancedSearchForm, SearchForm
@@ -368,6 +372,33 @@ class Search(View):
 
 class AuditSummaryView(View):
     def get(self, request, report_id):
+        if Audit.objects.filter(report_id=report_id).exists():
+            return self._new(request, report_id)
+        else:
+            return self._new(request, report_id)
+
+    def _new(self, request, report_id):
+        query = Q(report_id=report_id) & Q(submission_status=STATUS.DISSEMINATED)
+        audit = Audit.objects.filter(query)
+        if not audit.exists():
+            raise Http404(
+                "The report with this ID is not ready to view."
+            )
+        is_sf_sac_downloadable = True
+        audit_data = audit.first()
+        context = {
+            "report_id": report_id,
+            "auditee_name": audit_data.audit.get("auditee_name"),
+            "auditee_uei": audit_data.audit.get("auditee_uei"),
+            "general": audit_data.audit.get("general_information"),
+            "include_private": False,
+            "data": audit_data,
+            "is_sf_sac_downloadable": is_sf_sac_downloadable,
+        }
+
+        return render(request, "summary_new.html", context)
+
+    def _old(self, request, report_id):
         """
         Display information about the given report in the dissemination tables.
         1.  See if this audit is available. If not, 404.
@@ -402,6 +433,7 @@ class AuditSummaryView(View):
         }
 
         return render(request, "summary.html", context)
+
 
     def get_audit_content(self, report_id, include_private_and_public):
         """
