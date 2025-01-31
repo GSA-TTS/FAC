@@ -12,7 +12,7 @@ from audit.models import (
     LateChangeError,
     SingleAuditChecklist,
     SingleAuditReportFile,
-    SubmissionEvent,
+    SubmissionEvent, Audit,
 )
 from audit.forms import UploadReportForm
 
@@ -120,6 +120,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
+            # TODO: Will need to pull from the audit instead of sac.
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             form = UploadReportForm(request.POST, request.FILES)
 
@@ -142,6 +143,13 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 try:
                     sar_file.full_clean()
                     sar_file.save(
+                        event_user=request.user,
+                        event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+                    )
+
+                    audit = Audit.objects.get(report_id=report_id)
+                    audit.audit.update({"file_information": {"filename": sar_file.filename, "pages": sar_file.component_page_numbers}})
+                    audit.save(
                         event_user=request.user,
                         event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
                     )
