@@ -1,15 +1,21 @@
+# Usage:
+# Do a delete: python manage.py delete_stale_backups --days X --delete true
+# List objects: python manage.py delete_stale_backups --days X
+
+# python manage.py delete_stale_backups --days 0 --delete
+
+
 import boto3
 from datetime import datetime, timezone, timedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("--days", dest="days", metavar="DAYS", type="int",
+        parser.add_argument("--days", type=int,
             help="Max age a key(file) in days can have before we want to delete it")
-        parser.add_argument("--delete", dest="delete", metavar="DELETE", action="store_true",
-            default=False, help="Actually do a delete. If not specified, just list the keys found that match.")
+        parser.add_argument("--delete",
+            required=False, default=False, help="Actually do a delete. If not specified, just list the keys found that match.")
 
     def handle(self, *args, **options):
         days = options["days"]
