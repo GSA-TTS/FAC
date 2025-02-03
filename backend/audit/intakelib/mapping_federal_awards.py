@@ -82,6 +82,8 @@ def federal_awards_named_ranges(errors):
         meta_mapping,
     )
 
+def federal_awards_audit_view(data):
+    return {"federal_awards": data["FederalAwards"]["federal_awards"]}
 
 def _set_pass_through_entity_name(obj, target, value):
     if value is None or value == "":
