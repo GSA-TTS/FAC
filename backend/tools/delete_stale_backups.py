@@ -33,7 +33,7 @@ def main(args):
     )
 
     objects = s3_client.list_objects(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Prefix="backups/")
-    one_week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    one_week_ago = datetime.now(timezone.utc) - timedelta(days=1)
     # Check if the bucket contains any objects
     if 'Contents' in objects:
         for obj in objects['Contents']:
