@@ -100,6 +100,10 @@ class SingleAuditChecklistTests(TestCase):
             (
                 [
                     STATUS.IN_PROGRESS,
+                    STATUS.READY_FOR_CERTIFICATION,
+                    STATUS.AUDITOR_CERTIFIED,
+                    STATUS.AUDITEE_CERTIFIED,
+                    STATUS.CERTIFIED,
                 ],
                 STATUS.FLAGGED_FOR_REMOVAL,
                 "transition_to_flagged_for_removal",

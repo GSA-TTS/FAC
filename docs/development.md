@@ -8,6 +8,7 @@ See [the pull request template](../.github/pull_request_template.md) for steps t
 
 * [Tools](#tools)
 * [Setting up your dev environment](#setting-up-your-dev-environment)
+  * [Windows Setup](#windows-setup)
   * [Environment Variables](#environment-variables)
   * [Docker](#docker)
   * [Local Development](#local-development)
@@ -22,18 +23,25 @@ See [the pull request template](../.github/pull_request_template.md) for steps t
 * [Docker](https://docker.com)
 * [Node.js](https://nodejs.org/en/download/package-manager) for end-to-end testing with Cypress.
 * [CF8](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) for access to the cloud.gov CLI.
-* Local dev
+* [Postgres](https://www.postgresql.org/)
+* [SAM.gov](https://sam.gov/content/home) to validate UEI's
+### Local Development Tools
   * [Pyenv](https://github.com/pyenv) for managing Python versions
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments
-  * [Postgres](https://www.postgresql.org/)
-  * [SAM.gov](https://sam.gov/content/home) to validate UEI's
-
----
-**NOTE** - Windows users *may* need the following tools installed in addition to the above tools.
+#### Additional Windows Tools (Optional)
+Windows users *may* need the following tools installed in addition to the above tools.
+* [GNU Make](https://www.gnu.org/software/make/) - For running Makefile commands.
+* [Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/install) OR [Git Bash](https://gitforwindows.org/) - Provides a Unix-like shell environment.
+* [Visual Studio Code (VS Code)](https://code.visualstudio.com/) - install extensions for WSL and Remote Development.
 * [Chocolatey](https://chocolatey.org/install) - a package manager that will allow for installation of tools that are not available on Windows, such as GNU make (used for running Makefile operations).
   * Here is an example of how you would use Chocolatey in the terminal to install GNU make:
     ```
     choco install make
+    ```
+
+  * If make doesn’t run in Git Bash, prepend commands with winpty, e.g.:
+    ```
+    winpty make all
     ```
 ---
 
@@ -50,15 +58,95 @@ See [editorconfig.org](https://editorconfig.org/) for more information.
 
 By default, your IDE will acknowledge `CRLF` as the denotation for newlines. Many scripts in this repository **require** `LF` denotation (noticeably the .sh files when you first try to run and test the application). Make sure your IDE uses `LF` denotation for newlines when reading through each of these scripts.
 
-You can use the Git commands below BEFORE cloning the repository to your local computer to prevent files from using `CRLF` by default.
+You can use the Git commands below BEFORE cloning the repository to your local computer to prevent files from using `CRLF` by default. If you've already cloned it with incorrect line endings, you should reclone the repository.
 ```
 # don't use --global if you only want this behavior for a specific repository.
 git config --global core.autocrlf false
 # this ensures all files use LF.
 git config --global core.eol lf
+
+# If the repo was cloned before setting this, reclone it:
+rm -rf your-repo
+git clone https://github.com/your-org/your-repo.git
 ```
+
+
+
 ---
 
+### Windows Setup
+#### **Option 1: Use WSL**
+
+1. Install **WSL** and Ubuntu:
+   ```powershell
+   wsl --install -d Ubuntu
+   ```
+2. Install **Visual Studio Code** and the **Remote - WSL** extension.
+3. Open Ubuntu in VS Code by running:
+   ```bash
+   code .
+   ```
+4. Inside WSL Ubuntu, install dependencies:
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   sudo apt install python3 python3-venv python3-pip make build-essential
+   ```
+5. Install **Pyenv** and **Pyenv-Virtualenv** (Recommended for managing Python versions):
+   ```bash
+   curl https://pyenv.run | bash
+   ```
+   Follow the instructions to update `.bashrc` or `.zshrc`.
+
+#### **Option 2: Use Git Bash**
+
+1. Install **Git for Windows**.
+2. Install **Chocolatey** and run:
+   ```powershell
+   choco install make
+   ```
+3. Install Python and dependencies manually.
+4. Use Git Bash for commands but expect potential compatibility issues.
+
+### **Windows-Specific Git Settings**
+
+By default, Windows uses **CRLF line endings**, which can cause issues when running shell scripts. Before cloning the repo, run:
+
+```bash
+git config --global core.autocrlf false
+git config --global core.eol lf
+```
+
+## Activating Your Development Environment
+
+### **1. Clone the Repository**
+
+```bash
+git clone https://github.com/your-org/your-repo.git
+cd your-repo/backend
+```
+
+### **2. Set Up Python Virtual Environment**
+
+```bash
+python3 -m venv venv
+source venv/bin/activate  # (Linux/macOS, WSL)
+source venv/Scripts/activate  # (Windows Git Bash)
+```
+
+### **3. Install Dependencies**
+
+```bash
+pip install -r requirements.txt
+```
+
+### **4. Verify Development Tools**
+
+```bash
+python --version  # Should match the target version
+make --version    # Ensure GNU Make is installed
+```
+
+---
 ### Environment Variables
 
 Create a .env file in the `/backend` directory.
@@ -458,6 +546,54 @@ These tools run automatically as a part of our CI workflow in GitHub actions, bu
 
 ## Local Development
 
-You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead ([here](#docker)). It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned!
+You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead ([here](#docker)). It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned! This method requires **PostgreSQL** and additional setup. See [local-development.md](local-development.md) for additional warnings and details. 
 
-See [local-development.md](local-development.md) for additional warnings and details. 
+---
+## Troubleshooting
+
+### **Common Issues**
+
+#### **"ModuleNotFoundError" for Python Packages**
+
+- Ensure the virtual environment is activated (`source venv/bin/activate` or for Windows 'source venv/Scripts/activate').
+- Reinstall dependencies: `pip install -r requirements.txt`.
+
+#### **"Command Not Found" for Make**
+
+- If using **Git Bash**, install GNU Make via Chocolatey:
+  ```powershell
+  choco install make
+  ```
+- If using **WSL**, install it via Ubuntu:
+  ```bash
+  sudo apt install make
+  ```
+
+#### **"jsonnetfmt: command not found"**
+
+- Ensure `jsonnet` is installed:
+  ```bash
+  sudo apt install jsonnet
+  ```
+
+#### **"ModuleNotFoundError: No module named '\_jsonnet'"**
+
+- Install it manually:
+  ```bash
+  pip install --no-binary :all: pyjsonnet
+  ```
+
+#### **Docker Permission Issues**
+
+- If you get permission errors when running Docker, add yourself to the Docker group:
+  ```bash
+  sudo usermod -aG docker $USER
+  newgrp docker
+  ```
+If using Windows, ensure that WSL 2 integration is enabled in Docker Desktop > Settings > Resources > WSL Integration.
+
+#### **Error: Docker Daemon Not Running**
+
+- If using Docker Desktop, ensure it is running before executing any docker commands.
+  
+---

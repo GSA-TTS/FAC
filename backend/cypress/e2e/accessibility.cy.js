@@ -65,7 +65,7 @@ describe('A11y Testing on search pages', () => {
 });
 
 describe('A11y Testing on pre-submission pages', () => {
-  test_check_a11y('/audit/', 'my submissions');
+  test_check_a11y('/audit/', 'audit submissions');
   test_check_a11y('/report_submission/eligibility/', 'eligibility');
   test_check_a11y('/report_submission/auditeeinfo/', 'auditee info');
   test_check_a11y(

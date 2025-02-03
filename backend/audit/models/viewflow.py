@@ -171,7 +171,13 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
 
     @state.transition(
-        source=STATUS.IN_PROGRESS,
+        source=[
+            STATUS.IN_PROGRESS,
+            STATUS.READY_FOR_CERTIFICATION,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.CERTIFIED,
+        ],
         target=STATUS.FLAGGED_FOR_REMOVAL,
     )
     def transition_to_flagged_for_removal(self):

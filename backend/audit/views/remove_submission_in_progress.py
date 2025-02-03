@@ -26,7 +26,15 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
     template = "audit/remove-submission-in-progress.html"
 
-    @verify_status(STATUS.IN_PROGRESS)
+    @verify_status(
+        [
+            STATUS.IN_PROGRESS,
+            STATUS.READY_FOR_CERTIFICATION,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.CERTIFIED,
+        ]
+    )
     def get(self, request, *args, **kwargs):
         """
         Show the audit to be removed and confirmation form.
@@ -50,13 +58,26 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
         return render(request, self.template, context)
 
-    @verify_status(STATUS.IN_PROGRESS)
+    @verify_status(
+        [
+            STATUS.IN_PROGRESS,
+            STATUS.READY_FOR_CERTIFICATION,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.CERTIFIED,
+        ]
+    )
     def post(self, request, *args, **kwargs):
         """
         Remove the audit and redirect to the audits list.
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        role_values = [role[0] for role in ACCESS_ROLES]
+        if not Access.objects.filter(
+            email=request.user.email, sac=sac, role__in=role_values
+        ).exists():
+            raise PermissionDenied("Only authorized auditors can remove audits.")
 
         flow = SingleAuditChecklistFlow(sac)
         flow.transition_to_flagged_for_removal()
