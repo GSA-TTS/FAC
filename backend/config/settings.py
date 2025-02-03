@@ -361,14 +361,6 @@ else:
         elif service["instance_name"] == "backups":
             # Backups AWS S3 bucket for the app's backup files
             s3_creds = service["credentials"]
-            # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
-            DBBACKUP_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-            DBBACKUP_STORAGE_OPTIONS = {
-                "access_key": s3_creds["access_key_id"],
-                "secret_key": s3_creds["secret_access_key"],
-                "bucket_name": s3_creds["bucket"],
-                "default_acl": "private",  # type: ignore
-            }
 
             AWS_BACKUPS_ACCESS_KEY_ID = s3_creds["access_key_id"]
             AWS_BACKUPS_SECRET_ACCESS_KEY = s3_creds["secret_access_key"]
