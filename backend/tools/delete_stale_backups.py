@@ -3,6 +3,10 @@
 # Find or delete files in S3 older than a given age and matching a pattern
 # Useful for cleaning up old backups, etc.
 #
+# References:
+# https://stackoverflow.com/questions/11426560/amazon-s3-boto-how-to-delete-folder
+# https://github.com/jordansissel/s3cleaner/blob/master/s3cleaner.py
+#
 
 import boto3
 from datetime import datetime, timezone, timedelta
@@ -12,12 +16,14 @@ import sys
 
 def main(args):
     parser = OptionParser()
+    parser.add_option("--days", dest="days", metavar="DAYS",
+                    help="Max age a key(file) in days can have before we want to delete it")
     parser.add_option("--delete", dest="delete", metavar="DELETE", action="store_true",
                     default=False, help="Actually do a delete. If not specified, just list the keys found that match.")
     (config, args) = parser.parse_args(args)
 
     config_ok = True
-    for flag in ("bucket"):
+    for flag in ("days"):
         if getattr(config, flag) is None:
             print >>sys.stderr, "Missing required flag: --%s" % flag
             config_ok = False
@@ -33,7 +39,7 @@ def main(args):
     )
 
     objects = s3_client.list_objects(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Prefix="backups/")
-    one_week_ago = datetime.now(timezone.utc) - timedelta(days=1)
+    one_week_ago = datetime.now(timezone.utc) - timedelta(days=config.days)
     # Check if the bucket contains any objects
     if 'Contents' in objects:
         for obj in objects['Contents']:
