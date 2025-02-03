@@ -13,7 +13,7 @@ logger.setLevel(logging.WARNING)
 class Command(BaseCommand):
     help = """
         Replace 'GSA_MIGRATION' with '' in policies_content and rate_content
-        in census_data of a note in dissemination_migrationinspectionrecord
+        of census_data in a note in dissemination_migrationinspectionrecord
 
         Usage:
         manage.py update_migrationinspectionrecord
@@ -48,7 +48,6 @@ class Command(BaseCommand):
 
         count = 0
         for migrationinspectionrecord in migrationinspectionrecords:
-            print("\nmigrationinspectionrecord.note = ", migrationinspectionrecord.note)
             notes = []
             is_updated = False
             for note in migrationinspectionrecord.note:
@@ -61,7 +60,7 @@ class Command(BaseCommand):
                 notes += [note]
             if is_updated:
                 migrationinspectionrecord.note = notes
-                print("Updated notes = ", migrationinspectionrecord.note)
+                migrationinspectionrecord.save()
                 count += 1
 
         print("Number of records updated = ", count)
