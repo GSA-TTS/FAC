@@ -64,6 +64,9 @@ def extract_secondary_auditors(file, is_gsa_migration=False, auditee_uei=None):
     return result
 
 
+def secondary_auditors_audit_view(data):
+    return {"secondary_auditors": data["SecondaryAuditors"]["secondary_auditors_entries"]}
+
 def secondary_auditors_named_ranges(errors):
     return _extract_named_ranges(
         errors,
