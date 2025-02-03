@@ -9,17 +9,30 @@ import boto3
 from datetime import datetime, timezone, timedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
+import sys
+
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("--days", type=int,
-            help="Max age a key(file) in days can have before we want to delete it")
-        parser.add_argument("--delete",
-            required=False, default=False, help="Actually do a delete. If not specified, just list the keys found that match.")
+        parser.add_argument(
+            "--days",
+            type=int,
+            help="Max age a key(file) in days can have before we want to delete it",
+        )
+        parser.add_argument(
+            "--delete",
+            required=False,
+            default=False,
+            help="Actually do a delete. If not specified, just list the keys found that match.",
+        )
 
     def handle(self, *args, **options):
         days = options["days"]
         delete = options["delete"]
+
+        if days == 0:
+            print("Days cannot be equal to zero, otherwise all backups will be deleted")
+            sys.exit(1)
 
         s3_client = boto3.client(
             "s3",
@@ -28,23 +41,32 @@ class Command(BaseCommand):
             endpoint_url=settings.AWS_S3_BACKUPS_ENDPOINT_URL,
         )
 
-        objects = s3_client.list_objects(Bucket=settings.AWS_BACKUPS_STORAGE_BUCKET_NAME, Prefix="backups/")
+        objects = s3_client.list_objects(
+            Bucket=settings.AWS_BACKUPS_STORAGE_BUCKET_NAME, Prefix="backups/"
+        )
         delete_older_than = datetime.now(timezone.utc) - timedelta(days=days)
         # Check if the bucket contains any objects
-        if 'Contents' in objects:
-            for obj in objects['Contents']:
+        if "Contents" in objects:
+            for obj in objects["Contents"]:
                 # Get the last modified date of the object
-                last_modified = obj['LastModified']
+                last_modified = obj["LastModified"]
 
                 # If the object is older than one week, delete it
-                #s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f"backups/{item.file.name}")
+                # s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f"backups/{item.file.name}")
                 if delete:
                     if last_modified < delete_older_than:
                         print(f"Deleting {obj['Key']} last modified on {last_modified}")
-                        s3_client.delete_object(Bucket=settings.AWS_BACKUPS_STORAGE_BUCKET_NAME, Key=obj['Key'])
+                        s3_client.delete_object(
+                            Bucket=settings.AWS_BACKUPS_STORAGE_BUCKET_NAME,
+                            Key=obj["Key"],
+                        )
                     else:
-                        print(f"Object {obj['Key']} younger than {delete_older_than} days. Not deleting.")
+                        print(
+                            f"Object {obj['Key']} younger than {delete_older_than} days. Not deleting."
+                        )
                 else:
-                    print(f"Delete not sent. {obj['Key']} was last modified on {last_modified}")
+                    print(
+                        f"Delete not sent. {obj['Key']} was last modified on {last_modified}"
+                    )
         else:
             print("No objects found in the bucket.")
