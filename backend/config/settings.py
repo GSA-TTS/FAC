@@ -377,6 +377,8 @@ else:
             AWS_S3_BACKUPS_INTERNAL_ENDPOINT = AWS_S3_BACKUPS_ENDPOINT_URL
             AWS_S3_BACKUPS_EXTERNAL_ENDPOINT = AWS_S3_BACKUPS_ENDPOINT_URL
 
+            AWS_PRIVATE_DEFAULT_ACL = "private"
+
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
     # see settings options https://django-csp.readthedocs.io/en/latest/configuration.html#configuration-chapter
