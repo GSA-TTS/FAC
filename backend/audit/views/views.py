@@ -157,7 +157,8 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
             #TODO Audit Rework
             audit = Audit.objects.get(report_id=sac.report_id)
-            audit.audit.update({str(handler_info["field_name"]): audit_data})
+            audit_update = FORM_SECTION_HANDLERS.get(form_section)["audit_object"](audit_data)
+            audit.audit.update(audit_update)
             audit.save(
                 event_user=user,
                 event_type=self._event_type(form_section),

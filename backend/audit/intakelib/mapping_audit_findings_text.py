@@ -63,6 +63,8 @@ def extract_audit_findings_text(file, is_gsa_migration=False, auditee_uei=None):
     result = _extract_generic_data(xform_ir, params)
     return result
 
+def audit_findings_audit_view(data):
+    return {"findings_text": data["FindingsText"]["findings_text_entries"]}
 
 def audit_findings_text_named_ranges(errors):
     return _extract_named_ranges(

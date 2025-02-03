@@ -64,6 +64,8 @@ def extract_additional_ueis(file, is_gsa_migration=False, auditee_uei=None):
     result = _extract_generic_data(xform_ir, params)
     return result
 
+def additional_ueis_audit_view(data):
+    return {"additional_ueis": [uei_entry["additional_uei"] for uei_entry in data["AdditionalUEIs"]["additional_ueis_entries"]]}
 
 def additional_ueis_named_ranges(errors):
     return _extract_named_ranges(

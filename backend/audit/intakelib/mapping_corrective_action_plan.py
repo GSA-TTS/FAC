@@ -62,6 +62,8 @@ def extract_corrective_action_plan(file, is_gsa_migration=False, auditee_uei=Non
     result = _extract_generic_data(xform_ir, params)
     return result
 
+def corrective_action_plan_audit_view(data):
+    return {"corrective_action_plan": data["CorrectiveActionPlan"]["corrective_action_plan_entries"]}
 
 def corrective_action_plan_named_ranges(errors):
     return _extract_named_ranges(

@@ -67,6 +67,8 @@ def extract_additional_eins(file, is_gsa_migration=False, auditee_uei=None):
     result = _extract_generic_data(xform_ir, params)
     return result
 
+def additional_eins_audit_view(data):
+    return {"additional_eins": [ein_entry["additional_ein"] for ein_entry in data["AdditionalEINs"]["additional_eins_entries"]]}
 
 def additional_eins_named_ranges(errors):
     return _extract_named_ranges(

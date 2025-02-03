@@ -63,6 +63,8 @@ def extract_notes_to_sefa(file, is_gsa_migration=False, auditee_uei=None):
     result = _extract_generic_data(new_ir, params)
     return result
 
+def notes_to_sefa_audit_view(data):
+    return {"notes_to_sefa": data["NotesToSefa"]}
 
 def notes_to_sefa_named_ranges(errors):
     return _extract_named_ranges(
