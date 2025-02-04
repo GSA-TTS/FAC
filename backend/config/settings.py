@@ -368,6 +368,7 @@ else:
             AWS_S3_BACKUPS_REGION_NAME = s3_creds["region"]
             AWS_S3_BACKUPS_ENDPOINT = s3_creds["endpoint"]
             AWS_S3_BACKUPS_ENDPOINT_URL = f"https://{AWS_S3_BACKUPS_ENDPOINT}"
+            AWS_PRIVATE_DEFAULT_ACL = "private"
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
