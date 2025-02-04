@@ -137,7 +137,11 @@
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                 <p class="margin-y-1">
                                     <span><strong>Additional UEIs?</strong>&nbsp;
-
+                                      {% if audit.additional_ueis %}
+                                            Y
+                                        {% else %}
+                                            N
+                                        {% endif %}
                                     </span>
                                 </p>
                             </td>
