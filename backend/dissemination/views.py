@@ -6,6 +6,7 @@ from datetime import date, timedelta
 
 import newrelic.agent
 from django.db.models import Q
+from django.utils.dateparse import parse_date, parse_datetime
 
 from audit.models import Audit
 from audit.models.constants import STATUS
@@ -196,7 +197,7 @@ class AdvancedSearch(View):
 
         return render(
             request,
-            "search.html",
+            "search_new.html",
             {
                 "advanced_search_flag": True,
                 "form": form,
@@ -287,7 +288,7 @@ class AdvancedSearch(View):
         )
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
-        return render(request, "search.html", context | {"total_time_s": total_time_s})
+        return render(request, "search_new.html", context | {"total_time_s": total_time_s})
 
 
 class Search(View):
@@ -303,7 +304,7 @@ class Search(View):
 
         return render(
             request,
-            "search.html",
+            "search_new.html",
             {
                 "advanced_search_flag": False,
                 "form": form,
@@ -394,7 +395,7 @@ class Search(View):
         )
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
-        return render(request, "search.html", context | {"total_time_s": total_time_s})
+        return render(request, "search_new.html", context | {"total_time_s": total_time_s})
 
 
 class AuditSummaryView(View):
@@ -413,13 +414,13 @@ class AuditSummaryView(View):
             )
         is_sf_sac_downloadable = True
         audit_data = audit.first()
+
         context = {
             "report_id": report_id,
-            "auditee_name": audit_data.audit.get("auditee_name"),
-            "auditee_uei": audit_data.audit.get("auditee_uei"),
             "general": audit_data.audit.get("general_information"),
-            "include_private": False,
-            "data": audit_data,
+            "include_private": True,
+            "audit": audit_data.audit,
+            "fac_accepted_date": parse_datetime(audit_data.audit.get("fac_accepted_date")),
             "is_sf_sac_downloadable": is_sf_sac_downloadable,
         }
 

@@ -141,24 +141,24 @@
                             <tbody>
                                 {% for result in results %}
                                     <tr>
-                                        <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
+                                        <th scope="row" role="rowheader">{{ result.audit.general_information.auditee_name }}</th>
                                         {% comment %} Display UEI. If it's "GSA_MIGRATION", use the EIN instead. If no EIN, just show "GSA_MIGRATION". {% endcomment %}
                                         <td>
-                                            {% if result.auditee_uei != "GSA_MIGRATION" %}
-                                                {{ result.auditee_uei }}
-                                            {% elif result.auditee_ein %}
-                                                {{ result.auditee_ein }}
+                                            {% if result.audit.general_information.auditee_uei != "GSA_MIGRATION" %}
+                                                {{ result.audit.general_information.auditee_uei }}
+                                            {% elif result.audit.general_information.auditee_ein %}
+                                                {{ result.audit.general_information.auditee_ein }}
                                             {% else %}
-                                                {{ result.auditee_uei }}
+                                                {{ result.audit.general_information.auditee_uei }}
                                             {% endif %}
                                         </td>
                                         {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
-                                        <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}
+                                        <td data-sort-value={{ result.audit.fac_accepted_date|date:"Ymd" }}>{{ result.audit.fac_accepted_date }}
                                         </td>
-                                        <td>{{ result.audit_year }}</td>
+                                        <td>{{ result.audit.audit_year }}</td>
                                         <td>
-                                            {% if result.agency_name %}
-                                                {{ result.agency_name|linebreaksbr  }}
+                                            {% if result.audit.agency_name %}
+                                                {{ result.audit.agency_name|linebreaksbr  }}
                                             {% else %}
                                                 N/A
                                             {% endif %}
@@ -176,7 +176,8 @@
                                             </a>
                                         </td>
                                         <td>
-                                            {% if result.is_public or include_private %}
+                                            <!-- TODO: FIXME -->
+                                            {% if result.is_public or include_private or True %}
                                                 <a class="usa-link display-flex flex-column flex-align-center"
                                                 href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
                                                 target="_blank">

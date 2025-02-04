@@ -92,12 +92,12 @@ def _search_alns(params):
         # Build a filter for the agency numbers. E.g. given 93 and 45
         for an in agency_numbers:
             query |= \
-                Q(audit__federal_awards__contains=[{"program": {"federal_agency_prefix" : an.prefix }}])
+                Q(audit__federal_awards__awards__contains=[{"program": {"federal_agency_prefix" : an.prefix }}])
 
     if full_alns:
         for full_aln in full_alns:
-            query |= Q(audit__federal_awards__contains=[{"program": {"federal_agency_prefix" : full_aln.prefix }}]) & \
-                              Q(audit__federal_awards__contains=[{"program": {"three_digit_extension":full_aln.program}}])
+            query |= Q(audit__federal_awards__awards__contains=[{"program": {"federal_agency_prefix" : full_aln.prefix }}]) & \
+                              Q(audit__federal_awards__awards__contains=[{"program": {"three_digit_extension":full_aln.program}}])
 
     return query
 
@@ -186,9 +186,9 @@ def _search_direct_funding(params):
     for field in direct_funding_fields:
         match field:
             case "direct_funding":
-                q |= Q(audit__federal_awards__contains=[{"direct_or_indirect_award": {"is_direct":"Y"}}])
+                q |= Q(audit__federal_awards__awards__contains=[{"direct_or_indirect_award": {"is_direct":"Y"}}])
             case "passthrough_funding":
-                q |= Q(audit__federal_awards__contains=[{"direct_or_indirect_award": {"is_direct":"N"}}])
+                q |= Q(audit__federal_awards__awards__contains=[{"direct_or_indirect_award": {"is_direct":"N"}}])
             case _:
                 pass
     return q
@@ -197,9 +197,9 @@ def _search_major_program(params):
     q = Q()
     major_program_fields = params.get("major_program")
     if "True" in major_program_fields:
-        q |= Q(audit__federal_awards__contains=[{"program": {"is_major": "Y"}}])
+        q |= Q(audit__federal_awards__awards__contains=[{"program": {"is_major": "Y"}}])
     elif "False" in major_program_fields:
-        q |= Q(audit__federal_awards__contains=[{"program": {"is_major": "N"}}])
+        q |= Q(audit__federal_awards__awards__contains=[{"program": {"is_major": "N"}}])
     return q
 
 def _search_passthrough_name(params):
@@ -287,9 +287,9 @@ SEARCH_QUERIES = {
 # audit__general_information__auditee_uei
 # audit__additional_eins
 # audit__additional_ueis
-# audit__federal_awards__program__federal_agency_prefix
-# audit__federal_awards__program__is_major
-# audit__federal_awards__direct_or_indirect_award__is_direct
+# audit__federal_awards__awards__program__federal_agency_prefix
+# audit__federal_awards__awards__program__is_major
+# audit__federal_awards__awards__direct_or_indirect_award__is_direct
 # audit__oversight_agency
 # audit__cognizant_agency
 # audit_program_names
