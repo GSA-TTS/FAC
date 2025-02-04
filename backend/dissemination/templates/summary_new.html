@@ -12,9 +12,9 @@
                 <div class="grid-col-12 tablet:grid-col-7">
                     <h1 class="usa-legend usa-legend--large font-sans-2xl">Single audit summary</h1>
                     <legend class="usa-legend usa-legend--large text-normal font-sans-xl margin-top-4">
-                        <p class="margin-0 text-bold">{{ auditee_name }}</p>
+                        <p class="margin-0 text-bold">{{ general.auditee_name }}</p>
                         <p class="margin-0 text-semibold">
-                            <strong>UEI:</strong> {{ auditee_uei }}
+                            <strong>UEI:</strong> {{ general.auditee_uei }}
                         </p>
                     </legend>
                     <div class="font-sans-lg">
@@ -22,10 +22,10 @@
                             <strong>Report ID:&nbsp;</strong>{{ report_id }}
                         </p>
                         <p class="margin-y-1">
-                            <strong>FAC acceptance date:&nbsp;</strong>{{ general.fac_accepted_date }}
+                            <strong>FAC acceptance date:&nbsp;</strong>{{ fac_accepted_date|date:"Y-m-d" }}
                         </p>
                         <p class="margin-y-1">
-                            <strong>Fiscal Year:&nbsp;</strong>{{ general.fy_start_date }} to {{ general.fy_end_date }}
+                            <strong>Fiscal Year:&nbsp;</strong>{{ general.auditee_fiscal_period_start }} to {{ general.auditee_fiscal_period_end }}
                         </p>
                     </div>
                 </div>
@@ -145,14 +145,18 @@
                         <tr class="grid-row grid-col-12 margin-top-2">
                             <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
                                 <p class="margin-y-1">
-                                    <strong>EIN:&nbsp;</strong>{{ general.auditee_ein }}
+                                    <strong>EIN:&nbsp;</strong>{{ general.ein }}
                                 </p>
                             </td>
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                 <p class="margin-y-1">
                                     <span>
                                         <strong>Additional EINs?</strong>&nbsp;
-
+                                        {% if audit.additional_eins %}
+                                            Y
+                                        {% else %}
+                                            N
+                                        {% endif %}
                                     </span>
                                 </p>
                             </td>
@@ -160,12 +164,12 @@
                         <tr class="grid-row grid-col-12 margin-top-2">
                             <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
                                 <p class="margin-y-1">
-                                    <strong>Certifying name:&nbsp;</strong>{{ general.auditee_certify_name }}
+                                    <strong>Certifying name:&nbsp;</strong>{{ audit.auditee_certification.auditee_signature.auditee_name }}
                                 </p>
                             </td>
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                 <p class="margin-y-1">
-                                    <strong>Certifying title:&nbsp;</strong>{{ general.auditee_certify_title }}
+                                    <strong>Certifying title:&nbsp;</strong>{{ audit.auditee_certification.auditee_signature.auditee_title }}
                                 </p>
                             </td>
                         </tr>
@@ -223,7 +227,11 @@
                                 <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                     <p class="margin-y-1">
                                         <span><strong>Secondary Auditors?</strong>&nbsp;
-
+                                            {% if general.secondary_auditors_exist %}
+                                                Y
+                                            {% else %}
+                                                N
+                                            {% endif %}
                                         </span>
                                     </p>
                                 </td>
@@ -239,7 +247,11 @@
                                 <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                     <p class="margin-y-1">
                                         <span><strong>Secondary Auditors?</strong>&nbsp;
-
+                                          {% if general.secondary_auditors_exist %}
+                                                Y
+                                            {% else %}
+                                                N
+                                            {% endif %}
                                         </span>
                                     </p>
                                 </td>
@@ -256,7 +268,7 @@
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
                                 <p class="margin-y-1">
                                     <span><strong>Federal awards:</strong>&nbsp;
-
+                                        {{ audit.federal_awards.awards|length }}
                                     </span>
                                 </p>
                             </td>
@@ -264,7 +276,7 @@
                                 <p class="margin-y-1 {% if not data|getkey:"Notes to SEFA" %}text-gray-40{% endif %}">
                                     <span><strong>Notes to SEFA:</strong>&nbsp;
                                         {% if general.is_public or include_private %}
-
+                                            {{ audit.notes_to_sefa.notes_to_sefa_entries|length }}
                                         {% else %}
                                             N/A
                                         {% endif %}
@@ -276,15 +288,19 @@
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
                                 <p class="margin-y-1 {% if not data|getkey:"Audit Findings" %}text-gray-40{% endif %}">
                                     <span><strong>Findings:</strong>&nbsp;
-
+                                        {{ audit.findings_uniform_guidance|length }}
                                     </span>
                                 </p>
                             </td>
                             {% comment %} Findings text - If none, show the gray box with no link. {% endcomment %}
                             <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                 <p class="margin-y-1 {% if not data|getkey:"Audit Findings Text" %}text-gray-40{% endif %}">
-                                    <span><strong>Findings text:</strong>&nbsp;
-
+                                    <span><strong>Findings text:</strong>
+                                      {% if general.is_public or include_private %}
+                                            {{ audit.findings_text|length }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
                                     </span>
                                 </p>
                             </td>
@@ -294,7 +310,11 @@
                             <td class="grid-col-12 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
                                 <p class="margin-y-1 {% if not data|getkey:"Corrective Action Plan" %}text-gray-40{% endif %}">
                                     <span><strong>CAP:</strong>&nbsp;
-
+                                        {% if general.is_public or include_private %}
+                                            {{ audit.corrective_action_plan|length }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
                                     </span>
                                 </p>
                             </td>
@@ -302,7 +322,7 @@
                                 <p class="margin-y-1 display-flex flex-row flex-justify">
                                     <strong>Total federal expenditure:&nbsp;</strong>
                                     <span class="margin-0 display-flex">
-                                        ${{ general.total_amount_expended|intcomma }}
+                                        ${{ audit.federal_awards.total_amount_expended|intcomma }}
                                     </span>
                                 </p>
                             </td>

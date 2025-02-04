@@ -67,7 +67,6 @@ class Audit(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)
 
-    # TODO: Do we need these? oversight_agency, cognizant_agency (or add to the JSON)
     objects = AuditManager()
 
     class Meta:

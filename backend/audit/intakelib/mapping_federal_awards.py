@@ -83,7 +83,7 @@ def federal_awards_named_ranges(errors):
     )
 
 def federal_awards_audit_view(data):
-    return {"federal_awards": data["FederalAwards"]["federal_awards"]}
+    return {"federal_awards": {"awards": data["FederalAwards"]["federal_awards"], "total_amount_expended": data["FederalAwards"]["total_amount_expended"]}}
 
 def _set_pass_through_entity_name(obj, target, value):
     if value is None or value == "":
