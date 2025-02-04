@@ -785,8 +785,8 @@ def _compute_additional_audit_fields(audit, sac):
     oversight_agency = sac.oversight_agency
     entity_type = None
 
-    passthrough = _load_passthrough(audit.audit["federal_awards"])
-    program_names = [fa["program"]["program_name"] for fa in audit.audit["federal_awards"]]
+    passthrough = _load_passthrough(audit.audit["federal_awards"]["awards"])
+    program_names = [fa["program"]["program_name"] for fa in audit.audit["federal_awards"]["awards"]]
     audit.audit.update({
         "audit_year": "2023",
         "cognizant_agency": cognizant_agency,
