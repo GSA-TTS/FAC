@@ -131,12 +131,12 @@ def run_search(form_data):
 
     _add_search_params_to_newrelic(search_parameters)
 
-    try:
-        audit_search(search_parameters)
-    except Exception as e:
-        logger.exception(f"========================= Failed to run audit search {e}")
+    # try:
+    #     audit_search(search_parameters)
+    # except Exception as e:
+    #     logger.exception(f"========================= Failed to run audit search {e}")
 
-    return search(search_parameters)
+    return audit_search(search_parameters)
 
 
 # Function to do a dictionary lookup of the agency name to number
@@ -161,7 +161,28 @@ def _populate_cog_over_name(results):
             )
     return results
 
-
+def _populate_cog_over_name_audit(results):
+    agency_names = AGENCY_NAMES
+    for result in results:
+        oversight_agency = result.audit["oversight_agency"]
+        cognizant_agency = result.audit["cognizant_agency"]
+        if oversight_agency:
+            agency_code = oversight_agency
+            agency_name = agency_names.get(
+                oversight_agency, oversight_agency
+            )
+            result.audit.update(
+                {"agency_name": "\n".join(textwrap.wrap(agency_code + " - " + agency_name + " (OVER)", width=20))}
+            )
+        elif cognizant_agency:
+            agency_code = cognizant_agency
+            agency_name = agency_names.get(
+                cognizant_agency, cognizant_agency
+            )
+            result.audit.update(
+                {"agency_name": "\n".join(textwrap.wrap(agency_code + " - " + agency_name + " (COG)", width=20))}
+            )
+    return results
 class AdvancedSearch(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -243,7 +264,7 @@ class AdvancedSearch(View):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         # populate the agency name in cog/over field
-        paginator_results = _populate_cog_over_name(paginator_results)
+        paginator_results = _populate_cog_over_name_audit(paginator_results)
 
         context = context | {
             "advanced_search_flag": True,
@@ -350,7 +371,7 @@ class Search(View):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         # populate the agency name in cog/over field
-        paginator_results = _populate_cog_over_name(paginator_results)
+        paginator_results = _populate_cog_over_name_audit(paginator_results)
 
         context = context | {
             "advanced_search_flag": False,
