@@ -712,7 +712,6 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             audit = Audit.objects.get(report_id=report_id)
-            ## TODO!~!!
             errors = sac.validate_full()
             if errors:
                 context = {"report_id": report_id, "errors": errors}
@@ -723,6 +722,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     context,
                 )
 
+              ## TODO!~!!
             # Only change this value if things work...
             disseminated = "DID NOT DISSEMINATE"
 
@@ -730,9 +730,10 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             with transaction.atomic():
                 sac_transition(request, sac, audit=audit, transition_to=STATUS.SUBMITTED)
                 disseminated = sac.disseminate()
+                _compute_additional_fields(audit, sac)
                 # `disseminated` is None if there were no errors.
                 if disseminated is None:
-                    sac_transition(request, sac,  audit=audit, transition_to=STATUS.DISSEMINATED)
+                    sac_transition(request, sac, audit=audit, transition_to=STATUS.DISSEMINATED)
             # END ATOMIC BLOCK
 
             # IF THE DISSEMINATION SUCCEEDED
@@ -776,6 +777,16 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             if General.objects.get(report_id=sac.report_id):
                 return redirect(reverse("audit:MySubmissions"))
             raise
+
+# TODO: We'll want to calculate the cog/oversite for the audit same way as sac, for now just use the sac one
+def _compute_additional_fields(audit, sac):
+    audit_year, fy_end_month, _ = audit.audit["auditee_fiscal_period_end"].split("-")
+    cognizant_agency = sac.cognizant_agency
+    oversight_agency = sac.oversight_agency
+    entity_type = None
+
+    audit.audit.update({"audit_year": "2023", "cognizant_agency": cognizant_agency, "oversight_agency": oversight_agency, "fy_end_month": fy_end_month, "entity_type": entity_type})
+    audit.save()
 
 
 # 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView

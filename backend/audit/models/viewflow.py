@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from audit.models import SingleAuditChecklist, SubmissionEvent
 from audit.models.models import STATUS
 from curation.curationlib.curation_audit_tracking import CurationTracking
@@ -153,6 +155,7 @@ def sac_transition(request, sac, **kwargs):
             event_type=SubmissionEvent.EventType.SUBMITTED,
         )
         if audit:
+            audit.audit.update({"fac_accepted_date": str(datetime.datetime.now(datetime.timezone.utc))})
             audit.save(
                 event_user=request.user,
                 event_type=SubmissionEvent.EventType.SUBMITTED,

@@ -10,6 +10,7 @@ from django.db.models import Q
 from audit.models import Audit
 from audit.models.constants import STATUS
 from config.settings import AGENCY_NAMES, STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
+from dissemination.audit_search import audit_search
 from dissemination.file_downloads import get_download_url, get_filename
 from dissemination.forms import AdvancedSearchForm, SearchForm
 from dissemination.mixins import ReportAccessRequiredMixin
@@ -129,6 +130,11 @@ def run_search(form_data):
         search_parameters.update(advanced_parameters)
 
     _add_search_params_to_newrelic(search_parameters)
+
+    try:
+        audit_search(search_parameters)
+    except Exception as e:
+        logger.exception(f"========================= Failed to run audit search {e}")
 
     return search(search_parameters)
 
