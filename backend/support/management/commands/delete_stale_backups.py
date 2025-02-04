@@ -2,15 +2,11 @@
 # Do a delete: python manage.py delete_stale_backups --days X --delete true
 # List objects: python manage.py delete_stale_backups --days X
 
-# python manage.py delete_stale_backups --days 0 --delete
-
-
 import boto3
 from datetime import datetime, timezone, timedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
 import sys
-
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -62,7 +58,7 @@ class Command(BaseCommand):
                         )
                     else:
                         print(
-                            f"Object {obj['Key']} younger than {delete_older_than} days. Not deleting."
+                            f"Object {obj['Key']} younger than {delete_older_than}. Not deleting."
                         )
                 else:
                     print(
