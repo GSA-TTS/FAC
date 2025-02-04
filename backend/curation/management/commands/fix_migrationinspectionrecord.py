@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from dissemination.models import MigrationInspectionRecord
-from config.settings import ENVIRONMENT
+from config.settings import ENVIRONMENT, GSA_MIGRATION
 from django.db.models import Q
 
 import logging
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         return year not in valid_years
 
     def handle(self, *args, **options):
-        if ENVIRONMENT != "LOCAL":
+        if ENVIRONMENT not in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING"]:
             print(f"Environment is not LOCAL, ENVIRONMENT={ENVIRONMENT}")
             return
 
@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 if (
                     note[0]["transformation_functions"][0]
                     == "xform_missing_notes_records"
-                ) & (note[0]["census_data"][0]["value"] == "GSA_MIGRATION"):
+                ) & (note[0]["census_data"][0]["value"] == GSA_MIGRATION):
                     note[0]["census_data"][0]["value"] = ""
                     is_updated = True
                 notes += [note]
