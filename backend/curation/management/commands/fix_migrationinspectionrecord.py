@@ -30,8 +30,14 @@ class Command(BaseCommand):
         return year not in valid_years
 
     def handle(self, *args, **options):
-        if ENVIRONMENT not in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING"]:
-            print(f"Environment is not LOCAL, ENVIRONMENT={ENVIRONMENT}")
+        if ENVIRONMENT not in [
+            "LOCAL",
+            "DEVELOPMENT",
+            "PREVIEW",
+            "STAGING",
+            "PRODUCTION",
+        ]:
+            print(f"Environment is not as expected, ENVIRONMENT={ENVIRONMENT}")
             return
 
         year = options.get("year")
