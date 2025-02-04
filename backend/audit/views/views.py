@@ -730,7 +730,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             with transaction.atomic():
                 sac_transition(request, sac, audit=audit, transition_to=STATUS.SUBMITTED)
                 disseminated = sac.disseminate()
-                _compute_additional_fields(audit, sac)
+                _compute_additional_audit_fields(audit, sac)
                 # `disseminated` is None if there were no errors.
                 if disseminated is None:
                     sac_transition(request, sac, audit=audit, transition_to=STATUS.DISSEMINATED)
@@ -779,14 +779,37 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             raise
 
 # TODO: We'll want to calculate the cog/oversite for the audit same way as sac, for now just use the sac one
-def _compute_additional_fields(audit, sac):
+def _compute_additional_audit_fields(audit, sac):
     audit_year, fy_end_month, _ = audit.audit["auditee_fiscal_period_end"].split("-")
     cognizant_agency = sac.cognizant_agency
     oversight_agency = sac.oversight_agency
     entity_type = None
 
-    audit.audit.update({"audit_year": "2023", "cognizant_agency": cognizant_agency, "oversight_agency": oversight_agency, "fy_end_month": fy_end_month, "entity_type": entity_type})
+    passthrough = _load_passthrough(audit.audit["federal_awards"])
+    program_names = [fa["program"]["program_name"] for fa in audit.audit["federal_awards"]]
+    audit.audit.update({
+        "audit_year": "2023",
+        "cognizant_agency": cognizant_agency,
+        "oversight_agency": oversight_agency,
+        "fy_end_month": fy_end_month,
+        "entity_type": entity_type,
+        "passthrough": passthrough,
+        "program_names": program_names,
+    })
     audit.save()
 
+def _load_passthrough(federal_awards):
 
+    pass_objects = []
+    for entry in federal_awards:
+        entities = entry.get("direct_or_indirect_award", {}).get("entities", [])
+        for entity in entities:
+            passthrough = {
+                "award_reference" : entry["award_reference"],
+                "passthrough_id" : entity.get("passthrough_identifying_number", ""),
+                "passthrough_name": entity["passthrough_name"],
+            }
+            pass_objects.append(passthrough)
+
+    return pass_objects
 # 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView
