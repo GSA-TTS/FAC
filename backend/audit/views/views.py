@@ -780,7 +780,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
 # TODO: We'll want to calculate the cog/oversite for the audit same way as sac, for now just use the sac one
 def _compute_additional_audit_fields(audit, sac):
-    audit_year, fy_end_month, _ = audit.audit["auditee_fiscal_period_end"].split("-")
+    audit_year, fy_end_month, _ = audit.audit["general_information"]["auditee_fiscal_period_end"].split("-")
     cognizant_agency = sac.cognizant_agency
     oversight_agency = sac.oversight_agency
     entity_type = None

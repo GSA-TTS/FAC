@@ -131,7 +131,7 @@ def access_and_submission_check(user, data):
             submission_status=STATUS.IN_PROGRESS,
             audit_type=AUDIT_TYPE.SINGLE_AUDIT,
             schema=current_schema,
-            audit=all_steps_user_form_data,
+            audit={"general_information": all_steps_user_form_data},
             event_user=user,
             event_type=SubmissionEvent.EventType.CREATED
         )
