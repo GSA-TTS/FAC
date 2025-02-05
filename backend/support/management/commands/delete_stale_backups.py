@@ -29,7 +29,9 @@ class Command(BaseCommand):
         delete = options["delete"]
 
         if days < 14:
-            print("Days cannot less than 14 to prevent up-to-date backups from being deleted. Exiting...")
+            print(
+                "Days cannot less than 14 to prevent up-to-date backups from being deleted. Exiting..."
+            )
             sys.exit(1)
 
         s3_client = boto3.client(
