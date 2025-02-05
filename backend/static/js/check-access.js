@@ -1,16 +1,10 @@
 import { checkValidity } from './validate';
 
-const FORM = document.forms[0];
 let addedContactNum = 1;
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('create');
   continueBtn.disabled = shouldDisable;
-}
-
-function allResponsesValid() {
-  const inputsWithErrors = document.querySelectorAll('[class *="-error"]:not([hidden])');
-  return inputsWithErrors.length === 0;
 }
 
 function performValidations(nodes) {
