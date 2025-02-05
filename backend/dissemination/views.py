@@ -420,7 +420,6 @@ class AuditSummaryView(View):
             "general": audit_data.audit.get("general_information"),
             "include_private": True,
             "audit": audit_data.audit,
-            "fac_accepted_date": parse_datetime(audit_data.audit.get("fac_accepted_date")),
             "is_sf_sac_downloadable": is_sf_sac_downloadable,
         }
 
