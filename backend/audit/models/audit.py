@@ -18,9 +18,10 @@ class AuditManager(models.Manager):
     def create(self, **obj_data):
         user = obj_data.pop("event_user")
         event_type = obj_data.pop("event_type")
-        end_date = obj_data["audit"]["auditee_fiscal_period_end"]
-        report_id = obj_data.pop("report_id") if obj_data["report_id"] else generate_sac_report_id(count=self.model.objects.count(),
-                                           end_date=end_date) #TODO -> May want to adjust this
+        end_date = obj_data["audit"]["general_information"]["auditee_fiscal_period_end"]
+        report_id = obj_data.pop("report_id") if obj_data["report_id"] \
+            else generate_sac_report_id(count=self.model.objects.count(),
+                                        end_date=end_date) #TODO -> May want to adjust this
         version = 0
 
         updated = obj_data | {"report_id": report_id, "version": version, "created_by": user, "updated_by": user}
