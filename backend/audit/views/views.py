@@ -783,7 +783,6 @@ def _compute_additional_audit_fields(audit, sac):
     audit_year, fy_end_month, _ = audit.audit["general_information"]["auditee_fiscal_period_end"].split("-")
     cognizant_agency = sac.cognizant_agency
     oversight_agency = sac.oversight_agency
-    entity_type = None
 
     passthrough = _load_passthrough(audit.audit["federal_awards"]["awards"])
     program_names = [fa["program"]["program_name"] for fa in audit.audit["federal_awards"]["awards"]]
@@ -796,7 +795,6 @@ def _compute_additional_audit_fields(audit, sac):
         "cognizant_agency": cognizant_agency,
         "oversight_agency": oversight_agency,
         "fy_end_month": fy_end_month,
-        "entity_type": entity_type,
         "passthrough": passthrough,
         "program_names": program_names,
         "is_public": is_public,
