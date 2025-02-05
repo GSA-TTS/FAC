@@ -4,6 +4,7 @@
 {% load humanize %}
 {% load sprite_helper %}
 {% load static %}
+{% load parse_date %}
 {% block content %}
     <div class="grid-container margin-top-6">
         <div class="grid-col grid-gap">
@@ -22,7 +23,7 @@
                             <strong>Report ID:&nbsp;</strong>{{ report_id }}
                         </p>
                         <p class="margin-y-1">
-                            <strong>FAC acceptance date:&nbsp;</strong>{{ fac_accepted_date|date:"Y-m-d" }}
+                            <strong>FAC acceptance date:&nbsp;</strong>{{ audit.fac_accepted_date|parse_date|date:"Y-m-d" }}
                         </p>
                         <p class="margin-y-1">
                             <strong>Fiscal Year:&nbsp;</strong>{{ general.auditee_fiscal_period_start }} to {{ general.auditee_fiscal_period_end }}

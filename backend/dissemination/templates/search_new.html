@@ -2,6 +2,7 @@
 {% load humanize %}
 {% load static %}
 {% load sprite_helper %}
+{% load parse_date %}
 
 {% block content %}
     <div class="desktop:padding-x-10">
@@ -153,7 +154,7 @@
                                             {% endif %}
                                         </td>
                                         {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
-                                        <td data-sort-value={{ result.audit.fac_accepted_date|date:"Ymd" }}>{{ result.audit.fac_accepted_date }}
+                                        <td data-sort-value={{ result.audit.fac_accepted_date|date:"Ymd" }}>{{ result.audit.fac_accepted_date|parse_date|date:"Y-m-d" }}</td>
                                         </td>
                                         <td>{{ result.audit.audit_year }}</td>
                                         <td>
