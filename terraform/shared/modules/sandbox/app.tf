@@ -12,6 +12,7 @@ module "fac-app" {
   new_relic_creds_id      = cloudfoundry_user_provided_service.credentials.id
   private_s3_id           = module.s3-private.bucket_id
   public_s3_id            = module.s3-public.bucket_id
+  backups_s3_id           = var.backups_s3_id
   db_id                   = module.database.instance_id
   backup_db_id            = module.snapshot-database.instance_id
   app_instances           = 1
