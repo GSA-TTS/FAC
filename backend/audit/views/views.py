@@ -787,6 +787,10 @@ def _compute_additional_audit_fields(audit, sac):
 
     passthrough = _load_passthrough(audit.audit["federal_awards"]["awards"])
     program_names = [fa["program"]["program_name"] for fa in audit.audit["federal_awards"]["awards"]]
+
+    is_public = audit.audit["general_information"]["user_provided_organization_type"] != "tribal" or \
+                audit.audit["tribal_data_consent"]["is_tribal_information_authorized_to_be_public"]
+
     audit.audit.update({
         "audit_year": "2023",
         "cognizant_agency": cognizant_agency,
@@ -795,6 +799,7 @@ def _compute_additional_audit_fields(audit, sac):
         "entity_type": entity_type,
         "passthrough": passthrough,
         "program_names": program_names,
+        "is_public": is_public,
     })
     audit.save()
 
