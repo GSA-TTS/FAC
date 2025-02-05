@@ -41,32 +41,40 @@ class Command(BaseCommand):
             endpoint_url=settings.AWS_S3_BACKUPS_ENDPOINT_URL,
         )
 
-        objects = s3_client.list_objects(
+        paginator = s3_client.get_paginator("list_objects_v2")
+        pages = paginator.paginate(
             Bucket=settings.AWS_BACKUPS_STORAGE_BUCKET_NAME, Prefix="backups/"
         )
-        delete_older_than = datetime.now(timezone.utc) - timedelta(days=days)
-        # Check if the bucket contains any objects
-        if "Contents" in objects:
-            for obj in objects["Contents"]:
-                # Get the last modified date of the object
-                last_modified = obj["LastModified"]
 
-                # If the object is older than one week, delete it
-                # s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f"backups/{item.file.name}")
-                if delete:
-                    if last_modified < delete_older_than:
-                        print(f"Deleting {obj['Key']} last modified on {last_modified}")
-                        s3_client.delete_object(
-                            Bucket=settings.AWS_BACKUPS_STORAGE_BUCKET_NAME,
-                            Key=obj["Key"],
-                        )
+        delete_older_than = datetime.now(timezone.utc) - timedelta(days=days)
+        total_count = 0
+        for page in pages:
+            if "Contents" in page:
+                for obj in page["Contents"]:
+
+                    # Get the last modified date of the object
+                    last_modified = obj["LastModified"]
+
+                    # If the object is older than one week, delete it
+                    # s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f"backups/{item.file.name}")
+                    if delete:
+                        if last_modified < delete_older_than:
+                            print(
+                                f"Deleting {obj['Key']} last modified on {last_modified}"
+                            )
+                            s3_client.delete_object(
+                                Bucket=settings.AWS_BACKUPS_STORAGE_BUCKET_NAME,
+                                Key=obj["Key"],
+                            )
+                            total_count += 1
+                        else:
+                            print(
+                                f"Object {obj['Key']} younger than {delete_older_than}. Not deleting."
+                            )
                     else:
                         print(
-                            f"Object {obj['Key']} younger than {delete_older_than}. Not deleting."
+                            f"Delete not sent. {obj['Key']} was last modified on {last_modified}"
                         )
-                else:
-                    print(
-                        f"Delete not sent. {obj['Key']} was last modified on {last_modified}"
-                    )
-        else:
-            print("No objects found in the bucket.")
+            else:
+                print("No objects found in the bucket.")
+        print(f"Total number of objects deleted: {total_count}")
