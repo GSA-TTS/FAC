@@ -26,10 +26,9 @@ def get_agency_names():
     # Grab all the files, but we'll then sort and grab the latest one.
     # MCJ: We need to figure out how to keep ALNs up-to-date...
     # https://github.com/GSA-TTS/FAC/issues/1555
-    list_of_files = glob.glob("./schemas/source/data/cfda-agencies*.csv")
-    latest_file = max(list_of_files, key=os.path.getctime)
+    agency_file = "./schemas/source/data/cfda-agencies.csv"
 
-    with open(latest_file, "r", newline="", encoding="UTF-8") as file:
+    with open(agency_file, "r", newline="", encoding="UTF-8") as file:
         agencies = csv.reader(file)
         sorted_agencies = sorted(agencies, key=lambda x: x[0])
 
