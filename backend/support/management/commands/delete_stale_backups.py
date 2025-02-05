@@ -14,21 +14,22 @@ class Command(BaseCommand):
         parser.add_argument(
             "--days",
             type=int,
-            help="Max age a key(file) in days can have before we want to delete it",
+            required=True,
+            help="Max age a key(file) in days can have before we want to delete it. Value must be (14) or greater.",
         )
         parser.add_argument(
             "--delete",
             required=False,
             default=False,
-            help="Actually do a delete. If not specified, just list the keys found that match.",
+            help="True/False. Actually do a delete. If not specified, just list the keys found that match.",
         )
 
     def handle(self, *args, **options):
         days = options["days"]
         delete = options["delete"]
 
-        if days == 0:
-            print("Days cannot be equal to zero, otherwise all backups will be deleted")
+        if days == 0 or days < 14:
+            print("Days cannot be equal to 0 or less than 14 to prevent up-to-date backups from being deleted. Exiting...")
             sys.exit(1)
 
         s3_client = boto3.client(
