@@ -3,8 +3,7 @@ from datetime import datetime
 
 
 def merge_alns():
-    output_file = f"./source/data/cfda-lookup.csv"
-
+    output_file = "./source/data/cfda-lookup.csv"
     folder = "./source/data/aln_csvs_to_be_merged"
     print(f"Looking for CSV files in: {folder}")
 
