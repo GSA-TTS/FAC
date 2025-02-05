@@ -9,7 +9,7 @@ from audit.mixins import (
 )
 from audit.models import (
     SingleAuditChecklist,
-    SubmissionEvent,
+    SubmissionEvent, Audit,
 )
 from audit.forms import TribalAuditConsentForm
 from audit.validators import validate_tribal_data_consent_json
@@ -57,6 +57,13 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
                 )
                 logger.info("Tribal data consent saved.", tribal_data_consent)
+
+                audit = Audit.objects.get(report_id=report_id)
+                audit.audit.update({"tribal_data_consent": tribal_data_consent})
+                audit.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
+                )
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
