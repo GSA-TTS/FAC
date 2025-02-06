@@ -15,7 +15,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        general = General.objects.get(report_id="2023-12-GSAFAC-0000000038")
+        general = General.objects.get(report_id="2023-12-GSAFAC-0000000044")
         audit_data = dict()
 
         for handler in DISSEMINATION_HANDLERS:
@@ -150,7 +150,7 @@ def _convert_corrective_action_plan(general: General):
 def _convert_auditee_certification(general: General):
     return {"auditee_certification": {
             "auditee_signature": {
-              "auditee_name": general.auditee_name,
+              "auditee_name": general.auditee_certify_name,
               "auditee_title": general.auditee_certify_title,
               "auditee_certification_date_signed": str(general.auditee_certified_date)
             },
@@ -292,8 +292,6 @@ def _convert_month_year(general: General):
         "fac_accepted_date": str(general.fac_accepted_date),
     }
 
-def _convert_entity_type(general: General):
-    return {"entity_type": general.entity_type}
 
 DISSEMINATION_HANDLERS = [
     _convert_general_information,
@@ -312,6 +310,5 @@ DISSEMINATION_HANDLERS = [
     _convert_passthrough,
     _convert_cog_oversight,
     _convert_month_year,
-    _convert_entity_type,
     _convert_file_information
 ]

@@ -155,7 +155,7 @@ def sac_transition(request, sac, **kwargs):
             event_type=SubmissionEvent.EventType.SUBMITTED,
         )
         if audit:
-            audit.audit.update({"fac_accepted_date": str(datetime.datetime.now(datetime.timezone.utc))})
+            audit.audit.update({"fac_accepted_date":  datetime.datetime.today().strftime("%Y-%m-%d")})
             audit.save(
                 event_user=request.user,
                 event_type=SubmissionEvent.EventType.SUBMITTED,
