@@ -48,6 +48,11 @@ variable "public_s3_id" {
   description = "the full string of the public s3 resource id"
 }
 
+variable "backups_s3_id" {
+  type        = string
+  description = "the full string of the backups s3 resource id"
+}
+
 variable "db_id" {
   type        = string
   description = "the full string of the core db resource id"
