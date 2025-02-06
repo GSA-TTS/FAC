@@ -1,8 +1,7 @@
 module "database" {
-  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v1.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.1.0"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
+  cf_space_id   = data.cloudfoundry_space.space.id
   name          = "fac-db"
   tags          = ["rds"]
   rds_plan_name = var.database_plan
@@ -10,10 +9,9 @@ module "database" {
 }
 
 module "snapshot-database" {
-  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v1.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.1.0"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
+  cf_space_id   = data.cloudfoundry_space.space.id
   name          = "fac-snapshot-db"
   tags          = ["rds"]
   rds_plan_name = var.database_plan
@@ -41,6 +39,15 @@ module "s3-private" {
 }
 
 # Stuff used for apps in this space
+data "cloudfoundry_org" "org" {
+  name = var.cf_org_name
+}
+
+data "cloudfoundry_space" "space" {
+  name = var.cf_space_name
+  org  = data.cloudfoundry_org.org.id
+}
+
 data "cloudfoundry_space" "apps" {
   provider = cloudfoundry-community
   org_name = var.cf_org_name
