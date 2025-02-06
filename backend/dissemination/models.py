@@ -574,7 +574,6 @@ class SecondaryAuditor(models.Model):
         db_column="report_id",
     )
 
-
 class OneTimeAccess(models.Model):
     uuid = models.UUIDField()
     timestamp = models.DateTimeField(
