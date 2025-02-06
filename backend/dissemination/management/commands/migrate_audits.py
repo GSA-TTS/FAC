@@ -3,7 +3,6 @@ import logging
 from django.core.management.base import BaseCommand
 
 from audit.models import Audit, User, Schema, SingleAuditReportFile
-from audit.models.constants import AUDIT_TYPE
 from dissemination.models import General, Finding, FindingText, Note, AdditionalEin, AdditionalUei, CapText, \
     SecondaryAuditor, FederalAward, Passthrough
 
@@ -15,22 +14,26 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        general = General.objects.get(report_id="2023-12-GSAFAC-0000000044")
+        # audit_report_ids = [a.report_id for a in Audit.objects.all()]
+
+        # to_migrate = General.objects.filter(report_id__not_in=audit_report_ids)
+        to_migrate = General.objects.all()
         audit_data = dict()
 
-        for handler in DISSEMINATION_HANDLERS:
-            field = handler(general)
-            audit_data.update(field)
+        for general in to_migrate:
+            for handler in DISSEMINATION_HANDLERS:
+                field = handler(general)
+                audit_data.update(field)
 
-        Audit.objects.create(
-            event_type="MIGRATION",
-            event_user=User.objects.get(email="jason.rothacker+fac@gsa.gov"),
-            audit=audit_data,
-            report_id=f"{general.report_id}-MIGRATION",
-            schema=Schema.objects.get_current_schema(audit_type=AUDIT_TYPE.SINGLE_AUDIT),
-            submission_status="disseminated",
-            audit_type=general.audit_type,
-        )
+            Audit.objects.create(
+                event_type="MIGRATION",
+                event_user=User.objects.get(email="jason.rothacker+fac@gsa.gov"),
+                audit=audit_data,
+                report_id=general.report_id,
+                schema=Schema.objects.get_current_schema(audit_type="MIGRATION"),
+                submission_status="disseminated",
+                audit_type=general.audit_type,
+            )
         return
 
 ## TODO: Error Handling for Not Found ect.
