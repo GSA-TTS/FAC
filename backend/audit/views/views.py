@@ -791,7 +791,7 @@ def _compute_additional_audit_fields(audit, sac):
                 audit.audit["tribal_data_consent"]["is_tribal_information_authorized_to_be_public"]
 
     audit.audit.update({
-        "audit_year": "2023",
+        "audit_year": audit_year,
         "cognizant_agency": cognizant_agency,
         "oversight_agency": oversight_agency,
         "fy_end_month": fy_end_month,
