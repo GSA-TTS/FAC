@@ -34,4 +34,10 @@ resource "cloudfoundry_network_policy" "app-network-policy" {
     port            = "61443"
     protocol        = "tcp"
   }
+  policy {
+    source_app      = module.fac-app.app_id
+    destination_app = module.clamav.app_id
+    port            = "61443"
+    protocol        = "tcp"
+  }
 }
