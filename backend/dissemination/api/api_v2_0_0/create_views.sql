@@ -16,7 +16,7 @@ create view api_v2_0_0.findings_text as
     WHERE aud.audit ? 'findings_text'
       AND aud.submission_status = 'disseminated'
       AND (aud.audit @> '{"is_public" : true }'
-            OR (aud.audit @> '{"is_public" : true }' = false and api_v2_0_0_functions.has_tribal_data_access()))
+            OR (aud.audit @> '{"is_public" : false }' and api_v2_0_0_functions.has_tribal_data_access()))
     ORDER BY aud.id
 ;
 
