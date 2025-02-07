@@ -16,7 +16,7 @@ from audit.intakelib import (
 from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
 from audit.intakelib.mapping_additional_ueis import additional_ueis_audit_view
 from audit.intakelib.mapping_audit_findings import findings_audit_view
-from audit.intakelib.mapping_audit_findings_text import audit_findings_audit_view
+from audit.intakelib.mapping_audit_findings_text import audit_findings_text_audit_view
 from audit.intakelib.mapping_corrective_action_plan import \
     corrective_action_plan_audit_view
 from audit.intakelib.mapping_federal_awards import federal_awards_audit_view
@@ -129,7 +129,7 @@ FORM_SECTION_HANDLERS = {
         "extractor": extract_audit_findings_text,
         "field_name": "findings_text",
         "validator": validate_findings_text_json,
-        "audit_object": audit_findings_audit_view
+        "audit_object": audit_findings_text_audit_view
     },
     FORM_SECTIONS.ADDITIONAL_UEIS: {
         "extractor": extract_additional_ueis,
