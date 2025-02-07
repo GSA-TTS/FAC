@@ -4,22 +4,20 @@ begin;
 -- finding_text
 ---------------------------------------
 create view api_v2_0_0.findings_text as
-    select
-        gen.report_id,
-        gen.auditee_uei,
-        gen.audit_year,
-        ft.finding_ref_number,
-        ft.contains_chart_or_table,
-        ft.finding_text
-    from
-        dissemination_findingtext ft,
-        dissemination_general gen
-    where
-        ft.report_id = gen.report_id
-         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v2_0_0_functions.has_tribal_data_access()))
-    order by ft.id
+    SELECT
+        aud.report_id AS report_id,
+        aud.audit #>> ARRAY['general_information','auditee_uei'] AS auditee_uei,
+        aud.audit ->> 'audit_year' AS audit_year,
+        finding_text->> 'text_of_finding' AS finding_text,
+        finding_text->> 'reference_number' AS finding_ref_number,
+        finding_text->> 'contains_chart_or_table' AS contains_chart_or_table
+    FROM audit_audit AS aud,
+        jsonb_array_elements(aud.audit -> 'findings_text') AS finding_text
+    WHERE aud.audit ? 'findings_text'
+      AND aud.submission_status = 'disseminated'
+      AND (aud.audit @> '{"is_public" : true }'
+            OR (aud.audit @> '{"is_public" : true }' = false and api_v2_0_0_functions.has_tribal_data_access()))
+    ORDER BY aud.id
 ;
 
 ---------------------------------------

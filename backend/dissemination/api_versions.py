@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 # These are API versions we want live.
 live = {
-    "dissemination": ["api_v1_0_3", "api_v1_1_0"],
+    "dissemination": ["api_v1_0_3", "api_v1_1_0", "api_v2_0_0"],
     "support": ["admin_api_v1_1_0"],
 }
 
