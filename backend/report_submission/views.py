@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.shortcuts import render, redirect
@@ -118,18 +119,21 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
             return render(request, "report_submission/step-3.html", args)
 
     def post(self, request):
-        result = api.views.access_and_submission_check(request.user, request.POST)
 
-        report_id = result.get("report_id")
+        with transaction.atomic():
 
-        if report_id:
-            return Util.validate_redirect_url(
-                f"/report_submission/general-information/{report_id}"
-            )
-        else:
-            return render(
-                request, "report_submission/step-3.html", context=result, status=400
-            )
+            result = api.views.access_and_submission_check(request.user, request.POST)
+
+            report_id = result.get("report_id")
+
+            if report_id:
+                return Util.validate_redirect_url(
+                    f"/report_submission/general-information/{report_id}"
+                )
+            else:
+                return render(
+                    request, "report_submission/step-3.html", context=result, status=400
+                )
 
 
 class GeneralInformationFormView(LoginRequiredMixin, View):
