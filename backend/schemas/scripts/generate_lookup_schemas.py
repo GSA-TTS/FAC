@@ -1,14 +1,13 @@
-import glob
 import json
 import pandas as pd
 import sys
-import os
 
 """
 This script processes CFDA/ALN and cluster name CSV files to generate schema
 JSON, and it can be run using `make source_data`. Input files are found in
-`schemas/source/data`, and the latest-dated file will be used. To run manually:
+`schemas/source/data`.
 
+Usage:
 `python scripts/generate_lookup_schemas.py <item to process> <output JSON filepath>`
 
 where "item to process" is either "cfda-lookup" or "cluster-names".
@@ -71,34 +70,23 @@ if __name__ == "__main__":
     if len(sys.argv) >= 2:
         item_to_process = sys.argv[1]
         output_file = sys.argv[2]
-        glob_str = f"./source/data/{item_to_process}-*.csv"
+        input_file = f"./source/data/{item_to_process}.csv"
 
-        print(f"Loading latest CSV file matching pattern: {glob_str}")
-        list_of_files = glob.glob(glob_str)
-        print(f"Found {len(list_of_files)} files")
-
-        if not list_of_files:
-            print(f"No {item_to_process} CSV files found in schemas/source/data/")
-            if item_to_process == "cluster-names":
-                print("Skipping cluster-names processing as the file is not found.")
-                sys.exit(0)  # Exit without error for cluster-names
-            else:
-                sys.exit(1)  # Exit with error for other cases
-
-        latest_file = max(list_of_files, key=os.path.getmtime)
-        print(f"Processing latest file {latest_file}")
+        print(f"Using input file: {input_file}")
 
         obj = None
         match item_to_process:
             case "cfda-lookup":
-                obj = process_cfda_lookup(latest_file)
+                obj = process_cfda_lookup(input_file)
             case "cluster-names":
-                obj = process_cluster_names(latest_file)
+                obj = process_cluster_names(input_file)
             case _:
-                print("Unknown filename, exiting")
+                print(f"Unknown item {item_to_process}, exiting")
                 sys.exit(1)
 
         print(f"Saving output to {output_file}")
+
         with open(output_file, "w", newline="\n") as write_file:
             json.dump(obj, write_file, indent=2, sort_keys=True)
+
         print(f"File {output_file} successfully saved.")
