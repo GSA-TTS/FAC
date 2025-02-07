@@ -138,3 +138,8 @@ variable "backups_s3_id" {
   type        = string
   description = "the full string of the backups s3 resource id"
 }
+
+variable "cf_space_id" {
+  type        = string
+  description = "the guid of the cf space"
+}
