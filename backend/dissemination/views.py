@@ -214,7 +214,7 @@ class AdvancedSearch(View):
             # Reset page to one if the page number surpasses how many pages there actually are
             page = form_data["page"]
             ceiling = math.ceil(results_count / form_data["limit"])
-            if page > ceiling:
+            if page > ceiling or page < 1 or not page:
                 page = 1
 
             logger.info(f"TOTAL: results_count: [{results_count}]")
@@ -321,7 +321,7 @@ class Search(View):
             # Reset page to one if the page number surpasses how many pages there actually are
             page = form_data["page"]
             ceiling = math.ceil(results_count / form_data["limit"])
-            if page > ceiling:
+            if page > ceiling or page < 1 or not page:
                 page = 1
 
             logger.info(f"TOTAL: results_count: [{results_count}]")
