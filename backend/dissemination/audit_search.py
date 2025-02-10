@@ -1,4 +1,6 @@
 import logging
+import time
+from math import ceil
 
 from django.db.models import Q
 
@@ -16,6 +18,7 @@ def audit_search(params):
 
     TODO: Need to account for Tribal.
     """
+    t0 = time.time()
     params = params or dict()
     query = Q(submission_status=STATUS.DISSEMINATED)
 
@@ -28,6 +31,9 @@ def audit_search(params):
     # results = _sort_results(results, params)
     logger.error(f"=================== JASON JASON JASON ==========> {results.query}")
     logger.error(f"=================== JASON JASON JASON ==========> {results.count()}")
+    t1 = time.time()
+    readable = int(ceil((t1 - t0) * 1000))
+    logger.error(f"=================== JASON JASON JASON ==========> {readable}ms")
     return results
 
 def _sort_results(results, params):
