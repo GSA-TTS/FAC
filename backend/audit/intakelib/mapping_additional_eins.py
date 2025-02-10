@@ -68,7 +68,8 @@ def extract_additional_eins(file, is_gsa_migration=False, auditee_uei=None):
     return result
 
 def additional_eins_audit_view(data):
-    return {"additional_eins": [ein_entry["additional_ein"] for ein_entry in data["AdditionalEINs"]["additional_eins_entries"]]}
+    eins = data.get("AdditionalEINs", {}).get("additional_eins_entries", [])
+    return {"additional_eins": [ein["additional_ein"] for ein in eins]} if eins else {}
 
 def additional_eins_named_ranges(errors):
     return _extract_named_ranges(
