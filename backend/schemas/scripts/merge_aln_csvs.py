@@ -15,7 +15,11 @@ def merge_alns():
 
     for csv_file in csv_files:
         print(f"Processing file: {csv_file}")
-        aln_rows = pd.read_csv(f"{folder}/{csv_file}", encoding="ISO-8859-1", dtype={"Assistance Listings Number": str})
+        aln_rows = pd.read_csv(
+            f"{folder}/{csv_file}",
+            encoding="ISO-8859-1",
+            dtype={"Assistance Listings Number": str},
+        )
         aln_rows = aln_rows.rename(columns=column_mapping)
         all_aln_rows.append(aln_rows)
 
