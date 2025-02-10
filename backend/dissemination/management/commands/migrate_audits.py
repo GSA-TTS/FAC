@@ -51,14 +51,14 @@ class Command(BaseCommand):
         )
 
 def _convert_file_information(sac: SingleAuditChecklist):
-    try:
-        file = SingleAuditReportFile.objects.get(filename=f"{sac.report_id}.pdf")
-        return {"file_information": {
-            "pages": file.component_page_numbers,
-            "filename": file.filename,
-        }}
-    except SingleAuditReportFile.DoesNotExist:
-        return {}
+    file = (SingleAuditReportFile.objects
+            .filter(filename=f"{sac.report_id}.pdf")
+            .order_by('date_created')
+            .first())
+    return {"file_information": {
+        "pages": file.component_page_numbers,
+        "filename": file.filename,
+    }} if file is not None else {}
 
 
 def _convert_program_names(sac: SingleAuditChecklist):
@@ -73,11 +73,15 @@ def _convert_program_names(sac: SingleAuditChecklist):
     return {"program_names": program_names} if program_names else {}
 
 def _convert_month_year(sac: SingleAuditChecklist):
-    audit_year, fy_end_month, _ = sac.general_information["auditee_fiscal_period_end"].split("-")
+    fiscal_end = sac.general_information["auditee_fiscal_period_end"]
+    # In some "in-progress" the fiscal end date is not yet set.
+    if not fiscal_end:
+        return {}
+
+    audit_year, fy_end_month, _ = fiscal_end.split("-")
     return {
         "audit_year": audit_year,
         "fy_end_month": fy_end_month,
-        # "fac_accepted_date": general["fac_accepted_date"],
     }
 
 def _convert_passthrough(sac: SingleAuditChecklist):
