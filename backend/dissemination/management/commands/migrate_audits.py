@@ -2,7 +2,7 @@ import logging
 
 import pytz
 from django.core.management.base import BaseCommand
-
+from django.core.paginator import Paginator
 from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
 from audit.intakelib.mapping_additional_ueis import additional_ueis_audit_view
 from audit.intakelib.mapping_audit_findings import findings_audit_view
@@ -19,12 +19,20 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
-        sacs_to_migrate = SingleAuditChecklist.objects.raw(
+        queryset = SingleAuditChecklist.objects.raw(
             "select * from audit_singleauditchecklist "
-            "where report_id not in (select report_id from audit_audit)")
+            "where report_id not in (select report_id from audit_audit)"
+            "order by id desc limit 50000")
+        paginator = Paginator(queryset, 100)  # 100 items per page
 
-        for sac in sacs_to_migrate:
-            self._migrate_sac(sac)
+        for page_num in paginator.page_range:
+            logger.info("Processing page %s", page_num)
+            page = paginator.page(page_num)
+            for sac in page.object_list:
+                try:
+                    self._migrate_sac(sac)
+                except Exception as e:
+                    logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
 
     @staticmethod
     def _migrate_sac(sac: SingleAuditChecklist):
@@ -58,7 +66,9 @@ def _convert_program_names(sac: SingleAuditChecklist):
     if sac.federal_awards:
         awards = sac.federal_awards.get("FederalAwards", {}).get("federal_awards", [])
         for award in awards:
-            program_names.append(award["program"]["program_name"])
+            program_name = award.get("program", {}).get("program_name", "")
+            if program_name:
+                program_names.append(program_name)
 
     return {"program_names": program_names} if program_names else {}
 
@@ -78,9 +88,9 @@ def _convert_passthrough(sac: SingleAuditChecklist):
             entities = award.get("direct_or_indirect_award", {}).get("entities", [])
             for entity in entities:
                 passthrough = {
-                    "award_reference": entity["award_reference"],
+                    "award_reference": entity.get("award_reference", ""),
                     "passthrough_id": entity.get("passthrough_identifying_number", ""),
-                    "passthrough_name": entity["passthrough_name"],
+                    "passthrough_name": entity.get("passthrough_name", ""),
                 }
                 pass_objects.append(passthrough)
 
