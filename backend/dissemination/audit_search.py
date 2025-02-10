@@ -29,11 +29,11 @@ def audit_search(params):
 
     results = Audit.objects.filter(query)
     # results = _sort_results(results, params)
-    logger.error(f"=================== JASON JASON JASON ==========> {results.query}")
-    logger.error(f"=================== JASON JASON JASON ==========> {results.count()}")
+    logger.error(f"=================== AuditSearch ==========> {results.query}")
+    logger.error(f"=================== AuditSearch ==========> {results.count()}")
     t1 = time.time()
     readable = int(ceil((t1 - t0) * 1000))
-    logger.error(f"=================== JASON JASON JASON ==========> {readable}ms")
+    logger.error(f"=================== AuditSearch ==========> {readable}ms")
     return results
 
 def _sort_results(results, params):
