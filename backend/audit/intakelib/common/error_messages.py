@@ -72,6 +72,7 @@ messages = {
     "check_invalid_finding_reference_year": "The reference year in the finding reference <b>{}</b> declared in row {} does not match the audit year <b>{}</b>",
     "check_award_references_invalid": "Combining award references of 4 and 5-digit lengths is not allowed. If needed, zero-pad this number to make it 5 digits",
     "check_aln_prefix_invalid": "The federal agency prefix should be a two-digit value, for example, <b>10</b>",
+    "check_aln_invalid": "The ALN provided, {}, does not match any in the FederalPrograms sheet",
     "check_additional_award_identification_present": "Missing additional award identification",
     "check_federal_program_total": "Federal program total is {}, but should be {}",
     "check_cluster_total": "This cluster total is {}, but should be {}",
