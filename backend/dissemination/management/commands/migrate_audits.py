@@ -21,7 +21,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         queryset = SingleAuditChecklist.objects.raw(
             "select * from audit_singleauditchecklist "
-            "where report_id not in (select report_id from audit_audit)"
+            "where migrated is false "
             "order by id desc limit 50000")
         paginator = Paginator(queryset, 100)  # 100 items per page
 
