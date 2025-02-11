@@ -270,8 +270,7 @@ SEARCH_QUERIES = {
 ## TODO: Fields to Index
 # audit__audit_year
 # audit__general_information__auditee_state
-# audit__fac_accepted_date
-# audit__fac_accepted_date
+# audit__fac_accepted_date\
 # audit__fy_end_month
 # audit__general_information__user_provided_organization_type
 # report_id
