@@ -12,27 +12,52 @@ from audit.intakelib.mapping_federal_awards import federal_awards_audit_view
 from audit.intakelib.mapping_notes_to_sefa import notes_to_sefa_audit_view
 from audit.intakelib.mapping_secondary_auditors import secondary_auditors_audit_view
 from audit.models import Audit, User, Schema, SingleAuditReportFile, SingleAuditChecklist
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, FINDINGS_FIELD_TO_BITMASK, FINDINGS_BITMASK
 
 logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
-        queryset = SingleAuditChecklist.objects.raw(
-            "select * from audit_singleauditchecklist "
-            "where migrated is false "
-            "order by id desc limit 50000")
-        paginator = Paginator(queryset, 100)  # 100 items per page
-
+        # queryset = SingleAuditChecklist.objects.raw(
+        #     "select * from audit_singleauditchecklist "
+        #     "where migrated is false "
+        #     "order by id desc limit 50000")
+        # paginator = Paginator(queryset, 100)  # 100 items per page
+        #
+        # for page_num in paginator.page_range:
+        #     logger.info("Processing page %s", page_num)
+        #     page = paginator.page(page_num)
+        #     for sac in page.object_list:
+        #         try:
+        #             self._migrate_sac(sac)
+        #         except Exception as e:
+        #             logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
+        queryset = Audit.objects.raw(
+            "select * "
+            "from audit_audit "
+            "where audit->'findings_summary' is null "
+            "limit 50000"
+        )
+        paginator = Paginator(queryset, 100)
         for page_num in paginator.page_range:
             logger.info("Processing page %s", page_num)
             page = paginator.page(page_num)
-            for sac in page.object_list:
-                try:
-                    self._migrate_sac(sac)
-                except Exception as e:
-                    logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
+            for audit in page.object_list:
+                self._add_findings_summary(audit)
+
+    @staticmethod
+    def _add_findings_summary(audit: Audit):
+        findings = 0
+        for finding in audit.audit.get("findings_uniform_guidance", []):
+            for mask in FINDINGS_FIELD_TO_BITMASK:
+                if finding.get(mask.field, "N") == "Y":
+                    findings = findings | mask.mask
+            if finding.get("findings", {}).get("repeat_prior_reference", "N") == 'Y':
+                findings = findings | FINDINGS_BITMASK.REPEAT_FINDING
+
+        audit.audit.update({"findings_summary": findings})
+        audit.save()
 
     @staticmethod
     def _migrate_sac(sac: SingleAuditChecklist):

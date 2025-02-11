@@ -2,6 +2,9 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.db import models, transaction
+from django.db.models import GeneratedField
+from django.db.models.fields.json import KeyTextTransform
+from django.db.models.functions import Cast
 
 from audit.models.constants import AUDIT_TYPE_CODES, STATUS, STATUS_CHOICES
 from audit.models.history import History
@@ -67,6 +70,19 @@ class Audit(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)
+
+    # TODO: Add all search fields as generated fields.
+    findings_summary = GeneratedField(
+        expression=Cast(KeyTextTransform('findings_summary', 'audit'), output_field=models.IntegerField()),
+        output_field=models.IntegerField(),
+        db_persist=True
+    )
+
+    audit_year = GeneratedField(
+        expression=Cast(KeyTextTransform('audit_year', 'audit'), output_field=models.IntegerField()),
+        output_field=models.IntegerField(),
+        db_persist=True
+    )
 
     objects = AuditManager()
 

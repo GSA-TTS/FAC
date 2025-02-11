@@ -2,8 +2,11 @@ import logging
 import re
 from enum import Enum
 from collections import namedtuple as NT
-from django.db.models import Q
 
+from django.db.models import Q, Func
+from django.forms import BooleanField
+
+from audit.models.constants import FINDINGS_FIELD_TO_BITMASK, FINDINGS_BITMASK
 from dissemination.searchlib.search_constants import text_input_delimiters
 
 logger = logging.getLogger(__name__)
@@ -27,6 +30,11 @@ class SEARCH_FIELDS(Enum):
     MAJOR_PROGRAM = "major_program"
     PASSTHROUGH_NAME = "passthrough_name"
     TYPE_REQUIREMENT = "type_requirement"
+
+class JSONBitwiseOr(Func):
+    function = 'jsonb_bitwise_or'
+    arity = 4
+    output_field = BooleanField()
 
 def _search_names(params):
     names_list = params.get(SEARCH_FIELDS.NAMES)
@@ -141,44 +149,18 @@ def _search_federal_program_name(params):
     return query
 
 def _search_findings(params):
-    q = Q()
     findings_fields = params.get("findings")
 
-    is_modified_opinion = {"modified_opinion": "Y"}
-    is_other_findings = {"other_findings": "Y"}
-    is_material_weakness = {"material_weakness": "Y"}
-    is_significant_deficiency = {"significant_deficiency": "Y"}
-    is_other_matters = {"other_matters": "Y"}
-    is_questioned_costs = {"questioned_costs": "Y"}
-    is_repeat_finding = {"findings": { "repeat_prior_reference": "Y"}}
-    
-    for field in findings_fields:
-        match field:
-            case "all_findings":
-                q |= Q(audit__findings_uniform_guidance__contains=is_modified_opinion)
-                q |= Q(audit__findings_uniform_guidance__contains=is_other_findings)
-                q |= Q(audit__findings_uniform_guidance__contains=is_material_weakness)
-                q |= Q(audit__findings_uniform_guidance__contains=is_significant_deficiency)
-                q |= Q(audit__findings_uniform_guidance__contains=is_other_matters)
-                q |= Q(audit__findings_uniform_guidance__contains=is_questioned_costs)
-                q |= Q(audit__findings_uniform_guidance__contains=is_repeat_finding)
-            case "is_modified_opinion":
-                q |= Q(audit__findings_uniform_guidance__contains=is_modified_opinion)
-            case "is_other_findings":
-                q |= Q(audit__findings_uniform_guidance__contains=is_other_findings)
-            case "is_material_weakness":
-                q |= Q(audit__findings_uniform_guidance__contains=is_material_weakness)
-            case "is_significant_deficiency":
-                q |= Q(audit__findings_uniform_guidance__contains=is_significant_deficiency)
-            case "is_other_matters":
-                q |= Q(audit__findings_uniform_guidance__contains=is_other_matters)
-            case "is_questioned_costs":
-                q |= Q(audit__findings_uniform_guidance__contains=is_questioned_costs)
-            case "is_repeat_finding":
-                q |= Q(audit__findings_uniform_guidance__contains=is_repeat_finding)
-            case _:
-                pass
-    return q
+    findings_mask = 0
+    if "all_findings" in findings_fields:
+        findings_mask = FINDINGS_BITMASK.ALL
+    else:
+        for mask in FINDINGS_FIELD_TO_BITMASK:
+            if mask.search_param in findings_fields:
+                findings_mask = findings_mask | mask.mask
+    # TODO: Figure out how to get the query to work on the generated field
+    # where findings_summary & findings_mask > 0
+    return Q()
 
 def _search_direct_funding(params):
     q = Q()
@@ -246,8 +228,9 @@ def _get_full_alns(params):
                 split_alns.update([ALN(split_aln[0], split_aln[1])])
     return split_alns
 
+# TODO: Update to use generated fields
 SEARCH_QUERIES = {
-    SEARCH_FIELDS.AUDIT_YEARS: lambda params : Q(audit__audit_year__in=params.get(SEARCH_FIELDS.AUDIT_YEARS.value)),
+    SEARCH_FIELDS.AUDIT_YEARS: lambda params : Q(audit_year__in=params.get(SEARCH_FIELDS.AUDIT_YEARS.value)),
     SEARCH_FIELDS.AUDITEE_STATE: lambda params : Q(audit__general_information__auditee_state__in=[params.get(SEARCH_FIELDS.AUDITEE_STATE.value)]),
     SEARCH_FIELDS.NAMES: _search_names,
     SEARCH_FIELDS.UEI_EIN: lambda params : _search_uei_ein,
