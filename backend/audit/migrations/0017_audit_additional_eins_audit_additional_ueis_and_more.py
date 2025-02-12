@@ -8,12 +8,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("audit", "0016_history_schema_audit"),
     ]
 
     operations = [
+        migrations.RunSQL("""
+            CREATE OR REPLACE FUNCTION json_array_to_text_array (data jsonb)
+                RETURNS text[]
+                AS $CODE$
+            BEGIN
+                RETURN ARRAY (
+                    SELECT
+                        jsonb_array_elements(data));
+            END
+            $CODE$
+            LANGUAGE plpgsql
+            IMMUTABLE;
+        """),
         migrations.AddField(
             model_name="audit",
             name="additional_eins",
