@@ -62,15 +62,14 @@ class Command(BaseCommand):
 
 # Copied from backend/audit/views/views.py:806
 def _convert_additional_fields(audit, sac):
-    audit_year, fy_end_month, _ = audit["general_information"][
-        "auditee_fiscal_period_end"].split("-")
+    general_information = audit.get("general_information", {})
+    audit_year, fy_end_month, _ = general_information.get("auditee_fiscal_period_end", "1900-01-01").split("-")
+
     cognizant_agency = sac.cognizant_agency
     oversight_agency = sac.oversight_agency
 
-    is_public = audit["general_information"][
-                    "user_provided_organization_type"] != "tribal" or \
-                audit["tribal_data_consent"][
-                    "is_tribal_information_authorized_to_be_public"]
+    is_public = general_information.get("user_provided_organization_type", "") != "tribal" or \
+                audit.get("tribal_data_consent", {}).get("is_tribal_information_authorized_to_be_public", True)
     awards_indexes = _index_awards(audit)
     findings_indexes = _index_findings(audit)
     general_indexes = _index_general(audit)

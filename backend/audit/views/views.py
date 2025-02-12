@@ -784,29 +784,33 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 #    1) We'll want to calculate the cog/oversite for the audit same way as sac, for now just use the sac one
 #    2) Move this somewhere else... this file huge
 def _compute_additional_audit_fields(audit, sac):
-    audit_year, fy_end_month, _ = audit.audit["general_information"]["auditee_fiscal_period_end"].split("-")
+    general_information = audit.get("general_information", {})
+    audit_year, fy_end_month, _ = general_information.get("auditee_fiscal_period_end",
+                                                          "1900-01-01").split("-")
+
     cognizant_agency = sac.cognizant_agency
     oversight_agency = sac.oversight_agency
 
-    is_public = audit.audit["general_information"]["user_provided_organization_type"] != "tribal" or \
-                audit.audit["tribal_data_consent"]["is_tribal_information_authorized_to_be_public"]
-    awards_indexes = _index_awards(audit.audit)
-    findings_indexes = _index_findings(audit.audit)
-    general_indexes = _index_general(audit.audit)
-    search_indexes = {
-        **awards_indexes,
-        **findings_indexes,
-        **general_indexes
-    }
-    audit.audit.update({
-            "audit_year": audit_year,
-            "cognizant_agency": cognizant_agency,
-            "oversight_agency": oversight_agency,
-            "fy_end_month": fy_end_month,
-            "is_public": is_public,
+    is_public = general_information.get("user_provided_organization_type",
+                                        "") != "tribal" or \
+                audit.get("tribal_data_consent", {}).get(
+                    "is_tribal_information_authorized_to_be_public", True)
+    awards_indexes = _index_awards(audit)
+    findings_indexes = _index_findings(audit)
+    general_indexes = _index_general(audit)
 
-        "search_indexes": search_indexes
-    })
+    audit.update({
+        "audit_year": audit_year,
+        "cognizant_agency": cognizant_agency,
+        "oversight_agency": oversight_agency,
+        "fy_end_month": fy_end_month,
+        "is_public": is_public,
+
+        "search_indexes": {
+            **findings_indexes,
+            **awards_indexes,
+            **general_indexes
+        }})
     audit.save()
 
 def _index_findings(audit_data):
