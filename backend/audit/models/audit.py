@@ -1,8 +1,9 @@
 import logging
 
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.fields import ArrayField
 from django.db import models, transaction
-from django.db.models import GeneratedField, Field, Transform
+from django.db.models import GeneratedField, Field, Transform, F, Func
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast
 
@@ -12,6 +13,10 @@ from audit.models.schema import Schema
 from audit.models.utils import generate_sac_report_id
 
 logger = logging.getLogger(__name__)
+
+class JsonArrayToTextArray(Func):
+    function = 'json_array_to_text_array'
+    output_field = ArrayField(models.CharField())
 
 User = get_user_model()
 class AuditManager(models.Manager):
@@ -74,8 +79,10 @@ class Audit(models.Model):
     # All the Generated Fields are used to improve search performance.
     # TODO: Add all search fields as generated fields: Note: Some of these may require updating audit.views.views._compute_additional_audit_fields to improve performance i.e. findings_summary
     # TODO: ALNS, Names, UEI, EIN, Program Names, Findings, Funding, Major Program, Passthrough Name, Type Requirement
+
+    # TODO: Can we use https://github.com/disqus/django-bitfield/tree/master
     findings_summary = GeneratedField(
-        expression=Cast(KeyTextTransform('findings_summary', 'audit'), output_field=models.IntegerField()),
+        expression=Cast(KeyTextTransform('findings_summary', KeyTextTransform('search_indexes', 'audit')), output_field=models.IntegerField()),
         output_field=models.IntegerField(),
         db_persist=True
     )
@@ -115,7 +122,92 @@ class Audit(models.Model):
         output_field=models.BooleanField(),
         db_persist=True
     )
-    
+
+    cognizant_agency = GeneratedField(
+        expression=KeyTextTransform('cognizant_agency', 'audit'),
+        output_field=models.CharField(),
+        db_persist=True
+    )
+
+    oversight_agency = GeneratedField(
+        expression=KeyTextTransform('oversight_agency', 'audit'),
+        output_field=models.CharField(),
+        db_persist=True
+    )
+
+    has_direct_funding = GeneratedField(
+        expression=Cast(KeyTextTransform('has_direct_funding', KeyTextTransform('search_indexes', 'audit')), output_field=models.BooleanField()),
+        output_field=models.BooleanField(),
+        db_persist=True
+    )
+
+    has_indirect_funding = GeneratedField(
+        expression=Cast(KeyTextTransform('has_indirect_funding', KeyTextTransform('search_indexes', 'audit')),
+                        output_field=models.BooleanField()),
+        output_field=models.BooleanField(),
+        db_persist=True
+    )
+
+    is_major_program = GeneratedField(
+        expression=Cast(KeyTextTransform('is_major_program', KeyTextTransform('search_indexes', 'audit')), output_field=models.BooleanField()),
+        output_field=models.BooleanField(),
+        db_persist=True
+    )
+
+    program_names = GeneratedField(
+        expression=JsonArrayToTextArray('audit__search_indexes__program_names'),
+        output_field=ArrayField(models.CharField()),
+        db_persist=True
+    )
+
+    additional_ueis = GeneratedField(
+        expression=JsonArrayToTextArray('audit__additional_ueis'),
+        output_field=ArrayField(models.CharField()),
+        db_persist=True
+    )
+
+    additional_eins = GeneratedField(
+        expression=JsonArrayToTextArray('audit__additional_eins'),
+        output_field=ArrayField(models.CharField()),
+        db_persist=True
+    )
+
+    auditee_uei = GeneratedField(
+        expression=KeyTextTransform('auditee_uei', KeyTextTransform('general_information', 'audit')),
+        output_field=models.CharField(),
+        db_persist=True
+    )
+
+    auditee_ein = GeneratedField(
+        expression=KeyTextTransform('auditee_ein',
+                                    KeyTextTransform('general_information', 'audit')),
+        output_field=models.CharField(),
+        db_persist=True
+    )
+
+    passthrough_names = GeneratedField(
+        expression=JsonArrayToTextArray('audit__search_indexes__passthrough_names'),
+        output_field=ArrayField(models.CharField()),
+        db_persist=True
+    )
+
+    search_names = GeneratedField(
+        expression=JsonArrayToTextArray('audit__search_indexes__search_names'),
+        output_field=ArrayField(models.CharField()),
+        db_persist=True
+    )
+
+    agency_extensions = GeneratedField(
+        expression=JsonArrayToTextArray('audit__search_indexes__agency_extensions'),
+        output_field=ArrayField(models.CharField()),
+        db_persist=True
+    )
+
+    agency_prefixes = GeneratedField(
+        expression=JsonArrayToTextArray('audit__search_indexes__agency_prefixes'),
+        output_field=ArrayField(models.CharField()),
+        db_persist=True
+    )
     objects = AuditManager()
 
     class Meta:
@@ -150,7 +242,7 @@ class Audit(models.Model):
             return super().save()
 
     @Field.register_lookup
-    class IntegerValue(Transform):
+    class DateCast(Transform):
         # Register this before you filter things, for example in models.py
         lookup_name = 'date'  # Used as object.filter(LeftField__int__gte, "777")
         bilateral = True  # To cast both left and right
@@ -159,3 +251,5 @@ class Audit(models.Model):
             sql, params = compiler.compile(self.lhs)
             sql = 'CAST(%s AS DATE)' % sql
             return sql, params
+
+

@@ -3,6 +3,8 @@ import logging
 import pytz
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
+from django.db import connection
+
 from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
 from audit.intakelib.mapping_additional_ueis import additional_ueis_audit_view
 from audit.intakelib.mapping_audit_findings import findings_audit_view
@@ -12,52 +14,34 @@ from audit.intakelib.mapping_federal_awards import federal_awards_audit_view
 from audit.intakelib.mapping_notes_to_sefa import notes_to_sefa_audit_view
 from audit.intakelib.mapping_secondary_auditors import secondary_auditors_audit_view
 from audit.models import Audit, User, Schema, SingleAuditReportFile, SingleAuditChecklist
-from audit.models.constants import STATUS, FINDINGS_FIELD_TO_BITMASK, FINDINGS_BITMASK
+from audit.models.constants import STATUS
+from audit.views.views import _index_awards, _index_findings, _index_general
 
 logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
-        # queryset = SingleAuditChecklist.objects.raw(
-        #     "select * from audit_singleauditchecklist "
-        #     "where migrated is false "
-        #     "order by id desc limit 50000")
-        # paginator = Paginator(queryset, 100)  # 100 items per page
-        #
-        # for page_num in paginator.page_range:
-        #     logger.info("Processing page %s", page_num)
-        #     page = paginator.page(page_num)
-        #     for sac in page.object_list:
-        #         try:
-        #             self._migrate_sac(sac)
-        #         except Exception as e:
-        #             logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
-        queryset = Audit.objects.raw(
-            "select * "
-            "from audit_audit "
-            "where audit->'findings_summary' is null "
-            "limit 50000"
-        )
-        paginator = Paginator(queryset, 100)
+        queryset = SingleAuditChecklist.objects.raw(
+            "select * from audit_singleauditchecklist "
+            "where migrated is false "
+            "order by id desc limit 50000")
+        paginator = Paginator(queryset, 100)  # 100 items per page
+
         for page_num in paginator.page_range:
             logger.info("Processing page %s", page_num)
             page = paginator.page(page_num)
-            for audit in page.object_list:
-                self._add_findings_summary(audit)
+            for sac in page.object_list:
+                try:
+                    self._migrate_sac(sac)
+                    with connection.cursor() as cursor:
+                        cursor.execute(
+                            f"update audit_singleauditchecklist set migrated = true where report_id = '{sac.report_id}'")
+                except Exception as e:
+                    logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
+                    raise e
 
-    @staticmethod
-    def _add_findings_summary(audit: Audit):
-        findings = 0
-        for finding in audit.audit.get("findings_uniform_guidance", []):
-            for mask in FINDINGS_FIELD_TO_BITMASK:
-                if finding.get(mask.field, "N") == "Y":
-                    findings = findings | mask.mask
-            if finding.get("findings", {}).get("repeat_prior_reference", "N") == 'Y':
-                findings = findings | FINDINGS_BITMASK.REPEAT_FINDING
 
-        audit.audit.update({"findings_summary": findings})
-        audit.save()
 
     @staticmethod
     def _migrate_sac(sac: SingleAuditChecklist):
@@ -65,6 +49,7 @@ class Command(BaseCommand):
         for idx, handler in enumerate(SAC_HANDLERS):
             audit_data.update(handler(sac))
 
+        _convert_additional_fields(audit_data, sac)
         Audit.objects.create(
             event_type="MIGRATION",
             event_user=User.objects.get(email="jason.rothacker+fac@gsa.gov"),
@@ -74,6 +59,34 @@ class Command(BaseCommand):
             submission_status=sac.submission_status,
             audit_type=sac.audit_type,
         )
+
+# Copied from backend/audit/views/views.py:806
+def _convert_additional_fields(audit, sac):
+    audit_year, fy_end_month, _ = audit["general_information"][
+        "auditee_fiscal_period_end"].split("-")
+    cognizant_agency = sac.cognizant_agency
+    oversight_agency = sac.oversight_agency
+
+    is_public = audit["general_information"][
+                    "user_provided_organization_type"] != "tribal" or \
+                audit["tribal_data_consent"][
+                    "is_tribal_information_authorized_to_be_public"]
+    awards_indexes = _index_awards(audit)
+    findings_indexes = _index_findings(audit)
+    general_indexes = _index_general(audit)
+
+    audit.update({
+        "audit_year": audit_year,
+        "cognizant_agency": cognizant_agency,
+        "oversight_agency": oversight_agency,
+        "fy_end_month": fy_end_month,
+        "is_public": is_public,
+
+        "search_indexes": {
+            **findings_indexes,
+            **awards_indexes,
+            **general_indexes
+        }})
 
 def _convert_file_information(sac: SingleAuditChecklist):
     file = (SingleAuditReportFile.objects
