@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from audit.intakelib.checks.check_alns_are_valid import alns_are_valid
 from audit.context import set_sac_to_context
 
+
 class TestAlnIsValid(SimpleTestCase):
     def setUp(self):
         self.ir = [
