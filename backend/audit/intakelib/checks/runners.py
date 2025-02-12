@@ -34,7 +34,7 @@ from .check_no_major_program_no_type import no_major_program_no_type
 from .check_all_unique_award_numbers import all_unique_award_numbers
 from .check_sequential_award_numbers import sequential_award_numbers
 from .check_aln_three_digit_extension_pattern import aln_three_digit_extension
-from .check_aln_is_valid import aln_is_valid
+from .check_alns_are_valid import alns_are_valid
 from .check_additional_award_identification_present import (
     additional_award_identification,
 )
@@ -91,7 +91,7 @@ federal_awards_checks = general_checks + [
     sequential_award_numbers,
     aln_agency_prefix,
     aln_three_digit_extension,
-    aln_is_valid,
+    alns_are_valid,
     additional_award_identification,
     federal_program_total_is_correct,
     cluster_total_is_correct,

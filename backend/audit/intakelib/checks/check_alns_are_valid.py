@@ -9,7 +9,7 @@ from ..common import get_message, build_cell_error_tuple
 logger = logging.getLogger(__name__)
 
 
-def aln_is_valid(ir):
+def alns_are_valid(ir):
     """
     Raises an error if an ALN (prefix.extension) is not found in the column of
     valid ALNs provided in the FederalPrograms sheet.

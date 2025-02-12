@@ -3,7 +3,7 @@ from unittest.mock import Mock
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 
-from audit.intakelib.checks.check_aln_is_valid import aln_is_valid
+from audit.intakelib.checks.check_alns_are_valid import alns_are_valid
 from audit.context import set_sac_to_context
 
 class TestAlnIsValid(SimpleTestCase):
@@ -53,7 +53,7 @@ class TestAlnIsValid(SimpleTestCase):
         Normal case where a valid ALN is supplied
         """
         with set_sac_to_context(self.mock_sac):
-            errors = aln_is_valid(self.ir)
+            errors = alns_are_valid(self.ir)
 
             self.assertEqual(errors, None)
 
@@ -66,7 +66,7 @@ class TestAlnIsValid(SimpleTestCase):
 
         with set_sac_to_context(None):
             with self.assertRaises(ValidationError) as context:
-                aln_is_valid(self.ir)
+                alns_are_valid(self.ir)
 
             error = context.exception.args[0][0]
             self.assertEqual(
