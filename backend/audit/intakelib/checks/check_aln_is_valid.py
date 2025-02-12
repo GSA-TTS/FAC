@@ -35,6 +35,6 @@ def aln_is_valid(ir):
                 )
             )
 
-    if len(errors) > 0:
+    if errors:
         logger.info("Raising a validation error.")
         raise ValidationError(errors)
