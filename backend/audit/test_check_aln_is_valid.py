@@ -62,7 +62,7 @@ class TestAlnIsValid(SimpleTestCase):
         Error case where invalid ALN is supplied
         """
         # No ALNs are considered valid
-        self.ir[1]["ranges"][0]["values"] = []
+        self.ir[1]["ranges"][1]["values"] = []
 
         with set_sac_to_context(None):
             with self.assertRaises(ValidationError) as context:
