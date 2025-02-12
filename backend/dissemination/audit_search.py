@@ -26,7 +26,6 @@ def audit_search(params):
         if field.value in params and params.get(field.value):
             query = query & SEARCH_QUERIES[field](params)
 
-
     results = Audit.objects.filter(query)
     # results = _sort_results(results, params)
     logger.error(f"=================== AuditSearch ==========> {results.query}")
