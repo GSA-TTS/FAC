@@ -1193,11 +1193,13 @@ six==1.16.0 \
     #   orderedmultidict
     #   pyjwkest
     #   python-dateutil
-sling==1.3.4 \
-    --hash=sha256:70541da99b48313a0cfd5e61c52d984e4d50113b7945308697d32cd50a6bb183
+sling==1.4.2 \
+    --hash=sha256:37366d47a3249de8ac43db3b45b0a5c1785124b5554c9c7a36ca1d5547fd5c60 \
+    --hash=sha256:8df3dd51eb73b1509d01600c657393a1d32ec90744f0736dfbc264883af952c5
     # via -r ./requirements/requirements.in
-sling-linux-amd64==1.3.4 \
-    --hash=sha256:d5f3b71fb191e8b9663f88890c464d84ab4c36df3a5fd6148a51cdd2ea9a5099
+sling-linux-amd64==1.4.2 \
+    --hash=sha256:4935332ccefa56abafccb89ead7b743ecaafaf6059b8f5d9ce9e9ca21b9b2b36 \
+    --hash=sha256:cf9a41e4eb2bb5028e69313188eeb8b6328e21aa4e9718a528d2e6a92ee7d617
     # via sling
 sqlalchemy==2.0.36 \
     --hash=sha256:03e08af7a5f9386a43919eda9de33ffda16b44eb11f3b313e6822243770e9763 \
