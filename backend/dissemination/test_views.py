@@ -927,3 +927,71 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
             )
 
             self.assertEqual(response.content, b"fake file content")
+
+
+class PageHandlingTests(TestCase):
+    """Test cases for ensuring page handling logic in AdvancedSearch and Search views"""
+
+    def setUp(self):
+        """Set up test client and sample form data"""
+        self.client = Client()
+        self.advanced_search_url = reverse("dissemination:AdvancedSearch")
+        self.basic_search_url = reverse("dissemination:Search")
+
+        self.valid_post_data = {
+            "audit_year": ["2023"],
+            "limit": "10",
+            "order_by": "name",
+            "order_direction": "asc",
+            "page": "1",
+        }
+
+    @patch("dissemination.views.run_search")
+    def test_advanced_search_post_page_too_high(self, mock_run_search):
+        """Ensure page resets to 1 when the requested page is greater than available pages"""
+        mock_run_search.return_value.count.return_value = (
+            5  # Mock result count (only 1 page available)
+        )
+
+        invalid_data = self.valid_post_data.copy()
+        invalid_data["page"] = "100"  # Too high
+
+        response = self.client.post(self.advanced_search_url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page"], 1)  # Should reset to 1
+
+    @patch("dissemination.views.run_search")
+    def test_advanced_search_post_page_zero(self, mock_run_search):
+        """Ensure page resets to 1 when the requested page is zero"""
+        mock_run_search.return_value.count.return_value = 5
+
+        invalid_data = self.valid_post_data.copy()
+        invalid_data["page"] = "0"
+
+        response = self.client.post(self.advanced_search_url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page"], 1)  # Should reset to 1
+
+    @patch("dissemination.views.run_search")
+    def test_advanced_search_post_page_empty(self, mock_run_search):
+        """Ensure page defaults to 1 when no page is provided"""
+        mock_run_search.return_value.count.return_value = 5
+
+        invalid_data = self.valid_post_data.copy()
+        invalid_data["page"] = ""
+
+        response = self.client.post(self.advanced_search_url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page"], 1)  # Should default to 1
+
+    @patch("dissemination.views.run_search")
+    def test_advanced_search_post_valid_page(self, mock_run_search):
+        """Ensure valid page number remains unchanged"""
+        mock_run_search.return_value.count.return_value = 20  # Multiple pages exist
+
+        valid_data = self.valid_post_data.copy()
+        valid_data["page"] = "2"  # Valid page
+
+        response = self.client.post(self.advanced_search_url, valid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page"], 2)  # Should remain 2

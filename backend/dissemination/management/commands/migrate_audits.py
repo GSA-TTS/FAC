@@ -2,7 +2,7 @@ import logging
 
 import pytz
 from django.core.management.base import BaseCommand
-
+from django.core.paginator import Paginator
 from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
 from audit.intakelib.mapping_additional_ueis import additional_ueis_audit_view
 from audit.intakelib.mapping_audit_findings import findings_audit_view
@@ -12,19 +12,52 @@ from audit.intakelib.mapping_federal_awards import federal_awards_audit_view
 from audit.intakelib.mapping_notes_to_sefa import notes_to_sefa_audit_view
 from audit.intakelib.mapping_secondary_auditors import secondary_auditors_audit_view
 from audit.models import Audit, User, Schema, SingleAuditReportFile, SingleAuditChecklist
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, FINDINGS_FIELD_TO_BITMASK, FINDINGS_BITMASK
 
 logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
-        sacs_to_migrate = SingleAuditChecklist.objects.raw(
-            "select * from audit_singleauditchecklist "
-            "where report_id not in (select report_id from audit_audit)")
+        # queryset = SingleAuditChecklist.objects.raw(
+        #     "select * from audit_singleauditchecklist "
+        #     "where migrated is false "
+        #     "order by id desc limit 50000")
+        # paginator = Paginator(queryset, 100)  # 100 items per page
+        #
+        # for page_num in paginator.page_range:
+        #     logger.info("Processing page %s", page_num)
+        #     page = paginator.page(page_num)
+        #     for sac in page.object_list:
+        #         try:
+        #             self._migrate_sac(sac)
+        #         except Exception as e:
+        #             logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
+        queryset = Audit.objects.raw(
+            "select * "
+            "from audit_audit "
+            "where audit->'findings_summary' is null "
+            "limit 50000"
+        )
+        paginator = Paginator(queryset, 100)
+        for page_num in paginator.page_range:
+            logger.info("Processing page %s", page_num)
+            page = paginator.page(page_num)
+            for audit in page.object_list:
+                self._add_findings_summary(audit)
 
-        for sac in sacs_to_migrate:
-            self._migrate_sac(sac)
+    @staticmethod
+    def _add_findings_summary(audit: Audit):
+        findings = 0
+        for finding in audit.audit.get("findings_uniform_guidance", []):
+            for mask in FINDINGS_FIELD_TO_BITMASK:
+                if finding.get(mask.field, "N") == "Y":
+                    findings = findings | mask.mask
+            if finding.get("findings", {}).get("repeat_prior_reference", "N") == 'Y':
+                findings = findings | FINDINGS_BITMASK.REPEAT_FINDING
+
+        audit.audit.update({"findings_summary": findings})
+        audit.save()
 
     @staticmethod
     def _migrate_sac(sac: SingleAuditChecklist):
@@ -43,14 +76,14 @@ class Command(BaseCommand):
         )
 
 def _convert_file_information(sac: SingleAuditChecklist):
-    try:
-        file = SingleAuditReportFile.objects.get(filename=f"{sac.report_id}.pdf")
-        return {"file_information": {
-            "pages": file.component_page_numbers,
-            "filename": file.filename,
-        }}
-    except SingleAuditReportFile.DoesNotExist:
-        return {}
+    file = (SingleAuditReportFile.objects
+            .filter(filename=f"{sac.report_id}.pdf")
+            .order_by('date_created')
+            .first())
+    return {"file_information": {
+        "pages": file.component_page_numbers,
+        "filename": file.filename,
+    }} if file is not None else {}
 
 
 def _convert_program_names(sac: SingleAuditChecklist):
@@ -58,16 +91,22 @@ def _convert_program_names(sac: SingleAuditChecklist):
     if sac.federal_awards:
         awards = sac.federal_awards.get("FederalAwards", {}).get("federal_awards", [])
         for award in awards:
-            program_names.append(award["program"]["program_name"])
+            program_name = award.get("program", {}).get("program_name", "")
+            if program_name:
+                program_names.append(program_name)
 
     return {"program_names": program_names} if program_names else {}
 
 def _convert_month_year(sac: SingleAuditChecklist):
-    audit_year, fy_end_month, _ = sac.general_information["auditee_fiscal_period_end"].split("-")
+    fiscal_end = sac.general_information["auditee_fiscal_period_end"]
+    # In some "in-progress" the fiscal end date is not yet set.
+    if not fiscal_end:
+        return {}
+
+    audit_year, fy_end_month, _ = fiscal_end.split("-")
     return {
         "audit_year": audit_year,
         "fy_end_month": fy_end_month,
-        # "fac_accepted_date": general["fac_accepted_date"],
     }
 
 def _convert_passthrough(sac: SingleAuditChecklist):
@@ -78,9 +117,9 @@ def _convert_passthrough(sac: SingleAuditChecklist):
             entities = award.get("direct_or_indirect_award", {}).get("entities", [])
             for entity in entities:
                 passthrough = {
-                    "award_reference": entity["award_reference"],
+                    "award_reference": entity.get("award_reference", ""),
                     "passthrough_id": entity.get("passthrough_identifying_number", ""),
-                    "passthrough_name": entity["passthrough_name"],
+                    "passthrough_name": entity.get("passthrough_name", ""),
                 }
                 pass_objects.append(passthrough)
 

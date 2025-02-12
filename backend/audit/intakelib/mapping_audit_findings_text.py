@@ -64,7 +64,8 @@ def extract_audit_findings_text(file, is_gsa_migration=False, auditee_uei=None):
     return result
 
 def audit_findings_text_audit_view(data):
-    return {"findings_text": data["FindingsText"]["findings_text_entries"]}
+    findings_text = data.get("FindingsText", {}).get("findings_text_entries", [])
+    return {"findings_text": findings_text} if findings_text else {}
 
 def audit_findings_text_named_ranges(errors):
     return _extract_named_ranges(

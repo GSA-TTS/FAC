@@ -66,7 +66,8 @@ def extract_audit_findings(file, is_gsa_migration=False, auditee_uei=None):
 
 
 def findings_audit_view(data):
-    return {"findings_uniform_guidance": data["FindingsUniformGuidance"]["findings_uniform_guidance_entries"]}
+    findings = data.get("FindingsUniformGuidance", {}).get("findings_uniform_guidance_entries",[])
+    return {"findings_uniform_guidance": findings} if findings else {}
 
 def audit_findings_named_ranges(errors):
     return _extract_named_ranges(
