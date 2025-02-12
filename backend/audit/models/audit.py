@@ -2,7 +2,7 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.db import models, transaction
-from django.db.models import GeneratedField
+from django.db.models import GeneratedField, Field, Transform
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast
 
@@ -71,7 +71,9 @@ class Audit(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)
 
-    # TODO: Add all search fields as generated fields.
+    # All the Generated Fields are used to improve search performance.
+    # TODO: Add all search fields as generated fields: Note: Some of these may require updating audit.views.views._compute_additional_audit_fields to improve performance i.e. findings_summary
+    # TODO: ALNS, Names, UEI, EIN, Program Names, Findings, Funding, Major Program, Passthrough Name, Type Requirement
     findings_summary = GeneratedField(
         expression=Cast(KeyTextTransform('findings_summary', 'audit'), output_field=models.IntegerField()),
         output_field=models.IntegerField(),
@@ -84,6 +86,36 @@ class Audit(models.Model):
         db_persist=True
     )
 
+    auditee_state = GeneratedField(
+        expression=KeyTextTransform('auditee_state', KeyTextTransform('general_information', 'audit')),
+        output_field=models.CharField(), # TODO: Determine max_length
+        db_persist=True
+    )
+
+    fac_accepted_date = GeneratedField(
+        expression=KeyTextTransform('fac_accepted_date', 'audit'),
+        output_field=models.CharField(),
+        db_persist=True
+    )
+
+    fy_end_month = GeneratedField(
+        expression=Cast(KeyTextTransform('fy_end_month', 'audit'), output_field=models.IntegerField()),
+        output_field=models.IntegerField(),
+        db_persist=True
+    )
+
+    organization_type = GeneratedField(
+        expression=KeyTextTransform('user_provided_organization_type', KeyTextTransform('general_information', 'audit')),
+        output_field=models.CharField(),
+        db_persist=True
+    )
+
+    is_public = GeneratedField(
+        expression=Cast(KeyTextTransform('is_public', 'audit'), output_field=models.BooleanField()),
+        output_field=models.BooleanField(),
+        db_persist=True
+    )
+    
     objects = AuditManager()
 
     class Meta:
@@ -116,3 +148,14 @@ class Audit(models.Model):
                                        audit=self.audit,
                                        updated_by=self.updated_by)
             return super().save()
+
+    @Field.register_lookup
+    class IntegerValue(Transform):
+        # Register this before you filter things, for example in models.py
+        lookup_name = 'date'  # Used as object.filter(LeftField__int__gte, "777")
+        bilateral = True  # To cast both left and right
+
+        def as_sql(self, compiler, connection):
+            sql, params = compiler.compile(self.lhs)
+            sql = 'CAST(%s AS DATE)' % sql
+            return sql, params
