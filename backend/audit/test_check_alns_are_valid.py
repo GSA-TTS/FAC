@@ -72,5 +72,5 @@ class TestAlnIsValid(SimpleTestCase):
             error = context.exception.args[0][0]
             self.assertEqual(
                 error[3]["text"],
-                "The ALN provided, 93.001, does not match any in the FederalPrograms sheet",
+                "The ALN provided &lpar;93.001&rpar; does not match any in the FederalPrograms sheet",
             )
