@@ -231,13 +231,13 @@ def _get_full_alns(params):
 # TODO: Update to use generated fields
 SEARCH_QUERIES = {
     SEARCH_FIELDS.AUDIT_YEARS: lambda params : Q(audit_year__in=params.get(SEARCH_FIELDS.AUDIT_YEARS.value)),
-    SEARCH_FIELDS.AUDITEE_STATE: lambda params : Q(audit__general_information__auditee_state__in=[params.get(SEARCH_FIELDS.AUDITEE_STATE.value)]),
+    SEARCH_FIELDS.AUDITEE_STATE: lambda params : Q(auditee_state__in=[params.get(SEARCH_FIELDS.AUDITEE_STATE.value)]),
     SEARCH_FIELDS.NAMES: _search_names,
     SEARCH_FIELDS.UEI_EIN: lambda params : _search_uei_ein,
-    SEARCH_FIELDS.START_DATE: lambda params : Q(audit__fac_accepted_date__gte=params.get(SEARCH_FIELDS.START_DATE.value)),
-    SEARCH_FIELDS.END_DATE: lambda params : Q(audit__fac_accepted_date__lte=params.get(SEARCH_FIELDS.END_DATE.value)),
-    SEARCH_FIELDS.FY_END_MONTH: lambda params : Q(audit__fy_end_month=params.get(SEARCH_FIELDS.FY_END_MONTH.value)),
-    SEARCH_FIELDS.ENTITY_TYPE: lambda params: Q(audit__general_information__user_provided_organization_type__in=params.get(SEARCH_FIELDS.ENTITY_TYPE.value)),
+    SEARCH_FIELDS.START_DATE: lambda params : Q(fac_accepted_date__date__gte=params.get(SEARCH_FIELDS.START_DATE.value)),
+    SEARCH_FIELDS.END_DATE: lambda params : Q(fac_accepted_date__date__lte=params.get(SEARCH_FIELDS.END_DATE.value)),
+    SEARCH_FIELDS.FY_END_MONTH: lambda params : Q(fy_end_month=params.get(SEARCH_FIELDS.FY_END_MONTH.value)),
+    SEARCH_FIELDS.ENTITY_TYPE: lambda params: Q(organization_type__in=params.get(SEARCH_FIELDS.ENTITY_TYPE.value)),
     SEARCH_FIELDS.REPORT_ID: lambda params : Q(report_id=params.get(SEARCH_FIELDS.REPORT_ID.value)),
     # Advanced Search
     SEARCH_FIELDS.ALNS: _search_alns,
