@@ -11,7 +11,7 @@ from dissemination.searchlib.search_constants import text_input_delimiters
 logger = logging.getLogger(__name__)
 
 # TODO:
-#  1) Verify all queries are working correctly -> any using overlap, bitmask
+#  1) Verify all queries are working correctly. Double check findings and bitmasking.
 #  2) Clean-up: Split all the search helpers into separate files?
 class SEARCH_FIELDS(Enum):
     AUDIT_YEARS = "audit_years"
@@ -51,7 +51,6 @@ def _search_names(params):
 
 def _search_uei_ein(params):
     uei_eins = params.get(SEARCH_FIELDS.UEI_EIN.value)
-    logger.error(f"===================> {uei_eins}")
     uei_ein_query = Q()
     uei_ein_query |= Q(auditee_ein__in=uei_eins) | \
                      Q(auditee_uei__in=uei_eins)
