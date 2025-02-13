@@ -204,6 +204,12 @@ class Audit(models.Model):
         output_field=ArrayField(models.CharField()),
         db_persist=True
     )
+
+    compliance_requirements = GeneratedField(
+        expression=JsonArrayToTextArray('audit__search_indexes__compliance_requirements'),
+        output_field=ArrayField(models.CharField()),
+        db_persist=True
+    )
     objects = AuditManager()
 
     class Meta:
