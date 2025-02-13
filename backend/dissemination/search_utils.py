@@ -57,7 +57,6 @@ def _search_uei_ein(params):
             Q(additional_eins__contains=uei_ein) | \
             Q(additional_ueis__contains=uei_ein)
 
-# TODO: Not working as expected
 def _search_alns(params):
     full_alns = _get_full_alns(params)
     agency_numbers = _get_agency_numbers(params)
@@ -68,12 +67,13 @@ def _search_alns(params):
     query = Q()
     if agency_numbers:
         # Build a filter for the agency numbers. E.g. given 93 and 45
-        query |= Q(agency_prefixes__overlap=[an.prefix for an in agency_numbers])
+        for agency_number in agency_numbers:
+            query |= Q(agency_prefixes__icontains=agency_number.prefix)
 
     if full_alns:
         for full_aln in full_alns:
-            query |= Q(agency_prefixes__contains=full_aln.prefix) & \
-                              Q(agency_extensions__contains=full_aln.program)
+            query |= Q(agency_prefixes__icontains=full_aln.prefix) & \
+                              Q(agency_extensions__icontains=full_aln.program)
 
     return query
 
