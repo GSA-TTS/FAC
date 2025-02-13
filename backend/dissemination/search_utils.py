@@ -49,13 +49,15 @@ def _search_names(params):
 
     return Q(search_names__overlap=flattened) if flattened else Q()
 
+# TODO: Not working as expected
 def _search_uei_ein(params):
     uei_ein = params.get(SEARCH_FIELDS.UEI_EIN.value)
-    return Q(auditee_ein__in=uei_ein) | \
-            Q(auditee_uei__in=uei_ein) | \
+    return Q(auditee_ein=uei_ein) | \
+            Q(auditee_uei=uei_ein) | \
             Q(additional_eins__contains=uei_ein) | \
             Q(additional_ueis__contains=uei_ein)
 
+# TODO: Not working as expected
 def _search_alns(params):
     full_alns = _get_full_alns(params)
     agency_numbers = _get_agency_numbers(params)
@@ -133,9 +135,9 @@ def _search_direct_funding(params):
     for field in direct_funding_fields:
         match field:
             case "direct_funding":
-                q |= Q(has_direct_funding__eq=True)
+                q |= Q(has_direct_funding=True)
             case "passthrough_funding":
-                q |= Q(has_indirect_funding__eq=False)
+                q |= Q(has_indirect_funding=False)
             case _:
                 pass
     return q
@@ -146,7 +148,7 @@ def _search_passthrough_name(params):
     for term in passthrough_names:
         q_sub = Q()
         for sub in term.split():
-            q_sub.add(Q(passthrough__contains=[{"passthrough_name": sub}]), Q.AND)
+            q_sub.add(Q(passthrough_names__icontains=sub), Q.AND)
         q.add(q_sub, Q.OR)
     return q
 
@@ -191,7 +193,7 @@ SEARCH_QUERIES = {
     SEARCH_FIELDS.END_DATE: lambda params : Q(fac_accepted_date__date__lte=params.get(SEARCH_FIELDS.END_DATE.value)),
     SEARCH_FIELDS.FY_END_MONTH: lambda params : Q(fy_end_month=params.get(SEARCH_FIELDS.FY_END_MONTH.value)),
     SEARCH_FIELDS.ENTITY_TYPE: lambda params: Q(organization_type__in=params.get(SEARCH_FIELDS.ENTITY_TYPE.value)),
-    SEARCH_FIELDS.REPORT_ID: lambda params : Q(report_id=params.get(SEARCH_FIELDS.REPORT_ID.value)),
+    SEARCH_FIELDS.REPORT_ID: lambda params : Q(report_id__in=params.get(SEARCH_FIELDS.REPORT_ID.value)),
     # Advanced Search
     SEARCH_FIELDS.ALNS: _search_alns,
     SEARCH_FIELDS.COG_OVERSIGHT: _search_cog_or_oversight,
@@ -200,6 +202,6 @@ SEARCH_QUERIES = {
     SEARCH_FIELDS.DIRECT_FUNDING: _search_direct_funding,
     SEARCH_FIELDS.MAJOR_PROGRAM: _search_major_program,
     SEARCH_FIELDS.PASSTHROUGH_NAME: _search_passthrough_name,
-    # TODO: Validate this works as expected.
+    # TODO: Not working as expected
     SEARCH_FIELDS.TYPE_REQUIREMENT: lambda params : Q(compliance_requirements__overlap=params.get(SEARCH_FIELDS.TYPE_REQUIREMENT.value)) if params.get(SEARCH_FIELDS.TYPE_REQUIREMENT.value) else Q()
 }
