@@ -49,13 +49,18 @@ def _search_names(params):
 
     return Q(search_names__overlap=flattened) if flattened else Q()
 
-# TODO: Not working as expected
 def _search_uei_ein(params):
-    uei_ein = params.get(SEARCH_FIELDS.UEI_EIN.value)
-    return Q(auditee_ein=uei_ein) | \
-            Q(auditee_uei=uei_ein) | \
-            Q(additional_eins__contains=uei_ein) | \
-            Q(additional_ueis__contains=uei_ein)
+    uei_eins = params.get(SEARCH_FIELDS.UEI_EIN.value)
+    logger.error(f"===================> {uei_eins}")
+    uei_ein_query = Q()
+    uei_ein_query |= Q(auditee_ein__in=uei_eins) | \
+                     Q(auditee_uei__in=uei_eins)
+
+    for uei_ein in uei_eins:
+        uei_ein_query |= Q(additional_eins__icontains=uei_ein) | \
+                         Q(additional_ueis__icontains=uei_ein)
+
+    return uei_ein_query if uei_eins else Q()
 
 def _search_alns(params):
     full_alns = _get_full_alns(params)
