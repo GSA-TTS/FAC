@@ -161,6 +161,16 @@ def _search_major_program(params):
         q |= Q(is_major_program=False)
     return q
 
+def _search_compliance_requirement(params):
+    q = Q()
+    crs = params.get("type_requirement")
+    for cr in crs:
+        q_sub = Q()
+        for sub in cr.split():
+            q_sub.add(Q(compliance_requirements__icontains=sub), Q.AND)
+        q.add(q_sub, Q.OR)
+    return q if crs else Q()
+
 ALN = NT("ALN", "prefix, program")
 def _get_agency_numbers(params):
     alns = params.get("alns", [])
@@ -202,6 +212,5 @@ SEARCH_QUERIES = {
     SEARCH_FIELDS.DIRECT_FUNDING: _search_direct_funding,
     SEARCH_FIELDS.MAJOR_PROGRAM: _search_major_program,
     SEARCH_FIELDS.PASSTHROUGH_NAME: _search_passthrough_name,
-    # TODO: Not working as expected
-    SEARCH_FIELDS.TYPE_REQUIREMENT: lambda params : Q(compliance_requirements__overlap=params.get(SEARCH_FIELDS.TYPE_REQUIREMENT.value)) if params.get(SEARCH_FIELDS.TYPE_REQUIREMENT.value) else Q()
+    SEARCH_FIELDS.TYPE_REQUIREMENT: _search_compliance_requirement
 }
