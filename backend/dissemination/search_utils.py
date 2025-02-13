@@ -47,7 +47,10 @@ def _search_names(params):
         for sub in term.split():
             flattened.append(sub)
 
-    return Q(search_names__overlap=flattened) if flattened else Q()
+    query = Q()
+    for name in flattened:
+        query |= Q(search_names__icontains=name)
+    return query if flattened else Q()
 
 def _search_uei_ein(params):
     uei_eins = params.get(SEARCH_FIELDS.UEI_EIN.value)
