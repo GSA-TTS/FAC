@@ -63,7 +63,13 @@ class Command(BaseCommand):
 # Copied from backend/audit/views/views.py:806
 def _convert_additional_fields(audit, sac):
     general_information = audit.get("general_information", {})
-    audit_year, fy_end_month, _ = general_information.get("auditee_fiscal_period_end", "1900-01-01").split("-")
+    split_date = general_information.get("auditee_fiscal_period_end").split("-")
+
+    audit_year = "1900"
+    fy_end_month = "01"
+    if len(split_date) == 3:
+        audit_year = split_date[0]
+        fy_end_month = split_date[1]
 
     cognizant_agency = sac.cognizant_agency
     oversight_agency = sac.oversight_agency
