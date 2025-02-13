@@ -77,10 +77,6 @@ class Audit(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # All the Generated Fields are used to improve search performance.
-    # TODO: Add all search fields as generated fields: Note: Some of these may require updating audit.views.views._compute_additional_audit_fields to improve performance i.e. findings_summary
-    # TODO: ALNS, Names, UEI, EIN, Program Names, Findings, Funding, Major Program, Passthrough Name, Type Requirement
-
-    # TODO: Can we use https://github.com/disqus/django-bitfield/tree/master
     findings_summary = GeneratedField(
         expression=Cast(KeyTextTransform('findings_summary', KeyTextTransform('search_indexes', 'audit')), output_field=models.IntegerField()),
         output_field=models.IntegerField(),

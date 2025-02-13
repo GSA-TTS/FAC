@@ -10,7 +10,9 @@ from dissemination.searchlib.search_constants import text_input_delimiters
 
 logger = logging.getLogger(__name__)
 
-# TODO: Clean-up: Split all the search helpers into separate files?
+# TODO:
+#  1) Verify all queries are working correctly -> any using overlap, bitmask
+#  2) Clean-up: Split all the search helpers into separate files?
 class SEARCH_FIELDS(Enum):
     AUDIT_YEARS = "audit_years"
     AUDITEE_STATE = "auditee_state"
@@ -45,7 +47,6 @@ def _search_names(params):
         for sub in term.split():
             flattened.append(sub)
 
-    # TODO: This is probably wrong...
     return Q(search_names__overlap=flattened) if flattened else Q()
 
 def _search_uei_ein(params):
@@ -55,7 +56,6 @@ def _search_uei_ein(params):
             Q(additional_eins__contains=uei_ein) | \
             Q(additional_ueis__contains=uei_ein)
 
-# TODO: Generated Field Exists... Update search
 def _search_alns(params):
     full_alns = _get_full_alns(params)
     agency_numbers = _get_agency_numbers(params)
@@ -66,14 +66,12 @@ def _search_alns(params):
     query = Q()
     if agency_numbers:
         # Build a filter for the agency numbers. E.g. given 93 and 45
-        for an in agency_numbers:
-            query |= \
-                Q(audit__federal_awards__awards__contains=[{"program": {"federal_agency_prefix" : an.prefix }}])
+        query |= Q(agency_prefixes__overlap=[an.prefix for an in agency_numbers])
 
     if full_alns:
         for full_aln in full_alns:
-            query |= Q(audit__federal_awards__awards__contains=[{"program": {"federal_agency_prefix" : full_aln.prefix }}]) & \
-                              Q(audit__federal_awards__awards__contains=[{"program": {"three_digit_extension":full_aln.program}}])
+            query |= Q(agency_prefixes__contains=full_aln.prefix) & \
+                              Q(agency_extensions__contains=full_aln.program)
 
     return query
 
@@ -126,7 +124,6 @@ def _search_findings(params):
         for mask in FINDINGS_FIELD_TO_BITMASK:
             if mask.search_param in findings_fields:
                 findings_mask = findings_mask | mask.mask
-    # TODO: Found on stackoverflow, still not certain it is correct...
     # where findings_summary & findings_mask > 0
     return Q(findings_summary__gt=0) & Q(findings_summary__lt=F('findings_summary').bitor(findings_mask)) if findings_mask else Q()
 
@@ -182,9 +179,6 @@ def _get_full_alns(params):
         else:
             split_aln = aln.split(".")
             if len(split_aln) == 2:
-                # The [wrapping] is so the tuple goes into the set as a tuple.
-                # Otherwise, the individual elements go in unpaired.
-                # split_alns.update([tuple(split_aln)])
                 split_alns.update([ALN(split_aln[0], split_aln[1])])
     return split_alns
 
@@ -206,5 +200,6 @@ SEARCH_QUERIES = {
     SEARCH_FIELDS.DIRECT_FUNDING: _search_direct_funding,
     SEARCH_FIELDS.MAJOR_PROGRAM: _search_major_program,
     SEARCH_FIELDS.PASSTHROUGH_NAME: _search_passthrough_name,
+    # TODO: Validate this works as expected.
     SEARCH_FIELDS.TYPE_REQUIREMENT: lambda params : Q(compliance_requirements__overlap=params.get(SEARCH_FIELDS.TYPE_REQUIREMENT.value)) if params.get(SEARCH_FIELDS.TYPE_REQUIREMENT.value) else Q()
 }
