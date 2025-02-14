@@ -2,10 +2,10 @@ import logging
 import time
 from math import ceil
 
-from django.db.models import Q
+from django.db.models import Q, F
 
 from audit.models import Audit
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, FINDINGS_BITMASK, FINDINGS_FIELD_TO_BITMASK
 from dissemination.search_utils import SEARCH_FIELDS, SEARCH_QUERIES
 from dissemination.searchlib.search_constants import DIRECTION, ORDER_BY
 
@@ -16,7 +16,7 @@ def audit_search(params):
     This search is based off the updated 'audit' table rather than the
     dissemination tables.
 
-    TODO: Need to account for Tribal.
+    TODO: Need to account for Tribal. Remove Logging
     """
     t0 = time.time()
     params = params or dict()
@@ -26,14 +26,30 @@ def audit_search(params):
         if field.value in params and params.get(field.value):
             query = query & SEARCH_QUERIES[field](params)
 
-    results = Audit.objects.filter(query)
-    # results = _sort_results(results, params)
+    # Unfortunately, findings search is a bit different due to using a bit mask
+    bitmask = _calculate_bitmask(params)
+    results = Audit.objects.all().annotate(
+        findings_bitmask=F('findings_summary').bitand(bitmask)
+    )
+    results = results.filter(query)
+    results = _sort_results(results, params)
     logger.error(f"=================== AuditSearch ==========> {results.query}")
     logger.error(f"=================== AuditSearch ==========> {results.count()}")
     t1 = time.time()
     readable = int(ceil((t1 - t0) * 1000))
     logger.error(f"=================== AuditSearch ==========> {readable}ms")
     return results
+
+def _calculate_bitmask(params):
+    findings_fields = params.get("findings")
+    findings_mask = 0
+    if "all_findings" in findings_fields:
+        findings_mask = FINDINGS_BITMASK.ALL
+    else:
+        for mask in FINDINGS_FIELD_TO_BITMASK:
+            if mask.search_param in findings_fields:
+                findings_mask = findings_mask | mask.mask
+    return findings_mask
 
 def _sort_results(results, params):
     """

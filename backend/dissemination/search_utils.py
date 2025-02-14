@@ -5,7 +5,6 @@ from collections import namedtuple as NT
 
 from django.db.models import Q, F
 
-from audit.models.constants import FINDINGS_FIELD_TO_BITMASK, FINDINGS_BITMASK
 from dissemination.searchlib.search_constants import text_input_delimiters
 
 logger = logging.getLogger(__name__)
@@ -123,19 +122,6 @@ def _search_federal_program_name(params):
         query.add(sub_query, Q.OR)
     return query
 
-def _search_findings(params):
-    findings_fields = params.get("findings")
-
-    findings_mask = 0
-    if "all_findings" in findings_fields:
-        findings_mask = FINDINGS_BITMASK.ALL
-    else:
-        for mask in FINDINGS_FIELD_TO_BITMASK:
-            if mask.search_param in findings_fields:
-                findings_mask = findings_mask | mask.mask
-    # where findings_summary & findings_mask > 0
-    return Q(findings_summary__gt=0) & Q(findings_summary__lt=F('findings_summary').bitor(findings_mask)) if findings_mask else Q()
-
 def _search_direct_funding(params):
     q = Q()
     direct_funding_fields = params.get("direct_funding")
@@ -215,7 +201,7 @@ SEARCH_QUERIES = {
     SEARCH_FIELDS.ALNS: _search_alns,
     SEARCH_FIELDS.COG_OVERSIGHT: _search_cog_or_oversight,
     SEARCH_FIELDS.FEDERAL_PROGRAM_NAME: _search_federal_program_name,
-    SEARCH_FIELDS.FINDINGS: _search_findings,
+    SEARCH_FIELDS.FINDINGS: lambda params : Q(findings_bitmask__gt=0) if params.get("findings") else Q(),
     SEARCH_FIELDS.DIRECT_FUNDING: _search_direct_funding,
     SEARCH_FIELDS.MAJOR_PROGRAM: _search_major_program,
     SEARCH_FIELDS.PASSTHROUGH_NAME: _search_passthrough_name,
