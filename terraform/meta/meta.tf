@@ -10,8 +10,9 @@ data "cloudfoundry_org" "org" {
 # to ensure it has the expected permissions. See
 # https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/436
 data "cloudfoundry_user" "meta_deployer" {
-  name   = var.cf_user
-  org_id = data.cloudfoundry_org.org.id
+  provider = cloudfoundry-community
+  name     = var.cf_user
+  org_id   = data.cloudfoundry_org.org.id
 }
 
 module "environments" {
