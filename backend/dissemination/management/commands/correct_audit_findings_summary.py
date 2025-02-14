@@ -15,7 +15,7 @@ class Command(BaseCommand):
         queryset = Audit.objects.raw(
             "select * from audit_audit "
             "where corrected is false "
-            "order by id desc limit 50000")
+            "order by id desc limit 25000")
         paginator = Paginator(queryset, 100)  # 100 items per page
 
         for page_num in paginator.page_range:
