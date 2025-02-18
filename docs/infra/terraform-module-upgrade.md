@@ -176,4 +176,14 @@ Downloading git::https://github.com/gsa-tts/terraform-cloudgov.git?ref=v2.1.0 fo
 - sandbox.snapshot-database in .terraform/modules/sandbox.snapshot-database/database
 ```
 
-Do a `helper_scripts/plan.sh` and `helper_scripts/apply.sh` to finalize the changes, upgrading all existing modules to the latest version.
+Do a `helper_scripts/plan.sh`
+```
+terraform plan \
+  -var-file="../shared/config/preview.tfvars" \
+  -out preview.tfplan
+```
+and `helper_scripts/apply.sh`
+```
+terraform apply sandbox.tfplan
+```
+to finalize the changes, upgrading all existing modules to the latest version.
