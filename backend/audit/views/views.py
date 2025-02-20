@@ -818,10 +818,10 @@ def _index_findings(audit_data):
     compliance_requirements = set()
     for finding in audit_data.get("findings_uniform_guidance", []):
         for mask in FINDINGS_FIELD_TO_BITMASK:
-            if finding.get(mask, "N") == "Y":
-                findings &= mask.mask
+            if finding.get(mask.field, "N") == "Y":
+                findings |= mask.mask
         if finding.get("finding", {}).get("repeat_prior_reference", "N") == "Y":
-            findings &= FINDINGS_BITMASK.REPEAT_FINDING
+            findings |= FINDINGS_BITMASK.REPEAT_FINDING
 
         compliance_requirement = finding.get("program", {}).get("compliance_requirement", "")
         compliance_requirements.add(compliance_requirement)

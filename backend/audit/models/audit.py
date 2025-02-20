@@ -245,13 +245,11 @@ class Audit(models.Model):
 
     @Field.register_lookup
     class DateCast(Transform):
-        # Register this before you filter things, for example in models.py
-        lookup_name = 'date'  # Used as object.filter(LeftField__int__gte, "777")
-        bilateral = True  # To cast both left and right
+        lookup_name = 'date'
+        bilateral = True
 
-        def as_sql(self, compiler, connection):
+        def as_sql(self, compiler, connection, **kwargs):
             sql, params = compiler.compile(self.lhs)
             sql = 'CAST(%s AS DATE)' % sql
             return sql, params
-
 
