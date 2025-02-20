@@ -5,10 +5,12 @@ locals {
 }
 
 data "cloudfoundry_service" "service_account" {
-  name = "cloud-gov-service-account"
+  provider = cloudfoundry-community
+  name     = "cloud-gov-service-account"
 }
 
 resource "cloudfoundry_service_instance" "space_deployer" {
+  provider     = cloudfoundry-community
   name         = local.deployer_service_instance
   space        = cloudfoundry_space.space.id
   service_plan = data.cloudfoundry_service.service_account.service_plans["space-deployer"]
@@ -19,6 +21,7 @@ resource "cloudfoundry_service_instance" "space_deployer" {
   ]
 }
 resource "cloudfoundry_service_key" "deployer_creds" {
+  provider         = cloudfoundry-community
   name             = local.deployer_service_key
   service_instance = cloudfoundry_service_instance.space_deployer.id
   # We shouldn't attempt to manage service keys before we know that the space
