@@ -5,13 +5,12 @@ from collections import namedtuple as NT
 
 from django.db.models import Q, F
 
-from audit.models.constants import FINDINGS_FIELD_TO_BITMASK, FINDINGS_BITMASK
 from dissemination.searchlib.search_constants import text_input_delimiters
 
 logger = logging.getLogger(__name__)
 
 # TODO:
-#  1) Verify all queries are working correctly -> any using overlap, bitmask
+#  1) Verify all queries are working correctly. Double check findings and bitmasking.
 #  2) Clean-up: Split all the search helpers into separate files?
 class SEARCH_FIELDS(Enum):
     AUDIT_YEARS = "audit_years"
@@ -47,17 +46,23 @@ def _search_names(params):
         for sub in term.split():
             flattened.append(sub)
 
-    return Q(search_names__overlap=flattened) if flattened else Q()
+    query = Q()
+    for name in flattened:
+        query |= Q(search_names__icontains=name)
+    return query if flattened else Q()
 
-# TODO: Not working as expected
 def _search_uei_ein(params):
-    uei_ein = params.get(SEARCH_FIELDS.UEI_EIN.value)
-    return Q(auditee_ein=uei_ein) | \
-            Q(auditee_uei=uei_ein) | \
-            Q(additional_eins__contains=uei_ein) | \
-            Q(additional_ueis__contains=uei_ein)
+    uei_eins = params.get(SEARCH_FIELDS.UEI_EIN.value)
+    uei_ein_query = Q()
+    uei_ein_query |= Q(auditee_ein__in=uei_eins) | \
+                     Q(auditee_uei__in=uei_eins)
 
-# TODO: Not working as expected
+    for uei_ein in uei_eins:
+        uei_ein_query |= Q(additional_eins__icontains=uei_ein) | \
+                         Q(additional_ueis__icontains=uei_ein)
+
+    return uei_ein_query if uei_eins else Q()
+
 def _search_alns(params):
     full_alns = _get_full_alns(params)
     agency_numbers = _get_agency_numbers(params)
@@ -68,12 +73,13 @@ def _search_alns(params):
     query = Q()
     if agency_numbers:
         # Build a filter for the agency numbers. E.g. given 93 and 45
-        query |= Q(agency_prefixes__overlap=[an.prefix for an in agency_numbers])
+        for agency_number in agency_numbers:
+            query |= Q(agency_prefixes__icontains=agency_number.prefix)
 
     if full_alns:
         for full_aln in full_alns:
-            query |= Q(agency_prefixes__contains=full_aln.prefix) & \
-                              Q(agency_extensions__contains=full_aln.program)
+            query |= Q(agency_prefixes__icontains=full_aln.prefix) & \
+                              Q(agency_extensions__icontains=full_aln.program)
 
     return query
 
@@ -116,19 +122,6 @@ def _search_federal_program_name(params):
         query.add(sub_query, Q.OR)
     return query
 
-def _search_findings(params):
-    findings_fields = params.get("findings")
-
-    findings_mask = 0
-    if "all_findings" in findings_fields:
-        findings_mask = FINDINGS_BITMASK.ALL
-    else:
-        for mask in FINDINGS_FIELD_TO_BITMASK:
-            if mask.search_param in findings_fields:
-                findings_mask = findings_mask | mask.mask
-    # where findings_summary & findings_mask > 0
-    return Q(findings_summary__gt=0) & Q(findings_summary__lt=F('findings_summary').bitor(findings_mask)) if findings_mask else Q()
-
 def _search_direct_funding(params):
     q = Q()
     direct_funding_fields = params.get("direct_funding")
@@ -160,6 +153,16 @@ def _search_major_program(params):
     elif "False" in major_program_fields:
         q |= Q(is_major_program=False)
     return q
+
+def _search_compliance_requirement(params):
+    q = Q()
+    crs = params.get("type_requirement")
+    for cr in crs:
+        q_sub = Q()
+        for sub in cr.split():
+            q_sub.add(Q(compliance_requirements__icontains=sub), Q.AND)
+        q.add(q_sub, Q.OR)
+    return q if crs else Q()
 
 ALN = NT("ALN", "prefix, program")
 def _get_agency_numbers(params):
@@ -198,10 +201,9 @@ SEARCH_QUERIES = {
     SEARCH_FIELDS.ALNS: _search_alns,
     SEARCH_FIELDS.COG_OVERSIGHT: _search_cog_or_oversight,
     SEARCH_FIELDS.FEDERAL_PROGRAM_NAME: _search_federal_program_name,
-    SEARCH_FIELDS.FINDINGS: _search_findings,
+    SEARCH_FIELDS.FINDINGS: lambda params : Q(findings_bitmask__gt=0) if params.get("findings") else Q(),
     SEARCH_FIELDS.DIRECT_FUNDING: _search_direct_funding,
     SEARCH_FIELDS.MAJOR_PROGRAM: _search_major_program,
     SEARCH_FIELDS.PASSTHROUGH_NAME: _search_passthrough_name,
-    # TODO: Not working as expected
-    SEARCH_FIELDS.TYPE_REQUIREMENT: lambda params : Q(compliance_requirements__overlap=params.get(SEARCH_FIELDS.TYPE_REQUIREMENT.value)) if params.get(SEARCH_FIELDS.TYPE_REQUIREMENT.value) else Q()
+    SEARCH_FIELDS.TYPE_REQUIREMENT: _search_compliance_requirement
 }
