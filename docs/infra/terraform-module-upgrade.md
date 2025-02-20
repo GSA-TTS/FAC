@@ -187,3 +187,24 @@ and `helper_scripts/apply.sh`
 terraform apply sandbox.tfplan
 ```
 to finalize the changes, upgrading all existing modules to the latest version.
+
+
+-------------------
+
+#### Notes
+```
+basename=$(basename "$(pwd)")
+terraform init \
+  --backend-config=../shared/config/backend.tfvars \
+  --backend-config=key=terraform.tfstate."$basename"
+
+terraform plan \
+  -var-file="../shared/config/preview.tfvars" \
+  -out preview.tfplan
+
+terraform apply env.tfplan
+```
+
+#### Preview Output of items to import
+```
+
