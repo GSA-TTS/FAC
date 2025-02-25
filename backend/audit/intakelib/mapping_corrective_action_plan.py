@@ -63,6 +63,13 @@ def extract_corrective_action_plan(file, is_gsa_migration=False, auditee_uei=Non
     return result
 
 
+def corrective_action_plan_audit_view(data):
+    caps = data.get("CorrectiveActionPlan", {}).get(
+        "corrective_action_plan_entries", []
+    )
+    return {"corrective_action_plan": caps} if caps else {}
+
+
 def corrective_action_plan_named_ranges(errors):
     return _extract_named_ranges(
         errors,
