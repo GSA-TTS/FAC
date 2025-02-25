@@ -166,6 +166,18 @@ ul.usa-error-message {
   }
 }
 
+#no-uei-warning {
+  color: color('secondary');
+
+  h2 {
+    font-size: size('body', 8);
+  }
+
+  .usa-icon {
+    top: 0.1em;
+  }
+}
+
 .delete-contact {
   margin: 0 !important;
   margin-top: auto !important;
