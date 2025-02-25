@@ -19,14 +19,18 @@ from .models import (
     generate_sac_report_id,
     single_audit_report_path,
 )
+from .audit import Audit
+from .history import History
 from .submission_event import SubmissionEvent
 
 # In case we want to iterate through all the models for some reason:
 _models = [
     Access,
+    Audit,
     DeletedAccess,
     ExcelFile,
     GeneralInformationMixin,
+    History,
     SubmissionEvent,
     LateChangeError,
     SingleAuditChecklist,
