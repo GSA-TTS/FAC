@@ -1,7 +1,7 @@
 ## CI/CD Operations
 
 **Introduction:**
-We use a plethora of CI/CD mechanisms in the FAC, largely surrounding terraform and github workflows. Inside those mechanisms, there are various items that serve to handle our process which revolve around testing, scanning, and deploying. This document is considered a living document and should be updated as new mechanisms or items are introduced.
+We use a variety of CI/CD mechanisms in the FAC, largely surrounding terraform and github workflows. Inside those mechanisms, there are various items that serve to handle our process of testing, scanning, and deploying. This document is considered a living document and should be updated as new mechanisms or items are introduced.
 
 **Development Overview:**
 Largely, the scope of operations can be viewed in the below graph, which illustrate how a new piece of code, feature or implementation may be introduced to the ecosystem. A developer will take on a task, work on that task locally, create a pull request, that pull request will be tested, it is approved, and then merged into dev, automatically merged into staging the following day, and then released to production once a week, with ad-hoc releases also acceptable.
