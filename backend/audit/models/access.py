@@ -9,6 +9,7 @@ from .models import (
     SingleAuditChecklist,
     SubmissionEvent,
 )
+from audit.models import Audit
 
 
 User = get_user_model()
@@ -68,6 +69,9 @@ class Access(models.Model):
 
     ROLES = ACCESS_ROLES
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
+    # TODO: setting this temporarily to allow "null" to handle existing rows without audit fields.
+    # We will want to copy "Accesses" from SACs to their correlating Audit models.
+    audit = models.ForeignKey(Audit, on_delete=models.CASCADE, null=True)
     role = models.CharField(
         choices=ROLES,
         help_text="Access type granted to this user",

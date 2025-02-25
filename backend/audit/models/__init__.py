@@ -1,10 +1,3 @@
-from .access import (
-    Access,
-    delete_access_and_create_record,
-    remove_email_from_submission_access,
-)
-from .deleted_access import DeletedAccess
-from .access_roles import ACCESS_ROLES
 from .models import (
     ExcelFile,
     GeneralInformationMixin,
@@ -23,6 +16,13 @@ from .submission_event import SubmissionEvent
 from .audit import Audit
 from .history import History
 from .schema import Schema
+from .access import (
+    Access,
+    delete_access_and_create_record,
+    remove_email_from_submission_access,
+)
+from .deleted_access import DeletedAccess
+from .access_roles import ACCESS_ROLES
 
 # In case we want to iterate through all the models for some reason:
 _models = [
