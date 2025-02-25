@@ -62,7 +62,7 @@ function showValidUeiInfo() {
 
   auditeeName.removeAttribute('disabled');
   auditeeName.parentNode.setAttribute('hidden', 'hidden');
-  document.getElementById('no-uei-warning').replaceWith(ueiInfoEl);
+  document.getElementById('valid-uei-info').replaceWith(ueiInfoEl);
 }
 
 function setupFormWithValidUei() {
