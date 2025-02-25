@@ -186,7 +186,8 @@ flowchart LR
 Automated tasks are run on a schedule daily, with the exception of the backup operations in each environment, which run every 2 hours during operational times (EST Start) -> (PST End of Day).
 ```mermaid
 flowchart TB
-    X{{Daily Operations}} ---> C & E & F & G & A & N
+    X{{Daily Operations}} ---> C & E & F & A & N
+    Y{{Weekly Operations}} ---> G
     subgraph Scheduler
     C@{ shape: processes, label: "Run Materialized Views" }
     E@{ shape: processes, label: "Regression Tests" }
