@@ -1,10 +1,10 @@
 ## CI/CD Operations
 
 ### Introduction
-We use a variety of CI/CD mechanisms in the FAC, largely surrounding terraform and github workflows. Inside those mechanisms, there are various items that serve to handle our process of testing, scanning, and deploying. This document is considered a living document and should be updated as new mechanisms or items are introduced.
+We use a variety of CI/CD mechanisms in the FAC surrounding terraform and github workflows. Inside those mechanisms, there are various items that serve to handle our process of testing, scanning, and deploying. This document is considered a living document and should be updated as new mechanisms or items are introduced.
 
 ### Development
-Largely, the scope of operations can be viewed in the below graph, which illustrate how a new piece of code, feature or implementation may be introduced to the ecosystem. A developer will take on a task, work on that task locally, create a pull request, that pull request will be tested, it is approved, and then merged into dev, automatically merged into staging the following day, and then released to production once a week, with ad-hoc releases also acceptable.
+The scope of operations can be viewed in the below graph, which illustrate how a new piece of code, feature or implementation may be introduced to the ecosystem. A developer will take on a task, work on that task locally, create a pull request, that pull request will be tested, it is approved, and then merged into dev, automatically merged into staging the following day, and then released to production once a week, with ad-hoc releases also acceptable.
 
 ```mermaid
 flowchart LR
@@ -114,7 +114,7 @@ flowchart LR
     A --> S
 ```
 
-While all environments generally deploy the same way, it is heavily front-loaded in the dev environment. Staging differs slightly:
+While all environments generally deploy the same way, it is front-loaded with rebuilding the container before deploying to the dev environment. Staging differs slightly:
 ```mermaid
 flowchart LR
     A{Merge to staging}
@@ -182,7 +182,7 @@ flowchart LR
 ```
 
 ### Automated Tasks
-Automated tasks are run on a schedule daily, with the exception of the backup operations in each environment, which run every 2 hours during operational times (EST Start) -> (PST End of Day).
+Automated tasks are run on a schedule, with each schedule having different times or frequencies.
 ||Staging Deploy|Materialized Views|Regression Tests|Trivy Cache Update|Check Tables|Rebuild Containers|Backups|
 |:---|----|---|---|---|---|---|---|
 |**Time**|10am UTC Mon-Sa|6am UTC|9am UTC Mon-Fri|12am UTC|12am/12pm UTC|5am UTC Sun|12p, 2p, 4p, 6p, 8p, 10p UTC|
@@ -226,11 +226,11 @@ Detailed below is a reference to, with a description of, each of our various com
 * [Auto Merge Staging PR](../.github/workflows/auto-merge-staging-pr.yml)
     * This works in parallel with [Create PR to Staging](../.github/workflows/create-pull-request-to-staging.yml) as a means to automate staging merges. This approves the PR with a PAT.
 * [Build Docker Container](../.github/workflows/build-docker-container.yml)
-    * This workflow does a `docker build` on our system, much like if you were performaing this locally, gives the container a tag, and then pushes it to GHCR.
+    * This workflow does a `docker build` on our system, much like if you were performing this locally, gives the container a tag, and then pushes it to GHCR.
 * [Create PR to Staging](../.github/workflows/create-pull-request-to-staging.yml)
     * This checks to see if there has been a commit in 24 hours, and if so, creates a pull request, tags it, and then approves it with the Github secret access token [GITHUB_TOKEN](https://docs.github.com/en/enterprise-server@3.16/actions/security-for-github-actions/security-guides/automatic-token-authentication#about-the-github_token-secret).
 * [Create Release](../.github/workflows/create-release.yml)
-    * Largely unused, but autofills a changelog and generates a release with a tag `v1.YYYYMMDD`. This can be updated to automatically release on a scheduled cron.
+    * Autofills a changelog and generates a release with a tag `v1.YYYYMMDD`. This can be updated to automatically release on a scheduled cron.
 * [Pull & Push Containers to GCHR](../.github/workflows/pull-containers-and-push-to-ghcr.yml)
     * Pulls the latest ClamAV & Postgrest container from their respective sources, scans them with [Aquasecurity's Trivy](https://github.com/aquasecurity/trivy), and then publishes to our GHCR.
 * [Terraform Plan](../.github/workflows/terraform-plan-env.yml)
@@ -289,7 +289,7 @@ Detailed below is a reference to, with a description of, each of our various com
 * [Destroy and Regenerate Dissemination](../.github/workflows/destroy-and-regenerate-dissemination.yml)
     * This is no longer used, and in the event it needs to be used, can only be run by select accounts. Update the conditional accordingly `if: contains('["user1","user2"]', github.actor)`.
 * [E2E Test](../.github/workflows/end-to-end-test.yml)
-    * This is a stray workflow and can be deleted. Superceded by Cypress Workflows.
+    * This is a stray workflow and can be deleted. Superceeded by Cypress Workflows.
 * [Failed Data Migration Processor](../.github/workflows/failed-data-migration-reprocessor.yml) and [Historic Data Migration Processor](../.github/workflows/historic-data-migrator-with-pagination.yml)
     * This is no longer used, but was done as a means to generate and disseminate historic data in a target environment.
 
