@@ -114,7 +114,7 @@ flowchart LR
     A --> S
 ```
 
-While all environments generally deploy the same way, it is heavily front-loaded in the dev environment. Staging differs slightly
+While all environments generally deploy the same way, it is heavily front-loaded in the dev environment. Staging differs slightly:
 ```mermaid
 flowchart LR
     A{Merge to staging}
@@ -147,7 +147,7 @@ flowchart LR
     end
     A --> S
 ```
-And production differs in the the removal of regression tests, with a supplemental deployment step
+And production differs in the the removal of regression tests, with a supplemental deployment step:
 ```mermaid
 flowchart LR
     A{Release}
@@ -220,11 +220,11 @@ Detailed below is a reference to, with a description of, each of our various com
 
 **Ops:**
 * [Auto Merge Staging PR](../.github/workflows/auto-merge-staging-pr.yml)
-    * This works in parallel with [Auto Merge Staging PR](../.github/workflows/auto-merge-staging-pr.yml) as a means to automate staging merges. This approves the PR with a PAT
+    * This works in parallel with [Create PR to Staging](../.github/workflows/create-pull-request-to-staging.yml) as a means to automate staging merges. This approves the PR with a PAT.
 * [Build Docker Container](../.github/workflows/build-docker-container.yml)
     * This workflow does a `docker build` on our system, much like if you were performaing this locally, gives the container a tag, and then pushes it to GHCR.
 * [Create PR to Staging](../.github/workflows/create-pull-request-to-staging.yml)
-    * This checks to see if there has been a commit in 24 hours, and if so, creates a pull request, tags it, and then approves it with the Github secret access token [GITHUB_TOKEN](https://docs.github.com/en/enterprise-server@3.16/actions/security-for-github-actions/security-guides/automatic-token-authentication#about-the-github_token-secret)
+    * This checks to see if there has been a commit in 24 hours, and if so, creates a pull request, tags it, and then approves it with the Github secret access token [GITHUB_TOKEN](https://docs.github.com/en/enterprise-server@3.16/actions/security-for-github-actions/security-guides/automatic-token-authentication#about-the-github_token-secret).
 * [Create Release](../.github/workflows/create-release.yml)
     * Largely unused, but autofills a changelog and generates a release with a tag `v1.YYYYMMDD`. This can be updated to automatically release on a scheduled cron.
 * [Pull & Push Containers to GCHR](../.github/workflows/pull-containers-and-push-to-ghcr.yml)
@@ -238,7 +238,7 @@ Detailed below is a reference to, with a description of, each of our various com
 * [Trivy Cache Updater](../.github/workflows/trivy-cache.yml)
     * Rebuilds the vulnerability database for Trivy and stores in the Github Cache
 * [ZAP](../.github/workflows/zap-scan.yml)
-    * Crawls a live environment with [ZAP](https://www.zaproxy.org/) using our [configuration](../zap.conf)
+    * Crawls a live environment with [ZAP](https://www.zaproxy.org/) using our [configuration](../zap.conf).
 
 **Testing:**
 * [Cypress Test (Container)](../.github/workflows/cypress-testing-from-container.yml)
@@ -283,9 +283,9 @@ Detailed below is a reference to, with a description of, each of our various com
 * [BPMN Renders](../.github/workflows/add-bpmm-renders.yml)
     * This is no longer used, but in the event of BPMN diagrams being updated, this can be incorporated back into the operations.
 * [Destroy and Regenerate Dissemination](../.github/workflows/destroy-and-regenerate-dissemination.yml)
-    * This is no longer used, and in the event it needs to be used, can only be run by select accounts. Update the conditional accordingly `if: contains('["user1","user2"]', github.actor)`
+    * This is no longer used, and in the event it needs to be used, can only be run by select accounts. Update the conditional accordingly `if: contains('["user1","user2"]', github.actor)`.
 * [E2E Test](../.github/workflows/end-to-end-test.yml)
-    * This is a stray workflow and can be deleted. Superceded by Cypress Workflows
+    * This is a stray workflow and can be deleted. Superceded by Cypress Workflows.
 * [Failed Data Migration Processor](../.github/workflows/failed-data-migration-reprocessor.yml) and [Historic Data Migration Processor](../.github/workflows/historic-data-migrator-with-pagination.yml)
     * This is no longer used, but was done as a means to generate and disseminate historic data in a target environment.
 
