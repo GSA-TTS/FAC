@@ -34,7 +34,7 @@ from audit.models import (
     SingleAuditReportFile,
     SubmissionEvent, Audit,
 )
-from audit.models.constants import FINDINGS_BITMASK, FINDINGS_FIELD_TO_BITMASK, STATUS
+from audit.models.constants import FINDINGS_BITMASK, FINDINGS_FIELD_TO_BITMASK, STATUS, STATUS_CHOICES
 # from audit.models.models import STATUS
 from audit.models.viewflow import sac_transition
 from audit.intakelib.exceptions import ExcelExtractionError
@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
 
 
 def _friendly_status(status):
-    return dict(Audit.STATUS_CHOICES)[status]
+    return dict(STATUS_CHOICES)[status]
 
 
 class MySubmissions(LoginRequiredMixin, generic.View):
@@ -104,9 +104,9 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         ).values(
             "report_id",
             "submission_status",
-            auditee_uei=F("general_information__auditee_uei"),
-            auditee_name=F("general_information__auditee_name"),
-            fiscal_year_end_date=F("general_information__auditee_fiscal_period_end"),
+            "auditee_uei",
+            auditee_name=F("audit__general_information__auditee_name"),
+            fiscal_year_end_date=F("audit__general_information__auditee_fiscal_period_end")
         )
         # TODO: 2/25 access audit
         # The values for audit are invalid.

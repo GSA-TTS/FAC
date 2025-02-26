@@ -142,7 +142,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             # this should probably be a permission mixin
             accesses = Access.objects.filter(sac=sac, user=request.user)
