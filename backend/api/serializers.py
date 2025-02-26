@@ -282,15 +282,13 @@ class AccessListSerializer(serializers.ModelSerializer):
     submission_status = serializers.SerializerMethodField()
 
     def get_auditee_uei(self, access):
-        return access.audit.audit["general_information"]["auditee_uei"] if access.audit else access.sac.auditee_uei
+        return access.audit.audit.get("general_information", {}).get("auditee_uei", None) if access.audit else access.sac.auditee_uei
 
     def get_auditee_fiscal_period_end(self, access):
-        return access.audit.audit["general_information"]["auditee_fiscal_period_end"] if access.audit else access.sac.auditee_fiscal_period_end
+        return access.audit.audit.get("general_information", {}).get("auditee_fiscal_period_end", None) if access.audit else access.sac.auditee_fiscal_period_end
 
     def get_auditee_name(self, access):
-        # TODO: 2/25 access audit
-        # Where is the equivalent of "auditee_name" in the Audit model?
-        return access.sac.auditee_name
+        return access.audit.audit.get("general_information", {}).get("auditee_name", None) if access.audit else access.sac.auditee_name
 
     def get_report_id(self, access):
         return access.audit.report_id if access.audit else access.sac.report_id

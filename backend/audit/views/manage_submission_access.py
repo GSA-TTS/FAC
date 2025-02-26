@@ -75,7 +75,12 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        audit = Audit.objects.get(report_id=report_id)
+        # TODO: 2/25 access audit
+        # remove try/except once we are ready to deprecate SAC.
+        try:
+            audit = Audit.objects.get(report_id=report_id)
+        except Audit.DoesNotExist:
+            audit = None
         form = ChangeAccessForm(request.POST)
         context = self._get_user_role_management_context(sac)
 
@@ -123,8 +128,8 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             context = {
                 "role": self.role,
                 "friendly_role": _get_friendly_role(self.role),
-                "auditee_uei": audit.general_information["auditee_uei"],
-                "auditee_name": audit.general_information.get("auditee_name"),
+                "auditee_uei": audit.audit.get("general_information", {}).get("auditee_uei", None) if audit else sac.general_information["auditee_uei"],
+                "auditee_name": audit.audit.get("general_information", {}).get("auditee_name", None) if audit else sac.general_information.get("auditee_name"),
                 "certifier_name": access.fullname,
                 "email": access.email,
                 "report_id": report_id,

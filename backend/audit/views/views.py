@@ -172,13 +172,17 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             sac.save()
 
             #TODO Audit Rework
-            audit = Audit.objects.get(report_id=sac.report_id)
-            audit_update = FORM_SECTION_HANDLERS.get(form_section)["audit_object"](audit_data)
-            audit.audit.update(audit_update)
-            audit.save(
-                event_user=user,
-                event_type=self._event_type(form_section),
-            )
+            # remove try/except once we are ready to deprecate SAC.
+            try:
+                audit = Audit.objects.get(report_id=sac.report_id)
+                audit_update = FORM_SECTION_HANDLERS.get(form_section)["audit_object"](audit_data)
+                audit.audit.update(audit_update)
+                audit.save(
+                    event_user=user,
+                    event_type=self._event_type(form_section),
+                )
+            except Audit.DoesNotExist:
+                pass
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -354,7 +358,12 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            audit = Audit.objects.get(report_id=report_id)
+            # TODO: 2/25 access audit
+            # remove try/except once we are ready to deprecate SAC.
+            try:
+                audit = Audit.objects.get(report_id=report_id)
+            except Audit.DoesNotExist:
+                audit = None
             errors = sac.validate_full()
             if not errors:
                 sac_transition(
@@ -517,8 +526,13 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
                 auditor_certification.update(form_cleaned)
                 validated = validate_auditor_certification_json(auditor_certification)
                 sac.auditor_certification = validated
-                audit = Audit.objects.get(report_id=report_id)
-                audit.audit.update({"auditor_certification": validated})
+                # TODO: 2/25 access audit
+                # remove try/except once we are ready to deprecate SAC.
+                try:
+                    audit = Audit.objects.get(report_id=report_id)
+                    audit.audit.update({"auditor_certification": validated})
+                except Audit.DoesNotExist:
+                    audit = None
                 if sac_transition(request, sac, audit=audit, transition_to=STATUS.AUDITOR_CERTIFIED):
                     logger.info("Auditor certification saved.", auditor_certification)
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
@@ -657,8 +671,13 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
                 auditee_certification.update(form_cleaned)
                 validated = validate_auditee_certification_json(auditee_certification)
                 sac.auditee_certification = validated
-                audit = Audit.objects.get(report_id=report_id)
-                audit.audit.update({"auditee_certification": validated })
+                # TODO: 2/25 access audit
+                # remove try/except once we are ready to deprecate SAC.
+                try:
+                    audit = Audit.objects.get(report_id=report_id)
+                    audit.audit.update({"auditee_certification": validated })
+                except Audit.DoesNotExist:
+                    audit = None
                 if sac_transition(request, sac, audit=audit, transition_to=STATUS.AUDITEE_CERTIFIED):
                     logger.info("Auditee certification saved.", auditee_certification)
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
@@ -727,7 +746,12 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            audit = Audit.objects.get(report_id=report_id)
+            # TODO: 2/25 access audit
+            # remove try/except once we are ready to deprecate SAC.
+            try:
+                audit = Audit.objects.get(report_id=report_id)
+            except Audit.DoesNotExist:
+                audit = None
             errors = sac.validate_full()
             if errors:
                 context = {"report_id": report_id, "errors": errors}

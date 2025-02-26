@@ -147,12 +147,17 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                         event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
                     )
 
-                    audit = Audit.objects.get(report_id=report_id)
-                    audit.audit.update({"file_information": {"filename": sar_file.filename, "pages": sar_file.component_page_numbers}})
-                    audit.save(
-                        event_user=request.user,
-                        event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
-                    )
+                    # TODO: 2/25 access audit
+                    # remove try/except once we are ready to deprecate SAC.
+                    try:
+                        audit = Audit.objects.get(report_id=report_id)
+                        audit.audit.update({"file_information": {"filename": sar_file.filename, "pages": sar_file.component_page_numbers}})
+                        audit.save(
+                            event_user=request.user,
+                            event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+                        )
+                    except Audit.DoesNotExist:
+                        pass
                 except ValidationError as err:
                     for issue in err.error_dict.get("file"):
                         form.add_error("upload_report", issue)

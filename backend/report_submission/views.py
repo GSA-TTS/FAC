@@ -244,16 +244,20 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             )
 
             # Audit Path TODO: Clean-up post POC
-            audit = Audit.objects.get(report_id=report_id)
-            audit_type = general_information.get("audit_type").replace("-","_")
-            if audit_type and audit.audit_type != audit_type:
-                audit.audit_type = audit_type
-                audit.schema = Schema.objects.get_current_schema(audit_type = audit_type)
-            audit.audit.update({"general_information": general_information})
-            audit.save(
-                event_user=request.user,
-                event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
-            )
+            # remove try/except once we are ready to deprecate SAC.
+            try:
+                audit = Audit.objects.get(report_id=report_id)
+                audit_type = general_information.get("audit_type").replace("-","_")
+                if audit_type and audit.audit_type != audit_type:
+                    audit.audit_type = audit_type
+                    audit.schema = Schema.objects.get_current_schema(audit_type = audit_type)
+                audit.audit.update({"general_information": general_information})
+                audit.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+                )
+            except Audit.DoesNotExist:
+                pass
             return Util.validate_redirect_url(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
