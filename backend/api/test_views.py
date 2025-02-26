@@ -574,8 +574,8 @@ class SACCreationTests(TestCase):
         )
         data = response.json()
         audit = Audit.objects.get(report_id=data["report_id"])
-        self.assertEqual(audit.submitted_by, self.user)
-        self.assertEqual(audit.auditee_uei, "ZQGGHJH74DW7")
+        self.assertEqual(audit.created_by, self.user)
+        self.assertEqual(audit.audit["general_information"]["auditee_uei"], "ZQGGHJH74DW7")
         self.assertEqual(audit.submission_status, "in_progress")
 
         # We also need to verify that the response from the POST includes all

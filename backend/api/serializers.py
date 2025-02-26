@@ -282,19 +282,21 @@ class AccessListSerializer(serializers.ModelSerializer):
     submission_status = serializers.SerializerMethodField()
 
     def get_auditee_uei(self, access):
-        return access.audit.auditee_uei
+        return access.audit.audit["general_information"]["auditee_uei"] if access.audit else access.sac.auditee_uei
 
     def get_auditee_fiscal_period_end(self, access):
-        return access.audit.auditee_fiscal_period_end
+        return access.audit.audit["general_information"]["auditee_fiscal_period_end"] if access.audit else access.sac.auditee_fiscal_period_end
 
     def get_auditee_name(self, access):
-        return access.audit.auditee_name
+        # TODO: 2/25 access audit
+        # Where is the equivalent of "auditee_name" in the Audit model?
+        return access.sac.auditee_name
 
     def get_report_id(self, access):
-        return access.audit.report_id
+        return access.audit.report_id if access.audit else access.sac.report_id
 
     def get_submission_status(self, access):
-        return access.audit.submission_status
+        return access.audit.submission_status if access.audit else access.sac.submission_status
 
     class Meta:
         model = Access

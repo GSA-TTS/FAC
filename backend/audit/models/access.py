@@ -52,6 +52,7 @@ class AccessManager(models.Manager):
         if event_user and event_type:
             SubmissionEvent.objects.create(
                 sac=result.sac,
+                audit=result.audit,
                 user=event_user,
                 event=event_type,
             )
@@ -69,7 +70,8 @@ class Access(models.Model):
 
     ROLES = ACCESS_ROLES
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
-    # TODO: setting this temporarily to allow "null" to handle existing rows without audit fields.
+    # TODO: 2/25 access audit
+    # setting this temporarily to allow "null" to handle existing rows without audit fields.
     # We will want to copy "Accesses" from SACs to their correlating Audit models.
     audit = models.ForeignKey(Audit, on_delete=models.CASCADE, null=True)
     role = models.CharField(
@@ -162,6 +164,7 @@ def delete_access_and_create_record(
     removed_by_email = removing_user.email if removing_user else None
     deletion_record = DeletedAccess(
         sac=access.sac,
+        audit=access.audit,
         role=access.role,
         fullname=access.fullname,
         email=access.email,

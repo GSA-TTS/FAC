@@ -124,9 +124,11 @@ def access_and_submission_check(user, data):
             event_user=user,
             event_type=SubmissionEvent.EventType.CREATED,
         )
+        print(f"MY GENERAL INFO:\n{all_steps_user_form_data}")
 
+        # TODO: 2/25 access audit
         # TODO: use this for generating report_id when we deprecate "sac" from this workflow.
-        # report_id = generate_sac_report_id(end_date=all_steps_user_form_data["audit"]["general_information"]["auditee_fiscal_period_end"], source="GSAFAC")
+        # report_id = generate_sac_report_id(end_date=all_steps_user_form_data["auditee_fiscal_period_end"], source="GSAFAC")
         current_schema = Schema.objects.get_current_schema(audit_type=AUDIT_TYPE.SINGLE_AUDIT)
         audit = Audit.objects.create(
             report_id=sac.report_id,  # TODO Temporarily use the current id to mirror
@@ -140,7 +142,10 @@ def access_and_submission_check(user, data):
         )
 
         # Create all contact Access objects
+        # TODO: 2/25 access audit
+        # Remove references to sac for all 5 Access creations.
         Access.objects.create(
+            sac=sac,
             audit=audit,
             role="editor",
             email=str(user.email).lower(),
@@ -149,6 +154,7 @@ def access_and_submission_check(user, data):
             event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
         Access.objects.create(
+            sac=sac,
             audit=audit,
             role="certifying_auditee_contact",
             fullname=serializer.data.get("certifying_auditee_contact_fullname"),
@@ -157,6 +163,7 @@ def access_and_submission_check(user, data):
             event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
         Access.objects.create(
+            sac=sac,
             audit=audit,
             role="certifying_auditor_contact",
             fullname=serializer.data.get("certifying_auditor_contact_fullname"),
@@ -179,6 +186,7 @@ def access_and_submission_check(user, data):
         for email, name in auditee_contacts_info:
             if email:
                 Access.objects.create(
+                    sac=sac,
                     audit=audit,
                     role="editor",
                     fullname=name,
@@ -189,6 +197,7 @@ def access_and_submission_check(user, data):
         for email, name in auditor_contacts_info:
             if email:
                 Access.objects.create(
+                    sac=sac,
                     audit=audit,
                     role="editor",
                     fullname=name,

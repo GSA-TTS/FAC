@@ -94,6 +94,8 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         Get all submissions the user is associated with via Access objects.
         """
         accesses = Access.objects.filter(user=user)
+
+        # TODO: replace this with audit IDs -- commented below.
         sac_ids = [access.sac.id for access in accesses]
         data = SingleAuditChecklist.objects.filter(
             Q(id__in=sac_ids) & ~Q(submission_status=STATUS.FLAGGED_FOR_REMOVAL)
@@ -104,6 +106,18 @@ class MySubmissions(LoginRequiredMixin, generic.View):
             auditee_name=F("general_information__auditee_name"),
             fiscal_year_end_date=F("general_information__auditee_fiscal_period_end"),
         )
+        # TODO: 2/25 access audit
+        # The values for audit are invalid.
+        # audit_ids = [access.audit.id for access in accesses]
+        # data = Audit.objects.filter(
+        #     Q(id__in=audit_ids) & ~Q(submission_status=STATUS.FLAGGED_FOR_REMOVAL)
+        # ).values(
+        #     "report_id",
+        #     "submission_status",
+        #     auditee_uei=F("general_information__auditee_uei"),
+        #     auditee_name=F("general_information__auditee_name"),
+        #     fiscal_year_end_date=F("general_information__auditee_fiscal_period_end"),
+        # )
         return data
 
 

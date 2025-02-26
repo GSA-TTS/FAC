@@ -24,8 +24,8 @@ def _get_friendly_role(role):
     return dict(ACCESS_ROLES)[role]
 
 
-def _create_and_save_access(audit, role, fullname, email):
-    Access.objects.create(audit=audit, role=role, fullname=fullname, email=email)
+def _create_and_save_access(sac, audit, role, fullname, email):
+    Access.objects.create(sac=sac, audit=audit, role=role, fullname=fullname, email=email)
 
 
 class ChangeAccessForm(forms.Form):
@@ -59,20 +59,25 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         Show the current auditor certifying official and the form.
         """
         report_id = kwargs["report_id"]
-        audit = Audit.objects.get(report_id=report_id)
-        context = self._get_user_role_management_context(audit)
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        # TODO: 2/25 access audit
+        # We will want to replace "sac" with "audit" once we are ready to deprecate SAC.
+        context = self._get_user_role_management_context(sac)
 
         return render(request, self.template, context)
 
+    # TODO: 2/25 access audit
+    # We will want to replace "sac" with "audit" under this endpoint when we are ready to deprecate SAC.
     def post(self, request, *args, **kwargs):
         """
         Change the current auditor certifying official and redirect to submission
         progress.
         """
         report_id = kwargs["report_id"]
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
         audit = Audit.objects.get(report_id=report_id)
         form = ChangeAccessForm(request.POST)
-        context = self._get_user_role_management_context(audit)
+        context = self._get_user_role_management_context(sac)
 
         form.full_clean()
         if not form.is_valid():
@@ -96,12 +101,12 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         # If self.other_role is not set then we're adding an editor:
         if not self.other_role:
             return self._handle_add_editor(
-                request, url, audit, report_id, email, fullname
+                request, url, sac, audit, report_id, email, fullname
             )
 
         # We need the existing role assignment, if any, to delete it:
         try:
-            access = Access.objects.get(audit=audit, role=self.role)
+            access = Access.objects.get(sac=sac, role=self.role)
         except Access.DoesNotExist:
             access = SimpleNamespace(
                 fullname="UNASSIGNED ROLE", email="UNASSIGNED ROLE", role=self.role
@@ -109,7 +114,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
         # We need the other role assignment, if any, to compare email addresses:
         try:
-            other_access = Access.objects.get(audit=audit, role=self.other_role)
+            other_access = Access.objects.get(sac=sac, role=self.other_role)
             other_access_email = other_access.email
         except Access.DoesNotExist:
             other_access_email = None
@@ -133,30 +138,32 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         if hasattr(access, "delete"):
             with transaction.atomic():
                 access.delete(removing_user=request.user, removal_event="access-change")
-                _create_and_save_access(audit, self.role, fullname, email)
+                _create_and_save_access(sac, audit, self.role, fullname, email)
         # We know that submissions can get into a bad state where no
         # certifying role(s) exist, so we should support cases where this
         # happens:
         else:
-            _create_and_save_access(audit, self.role, fullname, email)
+            _create_and_save_access(sac, audit, self.role, fullname, email)
 
         return redirect(url)
 
-    def _get_user_role_management_context(self, audit):
+    # TODO: 2/25 access audit
+    # We will want to replace "sac" with "audit" under this endpoint when we are ready to deprecate SAC.
+    def _get_user_role_management_context(self, sac):
         context = {
             "role": self.role,
             "friendly_role": None,
-            "auditee_uei": audit.general_information["auditee_uei"],
-            "auditee_name": audit.general_information.get("auditee_name"),
+            "auditee_uei": sac.general_information["auditee_uei"],
+            "auditee_name": sac.general_information.get("auditee_name"),
             "certifier_name": "",
             "email": "",
-            "report_id": audit.report_id,
+            "report_id": sac.report_id,
             "errors": [],
         }
 
         if self.role != "editor":
             try:
-                access = Access.objects.get(audit=audit, role=self.role)
+                access = Access.objects.get(sac=sac, role=self.role)
             except Access.DoesNotExist:
                 access = SimpleNamespace(
                     fullname="UNASSIGNED ROLE", email="UNASSIGNED ROLE", role=self.role
@@ -170,14 +177,16 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
         return context
 
-    def _handle_add_editor(self, request, url, audit, report_id, email, fullname):
+    # TODO: 2/25 access audit
+    # We will want to replace "sac" with "audit".
+    def _handle_add_editor(self, request, url, sac, audit, report_id, email, fullname):
         # Avoid editors with duplicate emails
-        if Access.objects.filter(audit=audit, role=self.role, email=email).exists():
+        if Access.objects.filter(sac=sac, role=self.role, email=email).exists():
             context = {
                 "role": self.role,
                 "friendly_role": _get_friendly_role(self.role),
-                "auditee_uei": audit.general_information["auditee_uei"],
-                "auditee_name": audit.general_information.get("auditee_name"),
+                "auditee_uei": sac.general_information["auditee_uei"],
+                "auditee_name": sac.general_information.get("auditee_name"),
                 "certifier_name": fullname,
                 "email": email,
                 "report_id": report_id,
@@ -188,7 +197,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
             return render(request, self.template, context, status=400)
         else:
-            _create_and_save_access(audit, self.role, fullname, email)
+            _create_and_save_access(sac, audit, self.role, fullname, email)
             return redirect(url)
 
 
@@ -200,15 +209,17 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     template = "audit/remove-editor-access.html"
     role = "editor"
 
+    # TODO: 2/25 access audit
+    # We will want to replace "sac" with "audit".
     def get(self, request, *args, **kwargs):
         """
         Show the current editor and the form.
         """
         report_id = kwargs["report_id"]
-        audit = Audit.objects.get(report_id=report_id)
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
         if not Access.objects.filter(
-            email=request.user.email, audit=audit, role=self.role
+            email=request.user.email, sac=sac, role=self.role
         ).exists():
             raise PermissionDenied(
                 "Only Audit Editors may remove audit access for other Audit Editors."
@@ -217,32 +228,34 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         editor_id = request.GET.get("id", None)
 
         try:
-            access_to_remove = Access.objects.get(id=editor_id, audit=audit, role=self.role)
+            access_to_remove = Access.objects.get(id=editor_id, sac=sac, role=self.role)
         except Access.DoesNotExist as e:
             raise Http404() from e
 
         context = {
-            "auditee_uei": audit.general_information["auditee_uei"],
-            "auditee_name": audit.general_information.get("auditee_name"),
+            "auditee_uei": sac.general_information["auditee_uei"],
+            "auditee_name": sac.general_information.get("auditee_name"),
             "editor_id": access_to_remove.id,
             "name": access_to_remove.fullname,
             "email": access_to_remove.email,
-            "report_id": audit.report_id,
+            "report_id": sac.report_id,
             "is_editor_removing_self": request.user.email == access_to_remove.email,
             "errors": [],
         }
 
         return render(request, "audit/remove-editor-access.html", context)
 
+    # TODO: 2/25 access audit
+    # We will want to replace "sac" with "audit".
     def post(self, request, *args, **kwargs):
         """
         Remove the editor and redirect to manage submission.
         """
         report_id = kwargs["report_id"]
-        audit = Audit.objects.get(report_id=report_id)
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
         if not Access.objects.filter(
-            email=request.user.email, audit=audit, role=self.role
+            email=request.user.email, sac=sac, role=self.role
         ).exists():
             raise PermissionDenied(
                 "Only Audit Editors may remove audit access for other Audit Editors."
@@ -251,7 +264,7 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         editor_id = request.POST.get("editor_id")
 
         try:
-            access_to_remove = Access.objects.get(id=editor_id, audit=audit, role=self.role)
+            access_to_remove = Access.objects.get(id=editor_id, sac=sac, role=self.role)
         except Access.DoesNotExist as e:
             raise Http404() from e
 
@@ -259,12 +272,12 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             access_to_remove.delete()
         else:
             context = {
-                "auditee_uei": audit.general_information["auditee_uei"],
-                "auditee_name": audit.general_information.get("auditee_name"),
+                "auditee_uei": sac.general_information["auditee_uei"],
+                "auditee_name": sac.general_information.get("auditee_name"),
                 "editor_id": access_to_remove.id,
                 "name": access_to_remove.fullname,
                 "email": access_to_remove.email,
-                "report_id": audit.report_id,
+                "report_id": sac.report_id,
                 "is_editor_removing_self": True,
                 "errors": {"email": "You cannot remove your own audit access"},
             }

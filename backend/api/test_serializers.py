@@ -574,14 +574,16 @@ class AccessListSerializerTests(TestCase):
 
         serializer = AccessListSerializer(access)
 
-        self.assertEqual(serializer.data["auditee_uei"], access.audit.auditee_uei)
+        # TODO: 2/25 access audit
+        # remove if/else when we deprecate SAC data.
+        self.assertEqual(serializer.data["auditee_uei"], access.audit.audit["general_information"]["auditee_uei"] if access.audit else access.sac.auditee_uei)
         self.assertEqual(
             serializer.data["auditee_fiscal_period_end"],
-            access.audit.auditee_fiscal_period_end,
+            access.audit.audit["general_information"]["auditee_fiscal_period_end"] if access.audit else access.sac.auditee_fiscal_period_end,
         )
-        self.assertEqual(serializer.data["auditee_name"], access.audit.auditee_name)
-        self.assertEqual(serializer.data["report_id"], access.audit.report_id)
+        self.assertEqual(serializer.data["auditee_name"], access.sac.auditee_name)
+        self.assertEqual(serializer.data["report_id"], access.audit.report_id if access.audit else access.sac.report_id)
         self.assertEqual(
-            serializer.data["submission_status"], access.audit.submission_status
+            serializer.data["submission_status"], access.audit.submission_status if access.audit else access.sac.submission_status
         )
         self.assertEqual(serializer.data["role"], access.role)

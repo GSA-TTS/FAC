@@ -18,4 +18,18 @@ class Migration(migrations.Migration):
                 null=True, on_delete=django.db.models.deletion.CASCADE, to="audit.audit"
             ),
         ),
+        migrations.AddField(
+            model_name="submissionevent",
+            name="audit",
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.CASCADE, to="audit.audit"
+            ),
+        ),
+        migrations.AddField(
+            model_name="deletedaccess",
+            name="audit",
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.CASCADE, to="audit.audit"
+            ),
+        ),
     ]
