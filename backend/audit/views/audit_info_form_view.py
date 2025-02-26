@@ -101,12 +101,18 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     event_type=SubmissionEvent.EventType.AUDIT_INFORMATION_UPDATED,
                 )
 
-                audit = Audit.objects.get(report_id=report_id)
-                audit.audit.update({"audit_information": validated})
-                audit.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.AUDIT_INFORMATION_UPDATED,
-                )
+                # TODO: 2/25 access audit
+                # remove try/except once we are ready to deprecate SAC.
+                try:
+                    audit = Audit.objects.get(report_id=report_id)
+                    audit.audit.update({"audit_information": validated})
+                    audit.save(
+                        event_user=request.user,
+                        event_type=SubmissionEvent.EventType.AUDIT_INFORMATION_UPDATED,
+                    )
+                except Audit.DoesNotExist:
+                    audit = None
+
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
                 for field, errors in form.errors.items():

@@ -17,6 +17,7 @@ from .models import (
     User,
     generate_sac_report_id,
 )
+from audit.models import Audit
 from .models.models import STATUS
 from .models.viewflow import sac_transition, SingleAuditChecklistFlow
 
@@ -228,10 +229,10 @@ class AccessTests(TestCase):
         baker.make(User, email="a@a.com")
         baker.make(User, email="a@a.com")
 
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit)
 
         access = Access.objects.create(
-            sac=sac,
+            audit=audit,
             role="editor",
             email="a@a.com",
             event_user=creator,

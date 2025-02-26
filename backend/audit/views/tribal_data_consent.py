@@ -58,12 +58,17 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 )
                 logger.info("Tribal data consent saved.", tribal_data_consent)
 
-                audit = Audit.objects.get(report_id=report_id)
-                audit.audit.update({"tribal_data_consent": tribal_data_consent})
-                audit.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
-                )
+                # TODO: 2/25 access audit
+                # remove try/except once we are ready to deprecate SAC.
+                try:
+                    audit = Audit.objects.get(report_id=report_id)
+                    audit.audit.update({"tribal_data_consent": tribal_data_consent})
+                    audit.save(
+                        event_user=request.user,
+                        event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
+                    )
+                except Audit.DoesNotExist:
+                    pass
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 

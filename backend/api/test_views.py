@@ -8,7 +8,7 @@ from model_bakery import baker
 from rest_framework.test import APIClient
 
 from api.test_uei import valid_uei_results
-from audit.models import Access, SingleAuditChecklist
+from audit.models import Access, Audit, SingleAuditChecklist
 
 User = get_user_model()
 
@@ -409,20 +409,20 @@ class AccessAndSubmissionTests(TestCase):
         )
         data = response.json()
 
-        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
+        audit = Audit.objects.get(report_id=data["report_id"])
 
         certifying_auditee_contact_access = Access.objects.get(
-            sac=sac, role="certifying_auditee_contact"
+            audit=audit, role="certifying_auditee_contact"
         )
         certifying_auditor_contact_access = Access.objects.get(
-            sac=sac, role="certifying_auditor_contact"
+            audit=audit, role="certifying_auditor_contact"
         )
 
-        editors = Access.objects.filter(sac=sac, role="editor")
+        editors = Access.objects.filter(audit=audit, role="editor")
         editor_emails = [acc.email for acc in editors]
         editor_users = [acc.user for acc in editors]
 
-        self.assertEqual(sac.submitted_by, self.user)
+        self.assertEqual(audit.submitted_by, self.user)
         self.assertTrue(self.user.email in editor_emails)
         self.assertTrue("c@c.com" in editor_emails)
         self.assertTrue("d@d.com" in editor_emails)
@@ -451,10 +451,10 @@ class AccessAndSubmissionTests(TestCase):
         )
         data = response.json()
 
-        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
+        audit = Audit.objects.get(report_id=data["report_id"])
 
         editors = (
-            Access.objects.filter(sac=sac, role="editor")
+            Access.objects.filter(audit=audit, role="editor")
             .values_list("email", flat=True)
             .order_by("email")
         )
@@ -492,10 +492,10 @@ class AccessAndSubmissionTests(TestCase):
         )
         data = response.json()
 
-        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
+        audit = Audit.objects.get(report_id=data["report_id"])
 
         editors = (
-            Access.objects.filter(sac=sac, role="editor")
+            Access.objects.filter(audit=audit, role="editor")
             .values_list("email", flat=True)
             .order_by("email")
         )
@@ -573,14 +573,14 @@ class SACCreationTests(TestCase):
             next_step, access_and_submission_data, format="json"
         )
         data = response.json()
-        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
-        self.assertEqual(sac.submitted_by, self.user)
-        self.assertEqual(sac.auditee_uei, "ZQGGHJH74DW7")
-        self.assertEqual(sac.submission_status, "in_progress")
+        audit = Audit.objects.get(report_id=data["report_id"])
+        self.assertEqual(audit.created_by, self.user)
+        self.assertEqual(audit.audit.get("general_information", {}).get("auditee_uei", None), "ZQGGHJH74DW7")
+        self.assertEqual(audit.submission_status, "in_progress")
 
         # We also need to verify that the response from the POST includes all
         # the fields we expect, including the data that’s actually stored in
-        # Access objects related to this SAC instance.
+        # Access objects related to this Audit instance.
 
 
 class SingleAuditChecklistViewTests(TestCase):
@@ -634,8 +634,8 @@ class SingleAuditChecklistViewTests(TestCase):
             next_step, access_and_submission_data, format="json"
         )
         data = response.json()
-        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
-        response = self.client.get(self.path(sac.report_id))
+        audit = Audit.objects.get(report_id=data["report_id"])
+        response = self.client.get(self.path(audit.report_id))
         full_data = response.json()
         for key, value in access_and_submission_data.items():
             if key in ["auditee_contacts_email", "auditor_contacts_email"]:
@@ -667,20 +667,20 @@ class SingleAuditChecklistViewTests(TestCase):
 
     def test_get_no_audit_access(self):
         """
-        If a user doesn't have an Access object for the SAC, they should get a
+        If a user doesn't have an Access object for the Audit, they should get a
         403.
         """
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit)
 
-        response = self.client.get(self.path(sac.report_id))
+        response = self.client.get(self.path(audit.report_id))
         self.assertEqual(response.status_code, 403)
 
     def test_get_audit_access(self):
         """
-        If a user has an Access object for the SAC, they should get a 200.
+        If a user has an Access object for the Audit, they should get a 200.
         """
         access = baker.make(Access, user=self.user)
-        response = self.client.get(self.path(access.sac.report_id))
+        response = self.client.get(self.path(access.audit.report_id))
 
         self.assertEqual(response.status_code, 200)
 
@@ -745,13 +745,13 @@ class SacFederalAwardsViewTests(TestCase):
 
     def test_get_no_audit_awards_access(self):
         """
-        If a user doesn't have an Access object for the SAC, they should get a
+        If a user doesn't have an Access object for the Audit, they should get a
         403.
         """
 
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit)
 
-        response = self.client.get(self.path(sac.report_id))
+        response = self.client.get(self.path(audit.report_id))
         self.assertEqual(response.status_code, 403)
 
     def test_get_valid_placeholder_data(self):
@@ -847,7 +847,7 @@ class AccessListViewTests(TestCase):
 
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["role"], access.role)
-        self.assertEqual(data[0]["report_id"], access.sac.report_id)
+        self.assertEqual(data[0]["report_id"], access.audit.report_id)
 
     def test_multiple_access_returns_expected(self):
         """
@@ -861,23 +861,23 @@ class AccessListViewTests(TestCase):
 
         self.assertEqual(len(data), 2)
 
-        data_1 = next((a for a in data if a["report_id"] == access_1.sac.report_id))
+        data_1 = next((a for a in data if a["report_id"] == access_1.audit.report_id))
 
         self.assertEqual(data_1["role"], access_1.role)
-        self.assertEqual(data_1["report_id"], access_1.sac.report_id)
+        self.assertEqual(data_1["report_id"], access_1.audit.report_id)
 
-        data_2 = next((a for a in data if a["report_id"] == access_2.sac.report_id))
+        data_2 = next((a for a in data if a["report_id"] == access_2.audit.report_id))
 
         self.assertEqual(data_2["role"], access_2.role)
-        self.assertEqual(data_2["report_id"], access_2.sac.report_id)
+        self.assertEqual(data_2["report_id"], access_2.audit.report_id)
 
     def test_multiple_roles_returns_expected(self):
         """
         If a user has multiple roles for an audit, that audit is returned one time for each role
         """
-        sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=self.user, role="certifying_auditee_contact", sac=sac)
-        baker.make(Access, user=self.user, role="editor", sac=sac)
+        audit = baker.make(Audit)
+        baker.make(Access, user=self.user, role="certifying_auditee_contact", audit=audit)
+        baker.make(Access, user=self.user, role="editor", audit=audit)
 
         response = self.client.get(ACCESS_LIST_PATH, format="json")
         data = response.json()
@@ -889,20 +889,20 @@ class AccessListViewTests(TestCase):
         )
         self.assertEqual(len(certifying_auditee_contact_accesses), 1)
         self.assertEqual(
-            certifying_auditee_contact_accesses[0]["report_id"], sac.report_id
+            certifying_auditee_contact_accesses[0]["report_id"], audit.report_id
         )
 
         editor_accesses = list(filter(lambda a: a["role"] == "editor", data))
         self.assertEqual(len(editor_accesses), 1)
-        self.assertEqual(editor_accesses[0]["report_id"], sac.report_id)
+        self.assertEqual(editor_accesses[0]["report_id"], audit.report_id)
 
     def test_deleted_sac_not_returned(self):
         """
-        If a user has their SACs deleted, it is no longer returned in their access list
+        If a user has their Audits deleted, it is no longer returned in their access list
         """
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit)
         access_1 = baker.make(Access, user=self.user)
-        baker.make(Access, user=self.user, sac=sac)
+        baker.make(Access, user=self.user, audit=audit)
 
         response_1 = self.client.get(ACCESS_LIST_PATH, format="json")
         data_1 = response_1.json()
@@ -911,18 +911,18 @@ class AccessListViewTests(TestCase):
         self.assertEqual(len(data_1), 2)
 
         # now delete one access_2
-        sac.delete()
+        audit.delete()
 
         response_2 = self.client.get(ACCESS_LIST_PATH, format="json")
         data_2 = response_2.json()
 
         # only the one remaining access should come back
         self.assertEqual(len(data_2), 1)
-        self.assertEqual(data_2[0]["report_id"], access_1.sac.report_id)
+        self.assertEqual(data_2[0]["report_id"], access_1.audit.report_id)
 
     def test_deleted_access_not_returned(self):
         """
-        If a user has their Access deleted, the associated SAC is no longer returned in their access list
+        If a user has their Access deleted, the associated Audit is no longer returned in their access list
         """
         access_1 = baker.make(Access, user=self.user)
         access_2 = baker.make(Access, user=self.user)
@@ -941,7 +941,7 @@ class AccessListViewTests(TestCase):
 
         # only the one remaining access should come back
         self.assertEqual(len(data_2), 1)
-        self.assertEqual(data_2[0]["report_id"], access_1.sac.report_id)
+        self.assertEqual(data_2[0]["report_id"], access_1.audit.report_id)
 
 
 class SchemaViewTests(TestCase):

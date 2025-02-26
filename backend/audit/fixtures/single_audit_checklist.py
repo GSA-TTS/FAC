@@ -126,28 +126,36 @@ def _create_sac(user, auditee_name, submission_status="in_progress"):
         general_information=_fake_general_information(auditee_name),
         submission_status=submission_status,
     )
+    Audit = apps.get_model("audit.Audit")
+    audit = Audit.objects.create(
+        audit={"general_information": _fake_general_information(auditee_name)},
+        submission_status=submission_status
+    )
 
     Access = apps.get_model("audit.Access")
     Access.objects.create(
         sac=sac,
+        audit=audit,
         user=user,
         email=user.email,
         role="editor",
     )
     Access.objects.create(
         sac=sac,
+        audit=audit,
         user=user,
         email=user.email,
         role="certifying_auditor_contact",
     )
     Access.objects.create(
         sac=sac,
+        audit=audit,
         user=user,
         email=user.email,
         role="certifying_auditee_contact",
     )
-    logger.info("Created single audit checklist %s", sac)
-    return sac
+    logger.info("Created audit %s", audit)
+    return audit
 
 
 def _post_create_federal_awards(this_sac, this_user):
