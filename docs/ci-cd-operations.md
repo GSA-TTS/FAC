@@ -43,7 +43,7 @@ flowchart LR
     N --> |Approve| O{Merge to Dev}
 ```
 
-### Pull Requests:
+### Pull Requests
 By and large, when a pull request has been opened, one of the two above paths has been tested to qualify it as Pull Request ready. We follow a similar path to manual local testing when a PR opens, however, the underlying system is slightly different depending on what has been done. If a PR does not change core dependencies, then it will run necessary tests using the current [GHCR container](https://github.com/GSA-TTS/FAC/pkgs/container/fac%2Fweb-container), and after merging, it will rebuild and overwrite it. If a PR does change dependencies, the GHCR version is ignored, and all tests run on a builder.
 
 ```mermaid
@@ -77,7 +77,7 @@ flowchart LR
     C & E & G & I --> K@{ shape: dbl-circ, label: "Review" }
 ```
 
-### Deployments:
+### Deployments
 When a PR is approved and ready to merge, a bunch of processes are triggered to again, validate all operational components related to a deployment. Some of these operations are redundant, but they ensure that the new code base does not cause any conflict in any way. We operate under the assumption that if it passes in the pull request, we have high stability, however we run them again as a means to attempt to catch any outliers.
 
 ```mermaid
@@ -181,8 +181,7 @@ flowchart LR
     A --> S
 ```
 
-### Automated Tasks:
-
+### Automated Tasks
 Automated tasks are run on a schedule daily, with the exception of the backup operations in each environment, which run every 2 hours during operational times (EST Start) -> (PST End of Day).
 ```mermaid
 flowchart TB
