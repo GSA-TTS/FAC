@@ -183,6 +183,10 @@ flowchart LR
 
 ### Automated Tasks
 Automated tasks are run on a schedule daily, with the exception of the backup operations in each environment, which run every 2 hours during operational times (EST Start) -> (PST End of Day).
+||Staging Deploy|Materialized Views|Regression Tests|Trivy Cache Update|Check Tables|Rebuild Containers|Backups|
+|:---|----|---|---|---|---|---|---|
+|**Time**|10am UTC Mon-Sa|6am UTC|9am UTC Mon-Fri|12am UTC|12am/12pm UTC|5am UTC Sun|
+|**Cron**|'0 10 * * 1-6'| '0 6 * * *'|'0 9 * * 1-5'|'0 0 * * *'|'0 */12 * * *'|'0 5 * * 0'||
 ```mermaid
 flowchart TB
     X{{Daily Operations}} ---> C & E & F & A & N
@@ -204,7 +208,7 @@ flowchart TB
     subgraph Backups
     direction TB
     B@{ shape: processes, label: "Run Backups" }
-    B -- Every 2 Hours --> K(Dev) & L(Staging) & M(Prod)
+    B --> K(Dev) & L(Staging) & M(Prod)
     end
     subgraph Staging Deployment
     N@{ shape: subprocess, label: "Check for Diffs" }
