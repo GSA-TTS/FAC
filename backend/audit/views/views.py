@@ -82,7 +82,6 @@ class MySubmissions(LoginRequiredMixin, generic.View):
             else:
                 data["in_progress_audits"].append(audit)
 
-        print("the data", data)
         context = {
             "data": data,
             "new_link": new_link,
@@ -331,7 +330,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
                 request, "audit/cross-validation/cross-validation-results.html", context
             )
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
 
@@ -341,7 +340,7 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             context = {
                 "report_id": report_id,
@@ -350,7 +349,7 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
             return render(
                 request, "audit/cross-validation/ready-for-certification.html", context
             )
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.IN_PROGRESS)
@@ -410,7 +409,7 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
 
             return render(request, "audit/auditor-certification-step-1.html", context)
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.READY_FOR_CERTIFICATION)
@@ -446,7 +445,7 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
             context["form"] = form
             return render(request, "audit/auditor-certification-step-1.html", context)
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
 
