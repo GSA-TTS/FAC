@@ -32,7 +32,7 @@ export function testLoginGovLogin(
   // We can't wrap all of this in a cy.origin because it will error if it made
   // it back to localhost already, which is the typical case
   cy.url().then((url) => {
-      if (url.match(/\/login\/piv_cac_recommended$/)) {
+    if (url.match(/\/login\/piv_cac_recommended$/)) {
       // Handle the case where the page redirects to piv_cac_recommended
       cy.origin(
         'https://idp.int.identitysandbox.gov/',
