@@ -181,6 +181,52 @@ flowchart LR
     A --> S
 ```
 
+Finally, a high level illustration of what the process looks like to take a feature to production:
+```mermaid
+flowchart LR
+    A@{ shape: processes, label: "Local Development" }
+    C@{ shape: processes, label: "Pull Request" }
+
+    A --- B
+    B --o C@{ shape: processes, label: "Pull Request" }
+
+    subgraph Local
+    B@{ shape: processes, label: "Testing" }
+    end
+
+    subgraph Cloud
+    D@{ shape: processes, label: "Deploy Sandbox" }
+    E@{ shape: processes, label: "Deploy Preview" }
+    end
+    A --> D & E
+    Cloud --> C
+
+    subgraph Review
+    C --> F{Approval}
+    C --> G{Enhancements}
+    end
+    G -...-> A
+
+    subgraph Dev
+    I@{ shape: processes, label: "Merge 'branch' to 'main'" }
+    H@{ shape: processes, label: "Deploy 'main' to development environment" }
+    end
+    F --> I --> H
+    J{{Scheduler}}
+    Dev === J
+    J === K
+    subgraph Staging
+    K@{ shape: processes, label: "Merge 'main' to 'prod'" }
+    L@{ shape: processes, label: "Deploy 'prod' to staging environment" }
+    end
+    K --> L
+    subgraph Prod
+    M@{ shape: processes, label: "Deploy 'prod' to production environment" }
+    end
+    N{{Weekly Release}} --> M
+    Staging --> N
+```
+
 ### Automated Tasks
 Automated tasks are run on a schedule, with each schedule having different times or frequencies.
 ||Staging Deploy|Materialized Views|Regression Tests|Trivy Cache Update|Check Tables|Rebuild Containers|Backups|
