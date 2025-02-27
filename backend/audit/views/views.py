@@ -121,7 +121,6 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         #     fiscal_year_end_date=F("general_information__auditee_fiscal_period_end"),
         # )
         return data
-# TODO: check tomorrow with Jason
 
 class EditSubmission(LoginRequiredMixin, generic.View):
     redirect_field_name = "Home"
@@ -202,7 +201,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             download_url = get_download_url(filename)
 
             return redirect(download_url)
-        except Audit.DoesNotExist as err:
+        except SingleAuditChecklist.DoesNotExist as err:
             logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
             raise PermissionDenied() from err
 
@@ -223,7 +222,6 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             excel_file = self._create_excel_file(file, sac.id, form_section)
 
             auditee_uei = None
-            print("Sac", sac.audit["general_information"])
             if (
                 sac.audit['general_information'] is not None
                 and "auditee_uei" in sac.audit['general_information']
@@ -241,7 +239,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 return redirect("/")
 
         except Audit.DoesNotExist as err:
-            logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
+            logger.warning("no Audit found with report ID %s", report_id)
             raise PermissionDenied() from err
         except ValidationError as err:
             # The good error, where bad rows/columns are sent back in the request.
@@ -279,7 +277,7 @@ class SingleAuditReportFileHandlerView(
         try:
             report_id = kwargs["report_id"]
 
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             file = request.FILES["FILES"]
 
@@ -306,7 +304,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             context = {
                 "report_id": report_id,
@@ -315,7 +313,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             return render(
                 request, "audit/cross-validation/cross-validation.html", context
             )
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.IN_PROGRESS)
@@ -391,7 +389,7 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
             initial = {
                 "AuditorCertificationStep1Session": request.session.get(
                     "AuditorCertificationStep1Session", None
@@ -420,7 +418,7 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
             initial = {
                 "AuditorCertificationStep1Session": request.session.get(
                     "AuditorCertificationStep1Session", None
@@ -458,7 +456,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
             initial = {
                 "AuditorCertificationStep2Session": request.session.get(
                     "AuditorCertificationStep2Session", None
@@ -488,7 +486,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
 
             return render(request, "audit/auditor-certification-step-2.html", context)
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.READY_FOR_CERTIFICATION)
@@ -496,7 +494,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
             form1_cleaned = request.session.get(
                 "AuditorCertificationStep1Session", None
             )
@@ -543,7 +541,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
             context["form"] = form2
             return render(request, "audit/auditor-certification-step-2.html", context)
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
 
@@ -553,7 +551,7 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
             initial = {
                 "AuditeeCertificationStep1Session": request.session.get(
                     "AuditeeCertificationStep1Session", None
@@ -570,7 +568,7 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
 
             return render(request, "audit/auditee-certification-step-1.html", context)
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.AUDITOR_CERTIFIED)
@@ -578,7 +576,7 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
             initial = {
                 "AuditeeCertificationStep1Session": request.session.get(
                     "AuditeeCertificationStep1Session", None
@@ -602,7 +600,7 @@ class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View
             context["form"] = form
             return render(request, "audit/auditee-certification-step-1.html", context)
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
 
@@ -612,7 +610,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
             initial = {
                 "AuditeeCertificationStep2Session": request.session.get(
                     "AuditeeCertificationStep2Session", None
@@ -638,7 +636,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
 
             return render(request, "audit/auditee-certification-step-2.html", context)
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.AUDITOR_CERTIFIED)
@@ -646,7 +644,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
             form1_cleaned = request.session.get(
                 "AuditeeCertificationStep1Session", None
             )
@@ -688,7 +686,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
             context["form"] = form2
             return render(request, "audit/auditee-certification-step-2.html", context)
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
 
@@ -698,7 +696,7 @@ class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             context = {
                 "report_id": report_id,
@@ -706,7 +704,7 @@ class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
             }
 
             return render(request, "audit/certification.html", context)
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.AUDITOR_CERTIFIED)
@@ -714,13 +712,13 @@ class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             sac.save()
 
             return redirect(reverse("audit:MySubmissions"))
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
 
@@ -729,7 +727,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             context = {
                 "report_id": report_id,
@@ -737,7 +735,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             }
 
             return render(request, "audit/submission.html", context)
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.AUDITEE_CERTIFIED)
@@ -800,7 +798,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
             return redirect(reverse("audit:MySubmissions"))
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except TransactionManagementError:
             # ORIGINAL COMMENT
