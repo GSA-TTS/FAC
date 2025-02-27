@@ -51,6 +51,7 @@ class AccessManager(models.Manager):
         if event_user and event_type:
             SubmissionEvent.objects.create(
                 sac=result.sac,
+                audit=result.audit,
                 user=event_user,
                 event=event_type,
             )
@@ -68,6 +69,10 @@ class Access(models.Model):
 
     ROLES = ACCESS_ROLES
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
+    # TODO: Update Post SOC Launch
+    # setting this temporarily to allow "null" to handle existing rows without audit fields.
+    # We will want to copy "Accesses" from SACs to their correlating Audit models.
+    audit = models.ForeignKey("audit.Audit", on_delete=models.CASCADE, null=True)
     role = models.CharField(
         choices=ROLES,
         help_text="Access type granted to this user",
@@ -90,7 +95,7 @@ class Access(models.Model):
         Override method to create DeletedAccess entries upon deletion.
 
         Returns only the result of the Access deletion to maintain compatibility with
-        what all other delete methods return.
+        what all the other delete methods return.
         """
         removing_user = kwds.get("removing_user")
         removal_event = kwds.get("removal_event", "access-change")
@@ -109,6 +114,7 @@ class Access(models.Model):
         verbose_name_plural = "accesses"
 
         constraints = [
+            # TODO: Update Post SOC Launch
             # a SAC cannot have multiple certifying auditees
             models.UniqueConstraint(
                 fields=["sac"],
@@ -120,6 +126,18 @@ class Access(models.Model):
                 fields=["sac"],
                 condition=Q(role="certifying_auditor_contact"),
                 name="%(app_label)s_%(class)s_single_certifying_auditor",
+            ),
+            # a audit cannot have multiple certifying auditees
+            models.UniqueConstraint(
+                fields=["audit"],
+                condition=Q(role="certifying_auditee_contact"),
+                name="%(app_label)s_%(class)s_audit_single_certifying_auditee",
+            ),
+            # a audit cannot have multiple certifying auditors
+            models.UniqueConstraint(
+                fields=["audit"],
+                condition=Q(role="certifying_auditor_contact"),
+                name="%(app_label)s_%(class)s_audit_single_certifying_auditor",
             ),
         ]
 
@@ -158,6 +176,7 @@ def delete_access_and_create_record(
     removed_by_email = removing_user.email if removing_user else None
     deletion_record = DeletedAccess(
         sac=access.sac,
+        audit=access.audit,
         role=access.role,
         fullname=access.fullname,
         email=access.email,
@@ -168,4 +187,4 @@ def delete_access_and_create_record(
     )
     deletion_record.save()
     access_deletion_return = super(Access, access).delete()
-    return (access_deletion_return, deletion_record)
+    return access_deletion_return, deletion_record
