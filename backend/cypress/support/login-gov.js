@@ -9,6 +9,7 @@ export function testLoginGovLogin(
   cy.get('button.usa-button.sign-in-button')
     .should('contain.text', 'Authenticate with Login.gov')
     .click();
+
   cy.origin(
     'https://idp.int.identitysandbox.gov/',
     {
@@ -26,16 +27,27 @@ export function testLoginGovLogin(
         cy.get('input.one-time-code-input__input').type(token);
       });
       cy.get('lg-submit-button > .usa-button').click();
-      cy.url().then((url) => {
-        if (url.match(/\/login\/piv_cac_recommended$/)) {
-          // Handle the case where the page redirects to piv_cac_recommended
-          cy.get('button.usa-button.usa-button--unstyled[type="submit"]:contains("Skip")').click();
-        } else if (url.match(/\/sign_up\/completed$/)) {
-          // Login's additional data sharing consent
-          cy.get('button:contains("Agree and continue")').click();
-        }
+    });
+
+  // We can't wrap all of this in a cy.origin because it will error if it made
+  // it back to localhost already, which is the typical case
+  cy.url().then((url) => {
+      if (url.match(/\/login\/piv_cac_recommended$/)) {
+      // Handle the case where the page redirects to piv_cac_recommended
+      cy.origin(
+        'https://idp.int.identitysandbox.gov/',
+        () => {
+        cy.get('button.usa-button.usa-button--unstyled[type="submit"]:contains("Skip")').click();
+      });
+    } else if (url.match(/\/sign_up\/completed$/)) {
+      // Login's additional data sharing consent
+      cy.origin(
+        'https://idp.int.identitysandbox.gov/',
+        () => {
+        cy.get('button:contains("Agree and continue")').click();
       });
     }
-  );
+  });
+
   cy.url().should('match', /\/audit\/$/);
 };
