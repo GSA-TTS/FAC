@@ -34,16 +34,12 @@ export function testLoginGovLogin(
   cy.url().then((url) => {
     if (url.match(/\/login\/piv_cac_recommended$/)) {
       // Handle the case where the page redirects to piv_cac_recommended
-      cy.origin(
-        'https://idp.int.identitysandbox.gov/',
-        () => {
+      cy.origin('https://idp.int.identitysandbox.gov/', () => {
         cy.get('button.usa-button.usa-button--unstyled[type="submit"]:contains("Skip")').click();
       });
     } else if (url.match(/\/sign_up\/completed$/)) {
       // Login's additional data sharing consent
-      cy.origin(
-        'https://idp.int.identitysandbox.gov/',
-        () => {
+      cy.origin('https://idp.int.identitysandbox.gov/', () => {
         cy.get('button:contains("Agree and continue")').click();
       });
     }
