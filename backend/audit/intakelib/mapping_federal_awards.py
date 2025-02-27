@@ -83,6 +83,14 @@ def federal_awards_named_ranges(errors):
     )
 
 
+def federal_awards_audit_view(data):
+    awards = data.get("FederalAwards", {}).get("federal_awards", [])
+    total_expended = data.get("FederalAwards", {}).get("total_amount_expended", "")
+    return {
+        "federal_awards": {"awards": awards, "total_amount_expended": total_expended}
+    }
+
+
 def _set_pass_through_entity_name(obj, target, value):
     if value is None or value == "":
         pass
