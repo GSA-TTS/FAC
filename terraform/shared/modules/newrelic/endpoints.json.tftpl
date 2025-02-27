@@ -38,7 +38,7 @@
                 "accountIds": [
                   ${new_relic_account_id}
                 ],
-                "query": "FROM Transaction SELECT count(*) AS 'Transactions (last hour)' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 1 hour ago"
+                "query": "FROM Transaction SELECT count(*) AS 'Transactions (last hour)' WHERE (appName = 'gsa-fac-${env}') AND (request.method = '${endpoint.method}%' AND request.uri LIKE '${endpoint.uri}%') SINCE 1 hour ago"
               }
             ]
           }
@@ -70,7 +70,7 @@
                 "accountIds": [
                   ${new_relic_account_id}
                 ],
-                "query": "FROM Transaction SELECT rate(count(*), 1 hour) AS 'Transactions (per hour)' WHERE appName ='gsa-fac-${env}' AND request.uri LIKE '${endpoint.uri}%' SINCE 7 days ago"
+                "query": "FROM Transaction SELECT rate(count(*), 1 hour) AS 'Transactions (per hour)' WHERE appName ='gsa-fac-${env}' AND request.method = '${endpoint.method}' AND request.uri LIKE '${endpoint.uri}' SINCE 7 days ago"
               }
             ],
             "thresholds": [
@@ -122,7 +122,7 @@
             "nrqlQueries": [
               {
                 "accountId": ${new_relic_account_id},
-                "query": "FROM Transaction SELECT count(*) AS 'Transactions' WHERE appName = 'gsa-fac-${env}' and request.uri LIKE '${endpoint.uri}%' SINCE 14 days ago TIMESERIES"
+                "query": "FROM Transaction SELECT count(*) AS 'Transactions' WHERE appName = 'gsa-fac-${env}' AND request.method = '${endpoint.method}%' AND  request.uri LIKE '${endpoint.uri}%' SINCE 14 days ago TIMESERIES"
               }
             ]
           }
@@ -145,7 +145,7 @@
                 "accountIds": [
                   ${new_relic_account_id}
                 ],
-                "query": "FROM TransactionError SELECT count(*) AS 'Errors (last hour)' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 1 hour ago"
+                "query": "FROM TransactionError SELECT count(*) AS 'Errors (last hour)' WHERE (appName = 'gsa-fac-${env}') AND (request.method = '${endpoint.method}%' AND request.uri LIKE '${endpoint.uri}%') SINCE 1 hour ago"
               }
             ]
           }
@@ -176,7 +176,7 @@
                 "accountIds": [
                   ${new_relic_account_id}
                 ],
-                "query": "FROM Transaction SELECT 100 - percentage(count(*), WHERE error is true) AS 'Success Rate' WHERE appName ='gsa-fac-${env}' AND request.uri LIKE '${endpoint.uri}%' SINCE 7 days ago "
+                "query": "FROM Transaction SELECT 100 - percentage(count(*), WHERE error is true) AS 'Success Rate' WHERE appName ='gsa-fac-${env}' AND request.method = '${endpoint.method}%' AND request.uri LIKE '${endpoint.uri}%' SINCE 7 days ago "
               }
             ],
             "thresholds": [
@@ -228,7 +228,7 @@
             "nrqlQueries": [
               {
                 "accountId": ${new_relic_account_id},
-                "query": "FROM TransactionError SELECT count(*) AS 'Errors (last hour)' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 14 days ago TIMESERIES"
+                "query": "FROM TransactionError SELECT count(*) AS 'Errors (last hour)' WHERE (appName = 'gsa-fac-${env}') AND (request.method = '${endpoint.method}%' AND request.uri LIKE '${endpoint.uri}%') SINCE 14 days ago TIMESERIES"
               }
             ]
           }
@@ -268,7 +268,7 @@
                 "accountIds": [
                   ${new_relic_account_id}
                 ],
-                "query": "FROM Transaction SELECT average(convert(duration, 's', 'ms')) AS 'Average', percentile(convert(duration, 's', 'ms'), 50) AS 'p50', percentile(convert(duration, 's', 'ms'), 95) AS 'p95' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 1 hour ago"
+                "query": "FROM Transaction SELECT average(convert(duration, 's', 'ms')) AS 'Average', percentile(convert(duration, 's', 'ms'), 50) AS 'p50', percentile(convert(duration, 's', 'ms'), 95) AS 'p95' WHERE (appName = 'gsa-fac-${env}') AND (request.method = '${endpoint.method}%' AND request.uri LIKE '${endpoint.uri}%') SINCE 1 hour ago"
               }
             ],
             "platformOptions": {
@@ -302,7 +302,7 @@
                 "accountIds": [
                   ${new_relic_account_id}
                 ],
-                "query": "FROM Transaction SELECT average(convert(duration, 's', 'ms')) AS 'Average' WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 7 days ago "
+                "query": "FROM Transaction SELECT average(convert(duration, 's', 'ms')) AS 'Average' WHERE (appName = 'gsa-fac-${env}') AND (request.method = '${endpoint.method}%' AND request.uri LIKE '${endpoint.uri}%') SINCE 7 days ago "
               }
             ],
             "thresholds": [
@@ -362,7 +362,7 @@
                 "accountIds": [
                   ${new_relic_account_id}
                 ],
-                "query": "FROM Transaction SELECT average(convert(duration, 's', 'ms')) AS 'Average', percentile(convert(duration, 's', 'ms'), 50) AS 'p50', percentile(convert(duration, 's', 'ms'), 95) AS 'p95'  WHERE (appName = 'gsa-fac-${env}') AND (request.uri LIKE '${endpoint.uri}%') SINCE 14 days ago TIMESERIES"
+                "query": "FROM Transaction SELECT average(convert(duration, 's', 'ms')) AS 'Average', percentile(convert(duration, 's', 'ms'), 50) AS 'p50', percentile(convert(duration, 's', 'ms'), 95) AS 'p95'  WHERE (appName = 'gsa-fac-${env}') AND (request.method = '${endpoint.method}%' AND request.uri LIKE '${endpoint.uri}%') SINCE 14 days ago TIMESERIES"
               }
             ],
             "platformOptions": {
