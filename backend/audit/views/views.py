@@ -378,7 +378,7 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
                     context,
                 )
 
-        except Audit.DoesNotExist:
+        except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
 
