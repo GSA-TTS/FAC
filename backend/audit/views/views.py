@@ -223,11 +223,12 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             excel_file = self._create_excel_file(file, sac.id, form_section)
 
             auditee_uei = None
+            print("Sac", sac.audit["general_information"])
             if (
-                sac.general_information is not None
-                and "auditee_uei" in sac.general_information
+                sac.audit['general_information'] is not None
+                and "auditee_uei" in sac.audit['general_information']
             ):
-                auditee_uei = sac.general_information["auditee_uei"]
+                auditee_uei = sac.audit['general_information']["auditee_uei"]
             with set_sac_to_context(sac):
                 audit_data = self._extract_and_validate_data(
                     form_section, excel_file, auditee_uei
@@ -322,7 +323,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             errors = sac.validate_full()
 
