@@ -65,6 +65,11 @@ def extract_additional_ueis(file, is_gsa_migration=False, auditee_uei=None):
     return result
 
 
+def additional_ueis_audit_view(data):
+    ueis = data.get("AdditionalUEIs", {}).get("additional_ueis_entries", [])
+    return {"additional_ueis": [uei["additional_uei"] for uei in ueis]} if ueis else {}
+
+
 def additional_ueis_named_ranges(errors):
     return _extract_named_ranges(
         errors,
