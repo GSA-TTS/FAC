@@ -20,7 +20,7 @@ locals {
         latency_sla      = { critical = 1000, warning = 800 }    # Average Latency over a week, in ms
       },
       { name             = "Submit Audit"
-        uri              = "/audit/submission/%"                # '/audit/submission%' was also catching '/audit/submission-progress'
+        uri              = "/audit/submission/%" # '/audit/submission%' was also catching '/audit/submission-progress'
         method           = "POST"
         transactions_sla = { critical = 5, warning = 8 }        # Number of Transactions per hour
         success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
@@ -64,9 +64,9 @@ locals {
       { name             = "Single Summary Report Download"
         uri              = "/dissemination/summary-report/xlsx%"
         method           = "GET"
-        transactions_sla = { critical = 70, warning = 80 }       # Number of Transactions per hour
-        success_rate_sla = { critical = 0.99, warning = 0.995 }  # Success Rate Percentage
-        latency_sla      = { critical = 800, warning = 700 }     # Average Latency over a week, in ms
+        transactions_sla = { critical = 70, warning = 80 }      # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 800, warning = 700 }    # Average Latency over a week, in ms
       },
     ]
   })
