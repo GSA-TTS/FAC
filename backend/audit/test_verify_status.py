@@ -1,10 +1,11 @@
+from .decorators import verify_status
 from .models import (
     Access,
     SingleAuditChecklist,
     User,
 )
 from audit.models.models import STATUS
-from audit.views.views import verify_status
+
 
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase

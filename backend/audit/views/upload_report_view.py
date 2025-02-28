@@ -13,6 +13,7 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
     SubmissionEvent,
+    Audit,
 )
 from audit.forms import UploadReportForm
 
@@ -120,6 +121,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
+            # TODO: Will need to pull from the audit instead of sac.
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             form = UploadReportForm(request.POST, request.FILES)
 
@@ -144,6 +146,10 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     sar_file.save(
                         event_user=request.user,
                         event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+                    )
+
+                    self._save_audit(
+                        report_id=report_id, sar_file=sar_file, request=request
                     )
                 except ValidationError as err:
                     for issue in err.error_dict.get("file"):
@@ -207,3 +213,21 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         )
 
         return sar_file
+
+    @staticmethod
+    def _save_audit(report_id, sar_file, request):
+        # TODO: Update Post SOC Launch : Delete and move done for linting complexity
+        audit = Audit.objects.find_audit_or_none(report_id=report_id)
+        if audit:
+            audit.audit.update(
+                {
+                    "file_information": {
+                        "filename": sar_file.filename,
+                        "pages": sar_file.component_page_numbers,
+                    }
+                }
+            )
+            audit.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+            )

@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from collections import namedtuple as nt
 
 
 class STATUS:
@@ -37,3 +38,55 @@ AUDIT_TYPE_CODES = (
     (AuditType.SINGLE_AUDIT, _("Single Audit")),
     (AuditType.PROGRAM_SPECIFIC, _("Program-Specific Audit")),
 )
+
+
+class FindingsBitmask:
+    MODIFIED_OPINION = 1  # 0b0000001
+    OTHER_FINDINGS = 2  # 0b0000010
+    MATERIAL_WEAKNESS = 4  # 0b0000100
+    SIGNIFICANT_DEFICIENCY = 8  # 0b0001000
+    OTHER_MATTERS = 16  # 0b0010000
+    QUESTIONED_COSTS = 32  # 0b0100000
+    REPEAT_FINDING = 64  # 0b1000000
+    ALL = 127  # 0b1111111
+
+
+FindingsFieldBitmask = nt("FindingsFieldBitmask", ["field", "search_param", "mask"])
+FINDINGS_FIELD_TO_BITMASK = [
+    FindingsFieldBitmask(
+        field="modified_opinion",
+        search_param="is_modified_opinion",
+        mask=FindingsBitmask.MODIFIED_OPINION,
+    ),
+    FindingsFieldBitmask(
+        field="other_findings",
+        search_param="is_other_findings",
+        mask=FindingsBitmask.OTHER_FINDINGS,
+    ),
+    FindingsFieldBitmask(
+        field="material_weakness",
+        search_param="is_material_weakness",
+        mask=FindingsBitmask.MATERIAL_WEAKNESS,
+    ),
+    FindingsFieldBitmask(
+        field="significant_deficiency",
+        search_param="is_significant_deficiency",
+        mask=FindingsBitmask.SIGNIFICANT_DEFICIENCY,
+    ),
+    FindingsFieldBitmask(
+        field="other_matters",
+        search_param="is_other_matters",
+        mask=FindingsBitmask.OTHER_MATTERS,
+    ),
+    FindingsFieldBitmask(
+        field="questioned_costs",
+        search_param="is_questioned_costs",
+        mask=FindingsBitmask.QUESTIONED_COSTS,
+    ),
+    # This is a special case handled by dissemination, but works using this in search
+    FindingsFieldBitmask(
+        field="_blank_",
+        search_param="is_repeat_finding",
+        mask=FindingsBitmask.REPEAT_FINDING,
+    ),
+]
