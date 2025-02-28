@@ -9,6 +9,7 @@ module "sandbox" {
   login_secret_key        = var.login_secret_key
   branch_name             = var.branch_name
   backups_s3_id           = module.sandbox-backups-bucket.bucket_id
+  cf_space_id             = data.cloudfoundry_space.space.id
 
   database_plan         = "medium-gp-psql"
   https_proxy_instances = 1
@@ -20,11 +21,20 @@ module "sandbox" {
 }
 
 module "sandbox-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.1.0"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = "sandbox"
-  name          = "backups"
-  s3_plan_name  = "basic"
-  tags          = ["s3"]
+  cf_space_id  = data.cloudfoundry_space.space.id
+  name         = "backups"
+  s3_plan_name = "basic"
+  tags         = ["s3"]
+}
+
+# Stuff used for apps in this space
+data "cloudfoundry_org" "org" {
+  name = var.cf_org_name
+}
+
+data "cloudfoundry_space" "space" {
+  name = "sandbox"
+  org  = data.cloudfoundry_org.org.id
 }
