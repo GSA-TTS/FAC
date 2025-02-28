@@ -7,10 +7,7 @@ from django.urls import reverse
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import (
-    SingleAuditChecklist,
-    SubmissionEvent,
-)
+from audit.models import SingleAuditChecklist, SubmissionEvent, Audit
 from audit.forms import TribalAuditConsentForm
 from audit.validators import validate_tribal_data_consent_json
 
@@ -57,6 +54,18 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
                 )
                 logger.info("Tribal data consent saved.", tribal_data_consent)
+
+                # TODO: Update Post SOC Launch
+                # remove try/except once we are ready to deprecate SAC.
+                try:
+                    audit = Audit.objects.get(report_id=report_id)
+                    audit.audit.update({"tribal_data_consent": tribal_data_consent})
+                    audit.save(
+                        event_user=request.user,
+                        event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
+                    )
+                except Audit.DoesNotExist:
+                    pass
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
