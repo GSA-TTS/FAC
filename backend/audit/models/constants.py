@@ -28,12 +28,12 @@ STATUS_CHOICES = (
 )
 
 
-class AUDIT_TYPE:
+class AuditType:
     SINGLE_AUDIT = "single_audit"
     PROGRAM_SPECIFIC = "program_specific"
 
 
 AUDIT_TYPE_CODES = (
-    (AUDIT_TYPE.SINGLE_AUDIT, _("Single Audit")),
-    (AUDIT_TYPE.PROGRAM_SPECIFIC, _("Program-Specific Audit")),
+    (AuditType.SINGLE_AUDIT, _("Single Audit")),
+    (AuditType.PROGRAM_SPECIFIC, _("Program-Specific Audit")),
 )
