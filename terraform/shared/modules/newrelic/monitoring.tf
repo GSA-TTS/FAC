@@ -8,23 +8,16 @@ locals {
     latency_sla          = { critical = 1000, warning = 800 }    # Average Latency over a week, in ms
   })
 
-  endpoint_page = templatefile("${path.module}/endpoints.json.tftpl", {
+  healthcheck_pages = templatefile("${path.module}/widgets.json.tftpl", {
     env                  = var.cf_space_name
     new_relic_account_id = var.new_relic_account_id
-    endpoint_config = [
+    widgets_config = [
       { name             = "UEI Validation"
         uri              = "/api/sac/ueivalidation"
         method           = "POST"
         transactions_sla = { critical = 1, warning = 5 }         # Number of Transactions per hour
         success_rate_sla = { critical = 0.975, warning = 0.985 } # Success Rate Percentage
         latency_sla      = { critical = 1000, warning = 800 }    # Average Latency over a week, in ms
-      },
-      { name             = "Submit Audit"
-        uri              = "/audit/submission/%" # '/audit/submission%' was also catching '/audit/submission-progress'
-        method           = "POST"
-        transactions_sla = { critical = 5, warning = 8 }        # Number of Transactions per hour
-        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
-        latency_sla      = { critical = 1500, warning = 1200 }  # Average Latency over a week, in ms
       },
       { name             = "Homepage"
         uri              = "/"
@@ -40,7 +33,14 @@ locals {
         success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
         latency_sla      = { critical = 1500, warning = 1200 }  # Average Latency over a week, in ms
       },
-      { name             = "All Excel Uploads"
+    ]
+  })
+
+  file_uploads = templatefile("${path.module}/widgets.json.tftpl", {
+    env                  = var.cf_space_name
+    new_relic_account_id = var.new_relic_account_id
+    widgets_config = [
+      { name             = "Workbook Uploads"
         uri              = "/audit/excel/%"
         method           = "POST"
         transactions_sla = { critical = 20, warning = 25 }       # Number of Transactions per hour
@@ -54,13 +54,13 @@ locals {
         success_rate_sla = { critical = 0.99, warning = 0.995 }  # Success Rate Percentage
         latency_sla      = { critical = 15000, warning = 12000 } # Average Latency over a week, in ms
       },
-      { name             = "Cross Validation"
-        uri              = "/audit/cross-validation/%"
-        method           = "POST"
-        transactions_sla = { critical = 8, warning = 10 }       # Number of Transactions per hour
-        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
-        latency_sla      = { critical = 800, warning = 650 }    # Average Latency over a week, in ms
-      },
+    ]
+  })
+
+  file_downloads = templatefile("${path.module}/widgets.json.tftpl", {
+    env                  = var.cf_space_name
+    new_relic_account_id = var.new_relic_account_id
+    widgets_config = [
       { name             = "Single Summary Report Download"
         uri              = "/dissemination/summary-report/xlsx%"
         method           = "GET"
@@ -68,6 +68,34 @@ locals {
         success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
         latency_sla      = { critical = 800, warning = 700 }    # Average Latency over a week, in ms
       },
+      { name             = "Workbook Downloads"
+        uri              = "/audit/excel/%"
+        method           = "GET"
+        transactions_sla = { critical = 20, warning = 25 }       # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 }  # Success Rate Percentage
+        latency_sla      = { critical = 12000, warning = 10000 } # Average Latency over a week, in ms
+      },
+    ]
+  })
+
+  submission_pages = templatefile("${path.module}/widgets.json.tftpl", {
+    env                  = var.cf_space_name
+    new_relic_account_id = var.new_relic_account_id
+    widgets_config = [
+      { name             = "Cross Validation"
+        uri              = "/audit/cross-validation/%"
+        method           = "POST"
+        transactions_sla = { critical = 8, warning = 10 }       # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 800, warning = 650 }    # Average Latency over a week, in ms
+      },
+      { name             = "Submit Audit"
+        uri              = "/audit/submission/%" # '/audit/submission%' was also catching '/audit/submission-progress'
+        method           = "POST"
+        transactions_sla = { critical = 5, warning = 8 }        # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 1500, warning = 1200 }  # Average Latency over a week, in ms
+      }
     ]
   })
 }
@@ -75,7 +103,7 @@ locals {
 locals {
   template_renderer = templatefile("${path.module}/monitoring_dashboard.json.tftpl", {
     env   = var.cf_space_name
-    pages = [local.high_level_page, local.endpoint_page]
+    pages = [local.high_level_page, local.healthcheck_pages, local.file_uploads, local.file_downloads, local.submission_pages]
   })
 }
 
