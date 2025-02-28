@@ -211,34 +211,69 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         """
         try:
             report_id = kwargs["report_id"]
-
             form_section = kwargs["form_section"]
-
-            sac = Audit.objects.get(report_id=report_id)
-
             file = request.FILES["FILES"]
-
-            excel_file = self._create_excel_file(file, sac.id, form_section)
-
             auditee_uei = None
-            if (
-                sac.audit['general_information'] is not None
-                and "auditee_uei" in sac.audit['general_information']
-            ):
-                auditee_uei = sac.audit['general_information']["auditee_uei"]
-            with set_sac_to_context(sac):
-                audit_data = self._extract_and_validate_data(
-                    form_section, excel_file, auditee_uei
-                )
-                excel_file.save(
-                    event_user=request.user, event_type=self._event_type(form_section)
-                )
-                self._save_audit_data(sac, form_section, audit_data, request.user)
 
-                return redirect("/")
+            # TODO: 2/25 access audit
+            # When we are ready to transition SAC -> Audit:
+            # 1 - Remove this try block.
+            # 2 - Within the "Except" block, uncomment all relevant lines.
+            # 3 - Switch the SingleAuditChecklist.DoesNotExist -> Audit.DoesNotExist in the outer Except block.
+            try:
+                audit = Audit.objects.get(report_id=report_id)
 
-        except Audit.DoesNotExist as err:
-            logger.warning("no Audit found with report ID %s", report_id)
+                excel_file = self._create_excel_file(file, sac.id, form_section)
+
+                if (
+                    audit.audit['general_information'] is not None
+                    and "auditee_uei" in audit.audit['general_information']
+                ):
+                    auditee_uei = audit.audit.get('general_information', {}).get("auditee_uei", None)
+                with set_sac_to_context(sac):
+                    audit_data = self._extract_and_validate_data(
+                        form_section, excel_file, auditee_uei
+                    )
+                    excel_file.save(
+                        event_user=request.user, event_type=self._event_type(form_section)
+                    )
+                    self._save_audit_data(sac, form_section, audit_data, request.user)
+
+                    return redirect("/")
+
+            except Audit.DoesNotExist:
+
+                # TODO: 2/25 access audit
+                # uncomment the lines below when we switch SAC -> audit.
+
+                sac = SingleAuditChecklist.objects.get(report_id=report_id)
+                # audit = Audit.objects.get(report_id=report_id)
+
+                excel_file = self._create_excel_file(file, sac.id, form_section)
+
+                if (
+                    sac.general_information is not None
+                    and "auditee_uei" in sac.general_information
+                    # audit.audit['general_information'] is not None
+                    # and "auditee_uei" in audit.audit['general_information']
+                ):
+                    auditee_uei = sac.general_information["auditee_uei"]
+                    # auditee_uei = audit.audit.get('general_information', {}).get("auditee_uei", None)
+                with set_sac_to_context(sac):
+                    audit_data = self._extract_and_validate_data(
+                        form_section, excel_file, auditee_uei
+                    )
+                    excel_file.save(
+                        event_user=request.user, event_type=self._event_type(form_section)
+                    )
+                    self._save_audit_data(sac, form_section, audit_data, request.user)
+
+                    return redirect("/")
+
+        # TODO: 2/25 access audit
+        # Switch this model with "Audit" when we switch SAC -> audit.
+        except SingleAuditChecklist.DoesNotExist as err:
+            logger.warning("no SAC found with report ID %s", report_id)
             raise PermissionDenied() from err
         except ValidationError as err:
             # The good error, where bad rows/columns are sent back in the request.
