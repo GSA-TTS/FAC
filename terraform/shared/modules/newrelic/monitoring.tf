@@ -11,6 +11,7 @@ locals {
   healthcheck_pages = templatefile("${path.module}/widgets.json.tftpl", {
     env                  = var.cf_space_name
     new_relic_account_id = var.new_relic_account_id
+    page_name            = "Healthcheck"
     widgets_config = [
       { name             = "UEI Validation"
         uri              = "/api/sac/ueivalidation"
@@ -39,6 +40,7 @@ locals {
   file_uploads = templatefile("${path.module}/widgets.json.tftpl", {
     env                  = var.cf_space_name
     new_relic_account_id = var.new_relic_account_id
+    page_name            = "File Uploads"
     widgets_config = [
       { name             = "Workbook Uploads"
         uri              = "/audit/excel/%"
@@ -60,6 +62,7 @@ locals {
   file_downloads = templatefile("${path.module}/widgets.json.tftpl", {
     env                  = var.cf_space_name
     new_relic_account_id = var.new_relic_account_id
+    page_name            = "File Downloads"
     widgets_config = [
       { name             = "Single Summary Report Download"
         uri              = "/dissemination/summary-report/xlsx%"
@@ -81,6 +84,7 @@ locals {
   submission_pages = templatefile("${path.module}/widgets.json.tftpl", {
     env                  = var.cf_space_name
     new_relic_account_id = var.new_relic_account_id
+    page_name            = "Validation and Submission"
     widgets_config = [
       { name             = "Cross Validation"
         uri              = "/audit/cross-validation/%"
