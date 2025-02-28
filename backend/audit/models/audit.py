@@ -24,7 +24,7 @@ class AuditManager(models.Manager):
         end_date = obj_data["audit"]["general_information"]["auditee_fiscal_period_end"]
         report_id = (
             obj_data.pop("report_id")
-            if obj_data["report_id"]
+            if obj_data.get("report_id", None)
             else generate_sac_report_id(
                 count=self.model.objects.count(), end_date=end_date
             )
