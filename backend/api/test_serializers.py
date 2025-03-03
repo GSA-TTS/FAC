@@ -574,14 +574,48 @@ class AccessListSerializerTests(TestCase):
 
         serializer = AccessListSerializer(access)
 
-        self.assertEqual(serializer.data["auditee_uei"], access.sac.auditee_uei)
+        # TODO: Update Post SOC Launch
+        # remove if/else when we deprecate SAC data.
+        self.assertEqual(
+            serializer.data["auditee_uei"],
+            (
+                access.audit.audit.get("general_information", {}).get(
+                    "auditee_uei", None
+                )
+                if access.audit
+                else access.sac.auditee_uei
+            ),
+        )
         self.assertEqual(
             serializer.data["auditee_fiscal_period_end"],
-            access.sac.auditee_fiscal_period_end,
+            (
+                access.audit.audit.get("general_information", {}).get(
+                    "auditee_fiscal_period_end", None
+                )
+                if access.audit
+                else access.sac.auditee_fiscal_period_end
+            ),
         )
-        self.assertEqual(serializer.data["auditee_name"], access.sac.auditee_name)
-        self.assertEqual(serializer.data["report_id"], access.sac.report_id)
         self.assertEqual(
-            serializer.data["submission_status"], access.sac.submission_status
+            serializer.data["auditee_name"],
+            (
+                access.audit.audit.get("general_information", {}).get(
+                    "auditee_name", None
+                )
+                if access.audit
+                else access.sac.auditee_name
+            ),
+        )
+        self.assertEqual(
+            serializer.data["report_id"],
+            access.audit.report_id if access.audit else access.sac.report_id,
+        )
+        self.assertEqual(
+            serializer.data["submission_status"],
+            (
+                access.audit.submission_status
+                if access.audit
+                else access.sac.submission_status
+            ),
         )
         self.assertEqual(serializer.data["role"], access.role)
