@@ -14,6 +14,7 @@ from audit.models import (
     ACCESS_ROLES,
     Access,
     SingleAuditChecklist,
+    Audit,
 )
 
 logger = logging.getLogger(__name__)
@@ -23,8 +24,10 @@ def _get_friendly_role(role):
     return dict(ACCESS_ROLES)[role]
 
 
-def _create_and_save_access(sac, role, fullname, email):
-    Access.objects.create(sac=sac, role=role, fullname=fullname, email=email)
+def _create_and_save_access(sac, audit, role, fullname, email):
+    Access.objects.create(
+        sac=sac, audit=audit, role=role, fullname=fullname, email=email
+    )
 
 
 class ChangeAccessForm(forms.Form):
@@ -59,10 +62,14 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        # TODO: Update Post SOC Launch
+        # We will want to replace "sac" with "audit" once we are ready to deprecate SAC.
         context = self._get_user_role_management_context(sac)
 
         return render(request, self.template, context)
 
+    # TODO: Update Post SOC Launch
+    # We will want to replace "sac" with "audit" under this endpoint when we are ready to deprecate SAC.
     def post(self, request, *args, **kwargs):
         """
         Change the current auditor certifying official and redirect to submission
@@ -70,6 +77,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         """
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        audit = Audit.objects.find_audit_or_none(report_id=report_id)
         form = ChangeAccessForm(request.POST)
         context = self._get_user_role_management_context(sac)
 
@@ -95,7 +103,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         # If self.other_role is not set then we're adding an editor:
         if not self.other_role:
             return self._handle_add_editor(
-                request, url, sac, report_id, email, fullname
+                request, url, sac, audit, report_id, email, fullname
             )
 
         # We need the existing role assignment, if any, to delete it:
@@ -117,8 +125,16 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             context = {
                 "role": self.role,
                 "friendly_role": _get_friendly_role(self.role),
-                "auditee_uei": sac.general_information["auditee_uei"],
-                "auditee_name": sac.general_information.get("auditee_name"),
+                "auditee_uei": (
+                    audit.audit.get("general_information", {}).get("auditee_uei", None)
+                    if audit
+                    else sac.general_information["auditee_uei"]
+                ),
+                "auditee_name": (
+                    audit.audit.get("general_information", {}).get("auditee_name", None)
+                    if audit
+                    else sac.general_information.get("auditee_name")
+                ),
                 "certifier_name": access.fullname,
                 "email": access.email,
                 "report_id": report_id,
@@ -132,15 +148,17 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         if hasattr(access, "delete"):
             with transaction.atomic():
                 access.delete(removing_user=request.user, removal_event="access-change")
-                _create_and_save_access(sac, self.role, fullname, email)
+                _create_and_save_access(sac, audit, self.role, fullname, email)
         # We know that submissions can get into a bad state where no
         # certifying role(s) exist, so we should support cases where this
         # happens:
         else:
-            _create_and_save_access(sac, self.role, fullname, email)
+            _create_and_save_access(sac, audit, self.role, fullname, email)
 
         return redirect(url)
 
+    # TODO: Update Post SOC Launch
+    # We will want to replace "sac" with "audit" under this endpoint when we are ready to deprecate SAC.
     def _get_user_role_management_context(self, sac):
         context = {
             "role": self.role,
@@ -169,7 +187,9 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
         return context
 
-    def _handle_add_editor(self, request, url, sac, report_id, email, fullname):
+    # TODO: Update Post SOC Launch
+    # We will want to replace "sac" with "audit".
+    def _handle_add_editor(self, request, url, sac, audit, report_id, email, fullname):
         # Avoid editors with duplicate emails
         if Access.objects.filter(sac=sac, role=self.role, email=email).exists():
             context = {
@@ -187,7 +207,7 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
             return render(request, self.template, context, status=400)
         else:
-            _create_and_save_access(sac, self.role, fullname, email)
+            _create_and_save_access(sac, audit, self.role, fullname, email)
             return redirect(url)
 
 
@@ -199,6 +219,8 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     template = "audit/remove-editor-access.html"
     role = "editor"
 
+    # TODO: Update Post SOC Launch
+    # We will want to replace "sac" with "audit".
     def get(self, request, *args, **kwargs):
         """
         Show the current editor and the form.
@@ -233,6 +255,8 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
         return render(request, "audit/remove-editor-access.html", context)
 
+    # TODO: Update Post SOC Launch
+    # We will want to replace "sac" with "audit".
     def post(self, request, *args, **kwargs):
         """
         Remove the editor and redirect to manage submission.

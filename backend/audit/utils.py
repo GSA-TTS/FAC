@@ -13,6 +13,16 @@ from audit.intakelib import (
     extract_secondary_auditors,
     extract_notes_to_sefa,
 )
+from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
+from audit.intakelib.mapping_additional_ueis import additional_ueis_audit_view
+from audit.intakelib.mapping_audit_findings import findings_audit_view
+from audit.intakelib.mapping_audit_findings_text import audit_findings_text_audit_view
+from audit.intakelib.mapping_corrective_action_plan import (
+    corrective_action_plan_audit_view,
+)
+from audit.intakelib.mapping_federal_awards import federal_awards_audit_view
+from audit.intakelib.mapping_notes_to_sefa import notes_to_sefa_audit_view
+from audit.intakelib.mapping_secondary_auditors import secondary_auditors_audit_view
 from audit.validators import (
     validate_additional_ueis_json,
     validate_additional_eins_json,
@@ -102,40 +112,48 @@ FORM_SECTION_HANDLERS = {
         "extractor": extract_federal_awards,
         "field_name": "federal_awards",
         "validator": validate_federal_award_json,
+        "audit_object": federal_awards_audit_view,
     },
     FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: {
         "extractor": extract_corrective_action_plan,
         "field_name": "corrective_action_plan",
         "validator": validate_corrective_action_plan_json,
+        "audit_object": corrective_action_plan_audit_view,
     },
     FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: {
         "extractor": extract_audit_findings,
         "field_name": "findings_uniform_guidance",
         "validator": validate_findings_uniform_guidance_json,
+        "audit_object": findings_audit_view,
     },
     FORM_SECTIONS.FINDINGS_TEXT: {
         "extractor": extract_audit_findings_text,
         "field_name": "findings_text",
         "validator": validate_findings_text_json,
+        "audit_object": audit_findings_text_audit_view,
     },
     FORM_SECTIONS.ADDITIONAL_UEIS: {
         "extractor": extract_additional_ueis,
         "field_name": "additional_ueis",
         "validator": validate_additional_ueis_json,
+        "audit_object": additional_ueis_audit_view,
     },
     FORM_SECTIONS.ADDITIONAL_EINS: {
         "extractor": extract_additional_eins,
         "field_name": "additional_eins",
         "validator": validate_additional_eins_json,
+        "audit_object": additional_eins_audit_view,
     },
     FORM_SECTIONS.SECONDARY_AUDITORS: {
         "extractor": extract_secondary_auditors,
         "field_name": "secondary_auditors",
         "validator": validate_secondary_auditors_json,
+        "audit_object": secondary_auditors_audit_view,
     },
     FORM_SECTIONS.NOTES_TO_SEFA: {
         "extractor": extract_notes_to_sefa,
         "field_name": "notes_to_sefa",
         "validator": validate_notes_to_sefa_json,
+        "audit_object": notes_to_sefa_audit_view,
     },
 }

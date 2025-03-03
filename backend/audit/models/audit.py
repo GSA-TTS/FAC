@@ -57,6 +57,14 @@ class AuditManager(models.Manager):
         except self.model.DoesNotExist:
             return 0
 
+    # TODO: Update Post SOC Launch Delete
+    def find_audit_or_none(self, report_id):
+        """This is a temporary helper method to pass linting for too complex methods"""
+        try:
+            return self.get(report_id=report_id)
+        except Audit.DoesNotExist:
+            return None
+
 
 class Audit(CreatedMixin, UpdatedMixin):
     """
