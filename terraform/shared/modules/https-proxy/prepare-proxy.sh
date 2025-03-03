@@ -17,7 +17,7 @@ curl -s -L https://github.com/GSA-TTS/cg-egress-proxy/archive/${GITREF}.zip --ou
 
 # Zip up just the proxy/ subdirectory for pushing
 unzip -q -u local.zip \*/proxy/\*
-zip -q -j -r ${popdir}/proxy.zip cg-egress-proxy-*/proxy
+zip -q -j -r "${popdir}"/proxy.zip cg-egress-proxy-*/proxy
 
 # Tell Terraform where to find it
 cat << EOF
