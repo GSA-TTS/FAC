@@ -9,15 +9,27 @@ from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
 from audit.intakelib.mapping_additional_ueis import additional_ueis_audit_view
 from audit.intakelib.mapping_audit_findings import findings_audit_view
 from audit.intakelib.mapping_audit_findings_text import audit_findings_text_audit_view
-from audit.intakelib.mapping_corrective_action_plan import corrective_action_plan_audit_view
+from audit.intakelib.mapping_corrective_action_plan import (
+    corrective_action_plan_audit_view,
+)
 from audit.intakelib.mapping_federal_awards import federal_awards_audit_view
 from audit.intakelib.mapping_notes_to_sefa import notes_to_sefa_audit_view
 from audit.intakelib.mapping_secondary_auditors import secondary_auditors_audit_view
-from audit.models import Access, DeletedAccess, Audit, User, Schema, SingleAuditReportFile, SingleAuditChecklist
+from audit.models import (
+    Access,
+    DeletedAccess,
+    Audit,
+    User,
+    Schema,
+    SingleAuditReportFile,
+    SingleAuditChecklist,
+)
 from audit.models.constants import STATUS
+from audit.models.utils import generate_audit_indexes
 from audit.views.views import _index_awards, _index_findings, _index_general
 
 logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
 
@@ -25,7 +37,8 @@ class Command(BaseCommand):
         queryset = SingleAuditChecklist.objects.raw(
             "select * from audit_singleauditchecklist "
             "where migrated is false "
-            "order by id desc limit 50000")
+            "order by id desc limit 50000"
+        )
         paginator = Paginator(queryset, 100)  # 100 items per page
 
         for page_num in paginator.page_range:
@@ -36,20 +49,17 @@ class Command(BaseCommand):
                     self._migrate_sac(sac)
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            f"update audit_singleauditchecklist set migrated = true where report_id = '{sac.report_id}'")
+                            f"update audit_singleauditchecklist set migrated = true where report_id = '{sac.report_id}'"
+                        )
                 except Exception as e:
                     logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
                     raise e
-
-
 
     @staticmethod
     def _migrate_sac(sac: SingleAuditChecklist):
         audit_data = dict()
         for idx, handler in enumerate(SAC_HANDLERS):
             audit_data.update(handler(sac))
-
-        _convert_additional_fields(audit_data, sac)
 
         # update existing Audit.
         if Audit.objects.filter(report_id=sac.report_id).exists():
@@ -75,66 +85,32 @@ class Command(BaseCommand):
                 audit_type=sac.audit_type,
             )
 
+        audit = Audit.objects.get(report_id=sac.report_id)
+
         # update Access models.
-        _populate_accesses(sac.report_id)
+        Access.objects.filter(sac__report_id=sac.report_id).update(audit=audit)
+        DeletedAccess.objects.filter(sac__report_id=sac.report_id).update(audit=audit)
 
+        # convert additional fields.
+        audit.update(generate_audit_indexes(audit, sac))
 
-def _populate_accesses(report_id):
-    """ Provides each Access and DeletedAccess model with an audit (based on report_id). """
-    try:
-        audit = Audit.objects.get(report_id=report_id)
-        Access.objects.filter(sac__report_id=report_id).update(
-            audit=audit
-        )
-        DeletedAccess.objects.filter(sac__report_id=report_id).update(
-            audit=audit
-        )
-    except Audit.DoesNotExist:
-        logger.error(f"Unable to find an audit with report_id: {report_id}")
-
-
-# Copied from backend/audit/views/views.py:806
-def _convert_additional_fields(audit, sac):
-    general_information = audit.get("general_information", {})
-    split_date = general_information.get("auditee_fiscal_period_end").split("-")
-
-    audit_year = "1900"
-    fy_end_month = "01"
-    if len(split_date) == 3:
-        audit_year = split_date[0]
-        fy_end_month = split_date[1]
-
-    cognizant_agency = sac.cognizant_agency
-    oversight_agency = sac.oversight_agency
-
-    is_public = general_information.get("user_provided_organization_type", "") != "tribal" or \
-                audit.get("tribal_data_consent", {}).get("is_tribal_information_authorized_to_be_public", True)
-    awards_indexes = _index_awards(audit)
-    findings_indexes = _index_findings(audit)
-    general_indexes = _index_general(audit)
-
-    audit.update({
-        "audit_year": audit_year,
-        "cognizant_agency": cognizant_agency,
-        "oversight_agency": oversight_agency,
-        "fy_end_month": fy_end_month,
-        "is_public": is_public,
-
-        "search_indexes": {
-            **findings_indexes,
-            **awards_indexes,
-            **general_indexes
-        }})
 
 def _convert_file_information(sac: SingleAuditChecklist):
-    file = (SingleAuditReportFile.objects
-            .filter(filename=f"{sac.report_id}.pdf")
-            .order_by('date_created')
-            .first())
-    return {"file_information": {
-        "pages": file.component_page_numbers,
-        "filename": file.filename,
-    }} if file is not None else {}
+    file = (
+        SingleAuditReportFile.objects.filter(filename=f"{sac.report_id}.pdf")
+        .order_by("date_created")
+        .first()
+    )
+    return (
+        {
+            "file_information": {
+                "pages": file.component_page_numbers,
+                "filename": file.filename,
+            }
+        }
+        if file is not None
+        else {}
+    )
 
 
 def _convert_program_names(sac: SingleAuditChecklist):
@@ -148,6 +124,7 @@ def _convert_program_names(sac: SingleAuditChecklist):
 
     return {"program_names": program_names} if program_names else {}
 
+
 def _convert_month_year(sac: SingleAuditChecklist):
     fiscal_end = sac.general_information["auditee_fiscal_period_end"]
     # In some "in-progress" the fiscal end date is not yet set.
@@ -159,6 +136,7 @@ def _convert_month_year(sac: SingleAuditChecklist):
         "audit_year": audit_year,
         "fy_end_month": fy_end_month,
     }
+
 
 def _convert_passthrough(sac: SingleAuditChecklist):
     pass_objects = []
@@ -176,13 +154,16 @@ def _convert_passthrough(sac: SingleAuditChecklist):
 
     return {"passthrough": pass_objects} if pass_objects else {}
 
+
 def _convert_is_public(sac: SingleAuditChecklist):
     is_public = True
     if sac.general_information.get("user_provided_organization_type") == "tribal":
-        is_public = sac.tribal_data_consent and \
-                    sac.tribal_data_consent.get("is_tribal_information_authorized_to_be_public")
+        is_public = sac.tribal_data_consent and sac.tribal_data_consent.get(
+            "is_tribal_information_authorized_to_be_public"
+        )
 
     return {"is_public": is_public}
+
 
 def _convert_fac_accepted_date(sac: SingleAuditChecklist):
     date = None
@@ -191,6 +172,7 @@ def _convert_fac_accepted_date(sac: SingleAuditChecklist):
             date = sac.transition_date[i]
     submitted_date = _convert_utc_to_american_samoa_zone(date) if date else None
     return {"fac_accepted_date": submitted_date}
+
 
 # Taken from Intake to Dissemination... This could be moved to a utils class
 def _convert_utc_to_american_samoa_zone(date):
@@ -201,15 +183,38 @@ def _convert_utc_to_american_samoa_zone(date):
     formatted_date = american_samoa_time.strftime("%Y-%m-%d")
     return formatted_date
 
+
 SAC_HANDLERS = [
-    lambda sac: notes_to_sefa_audit_view(sac.notes_to_sefa) if sac.notes_to_sefa else {},
-    lambda sac: audit_findings_text_audit_view(sac.findings_text) if sac.findings_text else {},
-    lambda sac: additional_ueis_audit_view(sac.additional_ueis) if sac.additional_ueis else {},
-    lambda sac: additional_eins_audit_view(sac.additional_eins) if sac.additional_eins else {},
-    lambda sac: findings_audit_view(sac.findings_uniform_guidance) if sac.findings_uniform_guidance else {},
-    lambda sac: corrective_action_plan_audit_view(sac.corrective_action_plan) if sac.corrective_action_plan else {},
-    lambda sac: secondary_auditors_audit_view(sac.secondary_auditors) if sac.secondary_auditors else {},
-    lambda sac: federal_awards_audit_view(sac.federal_awards) if sac.federal_awards else {},
+    lambda sac: (
+        notes_to_sefa_audit_view(sac.notes_to_sefa) if sac.notes_to_sefa else {}
+    ),
+    lambda sac: (
+        audit_findings_text_audit_view(sac.findings_text) if sac.findings_text else {}
+    ),
+    lambda sac: (
+        additional_ueis_audit_view(sac.additional_ueis) if sac.additional_ueis else {}
+    ),
+    lambda sac: (
+        additional_eins_audit_view(sac.additional_eins) if sac.additional_eins else {}
+    ),
+    lambda sac: (
+        findings_audit_view(sac.findings_uniform_guidance)
+        if sac.findings_uniform_guidance
+        else {}
+    ),
+    lambda sac: (
+        corrective_action_plan_audit_view(sac.corrective_action_plan)
+        if sac.corrective_action_plan
+        else {}
+    ),
+    lambda sac: (
+        secondary_auditors_audit_view(sac.secondary_auditors)
+        if sac.secondary_auditors
+        else {}
+    ),
+    lambda sac: (
+        federal_awards_audit_view(sac.federal_awards) if sac.federal_awards else {}
+    ),
     lambda sac: {"audit_information": sac.audit_information or {}},
     lambda sac: {"general_information": sac.general_information or {}},
     lambda sac: {"auditee_certification": sac.auditee_certification or {}},
@@ -222,5 +227,5 @@ SAC_HANDLERS = [
     _convert_month_year,
     _convert_passthrough,
     _convert_is_public,
-    _convert_fac_accepted_date
+    _convert_fac_accepted_date,
 ]
