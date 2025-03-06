@@ -35,6 +35,7 @@ disable = [
 
 [tool.bandit]
 # TDB 2022-12-07 - test_schemas and test_validators use random number generation, which bandit doesn't like
+# TDB 2025-03-06 - migrate_audits uses string-based query construction, but it is for internal use only.
 exclude_dirs = [
     "audit/cross_validation/test_check_has_federal_awards.py",
     "audit/test_schemas.py",
@@ -42,6 +43,7 @@ exclude_dirs = [
     "node_modules",
     "dissemination/test_search.py",
     "dissemination/tests.py",
+    "dissemination/management/commands/migrate_audits.py",
     ".venv"
 ]
 
