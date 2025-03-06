@@ -4,9 +4,17 @@ DeletedAccess without running into circular import problems.
 """
 
 from django.utils.translation import gettext_lazy as _
+from collections import namedtuple as NT
+
+
+class AccessRole:
+    CERTIFYING_AUDITEE_CONTACT = "certifying_auditee_contact"
+    CERTIFYING_AUDITOR_CONTACT = "certifying_auditor_contact"
+    EDITOR = "editor"
+
 
 ACCESS_ROLES = (
-    ("certifying_auditee_contact", _("Auditee Certifying Official")),
-    ("certifying_auditor_contact", _("Auditor Certifying Official")),
-    ("editor", _("Audit Editor")),
+    (AccessRole.CERTIFYING_AUDITEE_CONTACT, _("Auditee Certifying Official")),
+    (AccessRole.CERTIFYING_AUDITOR_CONTACT, _("Auditor Certifying Official")),
+    (AccessRole.EDITOR, _("Audit Editor")),
 )
