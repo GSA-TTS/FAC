@@ -44,6 +44,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
+        # FOR DEBUGGING ONLY
+        # Removes all references to Audit data for testing a fresh migration.
+        from audit.models import SubmissionEvent, History
+
+        History.objects.filter(event="MIGRATION").delete()
+        Access.objects.all().exclude(audit=None).update(audit=None)
+        DeletedAccess.objects.all().exclude(audit=None).update(audit=None)
+        SubmissionEvent.objects.all().exclude(audit=None).update(audit=None)
+        SingleAuditChecklist.objects.filter(migrated_to_audit=True).update(
+            migrated_to_audit=False
+        )
+        Audit.objects.all().delete()
+
         # determine which SACs need to be retrieved.
         sac_status = ""
         if kwargs.get("disseminated"):
@@ -53,18 +66,23 @@ class Command(BaseCommand):
 
         # iterate through unmigrated SACs.
         queryset = _get_query(sac_status)
-        while queryset.count() != 0:
+        logger.info(
+            f"Found {len(list(queryset))} records for the first batch of migrations."
+        )
+        while len(list(queryset)) != 0:
             for sac in queryset:
                 try:
                     self._migrate_sac(sac)
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            f"update audit_singleauditchecklist set migrated = true where report_id = '{sac.report_id}'"
+                            f"update audit_singleauditchecklist set migrated_to_audit = true where report_id = '{sac.report_id}'"
                         )
                 except Exception as e:
                     logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
                     raise e
+            logger.info(f"Completed migration for {len(list(queryset))} SACs.")
             queryset = _get_query(sac_status)
+        logger.info("Completed audit migrations.")
 
     @staticmethod
     def _migrate_sac(sac: SingleAuditChecklist):
@@ -73,27 +91,33 @@ class Command(BaseCommand):
             audit_data.update(handler(sac))
 
         # create the audit.
-        audit = Audit.objects.create(
-            event_type="MIGRATION",
-            event_user=User.objects.get(email="jason.rothacker+fac@gsa.gov"),
-            audit=audit_data,
-            report_id=sac.report_id,
-            submission_status=sac.submission_status,
-            audit_type=sac.audit_type,
-        )
+        if not Audit.objects.filter(report_id=sac.report_id).exists():
+            audit = Audit.objects.create(
+                event_type="MIGRATION",
+                # FOR DEBUGGING
+                # Change the email to your local user (make sure you login once after app startup).
+                event_user=User.objects.get(email="robert.novak@gsa.gov"),
+                audit=audit_data,
+                report_id=sac.report_id,
+                submission_status=sac.submission_status,
+                audit_type=sac.audit_type,
+            )
 
-        # update Access models.
-        Access.objects.filter(sac__report_id=sac.report_id).update(audit=audit)
-        DeletedAccess.objects.filter(sac__report_id=sac.report_id).update(audit=audit)
+            # update Access models.
+            Access.objects.filter(sac__report_id=sac.report_id).update(audit=audit)
+            DeletedAccess.objects.filter(sac__report_id=sac.report_id).update(
+                audit=audit
+            )
 
-        # convert additional fields.
-        audit.update(generate_audit_indexes(audit, sac))
+            # convert additional fields.
+            audit.audit.update(generate_audit_indexes(audit, sac))
+            audit.save()
 
 
 def _get_query(status_condition):
     return SingleAuditChecklist.objects.raw(
         "select * from audit_singleauditchecklist "
-        f"where migrated is false {status_condition}"
+        f"where migrated_to_audit=false {status_condition}"
         "order by id desc limit 100"
     )
 
