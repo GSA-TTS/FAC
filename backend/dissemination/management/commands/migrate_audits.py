@@ -19,7 +19,6 @@ from audit.models import (
     DeletedAccess,
     Audit,
     User,
-    Schema,
     SingleAuditReportFile,
     SingleAuditChecklist,
 )
@@ -73,31 +72,15 @@ class Command(BaseCommand):
         for idx, handler in enumerate(SAC_HANDLERS):
             audit_data.update(handler(sac))
 
-        # update existing Audit.
-        if Audit.objects.filter(report_id=sac.report_id).exists():
-            Audit.objects.filter(report_id=sac.report_id).update(
-                event_type="MIGRATION",
-                event_user=User.objects.get(email="jason.rothacker+fac@gsa.gov"),
-                audit=audit_data,
-                report_id=sac.report_id,
-                schema=Schema.objects.get_current_schema(audit_type="MIGRATION"),
-                submission_status=sac.submission_status,
-                audit_type=sac.audit_type,
-            )
-
-        # create a new Audit.
-        else:
-            Audit.objects.create(
-                event_type="MIGRATION",
-                event_user=User.objects.get(email="jason.rothacker+fac@gsa.gov"),
-                audit=audit_data,
-                report_id=sac.report_id,
-                schema=Schema.objects.get_current_schema(audit_type="MIGRATION"),
-                submission_status=sac.submission_status,
-                audit_type=sac.audit_type,
-            )
-
-        audit = Audit.objects.get(report_id=sac.report_id)
+        # create the audit.
+        audit = Audit.objects.create(
+            event_type="MIGRATION",
+            event_user=User.objects.get(email="jason.rothacker+fac@gsa.gov"),
+            audit=audit_data,
+            report_id=sac.report_id,
+            submission_status=sac.submission_status,
+            audit_type=sac.audit_type,
+        )
 
         # update Access models.
         Access.objects.filter(sac__report_id=sac.report_id).update(audit=audit)
