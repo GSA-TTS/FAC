@@ -2,7 +2,6 @@ import logging
 
 import pytz
 from django.core.management.base import BaseCommand
-from django.core.paginator import Paginator
 from django.db import connection
 
 from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
@@ -26,25 +25,37 @@ from audit.models import (
 )
 from audit.models.constants import STATUS
 from audit.models.utils import generate_audit_indexes
-from audit.views.views import _index_awards, _index_findings, _index_general
 
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
 
-    def handle(self, *args, **kwargs):
-        queryset = SingleAuditChecklist.objects.raw(
-            "select * from audit_singleauditchecklist "
-            "where migrated is false "
-            "order by id desc limit 50000"
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--disseminated",
+            action="store_true",
+            help="Migrates the Audit model to disseminated records.",
         )
-        paginator = Paginator(queryset, 100)  # 100 items per page
+        parser.add_argument(
+            "--intake",
+            action="store_true",
+            help="Migrates the Audit model to in_progress records.",
+        )
 
-        for page_num in paginator.page_range:
-            logger.info("Processing page %s", page_num)
-            page = paginator.page(page_num)
-            for sac in page.object_list:
+    def handle(self, *args, **kwargs):
+
+        # determine which SACs need to be retrieved.
+        sac_status = ""
+        if kwargs.get("disseminated"):
+            sac_status = "and submission_status='disseminated'"
+        elif kwargs.get("intake"):
+            sac_status = "and submission_status<>'disseminated'"
+
+        # iterate through unmigrated SACs.
+        queryset = _get_query(sac_status)
+        while queryset.count() != 0:
+            for sac in queryset:
                 try:
                     self._migrate_sac(sac)
                     with connection.cursor() as cursor:
@@ -54,6 +65,7 @@ class Command(BaseCommand):
                 except Exception as e:
                     logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
                     raise e
+            queryset = _get_query(sac_status)
 
     @staticmethod
     def _migrate_sac(sac: SingleAuditChecklist):
@@ -93,6 +105,14 @@ class Command(BaseCommand):
 
         # convert additional fields.
         audit.update(generate_audit_indexes(audit, sac))
+
+
+def _get_query(status_condition):
+    return SingleAuditChecklist.objects.raw(
+        "select * from audit_singleauditchecklist "
+        f"where migrated is false {status_condition}"
+        "order by id desc limit 100"
+    )
 
 
 def _convert_file_information(sac: SingleAuditChecklist):
