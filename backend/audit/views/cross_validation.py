@@ -8,6 +8,7 @@ from audit.mixins import (
 )
 from audit.models import (
     SingleAuditChecklist,
+    Audit,
 )
 from audit.models.models import STATUS
 from audit.decorators import verify_status
@@ -17,9 +18,6 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )
 logger = logging.getLogger(__name__)
-
-
-# 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView
 
 
 class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
@@ -46,9 +44,11 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
+            audit = Audit.objects.find_audit_or_none(report_id=report_id)
             errors = sac.validate_full()
+            audit_errors = audit.validate() if audit else None
 
+            _compare_errors(errors, audit_errors)
             context = {"report_id": report_id, "errors": errors}
 
             return render(
@@ -57,3 +57,15 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
+
+
+# TODO: Post SOT Launch: Deletes
+def _compare_errors(sac_errors, audit_errors):
+    if (
+        (sac_errors and not audit_errors)
+        or (audit_errors and not sac_errors)
+        or (sac_errors) != set(audit_errors)
+    ):
+        logger.error(
+            f"<SOT ERROR> Cross Validation Errors do not match: SAC {sac_errors}, Audit {audit_errors}"
+        )

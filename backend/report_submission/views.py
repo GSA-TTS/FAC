@@ -12,11 +12,17 @@ from django.contrib import messages
 import api.views
 
 from audit.cross_validation import sac_validation_shape
+from audit.cross_validation.audit_validation_shape import audit_validation_shape
 from audit.cross_validation.naming import NC, SECTION_NAMES as SN
 from audit.cross_validation.submission_progress_check import section_completed_metadata
 
-from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent, \
-    Audit
+from audit.models import (
+    Access,
+    SingleAuditChecklist,
+    LateChangeError,
+    SubmissionEvent,
+    Audit,
+)
 from audit.validators import validate_general_information_json
 
 from audit.utils import Util
@@ -244,17 +250,8 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             )
 
             # Audit Path TODO: Clean-up post POC
-            # remove try/except once we are ready to deprecate SAC.
-            try:
-                audit = Audit.objects.get(report_id=report_id)
-                audit.audit_type = general_information.get("audit_type").replace("-","_")
-                audit.audit.update({"general_information": general_information})
-                audit.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
-                )
-            except Audit.DoesNotExist:
-                pass
+            _update_audit(report_id, general_information, request)
+
             return Util.validate_redirect_url(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
@@ -498,8 +495,18 @@ class UploadPageView(LoginRequiredMixin, View):
                     sac, additional_context[path_name]["DB_id"]
                 )
 
+                audit = Audit.objects.find_or_none(report_id=report_id)
                 shaped_sac = sac_validation_shape(sac)
+                shapped_audit = audit_validation_shape(audit)
+
+                _compare_shapes(shaped_sac, shapped_audit)
+
                 completed_metadata = section_completed_metadata(shaped_sac, path_name)
+                completed_audit_audit = section_completed_metadata(
+                    shaped_sac, path_name
+                )
+
+                _compare_completed_metadata(completed_metadata, completed_audit_audit)
 
                 context["last_uploaded_by"] = completed_metadata[0]
                 context["last_uploaded_at"] = completed_metadata[1]
@@ -643,3 +650,29 @@ class DeleteFileView(LoginRequiredMixin, View):
             logger.error(f"Unexpected error in DeleteFileView post: {str(e)}")
             messages.error(request, "An unexpected error occurred.")
             return Util.validate_redirect_url(redirect_uri)
+
+
+# TODO: Post SOT Launch -> Moved to pass linting
+def _update_audit(report_id, general_information, request):
+    audit = Audit.objects.find_audit_or_none(report_id=report_id)
+    if audit:
+        audit.audit_type = general_information.get("audit_type").replace("-", "_")
+        audit.audit.update({"general_information": general_information})
+        audit.save(
+            event_user=request.user,
+            event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+        )
+
+
+def _compare_shapes(sac_shape, audit_shape):
+    if sac_shape != audit_shape:
+        logger.error(
+            f"<SOT ERROR> SAC and Audit Shape do not match SAC: {sac_shape} Audit: {audit_shape}"
+        )
+
+
+def _compare_completed_metadata(sac_result, audit_result):
+    if sac_result != audit_result:
+        logger.error(
+            f"<SOT ERROR> SAC and Audit Results do not match SAC: {sac_result} Audit: {audit_result}"
+        )

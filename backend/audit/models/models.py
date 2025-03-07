@@ -445,7 +445,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     )
     migrated_to_audit = models.BooleanField(
         help_text="Determines whether SAC data has already been migrated to a corresponding Audit object",
-        default=False
+        default=False,
     )
 
     def validate_full(self):
