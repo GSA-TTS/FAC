@@ -80,7 +80,7 @@
                 </form>
             </div>
             <div class="grid-col audit-search-results">
-                <h1 class="font-sans-2xl">Audit Submissions Search </h1>
+                <h1 class="font-sans-2xl">Audit Submissions Search</h1>
                 {% if form.errors %}
                   {% include "search-alert-error.html" %}
                 {% elif results|length > 0 %}
@@ -124,21 +124,20 @@
                             <tbody>
                                 {% for result in results %}
                                     <tr>
-                                        <th scope="row" role="rowheader">{{ result.audit.general_information.auditee_name }}</th>
+                                        <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
                                         {% comment %} Display UEI. If it's "GSA_MIGRATION", use the EIN instead. If no EIN, just show "GSA_MIGRATION". {% endcomment %}
                                         <td>
-                                            {% if result.audit.general_information.auditee_uei != "GSA_MIGRATION" %}
-                                                {{ result.audit.general_information.auditee_uei }}
-                                            {% elif result.audit.general_information.auditee_ein %}
-                                                {{ result.audit.general_information.auditee_ein }}
+                                            {% if result.auditee_uei != "GSA_MIGRATION" %}
+                                                {{ result.auditee_uei }}
+                                            {% elif result.auditee_ein %}
+                                                {{ result.auditee_ein }}
                                             {% else %}
-                                                {{ result.audit.general_information.auditee_uei }}
+                                                {{ result.auditee_uei }}
                                             {% endif %}
                                         </td>
                                         {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
-                                        <td data-sort-value={{ result.audit.fac_accepted_date|date:"Ymd" }}>{{ result.audit.fac_accepted_date|parse_date|date:"Y-m-d" }}</td>
-                                        </td>
-                                        <td>{{ result.audit.audit_year }}</td>
+                                        <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}</td>
+                                        <td>{{ result.audit_year }}</td>
                                         <td>
                                             {% if result.audit.agency_name %}
                                                 {{ result.audit.agency_name|linebreaksbr  }}
@@ -159,8 +158,7 @@
                                             </a>
                                         </td>
                                         <td>
-                                            <!-- TODO: FIXME -->
-                                            {% if result.is_public or include_private or True %}
+                                            {% if result.is_public or include_private %}
                                                 <a class="usa-link display-flex flex-column flex-align-center"
                                                 href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
                                                 target="_blank">

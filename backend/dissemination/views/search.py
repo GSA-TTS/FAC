@@ -260,7 +260,7 @@ class AuditSearch(View):
 
         return render(
             request,
-            "search_audit.html",
+            "search-audit.html",
             {
                 "form": form,
                 "form_user_input": {"audit_year": default_checked_audit_years},
@@ -344,4 +344,4 @@ class AuditSearch(View):
         )
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
-        return render(request, "search.html", context | {"total_time_s": total_time_s})
+        return render(request, "search-audit.html", context | {"total_time_s": total_time_s})

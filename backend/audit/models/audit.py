@@ -255,6 +255,15 @@ class Audit(CreatedMixin, UpdatedMixin):
         output_field=ArrayField(models.CharField()),
         db_persist=True,
     )
+
+    auditee_name = GeneratedField(
+        expression=KeyTextTransform(
+            "auditee_name", KeyTextTransform("general_information", "audit")
+        ),
+        output_field=models.CharField(),
+        db_persist=True,
+    )
+
     objects = AuditManager()
 
     class Meta:
