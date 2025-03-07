@@ -15,7 +15,8 @@ from audit.cross_validation import sac_validation_shape
 from audit.cross_validation.naming import NC, SECTION_NAMES as SN
 from audit.cross_validation.submission_progress_check import section_completed_metadata
 
-from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
+from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent, \
+    Audit
 from audit.validators import validate_general_information_json
 
 from audit.utils import Util
@@ -242,6 +243,18 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
             )
 
+            # Audit Path TODO: Clean-up post POC
+            # remove try/except once we are ready to deprecate SAC.
+            try:
+                audit = Audit.objects.get(report_id=report_id)
+                audit.audit_type = general_information.get("audit_type").replace("-","_")
+                audit.audit.update({"general_information": general_information})
+                audit.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+                )
+            except Audit.DoesNotExist:
+                pass
             return Util.validate_redirect_url(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
