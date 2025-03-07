@@ -125,7 +125,11 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # TODO: Update Post SOC Launch
             # remove try/except once we are ready to deprecate SAC.
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
+            audit_errors = audit.validate() if audit else None
             errors = sac.validate_full()
+
+            _compare_errors(errors, audit_errors)
+
             if errors:
                 context = {"report_id": report_id, "errors": errors}
 
@@ -201,3 +205,11 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
 def _friendly_status(status):
     return dict(SingleAuditChecklist.STATUS_CHOICES)[status]
+
+
+# TODO: Post SOT Launch: Delete
+def _compare_errors(sac_errors, audit_errors):
+    if (sac_errors and audit_errors) and set(sac_errors) != set(audit_errors):
+        logger.error(
+            f"<SOT ERROR> Cross Validation Errors do not match: SAC {sac_errors}, Audit {audit_errors}"
+        )
