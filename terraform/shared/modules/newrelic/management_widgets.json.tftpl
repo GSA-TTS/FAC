@@ -160,7 +160,7 @@
                 "accountIds": [
                   ${new_relic_account_id}
                 ],
-                "query": "FROM Transaction SELECT count(*) AS 'Transactions (last hour)' WHERE (appName = 'gsa-fac-${env}') AND AND request.uri LIKE '${endpoint.uri}' SINCE 1 day ago"
+                "query": "FROM Transaction SELECT count(*) AS 'Transactions (last day)' WHERE (appName = 'gsa-fac-${env}') AND request.uri LIKE '${endpoint.uri}' SINCE 1 day ago"
               }
             ]
           }
