@@ -81,6 +81,65 @@ locals {
     ]
   })
 
+  submission_eligibility_forms = templatefile("${path.module}/widgets.json.tftpl", {
+    env                  = var.cf_space_name
+    new_relic_account_id = var.new_relic_account_id
+    page_name            = "Presubmission Eligibility"
+    widgets_config = [
+      { name             = "Eligibility (Step 1)"
+        uri              = "/report_submission/eligibility/"
+        method           = "POST"
+        transactions_sla = { critical = 10, warning = 15 }      # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 700, warning = 500 }    # Average Latency over a week, in ms
+      },
+      { name             = "Auditee Info (Step 2)"
+        uri              = "/report_submission/auditeeinfo/"
+        method           = "POST"
+        transactions_sla = { critical = 10, warning = 15 }      # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 1200, warning = 1000 }  # Average Latency over a week, in ms
+      },
+      { name             = "Submission Access (Step 3)"
+        uri              = "/report_submission/accessandsubmission/"
+        method           = "POST"
+        transactions_sla = { critical = 10, warning = 15 }      # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 1800, warning = 1500 }  # Average Latency over a week, in ms
+      },
+    ]
+  })
+
+  submission_information_forms = templatefile("${path.module}/widgets.json.tftpl", {
+    env                  = var.cf_space_name
+    new_relic_account_id = var.new_relic_account_id
+    page_name            = "Information Forms"
+    widgets_config = [
+      { name             = "Submit General Information"
+        uri              = "/report_submission/general-information/%"
+        method           = "POST"
+        transactions_sla = { critical = 20, warning = 40 }      # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 1000, warning = 750 }   # Average Latency over a week, in ms
+      },
+      { name             = "Submit Audit Information"
+        uri              = "/audit/audit-info/%"
+        method           = "POST"
+        transactions_sla = { critical = 15, warning = 30 }      # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 1000, warning = 750 }   # Average Latency over a week, in ms
+      },
+      # Super low traffic endpoint
+      { name             = "Submit Tribal Data Release"
+        uri              = "/audit/tribal-data-release/%"
+        method           = "POST"
+        transactions_sla = { critical = 1, warning = 3 }        # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 750, warning = 500 }    # Average Latency over a week, in ms
+      },
+    ]
+  })
+
   submission_pages = templatefile("${path.module}/widgets.json.tftpl", {
     env                  = var.cf_space_name
     new_relic_account_id = var.new_relic_account_id
@@ -149,7 +208,7 @@ locals {
 locals {
   template_renderer = templatefile("${path.module}/monitoring_dashboard.json.tftpl", {
     env   = var.cf_space_name
-    pages = [local.high_level_page, local.healthcheck_pages, local.file_uploads, local.file_downloads, local.submission_pages, local.management_pages]
+    pages = [local.high_level_page, local.healthcheck_pages, local.file_uploads, local.file_downloads, local.submission_eligibility_forms, local.submission_information_forms, local.submission_pages, local.management_pages]
   })
 }
 
