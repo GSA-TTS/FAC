@@ -93,6 +93,13 @@ locals {
         success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
         latency_sla      = { critical = 800, warning = 650 }    # Average Latency over a week, in ms
       },
+      { name             = "Unlock After Certification"
+        uri              = "/audit/unlock-after-certification/%"
+        method           = "POST"
+        transactions_sla = { critical = 3, warning = 5 }        # Number of Transactions per hour
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Success Rate Percentage
+        latency_sla      = { critical = 800, warning = 650 }    # Average Latency over a week, in ms
+      },
       { name             = "Submit Audit"
         uri              = "/audit/submission/%" # '/audit/submission%' was also catching '/audit/submission-progress'
         method           = "POST"
