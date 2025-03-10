@@ -102,12 +102,47 @@ locals {
       }
     ]
   })
+
+  # Management pages use the simplified "management_widgets.json.tftpl" due to their lower traffic.
+  management_pages = templatefile("${path.module}/management_widgets.json.tftpl", {
+    env                  = var.cf_space_name
+    new_relic_account_id = var.new_relic_account_id
+    page_name            = "Audit Management"
+    managment_uri        = "/audit/manage-submission%"
+    latency_sla          = { critical = 800, warning = 650 } # Target average latency over two weeks, in ms
+    widgets_config = [
+      { name             = "Remove In Progress Submission"
+        uri              = "/audit/manage-submission/remove-report/%"
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Target Success Rate Percentages
+      },
+      { name             = "Audit Management Homepage"
+        uri              = "/audit/manage-submission/20%"
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Target Success Rate Percentages
+      },
+      { name             = "Change Auditor Certifying Official"
+        uri              = "/audit/manage-submission/auditor-certifying-official/%"
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Target Success Rate Percentages
+      },
+      { name             = "Change Auditee Certifying Official"
+        uri              = "/audit/manage-submission/auditee-certifying-official/%"
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Target Success Rate Percentages
+      },
+      { name             = "Add Editor"
+        uri              = "/audit/manage-submission/add-editor/%"
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Target Success Rate Percentages
+      },
+      { name             = "Remove Editor"
+        uri              = "/audit/manage-submission/remove-editor/%"
+        success_rate_sla = { critical = 0.99, warning = 0.995 } # Target Success Rate Percentages
+      },
+    ]
+  })
 }
 
 locals {
   template_renderer = templatefile("${path.module}/monitoring_dashboard.json.tftpl", {
     env   = var.cf_space_name
-    pages = [local.high_level_page, local.healthcheck_pages, local.file_uploads, local.file_downloads, local.submission_pages]
+    pages = [local.high_level_page, local.healthcheck_pages, local.file_uploads, local.file_downloads, local.submission_pages, local.management_pages]
   })
 }
 
