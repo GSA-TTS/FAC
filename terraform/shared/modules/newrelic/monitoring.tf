@@ -115,7 +115,7 @@ locals {
     env                  = var.cf_space_name
     new_relic_account_id = var.new_relic_account_id
     page_name            = "Audit Management"
-    managment_uri        = "/audit/manage-submission%"
+    management_uri       = "/audit/manage-submission%"
     latency_sla          = { critical = 800, warning = 650 } # Target average latency over two weeks, in ms
     widgets_config = [
       { name             = "Remove In Progress Submission"
