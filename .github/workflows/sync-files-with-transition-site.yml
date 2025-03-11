@@ -1,7 +1,7 @@
-# Need to make sure FAC repo has GITHUB_TOKEN, also change paths out of my test repos
+# Need to make sure FAC repo has GITHUB_TOKEN
 # Need new "api" subfolder in asset folder of transition site
 
-name: Sync File Updates with FAC-Transition-Site
+name: Sync API File Updates with FAC-Transition-Site
 
 on:
   push:
@@ -30,17 +30,28 @@ jobs:
           cd FAC-transition-site
           git checkout -b update-watched-file || git checkout update-watched-file
 
-      - name: Copy updated file(s)
+      - name: Check for differences
+        id: check_diff
         run: |
+          set -e  # Exit immediately on error
           cp backend/dissemination/api_versions.py FAC-transition-site/assets/api/api_versions.py
+          
+          cd FAC-transition-site
+          
+          # Check if file has changed
+          if git diff --quiet assets/api/api_versions.py; then
+            echo "No changes detected. Exiting workflow."
+            exit 0
+          else
+            echo "File has changed. Proceeding with commit and PR."
+          fi
+
+      - name: Commit and Push Changes
+        run: |
           cd FAC-transition-site
           git add assets/api/api_versions.py
-          git commit -m "Sync api_versions.py from FAC" || echo "No changes to commit"
-
-      - name: Push changes
-        run: |
-          cd FAC-transition-site
-          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/GSA-TTS/FAC-transition-site.git update-watched-file || echo "No changes to push"
+          git commit -m "Sync api_versions.py from FAC" 
+          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/GSA-TTS/FAC-transition-site.git update-watched-file
 
       - name: Create or Update Pull Request in FAC-Transition-Site
         env:
