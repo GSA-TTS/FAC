@@ -1,7 +1,7 @@
 # Need to make sure FAC repo has GITHUB_TOKEN
 # Need new "api" subfolder in asset folder of transition site
 
-name: Sync API File Updates with FAC-Transition-Site
+name: Sync API File Updates with FAC-transition-site
 
 on:
   push:
@@ -30,14 +30,11 @@ jobs:
           cd FAC-transition-site
           git checkout -b update-watched-file || git checkout update-watched-file
 
-      - name: Check for differences
-        id: check_diff
+      - name: Copy updated file(s) and check for changes
         run: |
-          set -e  # Exit immediately on error
           cp backend/dissemination/api_versions.py FAC-transition-site/assets/api/api_versions.py
-          
           cd FAC-transition-site
-          
+
           # Check if file has changed
           if git diff --quiet assets/api/api_versions.py; then
             echo "No changes detected. Exiting workflow."
@@ -50,8 +47,8 @@ jobs:
         run: |
           cd FAC-transition-site
           git add assets/api/api_versions.py
-          git commit -m "Sync api_versions.py from FAC" 
-          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/GSA-TTS/FAC-transition-site.git update-watched-file
+          git commit -m "Sync api_versions.py from FAC"
+          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/GSA-TTS/FAC-transition-site.git update-watched-file || echo "No changes to push"
 
       - name: Create or Update Pull Request in FAC-Transition-Site
         env:
