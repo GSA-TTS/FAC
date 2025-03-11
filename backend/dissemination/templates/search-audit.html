@@ -80,6 +80,7 @@
             </div>
             <div class="grid-col audit-search-results">
                 <h1 class="font-sans-2xl">Audit Submissions Search</h1>
+                {% include "search-audit-alert-info.html" %}
                 {% if form.errors %}
                   {% include "search-alert-error.html" %}
                 {% elif results|length > 0 %}
