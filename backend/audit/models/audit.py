@@ -9,7 +9,7 @@ from django.db.models.functions import Cast
 from audit.cross_validation.naming import SECTION_NAMES
 from audit.cross_validation.audit_validation_shape import audit_validation_shape
 from audit.models import SingleAuditReportFile
-from audit.models.constants import AUDIT_TYPE_CODES, STATUS, STATUS_CHOICES
+from audit.models.constants import AUDIT_TYPE_CODES, STATUS, STATUS_CHOICES, EventType
 from audit.models.history import History
 from audit.models.mixins import CreatedMixin, UpdatedMixin
 from audit.models.utils import generate_sac_report_id, JsonArrayToTextArray
@@ -51,7 +51,7 @@ class AuditManager(models.Manager):
                 event=event_type,
                 report_id=report_id,
                 version=version,
-                audit=result.audit,
+                event_data=result.audit,
                 updated_by=user,
             )
             return result
@@ -117,7 +117,7 @@ class Audit(CreatedMixin, UpdatedMixin):
         expression=KeyTextTransform(
             "auditee_state", KeyTextTransform("general_information", "audit")
         ),
-        output_field=models.CharField(),  # TODO: Determine max_length
+        output_field=models.CharField(),
         db_persist=True,
     )
 
@@ -277,7 +277,7 @@ class Audit(CreatedMixin, UpdatedMixin):
     @property
     def submitted_by(self):
         history = (
-            History.objects.filter(report_id=self.report_id, event=STATUS.SUBMITTED)
+            History.objects.filter(report_id=self.report_id, event=EventType.SUBMITTED)
             .order_by("-updated_at")
             .first()
         )
@@ -314,7 +314,7 @@ class Audit(CreatedMixin, UpdatedMixin):
                     event=event_type,
                     report_id=report_id,
                     version=self.version,
-                    audit=self.audit,
+                    event_data=self.audit,
                     updated_by=self.updated_by,
                 )
             return super().save()

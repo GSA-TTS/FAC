@@ -146,9 +146,6 @@ def sac_transition(request, sac, **kwargs):
         return True
 
     elif target == STATUS.READY_FOR_CERTIFICATION:
-        logger.error(
-            f"JASON ReadyForCert ========> SAC: {sac.submission_status} Audit: {audit.submission_status}"
-        )
         flow.transition_to_ready_for_certification()
         sac.save(
             event_user=user,
