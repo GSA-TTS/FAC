@@ -44,32 +44,40 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
-        # FOR DEBUGGING ONLY
-        # Removes all references to Audit data for testing a fresh migration.
-        from audit.models import SubmissionEvent, History
+        BATCH_SIZE = 100
 
-        History.objects.filter(event="MIGRATION").delete()
-        Access.objects.all().exclude(audit=None).update(audit=None)
-        DeletedAccess.objects.all().exclude(audit=None).update(audit=None)
-        SubmissionEvent.objects.all().exclude(audit=None).update(audit=None)
-        SingleAuditChecklist.objects.filter(migrated_to_audit=True).update(
-            migrated_to_audit=False
-        )
-        Audit.objects.all().delete()
+        # # FOR DEBUGGING ONLY
+        # # Removes all references to Audit data for testing a fresh migration.
+        # # On large data sets, this block of logic may timeout.
+        # # You may want to run these queries directly in a local DB manager instead.
+        # from audit.models import SubmissionEvent, History
 
-        # determine which SACs need to be retrieved.
-        sac_status = ""
-        if kwargs.get("disseminated"):
-            sac_status = "and submission_status='disseminated'"
-        elif kwargs.get("intake"):
-            sac_status = "and submission_status<>'disseminated'"
+        # print("Clearing History...")
+        # History.objects.filter(event="MIGRATION").delete()
+        # print("Clearing Access...")
+        # Access.objects.all().exclude(audit=None).update(audit=None)
+        # print("Clearing DeletedAccess...")
+        # DeletedAccess.objects.all().exclude(audit=None).update(audit=None)
+        # print("Clearing SubmissionEvents...")
+        # SubmissionEvent.objects.all().exclude(audit=None).update(audit=None)
+        # print("Resetting SACs...")
+        # SingleAuditChecklist.objects.filter(migrated_to_audit=True).update(
+        #     migrated_to_audit=False
+        # )
+        # print("Clearing audits...")
+        # Audit.objects.all().delete()
 
         # iterate through unmigrated SACs.
-        queryset = _get_query(sac_status)
+        queryset = _get_query(kwargs, BATCH_SIZE)
+        total = _get_query(kwargs, None).count()
+        count = 0
         logger.info(
-            f"Found {len(list(queryset))} records for the first batch of migrations."
+            f"Found {total} records to parse through."
         )
-        while len(list(queryset)) != 0:
+        logger.info(
+            f"Selected {queryset.count()} records for the first batch of migrations."
+        )
+        while queryset.count() != 0:
             for sac in queryset:
                 try:
                     self._migrate_sac(sac)
@@ -77,11 +85,12 @@ class Command(BaseCommand):
                         cursor.execute(
                             f"update audit_singleauditchecklist set migrated_to_audit = true where report_id = '{sac.report_id}'"
                         )
+                    count += 1
                 except Exception as e:
                     logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
                     raise e
-            logger.info(f"Completed migration for {len(list(queryset))} SACs.")
-            queryset = _get_query(sac_status)
+            logger.info(f"Migration progress... ({count}/{total}) ({(count/total) * 100}%)")
+            queryset = _get_query(kwargs, BATCH_SIZE)
         logger.info("Completed audit migrations.")
 
     @staticmethod
@@ -114,12 +123,20 @@ class Command(BaseCommand):
             audit.save()
 
 
-def _get_query(status_condition):
-    return SingleAuditChecklist.objects.raw(
-        "select * from audit_singleauditchecklist "
-        f"where migrated_to_audit=false {status_condition}"
-        "order by id desc limit 100"
-    )
+def _get_query(kwargs, max_records):
+    """ Fetch unmigrated SACs, based on parameters. """
+    if kwargs.get("disseminated"):
+        queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False, submission_status="disseminated")
+    elif kwargs.get("intake"):
+        queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False).exclude(submission_status="disseminated")
+    else:
+        queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False)
+
+    # only return up to "max_records" if applied.
+    if max_records:
+        return queryset[:max_records]
+    else:
+        return queryset
 
 
 def _convert_file_information(sac: SingleAuditChecklist):
