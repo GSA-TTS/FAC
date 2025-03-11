@@ -952,7 +952,8 @@ class AccessListViewTests(TestCase):
         self.assertEqual(len(data_1), 2)
 
         # now delete one access_2
-        access_2.delete()
+        removing_user = baker.make(User)
+        access_2.delete(removing_user=removing_user)
 
         response_2 = self.client.get(ACCESS_LIST_PATH, format="json")
         data_2 = response_2.json()
