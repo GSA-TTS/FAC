@@ -69,10 +69,7 @@ def calc_base_year(audit_year):
     # For audit years 2029 through 2033, baseline year is 2029
     # For audit years 2034 through 2038, baseline year is 2034
     # and so on
-    # base_year = (
-    #     math.floor((int(audit_year) - FIRST_BASELINE_YEAR) / BASELINE_VALID_FOR_YEARS)
-    #     * BASELINE_VALID_FOR_YEARS
-    # ) + FIRST_BASELINE_YEAR
+
     base_year = (
         math.floor((audit_year - FIRST_BASELINE_YEAR) / BASELINE_VALID_FOR_YEARS)
         * BASELINE_VALID_FOR_YEARS
@@ -199,7 +196,6 @@ def get_base_audit(ein, uei, base_year):
     if len(audits) != 1:
         return (len(audits), 0, None)
     audit = audits[0]
-    # amt = BigIntegerField(audit.audit["federal_awards"]["total_amount_expended"])
     amt = audit.audit["federal_awards"]["total_amount_expended"]
     return (1, amt, audit.report_id)
 
@@ -226,7 +222,6 @@ def calc_cfda_amounts(cfdas):
     total_amount_agency = defaultdict(lambda: 0)
     total_da_amount_agency = defaultdict(lambda: 0)
     for cfda in cfdas:
-        # agency = cfda[0][:2]
         agency = cfda[0]
         amount = cfda[1] or 0
         direct = cfda[2]
