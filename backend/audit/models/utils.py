@@ -5,6 +5,8 @@ The intent of this file is to group together audit related helpers.
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Func
+from models.models import SingleAuditChecklist
+from models.audit import Audit
 
 from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
 
@@ -170,3 +172,109 @@ def _index_general(audit_data):
     return {
         "search_names": list(search_names),
     }
+
+
+# TESTING functions to check data in SAC and Audit
+def validate_audit_consistency(audit_instance):
+    """
+    Validates that all data in SingleAuditChecklist exists in Audit,
+    ignores strucutre and searches for keys/values. All values in SAC,
+    must exist in Audit.
+    """
+
+    sac = SingleAuditChecklist
+
+    try:
+        sac_instance = sac.objects.get(report_id=audit_instance.report_id)
+    except:
+        return False, [
+            {"error": f"No SAC found with report_id {audit_instance.report_id}"}
+        ]
+
+    difference = []
+
+    json_fields_to_check = [
+        "general_information",
+        "federal_awards",
+        "findings_text",
+        "findings_uniform_guidence",
+        "corrective_action_plan",
+        "additional_ueis",
+        "additional_eins",
+        "secondary_auditors",
+        "notes_to_sefa",
+        "audit_information",
+        "auditor_certification",
+        "auditee_certification",
+        "tribal_data_consent",
+    ]
+
+    simple_fields_to_check = [
+        "audit_type",
+        "data_source",
+        "cognizant_agency",
+        "oversight_agency",
+    ]
+
+    for field in simple_fields_to_check:
+        sac_value = getattr(sac_instance, field, None)
+        audit_value = getattr(audit_instance, field, None)
+
+        if sac_value and sac_value != audit_value:
+            difference.append(
+                {"field": field, "sac_value": sac_value, "audit_value": audit_value}
+            )
+
+    for field in json_fields_to_check:
+        sac_data = getattr(sac_instance, field, None)
+        if not sac_data:
+            continue
+
+        sac_values = flatten_json(sac_data)
+
+        flat_audit = flatten_json(audit_instance.audit)
+
+        for path, value in sac_values.items():
+            if not value_exists_in_audit(path, value, flat_audit):
+                difference.append(
+                    {
+                        "field": field,
+                        "path": path,
+                        "value": value,
+                        "error": f"Value from SAC.{field}.{path} no found in Audit",
+                    }
+                )
+    return len(difference) == 0, difference
+
+
+def flatten_json(obj, path="", result=None):
+    """Flatten a nested JSON into kv pair with path"""
+    if result is None:
+        result = {}
+
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            new_path = f"{path}.{key}" if path else key
+            flatten_json(value, new_path, result)
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            new_path = f"{path}[{i}]"
+            flatten_json(item, new_path, result)
+    else:
+        # if obj not in [None, "", []]:
+        result[path] = obj
+
+
+def value_exists_in_audit(path, value, audit_data):
+    """Check if a value from SAC exists somewhere in audit data with the same key-value"""
+    field_name = path.split(".")[-1] if "." in path else path
+    field_name = field_name.split("[")[0] if "[" in field_name else field_name
+
+    for audit_path, audit_value in audit_data.items():
+        audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
+        audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
+
+        if field_name == audit_field and value == audit_value:
+            return True
+
+    return False

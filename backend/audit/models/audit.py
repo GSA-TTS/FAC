@@ -8,7 +8,16 @@ from django.db.models.functions import Cast
 from audit.models.constants import AUDIT_TYPE_CODES, STATUS, STATUS_CHOICES
 from audit.models.history import History
 from audit.models.mixins import CreatedMixin, UpdatedMixin
-from audit.models.utils import generate_sac_report_id, JsonArrayToTextArray
+from audit.models.utils import (
+    generate_sac_report_id,
+    JsonArrayToTextArray,
+    validate_audit_consistency,
+)
+
+# TESTING
+import logging
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -282,6 +291,13 @@ class Audit(CreatedMixin, UpdatedMixin):
                 raise Exception(
                     f"Version Mismatch: Expected {previous_version} Got {current_version}"
                 )  # TODO
+
+            # TESTING: During save of audit, check for matching data in SAC
+            is_consistent, discrepancies = validate_audit_consistency(self)
+            if not is_consistent:
+                logger.warning(
+                    f"Inconsistencies found between models for {report_id}: {discrepancies}"
+                )
 
             if event_type and event_user:
                 History.objects.create(
