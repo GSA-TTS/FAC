@@ -5,7 +5,7 @@ module "production" {
   new_relic_account_id  = var.new_relic_account_id
   new_relic_api_key     = var.new_relic_api_key
   pgrst_jwt_secret      = var.pgrst_jwt_secret
-  clamav_instances      = 4
+  clamav_instances      = 3
   clamav_fs_instances   = 1
   database_plan         = "xlarge-gp-psql-redundant"
   postgrest_instances   = 4
