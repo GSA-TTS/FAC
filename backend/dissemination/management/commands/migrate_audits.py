@@ -1,3 +1,20 @@
+# README
+
+# When testing this script, make sure you proceed through the following:
+# 1. Make sure you import the public prod data dump from the drive into your local DB.
+# 2. If you have already migrated some audits and want to reset to a clean slate,
+#    run these SQL queries in order:
+#    - DELETE FROM public.audit_history WHERE event='MIGRATION';
+#    - UPDATE public.audit_access SET audit_id=null;
+#    - UPDATE public.audit_deletedaccess SET audit_id=null;
+#    - UPDATE public.audit_submissionevent SET audit_id=null;
+#    - UPDATE public.audit_singleauditchecklist SET migrated_to_audit=false;
+#    - DELETE FROM public.audit_audit;
+# 3. Run the command in a separate shell from the app.
+#    - If you want to ONLY target disseminated records, pass the parameter "--disseminated".
+#    - If you want to ONLY target intake records, pass the parameter "--intake".
+#    - If you want to target ALL records, leave out the parameters.
+
 import logging
 
 import pytz
