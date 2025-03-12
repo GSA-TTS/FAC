@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 
-from .models import Access, SingleAuditChecklist, Audit, ACCESS_ROLES
+from .models import Access, SingleAuditChecklist, Audit
 from .models.access_roles import AccessRole
 
 User = get_user_model()
