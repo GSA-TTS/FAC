@@ -43,9 +43,12 @@ class JsonArrayToTextArray(Func):
 #    1) We'll want to calculate the cog/oversite for the audit same way as sac, for now just use the sac one
 def generate_audit_indexes(audit, sac):
     general_information = audit.audit.get("general_information", {})
-    audit_year, fy_end_month, _ = general_information.get(
-        "auditee_fiscal_period_end", "1900-01-01"
-    ).split("-")
+
+    fiscal_period_end = general_information.get("auditee_fiscal_period_end", None)
+    if fiscal_period_end:
+        audit_year, fy_end_month, _ = fiscal_period_end.split("-")
+    else: 
+        audit_year, fy_end_month, _ = "1900-01-01".split("-")
 
     cognizant_agency = sac.cognizant_agency
     oversight_agency = sac.oversight_agency

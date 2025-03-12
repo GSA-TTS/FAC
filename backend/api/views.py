@@ -127,6 +127,9 @@ def access_and_submission_check(user, data):
             general_information=all_steps_user_form_data,
             event_user=user,
             event_type=SubmissionEvent.EventType.CREATED,
+            # TODO: Update Post SOC Launch
+            # migrated_to_audit should be true IF AND ONLY IF the Audit is being generated alongside the checklist.
+            migrated_to_audit=True,
         )
 
         # TODO: Update Post SOC Launch
