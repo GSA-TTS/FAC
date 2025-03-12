@@ -71,9 +71,7 @@ class Command(BaseCommand):
         queryset = _get_query(kwargs, BATCH_SIZE)
         total = _get_query(kwargs, None).count()
         count = 0
-        logger.info(
-            f"Found {total} records to parse through."
-        )
+        logger.info(f"Found {total} records to parse through.")
         logger.info(
             f"Selected {queryset.count()} records for the first batch of migrations."
         )
@@ -89,7 +87,9 @@ class Command(BaseCommand):
                 except Exception as e:
                     logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
                     raise e
-            logger.info(f"Migration progress... ({count}/{total}) ({(count/total) * 100}%)")
+            logger.info(
+                f"Migration progress... ({count}/{total}) ({(count/total) * 100}%)"
+            )
             queryset = _get_query(kwargs, BATCH_SIZE)
         logger.info("Completed audit migrations.")
 
@@ -124,11 +124,15 @@ class Command(BaseCommand):
 
 
 def _get_query(kwargs, max_records):
-    """ Fetch unmigrated SACs, based on parameters. """
+    """Fetch unmigrated SACs, based on parameters."""
     if kwargs.get("disseminated"):
-        queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False, submission_status="disseminated")
+        queryset = SingleAuditChecklist.objects.filter(
+            migrated_to_audit=False, submission_status="disseminated"
+        )
     elif kwargs.get("intake"):
-        queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False).exclude(submission_status="disseminated")
+        queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False).exclude(
+            submission_status="disseminated"
+        )
     else:
         queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False)
 

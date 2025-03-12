@@ -4,7 +4,6 @@ DeletedAccess without running into circular import problems.
 """
 
 from django.utils.translation import gettext_lazy as _
-from collections import namedtuple as NT
 
 
 class AccessRole:

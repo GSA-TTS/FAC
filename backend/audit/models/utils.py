@@ -47,7 +47,7 @@ def generate_audit_indexes(audit, sac):
     fiscal_period_end = general_information.get("auditee_fiscal_period_end", None)
     if fiscal_period_end:
         audit_year, fy_end_month, _ = fiscal_period_end.split("-")
-    else: 
+    else:
         audit_year, fy_end_month, _ = "1900-01-01".split("-")
 
     cognizant_agency = sac.cognizant_agency
