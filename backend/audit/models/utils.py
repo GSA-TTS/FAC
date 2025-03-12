@@ -5,8 +5,7 @@ The intent of this file is to group together audit related helpers.
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Func
-from models.models import SingleAuditChecklist
-from models.audit import Audit
+from audit.models import SingleAuditChecklist
 
 from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
 
@@ -227,23 +226,41 @@ def validate_audit_consistency(audit_instance):
 
     for field in json_fields_to_check:
         sac_data = getattr(sac_instance, field, None)
-        if not sac_data:
+        audit_field_data = audit_instance.audit.get(field)
+
+        if sac_data is not None and audit_field_data is None:
+            difference.append({
+                "field": field,
+                "error": f"Field is empty in Audit, but not in SAC",
+                "sac_value": sac_data,
+                "audit_value": None
+            })
             continue
 
-        sac_values = flatten_json(sac_data)
+        if sac_data is None and audit_field_data is not None:
+            difference.append({
+                "field": field,
+                "error": f"Field is empty in SAC, but not in Audit",
+                "sac_value": None,
+                "audit_value": audit_field_data
+            })
+            continue
 
-        flat_audit = flatten_json(audit_instance.audit)
+        if sac_data is not None:
 
-        for path, value in sac_values.items():
-            if not value_exists_in_audit(path, value, flat_audit):
-                difference.append(
-                    {
-                        "field": field,
-                        "path": path,
-                        "value": value,
-                        "error": f"Value from SAC.{field}.{path} no found in Audit",
-                    }
-                )
+            sac_values = flatten_json(sac_data)
+            flat_audit = flatten_json(audit_instance.audit)
+
+            for path, value in sac_values.items():
+                if not value_exists_in_audit(path, value, flat_audit):
+                    difference.append(
+                        {
+                            "field": field,
+                            "path": path,
+                            "value": value,
+                            "error": f"Value from SAC.{field}.{path} not found in Audit",
+                        }
+                    )
     return len(difference) == 0, difference
 
 
@@ -263,6 +280,8 @@ def flatten_json(obj, path="", result=None):
     else:
         # if obj not in [None, "", []]:
         result[path] = obj
+
+    return result
 
 
 def value_exists_in_audit(path, value, audit_data):
