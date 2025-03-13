@@ -3,10 +3,12 @@ from django.db.models import Q
 
 
 from audit.models import User
-from audit.models.audit import Audit
+
+# from audit.models.audit import Audit
 from audit.models.models import STATUS
 from support.models import CognizantAssignment
 from support.cog_over_w_audit import _get_cog_over
+from django.apps import apps
 
 from config.settings import ENVIRONMENT
 
@@ -14,7 +16,7 @@ from config.settings import ENVIRONMENT
 class Command(BaseCommand):
     help = """
     Analyze cog/over for 2022 / 2023 / 2024 submissions in LOCAL environment only.
-    Beware! Deletes any existing rows in Audit
+    Uses existing rows in Audit
     """
 
     def add_arguments(self, parser):
@@ -37,25 +39,17 @@ class Command(BaseCommand):
             return
 
         initialize_db()
-        audits = Audit.objects().filter(Q(audit_year=year))
+        audit_model = apps.get_model("audit.Audit")
+        audits = audit_model.objects.filter(Q(audit_year=year))
         print(f"Count of {year} submissions: {len(audits)}")
         processed = cog_mismatches = over_mismatches = 0
 
         for audit in audits:
             audit.submission_status = STATUS.SUBMITTED
             audit.save()
-            # current_cog = audit.cognizant_agency
-            # current_over = audit.oversight_agency
+
             cognizant_agency, oversight_agency = _get_cog_over(audit)
-            # if not audit.cognizant_agency and not audit.oversight_agency:
-            #     audit.assign_cog_over()
-            # cog_agency, over_agency = compute_cog_over(
-            #     audit.audit["federal_awards"],
-            #     audit.submission_status,
-            #     audit.auditee_ein,
-            #     audit.auditee_uei,
-            #     audit.audit_year,
-            # )
+
             processed += 1
             if audit.cognizant_agency == "":
                 audit.cognizant_agency = None
@@ -110,7 +104,6 @@ def initialize_db():
     """
     This will delete existing data, and should only be run in a local env
     """
-    # Audit.objects.all().delete()
     CognizantAssignment.objects.all().delete()
     User.objects.get_or_create(
         username="foo",
