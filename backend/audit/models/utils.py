@@ -9,6 +9,7 @@ from audit.models import SingleAuditChecklist
 
 from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
 
+import json
 
 def generate_sac_report_id(count, end_date, source="GSAFAC"):
     """
@@ -289,11 +290,57 @@ def value_exists_in_audit(path, value, audit_data):
     field_name = path.split(".")[-1] if "." in path else path
     field_name = field_name.split("[")[0] if "[" in field_name else field_name
 
+    norm_field = normalize_key(field_name)
+
     for audit_path, audit_value in audit_data.items():
         audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
         audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
 
-        if field_name == audit_field and value == audit_value:
+        norm_audit_field = normalize_key(audit_field)
+
+        if norm_field == norm_audit_field and (value == audit_value or get_other_formats(value, audit_value)):
             return True
+    
+    return False
+
+        # if field_name == audit_field and (value == audit_value or audit_value in value_formats):
+        #     return True
+
+def normalize_key(key):
+    """Normalize the keys for comparison"""
+    if not isinstance(key, str):
+        return key
+    
+    normalized = key.replace("-", "_")
+    return normalized.lower()
+
+def get_other_formats(value1, value2):
+    """Generate other format types for obj, str, list, dict"""
+    if value1 == value2:
+        return True
+    
+    if str(value1) == str(value2):
+        return True
+    
+    if isinstance(value1, dict) and isinstance(value2, str):
+        try:
+            parsed = json.loads(value2)
+            return value1 == parsed
+        except:
+            pass
+    
+    if isinstance(value1, list) and isinstance(value2, str):
+        try:
+            parsed = json.loads(value1)
+            return value2 == parsed
+        except:
+            pass
+
+    if isinstance(value2, list) and isinstance(value1, str):
+        try:
+            parsed = json.loads(value1)
+            return value2 == parsed
+        except:
+            pass
 
     return False
