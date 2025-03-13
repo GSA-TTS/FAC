@@ -64,6 +64,7 @@ class Command(BaseCommand):
                 )
                 self.show_mismatch(audit)
             if oversight_agency != audit.oversight_agency:
+                self.show_mismatch(audit)
                 over_mismatches += 1
                 print(
                     f"Oversight mismatch. Calculated {oversight_agency} Expected {audit.oversight_agency}"
