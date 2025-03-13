@@ -344,4 +344,6 @@ class AuditSearch(View):
         )
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
-        return render(request, "search-audit.html", context | {"total_time_s": total_time_s})
+        return render(
+            request, "search-audit.html", context | {"total_time_s": total_time_s}
+        )
