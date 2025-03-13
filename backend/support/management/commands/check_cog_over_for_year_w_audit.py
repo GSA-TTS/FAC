@@ -6,6 +6,7 @@ from audit.models import User
 from audit.models.audit import Audit
 from audit.models.models import STATUS
 from support.models import CognizantAssignment
+from support.cog_over_w_audit import _get_cog_over
 
 from config.settings import ENVIRONMENT
 
@@ -43,29 +44,33 @@ class Command(BaseCommand):
         for audit in audits:
             audit.submission_status = STATUS.SUBMITTED
             audit.save()
-            if not audit.cognizant_agency and not audit.oversight_agency:
-                cog_agency, over_agency = compute_cog_over(
-                    audit.audit["federal_awards"],
-                    audit.submission_status,
-                    audit.auditee_ein,
-                    audit.auditee_uei,
-                    audit.audit_year,
-                )
+            # current_cog = audit.cognizant_agency
+            # current_over = audit.oversight_agency
+            cognizant_agency, oversight_agency = _get_cog_over(audit)
+            # if not audit.cognizant_agency and not audit.oversight_agency:
+            #     audit.assign_cog_over()
+            # cog_agency, over_agency = compute_cog_over(
+            #     audit.audit["federal_awards"],
+            #     audit.submission_status,
+            #     audit.auditee_ein,
+            #     audit.auditee_uei,
+            #     audit.audit_year,
+            # )
             processed += 1
             if audit.cognizant_agency == "":
                 audit.cognizant_agency = None
             if audit.oversight_agency == "":
                 audit.oversight_agency = None
-            if cog_agency != audit.cognizant_agency:
+            if cognizant_agency != audit.cognizant_agency:
                 cog_mismatches += 1
                 print(
-                    f"Cog mismatch. Calculated {cog_agency} Expected {audit.cognizant_agency}"
+                    f"Cog mismatch. Calculated {cognizant_agency} Expected {audit.cognizant_agency}"
                 )
-                self.show_mismatch(sac)
-            if over_agency != audit.oversight_agency:
+                self.show_mismatch(audit)
+            if oversight_agency != audit.oversight_agency:
                 over_mismatches += 1
                 print(
-                    f"Oversight mismatch. Calculated {over_agency} Expected {audit.oversight_agency}"
+                    f"Oversight mismatch. Calculated {oversight_agency} Expected {audit.oversight_agency}"
                 )
                 self.show_mismatch(audit)
             if processed % 1000 == 0:
@@ -88,9 +93,9 @@ class Command(BaseCommand):
             audit.auditee_uei,
             audit.cognizant_agency,
             audit.oversight_agency,
-            audit.audit.federal_awards["total_amount_expended"],
+            audit.audit["federal_awards"]["total_amount_expended"],
         )
-        for award in audit.audit.federal_awards["awards"]:
+        for award in audit.audit["federal_awards"]["awards"]:
             print(
                 "Award:",
                 award["award_reference"],
@@ -105,7 +110,7 @@ def initialize_db():
     """
     This will delete existing data, and should only be run in a local env
     """
-    Audit.objects.all().delete()
+    # Audit.objects.all().delete()
     CognizantAssignment.objects.all().delete()
     User.objects.get_or_create(
         username="foo",

@@ -7,7 +7,7 @@ from django.db.models import BigIntegerField, Q
 
 from support.models import CognizantAssignment
 from dissemination.models import MigrationInspectionRecord
-from audit.models.audit import Audit
+from django.apps import apps
 
 logger = logging.getLogger(__name__)
 
@@ -131,13 +131,14 @@ def determine_hist_agency(ein, uei, audit_year):
 
 
 def get_dbkey(ein, uei):
+    audit_model = apps.get_model("audit.Audit")
     try:
-        report_id = Audit.objects.values_list("report_id", flat=True).get(
+        report_id = audit_model.objects.values_list("report_id", flat=True).get(
             Q(auditee_ein=ein),
             Q(auditee_uei=uei),
             Q(audit_year=DBKEY_TO_UEI_TRANSITION_YEAR),
         )
-    except (Audit.DoesNotExist, Audit.MultipleObjectsReturned):
+    except (audit_model.DoesNotExist, audit_model.MultipleObjectsReturned):
         report_id = None
         dbkey = None
         return dbkey
@@ -174,8 +175,11 @@ def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
         query_subsection = first_base_year_query_section
 
     try:
+        audit_model = apps.get_model("audit.Audit")
         cognizant_agency = (
-            Audit.objects.filter(Q(audit_year__in=query_years) & (query_subsection))
+            audit_model.objects.filter(
+                Q(audit_year__in=query_years) & (query_subsection)
+            )
             .exclude(cognizant_agency__isnull=True)
             .exclude(cognizant_agency__exact="")
             .order_by("-audit_year")
@@ -183,13 +187,14 @@ def lookup_latest_cog(ein, uei, dbkey, base_year, audit_year):
         )
         if len(cognizant_agency) >= 1:
             return cognizant_agency[0]
-    except Audit.DoesNotExist:
+    except audit_model.DoesNotExist:
         cognizant_agency = None
     return cognizant_agency
 
 
 def get_base_audit(ein, uei, base_year):
-    audits = Audit.objects.filter(
+    audit_model = apps.get_model("audit.Audit")
+    audits = audit_model.objects.filter(
         Q(auditee_ein=ein), Q(auditee_uei=uei), Q(audit_year=base_year)
     )
 
@@ -201,7 +206,8 @@ def get_base_audit(ein, uei, base_year):
 
 
 def get_base_cfdas(report_id):
-    audit = Audit.objects.get(report_id=report_id)
+    audit_model = apps.get_model("audit.Audit")
+    audit = audit_model.objects.get(report_id=report_id)
     cfdas = audit.audit["federal_awards"]["awards"]
 
     if len(cfdas) == 0:
@@ -258,3 +264,24 @@ def record_cog_assignment(report_id, user, cognizant_agency):
         cognizant_agency=cognizant_agency,
         assignor_email=user.email,
     ).save()
+
+
+def _get_cog_over(audit):
+    """
+    Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
+    """
+    if not audit.audit["federal_awards"]:
+        logger.warning(
+            "Trying to determine cog_over for a self with zero awards with status = %s",
+            audit.submission_status,
+        )
+    cognizant_agency, oversight_agency = compute_cog_over(
+        audit.federal_awards,
+        audit.submission_status,
+        audit.auditee_ein,
+        audit.auditee_uei,
+        audit.audit_year,
+    )
+    if cognizant_agency:
+        record_cog_assignment(audit.report_id, audit.submitted_by, cognizant_agency)
+    return (cognizant_agency, oversight_agency)
