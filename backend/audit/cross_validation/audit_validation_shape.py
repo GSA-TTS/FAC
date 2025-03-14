@@ -2,11 +2,7 @@ import logging
 
 from audit.cross_validation.naming import NC, SECTION_NAMES
 
-at_root_sections = (
-    NC.AUDIT_INFORMATION,
-    NC.GENERAL_INFORMATION,
-    NC.TRIBAL_DATA_CONSENT,
-)
+at_root_sections = (NC.AUDIT_INFORMATION, NC.GENERAL_INFORMATION, NC.TRIBAL_DATA_CONSENT)  # type: ignore
 
 logger = logging.getLogger(__name__)
 

@@ -16,7 +16,6 @@ from audit.models import (
     SubmissionEvent,
     Audit,
 )
-from audit.models.constants import EventType
 
 from audit.utils import Util
 from audit.models.models import ExcelFile

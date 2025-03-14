@@ -260,8 +260,9 @@ class AuditHistoryAdmin(admin.ModelAdmin):
 
     def event_display(self, obj):
         return obj.get_event_display()
-    event_display.admin_order_field = 'event'
-    event_display.short_description = _('Event')
+
+    event_display.admin_order_field = "event"  # type: ignore
+    event_display.short_description = _("Event")  # type: ignore
 
 
 class SACAdmin(admin.ModelAdmin):
