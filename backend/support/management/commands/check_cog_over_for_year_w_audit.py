@@ -44,39 +44,39 @@ class Command(BaseCommand):
         processed = cog_mismatches = over_mismatches = 0
 
         for audit in audits:
-            audit.submission_status = STATUS.SUBMITTED
-            audit.save()
+            if (audit.submission_status == STATUS.SUBMITTED) or (
+                audit.submission_status == STATUS.IN_PROGRESS
+            ):
+                print(
+                    f"audit.report_id = {audit.report_id} \n",
+                )
+                cognizant_agency, oversight_agency = _get_cog_over(audit)
 
-            print(
-                f"audit.report_id = {audit.report_id} \n",
-            )
-            cognizant_agency, oversight_agency = _get_cog_over(audit)
-
-            processed += 1
-            if audit.cognizant_agency == "":
-                audit.cognizant_agency = None
-            if audit.oversight_agency == "":
-                audit.oversight_agency = None
-            if cognizant_agency != audit.cognizant_agency:
-                cog_mismatches += 1
-                print(
-                    f"Cog mismatch. Calculated {cognizant_agency} Expected {audit.cognizant_agency}"
-                )
-                self.show_mismatch(audit)
-            if oversight_agency != audit.oversight_agency:
-                self.show_mismatch(audit)
-                over_mismatches += 1
-                print(
-                    f"Oversight mismatch. Calculated {oversight_agency} Expected {audit.oversight_agency}"
-                )
-                self.show_mismatch(audit)
-            if processed % 1000 == 0:
-                print(
-                    f"""
-                      Processed {processed} rows so far.
-                      Found {cog_mismatches} cog and {over_mismatches} over mismatches.
-                      ..."""
-                )
+                processed += 1
+                if audit.cognizant_agency == "":
+                    audit.cognizant_agency = None
+                if audit.oversight_agency == "":
+                    audit.oversight_agency = None
+                if cognizant_agency != audit.cognizant_agency:
+                    cog_mismatches += 1
+                    print(
+                        f"Cog mismatch. Calculated {cognizant_agency} Expected {audit.cognizant_agency}"
+                    )
+                    self.show_mismatch(audit)
+                if oversight_agency != audit.oversight_agency:
+                    self.show_mismatch(audit)
+                    over_mismatches += 1
+                    print(
+                        f"Oversight mismatch. Calculated {oversight_agency} Expected {audit.oversight_agency}"
+                    )
+                    self.show_mismatch(audit)
+                if processed % 1000 == 0:
+                    print(
+                        f"""
+                        Processed {processed} rows so far.
+                        Found {cog_mismatches} cog and {over_mismatches} over mismatches.
+                        ..."""
+                    )
         print(
             f"""
                 Processed all {processed} rows.
