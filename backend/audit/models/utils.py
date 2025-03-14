@@ -7,7 +7,6 @@ from django.db import models
 from django.db.models import Func
 
 from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
-
 from support.cog_over_w_audit import _get_cog_over
 
 
