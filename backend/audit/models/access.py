@@ -9,6 +9,7 @@ from .models import (
     SingleAuditChecklist,
     SubmissionEvent,
 )
+from audit.models.history import History
 
 
 User = get_user_model()
@@ -49,6 +50,13 @@ class AccessManager(models.Manager):
         result = super().create(**obj_data)
 
         if event_user and event_type:
+            History.objects.create(
+                report_id=result.audit.report_id,
+                audit=result.audit.audit,
+                version=result.audit.version,
+                event=event_type,
+                updated_by=event_user,
+            )
             SubmissionEvent.objects.create(
                 sac=result.sac,
                 audit=result.audit,
