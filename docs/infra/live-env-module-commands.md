@@ -150,7 +150,7 @@ terraform state rm -state=terraform.tfstate.staging module.staging.module.databa
 # Backup RDS
 terraform state show -state=terraform.tfstate.staging module.staging.module.snapshot-database.cloudfoundry_service_instance.rds | grep -m 1 id
 2916eb7d-5222-4347-97d4-b43aa4130e56
-terraform state show -state=terraform.tfstate.staging module.staging.module.snapshot-database.cloudfoundry_service_instance.rds | grep -m 1 id
+terraform state rm -state=terraform.tfstate.staging module.staging.module.snapshot-database.cloudfoundry_service_instance.rds
 
 # Public S3
 terraform state show -state=terraform.tfstate.staging module.staging.module.s3-public.cloudfoundry_service_instance.bucket | grep -m 1 id

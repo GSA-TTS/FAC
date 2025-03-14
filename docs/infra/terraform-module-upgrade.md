@@ -198,11 +198,14 @@ terraform init \
   --backend-config=../shared/config/backend.tfvars \
   --backend-config=key=terraform.tfstate."$basename"
 
-terraform plan \
-  -var-file="../shared/config/dev.tfvars" \
-  -out dev.tfplan
+cf delete fac-av-production -r -f
+cf delete fac-av-production-fs -r -f
 
-terraform apply env.tfplan
+terraform plan \
+  -var-file="../shared/config/production.tfvars" \
+  -out production.tfplan
+
+terraform apply production.tfplan
 ```
 
 #### Preview Output of items to import
