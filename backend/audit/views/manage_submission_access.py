@@ -279,7 +279,9 @@ class RemoveEditorView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             raise Http404() from e
 
         if request.user.email != access_to_remove.email:
-            access_to_remove.delete()
+            access_to_remove.delete(
+                removing_user=request.user, removal_event="access-change"
+            )
         else:
             context = {
                 "auditee_uei": sac.general_information["auditee_uei"],
