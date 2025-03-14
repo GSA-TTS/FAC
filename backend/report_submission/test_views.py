@@ -907,10 +907,11 @@ class DeleteFileViewTest(TestCase):
         request.path = "/delete/" + self.path_name + "/"
         request = self.make_request("get")
 
-        with patch("audit.models.SingleAuditChecklist.objects.get"):
-            with patch("audit.models.Access.objects.filter", return_value=[]):
-                response = self.view.post(request, report_id=self.report_id)
-                self.assertEqual(response.status_code, 302)
+        with patch("audit.models.Audit.objects.find_audit_or_none", return_value=None):
+            with patch("audit.models.SingleAuditChecklist.objects.get"):
+                with patch("audit.models.Access.objects.filter", return_value=[]):
+                    response = self.view.post(request, report_id=self.report_id)
+                    self.assertEqual(response.status_code, 302)
 
         messages = [message.message for message in get_messages(request)]
         self.assertIn("You do not have access to this audit.", messages)
@@ -918,21 +919,25 @@ class DeleteFileViewTest(TestCase):
     def test_post_file_deletion_successful(self):
         sac = MagicMock(report_id=self.report_id)
         access = MagicMock(user=self.user)
+        audit = MagicMock(report_id=self.report_id, version=0)
         request = self.factory.post(self.url)
         request.user = self.user
         request.path = "/delete/" + self.path_name + "/"
         request = self.make_request("get")
 
-        with patch("audit.models.SingleAuditChecklist.objects.get", return_value=sac):
-            with patch("audit.models.Access.objects.filter", return_value=[access]):
-                with patch("audit.models.ExcelFile.objects.filter") as mock_filter:
-                    mock_files = MagicMock()
-                    mock_filter.return_value = mock_files
-                    mock_files.count.return_value = 1
+        with patch("audit.models.Audit.objects.find_audit_or_none", return_value=audit):
+            with patch(
+                "audit.models.SingleAuditChecklist.objects.get", return_value=sac
+            ):
+                with patch("audit.models.Access.objects.filter", return_value=[access]):
+                    with patch("audit.models.ExcelFile.objects.filter") as mock_filter:
+                        mock_files = MagicMock()
+                        mock_filter.return_value = mock_files
+                        mock_files.count.return_value = 1
 
-                    response = self.view.post(request, report_id=self.report_id)
-                    self.assertEqual(response.status_code, 302)
-                    mock_files.delete.assert_called_once()
+                        response = self.view.post(request, report_id=self.report_id)
+                        self.assertEqual(response.status_code, 302)
+                        mock_files.delete.assert_called_once()
 
     def test_post_unexpected_error(self):
         request = self.factory.post(self.url)
