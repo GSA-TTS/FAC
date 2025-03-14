@@ -5,7 +5,9 @@ RUN apt-get update && \
 RUN apt-get install -y \
     postgresql-client \
     curl \
-    unzip
+    unzip \
+    file
+
 
 WORKDIR /layered
 COPY data/config.json .

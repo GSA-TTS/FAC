@@ -64,7 +64,16 @@ popd
 # Truncate the dissemination_* tables if they exist.
 # CASCADE as well. This makes sure we don't duplicate data,
 # which causes PK/FK problems.
-echo "select 'TRUNCATE TABLE '||tablename||' CASCADE;' FROM pg_tables WHERE tablename LIKE 'dissemination_%'" | \
+echo "
+    select 'TRUNCATE TABLE '||tablename||' CASCADE;' 
+    FROM pg_tables WHERE tablename LIKE 'dissemination_%'
+    UNION ALL
+    SELECT 'TRUNCATE TABLE auth_user CASCADE;'
+    UNION ALL
+    SELECT 'TRUNCATE TABLE audit_access CASCADE;'
+    UNION ALL
+    SELECT 'TRUNCATE TABLE audit_singleauditchecklist CASCADE;'
+    " | \
     psql $FAC_DB_URI -t | \
     psql $FAC_DB_URI
 
@@ -77,6 +86,26 @@ if [ $result -ne 0 ]; then
 else
     echo "Loaded lots of data without error, apparently."
 fi
+# Process all .dump files
+for file in "$BASE_PATH/data/"*.dump; do
+    echo "Restoring $file..."
+
+    # Determine file format using the 'file' command
+    if file "$file" | grep -q "ASCII text"; then
+        echo "$file appears to be a plain text dump. Using psql..."
+        psql -d "$FAC_DB_URI" -v ON_ERROR_STOP=on -f "$file"
+    else
+        echo "$file appears to be a custom-format dump. Using pg_restore..."
+        pg_restore --data-only -d "$FAC_DB_URI" "$file"
+    fi
+
+    if [ $? -ne 0 ]; then
+        echo "Something went wrong while processing $file."
+        exit 1
+    fi
+done
+
+echo "All dump files restored successfully."
 
 echo "Expanding the big audit table .tar file"
 pushd data
