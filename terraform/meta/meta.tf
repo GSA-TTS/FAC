@@ -1,7 +1,8 @@
 # Since we're not platform admins, we need to look for user details in the
 # context of our specific org.
 data "cloudfoundry_org" "org" {
-  name = local.org_name
+  provider = cloudfoundry-community
+  name     = local.org_name
 }
 
 # We need to include the meta deployer user in the set of users with the
@@ -41,16 +42,22 @@ locals {
   spaces_that_use_backups = join(" ", [for key, config in local.spaces : lookup(config, "uses_backups", false) ? key : ""])
 }
 
-module "s3-backups" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.1.0"
+data "cloudfoundry_org" "organization" {
+  name = local.org_name
+}
 
-  cf_org_name = local.org_name
-  # TODO: This should be the key for the first space that says "is_production =
-  # true" rather than being hardcoded
-  cf_space_name = "production"
-  name          = "backups"
-  s3_plan_name  = "basic"
-  tags          = ["s3"]
+data "cloudfoundry_space" "space" {
+  name = "production"
+  org  = data.cloudfoundry_org.organization.id
+}
+
+module "s3-backups" {
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
+
+  cf_space_id  = data.cloudfoundry_space.space.id
+  name         = "backups"
+  s3_plan_name = "basic"
+  tags         = ["s3"]
 }
 
 # TODO: We should have a corresponding "unshar-backup-from-spaces" resource, in
