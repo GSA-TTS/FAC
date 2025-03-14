@@ -32,7 +32,7 @@ We need the stack running for this whole process.
 
 ## Grab the ZIP
 
-You'll need to grab
+You'll need to grab `db_dissem_dump.zip`:
 
 https://drive.google.com/drive/folders/1gUsqD31Pkd17CruE4PWwwPKJVUssYNnI
 
@@ -40,7 +40,7 @@ which is cleaned/historic public data, fit for our dissem_* tables.
 
 Compressed, it is 330MB. Uncompressed, around 3GB.
 
-Put it in dissemination/tools/load_public_dissem_data/data (a child of this directory)
+Put it in util/load_public_dissem_data/data (a child of this directory)
 
 ## Build the container
 
@@ -57,6 +57,8 @@ make run
 ```
 
 You need to run this from the current directory.
+
+NOTE: Windows machines will need to use \$\{CURDIR\} rather than \$\{PWD\} for `make run`, as PWD is not recognizable.
 
 NOTE: The docker command in the Makefile uses the `--network` flag. The `--network` flag tells Docker to run this container on the same network as your currently running stack. It assumes that you did a `docker compose up` on the FAC stack, and that the web container has the default name of `backend-web-1`. If this does not work, you will need to...
 
