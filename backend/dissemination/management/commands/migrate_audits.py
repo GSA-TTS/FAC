@@ -105,7 +105,7 @@ class Command(BaseCommand):
                     logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
                     raise e
             logger.info(
-                f"Migration progress... ({count}/{total}) ({(count/total) * 100}%)"
+                f"Migration progress... ({count} / {total}) ({(count / total) * 100}%)"
             )
             queryset = _get_query(kwargs, BATCH_SIZE)
         logger.info("Completed audit migrations.")

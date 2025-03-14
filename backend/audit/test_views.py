@@ -235,6 +235,15 @@ class MySubmissionsViewTests(TestCase):
 
         self.client = Client()
 
+    def test_source_of_truth(self):
+        """
+        Simple test that validates the source of truth code path
+        TODO: Update Post SOC Launch -> We'll want to change all the test cases
+        """
+        self.client.force_login(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, True)
+        self.assertEqual(len(data), 0)
+
     def test_redirect_if_not_logged_in(self):
         """Test that accessing submission page redirects if user is not logged in"""
         result = self.client.get(SUBMISSIONS_PATH)
@@ -243,7 +252,7 @@ class MySubmissionsViewTests(TestCase):
     def test_no_submissions_returns_empty_list(self):
         """Test that an authenticated user with no submissions gets empty list"""
         self.client.force_login(user=self.user)
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
         self.assertEqual(len(data), 0)
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
@@ -256,7 +265,7 @@ class MySubmissionsViewTests(TestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
         self.assertGreater(len(data), 0)
 
         keys = data[0].keys()
@@ -276,7 +285,7 @@ class MySubmissionsViewTests(TestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_submissions(self.user2)
+        data = MySubmissions.fetch_my_submissions(self.user2, False)
         self.assertEqual(len(data), 0)
 
 
@@ -587,7 +596,7 @@ class SubmissionStatusTests(TransactionTestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
         self.assertGreater(len(data), 0)
         self.assertEqual(data[0]["submission_status"], STATUSES.IN_PROGRESS)
         report_id = data[0]["report_id"]
@@ -618,7 +627,7 @@ class SubmissionStatusTests(TransactionTestCase):
         sac.save()
 
         self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
 
         self.assertEqual(data[0]["submission_status"], STATUSES.READY_FOR_CERTIFICATION)
 
@@ -644,7 +653,7 @@ class SubmissionStatusTests(TransactionTestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
         self.assertGreater(len(data), 0)
         self.assertEqual(data[0]["submission_status"], STATUSES.IN_PROGRESS)
         report_id = data[0]["report_id"]
@@ -675,7 +684,7 @@ class SubmissionStatusTests(TransactionTestCase):
         sac.save()
 
         self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
 
         self.assertEqual(data[0]["submission_status"], STATUSES.READY_FOR_CERTIFICATION)
 
@@ -693,7 +702,7 @@ class SubmissionStatusTests(TransactionTestCase):
         self.client.post(
             f"/audit/unlock-after-certification/{report_id}", data=postdata
         )
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
 
         self.assertEqual(data[0]["submission_status"], STATUSES.IN_PROGRESS)
 

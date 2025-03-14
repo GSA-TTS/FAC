@@ -1,0 +1,19 @@
+{% comment %}
+Alert component, provides resources on what to do/where to go when an expected record isn't listed.
+{% endcomment %}
+{% if is_beta %}
+<div class="usa-alert usa-alert--info margin-bottom-3">
+    <div class="usa-alert__body">
+        <h2 class="usa-alert__heading">You are viewing a beta page.</h2>
+
+        <p class="usa-alert__text padding-bottom-2">
+            If this page does not look like you expect please click
+            <a class="usa-link"
+                href="{% url non_beta_url %}"
+                target="_blank"
+                rel="noopener noreferrer">here</a>
+            to view the original version of this page.
+        </p>
+    </div>
+</div>
+{% endif %}
