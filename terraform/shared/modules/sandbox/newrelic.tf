@@ -1,4 +1,6 @@
 resource "cloudfoundry_user_provided_service" "credentials" {
+  provider = cloudfoundry-community
+
   name  = "newrelic-creds"
   space = data.cloudfoundry_space.apps.id
   credentials = {

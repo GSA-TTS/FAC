@@ -1,13 +1,16 @@
 data "cloudfoundry_domain" "internal" {
-  name = "apps.internal"
+  provider = cloudfoundry-community
+  name     = "apps.internal"
 }
 
 data "cloudfoundry_space" "scanner_space" {
+  provider = cloudfoundry-community
   org_name = var.cf_org_name
   name     = var.cf_space_name
 }
 
 resource "cloudfoundry_route" "scanner_route" {
+  provider = cloudfoundry-community
   space    = data.cloudfoundry_space.scanner_space.id
   domain   = data.cloudfoundry_domain.internal.id
   hostname = "${var.name}-${replace(var.cf_space_name, ".", "-")}"
@@ -23,21 +26,21 @@ data "external" "scannerzip" {
 }
 
 resource "cloudfoundry_user_provided_service" "clam" {
-  name  = "clamav_ups"
-  space = data.cloudfoundry_space.scanner_space.id
+  provider = cloudfoundry-community
+  name     = "clamav_ups"
+  space    = data.cloudfoundry_space.scanner_space.id
   credentials = {
     "AV_SCAN_URL" : local.scan_url
   }
 }
 
 module "quarantine" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
-  name          = "fac-file-scanner-quarantine"
-  s3_plan_name  = "basic"
-  tags          = ["s3"]
+  cf_space_id  = var.cf_space_id
+  name         = "fac-file-scanner-quarantine"
+  s3_plan_name = "basic"
+  tags         = ["s3"]
 }
 
 locals {
@@ -46,6 +49,7 @@ locals {
 }
 
 resource "cloudfoundry_app" "scanner_app" {
+  provider  = cloudfoundry-community
   name      = var.name
   space     = data.cloudfoundry_space.scanner_space.id
   buildpack = "https://github.com/cloudfoundry/python-buildpack"
