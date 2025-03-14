@@ -1,5 +1,5 @@
 module "database" {
-  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.2.0"
 
   cf_space_id   = var.cf_space_id
   name          = "fac-db"
@@ -9,7 +9,7 @@ module "database" {
 }
 
 module "snapshot-database" {
-  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.2.0"
 
   cf_space_id   = var.cf_space_id
   name          = "fac-snapshot-db"
@@ -19,7 +19,7 @@ module "snapshot-database" {
 }
 
 module "s3-public" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
 
   cf_space_id  = var.cf_space_id
   name         = "fac-public-s3"
@@ -28,7 +28,7 @@ module "s3-public" {
 }
 
 module "s3-private" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
 
   cf_space_id  = var.cf_space_id
   name         = "fac-private-s3"

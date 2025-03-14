@@ -53,3 +53,8 @@ variable "logdrain_id" {
   type        = string
   description = "the full string of the logdrain id"
 }
+
+variable "cf_space_id" {
+  type        = string
+  description = "the guid of the cf space"
+}

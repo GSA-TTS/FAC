@@ -199,8 +199,8 @@ terraform init \
   --backend-config=key=terraform.tfstate."$basename"
 
 terraform plan \
-  -var-file="../shared/config/preview.tfvars" \
-  -out preview.tfplan
+  -var-file="../shared/config/dev.tfvars" \
+  -out dev.tfplan
 
 terraform apply env.tfplan
 ```

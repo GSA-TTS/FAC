@@ -10,7 +10,7 @@ terraform state rm -state=terraform.tfstate.preview module.preview.module.databa
 # Backup RDS
 terraform state show -state=terraform.tfstate.preview module.preview.module.snapshot-database.cloudfoundry_service_instance.rds | grep -m 1 id
 cbb796d4-3c0d-4ebd-80b0-0e7c6183d681
-terraform state show -state=terraform.tfstate.preview module.preview.module.snapshot-database.cloudfoundry_service_instance.rds | grep -m 1 id
+terraform state rm -state=terraform.tfstate.preview module.preview.module.snapshot-database.cloudfoundry_service_instance.rds
 
 # Public S3
 terraform state show -state=terraform.tfstate.preview module.preview.module.s3-public.cloudfoundry_service_instance.bucket | grep -m 1 id
@@ -26,6 +26,19 @@ terraform state rm -state=terraform.tfstate.preview module.preview.module.s3-pri
 terraform state show -state=terraform.tfstate.preview module.preview-backups-bucket.cloudfoundry_service_instance.bucket | grep -m 1 id
 01abcf56-c8c6-4d61-965b-894cf375ab0d
 terraform state rm -state=terraform.tfstate.preview module.preview-backups-bucket.cloudfoundry_service_instance.bucket
+
+#Logshipper S3
+terraform state show -state=terraform.tfstate.preview module.preview.module.cg-logshipper.module.s3-logshipper-storage.cloudfoundry_service_instance.bucket | grep -m 1 id
+c65050a7-fbba-4e27-8e69-0163835f17e3
+terraform state rm -state=terraform.tfstate.preview module.preview.module.cg-logshipper.module.s3-logshipper-storage.cloudfoundry_service_instance.bucket
+
+#Scanner S3
+terraform state show -state=terraform.tfstate.preview module.preview.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket | grep -m 1 id
+5cef0c0b-1e68-451a-8e32-bc175a491bfa
+terraform state rm -state=terraform.tfstate.preview module.preview.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket
+
+terraform state rm -state=terraform.tfstate.preview module.preview.module.clamav.cloudfoundry_app.clamav_api
+terraform state rm -state=terraform.tfstate.preview module.preview.module.file_scanner_clamav.cloudfoundry_app.clamav_api
 ```
 #### Preview Imports
 ```
@@ -66,7 +79,7 @@ terraform state rm -state=terraform.tfstate.dev module.dev.module.database.cloud
 # Backup RDS
 terraform state show -state=terraform.tfstate.dev module.dev.module.snapshot-database.cloudfoundry_service_instance.rds | grep -m 1 id
 86a11021-7922-411b-b0ca-4341b7a0b911
-terraform state show -state=terraform.tfstate.dev module.dev.module.snapshot-database.cloudfoundry_service_instance.rds | grep -m 1 id
+terraform state rm -state=terraform.tfstate.dev module.dev.module.snapshot-database.cloudfoundry_service_instance.rds
 
 # Public S3
 terraform state show -state=terraform.tfstate.dev module.dev.module.s3-public.cloudfoundry_service_instance.bucket | grep -m 1 id
@@ -82,6 +95,20 @@ terraform state rm -state=terraform.tfstate.dev module.dev.module.s3-private.clo
 terraform state show -state=terraform.tfstate.dev module.dev-backups-bucket.cloudfoundry_service_instance.bucket | grep -m 1 id
 4bebb1dc-3951-420e-810e-34e461776679
 terraform state rm -state=terraform.tfstate.dev module.dev-backups-bucket.cloudfoundry_service_instance.bucket
+
+#Logshipper S3
+terraform state show -state=terraform.tfstate.dev module.dev.module.cg-logshipper.module.s3-logshipper-storage.cloudfoundry_service_instance.bucket | grep -m 1 id
+d79b8e4c-c1f5-4711-8172-5da3f9298cc4
+terraform state rm -state=terraform.tfstate.dev module.dev.module.cg-logshipper.module.s3-logshipper-storage.cloudfoundry_service_instance.bucket
+
+#Scanner S3
+terraform state show -state=terraform.tfstate.dev module.dev.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket | grep -m 1 id
+c435cb9c-32a7-4a31-828b-48c8c6f3bf37
+terraform state rm -state=terraform.tfstate.dev module.dev.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket
+
+terraform state rm -state=terraform.tfstate.dev module.dev.module.clamav.cloudfoundry_app.clamav_api
+terraform state rm -state=terraform.tfstate.dev module.dev.module.file_scanner_clamav.cloudfoundry_app.clamav_api
+
 ```
 
 #### Dev Imports
@@ -139,6 +166,20 @@ terraform state rm -state=terraform.tfstate.staging module.staging.module.s3-pri
 terraform state show -state=terraform.tfstate.staging module.staging-backups-bucket.cloudfoundry_service_instance.bucket | grep -m 1 id
 d6222847-cc59-4d3b-bcc3-7df080c70f1c
 terraform state rm -state=terraform.tfstate.staging module.staging-backups-bucket.cloudfoundry_service_instance.bucket
+
+#Logshipper S3
+terraform state show -state=terraform.tfstate.staging module.staging.module.cg-logshipper.module.s3-logshipper-storage.cloudfoundry_service_instance.bucket | grep -m 1 id
+3db5447d-8403-45c6-8b47-63ea899fd1cd
+terraform state rm -state=terraform.tfstate.staging module.staging.module.cg-logshipper.module.s3-logshipper-storage.cloudfoundry_service_instance.bucket
+
+#Scanner S3
+terraform state show -state=terraform.tfstate.staging module.staging.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket | grep -m 1 id
+b4cf43f9-7ada-4c21-9d16-b340672e50ae
+terraform state rm -state=terraform.tfstate.staging module.staging.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket
+
+terraform state rm -state=terraform.tfstate.staging module.staging.module.clamav.cloudfoundry_app.clamav_api
+terraform state rm -state=terraform.tfstate.staging module.staging.module.file_scanner_clamav.cloudfoundry_app.clamav_api
+
 ```
 
 #### Staging Imports
@@ -191,6 +232,20 @@ terraform state rm -state=terraform.tfstate.production module.production.module.
 terraform state show -state=terraform.tfstate.production module.production.module.s3-private.cloudfoundry_service_instance.bucket | grep -m 1 id
 ac8bf271-4c6d-4ee0-bd36-1415b839a93c
 terraform state rm -state=terraform.tfstate.production module.production.module.s3-private.cloudfoundry_service_instance.bucket
+
+#Logshipper S3
+terraform state show -state=terraform.tfstate.production module.production.module.cg-logshipper.module.s3-logshipper-storage.cloudfoundry_service_instance.bucket | grep -m 1 id
+2f160a41-a7b7-417e-8856-f665e11b0d03
+terraform state rm -state=terraform.tfstate.production module.production.module.cg-logshipper.module.s3-logshipper-storage.cloudfoundry_service_instance.bucket
+
+#Scanner S3
+terraform state show -state=terraform.tfstate.production module.production.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket | grep -m 1 id
+ca564d14-b89a-4944-a43f-033dca62ab30
+terraform state rm -state=terraform.tfstate.production module.production.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket
+
+terraform state rm -state=terraform.tfstate.production module.production.module.clamav.cloudfoundry_app.clamav_api
+terraform state rm -state=terraform.tfstate.production module.production.module.file_scanner_clamav.cloudfoundry_app.clamav_api
+
 ```
 
 #### Production Imports
@@ -215,6 +270,11 @@ import {
   to = module.production.module.s3-private.cloudfoundry_service_instance.bucket
   id = "ac8bf271-4c6d-4ee0-bd36-1415b839a93c"
 }
+
+import {
+  to = module.domain.cloudfoundry_route.origin_route
+  id = "d560bd38-f68e-4613-8c63-f404a252c3a3"
+}
 ```
 
 
@@ -222,7 +282,7 @@ import {
 ```
 terraform state show -state=terraform.tfstate.meta module.s3-backups.cloudfoundry_service_instance.bucket | grep -m 1 id
 040c4133-1efe-4281-a485-005960b58405
-module.s3-backups.cloudfoundry_service_instance.bucket
+terraform state rm -state=terraform.tfstate.meta module.s3-backups.cloudfoundry_service_instance.bucket
 ```
 
 ```
