@@ -1,3 +1,9 @@
+variable "cf_org_name" {
+  type        = string
+  description = "name of the organization to configure"
+  default     = "gsa-tts-oros-fac"
+}
+
 variable "new_relic_license_key" {
   type        = string
   description = "the license key to use when setting up the New Relic agent"

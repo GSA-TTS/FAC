@@ -221,7 +221,7 @@ terraform state rm -state=terraform.tfstate.production module.production.module.
 # Backup RDS
 terraform state show -state=terraform.tfstate.production module.production.module.snapshot-database.cloudfoundry_service_instance.rds | grep -m 1 id
 e026cae8-7564-4886-9317-f84dc4a5b339
-terraform state show -state=terraform.tfstate.production module.production.module.snapshot-database.cloudfoundry_service_instance.rds | grep -m 1 id
+terraform state rm -state=terraform.tfstate.production module.production.module.snapshot-database.cloudfoundry_service_instance.rds
 
 # Public S3
 terraform state show -state=terraform.tfstate.production module.production.module.s3-public.cloudfoundry_service_instance.bucket | grep -m 1 id
@@ -242,6 +242,14 @@ terraform state rm -state=terraform.tfstate.production module.production.module.
 terraform state show -state=terraform.tfstate.production module.production.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket | grep -m 1 id
 ca564d14-b89a-4944-a43f-033dca62ab30
 terraform state rm -state=terraform.tfstate.production module.production.module.fac-file-scanner.module.quarantine.cloudfoundry_service_instance.bucket
+
+terraform state show -state=terraform.tfstate.production module.domain.cloudfoundry_route.origin_route | grep -m 1 id
+d560bd38-f68e-4613-8c63-f404a252c3a3
+terraform state rm -state=terraform.tfstate.production module.domain.cloudfoundry_route.origin_route
+
+terraform state show -state=terraform.tfstate.production module.domain.cloudfoundry_service_instance.external_domain_instance | grep -m 1 id
+c36480a2-ec78-4e75-b175-d6b53abf2400
+terraform state rm -state=terraform.tfstate.production module.domain.cloudfoundry_service_instance.external_domain_instance
 
 terraform state rm -state=terraform.tfstate.production module.production.module.clamav.cloudfoundry_app.clamav_api
 terraform state rm -state=terraform.tfstate.production module.production.module.file_scanner_clamav.cloudfoundry_app.clamav_api
