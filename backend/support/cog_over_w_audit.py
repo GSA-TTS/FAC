@@ -270,7 +270,7 @@ def _get_cog_over(audit):
     """
     Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
     """
-    if not audit.audit["federal_awards"]:
+    if "federal_awards" not in audit.audit.keys():
         # print(f"No federal awards for report_id = {audit.report_id} \n")
         # return (None, None)
         logger.warning(
@@ -278,12 +278,12 @@ def _get_cog_over(audit):
             audit.submission_status,
         )
     cognizant_agency, oversight_agency = compute_cog_over(
-        audit.federal_awards,
+        audit.audit["federal_awards"],
         audit.submission_status,
         audit.auditee_ein,
         audit.auditee_uei,
         audit.audit_year,
     )
-    if cognizant_agency:
-        record_cog_assignment(audit.report_id, audit.submitted_by, cognizant_agency)
+    # if cognizant_agency:
+    #     record_cog_assignment(audit.report_id, audit.submitted_by, cognizant_agency)
     return (cognizant_agency, oversight_agency)
