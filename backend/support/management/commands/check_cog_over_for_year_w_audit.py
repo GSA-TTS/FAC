@@ -4,7 +4,6 @@ from django.db.models import Q
 
 from audit.models import User
 
-# from audit.models.audit import Audit
 from audit.models.models import STATUS
 from support.models import CognizantAssignment
 from support.cog_over_w_audit import _get_cog_over
@@ -48,6 +47,9 @@ class Command(BaseCommand):
             audit.submission_status = STATUS.SUBMITTED
             audit.save()
 
+            print(
+                f"audit.report_id = {audit.report_id} \n",
+            )
             cognizant_agency, oversight_agency = _get_cog_over(audit)
 
             processed += 1
