@@ -11,6 +11,7 @@ from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
 
 import json
 
+
 def generate_sac_report_id(count, end_date, source="GSAFAC"):
     """
     Convenience method for generating report_id, a value consisting of:
@@ -230,21 +231,25 @@ def validate_audit_consistency(audit_instance):
         audit_field_data = audit_instance.audit.get(field)
 
         if sac_data is not None and audit_field_data is None:
-            difference.append({
-                "field": field,
-                "error": f"Field is empty in Audit, but not in SAC",
-                "sac_value": sac_data,
-                "audit_value": None
-            })
+            difference.append(
+                {
+                    "field": field,
+                    "error": f"Field is empty in Audit, but not in SAC",
+                    "sac_value": sac_data,
+                    "audit_value": None,
+                }
+            )
             continue
 
         if sac_data is None and audit_field_data is not None:
-            difference.append({
-                "field": field,
-                "error": f"Field is empty in SAC, but not in Audit",
-                "sac_value": None,
-                "audit_value": audit_field_data
-            })
+            difference.append(
+                {
+                    "field": field,
+                    "error": f"Field is empty in SAC, but not in Audit",
+                    "sac_value": None,
+                    "audit_value": audit_field_data,
+                }
+            )
             continue
 
         if sac_data is not None:
@@ -253,7 +258,9 @@ def validate_audit_consistency(audit_instance):
             flat_audit = flatten_json(audit_instance.audit)
 
             for path, value in sac_values.items():
-                if not value_exists_in_audit(path, value, flat_audit):
+                result = value_exists_in_audit(path, value, flat_audit)
+
+                if result == False:
                     difference.append(
                         {
                             "field": field,
@@ -262,6 +269,21 @@ def validate_audit_consistency(audit_instance):
                             "error": f"Value from SAC.{field}.{path} not found in Audit",
                         }
                     )
+
+                elif isinstance(result, dict) and result.get(
+                    "found_with_different_key"
+                ):
+                    difference.append(
+                        {
+                            "field": field,
+                            "path": path,
+                            "value": value,
+                            "found_in_path": result["found_in_path"],
+                            "found_value": result["found_value"],
+                            "error": f"Value from SAC.{field}.{path} found in Audit but with different structure/key",
+                        }
+                    )
+
     return len(difference) == 0, difference
 
 
@@ -298,49 +320,57 @@ def value_exists_in_audit(path, value, audit_data):
 
         norm_audit_field = normalize_key(audit_field)
 
-        if norm_field == norm_audit_field and (value == audit_value or get_other_formats(value, audit_value)):
+        if norm_field == norm_audit_field and (
+            value == audit_value or get_other_formats(value, audit_value)
+        ):
             return True
-    
+
+    for audit_path, audit_value in audit_data.items():
+        if value == audit_value or get_other_formats(value, audit_value):
+            return {
+                "found_with_different_key": True,
+                "original_field": field_name,
+                "found_in_path": audit_path,
+                "found_value": audit_value,
+            }
+
     return False
 
-        # if field_name == audit_field and (value == audit_value or audit_value in value_formats):
-        #     return True
 
 def normalize_key(key):
     """Normalize the keys for comparison"""
     if not isinstance(key, str):
         return key
-    
+
     normalized = key.replace("-", "_")
     return normalized.lower()
+
 
 def get_other_formats(value1, value2):
     """Generate other format types for obj, str, list, dict"""
     if value1 == value2:
         return True
-    
+
     if str(value1) == str(value2):
         return True
-    
-    if isinstance(value1, dict) and isinstance(value2, str):
-        try:
-            parsed = json.loads(value2)
-            return value1 == parsed
-        except:
-            pass
-    
-    if isinstance(value1, list) and isinstance(value2, str):
-        try:
-            parsed = json.loads(value1)
-            return value2 == parsed
-        except:
-            pass
 
-    if isinstance(value2, list) and isinstance(value1, str):
-        try:
-            parsed = json.loads(value1)
-            return value2 == parsed
-        except:
-            pass
+    if isinstance(value1, list) and value2 in value1:
+        return True
+
+    if isinstance(value2, list) and value1 in value2:
+        return True
+
+    if isinstance(value1, dict) and value2 in value1.values():
+        return True
+    if isinstance(value2, dict) and value1 in value2.values():
+        return True
+
+    try:
+        if isinstance(value1, (int, float)) and isinstance(value2, str):
+            return value1 == float(value2)
+        if isinstance(value2, (int, float)) and isinstance(value1, str):
+            return value2 == float(value1)
+    except (ValueError, TypeError):
+        pass
 
     return False
