@@ -1,6 +1,7 @@
 module "preview" {
   source                = "../shared/modules/env"
   cf_space_name         = "preview"
+  cf_space_id           = data.cloudfoundry_space.space.id
   new_relic_license_key = var.new_relic_license_key
   new_relic_account_id  = var.new_relic_account_id
   new_relic_api_key     = var.new_relic_api_key
@@ -13,7 +14,7 @@ module "preview" {
   https_proxy_instances = 1
   smtp_proxy_instances  = 1
   clamav_instances      = 1
-  clamav_memory         = 2048
+  clamav_memory         = "2048M"
   clamav_fs_instances   = 1
   json_params = jsonencode(
     {
@@ -22,17 +23,21 @@ module "preview" {
   )
 }
 
-module "preview-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.1.0"
-
-  cf_org_name   = var.cf_org_name
-  cf_space_name = "preview"
-  name          = "backups"
-  s3_plan_name  = "basic"
-  tags          = ["s3"]
+# Stuff used for apps in this space
+data "cloudfoundry_org" "org" {
+  name = var.cf_org_name
 }
 
-import {
-  to = module.preview.module.clamav.cloudfoundry_app.clamav_api
-  id = "ed9b5108-1e31-44b8-9ba0-375e091c5589"
+data "cloudfoundry_space" "space" {
+  name = "preview"
+  org  = data.cloudfoundry_org.org.id
+}
+
+module "preview-backups-bucket" {
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
+
+  cf_space_id  = data.cloudfoundry_space.space.id
+  name         = "backups"
+  s3_plan_name = "basic"
+  tags         = ["s3"]
 }

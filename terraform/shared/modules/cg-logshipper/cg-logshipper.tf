@@ -3,26 +3,28 @@ data "cloudfoundry_domain" "public" {
 }
 
 data "cloudfoundry_space" "apps" {
+  provider = cloudfoundry-community
   org_name = var.cf_org_name
   name     = var.cf_space_name
 }
 
 module "s3-logshipper-storage" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v1.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
-  name          = "log-storage"
-  s3_plan_name  = "basic"
-  tags          = ["logshipper-s3"]
+  cf_space_id  = var.cf_space_id
+  name         = "log-storage"
+  s3_plan_name = "basic"
+  tags         = ["logshipper-s3"]
 }
 
 resource "cloudfoundry_service_key" "logshipper-s3-service-key" {
+  provider         = cloudfoundry-community
   name             = "fac-to-gsa"
   service_instance = module.s3-logshipper-storage.bucket_id
 }
 
 resource "cloudfoundry_route" "logshipper" {
+  provider = cloudfoundry-community
   space    = data.cloudfoundry_space.apps.id
   domain   = data.cloudfoundry_domain.public.id
   hostname = "fac-${var.cf_space_name}-${var.name}"
@@ -30,8 +32,9 @@ resource "cloudfoundry_route" "logshipper" {
 }
 
 resource "cloudfoundry_user_provided_service" "logshipper_creds" {
-  name  = "cg-logshipper-creds"
-  space = data.cloudfoundry_space.apps.id
+  provider = cloudfoundry-community
+  name     = "cg-logshipper-creds"
+  space    = data.cloudfoundry_space.apps.id
   credentials = {
     "HTTP_USER" = local.username
     "HTTP_PASS" = local.password
@@ -40,6 +43,7 @@ resource "cloudfoundry_user_provided_service" "logshipper_creds" {
 }
 
 resource "cloudfoundry_user_provided_service" "logdrain_service" {
+  provider         = cloudfoundry-community
   name             = "fac-logdrain"
   space            = data.cloudfoundry_space.apps.id
   syslog_drain_url = local.syslog_drain
@@ -76,6 +80,7 @@ data "external" "logshipperzip" {
 }
 
 resource "cloudfoundry_app" "cg_logshipper_app" {
+  provider   = cloudfoundry-community
   name       = var.name
   space      = data.cloudfoundry_space.apps.id
   buildpacks = ["https://github.com/cloudfoundry/apt-buildpack", "nginx_buildpack"]
