@@ -2,15 +2,23 @@
 
 # When testing this script, make sure you proceed through the following:
 # 1. Make sure you import the public prod data dump from the drive into your local DB.
+#    1. Users
+#       pg_restore --username=postgres --dbname=postgres ./public-auth_user.dump --clean
+#    2. SAC data
+#       psql -U postgres -d postgres -f ./sac_data.dump
+#    3. Accesses
+#       pg_restore --username=postgres --dbname=postgres ./public-audit_access.dump --clean
+#       psql -U postgres -d postgres -f ./sac-user-access-data.dump
 # 2. If you have already migrated some audits and want to reset to a clean slate,
 #    run these SQL queries in order:
-#    - DELETE FROM public.audit_history WHERE event='MIGRATION';
-#    - UPDATE public.audit_access SET audit_id=null;
-#    - UPDATE public.audit_deletedaccess SET audit_id=null;
-#    - UPDATE public.audit_submissionevent SET audit_id=null;
-#    - UPDATE public.audit_singleauditchecklist SET migrated_to_audit=false;
-#    - DELETE FROM public.audit_audit;
-# 3. Run the command in a separate shell from the app.
+#      DELETE FROM public.audit_history WHERE event='MIGRATION';
+#      UPDATE public.audit_access SET audit_id=null;
+#      UPDATE public.audit_deletedaccess SET audit_id=null;
+#      UPDATE public.audit_submissionevent SET audit_id=null;
+#      UPDATE public.audit_singleauditchecklist SET migrated_to_audit=false;
+#      DELETE FROM public.audit_audit;
+# 3. Adjust the event_user's email to your local user email (Under the "FOR DEBUGGING" comment).
+# 4. Run the command in a separate shell from the app.
 #    - If you want to ONLY target disseminated records, pass the parameter "--disseminated".
 #    - If you want to ONLY target intake records, pass the parameter "--intake".
 #    - If you want to target ALL records, leave out the parameters.
@@ -38,7 +46,9 @@ from audit.models import (
     User,
     SingleAuditReportFile,
     SingleAuditChecklist,
+    SubmissionEvent
 )
+from audit.models.history import History
 from audit.models.constants import STATUS
 from audit.models.utils import generate_audit_indexes
 
@@ -62,27 +72,6 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
 
         BATCH_SIZE = 100
-
-        # # FOR DEBUGGING ONLY
-        # # Removes all references to Audit data for testing a fresh migration.
-        # # On large data sets, this block of logic may timeout.
-        # # You may want to run these queries directly in a local DB manager instead.
-        # from audit.models import SubmissionEvent, History
-
-        # print("Clearing History...")
-        # History.objects.filter(event="MIGRATION").delete()
-        # print("Clearing Access...")
-        # Access.objects.all().exclude(audit=None).update(audit=None)
-        # print("Clearing DeletedAccess...")
-        # DeletedAccess.objects.all().exclude(audit=None).update(audit=None)
-        # print("Clearing SubmissionEvents...")
-        # SubmissionEvent.objects.all().exclude(audit=None).update(audit=None)
-        # print("Resetting SACs...")
-        # SingleAuditChecklist.objects.filter(migrated_to_audit=True).update(
-        #     migrated_to_audit=False
-        # )
-        # print("Clearing audits...")
-        # Audit.objects.all().delete()
 
         # iterate through unmigrated SACs.
         queryset = _get_query(kwargs, BATCH_SIZE)
@@ -138,6 +127,18 @@ class Command(BaseCommand):
             # convert additional fields.
             audit.audit.update(generate_audit_indexes(audit, sac))
             audit.save()
+
+            # copy SubmissionEvents into History records.
+            events = SubmissionEvent.objects.filter(sac=sac)
+            for event in events:
+                History.objects.create(
+                    event=event.event,
+                    report_id=sac.report_id,
+                    audit=audit.audit,
+                    version=0,
+                    updated_at=event.timestamp,
+                    updated_by=event.user,
+                )
 
 
 def _get_query(kwargs, max_records):
