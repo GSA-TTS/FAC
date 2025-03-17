@@ -14,17 +14,20 @@ from config.settings import ENVIRONMENT
 
 class Command(BaseCommand):
     help = """
-    Analyze cog/over for 2022 / 2023 / 2024 submissions in LOCAL environment only.
+    Analyze cog/over for 2022 / 2023 / 2024 / 2025 submissions in LOCAL environment only.
     Uses existing rows in Audit
     """
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--year", help="Year(2022 or 2023 or 2024)", type=str, default="2022"
+            "--year",
+            help="Year(2022 or 2023 or 2024 or 2025)",
+            type=str,
+            default="2022",
         )
 
     def is_year_invalid(self, year):
-        valid_years = ["2022", "2023", "2024"]
+        valid_years = ["2022", "2023", "2024", "2025"]
         return year not in valid_years
 
     def handle(self, *args, **options):
@@ -34,7 +37,7 @@ class Command(BaseCommand):
 
         year = options.get("year")
         if self.is_year_invalid(year):
-            print(f"Invalid year {year}.  Expecting 2022 / 2023 / 2024")
+            print(f"Invalid year {year}.  Expecting 2022 / 2023 / 2024 / 2025")
             return
 
         initialize_db()
@@ -45,7 +48,7 @@ class Command(BaseCommand):
 
         for audit in audits:
             if (audit.submission_status == STATUS.SUBMITTED) or (
-                audit.submission_status == STATUS.IN_PROGRESS
+                audit.submission_status == STATUS.DISSEMINATED
             ):
                 print(
                     f"audit.report_id = {audit.report_id} \n",
