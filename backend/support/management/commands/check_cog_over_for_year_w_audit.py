@@ -6,7 +6,7 @@ from audit.models import User
 
 from audit.models.models import STATUS
 from support.models import CognizantAssignment
-from support.cog_over_w_audit import _get_cog_over
+from support.cog_over_w_audit import get_cog_over
 from django.apps import apps
 
 from config.settings import ENVIRONMENT
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 print(
                     f"audit.report_id = {audit.report_id} \n",
                 )
-                cognizant_agency, oversight_agency = _get_cog_over(audit)
+                cognizant_agency, oversight_agency = get_cog_over(audit)
 
                 processed += 1
                 if audit.cognizant_agency == "":

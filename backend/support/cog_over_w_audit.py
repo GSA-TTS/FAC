@@ -1,6 +1,7 @@
 from collections import defaultdict
 import logging
 import math
+import sys
 
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
@@ -266,24 +267,22 @@ def record_cog_assignment(report_id, user, cognizant_agency):
     ).save()
 
 
-def _get_cog_over(audit):
+def get_cog_over(audit):
     """
     Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
     """
-    if "federal_awards" not in audit.audit.keys():
-        # print(f"No federal awards for report_id = {audit.report_id} \n")
-        # return (None, None)
+    if not audit.audit.get("federal_awards"):
         logger.warning(
             "Trying to determine cog_over for a self with zero awards with status = %s",
             audit.submission_status,
         )
-    cognizant_agency, oversight_agency = compute_cog_over(
-        audit.audit["federal_awards"],
-        audit.submission_status,
-        audit.auditee_ein,
-        audit.auditee_uei,
-        audit.audit_year,
-    )
-    # if cognizant_agency:
-    #     record_cog_assignment(audit.report_id, audit.submitted_by, cognizant_agency)
-    return (cognizant_agency, oversight_agency)
+        sys.exit()
+    else:
+        cognizant_agency, oversight_agency = compute_cog_over(
+            audit.audit["federal_awards"],
+            audit.submission_status,
+            audit.auditee_ein,
+            audit.auditee_uei,
+            audit.audit_year,
+        )
+        return (cognizant_agency, oversight_agency)
