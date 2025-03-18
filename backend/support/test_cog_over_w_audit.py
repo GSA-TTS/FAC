@@ -65,7 +65,7 @@ class CogOverTests(TestCase):
                     "total_amount_expended": 210000000,
                 },
                 "general_information": {
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                     "auditee_uei": "ZQGGHJH74DW7",
                 },
                 "audit_year": 2019,
@@ -105,7 +105,7 @@ class CogOverTests(TestCase):
                         "total_amount_expended": 10000000,
                     },
                     "general_information": {
-                        "auditee_ein": DUP_EIN_WITHOUT_RESOLVER,
+                        "ein": DUP_EIN_WITHOUT_RESOLVER,
                         "auditee_uei": "ZQGGHJH74DW7",
                     },
                     "audit_year": 2019,
@@ -130,7 +130,7 @@ class CogOverTests(TestCase):
                     "total_amount_expended": 210000000,
                 },
                 "general_information": {
-                    "auditee_ein": RESOLVABLE_EIN_WITHOUT_BASELINE,
+                    "ein": RESOLVABLE_EIN_WITHOUT_BASELINE,
                     "auditee_uei": RESOLVABLE_UEI_WITHOUT_BASELINE,
                 },
                 "audit_year": 2022,
@@ -155,7 +155,7 @@ class CogOverTests(TestCase):
                     "total_amount_expended": 210000000,
                 },
                 "general_information": {
-                    "auditee_ein": RESOLVABLE_EIN_WITHOUT_BASELINE,
+                    "ein": RESOLVABLE_EIN_WITHOUT_BASELINE,
                     "auditee_uei": RESOLVABLE_UEI_WITHOUT_BASELINE,
                 },
                 "audit_year": 2019,
@@ -188,7 +188,7 @@ class CogOverTests(TestCase):
     def _fake_general():
         fake = Faker()
         return {
-            "auditee_ein": "ABC123DEF456",
+            "ein": "ABC123DEF456",
             "audit_type": "single-audit",
             "auditee_zip": fake.zipcode(),
             "auditor_ein": fake.ssn().replace("-", ""),
@@ -328,9 +328,7 @@ class CogOverTests(TestCase):
             },
         )
         audit = Audit.objects.get(report_id=audit.report_id)
-        audit.audit["general_information"]["auditee_ein"] = audit.auditee_ein = (
-            "ABC123DEF456"
-        )
+        audit.audit["general_information"]["ein"] = audit.auditee_ein = "ABC123DEF456"
         audit.audit["general_information"]["auditee_uei"] = audit.auditee_uei = (
             "ZQGGHJH74DW7"
         )
@@ -344,7 +342,7 @@ class CogOverTests(TestCase):
         """
         audit = self._fake_audit()
         audit = Audit.objects.get(report_id=audit.report_id)
-        audit.audit["general_information"]["auditee_ein"] = audit.auditee_ein = (
+        audit.audit["general_information"]["ein"] = audit.auditee_ein = (
             UNIQUE_EIN_WITHOUT_DBKEY
         )
         audit.audit["general_information"]["auditee_uei"] = audit.auditee_uei = (
@@ -368,9 +366,7 @@ class CogOverTests(TestCase):
         """
         audit = self._fake_audit()
         audit = Audit.objects.get(report_id=audit.report_id)
-        audit.audit["general_information"]["auditee_ein"] = audit.auditee_ein = (
-            EIN_2023_ONLY
-        )
+        audit.audit["general_information"]["ein"] = audit.auditee_ein = EIN_2023_ONLY
         audit.save()
         cog_agency, over_agency = compute_cog_over(
             audit.audit["federal_awards"],
@@ -389,7 +385,7 @@ class CogOverTests(TestCase):
 
         audit = self._fake_audit()
         audit = Audit.objects.get(report_id=audit.report_id)
-        audit.audit["general_information"]["auditee_ein"] = audit.auditee_ein = (
+        audit.audit["general_information"]["ein"] = audit.auditee_ein = (
             DUP_EIN_WITHOUT_RESOLVER
         )
         audit.save()
@@ -411,7 +407,7 @@ class CogOverTests(TestCase):
         """
         audit = self._fake_audit()
         audit = Audit.objects.get(report_id=audit.report_id)
-        audit.audit["general_information"]["auditee_ein"] = audit.auditee_ein = (
+        audit.audit["general_information"]["ein"] = audit.auditee_ein = (
             RESOLVABLE_EIN_WITHOUT_BASELINE
         )
         audit.audit["general_information"]["auditee_uei"] = audit.auditee_uei = (
@@ -443,9 +439,7 @@ class CogOverTests(TestCase):
             },
         )
         audit = Audit.objects.get(report_id=audit.report_id)
-        audit.audit["general_information"]["auditee_ein"] = audit.auditee_ein = (
-            "ABC123DEF456"
-        )
+        audit.audit["general_information"]["ein"] = audit.auditee_ein = "ABC123DEF456"
         audit.audit["general_information"]["auditee_uei"] = audit.auditee_uei = (
             "ZQGGHJH74DW7"
         )
@@ -477,7 +471,7 @@ class CogOverTests(TestCase):
             },
         )
         audit = Audit.objects.get(report_id=audit.report_id)
-        audit.audit["general_information"]["auditee_ein"] = audit.auditee_ein = (
+        audit.audit["general_information"]["ein"] = audit.auditee_ein = (
             UNIQUE_EIN_WITHOUT_DBKEY
         )
         audit.audit["general_information"]["auditee_uei"] = audit.auditee_uei = (
@@ -510,7 +504,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": BASE_UEI,
-                    "auditee_ein": BASE_EIN,
+                    "ein": BASE_EIN,
                 },
                 "audit_year": 2019,
                 "cognizant_agency": BASE_COG,
@@ -527,7 +521,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": BASE_UEI,
-                    "auditee_ein": BASE_EIN,
+                    "ein": BASE_EIN,
                 },
                 "audit_year": 2022,
             },
@@ -564,7 +558,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2024,
             },
@@ -608,7 +602,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2027,
             },
@@ -629,7 +623,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2024,
                 "cognizant_agency": "24",
@@ -672,7 +666,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW8",
-                    "auditee_ein": "EI27NOBAS",
+                    "ein": "EI27NOBAS",
                 },
                 "audit_year": 2027,
             },
@@ -716,7 +710,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2027,
             },
@@ -737,7 +731,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2024,
                 "cognizant_agency": "24",
@@ -755,7 +749,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2025,
                 "cognizant_agency": "14",
@@ -773,7 +767,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2026,
                 "cognizant_agency": "04",
@@ -816,7 +810,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2020,
                 "cognizant_agency": "34",
@@ -848,7 +842,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2026,
                 "cognizant_agency": "10",
@@ -866,7 +860,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ein": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2027,
             },
