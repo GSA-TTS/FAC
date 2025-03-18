@@ -254,35 +254,3 @@ def prune_dict_to_max_values(data: dict):
         if value == max_value:
             pruned_dict[key] = value
     return pruned_dict
-
-
-def record_cog_assignment(report_id, user, cognizant_agency):
-    """
-    To be unvoked by app to persist the computed cog agency
-    """
-    CognizantAssignment(
-        report_id=report_id,
-        cognizant_agency=cognizant_agency,
-        assignor_email=user.email,
-    ).save()
-
-
-def get_cog_over(audit):
-    """
-    Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
-    """
-    if not audit.audit.get("federal_awards"):
-        logger.warning(
-            "Trying to determine cog_over for a self with zero awards with status = %s",
-            audit.submission_status,
-        )
-        sys.exit()
-    else:
-        cognizant_agency, oversight_agency = compute_cog_over(
-            audit.audit["federal_awards"],
-            audit.submission_status,
-            audit.auditee_ein,
-            audit.auditee_uei,
-            audit.audit_year,
-        )
-        return (cognizant_agency, oversight_agency)

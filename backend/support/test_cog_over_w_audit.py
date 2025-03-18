@@ -10,7 +10,7 @@ from audit.models import (
 from model_bakery import baker
 from faker import Faker
 from .models.cog_over import CognizantAssignment
-from .cog_over_w_audit import compute_cog_over, record_cog_assignment
+from .cog_over_w_audit import compute_cog_over
 
 User = get_user_model()
 
@@ -552,83 +552,6 @@ class CogOverTests(TestCase):
         )
         self.assertEqual(cog_agency, BASE_COG)
         self.assertEqual(over_agency, None)
-
-    # def test_cog_assignment_with_uei_in_baseline_and_override(self):
-    #     BASE_UEI = "UEI1"
-    #     BASE_EIN = "EIN1"
-    #     BASE_COG = "00"
-
-    #     user = baker.make(
-    #         User,
-    #         email="Test_email",
-    #     )
-    #     audit = baker.make(
-    #         Audit,
-    #         version=0,
-    #         report_id="9991-09-GSAFAC-0000201851",
-    #         audit={
-    #             "federal_awards": {
-    #                 "awards": [],
-    #                 "total_amount_expended": 52_000_200,
-    #             },
-    #             "general_information": {
-    #                 "auditee_uei": BASE_EIN,
-    #                 "auditee_ein": BASE_UEI,
-    #             },
-    #             "audit_year": 2023,
-    #             "cognizant_agency": BASE_COG,
-    #         },
-    #     )
-    #     audit = Audit.objects.get(report_id=audit.report_id)
-    #     audit.event_user = user
-    #     audit.event_type = SubmissionEvent.EventType.SUBMITTED
-    #     audit.save()
-
-    #     cog_agency, _ = compute_cog_over(
-    #         audit.audit["federal_awards"],
-    #         audit.submission_status,
-    #         audit.auditee_ein,
-    #         audit.auditee_uei,
-    #         audit.audit_year,
-    #     )
-
-    #     record_cog_assignment(audit.report_id, audit.event_user, cog_agency)
-    #     cas = CognizantAssignment.objects.all()
-    #     self.assertEqual(len(cas), 1)
-
-    #     audit = Audit.objects.get(report_id=audit.report_id)
-    #     self.assertEqual(audit.cognizant_agency, cog_agency)
-
-    #     override_cog = "01"
-    #     CognizantAssignment(
-    #         report_id=audit.report_id,
-    #         cognizant_agency=override_cog,
-    #         assignor_email="test_cog_over   @test.gov",
-    #         override_comment="test_cog_over",
-    #     ).save()
-    #     cas = CognizantAssignment.objects.all()
-    #     self.assertEqual(len(cas), 2)
-
-    #     audit = Audit.objects.get(report_id=audit.report_id)
-    #     self.assertEqual(audit.cognizant_agency, override_cog)
-
-    #     audit.event_user = user
-    #     audit.event_type = SubmissionEvent.EventType.SUBMITTED
-    #     audit.audit["cognizant_agency"] = "00"
-    #     audit.save()
-
-    #     # a re-run ahould create a third assignmenet
-    #     cog_agency, _ = compute_cog_over(
-    #         audit.audit["federal_awards"],
-    #         audit.submission_status,
-    #         audit.auditee_ein,
-    #         audit.auditee_uei,
-    #         audit.audit_year,
-    #     )
-
-    #     record_cog_assignment(audit.report_id, audit.event_user, cog_agency)
-    #     audit = Audit.objects.get(report_id=audit.report_id)
-    #     self.assertEqual(audit.cognizant_agency, cog_agency)
 
     def test_cog_assignment_for_2024_audit(self):
 

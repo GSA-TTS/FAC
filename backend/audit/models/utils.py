@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import Func
 
 from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
-from support.cog_over_w_audit import get_cog_over
+from support.cog_over_w_audit import compute_cog_over
 
 
 def generate_sac_report_id(count, end_date, source="GSAFAC"):
@@ -51,7 +51,13 @@ def generate_audit_indexes(audit, sac):
     else:
         audit_year, fy_end_month, _ = "1900-01-01".split("-")
 
-    cognizant_agency, oversight_agency = get_cog_over(audit)
+    cognizant_agency, oversight_agency = compute_cog_over(
+        audit.audit["federal_awards"],
+        audit.submission_status,
+        audit.auditee_ein,
+        audit.auditee_uei,
+        audit.audit_year,
+    )
 
     is_public = general_information.get(
         "user_provided_organization_type", ""
