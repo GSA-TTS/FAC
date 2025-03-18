@@ -40,7 +40,6 @@ class Command(BaseCommand):
             print(f"Invalid year {year}.  Expecting 2022 / 2023 / 2024 / 2025")
             return
 
-        initialize_db()
         audit_model = apps.get_model("audit.Audit")
         audits = audit_model.objects.filter(
             Q(audit_year=year)
@@ -113,14 +112,3 @@ class Command(BaseCommand):
                 award["program"]["three_digit_extension"],
                 award["direct_or_indirect_award"]["is_direct"],
             )
-
-
-def initialize_db():
-    """
-    This will delete existing data, and should only be run in a local env
-    """
-    CognizantAssignment.objects.all().delete()
-    User.objects.get_or_create(
-        username="foo",
-        email="g22.foobar.com",
-    )
