@@ -1,9 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 
-
-from audit.models import User
-
 from audit.models.models import STATUS
 from support.cog_over_w_audit import compute_cog_over
 from django.apps import apps
