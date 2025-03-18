@@ -1,4 +1,3 @@
-
 from django.test import TestCase
 from model_bakery import baker
 
@@ -9,7 +8,6 @@ from audit.models.utils import (
   compare_values,
   validate_audit_consistency,
 )
-from .models import SingleAuditChecklist
 
 
 class TestFlattenJson(TestCase):
