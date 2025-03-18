@@ -18,3 +18,7 @@ class History(models.Model):
     event_data = models.JSONField()
     updated_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(User, on_delete=models.PROTECT)
+
+    class Meta:
+        verbose_name = "Audit History"
+        verbose_name_plural = "Audit History"

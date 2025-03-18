@@ -287,8 +287,8 @@ class Audit(CreatedMixin, UpdatedMixin):
         # Uncomment this line should we decide to make disseminated reports immutable in resubmission
         # unique_together = ("report_id", "version")
         # Admin View
-        verbose_name = "SF-SAC"
-        verbose_name_plural = "SF-SACs"
+        verbose_name = "Audit"
+        verbose_name_plural = "Audits"
 
     def save(self, *args, **kwargs):
         """
