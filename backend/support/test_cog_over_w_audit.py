@@ -41,7 +41,7 @@ class CogOverTests(TestCase):
                 },
                 "general_information": {
                     "auditee_uei": "ZQGGHJH74DW7",
-                    "auditee_ei": UNIQUE_EIN_WITHOUT_DBKEY,
+                    "ein": UNIQUE_EIN_WITHOUT_DBKEY,
                 },
                 "audit_year": 2022,
             },
