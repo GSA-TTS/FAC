@@ -145,4 +145,15 @@ class Migration(migrations.Migration):
                 output_field=models.CharField(),
             ),
         ),
+        migrations.AlterModelOptions(
+            name="history",
+            options={
+                "verbose_name": "Audit History",
+                "verbose_name_plural": "Audit History",
+            },
+        ),
+        migrations.AlterModelOptions(
+            name="audit",
+            options={"verbose_name": "Audit", "verbose_name_plural": "Audits"},
+        ),
     ]
