@@ -226,7 +226,7 @@ class Audit(CreatedMixin, UpdatedMixin):
 
     auditee_ein = GeneratedField(
         expression=KeyTextTransform(
-            "auditee_ein", KeyTextTransform("general_information", "audit")
+            "ein", KeyTextTransform("general_information", "audit")
         ),
         output_field=models.CharField(),
         db_persist=True,
