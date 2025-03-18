@@ -4,6 +4,9 @@ The intent of this file is to group together audit related helpers.
 
 import logging
 
+
+from datetime import timedelta
+from django.utils import timezone as django_timezone
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Func
@@ -42,6 +45,16 @@ def generate_sac_report_id(count, end_date, source="GSAFAC"):
 class JsonArrayToTextArray(Func):
     function = "json_array_to_text_array"
     output_field = ArrayField(models.CharField())
+
+
+def one_month_from_today():
+    return django_timezone.now() + timedelta(days=30)
+
+
+def camel_to_snake(raw: str) -> str:
+    """Convert camel case to snake_case."""
+    text = f"{raw[0].lower()}{raw[1:]}"
+    return "".join(c if c.islower() else f"_{c.lower()}" for c in text)
 
 
 def generate_audit_indexes(audit):
