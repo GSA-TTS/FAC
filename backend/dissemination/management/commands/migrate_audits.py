@@ -68,6 +68,11 @@ class Command(BaseCommand):
             action="store_true",
             help="Migrates the Audit model to in_progress records.",
         )
+        parser.add_argument(
+            "--report_id",
+            type=str,
+            help="Migrate a specific SingleAuditChecklist by ID.",
+        )
 
     def handle(self, *args, **kwargs):
 
@@ -143,7 +148,11 @@ class Command(BaseCommand):
 
 def _get_query(kwargs, max_records):
     """Fetch unmigrated SACs, based on parameters."""
-    if kwargs.get("disseminated"):
+    if kwargs.get("report_id"):
+        queryset = SingleAuditChecklist.objects.filter(
+            migrated_to_audit=False, report_id=kwargs.get("report_id")
+        )
+    elif kwargs.get("disseminated"):
         queryset = SingleAuditChecklist.objects.filter(
             migrated_to_audit=False, submission_status="disseminated"
         )
