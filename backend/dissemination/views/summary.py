@@ -161,7 +161,9 @@ class AuditSummaryView(View):
 
         # The main notes_to_sefa object counts as 1 note unless there are entries.
         if audit.audit["notes_to_sefa"]:
-            num_notes_entries = len(audit.audit["notes_to_sefa"].get("notes_to_sefa_entries", []))
+            num_notes_entries = len(
+                audit.audit["notes_to_sefa"].get("notes_to_sefa_entries", [])
+            )
             notes_count = max(1, num_notes_entries)
 
         return {
