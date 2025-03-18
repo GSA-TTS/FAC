@@ -9,7 +9,11 @@ Alert component, provides resources on what to do/where to go when an expected r
         <p class="usa-alert__text padding-bottom-2">
             If this page does not look like you expect please click
             <a class="usa-link"
+               {% if report_id %}
+                href="{% url non_beta_url report_id=report_id%}"
+               {% else %}
                 href="{% url non_beta_url %}"
+               {% endif %}
                 target="_blank"
                 rel="noopener noreferrer">here</a>
             to view the original version of this page.

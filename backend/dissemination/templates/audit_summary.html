@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load getkey %}
+{% load humanize %}
+{% load sprite_helper %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-col grid-gap">
+            {% comment %} Title & Header {% endcomment %}
+          {% include "includes/beta_warning.html" %}
+            <div class="grid-row" id="title">
+                <div class="grid-col-12 tablet:grid-col-7">
+                    <h1 class="usa-legend usa-legend--large font-sans-2xl">Single audit summary</h1>
+                    <legend class="usa-legend usa-legend--large text-normal font-sans-xl margin-top-4">
+                        <p class="margin-0 text-bold">{{ header.auditee_name }}</p>
+                        <p class="margin-0 text-semibold">
+                            <strong>UEI:</strong> {{ header.auditee_uei }}
+                        </p>
+                    </legend>
+                    <div class="font-sans-lg">
+                        <p class="margin-bottom-1 margin-top-2">
+                            <strong>Report ID:&nbsp;</strong>{{ header.report_id }}
+                        </p>
+                        <p class="margin-y-1">
+                            <strong>FAC acceptance date:&nbsp;</strong>{{ header.fac_accepted_date }}
+                        </p>
+                        <p class="margin-y-1">
+                            <strong>Fiscal Year:&nbsp;</strong>{{ header.fy_start_date }} to {{ header.fy_end_date }}
+                        </p>
+                    </div>
+                </div>
+                <div class="grid-col-12 tablet:grid-col-5 tablet:display-flex flex-column tablet:flex-justify-end">
+                    <div class="margin-0 flex-align-self-end margin-top-2">
+                        <div class="display-flex flex-row">
+                            <a class="usa-button display-flex flex-fill font-sans-xl margin-bottom-2"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href="{% url 'dissemination:SummaryReportDownload' report_id=report_id%}"
+                            >
+                                <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                    aria-hidden="true"
+                                    role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                                <p class="margin-0">SF-SAC</p>
+                            </a>
+                        </div>
+
+                        {% if allow_download %}
+                            <a class="usa-button display-flex font-sans-xl"
+                                href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                    aria-hidden="true"
+                                    role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                                <p class="margin-0">Single audit report</p>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% comment %} The grey box of doom {% endcomment %}
+    <div class="bg-base-lighter padding-bottom-10 ">
+        <div class="grid-container margin-top-6">
+            <div id="summary-information" class="margin-top-6 padding-y-3">
+                {% comment %} Auditee {% endcomment %}
+                <h2 class="font-sans-2xl text-semibold margin-bottom-2 margin-top-3">Auditee</h2>
+                <table class="usa-table width-full">
+                    <tbody class="grid-row" id="{{ section_key }}-table__body">
+                        <tr class="grid-row grid-col-12">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Contact Name:&nbsp;</strong>{{ auditee_info.auditee_contact_name }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Contact title:&nbsp;</strong>{{ auditee_info.auditee_contact_title }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Email:&nbsp;</strong>{{ auditee_info.auditee_email }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Phone:&nbsp;</strong>{{ auditee_info.auditee_phone }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Address:&nbsp;</strong>{{ auditee_info.auditee_address_line_1 }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>City and state:&nbsp;</strong>{{ auditee_info.auditee_city }}, {{ auditee_info.auditee_state }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Zip code:&nbsp;</strong>{{ auditee_info.auditee_zip }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <span><strong>Additional UEIs? </strong>{{ auditee_info.additional_ueis }}</span>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>EIN:&nbsp;</strong>{{ auditee_info.ein }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <span><strong>Additional EINs? </strong>{{ auditee_info.additional_eins }}</span>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Certifying name:&nbsp;</strong>{{ auditee_info.auditee_certify_name }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Certifying title:&nbsp;</strong>{{ auditee_info.auditee_certify_title }}
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                {% comment %} Auditor {% endcomment %}
+                <h2 class="font-sans-2xl text-semibold margin-bottom-2 margin-top-3">Auditor</h2>
+                <table class="usa-table width-full">
+                    <tbody class="grid-row" id="{{ section_key }}-table__body">
+                        <tr class="grid-row grid-col-12">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Contact Name:&nbsp;</strong>{{ auditor_info.auditor_contact_name }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Contact title:&nbsp;</strong>{{ auditor_info.auditor_contact_title }}
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                <p class="margin-y-1">
+                                    <strong>Email:&nbsp;</strong>{{ auditor_info.auditor_email }}
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <strong>Phone:&nbsp;</strong>{{ auditor_info.auditor_phone }}
+                                </p>
+                            </td>
+                        </tr>
+                        {% if auditor_info.auditor_address_line_1 %}
+                            {% comment %} Domestic auditor {% endcomment %}
+                            <tr class="grid-row grid-col-12 margin-top-2">
+                                <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                    <p class="margin-y-1">
+                                        <strong>Address:&nbsp;</strong>{{ auditor_info.auditor_address_line_1 }}
+                                    </p>
+                                </td>
+                                <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                    <p class="margin-y-1">
+                                        <strong>City and state:&nbsp;</strong>{{ auditor_info.auditor_city }}, {{ auditor_info.auditor_state }}
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr class="grid-row grid-col-12 margin-top-2">
+                                <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                    <p class="margin-y-1">
+                                        <strong>Zip code:&nbsp;</strong>{{ auditor_info.auditor_zip }}
+                                    </p>
+                                </td>
+                                <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                    <p class="margin-y-1">
+                                        <span><strong>Secondary Auditors? </strong>&nbsp;{{auditor_info.has_secondary_auditors}}
+                                        </span>
+                                    </p>
+                                </td>
+                            </tr>
+                        {% else %}
+                            {% comment %} International auditor {% endcomment %}
+                            <tr class="grid-row grid-col-12 margin-top-2">
+                                <td class="grid-col-12 tablet:grid-col tablet:margin-right-2">
+                                    <p class="margin-y-1">
+                                        <strong>Address:&nbsp;</strong>{{ auditor_info.auditor_foreign_address }}
+                                    </p>
+                                </td>
+                                <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                    <p class="margin-y-1">
+                                        <span><strong>Secondary Auditors? </strong> {{auditor_info.has_secondary_auditors}}
+                                    </p>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+
+                {% comment %} Summary {% endcomment %}
+                <h2 class="font-sans-2xl text-semibold margin-bottom-2 margin-top-3">Summary</h2>
+                <table class="usa-table width-full">
+                    <tbody class="grid-row" id="{{ section_key }}-table__body">
+                        <tr class="grid-row grid-col-12">
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
+                                <p class="margin-y-1">
+                                    <span><strong>Federal awards:</strong>&nbsp;
+                                        {{ summary.number_of_federal_awards }}
+                                    </span>
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1 {% if not summary|getkey:"Notes to SEFA" %}text-gray-40{% endif %}">
+                                    <span><strong>Notes to SEFA:</strong>&nbsp;{{ summary.number_of_notes }}</span>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
+                                <p class="margin-y-1 {% if not summary|getkey:"Audit Findings" %}text-gray-40{% endif %}">
+                                    <span><strong>Findings:</strong>&nbsp;
+                                        {{ summary.number_of_findings }}
+                                    </span>
+                                </p>
+                            </td>
+                            {% comment %} Findings text - If none, show the gray box with no link. {% endcomment %}
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1 {% if not summary|getkey:"Audit Findings Text" %}text-gray-40{% endif %}">
+                                    <span><strong>Findings text:</strong>&nbsp; {{ summary.number_of_findings_text }}</span>
+                                </p>
+                            </td>
+                        </tr>
+                        {% comment %} CAP - If none, show the gray box with no link. {% endcomment %}
+                        <tr class="grid-row grid-col-12 margin-top-2">
+                            <td class="grid-col-12 tablet:grid-col tablet:margin-right-2 tablet:margin-top-0">
+                                <p class="margin-y-1 {% if not summary|getkey:"Corrective Action Plan" %}text-gray-40{% endif %}">
+                                    <span><strong>CAP:</strong>&nbsp;{{ summary.number_of_caps }}
+                                    </span>
+                                </p>
+                            </td>
+                            <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
+                                <p class="margin-y-1 display-flex flex-row flex-justify">
+                                    <strong>Total federal expenditure:&nbsp;</strong>
+                                    <span class="margin-0 display-flex">
+                                        ${{ summary.total_amount_expended|intcomma }}
+                                    </span>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
