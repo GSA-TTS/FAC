@@ -351,37 +351,23 @@ def compare_values(value1, value2):
         return True
 
     if str(value1) == str(value2):
-        # print("str")
-        # print(value1, value2)
         return True
 
     if isinstance(value1, list) and value2 in value1:
-        # print("list1")
-        # print(value1, value2)
         return True
 
     if isinstance(value2, list) and value1 in value2:
-        # print("list2")
-        # print(value1, value2)
         return True
 
     if isinstance(value1, dict) and value2 in value1.values():
-        # print("dict1")
-        # print(value1, value2)
         return True
     if isinstance(value2, dict) and value1 in value2.values():
-        # print("dict2")
-        # print(value1, value2)
         return True
 
     try:
         if isinstance(value1, (int, float)) and isinstance(value2, str):
-            # print("float1")
-            # print(value1, value2)
             return value1 == float(value2)
         if isinstance(value2, (int, float)) and isinstance(value1, str):
-            # print("float2")
-            # print(value1, value2)
             return value2 == float(value1)
     except (ValueError, TypeError):
         pass
