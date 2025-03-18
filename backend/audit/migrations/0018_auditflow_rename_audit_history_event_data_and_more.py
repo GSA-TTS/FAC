@@ -130,4 +130,19 @@ class Migration(migrations.Migration):
                 ]
             ),
         ),
+        migrations.RemoveField(model_name="audit", name="auditee_ein"),
+        migrations.AddField(
+            model_name="audit",
+            name="auditee_ein",
+            field=models.GeneratedField(
+                db_persist=True,
+                expression=django.db.models.fields.json.KeyTextTransform(
+                    "ein",
+                    django.db.models.fields.json.KeyTextTransform(
+                        "general_information", "audit"
+                    ),
+                ),
+                output_field=models.CharField(),
+            ),
+        ),
     ]
