@@ -1,10 +1,8 @@
 from collections import defaultdict
 import logging
 import math
-import sys
 
-from django.db.models.functions import Cast
-from django.db.models import BigIntegerField, Q
+from django.db.models import Q
 
 from dissemination.models import MigrationInspectionRecord
 from django.apps import apps
@@ -25,14 +23,8 @@ def compute_cog_over(
     federal_awards, submission_status, auditee_ein, auditee_uei, audit_year
 ):
     """
-    Compute cog or oversight agency for the sac.
+    Compute cog or oversight agency for the audit.
     Return tuple (cog_agency, oversight_agency)
-
-    WIP:
-    - sac.federal_awards
-    - sac.submission_status
-    - sac.ein
-    - sac.auditee_uei
     """
     if not federal_awards:
         logger.warning(

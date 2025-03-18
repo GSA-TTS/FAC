@@ -5,7 +5,6 @@ from dissemination.models import MigrationInspectionRecord
 # from audit.models.audit import Audit
 from audit.models import (
     Audit,
-    SubmissionEvent,
 )
 from model_bakery import baker
 from faker import Faker
