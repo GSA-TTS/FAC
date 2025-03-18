@@ -35,7 +35,7 @@ from audit.validators import (
     validate_component_page_numbers,
 )
 from audit.utils import FORM_SECTION_HANDLERS
-from support.cog_over import compute_cog_over, record_cog_assignment
+from support.cog_over import compute_cog_over
 from .submission_event import SubmissionEvent
 
 User = get_user_model()
@@ -266,7 +266,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         if cognizant_agency:
             self.cognizant_agency = cognizant_agency
             self.save()
-            record_cog_assignment(self.report_id, self.submitted_by, cognizant_agency)
 
     def _reject_late_changes(self):
         """

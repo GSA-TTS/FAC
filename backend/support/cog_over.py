@@ -5,7 +5,6 @@ import math
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
 
-from support.models import CognizantAssignment
 from dissemination.models import General, MigrationInspectionRecord, FederalAward
 
 logger = logging.getLogger(__name__)
@@ -238,14 +237,3 @@ def prune_dict_to_max_values(data: dict):
         if value == max_value:
             pruned_dict[key] = value
     return pruned_dict
-
-
-def record_cog_assignment(report_id, user, cognizant_agency):
-    """
-    To be unvoked by app to persist the computed cog agency
-    """
-    CognizantAssignment(
-        report_id=report_id,
-        cognizant_agency=cognizant_agency,
-        assignor_email=user.email,
-    ).save()

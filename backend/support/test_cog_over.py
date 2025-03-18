@@ -5,9 +5,8 @@ from model_bakery import baker
 from faker import Faker
 
 from audit.models import SingleAuditChecklist
-from .models import CognizantAssignment
 
-from .cog_over import compute_cog_over, record_cog_assignment
+from .cog_over import compute_cog_over
 
 # Note:  Fake data is generated for SingleAuditChecklist.
 #        Using only the data fields that apply to cog / over assignment.
@@ -446,25 +445,18 @@ class CogOverTests(TestCase):
             sac.auditee_uei,
             sac.general_information["audit_year"],
         )
-        record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
-        cas = CognizantAssignment.objects.all()
-        self.assertEqual(len(cas), 1)
+        sac.cognizant_agency = cog_agency
+        sac.save()
 
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(sac.cognizant_agency, cog_agency)
 
-        oberride_cog = "01"
-        CognizantAssignment(
-            report_id=sac.report_id,
-            cognizant_agency=oberride_cog,
-            assignor_email="test_cog_over   @test.gov",
-            override_comment="test_cog_over",
-        ).save()
-        cas = CognizantAssignment.objects.all()
-        self.assertEqual(len(cas), 2)
+        override_cog = "01"
+        sac.cognizant_agency = override_cog
+        sac.save()
 
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
-        self.assertEqual(sac.cognizant_agency, oberride_cog)
+        self.assertEqual(sac.cognizant_agency, override_cog)
 
         # a re-run ahould create a third assignmenet
         sac.cognizant_agency = None
@@ -476,7 +468,9 @@ class CogOverTests(TestCase):
             sac.auditee_uei,
             sac.general_information["audit_year"],
         )
-        record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
+        sac.cognizant_agency = cog_agency
+        sac.save()
+
         sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(sac.cognizant_agency, cog_agency)
 

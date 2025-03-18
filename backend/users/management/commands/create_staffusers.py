@@ -33,7 +33,6 @@ class Command(BaseCommand):
             "view_note",
             "view_passthrough",
             "view_secondaryauditor",
-            "view_cognizantassignment",
             "view_staffuser",
             "view_userpermission",
             "view_tribalapiaccesskeyids",
@@ -54,7 +53,6 @@ class Command(BaseCommand):
             "delete_tribalapiaccesskeyids",
             "add_sacvalidationwaiver",
             "add_ueivalidationwaiver",
-            "add_cognizantassignment",
         ]
         group_helpdesk.permissions.clear()
         for code in helpdesk_codenames:

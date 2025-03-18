@@ -6,7 +6,6 @@ from django.db.models import BigIntegerField, Q
 from dissemination.models import General, FederalAward
 from audit.models import SingleAuditChecklist, User
 from audit.models.models import STATUS
-from support.models import CognizantAssignment
 
 from config.settings import ENVIRONMENT
 
@@ -148,8 +147,3 @@ def initialize_db():
     This will delete existing data, and should only be run in a local env
     """
     SingleAuditChecklist.objects.all().delete()
-    CognizantAssignment.objects.all().delete()
-    User.objects.get_or_create(
-        username="foo",
-        email="g22.foobar.com",
-    )
