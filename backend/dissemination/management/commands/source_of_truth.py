@@ -62,10 +62,10 @@ class Command(BaseCommand):
         sot_audits_by_report_id = self._get_audits_by_report_id(sot_audits_query)
 
         for report_id in sot_sorted_report_ids:
-            is_consistent, discrepancies = validate_audit_consistency(sot_audits_by_report_id[report_id])
+            is_consistent, differences = validate_audit_consistency(sot_audits_by_report_id[report_id])
 
             if not is_consistent:
-                logger.error(discrepancies)
+                logger.error(differences)
 
     def _get_sorted_report_ids(self, queryset):
         report_ids = []
