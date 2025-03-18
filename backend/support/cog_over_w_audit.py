@@ -6,7 +6,6 @@ import sys
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
 
-from support.models import CognizantAssignment
 from dissemination.models import MigrationInspectionRecord
 from django.apps import apps
 

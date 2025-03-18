@@ -9,7 +9,6 @@ from audit.models import (
 )
 from model_bakery import baker
 from faker import Faker
-from .models.cog_over import CognizantAssignment
 from .cog_over_w_audit import compute_cog_over
 
 User = get_user_model()
