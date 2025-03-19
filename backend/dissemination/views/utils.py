@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from users.permissions import can_read_tribal
 
 
@@ -12,3 +14,10 @@ def include_private_results(request):
         return False
 
     return True
+
+
+def to_date(date_string):
+    """
+    Helper method to convert a string in the format YYYY-MM-DD to a date object.
+    """
+    return datetime.strptime(date_string, "%Y-%m-%d").date()
