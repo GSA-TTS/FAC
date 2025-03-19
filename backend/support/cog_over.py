@@ -237,3 +237,15 @@ def prune_dict_to_max_values(data: dict):
         if value == max_value:
             pruned_dict[key] = value
     return pruned_dict
+
+
+def record_cog_assignment(report_id, cognizant_agency):
+    """
+    To be invoked by app to persist the computed cog agency
+    """
+    try:
+        gen = General.objects.get(report_id=report_id)
+        gen.cognizant_agency = cognizant_agency
+        gen.save()
+    except General.DoesNotExist:
+        pass
