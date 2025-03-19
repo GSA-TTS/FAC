@@ -256,10 +256,13 @@ def validate_audit_consistency(audit_instance):
             flat_sac = flatten_json(sac_data)
             flat_audit = flatten_json(audit_instance.audit)
 
-            for sac_path, sac_value in flat_sac.items(): # change to sac_path, sac_value
+            for (
+                sac_path,
+                sac_value,
+            ) in flat_sac.items():  # change to sac_path, sac_value
                 result = value_exists_in_audit(sac_path, sac_value, flat_audit)
 
-                if result == False:
+                if not result.get("found"):
                     differences.append(
                         {
                             "field": field,
@@ -269,9 +272,7 @@ def validate_audit_consistency(audit_instance):
                         }
                     )
 
-                elif isinstance(result, dict) and result.get(
-                    "found_with_different_key"
-                ):
+                elif result.get("found_with_different_key"):
                     differences.append(
                         {
                             "field": field,
@@ -323,23 +324,29 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
         ):
             if sac_field != audit_field:
                 return {
+                    "found": True,
                     "found_with_different_key": True,
                     "sac_field": sac_field,
                     "audit_path": audit_path,
                     "value": audit_value,
                 }
-            return True
+            return {
+                "found": True,
+            }
 
     for audit_path, audit_value in audit_data.items():
         if compare_values(sac_value, audit_value):
             return {
+                "found": True,
                 "found_with_different_key": True,
                 "sac_field": sac_field,
                 "audit_path": audit_path,
                 "value": audit_value,
             }
 
-    return False
+    return {
+        "found": True,
+    }
 
 
 # Do we need this?
