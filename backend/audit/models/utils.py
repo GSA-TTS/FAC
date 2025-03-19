@@ -321,6 +321,13 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
         if sac_norm_field == norm_audit_field and (
             compare_values(sac_value, audit_value)
         ):
+            if sac_field != audit_field:
+                return {
+                    "found_with_different_key": True,
+                    "sac_field": sac_field,
+                    "audit_path": audit_path,
+                    "value": audit_value,
+                }
             return True
 
     for audit_path, audit_value in audit_data.items():
