@@ -320,7 +320,7 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
         norm_audit_field = normalize_key(audit_field)
 
         if sac_norm_field == norm_audit_field and (
-            compare_values(sac_value, audit_value)
+            sac_value == audit_value or compare_values(sac_value, audit_value)
         ):
             if sac_field != audit_field:
                 return {
@@ -335,7 +335,7 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             }
 
     for audit_path, audit_value in audit_data.items():
-        if compare_values(sac_value, audit_value):
+        if sac_value == audit_value or compare_values(sac_value, audit_value):
             return {
                 "found": True,
                 "found_with_different_key": True,
@@ -361,8 +361,6 @@ def normalize_key(key):
 
 def compare_values(value1, value2):
     """Generate other format types for obj, str, list, dict"""
-    if value1 == value2:
-        return True
 
     if str(value1) == str(value2):
         return True
