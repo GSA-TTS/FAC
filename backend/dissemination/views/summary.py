@@ -78,7 +78,7 @@ class AuditSummaryView(View):
             "auditee_info": self._populate_auditee(audit),
             "auditor_info": self._populate_auditor(audit),
             "summary": self._populate_summary(audit, include_private_and_public),
-            "all_download": include_private_and_public,
+            "allow_download": include_private_and_public,
             "is_beta": True,
             "non_beta_url": "dissemination:Summary",
         }
