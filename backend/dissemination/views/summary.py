@@ -78,7 +78,11 @@ class AuditSummaryView(View):
             "auditee_info": self._populate_auditee(audit),
             "auditor_info": self._populate_auditor(audit),
             "summary": self._populate_summary(audit, include_private_and_public),
+<<<<<<< HEAD
             "allow_download": include_private_and_public,
+=======
+            "all_download": include_private_and_public,
+>>>>>>> 21f73aa2 (Fix issue with non-disseminated audits)
             "is_beta": True,
             "non_beta_url": "dissemination:Summary",
         }
@@ -157,6 +161,7 @@ class AuditSummaryView(View):
 
     @staticmethod
     def _populate_summary(audit, is_public):
+<<<<<<< HEAD
         notes_count = 0
 
         # The main notes_to_sefa object counts as 1 note unless there are entries.
@@ -166,14 +171,29 @@ class AuditSummaryView(View):
             )
             notes_count = max(1, num_notes_entries)
 
+=======
+>>>>>>> 21f73aa2 (Fix issue with non-disseminated audits)
         return {
             "number_of_federal_awards": len(
                 audit.audit["federal_awards"].get("awards", [])
             ),
+<<<<<<< HEAD
             "number_of_notes": notes_count if is_public else "N/A",
             "number_of_findings": audit.audit.get("search_indexes", {}).get(
                 "unique_audit_findings_count", 0
             ),
+=======
+            "number_of_notes": (
+                len(
+                    audit.audit.get("notes_to_sefa", {}).get(
+                        "notes_to_sefa_entries", []
+                    )
+                )
+                if is_public
+                else "N/A"
+            ),
+            "number_of_findings": len(audit.audit.get("findings_uniform_guidance", [])),
+>>>>>>> 21f73aa2 (Fix issue with non-disseminated audits)
             "number_of_findings_text": (
                 len(audit.audit.get("findings_text", [])) if is_public else "N/A"
             ),
