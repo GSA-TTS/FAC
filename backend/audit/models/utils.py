@@ -2,12 +2,16 @@
 The intent of this file is to group together audit related helpers.
 """
 
+import logging
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Func
 
 from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
 from support.cog_over_w_audit import compute_cog_over
+
+logger = logging.getLogger(__name__)
 
 
 def generate_sac_report_id(count, end_date, source="GSAFAC"):
@@ -40,9 +44,7 @@ class JsonArrayToTextArray(Func):
     output_field = ArrayField(models.CharField())
 
 
-# TODO:
-#    1) We'll want to calculate the cog/oversite for the audit same way as sac, for now just use the sac one
-def generate_audit_indexes(audit, sac):
+def generate_audit_indexes(audit):
     general_information = audit.audit.get("general_information", {})
 
     fiscal_period_end = general_information.get("auditee_fiscal_period_end", None)
@@ -81,11 +83,12 @@ def generate_audit_indexes(audit, sac):
 def _index_findings(audit_data):
     findings = 0
     compliance_requirements = set()
+    unique_findings = set()
     for finding in audit_data.get("findings_uniform_guidance", []):
         for mask in FINDINGS_FIELD_TO_BITMASK:
             if finding.get(mask.field, "N") == "Y":
                 findings |= mask.mask
-        if finding.get("finding", {}).get("repeat_prior_reference", "N") == "Y":
+        if finding.get("findings", {}).get("repeat_prior_reference", "N") == "Y":
             findings |= FindingsBitmask.REPEAT_FINDING
 
         compliance_requirement = finding.get("program", {}).get(
@@ -93,9 +96,14 @@ def _index_findings(audit_data):
         )
         compliance_requirements.add(compliance_requirement)
 
+        reference_number = finding.get("findings", {}).get("reference_number", None)
+        if reference_number:
+            unique_findings.add(reference_number)
+
     return {
         "findings_summary": findings,
         "compliance_requirements": list(compliance_requirements),
+        "unique_audit_findings_count": len(unique_findings),
     }
 
 
