@@ -67,7 +67,7 @@ class AuditSummaryView(View):
     def _handle_sot(self, request, report_id):
         # TODO: Update Post SOC Launch
         audit = Audit.objects.find_audit_or_none(report_id=report_id)
-        if not audit and audit.submission_status != STATUS.DISSEMINATED:
+        if not audit or audit.submission_status != STATUS.DISSEMINATED:
             raise Http404(f"The report with ID: {report_id} does not exist.")
 
         include_private = include_private_results(request)
