@@ -345,7 +345,7 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             }
 
     return {
-        "found": True,
+        "found": False,
     }
 
 
