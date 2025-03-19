@@ -248,4 +248,4 @@ def record_cog_assignment(report_id, cognizant_agency):
         gen.cognizant_agency = cognizant_agency
         gen.save()
     except General.DoesNotExist:
-        pass
+        logger.warning(f"General object not found for report_id = {report_id}.")
