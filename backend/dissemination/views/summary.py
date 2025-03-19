@@ -157,19 +157,18 @@ class AuditSummaryView(View):
 
     @staticmethod
     def _populate_summary(audit, is_public):
+        notes_count = 0
+
+        # The main notes_to_sefa object counts as 1 note unless there are entries.
+        if audit.audit["notes_to_sefa"]:
+            num_notes_entries = len(audit.audit["notes_to_sefa"].get("notes_to_sefa_entries", []))
+            notes_count = max(1, num_notes_entries)
+
         return {
             "number_of_federal_awards": len(
                 audit.audit["federal_awards"].get("awards", [])
             ),
-            "number_of_notes": (
-                len(
-                    audit.audit.get("notes_to_sefa", {}).get(
-                        "notes_to_sefa_entries", []
-                    )
-                )
-                if is_public
-                else "N/A"
-            ),
+            "number_of_notes": notes_count if is_public else "N/A",
             "number_of_findings": len(audit.audit.get("findings_uniform_guidance", [])),
             "number_of_findings_text": (
                 len(audit.audit.get("findings_text", [])) if is_public else "N/A"
