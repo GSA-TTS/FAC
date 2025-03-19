@@ -171,7 +171,9 @@ class AuditSummaryView(View):
                 audit.audit["federal_awards"].get("awards", [])
             ),
             "number_of_notes": notes_count if is_public else "N/A",
-            "number_of_findings": len(audit.audit.get("findings_uniform_guidance", [])),
+            "number_of_findings": audit.audit.get("search_indexes", {}).get(
+                "unique_audit_findings_count", 0
+            ),
             "number_of_findings_text": (
                 len(audit.audit.get("findings_text", [])) if is_public else "N/A"
             ),
