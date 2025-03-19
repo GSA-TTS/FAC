@@ -192,7 +192,7 @@ def validate_audit_consistency(audit_instance):
             {"error": f"No SAC found with report_id {audit_instance.report_id}"}
         ]
 
-    difference = []
+    differences = []
 
     json_fields_to_check = [
         "general_information",
@@ -222,7 +222,7 @@ def validate_audit_consistency(audit_instance):
         audit_value = getattr(audit_instance, field, None)
 
         if sac_value and sac_value != audit_value:
-            difference.append(
+            differences.append(
                 {"field": field, "sac_value": sac_value, "audit_value": audit_value}
             )
 
@@ -231,7 +231,7 @@ def validate_audit_consistency(audit_instance):
         audit_field_data = audit_instance.audit.get(field)
 
         if sac_data is not None and audit_field_data is None:
-            difference.append(
+            differences.append(
                 {
                     "field": field,
                     "error": f"Field is empty in Audit, but not in SAC",
@@ -242,7 +242,7 @@ def validate_audit_consistency(audit_instance):
             continue
 
         if sac_data is None and audit_field_data is not None:
-            difference.append(
+            differences.append(
                 {
                     "field": field,
                     "error": f"Field is empty in SAC, but not in Audit",
@@ -253,38 +253,36 @@ def validate_audit_consistency(audit_instance):
             continue
 
         if sac_data is not None:
-
-            sac_values = flatten_json(sac_data)
+            flat_sac = flatten_json(sac_data)
             flat_audit = flatten_json(audit_instance.audit)
 
-            for path, value in sac_values.items():
-                result = value_exists_in_audit(path, value, flat_audit)
+            for sac_path, sac_value in flat_sac.items(): # change to sac_path, sac_value
+                result = value_exists_in_audit(sac_path, sac_value, flat_audit)
 
                 if result == False:
-                    difference.append(
+                    differences.append(
                         {
                             "field": field,
-                            "path": path,
-                            "value": value,
-                            "error": f"Value from SAC.{field}.{path} not found in Audit",
+                            "sac_path": sac_path,
+                            "sac_value": sac_value,
+                            "error": f"Value from SAC.{field}.{sac_path} not found in Audit",
                         }
                     )
 
                 elif isinstance(result, dict) and result.get(
                     "found_with_different_key"
                 ):
-                    difference.append(
+                    differences.append(
                         {
                             "field": field,
-                            "path": path,
-                            "value": value,
-                            "found_in_path": result["found_in_path"],
-                            "found_value": result["found_value"],
-                            "error": f"Value from SAC.{field}.{path} found in Audit but with different structure/key",
+                            "sac_path": sac_path,
+                            "sac_value": sac_value,
+                            "audit_path": result["audit_path"],
+                            "error": f"Value from SAC.{field}.{sac_path} found in Audit but with different structure/key",
                         }
                     )
 
-    return len(difference) == 0, difference
+    return len(differences) == 0, differences
 
 
 def flatten_json(obj, path="", result=None):
@@ -307,12 +305,12 @@ def flatten_json(obj, path="", result=None):
     return result
 
 
-def value_exists_in_audit(path, value, audit_data):
+def value_exists_in_audit(sac_path, sac_value, audit_data):
     """Check if a value from SAC exists somewhere in audit data with the same key-value"""
-    field_name = path.split(".")[-1] if "." in path else path
-    field_name = field_name.split("[")[0] if "[" in field_name else field_name
+    sac_field = sac_path.split(".")[-1] if "." in sac_path else sac_path
+    sac_field = sac_field.split("[")[0] if "[" in sac_field else sac_field
 
-    norm_field = normalize_key(field_name)
+    sac_norm_field = normalize_key(sac_field)
 
     for audit_path, audit_value in audit_data.items():
         audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
@@ -320,23 +318,24 @@ def value_exists_in_audit(path, value, audit_data):
 
         norm_audit_field = normalize_key(audit_field)
 
-        if norm_field == norm_audit_field and (
-            value == audit_value or get_other_formats(value, audit_value)
+        if sac_norm_field == norm_audit_field and (
+            compare_values(sac_value, audit_value)
         ):
             return True
 
     for audit_path, audit_value in audit_data.items():
-        if value == audit_value or get_other_formats(value, audit_value):
+        if compare_values(sac_value, audit_value):
             return {
                 "found_with_different_key": True,
-                "original_field": field_name,
-                "found_in_path": audit_path,
-                "found_value": audit_value,
+                "sac_field": sac_field,
+                "audit_path": audit_path,
+                "value": audit_value,
             }
 
     return False
 
 
+# Do we need this?
 def normalize_key(key):
     """Normalize the keys for comparison"""
     if not isinstance(key, str):
@@ -346,7 +345,7 @@ def normalize_key(key):
     return normalized.lower()
 
 
-def get_other_formats(value1, value2):
+def compare_values(value1, value2):
     """Generate other format types for obj, str, list, dict"""
     if value1 == value2:
         return True
