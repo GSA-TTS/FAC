@@ -161,7 +161,9 @@ class AuditSummaryView(View):
 
         # The main notes_to_sefa object counts as 1 note unless there are entries.
         if audit.audit["notes_to_sefa"]:
-            num_notes_entries = len(audit.audit["notes_to_sefa"].get("notes_to_sefa_entries", []))
+            num_notes_entries = len(
+                audit.audit["notes_to_sefa"].get("notes_to_sefa_entries", [])
+            )
             notes_count = max(1, num_notes_entries)
 
         return {
@@ -169,7 +171,9 @@ class AuditSummaryView(View):
                 audit.audit["federal_awards"].get("awards", [])
             ),
             "number_of_notes": notes_count if is_public else "N/A",
-            "number_of_findings": len(audit.audit.get("findings_uniform_guidance", [])),
+            "number_of_findings": audit.audit.get("search_indexes", {}).get(
+                "unique_audit_findings_count", 0
+            ),
             "number_of_findings_text": (
                 len(audit.audit.get("findings_text", [])) if is_public else "N/A"
             ),
