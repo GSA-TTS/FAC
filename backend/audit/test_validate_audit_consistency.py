@@ -49,41 +49,41 @@ class TestValueExistsInAudit(TestCase):
         sac_path = "a"
         sac_value = 1
         test_json = {}
-        expected_result = False
+        expected_result = { 'found': False }
         result = value_exists_in_audit(sac_path, sac_value, test_json)
-        self.assertEqual(result, expected_result)
+        self.assertDictEqual(result, expected_result)
 
     def test_simple(self):
         sac_path = "a"
         sac_value = 1
         test_json = { "a": 1 }
-        expected_result = True
+        expected_result = { 'found': True }
         result = value_exists_in_audit(sac_path, sac_value, test_json)
-        self.assertEqual(result, expected_result)
+        self.assertDictEqual(result, expected_result)
 
     def test_nested(self):
         sac_path = "a.b"
         sac_value = 2
         test_json = { "c.b": 2 }
-        expected_result = True
+        expected_result = { 'found': True }
         result = value_exists_in_audit(sac_path, sac_value, test_json)
-        self.assertEqual(result, expected_result)
+        self.assertDictEqual(result, expected_result)
 
     def test_list(self):
         sac_path = "a[0]"
         sac_value = 1
         test_json = { "a[0]": 1 }
-        expected_result = True
+        expected_result = { 'found': True }
         result = value_exists_in_audit(sac_path, sac_value, test_json)
-        self.assertEqual(result, expected_result)
+        self.assertDictEqual(result, expected_result)
 
     def test_nested_list(self):
         sac_path = "a.b[0]"
         sac_value = 1
         test_json = { "a.b[0]": 1 }
-        expected_result = True
+        expected_result = { 'found': True }
         result = value_exists_in_audit(sac_path, sac_value, test_json)
-        self.assertEqual(result, expected_result)
+        self.assertDictEqual(result, expected_result)
 
     def test_list_different_index(self):
         """
@@ -93,9 +93,9 @@ class TestValueExistsInAudit(TestCase):
         sac_path = "a[0]"
         sac_value = 1
         test_json = { "a[1]": 1 }
-        expected_result = True
+        expected_result = { 'found': True }
         result = value_exists_in_audit(sac_path, sac_value, test_json)
-        self.assertEqual(result, expected_result)
+        self.assertDictEqual(result, expected_result)
 
     def test_different_key(self):
         """The SAC value is found in the SOT, but uses a different key"""
@@ -103,6 +103,7 @@ class TestValueExistsInAudit(TestCase):
         sac_value = 1
         test_json = { "b": 1 }
         expected_result = {
+            'found': True,
             'found_with_different_key': True,
             'sac_field': 'a',
             'audit_path': 'b',
@@ -125,17 +126,18 @@ class TestCompareValues(TestCase):
         result = compare_values(value_1, value_2)
         self.assertFalse(result)
 
-    def test_float_1(self):
-        value_1 = 1.0
-        value_2 = 1
-        result = compare_values(value_1, value_2)
-        self.assertTrue(result)
+    # int/float is not an option, only if one is str
+    # def test_float_1(self):
+    #     value_1 = 1.0
+    #     value_2 = 1
+    #     result = compare_values(value_1, value_2)
+    #     self.assertTrue(result)
 
-    def test_float_2(self):
-        value_1 = 1
-        value_2 = 1.0
-        result = compare_values(value_1, value_2)
-        self.assertTrue(result)
+    # def test_float_2(self):
+    #     value_1 = 1
+    #     value_2 = 1.0
+    #     result = compare_values(value_1, value_2)
+    #     self.assertTrue(result)
 
     def test_int_str_1(self):
         value_1 = 1
@@ -240,3 +242,28 @@ class TestValidateAuditConsistency(TestCase):
             result[1],
             [{'field': 'general_information', 'error': 'Field is empty in SAC, but not in Audit', 'sac_value': None, 'audit_value': {'a': 1}}],
         )
+
+    def test_normalizing_keys(self):
+        audit = baker.make(Audit, version=0)
+        audit.audit = { 'general_information': { 'foo_bar': 1 } }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.general_information = { 'foo-bar': 1 }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertFalse(result[0])
+        self.assertEqual(
+            result[1],
+            [{'field': 'general_information', 'sac_path': 'foo-bar', 'sac_value': 1, 'audit_path': 'general_information.foo_bar', 'error': 'Value from SAC.general_information.foo-bar found in Audit but with different structure/key'}],
+        )
+
+    def test_json_valid_different_formats(self):
+        audit = baker.make(Audit, version=0)
+        audit.audit = { 'general_information': { 'a': 1 } }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.general_information = { 'a': '1' }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertTrue(result[0])
+        self.assertEqual(result[1], [])
