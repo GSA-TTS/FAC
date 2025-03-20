@@ -130,7 +130,7 @@ class Command(BaseCommand):
             )
 
             # convert additional fields.
-            audit.audit.update(generate_audit_indexes(audit, sac))
+            audit.audit.update(generate_audit_indexes(audit))
             audit.save()
 
             # copy SubmissionEvents into History records.
