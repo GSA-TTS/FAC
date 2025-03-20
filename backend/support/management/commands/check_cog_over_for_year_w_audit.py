@@ -11,7 +11,7 @@ from config.settings import ENVIRONMENT
 class Command(BaseCommand):
     help = """
     Analyze cog/over for 2022 / 2023 / 2024 / 2025 submissions in LOCAL environment only.
-    Uses existing rows in Audit
+    Uses 20000 existing rows in Audit
     """
 
     def add_arguments(self, parser):
@@ -43,7 +43,7 @@ class Command(BaseCommand):
                 Q(submission_status=STATUS.SUBMITTED)
                 | Q(submission_status=STATUS.DISSEMINATED)
             )
-        )
+        )[:20000]
         print(f"Count of {year} submissions: {len(audits)}")
         processed = cog_mismatches = over_mismatches = 0
 
