@@ -361,33 +361,29 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             else:
                 return {"found_with_different_format": True, **comp_vals}
 
-    for audit_path, audit_value in audit_data.items():
-        if sac_value == audit_value:
-            return {
-                "found": True,
-                "found_with_different_key": True,
-                "sac_field": sac_field,
-                "audit_path": audit_path,
-                "value": audit_value,
-            }
-        elif compare_values(sac_value, audit_value).get("found"):
-            comp_vals = compare_values(sac_value, audit_value)
-            return {
-                "found": True,
-                "found_with_different_key": True,
-                "found_with_different_format": True,
-                "sac_field": sac_field,
-                "audit_path": audit_path,
-                "value": audit_value,
-                **comp_vals,
-            }
-        else:
-            return {
-                "found": False,
-            }
-    # return {
-    #     "found": False,
-    # }
+        for audit_path, audit_value in audit_data.items():
+            if sac_value == audit_value:
+                return {
+                    "found": True,
+                    "found_with_different_key": True,
+                    "sac_field": sac_field,
+                    "audit_path": audit_path,
+                    "value": audit_value,
+                }
+            elif compare_values(sac_value, audit_value).get("found"):
+                comp_vals = compare_values(sac_value, audit_value)
+                return {
+                    "found": True,
+                    "found_with_different_key": True,
+                    "found_with_different_format": True,
+                    "sac_field": sac_field,
+                    "audit_path": audit_path,
+                    "value": audit_value,
+                    **comp_vals,
+                }
+    return {
+        "found": False,
+    }
 
 
 # Do we need this?
