@@ -114,17 +114,12 @@ class TestValueExistsInAudit(TestCase):
 
 class TestCompareValues(TestCase):
     """Tests for compare_values"""
-    def test_simple_true(self):
-        value_1 = 1
-        value_2 = 1
-        result = compare_values(value_1, value_2)
-        self.assertTrue(result)
-
     def test_simple_false(self):
         value_1 = 1
         value_2 = 2
+        expected_result = { "found": False }
         result = compare_values(value_1, value_2)
-        self.assertFalse(result)
+        self.assertDictEqual(result, expected_result)
 
     # int/float is not an option, only if one is str
     # def test_float_1(self):
@@ -257,7 +252,7 @@ class TestValidateAuditConsistency(TestCase):
             [{'field': 'general_information', 'sac_path': 'foo-bar', 'sac_value': 1, 'audit_path': 'general_information.foo_bar', 'error': 'Value from SAC.general_information.foo-bar found in Audit but with different structure/key'}],
         )
 
-    def test_json_valid_different_formats(self):
+    def test_json_different_formats_invalid(self):
         audit = baker.make(Audit, version=0)
         audit.audit = { 'general_information': { 'a': 1 } }
         audit.save()
@@ -265,5 +260,8 @@ class TestValidateAuditConsistency(TestCase):
         sac.general_information = { 'a': '1' }
         sac.save()
         result = validate_audit_consistency(audit)
-        self.assertTrue(result[0])
-        self.assertEqual(result[1], [])
+        self.assertFalse(result[0])
+        self.assertEqual(
+            result[1],
+            [{'field': 'general_information', 'sac_path': 'a', 'sac_value': '1', 'found_with_different_format': True, 'found': True, 'error': '1 is int/float, found 1 as string'}],
+        )
