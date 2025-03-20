@@ -284,13 +284,15 @@ def validate_audit_consistency(audit_instance):
                     )
 
                 elif result.get("found_with_different_format"):
-                    differences.append({
-                        "field": field,
-                        "sac_path": sac_path,
-                        "sac_value": sac_value,
-                        # "audit_path": result["audit_path"],
-                        **result
-                    })
+                    differences.append(
+                        {
+                            "field": field,
+                            "sac_path": sac_path,
+                            "sac_value": sac_value,
+                            # "audit_path": result["audit_path"],
+                            **result,
+                        }
+                    )
 
     return len(differences) == 0, differences
 
@@ -354,12 +356,10 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
                     "sac_field": sac_field,
                     "audit_path": audit_path,
                     "value": audit_value,
-                    **comp_vals
+                    **comp_vals,
                 }
             else:
                 return {"found_with_different_format": True, **comp_vals}
-        else:
-            return {"found": False}
 
     for audit_path, audit_value in audit_data.items():
         if sac_value == audit_value:
@@ -379,7 +379,7 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
                 "sac_field": sac_field,
                 "audit_path": audit_path,
                 "value": audit_value,
-                **comp_vals
+                **comp_vals,
             }
         else:
             return {
