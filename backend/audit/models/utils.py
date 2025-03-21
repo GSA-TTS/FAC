@@ -328,7 +328,7 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
 
         audit_norm_field = normalize_key(audit_field)
 
-        if sac_norm_field == audit_norm_field and (sac_value == audit_value and (not isinstance(audit_value, bool))):
+        if sac_norm_field == audit_norm_field and sac_value == audit_value:
             if sac_field != audit_field:
                 return {
                     "found": True,
@@ -340,7 +340,7 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             return {
                 "found": True,
             }
-        elif not isinstance(sac_value, bool) and compare_values(sac_value, audit_value).get("found"):
+        elif compare_values(sac_value, audit_value).get("found"):
             comp_vals = compare_values(sac_value, audit_value)
             if sac_field != audit_field:
                 return {
@@ -355,33 +355,33 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             else:
                 return {"found_with_different_format": True, **comp_vals}
 
-    for audit_path, audit_value in audit_data.items():
-        if sac_value == audit_value and (not isinstance(sac_value, bool) or isinstance(audit_value, bool)):
-            return {
-                "found": True,
-                "found_with_different_key": True,
-                "sac_field": sac_field,
-                "audit_path": audit_path,
-                "value": audit_value,
-            }
-        elif not isinstance(sac_value, bool) and compare_values(sac_value, audit_value).get("found"):
-            comp_vals = compare_values(sac_value, audit_value)
-            return {
-                "found": True,
-                "found_with_different_key": True,
-                "found_with_different_format": True,
-                "sac_field": sac_field,
-                "audit_path": audit_path,
-                "value": audit_value,
-                **comp_vals,
-            }
+    if not isinstance(sac_value, bool):
+        for audit_path, audit_value in audit_data.items():
+            if sac_value == audit_value:
+                return {
+                    "found": True,
+                    "found_with_different_key": True,
+                    "sac_field": sac_field,
+                    "audit_path": audit_path,
+                    "value": audit_value,
+                }
+            elif compare_values(sac_value, audit_value).get("found"):
+                comp_vals = compare_values(sac_value, audit_value)
+                return {
+                    "found": True,
+                    "found_with_different_key": True,
+                    "found_with_different_format": True,
+                    "sac_field": sac_field,
+                    "audit_path": audit_path,
+                    "value": audit_value,
+                    **comp_vals,
+                }
 
     return {
         "found": False,
     }
 
 
-# Do we need this?
 def normalize_key(key):
     """Normalize the keys for comparison"""
     if not isinstance(key, str):
@@ -393,25 +393,17 @@ def normalize_key(key):
 
 def compare_values(value1, value2):
     """Generate other format types for obj, str, list, dict"""
-
-    # if str(value1) == str(value2):
-    #     return {"found": True, "result": "String conversion match"}
-    #     # return True
-
     if isinstance(value1, list) and value2 in value1:
         return {"found": True, "error": f"{value1} is list, found {value2}"}
-        # return True
 
     if isinstance(value2, list) and value1 in value2:
         return {"found": True, "error": f"{value2} is list, found {value1}"}
-        # return True
 
     if isinstance(value1, dict) and value2 in value1.values():
         return {"found": True, "error": f"{value1} is dict, found {value2}"}
-        # return True
+
     if isinstance(value2, dict) and value1 in value2.values():
         return {"found": True, "error": f"{value2} is dict, found {value1}"}
-        # return True
 
     try:
         if isinstance(value1, (int, float)) and isinstance(value2, str):

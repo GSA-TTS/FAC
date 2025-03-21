@@ -112,6 +112,17 @@ class TestValueExistsInAudit(TestCase):
         result = value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
+    def test_different_key_bool(self):
+        """Booleans should not be used to match fields"""
+        sac_path = "a"
+        sac_value = True
+        test_json = { "b": True }
+        expected_result = {
+            'found': False,
+        }
+        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        self.assertDictEqual(result, expected_result)
+
 class TestCompareValues(TestCase):
     """Tests for compare_values"""
     def test_simple_false(self):
