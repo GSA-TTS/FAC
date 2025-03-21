@@ -30,7 +30,7 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
 
-        self.assertRaises(KeyError, view.dispatch, request)
+        self.assertRaises(PermissionDenied, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
         user = baker.make(User)
@@ -96,7 +96,7 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
 
-        self.assertRaises(KeyError, view.dispatch, request)
+        self.assertRaises(PermissionDenied, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
         user = baker.make(User)
@@ -191,7 +191,7 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
 
-        self.assertRaises(KeyError, view.dispatch, request)
+        self.assertRaises(PermissionDenied, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
         user = baker.make(User)

@@ -35,6 +35,7 @@ from audit.models import (
     SingleAuditReportFile,
     SubmissionEvent,
     generate_sac_report_id,
+    Audit,
 )
 from audit.models.models import STATUS, ExcelFile
 from audit.views import AuditeeCertificationStep2View, MySubmissions
@@ -115,6 +116,15 @@ def _make_user_and_sac(**kwargs):
     user = baker.make(User)
     sac = baker.make(SingleAuditChecklist, **kwargs)
     return user, sac
+
+
+# TODO: Update Post SOC Launch -> Use data, right now just using an empty object.
+def _make_user_and_audit(report_id, audit_data):
+    """Helper function for to make a user and basic audit"""
+    user = baker.make(User)
+    audit_data = audit_data or {}
+    audit = baker.make(Audit, report_id=report_id, version=0, audit=audit_data)
+    return user, audit
 
 
 def _load_json(target):
@@ -225,6 +235,15 @@ class MySubmissionsViewTests(TestCase):
 
         self.client = Client()
 
+    def test_source_of_truth(self):
+        """
+        Simple test that validates the source of truth code path
+        TODO: Update Post SOC Launch -> We'll want to change all the test cases
+        """
+        self.client.force_login(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, True)
+        self.assertEqual(len(data), 0)
+
     def test_redirect_if_not_logged_in(self):
         """Test that accessing submission page redirects if user is not logged in"""
         result = self.client.get(SUBMISSIONS_PATH)
@@ -233,7 +252,7 @@ class MySubmissionsViewTests(TestCase):
     def test_no_submissions_returns_empty_list(self):
         """Test that an authenticated user with no submissions gets empty list"""
         self.client.force_login(user=self.user)
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
         self.assertEqual(len(data), 0)
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
@@ -246,7 +265,7 @@ class MySubmissionsViewTests(TestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
         self.assertGreater(len(data), 0)
 
         keys = data[0].keys()
@@ -266,7 +285,7 @@ class MySubmissionsViewTests(TestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_submissions(self.user2)
+        data = MySubmissions.fetch_my_submissions(self.user2, False)
         self.assertEqual(len(data), 0)
 
 
@@ -316,10 +335,15 @@ class SubmissionViewTests(TestCase):
         """Set up test client, user, SAC, and URL"""
         self.client = Client()
         self.user = baker.make(User)
+        self.audit = baker.make(Audit, version=0)
         self.sac = baker.make(
-            SingleAuditChecklist, submission_status=STATUS.AUDITEE_CERTIFIED
+            SingleAuditChecklist,
+            submission_status=STATUS.AUDITEE_CERTIFIED,
+            report_id=self.audit.report_id,
         )
-        self.url = reverse("audit:Submission", kwargs={"report_id": self.sac.report_id})
+        self.url = reverse(
+            "audit:Submission", kwargs={"report_id": self.audit.report_id}
+        )
         self.client.force_login(self.user)
         baker.make(
             "audit.Access",
@@ -354,36 +378,48 @@ class SubmissionViewTests(TestCase):
         self.assertTrue(response.context["session_expired"])
 
     @patch("audit.models.SingleAuditChecklist.validate_full")
-    @patch("audit.views.views.sac_transition")
-    @patch("audit.views.views.remove_workbook_artifacts")
-    @patch("audit.views.views.SingleAuditChecklist.disseminate")
+    @patch("audit.models.Audit.validate")
+    @patch("audit.views.submissions.sac_transition")
+    @patch("audit.views.submissions.remove_workbook_artifacts")
+    @patch("audit.views.submissions.SingleAuditChecklist.disseminate")
     def test_post_successful(
-        self, mock_disseminate, mock_remove, mock_transition, mock_validate
+        self,
+        mock_disseminate,
+        mock_remove,
+        mock_transition,
+        mock_validate,
+        mock_validate_audit,
     ):
         """Test that a valid submission transitions SAC to a disseminated state"""
         mock_validate.return_value = []
+        mock_validate_audit.return_value = []
         mock_disseminate.return_value = None
         response = self.client.post(self.url)
 
         mock_validate.assert_called_once()
+        mock_validate_audit.assert_called_once()
         mock_disseminate.assert_called_once()
         mock_transition.assert_called_with(
-            response.wsgi_request, self.sac, transition_to=STATUS.DISSEMINATED
+            response.wsgi_request,
+            self.sac,
+            audit=self.audit,
+            transition_to=STATUS.DISSEMINATED,
         )
         mock_remove.assert_called_once()
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("audit:MySubmissions"))
 
-    @patch("audit.views.views.SingleAuditChecklist.validate_full")
-    @patch("audit.views.views.sac_transition")
-    @patch("audit.views.views.SingleAuditChecklist.disseminate")
+    @patch("audit.views.submissions.SingleAuditChecklist.validate_full")
+    @patch("audit.models.Audit.validate")
+    @patch("audit.views.submissions.sac_transition")
+    @patch("audit.views.submissions.SingleAuditChecklist.disseminate")
     def test_post_validation_errors(
-        self, mock_disseminate, mock_transition, mock_validate
+        self, mock_disseminate, mock_transition, mock_validate, mock_validate_audit
     ):
         """Test that validation errors are displayed if submission is invalid"""
         mock_validate.return_value = ["Error 1", "Error 2"]
-
+        mock_validate_audit.return_value = ["Error 1", "Error 2"]
         self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
         self.sac.save()
 
@@ -398,20 +434,24 @@ class SubmissionViewTests(TestCase):
         mock_disseminate.assert_not_called()
         mock_transition.assert_not_called()
 
-    @patch("audit.views.views.General.objects.get")
-    @patch("audit.views.views.SingleAuditChecklist.validate_full")
-    def test_post_transaction_error(self, mock_validate, mock_general_get):
+    @patch("audit.views.submissions.General.objects.get")
+    @patch("audit.views.submissions.SingleAuditChecklist.validate_full")
+    @patch("audit.models.Audit.validate")
+    def test_post_transaction_error(
+        self, mock_validate, mock_validate_audit, mock_general_get
+    ):
         """Test that a transaction error during a submission is handled properly"""
         self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
         self.sac.save()
 
+        self.audit.submission_status = STATUS.AUDITEE_CERTIFIED
+        self.audit.save()
+
         mock_validate.return_value = []
+        mock_validate_audit.return_value = []
         mock_general_get.return_value = True
 
         response = self.client.post(self.url)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("audit:MySubmissions"))
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("audit:MySubmissions"))
@@ -461,10 +501,35 @@ class SubmissionViewTests(TestCase):
             sac.transition_name.append(rs)
             sac.transition_date.append(datetime.now(timezone.utc))
 
+        audit_data = {
+            "auditee_certification": _build_auditee_cert_dict(
+                *fake_auditee_certification()
+            ),
+            "auditor_certification": _build_auditor_cert_dict(
+                *fake_auditor_certification()
+            ),
+            "audit_information": _fake_audit_information(),
+            "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
+            "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
+            "notes_to_sefa": {
+                "accounting_policies": "Exhaustive",
+                "is_minimis_rate_used": "Y",
+                "rate_explained": "At great length",
+            },
+        }
+
+        _, audit = _make_user_and_audit(sac.report_id, audit_data)
+
         baker.make(SingleAuditReportFile, sac=sac)
-        baker.make(Access, user=user, sac=sac, role="certifying_auditee_contact")
+        baker.make(
+            Access, user=user, sac=sac, audit=audit, role="certifying_auditee_contact"
+        )
+
         sac.submission_status = STATUSES.AUDITEE_CERTIFIED
         sac.save()
+
+        audit.submission_status = STATUSES.AUDITEE_CERTIFIED
+        audit.save()
 
         response = _authed_post(
             Client(),
@@ -474,8 +539,11 @@ class SubmissionViewTests(TestCase):
             data={},
         )
         sac_after = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        audit_after = Audit.objects.get(report_id=audit.report_id)
+
         self.assertEqual(response.status_code, 302)
         self.assertEqual(sac_after.submission_status, STATUSES.DISSEMINATED)
+        self.assertEqual(audit_after.submission_status, STATUSES.DISSEMINATED)
 
 
 class SubmissionGetTest(TestCase):
@@ -528,7 +596,7 @@ class SubmissionStatusTests(TransactionTestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
         self.assertGreater(len(data), 0)
         self.assertEqual(data[0]["submission_status"], STATUSES.IN_PROGRESS)
         report_id = data[0]["report_id"]
@@ -559,7 +627,7 @@ class SubmissionStatusTests(TransactionTestCase):
         sac.save()
 
         self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
 
         self.assertEqual(data[0]["submission_status"], STATUSES.READY_FOR_CERTIFICATION)
 
@@ -585,7 +653,7 @@ class SubmissionStatusTests(TransactionTestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
         self.assertGreater(len(data), 0)
         self.assertEqual(data[0]["submission_status"], STATUSES.IN_PROGRESS)
         report_id = data[0]["report_id"]
@@ -616,7 +684,7 @@ class SubmissionStatusTests(TransactionTestCase):
         sac.save()
 
         self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
 
         self.assertEqual(data[0]["submission_status"], STATUSES.READY_FOR_CERTIFICATION)
 
@@ -634,7 +702,7 @@ class SubmissionStatusTests(TransactionTestCase):
         self.client.post(
             f"/audit/unlock-after-certification/{report_id}", data=postdata
         )
-        data = MySubmissions.fetch_my_submissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user, False)
 
         self.assertEqual(data[0]["submission_status"], STATUSES.IN_PROGRESS)
 
@@ -764,18 +832,43 @@ class SubmissionStatusTests(TransactionTestCase):
             sac.transition_name.append(rs)
             sac.transition_date.append(datetime.now(timezone.utc))
 
+        # TODO: Post SOT Launch Most of the above can be deleted.
+        audit_data = {
+            "auditee_certification": _build_auditee_cert_dict(
+                *fake_auditee_certification()
+            ),
+            "auditor_certification": _build_auditor_cert_dict(
+                *fake_auditor_certification()
+            ),
+            "audit_information": _fake_audit_information(),
+            "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
+            "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
+            "submission_status": STATUSES.IN_PROGRESS,
+            "notes_to_sefa": {
+                "accounting_policies": "Exhaustive",
+                "is_minimis_rate_used": "Y",
+                "rate_explained": "At great length",
+            },
+        }
+        _, audit = _make_user_and_audit(report_id=sac.report_id, audit_data=audit_data)
         baker.make(SingleAuditReportFile, sac=sac)
-        baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+        baker.make(
+            Access, sac=sac, user=user, audit=audit, role="certifying_auditee_contact"
+        )
+
         sac.submission_status = STATUSES.AUDITEE_CERTIFIED
         sac.save()
+        audit.submission_status = STATUSES.AUDITEE_CERTIFIED
+        audit.save()
 
         kwargs = {"report_id": sac.report_id}
         _authed_post(self.client, user, "audit:Submission", kwargs=kwargs)
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        updated_audit = Audit.objects.get(report_id=audit.report_id)
 
         self.assertEqual(updated_sac.submission_status, STATUSES.DISSEMINATED)
-
+        self.assertEqual(updated_audit.submission_status, STATUSES.DISSEMINATED)
         submission_events = SubmissionEvent.objects.filter(sac=sac)
 
         # the most recent event should be SUBMITTED
@@ -2073,6 +2166,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         self.sac = baker.make(
             SingleAuditChecklist, submission_status=STATUS.AUDITOR_CERTIFIED
         )
+        self.audit = baker.make(Audit, report_id=self.sac.report_id, version=0)
         self.url = reverse(
             "audit:AuditeeCertificationConfirm",
             kwargs={"report_id": self.sac.report_id},
@@ -2081,6 +2175,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         baker.make(
             "audit.Access",
             sac=self.sac,
+            audit=self.audit,
             user=self.user,
             role="certifying_auditee_contact",
         )
@@ -2117,8 +2212,8 @@ class AuditeeCertificationStep2ViewTests(TestCase):
             response, f"/audit/submission-progress/{self.sac.report_id}"
         )
 
-    @patch("audit.views.views.validate_auditee_certification_json")
-    @patch("audit.views.views.sac_transition")
+    @patch("audit.views.auditee_certification.validate_auditee_certification_json")
+    @patch("audit.views.auditee_certification.sac_transition")
     def test_post_valid_form(self, mock_transition, mock_validate):
         """
         Test that submitting a valid Auditee Certification Form
@@ -2144,7 +2239,10 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.sac.refresh_from_db()
         mock_transition.assert_called_once_with(
-            response.wsgi_request, self.sac, transition_to=STATUS.AUDITEE_CERTIFIED
+            response.wsgi_request,
+            self.sac,
+            audit=self.audit,
+            transition_to=STATUS.AUDITEE_CERTIFIED,
         )
         self.assertRedirects(
             response, reverse("audit:SubmissionProgress", args=[self.sac.report_id])
