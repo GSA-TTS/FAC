@@ -144,7 +144,7 @@ You can run
 FILENAME=data/some-other-dumpfile.dump ./menu.bash
 ```
 
-to chose the name of the file you want to load. Use plain-text dumpfiles. The script assumes they
+to chose the name of the file you want to load. Use plain-text dumpfiles.
 
 
 # how the data was prepared
