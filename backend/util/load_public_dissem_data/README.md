@@ -69,11 +69,12 @@ Use the menu script in this folder.
 ./menu.bash
 ```
 
-This will give you two options:
+This will give you three options:
 
 ```
 1) Truncate tables
 2) Load data
+3) Check row counts
 3) Quit
 ```
 
@@ -108,6 +109,32 @@ This will reload:
 * audit_singleauditchecklist
 * auth_user
 * dissemination_*
+
+## check counts
+
+This verifies the row counts in every table we loaded. 
+
+```
+1) Truncate tables
+2) Load data
+3) Check row counts
+4) Quit
+Please enter your choice: 3
+Checking counts
+[PASS] audit_singleauditchecklist has 354222 rows
+[PASS] audit_access has 1195595 rows
+[PASS] auth_user has 75461 rows
+[PASS] dissemination_additionalein has 59251 rows
+[PASS] dissemination_additionaluei has 15101 rows
+[PASS] dissemination_captext has 116694 rows
+[PASS] dissemination_federalaward has 5811948 rows
+[PASS] dissemination_finding has 507895 rows
+[PASS] dissemination_findingtext has 120290 rows
+[PASS] dissemination_general has 343114 rows
+[PASS] dissemination_note has 530405 rows
+[PASS] dissemination_passthrough has 4025800 rows
+[PASS] dissemination_secondaryauditor has 1803 rows
+```
 
 ## overriding the data filename
 
