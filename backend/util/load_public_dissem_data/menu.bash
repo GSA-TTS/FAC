@@ -51,7 +51,7 @@ load_data () {
 		-p ${PORT} \
 		-h ${HOST} \
     -v ON_ERROR_STOP=1 \
-		-w < ${FILENAME}
+		-w
 
   if [ $? = 0 ]; then
     echo "Data loaded successfully."
