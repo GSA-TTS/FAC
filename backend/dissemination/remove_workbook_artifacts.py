@@ -2,10 +2,11 @@ import logging
 import math
 
 from django.conf import settings
+
+from audit.models import ExcelFile
+from audit.models.constants import STATUS
 from audit.models.models import (
-    ExcelFile,
     SingleAuditChecklist,
-    STATUS,
 )
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config

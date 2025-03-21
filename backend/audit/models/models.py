@@ -1,4 +1,3 @@
-from datetime import timedelta
 from itertools import chain
 import json
 import logging
@@ -11,7 +10,6 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone as django_timezone
 
 import audit.cross_validation
 from audit.cross_validation.naming import SECTION_NAMES
@@ -20,29 +18,30 @@ from audit.validators import (
     validate_additional_ueis_json,
     validate_additional_eins_json,
     validate_corrective_action_plan_json,
-    validate_excel_file,
     validate_federal_award_json,
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
     validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
-    validate_single_audit_report_file,
     validate_auditor_certification_json,
     validate_auditee_certification_json,
     validate_tribal_data_consent_json,
     validate_audit_information_json,
-    validate_component_page_numbers,
 )
 from audit.utils import FORM_SECTION_HANDLERS
 from support.cog_over import compute_cog_over, record_cog_assignment
+from .files import SingleAuditReportFile
 from .submission_event import SubmissionEvent
+from .utils import camel_to_snake
+from ..exceptions import LateChangeError
 
 User = get_user_model()
 
 logger = logging.getLogger(__name__)
 
 
+# TODO: Update Post SOC Launch -> This whole file should be able to be deleted.
 def generate_sac_report_id(end_date=None, source="GSAFAC", count=None):
     """
     Convenience method for generating report_id, a value consisting of:
@@ -70,10 +69,6 @@ def generate_sac_report_id(end_date=None, source="GSAFAC", count=None):
     separator = "-"
     report_id = separator.join([year, month, source, count])
     return report_id
-
-
-def one_month_from_today():
-    return django_timezone.now() + timedelta(days=30)
 
 
 class SingleAuditChecklistManager(models.Manager):
@@ -115,12 +110,6 @@ class SingleAuditChecklistManager(models.Manager):
         return result
 
 
-def camel_to_snake(raw: str) -> str:
-    """Convert camel case to snake_case."""
-    text = f"{raw[0].lower()}{raw[1:]}"
-    return "".join(c if c.islower() else f"_{c.lower()}" for c in text)
-
-
 def json_property_mixin_generator(name, fname=None, toplevel=None, classname=None):
     """Generates a mixin class named classname, using the top-level fields
     in the properties field in the file named fname, accessing those fields
@@ -150,13 +139,6 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
 
 
 GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
-
-
-class LateChangeError(Exception):
-    """
-    Exception covering attempts to change submissions that don't have the in_progress
-    status.
-    """
 
 
 class STATUS:
@@ -545,182 +527,3 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         if index >= 0:
             return self.transition_date[index]
         return None
-
-
-def excel_file_path(instance, _filename):
-    """
-    We want the actual filename in the filesystem to be unique and determined
-    by report_id and form_section--not the user-provided filename.
-    """
-    return f"excel/{instance.sac.report_id}--{instance.form_section}.xlsx"
-
-
-class ExcelFile(models.Model):
-    """
-    Data model to track uploaded Excel files and associate them with SingleAuditChecklists
-    """
-
-    file = models.FileField(upload_to=excel_file_path, validators=[validate_excel_file])
-    filename = models.CharField(max_length=255)
-    form_section = models.CharField(max_length=255)
-    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
-    date_created = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        if self.sac.submission_status != STATUS.IN_PROGRESS:
-            raise LateChangeError("Attemtped Excel file upload")
-
-        self.filename = f"{self.sac.report_id}--{self.form_section}.xlsx"
-
-        event_user = kwargs.pop("event_user", None)
-        event_type = kwargs.pop("event_type", None)
-
-        if event_user and event_type:
-            SubmissionEvent.objects.create(
-                sac=self.sac, user=event_user, event=event_type
-            )
-
-        super().save(*args, **kwargs)
-
-
-def single_audit_report_path(instance, _filename):
-    """
-    We want the actual filename in the filesystem to be unique and determined
-    by report_id, not the user-provided filename.
-    """
-    base_path = "singleauditreport"
-    report_id = instance.sac.report_id
-    return f"{base_path}/{report_id}.pdf"
-
-
-class SingleAuditReportFile(models.Model):
-    """
-    Data model to track uploaded Single Audit report PDFs and associate them
-    with SingleAuditChecklists
-    """
-
-    file = models.FileField(
-        upload_to=single_audit_report_path,
-        validators=[validate_single_audit_report_file],
-    )
-    filename = models.CharField(max_length=255)
-    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
-    date_created = models.DateTimeField(auto_now_add=True)
-    component_page_numbers = models.JSONField(
-        blank=True, null=True, validators=[validate_component_page_numbers]
-    )
-
-    def save(self, *args, **kwargs):
-        report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
-        self.filename = f"{report_id}.pdf"
-        if self.sac.submission_status != STATUS.IN_PROGRESS:
-            raise LateChangeError("Attempted PDF upload")
-
-        event_user = kwargs.pop("event_user", None)
-        event_type = kwargs.pop("event_type", None)
-
-        if event_user and event_type:
-            SubmissionEvent.objects.create(
-                sac=self.sac, user=event_user, event=event_type
-            )
-
-        super().save(*args, **kwargs)
-
-
-class UeiValidationWaiver(models.Model):
-    """Records of UEIs that are permitted to be inactive."""
-
-    # Method overrides:
-    def __str__(self):
-        return f"#{self.id}--{self.uei}"
-
-    # Not unique, in the case that one UEI needs to be waived several times with different expiration dates.
-    uei = models.TextField("UEI")
-    timestamp = models.DateTimeField(
-        "When the waiver was created",
-        default=django_timezone.now,
-    )
-    expiration = models.DateTimeField(
-        "When the waiver will expire",
-        default=one_month_from_today,
-    )
-    approver_email = models.TextField(
-        "Email address of FAC staff member approving the waiver",
-    )
-    approver_name = models.TextField(
-        "Name of FAC staff member approving the waiver",
-    )
-    requester_email = models.TextField(
-        "Email address of NSAC/KSAML requesting the waiver",
-    )
-    requester_name = models.TextField(
-        "Name of NSAC/KSAML requesting the waiver",
-    )
-    justification = models.TextField(
-        "Brief plain-text justification for the waiver",
-    )
-
-
-class SacValidationWaiver(models.Model):
-    """Records of reports that have had a requirement waived."""
-
-    class TYPES:
-        AUDITEE_CERTIFYING_OFFICIAL = "auditee_certifying_official"
-        AUDITOR_CERTIFYING_OFFICIAL = "auditor_certifying_official"
-        FINDING_REFERENCE_NUMBER = "finding_reference_number"
-        PRIOR_REFERENCES = "prior_references"
-
-    WAIVER_CHOICES = [
-        (
-            TYPES.AUDITEE_CERTIFYING_OFFICIAL,
-            "No auditee certifying official is available",
-        ),
-        (
-            TYPES.AUDITOR_CERTIFYING_OFFICIAL,
-            "No auditor certifying official is available",
-        ),
-        (
-            TYPES.FINDING_REFERENCE_NUMBER,
-            "Report has duplicate finding reference numbers",
-        ),
-        (
-            TYPES.PRIOR_REFERENCES,
-            "Report has invalid prior reference numbers",
-        ),
-    ]
-    report_id = models.ForeignKey(
-        "SingleAuditChecklist",
-        help_text="The report that the waiver applies to",
-        on_delete=models.CASCADE,
-        to_field="report_id",
-        db_column="report_id",
-    )
-    timestamp = models.DateTimeField(
-        "When the waiver was created",
-        default=django_timezone.now,
-    )
-    approver_email = models.TextField(
-        "Email address of FAC staff member approving the waiver",
-    )
-    approver_name = models.TextField(
-        "Name of FAC staff member approving the waiver",
-    )
-    requester_email = models.TextField(
-        "Email address of NSAC/KSAML requesting the waiver",
-    )
-    requester_name = models.TextField(
-        "Name of NSAC/KSAML requesting the waiver",
-    )
-    justification = models.TextField(
-        "Brief plain-text justification for the waiver",
-    )
-    waiver_types = ArrayField(
-        models.CharField(
-            max_length=50,
-            choices=WAIVER_CHOICES,
-        ),
-        verbose_name="The waiver type",
-        default=list,
-    )

@@ -156,4 +156,24 @@ class Migration(migrations.Migration):
             name="audit",
             options={"verbose_name": "Audit", "verbose_name_plural": "Audits"},
         ),
+        migrations.AddField(
+            model_name="excelfile",
+            name="audit",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="audit.audit",
+            ),
+        ),
+        migrations.AddField(
+            model_name="singleauditreportfile",
+            name="audit",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="audit.audit",
+            ),
+        ),
     ]

@@ -111,6 +111,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            audit = Audit.objects.find_audit_or_none(report_id=report_id)
 
             # Determine if the auditee certifier is the same as the current user.
             # If there is no auditee certifier, default to False.
@@ -134,7 +135,6 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
             shaped_sac = sac_validation_shape(sac)
 
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
             shaped_audit = audit_validation_shape(audit) if audit else None
 
             subcheck = submission_progress_check(shaped_sac, sar, crossval=False)

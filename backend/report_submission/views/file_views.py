@@ -15,10 +15,10 @@ from audit.models import (
     SingleAuditChecklist,
     SubmissionEvent,
     Audit,
+    ExcelFile,
 )
 
 from audit.utils import Util
-from audit.models.models import ExcelFile
 from report_submission.views.utils import create_upload_context, create_delete_context
 
 logger = logging.getLogger(__name__)
@@ -28,12 +28,14 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
+        if request.GET.get("beta", "N") == "Y":
+            return _handle_sot_beta_upload_get(request, *args, **kwargs)
+
         # Organized by URL name, page specific constants are defined here
         # Data can then be accessed by checking the current URL
         additional_context = create_upload_context(report_id)
 
         try:
-            # TODO: Post SOT Launch -> Change SAC to Audit
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             # Context for every upload page
@@ -55,9 +57,9 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
 
                 audit = Audit.objects.find_or_none(report_id=report_id)
                 shaped_sac = sac_validation_shape(sac)
-                shapped_audit = audit_validation_shape(audit)
+                shaped_audit = audit_validation_shape(audit)
 
-                _compare_shapes(shaped_sac, shapped_audit)
+                _compare_shapes(shaped_sac, shaped_audit)
 
                 completed_metadata = section_completed_metadata(shaped_sac, path_name)
                 completed_audit_audit = section_completed_metadata(
@@ -100,6 +102,7 @@ class DeleteFileView(SingleAuditChecklistAccessRequiredMixin, View):
         report_id = kwargs["report_id"]
 
         try:
+            # TODO: Update Post SOC Launch -> don't use sac.
             SingleAuditChecklist.objects.get(report_id=report_id)
 
             # Context for every upload page
@@ -175,6 +178,7 @@ class DeleteFileView(SingleAuditChecklistAccessRequiredMixin, View):
             return Util.validate_redirect_url(redirect_uri)
 
 
+# TODO: Update Post SOC Launch -> Compare methods can be deleted, handle_sot_beta can be used above
 def _compare_shapes(sac_shape, audit_shape):
     if sac_shape != audit_shape:
         logger.error(
@@ -187,3 +191,38 @@ def _compare_completed_metadata(sac_result, audit_result):
         logger.error(
             f"<SOT ERROR> SAC and Audit Results do not match SAC: {sac_result} Audit: {audit_result}"
         )
+
+
+def _handle_sot_beta_upload_get(request, *args, **kwargs):
+    report_id = kwargs["report_id"]
+
+    audit = Audit.objects.find_audit_or_none(report_id=report_id)
+    if not audit:
+        raise PermissionDenied("You do not have access to this audit.")
+
+    path_name = request.path.split("/")[2]
+    additional_context = create_upload_context(report_id)
+    context = {
+        "auditee_name": audit.auditee_name,
+        "report_id": report_id,
+        "auditee_uei": audit.auditee_uei,
+        "user_provided_organization_type": audit.organization_type,
+        "is_beta": True,
+        "non_beta_url": f"report_submission:{path_name}",
+    }
+
+    for item in additional_context[path_name]:
+        context[item] = additional_context[path_name][item]
+
+    context["already_submitted"] = audit.audit.get(
+        additional_context[path_name]["DB_id"], None
+    )
+
+    shaped_audit = audit_validation_shape(audit)
+
+    completed_metadata = section_completed_metadata(shaped_audit, path_name)
+
+    context["last_uploaded_by"] = completed_metadata[0]
+    context["last_uploaded_at"] = completed_metadata[1]
+
+    return render(request, "report_submission/upload-page.html", context)

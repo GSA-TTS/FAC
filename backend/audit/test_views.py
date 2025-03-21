@@ -36,8 +36,10 @@ from audit.models import (
     SubmissionEvent,
     generate_sac_report_id,
     Audit,
+    ExcelFile,
 )
-from audit.models.models import STATUS, ExcelFile
+from audit.models.constants import STATUS
+from audit.utils import FORM_SECTION_HANDLERS
 from audit.views import AuditeeCertificationStep2View, MySubmissions
 from dissemination.models import FederalAward, General
 from django.contrib.auth import get_user_model
@@ -81,6 +83,11 @@ VALID_ACCESS_AND_SUBMISSION_DATA = {
     "auditor_contacts_fullname": ["Fuller D. Namesmith"],
     "auditor_contacts_email": ["d@d.com"],
 }
+
+
+def _load_json_audit_data(file, section):
+    json = _load_json(AUDIT_JSON_FIXTURES / file)
+    return FORM_SECTION_HANDLERS.get(section)["audit_object"](json)
 
 
 # Mocking the user login and file scan functions
@@ -333,9 +340,15 @@ class SubmissionViewTests(TestCase):
 
     def setUp(self):
         """Set up test client, user, SAC, and URL"""
+        awardsfile = "federal-awards--test0001test--simple-pass.json"
+
         self.client = Client()
         self.user = baker.make(User)
-        self.audit = baker.make(Audit, version=0)
+        self.audit = baker.make(
+            Audit,
+            version=0,
+            audit={**_load_json_audit_data(awardsfile, FORM_SECTIONS.FEDERAL_AWARDS)},
+        )
         self.sac = baker.make(
             SingleAuditChecklist,
             submission_status=STATUS.AUDITEE_CERTIFIED,
@@ -370,13 +383,6 @@ class SubmissionViewTests(TestCase):
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, 403)
 
-    def test_get_access_denied_for_unauthorized_user(self):
-        """Test that GET returns 403 if user is unauthorized"""
-        self.client.logout()
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "home.html")
-        self.assertTrue(response.context["session_expired"])
-
     @patch("audit.models.SingleAuditChecklist.validate_full")
     @patch("audit.models.Audit.validate")
     @patch("audit.views.submissions.sac_transition")
@@ -409,6 +415,13 @@ class SubmissionViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("audit:MySubmissions"))
+
+    def test_get_access_denied_for_unauthorized_user(self):
+        """Test that GET returns 403 if user is unauthorized"""
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "home.html")
+        self.assertTrue(response.context["session_expired"])
 
     @patch("audit.views.submissions.SingleAuditChecklist.validate_full")
     @patch("audit.models.Audit.validate")
@@ -444,6 +457,10 @@ class SubmissionViewTests(TestCase):
         self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
         self.sac.save()
 
+        awardsfile = "federal-awards--test0001test--simple-pass.json"
+        self.audit.audit.update(
+            **_load_json_audit_data(awardsfile, FORM_SECTIONS.FEDERAL_AWARDS)
+        )
         self.audit.submission_status = STATUS.AUDITEE_CERTIFIED
         self.audit.save()
 
@@ -509,13 +526,13 @@ class SubmissionViewTests(TestCase):
                 *fake_auditor_certification()
             ),
             "audit_information": _fake_audit_information(),
-            "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
             "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
             "notes_to_sefa": {
                 "accounting_policies": "Exhaustive",
                 "is_minimis_rate_used": "Y",
                 "rate_explained": "At great length",
             },
+            **_load_json_audit_data(awardsfile, FORM_SECTIONS.FEDERAL_AWARDS),
         }
 
         _, audit = _make_user_and_audit(sac.report_id, audit_data)
@@ -795,6 +812,7 @@ class SubmissionStatusTests(TransactionTestCase):
             SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
         )
 
+    # audit.test_views.SubmissionStatusTests.test_submission
     def test_submission(self):
         """
         Test that certifying auditee contacts can perform submission
@@ -841,7 +859,6 @@ class SubmissionStatusTests(TransactionTestCase):
                 *fake_auditor_certification()
             ),
             "audit_information": _fake_audit_information(),
-            "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
             "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
             "submission_status": STATUSES.IN_PROGRESS,
             "notes_to_sefa": {
@@ -849,9 +866,10 @@ class SubmissionStatusTests(TransactionTestCase):
                 "is_minimis_rate_used": "Y",
                 "rate_explained": "At great length",
             },
+            **_load_json_audit_data(awardsfile, FORM_SECTIONS.FEDERAL_AWARDS),
         }
         _, audit = _make_user_and_audit(report_id=sac.report_id, audit_data=audit_data)
-        baker.make(SingleAuditReportFile, sac=sac)
+        baker.make(SingleAuditReportFile, sac=sac, audit=audit)
         baker.make(
             Access, sac=sac, user=user, audit=audit, role="certifying_auditee_contact"
         )
