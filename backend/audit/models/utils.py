@@ -340,7 +340,7 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             return {
                 "found": True,
             }
-        elif (not isinstance(sac_value, bool) or sac_value != 0) and compare_values(sac_value, audit_value).get("found"):
+        elif (not isinstance(sac_value, bool) and sac_value != 0) and compare_values(sac_value, audit_value).get("found"):
             comp_vals = compare_values(sac_value, audit_value)
             if sac_field != audit_field:
                 return {
@@ -355,7 +355,7 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             else:
                 return {"found_with_different_format": True, **comp_vals}
 
-    if not isinstance(sac_value, bool) or sac_value != 0:
+    if not isinstance(sac_value, bool) and sac_value != 0:
         for audit_path, audit_value in audit_data.items():
             if sac_value == audit_value:
                 return {
