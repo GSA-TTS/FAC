@@ -340,7 +340,9 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             return {
                 "found": True,
             }
-        elif (not isinstance(sac_value, bool) and sac_value != 0) and compare_values(sac_value, audit_value).get("found"):
+        elif (not isinstance(sac_value, bool) and sac_value != 0) and compare_values(
+            sac_value, audit_value
+        ).get("found"):
             comp_vals = compare_values(sac_value, audit_value)
             if sac_field != audit_field:
                 return {
@@ -406,6 +408,9 @@ def compare_values(value1, value2):
         return {"found": True, "error": f"{value2} is dict, found {value1}"}
 
     try:
+        if value1 == 0 or value2 == 0:
+            return {"found": False}
+
         if isinstance(value1, (int, float)) and isinstance(value2, str):
             if value1 == float(value2):
                 return {
