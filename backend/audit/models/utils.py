@@ -259,7 +259,7 @@ def validate_audit_consistency(audit_instance):
             for (
                 sac_path,
                 sac_value,
-            ) in flat_sac.items():  # change to sac_path, sac_value
+            ) in flat_sac.items():
                 result = value_exists_in_audit(sac_path, sac_value, flat_audit)
 
                 if not result.get("found"):
@@ -289,7 +289,6 @@ def validate_audit_consistency(audit_instance):
                             "field": field,
                             "sac_path": sac_path,
                             "sac_value": sac_value,
-                            # "audit_path": result["audit_path"],
                             **result,
                         }
                     )
@@ -311,7 +310,6 @@ def flatten_json(obj, path="", result=None):
             new_path = f"{path}[{i}]"
             flatten_json(item, new_path, result)
     else:
-        # if obj not in [None, "", []]:
         result[path] = obj
 
     return result
@@ -328,13 +326,9 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
         audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
         audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
 
-        norm_audit_field = normalize_key(audit_field)
+        audit_norm_field = normalize_key(audit_field)
 
-        # if sac_norm_field == norm_audit_field and (
-        #     sac_value == audit_value or compare_values(sac_value, audit_value)
-        # ):
-
-        if sac_norm_field == norm_audit_field and sac_value == audit_value:
+        if sac_norm_field == audit_norm_field and sac_value == audit_value:
             if sac_field != audit_field:
                 return {
                     "found": True,
@@ -361,26 +355,27 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             else:
                 return {"found_with_different_format": True, **comp_vals}
 
-        for audit_path, audit_value in audit_data.items():
-            if sac_value == audit_value:
-                return {
-                    "found": True,
-                    "found_with_different_key": True,
-                    "sac_field": sac_field,
-                    "audit_path": audit_path,
-                    "value": audit_value,
-                }
-            elif compare_values(sac_value, audit_value).get("found"):
-                comp_vals = compare_values(sac_value, audit_value)
-                return {
-                    "found": True,
-                    "found_with_different_key": True,
-                    "found_with_different_format": True,
-                    "sac_field": sac_field,
-                    "audit_path": audit_path,
-                    "value": audit_value,
-                    **comp_vals,
-                }
+    for audit_path, audit_value in audit_data.items():
+        if sac_value == audit_value:
+            return {
+                "found": True,
+                "found_with_different_key": True,
+                "sac_field": sac_field,
+                "audit_path": audit_path,
+                "value": audit_value,
+            }
+        elif compare_values(sac_value, audit_value).get("found"):
+            comp_vals = compare_values(sac_value, audit_value)
+            return {
+                "found": True,
+                "found_with_different_key": True,
+                "found_with_different_format": True,
+                "sac_field": sac_field,
+                "audit_path": audit_path,
+                "value": audit_value,
+                **comp_vals,
+            }
+
     return {
         "found": False,
     }
