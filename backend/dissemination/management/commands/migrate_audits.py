@@ -130,7 +130,8 @@ class Command(BaseCommand):
             )
 
             # convert additional fields.
-            audit.audit.update(generate_audit_indexes(audit))
+            if sac.submission_status == STATUS.DISSEMINATED:
+                audit.audit.update(generate_audit_indexes(audit))
             audit.save()
 
             # copy SubmissionEvents into History records.
