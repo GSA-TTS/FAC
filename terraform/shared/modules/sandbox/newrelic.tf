@@ -1,13 +1,14 @@
-resource "cloudfoundry_user_provided_service" "credentials" {
-  provider = cloudfoundry-community
-
-  name  = "newrelic-creds"
-  space = data.cloudfoundry_space.apps.id
-  credentials = {
-    "NEW_RELIC_LICENSE_KEY"   = var.new_relic_license_key
-    "NEW_RELIC_LOGS_ENDPOINT" = "https://gov-log-api.newrelic.com/log/v1"
+resource "cloudfoundry_service_instance" "newrelic_creds" {
+  name        = "newrelic-creds"
+  type        = "user-provided"
+  tags        = ["newrelic-creds"]
+  space       = data.cloudfoundry_space.space.id
+  credentials = <<NRCREDS
+  {
+    "NEW_RELIC_LICENSE_KEY": "${var.new_relic_license_key}",
+    "NEW_RELIC_LOGS_ENDPOINT": "https://gov-log-api.newrelic.com/log/v1"
   }
-  tags = ["newrelic-creds"]
+  NRCREDS
 }
 
 # module "newrelic" {
