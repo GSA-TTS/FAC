@@ -2,6 +2,16 @@ from django.utils.translation import gettext_lazy as _
 from collections import namedtuple as nt
 
 
+class ORGANIZATION_TYPE:
+    STATE = "state"
+    LOCAL = "local"
+    TRIBAL = "tribal"
+    HIGHER_ED = "higher-ed"
+    NON_PROFIT = "non-profit"
+    UNKNOWN = "unknown"
+    NONE = "none"
+
+
 class STATUS:
     """
     The possible states of a submission.
