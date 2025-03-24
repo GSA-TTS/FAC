@@ -44,6 +44,7 @@ from audit.models import (
     DeletedAccess,
     Audit,
     User,
+    ExcelFile,
     SingleAuditReportFile,
     SingleAuditChecklist,
     SubmissionEvent,
@@ -145,6 +146,10 @@ class Command(BaseCommand):
                     updated_at=event.timestamp,
                     updated_by=event.user,
                 )
+
+            # assign audit reference to file-based models.
+            SingleAuditReportFile.objects.filter(sac=sac).update(audit=audit)
+            ExcelFile.objects.filter(sac=sac).update(audit=audit)
 
 
 def _get_query(kwargs, max_records):
