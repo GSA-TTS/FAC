@@ -5,7 +5,7 @@ from audit.models import Audit, SingleAuditChecklist
 from audit.models.utils import (
   flatten_json,
   value_exists_in_audit,
-  compare_values,
+  other_formats_match,
   validate_audit_consistency,
 )
 
@@ -123,63 +123,74 @@ class TestValueExistsInAudit(TestCase):
         result = value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
+    def test_bool_comparison(self):
+        """Zeroes should not be used to match fields"""
+        sac_path = "a"
+        sac_value = 0
+        test_json = { "b": 0 }
+        expected_result = {
+            'found': False,
+        }
+        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        self.assertDictEqual(result, expected_result)
+
 class TestCompareValues(TestCase):
-    """Tests for compare_values"""
-    def test_simple_false(self):
+    """Tests for other_formats_match"""
+    def test_simple_equal(self):
+        value_1 = 1
+        value_2 = 1
+        expected_result = { "found": False }
+        result = other_formats_match(value_1, value_2)
+        self.assertDictEqual(result, expected_result)
+
+    def test_simple_not_equal(self):
         value_1 = 1
         value_2 = 2
         expected_result = { "found": False }
-        result = compare_values(value_1, value_2)
+        result = other_formats_match(value_1, value_2)
         self.assertDictEqual(result, expected_result)
 
-    # int/float is not an option, only if one is str
-    # def test_float_1(self):
-    #     value_1 = 1.0
-    #     value_2 = 1
-    #     result = compare_values(value_1, value_2)
-    #     self.assertTrue(result)
-
-    # def test_float_2(self):
-    #     value_1 = 1
-    #     value_2 = 1.0
-    #     result = compare_values(value_1, value_2)
-    #     self.assertTrue(result)
+    def test_simple_zero(self):
+        value_1 = 0
+        value_2 = "0"
+        expected_result = { "found": False }
+        result = other_formats_match(value_1, value_2)
+        self.assertDictEqual(result, expected_result)
 
     def test_int_str_1(self):
         value_1 = 1
         value_2 = "1"
-        result = compare_values(value_1, value_2)
+        result = other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
     def test_int_str_2(self):
         value_1 = "1"
         value_2 = 1
-        result = compare_values(value_1, value_2)
+        result = other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
-    # Are these possible, since we're flattening?
     def test_list_1(self):
         value_1 = [1, 2]
         value_2 = 1
-        result = compare_values(value_1, value_2)
+        result = other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
     def test_list_2(self):
         value_1 = 1
         value_2 = [1, 2]
-        result = compare_values(value_1, value_2)
+        result = other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
     def test_dict_1(self):
         value_1 = { "a": 1 }
         value_2 = 1
-        result = compare_values(value_1, value_2)
+        result = other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
     def test_dict_2(self):
         value_1 = 1
         value_2 = { "a": 1 }
-        result = compare_values(value_1, value_2)
+        result = other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
 class TestValidateAuditConsistency(TestCase):
@@ -198,7 +209,10 @@ class TestValidateAuditConsistency(TestCase):
         sac.save()
         result = validate_audit_consistency(audit)
         self.assertFalse(result[0])
-        self.assertEqual(result[1], [{'field': 'data_source', 'sac_value': 'foo', 'audit_value': 'GSAFAC'}])
+        self.assertEqual(
+            result[1][0],
+            {'field': 'data_source', 'sac_value': 'foo', 'audit_value': 'GSAFAC'},
+        )
 
     def test_json_valid(self):
         audit = baker.make(Audit, version=0)
@@ -220,9 +234,9 @@ class TestValidateAuditConsistency(TestCase):
         sac.save()
         result = validate_audit_consistency(audit)
         self.assertFalse(result[0])
-        self.assertEqual(
-            result[1],
-            [{'field': 'general_information', 'sac_path': 'a', 'sac_value': 2, 'error': 'Value from SAC.general_information.a not found in Audit'}],
+        self.assertDictEqual(
+            result[1][0],
+            {'field': 'general_information', 'sac_path': 'a', 'sac_value': 2, 'error': 'Value from SAC.general_information.a not found in Audit'},
         )
 
     def test_json_audit_none_invalid(self):
@@ -232,9 +246,9 @@ class TestValidateAuditConsistency(TestCase):
         sac.save()
         result = validate_audit_consistency(audit)
         self.assertFalse(result[0])
-        self.assertEqual(
-            result[1],
-            [{'field': 'general_information', 'error': 'Field is empty in Audit, but not in SAC', 'sac_value': {'a': 1}, 'audit_value': None}],
+        self.assertDictEqual(
+            result[1][0],
+            {'field': 'general_information', 'error': 'Field is empty in Audit, but not in SAC', 'sac_value': {'a': 1}, 'audit_value': None},
         )
 
     def test_json_sac_none_invalid(self):
@@ -244,9 +258,9 @@ class TestValidateAuditConsistency(TestCase):
         baker.make(SingleAuditChecklist, report_id=audit.report_id)
         result = validate_audit_consistency(audit)
         self.assertFalse(result[0])
-        self.assertEqual(
-            result[1],
-            [{'field': 'general_information', 'error': 'Field is empty in SAC, but not in Audit', 'sac_value': None, 'audit_value': {'a': 1}}],
+        self.assertDictEqual(
+            result[1][0],
+            {'field': 'general_information', 'error': 'Field is empty in SAC, but not in Audit', 'sac_value': None, 'audit_value': {'a': 1}},
         )
 
     def test_normalizing_keys(self):
@@ -258,9 +272,9 @@ class TestValidateAuditConsistency(TestCase):
         sac.save()
         result = validate_audit_consistency(audit)
         self.assertFalse(result[0])
-        self.assertEqual(
-            result[1],
-            [{'field': 'general_information', 'sac_path': 'foo-bar', 'sac_value': 1, 'audit_path': 'general_information.foo_bar', 'error': 'Value from SAC.general_information.foo-bar found in Audit but with different structure/key'}],
+        self.assertDictEqual(
+            result[1][0],
+            {'field': 'general_information', 'sac_path': 'foo-bar', 'sac_value': 1, 'audit_path': 'general_information.foo_bar', 'error': 'Value from SAC.general_information.foo-bar found in Audit but with different structure/key'},
         )
 
     def test_json_different_formats_invalid(self):
@@ -272,7 +286,7 @@ class TestValidateAuditConsistency(TestCase):
         sac.save()
         result = validate_audit_consistency(audit)
         self.assertFalse(result[0])
-        self.assertEqual(
-            result[1],
-            [{'field': 'general_information', 'sac_path': 'a', 'sac_value': '1', 'found_with_different_format': True, 'found': True, 'error': '1 is int/float, found 1 as string'}],
+        self.assertDictEqual(
+            result[1][0],
+            {'field': 'general_information', 'sac_path': 'a', 'sac_value': '1', 'found_with_different_format': True, 'found': True, 'error': '1 is int/float, found 1 as string'},
         )

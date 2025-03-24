@@ -272,6 +272,16 @@ def validate_audit_consistency(audit_instance):
                         }
                     )
 
+                elif result.get("found_with_different_format"):
+                    differences.append(
+                        {
+                            "field": field,
+                            "sac_path": sac_path,
+                            "sac_value": sac_value,
+                            **result,
+                        }
+                    )
+
                 elif result.get("found_with_different_key"):
                     differences.append(
                         {
@@ -280,16 +290,6 @@ def validate_audit_consistency(audit_instance):
                             "sac_value": sac_value,
                             "audit_path": result["audit_path"],
                             "error": f"Value from SAC.{field}.{sac_path} found in Audit but with different structure/key",
-                        }
-                    )
-
-                elif result.get("found_with_different_format"):
-                    differences.append(
-                        {
-                            "field": field,
-                            "sac_path": sac_path,
-                            "sac_value": sac_value,
-                            **result,
                         }
                     )
 
@@ -340,10 +340,10 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             return {
                 "found": True,
             }
-        elif (not isinstance(sac_value, bool) and sac_value != 0) and compare_values(
+        elif not isinstance(sac_value, bool) and sac_value != 0 and other_formats_match(
             sac_value, audit_value
         ).get("found"):
-            comp_vals = compare_values(sac_value, audit_value)
+            comp_vals = other_formats_match(sac_value, audit_value)
             if sac_field != audit_field:
                 return {
                     "found": True,
@@ -367,8 +367,8 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
                     "audit_path": audit_path,
                     "value": audit_value,
                 }
-            elif compare_values(sac_value, audit_value).get("found"):
-                comp_vals = compare_values(sac_value, audit_value)
+            elif other_formats_match(sac_value, audit_value).get("found"):
+                comp_vals = other_formats_match(sac_value, audit_value)
                 return {
                     "found": True,
                     "found_with_different_key": True,
@@ -393,8 +393,8 @@ def normalize_key(key):
     return normalized.lower()
 
 
-def compare_values(value1, value2):
-    """Generate other format types for obj, str, list, dict"""
+def other_formats_match(value1, value2):
+    """Determines if value1 matches value2 but in a different format"""
     if isinstance(value1, list) and value2 in value1:
         return {"found": True, "error": f"{value1} is list, found {value2}"}
 
@@ -408,6 +408,7 @@ def compare_values(value1, value2):
         return {"found": True, "error": f"{value2} is dict, found {value1}"}
 
     try:
+        # Zeroes create false positives when comparing values like "00" or False
         if value1 == 0 or value2 == 0:
             return {"found": False}
 
