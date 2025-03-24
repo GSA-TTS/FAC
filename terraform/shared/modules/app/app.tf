@@ -113,7 +113,7 @@ resource "cloudfoundry_app" "fac_app" {
 
   # Use for the first deployment
   environment = {
-    # PROXYROUTE            = var.https_proxy
+    PROXYROUTE            = var.https_proxy
     ENV = "SANDBOX"
     # DISABLE_COLLECTSTATIC = 0
     DJANGO_BASE_URL    = "https://fac-${var.cf_space_name}.app.cloud.gov"
