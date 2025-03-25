@@ -3,16 +3,10 @@ locals {
 }
 
 resource "cloudfoundry_route" "postgrest" {
-  space  = data.cloudfoundry_space.space.id
-  domain = data.cloudfoundry_domain.public.id
-  host   = "fac-${var.cf_space_name}-${local.postgrest_name}"
-  destinations = [{app_id = cloudfoundry_app.postgrest.id}]
-}
-
-resource "cloudfoundry_service_key" "postgrest" {
-  provider         = cloudfoundry-community
-  name             = "postgrest"
-  service_instance = module.database.instance_id
+  space        = data.cloudfoundry_space.space.id
+  domain       = data.cloudfoundry_domain.public.id
+  host         = "fac-${var.cf_space_name}-${local.postgrest_name}"
+  destinations = [{ app_id = cloudfoundry_app.postgrest.id }]
 }
 
 data "docker_registry_image" "postgrest" {
@@ -36,4 +30,15 @@ resource "cloudfoundry_app" "postgrest" {
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
     PGRST_DB_MAX_ROWS : 20000
   }
+}
+
+# The following use the community provider as these have not been moved to the official provider.
+# In the event that test items do not get moved, the following will likely break
+# and need to be rebuilt in a different method. In the event the v2 api gets an extended depreciation,
+# these may continue to be used until the provider adds this functionality, in which case, should be
+# upgraded as soon as possible.
+resource "cloudfoundry_service_key" "postgrest" {
+  provider         = cloudfoundry-community
+  name             = "postgrest"
+  service_instance = module.database.instance_id
 }

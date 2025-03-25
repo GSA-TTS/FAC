@@ -2,29 +2,48 @@ locals {
   app_name = "gsa-fac"
 }
 
-# TODO - Overhaul App Deploy
 module "fac-app" {
   source                  = "../app"
-  name                    = local.app_name
+  gitref                  = "refs/heads/${var.branch_name}"
   cf_org_name             = var.cf_org_name
   cf_space_name           = var.cf_space_name
-  https_proxy             = module.https-proxy.https_proxy
-  https_proxy_creds_id    = cloudfoundry_service_instance.proxy_credentials.id
-  new_relic_creds_id      = cloudfoundry_service_instance.newrelic_creds.id
-  private_s3_id           = module.s3-private.bucket_id
-  public_s3_id            = module.s3-public.bucket_id
-  backups_s3_id           = var.backups_s3_id
-  db_id                   = module.database.instance_id
-  backup_db_id            = module.snapshot-database.instance_id
+  name                    = local.app_name
+  app_memory              = "2048M"
+  disk_quota              = "3072M"
   app_instances           = 1
-  app_memory              = 4096
-  disk_quota              = 3072
-  gitref                  = "refs/heads/${var.branch_name}"
   django_secret_login_key = var.django_secret_login_key
   sam_api_key             = var.sam_api_key
   login_client_id         = var.login_client_id
   login_secret_key        = var.login_secret_key
-  depends_on = [ cloudfoundry_service_instance.newrelic_creds, module.https-proxy ]
+  environment_variables = {
+    ENV                   = "SANDBOX"
+    DISABLE_COLLECTSTATIC = 1
+    DJANGO_BASE_URL       = "https://fac-${var.cf_space_name}.app.cloud.gov"
+    AV_SCAN_URL           = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
+    ALLOWED_HOSTS         = "fac-${var.cf_space_name}.app.cloud.gov"
+  }
+  service_bindings = {
+    # "${module.s3-private.bucket_name}" = ""
+    # "${module.s3-private.bucket_name}" = ""
+    # "${module.database.db_name}" = ""
+    # "${module.snapshot-database.db_name}" = ""
+    "fac-private-s3"                                          = ""
+    "fac-public-s3"                                           = ""
+    "fac-db"                                                  = ""
+    "fac-snapshot-db"                                         = ""
+    "${cloudfoundry_service_instance.newrelic_creds.name}"    = ""
+    "${cloudfoundry_service_instance.proxy_credentials.name}" = ""
+    # Services:
+    # fac-private-s3
+    # fac-public-s3
+    # fac-db
+    # fac-snapshot-db
+    # fac-key-service
+    # clamav_ups
+    # newrelic-creds
+    # https-proxy-creds
+  }
+  depends_on = [cloudfoundry_service_instance.newrelic_creds, module.https-proxy]
 }
 
 # The following use the community provider as these have not been moved to the official provider.
