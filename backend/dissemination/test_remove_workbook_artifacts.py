@@ -1,6 +1,8 @@
 from django.test import TestCase
 from unittest.mock import patch
-from audit.models.models import ExcelFile, SingleAuditChecklist, STATUS
+from audit.models.models import SingleAuditChecklist
+from audit.models import ExcelFile
+from audit.models.constants import STATUS
 from model_bakery import baker
 
 from dissemination.remove_workbook_artifacts import (

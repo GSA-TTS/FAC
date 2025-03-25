@@ -5,8 +5,8 @@ import time
 from .search_general import report_timing
 
 from .search_constants import (
-    ORDER_BY,
-    DIRECTION,
+    OrderBy,
+    Direction,
 )
 
 import logging
@@ -16,6 +16,29 @@ logger = logging.getLogger(__name__)
 ALN = NT("ALN", "prefix, program")
 
 
+def audit_search_alns(params):
+    full_alns = _get_full_alns(params)
+    agency_numbers = _get_agency_numbers(params)
+
+    if not (full_alns or agency_numbers):
+        return Q()
+
+    query = Q()
+    if agency_numbers:
+        # Build a filter for the agency numbers. E.g. given 93 and 45
+        for agency_number in agency_numbers:
+            query |= Q(agency_prefixes__icontains=agency_number.prefix)
+
+    if full_alns:
+        for full_aln in full_alns:
+            query |= Q(agency_prefixes__icontains=full_aln.prefix) & Q(
+                agency_extensions__icontains=full_aln.program
+            )
+
+    return query
+
+
+# TODO: Update Post SOC Launch -> Remove unused
 def search_alns(general_results, params):
     t0 = time.time()
     full_alns = _get_full_alns(params)
@@ -41,19 +64,19 @@ def search_alns(general_results, params):
 
 
 def _findings_sort(results, params):
-    if params.get("order_by") == ORDER_BY.findings_my_aln:
+    if params.get("order_by") == OrderBy.findings_my_aln:
         results = sorted(
             results,
             key=lambda obj: (2 if obj.finding_my_aln else 0)
             + (1 if obj.finding_all_aln else 0),
-            reverse=bool(params.get("order_direction") == DIRECTION.descending),
+            reverse=bool(params.get("order_direction") == Direction.descending),
         )
-    elif params.get("order_by") == ORDER_BY.findings_all_aln:
+    elif params.get("order_by") == OrderBy.findings_all_aln:
         results = sorted(
             results,
             key=lambda obj: (1 if obj.finding_my_aln else 0)
             + (2 if obj.finding_all_aln else 0),
-            reverse=bool(params.get("order_direction") == DIRECTION.descending),
+            reverse=bool(params.get("order_direction") == Direction.descending),
         )
     return results
 

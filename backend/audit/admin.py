@@ -7,8 +7,10 @@ from django.urls import reverse
 from audit.forms import SacValidationWaiverForm, UeiValidationWaiverForm
 from audit.models import (
     Access,
+    Audit,
     DeletedAccess,
     ExcelFile,
+    History,
     SingleAuditChecklist,
     SingleAuditReportFile,
     SubmissionEvent,
@@ -175,6 +177,92 @@ def flag_for_removal(modeladmin, request, queryset):
             f"Report(s) ({', '.join(already_flagged)}) were already flagged.",
             level=messages.WARNING,
         )
+
+
+class AuditAdmin(admin.ModelAdmin):
+    """
+    Support for read-only staff access, and control of what fields are present and
+    filterable/searchable.
+    """
+
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    list_display = (
+        "id",
+        "report_id",
+        "cognizant_agency",
+        "oversight_agency",
+        "submission_status",
+    )
+    list_filter = [
+        "cognizant_agency",
+        "oversight_agency",
+        "oversight_agency",
+        "submission_status",
+    ]
+    readonly_fields = ("submitted_by",)
+    search_fields = ("audit__general_information__auditee_uei", "report_id")
+    actions = [revert_to_in_progress, flag_for_removal, delete_flagged_records]
+
+    def changelist_view(self, request, extra_context=None):
+        """
+        Override changelist_view to allow running the action without selection.
+        """
+        if (
+            "action" in request.POST
+            and request.POST["action"] == "delete_flagged_records"
+        ):
+            queryset = self.get_queryset(request)
+            delete_flagged_records(self, request, queryset)
+            # Redirect to avoid Django's "No items selected" error and ensure a valid response
+            return redirect(
+                reverse(
+                    f"admin:{self.opts.app_label}_{self.opts.model_name}_changelist"
+                )
+            )
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+
+class AuditHistoryAdmin(admin.ModelAdmin):
+    """
+    Support for read-only staff access, and control of what fields are present and
+    filterable/searchable.
+    """
+
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    list_display = (
+        "id",
+        "report_id",
+        "updated_at",
+        "event_display",
+        "updated_by__email",
+        "version",
+    )
+    list_filter = [
+        "report_id",
+        "updated_at",
+        "event",
+        "updated_by__email",
+        "version",
+    ]
+    search_fields = ("report_id", "updated_by__email")
+    ordering = ("-updated_at",)
+
+    def event_display(self, obj):
+        return obj.get_event_display()
+
+    event_display.admin_order_field = "event"  # type: ignore
+    event_display.short_description = _("Event")  # type: ignore
 
 
 class SACAdmin(admin.ModelAdmin):
@@ -490,6 +578,8 @@ class UeiValidationWaiverAdmin(admin.ModelAdmin):
 admin.site.register(Access, AccessAdmin)
 admin.site.register(DeletedAccess, DeletedAccessAdmin)
 admin.site.register(ExcelFile, ExcelFileAdmin)
+admin.site.register(Audit, AuditAdmin)
+admin.site.register(History, AuditHistoryAdmin)
 admin.site.register(SingleAuditChecklist, SACAdmin)
 admin.site.register(SingleAuditReportFile, AuditReportAdmin)
 admin.site.register(SubmissionEvent, SubmissionEventAdmin)

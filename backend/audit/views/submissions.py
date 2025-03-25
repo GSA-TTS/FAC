@@ -38,8 +38,8 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         template_name = "audit/audit_submissions/audit_submissions.html"
         new_link = "report_submission"
         edit_link = "audit:EditSubmission"
-
-        submissions = MySubmissions.fetch_my_submissions(request.user)
+        use_audit = request.GET.get("beta", "N") == "Y"
+        submissions = MySubmissions.fetch_my_submissions(request.user, use_audit)
 
         data = {"completed_audits": [], "in_progress_audits": []}
         for audit in submissions:
@@ -53,40 +53,47 @@ class MySubmissions(LoginRequiredMixin, generic.View):
             "data": data,
             "new_link": new_link,
             "edit_link": edit_link,
+            "is_beta": use_audit,
+            "non_beta_url": "audit:MySubmissions",
         }
         return render(request, template_name, context)
 
     @classmethod
-    def fetch_my_submissions(cls, user):
+    def fetch_my_submissions(cls, user, use_audit):
         """
         Get all submissions the user is associated with via Access objects.
         """
         accesses = Access.objects.filter(user=user)
 
-        # TODO: Update Post SOC Launch replace this with audit IDs -- commented below.
-        sac_ids = [access.sac.id for access in accesses]
-        data = SingleAuditChecklist.objects.filter(
-            Q(id__in=sac_ids) & ~Q(submission_status=STATUS.FLAGGED_FOR_REMOVAL)
-        ).values(
-            "report_id",
-            "submission_status",
-            auditee_uei=F("general_information__auditee_uei"),
-            auditee_name=F("general_information__auditee_name"),
-            fiscal_year_end_date=F("general_information__auditee_fiscal_period_end"),
-        )
         # TODO: Update Post SOC Launch
-        # The values for audit are invalid.
-        # audit_ids = [access.audit.id for access in accesses]
-        # data = Audit.objects.filter(
-        #     Q(id__in=audit_ids) & ~Q(submission_status=STATUS.FLAGGED_FOR_REMOVAL)
-        # ).values(
-        #     "report_id",
-        #     "submission_status",
-        #     auditee_uei=F("general_information__auditee_uei"),
-        #     auditee_name=F("general_information__auditee_name"),
-        #     fiscal_year_end_date=F("general_information__auditee_fiscal_period_end"),
-        # )
-        return data
+        if use_audit:
+            audit_ids = [access.audit.id for access in accesses]
+            data = Audit.objects.filter(
+                Q(id__in=audit_ids) & ~Q(submission_status=STATUS.FLAGGED_FOR_REMOVAL)
+            ).values(
+                "report_id",
+                "submission_status",
+                "auditee_uei",
+                "auditee_name",
+                fiscal_year_end_date=F(
+                    "audit__general_information__auditee_fiscal_period_end"
+                ),
+            )
+            return data
+        else:
+            sac_ids = [access.sac.id for access in accesses]
+            data = SingleAuditChecklist.objects.filter(
+                Q(id__in=sac_ids) & ~Q(submission_status=STATUS.FLAGGED_FOR_REMOVAL)
+            ).values(
+                "report_id",
+                "submission_status",
+                auditee_uei=F("general_information__auditee_uei"),
+                auditee_name=F("general_information__auditee_name"),
+                fiscal_year_end_date=F(
+                    "general_information__auditee_fiscal_period_end"
+                ),
+            )
+            return data
 
 
 class EditSubmission(LoginRequiredMixin, generic.View):
@@ -125,7 +132,11 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # TODO: Update Post SOC Launch
             # remove try/except once we are ready to deprecate SAC.
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
+            audit_errors = audit.validate() if audit else None
             errors = sac.validate_full()
+
+            _compare_errors(errors, audit_errors)
+
             if errors:
                 context = {"report_id": report_id, "errors": errors}
 
@@ -145,9 +156,8 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     request, sac, audit=audit, transition_to=STATUS.SUBMITTED
                 )
                 disseminated = sac.disseminate()
-                audit_indexes = generate_audit_indexes(audit, sac)
+                audit_indexes = generate_audit_indexes(audit)
                 audit.audit.update(audit_indexes)
-                audit.save()
 
                 # `disseminated` is None if there were no errors.
                 if disseminated is None:
@@ -201,3 +211,11 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
 def _friendly_status(status):
     return dict(SingleAuditChecklist.STATUS_CHOICES)[status]
+
+
+# TODO: Post SOT Launch: Delete
+def _compare_errors(sac_errors, audit_errors):
+    if (sac_errors and audit_errors) and set(sac_errors) != set(audit_errors):
+        logger.error(
+            f"<SOT ERROR> Cross Validation Errors do not match: SAC {sac_errors}, Audit {audit_errors}"
+        )

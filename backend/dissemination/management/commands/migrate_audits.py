@@ -1,3 +1,28 @@
+# README
+
+# When testing this script, make sure you proceed through the following:
+# 1. Make sure you import the public prod data dump from the drive into your local DB.
+#    1. Users
+#       pg_restore --username=postgres --dbname=postgres ./public-auth_user.dump --clean
+#    2. SAC data
+#       psql -U postgres -d postgres -f ./sac_data.dump
+#    3. Accesses
+#       pg_restore --username=postgres --dbname=postgres ./public-audit_access.dump --clean
+#       psql -U postgres -d postgres -f ./sac-user-access-data.dump
+# 2. If you have already migrated some audits and want to reset to a clean slate,
+#    run these SQL queries in order:
+#      DELETE FROM public.audit_history WHERE event='MIGRATION';
+#      UPDATE public.audit_access SET audit_id=null;
+#      UPDATE public.audit_deletedaccess SET audit_id=null;
+#      UPDATE public.audit_submissionevent SET audit_id=null;
+#      UPDATE public.audit_singleauditchecklist SET migrated_to_audit=false;
+#      DELETE FROM public.audit_audit;
+# 3. Adjust the event_user's email to your local user email (Under the "FOR DEBUGGING" comment).
+# 4. Run the command in a separate shell from the app.
+#    - If you want to ONLY target disseminated records, pass the parameter "--disseminated".
+#    - If you want to ONLY target intake records, pass the parameter "--intake".
+#    - If you want to target ALL records, leave out the parameters.
+
 import logging
 
 import pytz
@@ -19,9 +44,12 @@ from audit.models import (
     DeletedAccess,
     Audit,
     User,
+    ExcelFile,
     SingleAuditReportFile,
     SingleAuditChecklist,
+    SubmissionEvent,
 )
+from audit.models.history import History
 from audit.models.constants import STATUS
 from audit.models.utils import generate_audit_indexes
 
@@ -41,35 +69,25 @@ class Command(BaseCommand):
             action="store_true",
             help="Migrates the Audit model to in_progress records.",
         )
+        parser.add_argument(
+            "--report_id",
+            type=str,
+            help="Migrate a specific SingleAuditChecklist by ID.",
+        )
 
     def handle(self, *args, **kwargs):
 
-        # FOR DEBUGGING ONLY
-        # Removes all references to Audit data for testing a fresh migration.
-        from audit.models import SubmissionEvent, History
-
-        History.objects.filter(event="MIGRATION").delete()
-        Access.objects.all().exclude(audit=None).update(audit=None)
-        DeletedAccess.objects.all().exclude(audit=None).update(audit=None)
-        SubmissionEvent.objects.all().exclude(audit=None).update(audit=None)
-        SingleAuditChecklist.objects.filter(migrated_to_audit=True).update(
-            migrated_to_audit=False
-        )
-        Audit.objects.all().delete()
-
-        # determine which SACs need to be retrieved.
-        sac_status = ""
-        if kwargs.get("disseminated"):
-            sac_status = "and submission_status='disseminated'"
-        elif kwargs.get("intake"):
-            sac_status = "and submission_status<>'disseminated'"
+        BATCH_SIZE = 100
 
         # iterate through unmigrated SACs.
-        queryset = _get_query(sac_status)
+        queryset = _get_query(kwargs, BATCH_SIZE)
+        total = _get_query(kwargs, None).count()
+        count = 0
+        logger.info(f"Found {total} records to parse through.")
         logger.info(
-            f"Found {len(list(queryset))} records for the first batch of migrations."
+            f"Selected {queryset.count()} records for the first batch of migrations."
         )
-        while len(list(queryset)) != 0:
+        while queryset.count() != 0:
             for sac in queryset:
                 try:
                     self._migrate_sac(sac)
@@ -77,11 +95,14 @@ class Command(BaseCommand):
                         cursor.execute(
                             f"update audit_singleauditchecklist set migrated_to_audit = true where report_id = '{sac.report_id}'"
                         )
+                    count += 1
                 except Exception as e:
                     logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
                     raise e
-            logger.info(f"Completed migration for {len(list(queryset))} SACs.")
-            queryset = _get_query(sac_status)
+            logger.info(
+                f"Migration progress... ({count} / {total}) ({(count / total) * 100}%)"
+            )
+            queryset = _get_query(kwargs, BATCH_SIZE)
         logger.info("Completed audit migrations.")
 
     @staticmethod
@@ -110,16 +131,49 @@ class Command(BaseCommand):
             )
 
             # convert additional fields.
-            audit.audit.update(generate_audit_indexes(audit, sac))
+            if sac.submission_status == STATUS.DISSEMINATED:
+                audit.audit.update(generate_audit_indexes(audit))
             audit.save()
 
+            # copy SubmissionEvents into History records.
+            events = SubmissionEvent.objects.filter(sac=sac)
+            for event in events:
+                History.objects.create(
+                    event=event.event,
+                    report_id=sac.report_id,
+                    audit=audit.audit,
+                    version=0,
+                    updated_at=event.timestamp,
+                    updated_by=event.user,
+                )
 
-def _get_query(status_condition):
-    return SingleAuditChecklist.objects.raw(
-        "select * from audit_singleauditchecklist "
-        f"where migrated_to_audit=false {status_condition}"
-        "order by id desc limit 100"
-    )
+            # assign audit reference to file-based models.
+            SingleAuditReportFile.objects.filter(sac=sac).update(audit=audit)
+            ExcelFile.objects.filter(sac=sac).update(audit=audit)
+
+
+def _get_query(kwargs, max_records):
+    """Fetch unmigrated SACs, based on parameters."""
+    if kwargs.get("report_id"):
+        queryset = SingleAuditChecklist.objects.filter(
+            migrated_to_audit=False, report_id=kwargs.get("report_id")
+        )
+    elif kwargs.get("disseminated"):
+        queryset = SingleAuditChecklist.objects.filter(
+            migrated_to_audit=False, submission_status="disseminated"
+        )
+    elif kwargs.get("intake"):
+        queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False).exclude(
+            submission_status="disseminated"
+        )
+    else:
+        queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False)
+
+    # only return up to "max_records" if applied.
+    if max_records:
+        return queryset[:max_records]
+    else:
+        return queryset
 
 
 def _convert_file_information(sac: SingleAuditChecklist):

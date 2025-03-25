@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from audit.models.constants import STATUS_CHOICES
+from audit.models.constants import EVENT_TYPES
 
 User = get_user_model()
 
@@ -12,9 +12,13 @@ class History(models.Model):
     of the event.
     """
 
-    event = models.CharField(choices=STATUS_CHOICES)
+    event = models.CharField(choices=EVENT_TYPES)
     report_id = models.CharField()
     version = models.IntegerField()
-    audit = models.JSONField()
+    event_data = models.JSONField()
     updated_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(User, on_delete=models.PROTECT)
+
+    class Meta:
+        verbose_name = "Audit History"
+        verbose_name_plural = "Audit History"

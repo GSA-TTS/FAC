@@ -2,12 +2,20 @@
 The intent of this file is to group together audit related helpers.
 """
 
+import logging
+
+
+from datetime import timedelta
+from django.utils import timezone as django_timezone
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Func
 from audit.models import SingleAuditChecklist
 
 from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
+from support.cog_over_w_audit import compute_cog_over
+
+logger = logging.getLogger(__name__)
 
 import json
 
@@ -42,16 +50,32 @@ class JsonArrayToTextArray(Func):
     output_field = ArrayField(models.CharField())
 
 
-# TODO:
-#    1) We'll want to calculate the cog/oversite for the audit same way as sac, for now just use the sac one
-def generate_audit_indexes(audit, sac):
-    general_information = audit.audit.get("general_information", {})
-    audit_year, fy_end_month, _ = general_information.get(
-        "auditee_fiscal_period_end", "1900-01-01"
-    ).split("-")
+def one_month_from_today():
+    return django_timezone.now() + timedelta(days=30)
 
-    cognizant_agency = sac.cognizant_agency
-    oversight_agency = sac.oversight_agency
+
+def camel_to_snake(raw: str) -> str:
+    """Convert camel case to snake_case."""
+    text = f"{raw[0].lower()}{raw[1:]}"
+    return "".join(c if c.islower() else f"_{c.lower()}" for c in text)
+
+
+def generate_audit_indexes(audit):
+    general_information = audit.audit.get("general_information", {})
+
+    fiscal_period_end = general_information.get("auditee_fiscal_period_end", None)
+    if fiscal_period_end:
+        audit_year, fy_end_month, _ = fiscal_period_end.split("-")
+    else:
+        audit_year, fy_end_month, _ = "1900-01-01".split("-")
+
+    cognizant_agency, oversight_agency = compute_cog_over(
+        audit.audit["federal_awards"],
+        audit.submission_status,
+        audit.auditee_ein,
+        audit.auditee_uei,
+        audit.audit_year,
+    )
 
     is_public = general_information.get(
         "user_provided_organization_type", ""
@@ -75,11 +99,12 @@ def generate_audit_indexes(audit, sac):
 def _index_findings(audit_data):
     findings = 0
     compliance_requirements = set()
+    unique_findings = set()
     for finding in audit_data.get("findings_uniform_guidance", []):
         for mask in FINDINGS_FIELD_TO_BITMASK:
             if finding.get(mask.field, "N") == "Y":
                 findings |= mask.mask
-        if finding.get("finding", {}).get("repeat_prior_reference", "N") == "Y":
+        if finding.get("findings", {}).get("repeat_prior_reference", "N") == "Y":
             findings |= FindingsBitmask.REPEAT_FINDING
 
         compliance_requirement = finding.get("program", {}).get(
@@ -87,9 +112,14 @@ def _index_findings(audit_data):
         )
         compliance_requirements.add(compliance_requirement)
 
+        reference_number = finding.get("findings", {}).get("reference_number", None)
+        if reference_number:
+            unique_findings.add(reference_number)
+
     return {
         "findings_summary": findings,
         "compliance_requirements": list(compliance_requirements),
+        "unique_audit_findings_count": len(unique_findings),
     }
 
 

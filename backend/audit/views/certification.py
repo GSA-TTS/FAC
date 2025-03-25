@@ -48,9 +48,11 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             # TODO: Update Post SOC Launch
-            # remove try/except once we are ready to deprecate SAC.
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
             errors = sac.validate_full()
+            audit_errors = audit.validate() if audit else None
+
+            _compare_errors(errors, audit_errors)
             if not errors:
                 sac_transition(
                     request,
@@ -100,3 +102,15 @@ class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
+
+
+# TODO: Post SOT Launch: Delete
+def _compare_errors(sac_errors, audit_errors):
+    if (
+        (sac_errors and not audit_errors)
+        or (audit_errors and not sac_errors)
+        or (sac_errors) != set(audit_errors)
+    ):
+        logger.error(
+            f"<SOT ERROR> Cross Validation Errors do not match: SAC {sac_errors}, Audit {audit_errors}"
+        )

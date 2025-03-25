@@ -11,8 +11,9 @@ from audit.mixins import (
 from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
-    SubmissionEvent,
+    Audit,
 )
+from audit.models.constants import EventType
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
@@ -28,17 +29,22 @@ class SingleAuditReportFileHandlerView(
             report_id = kwargs["report_id"]
 
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
+            audit = Audit.objects.find_audit_or_none(report_id=report_id)
             file = request.FILES["FILES"]
 
             sar_file = SingleAuditReportFile(
-                **{"file": file, "filename": "temp", "sac_id": sac.id}
+                **{
+                    "file": file,
+                    "filename": "temp",
+                    "sac_id": sac.id,
+                    "audit_id": audit.id if audit else None,
+                }
             )
 
             sar_file.full_clean()
             sar_file.save(
                 event_user=request.user,
-                event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+                event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
             )
 
             return redirect("/")

@@ -1,4 +1,5 @@
 from audit.models import SingleAuditChecklist, SubmissionEvent, Audit
+from audit.models.constants import EventType
 from audit.models.models import STATUS
 from curation.curationlib.curation_audit_tracking import CurationTracking
 import datetime
@@ -126,7 +127,7 @@ def sac_transition(request, sac, **kwargs):
         _transition_audit(
             audit=audit,
             user=user,
-            submission_event=SubmissionEvent.EventType.UNLOCKED_AFTER_CERTIFICATION,
+            submission_event=EventType.UNLOCKED_AFTER_CERTIFICATION,
             autoflow_action=audit_flow.transition_to_in_progress_again,
         )
         return True
@@ -140,15 +141,12 @@ def sac_transition(request, sac, **kwargs):
         _transition_audit(
             audit=audit,
             user=user,
-            submission_event=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
+            submission_event=EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
             autoflow_action=audit_flow.transition_to_flagged_for_removal,
         )
         return True
 
     elif target == STATUS.READY_FOR_CERTIFICATION:
-        logger.error(
-            f"JASON ReadyForCert ========> SAC: {sac.submission_status} Audit: {audit.submission_status}"
-        )
         flow.transition_to_ready_for_certification()
         sac.save(
             event_user=user,
@@ -157,7 +155,7 @@ def sac_transition(request, sac, **kwargs):
         _transition_audit(
             audit=audit,
             user=user,
-            submission_event=SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
+            submission_event=EventType.LOCKED_FOR_CERTIFICATION,
             autoflow_action=audit_flow.transition_to_ready_for_certification,
         )
         return True
@@ -171,7 +169,7 @@ def sac_transition(request, sac, **kwargs):
         _transition_audit(
             audit=audit,
             user=user,
-            submission_event=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+            submission_event=EventType.AUDITEE_CERTIFICATION_COMPLETED,
             autoflow_action=audit_flow.transition_to_auditee_certified,
         )
         return True
@@ -185,7 +183,7 @@ def sac_transition(request, sac, **kwargs):
         _transition_audit(
             audit=audit,
             user=user,
-            submission_event=SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
+            submission_event=EventType.AUDITOR_CERTIFICATION_COMPLETED,
             autoflow_action=audit_flow.transition_to_auditor_certified,
         )
         return True
@@ -199,7 +197,7 @@ def sac_transition(request, sac, **kwargs):
         _transition_audit(
             audit=audit,
             user=user,
-            submission_event=SubmissionEvent.EventType.SUBMITTED,
+            submission_event=EventType.SUBMITTED,
             autoflow_action=audit_flow.transition_to_submitted,
         )
         return True
@@ -213,7 +211,7 @@ def sac_transition(request, sac, **kwargs):
         _transition_audit(
             audit=audit,
             user=user,
-            submission_event=SubmissionEvent.EventType.DISSEMINATED,
+            submission_event=EventType.DISSEMINATED,
             autoflow_action=audit_flow.transition_to_disseminated,
         )
         return True
@@ -476,8 +474,6 @@ class AuditFlow(Audit):
             {"fac_accepted_date": datetime.datetime.today().strftime("%Y-%m-%d")}
         )
 
-    # WIP
-    # to add - source=[STATUS.SUBMITTED, STATUS.DISSEMINATED]
     @state.transition(
         source=STATUS.SUBMITTED,
         target=STATUS.DISSEMINATED,
