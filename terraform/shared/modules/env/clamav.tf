@@ -8,11 +8,10 @@ data "docker_registry_image" "clamav" {
 }
 
 module "clamav" {
-  source = "github.com/gsa-tts/terraform-cloudgov//clamav?ref=v1.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//clamav?ref=v2.2.0"
 
   # This generates eg "fac-av-staging.apps.internal", avoiding collisions with routes for other projects and spaces
-  name           = local.clam_name
-  app_name_or_id = "gsa-fac"
+  name = local.clam_name
 
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space_name
@@ -28,11 +27,10 @@ module "clamav" {
 }
 
 module "file_scanner_clamav" {
-  source = "github.com/gsa-tts/terraform-cloudgov//clamav?ref=v1.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//clamav?ref=v2.2.0"
 
   # This generates eg "fac-av-staging-fs.apps.internal", avoiding collisions with routes for other projects and spaces
-  name           = local.fs_clam_name
-  app_name_or_id = "fac-file-scanner"
+  name = local.fs_clam_name
 
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space_name
@@ -47,5 +45,45 @@ module "file_scanner_clamav" {
   proxy_password = module.https-proxy.password
 
   depends_on = [module.fac-file-scanner.id]
+}
+
+resource "cloudfoundry_network_policy" "clamav-network-policy" {
+  provider = cloudfoundry-community
+  policy {
+    source_app      = module.clamav.app_id
+    destination_app = module.https-proxy.app_id
+    port            = "61443"
+    protocol        = "tcp"
+  }
+
+  policy {
+    source_app      = module.file_scanner_clamav.app_id
+    destination_app = module.https-proxy.app_id
+    port            = "61443"
+    protocol        = "tcp"
+  }
+}
+
+data "cloudfoundry_app" "fac-file-scanner" {
+  name       = "fac-file-scanner"
+  space_name = var.cf_space_name
+  org_name   = var.cf_org_name
+}
+
+resource "cloudfoundry_network_policy" "app-network-policy" {
+  provider = cloudfoundry-community
+  policy {
+    source_app      = data.cloudfoundry_app.fac-app.id
+    destination_app = module.clamav.app_id
+    port            = "61443"
+    protocol        = "tcp"
+  }
+
+  policy {
+    source_app      = data.cloudfoundry_app.fac-file-scanner.id
+    destination_app = module.clamav.app_id
+    port            = "61443"
+    protocol        = "tcp"
+  }
 }
 

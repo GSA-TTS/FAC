@@ -81,9 +81,9 @@ variable "clamav_fs_instances" {
 }
 
 variable "clamav_memory" {
-  type        = number
+  type        = string
   description = "memory in MB to allocate to clamav app"
-  default     = 3072
+  default     = "3072M"
 }
 
 variable "new_relic_license_key" {
@@ -109,4 +109,29 @@ variable "new_relic_account_id" {
 variable "new_relic_api_key" {
   type        = string
   description = "New Relic API key"
+}
+
+variable "cf_space_id" {
+  type        = string
+  description = "the guid of the cf space"
+}
+
+variable "allowlist" {
+  description = "Allowed egress for apps (applied first). A map where keys are app names, and the values are sets of acl strings."
+  # See the upstream documentation for possible acl strings:
+  #   https://github.com/caddyserver/forwardproxy/blob/caddy2/README.md#caddyfile-syntax-server-configuration
+  type = map(set(string))
+  default = {
+    # appname    = [ "*.example.com:443", "example2.com:443" ]
+  }
+}
+
+variable "denylist" {
+  description = "Denied egress for apps (applied second). A map where keys are app names, and the values are sets of host:port strings."
+  # See the upstream documentation for possible acl strings:
+  #   https://github.com/caddyserver/forwardproxy/blob/caddy2/README.md#caddyfile-syntax-server-configuration
+  type = map(set(string))
+  default = {
+    # appname    = [ "bad.example.com:443" ]
+  }
 }
