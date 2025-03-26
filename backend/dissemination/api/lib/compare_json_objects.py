@@ -11,13 +11,19 @@ def andmap(ls) -> bool:
 def check_dictionaries_have_same_keys(o1, o2):
     key_set_1 = set(o1.keys())
     key_set_2 = set(o2.keys())
-    return key_set_1 == key_set_2
+    result = key_set_1 == key_set_2
+    if not result:
+        print("keys different between objects:", key_set_1 - key_set_2)
+    return result
 
 
 def check_dictionaries_have_same_values(o1, o2):
     val_set_1 = set(o1.values())
     val_set_2 = set(o2.values())
-    return val_set_1 == val_set_2
+    result = val_set_1 == val_set_2
+    if not result:
+        print("values different between objects:", {val_set_1 - val_set_2})
+    return result
 
 
 def check_dictionaries_have_same_mappings(o1, o2):
@@ -25,6 +31,7 @@ def check_dictionaries_have_same_mappings(o1, o2):
         if o1[k] == o2[k]:
             pass
         else:
+            print(f"mapping different for {k}; o1: {o1[k]} o2: {o2[k]}")
             return False
     return True
 
@@ -95,7 +102,10 @@ def compare_strict_order(l1: list, l2: list) -> list:
 
 
 def check_lists_same_length(l1, l2):
-    return len(l1) == len(l2)
+    result = len(l1) == len(l2)
+    if not result:
+        print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
+    return result
 
 
 KEY_IN_BOTH = 0
@@ -115,7 +125,10 @@ def check_key_in_both_lists(l1, l2, comparison_key):
 def check_equal_values_for_key(l1, l2, comparison_key):
     kv1 = set(map(lambda o: o[comparison_key], l1))
     kv2 = set(map(lambda o: o[comparison_key], l2))
-    return kv1 == kv2
+    result = kv1 == kv2
+    if not result:
+        print(f"key `{comparison_key}` returned different values: {kv1 - kv2}")
+    return result
 
 
 # Compares two lists of JSON objects
