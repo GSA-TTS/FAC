@@ -1,5 +1,6 @@
 import os
 import logging
+import support.export_audit_sql as export_audit_sql
 
 from config import settings
 from datetime import datetime
@@ -36,17 +37,21 @@ DEFAULT_OPTIONS = {
 
 
 class StreamGenerator:
-    EXCLUDE_NONPUBLIC_QUERY = "select report_id, version, audit_type, data_source, audit_year, jsonb(audit->>'{table_name}') from audit_audit where audit_year = {audit_year} and is_public = 'true'"
+    EXCLUDE_NONPUBLIC_QUERY = (
+        "select report_id, version, audit_type, data_source, "
+        "audit_year, jsonb(audit->>'{table_name}') from audit_audit where audit_year = {audit_year} "
+        "and is_public = 'true'"
+    )
 
-    UNRESTRICTED_QUERY = "select report_id, version, audit_type, data_source, audit_year, jsonb(audit->>'{table_name}') from audit_audit where audit_year = {audit_year}"
+    UNRESTRICTED_QUERY = (
+        "select report_id, version, audit_type, data_source, "
+        "audit_year, jsonb(audit->>'{table_name}') from audit_audit where audit_year = {audit_year}"
+    )
 
     def __init__(self, table_name, friendly_name, query_override=None):
         self.table_name = table_name
         self.friendly_name = friendly_name
 
-        # restricted_tables = [
-        #     "dissemination_" + model for model in restricted_model_names
-        # ]
         default_query = (
             self.EXCLUDE_NONPUBLIC_QUERY
             if table_name in restricted_audit_sections
@@ -72,29 +77,27 @@ STREAM_GENERATORS = [
     StreamGenerator(
         friendly_name="General",
         table_name="general_information",
-        # query_override="select audit->>"general_information" from Audit where audit_year = {audit_year}",
+        query_override=export_audit_sql.select_general_information,
     ),
     StreamGenerator(
         friendly_name="AdditionalEIN",
         table_name="additional_eins",
-        query_override=(
-            "select a.report_id, a.version, a.audit_type, a.data_source, a.audit_year, "
-            "ft_elem::text as additional_eins "
-            "from audit_audit as a, "
-            "LATERAL jsonb_array_elements(a.audit->'additional_eins') as ft_elem "
-            "where a.audit_year = {audit_year}"
-        ),
+        query_override=export_audit_sql.select_additional_eins,
     ),
-    StreamGenerator(friendly_name="AdditionalUEI", table_name="additional_ueis"),
     StreamGenerator(
-        friendly_name="CorrectiveActionPlans", table_name="corrective_action_plan"
+        friendly_name="AdditionalUEI",
+        table_name="additional_ueis",
+        query_override=export_audit_sql.select_additional_ueis,
     ),
-    StreamGenerator(friendly_name="FederalAward", table_name="federal_awards"),
-    StreamGenerator(friendly_name="Finding", table_name="findings_uniform_guidance"),
-    StreamGenerator(friendly_name="FindingText", table_name="findings_text"),
-    StreamGenerator(friendly_name="Note", table_name="notes_to_sefa"),
-    StreamGenerator(friendly_name="PassThrough", table_name="passthrough"),
-    StreamGenerator(friendly_name="SecondaryAuditor", table_name="secondary_auditors"),
+    # StreamGenerator(
+    #     friendly_name="CorrectiveActionPlans", table_name="corrective_action_plan"
+    # ),
+    # StreamGenerator(friendly_name="FederalAward", table_name="federal_awards"),
+    # StreamGenerator(friendly_name="Finding", table_name="findings_uniform_guidance"),
+    # StreamGenerator(friendly_name="FindingText", table_name="findings_text"),
+    # StreamGenerator(friendly_name="Note", table_name="notes_to_sefa"),
+    # StreamGenerator(friendly_name="PassThrough", table_name="passthrough"),
+    # StreamGenerator(friendly_name="SecondaryAuditor", table_name="secondary_auditors"),
 ]
 
 
