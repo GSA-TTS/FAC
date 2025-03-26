@@ -10,7 +10,6 @@ from django.utils import timezone as django_timezone
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Func
-from audit.models import SingleAuditChecklist
 
 from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
 from support.cog_over_w_audit import compute_cog_over
@@ -212,7 +211,7 @@ def validate_audit_consistency(audit_instance):
     ignores strucutre and searches for keys/values. All values in SAC,
     must exist in Audit.
     """
-
+    from audit.models import SingleAuditChecklist
     sac = SingleAuditChecklist
 
     try:
