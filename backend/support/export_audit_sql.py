@@ -75,5 +75,6 @@ select_general_information = (
     "a.data_source as data_source, "
     "a.audit->'general_information'->>'is_aicpa_audit_guide_included' as is_aicpa_audit_guide_included, "
     "a.audit->'general_information'->>'is_additional_ueis' as is_additional_ueis "
-    "from audit_audit as a"
+    "from audit_audit as a "
+    "where a.audit_year = {audit_year}"
 )
