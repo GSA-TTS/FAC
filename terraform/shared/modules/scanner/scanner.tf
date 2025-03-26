@@ -1,19 +1,21 @@
 data "cloudfoundry_domain" "internal" {
-  provider = cloudfoundry-community
-  name     = "apps.internal"
+  name = "apps.internal"
+}
+
+data "cloudfoundry_org" "org" {
+  name = var.cf_org_name
 }
 
 data "cloudfoundry_space" "scanner_space" {
-  provider = cloudfoundry-community
-  org_name = var.cf_org_name
-  name     = var.cf_space_name
+  name = var.cf_space_name
+  org  = data.cloudfoundry_org.org.id
 }
 
 resource "cloudfoundry_route" "scanner_route" {
-  provider = cloudfoundry-community
-  space    = data.cloudfoundry_space.scanner_space.id
-  domain   = data.cloudfoundry_domain.internal.id
-  hostname = "${var.name}-${replace(var.cf_space_name, ".", "-")}"
+  space        = data.cloudfoundry_space.scanner_space.id
+  domain       = data.cloudfoundry_domain.internal.id
+  host         = "${var.name}-${replace(var.cf_space_name, ".", "-")}"
+  destinations = [{ app_id = cloudfoundry_app.scanner_app.id }]
   # Yields something like: fac-file-scanner-spacename.apps.internal
 }
 
@@ -25,19 +27,19 @@ data "external" "scannerzip" {
   }
 }
 
-resource "cloudfoundry_user_provided_service" "clam" {
-  provider = cloudfoundry-community
-  name     = "clamav_ups"
-  space    = data.cloudfoundry_space.scanner_space.id
-  credentials = {
-    "AV_SCAN_URL" : local.scan_url
-  }
+resource "cloudfoundry_service_instance" "clam_ups_fs" {
+  name        = "clamav_ups"
+  type        = "user-provided"
+  tags        = ["clamav-ups"]
+  space       = data.cloudfoundry_space.scanner_space.id
+  credentials = <<CLAMAVUPS
+  {"AV_SCAN_URL": "${local.scan_url}"}
+  CLAMAVUPS
 }
 
 module "quarantine" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
-
-  cf_space_id  = var.cf_space_id
+  source       = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
+  cf_space_id  = data.cloudfoundry_space.scanner_space.id
   name         = "fac-file-scanner-quarantine"
   s3_plan_name = "basic"
   tags         = ["s3"]
@@ -46,15 +48,23 @@ module "quarantine" {
 locals {
   app_id   = cloudfoundry_app.scanner_app.id
   scan_url = "https://fac-av-${var.cf_space_name}-fs.apps.internal:61443/scan"
+  services = merge({
+    "${cloudfoundry_service_instance.clam_ups_fs.name}" = ""
+    # "${module.quarantine.bucket_name}" = ""
+    "fac-file-scanner-quarantine" = ""
+  }, var.service_bindings)
 }
 
+
 resource "cloudfoundry_app" "scanner_app" {
-  provider  = cloudfoundry-community
-  name      = var.name
-  space     = data.cloudfoundry_space.scanner_space.id
-  buildpack = "https://github.com/cloudfoundry/python-buildpack"
-  path      = "${path.module}/${data.external.scannerzip.result.path}"
-  #source_code_hash  = filesha256("${path.module}/${data.external.scannerzip.result.path}")
+  name       = var.name
+  space_name = var.cf_space_name
+  org_name   = var.cf_org_name
+
+  buildpacks       = ["https://github.com/cloudfoundry/python-buildpack"]
+  path             = "${path.module}/${data.external.scannerzip.result.path}"
+  source_code_hash = filesha256("${path.module}/${data.external.scannerzip.result.path}")
+
   timeout           = 180
   disk_quota        = var.disk_quota
   memory            = var.scanner_memory
@@ -62,27 +72,19 @@ resource "cloudfoundry_app" "scanner_app" {
   strategy          = "rolling"
   health_check_type = "port"
 
-  service_binding {
-    service_instance = cloudfoundry_user_provided_service.clam.id
-  }
+  # Handled with cloudfoundry_route.scanner_route
+  # routes = [{
+  #   route = local.app_route
+  # }]
 
-  service_binding {
-    service_instance = var.s3_id
-  }
-
-  service_binding {
-    service_instance = module.quarantine.bucket_id
-  }
-
-  service_binding {
-    service_instance = var.logdrain_id
-  }
-
-  routes {
-    route = cloudfoundry_route.scanner_route.id
-  }
-
+  service_bindings = [
+    for service_name, params in local.services : {
+      service_instance = service_name
+      params           = (params == "" ? "{}" : params) # Empty string -> Minimal JSON
+    }
+  ]
   environment = {
-    PROXYROUTE = var.https_proxy
+    PROXYROUTE = "${var.https_proxy}"
   }
+  depends_on = [ module.quarantine ]
 }

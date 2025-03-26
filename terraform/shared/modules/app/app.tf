@@ -27,16 +27,6 @@ data "external" "app_zip" {
   }
 }
 
-resource "cloudfoundry_service_instance" "clam_ups" {
-  name        = "clamav-ups"
-  type        = "user-provided"
-  tags        = ["clamav-ups"]
-  space       = data.cloudfoundry_space.app_space.id
-  credentials = <<CLAMAVUPS
-  {"AV_SCAN_URL": "${local.scan_url}"}
-  CLAMAVUPS
-}
-
 resource "cloudfoundry_service_instance" "key_service" {
   name        = "fac-key-service"
   type        = "user-provided"
@@ -57,7 +47,6 @@ locals {
   scan_url  = "https://fac-av-${var.cf_space_name}-fs.apps.internal:61443/scan"
   app_route = coalesce(var.route, "${var.name}.app.cloud.gov")
   services = merge({
-    "${cloudfoundry_service_instance.clam_ups.name}"    = ""
     "${cloudfoundry_service_instance.key_service.name}" = ""
   }, var.service_bindings)
 }
