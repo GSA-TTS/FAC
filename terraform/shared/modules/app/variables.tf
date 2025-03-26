@@ -38,46 +38,6 @@ variable "disk_quota" {
   default     = "2048M"
 }
 
-# variable "private_s3_id" {
-#   type        = string
-#   description = "the full string of the private s3 resource id"
-# }
-
-# variable "public_s3_id" {
-#   type        = string
-#   description = "the full string of the public s3 resource id"
-# }
-
-# variable "backups_s3_id" {
-#   type        = string
-#   description = "the full string of the backups s3 resource id"
-# }
-
-# variable "db_id" {
-#   type        = string
-#   description = "the full string of the core db resource id"
-# }
-
-# variable "backup_db_id" {
-#   type        = string
-#   description = "the full string of the backup db resource id"
-# }
-# # Can't be created before the app exists
-# variable "https_proxy" {
-#   type        = string
-#   description = "the full string of the https proxy for use with the app"
-# }
-
-# variable "https_proxy_creds_id" {
-#   type        = string
-#   description = "the id of the credentials for the proxy to bind to the app"
-# }
-
-# variable "new_relic_creds_id" {
-#   type        = string
-#   description = "the id of the credentials for newrelic to bind to the app"
-# }
-
 variable "recursive_delete" {
   type        = bool
   description = "when true, deletes service bindings attached to the resource (not recommended for production)"
