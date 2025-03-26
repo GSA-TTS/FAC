@@ -1,6 +1,6 @@
 from requests import get
 
-from compare_json_objects import (
+from lib.compare_json_objects import (
     compare_lists_of_json_objects as clojo,
 )
 
