@@ -38,10 +38,18 @@ module "s3-private" {
 
 
 # Stuff used for apps in this space
-data "cloudfoundry_space" "apps" {
-  provider = cloudfoundry-community
-  org_name = var.cf_org_name
-  name     = var.cf_space_name
+data "cloudfoundry_org" "org" {
+  name = var.cf_org_name
+}
+
+data "cloudfoundry_space" "space" {
+  name = var.cf_space_name
+  org  = data.cloudfoundry_org.org.id
+}
+
+data "cloudfoundry_space" "egress_space" {
+  name = "${var.cf_space_name}-egress"
+  org  = data.cloudfoundry_org.org.id
 }
 
 data "cloudfoundry_domain" "public" {

@@ -4,27 +4,46 @@ locals {
 
 module "fac-app" {
   source                  = "../app"
-  name                    = local.app_name
+  gitref                  = "refs/heads/${var.branch_name}"
   cf_org_name             = var.cf_org_name
   cf_space_name           = var.cf_space_name
-  https_proxy             = module.https-proxy.https_proxy
-  https_proxy_creds_id    = module.https-proxy.creds_id
-  new_relic_creds_id      = cloudfoundry_user_provided_service.credentials.id
-  private_s3_id           = module.s3-private.bucket_id
-  public_s3_id            = module.s3-public.bucket_id
-  backups_s3_id           = var.backups_s3_id
-  db_id                   = module.database.instance_id
-  backup_db_id            = module.snapshot-database.instance_id
+  name                    = local.app_name
+  app_memory              = "2048M"
+  disk_quota              = "3072M"
   app_instances           = 1
-  app_memory              = 4096
-  disk_quota              = 3072
-  gitref                  = "refs/heads/${var.branch_name}"
   django_secret_login_key = var.django_secret_login_key
   sam_api_key             = var.sam_api_key
   login_client_id         = var.login_client_id
   login_secret_key        = var.login_secret_key
+  environment_variables = {
+    ENV                   = "SANDBOX"
+    DISABLE_COLLECTSTATIC = 1
+    DJANGO_BASE_URL       = "https://fac-${var.cf_space_name}.app.cloud.gov"
+    AV_SCAN_URL           = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
+    ALLOWED_HOSTS         = "fac-${var.cf_space_name}.app.cloud.gov"
+  }
+  service_bindings = {
+    # We can use these with the 2.3.0 release of terraform-cloudgov
+    # "${module.s3-private.bucket_name}" = ""
+    # "${module.s3-private.bucket_name}" = ""
+    # "${module.database.database_name}" = ""
+    # "${module.snapshot-database.db_name}" = ""
+    "fac-private-s3"                                          = ""
+    "fac-public-s3"                                           = ""
+    "fac-db"                                                  = ""
+    "fac-snapshot-db"                                         = ""
+    "${cloudfoundry_service_instance.newrelic_creds.name}"    = ""
+    "${cloudfoundry_service_instance.proxy_credentials.name}" = ""
+    "${module.logshipper.syslog_drain_name}"                  = ""
+  }
+  depends_on = [cloudfoundry_service_instance.newrelic_creds, module.https-proxy, module.logshipper]
 }
 
+# The following use the community provider as these have not been moved to the official provider.
+# In the event that test items do not get moved, the following will likely break
+# and need to be rebuilt in a different method. In the event the v2 api gets an extended depreciation,
+# these may continue to be used until the provider adds this functionality, in which case, should be
+# upgraded as soon as possible.
 resource "cloudfoundry_network_policy" "app-network-policy" {
   provider = cloudfoundry-community
 
