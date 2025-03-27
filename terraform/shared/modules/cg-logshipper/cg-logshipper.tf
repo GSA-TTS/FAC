@@ -1,51 +1,64 @@
+locals {
+  username = random_uuid.username.result
+  password = random_password.password.result
+  # The syslog_drain must be registered on the public domain for cloudfoundry.
+  # Cloud Foundry uses the syslog URL to route messages to the service.
+  # The syslog URL has a scheme of syslog, syslog-tls, or https, and can include a port number.
+  # More information here:
+  # https://docs.cloudfoundry.org/devguide/services/log-management.html
+  # https://docs.cloudfoundry.org/devguide/services/user-provided.html#syslog
+  syslog_drain = "https://${local.username}:${local.password}@${cloudfoundry_route.logshipper_route.host}.app.cloud.gov/?drain-type=all"
+  domain       = cloudfoundry_route.logshipper_route.domain
+  app_id       = cloudfoundry_app.logshipper_app.id
+  route        = "${var.cf_space.name}-${var.name}.app.cloud.gov"
+
+  logshipper_creds_name = "logshipper-creds"
+
+  services = merge({
+    "${local.logshipper_creds_name}" = ""
+    # "${module.logshipper-storage.bucket_name}" = ""
+    "log-storage" = ""
+  }, var.service_bindings)
+}
+
 data "cloudfoundry_domain" "public" {
   name = "app.cloud.gov"
 }
 
-data "cloudfoundry_space" "apps" {
-  provider = cloudfoundry-community
-  org_name = var.cf_org_name
-  name     = var.cf_space_name
-}
-
-module "s3-logshipper-storage" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
-
-  cf_space_id  = var.cf_space_id
+module "logshipper-storage" {
+  source       = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
+  cf_space_id  = var.cf_space.id
   name         = "log-storage"
   s3_plan_name = "basic"
   tags         = ["logshipper-s3"]
 }
 
-resource "cloudfoundry_service_key" "logshipper-s3-service-key" {
-  provider         = cloudfoundry-community
-  name             = "fac-to-gsa"
-  service_instance = module.s3-logshipper-storage.bucket_id
+resource "cloudfoundry_route" "logshipper_route" {
+  space        = var.cf_space.id
+  domain       = data.cloudfoundry_domain.public.id
+  host         = "fac-${var.cf_space.name}-${var.name}"
+  destinations = [{ app_id = cloudfoundry_app.logshipper_app.id }]
+  # Yields something like: fac-dev-logshipper.app.cloud.gov
 }
 
-resource "cloudfoundry_route" "logshipper" {
-  provider = cloudfoundry-community
-  space    = data.cloudfoundry_space.apps.id
-  domain   = data.cloudfoundry_domain.public.id
-  hostname = "fac-${var.cf_space_name}-${var.name}"
-  # Yields something like: fac-spacename-name
-}
-
-resource "cloudfoundry_user_provided_service" "logshipper_creds" {
-  provider = cloudfoundry-community
-  name     = "cg-logshipper-creds"
-  space    = data.cloudfoundry_space.apps.id
-  credentials = {
-    "HTTP_USER" = local.username
-    "HTTP_PASS" = local.password
+resource "cloudfoundry_service_instance" "logshipper_creds" {
+  name        = local.logshipper_creds_name
+  type        = "user-provided"
+  tags        = ["logshipper-creds"]
+  space       = var.cf_space.id
+  credentials = <<CREDS
+  {
+    "HTTP_USER": "${local.username}",
+    "HTTP_PASS": "${local.password}"
   }
-  tags = ["logshipper-creds"]
+  CREDS
 }
 
-resource "cloudfoundry_user_provided_service" "logdrain_service" {
-  provider         = cloudfoundry-community
-  name             = "fac-logdrain"
-  space            = data.cloudfoundry_space.apps.id
+resource "cloudfoundry_service_instance" "logdrain" {
+  name             = var.syslog_drain_name
+  type             = "user-provided"
+  tags             = ["syslog-drain"]
+  space            = var.cf_space.id
   syslog_drain_url = local.syslog_drain
 }
 
@@ -55,23 +68,7 @@ resource "random_password" "password" {
   special = false
 }
 
-locals {
-  username     = random_uuid.username.result
-  password     = random_password.password.result
-  syslog_drain = "https://${local.username}:${local.password}@${cloudfoundry_route.logshipper.hostname}.app.cloud.gov/?drain-type=all"
-  domain       = cloudfoundry_route.logshipper.endpoint
-  app_id       = cloudfoundry_app.cg_logshipper_app.id
-  logdrain_id  = cloudfoundry_user_provided_service.logdrain_service.id
-  sidecar_json = jsonencode(
-    {
-      "name" : "fluentbit",
-      "command" : "/home/vcap/deps/0/apt/opt/fluent-bit/bin/fluent-bit -Y -c fluentbit.conf",
-      "process_types" : ["web"],
-    }
-  )
-}
-
-data "external" "logshipperzip" {
+data "external" "logshipper_zip" {
   program     = ["/bin/sh", "prepare-logshipper.sh"]
   working_dir = path.module
   query = {
@@ -79,39 +76,33 @@ data "external" "logshipperzip" {
   }
 }
 
-resource "cloudfoundry_app" "cg_logshipper_app" {
-  provider   = cloudfoundry-community
+resource "cloudfoundry_app" "logshipper_app" {
   name       = var.name
-  space      = data.cloudfoundry_space.apps.id
-  buildpacks = ["https://github.com/cloudfoundry/apt-buildpack", "nginx_buildpack"]
-  path       = "${path.module}/${data.external.logshipperzip.result.path}"
-  # source_code_hash  = filesha256("${path.module}/${data.external.logshipperzip.result.path}")
-  timeout           = 180
+  space_name = var.cf_space.name
+  org_name   = var.cf_org_name
+
+  buildpacks       = ["https://github.com/cloudfoundry/apt-buildpack.git", "nginx_buildpack"]
+  path             = "${path.module}/${data.external.logshipper_zip.result.path}"
+  source_code_hash = filesha256("${path.module}/${data.external.logshipper_zip.result.path}")
+
   disk_quota        = var.disk_quota
   memory            = var.logshipper_memory
   instances         = var.logshipper_instances
   strategy          = "rolling"
   health_check_type = "process"
 
-  provisioner "local-exec" {
-    command = "cf curl /v3/apps/${self.id}/sidecars  -d '${local.sidecar_json}'"
-  }
+  sidecars = [{
+    name          = "fluentbit"
+    command       = "/home/vcap/deps/0/apt/opt/fluent-bit/bin/fluent-bit -Y -c fluentbit.conf"
+    process_types = ["web"]
+  }]
 
-  service_binding {
-    service_instance = var.new_relic_id
-  }
-
-  service_binding {
-    service_instance = cloudfoundry_user_provided_service.logshipper_creds.id
-  }
-
-  service_binding {
-    service_instance = module.s3-logshipper-storage.bucket_id
-  }
-
-  routes {
-    route = cloudfoundry_route.logshipper.id
-  }
+  service_bindings = [
+    for service_name, params in local.services : {
+      service_instance = service_name
+      params           = (params == "" ? "{}" : params) # Empty string -> Minimal JSON
+    }
+  ]
 
   environment = {
     PROXYROUTE = var.https_proxy
