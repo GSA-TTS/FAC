@@ -10,7 +10,7 @@ module "https-proxy" {
   allowlist = [
     "api.sam.gov:443",
     "*.newrelic.com:443",
-    "${var.cf_org_name}-${var.cf_space_name}-egress-https-proxy.apps.internal",
+    "${var.cf_org_name}-${var.cf_space.name}-egress-https-proxy.apps.internal",
     "idp.int.identitysandbox.gov:443",
     "secure.login.gov:443",
     "objects.githubusercontent.com:443",
@@ -26,7 +26,7 @@ module "https-proxy" {
 # upgraded as soon as possible.
 resource "cloudfoundry_service_instance" "proxy_credentials" {
   name        = "https-proxy-creds"
-  space       = data.cloudfoundry_space.space.id
+  space       = var.cf_space.id
   type        = "user-provided"
   tags        = ["https-proxy-creds"]
   credentials = module.https-proxy.json_credentials

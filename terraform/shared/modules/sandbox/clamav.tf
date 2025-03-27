@@ -34,7 +34,7 @@ module "file_scanner_clamav" {
   name = local.fs_clam_name
 
   cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
+  cf_space_name = var.cf_space.name
   clamav_image  = "ghcr.io/gsa-tts/fac/clamav@${data.docker_registry_image.clamav.sha256_digest}"
   max_file_size = "30M"
   instances     = var.clamav_fs_instances
@@ -44,26 +44,4 @@ module "file_scanner_clamav" {
   proxy_port     = module.https-proxy.https_port
   proxy_username = module.https-proxy.username
   proxy_password = module.https-proxy.password
-}
-
-# The following use the community provider as these have not been moved to the official provider.
-# In the event that these resources do not get moved, the following will likely break
-# and need to be rebuilt in a different method. In the event the v2 api gets an extended depreciation,
-# these may continue to be used until the provider adds this functionality, in which case, should be
-# upgraded as soon as possible.
-resource "cloudfoundry_network_policy" "clamav-network-policy" {
-  provider = cloudfoundry-community
-  policy {
-    source_app      = module.clamav.app_id
-    destination_app = module.https-proxy.app_id
-    port            = "61443"
-    protocol        = "tcp"
-  }
-
-  policy {
-    source_app      = module.file_scanner_clamav.app_id
-    destination_app = module.https-proxy.app_id
-    port            = "61443"
-    protocol        = "tcp"
-  }
 }
