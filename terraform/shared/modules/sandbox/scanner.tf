@@ -6,12 +6,12 @@ locals {
 }
 
 module "fac-file-scanner" {
-  source            = "../scanner"
-  name              = local.scanner_name
-  cf_org_name       = var.cf_org_name
+  source      = "../scanner"
+  name        = local.scanner_name
+  cf_org_name = var.cf_org_name
   cf_space = {
-    id   = data.cloudfoundry_space.space.id
-    name = var.cf_space_name
+    id   = var.cf_space.id
+    name = var.cf_space.name
   }
   https_proxy       = module.https-proxy.https_proxy
   scanner_instances = 1

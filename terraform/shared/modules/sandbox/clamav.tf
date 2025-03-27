@@ -1,6 +1,6 @@
 locals {
-  clam_name    = "fac-av-${var.cf_space_name}"
-  fs_clam_name = "fac-av-${var.cf_space_name}-fs"
+  clam_name    = "fac-av-${var.cf_space.name}"
+  fs_clam_name = "fac-av-${var.cf_space.name}-fs"
 }
 
 data "docker_registry_image" "clamav" {
@@ -14,7 +14,7 @@ module "clamav" {
   name = local.clam_name
 
   cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
+  cf_space_name = var.cf_space.name
 
   clamav_image  = "ghcr.io/gsa-tts/fac/clamav@${data.docker_registry_image.clamav.sha256_digest}"
   clamav_memory = var.clamav_memory
