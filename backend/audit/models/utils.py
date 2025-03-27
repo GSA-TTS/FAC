@@ -289,7 +289,20 @@ def validate_audit_consistency(audit_instance):
                 sac_path,
                 sac_value,
             ) in flat_sac.items():
-                result = value_exists_in_audit(sac_path, sac_value, flat_audit)
+
+                normalized_sac_path = sac_path.split(".")[-1]
+
+                match_found = False
+
+                for audit_path, audit_value in flat_audit.items():
+                    normalized_audit_path = audit_path.split(".")[-1]
+
+                if normalized_sac_path == normalized_audit_path and sac_value == audit_value:
+                    match_found = True
+                    break
+
+                if not match_found:
+                    result = value_exists_in_audit(sac_path, sac_value, flat_audit)
 
                 if not result.get("found"):
                     differences.append(
