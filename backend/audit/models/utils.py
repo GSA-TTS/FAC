@@ -212,6 +212,7 @@ def validate_audit_consistency(audit_instance):
     must exist in Audit.
     """
     from audit.models import SingleAuditChecklist
+
     sac = SingleAuditChecklist
 
     try:
@@ -297,7 +298,10 @@ def validate_audit_consistency(audit_instance):
                 for audit_path, audit_value in flat_audit.items():
                     normalized_audit_path = audit_path.split(".")[-1]
 
-                if normalized_sac_path == normalized_audit_path and sac_value == audit_value:
+                if (
+                    normalized_sac_path == normalized_audit_path
+                    and sac_value == audit_value
+                ):
                     match_found = True
                     break
 
@@ -370,7 +374,10 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
 
         audit_norm_field = normalize_key(audit_field)
 
-        if sac_norm_field == audit_norm_field and sac_value == audit_value:
+        if normalize_key(audit_field) != sac_norm_field:
+            continue
+
+        if sac_value == audit_value:
             if sac_field != audit_field:
                 return {
                     "found": True,
@@ -382,9 +389,11 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             return {
                 "found": True,
             }
-        elif not isinstance(sac_value, bool) and sac_value != 0 and other_formats_match(
-            sac_value, audit_value
-        ).get("found"):
+        elif (
+            not isinstance(sac_value, bool)
+            and sac_value != 0
+            and other_formats_match(sac_value, audit_value).get("found")
+        ):
             comp_vals = other_formats_match(sac_value, audit_value)
             if sac_field != audit_field:
                 return {
@@ -401,6 +410,14 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
 
     if not isinstance(sac_value, bool) and sac_value != 0:
         for audit_path, audit_value in audit_data.items():
+            audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
+            audit_field = (
+                audit_field.split("[")[0] if "[" in audit_field else audit_field
+            )
+
+            if normalize_key(audit_field) == sac_norm_field:
+                continue
+
             if sac_value == audit_value:
                 return {
                     "found": True,
