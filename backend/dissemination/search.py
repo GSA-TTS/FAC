@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-from .searchlib.search_constants import ORDER_BY, DIRECTION, DAS_LIMIT
+from .searchlib.search_constants import OrderBy, Direction, DAS_LIMIT
 from .searchlib.search_general import report_timing, search_general
 from .searchlib.search_alns import search_alns
 from .searchlib.search_cog_or_oversight import search_cog_or_oversight
@@ -61,7 +61,6 @@ def search(params):
     ##############
     # GENERAL
 
-    logger.info(params)
     if is_advanced_search(params):
         logger.info("search Searching `DisseminationCombined`")
         results = search_general(DisseminationCombined, params)
@@ -90,9 +89,9 @@ def _set_general_defaults(params):
     # Set some defaults.
     # Set default order direction
     if not params.get("order_by", None):
-        params["order_by"] = ORDER_BY.fac_accepted_date
+        params["order_by"] = OrderBy.fac_accepted_date
     if not params.get("order_direction", None):
-        params["order_direction"] = DIRECTION.descending
+        params["order_direction"] = Direction.descending
 
     params["LIMIT"] = DAS_LIMIT
 
@@ -107,23 +106,23 @@ def _sort_results(results, params):
     # Instead of nesting conditions, we'll prep a string
     # for determining the sort direction.
     match params.get("order_direction"):
-        case DIRECTION.ascending:
+        case Direction.ascending:
             direction = ""
         case _:
             direction = "-"
 
     # Now, apply the sort that we pass in front the front-end.
     match params.get("order_by"):
-        case ORDER_BY.auditee_name:
+        case OrderBy.auditee_name:
             new_results = results.order_by(f"{direction}auditee_name")
-        case ORDER_BY.auditee_uei:
+        case OrderBy.auditee_uei:
             new_results = results.order_by(f"{direction}auditee_uei")
-        case ORDER_BY.fac_accepted_date:
+        case OrderBy.fac_accepted_date:
             new_results = results.order_by(f"{direction}fac_accepted_date")
-        case ORDER_BY.audit_year:
+        case OrderBy.audit_year:
             new_results = results.order_by(f"{direction}audit_year")
-        case ORDER_BY.cog_over:
-            if params.get("order_direction") == DIRECTION.ascending:
+        case OrderBy.cog_over:
+            if params.get("order_direction") == Direction.ascending:
                 # Ex. COG-01 -> COG-99, OVER-01 -> OVER-99
                 new_results = results.order_by("oversight_agency", "cognizant_agency")
             else:

@@ -4,7 +4,9 @@ from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from .models import SacValidationWaiver, SingleAuditChecklist
-from .models.models import STATUS, UeiValidationWaiver
+from .models.constants import STATUS
+from .models.waivers import UeiValidationWaiver
+
 from .admin import (
     SACAdmin,
     SacValidationWaiverAdmin,

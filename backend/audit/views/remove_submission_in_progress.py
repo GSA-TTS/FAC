@@ -9,12 +9,13 @@ from audit.mixins import (
 from audit.models import (
     Access,
     SingleAuditChecklist,
+    Audit,
 )
-from audit.views.views import verify_status
 from audit.models.models import STATUS
-from audit.models.viewflow import SingleAuditChecklistFlow
+from audit.models.viewflow import SingleAuditChecklistFlow, AuditFlow
 from audit.models.submission_event import SubmissionEvent
 from audit.models.access_roles import ACCESS_ROLES
+from audit.decorators import verify_status
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +86,20 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             event_user=request.user,
             event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
         )
+        self._remove_audit(report_id, request.user)
+
         url = reverse("audit:MySubmissions")
 
         return redirect(url)
+
+    # TODO: Update Post SOC Launch : This can be merged into post above
+    @staticmethod
+    def _remove_audit(report_id, user):
+        audit = Audit.objects.find_audit_or_none(report_id=report_id)
+        if audit:
+            flow = AuditFlow(audit=audit)
+            flow.transition_to_flagged_for_removal()
+            audit.save(
+                event_user=user,
+                event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
+            )

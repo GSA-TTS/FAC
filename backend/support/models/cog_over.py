@@ -42,19 +42,37 @@ class CognizantAssignment(models.Model):
 
     def save(self, *args, **kwargs):
         if self._state.adding:
-            sac_model = apps.get_model("audit.SingleAuditChecklist")
-            cognizant_agency = self.cognizant_agency
-            sac = sac_model.objects.get(report_id=self.report_id)
-            sac.cognizant_agency = cognizant_agency
-            sac.save()
-
+            sac = None
             try:
-                gen_model = apps.get_model("dissemination.General")
-                gen = gen_model.objects.get(report_id=sac.report_id)
-                gen.cognizant_agency = cognizant_agency
-                gen.save()
-            except gen_model.DoesNotExist:
+                sac_model = apps.get_model("audit.SingleAuditChecklist")
+                cognizant_agency = self.cognizant_agency
+                sac = sac_model.objects.get(report_id=self.report_id)
+                sac.cognizant_agency = cognizant_agency
+                sac.save()
+            except sac_model.DoesNotExist:
                 # etl may not have been run yet
+                pass
+
+            if sac:
+                try:
+                    gen_model = apps.get_model("dissemination.General")
+                    gen = gen_model.objects.get(report_id=sac.report_id)
+                    gen.cognizant_agency = cognizant_agency
+                    gen.save()
+                except gen_model.DoesNotExist:
+                    # etl may not have been run yet
+                    pass
+
+            # Update Audit model.
+            # TO DO: Remove sac and gen updates above when Audit model goes live
+            try:
+                audit_model = apps.get_model("audit.Audit")
+                cognizant_agency = self.cognizant_agency
+                audit = audit_model.objects.get(report_id=self.report_id)
+                audit.audit["cognizant_agency"] = cognizant_agency
+                audit.save()
+            except audit_model.DoesNotExist:
+                # This might happen with SAC testing
                 pass
 
             super().save(*args, **kwargs)

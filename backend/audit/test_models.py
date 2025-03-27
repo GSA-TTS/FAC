@@ -7,10 +7,10 @@ from django.test import TestCase
 from viewflow.fsm import TransitionNotAllowed
 from model_bakery import baker
 
+from .exceptions import LateChangeError
 from .models import (
     Access,
     ExcelFile,
-    LateChangeError,
     SingleAuditChecklist,
     SingleAuditReportFile,
     SubmissionEvent,
