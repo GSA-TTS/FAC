@@ -8,9 +8,9 @@ variable "cf_org_name" {
   description = "cloud.gov organization name"
 }
 
-variable "cf_space_name" {
-  type        = string
-  description = "cloud.gov space name for scanner (eg production)"
+variable "cf_space" {
+  type        = object({ id = string, name = string })
+  description = "cloud.gov space"
 }
 
 variable "gitref" {
