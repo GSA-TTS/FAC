@@ -10,12 +10,12 @@ output "syslog_drain_url" {
   value = local.syslog_drain
 }
 
-output "domain" {
-  value = local.domain
+output "syslog_drain_name" {
+  value = var.syslog_drain_name
 }
 
-output "logdrain_service_id" {
-  value = local.logdrain_id
+output "domain" {
+  value = local.domain
 }
 
 output "app_id" {

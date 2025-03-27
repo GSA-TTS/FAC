@@ -3,9 +3,9 @@ variable "cf_org_name" {
   description = "cloud.gov organization name"
 }
 
-variable "cf_space_name" {
-  type        = string
-  description = "cloud.gov space name for client apps (eg staging or prod)"
+variable "cf_space" {
+  type        = object({ id = string, name = string })
+  description = "cloud.gov space"
 }
 
 variable "name" {
@@ -21,15 +21,15 @@ variable "gitref" {
 }
 
 variable "disk_quota" {
-  type        = number
+  type        = string
   description = "disk in MB to allocate to cg-logshipper app instance"
-  default     = 512
+  default     = "512M"
 }
 
 variable "logshipper_memory" {
-  type        = number
+  type        = string
   description = "Memory in MB to allocate to cg-logshipper app instance"
-  default     = 1046
+  default     = "1046M"
 }
 
 variable "logshipper_instances" {
@@ -43,12 +43,30 @@ variable "https_proxy" {
   description = "the full string of the https proxy for use with the logshipper app"
 }
 
-variable "new_relic_id" {
+variable "syslog_drain_name" {
   type        = string
-  description = "the full string of the new relic resource id"
+  description = "the name of the logdrain"
+  default     = "fac-logdrain"
 }
 
-variable "cf_space_id" {
-  type        = string
-  description = "the guid of the cf space"
+# Example:
+# service_bindings = {
+#   my-service = "",
+#   (module.my-other-service.name) = "",
+#   yet-another-service = <<-EOT
+#      {
+#        "astring"     : "foo",
+#        "anarray"     : ["bar", "baz"],
+#        "anarrayobjs" : [
+#          {
+#            "name": "bat",
+#            "value": "boz"
+#        ],
+#      }
+#      EOT
+#   }
+# }
+variable "service_bindings" {
+  description = "A map of service instance name to JSON parameter string."
+  type        = map(string)
 }

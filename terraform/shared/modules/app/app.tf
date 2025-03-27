@@ -66,25 +66,11 @@ resource "cloudfoundry_app" "fac_app" {
   strategy          = "rolling"
   health_check_type = "port"
 
-  # Handled with cloudfoundry_route.app_route
-  # routes = [{
-  #   route = local.app_route
-  # }]
-
   service_bindings = [
     for service_name, params in local.services : {
       service_instance = service_name
       params           = (params == "" ? "{}" : params) # Empty string -> Minimal JSON
     }
-    # Services:
-    # fac-private-s3
-    # fac-public-s3
-    # fac-db
-    # fac-snapshot-db
-    # fac-key-service
-    # clamav_ups
-    # newrelic-creds
-    # https-proxy-creds
   ]
   environment = merge({
     REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
