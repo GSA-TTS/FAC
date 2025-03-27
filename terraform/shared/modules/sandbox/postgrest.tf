@@ -3,9 +3,9 @@ locals {
 }
 
 resource "cloudfoundry_route" "postgrest" {
-  space        = data.cloudfoundry_space.space.id
+  space        = var.cf_space.id
   domain       = data.cloudfoundry_domain.public.id
-  host         = "fac-${var.cf_space_name}-${local.postgrest_name}"
+  host         = "fac-${var.cf_space.name}-${local.postgrest_name}"
   destinations = [{ app_id = cloudfoundry_app.postgrest.id }]
 }
 
@@ -16,7 +16,7 @@ data "docker_registry_image" "postgrest" {
 resource "cloudfoundry_app" "postgrest" {
   name         = local.postgrest_name
   org_name     = data.cloudfoundry_org.org.name
-  space_name   = data.cloudfoundry_space.space.name
+  space_name   = var.cf_space.name
   docker_image = "ghcr.io/gsa-tts/fac/postgrest@${data.docker_registry_image.postgrest.sha256_digest}"
   timeout      = 180
   memory       = "1024M"
