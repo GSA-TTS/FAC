@@ -38,12 +38,6 @@ module "s3-private" {
 
 
 # Stuff used for apps in this space
-data "cloudfoundry_space" "apps" {
-  provider = cloudfoundry-community
-  org_name = var.cf_org_name
-  name     = var.cf_space_name
-}
-
 data "cloudfoundry_org" "org" {
   name = var.cf_org_name
 }
