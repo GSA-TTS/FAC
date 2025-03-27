@@ -12,12 +12,12 @@ create view api_v1_2_0.findings_text as
         ft_elem->>'contains_chart_or_table' as contains_chart_or_table,
         ft_elem->>'text_of_finding' as finding_text
     from
-        audit_audit as a,
-        LATERAL jsonb_array_elements(a.audit->'findings_text') as ft_elem
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'findings_text') as ft_elem on true
     where
-        (a.audit->>'is_public')::boolean = TRUE
+        a.is_public is true
         or (
-            (a.audit->>'is_public')::boolean = FALSE
+            a.is_public is false
             and api_v1_2_0_functions.has_tribal_data_access()
         )
 ;
@@ -31,8 +31,8 @@ create view api_v1_2_0.additional_ueis as
         a.audit->>'audit_year' as audit_year,
         uei_elem::text as additional_uei
     from
-        audit_audit as a,
-        LATERAL jsonb_array_elements(a.audit->'additional_ueis') as uei_elem
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'additional_ueis') as uei_elem on true
 ;
 ---------------------------------------
 -- finding
@@ -54,8 +54,8 @@ create view api_v1_2_0.findings as
         f_elem->'significant_deficiency' as is_significant_deficiency,
         f_elem->'program'->>'compliance_requirement' as type_requirement
     from
-        audit_audit as a,
-        LATERAL jsonb_array_elements(a.audit->'findings_uniform_guidance') as f_elem
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'findings_uniform_guidance') as f_elem on true
 ;
 
 ---------------------------------------
@@ -86,8 +86,8 @@ create view api_v1_2_0.federal_awards as
         fa_elem->'subrecipients'->>'is_passed' as is_passthrough_award,
         fa_elem->'subrecipients'->>'subrecipient_amount' as passthrough_amount
     from
-        audit_audit as a,
-        LATERAL jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem on true
 ;
 
 ---------------------------------------
@@ -102,12 +102,12 @@ create view api_v1_2_0.corrective_action_plans as
         cap_elem->>'contains_chart_or_table' as contains_chart_or_table,
         cap_elem->>'planned_action' as planned_action
     from
-        audit_audit as a,
-        LATERAL jsonb_array_elements(a.audit->'corrective_action_plan') as cap_elem
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'corrective_action_plan') as cap_elem on true
     where
-        (a.audit->>'is_public')::boolean = TRUE
+        a.is_public is true
         or (
-            (a.audit->>'is_public')::boolean = FALSE
+            a.is_public is false
             and api_v1_2_0_functions.has_tribal_data_access()
         )
 ;
@@ -124,16 +124,16 @@ create view api_v1_2_0.notes_to_sefa as
         nts_elem->>'is_minimis_rate_used' as is_minimis_rate_used,
         nts_elem->>'rate_explained' as rate_explained,
         note->>'note_content' as content,
-        note->>'contains_chart_or_table' as contains_chart_or_table,
+        note->>'contains_chart_or_table' as contains_chart_or_table
 
     from
-        audit_audit as a,
-        LATERAL jsonb_array_elements(a.audit->'notes_to_sefa') as nts_elem
-        LATERAL jsonb_array_elements(nts_elem->'notes_to_sefa_entries') as note
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'notes_to_sefa') as nts_elem on true
+        join lateral jsonb_array_elements(nts_elem->'notes_to_sefa_entries') as note on true
     where
-        (a.audit->>'is_public')::boolean = TRUE
+        a.is_public is true
         or (
-            (a.audit->>'is_public')::boolean = FALSE
+            a.is_public is false
             and api_v1_2_0_functions.has_tribal_data_access()
         )
 ;
@@ -149,9 +149,9 @@ create view api_v1_2_0.passthrough as
         pass_elem->>'passthrough_identifying_number' as passthrough_id,
         pass_elem->>'passthrough_name' as passthrough_name
     from
-        audit_audit as a,
-        LATERAL jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem,
-        LATERAL jsonb_array_elements(fa_elem->'direct_or_indirect_award'->'entities') as pass_elem
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem on true
+        join lateral jsonb_array_elements(fa_elem->'direct_or_indirect_award'->'entities') as pass_elem on true
 ;
 ---------------------------------------
 -- general
@@ -218,7 +218,7 @@ create view api_v1_2_0.general as
         a.audit->'general_information'->>'audit_period_covered' as audit_period_covered,
         a.audit->'federal_awards'->>'total_amount_expended' as total_amount_expended,
         a.audit->'general_information'->>'type_audit_code' as type_audit_code,
-        a.audit->'general_information'->>'is_public' as is_public,
+        a.is_public as is_public,
         a.data_source as data_source,
         a.audit->'general_information'->>'is_aicpa_audit_guide_included' as is_aicpa_audit_guide_included,
         a.audit->'general_information'->>'is_additional_ueis' as is_additional_ueis       
@@ -244,8 +244,8 @@ create view api_v1_2_0.secondary_auditors as
         sa_elem->>'secondary_auditor_address_state' as address_state,
         sa_elem->>'secondary_auditor_address_zipcode' as address_zipcode
     from
-        audit_audit as a,
-        LATERAL jsonb_array_elements(a.audit->'secondary_auditors') as sa_elem
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'secondary_auditors') as sa_elem on true
 ;
 ---------------------------------------
 -- additional_eins
@@ -257,8 +257,8 @@ create view api_v1_2_0.additional_eins as
         a.audit->>'audit_year' as audit_year,
         ein_elem::text as additional_ein
     from
-        audit_audit as a,
-        LATERAL jsonb_array_elements(a.audit->'additional_eins') as ein_elem
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'additional_eins') as ein_elem on true
 ;
 commit;
 
