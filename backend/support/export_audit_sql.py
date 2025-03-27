@@ -78,3 +78,115 @@ select_general_information = (
     "from audit_audit as a "
     "where a.audit_year = {audit_year}"
 )
+
+
+select_corrective_action_plans = (
+    "select a.report_id, a.audit->'general_information'->>'auditee_uei' as auditee_uei, "
+    "a.audit->>'audit_year' as audit_year, cap_elem->>'reference_number' as finding_ref_number, "
+    "cap_elem->>'contains_chart_or_table' as contains_chart_or_table, "
+    "cap_elem->>'planned_action' as planned_action "
+    "from audit_audit as a, "
+    "LATERAL jsonb_array_elements(a.audit->'corrective_action_plan') as cap_elem "
+    "where a.is_public is true and a.audit_year = {audit_year}"
+)
+
+
+select_federal_awards = (
+    "select a.report_id, a.audit->'general_information'->>'auditee_uei' as auditee_uei, "
+    "a.audit->>'audit_year' as audit_year, fa_elem->>'award_reference' as award_reference, "
+    "fa_elem->'program'->>'federal_agency_prefix' as federal_agency_prefix, "
+    "fa_elem->'program'->>'three_digit_extension' as federal_award_extension, "
+    "fa_elem->'program'->>'additional_award_identification' as additional_award_identification, "
+    "fa_elem->'program'->>'program_name' as federal_program_name, "
+    "fa_elem->'program'->>'amount_expended' as amount_expended, "
+    "fa_elem->'cluster'->>'cluster_name' as cluster_name, "
+    "fa_elem->'cluster'->>'other_cluster_name' as other_cluster_name, "
+    "fa_elem->'cluster'->>'state_cluster_name' as state_cluster_name, "
+    "fa_elem->'cluster'->>'cluster_total' as cluster_total, "
+    "fa_elem->'program'->>'federal_program_total' as federal_program_total, "
+    "fa_elem->'program'->>'is_major' as is_major, "
+    "fa_elem->'loan_or_loan_guarantee'->>'is_guaranteed' as is_loan, "
+    "fa_elem->'loan_or_loan_guarantee'->>'loan_balance_at_audit_period_end' as loan_balance, "
+    "fa_elem->'direct_or_indirect_award'->>'is_direct' as is_direct, "
+    "fa_elem->'program'->>'audit_report_type' as audit_report_type, "
+    "fa_elem->'program'->>'number_of_audit_findings' as findings_count, "
+    "fa_elem->'subrecipients'->>'is_passed' as is_passthrough_award, "
+    "fa_elem->'subrecipients'->>'subrecipient_amount' as passthrough_amount "
+    "from audit_audit as a, "
+    "LATERAL jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem "
+    "where a.audit_year = {audit_year}"
+)
+
+
+select_findings = (
+    "select a.report_id, a.audit->'general_information'->>'auditee_uei' as auditee_uei, "
+    "a.audit->>'audit_year' as audit_year, f_elem->'program'->>'award_reference' as award_reference, "
+    "f_elem->'findings'->>'reference_number' as reference_number, "
+    "f_elem->'material_weakness' as is_material_weakness, "
+    "f_elem->'modified_opinion' as is_modified_opinion, "
+    "f_elem->'other_findings' as is_other_findings, "
+    "f_elem->'other_matters' as is_other_matters, "
+    "f_elem->'findings'->>'prior_references' as prior_finding_ref_numbers, "
+    "f_elem->'questioned_costs' as is_questioned_costs, "
+    "f_elem->'findings'->>'repeat_prior_reference' as is_repeat_finding, "
+    "f_elem->'significant_deficiency' as is_significant_deficiency, "
+    "f_elem->'program'->>'compliance_requirement' as type_requirement "
+    "from audit_audit as a, "
+    "LATERAL jsonb_array_elements(a.audit->'findings_uniform_guidance') as f_elem "
+    "where a.audit_year = {audit_year}"
+)
+
+
+select_findings_text = (
+    "select a.report_id, a.audit->'general_information'->>'auditee_uei' as auditee_uei, "
+    "a.audit->>'audit_year' as audit_year, ft_elem->>'reference_number' as finding_ref_number, "
+    "ft_elem->>'contains_chart_or_table' as contains_chart_or_table, "
+    "ft_elem->>'text_of_finding' as finding_text "
+    "from audit_audit as a, "
+    "LATERAL jsonb_array_elements(a.audit->'findings_text') as ft_elem "
+    "where a.is_public is true and a.audit_year = {audit_year}"
+)
+
+
+select_notes_to_sefa = (
+    "select a.report_id, a.audit->'general_information'->>'auditee_uei' as auditee_uei, "
+    "a.audit->>'audit_year' as audit_year, note->>'note_title' as title, "
+    "nts_elem->>'accounting_policies' as accounting_policies, "
+    "nts_elem->>'is_minimis_rate_used' as is_minimis_rate_used, "
+    "nts_elem->>'rate_explained' as rate_explained, note->>'note_content' as content, "
+    "note->>'contains_chart_or_table' as contains_chart_or_table "
+    "from audit_audit as a, "
+    "LATERAL jsonb_array_elements(a.audit->'notes_to_sefa') as nts_elem, "
+    "LATERAL jsonb_array_elements(nts_elem->'notes_to_sefa_entries') as note "
+    " where a.is_public is true and a.audit_year = {audit_year}"
+)
+
+
+select_passthrough = (
+    "select a.report_id, a.audit->'general_information'->>'auditee_uei' as auditee_uei, "
+    "a.audit->>'audit_year' as audit_year, fa_elem->>'award_reference' as award_reference, "
+    "pass_elem->>'passthrough_identifying_number' as passthrough_id, "
+    "pass_elem->>'passthrough_name' as passthrough_name "
+    "from audit_audit as a, "
+    "LATERAL jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem, "
+    "LATERAL jsonb_array_elements(fa_elem->'direct_or_indirect_award'->'entities') as pass_elem "
+    "where a.audit_year = {audit_year}"
+)
+
+
+select_secondary_auditors = (
+    "select a.report_id, a.audit->'general_information'->>'auditee_uei' as auditee_uei, "
+    "a.audit->>'audit_year' as audit_year, sa_elem->>'secondary_auditor_ein' as auditor_ein, "
+    "sa_elem->>'secondary_auditor_name' as auditor_name, "
+    "sa_elem->>'secondary_auditor_contact_name' as contact_name, "
+    "sa_elem->>'secondary_auditor_contact_title' as contact_title, "
+    "sa_elem->>'secondary_auditor_contact_email' as contact_email, "
+    "sa_elem->>'secondary_auditor_contact_phone' as contact_phone, "
+    "sa_elem->>'secondary_auditor_address_street' as address_street, "
+    "sa_elem->>'secondary_auditor_address_city' as address_city, "
+    "sa_elem->>'secondary_auditor_address_state' as address_state, "
+    "sa_elem->>'secondary_auditor_address_zipcode' as address_zipcode "
+    "from audit_audit as a, "
+    "LATERAL jsonb_array_elements(a.audit->'secondary_auditors') as sa_elem "
+    "where a.audit_year = {audit_year}"
+)

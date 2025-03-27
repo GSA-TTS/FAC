@@ -35,6 +35,9 @@ DEFAULT_OPTIONS = {
     }
 }
 
+# Note:  TO DO:
+# To allow Sling to create empty files, when there is no data for the year set SLING_ALLOW_EMPTY=TRUE in .env
+
 
 class StreamGenerator:
     EXCLUDE_NONPUBLIC_QUERY = (
@@ -89,15 +92,41 @@ STREAM_GENERATORS = [
         table_name="additional_ueis",
         query_override=export_audit_sql.select_additional_ueis,
     ),
+    StreamGenerator(
+        friendly_name="CorrectiveActionPlans",
+        table_name="corrective_action_plan",
+        query_override=export_audit_sql.select_corrective_action_plans,
+    ),
+    StreamGenerator(
+        friendly_name="FederalAward",
+        table_name="federal_awards",
+        query_override=export_audit_sql.select_federal_awards,
+    ),
+    StreamGenerator(
+        friendly_name="Finding",
+        table_name="findings_uniform_guidance",
+        query_override=export_audit_sql.select_findings,
+    ),
+    StreamGenerator(
+        friendly_name="FindingText",
+        table_name="findings_text",
+        query_override=export_audit_sql.select_findings_text,
+    ),
     # StreamGenerator(
-    #     friendly_name="CorrectiveActionPlans", table_name="corrective_action_plan"
+    #     friendly_name="Note",
+    #     table_name="notes_to_sefa",
+    #     query_override=export_audit_sql.select_notes_to_sefa,
     # ),
-    # StreamGenerator(friendly_name="FederalAward", table_name="federal_awards"),
-    # StreamGenerator(friendly_name="Finding", table_name="findings_uniform_guidance"),
-    # StreamGenerator(friendly_name="FindingText", table_name="findings_text"),
-    # StreamGenerator(friendly_name="Note", table_name="notes_to_sefa"),
-    # StreamGenerator(friendly_name="PassThrough", table_name="passthrough"),
-    # StreamGenerator(friendly_name="SecondaryAuditor", table_name="secondary_auditors"),
+    StreamGenerator(
+        friendly_name="PassThrough",
+        table_name="passthrough",
+        query_override=export_audit_sql.select_passthrough,
+    ),
+    StreamGenerator(
+        friendly_name="SecondaryAuditor",
+        table_name="secondary_auditors",
+        query_override=export_audit_sql.select_secondary_auditors,
+    ),
 ]
 
 
