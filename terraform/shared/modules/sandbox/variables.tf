@@ -24,12 +24,13 @@ variable "cf_org_name" {
   default     = "gsa-tts-oros-fac"
 }
 
-variable "cf_space_name" {
-  type        = string
-  description = "name of the space to configure"
+variable "cf_space" {
+  type        = object({ id = string, name = string })
+  description = "cloud.gov space"
   # No default... The calling module knows which env is for which space and we
   # shouldn't assume it!
 }
+
 
 variable "database_plan" {
   type        = string
@@ -139,7 +140,3 @@ variable "backups_s3_id" {
   description = "the full string of the backups s3 resource id"
 }
 
-variable "cf_space_id" {
-  type        = string
-  description = "the guid of the cf space"
-}

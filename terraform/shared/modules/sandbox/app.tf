@@ -6,7 +6,7 @@ module "fac-app" {
   source                  = "../app"
   gitref                  = "refs/heads/${var.branch_name}"
   cf_org_name             = var.cf_org_name
-  cf_space_name           = var.cf_space_name
+  cf_space_name           = var.cf_space.name
   name                    = local.app_name
   app_memory              = "2048M"
   disk_quota              = "3072M"
@@ -18,9 +18,9 @@ module "fac-app" {
   environment_variables = {
     ENV                   = "SANDBOX"
     DISABLE_COLLECTSTATIC = 1
-    DJANGO_BASE_URL       = "https://fac-${var.cf_space_name}.app.cloud.gov"
-    AV_SCAN_URL           = "https://fac-av-${var.cf_space_name}.apps.internal:61443/scan"
-    ALLOWED_HOSTS         = "fac-${var.cf_space_name}.app.cloud.gov"
+    DJANGO_BASE_URL       = "https://fac-${var.cf_space.name}.app.cloud.gov"
+    AV_SCAN_URL           = "https://fac-av-${var.cf_space.name}.apps.internal:61443/scan"
+    ALLOWED_HOSTS         = "fac-${var.cf_space.name}.app.cloud.gov"
   }
   service_bindings = {
     # We can use these with the 2.3.0 release of terraform-cloudgov

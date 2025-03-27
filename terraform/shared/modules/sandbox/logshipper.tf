@@ -9,8 +9,8 @@ module "logshipper" {
   cf_org_name = var.cf_org_name
   https_proxy = module.https-proxy.https_proxy
   cf_space = {
-    id   = data.cloudfoundry_space.space.id
-    name = var.cf_space_name
+    id   = var.cf_space.id
+    name = var.cf_space.name
   }
   service_bindings = {
     "${cloudfoundry_service_instance.newrelic_creds.name}" = ""
