@@ -134,6 +134,16 @@ class TestValueExistsInAudit(TestCase):
         result = value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
+    def test_format_error(self):
+        """Should not prematurely match on a similar value in another format"""
+        sac_path = "a"
+        sac_value = 1
+        test_json = { "x": "01", "a": 1 }
+        expected_result = { 'found': True }
+        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        self.assertDictEqual(result, expected_result)
+
+
 class TestCompareValues(TestCase):
     """Tests for other_formats_match"""
     def test_simple_equal(self):
@@ -290,3 +300,14 @@ class TestValidateAuditConsistency(TestCase):
             result[1][0],
             {'field': 'general_information', 'sac_path': 'a', 'sac_value': '1', 'found_with_different_format': True, 'found': True, 'error': '1 is int/float, found 1 as string'},
         )
+
+    def test_format_error(self):
+        audit = baker.make(Audit, version=0)
+        audit.audit = { 'general_information': { 'a': 1 } }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.general_information = { 'x': '01', 'a': 1 }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
