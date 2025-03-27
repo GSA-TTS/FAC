@@ -25,7 +25,7 @@ data "cloudfoundry_domain" "public" {
   name = "app.cloud.gov"
 }
 
-module "logshipper-storage" {
+module "s3-logshipper-storage" {
   source       = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
   cf_space_id  = var.cf_space.id
   name         = "log-storage"
