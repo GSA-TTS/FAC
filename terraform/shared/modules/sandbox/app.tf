@@ -34,17 +34,9 @@ module "fac-app" {
     "fac-snapshot-db"                                         = ""
     "${cloudfoundry_service_instance.newrelic_creds.name}"    = ""
     "${cloudfoundry_service_instance.proxy_credentials.name}" = ""
-    # Services:
-    # fac-private-s3
-    # fac-public-s3
-    # fac-db
-    # fac-snapshot-db
-    # fac-key-service
-    # clamav_ups
-    # newrelic-creds
-    # https-proxy-creds
+    "${module.logshipper.syslog_drain_name}"                  = ""
   }
-  depends_on = [cloudfoundry_service_instance.newrelic_creds, module.https-proxy]
+  depends_on = [cloudfoundry_service_instance.newrelic_creds, module.https-proxy, module.logshipper]
 }
 
 # The following use the community provider as these have not been moved to the official provider.

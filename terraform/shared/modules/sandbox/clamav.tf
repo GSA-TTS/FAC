@@ -51,7 +51,6 @@ module "file_scanner_clamav" {
 # and need to be rebuilt in a different method. In the event the v2 api gets an extended depreciation,
 # these may continue to be used until the provider adds this functionality, in which case, should be
 # upgraded as soon as possible.
-
 resource "cloudfoundry_network_policy" "clamav-network-policy" {
   provider = cloudfoundry-community
   policy {
