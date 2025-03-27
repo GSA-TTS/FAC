@@ -24,9 +24,9 @@ variable "cf_org_name" {
   default     = "gsa-tts-oros-fac"
 }
 
-variable "cf_space_name" {
-  type        = string
-  description = "name of the space to configure"
+variable "cf_space" {
+  type        = object({ id = string, name = string })
+  description = "cloud.gov space"
   # No default... The calling module knows which env is for which space and we
   # shouldn't assume it!
 }
@@ -45,9 +45,9 @@ variable "postgrest_instances" {
 }
 
 variable "postgrest_memory" {
-  type        = number
+  type        = string
   description = "the number of instances of the postgrest application to run (default: 2)"
-  default     = 1024
+  default     = "1024M"
 }
 
 variable "swagger_instances" {
@@ -109,11 +109,6 @@ variable "new_relic_account_id" {
 variable "new_relic_api_key" {
   type        = string
   description = "New Relic API key"
-}
-
-variable "cf_space_id" {
-  type        = string
-  description = "the guid of the cf space"
 }
 
 variable "allowlist" {

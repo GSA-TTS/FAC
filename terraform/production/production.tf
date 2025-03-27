@@ -1,7 +1,9 @@
 module "production" {
   source                = "../shared/modules/env"
-  cf_space_name         = "production"
-  cf_space_id           = data.cloudfoundry_space.space.id
+  cf_space = {
+    id   = data.cloudfoundry_space.space.id
+    name = "production"
+  }
   new_relic_license_key = var.new_relic_license_key
   new_relic_account_id  = var.new_relic_account_id
   new_relic_api_key     = var.new_relic_api_key
