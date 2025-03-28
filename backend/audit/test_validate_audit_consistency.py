@@ -309,5 +309,26 @@ class TestValidateAuditConsistency(TestCase):
         sac.general_information = { 'x': '01', 'a': 1 }
         sac.save()
         result = validate_audit_consistency(audit)
-        self.assertEqual(result[1], [])
         self.assertTrue(result[0])
+        self.assertEqual(result[1], [])
+
+    # def test_null_tribal_data_consent(self):
+    #     audit = baker.make(Audit, version=0)
+    #     audit.audit = { 'tribal_data_consent': {} }
+    #     audit.save()
+    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+    #     sac.tribal_data_consent = None
+    #     sac.save()
+    #     result = validate_audit_consistency(audit)
+    #     self.assertTrue(result[0])
+    #     self.assertEqual(result[1], [])
+
+    # def test_meta(self):
+    #     audit = baker.make(Audit, version=0)
+    #     audit.audit = { 'federal_awards': { 'Meta': { 'section_name': 'FederalAwardsExpended' } } }
+    #     audit.save()
+    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+    #     sac.save()
+    #     result = validate_audit_consistency(audit)
+    #     self.assertTrue(result[0])
+    #     self.assertEqual(result[1], [])
