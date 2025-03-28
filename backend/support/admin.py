@@ -199,7 +199,9 @@ def add_custom_field_to_log(sender, instance, created, **kwargs):
                         qset.values("email", "permission__slug")
                     )
                 elif model_class == TribalApiAccessKeyIds:
-                    change_message_json[0]["content"] = list(qset.values("email", "key_id"))
+                    change_message_json[0]["content"] = list(
+                        qset.values("email", "key_id")
+                    )
                 else:
                     change_message_json[0]["content"] = list(qset.values("id"))
 
