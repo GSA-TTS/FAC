@@ -1,22 +1,17 @@
+# Generate an updated requirements.txt
+# We want these to run at the same time if we are ever updating a package in either file
+# since the dev-requirements.txt are built on top of the requirements.txt
+compile:
+	@pip-compile --generate-hashes ./requirements/requirements.in -o requirements.txt --allow-unsafe
+	@pip-compile --generate-hashes ./requirements/dev-requirements.in -o dev-requirements.txt --allow-unsafe
+
 # Install python dependencies
 install:
 	@pip install -r requirements.txt
 	@npm ci
 
-# Generate an updated requirements.txt
-compile:
-	@touch requirements.txt
-	@rm requirements.txt
-	@pip-compile --generate-hashes ./requirements/requirements.in -o requirements.txt --allow-unsafe
-
 compile-assets:
 	@node build-assets.mjs
-
-# Generate an updated dev-requirements.txt
-compile-dev:
-	@touch dev-requirements.txt
-	@rm dev-requirements.txt
-	@pip-compile --generate-hashes ./requirements/dev-requirements.in -o dev-requirements.txt --allow-unsafe
 
 # Install python dev dependencies
 install-dev:
