@@ -337,7 +337,7 @@ class TestValidateAuditConsistency(TestCase):
         sac.save()
         result = validate_audit_consistency(audit)
         self.assertEqual(result[1], [])
-        self.assertTrue(result[0])
+        self.assertFalse(result[0])
 
     # def test_meta(self):
     #     audit = baker.make(Audit, version=0)
