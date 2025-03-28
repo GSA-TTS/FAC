@@ -190,22 +190,23 @@ def add_custom_field_to_log(sender, instance, created, **kwargs):
             obj = qset.first()
 
         # update content of record after save occurred.
-        change_message_json = json.loads(instance.change_message)
+        if instance.change_message:
+            change_message_json = json.loads(instance.change_message)
 
-        if change_message_json:
-            if model_class == UserPermission:
-                change_message_json[0]["content"] = list(
-                    qset.values("email", "permission__slug")
-                )
-            elif model_class == TribalApiAccessKeyIds:
-                change_message_json[0]["content"] = list(qset.values("email", "key_id"))
-            else:
-                change_message_json[0]["content"] = list(qset.values("id"))
+            if change_message_json:
+                if model_class == UserPermission:
+                    change_message_json[0]["content"] = list(
+                        qset.values("email", "permission__slug")
+                    )
+                elif model_class == TribalApiAccessKeyIds:
+                    change_message_json[0]["content"] = list(qset.values("email", "key_id"))
+                else:
+                    change_message_json[0]["content"] = list(qset.values("id"))
 
-            # record still exists.
-            if obj:
-                change_message_json[0]["id"] = obj.pk
+                # record still exists.
+                if obj:
+                    change_message_json[0]["id"] = obj.pk
 
-        # write changes to instance.
-        instance.change_message = json.dumps(change_message_json, cls=DateEncoder)
-        instance.save()
+            # write changes to instance.
+            instance.change_message = json.dumps(change_message_json, cls=DateEncoder)
+            instance.save()
