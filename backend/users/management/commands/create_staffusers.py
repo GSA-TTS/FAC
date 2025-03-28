@@ -20,6 +20,8 @@ class Command(BaseCommand):
         readonly_codenames = [
             "view_access",
             "view_deletedaccess",
+            "view_audit",
+            "view_auditvalidationwaiver",
             "view_singleauditchecklist",
             "view_sacvalidationwaiver",
             "view_ueivalidationwaiver",
@@ -52,6 +54,7 @@ class Command(BaseCommand):
             "add_tribalapiaccesskeyids",
             "change_tribalapiaccesskeyids",
             "delete_tribalapiaccesskeyids",
+            "add_auditvalidationwaiver",
             "add_sacvalidationwaiver",
             "add_ueivalidationwaiver",
             "add_cognizantassignment",

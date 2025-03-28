@@ -21,13 +21,14 @@ from .models import (
 from .audit import Audit
 from .history import History
 from .submission_event import SubmissionEvent
-from .waivers import SacValidationWaiver, UeiValidationWaiver
+from .waivers import AuditValidationWaiver, SacValidationWaiver, UeiValidationWaiver
 from ..exceptions import LateChangeError
 
 # In case we want to iterate through all the models for some reason:
 _models = [
     Access,
     Audit,
+    AuditValidationWaiver,
     DeletedAccess,
     History,
     ExcelFile,

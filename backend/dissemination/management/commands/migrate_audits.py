@@ -48,6 +48,8 @@ from audit.models import (
     SingleAuditReportFile,
     SingleAuditChecklist,
     SubmissionEvent,
+    SacValidationWaiver,
+    AuditValidationWaiver,
 )
 from audit.models.history import History
 from audit.models.constants import STATUS
@@ -150,6 +152,23 @@ class Command(BaseCommand):
             # assign audit reference to file-based models.
             SingleAuditReportFile.objects.filter(sac=sac).update(audit=audit)
             ExcelFile.objects.filter(sac=sac).update(audit=audit)
+
+            # copy SacValidationWaivers.
+            if not AuditValidationWaiver.objects.filter(
+                report_id=sac.report_id
+            ).exists():
+                waivers = SacValidationWaiver.objects.filter(report_id=sac.report_id)
+                for waiver in waivers:
+                    AuditValidationWaiver.objects.create(
+                        report_id=sac.report_id,
+                        timestamp=waiver.timestamp,
+                        approver_email=waiver.approver_email,
+                        approver_name=waiver.approver_name,
+                        requester_email=waiver.requester_email,
+                        requester_name=waiver.requester_name,
+                        justification=waiver.justification,
+                        waiver_types=waiver.waiver_types,
+                    )
 
 
 def _get_query(kwargs, max_records):

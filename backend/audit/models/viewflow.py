@@ -61,6 +61,17 @@ def sac_revert_from_flagged_for_removal(sac, user, audit=None):
                 event_type=SubmissionEvent.EventType.CANCEL_REMOVAL_FLAG,
             )
 
+    # undo the flagged status for the audit as well.
+    if audit and audit.submission_status == STATUS.FLAGGED_FOR_REMOVAL:
+        audit_revert_from_flagged_for_removal(audit, user)
+
+
+def audit_revert_from_flagged_for_removal(audit, user):
+    """
+    Transitions the submission_state for an Audit back
+    to "in_progress" so the user can continue working on it.
+    This should be accessible to django admin.
+    """
     if audit and audit.submission_status == STATUS.FLAGGED_FOR_REMOVAL:
         flow = AuditFlow(audit)
 
@@ -89,6 +100,15 @@ def sac_flag_for_removal(sac, user, audit=None):
                 event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
             )
 
+    if audit and audit.submission_status == STATUS.IN_PROGRESS:
+        audit_flag_for_removal(audit, user)
+
+
+def audit_flag_for_removal(audit, user):
+    """
+    Transitions the submission_state for an Audit to "flagged_for_removal".
+    This should be accessible to django admin.
+    """
     if audit and audit.submission_status == STATUS.IN_PROGRESS:
         flow = AuditFlow(audit)
         flow.transition_to_flagged_for_removal()
@@ -226,6 +246,42 @@ def _transition_audit(audit, user, submission_event, autoflow_action):
             event_user=user,
             event_type=submission_event,
         )
+
+
+def audit_transition(request, audit, **kwargs):
+    """
+    Transitions the submission_state for an Audit.
+    """
+    user = None
+    flow = AuditFlow(audit)
+
+    target = kwargs.get("transition_to", None)
+
+    event_to_action = {
+        EventType.UNLOCKED_AFTER_CERTIFICATION: flow.transition_to_in_progress_again,
+        EventType.FLAGGED_SUBMISSION_FOR_REMOVAL: flow.transition_to_flagged_for_removal,
+        EventType.LOCKED_FOR_CERTIFICATION: flow.transition_to_ready_for_certification,
+        EventType.AUDITEE_CERTIFICATION_COMPLETED: flow.transition_to_auditee_certified,
+        EventType.AUDITOR_CERTIFICATION_COMPLETED: flow.transition_to_auditor_certified,
+        EventType.SUBMITTED: flow.transition_to_submitted,
+        EventType.DISSEMINATED: flow.transition_to_disseminated,
+    }
+
+    # optional - only needed when a user is involved.
+    if request:
+        user = request.user
+
+    # Audit must transition to a target state.
+    if target is None:
+        return False
+
+    _transition_audit(
+        audit=audit,
+        user=user,
+        submission_event=target,
+        autoflow_action=event_to_action[target],
+    )
+    return True
 
 
 class SingleAuditChecklistFlow(SingleAuditChecklist):
