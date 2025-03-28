@@ -1,5 +1,5 @@
 module "dev" {
-  source                = "../shared/modules/env"
+  source = "../shared/modules/env"
   cf_space = {
     id   = data.cloudfoundry_space.space.id
     name = "dev"
