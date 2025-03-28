@@ -325,8 +325,28 @@ class TestValidateAuditConsistency(TestCase):
 
     # def test_meta(self):
     #     audit = baker.make(Audit, version=0)
+    #     audit.audit = { 'federal_awards' : {} }
     #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
     #     sac.federal_awards = { 'Meta': { 'section_name': 'FederalAwardsExpended' } }
+    #     sac.save()
+    #     result = validate_audit_consistency(audit)
+    #     self.assertEqual(result[1], [])
+    #     self.assertTrue(result[0])
+
+    # def test_eins(self):
+    #     audit = baker.make(Audit, version=0)
+    #     audit.audit = { "additional_eins": ["621832456"] }
+    #     audit.save()
+    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+    #     sac.additional_eins = {
+    #         "AdditionalEINs": {
+    #             "additional_eins_entries": [
+    #                 {
+    #                     "additional_ein": "621832456"
+    #                 }
+    #             ]
+    #         }
+    #     }
     #     sac.save()
     #     result = validate_audit_consistency(audit)
     #     self.assertEqual(result[1], [])
