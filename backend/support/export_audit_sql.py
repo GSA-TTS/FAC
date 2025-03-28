@@ -151,13 +151,12 @@ select_findings_text = (
 select_notes_to_sefa = (
     "select a.report_id, a.audit->'general_information'->>'auditee_uei' as auditee_uei, "
     "a.audit->>'audit_year' as audit_year, note->>'note_title' as title, "
-    "nts_elem->>'accounting_policies' as accounting_policies, "
-    "nts_elem->>'is_minimis_rate_used' as is_minimis_rate_used, "
-    "nts_elem->>'rate_explained' as rate_explained, note->>'note_content' as content, "
+    "a.audit->'notes_to_sefa'->>'accounting_policies' as accounting_policies, "
+    "a.audit->'notes_to_sefa'->>'is_minimis_rate_used' as is_minimis_rate_used, "
+    "a.audit->'notes_to_sefa'->>'rate_explained' as rate_explained, note->>'note_content' as content, "
     "note->>'contains_chart_or_table' as contains_chart_or_table "
     "from audit_audit as a, "
-    "LATERAL jsonb_array_elements(a.audit->'notes_to_sefa') as nts_elem, "
-    "LATERAL jsonb_array_elements(nts_elem->'notes_to_sefa_entries') as note "
+    "LATERAL jsonb_array_elements(a.audit->'notes_to_sefa'->'notes_to_sefa_entries') as note "
     " where a.is_public is true and a.audit_year = {audit_year}"
 )
 

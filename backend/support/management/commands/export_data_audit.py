@@ -112,11 +112,11 @@ STREAM_GENERATORS = [
         table_name="findings_text",
         query_override=export_audit_sql.select_findings_text,
     ),
-    # StreamGenerator(
-    #     friendly_name="Note",
-    #     table_name="notes_to_sefa",
-    #     query_override=export_audit_sql.select_notes_to_sefa,
-    # ),
+    StreamGenerator(
+        friendly_name="Note",
+        table_name="notes_to_sefa",
+        query_override=export_audit_sql.select_notes_to_sefa,
+    ),
     StreamGenerator(
         friendly_name="PassThrough",
         table_name="passthrough",
@@ -135,7 +135,7 @@ def _run_data_export():
     logger.info("Begin exporting data from audit table")
     # We may want to consider instead of hardcoding 2016 only export the past X years.
     # This will only export data that exists, so doing +2 just incase some data is in early
-    years = range(2024, datetime.today().year + 2)
+    years = range(2016, datetime.today().year + 2)
     streams = {}
     for stream_generator in STREAM_GENERATORS:
         for year in years:
