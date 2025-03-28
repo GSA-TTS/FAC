@@ -1,5 +1,5 @@
 module "sandbox" {
-  source                  = "../shared/modules/sandbox"
+  source = "../shared/modules/sandbox"
   cf_space = {
     id   = data.cloudfoundry_space.space.id
     name = "sandbox"
