@@ -320,15 +320,14 @@ class TestValidateAuditConsistency(TestCase):
     #     sac.tribal_data_consent = None
     #     sac.save()
     #     result = validate_audit_consistency(audit)
-    #     self.assertTrue(result[0])
     #     self.assertEqual(result[1], [])
+    #     self.assertTrue(result[0])
 
     # def test_meta(self):
     #     audit = baker.make(Audit, version=0)
-    #     audit.audit = { 'federal_awards': { 'Meta': { 'section_name': 'FederalAwardsExpended' } } }
-    #     audit.save()
     #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+    #     sac.federal_awards = { 'Meta': { 'section_name': 'FederalAwardsExpended' } }
     #     sac.save()
     #     result = validate_audit_consistency(audit)
-    #     self.assertTrue(result[0])
     #     self.assertEqual(result[1], [])
+    #     self.assertTrue(result[0])
