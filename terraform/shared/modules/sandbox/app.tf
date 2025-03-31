@@ -23,15 +23,10 @@ module "fac-app" {
     ALLOWED_HOSTS         = "fac-${var.cf_space.name}.app.cloud.gov"
   }
   service_bindings = {
-    # We can use these with the 2.3.0 release of terraform-cloudgov
-    # "${module.s3-private.bucket_name}" = ""
-    # "${module.s3-private.bucket_name}" = ""
-    # "${module.database.database_name}" = ""
-    # "${module.snapshot-database.db_name}" = ""
-    "fac-private-s3"                                          = ""
-    "fac-public-s3"                                           = ""
-    "fac-db"                                                  = ""
-    "fac-snapshot-db"                                         = ""
+    "${module.s3-private.bucket_name}" = ""
+    "${module.s3-private.bucket_name}" = ""
+    "${module.database.database_name}" = ""
+    "${module.snapshot-database.database_name}" = ""
     "${cloudfoundry_service_instance.newrelic_creds.name}"    = ""
     "${cloudfoundry_service_instance.proxy_credentials.name}" = ""
     "${module.logshipper.syslog_drain_name}"                  = ""
