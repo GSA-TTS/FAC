@@ -29,7 +29,7 @@ resource "cloudfoundry_service_instance" "clam_ups_fs" {
 }
 
 module "quarantine" {
-  source       = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
+  source       = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
   cf_space_id  = var.cf_space.id
   name         = "fac-file-scanner-quarantine"
   s3_plan_name = "basic"
