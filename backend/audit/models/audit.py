@@ -283,6 +283,12 @@ class Audit(CreatedMixin, UpdatedMixin):
         )
         return history.updated_by if history else None
 
+    @property
+    def auditee_fiscal_period_end(self):
+        return self.audit.get("general_information", {}).get(
+            "auditee_fiscal_period_end"
+        )
+
     class Meta:
         # Uncomment this line should we decide to make disseminated reports immutable in resubmission
         # unique_together = ("report_id", "version")

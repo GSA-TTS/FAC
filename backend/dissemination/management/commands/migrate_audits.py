@@ -43,7 +43,6 @@ from audit.models import (
     Access,
     DeletedAccess,
     Audit,
-    User,
     ExcelFile,
     SingleAuditReportFile,
     SingleAuditChecklist,
@@ -120,7 +119,7 @@ class Command(BaseCommand):
                 data_source=sac.data_source,
                 # FOR DEBUGGING
                 # Change the email to your local user (make sure you login once after app startup).
-                event_user=User.objects.get(email="robert.novak@gsa.gov"),
+                event_user=sac.submitted_by,
                 audit=audit_data,
                 report_id=sac.report_id,
                 submission_status=sac.submission_status,
