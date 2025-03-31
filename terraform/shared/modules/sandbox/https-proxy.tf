@@ -1,5 +1,5 @@
 module "https-proxy" {
-  source      = "github.com/GSA-TTS/terraform-cloudgov//egress_proxy?ref=v2.2.0"
+  source      = "github.com/GSA-TTS/terraform-cloudgov//egress_proxy?ref=v2.3.0"
   name        = "https-proxy"
   cf_org_name = var.cf_org_name
   cf_egress_space = {

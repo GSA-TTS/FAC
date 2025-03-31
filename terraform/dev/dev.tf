@@ -26,7 +26,7 @@ module "dev" {
 }
 
 module "dev-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
 
   cf_space_id  = data.cloudfoundry_space.space.id
   name         = "backups"
