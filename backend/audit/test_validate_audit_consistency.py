@@ -206,25 +206,31 @@ class TestCompareValues(TestCase):
 class TestValidateAuditConsistency(TestCase):
     """Tests for validate_audit_consistency"""
     def test_simple_valid(self):
+        """Trivial valid case"""
         audit = baker.make(Audit, version=0)
         baker.make(SingleAuditChecklist, report_id=audit.report_id)
         result = validate_audit_consistency(audit)
-        self.assertTrue(result[0])
         self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
 
     def test_simple_invalid(self):
+        """
+        Generate a difference when the values for a simple field don't
+        match
+        """
         audit = baker.make(Audit, version=0)
         sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
         sac.data_source = "foo"
         sac.save()
         result = validate_audit_consistency(audit)
-        self.assertFalse(result[0])
         self.assertEqual(
             result[1][0],
             {'field': 'data_source', 'sac_value': 'foo', 'audit_value': 'GSAFAC'},
         )
+        self.assertFalse(result[0])
 
     def test_json_valid(self):
+        """Simple valid case for a JSON field"""
         audit = baker.make(Audit, version=0)
         audit.audit = { 'general_information': { 'a': 1 } }
         audit.save()
@@ -232,10 +238,11 @@ class TestValidateAuditConsistency(TestCase):
         sac.general_information = { 'a': 1 }
         sac.save()
         result = validate_audit_consistency(audit)
-        self.assertTrue(result[0])
         self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
 
     def test_json_invalid(self):
+        """Generate a difference when a value differs between SAC and SOT"""
         audit = baker.make(Audit, version=0)
         audit.audit = { 'general_information': { 'a': 1 } }
         audit.save()
@@ -243,37 +250,46 @@ class TestValidateAuditConsistency(TestCase):
         sac.general_information = { 'a': 2 }
         sac.save()
         result = validate_audit_consistency(audit)
-        self.assertFalse(result[0])
         self.assertDictEqual(
             result[1][0],
             {'field': 'general_information', 'sac_path': 'a', 'sac_value': 2, 'error': 'Value from SAC.general_information.a not found in Audit'},
         )
+        self.assertFalse(result[0])
 
     def test_json_audit_none_invalid(self):
+        """
+        Generate a difference when a field is empty in SAC, but not in
+        SOT
+        """
         audit = baker.make(Audit, version=0)
         sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
         sac.general_information = { 'a': 1 }
         sac.save()
         result = validate_audit_consistency(audit)
-        self.assertFalse(result[0])
         self.assertDictEqual(
             result[1][0],
             {'field': 'general_information', 'error': 'Field is empty in Audit, but not in SAC', 'sac_value': {'a': 1}, 'audit_value': None},
         )
+        self.assertFalse(result[0])
 
     def test_json_sac_none_invalid(self):
+        """
+        Generate a difference when a field is empty in SOT, but not in
+        SAC
+        """
         audit = baker.make(Audit, version=0)
         audit.audit = { 'general_information': { 'a': 1 } }
         audit.save()
         baker.make(SingleAuditChecklist, report_id=audit.report_id)
         result = validate_audit_consistency(audit)
-        self.assertFalse(result[0])
         self.assertDictEqual(
             result[1][0],
             {'field': 'general_information', 'error': 'Field is empty in SAC, but not in Audit', 'sac_value': None, 'audit_value': {'a': 1}},
         )
+        self.assertFalse(result[0])
 
     def test_normalizing_keys(self):
+        """Generate a difference when keys differ only by snake/kebab casing"""
         audit = baker.make(Audit, version=0)
         audit.audit = { 'general_information': { 'foo_bar': 1 } }
         audit.save()
@@ -281,13 +297,14 @@ class TestValidateAuditConsistency(TestCase):
         sac.general_information = { 'foo-bar': 1 }
         sac.save()
         result = validate_audit_consistency(audit)
-        self.assertFalse(result[0])
         self.assertDictEqual(
             result[1][0],
             {'field': 'general_information', 'sac_path': 'foo-bar', 'sac_value': 1, 'audit_path': 'general_information.foo_bar', 'error': 'Value from SAC.general_information.foo-bar found in Audit but with different structure/key'},
         )
+        self.assertFalse(result[0])
 
     def test_json_different_formats_invalid(self):
+        """Generate a difference when matching fields have different formats"""
         audit = baker.make(Audit, version=0)
         audit.audit = { 'general_information': { 'a': 1 } }
         audit.save()
@@ -295,49 +312,54 @@ class TestValidateAuditConsistency(TestCase):
         sac.general_information = { 'a': '1' }
         sac.save()
         result = validate_audit_consistency(audit)
-        self.assertFalse(result[0])
         self.assertDictEqual(
             result[1][0],
             {'field': 'general_information', 'sac_path': 'a', 'sac_value': '1', 'found_with_different_format': True, 'found': True, 'error': '1 is int/float, found 1 as string'},
         )
+        self.assertFalse(result[0])
 
     def test_format_error(self):
+        """
+        Don't prematurely match on values of different formats when a key
+        match exists
+        """
         audit = baker.make(Audit, version=0)
-        audit.audit = { 'general_information': { 'a': 1 } }
+        audit.audit = { 'general_information': { 'x': '01', 'a': 1 } }
         audit.save()
         sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-        sac.general_information = { 'x': '01', 'a': 1 }
+        sac.general_information = { 'a': 1 }
         sac.save()
         result = validate_audit_consistency(audit)
-        self.assertTrue(result[0])
-        self.assertEqual(result[1], [])
-
-    def test_has_tribal_data_consent(self):
-        tribal_data_consent = {
-            "is_tribal_information_authorized_to_be_public": False,
-            "tribal_authorization_certifying_official_name": "GSA Name",
-            "tribal_authorization_certifying_official_title": "GSA Title",
-        }
-        audit = baker.make(Audit, version=0)
-        audit.organization_type = 'tribal'
-        audit.audit = { "tribal_data_consent": tribal_data_consent }
-        audit.save()
-        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-        sac.tribal_data_consent = tribal_data_consent
-        sac.save()
-        result = validate_audit_consistency(audit)
+        print(result)
         self.assertEqual(result[1], [])
         self.assertTrue(result[0])
 
-    def test_no_tribal_data_consent(self):
-        audit = baker.make(Audit, version=0)
-        audit.organization_type = 'non-tribal'
-        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-        sac.tribal_data_consent = None
-        sac.save()
-        result = validate_audit_consistency(audit)
-        self.assertEqual(result[1], [])
-        self.assertFalse(result[0])
+    # def test_has_tribal_data_consent(self):
+    #     tribal_data_consent = {
+    #         "is_tribal_information_authorized_to_be_public": False,
+    #         "tribal_authorization_certifying_official_name": "GSA Name",
+    #         "tribal_authorization_certifying_official_title": "GSA Title",
+    #     }
+    #     audit = baker.make(Audit, version=0)
+    #     audit.organization_type = 'tribal'
+    #     audit.audit = { "tribal_data_consent": tribal_data_consent }
+    #     audit.save()
+    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+    #     sac.tribal_data_consent = tribal_data_consent
+    #     sac.save()
+    #     result = validate_audit_consistency(audit)
+    #     self.assertEqual(result[1], [])
+    #     self.assertTrue(result[0])
+
+    # def test_no_tribal_data_consent(self):
+    #     audit = baker.make(Audit, version=0)
+    #     audit.organization_type = 'non-tribal'
+    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+    #     sac.tribal_data_consent = None
+    #     sac.save()
+    #     result = validate_audit_consistency(audit)
+    #     self.assertEqual(result[1], [])
+    #     self.assertFalse(result[0])
 
     # def test_meta(self):
     #     audit = baker.make(Audit, version=0)

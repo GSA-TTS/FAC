@@ -292,52 +292,51 @@ def validate_audit_consistency(audit_instance):
             ) in flat_sac.items():
 
                 normalized_sac_path = sac_path.split(".")[-1]
-
                 match_found = False
 
                 for audit_path, audit_value in flat_audit.items():
                     normalized_audit_path = audit_path.split(".")[-1]
 
-                if (
-                    normalized_sac_path == normalized_audit_path
-                    and sac_value == audit_value
-                ):
-                    match_found = True
-                    break
+                    if (
+                        normalized_sac_path == normalized_audit_path
+                        and sac_value == audit_value
+                    ):
+                        match_found = True
+                        break
 
                 if not match_found:
                     result = value_exists_in_audit(sac_path, sac_value, flat_audit)
 
-                if not result.get("found"):
-                    differences.append(
-                        {
-                            "field": field,
-                            "sac_path": sac_path,
-                            "sac_value": sac_value,
-                            "error": f"Value from SAC.{field}.{sac_path} not found in Audit",
-                        }
-                    )
+                    if not result.get("found"):
+                        differences.append(
+                            {
+                                "field": field,
+                                "sac_path": sac_path,
+                                "sac_value": sac_value,
+                                "error": f"Value from SAC.{field}.{sac_path} not found in Audit",
+                            }
+                        )
 
-                elif result.get("found_with_different_format"):
-                    differences.append(
-                        {
-                            "field": field,
-                            "sac_path": sac_path,
-                            "sac_value": sac_value,
-                            **result,
-                        }
-                    )
+                    elif result.get("found_with_different_format"):
+                        differences.append(
+                            {
+                                "field": field,
+                                "sac_path": sac_path,
+                                "sac_value": sac_value,
+                                **result,
+                            }
+                        )
 
-                elif result.get("found_with_different_key"):
-                    differences.append(
-                        {
-                            "field": field,
-                            "sac_path": sac_path,
-                            "sac_value": sac_value,
-                            "audit_path": result["audit_path"],
-                            "error": f"Value from SAC.{field}.{sac_path} found in Audit but with different structure/key",
-                        }
-                    )
+                    elif result.get("found_with_different_key"):
+                        differences.append(
+                            {
+                                "field": field,
+                                "sac_path": sac_path,
+                                "sac_value": sac_value,
+                                "audit_path": result["audit_path"],
+                                "error": f"Value from SAC.{field}.{sac_path} found in Audit but with different structure/key",
+                            }
+                        )
 
     return len(differences) == 0, differences
 
