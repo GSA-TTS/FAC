@@ -9,10 +9,6 @@ from sling import Replication, ReplicationStream
 
 from support.decorators import newrelic_timing_metric
 
-# from dissemination.summary_reports import restricted_model_names
-
-restricted_audit_sections = ["corrective_action_plan", "findings_text", "notes_to_sefa"]
-
 logger = logging.getLogger(__name__)
 
 S3_CONNECTION = f"""{{
@@ -35,32 +31,15 @@ DEFAULT_OPTIONS = {
     }
 }
 
-# Note:  TO DO:
+# Note:
 # To allow Sling to create empty files, when there is no data for the year set SLING_ALLOW_EMPTY=TRUE in .env
 
 
 class StreamGenerator:
-    EXCLUDE_NONPUBLIC_QUERY = (
-        "select report_id, version, audit_type, data_source, "
-        "audit_year, jsonb(audit->>'{table_name}') from audit_audit where audit_year = {audit_year} "
-        "and is_public = 'true'"
-    )
-
-    UNRESTRICTED_QUERY = (
-        "select report_id, version, audit_type, data_source, "
-        "audit_year, jsonb(audit->>'{table_name}') from audit_audit where audit_year = {audit_year}"
-    )
-
     def __init__(self, table_name, friendly_name, query_override=None):
         self.table_name = table_name
         self.friendly_name = friendly_name
-
-        default_query = (
-            self.EXCLUDE_NONPUBLIC_QUERY
-            if table_name in restricted_audit_sections
-            else self.UNRESTRICTED_QUERY
-        )
-        self.query = query_override or default_query
+        self.query = query_override
 
     def generate_stream(self, audit_year):
         return (
