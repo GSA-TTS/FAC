@@ -36,10 +36,10 @@ DEFAULT_OPTIONS = {
 
 
 class StreamGenerator:
-    def __init__(self, table_name, friendly_name, query_override=None):
+    def __init__(self, table_name, friendly_name, query=None):
         self.table_name = table_name
         self.friendly_name = friendly_name
-        self.query = query_override
+        self.query = query
 
     def generate_stream(self, audit_year):
         return (
@@ -59,52 +59,52 @@ STREAM_GENERATORS = [
     StreamGenerator(
         friendly_name="General",
         table_name="general_information",
-        query_override=export_audit_sql.select_general_information,
+        query=export_audit_sql.select_general_information,
     ),
     StreamGenerator(
         friendly_name="AdditionalEIN",
         table_name="additional_eins",
-        query_override=export_audit_sql.select_additional_eins,
+        query=export_audit_sql.select_additional_eins,
     ),
     StreamGenerator(
         friendly_name="AdditionalUEI",
         table_name="additional_ueis",
-        query_override=export_audit_sql.select_additional_ueis,
+        query=export_audit_sql.select_additional_ueis,
     ),
     StreamGenerator(
         friendly_name="CorrectiveActionPlans",
         table_name="corrective_action_plan",
-        query_override=export_audit_sql.select_corrective_action_plans,
+        query=export_audit_sql.select_corrective_action_plans,
     ),
     StreamGenerator(
         friendly_name="FederalAward",
         table_name="federal_awards",
-        query_override=export_audit_sql.select_federal_awards,
+        query=export_audit_sql.select_federal_awards,
     ),
     StreamGenerator(
         friendly_name="Finding",
         table_name="findings_uniform_guidance",
-        query_override=export_audit_sql.select_findings,
+        query=export_audit_sql.select_findings,
     ),
     StreamGenerator(
         friendly_name="FindingText",
         table_name="findings_text",
-        query_override=export_audit_sql.select_findings_text,
+        query=export_audit_sql.select_findings_text,
     ),
     StreamGenerator(
         friendly_name="Note",
         table_name="notes_to_sefa",
-        query_override=export_audit_sql.select_notes_to_sefa,
+        query=export_audit_sql.select_notes_to_sefa,
     ),
     StreamGenerator(
         friendly_name="PassThrough",
         table_name="passthrough",
-        query_override=export_audit_sql.select_passthrough,
+        query=export_audit_sql.select_passthrough,
     ),
     StreamGenerator(
         friendly_name="SecondaryAuditor",
         table_name="secondary_auditors",
-        query_override=export_audit_sql.select_secondary_auditors,
+        query=export_audit_sql.select_secondary_auditors,
     ),
 ]
 
