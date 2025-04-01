@@ -260,7 +260,7 @@ def validate_audit_consistency(audit_instance):
         sac_data = getattr(sac_instance, field, None)
         audit_field_data = audit_instance.audit.get(field)
 
-        if sac_data is not None and audit_field_data is None:
+        if sac_data is not None and audit_field_data in [None, {}]:
             differences.append(
                 {
                     "field": field,
@@ -271,7 +271,7 @@ def validate_audit_consistency(audit_instance):
             )
             continue
 
-        if sac_data is None and audit_field_data is not None:
+        if sac_data is None and audit_field_data not in [None, {}]:
             differences.append(
                 {
                     "field": field,
