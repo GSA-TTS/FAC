@@ -1,6 +1,5 @@
 from unittest.mock import Mock
 from django.test import SimpleTestCase
-from django.core.exceptions import ValidationError
 from audit.intakelib.transforms.xform_reformat_prior_references import (
     reformat_prior_references,
 )
