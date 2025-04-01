@@ -69,14 +69,15 @@ Use the menu script in this folder.
 ./menu.bash
 ```
 
-This will give you three options:
+This will give you several options:
 
-```
-1) Truncate tables
-2) Load data
-3) Check row counts
-3) Quit
-```
+1. Truncate tables
+1. Load data
+1. Check row counts
+1. Reset migrated_to_audit
+1. Truncate audit_audit
+1. Quit
+
 
 ## truncate tables
 
@@ -110,6 +111,8 @@ This will reload:
 * auth_user
 * dissemination_*
 
+This also runs `reset_migrated_to_audit`, so that the data is ready for migration to SOT.
+
 ## check counts
 
 This verifies the row counts in every table we loaded. 
@@ -135,6 +138,16 @@ Checking counts
 [PASS] dissemination_passthrough has 4025800 rows
 [PASS] dissemination_secondaryauditor has 1803 rows
 ```
+
+## reset migrated_to_audit
+
+This option will set `migrated_to_audit` to `false` for all rows in the `singleauditchecklist`.
+
+This is run after data load, but is included in the menu as an option.
+
+## truncate audit_audit
+
+This truncates the audit_audit table with `CASCADE`, and then runs the `migrated_to_audit` reset.
 
 ## overriding the data filename
 
