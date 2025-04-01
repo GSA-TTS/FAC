@@ -22,7 +22,6 @@ from audit.models import (
     SacValidationWaiver,
     UeiValidationWaiver,
 )
-from audit.models.constants import EventType
 from audit.models.models import STATUS
 from audit.models.viewflow import (
     sac_flag_for_removal,
@@ -132,42 +131,36 @@ def audit_delete_flagged_records(modeladmin, request, queryset):
     Admin action to delete records flagged for removal older than the specified months.
     """
     cutoff_date = now() - datetime.timedelta(days=FLAGGED_REPORT_RETENTION_DAYS)
-
-    # Filter records for deletion
-    records_to_delete = queryset.filter(
-        submission_status=STATUS.FLAGGED_FOR_REMOVAL,
-    )
-
     count = 0
     failed_count = 0
     report_ids = []
     failed_report_ids = []
+
+    # Filter records for deletion.
+    records_to_delete = queryset.filter(
+        submission_status=STATUS.FLAGGED_FOR_REMOVAL, updated_at__lte=cutoff_date
+    )
+
     for audit in records_to_delete:
         try:
-            histories = History.objects.filter(
-                report_id=audit.report_id,
-                event=EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
-            )
-            if histories.exists():
-                transition_datetime = histories.last().updated_at
-                if transition_datetime <= cutoff_date:
-                    with transaction.atomic():
-                        auditee_uei = audit.audit.get("general_information").get(
-                            "auditee_uei"
-                        )
-                        if auditee_uei:
-                            UeiValidationWaiver.objects.filter(uei=auditee_uei).delete()
-                        AuditValidationWaiver.objects.filter(report_id=audit).delete()
-                        audit_remove_singleauditreport_pdf(audit)
-                        audit_remove_workbook_artifacts(audit)
-                        Access.objects.filter(audit=audit).delete()
-                        DeletedAccess.objects.filter(audit=audit).delete()
-                        SubmissionEvent.objects.filter(audit=audit).delete()
-                        ExcelFile.objects.filter(audit=audit).delete()
-                        SingleAuditReportFile.objects.filter(audit=audit).delete()
-                        report_ids.append(audit.report_id)
-                        audit.delete()
-                        count += 1
+
+            # Delete the record and all its associated data.
+            with transaction.atomic():
+                auditee_uei = audit.audit.get("general_information").get("auditee_uei")
+                if auditee_uei:
+                    UeiValidationWaiver.objects.filter(uei=auditee_uei).delete()
+                AuditValidationWaiver.objects.filter(report_id=audit).delete()
+                audit_remove_singleauditreport_pdf(audit)
+                audit_remove_workbook_artifacts(audit)
+                Access.objects.filter(audit=audit).delete()
+                DeletedAccess.objects.filter(audit=audit).delete()
+                SubmissionEvent.objects.filter(audit=audit).delete()
+                ExcelFile.objects.filter(audit=audit).delete()
+                SingleAuditReportFile.objects.filter(audit=audit).delete()
+                report_ids.append(audit.report_id)
+                audit.delete()
+                count += 1
+
         except Exception as e:
             logger.error(
                 f"Failed to delete audit report with ID {audit.report_id}: {str(e)}"
@@ -712,21 +705,6 @@ class AuditValidationWaiverAdmin(admin.ModelAdmin):
 
     def report_by_id(self, obj):
         return obj.report_id.report_id
-
-    def has_add_permission(self, request, obj=None):
-        return request.user.is_staff
-
-    def has_change_permission(self, request, obj=None):
-        return request.user.is_staff
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_staff
-
-    def has_module_permission(self, request, obj=None):
-        return request.user.is_staff
-
-    def has_view_permission(self, request, obj=None):
-        return request.user.is_staff
 
     def save_model(self, request, obj, form, change):
         try:
