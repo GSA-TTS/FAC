@@ -116,8 +116,8 @@ def _run_data_export():
     # This will only export data that exists, so doing +2 just incase some data is in early
     years = range(2016, datetime.today().year + 2)
     streams = {}
-    for stream_generator in STREAM_GENERATORS:
-        for year in years:
+    for year in years:
+        for stream_generator in STREAM_GENERATORS:
             streams.update([stream_generator.generate_stream(year)])
 
     replication = Replication(
