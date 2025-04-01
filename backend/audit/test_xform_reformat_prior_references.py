@@ -46,7 +46,7 @@ class TestFindingReferenceYear(SimpleTestCase):
                             # Note multiline test case...
                             """ 2029-009 ,
                               2028-008 ,
-                                2027-007 
+                                2027-007
 """,
                         ],
                     },
