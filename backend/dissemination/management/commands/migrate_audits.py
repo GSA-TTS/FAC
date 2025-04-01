@@ -115,6 +115,7 @@ class Command(BaseCommand):
         if not Audit.objects.filter(report_id=sac.report_id).exists():
             audit = Audit.objects.create(
                 event_type="MIGRATION",
+                data_source=sac.data_source,
                 # FOR DEBUGGING
                 # Change the email to your local user (make sure you login once after app startup).
                 event_user=User.objects.get(email="robert.novak@gsa.gov"),
