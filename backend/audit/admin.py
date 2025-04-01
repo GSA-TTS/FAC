@@ -55,6 +55,24 @@ logger = logging.getLogger(__name__)
 FLAGGED_REPORT_RETENTION_DAYS = 180  # 6 months
 
 
+def admin_message(request, message_type, ui_message, logger_message=None):
+    """Return a message to the user in the Django admin UI. (and optionally send a log)."""
+    messages.set_level(request, message_type)
+
+    if message_type == messages.INFO:
+        messages.info(request, ui_message)
+        if logger_message:
+            logger.info(logger_message)
+    if message_type == messages.WARNING:
+        messages.warning(request, ui_message)
+        if logger_message:
+            logger.warning(logger_message)
+    if message_type == messages.ERROR:
+        messages.error(request, ui_message)
+        if logger_message:
+            logger.error(logger_message)
+
+
 # TODO: SoT
 # No longer needed after SAC deprecation.
 @admin.action(description="Delete reports flagged for removal for over 6 months")
@@ -715,84 +733,82 @@ class AuditValidationWaiverAdmin(admin.ModelAdmin):
                 STATUS.READY_FOR_CERTIFICATION,
                 STATUS.AUDITOR_CERTIFIED,
             ]:
-                logger.info(
-                    f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}"
-                )
                 self.handle_auditor_certification(request, obj, audit)
                 self.handle_auditee_certification(request, obj, audit)
                 super().save_model(request, obj, form, change)
-                logger.info(
-                    f"Audit {audit.report_id} updated successfully with waiver by user: {request.user.email}."
+                admin_message(
+                    request,
+                    messages.INFO,
+                    f"Audit {audit.report_id} updated successfully with waiver by user: {request.user.email}.",
+                    f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}",
                 )
 
             # Creating a waiver for an in_progress audit.
             elif STATUS.IN_PROGRESS:
 
-                # Create the waiver - audit submission now ignores duplicate finding reference numbers.
+                # Audit does not have the appropriate waiver type for its in_progress status.
                 if (
-                    AuditValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER
+                    AuditValidationWaiver.TYPES.AUDITOR_CERTIFYING_OFFICIAL
+                    in obj.waiver_types
+                    or AuditValidationWaiver.TYPES.AUDITEE_CERTIFYING_OFFICIAL
                     in obj.waiver_types
                 ):
-                    logger.info(
-                        f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}"
-                    )
-                    super().save_model(request, obj, form, change)
-                    logger.info(
-                        f"Duplicate finding reference number waiver applied to Audit {audit.report_id} by user: {request.user.email}."
-                    )
-
-                # Create the waiver - audit submission now ignores invalid prior references.
-                elif AuditValidationWaiver.TYPES.PRIOR_REFERENCES in obj.waiver_types:
-                    logger.info(
-                        f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}"
-                    )
-                    super().save_model(request, obj, form, change)
-                    logger.info(
-                        f"Invalid prior reference waiver applied to Audit {audit.report_id} by user: {request.user.email}."
+                    admin_message(
+                        request,
+                        messages.WARNING,
+                        f"Cannot apply waiver to Audit with status {audit.submission_status}. {obj.waiver_types} is an invalid type of waiver for this Audit.",
+                        f"User {request.user.email} attempted to apply waiver to Audit with invalid status: {audit.submission_status}",
                     )
 
-                # Audit does not have the appropriate waiver type for its in_progress status.
                 else:
-                    messages.set_level(request, messages.WARNING)
+
+                    # Create the waiver - audit submission now ignores duplicate finding reference numbers.
                     if (
-                        AuditValidationWaiver.TYPES.AUDITOR_CERTIFYING_OFFICIAL
-                        in obj.waiver_types
-                        or AuditValidationWaiver.TYPES.AUDITEE_CERTIFYING_OFFICIAL
+                        AuditValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER
                         in obj.waiver_types
                     ):
-                        messages.warning(
+                        super().save_model(request, obj, form, change)
+                        admin_message(
                             request,
-                            f"Cannot apply waiver to Audit with status {audit.submission_status}. {obj.waiver_types} is an invalid type of waiver for this Audit.",
+                            messages.INFO,
+                            f"Duplicate finding reference number waiver applied to Audit {audit.report_id} by user: {request.user.email}.",
+                            f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}",
                         )
-                        logger.warning(
-                            f"User {request.user.email} attempted to apply waiver to Audit with invalid status: {audit.submission_status}"
+
+                    # Create the waiver - audit submission now ignores invalid prior references.
+                    elif AuditValidationWaiver.TYPES.PRIOR_REFERENCES in obj.waiver_types:
+                        super().save_model(request, obj, form, change)
+                        admin_message(
+                            request,
+                            messages.INFO,
+                            f"Invalid prior reference waiver applied to Audit {audit.report_id} by user: {request.user.email}.",
+                            f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}",
                         )
+
+                    # Audit does not have the appropriate waiver type for its in_progress status.
                     else:
-                        messages.warning(
+                        admin_message(
                             request,
+                            messages.WARNING,
                             f"Cannot apply waiver to Audit with status {audit.submission_status}. Expected status to be one of {STATUS.READY_FOR_CERTIFICATION}, {STATUS.AUDITOR_CERTIFIED}, or {STATUS.IN_PROGRESS}.",
-                        )
-                        logger.warning(
-                            f"User {request.user.email} attempted to apply waiver to Audit with invalid status: {audit.submission_status}"
+                            f"User {request.user.email} attempted to apply waiver to Audit with invalid status: {audit.submission_status}",
                         )
 
             # Cannot create waiver since the audit status is invalid.
             else:
-                messages.set_level(request, messages.WARNING)
-                messages.warning(
+                admin_message(
                     request,
+                    messages.WARNING,
                     f"Cannot apply waiver to Audit with status {audit.submission_status}. Expected status to be one of {STATUS.READY_FOR_CERTIFICATION}, {STATUS.AUDITOR_CERTIFIED}, or {STATUS.IN_PROGRESS}.",
-                )
-                logger.warning(
-                    f"User {request.user.email} attempted to apply waiver to Audit with invalid status: {audit.submission_status}"
+                    f"User {request.user.email} attempted to apply waiver to Audit with invalid status: {audit.submission_status}",
                 )
 
         except Exception as e:
-            messages.set_level(request, messages.ERROR)
-            messages.error(request, str(e))
-            logger.error(
+            admin_message(
+                request,
+                messages.ERROR,
+                str(e),
                 f"Error saving Audit waiver by user {request.user.email}: {str(e)}",
-                exc_info=True,
             )
 
     def handle_auditor_certification(self, request, obj, audit):

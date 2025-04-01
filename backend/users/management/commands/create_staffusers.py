@@ -55,6 +55,8 @@ class Command(BaseCommand):
             "change_tribalapiaccesskeyids",
             "delete_tribalapiaccesskeyids",
             "add_auditvalidationwaiver",
+            "change_auditvalidationwaiver",
+            "delete_auditvalidationwaiver",
             "add_sacvalidationwaiver",
             "add_ueivalidationwaiver",
             "add_cognizantassignment",
