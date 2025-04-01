@@ -709,6 +709,8 @@ class AuditValidationWaiverAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         try:
             audit = Audit.objects.get(report_id=obj.report_id_id)
+
+            # Creating a waiver for an audit in the certification process (before auditee_certified).
             if audit.submission_status in [
                 STATUS.READY_FOR_CERTIFICATION,
                 STATUS.AUDITOR_CERTIFIED,
@@ -722,43 +724,59 @@ class AuditValidationWaiverAdmin(admin.ModelAdmin):
                 logger.info(
                     f"Audit {audit.report_id} updated successfully with waiver by user: {request.user.email}."
                 )
-            elif (
-                STATUS.IN_PROGRESS
-                and AuditValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER
-                in obj.waiver_types
-            ):
-                logger.info(
-                    f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}"
-                )
-                super().save_model(request, obj, form, change)
-                logger.info(
-                    f"Duplicate finding reference number waiver applied to Audit {audit.report_id} by user: {request.user.email}."
-                )
-            elif (
-                STATUS.IN_PROGRESS
-                and AuditValidationWaiver.TYPES.PRIOR_REFERENCES in obj.waiver_types
-            ):
-                logger.info(
-                    f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}"
-                )
-                super().save_model(request, obj, form, change)
-                logger.info(
-                    f"Invalid prior reference waiver applied to Audit {audit.report_id} by user: {request.user.email}."
-                )
-            elif STATUS.IN_PROGRESS and (
-                AuditValidationWaiver.TYPES.AUDITOR_CERTIFYING_OFFICIAL
-                in obj.waiver_types
-                or AuditValidationWaiver.TYPES.AUDITEE_CERTIFYING_OFFICIAL
-                in obj.waiver_types
-            ):
-                messages.set_level(request, messages.WARNING)
-                messages.warning(
-                    request,
-                    f"Cannot apply waiver to Audit with status {audit.submission_status}. {obj.waiver_types} is an invalid type of waiver for this Audit.",
-                )
-                logger.warning(
-                    f"User {request.user.email} attempted to apply waiver to Audit with invalid status: {audit.submission_status}"
-                )
+
+            # Creating a waiver for an in_progress audit.
+            elif STATUS.IN_PROGRESS:
+
+                # Create the waiver - audit submission now ignores duplicate finding reference numbers.
+                if (
+                    AuditValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER
+                    in obj.waiver_types
+                ):
+                    logger.info(
+                        f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}"
+                    )
+                    super().save_model(request, obj, form, change)
+                    logger.info(
+                        f"Duplicate finding reference number waiver applied to Audit {audit.report_id} by user: {request.user.email}."
+                    )
+
+                # Create the waiver - audit submission now ignores invalid prior references.
+                elif AuditValidationWaiver.TYPES.PRIOR_REFERENCES in obj.waiver_types:
+                    logger.info(
+                        f"User {request.user.email} is applying waiver for Audit with status: {audit.submission_status}"
+                    )
+                    super().save_model(request, obj, form, change)
+                    logger.info(
+                        f"Invalid prior reference waiver applied to Audit {audit.report_id} by user: {request.user.email}."
+                    )
+
+                # Audit does not have the appropriate waiver type for its in_progress status.
+                else:
+                    messages.set_level(request, messages.WARNING)
+                    if (
+                        AuditValidationWaiver.TYPES.AUDITOR_CERTIFYING_OFFICIAL
+                        in obj.waiver_types
+                        or AuditValidationWaiver.TYPES.AUDITEE_CERTIFYING_OFFICIAL
+                        in obj.waiver_types
+                    ):
+                        messages.warning(
+                            request,
+                            f"Cannot apply waiver to Audit with status {audit.submission_status}. {obj.waiver_types} is an invalid type of waiver for this Audit.",
+                        )
+                        logger.warning(
+                            f"User {request.user.email} attempted to apply waiver to Audit with invalid status: {audit.submission_status}"
+                        )
+                    else:
+                        messages.warning(
+                            request,
+                            f"Cannot apply waiver to Audit with status {audit.submission_status}. Expected status to be one of {STATUS.READY_FOR_CERTIFICATION}, {STATUS.AUDITOR_CERTIFIED}, or {STATUS.IN_PROGRESS}.",
+                        )
+                        logger.warning(
+                            f"User {request.user.email} attempted to apply waiver to Audit with invalid status: {audit.submission_status}"
+                        )
+
+            # Cannot create waiver since the audit status is invalid.
             else:
                 messages.set_level(request, messages.WARNING)
                 messages.warning(
