@@ -31,9 +31,6 @@ DEFAULT_OPTIONS = {
     }
 }
 
-# Note:
-# To allow Sling to create empty files, when there is no data for the year set SLING_ALLOW_EMPTY=TRUE in .env
-
 
 class StreamGenerator:
     def __init__(self, table_name, friendly_name, query=None):
@@ -125,7 +122,9 @@ def _run_data_export():
         target="BULK_DATA_EXPORT",
         streams=streams,
         defaults=DEFAULT_OPTIONS,
-        env=dict(FAC_DB=FAC_DB_URL, BULK_DATA_EXPORT=S3_CONNECTION),
+        env=dict(
+            FAC_DB=FAC_DB_URL, BULK_DATA_EXPORT=S3_CONNECTION, SLING_ALLOW_EMPTY="TRUE"
+        ),
         debug=settings.DEBUG,
     )
     logger.info(f"Exporting {len(streams)} streams")
