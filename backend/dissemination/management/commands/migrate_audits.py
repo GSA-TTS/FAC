@@ -246,7 +246,7 @@ def _convert_passthrough(sac: SingleAuditChecklist):
             entities = award.get("direct_or_indirect_award", {}).get("entities", [])
             for entity in entities:
                 passthrough = {
-                    "award_reference": entity.get("award_reference", ""),
+                    "award_reference": award.get("award_reference", ""),
                     "passthrough_id": entity.get("passthrough_identifying_number", ""),
                     "passthrough_name": entity.get("passthrough_name", ""),
                 }

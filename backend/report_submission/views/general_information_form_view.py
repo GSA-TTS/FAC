@@ -337,7 +337,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 def _update_audit(report_id, general_information, request):
     audit = Audit.objects.find_audit_or_none(report_id=report_id)
     if audit:
-        audit.audit_type = general_information.get("audit_type").replace("-", "_")
         audit.audit.update({"general_information": general_information})
         audit.save(
             event_user=request.user,

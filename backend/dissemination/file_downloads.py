@@ -7,6 +7,7 @@ from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 
 from audit.models import ExcelFile, SingleAuditReportFile, SingleAuditChecklist, Audit
+from audit.models.constants import STATUS
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,9 @@ def get_filename_from_audit(report_id, file_type):
     """
     Basically a copy of above. Used for "SOT Beta" pages. Post launch this method should replace get_filename above.
     """
-    audit = Audit.objects.filter(report_id=report_id).first()
+    audit = Audit.objects.filter(
+        report_id=report_id, submission_status=STATUS.DISSEMINATED
+    ).first()
     if file_type == "report":
         try:
             if audit:

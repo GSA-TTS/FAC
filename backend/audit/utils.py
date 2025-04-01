@@ -92,6 +92,10 @@ class Util:
         else:
             return redirect("/")
 
+    @staticmethod
+    def format_date(date):
+        return date.strftime("%Y-%m-%d")
+
 
 class ExcelExtractionError(Exception):
     def __init__(
