@@ -358,15 +358,15 @@ class TestValidateAuditConsistency(TestCase):
         self.assertEqual(result[1], [])
         self.assertTrue(result[0])
 
-    # def test_meta(self):
-    #     audit = baker.make(Audit, version=0)
-    #     audit.audit = { 'federal_awards' : {} }
-    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-    #     sac.federal_awards = { 'Meta': { 'section_name': 'FederalAwardsExpended' } }
-    #     sac.save()
-    #     result = validate_audit_consistency(audit)
-    #     self.assertEqual(result[1], [])
-    #     self.assertTrue(result[0])
+    def test_meta(self):
+        audit = baker.make(Audit, version=0)
+        audit.audit = { 'federal_awards' : { 'foo': 'bar' } }
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.federal_awards = { 'Meta': { 'section_name': 'FederalAwardsExpended' } }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
 
     # def test_eins(self):
     #     audit = baker.make(Audit, version=0)

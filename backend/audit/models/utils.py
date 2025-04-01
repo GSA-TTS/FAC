@@ -290,6 +290,9 @@ def validate_audit_consistency(audit_instance):
                 sac_path,
                 sac_value,
             ) in flat_sac.items():
+                # json_field.Meta data has not been included in SOT
+                if sac_path.startswith("Meta"):
+                    continue
 
                 normalized_sac_path = sac_path.split(".")[-1]
                 match_found = False
