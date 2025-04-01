@@ -330,36 +330,33 @@ class TestValidateAuditConsistency(TestCase):
         sac.general_information = { 'a': 1 }
         sac.save()
         result = validate_audit_consistency(audit)
-        print(result)
         self.assertEqual(result[1], [])
         self.assertTrue(result[0])
 
-    # def test_has_tribal_data_consent(self):
-    #     tribal_data_consent = {
-    #         "is_tribal_information_authorized_to_be_public": False,
-    #         "tribal_authorization_certifying_official_name": "GSA Name",
-    #         "tribal_authorization_certifying_official_title": "GSA Title",
-    #     }
-    #     audit = baker.make(Audit, version=0)
-    #     audit.organization_type = 'tribal'
-    #     audit.audit = { "tribal_data_consent": tribal_data_consent }
-    #     audit.save()
-    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-    #     sac.tribal_data_consent = tribal_data_consent
-    #     sac.save()
-    #     result = validate_audit_consistency(audit)
-    #     self.assertEqual(result[1], [])
-    #     self.assertTrue(result[0])
+    def test_has_tribal_data_consent(self):
+        """Valid case when tribal data consent exists"""
+        audit = baker.make(Audit, version=0)
+        audit.organization_type = 'tribal'
+        audit.audit = { "tribal_data_consent": { 'foo': 'bar' } }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.tribal_data_consent = { 'foo': 'bar' }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
 
-    # def test_no_tribal_data_consent(self):
-    #     audit = baker.make(Audit, version=0)
-    #     audit.organization_type = 'non-tribal'
-    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-    #     sac.tribal_data_consent = None
-    #     sac.save()
-    #     result = validate_audit_consistency(audit)
-    #     self.assertEqual(result[1], [])
-    #     self.assertFalse(result[0])
+    def test_no_tribal_data_consent(self):
+        """Valid case when tribal data consent doesn't exist"""
+        audit = baker.make(Audit, version=0)
+        audit.organization_type = 'non-tribal'
+        audit.audit = { "tribal_data_consent": {} }
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.tribal_data_consent = None
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
 
     # def test_meta(self):
     #     audit = baker.make(Audit, version=0)
