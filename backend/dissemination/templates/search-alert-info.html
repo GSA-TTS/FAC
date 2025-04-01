@@ -1,12 +1,32 @@
 {% load humanize %}
 {% load sprite_helper %}
 <div class="margin-y-2 display-flex">
-    <div class="text-family-public-sans">
-        <p class="usa-alert__text">
-          <a href="{% url 'dissemination:Search' %}">Basic Search</a> is updated in real time and can be used to confirm that an audit submission has been accepted. <a href="{% url 'dissemination:AdvancedSearch' %}">Advanced Search</a> is updated once daily at 12am EST and includes additional filters to support our Federal partners.
-        </p>
-        <p class="usa-alert__text">
-          Learn how Basic and Advanced search filters work on our <a href='https://www.fac.gov/search-resources/filters/' target='_blank' rel="noopener noreferrer">Search resources page</a>.
-        </p>
-    </div>
+  <div class="text-family-public-sans">
+    <p class="usa-alert__text">
+      <a href="{% url 'dissemination:Search' %}">Basic Search</a> is updated in real time and can be used to confirm that an audit submission has been accepted.
+      <a href="{% url 'dissemination:AdvancedSearch' %}">Advanced Search</a> is updated once daily at 12am EST and includes additional filters to support our Federal partners.
+    </p>
+
+    <p class="usa-alert__text">
+      Learn how Basic and Advanced search filters work on our
+      <a href="https://www.fac.gov/search-resources/filters/" target="_blank" rel="noopener noreferrer">Search resources page</a>.
+    </p>
+
+    <p class="usa-alert__text">
+      Download bulk audit data exports by year:
+    </p>
+    <ul class="usa-list">
+      <li><a href="https://your-bucket.s3.amazonaws.com/pre-2016.zip" target="_blank" rel="noopener noreferrer">Pre-2016 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2016.zip" target="_blank" rel="noopener noreferrer">2016 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2017.zip" target="_blank" rel="noopener noreferrer">2017 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2018.zip" target="_blank" rel="noopener noreferrer">2018 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2019.zip" target="_blank" rel="noopener noreferrer">2019 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2020.zip" target="_blank" rel="noopener noreferrer">2020 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2021.zip" target="_blank" rel="noopener noreferrer">2021 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2022.zip" target="_blank" rel="noopener noreferrer">2022 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2023.zip" target="_blank" rel="noopener noreferrer">2023 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2024.zip" target="_blank" rel="noopener noreferrer">2024 Export</a></li>
+      <li><a href="https://your-bucket.s3.amazonaws.com/2025-latest.zip" target="_blank" rel="noopener noreferrer">2025 Export (Updated Weekly)</a></li>
+    </ul>
+  </div>
 </div>
