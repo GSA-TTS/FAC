@@ -23,6 +23,7 @@ EXPECTED = [
 
 class TestFindingReferenceYear(SimpleTestCase):
     def setUp(self):
+        # noqa: W291
         self.ir = [
             {
                 "name": "Form",
