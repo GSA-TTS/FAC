@@ -12,9 +12,13 @@ on:
           - staging
           - preview
           - production
+      year:
+        required: true
+        type: string
+        description: Provide audit year.
 
 jobs:
-  scheduled-data-export:
+  scheduled-audit-data-export:
     if: ${{ github.event_name == 'schedule' }}
     strategy:
       matrix:
@@ -32,9 +36,9 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name export_data_to_csv --command "python manage.py export_data_audit" --wait
+          command: cf run-task gsa-fac -k 2G -m 2G --name export_data_to_csv --command "python manage.py export_data_audit --year ${{ inputs.year }}" --wait
 
-  dispatch-data-export:
+  dispatch-audit-data-export:
     if: ${{ github.event.inputs.environment != '' }}
     name: Run data export on ${{ inputs.environment }}
     runs-on: ubuntu-latest
@@ -49,4 +53,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name export_data_to_csv --command "python manage.py export_data_audit" --wait
+          command: cf run-task gsa-fac -k 2G -m 2G --name export_data_to_csv --command "python manage.py export_data_audit --year ${{ inputs.year }}" --wait
