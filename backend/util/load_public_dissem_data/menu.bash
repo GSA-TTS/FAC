@@ -4,7 +4,7 @@ DATABASE=postgres
 USERNAME=postgres
 HOST=localhost
 PORT=5432
-FILENAME=${FILENAME:-data/sac-user-access-valwaiver-pdf-xlsx-event-data-03-28-25.dump}
+FILENAME=${FILENAME:-data/internal-and-external-20250320.dump}
 
 count_audit_singleauditchecklist=354222
 count_audit_access=1195595 
