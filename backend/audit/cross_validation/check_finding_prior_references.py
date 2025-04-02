@@ -58,7 +58,7 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
     for award_ref, prior_refs_strings in all_prior_refs.items():
         # Make sure we have no leading or trailing whitespace on
         # any of the refs.
-        prior_refs = list(map(lambda s: s.trim(), prior_refs_strings.split(",")))
+        prior_refs = list(map(lambda s: s.strip(), prior_refs_strings.split(",")))
         _validate_prior_refs(
             prior_refs,
             award_ref,
