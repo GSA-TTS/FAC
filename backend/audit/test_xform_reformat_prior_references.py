@@ -23,7 +23,6 @@ EXPECTED = [
 
 class TestFindingReferenceYear(SimpleTestCase):
     def setUp(self):
-        # noqa: W291
         self.ir = [
             {
                 "name": "Form",
@@ -44,6 +43,7 @@ class TestFindingReferenceYear(SimpleTestCase):
                             "2027-007 , 2026-006 , 2025-005 ",
                             " 2028-008 , 2027-007 , 2026-006 ",
                             # Note multiline test case...
+                            # noqa: W291
                             """ 2029-009 ,
                               2028-008 ,
                                 2027-007
