@@ -2,7 +2,7 @@ import argparse
 import subprocess  # nosec
 import time
 
-from util import trigger_migration_workflow
+from census_historical_migration.throwaway_scripts.util import trigger_migration_workflow
 
 # This throwaway script spits out code that can be
 # copy-pasted into a bash script, or directly into the command line.
