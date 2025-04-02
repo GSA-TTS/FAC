@@ -123,7 +123,7 @@ def _run_data_export(year):
     logger.info(f"Begin exporting data from audit table for year={year}")
 
     if year == "all":
-        years = range(valid_years[0], valid_years[-2] + 1)
+        years = range(int(valid_years[0]), int(valid_years[-2]) + 1)
     else:
         years = [year]
 
