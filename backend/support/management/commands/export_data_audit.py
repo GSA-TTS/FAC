@@ -3,7 +3,6 @@ import logging
 import support.export_audit_sql as export_audit_sql
 
 from config import settings
-from datetime import datetime
 from django.core.management.base import BaseCommand, CommandError
 from sling import Replication, ReplicationStream
 
@@ -30,6 +29,19 @@ DEFAULT_OPTIONS = {
         "file_max_rows": 0,
     }
 }
+valid_years = [
+    "2016",
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025",
+    "all",
+]
 
 
 class StreamGenerator:
@@ -107,11 +119,14 @@ STREAM_GENERATORS = [
 
 
 @newrelic_timing_metric("data_export")
-def _run_data_export():
-    logger.info("Begin exporting data from audit table")
-    # We may want to consider instead of hardcoding 2016 only export the past X years.
-    # This will only export data that exists, so doing +2 just incase some data is in early
-    years = range(2016, datetime.today().year + 2)
+def _run_data_export(year):
+    logger.info(f"Begin exporting data from audit table for year={year}")
+
+    if year == "all":
+        years = range(valid_years[0], valid_years[-2] + 1)
+    else:
+        years = [year]
+
     streams = {}
     for year in years:
         for stream_generator in STREAM_GENERATORS:
@@ -133,9 +148,33 @@ def _run_data_export():
 
 
 class Command(BaseCommand):
-    def handle(self, *args, **kwargs):
+    help = """
+    Export dissemination data for audit years
+    2016/2017/2018/2019/2020/2021/2022/2023/2024/2025/all.
+    Default is 2024.
+    """
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--year",
+            help="Year(2016 or 2017 or 2018 or 2019 or 2020 or 2021 or 2022 or 2023 or 2024 or 2025 or all)",
+            type=str,
+            default="2024",
+        )
+
+    def is_year_invalid(self, year):
+        return year not in valid_years
+
+    def handle(self, *args, **options):
+        year = options.get("year")
+        if self.is_year_invalid(year):
+            print(
+                f"Invalid year {year}.  Expecting 2016 / 2017 / 2018 / 2019 / 2020 / 2021 / 2022 / 2023 / 2024 / 2025 / all"
+            )
+            return
+
         try:
-            _run_data_export()
+            _run_data_export(year)
         except Exception as ex:
             logger.error(
                 "An error occurred while exporting data from audit table", exc_info=ex
