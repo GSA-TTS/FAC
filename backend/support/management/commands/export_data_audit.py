@@ -3,6 +3,7 @@ import logging
 import support.export_audit_sql as export_audit_sql
 
 from config import settings
+from datetime import datetime
 from django.core.management.base import BaseCommand, CommandError
 from sling import Replication, ReplicationStream
 
@@ -25,23 +26,10 @@ FAC_DB_URL = (
 DEFAULT_OPTIONS = {
     "target_options": {
         "format": "csv",
-        "compression": "gzip",
+        "compression": "none",
         "file_max_rows": 0,
     }
 }
-valid_years = [
-    "2016",
-    "2017",
-    "2018",
-    "2019",
-    "2020",
-    "2021",
-    "2022",
-    "2023",
-    "2024",
-    "2025",
-    "all",
-]
 
 
 class StreamGenerator:
@@ -58,6 +46,17 @@ class StreamGenerator:
                 sql=self.query.format(
                     table_name=self.table_name, audit_year=audit_year
                 ),
+                mode="full-refresh",
+                target_options={"format": "csv"},
+            ),
+        )
+
+    def generate_stream_all(self):
+        return (
+            f"{self.table_name}",
+            ReplicationStream(
+                object=f"bulk_export/{{MM}}/{self.friendly_name}.csv",
+                sql=self.query.format(table_name=self.table_name),
                 mode="full-refresh",
                 target_options={"format": "csv"},
             ),
@@ -118,17 +117,70 @@ STREAM_GENERATORS = [
 ]
 
 
+STREAM_GENERATORS_ALL = [
+    StreamGenerator(
+        friendly_name="General",
+        table_name="general_information",
+        query=export_audit_sql.select_all_general_information,
+    ),
+    StreamGenerator(
+        friendly_name="AdditionalEIN",
+        table_name="additional_eins",
+        query=export_audit_sql.select_all_additional_eins,
+    ),
+    StreamGenerator(
+        friendly_name="AdditionalUEI",
+        table_name="additional_ueis",
+        query=export_audit_sql.select_all_additional_ueis,
+    ),
+    StreamGenerator(
+        friendly_name="CorrectiveActionPlans",
+        table_name="corrective_action_plan",
+        query=export_audit_sql.select_all_corrective_action_plans,
+    ),
+    StreamGenerator(
+        friendly_name="FederalAward",
+        table_name="federal_awards",
+        query=export_audit_sql.select_all_federal_awards,
+    ),
+    StreamGenerator(
+        friendly_name="Finding",
+        table_name="findings_uniform_guidance",
+        query=export_audit_sql.select_all_findings,
+    ),
+    StreamGenerator(
+        friendly_name="FindingText",
+        table_name="findings_text",
+        query=export_audit_sql.select_all_findings_text,
+    ),
+    StreamGenerator(
+        friendly_name="Note",
+        table_name="notes_to_sefa",
+        query=export_audit_sql.select_all_notes_to_sefa,
+    ),
+    StreamGenerator(
+        friendly_name="PassThrough",
+        table_name="passthrough",
+        query=export_audit_sql.select_all_passthrough,
+    ),
+    StreamGenerator(
+        friendly_name="SecondaryAuditor",
+        table_name="secondary_auditors",
+        query=export_audit_sql.select_all_secondary_auditors,
+    ),
+]
+
+
 @newrelic_timing_metric("data_export")
 def _run_data_export(year):
     logger.info(f"Begin exporting data from audit table for year={year}")
-
-    if year == "all":
-        years = range(int(valid_years[0]), int(valid_years[-2]) + 1)
-    else:
-        years = [year]
+    print(f"Begin exporting data from audit table for year={year}\n")
 
     streams = {}
-    for year in years:
+    if year == "all":
+        for stream_generator in STREAM_GENERATORS_ALL:
+            streams.update([stream_generator.generate_stream_all()])
+    else:
         for stream_generator in STREAM_GENERATORS:
             streams.update([stream_generator.generate_stream(year)])
 
@@ -149,29 +201,32 @@ def _run_data_export(year):
 
 class Command(BaseCommand):
     help = """
-    Export dissemination data for audit years
-    2016/2017/2018/2019/2020/2021/2022/2023/2024/2025/all.
-    Default is 2024.
+    Export dissemination data for audit years >=2016/all.
+    Default is current year.
     """
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--year",
-            help="Year(2016 or 2017 or 2018 or 2019 or 2020 or 2021 or 2022 or 2023 or 2024 or 2025 or all)",
+            help="Year(>=2016 or all)",
             type=str,
-            default="2024",
+            default=datetime.today().year,
         )
 
     def is_year_invalid(self, year):
-        return year not in valid_years
+        if year != "all":
+            return int(year) < 2016
+        else:
+            return False
 
     def handle(self, *args, **options):
         year = options.get("year")
         if self.is_year_invalid(year):
-            print(
-                f"Invalid year {year}.  Expecting 2016 / 2017 / 2018 / 2019 / 2020 / 2021 / 2022 / 2023 / 2024 / 2025 / all"
-            )
+            print(f"Invalid year {year}.  Expecting >=2016 / all")
             return
+
+        if year != "all":
+            year = int(year)
 
         try:
             _run_data_export(year)
