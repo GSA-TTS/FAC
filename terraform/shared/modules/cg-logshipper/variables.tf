@@ -47,3 +47,8 @@ variable "new_relic_id" {
   type        = string
   description = "the full string of the new relic resource id"
 }
+
+variable "cf_space_id" {
+  type        = string
+  description = "the guid of the cf space"
+}

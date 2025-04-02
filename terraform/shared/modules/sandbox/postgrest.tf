@@ -3,12 +3,16 @@ locals {
 }
 
 resource "cloudfoundry_route" "postgrest" {
+  provider = cloudfoundry-community
+
   space    = data.cloudfoundry_space.apps.id
   domain   = data.cloudfoundry_domain.public.id
   hostname = "fac-${var.cf_space_name}-${local.postgrest_name}"
 }
 
 resource "cloudfoundry_service_key" "postgrest" {
+  provider = cloudfoundry-community
+
   name             = "postgrest"
   service_instance = module.database.instance_id
 }
@@ -18,6 +22,8 @@ data "docker_registry_image" "postgrest" {
 }
 
 resource "cloudfoundry_app" "postgrest" {
+  provider = cloudfoundry-community
+
   name         = local.postgrest_name
   space        = data.cloudfoundry_space.apps.id
   docker_image = "ghcr.io/gsa-tts/fac/postgrest@${data.docker_registry_image.postgrest.sha256_digest}"
