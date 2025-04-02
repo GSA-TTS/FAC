@@ -266,4 +266,17 @@ class Migration(migrations.Migration):
                 ),
             ],
         ),
+        migrations.AlterField(
+            model_name="audit",
+            name="audit_type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("single-audit", "Single Audit"),
+                    ("program-specific", "Program-Specific Audit"),
+                ],
+                max_length=20,
+                null=True,
+            ),
+        ),
     ]

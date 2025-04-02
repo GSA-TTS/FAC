@@ -138,8 +138,8 @@ EVENT_TYPES = (
 
 
 class AuditType:
-    SINGLE_AUDIT = "single_audit"
-    PROGRAM_SPECIFIC = "program_specific"
+    SINGLE_AUDIT = "single-audit"
+    PROGRAM_SPECIFIC = "program-specific"
 
 
 AUDIT_TYPE_CODES = (

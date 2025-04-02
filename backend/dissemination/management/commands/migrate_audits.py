@@ -144,7 +144,7 @@ class Command(BaseCommand):
                 History.objects.create(
                     event=event.event,
                     report_id=sac.report_id,
-                    audit=audit.audit,
+                    event_data=audit.audit,
                     version=0,
                     updated_at=event.timestamp,
                     updated_by=event.user,
