@@ -174,7 +174,6 @@ STREAM_GENERATORS_ALL = [
 @newrelic_timing_metric("data_export")
 def _run_data_export(year):
     logger.info(f"Begin exporting data from audit table for year={year}")
-    print(f"Begin exporting data from audit table for year={year}\n")
 
     streams = {}
     if year == "all":
