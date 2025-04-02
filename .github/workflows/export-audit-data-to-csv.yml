@@ -1,6 +1,8 @@
 ---
 name: Export Audit Data to CSV
 on:
+  on:
+  pull_request:
   workflow_dispatch:
     inputs:
       environment:
