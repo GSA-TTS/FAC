@@ -198,7 +198,7 @@ create view api_v1_2_0.general as
         a.audit->'general_information'->>'auditor_certified_date' as auditor_certified_date,
         a.audit->'general_information'->>'auditee_certified_date' as auditee_certified_date,
         a.audit->'general_information'->>'submitted_date' as submitted_date,
-        a.audit->'general_information'->>'fac_accepted_date' as fac_accepted_date,
+        a.audit->>'fac_accepted_date' as fac_accepted_date,
         a.audit->'general_information'->>'auditee_fiscal_period_end' as fy_end_date,
         a.audit->'general_information'->>'auditee_fiscal_period_start' as fy_start_date,
         a.audit->'general_information'->>'audit_type' as audit_type,

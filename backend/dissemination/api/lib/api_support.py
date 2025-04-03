@@ -72,7 +72,6 @@ def compare(
     environment="local",
     comparison_key="report_id",
     strict_order=True,
-    output_csv="",
 ):
 
     # The base headers are different in the local environment and in the cloud.
@@ -179,43 +178,5 @@ def compare(
         return True
     else:
         print("different")
-        # for r in result:
-        #     print(r)
-        # return False
-        # Collect all error pairs
-        all_errors = []
-        result_list = result if isinstance(result, list) else [result]
-        for r in result_list:
-            for error in r.get_errors():
-                all_errors.append(
-                    {
-                        "api_version_1": error.e1.version,
-                        "key_1": error.e1.key,
-                        "value_1": error.e1.value,
-                        "api_version_2": error.e2.version,
-                        "key_2": error.e2.key,
-                        "value_2": error.e2.value,
-                    }
-                )
-
-        # Write CSV if needed
-        if output_csv:
-            import csv
-
-            with open(output_csv, "w", newline="", encoding="utf-8") as f:
-                writer = csv.DictWriter(
-                    f,
-                    fieldnames=[
-                        "api_version_1",
-                        "key_1",
-                        "value_1",
-                        "api_version_2",
-                        "key_2",
-                        "value_2",
-                    ],
-                )
-                writer.writeheader()
-                writer.writerows(all_errors)
-            print(f"Mismatch results saved to {output_csv}")
-
-        return False
+        # print(result)
+        return result

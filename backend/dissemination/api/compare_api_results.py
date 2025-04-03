@@ -1,5 +1,6 @@
 from requests import get
 import argparse
+import csv
 
 
 from lib.api_support import (
@@ -34,11 +35,24 @@ def setup_parser():
     parser.add_argument("--start_date", type=str)
     parser.add_argument("--end_date", type=str)
     parser.add_argument(
-        "--output_csv", type=str, help="Path to save mismatch details (CSV)"
+        "--output_csv",
+        type=str,
+        help="Path to save mismatch details (CSV)",
+        default="STDOUT",
     )
-    parser.add_argument("--strict_order", type=bool, default=True)
+    # parser.add_argument("--strict_order", type=bool, default=True)
+    parser.add_argument("--strict_order", dest="strict_order", action="store_true")
+    parser.add_argument("--any_order", dest="strict_order", action="store_false")
+
     parser.add_argument("--comparison_key", type=str, default="report_id")
     return parser
+
+
+def null_string(v):
+    if v == None:
+        return "<null>"
+    else:
+        return v
 
 
 def main():
@@ -91,7 +105,7 @@ def main():
         print(f"--environment must be either `local` or `cloud`")
         sys.exit(-1)
 
-    compare(
+    result = compare(
         args.scheme,
         args.api_base_1,
         args.api_base_2,
@@ -105,8 +119,70 @@ def main():
         args.environment,
         args.comparison_key,
         args.strict_order,
-        args.output_csv,
     )
+
+    if isinstance(result, list):
+        # for r in result:
+        #     print(r)
+        # return False
+        # Collect all error pairs
+        all_errors = []
+        used_keys = set()
+
+        result_list = result if isinstance(result, list) else [result]
+        for r in result_list:
+            for error in r.get_errors():
+                if error.e1.key in used_keys:
+                    pass
+                elif error.e2.key in used_keys:
+                    pass
+                else:
+                    used_keys.add(error.e1.key)
+                    used_keys.add(error.e2.key)
+                    all_errors.append(
+                        {
+                            "error_type": error.type,
+                            "api_version_1": error.e1.version,
+                            "key_1": error.e1.key,
+                            "value_1": null_string(error.e1.value),
+                            "api_version_2": error.e2.version,
+                            "key_2": error.e2.key,
+                            "value_2": null_string(error.e2.value),
+                        }
+                    )
+
+        if args.output_csv == "STDOUT":
+            handle = sys.stdout
+        else:
+            handle = open(args.output_csv, "w", newline="", encoding="utf-8")
+
+        # Write CSV if needed
+        if args.output_csv:
+
+            separator = ","
+            quote = '"'
+            with handle as f:
+                writer = csv.DictWriter(
+                    f,
+                    fieldnames=[
+                        "error_type",
+                        "api_version_1",
+                        "key_1",
+                        "value_1",
+                        "api_version_2",
+                        "key_2",
+                        "value_2",
+                    ],
+                    delimiter=separator,
+                    quotechar=quote,
+                    quoting=csv.QUOTE_NONNUMERIC,
+                )
+                writer.writeheader()
+                writer.writerows(all_errors)
+            # print(f"Mismatch results saved to {args.output_csv}")
+
+            if handle is not sys.stdout:
+                handle.close()
 
 
 if __name__ in "__main__":
