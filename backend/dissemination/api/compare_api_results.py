@@ -33,7 +33,9 @@ def setup_parser():
 
     parser.add_argument("--start_date", type=str)
     parser.add_argument("--end_date", type=str)
-
+    parser.add_argument(
+        "--output_csv", type=str, help="Path to save mismatch details (CSV)"
+    )
     parser.add_argument("--strict_order", type=bool, default=True)
     parser.add_argument("--comparison_key", type=str, default="report_id")
     return parser
@@ -103,6 +105,7 @@ def main():
         args.environment,
         args.comparison_key,
         args.strict_order,
+        args.output_csv,
     )
 
 
