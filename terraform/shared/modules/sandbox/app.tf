@@ -23,10 +23,10 @@ module "fac-app" {
     ALLOWED_HOSTS         = "fac-${var.cf_space.name}.app.cloud.gov"
   }
   service_bindings = {
-    "${module.s3-private.bucket_name}" = ""
-    "${module.s3-private.bucket_name}" = ""
-    "${module.database.database_name}" = ""
-    "${module.snapshot-database.database_name}" = ""
+    "${module.s3-private.bucket_name}"                        = ""
+    "${module.s3-private.bucket_name}"                        = ""
+    "${module.database.database_name}"                        = ""
+    "${module.snapshot-database.database_name}"               = ""
     "${cloudfoundry_service_instance.newrelic_creds.name}"    = ""
     "${cloudfoundry_service_instance.proxy_credentials.name}" = ""
     "${module.logshipper.syslog_drain_name}"                  = ""
