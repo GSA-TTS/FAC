@@ -28,7 +28,7 @@ module "domain" {
 
   cf_org_name   = "gsa-tts-oros-fac"
   cf_space      = { id = data.cloudfoundry_space.space.id, name = "production" }
-  app_names     = ["gsa-fac"]
+  app_ids       = [data.cloudfoundry_app.fac_app.id]
   cdn_plan_name = "domain"
   domain_name   = "fac.gov"
   host_name     = "app"
@@ -41,4 +41,10 @@ data "cloudfoundry_org" "org" {
 data "cloudfoundry_space" "space" {
   name = "production"
   org  = data.cloudfoundry_org.org.id
+}
+
+data "cloudfoundry_app" "fac_app" {
+  name       = "gsa-fac"
+  space_name = var.cf_space_name
+  org_name   = "production"
 }
