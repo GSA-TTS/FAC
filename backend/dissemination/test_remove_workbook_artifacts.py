@@ -39,7 +39,7 @@ class RemovedWorkbookArtifactsTestCase(TestCase):
                 f"excel/{sac.report_id}--{excel_file_1.form_section}.xlsx",
                 f"excel/{sac.report_id}--{excel_file_2.form_section}.xlsx",
             ],
-            sac,
+            sac.report_id,
         )
 
     @patch("dissemination.remove_workbook_artifacts.delete_files_in_bulk")

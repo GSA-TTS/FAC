@@ -262,6 +262,8 @@ class AuditSearch(View):
             request,
             "search-audit.html",
             {
+                "is_beta": True,
+                "non_beta_url": "dissemination:Search",
                 "form": form,
                 "form_user_input": {"audit_year": default_checked_audit_years},
                 "state_abbrevs": STATE_ABBREVS,
