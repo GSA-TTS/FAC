@@ -62,6 +62,24 @@ class StreamGenerator:
             ),
         )
 
+    def generate_fed_year_stream(self, audit_year):
+        prev_audit_year = audit_year - 1
+        fac_accepted_date_start = str(prev_audit_year) + "-10-31"
+        fac_accepted_date_end = str(audit_year) + "-09-30"
+        return (
+            f"{self.table_name}_Federal_year.{audit_year}",
+            ReplicationStream(
+                object=f"bulk_export/{{MM}}/{audit_year}_{self.friendly_name}.csv",
+                sql=self.query.format(
+                    table_name=self.table_name,
+                    fac_accepted_date_start=fac_accepted_date_start,
+                    fac_accepted_date_end=fac_accepted_date_end,
+                ),
+                mode="full-refresh",
+                target_options={"format": "csv"},
+            ),
+        )
+
 
 STREAM_GENERATORS = [
     StreamGenerator(
@@ -171,6 +189,60 @@ STREAM_GENERATORS_ALL = [
 ]
 
 
+STREAM_GENERATORS_FEDERAL_YEAR = [
+    StreamGenerator(
+        friendly_name="General_Federal_year",
+        table_name="general_information",
+        query=export_audit_sql.select_fed_year_general_information,
+    ),
+    StreamGenerator(
+        friendly_name="AdditionalEIN_Federal_year",
+        table_name="additional_eins",
+        query=export_audit_sql.select_fed_year_additional_eins,
+    ),
+    StreamGenerator(
+        friendly_name="AdditionalUEI_Federal_year",
+        table_name="additional_ueis",
+        query=export_audit_sql.select_fed_year_additional_ueis,
+    ),
+    StreamGenerator(
+        friendly_name="CorrectiveActionPlans_Federal_year",
+        table_name="corrective_action_plan",
+        query=export_audit_sql.select_fed_year_corrective_action_plans,
+    ),
+    StreamGenerator(
+        friendly_name="FederalAward_Federal_year",
+        table_name="federal_awards",
+        query=export_audit_sql.select_fed_year_federal_awards,
+    ),
+    StreamGenerator(
+        friendly_name="Finding_Federal_year",
+        table_name="findings_uniform_guidance",
+        query=export_audit_sql.select_fed_year_findings,
+    ),
+    StreamGenerator(
+        friendly_name="FindingText_Federal_year",
+        table_name="findings_text",
+        query=export_audit_sql.select_fed_year_findings_text,
+    ),
+    StreamGenerator(
+        friendly_name="Note_Federal_year",
+        table_name="notes_to_sefa",
+        query=export_audit_sql.select_fed_year_notes_to_sefa,
+    ),
+    StreamGenerator(
+        friendly_name="PassThrough_Federal_year",
+        table_name="passthrough",
+        query=export_audit_sql.select_fed_year_passthrough,
+    ),
+    StreamGenerator(
+        friendly_name="SecondaryAuditor_Federal_year",
+        table_name="secondary_auditors",
+        query=export_audit_sql.select_fed_year_secondary_auditors,
+    ),
+]
+
+
 @newrelic_timing_metric("data_export")
 def _run_data_export(year):
     logger.info(f"Begin exporting data from audit table for year={year}")
@@ -182,6 +254,8 @@ def _run_data_export(year):
     else:
         for stream_generator in STREAM_GENERATORS:
             streams.update([stream_generator.generate_stream(year)])
+        for stream_generator in STREAM_GENERATORS_FEDERAL_YEAR:
+            streams.update([stream_generator.generate_fed_year_stream(year)])
 
     replication = Replication(
         source="FAC_DB",
