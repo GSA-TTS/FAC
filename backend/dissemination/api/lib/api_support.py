@@ -1,8 +1,6 @@
 from requests import get
 
-from lib.compare_json_objects import (
-    compare_lists_of_json_objects as clojo,
-)
+from lib.compare_json_objects import compare_lists_of_json_objects as clojo, Result
 
 import os
 import sys
@@ -162,6 +160,10 @@ def compare(
     # The order is strict, meaning we expect API version 1 to return objects in exactly
     # the same order as objects in version 2. We can change that, which will allow for order
     # to vary... but, we have a number of data endpoints that *require* the correct sort order.
+
+    # Either returns:
+    #  - A single Result object, or
+    #  - A list of Result objects
     result = clojo(
         list_of_objects1.json(),
         list_of_objects2.json(),
@@ -169,9 +171,11 @@ def compare(
         strict_order=strict_order,
     )
 
-    if result:
+    if isinstance(result, Result) and result:
         print("identical")
         return True
     else:
-        print("different")
+        # print("different")
+        for r in result:
+            print(r)
         return False

@@ -1,39 +1,101 @@
 import random
 
+# To make understanding differences easier, all the functions will return
+# objects instead of booleans.
 
-def andmap(ls) -> bool:
+
+class APIValue:
+    def __init__(self, version, key, value):
+        self.version = version
+        self.key = key
+        self.value = value
+
+
+class ErrorPair:
+    def __init__(self, e1, e2):
+        self.e1 = e1
+        self.e2 = e2
+
+
+class Result:
+    def __init__(self, b, error_pair=None):
+        self.bool = b
+        self.errors = []
+        if error_pair:
+            self.errors.append(error_pair)
+
+    def add_error(self, error_pair):
+        self.errors.append(error_pair)
+
+    def set_result(self, b):
+        self.bool = b
+
+    def get_errors(self):
+        return self.errors
+
+    def __bool__(self):
+        return self.bool
+
+    def __str__(self):
+        return "\n".join([f"{e['key']}: {e['message']}" for e in self.errors])
+
+
+def andmap(ls):
     result = True
     for v in ls:
         result = result and v
-    return result
+    return Result(result)
 
 
-def check_dictionaries_have_same_keys(o1, o2):
+def check_dictionaries_have_same_keys(v1, o1, v2, o2):
     key_set_1 = set(o1.keys())
     key_set_2 = set(o2.keys())
     result = key_set_1 == key_set_2
+    R = Result(result)
     if not result:
-        print("keys different between objects:", key_set_1 - key_set_2)
-    return result
+        for k in key_set_1:
+            if k not in key_set_2:
+                R.add_error(ErrorPair(APIValue(v1, k, k), APIValue(v2, k, None)))
+        for k in key_set_2:
+            if k not in key_set_1:
+                R.add_error(ErrorPair(APIValue(v1, k, None), APIValue(v2, k, k)))
+    return R
 
 
-def check_dictionaries_have_same_values(o1, o2):
+def check_dictionaries_have_same_values(v1, o1, v2, o2):
     val_set_1 = set(o1.values())
     val_set_2 = set(o2.values())
     result = val_set_1 == val_set_2
+    R = Result(result)
     if not result:
-        print("values different between objects:", {val_set_1 - val_set_2})
-    return result
+        for v in val_set_1:
+            if v not in val_set_2:
+                # R.add_error("mismatched value", f"'{v}' not in object 2")
+                R.add_error(ErrorPair(APIValue(v1, v, v), APIValue(v2, v, None)))
+        for v in val_set_2:
+            if v not in val_set_1:
+                # R.add_error("mismatched value", f"'{v}' not in object 1")
+                R.add_error(ErrorPair(APIValue(v1, v, None), APIValue(v2, v, v)))
+    return R
 
 
-def check_dictionaries_have_same_mappings(o1, o2):
+def check_dictionaries_have_same_mappings(v1, o1, v2, o2):
+    R = Result(True)
     for k in o1.keys():
         if o1[k] == o2[k]:
             pass
         else:
-            print(f"mapping different for {k}; o1: {o1[k]} o2: {o2[k]}")
-            return False
-    return True
+            # R.add_error(f"wrong mapping for '{k}", f"o1<-'{o1[k]}' o2<-'{o2[k]}'")
+            R.add_error(ErrorPair(APIValue(v1, k, o1[k]), APIValue(v2, k, o2[k])))
+            R.set_result(False)
+    for k in o2.keys():
+        if o1[k] == o2[k]:
+            pass
+        else:
+            # R.add_error(f"wrong mapping for '{k}", f"o1<-'{o1[k]}' o2<-'{o2[k]}'")
+            R.add_error(ErrorPair(APIValue(v1, k, o1[k]), APIValue(v2, k, o2[k])))
+            R.set_result(False)
+    return R
 
 
 def compare_json_objects(o1: dict, o2: dict) -> bool:
@@ -42,27 +104,30 @@ def compare_json_objects(o1: dict, o2: dict) -> bool:
     # o1 must have the same values as o2
     # the mapping from [k1, v1] must be the same for [k2, v2]
 
-    # Check if the keys for both objects are the same
-    if not check_dictionaries_have_same_keys(o1, o2):
-        print("object keys are not equal")
-        return False
-
-    if not check_dictionaries_have_same_values(o1, o2):
-        print("object values are not equal")
-        return False
-
     # At this point, we have the same keys and the same
     # values in each object. Now, we have to make sure
     # that the keys in o1 and o2 map to identical values.
-    if not check_dictionaries_have_same_mappings(o1, o2):
+    cdhsm = check_dictionaries_have_same_mappings(o1, o2)
+    if not cdhsm:
         print(f"mappings not identical in objects")
-        return False
+        return cdhsm
+
+    # Check if the keys for both objects are the same
+    cdhsk = check_dictionaries_have_same_keys(o1, o2)
+    if not cdhsk:
+        return cdhsk
+
+    cdhsv = check_dictionaries_have_same_values(o1, o2)
+    if not cdhsv:
+        return cdhsv
 
     # If we made it this far, we think they are the same.
-    return True
+    return Result(True)
 
 
-def compare_any_order(l1: list, l2: list, comparison_key: str = "report_id") -> list:
+def compare_any_order(
+    v1, l1: list, v2, l2: list, comparison_key: str = "report_id"
+) -> list:
     results = []
     for o1 in l1:
         to_compare = None
@@ -74,22 +139,37 @@ def compare_any_order(l1: list, l2: list, comparison_key: str = "report_id") -> 
         # We *should* be able to guarantee order.
         for o2 in l2:
             if comparison_key in o2 and o1[comparison_key] == o2[comparison_key]:
-                # print(f"Comparing against 1 {o2}")
                 to_compare = o2
                 break
 
         # If we can't find an object to compare to, we might
         # as well record a false and break now.
-        # print(f"Comparing against 2 {to_compare}")
         if not to_compare:
-            print(f"No object found for comparison")
-            results.append(False)
+            # print(f"No object found for comparison")
+            results.append(
+                # Result(False, "empty comparison", "no object found to compare against")
+                Result(
+                    False,
+                    ErrorPair(
+                        APIValue(v1, comparison_key, o1[comparison_key]),
+                        APIValue(v2, None, None),
+                    ),
+                )
+            )
             break
         elif o1[comparison_key] == to_compare[comparison_key]:
             results.append(compare_json_objects(o1, to_compare))
         else:
             print(f"Values do not match for key {comparison_key}")
-            results.append(False)
+            results.append(
+                Result(
+                    False,
+                    ErrorPair(
+                        APIValue(v1, comparison_key, o1[comparison_key]),
+                        APIValue(v2, comparison_key, to_compare[comparison_key]),
+                    ),
+                )
+            )
             break
     return results
 
@@ -101,11 +181,18 @@ def compare_strict_order(l1: list, l2: list) -> list:
     return results
 
 
-def check_lists_same_length(l1, l2):
+def check_lists_same_length(v1, l1, v2, l2):
     result = len(l1) == len(l2)
-    # if not result:
-    #     print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
-    return result
+    if result:
+        return Result(True)
+    else:
+        return Result(
+            False,
+            ErrorPair(
+                APIValue(v1, "list_length", len(l1)),
+                APIValue(v2, "list_length", len(l2)),
+            ),
+        )
 
 
 KEY_IN_BOTH = 0
@@ -122,39 +209,49 @@ def check_key_in_both_lists(l1, l2, comparison_key):
     return KEY_IN_BOTH
 
 
-def check_equal_values_for_key(l1, l2, comparison_key):
+def check_equal_values_for_key(v1, l1, v2, l2, comparison_key):
     kv1 = set(map(lambda o: o[comparison_key], l1))
     kv2 = set(map(lambda o: o[comparison_key], l2))
     result = kv1 == kv2
+    R = Result(result)
     if not result:
-        print(f"key `{comparison_key}` returned different values: {kv1 - kv2}")
-    return result
+        # R.add_error(f"{comparison_key} returned different values", f"{kv1 - kv2}")
+        R.add_error(
+            ErrorPair(
+                APIValue(v1, comparison_key, kv1), APIValue(v2, comparison_key, kv2)
+            )
+        )
+    return R
 
 
 # Compares two lists of JSON objects
 # Uses the key to find which objects should be compared
 def compare_lists_of_json_objects(
-    l1: list, l2: list, comparison_key: str = "report_id", strict_order=True
+    v1, l1: list, v2, l2: list, comparison_key: str = "report_id", strict_order=True
 ) -> bool:
 
     # The lists must be the same length
-    if not check_lists_same_length(l1, l2):
-        print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
-        return False
+    clsl = check_lists_same_length(v1, l1, v2, l2)
+    if not clsl:
+        # print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
+        return clsl
 
     # Make sure all objects in both lists all have they key
-    key_in_lists = check_key_in_both_lists(l1, l2, comparison_key)
+    key_in_lists = check_key_in_both_lists(v1, l1, v2, l2, comparison_key)
     if key_in_lists == KEY_IN_BOTH:
         pass
     elif key_in_lists == KEY_MISSING_L1:
-        print(f"key {comparison_key} missing in l1")
-        return False
+        return Result(
+            False,
+            ErrorPair(
+                APIValue(v1, comparison_key, None), APIValue(v2, comparison_key, True)
+            ),
+        )
     elif key_in_lists == KEY_MISSING_L2:
-        print(f"key {comparison_key} missing in l2")
-        return False
+        return Result(False, "comparison key missing in l2", comparison_key)
     else:
         print("impossible key check condition found; should never be here.")
-        return False
+        return Result(False, "impossible condition", "should not be here")
 
     # The set of values in l1 for this key must be the same as the set of
     # values in l2 for this key.
@@ -171,5 +268,7 @@ def compare_lists_of_json_objects(
     and_mapped = True
     for r in results:
         and_mapped = and_mapped and r
-    # print(f"andmap: {and_mapped}")
-    return and_mapped
+    if and_mapped:
+        return Result(True)
+    else:
+        return results
