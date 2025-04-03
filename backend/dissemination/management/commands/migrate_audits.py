@@ -41,15 +41,15 @@ from audit.intakelib.mapping_notes_to_sefa import notes_to_sefa_audit_view
 from audit.intakelib.mapping_secondary_auditors import secondary_auditors_audit_view
 from audit.models import (
     Access,
-    DeletedAccess,
     Audit,
-    User,
+    AuditValidationWaiver,
+    DeletedAccess,
     ExcelFile,
+    SacValidationWaiver,
     SingleAuditReportFile,
     SingleAuditChecklist,
     SubmissionEvent,
-    SacValidationWaiver,
-    AuditValidationWaiver,
+    User,
 )
 from audit.models.history import History
 from audit.models.constants import STATUS
@@ -121,6 +121,7 @@ class Command(BaseCommand):
                 # FOR DEBUGGING
                 # Change the email to your local user (make sure you login once after app startup).
                 event_user=User.objects.get(email="robert.novak@gsa.gov"),
+                created_by=sac.submitted_by,
                 audit=audit_data,
                 report_id=sac.report_id,
                 submission_status=sac.submission_status,
@@ -144,7 +145,7 @@ class Command(BaseCommand):
                 History.objects.create(
                     event=event.event,
                     report_id=sac.report_id,
-                    audit=audit.audit,
+                    event_data=audit.audit,
                     version=0,
                     updated_at=event.timestamp,
                     updated_by=event.user,

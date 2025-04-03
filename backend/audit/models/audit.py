@@ -29,10 +29,11 @@ class AuditManager(models.Manager):
     def create(self, **obj_data):
         user = obj_data.pop("event_user")
         event_type = obj_data.pop("event_type")
+        created_by = obj_data.pop("created_by") if "created_by" in obj_data else user
         end_date = obj_data["audit"]["general_information"]["auditee_fiscal_period_end"]
         report_id = (
             obj_data.pop("report_id")
-            if obj_data.get("report_id", None)
+            if "report_id" in obj_data
             else generate_sac_report_id(
                 count=self.model.objects.count(), end_date=end_date
             )
@@ -42,7 +43,7 @@ class AuditManager(models.Manager):
         updated = obj_data | {
             "report_id": report_id,
             "version": version,
-            "created_by": user,
+            "created_by": created_by,
             "updated_by": user,
         }
         with transaction.atomic():
@@ -282,6 +283,12 @@ class Audit(CreatedMixin, UpdatedMixin):
             .first()
         )
         return history.updated_by if history else None
+
+    @property
+    def auditee_fiscal_period_end(self):
+        return self.audit.get("general_information", {}).get(
+            "auditee_fiscal_period_end"
+        )
 
     class Meta:
         # Uncomment this line should we decide to make disseminated reports immutable in resubmission

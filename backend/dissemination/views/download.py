@@ -135,11 +135,14 @@ class SingleSummaryReportDownloadView(View):
         redirect to its download link.
         """
         use_audit = request.GET.get("beta", "N") == "Y"
+        if use_audit:
+            get_object_or_404(Audit, report_id=report_id)
+        else:
+            get_object_or_404(General, report_id=report_id)
 
-        sac = get_object_or_404(General, report_id=report_id)
         include_private = include_private_results(request)
         filename, workbook_bytes = (
-            generate_summary_report([sac.report_id], include_private)
+            generate_summary_report([report_id], include_private)
             if not use_audit
             else generate_audit_summary_report([report_id], include_private)
         )
