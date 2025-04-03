@@ -1,0 +1,6 @@
+*.csv
+*.zip
+*.tar
+*.gz
+*.dump
+__MACOSX

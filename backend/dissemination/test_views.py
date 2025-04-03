@@ -946,7 +946,7 @@ class PageHandlingTests(TestCase):
             "page": "1",
         }
 
-    @patch("dissemination.views.run_search")
+    @patch("dissemination.views.search.run_search")
     def test_advanced_search_post_page_too_high(self, mock_run_search):
         """Ensure page resets to 1 when the requested page is greater than available pages"""
         mock_run_search.return_value.count.return_value = (
@@ -960,7 +960,7 @@ class PageHandlingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should reset to 1
 
-    @patch("dissemination.views.run_search")
+    @patch("dissemination.views.search.run_search")
     def test_advanced_search_post_page_zero(self, mock_run_search):
         """Ensure page resets to 1 when the requested page is zero"""
         mock_run_search.return_value.count.return_value = 5
@@ -972,7 +972,7 @@ class PageHandlingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should reset to 1
 
-    @patch("dissemination.views.run_search")
+    @patch("dissemination.views.search.run_search")
     def test_advanced_search_post_page_empty(self, mock_run_search):
         """Ensure page defaults to 1 when no page is provided"""
         mock_run_search.return_value.count.return_value = 5
@@ -984,7 +984,7 @@ class PageHandlingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should default to 1
 
-    @patch("dissemination.views.run_search")
+    @patch("dissemination.views.search.run_search")
     def test_advanced_search_post_valid_page(self, mock_run_search):
         """Ensure valid page number remains unchanged"""
         mock_run_search.return_value.count.return_value = 20  # Multiple pages exist

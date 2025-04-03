@@ -186,6 +186,7 @@ def add_custom_field_to_log(sender, instance, created, **kwargs):
     if created:
         model_class = instance.content_type.model_class()
         qset = model_class.objects.filter(pk=instance.object_id)
+        obj = None
         if qset.exists():
             obj = qset.first()
 

@@ -1,8 +1,10 @@
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import MultipleObjectsReturned
 from django.db import models
 from django.db.models import Q
+
 from .access_roles import ACCESS_ROLES
 from .deleted_access import DeletedAccess
 from .models import (
@@ -55,6 +57,20 @@ class AccessManager(models.Manager):
                 user=event_user,
                 event=event_type,
             )
+            if result.audit:
+                event_data = {
+                    "access": event_type,
+                    "email": obj_data["email"],
+                    "role": obj_data["role"],
+                    "user": obj_data["user"].id if obj_data.get("user") else "None",
+                }
+                apps.get_model("audit.History").objects.create(
+                    event=event_type,
+                    report_id=result.audit.report_id,
+                    version=result.audit.version,
+                    event_data=event_data,
+                    updated_by=event_user,
+                )
 
         return result
 
@@ -157,6 +173,15 @@ def remove_email_from_submission_access(
     """
     sac = SingleAuditChecklist.objects.get(report_id=report_id)
     accesses = Access.objects.filter(sac=sac, email=email, role=role)
+
+    audit = apps.get_model("audit.Audit").objects.find_audit_or_none(
+        report_id=report_id
+    )
+    audit_accesses = (
+        Access.objects.filter(audit=audit, email=email, role=role) if audit else None
+    )
+    _compare_access(accesses, audit_accesses)
+
     if len(accesses) < 1:
         raise Access.DoesNotExist
     deletion_records: list[tuple[tuple[int, dict], DeletedAccess]] = []
@@ -186,5 +211,25 @@ def delete_access_and_create_record(
         removal_event=event,
     )
     deletion_record.save()
+
+    if access.audit:
+        event_data = {
+            "access": event,
+            "email": access.email,
+            "role": access.role,
+            "user_id": access.user.id if access.user else "None",
+        }
+        apps.get_model("audit.History").objects.create(
+            event=event,
+            report_id=access.audit.report_id,
+            version=access.audit.version,
+            event_data=event_data,
+            updated_by=removing_user,
+        )
+
     access_deletion_return = super(Access, access).delete()
     return access_deletion_return, deletion_record
+
+
+def _compare_access(sac_accesses, audit_accesses):
+    pass
