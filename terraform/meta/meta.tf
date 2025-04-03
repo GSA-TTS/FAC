@@ -13,7 +13,7 @@ data "cloudfoundry_org" "org" {
 # This id is accessed with data.cloudfoundry_user.meta_deployer.users.0.id
 # https://registry.terraform.io/providers/cloudfoundry/cloudfoundry/latest/docs/data-sources/user#nested-schema-for-users
 data "cloudfoundry_user" "meta_deployer" {
-  name     = var.cf_user
+  name = var.cf_user
 }
 
 module "environments" {
@@ -52,7 +52,7 @@ data "cloudfoundry_space" "space" {
 }
 
 module "s3-backups" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
+  source       = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
   cf_space_id  = data.cloudfoundry_space.space.id
   name         = "backups"
   s3_plan_name = "basic"
