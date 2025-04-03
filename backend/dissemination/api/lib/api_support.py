@@ -147,6 +147,9 @@ def compare(
     for ndx, loo in enumerate([list_of_objects1, list_of_objects2]):
         if loo.status_code != 200:
             print(f"did not get status 200 for url {ndx}. exiting.")
+            print(f"url: {[url_1, url_2][ndx]}")
+            print(f"{loo.status_code}: {loo.reason}")
+            print(f"headers: {[headers_1, headers_2][ndx]}")
             sys.exit(-1)
 
     # print(list_of_objects1.json())

@@ -103,8 +103,8 @@ def compare_strict_order(l1: list, l2: list) -> list:
 
 def check_lists_same_length(l1, l2):
     result = len(l1) == len(l2)
-    if not result:
-        print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
+    # if not result:
+    #     print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
     return result
 
 
@@ -139,7 +139,7 @@ def compare_lists_of_json_objects(
 
     # The lists must be the same length
     if not check_lists_same_length(l1, l2):
-        print(f"len(l1) <- {len(l1)}, len(l2) <- {len(l2)}")
+        print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
         return False
 
     # Make sure all objects in both lists all have they key
