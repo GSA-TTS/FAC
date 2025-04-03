@@ -207,5 +207,5 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 def _compare_progress_check(sac_result, audit_result):
     if sac_result != audit_result:
         logger.error(
-            f"<SOT ERROR> Submission check failure SAC: {sac_result} Audit: {audit_result}"
+            f"<SOT ERROR> Submission check progress failure SAC: {sac_result} Audit: {audit_result}"
         )

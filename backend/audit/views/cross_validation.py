@@ -61,11 +61,23 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
 # TODO: Post SOT Launch: Deletes
 def _compare_errors(sac_errors, audit_errors):
-    if (
-        (sac_errors and not audit_errors)
-        or (audit_errors and not sac_errors)
-        or (sac_errors) != set(audit_errors)
-    ):
+    # We will ignore some meta-data
+    sac = sac_errors.copy() if sac_errors else dict({"data": {}})
+    audit = audit_errors.copy() if audit_errors else dict({"data": {}})
+
+    sac_metadata = sac.get("data", {}).get("sf_sac_meta", {})
+    audit_metadata = audit.get("data", {}).get("sf_sac_meta", {})
+
+    remove_fields = ("date_created", "transition_name", "transition_date")
+    for field in remove_fields:
+        if field in sac_metadata:
+            del sac_metadata[field]
+        if field in audit_metadata:
+            del audit_metadata[field]
+
+    sac["data"]["sf_sac_meta"] = sac_metadata
+    audit["data"]["sf_sac_meta"] = audit_metadata
+    if (sac and not audit) or (audit and not sac) or (sac) != (audit):
         logger.error(
-            f"<SOT ERROR> Cross Validation Errors do not match: SAC {sac_errors}, Audit {audit_errors}"
+            f"<SOT ERROR> Cross Validation does not match: SAC {sac}, Audit {audit}"
         )
