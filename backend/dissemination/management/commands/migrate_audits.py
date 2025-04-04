@@ -133,19 +133,27 @@ class Command(BaseCommand):
             # convert additional fields.
             if sac.submission_status == STATUS.DISSEMINATED:
                 audit.audit.update(generate_audit_indexes(audit))
+
+                # re-adjust cog/over afterwards.
+                audit.cognizant_agency = sac.cognizant_agency
+                audit.oversight_agency = sac.oversight_agency
+                audit.audit["cognizant_agency"] = sac.cognizant_agency
+                audit.audit["oversight_agency"] = sac.oversight_agency
+
             audit.save()
 
             # copy SubmissionEvents into History records.
             events = SubmissionEvent.objects.filter(sac=sac)
             for event in events:
-                History.objects.create(
+                history = History.objects.create(
                     event=event.event,
                     report_id=sac.report_id,
                     event_data=audit.audit,
                     version=0,
-                    updated_at=event.timestamp,
                     updated_by=event.user,
                 )
+                history.updated_at = event.timestamp
+                history.save()
 
             # assign audit reference to file-based models.
             SingleAuditReportFile.objects.filter(sac=sac).update(audit=audit)
