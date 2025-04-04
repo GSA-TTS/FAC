@@ -41,13 +41,15 @@ from audit.intakelib.mapping_notes_to_sefa import notes_to_sefa_audit_view
 from audit.intakelib.mapping_secondary_auditors import secondary_auditors_audit_view
 from audit.models import (
     Access,
-    DeletedAccess,
     Audit,
-    User,
+    AuditValidationWaiver,
+    DeletedAccess,
     ExcelFile,
+    SacValidationWaiver,
     SingleAuditReportFile,
     SingleAuditChecklist,
     SubmissionEvent,
+    User,
 )
 from audit.models.history import History
 from audit.models.constants import STATUS
@@ -115,9 +117,11 @@ class Command(BaseCommand):
         if not Audit.objects.filter(report_id=sac.report_id).exists():
             audit = Audit.objects.create(
                 event_type="MIGRATION",
+                data_source=sac.data_source,
                 # FOR DEBUGGING
                 # Change the email to your local user (make sure you login once after app startup).
                 event_user=User.objects.get(email="robert.novak@gsa.gov"),
+                created_by=sac.submitted_by,
                 audit=audit_data,
                 report_id=sac.report_id,
                 submission_status=sac.submission_status,
@@ -141,7 +145,7 @@ class Command(BaseCommand):
                 History.objects.create(
                     event=event.event,
                     report_id=sac.report_id,
-                    audit=audit.audit,
+                    event_data=audit.audit,
                     version=0,
                     updated_at=event.timestamp,
                     updated_by=event.user,
@@ -150,6 +154,23 @@ class Command(BaseCommand):
             # assign audit reference to file-based models.
             SingleAuditReportFile.objects.filter(sac=sac).update(audit=audit)
             ExcelFile.objects.filter(sac=sac).update(audit=audit)
+
+            # copy SacValidationWaivers.
+            if not AuditValidationWaiver.objects.filter(
+                report_id=sac.report_id
+            ).exists():
+                waivers = SacValidationWaiver.objects.filter(report_id=sac.report_id)
+                for waiver in waivers:
+                    AuditValidationWaiver.objects.create(
+                        report_id=sac.report_id,
+                        timestamp=waiver.timestamp,
+                        approver_email=waiver.approver_email,
+                        approver_name=waiver.approver_name,
+                        requester_email=waiver.requester_email,
+                        requester_name=waiver.requester_name,
+                        justification=waiver.justification,
+                        waiver_types=waiver.waiver_types,
+                    )
 
 
 def _get_query(kwargs, max_records):
@@ -227,7 +248,7 @@ def _convert_passthrough(sac: SingleAuditChecklist):
             entities = award.get("direct_or_indirect_award", {}).get("entities", [])
             for entity in entities:
                 passthrough = {
-                    "award_reference": entity.get("award_reference", ""),
+                    "award_reference": award.get("award_reference", ""),
                     "passthrough_id": entity.get("passthrough_identifying_number", ""),
                     "passthrough_name": entity.get("passthrough_name", ""),
                 }

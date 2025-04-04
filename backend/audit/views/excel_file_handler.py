@@ -16,11 +16,11 @@ from audit.models import (
     ExcelFile,
     LateChangeError,
     SingleAuditChecklist,
-    SubmissionEvent,
     Audit,
 )
 
 from audit.intakelib.exceptions import ExcelExtractionError
+from audit.models.constants import EventType
 from audit.utils import FORM_SECTION_HANDLERS
 
 from audit.context import set_sac_to_context
@@ -47,14 +47,14 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
     def _event_type(self, form_section):
         return {
-            FORM_SECTIONS.ADDITIONAL_EINS: SubmissionEvent.EventType.ADDITIONAL_EINS_UPDATED,
-            FORM_SECTIONS.ADDITIONAL_UEIS: SubmissionEvent.EventType.ADDITIONAL_UEIS_UPDATED,
-            FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: SubmissionEvent.EventType.CORRECTIVE_ACTION_PLAN_UPDATED,
-            FORM_SECTIONS.FEDERAL_AWARDS: SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
-            FORM_SECTIONS.FINDINGS_TEXT: SubmissionEvent.EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED,
-            FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: SubmissionEvent.EventType.FINDINGS_UNIFORM_GUIDANCE_UPDATED,
-            FORM_SECTIONS.NOTES_TO_SEFA: SubmissionEvent.EventType.NOTES_TO_SEFA_UPDATED,
-            FORM_SECTIONS.SECONDARY_AUDITORS: SubmissionEvent.EventType.SECONDARY_AUDITORS_UPDATED,
+            FORM_SECTIONS.ADDITIONAL_EINS: EventType.ADDITIONAL_EINS_UPDATED,
+            FORM_SECTIONS.ADDITIONAL_UEIS: EventType.ADDITIONAL_UEIS_UPDATED,
+            FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: EventType.CORRECTIVE_ACTION_PLAN_UPDATED,
+            FORM_SECTIONS.FEDERAL_AWARDS: EventType.FEDERAL_AWARDS_UPDATED,
+            FORM_SECTIONS.FINDINGS_TEXT: EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED,
+            FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: EventType.FINDINGS_UNIFORM_GUIDANCE_UPDATED,
+            FORM_SECTIONS.NOTES_TO_SEFA: EventType.NOTES_TO_SEFA_UPDATED,
+            FORM_SECTIONS.SECONDARY_AUDITORS: EventType.SECONDARY_AUDITORS_UPDATED,
         }[form_section]
 
     def _extract_and_validate_data(self, form_section, excel_file, auditee_uei):

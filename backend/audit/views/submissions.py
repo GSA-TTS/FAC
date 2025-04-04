@@ -217,5 +217,5 @@ def _friendly_status(status):
 def _compare_errors(sac_errors, audit_errors):
     if (sac_errors and audit_errors) and set(sac_errors) != set(audit_errors):
         logger.error(
-            f"<SOT ERROR> Cross Validation Errors do not match: SAC {sac_errors}, Audit {audit_errors}"
+            f"<SOT ERROR> Submission Errors do not match: SAC {sac_errors}, Audit {audit_errors}"
         )

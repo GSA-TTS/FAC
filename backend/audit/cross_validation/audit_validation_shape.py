@@ -52,12 +52,12 @@ def audit_validation_shape(audit):
     }
 
     """
-    from audit.models import Access, SacValidationWaiver
+    from audit.models import Access, AuditValidationWaiver
 
     shape = {
         "sf_sac_sections": {k: get_shaped_section(audit, k) for k in SECTION_NAMES},
         "sf_sac_meta": {
-            "submitted_by": audit.submitted_by,
+            "submitted_by": audit.created_by,  # For SACs submitted by was created_by (and at this point the audit isn't even submitted
             "date_created": audit.created_at,
             "submission_status": audit.submission_status,
             "report_id": audit.report_id,
@@ -66,8 +66,8 @@ def audit_validation_shape(audit):
         },
     }
 
-    # Querying the SacValidationWaiver table for waivers
-    waivers = SacValidationWaiver.objects.filter(report_id=audit.report_id)
+    # Querying the AuditValidationWaiver table for waivers
+    waivers = AuditValidationWaiver.objects.filter(report_id=audit.report_id)
 
     # Extracting waiver types from waivers
     waiver_types = [

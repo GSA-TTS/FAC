@@ -176,4 +176,107 @@ class Migration(migrations.Migration):
                 to="audit.audit",
             ),
         ),
+        migrations.CreateModel(
+            name="AuditValidationWaiver",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "timestamp",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        verbose_name="When the waiver was created",
+                    ),
+                ),
+                (
+                    "approver_email",
+                    models.TextField(
+                        verbose_name="Email address of FAC staff member approving the waiver"
+                    ),
+                ),
+                (
+                    "approver_name",
+                    models.TextField(
+                        verbose_name="Name of FAC staff member approving the waiver"
+                    ),
+                ),
+                (
+                    "requester_email",
+                    models.TextField(
+                        verbose_name="Email address of NSAC/KSAML requesting the waiver"
+                    ),
+                ),
+                (
+                    "requester_name",
+                    models.TextField(
+                        verbose_name="Name of NSAC/KSAML requesting the waiver"
+                    ),
+                ),
+                (
+                    "justification",
+                    models.TextField(
+                        verbose_name="Brief plain-text justification for the waiver"
+                    ),
+                ),
+                (
+                    "waiver_types",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.CharField(
+                            choices=[
+                                (
+                                    "auditee_certifying_official",
+                                    "No auditee certifying official is available",
+                                ),
+                                (
+                                    "auditor_certifying_official",
+                                    "No auditor certifying official is available",
+                                ),
+                                (
+                                    "finding_reference_number",
+                                    "Report has duplicate finding reference numbers",
+                                ),
+                                (
+                                    "prior_references",
+                                    "Report has invalid prior reference numbers",
+                                ),
+                            ],
+                            max_length=50,
+                        ),
+                        default=list,
+                        size=None,
+                        verbose_name="The waiver type",
+                    ),
+                ),
+                (
+                    "report_id",
+                    models.ForeignKey(
+                        db_column="report_id",
+                        help_text="The report that the waiver applies to",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="audit.audit",
+                        to_field="report_id",
+                    ),
+                ),
+            ],
+        ),
+        migrations.AlterField(
+            model_name="audit",
+            name="audit_type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("single-audit", "Single Audit"),
+                    ("program-specific", "Program-Specific Audit"),
+                ],
+                max_length=20,
+                null=True,
+            ),
+        ),
     ]

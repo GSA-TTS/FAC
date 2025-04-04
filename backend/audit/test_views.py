@@ -2366,7 +2366,7 @@ class CrossValidationViewTests(TestCase):
     @patch("audit.models.SingleAuditChecklist.validate_full")
     def test_post_view_renders_results_template(self, mock_validate_full):
         """Test that POST with validation errors renders template with errors"""
-        mock_validate_full.return_value = ["Error 1", "Error 2"]
+        mock_validate_full.return_value = {"errors": ["Error 1", "Error 2"], "data": {}}
 
         response = self.client.post(self.url)
 
@@ -2375,7 +2375,7 @@ class CrossValidationViewTests(TestCase):
             response, "audit/cross-validation/cross-validation-results.html"
         )
         self.assertEqual(response.context["report_id"], self.sac.report_id)
-        self.assertEqual(response.context["errors"], ["Error 1", "Error 2"])
+        self.assertEqual(response.context["errors"]["errors"], ["Error 1", "Error 2"])
         mock_validate_full.assert_called_once()
 
     def test_post_view_permission_denied(self):

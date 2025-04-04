@@ -35,7 +35,7 @@
                             <a class="usa-button display-flex flex-fill font-sans-xl margin-bottom-2"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                href="{% url 'dissemination:SummaryReportDownload' report_id=report_id%}"
+                                href="{% url 'dissemination:SummaryReportDownload' report_id=report_id%}?beta=Y"
                             >
                                 <svg class="usa-icon margin-right-1 flex-align-self-center"
                                     aria-hidden="true"
@@ -48,7 +48,7 @@
 
                         {% if allow_download %}
                             <a class="usa-button display-flex font-sans-xl"
-                                href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
+                                href="{% url 'dissemination:PdfDownload' report_id=report_id %}?beta=Y"
                                 target="_blank"
                                 rel="noopener noreferrer">
                                 <svg class="usa-icon margin-right-1 flex-align-self-center"
