@@ -303,6 +303,7 @@ SAC_HANDLERS = [
     lambda sac: {"tribal_data_consent": sac.tribal_data_consent or {}},
     lambda sac: {"cognizant_agency": sac.cognizant_agency},
     lambda sac: {"oversight_agency": sac.oversight_agency},
+    lambda sac: {"type_audit_code": "UG"},
     _convert_program_names,
     _convert_file_information,
     _convert_month_year,
