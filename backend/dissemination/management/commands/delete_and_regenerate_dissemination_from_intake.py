@@ -61,7 +61,7 @@ class Command(BaseCommand):
             STATUS.SUBMITTED,
         )
 
-        for sac in SingleAuditChecklist.objects.all():
+        for sac in SingleAuditChecklist.objects.iterator():
             if sac.submission_status in regen_statuses:
                 logger.info("Disseminating %s, ", sac.report_id)
                 sac.disseminate()
