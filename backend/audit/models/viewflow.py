@@ -1,6 +1,7 @@
 from audit.models import SingleAuditChecklist, SubmissionEvent, Audit
 from audit.models.constants import EventType
 from audit.models.models import STATUS
+from audit.models.utils import convert_utc_to_american_samoa_zone
 from curation.curationlib.curation_audit_tracking import CurationTracking
 import datetime
 import logging
@@ -527,7 +528,11 @@ class AuditFlow(Audit):
         the appropriate privileges will be done at the view level.
         """
         self.audit.audit.update(
-            {"fac_accepted_date": datetime.datetime.today().strftime("%Y-%m-%d")}
+            {
+                "fac_accepted_date": convert_utc_to_american_samoa_zone(
+                    datetime.datetime.today()
+                )
+            }
         )
 
     @state.transition(
