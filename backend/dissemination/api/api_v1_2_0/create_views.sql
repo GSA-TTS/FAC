@@ -1,5 +1,60 @@
 begin;
+---------------------------------------
+-- functions
+---------------------------------------
+create or replace function yesnonull(input text)
+returns text as $$
+begin
+  case 
+    when input = 'true' then return 'Yes';
+    when input = 'false' then return 'No';
+    else return null;
+  end case;
+end;
+$$ language plpgsql immutable;
 
+create or replace function yesno(input text)
+returns text as $$
+begin
+  case 
+    when input = 'true' then return 'Yes';
+    else return 'No';
+  end case;
+end;
+$$ language plpgsql immutable;
+
+create or replace function yesnogsamigration(input text)
+returns text as $$
+begin
+  case 
+    when input = 'true' then return 'Yes';
+    when input = 'GSA_MIGRATION' then return 'GSA_MIGRATION';
+    else return 'No';
+  end case;
+end;
+$$ language plpgsql immutable;
+
+create or replace function yesnogsamigrationnull(input text)
+returns text as $$
+begin
+  case 
+    when input = 'true' then return 'Yes';
+    when input = 'false' then return 'No';
+    when input = 'GSA_MIGRATION' then return 'GSA_MIGRATION';
+    else return null;
+  end case;
+end;
+$$ language plpgsql immutable;
+
+create or replace function jsonb_array_to_string(input jsonb)
+returns text as $$
+begin
+  return (
+    select string_agg(elem, ',')
+    from jsonb_array_elements_text(input) as elem
+  );
+end;
+$$ language plpgsql immutable;
 ---------------------------------------
 -- finding_text
 ---------------------------------------
@@ -195,26 +250,31 @@ create view api_v1_2_0.general as
         -- dates
         a.created_at as date_created,
         a.audit->'general_information'->>'ready_for_certification_date'as ready_for_certification_date,
-        -- FIXME 
-        a.audit->'auditor_certification'->'auditor_signature'->>'auditor_certification_date_signed' as auditor_certified_date,
-        a.audit->'auditee_certification'->'auditee_signature'->>'auditee_certification_date_signed' as auditee_certified_date,
-        a.audit->'general_information'->>'submitted_date' as submitted_date,
-        a.audit->>'fac_accepted_date' as fac_accepted_date,
-        -- END FIXME    
+        (select 'updated_at' from public.audit_history
+        where event = 'auditor-certification-completed'
+        and h.report_id = a.report_id
+        order by id desc limit 1) as auditor_certified_date,        
+        (select 'updated_at' from public.audit_history
+        where event = 'auditee-certification-completed'
+        and h.report_id = a.report_id
+        order by id desc limit 1) as auditee_certified_date,
+
+        a.audit->>'fac_accepted_date' as submitted_date,
+        a.audit->>'fac_accepted_date' as fac_accepted_date,   
         a.audit->'general_information'->>'auditee_fiscal_period_end' as fy_end_date,
         a.audit->'general_information'->>'auditee_fiscal_period_start' as fy_start_date,
         a.audit->'general_information'->>'audit_type' as audit_type,
-        jsonb_array_elements_text(a.audit->'audit_information'->'gaap_results') as gaap_results,
-        jsonb_array_elements_text(a.audit->'audit_information'->'sp_framework_basis') as sp_framework_basis,
-        a.audit->'audit_information'->>'is_sp_framework_required' as is_sp_framework_required,
-        jsonb_array_elements_text(a.audit->'audit_information'->'sp_framework_opinions') as sp_framework_opinions,
-        a.audit->'audit_information'->>'is_going_concern_included' as is_going_concern_included,
-        a.audit->'audit_information'->>'is_internal_control_deficiency_disclosed' as is_internal_control_deficiency_disclosed,
-        a.audit->'audit_information'->>'is_internal_control_material_weakness_disclosed' as is_internal_control_material_weakness_disclosed,
-        a.audit->'audit_information'->>'is_material_noncompliance_disclosed' as is_material_noncompliance_disclosed,
+        coalesce(jsonb_array_to_string(a.audit->'audit_information'->'gaap_results'),'') as gaap_results,
+        coalesce(jsonb_array_to_string(a.audit->'audit_information'->'sp_framework_basis'),'') as sp_framework_basis,
+        coalesce(yesnogsamigrationnull(a.audit->'audit_information'->>'is_sp_framework_required'),'') as is_sp_framework_required,
+        coalesce(jsonb_array_to_string(a.audit->'audit_information'->'sp_framework_opinions'),'')as sp_framework_opinions,
+        yesnogsamigration(a.audit->'audit_information'->>'is_going_concern_included') as is_going_concern_included,
+        yesnogsamigration(a.audit->'audit_information'->>'is_internal_control_deficiency_disclosed') as is_internal_control_deficiency_disclosed,
+        yesnogsamigration(a.audit->'audit_information'->>'is_internal_control_material_weakness_disclosed') as is_internal_control_material_weakness_disclosed,
+        yesnogsamigration(a.audit->'audit_information'->>'is_material_noncompliance_disclosed') as is_material_noncompliance_disclosed,
         (a.audit->'audit_information'->>'dollar_threshold')::integer as dollar_threshold,
-        a.audit->'audit_information'->>'is_low_risk_auditee' as is_low_risk_auditee,
-        jsonb_array_elements_text(a.audit->'audit_information'->'agencies') as agencies_with_prior_findings,
+        yesnogsamigration(a.audit->'audit_information'->>'is_low_risk_auditee') as is_low_risk_auditee,
+        coalesce(jsonb_array_to_string(a.audit->'audit_information'->'agencies'),'') as agencies_with_prior_findings,
         a.audit->'general_information'->>'user_provided_organization_type' as entity_type,
         a.audit->'general_information'->>'number_months' as number_months,
         a.audit->'general_information'->>'audit_period_other_months' as audit_period_covered,
@@ -222,10 +282,14 @@ create view api_v1_2_0.general as
         a.audit->'type_audit_code'->>'type_audit_code' as type_audit_code,
         a.is_public as is_public,
         a.data_source as data_source,
-        a.audit->'general_information'->>'is_aicpa_audit_guide_included' as is_aicpa_audit_guide_included,
-        a.audit->'general_information'->>'is_additional_ueis' as is_additional_ueis       
+        yesnogsamigration(a.audit->'audit_information'->>'is_aicpa_audit_guide_included') as is_aicpa_audit_guide_included,
+        yesno(a.audit->'general_information'->>'multiple_ueis_covered') as is_additional_ueis,
+        yesno(a.audit->'general_information'->>'multiple_eins_covered') as is_multiple_eins,
+        yesno(a.audit->'general_information'->>'secondary_auditors_exist') as is_secondary_auditors     
     from
         audit_audit as a
+    join audit_history as h
+    on h.report_id = a.report_id;
 ;
 ---------------------------------------
 -- auditor (secondary auditor)
