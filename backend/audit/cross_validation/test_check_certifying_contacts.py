@@ -1,6 +1,6 @@
 from django.test import TestCase
-from audit.models import Access, SingleAuditChecklist
-from .sac_validation_shape import sac_validation_shape
+from audit.models import Access, Audit
+from .audit_validation_shape import audit_validation_shape
 from .check_certifying_contacts import check_certifying_contacts
 from .errors import err_certifying_contacts_should_not_match
 
@@ -14,27 +14,27 @@ class CheckCertifyingContactsTest(TestCase):
         self.email2 = "auditor@example.com"
         self.email3 = "same@example.com"
 
-    def _make_sac(self, auditee_email, auditor_email) -> SingleAuditChecklist:
-        sac = baker.make(SingleAuditChecklist)
+    def _make_audit(self, auditee_email, auditor_email) -> Audit:
+        audit = baker.make(Audit, version=0)
         baker.make(
-            Access, sac=sac, role="certifying_auditee_contact", email=auditee_email
+            Access, audit=audit, role="certifying_auditee_contact", email=auditee_email
         )
         baker.make(
-            Access, sac=sac, role="certifying_auditor_contact", email=auditor_email
+            Access, audit=audit, role="certifying_auditor_contact", email=auditor_email
         )
 
-        return sac
+        return audit
 
     def test_diff_certifying_contacts(self):
         """When auditor and auditee emails are different, no errors should be raised."""
-        sac = self._make_sac(self.email1, self.email2)
-        errors = check_certifying_contacts(sac_validation_shape(sac))
+        audit = self._make_audit(self.email1, self.email2)
+        errors = check_certifying_contacts(audit_validation_shape(audit))
         self.assertEqual(errors, [])
 
     def test_same_certifying_contacts_raise_errors(self):
         """When auditor and auditee emails are the same, the appropriate error should be raised."""
-        sac = self._make_sac(self.email3, self.email3)
-        errors = check_certifying_contacts(sac_validation_shape(sac))
+        audit = self._make_audit(self.email3, self.email3)
+        errors = check_certifying_contacts(audit_validation_shape(audit))
 
         self.assertEqual(len(errors), 1)
 

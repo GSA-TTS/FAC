@@ -5,7 +5,8 @@ from django.urls import reverse
 from django.views import generic
 from audit.forms import AuditInfoForm
 from audit.mixins import SingleAuditChecklistAccessRequiredMixin
-from audit.models import SingleAuditChecklist, SubmissionEvent, Audit
+from audit.models import Audit
+from audit.models.constants import EventType
 from audit.validators import validate_audit_information_json
 from config.settings import (
     AGENCY_NAMES,
@@ -24,50 +25,49 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
+            audit_information = audit.audit.get("audit_information", {})
             current_info = {}
-            if sac.audit_information:
+            if audit_information:
                 current_info = {
                     "cleaned_data": {
-                        "gaap_results": sac.audit_information.get("gaap_results"),
-                        "sp_framework_basis": sac.audit_information.get(
+                        "gaap_results": audit_information.get("gaap_results"),
+                        "sp_framework_basis": audit_information.get(
                             "sp_framework_basis"
                         ),
-                        "is_sp_framework_required": sac.audit_information.get(
+                        "is_sp_framework_required": audit_information.get(
                             "is_sp_framework_required"
                         ),
-                        "sp_framework_opinions": sac.audit_information.get(
+                        "sp_framework_opinions": audit_information.get(
                             "sp_framework_opinions"
                         ),
-                        "is_going_concern_included": sac.audit_information.get(
+                        "is_going_concern_included": audit_information.get(
                             "is_going_concern_included"
                         ),
-                        "is_internal_control_deficiency_disclosed": sac.audit_information.get(
+                        "is_internal_control_deficiency_disclosed": audit_information.get(
                             "is_internal_control_deficiency_disclosed"
                         ),
-                        "is_internal_control_material_weakness_disclosed": sac.audit_information.get(
+                        "is_internal_control_material_weakness_disclosed": audit_information.get(
                             "is_internal_control_material_weakness_disclosed"
                         ),
-                        "is_material_noncompliance_disclosed": sac.audit_information.get(
+                        "is_material_noncompliance_disclosed": audit_information.get(
                             "is_material_noncompliance_disclosed"
                         ),
-                        "is_aicpa_audit_guide_included": sac.audit_information.get(
+                        "is_aicpa_audit_guide_included": audit_information.get(
                             "is_aicpa_audit_guide_included"
                         ),
-                        "dollar_threshold": sac.audit_information.get(
-                            "dollar_threshold"
-                        ),
-                        "is_low_risk_auditee": sac.audit_information.get(
+                        "dollar_threshold": audit_information.get("dollar_threshold"),
+                        "is_low_risk_auditee": audit_information.get(
                             "is_low_risk_auditee"
                         ),
-                        "agencies": sac.audit_information.get("agencies"),
+                        "agencies": audit_information.get("agencies"),
                     }
                 }
 
-            context = self._get_context(sac, current_info)
+            context = self._get_context(audit, current_info)
 
             return render(request, "audit/audit-info-form.html", context)
-        except SingleAuditChecklist.DoesNotExist:
+        except Audit.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except Exception as e:
             logger.info("Unexpected error in AuditInfoFormView get.\n%s", e)
@@ -77,7 +77,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sac = Audit.objects.get(report_id=report_id)
             form = AuditInfoForm(request.POST)
 
             if form.is_valid():
@@ -95,19 +95,12 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
                 validated = validate_audit_information_json(form.cleaned_data, False)
 
-                sac.audit_information = validated
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.AUDIT_INFORMATION_UPDATED,
-                )
-
-                # TODO: Update Post SOC Launch
-                audit = Audit.objects.find_audit_or_none(report_id=report_id)
+                audit = Audit.objects.get(report_id=report_id)
                 if audit:
                     audit.audit.update({"audit_information": validated})
                     audit.save(
                         event_user=request.user,
-                        event_type=SubmissionEvent.EventType.AUDIT_INFORMATION_UPDATED,
+                        event_type=EventType.AUDIT_INFORMATION_UPDATED,
                     )
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
@@ -120,18 +113,18 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 context = self._get_context(sac, form)
                 return render(request, "audit/audit-info-form.html", context)
 
-        except SingleAuditChecklist.DoesNotExist:
+        except Audit.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except Exception as e:
             logger.info("Enexpected error in AuditInfoFormView post.\n%s", e)
             raise BadRequest()
 
-    def _get_context(self, sac, form):
+    def _get_context(self, audit, form):
         context = {
-            "auditee_name": sac.auditee_name,
-            "report_id": sac.report_id,
-            "auditee_uei": sac.auditee_uei,
-            "user_provided_organization_type": sac.user_provided_organization_type,
+            "auditee_name": audit.auditee_name,
+            "report_id": audit.report_id,
+            "auditee_uei": audit.auditee_uei,
+            "user_provided_organization_type": audit.organization_type,
             "agency_names": AGENCY_NAMES,
             "gaap_results": GAAP_RESULTS,
             "sp_framework_basis": SP_FRAMEWORK_BASIS,

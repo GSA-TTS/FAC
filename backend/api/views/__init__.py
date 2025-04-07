@@ -4,8 +4,6 @@ from api.views.access import (
     access_and_submission_check,
 )
 from api.views.audit import (
-    SingleAuditChecklistView,
-    SubmissionsView,
     AuditView,
     AuditAwardsView,
     AuditSubmissionsView,
@@ -25,9 +23,7 @@ views = [
     AuditSubmissionsView,
     EligibilityFormView,
     SchemaView,
-    SingleAuditChecklistView,
     Sprite,
-    SubmissionsView,
     UEIValidationFormView,
 ]
 

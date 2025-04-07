@@ -6,44 +6,13 @@ from django.http import Http404
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 
-from audit.models import ExcelFile, SingleAuditReportFile, SingleAuditChecklist, Audit
+from audit.models import ExcelFile, SingleAuditReportFile, Audit
 from audit.models.constants import STATUS
 
 logger = logging.getLogger(__name__)
 
 
-# TODO: Update Post SOC Launch -> replace get_filename with get_filename_from_audit.
 def get_filename(report_id, file_type):
-    # .first() returns None if nothing is there.
-    sac = SingleAuditChecklist.objects.filter(report_id=report_id).first()
-    if file_type == "report":
-        try:
-            if sac:
-                file_obj = SingleAuditReportFile.objects.filter(sac=sac).latest(
-                    "date_created"
-                )
-                return f"singleauditreport/{file_obj.filename}"
-            else:
-                if settings.CENSUS_DATA_SOURCE in report_id:
-                    return f"singleauditreport/{report_id}.pdf"
-                else:
-                    raise Http404()
-        except SingleAuditReportFile.DoesNotExist:
-            raise Http404()
-    else:
-        try:
-            file_obj = ExcelFile.objects.filter(sac=sac, form_section=file_type).latest(
-                "date_created"
-            )
-            return f"excel/{file_obj.filename}"
-        except ExcelFile.DoesNotExist:
-            raise Http404()
-
-
-def get_filename_from_audit(report_id, file_type):
-    """
-    Basically a copy of above. Used for "SOT Beta" pages. Post launch this method should replace get_filename above.
-    """
     audit = Audit.objects.filter(
         report_id=report_id, submission_status=STATUS.DISSEMINATED
     ).first()

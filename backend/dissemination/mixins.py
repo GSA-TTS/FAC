@@ -3,7 +3,7 @@ import logging
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 
-from dissemination.models import General
+from audit.models import Audit
 from users.permissions import can_read_tribal
 
 
@@ -14,9 +14,9 @@ class ReportAccessRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
         try:
-            general = General.objects.get(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
 
-            if general.is_public:
+            if audit.is_public:
                 return super().dispatch(request, *args, **kwargs)
 
             if not request.user:
@@ -39,5 +39,5 @@ class ReportAccessRequiredMixin:
 
             return super().dispatch(request, *args, **kwargs)
 
-        except General.DoesNotExist:
+        except Audit.DoesNotExist:
             raise Http404()

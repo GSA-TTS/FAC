@@ -5,15 +5,15 @@ from django.shortcuts import render
 from django.views import generic
 from audit.cross_validation import (
     naming,
-    sac_validation_shape,
     submission_progress_check,
 )
 from audit.cross_validation.audit_validation_shape import audit_validation_shape
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access, Audit
-from audit.models.models import STATUS
+from audit.models import SingleAuditReportFile, Access, Audit
+from audit.models.constants import STATUS
+from audit.models.utils import get_friendly_submission_status
 
 logger = logging.getLogger(__name__)
 
@@ -110,48 +110,43 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
         report_id = kwargs["report_id"]
 
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
 
             # Determine if the auditee certifier is the same as the current user.
             # If there is no auditee certifier, default to False.
             is_user_auditee_certifier = False
-            sac_auditee_results = Access.objects.filter(
-                sac_id=sac.id, role="certifying_auditee_contact"
+            auditee_results = Access.objects.filter(
+                audit_id=audit.id, role="certifying_auditee_contact"
             ).values()  # ValuesQuerySet (array of dicts)
-            if sac_auditee_results.exists():
+            if auditee_results.exists():
                 is_user_auditee_certifier = (
-                    sac_auditee_results[0].get("user_id") == request.user.id
+                    auditee_results[0].get("user_id") == request.user.id
                 )
 
-            is_tribal_data_consent_complete = True if sac.tribal_data_consent else False
+            is_tribal_data_consent_complete = (
+                True if audit.audit.get("tribal_data_consent", None) else False
+            )
 
             try:
-                sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest(
+                sar = SingleAuditReportFile.objects.filter(audit_id=audit.id).latest(
                     "date_created"
                 )
             except SingleAuditReportFile.DoesNotExist:
                 sar = None
 
-            shaped_sac = sac_validation_shape(sac)
+            shaped_audit = audit_validation_shape(audit)
 
-            shaped_audit = audit_validation_shape(audit) if audit else None
+            subcheck = submission_progress_check(shaped_audit, sar, crossval=False)
 
-            subcheck = submission_progress_check(shaped_sac, sar, crossval=False)
-            audit_subcheck = (
-                submission_progress_check(shaped_audit, sar, crossval=False)
-                if shaped_audit
-                else None
-            )
-
-            _compare_progress_check(subcheck, audit_subcheck)
             # Update with the view-specific info from SECTIONS_BASE:
             for key, value in SECTIONS_BASE.items():
                 subcheck[key] = subcheck[key] | value
 
+            auditor_certification = audit.audit.get("auditor_certification", None)
+            auditee_certification = audit.audit.get("auditee_certification", None)
             context = {
                 "pre_submission_validation": {
-                    "completed": sac.submission_status
+                    "completed": audit.submission_status
                     in [
                         STATUS.READY_FOR_CERTIFICATION,
                         STATUS.AUDITOR_CERTIFIED,
@@ -165,33 +160,31 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "enabled": True,
                 },
                 "certification": {
-                    "auditor_certified": bool(sac.auditor_certification),
-                    "auditor_enabled": sac.submission_status
+                    "auditor_certified": bool(auditor_certification),
+                    "auditor_enabled": audit.submission_status
                     == STATUS.READY_FOR_CERTIFICATION,
-                    "auditee_certified": bool(sac.auditee_certification),
-                    "auditee_enabled": sac.submission_status
+                    "auditee_certified": bool(auditee_certification),
+                    "auditee_enabled": audit.submission_status
                     == STATUS.AUDITOR_CERTIFIED,
                 },
                 "submission": {
-                    "completed": sac.submission_status
+                    "completed": audit.submission_status
                     in [
                         STATUS.SUBMITTED,
                         STATUS.DISSEMINATED,
                     ],
                     "completed_date": None,
                     "completed_by": None,
-                    "enabled": sac.submission_status == STATUS.AUDITEE_CERTIFIED,
+                    "enabled": audit.submission_status == STATUS.AUDITEE_CERTIFIED,
                 },
                 "report_id": report_id,
-                "auditee_name": sac.auditee_name,
-                "auditee_uei": sac.auditee_uei,
-                "fiscal_year_end_date": (
-                    sac.general_information.get("auditee_fiscal_period_end")
-                    if sac.general_information
-                    else "N/A"
+                "auditee_name": audit.auditee_name,
+                "auditee_uei": audit.auditee_uei,
+                "fiscal_year_end_date": audit.auditee_fiscal_period_end,
+                "submission_status": get_friendly_submission_status(
+                    audit.submission_status
                 ),
-                "submission_status": sac.get_friendly_status(),
-                "user_provided_organization_type": sac.user_provided_organization_type,
+                "user_provided_organization_type": audit.organization_type,
                 "is_user_auditee_certifier": is_user_auditee_certifier,
                 "is_tribal_data_consent_complete": is_tribal_data_consent_complete,
             }
@@ -200,12 +193,5 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             return render(
                 request, "audit/submission_checklist/submission-checklist.html", context
             )
-        except SingleAuditChecklist.DoesNotExist as err:
+        except Audit.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
-
-
-def _compare_progress_check(sac_result, audit_result):
-    if sac_result != audit_result:
-        logger.error(
-            f"<SOT ERROR> Submission check progress failure SAC: {sac_result} Audit: {audit_result}"
-        )

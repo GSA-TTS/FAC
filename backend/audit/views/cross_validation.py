@@ -6,13 +6,10 @@ from django.core.exceptions import PermissionDenied
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import (
-    SingleAuditChecklist,
-    Audit,
-)
-from audit.models.models import STATUS
-from audit.decorators import verify_status
+from audit.models import Audit
 
+from audit.decorators import verify_status
+from audit.models.constants import STATUS
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
@@ -26,7 +23,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
 
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sac = Audit.objects.get(report_id=report_id)
 
             context = {
                 "report_id": report_id,
@@ -35,7 +32,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             return render(
                 request, "audit/cross-validation/cross-validation.html", context
             )
-        except SingleAuditChecklist.DoesNotExist:
+        except Audit.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.IN_PROGRESS)
@@ -43,41 +40,14 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
 
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
-            errors = sac.validate_full()
-            audit_errors = audit.validate() if audit else None
+            audit = Audit.objects.get(report_id=report_id)
+            audit_errors = audit.validate()
 
-            _compare_errors(errors, audit_errors)
-            context = {"report_id": report_id, "errors": errors}
+            context = {"report_id": report_id, "errors": audit_errors}
 
             return render(
                 request, "audit/cross-validation/cross-validation-results.html", context
             )
 
-        except SingleAuditChecklist.DoesNotExist:
+        except Audit.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
-
-
-# TODO: Post SOT Launch: Deletes
-def _compare_errors(sac_errors, audit_errors):
-    # We will ignore some meta-data
-    sac = sac_errors.copy() if sac_errors else dict({"data": {}})
-    audit = audit_errors.copy() if audit_errors else dict({"data": {}})
-
-    sac_metadata = sac.get("data", {}).get("sf_sac_meta", {})
-    audit_metadata = audit.get("data", {}).get("sf_sac_meta", {})
-
-    remove_fields = ("date_created", "transition_name", "transition_date")
-    for field in remove_fields:
-        if field in sac_metadata:
-            del sac_metadata[field]
-        if field in audit_metadata:
-            del audit_metadata[field]
-
-    sac["data"]["sf_sac_meta"] = sac_metadata
-    audit["data"]["sf_sac_meta"] = audit_metadata
-    if (sac and not audit) or (audit and not sac) or (sac) != (audit):
-        logger.error(
-            f"<SOT ERROR> Cross Validation does not match: SAC {sac}, Audit {audit}"
-        )

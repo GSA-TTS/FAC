@@ -1213,6 +1213,8 @@ sling-linux-amd64==1.4.2 \
     --hash=sha256:4935332ccefa56abafccb89ead7b743ecaafaf6059b8f5d9ce9e9ca21b9b2b36 \
     --hash=sha256:cf9a41e4eb2bb5028e69313188eeb8b6328e21aa4e9718a528d2e6a92ee7d617
     # via sling
+sling-linux-arm64==1.4.2 \
+    --hash=sha256:29e93239544b1a29f1e70573a57a362743465346816bbb17af2755ca40c4b25f
 sqlalchemy==2.0.36 \
     --hash=sha256:03e08af7a5f9386a43919eda9de33ffda16b44eb11f3b313e6822243770e9763 \
     --hash=sha256:0572f4bd6f94752167adfd7c1bed84f4b240ee6203a95e05d1e208d488d0d436 \
