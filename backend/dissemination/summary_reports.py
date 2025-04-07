@@ -24,6 +24,7 @@ from dissemination.models import (
     DisseminationCombined,
 )
 
+# TODO: Update Post SOC Launch -> This whole file can be deleted
 logger = logging.getLogger(__name__)
 
 models = [

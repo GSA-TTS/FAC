@@ -1,5 +1,7 @@
 from typing import Any
 
+import newrelic.agent
+
 from audit.exceptions import SessionExpiredException
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -8,7 +10,8 @@ from django.core.exceptions import PermissionDenied
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 
-from .models import Access, SingleAuditChecklist
+from .models import Access, SingleAuditChecklist, Audit
+from .models.access_roles import AccessRole
 
 User = get_user_model()
 
@@ -30,14 +33,70 @@ def check_authenticated(request):
         raise SessionExpiredException()
 
 
+# TODO: Update Post SOC Launch
 def has_access(sac, user):
     """Does a user have permission to access a submission?"""
     return bool(Access.objects.filter(sac=sac, user=user))
 
 
+def has_access_to_audit(audit, user):
+    """Does a user have permission to access a submission?"""
+    return bool(Access.objects.filter(audit=audit, user=user))
+
+
 def has_role(sac, user, role):
     """Does a user have a specific role on a submission?"""
-    return bool(Access.objects.filter(sac=sac, user=user, role=role))
+    return bool(Access.objects.filter(sac=sac, user=user, role=role)) if role else True
+
+
+def has_role_on_audit(audit, user, role):
+    """Does a user have a specific role on a submission?"""
+    return (
+        bool(Access.objects.filter(audit=audit, user=user, role=role)) if role else True
+    )
+
+
+ACCESS_ROLE_ERROR_MESSAGES = {
+    AccessRole.CERTIFYING_AUDITEE_CONTACT: "Invalid role. User is not the Auditee Certifying Official",
+    AccessRole.CERTIFYING_AUDITOR_CONTACT: "Invalid role. User is not the Auditor Certifying Official",
+}
+
+
+def _validate_access(request, report_id, role=None):
+    audit = Audit.objects.find_audit_or_none(report_id)
+    try:
+        check_authenticated(request)
+
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        audit_has_access = has_access_to_audit(audit, request.user)
+        audit_has_role = has_role_on_audit(audit, request.user, role)
+
+        if not has_access(sac, request.user) and not settings.DISABLE_AUTH:
+            if audit_has_access:
+                newrelic.agent.record_custom_metric("Custom/SOT/AccessMismatch", 1)
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+
+        if not has_role(sac, request.user, role):
+            eligible_accesses = Access.objects.select_related("user").filter(
+                sac=sac, role=role
+            )
+            eligible_users = [acc.user for acc in eligible_accesses]
+
+            if audit_has_role:
+                newrelic.agent.record_custom_metric("Custom/SOT/AccessMismatch", 1)
+            raise CertificationPermissionDenied(
+                ACCESS_ROLE_ERROR_MESSAGES[role],
+                eligible_users=eligible_users,
+            )
+    except SingleAuditChecklist.DoesNotExist:
+        if audit:
+            newrelic.agent.record_custom_metric("Custom/SOT/AccessMismatch", 1)
+        raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+
+    if not audit_has_access or not audit_has_role:
+        newrelic.agent.record_custom_metric("Custom/SOT/AccessMismatch", 1)
+    else:
+        newrelic.agent.record_custom_metric("Custom/SOT/AccessMismatch", 0)
 
 
 class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
@@ -46,16 +105,7 @@ class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
     """
 
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        try:
-            check_authenticated(request)
-
-            sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
-
-            if not has_access(sac, request.user) and not settings.DISABLE_AUTH:
-                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-
+        _validate_access(request=request, report_id=kwargs.get("report_id"))
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -66,28 +116,11 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
     """
 
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        role = "certifying_auditee_contact"
-        try:
-            check_authenticated(request)
-
-            sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
-
-            if not has_access(sac, request.user):
-                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-
-            if not has_role(sac, request.user, role):
-                eligible_accesses = Access.objects.select_related("user").filter(
-                    sac=sac, role=role
-                )
-                eligible_users = [acc.user for acc in eligible_accesses]
-
-                raise CertificationPermissionDenied(
-                    "Invalid role. User is not the Auditee Certifying Official.",
-                    eligible_users=eligible_users,
-                )
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-
+        _validate_access(
+            request=request,
+            report_id=kwargs.get("report_id"),
+            role=AccessRole.CERTIFYING_AUDITEE_CONTACT,
+        )
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -98,26 +131,9 @@ class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
     """
 
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        role = "certifying_auditor_contact"
-        try:
-
-            check_authenticated(request)
-
-            sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
-
-            if not has_access(sac, request.user):
-                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-
-            if not has_role(sac, request.user, role):
-                eligible_accesses = Access.objects.select_related("user").filter(
-                    sac=sac, role=role
-                )
-                eligible_users = [acc.user for acc in eligible_accesses]
-                raise CertificationPermissionDenied(
-                    "Invalid role. User is not the Auditor Certifying Official.",
-                    eligible_users=eligible_users,
-                )
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-
+        _validate_access(
+            request=request,
+            report_id=kwargs.get("report_id"),
+            role=AccessRole.CERTIFYING_AUDITOR_CONTACT,
+        )
         return super().dispatch(request, *args, **kwargs)
