@@ -1,3 +1,4 @@
+# flake8: noqa
 from requests import get
 
 from lib.compare_json_objects import compare_lists_of_json_objects as clojo, Result

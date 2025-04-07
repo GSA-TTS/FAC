@@ -1,4 +1,4 @@
-import random
+# flake8: noqa
 
 # To make understanding differences easier, all the functions will return
 # objects instead of booleans.
