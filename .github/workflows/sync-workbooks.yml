@@ -1,0 +1,74 @@
+#Sample--to tweak with Phil, change 'backend/dissemination/api_versions.py' and 'FAC-transition-site/assets/api/api_versions.py' to workbooks
+
+name: Sync Workbooks with FAC-Transition-Site
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/dissemination/api_versions.py'
+  workflow_dispatch:
+
+jobs:
+  sync-files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout FAC Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Clone FAC-Transition-Site Repo
+        run: |
+          git clone https://github.com/GSA-TTS/FAC-transition-site.git
+          cd FAC-transition-site
+          git checkout -b update-watched-file || git checkout update-watched-file
+
+      - name: Copy updated file(s) and check for changes
+        run: |
+          cp backend/dissemination/api_versions.py FAC-transition-site/assets/api/api_versions.py
+          cd FAC-transition-site
+
+          # Check if file has changed
+          if git diff --quiet assets/api/api_versions.py; then
+            echo "No changes detected. Exiting workflow."
+            exit 0
+          else
+            echo "File has changed. Proceeding with commit and PR."
+          fi
+
+      - name: Commit and Push Changes
+        run: |
+          cd FAC-transition-site
+          git add assets/api/api_versions.py
+          git commit -m "Sync api_versions.py from FAC"
+          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/GSA-TTS/FAC-transition-site.git update-watched-file || echo "No changes to push"
+
+      - name: Create or Update Pull Request in FAC-Transition-Site
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}  # Use GH_PAT if available, fallback to GITHUB_TOKEN
+        run: |
+          cd FAC-transition-site
+          
+          # Check if a PR already exists
+          PR_EXISTS=$(gh pr list --repo GSA-TTS/FAC-transition-site --head update-watched-file --json number --jq '.[0].number')
+      
+          if [[ -z "$PR_EXISTS" ]]; then
+            echo "No existing PR found. Creating a new one..."
+            gh pr create \
+              --repo GSA-TTS/FAC-transition-site \
+              --head update-watched-file \
+              --base main \
+              --title "Sync api_versions.py: $(date +'%Y-%m-%d')" \
+              --body "This PR updates the \`api_versions.py\` file in FAC-Transition-Site with changes from FAC."
+          else
+            echo "PR #$PR_EXISTS already exists. Updating description..."
+            gh pr edit $PR_EXISTS --repo GSA-TTS/FAC-transition-site \
+              --title "Sync api_versions.py: $(date +'%Y-%m-%d')" \
+              --body "This PR updates the \`api_versions.py\` file in FAC-Transition-Site with changes from FAC. Latest commit added automatically."
+          fi
