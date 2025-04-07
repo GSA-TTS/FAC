@@ -283,10 +283,28 @@ def compare_lists_of_json_objects(
             )
         ]
     elif key_in_lists == KEY_MISSING_L2:
-        return [Result(False, "comparison key missing in l2", comparison_key)]
+        return [
+            Result(
+                False,
+                ErrorPair(
+                    "missing_comparison_key",
+                    APIValue(v1, comparison_key, None),
+                    APIValue(v2, comparison_key, True),
+                ),
+            )
+        ]
     else:
         # print("impossible key check condition found; should never be here.")
-        return [Result(False, "impossible condition", "should not be here")]
+        return [
+            Result(
+                False,
+                ErrorPair(
+                    "impossible; should never be here",
+                    APIValue(v1, comparison_key, None),
+                    APIValue(v2, comparison_key, None),
+                ),
+            )
+        ]
 
     # The set of values in l1 for this key must be the same as the set of
     # values in l2 for this key.
