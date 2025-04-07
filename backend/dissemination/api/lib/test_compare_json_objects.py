@@ -8,38 +8,38 @@ import os
 def test_small_equal1():
     o1 = {"a": 1}
     o2 = {"a": 1}
-    assert cjo(o1, o2) == True
+    assert cjo(o1, o2)
 
 
 def test_small_equal2():
     # Key order should not matter
     o1 = {"a": 1, "b": 2}
     o2 = {"b": 2, "a": 1}
-    assert cjo(o1, o2) == True
+    assert cjo(o1, o2)
 
 
 def test_small_unequal1():
     o1 = {"a": 1}
     o2 = {"a": 2}
-    assert cjo(o1, o2) == False
+    assert not cjo(o1, o2)
 
 
 def test_small_unequal2():
     o1 = {"a": 1, "b": 2}
     o2 = {"a": 1}
-    assert cjo(o1, o2) == False
+    assert not cjo(o1, o2)
 
 
 def test_small_unequal3():
     o1 = {"a": 1, "b": 2}
     o2 = {"a": 1, "b": 3}
-    assert cjo(o1, o2) == False
+    assert not cjo(o1, o2)
 
 
-def test_small_unequal3():
+def test_small_unequal4():
     o1 = {"a": 1, "b": 2}
     o2 = {"a": 2, "b": 1}
-    assert cjo(o1, o2) == False
+    assert not cjo(o1, o2)
 
 
 def test_lod_equal1():
@@ -53,27 +53,27 @@ def test_lod_equal2():
     l2 = [{"report_id": 2}, {"report_id": 1}]
     # report_id is the default key
     # With strict ordering, these are different
-    assert clojo(l1, l2, strict_order=True) == False
+    assert not clojo(l1, l2, strict_order=True)
     # If we allow the order to shuffle, they are the same.
-    assert clojo(l1, l2, strict_order=False) == True
+    assert clojo(l1, l2, strict_order=False)
 
 
 def test_lod_not_equal1():
     l1 = [{"report_id": 1}]
     l2 = [{"report_id": 1}, {"something_else": 2}]
-    assert clojo(l1, l2, comparison_key="report_id") == False
+    assert not clojo(l1, l2, comparison_key="report_id")
 
 
 def test_lod_not_equal2():
     l1 = [{"report_id": 1}, {"report_id": 3}]
     l2 = [{"report_id": 1}, {"report_id": 2}]
-    assert clojo(l1, l2, comparison_key="report_id") == False
+    assert not clojo(l1, l2, comparison_key="report_id")
 
 
 def test_lod_not_equal3():
     l1 = [{"report_id": 1}, {"not_something": 2}]
     l2 = [{"report_id": 1}, {"something_else": 2}]
-    assert clojo(l1, l2, comparison_key="something_else") == False
+    assert not clojo(l1, l2, comparison_key="something_else")
 
 
 def test_live1():

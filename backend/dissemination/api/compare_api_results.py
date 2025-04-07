@@ -1,4 +1,3 @@
-from requests import get
 import argparse
 import csv
 
@@ -49,78 +48,13 @@ def setup_parser():
 
 
 def null_string(v):
-    if v == None:
+    if v is None:
         return "<null>"
     else:
         return v
 
 
-def main():
-    # Set up and run the argument parser
-    parser = setup_parser()
-    args = parser.parse_args()
-
-    # Everything that follows is argument validation.
-    # All of the work is done by `compare`.
-    # This lets us write tests against everything in the command.
-
-    if args.scheme == None:
-        print("`scheme` must be http or https")
-        sys.exit(-1)
-
-    # Check that we have base URLs for the two APIs.
-    for api_base in ["api_base_1", "api_base_2"]:
-        if getattr(args, api_base) is None:
-            print(
-                f"You must provide an initial API base URL for comparison (missing {api_base})"
-            )
-            sys.exit(-1)
-
-    # Check that we have api versions.
-    for api_version in ["api_version_1", "api_version_2"]:
-        if getattr(args, api_version) is None:
-            print(f"You must provide an API version (missing {api_version}). exiting.")
-            sys.exit(-1)
-
-    # Make sure we have a table
-    if args.endpoint is None:
-        print("You must provide an endpoint (e.g. `general`). exiting.")
-        sys.exit(-1)
-
-    # We must have a report_id or a start/end date.
-    if (not args.report_id) and (not args.start_date and not args.end_date):
-        print("You must provide either a report_id or a start/end date range. exiting.")
-        sys.exit(-1)
-
-    if args.start_date or args.end_date:
-        if args.start_date and not args.end_date:
-            print("You provided a start date with no end date. exiting.")
-            sys.exit(-1)
-
-        if not args.start_date and args.end_date:
-            print("You provided an end date without a start date. exiting.")
-            sys.exit(-1)
-
-    if not args.environment and args.environment not in ["local", "cloud"]:
-        print(f"--environment must be either `local` or `cloud`")
-        sys.exit(-1)
-
-    result = compare(
-        args.scheme,
-        args.api_base_1,
-        args.api_base_2,
-        args.api_version_1,
-        args.api_version_2,
-        args.endpoint,
-        args.port,
-        args.report_id,
-        args.start_date,
-        args.end_date,
-        args.environment,
-        args.comparison_key,
-        args.strict_order,
-    )
-
+def output_results(args, result):
     if isinstance(result, list):
         # for r in result:
         #     print(r)
@@ -183,6 +117,75 @@ def main():
 
             if handle is not sys.stdout:
                 handle.close()
+
+
+def main():
+    # Set up and run the argument parser
+    parser = setup_parser()
+    args = parser.parse_args()
+
+    # Everything that follows is argument validation.
+    # All of the work is done by `compare`.
+    # This lets us write tests against everything in the command.
+
+    if args.scheme is None:
+        print("`scheme` must be http or https")
+        sys.exit(-1)
+
+    # Check that we have base URLs for the two APIs.
+    for api_base in ["api_base_1", "api_base_2"]:
+        if getattr(args, api_base) is None:
+            print(
+                f"You must provide an initial API base URL for comparison (missing {api_base})"
+            )
+            sys.exit(-1)
+
+    # Check that we have api versions.
+    for api_version in ["api_version_1", "api_version_2"]:
+        if getattr(args, api_version) is None:
+            print(f"You must provide an API version (missing {api_version}). exiting.")
+            sys.exit(-1)
+
+    # Make sure we have a table
+    if args.endpoint is None:
+        print("You must provide an endpoint (e.g. `general`). exiting.")
+        sys.exit(-1)
+
+    # We must have a report_id or a start/end date.
+    if (not args.report_id) and (not args.start_date and not args.end_date):
+        print("You must provide either a report_id or a start/end date range. exiting.")
+        sys.exit(-1)
+
+    if args.start_date or args.end_date:
+        if args.start_date and not args.end_date:
+            print("You provided a start date with no end date. exiting.")
+            sys.exit(-1)
+
+        if not args.start_date and args.end_date:
+            print("You provided an end date without a start date. exiting.")
+            sys.exit(-1)
+
+    if not args.environment and args.environment not in ["local", "cloud"]:
+        print("--environment must be either `local` or `cloud`")
+        sys.exit(-1)
+
+    result = compare(
+        args.scheme,
+        args.api_base_1,
+        args.api_base_2,
+        args.api_version_1,
+        args.api_version_2,
+        args.endpoint,
+        args.port,
+        args.report_id,
+        args.start_date,
+        args.end_date,
+        args.environment,
+        args.comparison_key,
+        args.strict_order,
+    )
+
+    output_results(args, result)
 
 
 if __name__ in "__main__":
