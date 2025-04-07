@@ -1,4 +1,21 @@
 "Assistance Listings Number","Title","Types of Assistance","Department/Ind. Agency","Sub-Tier","Related Federal Assistance","Last Date Modified","Date Published","Funded","POC Information"
+"15.961","Federal Historic Preservation Tax Incentive","K - Advisory Services on Compliance","INTERIOR, DEPARTMENT OF THE","NATIONAL PARK SERVICE","15.914, 15.904, 15.915","Mar 27, 2025","Sep 13, 2024","true","Brian Goeken
+Technical Preservation Services
+National Park Service, Washington DC 20240
+(202)354-2033
+"
+"15.080","Stewardship of Natural and Cultural Resources in Offshore Energy and Mineral Activities","B - Cooperative Agreements","INTERIOR, DEPARTMENT OF THE","BUREAU OF SAFETY AND ENVIRONMENTAL ENFORCEMENT","N/A","Feb 6, 2025","Feb 6, 2025","true","Jones, Douglas S
+Gulf of Mexico, New Orleans LA 70117
+504-736-2859
+"
+"93.232","Loan Repayment Program for General Research","C - Direct Payments for Specified Use","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","NATIONAL INSTITUTES OF HEALTH","N/A","Jan 29, 2025","Jul 25, 2023","false","Patricia A. Cole, PhD
+Office of Intramural Training and Education
+National Institutes of Health
+U.S. Department of Health and Human Services 
+Building 2, Room 2E18
+2 Center Drive , Bethesda MD 20892-0230
+3014021283
+"
 "81.131","Expand and Extend Clean Coal Power Initiative","B - Cooperative Agreements","ENERGY, DEPARTMENT OF","","81.089","Dec 5, 2024","Aug 14, 2023","false","Maria Jones,
 1000 Independence Ave., SW, Washington DC 20623
 (202) 586-1890.
@@ -25,10 +42,9 @@ US EPA Region 6, 1201 Elm Street, Suite 500 (LCRPT), Dallas TX 752702002
 6th Floor Washington, DC 20472, Washington DC 20009
 2027171601
 "
-"93.980","Increasing Public Awareness and Provider Education about Primary Immunodeficiency Disease","B - Project Grants","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","Nov 19, 2024","Nov 15, 2024","false","Salaria Allen
-1600 Clifton Rd, NE
-Mailstop H21-8, Atlanta GA 30333
-404-498-6043
+"93.980","Increasing Public Awareness and Provider Education about Primary Immunodeficiency Disease","B - Project Grants","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","Nov 19, 2024","Nov 15, 2024","false","Scott Bowen
+1600 Clifton Road, Altanta GA 30329
+404-498-0068
 "
 "93.082","Sodium Reduction in Communities","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","Nov 19, 2024","Nov 15, 2024","false","Sheryl Heard
 4770 Buford Highway, Atlanta GA 30341
@@ -90,7 +106,7 @@ SMART Office, Washington DC 20531
 1200 New Jersey Ave. S.E., Washington DC 20590
 (202) 366-9261
 "
-"93.702","National Center for Research Resources, Recovery Act Construction Support","B - Project Grants","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","NATIONAL INSTITUTES OF HEALTH","93.310","Nov 7, 2024","Aug 2, 2023","false","Gregory K. Farber,
+"93.702","National Center for Research Resources, Recovery Act Construction Support","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","NATIONAL INSTITUTES OF HEALTH","93.310","Nov 7, 2024","Aug 2, 2023","false","Gregory K. Farber,
 6701 Democracy Blvd., Room 960, Bethesda MD 20892-4874
 (301) 435-08778.
 "
@@ -106,7 +122,7 @@ SMART Office, Washington DC 20531
 1400 Independence Avenue, SW Room 4534-S, Washington DC 20250
 202-819-6368
 "
-"10.921","Conservation Security Program","Z - Salaries and Expenses","AGRICULTURE, DEPARTMENT OF","NATURAL RESOURCES CONSERVATION SERVICE","10.912, 10.924, 10.914, 10.917, 10.924, 10.904","Nov 4, 2024","Sep 5, 2023","false","Ronnie Maurer, Branch Chief, Programs Branch, Financial Assistance Programs Division
+"10.921","Conservation Security Program","C - Direct Payments for Specified Use","AGRICULTURE, DEPARTMENT OF","NATURAL RESOURCES CONSERVATION SERVICE","10.912, 10.924, 10.914, 10.917, 10.924, 10.904","Nov 4, 2024","Sep 5, 2023","false","Ronnie Maurer, Branch Chief, Programs Branch, Financial Assistance Programs Division
 1400 Independence Ave, SW Room 4534-S,, Washington DC 20250
 (202) 819-6368
 "
@@ -114,9 +130,9 @@ SMART Office, Washington DC 20531
 6705 Rockledge Drive, 807-E, Bethesda MD 20901
 301.402.3263
 "
-"93.663","Extramural Research Restoration Program: Hurricanes Harvey, Maria, and Irma – non-construction","B - Project Grants (Special)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","NATIONAL INSTITUTES OF HEALTH","N/A","Nov 1, 2024","Aug 1, 2023","false","NIH General Grants Contacts page at http://grants.nih.gov/grants/contacts.htm, Bethesda, Maryland 20892 
-NIH General Grants Contacts page at http://grants.nih.gov/grants/contacts.htm, , Bethesda MD 20892
-NIH General Grants Contacts page
+"93.663","Extramural Research Restoration Program: Hurricanes Harvey, Maria, and Irma – non-construction","B - Project Grants (Special)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","NATIONAL INSTITUTES OF HEALTH","N/A","Nov 1, 2024","Aug 1, 2023","false","Adam Graham
+6705 Rockledge Drive, 807-E, Bethesda MD 20892
+301-402-3263
 "
 "84.427","Congressionally Directed Spending—Rehabilitation Services and Disability Research","A - Formula Grants","EDUCATION, DEPARTMENT OF","","N/A","Nov 1, 2024","Aug 2, 2023","false","Theresa DeVaughn
 US Department of Education, OSERS
@@ -232,9 +248,9 @@ Washington, DC 20472, Washington DC 20472
 P.O. Box 61470, Boulder City NV 89006
 LCBEfficiency@usbr.gov
 "
-"10.536","CACFP Training Grants","B - Cooperative Agreements","AGRICULTURE, DEPARTMENT OF","FOOD AND NUTRITION SERVICE","N/A","Jul 19, 2024","Sep 7, 2023","false","Barbara Smith
-3101 Park Center Drive, Alexandria VA 22302
-703-605-0784
+"10.536","CACFP Training Grants","B - Project Grants (Cooperative Agreements)","AGRICULTURE, DEPARTMENT OF","FOOD AND NUTRITION SERVICE","N/A","Jul 19, 2024","Sep 7, 2023","false","Anne Buckley
+1320 Braddock Pl., Alexandria VA 22302
+703-457-7802
 "
 "20.113","Veterans Pilot Training Program","B - Project Grants","TRANSPORTATION, DEPARTMENT OF","FEDERAL AVIATION ADMINISTRATION","20.111, 20.112","Jun 11, 2024","Aug 30, 2023","false","Frances Woodburn
 1250 Maryland Ave SW, Washington DC 20024
@@ -289,7 +305,7 @@ BOEM Resource Evaluation Division
 16825 South Seton Avenue, Emmitsburg MD 21727
 (301) 447-1045
 "
-"64.027","Post-9/11 Veterans Educational Assistance","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","VETERANS BENEFITS ADMINISTRATION","64.117, 64.117","Nov 24, 2023","Aug 27, 2023","false","Education Service-Stakeholder Engagement
+"64.027","Post-9/11 Veterans Educational Assistance","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","VETERANS BENEFITS ADMINISTRATION","64.117","Nov 24, 2023","Aug 27, 2023","false","Education Service-Stakeholder Engagement
 810 Vermont Ave. NW, Washington DC 20420
 202-461-9800
 "
@@ -297,7 +313,7 @@ BOEM Resource Evaluation Division
 1849 C Street NW, Washington DC 20240
 202-208-4781
 "
-"15.231","Fish, Wildlife and Plant Conservation Resource Management","B - Cooperative Agreements (Discretionary Grants)","INTERIOR, DEPARTMENT OF THE","BUREAU OF LAND MANAGEMENT","15.244, 15.247, 15.246, 15.245","Nov 17, 2023","Jul 19, 2022","false","Division of Wildlife, Aquatics, and Environmental Protection
+"15.231","Fish, Wildlife and Plant Conservation Resource Management","B - Cooperative Agreements (Discretionary Grants)","INTERIOR, DEPARTMENT OF THE","BUREAU OF LAND MANAGEMENT","15.246, 15.244, 15.245, 15.247","Nov 17, 2023","Jul 19, 2022","false","Division of Wildlife, Aquatics, and Environmental Protection
 760 Horizon Drive, Suite 324, Grand Junction CO 81506
 (202) 823-1091
 "
@@ -401,7 +417,7 @@ Bureau of Health Workforce (BHW), Room 14N56, Rockville MD 20857
 201 12th Street South, Arlington VA 22202
 (202) 693-9594
 "
-"10.926","Chesapeake Bay Watershed Program","Z - Salaries and Expenses","AGRICULTURE, DEPARTMENT OF","NATURAL RESOURCES CONSERVATION SERVICE","10.912, 10.920, 10.069, 10.913, 10.924, 10.902, 10.914, 10.913, 10.924","Sep 1, 2023","Aug 5, 2022","false","Ronnie Maurer, Acting Branch Chief, Programs Branch, Financial Assistance Programs Division
+"10.926","Chesapeake Bay Watershed Program","C - Direct Payments for Specified Use","AGRICULTURE, DEPARTMENT OF","NATURAL RESOURCES CONSERVATION SERVICE","10.912, 10.920, 10.069, 10.913, 10.924, 10.902, 10.914, 10.913, 10.924","Sep 1, 2023","Aug 5, 2022","false","Ronnie Maurer, Acting Branch Chief, Programs Branch, Financial Assistance Programs Division
 1400 Independence Avenue, SW; Room 4534-S,, Washington DC 20250
 (202) 819-6368
 "
@@ -413,7 +429,7 @@ Bureau of Health Workforce (BHW), Room 14N56, Rockville MD 20857
 7500 Security Blvd., Baltimore MD 21244
 410-786-2736
 "
-"10.206","Grants for Agricultural Research_Competitive Research Grants","B - Project Grants","AGRICULTURE, DEPARTMENT OF","NATIONAL INSTITUTE OF FOOD AND AGRICULTURE","10.205, 10.207, 10.219, 10.652, 10.250, 10.200, 10.202, 10.001, 10.203","Aug 30, 2023","Aug 4, 2022","false","USDA, NIFA, Competitive Programs
+"10.206","Grants for Agricultural Research_Competitive Research Grants","B - Project Grants","AGRICULTURE, DEPARTMENT OF","NATIONAL INSTITUTE OF FOOD AND AGRICULTURE","10.205, 10.207, 10.219, 10.250, 10.652, 10.250, 10.200, 10.202, 10.001, 10.203","Aug 30, 2023","Aug 4, 2022","false","USDA, NIFA, Competitive Programs
 P.O. Box 419205, Mail Stop 10000, Kansas City, MO 64141-6205
 Courier/Package Delivery Address:
 2312 East Bannister Road, Mail Stop 10000, Kansas City, MO 64141-3061, Kansas City MO 64141
@@ -478,9 +494,9 @@ U.S. Department of Housing and Urban Development; Community Planning and Develop
 131 M Street, N.E., Washington DC 20507
 202-663-4191
 "
-"30.011","Employment Discrimination Title I of The Americans with Disabilities Act","N - Investigation of Complaints","EQUAL EMPLOYMENT OPPORTUNITY COMMISSION","","30.013, 30.008, 30.010, 16.101","Aug 17, 2023","Nov 21, 2022","false","Equal Employment 
-131 M. Street NE, Washington DC 20507
-1-800-669-4000 (voice)/1-800-669-6820 (TTY)/1-844-234-5122 (ASL Video Phone)
+"30.011","Employment Discrimination Title I of The Americans with Disabilities Act","N - Investigation of Complaints","EQUAL EMPLOYMENT OPPORTUNITY COMMISSION","","30.013, 30.008, 30.010, 16.101","Aug 17, 2023","Nov 21, 2022","false","Equal Employment Opportunity Commission
+131 M Street, NE, Washington DC 20507
+202-663-4191/202-663-4494(TTY)
 "
 "30.010","Employment Discrimination Equal Pay Act","N - Investigation of Complaints","EQUAL EMPLOYMENT OPPORTUNITY COMMISSION","","30.011, 30.013, 30.008, 30.001, 16.101","Aug 17, 2023","Nov 21, 2022","false","Equal Employment Opportunity Commission (EEOC)
 131 M Street, NE, Washington DC 20507
@@ -535,7 +551,7 @@ Central California Area Office
 Office of Budget, Department of the Interior, 1849 C St N.W., (MS 4106, MIB),, Washington DC 20240
 202-341-2066
 "
-"15.158","DOI National Fire Plan","B - Cooperative Agreements (Discretionary Grants)","INTERIOR, DEPARTMENT OF THE","DEPARTMENTAL OFFICES","15.631, 15.948, 15.232","Aug 2, 2023","Aug 26, 2022","false","Amy Kishpaugh
+"15.158","DOI National Fire Plan","B - Cooperative Agreements (Discretionary Grants)","INTERIOR, DEPARTMENT OF THE","DEPARTMENTAL OFFICES","15.631, 15.631, 15.948, 15.232","Aug 2, 2023","Aug 26, 2022","false","Amy Kishpaugh
 Office of the Secretary
 Office of Wildland Fire 
 300 E. Mallard Drive, Suite 170
@@ -562,7 +578,7 @@ Falls Church, VA  22041-3803
 Bureau of Reclamation, Mail Code 84-27130, Denver Federal Center, P.O. Box 25007, Denver CO 80225
 3034452025
 "
-"15.638","Tribal Landowner Incentive Program","A - Formula Grants","INTERIOR, DEPARTMENT OF THE","U.S. FISH AND WILDLIFE SERVICE","15.631, 15.639, 15.630, 15.623","Jul 28, 2023","Jul 27, 2023","false","Not active
+"15.638","Tribal Landowner Incentive Program","A - Formula Grants","INTERIOR, DEPARTMENT OF THE","U.S. FISH AND WILDLIFE SERVICE","15.631, 15.631, 15.639, 15.630, 15.630, 15.623","Jul 28, 2023","Jul 27, 2023","false","Not active
 DOI, Washington DC 20001
 555-555-5555
 "
@@ -582,7 +598,7 @@ NA
 U.S. Department of Housing and Urban Development, Community Planning and Development, Office of Special Needs Assistance Programs, 451 7th Street, SW, Room 7262, Washington DC 20410
 202-402-4080
 "
-"14.235","Supportive Housing Program","B - Project Grants","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","ASSISTANT SECRETARY FOR COMMUNITY PLANNING AND DEVELOPMENT","14.238, 14.241, 14.267, 14.249, 14.267, 14.231, 14.231","Jul 24, 2023","Aug 11, 2022","false","Tonya Proctor, Deputy Director 
+"14.235","Supportive Housing Program","B - Project Grants","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","ASSISTANT SECRETARY FOR COMMUNITY PLANNING AND DEVELOPMENT","14.238, 14.241, 14.267, 14.267, 14.231, 14.249, 14.231","Jul 24, 2023","Aug 11, 2022","false","Tonya Proctor, Deputy Director 
 U.S. Department of Housing and Urban Development; 
 Community Planning and Development; 
 Office of Special Needs Assistance Programs, Washington DC 20410
@@ -628,9 +644,9 @@ PO Box 12748, Fort Huachuca AZ 85670-2748
 3101 Park Center Drive, Alexandria VA 22302
 703-305-4386
 "
-"15.840","Upper Mississippi River System Navigation and Ecosystem Sustainability Program","B - Cooperative Agreements","INTERIOR, DEPARTMENT OF THE","US GEOLOGICAL SURVEY","N/A","Jul 18, 2023","Nov 17, 2022","false","Mark Gaikowski
-2630 Fanta Reed Road, LaCrosse WI 54603
-6087816221
+"15.840","Upper Mississippi River System Navigation and Ecosystem Sustainability Program","B - Cooperative Agreements","INTERIOR, DEPARTMENT OF THE","US GEOLOGICAL SURVEY","N/A","Jul 18, 2023","Nov 17, 2022","false","Marissa Borre
+, 2630 Fanta Reed Road, LaCrosse WI 54602
+(608) 781-6303
 "
 "15.633","Landowner Incentive","B - Project Grants (Discretionary)","INTERIOR, DEPARTMENT OF THE","U.S. FISH AND WILDLIFE SERVICE","15.615, 15.611, 15.634, 15.605, 15.608","Jul 17, 2023","May 5, 2022","false","Chief, Policy and Programs Division
 Chief, Policy and Programs Division, Wildlife and Sport Fish Restoration Programs, U.S. Fish and Wildlife Service, Department of the Interior, MS: WSFR, 5275 Leesburg Pike, , Falls Church VA 22041-3803
@@ -644,12 +660,6 @@ W84-322, Washington DC 20590
 "59.074","OED Resource Partners Training Portal (RPTP)","B - Project Grants","SMALL BUSINESS ADMINISTRATION","","N/A","Jul 12, 2023","Jul 28, 2022","false","Nathaniel Bishop
 409 3rd Street, SW, Washington DC 20416
 202.205.7007
-"
-"12.432","U.S. Military Academy Athletic Programs at West Point","B - Project Grants (Cooperative Agreements)","DEPT OF DEFENSE","DEPT OF THE ARMY","N/A","Jul 10, 2023","Aug 31, 2022","false","Kia S McCormick
-US ARMY RESEARCH OFFICE / ACC-APG-RTP DIVISION
-
-, RESEARCH TRIANGLE PARK NC 27709-2211
-9195414281
 "
 "93.602","Assets for Independence Demonstration Program","B - Project Grants (Discretionary)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","ADMINISTRATION FOR CHILDREN AND FAMILIES","N/A","Jul 5, 2023","Sep 9, 2022","false","Rafael J. Elizalde, Program Manager
 Division of Community Discretionary Programs, Office of Community Services, Administration for Children and Families, Department of Health and Human Services, 330 C Street, S.W, Washington DC 20201
@@ -699,9 +709,9 @@ Suite 400, Clarksdale MS 38614
 "90.201","Delta Area Economic Development","A - Formula Grants","DELTA REGIONAL AUTHORITY","","N/A","May 16, 2023","Jul 18, 2008","false","Inquiries and proposals for projects should be submitted first to The Local Development District.  (See DRA website for listing.)  Other inquiries may be addressed to: Executive Director, Delta Regional Authority, 236 Sharkey Avenue, Suite 400, Clarksdale, MS 38614. Telephone: (662) 624-8600. , 
 
 "
-"64.050","VHA Diagnostic Care","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Stephen Kendall
-100 Grandview Road, Suite 114, Braintree MA 02184
-781-348-0134
+"64.050","VHA Diagnostic Care","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
+100 Grandview Rd Suite 114, Braintree MA 02184
+781.348-0126
 "
 "64.049","VHA Community Living Center","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
 100 Grandview Road, Suite 114, Braintree MA 02184
@@ -711,33 +721,33 @@ Suite 400, Clarksdale MS 38614
 100 Grandview Road, Suite 114, Braintree MA 02184
 781-348-0126
 "
-"64.047","VHA Primary Care","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
+"64.047","VHA Primary Care","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Stephen Kendall
+100 Grandview Road, Suite 114, Braintree ME 02184
+781-348-0134
+"
+"64.046","VHA Inpatient Psychiatry","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Stephen Kendall
+100 Grandview Road, Suite 114, Braintree ME 02184
+781-348-0134
+"
+"64.045","VHA Outpatient Ancillary Services","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Stephen Kendall
 100 Grandview Road, Suite 114, Braintree MA 02184
+781-348-0134
+"
+"64.044","VHA Home Care","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
+100 Grandview Rd, Suite 114, Braintree MA 01284
 781-348-0126
 "
-"64.046","VHA Inpatient Psychiatry","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
-100 Grandview Road, Suite 114, Braintree MA 02184
-781-348-0126
-"
-"64.045","VHA Outpatient Ancillary Services","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
+"64.043","VHA Mental Health Residential","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
 100 Grandview Rd, Suite 114, Braintree MA 02184
 781-348-0126
-"
-"64.044","VHA Home Care","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Stephen Kendall
-100 Grandview Road, Suite 114, Braintree MA 02184
-781-348-0134
-"
-"64.043","VHA Mental Health Residential","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Stephen Kendall
-100 Grandview Road, Suite 114, Braintree MA 02184
-781-348-0134
 "
 "64.042","VHA Inpatient Surgery","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
 100 Grandview Rd, Suite 114, Braintree MA 02184
 781-348-0126
 "
-"64.041","VHA Outpatient Specialty Care","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Stephen Kendall
+"64.041","VHA Outpatient Specialty Care","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
 100 Grandview Rd, Suite 114, Braintree MA 02184
-781-348-0134
+781-348-0126
 "
 "64.040","VHA Inpatient Medicine","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","","N/A","Apr 14, 2023","Sep 18, 2020","false","Stephen Kendall
 100 Grandview Rd., Suite 114, Braintree MA 02184
@@ -750,9 +760,9 @@ VHA Office of Community Care (10D)
 Washington, DC 20420, Washington DC 20420
 310-560-8742
 "
-"64.013","Veterans Prosthetic Appliances","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","VA HEALTH ADMINISTRATION CENTER","93.778, 64.009, 64.100, 93.774, 64.011, 64.116","Apr 14, 2023","Sep 18, 2020","false","Debra Fitts
-100 Grandview Rd, Suite 114, Braintree MA 02184
-781-348-0126
+"64.013","Veterans Prosthetic Appliances","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","VA HEALTH ADMINISTRATION CENTER","93.778, 64.009, 64.100, 93.774, 64.011, 64.116","Apr 14, 2023","Sep 18, 2020","false","Chief Prosthetics and Clinical Logistics Officer
+CHIEF Prosthetics and Clinical Logistics Officer (10f), Department of Veterans Affairs, Washington, DC 20420. Telephone: (202) 254-0440.  Fax: (202) 254-0470. , Washington DC 20420
+202-254-0440
 "
 "64.012","Veterans Prescription Service","Z - Salaries and Expenses","VETERANS AFFAIRS, DEPARTMENT OF","VA HEALTH ADMINISTRATION CENTER","93.778, 93.774, 64.011","Apr 14, 2023","Sep 18, 2020","false","Chief Consultant, Pharmacy Benefits Management
 Chief Consultant, Pharmacy Benefits Management, Department of Veterans Affairs, Washington, DC 20420. Telephone: (202) 273-8429. , Washington DC 20420
@@ -794,7 +804,7 @@ Courier/Package Delivery Address:
 MS D-29, Atlanta  GA 30029-4018
 4046395276
 "
-"15.656","Recovery Act Funds - Habitat Enhancement, Restoration and Improvement.","B - Cooperative Agreements (Discretionary Grants)","INTERIOR, DEPARTMENT OF THE","U.S. FISH AND WILDLIFE SERVICE","15.605, 15.631, 15.630, 66.708, 15.608","Sep 8, 2022","Sep 8, 2022","false","Assistant Director,
+"15.656","Recovery Act Funds - Habitat Enhancement, Restoration and Improvement.","B - Cooperative Agreements (Discretionary Grants)","INTERIOR, DEPARTMENT OF THE","U.S. FISH AND WILDLIFE SERVICE","15.631, 15.605, 15.631, 15.630, 66.708, 15.630, 15.608","Sep 8, 2022","Sep 8, 2022","false","Assistant Director,
 Fisheries and Habitat Conservation, Fish and Wildlife Service, Department of the Interior, 1849 C Street, N.W., Washington DC 20240
 (202) 208-6394
 "
@@ -812,8 +822,8 @@ SSMC 4 Room 13267, Silver Spring MD 20910
 Tower Building, Rockville MD 20852
 (240) 453-8822
 "
-"93.910","Family and Community Violence Prevention Program","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","OFFICE OF ASSISTANT SECRETARY FOR HEALTH","N/A","Sep 6, 2022","Aug 25, 2021","false","Stacey Williams
-1101  Wootton Parkway, Rockville MD 20852
+"93.910","Family and Community Violence Prevention Program","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","OFFICE OF ASSISTANT SECRETARY FOR HEALTH","N/A","Sep 6, 2022","Aug 25, 2021","false","Sonsiere Cobb-Souza
+1101 Wootton Parkway, Suite 100, Rockville MD 20852
 2404538444
 "
 "10.547","Professional Standards for School Nutrition Employees","M - Training","AGRICULTURE, DEPARTMENT OF","FOOD AND NUTRITION SERVICE","N/A","Aug 31, 2022","Sep 20, 2021","false","Rebecca MacIsaac
@@ -887,9 +897,9 @@ Mail Stop F-80, Atlanta GA 30341
 1600 Clifton Rd, MS E-03, Atlanta GA 30333
 404-639-0712
 "
-"93.533","Prevention and Public Health Fund  (Affordable Care Act): Enhanced Surveillance for New Vaccine Preventable Disease","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","93.185","Aug 24, 2022","Aug 25, 2021","false","Thijuanie Lockhart
-1600 Clifton Road , Atlanta GA 30329
-404-639-1305
+"93.533","Prevention and Public Health Fund  (Affordable Care Act): Enhanced Surveillance for New Vaccine Preventable Disease","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","93.185","Aug 24, 2022","Aug 25, 2021","false","Ricky Bankston
+1600 Clifton Road, Atlanta GA 30329
+404-718-7410
 "
 "93.521","The Affordable Care Act: Building Epidemiology, Laboratory, and Health Information Systems Capacity in the Epidemiology and Laboratory Capacity for Infectious Disease (ELC) and Emerging Infections Program (EIP) Cooperative Agreements; PPHF","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","Aug 24, 2022","Aug 13, 2021","false","Jason Snow
 Scientific Programs & Development Branch (SPDB)
@@ -987,11 +997,9 @@ Land Buy-Back Program for Tribal Nations, Department of the Interior, 1849 C St.
 250 E Street, SW, Washington DC 20525
 202-606-6659
 "
-"93.765","PPHF-CDC Partnership: Strengthening Public Health Laboratories","A - Formula Grants (Cooperative Agreements)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","Jul 29, 2022","Aug 2, 2021","false","Se'Veda Kent
-Centers for Disease Control and Prevention
-Center for Surveillance, Epidemiology and Laboratory Services (CSELS)
-MS: V24-3, 2400 Century Parkway NE, Atlanta GA 30345
-404-488-8268
+"93.765","PPHF-CDC Partnership: Strengthening Public Health Laboratories","A - Formula Grants (Cooperative Agreements)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","Jul 29, 2022","Aug 2, 2021","false","Brittany Dunigan-Willis
+Centers for Disease Control and Prevention Center for Surveillance, Epidemiology and Laboratory Services (CSELS) MS: V24-3, 2400 Century Parkway NE, Atlanta GA 30345
+404-498-0824
 "
 "66.514","Science To Achieve Results (STAR) Fellowship Program","B - Project Grants (Discretionary)","ENVIRONMENTAL PROTECTION AGENCY","","N/A","Jul 26, 2022","Sep 22, 2021","false","Ron Josephson, Eligibility Contact
 U.S. Environmental Protection Agency, Office of Research and Development, 1200 Pennsylvania Avenue, N.W. (Mail Code: 3204R), Washington DC 20460
@@ -1232,9 +1240,9 @@ Washington, D.C. 20515, Washington DC 20515
 4770 Buford Hwy NE, MS F77, Atlanta GA 30341
 770-488-6042
 "
-"93.739","PPHF: Chronic Disease Innovation Grants - financed solely by Public Prevention Health Funds","B - Cooperative Agreements (Discretionary Grants)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","93.283","Jul 26, 2021","Jul 22, 2020","false","Sheryl Heard
-4770 Buford Highway, NE, Atlanta GA 30341
-7704882855
+"93.739","PPHF: Chronic Disease Innovation Grants - financed solely by Public Prevention Health Funds","B - Cooperative Agreements (Discretionary Grants)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","93.283","Jul 26, 2021","Jul 22, 2020","false","Debra Toress
+4770 Buford Hwy, NE, MS K10, NCCDPHP, Atlanta GA 30333
+770-488-1097
 "
 "93.699","State and National Tobacco Cessation Support Systems","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","Jul 26, 2021","Jul 20, 2020","false","Sarah O'Leary
 4770 Buford Hwy, NE, Atlanta GA 30341
@@ -1342,11 +1350,11 @@ Suite 08 G 08
 1200 New Jersey Avenue, S.E., NRO-100, Washington DC 20590
 (202) 366-5424
 "
-"20.609","Safety Belt Performance Grants","A - Formula Grants (Apportionments)","TRANSPORTATION, DEPARTMENT OF","NATIONAL HIGHWAY TRAFFIC SAFETY ADMINISTRATION","N/A","May 27, 2021","Jul 2, 2020","false","Jamie D. Pfister
+"20.609","Safety Belt Performance Grants","A - Formula Grants","TRANSPORTATION, DEPARTMENT OF","NATIONAL HIGHWAY TRAFFIC SAFETY ADMINISTRATION","N/A","May 27, 2021","Jul 2, 2020","false","Jamie D. Pfister
 1200 New Jersey Avenue, S.E., NRO-010, Washington DC 20590
 (202) 366-5424
 "
-"20.613","Child Safety and Child Booster Seats Incentive Grants","B - Project Grants","TRANSPORTATION, DEPARTMENT OF","NATIONAL HIGHWAY TRAFFIC SAFETY ADMINISTRATION","N/A","May 27, 2021","Jul 6, 2020","false","Jamie D. Pfister
+"20.613","Child Safety and Child Booster Seats Incentive Grants","A - Formula Grants","TRANSPORTATION, DEPARTMENT OF","NATIONAL HIGHWAY TRAFFIC SAFETY ADMINISTRATION","N/A","May 27, 2021","Jul 6, 2020","false","Jamie D. Pfister
 1200 New Jersey Avenue, S.E., NRO-010, Washington DC 20590
 (202) 366-5424
 "
@@ -1366,9 +1374,9 @@ Suite 08 G 08
 Federal Duck Stamp Office, U.S. Fish and Wildlife Service, Department of the Interior, 5275 Leesburg Pike, MS: MB, Falls Church VA 22041-3803
 703-358-2145
 "
-"45.030","Museums for America","B - Project Grants","THE INSTITUTE OF MUSEUM AND LIBRARY SERVICES","","N/A","Apr 1, 2021","Sep 17, 2020","false","Connie Bodner
-955 L'Enfant Plaza North, SW, Washington DC 20023
-202-654-4636
+"45.030","Museums for America","B - Project Grants","THE INSTITUTE OF MUSEUM AND LIBRARY SERVICES","","N/A","Apr 1, 2021","Sep 17, 2020","false","Sandra Narva
+955 L'Enfant Plaza North, SW, Washington DC 20024
+202-653-4634
 "
 "45.029","Native American and Native Hawaiian Library Services","B - Project Grants","THE INSTITUTE OF MUSEUM AND LIBRARY SERVICES","","N/A","Apr 1, 2021","Mar 4, 2021","false","Sandra Narva
 955 L'Enfant Plaza North, SW, Washington DC 20024
@@ -1378,17 +1386,17 @@ Federal Duck Stamp Office, U.S. Fish and Wildlife Service, Department of the Int
 955 L'Enfant Plaza North, SW, Washington DC 20023
 202-654-4636
 "
-"45.019","Museum Grants for African American History and Culture","B - Project Grants","THE INSTITUTE OF MUSEUM AND LIBRARY SERVICES","","N/A","Apr 1, 2021","Sep 17, 2020","false","Connie Bodner
+"45.019","Museum Grants for African American History and Culture","B - Project Grants","THE INSTITUTE OF MUSEUM AND LIBRARY SERVICES","","N/A","Apr 1, 2021","Sep 17, 2020","false","Sandra Narva
 955 L'Enfant Plaza North, SW, Washington DC 200242135
-202-653-4636
+202-653-3634
 "
 "45.018","National Leadership Grants","B - Project Grants","THE INSTITUTE OF MUSEUM AND LIBRARY SERVICES","","N/A","Apr 1, 2021","Sep 17, 2020","false","Sandra Narva
 955 L'Enfant Plaza North, SW, Washington DC 20024
 202-653-4634
 "
-"45.017","Laura Bush 21st Century Librarian Program","B - Project Grants","THE INSTITUTE OF MUSEUM AND LIBRARY SERVICES","","N/A","Apr 1, 2021","Sep 17, 2020","false","Sandra Narva
-955 L'Enfant Plaza North, SW, Washington DC 20024
-202-653-4634
+"45.017","Laura Bush 21st Century Librarian Program","B - Project Grants","THE INSTITUTE OF MUSEUM AND LIBRARY SERVICES","","N/A","Apr 1, 2021","Sep 17, 2020","false","Connie Bodner
+955 L'Enfant Plaza North, SW, Washington DC 200242135
+202-653-4636
 "
 "45.016","Grants to State Library Administrative Agencies","A - Formula Grants","THE INSTITUTE OF MUSEUM AND LIBRARY SERVICES","","N/A","Apr 1, 2021","Nov 26, 2020","false","Sandra Narva
 955 L'Enfant Plaza North, SW, Washington DC 20024
@@ -1571,7 +1579,7 @@ Room 6230, Washington DC 20410
 , Washington DC 20201.
 301-492-4312.
 "
-"93.615","Maternal, Infant, and Early Childhood Home Visiting Research Programs","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","HEALTH RESOURCES AND SERVICES ADMINISTRATION","93.505, 93.870, 93.110","Jul 7, 2020","Jul 26, 2019","false","Kyle Peplinski, MA
+"93.615","Maternal, Infant, and Early Childhood Home Visiting Research Programs","B - Project Grants","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","HEALTH RESOURCES AND SERVICES ADMINISTRATION","93.505, 93.870, 93.110","Jul 7, 2020","Jul 26, 2019","false","Kyle Peplinski, MA
 5600 Fishers Lane, Room 18N160, Rockville MD 20857
 (301) 443-7758
 "
@@ -1629,9 +1637,11 @@ Office of Rural Housing and Economic Development
 451 7th Street, SW, Room 7240, Washington, DC DC 20410
 202 402 4464
 "
-"14.012","Rural Housing and Economic Development","B - Project Grants","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","ASSISTANT SECRETARY FOR COMMUNITY PLANNING AND DEVELOPMENT","N/A","May 13, 2020","May 12, 2020","false","Jackie L. Williams
-U.S. Department of Housing and Economic Development Office of Rural Housing and Economic Development 451 7th Steet, SW, Room 7240, washington DC 20410
-877-787-2526
+"14.012","Rural Housing and Economic Development","B - Project Grants","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","ASSISTANT SECRETARY FOR COMMUNITY PLANNING AND DEVELOPMENT","N/A","May 13, 2020","May 12, 2020","false","Thann Young
+U.S. Department of Housing and Economic Development
+Office of Rural Housing and Economic Development
+451 7th Steet, SW, Room 7240, Washington, DC DC 20410
+202 402-4464
 "
 "14.014","Appalachia Economic Development Initiative","B - Project Grants","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","ASSISTANT SECRETARY FOR COMMUNITY PLANNING AND DEVELOPMENT","N/A","May 13, 2020","May 12, 2020","false","Thann Young
 U.S. Department of Housing and Urban Development
@@ -1658,12 +1668,12 @@ Office of Rural Housing and Economic Development
 451 7th Street, SW, Room 7240, washington DC 20410
 877-787-2526
 "
-"93.425","Centers for Disease Control and Prevention - Resident Postdoctoral Program in Microbiology","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","93.283, 93.065, 93.322","May 12, 2020","Aug 22, 2019","false","Angela Y. Slaughter
-Centers for Disease Control and Prevention
-1600 Clifton Road, MS C-18, Atlanta GA 30329
-4046397722
+"93.425","Centers for Disease Control and Prevention - Resident Postdoctoral Program in Microbiology","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","93.283, 93.065, 93.322","May 12, 2020","Aug 22, 2019","false","Rainy Henry
+1600 Clifton Road NE, MS-C18
+, Atlanta GA 30329
+4046396146
 "
-"93.373","Multiple Approaches to Support Young Breast Cancer Survivors and Metastatic Breast Cancer Patients","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","May 12, 2020","Aug 26, 2019","false","Angela R. Moore, MPH
+"93.373","Multiple Approaches to Support Young Breast Cancer Survivors and Metastatic Breast Cancer Patients","A - Formula Grants (Cooperative Agreements)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","May 12, 2020","Aug 26, 2019","false","Angela R. Moore, MPH
 4770 Buford Highway
 Chamblee Campus, Building 107/4th Floor, Atlanta GA 30341
 770.488.3094
@@ -1708,7 +1718,7 @@ CDC, NCEH, 4770 Buford Hwy, Atlanta GA 30341-3717
 NCCDPHP, 4770 Buford Highway NE, MSK50, Atlanta GA 30341
 770-488-1172
 "
-"93.875","Assistance for Oral Disease Prevention and Control","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","93.283","Jan 9, 2020","Aug 23, 2019","false","Marcia Parker
+"93.875","Assistance for Oral Disease Prevention and Control","B - Project Grants (Cooperative Agreements)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","93.283","Jan 9, 2020","Aug 23, 2019","false","Marcia Parker
 4770 Buford Hwy, MS F80, Atlanta GA 30341
 7704886075
 "
@@ -1716,9 +1726,9 @@ NCCDPHP, 4770 Buford Highway NE, MSK50, Atlanta GA 30341
 4770 Buford Highway, MS-F80, Atlanta GA 30341
 770-488-6393
 "
-"93.815","Domestic Ebola Supplement to the Epidemiology and Laboratory Capacity for Infectious Diseases (ELC).","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","Jan 8, 2020","Aug 26, 2019","false","Jason Snow
-Angelica O'Conner, Atlanta GA 30341
-404-639-4577
+"93.815","Domestic Ebola Supplement to the Epidemiology and Laboratory Capacity for Infectious Diseases (ELC).","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","N/A","Jan 8, 2020","Aug 26, 2019","false","Angelica O'Connor
+1600 Clifton Rd, NE (MS-C18), Atlanta GA 30333
+4046397379
 "
 "93.466","Building Capacity of the Public Health System to Address Ebola Through National Nonprofit Organizations","B - Cooperative Agreements","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR DISEASE CONTROL AND PREVENTION","66.110","Jan 3, 2020","Aug 26, 2019","false","Linton Charles Browning
 2920 Brandywine Road, Mail Stop K-98, , Atlanta GA 30341
@@ -2190,7 +2200,7 @@ TechWorld Bldg - South Tower 5th Floor
 , Washington DC 20472-3615
 (1-866) 274-0960
 "
-"97.113","Rail and Transit Security Grant Program (ARRA)","B - Project Grants","HOMELAND SECURITY, DEPARTMENT OF","FEDERAL EMERGENCY MANAGEMENT AGENCY","97.057, 97.056, 97.008, 97.067, 97.078","Sep 18, 2018","Aug 5, 2017","false","Grant Programs Directorate, FEMA
+"97.113","Rail and Transit Security Grant Program (ARRA)","B - Project Grants","HOMELAND SECURITY, DEPARTMENT OF","FEDERAL EMERGENCY MANAGEMENT AGENCY","97.057, 97.056, 97.008, 97.067, 97.078, 97.057, 97.056, 97.067","Sep 18, 2018","Aug 5, 2017","false","Grant Programs Directorate, FEMA
 DHS/FEMA/GPD
 400 C Street, SW
 3N
@@ -2537,7 +2547,7 @@ Rights Division, Educational Opportunities Litigation Section, , Washington DC 2
 Millennium Challenge Corporation, Contracts and Grants Management Division, 875 15th Street, NW, Washington DC 20005
 (202) 521-3600.
 "
-"40.002","Government Publications Sales and Distribution",,"UNITED STATES GOVERNMENT PUBLISHING OFFICE","","43.002, 39.009, 40.001, 11.650","Sep 11, 2017","Sep 18, 2008","false","Mail orders and inquiries should be addressed to: United States Government Printing Office, Superintendent of Documents, 732 N. Capitol Street, Washington, DC 20402. Contact: Order Desk. Telephone: (toll free) (866) 512-1800 or DC area (202) 512-1800. Fax: (202) 512-2104, E Mail: orders@gpo.gov or gpo@custhelp.com . , 
+"40.002","Government Publications Sales and Distribution",,"UNITED STATES GOVERNMENT PUBLISHING OFFICE","","39.009, 40.001, 11.650, 43.002","Sep 11, 2017","Sep 18, 2008","false","Mail orders and inquiries should be addressed to: United States Government Printing Office, Superintendent of Documents, 732 N. Capitol Street, Washington, DC 20402. Contact: Order Desk. Telephone: (toll free) (866) 512-1800 or DC area (202) 512-1800. Fax: (202) 512-2104, E Mail: orders@gpo.gov or gpo@custhelp.com . , 
 
 "
 "40.001","Depository Libraries for Government Publications",,"UNITED STATES GOVERNMENT PUBLISHING OFFICE","","40.002, 11.650","Sep 11, 2017","Sep 18, 2008","false","U.S. Government Printing Office, Information Dissemination Department (Superintendent of Documents), 732 North Capitol Street, NW., Washington, DC 20402. Contact: U.S. Government Printing Office, Judy Russell, Superintendent of Documents, 732 North Capitol Street, NW., Washington, DC 20402.  Telephone: (202) 512-1114. The Gpo Contact Center:   Hours:  7:00 a.m. to 8:00 p.m.  EST Monday through Friday    (except Federal Holidays)  Toll-Free: 1-866-512-1800 DC Area:  202-512-1800  E-Mail: ContractCenter@gpo.gov  Online: www.gpoaccess.gov/help  Fax: 202-512-2104. , 
@@ -2607,7 +2617,7 @@ United States Institute of Peace, 1200 17th Street NW, Suite 200, Washington DC 
 "78.004","Commodity Futures Reparations Claims","Z - Salaries and Expenses","COMMODITY FUTURES TRADING COMMISSION","","N/A","Sep 11, 2017","Sep 17, 2008","false","Office of the Executive Director, Office of Proceedings, Commodity Futures Trading Commission, 3 Lafayette Center, 1155 21st Street, NW., Washington, DC 20581.  Telephone: (202) 418-5250. , 
 
 "
-"85.105","Agriscience Awards","C - Direct Payments for Specified Use","CHRISTOPHER COLUMBUS FELLOWSHIP FOUNDATION","","N/A","Sep 11, 2017","Sep 21, 2013","false","Judith Shellenberger, 
+"85.105","Agriscience Awards","D - Direct Payments with Unrestricted Use","CHRISTOPHER COLUMBUS FELLOWSHIP FOUNDATION","","N/A","Sep 11, 2017","Sep 21, 2013","false","Judith Shellenberger, 
 110 Genesee Street, Suite 390, Auburn NY 13021
 (315) 258-0090
 "
@@ -2674,7 +2684,7 @@ see website for local SSA office., Baltimore  MD 21235
 1000 Independence Avenue, SW, Washington DC 20585
 2025869743
 "
-"64.036","Veterans Retraining Assistance Program (VRAP)","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","VETERANS BENEFITS ADMINISTRATION","64.125, 64.117, 64.117","Sep 8, 2017","Apr 15, 2012","false","Department of Veterans Affairs
+"64.036","Veterans Retraining Assistance Program (VRAP)","C - Direct Payments for Specified Use","VETERANS AFFAIRS, DEPARTMENT OF","VETERANS BENEFITS ADMINISTRATION","64.125, 64.117","Sep 8, 2017","Apr 15, 2012","false","Department of Veterans Affairs
 810 Vermont Ave., N.W., Washington DC 20420
 202-461-9800
 "
@@ -3207,7 +3217,7 @@ Tower Building Suite 550, 1101 Wootton Parkway , Rockville MD 20852
 200 Constitution Avenue, N.W. , Washington DC 20210
 202-693-3177
 "
-"17.260","WIA Dislocated  Workers","A - Formula Grants","LABOR, DEPARTMENT OF","EMPLOYMENT AND TRAINING ADMINISTRATION","17.277, 17.258, 17.245, 17.278, 17.259, 17.207","Aug 12, 2016","Aug 20, 2015","false","Grace Kilbane,
+"17.260","WIA Dislocated  Workers","B - Project Grants","LABOR, DEPARTMENT OF","EMPLOYMENT AND TRAINING ADMINISTRATION","17.277, 17.258, 17.245, 17.278, 17.259, 17.207","Aug 12, 2016","Aug 20, 2015","false","Grace Kilbane,
 200 Constitution Avenue, NW, Room S-4209, Washington DC 20210
 (202) 693-3980
 "
@@ -3365,7 +3375,7 @@ Rehabilitation Services Administration, 400 Maryland Avenue, S.W., Washington DC
 Department of Education, OSERS Rehabilitation Services Administration 400 Maryland Ave., S.W, Washington DC 20202
 (202) 245-7557. 
 "
-"97.068","Competitive Training Grant","B - Cooperative Agreements","HOMELAND SECURITY, DEPARTMENT OF","","97.005, 97.007, 97.067, 97.005, 97.007","Sep 18, 2015","Sep 12, 2014","false","FEMA Grant Programs Directorate
+"97.068","Competitive Training Grant","B - Cooperative Agreements","HOMELAND SECURITY, DEPARTMENT OF","","97.005, 97.007, 97.067, 97.005, 97.067, 97.007","Sep 18, 2015","Sep 12, 2014","false","FEMA Grant Programs Directorate
 500 C Street SW, Washington DC 20472
 1-800-368-6498
 "
@@ -3496,7 +3506,7 @@ Rural Utilities Service, 1400 Independence Avenue, S.W., STOP 1590, Washington D
 Institute of Food Safety and Nutrition, Division of Nutrition, 1400 Independence Avenue, SW., STOP 2225, Washington DC 20250-2225
 (202) 401-2138
 "
-"10.781","Water and Waste Disposal Systems for Rural Communities - ARRA","B - Project Grants","AGRICULTURE, DEPARTMENT OF","RURAL UTILITIES SERVICE","11.300, 14.218","Aug 13, 2015","Aug 7, 2014","false","Assistant Administrator, Water and Environmental Programs,
+"10.781","Water and Waste Disposal Systems for Rural Communities - ARRA","E - Direct Loans","AGRICULTURE, DEPARTMENT OF","RURAL UTILITIES SERVICE","11.300, 14.218","Aug 13, 2015","Aug 7, 2014","false","Assistant Administrator, Water and Environmental Programs,
 Department of Agriculture, Rural Utilities Service, Water and Environmental Programs, 1400 Independence Ave., SW, Stop 1548, Washington DC 20250
 (202) 690-2670.
 "
@@ -3536,7 +3546,7 @@ Office of the Chief Communications Officer, External and Governmental Affairs
 540 Gaither Rd, Rockville MD 20850
 301-427-1493
 "
-"14.260","Veterans Homelessness Prevention Demonstration Program","B - Project Grants","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","Office of Community Planning and Development","14.238, 14.235, 14.241, 14.249, 14.231, 14.231","Jun 26, 2015","Aug 13, 2014","false","Brian Fitzmaurice,
+"14.260","Veterans Homelessness Prevention Demonstration Program","B - Project Grants","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","Office of Community Planning and Development","14.238, 14.235, 14.241, 14.231, 14.249, 14.231","Jun 26, 2015","Aug 13, 2014","false","Brian Fitzmaurice,
 Office of Special Needs Assistance Programs, U.S. Department of Housing and Urban Development, Community Planning and Development, 451 7th Street, SW, Room 7262, Washington DC 20410
 202-708-4300
 "
@@ -3572,7 +3582,7 @@ Office of Special Needs Assistance Programs, U.S. Department of Housing and Urba
 7500 Security Boulevard , Baltimore MD 21207
 (410) 786-8279.
 "
-"59.009","Procurement Assistance to Small Businesses","Z - Salaries and Expenses","SMALL BUSINESS ADMINISTRATION","","17.301, 59.006, 43.002, 36.001, 17.303, 59.006","May 27, 2015","Jun 17, 2009","false","SBA Executive Secretariat
+"59.009","Procurement Assistance to Small Businesses","Z - Salaries and Expenses","SMALL BUSINESS ADMINISTRATION","","17.301, 59.006, 36.001, 17.303, 43.002, 59.006","May 27, 2015","Jun 17, 2009","false","SBA Executive Secretariat
 409 3rd. Street, SW, Washington DC 20416
 1-800-827-5722
 "
@@ -3767,7 +3777,7 @@ Countermeasures Dispensing Program, Office of Preparedness and Emergency Operati
 451 Seventh Street, S.W., Room 5156, Washington DC 20410
 (202) 402.4274
 "
-"14.262","Homeless Prevention and Rapid Re-Housing Program Technical Assistance","B - Cooperative Agreements","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","Office of Community Planning and Development","14.238, 14.235, 14.241, 14.249, 14.231, 14.231","Jun 16, 2014","Aug 8, 2012","false","Michael Roanhouse,
+"14.262","Homeless Prevention and Rapid Re-Housing Program Technical Assistance","B - Cooperative Agreements","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","Office of Community Planning and Development","14.238, 14.235, 14.241, 14.231, 14.249, 14.231","Jun 16, 2014","Aug 8, 2012","false","Michael Roanhouse,
 Office of Special Needs Assistance Programs, Room 7262, Office of Community Planning and Development,  Department of Housing and Urban Development, Washington DC 20410
 (202) 708-1226.
 "
@@ -3796,7 +3806,7 @@ Millennium Challenge Corporation
 245 Murray Lane, SW, Mail Stop 0115, Washington DC 20528
 (703) 235-2871
 "
-"97.004","State Domestic Preparedness Equipment Support Program","B - Project Grants","HOMELAND SECURITY, DEPARTMENT OF","","16.580, 97.067","Mar 5, 2014","Jun 18, 2009","false","Headquarters Office:  U.S Department of Homeland Security/FEMA Techworld, Control Desk, 4th Floor, Rm 427
+"97.004","State Domestic Preparedness Equipment Support Program","B - Project Grants","HOMELAND SECURITY, DEPARTMENT OF","","16.580, 97.067, 97.067","Mar 5, 2014","Jun 18, 2009","false","Headquarters Office:  U.S Department of Homeland Security/FEMA Techworld, Control Desk, 4th Floor, Rm 427
 500 C St., SW
 , Washington DC 20472
  (800) 368-6498.
@@ -3965,7 +3975,7 @@ EPA Region 3
 5600 Fishers Lane, Room 9C-05, Rockville MD 20857
 (301) 443-6950
 "
-"97.059","Truck Security Program","B - Cooperative Agreements","HOMELAND SECURITY, DEPARTMENT OF","","97.075, 97.057, 97.056, 97.078","Aug 4, 2013","Sep 14, 2012","false","Department of Homeland Security /FEMA Techworld, Control Desk, 4th Floor, Room: 427
+"97.059","Truck Security Program","B - Cooperative Agreements","HOMELAND SECURITY, DEPARTMENT OF","","97.075, 97.057, 97.056, 97.078, 97.057, 97.056","Aug 4, 2013","Sep 14, 2012","false","Department of Homeland Security /FEMA Techworld, Control Desk, 4th Floor, Room: 427
 500 C St. SW, Washington DC 20427
 (1-800) 368-6498
 "
@@ -4018,7 +4028,7 @@ U.S. Environmental Protection Agency, Region 10
 EPA, Region 3, Mail code 3EA00, 1650 Arch Street, Philadelphia, PA 19103, Philadelphia PA 19103
 (215) 814-2722
 "
-"14.323","Emergency Homeowners’ Loan Program","F - Loan Guarantees/Grants","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","Office of Housing-Federal Housing Commissioner","N/A","Jul 12, 2013","Jul 28, 2012","false","Wanda L. Sampedro
+"14.323","Emergency Homeowners’ Loan Program","E - Direct Loans","HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF","Office of Housing-Federal Housing Commissioner","N/A","Jul 12, 2013","Jul 28, 2012","false","Wanda L. Sampedro
 451 7th Street, SW, Washington DC 20410
 (800) 225-5342
 "
@@ -4043,7 +4053,7 @@ National Program Chemical Division (7404T), Office of Pollution Prevention and T
 1099 14th Street NW, Washington DC 20570
 (202) 273-3887
 "
-"11.650","National Technical Information Service",,"COMMERCE, DEPARTMENT OF","NATIONAL TECHNICAL INFORMATION SERVICE","40.002, 43.002, 39.009, 40.001, 11.604, 11.603, 11.900, 81.003","Jun 10, 2013","Sep 19, 2008","false","Ellen Herbst(Director), 5285 Port Royal Road, Room 1014 Sills, Springfield, VA 22161. Telephone: (703) 605-6400. Sales Division: Telephone: 1-800-553-6847 or E-mail: info@ntis.gov (for Placing orders and for information on NTIS products and services). , 
+"11.650","National Technical Information Service",,"COMMERCE, DEPARTMENT OF","NATIONAL TECHNICAL INFORMATION SERVICE","40.002, 39.009, 40.001, 11.604, 11.603, 11.900, 81.003, 43.002","Jun 10, 2013","Sep 19, 2008","false","Ellen Herbst(Director), 5285 Port Royal Road, Room 1014 Sills, Springfield, VA 22161. Telephone: (703) 605-6400. Sales Division: Telephone: 1-800-553-6847 or E-mail: info@ntis.gov (for Placing orders and for information on NTIS products and services). , 
 
 "
 "11.702","Internship Program for Postsecondary Students","B - Cooperative Agreements","COMMERCE, DEPARTMENT OF","OFFICE OF THE SECRETARY","N/A","Jun 10, 2013","Sep 19, 2008","false","Office of Human Resources Management, Department of Commerce, Washington, DC 20230. , 
@@ -4058,7 +4068,7 @@ National Program Chemical Division (7404T), Office of Pollution Prevention and T
 451 7th ST. SW, Room 7218, Washington DC 20410
 (202) 402-6324
 "
-"21.003","Taxpayer Service","K - Advisory Services and Counseling","TREASURY, DEPARTMENT OF THE","INTERNAL REVENUE SERVICE","21.006, 21.009, 21.009, 21.008, 21.006, 21.004","Jun 5, 2013","Jul 29, 2012","false","James E. Southwell
+"21.003","Taxpayer Service","K - Advisory Services and Counseling","TREASURY, DEPARTMENT OF THE","INTERNAL REVENUE SERVICE","21.009, 21.008, 21.006, 21.004","Jun 5, 2013","Jul 29, 2012","false","James E. Southwell
 401 W. Peachtree St. NW, Atlanta GA 30308
 (404) 338-7005
 "
@@ -4164,7 +4174,7 @@ Assistance to Firefighters Grant Program, Tech World Bldg - South Tower 5th Floo
 500 C Street SW, Centralized Scheduling and Information Desk (CSID), Washington DC 20472-3625
 (1-800) 368-6498
 "
-"97.058","Operation Safe Commerce (OSC) Cooperative Agreement Program","B - Project Grants","HOMELAND SECURITY, DEPARTMENT OF","","97.056","Sep 4, 2012","Sep 16, 2011","false","Headquarters Office: Department of Homeland Security/Techworld, control desk, 4th floor, Rm 427
+"97.058","Operation Safe Commerce (OSC) Cooperative Agreement Program","B - Project Grants","HOMELAND SECURITY, DEPARTMENT OF","","97.056, 97.056","Sep 4, 2012","Sep 16, 2011","false","Headquarters Office: Department of Homeland Security/Techworld, control desk, 4th floor, Rm 427
 500 C St., SW, Washington DC 20472
 (1-800) 368-6498
 "
@@ -4248,11 +4258,11 @@ Department of Education, OESE Office of Migrant Education, 400 Maryland Ave., SW
 Department of Education, OESE Academic Improvement and Teacher Quality, 400 Maryland Ave., SW, Washington DC 20202
 (202) 260-8268.
 "
-"84.037","Perkins Loan Cancellations","C - Direct Payments for Specified Use","EDUCATION, DEPARTMENT OF","OFFICE OF STUDENT FINANCIAL ASSISTANCE PROGRAMS","84.031, 84.032, 84.044, 84.033, 84.063, 64.117, 84.007, 84.069, 84.042, 64.117, 84.047, 84.066","Aug 24, 2012","Sep 11, 2011","false","Federal Student Aid Information Center 
+"84.037","Perkins Loan Cancellations","C - Direct Payments for Specified Use","EDUCATION, DEPARTMENT OF","OFFICE OF STUDENT FINANCIAL ASSISTANCE PROGRAMS","84.031, 84.032, 84.044, 84.033, 84.063, 84.007, 84.069, 84.042, 64.117, 84.047, 84.066","Aug 24, 2012","Sep 11, 2011","false","Federal Student Aid Information Center 
 Federal Student Aid (FSA), Department of Education, 400 Maryland Avenue, S.W., , Washington DC 20202
 (800) 433-3243
 "
-"84.032","Federal Family Education Loans","E - Direct Loans","EDUCATION, DEPARTMENT OF","OFFICE OF STUDENT FINANCIAL ASSISTANCE PROGRAMS","84.044, 84.033, 84.063, 64.117, 84.007, 84.069, 84.042, 64.117, 84.047, 84.066","Aug 24, 2012","Sep 11, 2011","false","Federal Student Aid Information Center,
+"84.032","Federal Family Education Loans","E - Direct Loans","EDUCATION, DEPARTMENT OF","OFFICE OF STUDENT FINANCIAL ASSISTANCE PROGRAMS","84.044, 84.033, 84.063, 84.007, 84.069, 84.042, 64.117, 84.047, 84.066","Aug 24, 2012","Sep 11, 2011","false","Federal Student Aid Information Center,
 Federal Student Aid (FSA), Department of Education, 400 Maryland Avenue, S.W., Washington DC 20202
 (800) 433-3243.
 "
@@ -4382,7 +4392,7 @@ USDA South Building, Room 6717-S
  Stop Code 0808, Washington DC 20250-0808
 2027203325
 "
-"10.444","Direct Housing_Natural Disaster Loans and Grants","B - Project Grants","AGRICULTURE, DEPARTMENT OF","RURAL HOUSING SERVICE","10.410","Aug 3, 2012","Apr 17, 2012","false","Myron L. Wooden,
+"10.444","Direct Housing_Natural Disaster Loans and Grants","E - Direct Loans","AGRICULTURE, DEPARTMENT OF","RURAL HOUSING SERVICE","10.410","Aug 3, 2012","Apr 17, 2012","false","Myron L. Wooden,
 1400 Independence Avenue, SW, Washington DC 20250
 (202) 720-4780.
 "
@@ -4467,7 +4477,7 @@ USDA, Rural Development, 1400 Independence Avenue, S.W., Washington DC 20250
 USDA, Rural Development, 1400 Independence Avenue, S.W., Washington DC 20250-0787
 (202) 720-1474; (202) 720-1452.
 "
-"10.780","Community Facilities Loans and Grants","B - Project Grants","AGRICULTURE, DEPARTMENT OF","RURAL HOUSING SERVICE","N/A","May 30, 2012","Apr 17, 2012","false","Deputy Administrator, Community Programs,
+"10.780","Community Facilities Loans and Grants","E - Direct Loans","AGRICULTURE, DEPARTMENT OF","RURAL HOUSING SERVICE","N/A","May 30, 2012","Apr 17, 2012","false","Deputy Administrator, Community Programs,
 Department of Agriculture, 1400 Independence Avenue, S.W., Mail Stop 0788, Washington DC 20250-0788
 (202) 720-1490.
 "
@@ -4647,7 +4657,7 @@ Centers for Disease Control and Prevention, 1600 Clifton Road, MS D-72, Atlanta 
 7500 Security Boulevard, Baltimore MD 21207
 (410) 786-6107.
 "
-"93.769","Demonstration to Maintain Independence and Employment","A - Formula Grants (Apportionments)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR MEDICARE AND MEDICAID SERVICES","93.779, 93.778","Jul 28, 2011","Jun 17, 2010","false","Adrienne Delozier,
+"93.769","Demonstration to Maintain Independence and Employment","A - Formula Grants (Apportionments)","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","CENTERS FOR MEDICARE AND MEDICAID SERVICES","93.778, 93.779","Jul 28, 2011","Jun 17, 2010","false","Adrienne Delozier,
 7500 Security Boulevard, Baltimore MD 21244
 (410) 786-0278.
 "
@@ -4743,7 +4753,7 @@ National Institute on Alcohol Abuse and Alcoholism, National Institutes of Healt
 "93.100","Health Disparities in Minority Health","A - Formula Grants","HEALTH AND HUMAN SERVICES, DEPARTMENT OF","IMMED OFFICE OF THE SECRETARY OF HEALTH AND HUMAN SERVICES","N/A","Sep 8, 2010","Nov 6, 2008","false","Program Contact: Ms. Cynthia H. Amis, Director, Division of Program Operations, Office of Minority Health, Office of Public Health and Science, Office of the Secretary, 1101 Wootton Parkway, Suite 700, Rockville, MD 20852. Telephone: (301) 594-0769.  Grants Management Contact: Ms. Karen Campbell, Director, Office of Grants Management, Office of Public Health and Science, 1101 Wootton Parkway, Suite 550, Rockville, MD 20852, Telephone (301) 594-0758. , 
 
 "
-"84.038","Federal Perkins Loan Program_Federal Capital Contributions","C - Direct Payments for Specified Use","EDUCATION, DEPARTMENT OF","OFFICE OF STUDENT FINANCIAL ASSISTANCE PROGRAMS","84.032, 84.044, 84.033, 84.063, 64.117, 84.007, 84.069, 84.042, 64.117, 84.047, 84.066","Sep 3, 2010","Jun 17, 2009","false","Federal Student Aid Information Center 
+"84.038","Federal Perkins Loan Program_Federal Capital Contributions","C - Direct Payments for Specified Use","EDUCATION, DEPARTMENT OF","OFFICE OF STUDENT FINANCIAL ASSISTANCE PROGRAMS","84.032, 84.044, 84.033, 84.063, 84.007, 84.069, 84.042, 64.117, 84.047, 84.066","Sep 3, 2010","Jun 17, 2009","false","Federal Student Aid Information Center 
 Federal Student Aid (FSA), Department of Education, 400 Maryland Avenue, S.W., , Washington DC 20202
 (800) 433-3243
 "
@@ -4886,7 +4896,7 @@ CSID is open from 8:00 am to 7:00 p.m., Eastern Standard Time, Monday through Fr
 Building #410, Washington DC 20528
 202-646-4542
 "
-"97.060","Port Security Research and Development Grant","Z - Salaries and Expenses","HOMELAND SECURITY, DEPARTMENT OF","","97.058, 97.056","Jul 20, 2010","Jul 22, 2009","false","Pat Masterson
+"97.060","Port Security Research and Development Grant","Z - Salaries and Expenses","HOMELAND SECURITY, DEPARTMENT OF","","97.058, 97.056, 97.056","Jul 20, 2010","Jul 22, 2009","false","Pat Masterson
 701 South 12th Street, Arlington VA 22202
 (571) 227-1587
 "
