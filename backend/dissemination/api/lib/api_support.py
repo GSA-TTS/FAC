@@ -19,15 +19,15 @@ def build_headers_base(environment: str):
             if not os.getenv(local_var):
                 print(f"env var {local_var} not set locally")
                 return None
-        header_keys["authorization"] = "bearer " + os.getenv("FAC_API_JWT")
-        header_keys["x-api-user-id"] = os.getenv("FAC_API_USER_ID")
+        header_keys["authorization"] = "bearer " + os.getenv("FAC_API_JWT", "NOJWT")
+        header_keys["x-api-user-id"] = os.getenv("FAC_API_USER_ID", "NOUSERID")
 
     elif environment == "cloud":
         for cloud_var in ["FAC_API_KEY"]:
             if not os.getenv(cloud_var):
                 print(f"env var {cloud_var} not set in cloud")
                 return None
-        header_keys["x-api-key"] = os.getenv("FAC_API_KEY")
+        header_keys["x-api-key"] = os.getenv("FAC_API_KEY", "NOAPIKEY")
     else:
         # Return as an error if we did not set the environment correctly.
         return None

@@ -2,6 +2,7 @@
 
 # To make understanding differences easier, all the functions will return
 # objects instead of booleans.
+from typing import Any
 
 
 class APIValue:
@@ -118,7 +119,7 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2):
     return R
 
 
-def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict) -> bool:
+def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict):
     # We want to confirm that these two objects are identical.
     # o1 must have the same keys as o2
     # o1 must have the same values as o2
@@ -147,7 +148,7 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict) -> bool:
 
 def compare_any_order(
     v1: str, l1: list, v2: str, l2: list, comparison_key: str = "report_id"
-) -> list:
+):
     results = []
     for o1 in l1:
         to_compare = None
@@ -196,7 +197,7 @@ def compare_any_order(
     return results
 
 
-def compare_strict_order(v1: str, l1: list, v2: str, l2: list) -> list:
+def compare_strict_order(v1: str, l1: list, v2: str, l2: list):
     results = []
     for o1, o2 in zip(l1, l2):
         results.append(compare_json_objects(v1, o1, v2, o2))
@@ -258,7 +259,7 @@ def compare_lists_of_json_objects(
     l2: list,
     comparison_key: str = "report_id",
     strict_order=True,
-) -> bool:
+):
 
     # The lists must be the same length
     clsl = check_lists_same_length(v1, l1, v2, l2)
