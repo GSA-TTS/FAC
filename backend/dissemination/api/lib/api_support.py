@@ -126,7 +126,7 @@ def compare(
 
     # Retrieve the lists of objects from the API server for the first version.
     try:
-        list_of_objects1 = get(url_1, headers=headers_1)
+        list_of_objects1 = get(url_1, headers=headers_1, timeout=10)
     except Exception as e:
         print("exception while calling API. exiting.")
         print("url:", url_1)
@@ -135,7 +135,7 @@ def compare(
 
     # Retrieve the objects from the second API.
     try:
-        list_of_objects2 = get(url_2, headers=headers_2)
+        list_of_objects2 = get(url_2, headers=headers_2, timeout=10)
     except Exception as e:
         print("exception while calling API. exiting.")
         print("url:", url_2)
