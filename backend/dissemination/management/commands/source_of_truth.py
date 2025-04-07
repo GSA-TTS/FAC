@@ -42,10 +42,10 @@ class Command(BaseCommand):
             start = kwargs["start"]
             end = kwargs["end"]
             logger.info(f"Testing on date range {start}-{end}")
-            query = Q(fac_accepted_date__gte=start) | Q(fac_accepted_date__lte=end)
+            query = Q(fac_accepted_date__gte=start) & Q(fac_accepted_date__lte=end)
             limit = kwargs.get("limit", None)
 
-        sot_audits_query = Audit.objects.filter(query | Q(submission_status='disseminated')).order_by('report_id')[:limit]
+        sot_audits_query = Audit.objects.filter(query & Q(submission_status='disseminated')).order_by('report_id')[:limit]
         sot_sorted_report_ids = self._get_sorted_report_ids(sot_audits_query)
 
         gen_audits_query = General.objects.filter(query).order_by('report_id')[:limit]
