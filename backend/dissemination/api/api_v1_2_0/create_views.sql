@@ -1,0 +1,269 @@
+begin;
+
+---------------------------------------
+-- finding_text
+---------------------------------------
+create view api_v1_2_0.findings_text as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        ft_elem->>'reference_number' as finding_ref_number,
+        ft_elem->>'contains_chart_or_table' as contains_chart_or_table,
+        ft_elem->>'text_of_finding' as finding_text
+    from
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'findings_text') as ft_elem on true
+    where
+        a.is_public is true
+        or (
+            a.is_public is false
+            and api_v1_2_0_functions.has_tribal_data_access()
+        )
+;
+---------------------------------------
+-- additional_ueis
+---------------------------------------
+create view api_v1_2_0.additional_ueis as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        uei_elem::text as additional_uei
+    from
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'additional_ueis') as uei_elem on true
+;
+---------------------------------------
+-- finding
+---------------------------------------
+create view api_v1_2_0.findings as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        f_elem->'program'->>'award_reference' as award_reference,
+        f_elem->'findings'->>'reference_number' as reference_number,
+        f_elem->'material_weakness' as is_material_weakness,
+        f_elem->'modified_opinion' as is_modified_opinion,
+        f_elem->'other_findings' as is_other_findings,
+        f_elem->'other_matters' as is_other_matters,
+        f_elem->'findings'->>'prior_references' as prior_finding_ref_numbers,
+        f_elem->'questioned_costs' as is_questioned_costs,
+        f_elem->'findings'->>'repeat_prior_reference' as is_repeat_finding,
+        f_elem->'significant_deficiency' as is_significant_deficiency,
+        f_elem->'program'->>'compliance_requirement' as type_requirement
+    from
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'findings_uniform_guidance') as f_elem on true
+;
+
+---------------------------------------
+-- federal award
+---------------------------------------
+create view api_v1_2_0.federal_awards as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        fa_elem->>'award_reference' as award_reference,
+        fa_elem->'program'->>'federal_agency_prefix' as federal_agency_prefix,
+        fa_elem->'program'->>'three_digit_extension' as federal_award_extension,
+        fa_elem->'program'->>'additional_award_identification' as additional_award_identification,
+        fa_elem->'program'->>'program_name' as federal_program_name,
+        fa_elem->'program'->>'amount_expended' as amount_expended,
+        fa_elem->'cluster'->>'cluster_name' as cluster_name,
+        fa_elem->'cluster'->>'other_cluster_name' as other_cluster_name,
+        fa_elem->'cluster'->>'state_cluster_name' as state_cluster_name,
+        fa_elem->'cluster'->>'cluster_total' as cluster_total,
+        fa_elem->'program'->>'federal_program_total' as federal_program_total,
+        fa_elem->'program'->>'is_major' as is_major,
+        fa_elem->'loan_or_loan_guarantee'->>'is_guaranteed' as is_loan,
+        fa_elem->'loan_or_loan_guarantee'->>'loan_balance_at_audit_period_end' as loan_balance,
+        fa_elem->'direct_or_indirect_award'->>'is_direct' as is_direct,
+        fa_elem->'program'->>'audit_report_type' as audit_report_type,
+        fa_elem->'program'->>'number_of_audit_findings' as findings_count,
+        fa_elem->'subrecipients'->>'is_passed' as is_passthrough_award,
+        fa_elem->'subrecipients'->>'subrecipient_amount' as passthrough_amount
+    from
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem on true
+;
+
+---------------------------------------
+-- corrective_action_plan
+---------------------------------------
+create view api_v1_2_0.corrective_action_plans as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        cap_elem->>'reference_number' as finding_ref_number,
+        cap_elem->>'contains_chart_or_table' as contains_chart_or_table,
+        cap_elem->>'planned_action' as planned_action
+    from
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'corrective_action_plan') as cap_elem on true
+    where
+        a.is_public is true
+        or (
+            a.is_public is false
+            and api_v1_2_0_functions.has_tribal_data_access()
+        )
+;
+---------------------------------------
+-- notes_to_sefa
+---------------------------------------
+create view api_v1_2_0.notes_to_sefa as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        note->>'note_title' as title,
+        nts_elem->>'accounting_policies' as accounting_policies,
+        nts_elem->>'is_minimis_rate_used' as is_minimis_rate_used,
+        nts_elem->>'rate_explained' as rate_explained,
+        note->>'note_content' as content,
+        note->>'contains_chart_or_table' as contains_chart_or_table
+
+    from
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'notes_to_sefa') as nts_elem on true
+        join lateral jsonb_array_elements(nts_elem->'notes_to_sefa_entries') as note on true
+    where
+        a.is_public is true
+        or (
+            a.is_public is false
+            and api_v1_2_0_functions.has_tribal_data_access()
+        )
+;
+---------------------------------------
+-- passthrough
+---------------------------------------
+create view api_v1_2_0.passthrough as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        fa_elem->>'award_reference' as award_reference,
+        pass_elem->>'passthrough_identifying_number' as passthrough_id,
+        pass_elem->>'passthrough_name' as passthrough_name
+    from
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem on true
+        join lateral jsonb_array_elements(fa_elem->'direct_or_indirect_award'->'entities') as pass_elem on true
+;
+---------------------------------------
+-- general
+---------------------------------------
+create view api_v1_2_0.general as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        -- auditee
+        a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_name' as auditee_certify_name,
+        a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_title' as auditee_certify_title,
+        a.audit->'general_information'->>'auditee_contact_name' as auditee_contact_name,
+        a.audit->'general_information'->>'auditee_email' as auditee_email,
+        a.audit->'general_information'->>'auditee_name' as auditee_name,
+        a.audit->'general_information'->>'auditee_phone' as auditee_phone,
+        a.audit->'general_information'->>'auditee_contact_title' as auditee_contact_title,
+        a.audit->'general_information'->>'auditee_address_line_1' as auditee_address_line_1,
+        a.audit->'general_information'->>'auditee_city' as auditee_city,
+        a.audit->'general_information'->>'auditee_state' as auditee_state,
+        a.audit->'general_information'->>'ein' as auditee_ein,
+        a.audit->'general_information'->>'auditee_zip' as auditee_zip,
+        -- auditor
+        a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_name' as auditor_certify_name,
+        a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_title' as auditor_certify_title,
+        a.audit->'general_information'->>'auditor_phone' as auditor_phone,
+        a.audit->'general_information'->>'auditor_state' as auditor_state,
+        a.audit->'general_information'->>'auditor_city' as auditor_city,
+        a.audit->'general_information'->>'auditor_contact_title' as auditor_contact_title,
+        a.audit->'general_information'->>'auditor_address_line_1' as auditor_address_line_1,
+        a.audit->'general_information'->>'auditor_zip' as auditor_zip,
+        a.audit->'general_information'->>'auditor_country' as auditor_country,
+        a.audit->'general_information'->>'auditor_contact_name' as auditor_contact_name,
+        a.audit->'general_information'->>'auditor_email' as auditor_email,
+        a.audit->'general_information'->>'auditor_firm_name' as auditor_firm_name,
+        coalesce(a.audit->'general_information'->>'auditor_international_address', '') as auditor_foreign_address,
+        a.audit->'general_information'->>'auditor_ein' as auditor_ein,
+        -- agency
+        a.audit->>'cognizant_agency' as cognizant_agency,
+        a.audit->>'oversight_agency' as oversight_agency,
+        -- dates
+        a.created_at as date_created,
+        a.audit->'general_information'->>'ready_for_certification_date'as ready_for_certification_date,
+        -- FIXME 
+        a.audit->'auditor_certification'->'auditor_signature'->>'auditor_certification_date_signed' as auditor_certified_date,
+        a.audit->'auditee_certification'->'auditee_signature'->>'auditee_certification_date_signed' as auditee_certified_date,
+        a.audit->'general_information'->>'submitted_date' as submitted_date,
+        a.audit->>'fac_accepted_date' as fac_accepted_date,
+        -- END FIXME    
+        a.audit->'general_information'->>'auditee_fiscal_period_end' as fy_end_date,
+        a.audit->'general_information'->>'auditee_fiscal_period_start' as fy_start_date,
+        a.audit->'general_information'->>'audit_type' as audit_type,
+        jsonb_array_elements_text(a.audit->'audit_information'->'gaap_results') as gaap_results,
+        jsonb_array_elements_text(a.audit->'audit_information'->'sp_framework_basis') as sp_framework_basis,
+        a.audit->'audit_information'->>'is_sp_framework_required' as is_sp_framework_required,
+        jsonb_array_elements_text(a.audit->'audit_information'->>'sp_framework_opinions') as sp_framework_opinions,
+        a.audit->'audit_information'->>'is_going_concern_included' as is_going_concern_included,
+        a.audit->'audit_information'->>'is_internal_control_deficiency_disclosed' as is_internal_control_deficiency_disclosed,
+        a.audit->'audit_information'->>'is_internal_control_material_weakness_disclosed' as is_internal_control_material_weakness_disclosed,
+        a.audit->'audit_information'->>'is_material_noncompliance_disclosed' as is_material_noncompliance_disclosed,
+        (a.audit->'audit_information'->>'dollar_threshold')::integer as dollar_threshold,
+        a.audit->'audit_information'->>'is_low_risk_auditee' as is_low_risk_auditee,
+        jsonb_array_elements_text(a.audit->'audit_information'->>'agencies') as agencies_with_prior_findings,
+        a.audit->'general_information'->>'user_provided_organization_type' as entity_type,
+        a.audit->'general_information'->>'number_months' as number_months,
+        a.audit->'general_information'->>'audit_period_other_months' as audit_period_covered,
+        a.audit->'federal_awards'->>'total_amount_expended' as total_amount_expended,
+        a.audit->'type_audit_code'->>'type_audit_code' as type_audit_code,
+        a.is_public as is_public,
+        a.data_source as data_source,
+        a.audit->'general_information'->>'is_aicpa_audit_guide_included' as is_aicpa_audit_guide_included,
+        a.audit->'general_information'->>'is_additional_ueis' as is_additional_ueis       
+    from
+        audit_audit as a
+;
+---------------------------------------
+-- auditor (secondary auditor)
+---------------------------------------
+create view api_v1_2_0.secondary_auditors as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        sa_elem->>'secondary_auditor_ein' as auditor_ein,
+        sa_elem->>'secondary_auditor_name' as auditor_name,
+        sa_elem->>'secondary_auditor_contact_name' as contact_name,
+        sa_elem->>'secondary_auditor_contact_title' as contact_title,
+        sa_elem->>'secondary_auditor_contact_email' as contact_email,
+        sa_elem->>'secondary_auditor_contact_phone' as contact_phone,
+        sa_elem->>'secondary_auditor_address_street' as address_street,
+        sa_elem->>'secondary_auditor_address_city' as address_city,
+        sa_elem->>'secondary_auditor_address_state' as address_state,
+        sa_elem->>'secondary_auditor_address_zipcode' as address_zipcode
+    from
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'secondary_auditors') as sa_elem on true
+;
+---------------------------------------
+-- additional_eins
+---------------------------------------
+create view api_v1_2_0.additional_eins as
+    select
+        a.report_id,
+        a.audit->'general_information'->>'auditee_uei' as auditee_uei,
+        a.audit->>'audit_year' as audit_year,
+        ein_elem::text as additional_ein
+    from
+        audit_audit as a
+        join lateral jsonb_array_elements(a.audit->'additional_eins') as ein_elem on true
+;
+commit;
+
+notify pgrst,
+       'reload schema';
+
