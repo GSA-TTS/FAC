@@ -2,11 +2,9 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 import logging
-import sys
 
 from audit.models import Audit
 from dissemination.models import General
-from audit.models import SingleAuditChecklist
 from audit.models.utils import validate_audit_consistency
 
 logger = logging.getLogger(__name__)
@@ -18,8 +16,9 @@ class Command(BaseCommand):
         matches for both the SOT and SAC models.
         Usage:
         manage.py source_of_truth
-            --start <YYYYMMDD start fac_accepted_date>
-            --end <YYYYMMDD end fac_accepted_date>
+            --start <YYYY-MM-DD start fac_accepted_date>
+            --end <YYYY-MM-DD end fac_accepted_date>
+            -- limit <int>
 
         Alternatively, it can also test on a single report_id:
         manage.py source_of_truth
