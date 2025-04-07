@@ -7,7 +7,6 @@
     <div class="grid-container margin-top-6">
         <div class="grid-col grid-gap">
             {% comment %} Title & Header {% endcomment %}
-          {% include "includes/beta_warning.html" %}
             <div class="grid-row" id="title">
                 <div class="grid-col-12 tablet:grid-col-7">
                     <h1 class="usa-legend usa-legend--large font-sans-2xl">Single audit summary</h1>
@@ -35,7 +34,7 @@
                             <a class="usa-button display-flex flex-fill font-sans-xl margin-bottom-2"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                href="{% url 'dissemination:SummaryReportDownload' report_id=report_id %}?beta=Y"
+                                href="{% url 'dissemination:SummaryReportDownload' report_id=report_id %}"
                             >
                                 <svg class="usa-icon margin-right-1 flex-align-self-center"
                                     aria-hidden="true"
@@ -48,7 +47,7 @@
 
                         {% if allow_download %}
                             <a class="usa-button display-flex font-sans-xl"
-                                href="{% url 'dissemination:PdfDownload' report_id=report_id %}?beta=Y"
+                                href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
                                 target="_blank"
                                 rel="noopener noreferrer">
                                 <svg class="usa-icon margin-right-1 flex-align-self-center"

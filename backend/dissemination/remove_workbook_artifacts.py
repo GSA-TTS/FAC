@@ -3,11 +3,8 @@ import math
 
 from django.conf import settings
 
-from audit.models import ExcelFile
+from audit.models import ExcelFile, Audit
 from audit.models.constants import STATUS
-from audit.models.models import (
-    SingleAuditChecklist,
-)
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 from django.core.paginator import Paginator
@@ -15,28 +12,6 @@ from django.core.paginator import PageNotAnInteger, EmptyPage
 
 
 logger = logging.getLogger(__name__)
-
-
-# TODO: SoT
-# This function will have no use after deprecating the SAC.
-def remove_workbook_artifacts(sac):
-    """
-    Remove all workbook artifacts associated with the given sac.
-    """
-    try:
-        excel_files = ExcelFile.objects.filter(sac=sac)
-        files = [f"excel/{excel_file.filename}" for excel_file in excel_files]
-
-        if files:
-            # Delete the files from S3 in bulk
-            delete_files_in_bulk(files, sac.report_id)
-
-    except ExcelFile.DoesNotExist:
-        logger.info(f"No files found to delete for report: {sac.report_id}")
-    except Exception as e:
-        logger.error(
-            f"Failed to delete files from S3 for report: {sac.report_id}. Error: {e}"
-        )
 
 
 def audit_remove_workbook_artifacts(audit):
@@ -100,25 +75,25 @@ def delete_files_in_bulk(filenames, report_id):
         )
 
 
-def clean_artifacts(sac_list):
+def clean_artifacts(audit_list):
     """
-    Perform necessary cleanup associated with the given list of sac values.
+    Perform necessary cleanup associated with the given list of audit values.
     """
     try:
-        excel_files = ExcelFile.objects.filter(sac__in=sac_list)
+        excel_files = ExcelFile.objects.filter(audit__in=audit_list)
         files = [f"excel/{excel_file.filename}" for excel_file in excel_files]
 
         if files:
             logger.info(
-                f"Found {len(files)} ExcelFile records for reports: {[sac.report_id for sac in sac_list]}"
+                f"Found {len(files)} ExcelFile records for reports: {[audit.report_id for audit in audit_list]}"
             )
 
             # Track results but do not delete the ExcelFile records from the database
             successful_deletes, failed_deletes = batch_removal(
                 files,
-                sac_list,
+                audit_list,
                 {
-                    f"excel/{excel_file.filename}": excel_file.sac.report_id
+                    f"excel/{excel_file.filename}": excel_file.audit.report_id
                     for excel_file in excel_files
                 },
             )
@@ -133,10 +108,12 @@ def clean_artifacts(sac_list):
                 )
 
     except Exception as e:
-        logger.error(f"Failed to process files for the provided sac values. Error: {e}")
+        logger.error(
+            f"Failed to process files for the provided audit values. Error: {e}"
+        )
 
 
-def batch_removal(filenames, sac_list, sac_to_report_id_map):
+def batch_removal(filenames, audit_list, audit_to_report_id_map):
     """Delete files from S3 in bulk and return the results."""
     s3_client = boto3_client(
         service_name="s3",
@@ -162,7 +139,7 @@ def batch_removal(filenames, sac_list, sac_to_report_id_map):
             successful_deletes.append(
                 {
                     "filename": filename,
-                    "sac_report_id": sac_to_report_id_map[filename],
+                    "report_id": audit_to_report_id_map[filename],
                 }
             )
 
@@ -173,7 +150,7 @@ def batch_removal(filenames, sac_list, sac_to_report_id_map):
                 failed_deletes.append(
                     {
                         "filename": filename,
-                        "sac_report_id": sac_to_report_id_map[filename],
+                        "report_id": audit_to_report_id_map[filename],
                         "error_message": error["Message"],
                     }
                 )
@@ -182,7 +159,7 @@ def batch_removal(filenames, sac_list, sac_to_report_id_map):
 
     except ClientError as e:
         logger.error(
-            f"Failed to delete files from S3 for sac values: {[sac.report_id for sac in sac_list]}. Error: {e}"
+            f"Failed to delete files from S3 for audit values: {[audit.report_id for audit in audit_list]}. Error: {e}"
         )
         return [], [{"error_message": str(e)}]
     except Exception as e:
@@ -199,7 +176,7 @@ def delete_workbooks(partition_number, total_partitions, page_size=10, pages=Non
         )
 
     all_ids = (
-        SingleAuditChecklist.objects.filter(submission_status=STATUS.DISSEMINATED)
+        Audit.objects.filter(submission_status=STATUS.DISSEMINATED)
         .values_list("id", flat=True)
         .order_by("id")
     )
@@ -212,15 +189,15 @@ def delete_workbooks(partition_number, total_partitions, page_size=10, pages=Non
 
     ids_to_process = all_ids[start_index:end_index]
 
-    sacs = SingleAuditChecklist.objects.filter(id__in=ids_to_process).order_by("id")
+    audits = Audit.objects.filter(id__in=ids_to_process).order_by("id")
 
-    paginator = Paginator(sacs, page_size)
+    paginator = Paginator(audits, page_size)
     total_pages = (
         paginator.num_pages if pages is None else min(pages, paginator.num_pages)
     )
 
     logger.info(
-        f"Retrieving {sacs.count()} reports for partition {partition_number} of {total_partitions}"
+        f"Retrieving {audits.count()} reports for partition {partition_number} of {total_partitions}"
     )
 
     for page_number in range(1, total_pages + 1):
@@ -230,9 +207,9 @@ def delete_workbooks(partition_number, total_partitions, page_size=10, pages=Non
                 f"Processing page {page_number} with {page.object_list.count()} reports."
             )
 
-            # Extract sac values from the current page
-            sac_list = list(page.object_list)
-            clean_artifacts(sac_list)
+            # Extract audit values from the current page
+            audit_list = list(page.object_list)
+            clean_artifacts(audit_list)
 
         except PageNotAnInteger:
             logger.error(f"Page number {page_number} is not an integer.")

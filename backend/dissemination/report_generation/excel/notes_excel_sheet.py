@@ -25,6 +25,7 @@ def _get_entries(audit):
                 note_entry.get("contains_chart_or_table"),
             ]
         )
+    return entries
 
 
 notes_to_sefa_excel_sheet = ExcelSheet(

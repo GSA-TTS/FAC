@@ -8,7 +8,7 @@ from django.db.models.functions import Cast
 
 from audit.cross_validation.naming import SECTION_NAMES
 from audit.cross_validation.audit_validation_shape import audit_validation_shape
-from audit.models import SingleAuditReportFile
+from audit.models.files import SingleAuditReportFile
 from audit.models.constants import AUDIT_TYPE_CODES, STATUS, STATUS_CHOICES, EventType
 from audit.models.history import History
 from audit.models.mixins import CreatedMixin, UpdatedMixin
@@ -65,14 +65,6 @@ class AuditManager(models.Manager):
             return audit.version
         except self.model.DoesNotExist:
             return 0
-
-    # TODO: Update Post SOC Launch Delete
-    def find_audit_or_none(self, report_id):
-        """This is a temporary helper method to pass linting for too complex methods"""
-        try:
-            return self.get(report_id=report_id)
-        except Audit.DoesNotExist:
-            return None
 
 
 class Audit(CreatedMixin, UpdatedMixin):
@@ -287,7 +279,7 @@ class Audit(CreatedMixin, UpdatedMixin):
     @property
     def auditee_fiscal_period_end(self):
         return self.audit.get("general_information", {}).get(
-            "auditee_fiscal_period_end"
+            "auditee_fiscal_period_end", "N/A"
         )
 
     class Meta:
@@ -314,7 +306,7 @@ class Audit(CreatedMixin, UpdatedMixin):
             if previous_version != current_version:
                 raise Exception(
                     f"Version Mismatch: Expected {previous_version} Got {current_version}"
-                )  # TODO
+                )
 
             if event_type and event_user:
                 History.objects.create(
@@ -384,7 +376,7 @@ class Audit(CreatedMixin, UpdatedMixin):
         """
         shaped_audit = audit_validation_shape(self)
         try:
-            sar = SingleAuditReportFile.objects.filter(sac_id=self.id).latest(
+            sar = SingleAuditReportFile.objects.filter(audit_id=self.id).latest(
                 "date_created"
             )
         except SingleAuditReportFile.DoesNotExist:

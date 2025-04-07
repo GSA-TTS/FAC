@@ -80,6 +80,7 @@ def search(params):
     results = Audit.objects.all().annotate(
         findings_bitmask=F("findings_summary").bitand(bitmask)
     )
+
     results = results.filter(query)
     results = _sort_results(results, params)
     return results
@@ -87,6 +88,9 @@ def search(params):
 
 def _calculate_bitmask(params):
     findings_fields = params.get("findings")
+    if not findings_fields:
+        return 0
+
     findings_mask = 0
     if "all_findings" in findings_fields:
         findings_mask = FindingsBitmask.ALL

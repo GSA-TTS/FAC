@@ -13,7 +13,11 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Func
 
-from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
+from audit.models.constants import (
+    FindingsBitmask,
+    FINDINGS_FIELD_TO_BITMASK,
+    STATUS_CHOICES,
+)
 from support.cog_over_w_audit import compute_cog_over
 
 logger = logging.getLogger(__name__)
@@ -215,3 +219,8 @@ def _index_general(audit_data):
     return {
         "search_names": list(search_names),
     }
+
+
+def get_friendly_submission_status(submission_status) -> str:
+    """Return the friendly version of submission_status."""
+    return dict(STATUS_CHOICES)[submission_status]

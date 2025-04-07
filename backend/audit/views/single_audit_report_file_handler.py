@@ -9,7 +9,6 @@ from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import (
-    SingleAuditChecklist,
     SingleAuditReportFile,
     Audit,
 )
@@ -28,16 +27,14 @@ class SingleAuditReportFileHandlerView(
         try:
             report_id = kwargs["report_id"]
 
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
             file = request.FILES["FILES"]
 
             sar_file = SingleAuditReportFile(
                 **{
                     "file": file,
                     "filename": "temp",
-                    "sac_id": sac.id,
-                    "audit_id": audit.id if audit else None,
+                    "audit_id": audit.id,
                 }
             )
 

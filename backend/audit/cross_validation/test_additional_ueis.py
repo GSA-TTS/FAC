@@ -1,14 +1,14 @@
 from django.test import TestCase
 from model_bakery import baker
-from audit.models import SingleAuditChecklist
+from audit.models import Audit
 
 from .additional_ueis import additional_ueis
+from .audit_validation_shape import audit_validation_shape
 from .errors import (
     err_additional_ueis_empty,
     err_additional_ueis_has_auditee_uei,
     err_additional_ueis_not_empty,
 )
-from .sac_validation_shape import sac_validation_shape
 
 ERROR_EMPTY = {"error": err_additional_ueis_empty()}
 ERROR_PRESENT = {"error": err_additional_ueis_not_empty()}
@@ -26,11 +26,11 @@ class AdditionalUEIsTests(TestCase):
         For a SAC with General Information and a no answer, there should be no
         additonal UEIs in that section. "No" answer plus no section = valid.
         """
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"multiple_ueis_covered": False}
+        audit_data = {"general_information": {"multiple_ueis_covered": False}}
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        shaped_audit = audit_validation_shape(audit)
+        validation_result = additional_ueis(shaped_audit)
 
         self.assertEqual(validation_result, [])
 
@@ -40,17 +40,14 @@ class AdditionalUEIsTests(TestCase):
         additonal UEIs in that section.
         "No" answer plus data in section: invalid
         """
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"multiple_ueis_covered": False}
-        sac.additional_ueis = {
-            "AdditionalUEIs": {
-                "auditee_uei": "123456789",
-                "additional_ueis_entries": [{"additional_uei": "987654321"}],
-            }
+        audit_data = {
+            "general_information": {"multiple_ueis_covered": False},
+            "additional_ueis": ["987654321"],
         }
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        shaped_audit = audit_validation_shape(audit)
+        validation_result = additional_ueis(shaped_audit)
 
         self.assertEqual(validation_result, [ERROR_PRESENT])
 
@@ -59,11 +56,11 @@ class AdditionalUEIsTests(TestCase):
         For a SAC with General Information and a yes answer, and no Additional UEIs
         data, generate errors.
         """
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"multiple_ueis_covered": True}
+        audit_data = {"general_information": {"multiple_ueis_covered": True}}
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        shaped_audit = audit_validation_shape(audit)
+        validation_result = additional_ueis(shaped_audit)
 
         self.assertEqual(validation_result, [ERROR_EMPTY])
 
@@ -72,24 +69,14 @@ class AdditionalUEIsTests(TestCase):
         For a SAC with General Information and a yes answer, and no Additional UEIs
         listed in the data, generate errors.
         """
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"multiple_ueis_covered": True}
-        sac.additional_ueis = {}
-
-        shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
-
-        self.assertEqual(validation_result, [ERROR_EMPTY])
-
-        sac.additional_ueis = {
-            "AdditionalUEIs": {
-                "auditee_uei": "123456789",
-                "additional_ueis_entries": [],
-            }
+        audit_data = {
+            "general_information": {"multiple_ueis_covered": True},
+            "additional_ueis": [],
         }
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        shaped_audit = audit_validation_shape(audit)
+        validation_result = additional_ueis(shaped_audit)
 
         self.assertEqual(validation_result, [ERROR_EMPTY])
 
@@ -98,18 +85,14 @@ class AdditionalUEIsTests(TestCase):
         For a SAC with General Information and a yes answer, and Additional UEIs
         listed in the data, do not generate errors.
         """
-        sac = baker.make(SingleAuditChecklist)
-
-        sac.general_information = {"multiple_ueis_covered": True}
-        sac.additional_ueis = {
-            "AdditionalUEIs": {
-                "auditee_uei": "123456789",
-                "additional_ueis_entries": [{"additional_uei": "987654321"}],
-            }
+        audit_data = {
+            "general_information": {"multiple_ueis_covered": True},
+            "additional_ueis": ["987654321"],
         }
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        shaped_audit = audit_validation_shape(audit)
+        validation_result = additional_ueis(shaped_audit)
 
         self.assertEqual(validation_result, [])
 
@@ -118,23 +101,16 @@ class AdditionalUEIsTests(TestCase):
         For a SAC with General Information and a yes answer, if the auditee_uei is
         found in the additonal_ueis, generate an error.
         """
-        sac = baker.make(SingleAuditChecklist)
-
-        sac.general_information = {
-            "auditee_uei": "123456789",
-            "multiple_ueis_covered": True,
-        }
-        sac.additional_ueis = {
-            "AdditionalUEIs": {
+        audit_data = {
+            "general_information": {
                 "auditee_uei": "123456789",
-                "additional_ueis_entries": [
-                    {"additional_uei": "987654321"},
-                    {"additional_uei": "123456789"},
-                ],
-            }
+                "multiple_ueis_covered": True,
+            },
+            "additional_ueis": ["987654321", "123456789"],
         }
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        shaped_audit = audit_validation_shape(audit)
+        validation_result = additional_ueis(shaped_audit)
 
         self.assertEqual(validation_result, [ERROR_AUEI])

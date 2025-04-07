@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.postgres.forms import SimpleArrayField
-from audit.models import AuditValidationWaiver, SacValidationWaiver, UeiValidationWaiver
+from audit.models import AuditValidationWaiver, UeiValidationWaiver
 from config.settings import (
     AGENCY_NAMES,
     GAAP_RESULTS,
@@ -25,7 +25,7 @@ class UploadReportForm(forms.Form):
 
 
 def _kvpair(info):
-    return (info["key"], info["value"])
+    return info["key"], info["value"]
 
 
 class AuditInfoForm(forms.Form):
@@ -127,24 +127,6 @@ class TribalAuditConsentForm(forms.Form):
 
 class UnlockAfterCertificationForm(forms.Form):
     unlock_after_certification = forms.BooleanField()
-
-
-class SacValidationWaiverForm(forms.ModelForm):
-    class MultiSelectArrayWidget(forms.SelectMultiple):
-        def __init__(self, *args, **kwargs):
-            choices = kwargs.pop("choices", [])
-            super().__init__(*args, **kwargs)
-            self.choices = choices
-
-    waiver_types = SimpleArrayField(
-        forms.ChoiceField(choices=SacValidationWaiver.WAIVER_CHOICES),
-        delimiter=",",
-        widget=MultiSelectArrayWidget(choices=SacValidationWaiver.WAIVER_CHOICES),
-    )
-
-    class Meta:
-        model = SacValidationWaiver
-        fields = "__all__"
 
 
 class AuditValidationWaiverForm(forms.ModelForm):
