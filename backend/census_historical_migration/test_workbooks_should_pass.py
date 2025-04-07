@@ -1,3 +1,6 @@
+# type: ignore
+# this whole file is broke with SOT, it's not used, but kept for posterity
+
 import logging
 from django.test import TestCase
 import os

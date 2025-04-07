@@ -88,7 +88,7 @@ def create_workbook(data, protect_sheets=False):
             protect_sheet(sheet)
 
     t1 = time.time()
-    return (workbook, t1 - t0)
+    return workbook, t1 - t0
 
 
 def set_column_widths(worksheet):

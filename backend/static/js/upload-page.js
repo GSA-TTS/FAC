@@ -77,7 +77,7 @@ function display_error_table(data) {
       <td>${row_array[2]}</td>
       <td>${row_array[3]['text']}.</td>
     </tr>`;
-    // TODO: Add this link once the site is hosting elpful information.
+    // TODO: Add this link once the site is hosting helpful information.
     // <a class="usa-link" href="${row_array[3]["link"]}">Link</a>
   }
 

@@ -1,3 +1,5 @@
+# type: ignore
+# this whole file is broke with SOT, it's not used, but kept for posterity
 from .sac_general_lib.utils import xform_census_date_to_utc_time
 from .workbooklib.post_upload_utils import record_dummy_pdf_object
 from .exception_utils import (

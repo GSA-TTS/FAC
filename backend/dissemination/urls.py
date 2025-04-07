@@ -38,8 +38,8 @@ urlpatterns = [
         views.MultipleSummaryReportDownloadView.as_view(),
         name="MultipleSummaryReportDownload",
     ),
-    path("search/", views.Search.as_view(), name="Search"),
-    path("search/advanced/", views.AdvancedSearch.as_view(), name="AdvancedSearch"),
+    path("search/", views.AuditSearch.as_view(), name="Search"),
+    # This can go away, keeping it in case people have bookmarks
+    path("search/advanced/", views.AuditSearch.as_view(), name="AdvancedSearch"),
     path("summary/<str:report_id>", views.AuditSummaryView.as_view(), name="Summary"),
-    path("search/beta/", views.AuditSearch.as_view(), name="BetaSearch"),
 ]

@@ -1,6 +1,6 @@
 from copy import deepcopy
 from audit.cross_validation.naming import NC, find_section_by_name
-from audit.models.submission_event import SubmissionEvent
+from audit.models.history import History
 from audit.validators import validate_general_information_complete_json
 from django.core.exceptions import ValidationError
 
@@ -155,26 +155,26 @@ def section_completed_metadata(sac, section_key):
         event_type = section.submission_event
         report_id = sac["sf_sac_meta"]["report_id"]
         try:
-            submission_event = SubmissionEvent.objects.filter(
-                sac__report_id=report_id, event=event_type
-            ).latest("timestamp")
-        except SubmissionEvent.DoesNotExist:
+            submission_event = History.objects.filter(
+                report_id=report_id, event=event_type
+            ).latest("updated_at")
+        except History.DoesNotExist:
             submission_event = None
         try:
-            deletion_event = SubmissionEvent.objects.filter(
-                sac__report_id=report_id, event=section.deletion_event
-            ).latest("timestamp")
-        except SubmissionEvent.DoesNotExist:
+            deletion_event = History.objects.filter(
+                report_id=report_id, event=section.deletion_event
+            ).latest("updated_at")
+        except History.DoesNotExist:
             deletion_event = None
         if deletion_event and (
             not submission_event
-            or deletion_event.timestamp > submission_event.timestamp
+            or deletion_event.updated_at > submission_event.updated_at
         ):
             # If the deletion event is more recent than the submission event, the section is not complete.
             return None, None
 
         if submission_event:
-            return submission_event.user.email, submission_event.timestamp
+            return submission_event.updated_by.email, submission_event.updated_at
 
         # If there is no submission event, the section is not complete.
         return None, None

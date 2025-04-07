@@ -7,11 +7,10 @@ from django.views import View
 
 from audit.models import (
     Access,
-    SingleAuditChecklist,
     LateChangeError,
-    SubmissionEvent,
     Audit,
 )
+from audit.models.constants import EventType
 from audit.validators import validate_general_information_json
 
 from audit.utils import Util
@@ -28,23 +27,17 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         report_id = kwargs["report_id"]
 
         try:
-            # TODO: Post SOT Launch -> Change this all to use Audit.
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
 
-            accesses = Access.objects.filter(sac=sac, user=request.user)
+            accesses = Access.objects.filter(audit=audit, user=request.user)
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
 
-            sac_context = self._context_from_sac(sac)
-            audit_context = self._context_from_audit(audit)
-            audit_context = self._dates_to_slashes(audit_context)
+            context = self._context_from_audit(audit)
+            context = self._dates_to_slashes(context)
 
-            context = self._dates_to_slashes(sac_context)
-
-            self._compare_contexts(context, audit_context)
             return render(request, "report_submission/gen-form.html", context)
-        except SingleAuditChecklist.DoesNotExist as err:
+        except Audit.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
 
     def post(self, request, *args, **kwargs):
@@ -53,15 +46,17 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         verify access, validate form data, save, and redirect.
         """
         report_id = kwargs["report_id"]
+        form = GeneralInformationForm(request.POST)
 
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
+        except Audit.DoesNotExist as err:
+            raise PermissionDenied("You do not have access to this audit.") from err
 
-            accesses = Access.objects.filter(sac=sac, user=request.user)
+        try:
+            accesses = Access.objects.filter(audit=audit, user=request.user)
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
-
-            form = GeneralInformationForm(request.POST)
 
             if not form.is_valid():
                 context = form.cleaned_data | {
@@ -77,7 +72,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             form = self._wipe_auditor_address(form)
             form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
-            general_information = sac.general_information
+            general_information = audit.audit.get("general_information", {})
             general_information.update(form.cleaned_data)
             # Remove extra fields based on auditor_country and auditor_international_address and based on audit_period_covered
             # This patch is necessary to filter out unnecessary empty fields returned by the form.
@@ -86,21 +81,15 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             validated = validate_general_information_json(
                 patched_general_information, False
             )
-            sac.general_information = validated
-            if general_information.get("audit_type"):
-                sac.audit_type = general_information["audit_type"]
 
-            sac.save(
+            audit.audit.update({"general_information": validated})
+            audit.save(
                 event_user=request.user,
-                event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+                event_type=EventType.GENERAL_INFORMATION_UPDATED,
             )
 
-            # Audit Path TODO: Clean-up post POC
-            _update_audit(report_id, general_information, request)
-
             return Util.validate_redirect_url(f"/audit/submission-progress/{report_id}")
-        except SingleAuditChecklist.DoesNotExist as err:
-            raise PermissionDenied("You do not have access to this audit.") from err
+
         except ValidationError as err:
             form.cleaned_data = self._dates_to_slashes(form.cleaned_data)
             context = form.cleaned_data | {
@@ -281,64 +270,4 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             }
             if audit
             else {}
-        )
-
-    # TODO: Post SOT Launch -> below can be deleted
-    @staticmethod
-    def _context_from_sac(sac):
-        return {
-            "audit_type": sac.audit_type,
-            "auditee_fiscal_period_end": sac.auditee_fiscal_period_end,
-            "auditee_fiscal_period_start": sac.auditee_fiscal_period_start,
-            "audit_period_covered": sac.audit_period_covered,
-            "audit_period_other_months": sac.audit_period_other_months,
-            "ein": sac.ein,
-            "ein_not_an_ssn_attestation": sac.ein_not_an_ssn_attestation,
-            "multiple_eins_covered": sac.multiple_eins_covered,
-            "auditee_uei": sac.auditee_uei,
-            "multiple_ueis_covered": sac.multiple_ueis_covered,
-            "auditee_name": sac.auditee_name,
-            "auditee_address_line_1": sac.auditee_address_line_1,
-            "auditee_city": sac.auditee_city,
-            "auditee_state": sac.auditee_state,
-            "auditee_zip": sac.auditee_zip,
-            "auditee_contact_name": sac.auditee_contact_name,
-            "auditee_contact_title": sac.auditee_contact_title,
-            "auditee_phone": sac.auditee_phone,
-            "auditee_email": sac.auditee_email,
-            "user_provided_organization_type": sac.user_provided_organization_type,
-            "is_usa_based": sac.is_usa_based,
-            "auditor_firm_name": sac.auditor_firm_name,
-            "auditor_ein": sac.auditor_ein,
-            "auditor_ein_not_an_ssn_attestation": sac.auditor_ein_not_an_ssn_attestation,
-            "auditor_country": sac.auditor_country,
-            "auditor_international_address": sac.auditor_international_address,
-            "auditor_address_line_1": sac.auditor_address_line_1,
-            "auditor_city": sac.auditor_city,
-            "auditor_state": sac.auditor_state,
-            "auditor_zip": sac.auditor_zip,
-            "auditor_contact_name": sac.auditor_contact_name,
-            "auditor_contact_title": sac.auditor_contact_title,
-            "auditor_phone": sac.auditor_phone,
-            "auditor_email": sac.auditor_email,
-            "secondary_auditors_exist": sac.secondary_auditors_exist,
-            "report_id": sac.report_id,
-            "state_abbrevs": STATE_ABBREVS,
-        }
-
-    @staticmethod
-    def _compare_contexts(sac_context, audit_context):
-        if sac_context != audit_context:
-            logger.error(
-                f"<SOT ERROR> SAC and Audit Contexts do not match SAC: {sac_context} Audit: {audit_context}"
-            )
-
-
-def _update_audit(report_id, general_information, request):
-    audit = Audit.objects.find_audit_or_none(report_id=report_id)
-    if audit:
-        audit.audit.update({"general_information": general_information})
-        audit.save(
-            event_user=request.user,
-            event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
         )

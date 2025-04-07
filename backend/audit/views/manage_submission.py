@@ -8,8 +8,9 @@ from audit.mixins import (
 from audit.models import (
     ACCESS_ROLES,
     Access,
-    SingleAuditChecklist,
+    Audit,
 )
+from audit.models.utils import get_friendly_submission_status
 
 
 def _get_friendly_role(role):
@@ -59,11 +60,13 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             return reverse(f"audit:{viewname}", **kwargs)
 
         report_id = kwargs["report_id"]
-        sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        accesses = Access.objects.filter(sac=sac).order_by("role")
+        audit = Audit.objects.get(report_id=report_id)
+        general_information = audit.audit.get("general_information", {})
+
+        accesses = Access.objects.filter(audit=audit).order_by("role")
         base_entries = list(map(_user_entry, accesses))
-        period_start = sac.general_information.get("auditee_fiscal_period_start")
-        period_end = sac.general_information.get("auditee_fiscal_period_end")
+        period_start = general_information.get("auditee_fiscal_period_start")
+        period_end = general_information.get("auditee_fiscal_period_end")
         _url = partial(_get_url_from_viewname, report_id=report_id)
 
         # Handle missing certifier roles:
@@ -82,11 +85,11 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
         entries = base_entries + entries_to_add
 
         context = {
-            "auditee_uei": sac.general_information["auditee_uei"],
-            "auditee_name": sac.general_information.get("auditee_name"),
+            "auditee_uei": audit.auditee_uei,
+            "auditee_name": audit.auditee_name,
             "report_id": report_id,
             "entries": entries,
-            "status": sac.get_friendly_status(),
+            "status": get_friendly_submission_status(audit.submission_status),
             "period": f"{period_start} to {period_end}",
             "progress_url": _url("SubmissionProgress"),
             "change_cert_auditee_url": _url("ChangeAuditeeCertifyingOfficial"),
@@ -94,7 +97,7 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             "add_editor_url": _url("ChangeOrAddRoleView"),
             "remove_editor_url": _url("RemoveEditorView"),
             "user_is_editor": Access.objects.filter(
-                sac=sac, email=request.user.email, role="editor"
+                audit=audit, email=request.user.email, role="editor"
             ),
         }
 

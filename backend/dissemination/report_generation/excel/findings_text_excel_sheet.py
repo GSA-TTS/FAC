@@ -12,7 +12,7 @@ def _get_entries(audit):
     for finding in findings_text:
         entries.append(
             [
-                "id",  # TODO
+                "",  # TODO: Follow-up with what we should display here.
                 audit.report_id,
                 finding.get("reference_number"),  # finding_ref_number
                 finding.get("contains_chart_or_table"),

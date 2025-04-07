@@ -9,12 +9,10 @@ from audit.forms import UnlockAfterCertificationForm
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import (
-    SingleAuditChecklist,
-    Audit,
-)
-from audit.models.models import STATUS
-from audit.models.viewflow import sac_transition
+from audit.models import Audit
+from audit.models.constants import STATUS, EventType
+
+from audit.models.viewflow import audit_transition
 from audit.decorators import verify_status
 
 
@@ -40,7 +38,7 @@ class UnlockAfterCertificationView(
         report_id = kwargs["report_id"]
 
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sac = Audit.objects.get(report_id=report_id)
             target_statuses = [
                 STATUS.READY_FOR_CERTIFICATION,
                 STATUS.AUDITOR_CERTIFIED,
@@ -59,7 +57,7 @@ class UnlockAfterCertificationView(
                 "audit/unlock-after-certification.html",
                 context,
             )
-        except SingleAuditChecklist.DoesNotExist:
+        except Audit.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(
@@ -73,24 +71,26 @@ class UnlockAfterCertificationView(
         report_id = kwargs["report_id"]
 
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
             form = UnlockAfterCertificationForm(request.POST or None)
             acceptable = ("True", True)
             should_go_to_in_progress = (
                 form.data.get("unlock_after_certification") in acceptable
             )
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
+
             if form.is_valid() and should_go_to_in_progress:
-                if sac_transition(
-                    request, sac, audit=audit, transition_to=STATUS.IN_PROGRESS
+                if audit_transition(
+                    request=request,
+                    audit=audit,
+                    transition_to=EventType.UNLOCKED_AFTER_CERTIFICATION,
                 ):
                     logger.info("Submission unlocked after certification")
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
             context = {
-                "auditee_uei": sac.auditee_uei,
-                "auditee_name": sac.auditee_name,
+                "auditee_uei": audit.auditee_uei,
+                "auditee_name": audit.auditee_name,
                 "report_id": report_id,
                 "errors": form.errors,
             }
@@ -101,5 +101,5 @@ class UnlockAfterCertificationView(
                 context,
             )
 
-        except SingleAuditChecklist.DoesNotExist:
+        except Audit.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
