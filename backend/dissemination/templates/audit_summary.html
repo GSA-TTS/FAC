@@ -35,7 +35,7 @@
                             <a class="usa-button display-flex flex-fill font-sans-xl margin-bottom-2"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                href="{% url 'dissemination:SummaryReportDownload' report_id=report_id%}?beta=Y"
+                                href="{% url 'dissemination:SummaryReportDownload' report_id=report_id %}?beta=Y"
                             >
                                 <svg class="usa-icon margin-right-1 flex-align-self-center"
                                     aria-hidden="true"
@@ -198,7 +198,7 @@
                                 </td>
                                 <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                     <p class="margin-y-1">
-                                        <span><strong>Secondary Auditors? </strong>&nbsp;{{auditor_info.has_secondary_auditors}}
+                                        <span><strong>Secondary Auditors? </strong>&nbsp;{{ auditor_info.has_secondary_auditors }}
                                         </span>
                                     </p>
                                 </td>
@@ -213,7 +213,7 @@
                                 </td>
                                 <td class="grid-col-12 margin-top-2 tablet:grid-col tablet:margin-left-2 tablet:margin-top-0">
                                     <p class="margin-y-1">
-                                        <span><strong>Secondary Auditors? </strong> {{auditor_info.has_secondary_auditors}}
+                                      <span><strong>Secondary Auditors? </strong> {{ auditor_info.has_secondary_auditors }}</span>
                                     </p>
                                 </td>
                             </tr>
