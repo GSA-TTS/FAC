@@ -25,7 +25,6 @@
 
 import logging
 
-import pytz
 from django.core.management.base import BaseCommand
 from django.db import connection
 
@@ -53,7 +52,10 @@ from audit.models import (
 )
 from audit.models.history import History
 from audit.models.constants import STATUS
-from audit.models.utils import generate_audit_indexes
+from audit.models.utils import (
+    generate_audit_indexes,
+    convert_utc_to_american_samoa_zone,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -280,18 +282,8 @@ def _convert_fac_accepted_date(sac: SingleAuditChecklist):
     for i in range(len(sac.transition_name)):
         if sac.transition_name[i] == STATUS.SUBMITTED:
             date = sac.transition_date[i]
-    submitted_date = _convert_utc_to_american_samoa_zone(date) if date else None
+    submitted_date = convert_utc_to_american_samoa_zone(date) if date else None
     return {"fac_accepted_date": submitted_date}
-
-
-# Taken from Intake to Dissemination... This could be moved to a utils class
-def _convert_utc_to_american_samoa_zone(date):
-    us_samoa_zone = pytz.timezone("US/Samoa")
-    if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
-        date = pytz.utc.localize(date)
-    american_samoa_time = date.astimezone(us_samoa_zone)
-    formatted_date = american_samoa_time.strftime("%Y-%m-%d")
-    return formatted_date
 
 
 SAC_HANDLERS = [
