@@ -1,6 +1,8 @@
 from django.test import TestCase
 from unittest.mock import patch
-from audit.models.models import ExcelFile, SingleAuditChecklist, STATUS
+from audit.models.models import SingleAuditChecklist
+from audit.models import ExcelFile
+from audit.models.constants import STATUS
 from model_bakery import baker
 
 from dissemination.remove_workbook_artifacts import (
@@ -37,7 +39,7 @@ class RemovedWorkbookArtifactsTestCase(TestCase):
                 f"excel/{sac.report_id}--{excel_file_1.form_section}.xlsx",
                 f"excel/{sac.report_id}--{excel_file_2.form_section}.xlsx",
             ],
-            sac,
+            sac.report_id,
         )
 
     @patch("dissemination.remove_workbook_artifacts.delete_files_in_bulk")

@@ -2,10 +2,11 @@ import logging
 import math
 
 from django.conf import settings
+
+from audit.models import ExcelFile
+from audit.models.constants import STATUS
 from audit.models.models import (
-    ExcelFile,
     SingleAuditChecklist,
-    STATUS,
 )
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
@@ -16,6 +17,8 @@ from django.core.paginator import PageNotAnInteger, EmptyPage
 logger = logging.getLogger(__name__)
 
 
+# TODO: SoT
+# This function will have no use after deprecating the SAC.
 def remove_workbook_artifacts(sac):
     """
     Remove all workbook artifacts associated with the given sac.
@@ -26,7 +29,7 @@ def remove_workbook_artifacts(sac):
 
         if files:
             # Delete the files from S3 in bulk
-            delete_files_in_bulk(files, sac)
+            delete_files_in_bulk(files, sac.report_id)
 
     except ExcelFile.DoesNotExist:
         logger.info(f"No files found to delete for report: {sac.report_id}")
@@ -36,7 +39,27 @@ def remove_workbook_artifacts(sac):
         )
 
 
-def delete_files_in_bulk(filenames, sac):
+def audit_remove_workbook_artifacts(audit):
+    """
+    Remove all workbook artifacts associated with the given audit.
+    """
+    try:
+        excel_files = ExcelFile.objects.filter(audit=audit)
+        files = [f"excel/{excel_file.filename}" for excel_file in excel_files]
+
+        if files:
+            # Delete the files from S3 in bulk
+            delete_files_in_bulk(files, audit.report_id)
+
+    except ExcelFile.DoesNotExist:
+        logger.info(f"No files found to delete for report: {audit.report_id}")
+    except Exception as e:
+        logger.error(
+            f"Failed to delete files from S3 for report: {audit.report_id}. Error: {e}"
+        )
+
+
+def delete_files_in_bulk(filenames, report_id):
     """Delete files from S3 in bulk."""
     # This client uses the internal endpoint URL because we're making a request to S3 from within the app
     s3_client = boto3_client(
@@ -60,7 +83,7 @@ def delete_files_in_bulk(filenames, sac):
         for deleted in deleted_files:
             if deleted.get("Key", None):
                 logger.info(
-                    f"Successfully deleted {deleted['Key']} from S3 for report: {sac.report_id}"
+                    f"Successfully deleted {deleted['Key']} from S3 for report: {report_id}"
                 )
 
         errors = response.get("Errors", [])
@@ -68,12 +91,12 @@ def delete_files_in_bulk(filenames, sac):
             for error in errors:
                 if error.get("Key", None):
                     logger.error(
-                        f"Failed to delete {error['Key']} from S3 for report: {sac.report_id}. Error: {error['Message']}"  # nosec B608
+                        f"Failed to delete {error['Key']} from S3 for report: {report_id}. Error: {error['Message']}"  # nosec B608
                     )
 
     except ClientError as e:
         logger.error(
-            f"Failed to delete files from S3 for report: {sac.report_id}. Error: {e}"
+            f"Failed to delete files from S3 for report: {report_id}. Error: {e}"
         )
 
 

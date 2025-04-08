@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.views import generic
@@ -6,12 +8,14 @@ from audit.cross_validation import (
     sac_validation_shape,
     submission_progress_check,
 )
+from audit.cross_validation.audit_validation_shape import audit_validation_shape
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access
+from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access, Audit
 from audit.models.models import STATUS
 
+logger = logging.getLogger(__name__)
 
 # Turn the named tuples into dicts because Django templates work with dicts:
 SECTIONS_NAMING = {k: v._asdict() for k, v in naming.SECTION_NAMES.items()}
@@ -107,6 +111,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            audit = Audit.objects.find_audit_or_none(report_id=report_id)
 
             # Determine if the auditee certifier is the same as the current user.
             # If there is no auditee certifier, default to False.
@@ -129,7 +134,17 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 sar = None
 
             shaped_sac = sac_validation_shape(sac)
+
+            shaped_audit = audit_validation_shape(audit) if audit else None
+
             subcheck = submission_progress_check(shaped_sac, sar, crossval=False)
+            audit_subcheck = (
+                submission_progress_check(shaped_audit, sar, crossval=False)
+                if shaped_audit
+                else None
+            )
+
+            _compare_progress_check(subcheck, audit_subcheck)
             # Update with the view-specific info from SECTIONS_BASE:
             for key, value in SECTIONS_BASE.items():
                 subcheck[key] = subcheck[key] | value
@@ -187,3 +202,10 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             )
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
+
+
+def _compare_progress_check(sac_result, audit_result):
+    if sac_result != audit_result:
+        logger.error(
+            f"<SOT ERROR> Submission check progress failure SAC: {sac_result} Audit: {audit_result}"
+        )

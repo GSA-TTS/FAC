@@ -1,7 +1,7 @@
 import argparse
 import time
 
-from util import (
+from census_historical_migration.throwaway_scripts.util import (
     trigger_migration_workflow,
 )
 import subprocess  # nosec
