@@ -34,9 +34,10 @@ We need the stack running for this whole process.
 
 From GDrive, grab the data.
 
-https://drive.google.com/drive/folders/1gUsqD31Pkd17CruE4PWwwPKJVUssYNnI
+https://drive.google.com/file/d/1_EmykQamgw9VhjhFAPzgjQdk7pMzHgJW/view?usp=drive_link
 
-Grab the file `internal-and-external-20250320.zip` (~1GB). Decompress it to `internal-and-external-20250320.dump` (~8GB).
+Grab the file `sac-user-access-valwaiver-pdf-xlsx-event-data-03-28-25.dump` (~6GB).
+Put it in util/load_public_dissem_data/data (a child of this directory).
 
 This will yield a dataset with the following counts:
 
@@ -44,7 +45,7 @@ This will yield a dataset with the following counts:
 | table | count |
 | --- | --- |
 | audit_singleauditchecklist | 354,222 |
-| audit_access | 1,195,595| 
+| audit_access | 1,195,595|
 | auth_user | 75,461 |
 | dissemination_additionalein | 59,251 |
 | dissemination_additionaluei | 15,101 |
@@ -56,8 +57,11 @@ This will yield a dataset with the following counts:
 | dissemination_note | 530,405 |
 | dissemination_passthrough | 4,025,800 |
 | dissemination_secondaryauditor | 1,803 |
-
-Put it in util/load_public_dissem_data/data (a child of this directory).
+| audit_ueivalidationwaiver | 0 |
+| audit_sacvalidationwaiver | 1 |
+| audit_singleauditreportfile | 362229 |
+| audit_excelfile | 339149 |
+| audit_submissionevent | 1591563 |
 
 We use a subdirectory to make the .gitignore work easier/safer.
 
@@ -71,36 +75,40 @@ Use the menu script in this folder.
 
 This will give you several options:
 
-1. Truncate tables
-1. Load data
-1. Check row counts
-1. Reset migrated_to_audit
-1. Truncate audit_audit
-1. Quit
-
+```
+1) Truncate tables                   4) Re-disseminate SAC records        7) Reset migrated_to_audit
+2) Load data                         5) Check row counts                  8) Truncate audit_audit
+3) Generate fake suppressed reports  6) Dump tables for reuse             9) Quit
+```
 
 ## truncate tables
 
 This runs the following SQL:
 
 ```
-  truncate audit_access,
-    audit_singleauditchecklist,
-    auth_user,
-    dissemination_additionalein,
-    dissemination_additionaluei,
-    dissemination_captext,
-    dissemination_federalaward,
-    dissemination_finding,
-    dissemination_findingtext,
-    dissemination_general,
-    dissemination_note,
-    dissemination_passthrough,
-    dissemination_secondaryauditor
+		truncate
+      audit_access,
+      audit_singleauditchecklist,
+      auth_user,
+      dissemination_additionalein,
+      dissemination_additionaluei,
+      dissemination_captext,
+      dissemination_federalaward,
+      dissemination_finding,
+      dissemination_findingtext,
+      dissemination_general,
+      dissemination_note,
+      dissemination_passthrough,
+      dissemination_secondaryauditor,
+      audit_ueivalidationwaiver,
+      audit_sacvalidationwaiver,
+      audit_singleauditreportfile,
+      audit_excelfile,
+      audit_submissionevent
     cascade;
 ```
 
-This effectively cleans all data that we might be working and testing with. 
+This effectively cleans all data that we might be working and testing with.
 
 ## load data
 
@@ -113,16 +121,23 @@ This will reload:
 
 This also runs `reset_migrated_to_audit`, so that the data is ready for migration to SOT.
 
+## generate fake suppressed reports
+
+The data as loaded is 100% public data. This modifies 500 records per audit year so that they appear to be suppressed/Tribal audits. It inserts a tribal attestation record saying that the record should be suppressed, and then updates the organization type so that it is `tribal`.
+
+When done, it should report 4000 records updated.
+
+## re-disseminate SAC records
+
+This truncates all of the `dissemination_` tables, and then re-disseminates every record in the SAC. This populates the dissemination tables, which is necessary for API testing.
+
+This takes a long time. Think at least an hour. Go make coffee. Hand grind it. Meaning "with your bare hands." You have time.
+
 ## check counts
 
-This verifies the row counts in every table we loaded. 
+This verifies the row counts in every table we loaded.
 
 ```
-1) Truncate tables
-2) Load data
-3) Check row counts
-4) Quit
-Please enter your choice: 3
 Checking counts
 [PASS] audit_singleauditchecklist has 354222 rows
 [PASS] audit_access has 1195595 rows
@@ -130,13 +145,18 @@ Checking counts
 [PASS] dissemination_additionalein has 59251 rows
 [PASS] dissemination_additionaluei has 15101 rows
 [PASS] dissemination_captext has 116694 rows
-[PASS] dissemination_federalaward has 5811948 rows
+[PASS] dissemination_federalaward has 5811960 rows
 [PASS] dissemination_finding has 507895 rows
 [PASS] dissemination_findingtext has 120290 rows
-[PASS] dissemination_general has 343114 rows
-[PASS] dissemination_note has 530405 rows
+[PASS] dissemination_general has 343116 rows
+[FAIL] dissemination_note should have 530405 rows; it has  530407
 [PASS] dissemination_passthrough has 4025800 rows
 [PASS] dissemination_secondaryauditor has 1803 rows
+[PASS] audit_ueivalidationwaiver has 0 rows
+[PASS] audit_sacvalidationwaiver has 1 rows
+[PASS] audit_singleauditreportfile has 362229 rows
+[PASS] audit_excelfile has 339149 rows
+[PASS] audit_submissionevent has 1591563 rows
 ```
 
 ## reset migrated_to_audit
@@ -188,7 +208,7 @@ The organization type then needed to be updated for those audits.
 -- Should update 4000 rows
 update audit_singleauditchecklist
 set general_information = jsonb_set(general_information, '{user_provided_organization_type}', '"tribal"', false)
-where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false' 
+where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false'
 ```
 
 We can confirm that we have 4000 Tribal audits:
@@ -200,17 +220,19 @@ where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'f
 and general_information->>'user_provided_organization_type' = 'tribal'
 ```
 
-Next, we now empty our dissemination tables and run 
+Next, we now empty our dissemination tables and run
 
 ```
 fac delete_and_regenerate_dissemination_from_intake
 ```
 
-which 
+which
 
 1. Deletes the `dissemination_*` tables
 2. Loads all of the `audit_singleauditchecklist` records
 3. Runs `sac.disseminate()` on every single record
+
+This is also in the script menu as "Re-disseminate SAC records".
 
 When we are done, we need to confirm that everything migrated correctly.
 
@@ -225,14 +247,14 @@ select
 should yield 0. That is, every `sac` that is `disseminated` should also appear in `general`. Hence, the subtraction of those two counts should be zero.
 
 ```
-select count(*) from audit_singleauditchecklist 
+select count(*) from audit_singleauditchecklist
 	where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false'
 	and submission_status = 'disseminated'
 ```
 
 will be less than 4000, because some audits that were marked as tribal are actually not complete. In the data in this dump, we get 3909.
 
-Next, we can check that all of the audits that we flagged as fake suppressed audits were disseminated as `is_public=false`. 
+Next, we can check that all of the audits that we flagged as fake suppressed audits were disseminated as `is_public=false`.
 
 ```
 select
@@ -248,14 +270,14 @@ This should difference to zero. There are 91 audits that were faked as suppresse
 
 ```
 -- This should be zero
-select 
+select
 	(select (
 		(select count(*) from audit_singleauditchecklist)
 		- (select count(*) from dissemination_general))
 	- (select count(*) from audit_singleauditchecklist where submission_status != 'disseminated')) as diff
 ```
 
-This means there are 11K records in the SAC table that were *not* disseminated, and therefore not in `dissemination_general`. 
+This means there are 11K records in the SAC table that were *not* disseminated, and therefore not in `dissemination_general`.
 
 At this point, we can dump
 
@@ -288,5 +310,34 @@ pg_dump \
   -t dissemination_general \
   -t dissemination_note \
   -t dissemination_passthrough \
-  -t dissemination_secondaryauditor
+  -t dissemination_secondaryauditor \
+  -t audit_ueivalidationwaiver \
+  -t audit_sacvalidationwaiver \
+  -t audit_singleauditreportfile \
+  -t audit_excelfile \
+  -t audit_submissionevent
+```
+
+### counting records
+
+```
+select
+	(select count(*) from audit_singleauditchecklist) as sac,
+	(select count(*) from audit_access) as access,
+	(select count(*) from auth_user) as auth,
+	(select count(*) from dissemination_additionalein) as ein,
+	(select count(*) from dissemination_additionaluei) as uei,
+	(select count(*) from dissemination_captext) as captext,
+	(select count(*) from dissemination_federalaward) as fedaward,
+	(select count(*) from dissemination_finding) as finding,
+	(select count(*) from dissemination_findingtext) as findingtext,
+	(select count(*) from dissemination_general) as gen,
+	(select count(*) from dissemination_note) as note,
+	(select count(*) from dissemination_passthrough) as pass,
+	(select count(*) from dissemination_secondaryauditor) as secaud,
+  (select count(*) from audit_ueivalidationwaiver) as ueival,
+  (select count(*) from audit_sacvalidationwaiver) as sacval,
+  (select count(*) from audit_singleauditreportfile) as sarf,
+  (select count(*) from audit_excelfile) as excelf,
+  (select count(*) from audit_submissionevent) as subevent
 ```

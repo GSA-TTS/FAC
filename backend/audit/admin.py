@@ -776,7 +776,9 @@ class AuditValidationWaiverAdmin(admin.ModelAdmin):
                         )
 
                     # Create the waiver - audit submission now ignores invalid prior references.
-                    elif AuditValidationWaiver.TYPES.PRIOR_REFERENCES in obj.waiver_types:
+                    elif (
+                        AuditValidationWaiver.TYPES.PRIOR_REFERENCES in obj.waiver_types
+                    ):
                         super().save_model(request, obj, form, change)
                         admin_message(
                             request,

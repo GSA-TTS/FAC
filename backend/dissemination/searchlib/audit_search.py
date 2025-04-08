@@ -1,6 +1,4 @@
 import logging
-import time
-from math import ceil
 
 from django.db.models import Q, F
 
@@ -69,10 +67,7 @@ def search(params):
     """
     This search is based off the updated 'audit' table rather than the
     dissemination tables.
-
-    TODO: Update Post SOC Launch -> Remove logging.
     """
-    t0 = time.time()
     params = params or dict()
     query = Q(submission_status=STATUS.DISSEMINATED)
 
@@ -87,11 +82,6 @@ def search(params):
     )
     results = results.filter(query)
     results = _sort_results(results, params)
-    logger.error(f"=================== AuditSearch ==========> {results.query}")
-    logger.error(f"=================== AuditSearch ==========> {results.count()}")
-    t1 = time.time()
-    readable = int(ceil((t1 - t0) * 1000))
-    logger.error(f"=================== AuditSearch ==========> {readable}ms")
     return results
 
 

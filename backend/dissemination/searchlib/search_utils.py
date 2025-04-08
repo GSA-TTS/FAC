@@ -147,6 +147,7 @@ def audit_populate_cog_over_name(results):
     return results
 
 
+# TODO: Update Post SOC Launch -> Pull out the extra search, logging.
 def _compare_searches(search_parameters):
     audit_t0 = time.time()
     audit_results = search_audit(search_parameters)
@@ -160,10 +161,16 @@ def _compare_searches(search_parameters):
 
     audit_duration = int(ceil((audit_t1 - audit_t0) * 1000))
     sac_duration = int(ceil((sca_t1 - sac_t0) * 1000))
+
+    logger.info("=========== SOT Search Data ======================")
+    logger.info(f"Audit Count: {audit_count} Duration: {audit_duration} ms")
+    logger.info(f"SAC Count: {sac_results_count} Duration: {sac_duration} ms")
+    # Only log the query if mismatched
     if audit_count != sac_results_count:
-        logger.info(
-            f"Audit Search Mismatch Audit Results: {audit_count}, SAC Count: {sac_results_count}\n Audit Query: {audit_results.query}"
-        )
+        logger.error("!!!!!!! Search Mismatch !!!!!!!")
+        logger.info(f"Audit Query: {audit_results.query}")
+        logger.info(f"SAC Query: {sac_results.query}")
+    logger.info("===================================================")
 
     mismatch = 0 if audit_count == sac_results_count else 1
 

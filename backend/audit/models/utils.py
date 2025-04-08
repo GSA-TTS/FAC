@@ -6,6 +6,8 @@ import logging
 
 
 from datetime import timedelta
+
+import pytz
 from django.utils import timezone as django_timezone
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -15,8 +17,6 @@ from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
 from support.cog_over_w_audit import compute_cog_over
 
 logger = logging.getLogger(__name__)
-
-import json
 
 
 def generate_sac_report_id(count, end_date, source="GSAFAC"):
@@ -57,6 +57,19 @@ def camel_to_snake(raw: str) -> str:
     """Convert camel case to snake_case."""
     text = f"{raw[0].lower()}{raw[1:]}"
     return "".join(c if c.islower() else f"_{c.lower()}" for c in text)
+
+
+def convert_utc_to_american_samoa_zone(date):
+    us_samoa_zone = pytz.timezone("US/Samoa")
+    # Ensure the datetime object is time zone aware
+    if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
+        date = pytz.utc.localize(date)
+    # Convert to American Samoa timezone (UTC-11)
+    american_samoa_time = date.astimezone(us_samoa_zone)
+    # Extract the date and format it as YYYY-MM-DD
+    formatted_date = american_samoa_time.strftime("%Y-%m-%d")
+
+    return formatted_date
 
 
 def generate_audit_indexes(audit):

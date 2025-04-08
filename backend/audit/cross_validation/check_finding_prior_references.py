@@ -67,7 +67,9 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
     audit_errors = []
     # Validate all prior reference numbers for each award
     for award_ref, prior_refs_strings in all_prior_refs.items():
-        prior_refs = prior_refs_strings.split(",")
+        # Make sure we have no leading or trailing whitespace on
+        # any of the refs.
+        prior_refs = list(map(lambda s: s.strip(), prior_refs_strings.split(",")))
         if use_audit:
             _validate_prior_refs_audit(
                 prior_refs,
@@ -76,7 +78,6 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
                 previous_findings_refs,
                 audit_errors,
             )
-
         _validate_prior_refs(
             prior_refs,
             award_ref,

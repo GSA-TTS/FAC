@@ -409,6 +409,7 @@ class TestDeleteFlaggedRecordsAdminAction(TestCase):
     ):
         AUDITEE_UEI = "ABCDHJH74DW7"
         REPORT_ID = "1900-01-GSAFAC-0000000001"
+        UPDATED_AT = "2023-03-01"
 
         audit = baker.make(
             Audit,
@@ -416,13 +417,14 @@ class TestDeleteFlaggedRecordsAdminAction(TestCase):
             submission_status=STATUS.FLAGGED_FOR_REMOVAL,
             audit={"general_information": {"auditee_uei": AUDITEE_UEI}},
             version=0,
+            updated_at=UPDATED_AT,
         )
         baker.make(
             History,
             event=EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
             report_id=REPORT_ID,
             version=audit.version,
-            updated_at="2023-03-01",
+            updated_at=UPDATED_AT,
             updated_by=audit.created_by,
             event_data=audit.audit,
         )

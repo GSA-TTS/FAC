@@ -53,7 +53,10 @@ from audit.models import (
 )
 from audit.models.history import History
 from audit.models.constants import STATUS
-from audit.models.utils import generate_audit_indexes
+from audit.models.utils import (
+    generate_audit_indexes,
+    convert_utc_to_american_samoa_zone,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -137,19 +140,27 @@ class Command(BaseCommand):
             # convert additional fields.
             if sac.submission_status == STATUS.DISSEMINATED:
                 audit.audit.update(generate_audit_indexes(audit))
+
+                # re-adjust cog/over afterwards.
+                audit.cognizant_agency = sac.cognizant_agency
+                audit.oversight_agency = sac.oversight_agency
+                audit.audit["cognizant_agency"] = sac.cognizant_agency
+                audit.audit["oversight_agency"] = sac.oversight_agency
+
             audit.save()
 
             # copy SubmissionEvents into History records.
             events = SubmissionEvent.objects.filter(sac=sac)
             for event in events:
-                History.objects.create(
+                history = History.objects.create(
                     event=event.event,
                     report_id=sac.report_id,
                     event_data=audit.audit,
                     version=0,
-                    updated_at=event.timestamp,
                     updated_by=event.user,
                 )
+                history.updated_at = event.timestamp
+                history.save()
 
             # assign audit reference to file-based models.
             SingleAuditReportFile.objects.filter(sac=sac).update(audit=audit)
@@ -272,18 +283,8 @@ def _convert_fac_accepted_date(sac: SingleAuditChecklist):
     for i in range(len(sac.transition_name)):
         if sac.transition_name[i] == STATUS.SUBMITTED:
             date = sac.transition_date[i]
-    submitted_date = _convert_utc_to_american_samoa_zone(date) if date else None
+    submitted_date = convert_utc_to_american_samoa_zone(date) if date else None
     return {"fac_accepted_date": submitted_date}
-
-
-# Taken from Intake to Dissemination... This could be moved to a utils class
-def _convert_utc_to_american_samoa_zone(date):
-    us_samoa_zone = pytz.timezone("US/Samoa")
-    if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
-        date = pytz.utc.localize(date)
-    american_samoa_time = date.astimezone(us_samoa_zone)
-    formatted_date = american_samoa_time.strftime("%Y-%m-%d")
-    return formatted_date
 
 
 SAC_HANDLERS = [
@@ -324,6 +325,7 @@ SAC_HANDLERS = [
     lambda sac: {"tribal_data_consent": sac.tribal_data_consent or {}},
     lambda sac: {"cognizant_agency": sac.cognizant_agency},
     lambda sac: {"oversight_agency": sac.oversight_agency},
+    lambda sac: {"type_audit_code": "UG"},
     _convert_program_names,
     _convert_file_information,
     _convert_month_year,
