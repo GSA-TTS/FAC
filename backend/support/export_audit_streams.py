@@ -13,6 +13,7 @@ map_table_to_file = {
     "passthrough": "PassThrough",
     "secondary_auditors": "SecondaryAuditor",
 }
+API_VERSION = "api_v1_1_0"
 
 
 class StreamGenerator:
@@ -26,7 +27,7 @@ class StreamGenerator:
             f"{table_name}.{audit_year}",
             ReplicationStream(
                 object=f"public-data/current/audit-year/{audit_year}-ay-{file_name}.csv",
-                sql=self.query.format(audit_year=audit_year),
+                sql=self.query.format(api_version=API_VERSION, audit_year=audit_year),
                 mode="full-refresh",
                 target_options={"format": "csv"},
             ),
@@ -39,7 +40,7 @@ class StreamGenerator:
             f"{table_name}",
             ReplicationStream(
                 object=f"public-data/current/full/{file_name}.csv",
-                sql=self.query,
+                sql=self.query.format(api_version=API_VERSION),
                 mode="full-refresh",
                 target_options={"format": "csv"},
             ),
@@ -56,6 +57,7 @@ class StreamGenerator:
             ReplicationStream(
                 object=f"public-data/current/fiscal-year/{audit_year}-ffy-{file_name}.csv",
                 sql=self.query.format(
+                    api_version=API_VERSION,
                     fac_accepted_date_start=fac_accepted_date_start,
                     fac_accepted_date_end=fac_accepted_date_end,
                 ),
