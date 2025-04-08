@@ -261,10 +261,13 @@ def validate_audit_consistency(audit_instance):
         audit_field_data = audit_instance.audit.get(field)
 
         # Ignore SAC fields that only contain metadata
-        if field == "findings_text" and not sac_data.get("FindingsText").get("findings_text_entries"):
-            sac_data = None
-        elif field == "corrective_action_plan" and not sac_data.get("CorrectiveActionPlan").get("corrective_action_plan_entries"):
-            sac_data = None
+        if sac_data:
+            if field == "findings_text" \
+                and not sac_data.get("FindingsText", {}).get("findings_text_entries"):
+                sac_data = None
+            elif field == "corrective_action_plan" \
+                and not sac_data.get("CorrectiveActionPlan", {}).get("corrective_action_plan_entries"):
+                sac_data = None
 
         if sac_data is not None and audit_field_data in [None, {}]:
             differences.append(
