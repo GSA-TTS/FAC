@@ -1,8 +1,11 @@
-from django.urls import path
+from django.urls import path, register_converter
 
+from config import converters
 from dissemination import views
 
 app_name = "dissemination"
+
+register_converter(converters.PublicDataPathConverter, "public_data_path")
 
 urlpatterns = [
     path(
@@ -16,7 +19,7 @@ urlpatterns = [
         name="PdfDownload",
     ),
     path(
-        "public-data/<path:relative_path>",
+        "public-data/<public_data_path:relative_path>",
         views.PublicDataDownloadView.as_view(),
         name="PublicDataDownload",
     ),
