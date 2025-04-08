@@ -147,30 +147,28 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     print("CALL SAM", resp, error)
 
     if resp is None:
-        print("ERR ERR ERR", "None")
         return {"valid": False, "errors": [error]}
     if resp.status_code in [403]:
         # We need to handle the case where no one is able to update the API key.
-        # See ADR ###
-        print("ERR ERR ERR", resp, error)
+        # See ADR https://github.com/GSA-TTS/FAC/issues/4861
         waiver = UeiValidationWaiver()
         # Auditors queue audits up far in advance; give the automatic waiver
         # plenty of time, so we don't have it expire mid-submission.
-        waiver.expiration = one_year_from_today
+        waiver.expiration = one_year_from_today()
         waiver.approver_email = "fac+system@gsa.gov"
         waiver.approver_name = "Federal Audit Clearinghouse System"
-        waiver.requester_email = "fac+sam_403@gsa.gov"
+        waiver.requester_email = "fac+samgov403@gsa.gov"
         waiver.requester_name = "SAM.gov 403"
         waiver.justification = json.dumps(
             {
                 "status_code": resp.status_code,
                 "reason": resp.reason,
-                "justification": "This is an automatically issued waiver.",
+                "justification": "This is an automatically issued waiver in the event of a SAM.gov 403 response.",
                 "uei": uei,
             }
         )
         waiver.save()
-        return get_placeholder_sam(uei)
+        return get_placeholder_sam403(uei)
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
         return {"valid": False, "errors": [error]}
@@ -217,6 +215,23 @@ def get_placeholder_sam(uei: str) -> dict:
         "coreData": {},
         "entityRegistration": {
             "legalBusinessName": GSA_FAC_WAIVER,
+            "ueiSAM": uei,
+        },
+    }
+
+    return {"valid": True, "response": placeholder_entry}
+
+
+def get_placeholder_sam403(uei: str) -> dict:
+    """
+    Return a dictionary with placeholder data as though it were parsed from SAM.gov.
+    Only provides placeholders for required fields, to unblock UEIs with waivers.
+    This variation is for when we're automating a waiver due to a 403 response.
+    """
+    placeholder_entry = {
+        "coreData": {},
+        "entityRegistration": {
+            "legalBusinessName": "to be entered",
             "ueiSAM": uei,
         },
     }
