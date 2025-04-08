@@ -1,4 +1,5 @@
 from django.utils import timezone as django_timezone
+import json
 import logging
 import requests
 import ssl
@@ -7,6 +8,7 @@ import urllib3
 
 from audit.models import UeiValidationWaiver
 from config.settings import SAM_API_URL, SAM_API_KEY, GSA_FAC_WAIVER
+from audit.models.utils import one_year_from_today
 
 logger = logging.getLogger(__name__)
 
@@ -147,10 +149,27 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     if resp is None:
         print("ERR ERR ERR", "None")
         return {"valid": False, "errors": [error]}
-    if resp.status_code == 403:
+    if resp.status_code in [403]:
         # We need to handle the case where no one is able to update the API key.
         # See ADR ###
         print("ERR ERR ERR", resp, error)
+        waiver = UeiValidationWaiver()
+        # Auditors queue audits up far in advance; give the automatic waiver
+        # plenty of time, so we don't have it expire mid-submission.
+        waiver.expiration = one_year_from_today
+        waiver.approver_email = "fac+system@gsa.gov"
+        waiver.approver_name = "Federal Audit Clearinghouse System"
+        waiver.requester_email = "fac+sam_403@gsa.gov"
+        waiver.requester_name = "SAM.gov 403"
+        waiver.justification = json.dumps(
+            {
+                "status_code": resp.status_code,
+                "reason": resp.reason,
+                "justification": "This is an automatically issued waiver.",
+                "uei": uei,
+            }
+        )
+        waiver.save()
         return get_placeholder_sam(uei)
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
