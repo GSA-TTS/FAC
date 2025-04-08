@@ -45,7 +45,7 @@ This will yield a dataset with the following counts:
 | table | count |
 | --- | --- |
 | audit_singleauditchecklist | 354,222 |
-| audit_access | 1,195,595|
+| audit_access | 1,195,595| 
 | auth_user | 75,461 |
 | dissemination_additionalein | 59,251 |
 | dissemination_additionaluei | 15,101 |
@@ -86,7 +86,7 @@ This will give you several options:
 This runs the following SQL:
 
 ```
-		truncate
+		truncate 
       audit_access,
       audit_singleauditchecklist,
       auth_user,
@@ -108,7 +108,7 @@ This runs the following SQL:
     cascade;
 ```
 
-This effectively cleans all data that we might be working and testing with.
+This effectively cleans all data that we might be working and testing with. 
 
 ## load data
 
@@ -123,7 +123,7 @@ This also runs `reset_migrated_to_audit`, so that the data is ready for migratio
 
 ## generate fake suppressed reports
 
-The data as loaded is 100% public data. This modifies 500 records per audit year so that they appear to be suppressed/Tribal audits. It inserts a tribal attestation record saying that the record should be suppressed, and then updates the organization type so that it is `tribal`.
+The data as loaded is 100% public data. This modifies 500 records per audit year so that they appear to be suppressed/Tribal audits. It inserts a tribal attestation record saying that the record should be suppressed, and then updates the organization type so that it is `tribal`. 
 
 When done, it should report 4000 records updated.
 
@@ -135,7 +135,7 @@ This takes a long time. Think at least an hour. Go make coffee. Hand grind it. M
 
 ## check counts
 
-This verifies the row counts in every table we loaded.
+This verifies the row counts in every table we loaded. 
 
 ```
 Checking counts
@@ -208,7 +208,7 @@ The organization type then needed to be updated for those audits.
 -- Should update 4000 rows
 update audit_singleauditchecklist
 set general_information = jsonb_set(general_information, '{user_provided_organization_type}', '"tribal"', false)
-where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false'
+where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false' 
 ```
 
 We can confirm that we have 4000 Tribal audits:
@@ -220,13 +220,13 @@ where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'f
 and general_information->>'user_provided_organization_type' = 'tribal'
 ```
 
-Next, we now empty our dissemination tables and run
+Next, we now empty our dissemination tables and run 
 
 ```
 fac delete_and_regenerate_dissemination_from_intake
 ```
 
-which
+which 
 
 1. Deletes the `dissemination_*` tables
 2. Loads all of the `audit_singleauditchecklist` records
@@ -247,14 +247,14 @@ select
 should yield 0. That is, every `sac` that is `disseminated` should also appear in `general`. Hence, the subtraction of those two counts should be zero.
 
 ```
-select count(*) from audit_singleauditchecklist
+select count(*) from audit_singleauditchecklist 
 	where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false'
 	and submission_status = 'disseminated'
 ```
 
 will be less than 4000, because some audits that were marked as tribal are actually not complete. In the data in this dump, we get 3909.
 
-Next, we can check that all of the audits that we flagged as fake suppressed audits were disseminated as `is_public=false`.
+Next, we can check that all of the audits that we flagged as fake suppressed audits were disseminated as `is_public=false`. 
 
 ```
 select
@@ -270,14 +270,14 @@ This should difference to zero. There are 91 audits that were faked as suppresse
 
 ```
 -- This should be zero
-select
+select 
 	(select (
 		(select count(*) from audit_singleauditchecklist)
 		- (select count(*) from dissemination_general))
 	- (select count(*) from audit_singleauditchecklist where submission_status != 'disseminated')) as diff
 ```
 
-This means there are 11K records in the SAC table that were *not* disseminated, and therefore not in `dissemination_general`.
+This means there are 11K records in the SAC table that were *not* disseminated, and therefore not in `dissemination_general`. 
 
 At this point, we can dump
 

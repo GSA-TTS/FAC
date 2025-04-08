@@ -9,8 +9,8 @@ RAW_FILENAME=${RAW_FILENAME:-data/sac-user-access-valwaiver-pdf-xlsx-event-data-
 DATE=$(date '+%Y%m%d')
 
 count_audit_singleauditchecklist=354222
-count_audit_access=1195595
-count_auth_user=75461
+count_audit_access=1195595 
+count_auth_user=75461 
 count_dissemination_additionalein=59251
 count_dissemination_additionaluei=15101
 count_dissemination_captext=116694
@@ -41,7 +41,7 @@ truncate () {
     -v ON_ERROR_STOP=1 \
     <<EOF
 	begin;
-		truncate
+		truncate 
       audit_access,
       audit_singleauditchecklist,
       auth_user,
@@ -247,8 +247,8 @@ check_row_counts () {
 check_all_row_counts () {
   echo "Checking counts"
   check_row_counts "audit_singleauditchecklist" ${count_audit_singleauditchecklist}
-  check_row_counts "audit_access" ${count_audit_access}
-  check_row_counts "auth_user" ${count_auth_user}
+  check_row_counts "audit_access" ${count_audit_access} 
+  check_row_counts "auth_user" ${count_auth_user} 
   check_row_counts "dissemination_additionalein" ${count_dissemination_additionalein}
   check_row_counts "dissemination_additionaluei" ${count_dissemination_additionaluei}
   check_row_counts "dissemination_captext" ${count_dissemination_captext}
