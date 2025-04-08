@@ -244,7 +244,6 @@ def validate_audit_consistency(audit_instance):
         "findings_uniform_guidence",
         "corrective_action_plan",
         "additional_ueis",
-        "additional_eins",
         "secondary_auditors",
         "notes_to_sefa",
         "audit_information",
@@ -259,6 +258,36 @@ def validate_audit_consistency(audit_instance):
         "cognizant_agency",
         "oversight_agency",
     ]
+
+    if hasattr(sac_instance, "additional_eins") and sac_instance.additional_eins:
+        sac_eins = []
+        if (
+            isinstance(sac_instance.additional_eins, dict)
+            and "AdditionalEINs" in sac_instance.additional_eins
+        ):
+            entries = sac_instance.additional_eins.get("AdditionalEINs", {}).get(
+                "additional_eins_entries", []
+            )
+            for entry in entries:
+                if "additional_ein" in entry:
+                    sac_eins.append(entry["additional_ein"])
+
+        audit_eins = []
+        if (
+            "additional_eins" in audit_instance.audit
+            and audit_instance.audit["additional_eins"]
+        ):
+            audit_eins = audit_instance.audit["additional_eins"]
+
+        if set(sac_eins) != set(audit_eins):
+            differences.append(
+                {
+                    "field": "additional_eins",
+                    "sac_value": sac_eins,
+                    "audit_value": audit_eins,
+                    "error": "EIN values don't match between SAC and Audit",
+                }
+            )
 
     for field in simple_fields_to_check:
         sac_value = getattr(sac_instance, field, None)
@@ -275,11 +304,13 @@ def validate_audit_consistency(audit_instance):
 
         # Ignore SAC fields that only contain metadata
         if sac_data:
-            if field == "findings_text" \
-                and not sac_data.get("FindingsText", {}).get("findings_text_entries"):
+            if field == "findings_text" and not sac_data.get("FindingsText", {}).get(
+                "findings_text_entries"
+            ):
                 sac_data = None
-            elif field == "corrective_action_plan" \
-                and not sac_data.get("CorrectiveActionPlan", {}).get("corrective_action_plan_entries"):
+            elif field == "corrective_action_plan" and not sac_data.get(
+                "CorrectiveActionPlan", {}
+            ).get("corrective_action_plan_entries"):
                 sac_data = None
 
         if sac_data is not None and audit_field_data in [None, {}]:
