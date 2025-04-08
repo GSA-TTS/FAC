@@ -18,15 +18,6 @@ from audit.models.utils import (
     validate_audit_consistency,
 )
 
-# TESTING
-import logging
-
-logger = logging.getLogger(__name__)
-
-from itertools import chain
-from audit.cross_validation import functions as cross_validation_functions
-from audit.utils import FORM_SECTION_HANDLERS
-
 from itertools import chain
 from audit.cross_validation import functions as cross_validation_functions
 from audit.utils import FORM_SECTION_HANDLERS
