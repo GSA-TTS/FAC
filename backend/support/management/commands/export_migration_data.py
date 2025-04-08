@@ -33,12 +33,24 @@ class StreamGenerator:
     def __init__(self, query=None):
         self.query = query
 
-    def generate_stream(self, audit_year):
+    def generate_stream_inspection(self, audit_year):
         table_name = "public.dissemination_migrationinspectionrecord"
         return (
             f"{table_name}.{audit_year}",
             ReplicationStream(
-                object=f"public-data/historic/migrationinspectionrecord/{audit_year}-migration.csv",
+                object=f"public-data/migration/{audit_year}-inspectionrecord.csv",
+                sql=self.query.format(audit_year=audit_year),
+                mode="full-refresh",
+                target_options={"format": "csv"},
+            ),
+        )
+
+    def generate_stream_invalidaudit(self, audit_year):
+        table_name = "public.dissemination_invalidauditrecord"
+        return (
+            f"{table_name}.{audit_year}",
+            ReplicationStream(
+                object=f"public-data/migration/{audit_year}-invalidauditrecord.csv",
                 sql=self.query.format(audit_year=audit_year),
                 mode="full-refresh",
                 target_options={"format": "csv"},
@@ -56,16 +68,29 @@ STREAM_GENERATORS = [
     ),
 ]
 
+STREAM_GENERATORS_INVALID_AUDIT = [
+    StreamGenerator(
+        query=(
+            "select * from dissemination_invalidauditrecord "
+            "where audit_year='{audit_year}' and "
+            "report_id in (select report_id from dissemination_general where audit_year='{audit_year}' and is_public='True')"
+        ),
+    ),
+]
+
 
 def _run_data_export(year):
     logger.info(
-        f"Begin exporting data from dissemination_migrationinspectionrecord table for year={year}"
+        f"Begin exporting data from dissemination migrationinspectionrecord and invalidauditrecord tables for year={year}"
     )
 
     streams = {}
 
     for stream_generator in STREAM_GENERATORS:
-        streams.update([stream_generator.generate_stream(year)])
+        streams.update([stream_generator.generate_stream_inspection(year)])
+
+    for stream_generator in STREAM_GENERATORS_INVALID_AUDIT:
+        streams.update([stream_generator.generate_stream_invalidaudit(year)])
 
     replication = Replication(
         source="FAC_DB",
@@ -80,13 +105,13 @@ def _run_data_export(year):
     logger.info(f"Exporting {len(streams)} streams")
     replication.run()
     logger.info(
-        "Successfully exported data from dissemination_migrationinspectionrecord table"
+        "Successfully exported data from dissemination migrationinspectionrecord and invalidauditrecord tables"
     )
 
 
 class Command(BaseCommand):
     help = """
-    Export dissemination_migrationinspectionrecord data for audit years >=2016 and <=2022.
+    Export dissemination migrationinspectionrecord and invalidauditrecord data for audit years >=2016 and <=2022.
     Default is current year.
     """
 
@@ -113,9 +138,9 @@ class Command(BaseCommand):
             _run_data_export(year)
         except Exception as ex:
             logger.error(
-                "An error occurred while exporting data from dissemination_migrationinspectionrecord table",
+                "An error occurred while exporting data from dissemination migrationinspectionrecord and invalidauditrecord tables",
                 exc_info=ex,
             )
             raise CommandError(
-                "Error while exporting data from dissemination_migrationinspectionrecord table"
+                "Error while exporting data from dissemination migrationinspectionrecord and invalidauditrecord tables"
             )
