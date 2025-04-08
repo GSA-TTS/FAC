@@ -359,10 +359,78 @@ class TestValidateAuditConsistency(TestCase):
         self.assertTrue(result[0])
 
     def test_meta(self):
+        """
+        Valid case where SAC fields that only contain a Meta field is
+        ignored
+        """
         audit = baker.make(Audit, version=0)
         audit.audit = { 'federal_awards' : { 'foo': 'bar' } }
         sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
         sac.federal_awards = { 'Meta': { 'section_name': 'FederalAwardsExpended' } }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
+
+    def test_findings_text(self):
+        """Valid case for findings_text"""
+        audit = baker.make(Audit, version=0)
+        audit.audit = { 'findings_text' : [{ 'foo': 'bar' }] }
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.findings_text = {
+            'FindingsText': {
+                'findings_text_entries': [{
+                    'foo': 'bar',
+                }],
+            },
+        }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
+
+    def test_findings_text_none(self):
+        """
+        Valid case for findings_text where SOT and SAC have no data
+        """
+        audit = baker.make(Audit, version=0)
+        audit.audit = {}
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.findings_text = {
+            'FindingsText': {},
+        }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
+
+    def test_corrective_action_plan(self):
+        """Valid case for corrective_action_plan"""
+        audit = baker.make(Audit, version=0)
+        audit.audit = { 'corrective_action_plan' : [{ 'foo': 'bar' }] }
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.corrective_action_plan = {
+            'CorrectiveActionPlan': {
+                'corrective_action_plan_entries': [{
+                    'foo': 'bar',
+                }],
+            },
+        }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
+
+    def test_corrective_action_plan_none(self):
+        """
+        Valid case for corrective_action_plan where SOT and SAC have no data
+        """
+        audit = baker.make(Audit, version=0)
+        audit.audit = {}
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.corrective_action_plan = {
+            'CorrectiveActionPlan': {},
+        }
         sac.save()
         result = validate_audit_consistency(audit)
         self.assertEqual(result[1], [])
