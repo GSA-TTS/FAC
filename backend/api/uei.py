@@ -141,8 +141,17 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
 
     # 1. Best case. samRegistered "Yes"
     resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
+
+    print("CALL SAM", resp, error)
+
     if resp is None:
+        print("ERR ERR ERR", "None")
         return {"valid": False, "errors": [error]}
+    if resp.status_code == 403:
+        # We need to handle the case where no one is able to update the API key.
+        # See ADR ###
+        print("ERR ERR ERR", resp, error)
+        return get_placeholder_sam(uei)
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
         return {"valid": False, "errors": [error]}
