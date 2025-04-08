@@ -326,6 +326,8 @@ Detailed below is a reference to, with a description of, each of our various com
     * These work in parallel to invoke the [FAC Backup Utility](https://github.com/GSA-TTS/fac-backup-utility) via a [bash script](../backend/fac-backup-util.sh) to perform a table check on the RDS using a manifest to determine if there are any discrepancies in our tables (missing, lost, untracked).
 * [Export to CSV](../.github/workflows/export-data-to-csv.yml)
     * Invokes a django command to [export data](../backend/support/management/commands/export_data.py) to CSV format.
+* [Export Audit Data to CSV](../.github/workflows/export-audit-data-to-csv.yml)
+    * Invokes a django command to [export data](../backend/support/management/commands/export_data_audit.py) to CSV format.
 * [Materialized Views](../.github/workflows/materialized-views.yml)
     * Calls the Django function [materialized views](../backend/dissemination/management/commands/materialized_views.py) to run the [create materialized views](../backend/dissemination/sql/create_materialized_views.sql) sql.
 

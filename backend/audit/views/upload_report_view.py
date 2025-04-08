@@ -12,14 +12,17 @@ from audit.models import (
     LateChangeError,
     SingleAuditChecklist,
     SingleAuditReportFile,
-    SubmissionEvent,
+    Audit,
 )
 from audit.forms import UploadReportForm
+from audit.models.constants import EventType
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# TODO: Update Post SOC Launch
 
 
 class PageInput:
@@ -121,6 +124,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            audit = Audit.objects.find_audit_or_none(report_id)
             form = UploadReportForm(request.POST, request.FILES)
 
             # Standard context always needed on this page
@@ -134,7 +138,9 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 file = request.FILES["upload_report"]
-                sar_file = self.reformat_form_data(file, form, sac.id)
+                sar_file = self.reformat_form_data(
+                    file, form, sac.id, audit.id if audit else None
+                )
 
                 # Try to save the formatted form data. If it fails on the file
                 # (encryption issues, file size issues), add and pass back the file errors.
@@ -143,7 +149,11 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     sar_file.full_clean()
                     sar_file.save(
                         event_user=request.user,
-                        event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+                        event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
+                    )
+
+                    self._save_audit(
+                        report_id=report_id, sar_file=sar_file, request=request
                     )
                 except ValidationError as err:
                     for issue in err.error_dict.get("file"):
@@ -169,7 +179,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             logger.info("Unexpected error in UploadReportView post:\n %s", err)
             raise BadRequest() from err
 
-    def reformat_form_data(self, file, form, report_id):
+    def reformat_form_data(self, file, form, sac_id, audit_id):
         """
         Given the file, form, and report_id, return the formatted SingleAuditReportFile.
         Maps cleaned form data into an object to be passed alongside the file, filename, and report id.
@@ -196,14 +206,31 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             or None,
             "CAP_page": form.cleaned_data["CAP_page"] or None,
         }
-
         sar_file = SingleAuditReportFile(
             **{
                 "component_page_numbers": component_page_numbers,
                 "file": file,
                 "filename": file.name,
-                "sac_id": report_id,
+                "sac_id": sac_id,
+                "audit_id": audit_id,
             }
         )
-
         return sar_file
+
+    @staticmethod
+    def _save_audit(report_id, sar_file, request):
+        # TODO: Update Post SOC Launch : Delete and move done for linting complexity
+        audit = Audit.objects.find_audit_or_none(report_id=report_id)
+        if audit:
+            audit.audit.update(
+                {
+                    "file_information": {
+                        "filename": sar_file.filename,
+                        "pages": sar_file.component_page_numbers,
+                    }
+                }
+            )
+            audit.save(
+                event_user=request.user,
+                event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
+            )

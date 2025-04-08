@@ -20,7 +20,7 @@ class TestRemoveSingleAuditReportPDF(TestCase):
 
         # Assert that delete_files_in_bulk is called with correct arguments
         mock_delete_files_in_bulk.assert_called_once_with(
-            ["singleauditreport/1900-01-GSAFAC-0000000001.pdf"], sac
+            ["singleauditreport/1900-01-GSAFAC-0000000001.pdf"], sac.report_id
         )
 
     @patch("dissemination.remove_singleauditreport_pdf.delete_files_in_bulk")
