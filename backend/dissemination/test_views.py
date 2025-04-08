@@ -265,12 +265,15 @@ class PublicDataDownloadViewTests(TestCase):
         Then the response should be 404
         """
         mock_file_exists.return_value = False
-        url = reverse("dissemination:PublicDataDownload", kwargs={"relative_path": self.mock_file_path})
+        url = reverse(
+            "dissemination:PublicDataDownload",
+            kwargs={"relative_path": self.mock_file_path},
+        )
 
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 404)
-    
+
     @patch("dissemination.file_downloads.file_exists")
     def test_exisiting_file_returns_redirect(self, mock_file_exists):
         """
@@ -279,12 +282,16 @@ class PublicDataDownloadViewTests(TestCase):
         Then the response should be a redirect to the file download
         """
         mock_file_exists.return_value = True
-        url = reverse("dissemination:PublicDataDownload", kwargs={"relative_path": self.mock_file_path})
+        url = reverse(
+            "dissemination:PublicDataDownload",
+            kwargs={"relative_path": self.mock_file_path},
+        )
 
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
         self.assertIn(self.mock_file_path, response.url)
+
 
 class OneTimeAccessDownloadViewTests(TestCase):
     def setUp(self):
