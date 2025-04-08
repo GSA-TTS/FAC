@@ -94,6 +94,7 @@ class PublicDataDownloadView(View):
         Ex. Given 'historic/2022.zip', attempt to serve the file located at 'BUCKET/public-data/historic/2022.zip'.
         """
         relative_path = f"/public-data/{relative_path}"
+        logger.info(f"Attempting to serve file {relative_path} from S3.")
         return redirect(get_download_url(relative_path))
 
 
