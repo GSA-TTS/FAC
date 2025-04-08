@@ -1,6 +1,9 @@
 ---
 name: Export Audit Data to CSV
 on:
+  schedule:
+    # Every week on Sunday Midnight UTC
+    - cron: '0 0 * * 0'
   workflow_dispatch:
     inputs:
       environment:
