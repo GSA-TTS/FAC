@@ -252,7 +252,7 @@ class Migration(migrations.Migration):
                 (
                     "file",
                     models.FileField(
-                        upload_to=audit.models.models.single_audit_report_path,
+                        upload_to=audit.models.single_audit_report_path,
                         validators=[audit.validators.validate_single_audit_report_file],
                     ),
                 ),
@@ -299,7 +299,7 @@ class Migration(migrations.Migration):
                 (
                     "file",
                     models.FileField(
-                        upload_to=audit.models.models.excel_file_path,
+                        upload_to=audit.models.excel_file_path,
                         validators=[audit.validators.validate_excel_file],
                     ),
                 ),
@@ -610,7 +610,7 @@ class Migration(migrations.Migration):
                 (
                     "expiration",
                     models.DateTimeField(
-                        default=audit.models.models.one_month_from_today,
+                        default=audit.models.utils.one_month_from_today,
                         verbose_name="When the waiver will expire",
                     ),
                 ),
