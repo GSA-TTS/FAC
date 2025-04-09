@@ -58,22 +58,22 @@ class StaffUser(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        try:
-            user = User.objects.get(email=self.staff_email)
-            user.is_staff = True
-            user.save()
-        except User.DoesNotExist:
-            pass  # silently ignore. User may be created later.
+        """Add a new staffuser based on email."""
+        users = User.objects.filter(email=self.staff_email).order_by("last_login")
+
+        # there are cases where multiple users share the same email.
+        # make the most recent one into the staff user.
+        if users.exists():
+            users.update(is_staff=True)
+            users.last().is_staff = True
+            users.last().save()
         super(StaffUser, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        try:
-            user = User.objects.get(email=self.staff_email)
-            user.is_staff = False
-            user.is_superuser = False
-            user.save()
-        except User.DoesNotExist:
-            pass  # silently ignore. Nothing to do.
+        """Removes any user associated with an email as a staffuser."""
+        User.objects.filter(email=self.staff_email).update(
+            is_staff=False, is_superuser=False
+        )
         super(StaffUser, self).delete(*args, **kwargs)
 
 
