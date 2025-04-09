@@ -148,7 +148,7 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
 
     if resp is None:
         return {"valid": False, "errors": [error]}
-    if resp.status_code in [403]:
+    if resp.status_code in [403, 404]:
         # We need to handle the case where no one is able to update the API key.
         # See ADR https://github.com/GSA-TTS/FAC/issues/4861
         waiver = UeiValidationWaiver()
@@ -157,8 +157,8 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
         waiver.expiration = one_year_from_today()
         waiver.approver_email = "fac+system@gsa.gov"
         waiver.approver_name = "Federal Audit Clearinghouse System"
-        waiver.requester_email = "fac+samgov403@gsa.gov"
-        waiver.requester_name = "SAM.gov 403"
+        waiver.requester_email = "fac+samgov@gsa.gov"
+        waiver.requester_name = f"SAM.gov {resp.status_code}"
         waiver.justification = json.dumps(
             {
                 "status_code": resp.status_code,
