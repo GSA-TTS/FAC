@@ -22,6 +22,10 @@ from itertools import chain
 from audit.cross_validation import functions as cross_validation_functions
 from audit.utils import FORM_SECTION_HANDLERS
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 User = get_user_model()
 
 

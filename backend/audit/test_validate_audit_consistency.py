@@ -436,21 +436,43 @@ class TestValidateAuditConsistency(TestCase):
         self.assertEqual(result[1], [])
         self.assertTrue(result[0])
 
-    # def test_eins(self):
-    #     audit = baker.make(Audit, version=0)
-    #     audit.audit = { "additional_eins": ["621832456"] }
-    #     audit.save()
-    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-    #     sac.additional_eins = {
-    #         "AdditionalEINs": {
-    #             "additional_eins_entries": [
-    #                 {
-    #                     "additional_ein": "621832456"
-    #                 }
-    #             ]
-    #         }
-    #     }
-    #     sac.save()
-    #     result = validate_audit_consistency(audit)
-    #     self.assertEqual(result[1], [])
-    #     self.assertTrue(result[0])
+    def test_eins(self):
+        audit = baker.make(Audit, version=0)
+        audit.audit = { "additional_eins": ["42"] }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.additional_eins = {
+            "AdditionalEINs": {
+                "additional_eins_entries": [
+                    {
+                        "additional_ein": "42"
+                    }
+                ]
+            }
+        }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
+
+    def test_eins_invalid(self):
+        audit = baker.make(Audit, version=0)
+        audit.audit = { "additional_eins": ["42"] }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.additional_eins = {
+            "AdditionalEINs": {
+                "additional_eins_entries": [
+                    {
+                        "additional_ein": "0"
+                    }
+                ]
+            }
+        }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertDictEqual(
+            result[1][0],
+            {'field': 'additional_eins', 'sac_value': ['0'], 'audit_value': ['42'], 'error': "EIN values don't match between SAC and Audit"},
+        )
+        self.assertFalse(result[0])
