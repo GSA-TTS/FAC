@@ -14,8 +14,8 @@ Follow these steps to version bump the workbook templates:
 
 # Updating the ALN (formerly CFDA) listings
 
-1. Log in to Sam.gov with your GSA account and go to https://sam.gov/search/.
-2. Select "Assistance Listings" as domain.
+1. Log in to Sam.gov with your GSA account and go to [https://sam.gov/search/](https://sam.gov/assistance-listings).
+2. Make sure you are in the "Assistance Listings" domain.
 3. Under "key word" search, choose simple and "any words" and then "active" listings.
 4. Click "Actions" on the upper-right and then "download" to get the CSV file of active listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/active-alns.csv`.
 5. Repeat the process, choosing "inactive" listings to get the CSV file for inactive ALN listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/inactive-alns.csv`. These have to be done separately due to a limit on the amount of records that can be downloaded into a CSV file.
