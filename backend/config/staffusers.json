@@ -15,10 +15,10 @@
     "james.person@gsa.gov",
     "leigh.cox@gsa.gov",
     "rochelle.ribeiro@gsa.gov",
-    "laura.herring@gsa.gov",
-    "matthew.jadud@gsa.gov"
+    "laura.herring@gsa.gov"
   ],
   "superuser": [
+    "matthew.jadud@gsa.gov",
     "daniel.swick@gsa.gov"
   ]
 }
