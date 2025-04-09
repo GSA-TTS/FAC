@@ -38,7 +38,7 @@ class StreamGenerator:
         return (
             f"{table_name}.{audit_year}",
             ReplicationStream(
-                object=f"public-data/migration/{audit_year}-inspectionrecord.csv",
+                object=f"public-data/gsa/migration/{audit_year}-inspectionrecord.csv",
                 sql=self.query.format(audit_year=audit_year),
                 mode="full-refresh",
                 target_options={"format": "csv"},
@@ -50,7 +50,7 @@ class StreamGenerator:
         return (
             f"{table_name}.{audit_year}",
             ReplicationStream(
-                object=f"public-data/migration/{audit_year}-invalidauditrecord.csv",
+                object=f"public-data/gsa/migration/{audit_year}-invalidauditrecord.csv",
                 sql=self.query.format(audit_year=audit_year),
                 mode="full-refresh",
                 target_options={"format": "csv"},

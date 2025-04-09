@@ -13,7 +13,7 @@ class StreamGenerator:
         return (
             f"{table_name}.{audit_year}",
             ReplicationStream(
-                object=f"public-data/current/audit-year/{audit_year}-ay-{table_name}.csv",
+                object=f"public-data/gsa/audit-year/{audit_year}-ay-{table_name}.csv",
                 sql=self.query.format(api_version=API_VERSION, audit_year=audit_year),
                 mode="full-refresh",
                 target_options={"format": "csv"},
@@ -25,7 +25,7 @@ class StreamGenerator:
         return (
             f"{table_name}",
             ReplicationStream(
-                object=f"public-data/current/full/{table_name}.csv",
+                object=f"public-data/gsa/full/{table_name}.csv",
                 sql=self.query.format(api_version=API_VERSION),
                 mode="full-refresh",
                 target_options={"format": "csv"},
@@ -40,7 +40,7 @@ class StreamGenerator:
         return (
             f"{table_name}_Federal_year.{audit_year}",
             ReplicationStream(
-                object=f"public-data/current/fiscal-year/{audit_year}-ffy-{table_name}.csv",
+                object=f"public-data/gsa/federal-fiscal-year/{audit_year}-ffy-{table_name}.csv",
                 sql=self.query.format(
                     api_version=API_VERSION,
                     fac_accepted_date_start=fac_accepted_date_start,
