@@ -6,10 +6,8 @@ Follow these steps to version bump the workbook templates:
 3. The JSON files in `backend/schemas/source/sections/` require some modification. For each file, locate the version enum found in `Meta.properties.version.enum`. Append the PREVIOUS version to the end of this list, followed by `Sheets.WORKBOOKS_VERSION`.
     * Note: Some of these files don't have version enums. These are non-workbook schemas and can be skipped.
 4. Activate your virtual env inside `backend/schemas` and run `make all`. This will generate new schemas and templates in `/schemas/output/`.
-5. Update the workbook template fixtures used in the Cypress tests, found in `backend/cypress/fixtures/test_workbooks`.
-    * An easy (but tedious) way to do this is to modify the templates with the data used in the existing fixtures, then copy/overwrite all of those XLSXes into `test_workbooks`.
-        * If a cell has a selector, use that instead of copy-pasting.
-        * Don't forget to revert the templates afterwards!
+5. Update the workbook fixtures used in the Cypress tests, found in `backend/cypress/fixtures/test_workbooks`.
+    * An easy (but tedious) way to do this is to modify the templates found in 'backend\schemas\output\excel\xlsx' with the data used in the existing fixtures. If a cell has a selector (like a dropdown), make the selection with that instead of copy-pasting. Then copy/overwrite all of the XLSXes into the `test_workbooks` directory. Don't forget to revert the templates afterwards back to their originals!
 6. Once your PR is merged, don't forget to copy the new templates, found in `backend/schemas/output/excel/xlsx/`, into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
 
 # Updating the ALN (formerly CFDA) listings
