@@ -12,6 +12,8 @@ from audit.models.utils import one_year_from_today
 
 logger = logging.getLogger(__name__)
 
+automatic_waiver_4xx_codes = [401, 403, 404, 405, 406, 410, 418, 429, 451]
+
 
 class CustomHttpAdapter(requests.adapters.HTTPAdapter):
     """Transport adapter that allows us to use custom ssl_context."""
@@ -144,11 +146,9 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     # 1. Best case. samRegistered "Yes"
     resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
 
-    print("CALL SAM", resp, error)
-
     if resp is None:
         return {"valid": False, "errors": [error]}
-    if resp.status_code in [403, 404]:
+    if resp.status_code in automatic_waiver_4xx_codes:
         # We need to handle the case where no one is able to update the API key.
         # See ADR https://github.com/GSA-TTS/FAC/issues/4861
         waiver = UeiValidationWaiver()
@@ -163,7 +163,7 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
             {
                 "status_code": resp.status_code,
                 "reason": resp.reason,
-                "justification": "This is an automatically issued waiver in the event of a SAM.gov 403 response.",
+                "justification": "This is an automatically issued waiver in the event of a SAM.gov error response.",
                 "uei": uei,
             }
         )

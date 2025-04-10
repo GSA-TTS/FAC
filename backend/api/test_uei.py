@@ -6,7 +6,7 @@ import requests
 
 # from requests.exceptions import Timeout, TooManyRedirects
 
-from api.uei import get_uei_info_from_sam_gov
+from api.uei import get_uei_info_from_sam_gov, automatic_waiver_4xx_codes
 
 
 valid_uei_results_dict = {
@@ -613,6 +613,27 @@ class UtilsTesting(TestCase):
                 results["errors"],
                 ["UEI was not found in SAM.gov"],
             )
+
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses
+    # We will issue automatic waivers on multiple 4xx response codes.
+    # This is to handle the possibility that we were unable to update a key in a timely manner,
+    # or the possibility that SAM's service is unavaiable for an extended period of time
+    # at a critical moment.
+    def test_automatic_waiver_issuance_for_sam_gov(self):
+        test_uei = "EJLRWNCJTJF5"
+        # Automatic waivers - 403, 404
+        # This should pass for all the session codes we list here.
+        with patch("api.uei.SESSION.get") as mock_get:
+            for status_code in automatic_waiver_4xx_codes:
+                mock_get.return_value.status_code = status_code
+                mock_get.return_value.reason = "SAM.gov key expired"
+
+                results = get_uei_info_from_sam_gov(uei=test_uei)
+
+                self.assertTrue(results["valid"])
+                self.assertEqual(
+                    results["response"]["entityRegistration"]["ueiSAM"], test_uei
+                )
 
     def test_get_uei_info_from_sam_gov_inactive_result(self):
         """
