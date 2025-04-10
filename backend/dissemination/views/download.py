@@ -84,6 +84,20 @@ class XlsxDownloadView(ReportAccessRequiredMixin, View):
         return redirect(get_download_url(filename))
 
 
+class PublicDataDownloadView(View):
+    def get(self, request, relative_path):
+        """
+        Given a relative path, prepend '/public-data/' and attempt to serve the file.
+        The only user feedback is a file download or a 404 error.
+        This is meant to serve single files of at static, known locations.
+
+        Ex. Given 'historic/2022.zip', attempt to serve the file located at 'BUCKET/public-data/historic/2022.zip'.
+        """
+        relative_path = f"/public-data/{relative_path}"
+        logger.info(f"Attempting to serve file {relative_path} from S3.")
+        return redirect(get_download_url(relative_path))
+
+
 class OneTimeAccessDownloadView(View):
     def get(self, request, uuid):
         """
