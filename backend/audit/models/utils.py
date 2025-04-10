@@ -53,6 +53,10 @@ def one_month_from_today():
     return django_timezone.now() + timedelta(days=30)
 
 
+def one_year_from_today():
+    return django_timezone.now() + timedelta(days=365)
+
+
 def camel_to_snake(raw: str) -> str:
     """Convert camel case to snake_case."""
     text = f"{raw[0].lower()}{raw[1:]}"
