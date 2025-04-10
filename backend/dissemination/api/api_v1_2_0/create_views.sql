@@ -1,5 +1,15 @@
 begin;
 ---------------------------------------
+-- indexes
+---------------------------------------
+create index if not exists idx_audit_submission_status on audit_audit (submission_status);
+create index if not exists idx_audit_auditee_uei on audit_audit ((audit->'general_information'->>'auditee_uei'));
+create index if not exists idx_audit_auditee_email on audit_audit ((audit->'general_information'->>'auditee_email'));
+create index if not exists idx_audit_auditor_email on audit_audit ((audit->'general_information'->>'auditor_email'));
+create index if not exists idx_audit_fac_accepted_date on audit_audit ((audit->>'fac_accepted_date'));
+create index if not exists idx_history_auditor_cert on audit_history (report_id, event, id DESC);
+create index if not exists idx_history_auditee_cert on audit_history (report_id, event, id DESC);
+---------------------------------------
 -- functions
 ---------------------------------------
 create or replace function yesnonull(input text)
@@ -217,8 +227,8 @@ create view api_v1_2_0.general as
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
         -- auditee
-        a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_name' as auditee_certify_name,
-        a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_title' as auditee_certify_title,
+        coalesce(a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_name','') as auditee_certify_name,
+        coalesce(a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_title','') as auditee_certify_title,
         a.audit->'general_information'->>'auditee_contact_name' as auditee_contact_name,
         a.audit->'general_information'->>'auditee_email' as auditee_email,
         a.audit->'general_information'->>'auditee_name' as auditee_name,
@@ -230,8 +240,8 @@ create view api_v1_2_0.general as
         a.audit->'general_information'->>'ein' as auditee_ein,
         a.audit->'general_information'->>'auditee_zip' as auditee_zip,
         -- auditor
-        a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_name' as auditor_certify_name,
-        a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_title' as auditor_certify_title,
+        coalesce(a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_name','') as auditor_certify_name,
+        coalesce(a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_title','') as auditor_certify_title,
         a.audit->'general_information'->>'auditor_phone' as auditor_phone,
         a.audit->'general_information'->>'auditor_state' as auditor_state,
         a.audit->'general_information'->>'auditor_city' as auditor_city,
@@ -245,16 +255,19 @@ create view api_v1_2_0.general as
         coalesce(a.audit->'general_information'->>'auditor_international_address', '') as auditor_foreign_address,
         a.audit->'general_information'->>'auditor_ein' as auditor_ein,
         -- agency
-        a.audit->>'cognizant_agency' as cognizant_agency,
-        a.audit->>'oversight_agency' as oversight_agency,
+        coalesce(a.audit->>'cognizant_agency','') as cognizant_agency,
+        coalesce(a.audit->>'oversight_agency','') as oversight_agency,
         -- dates
-        a.created_at as date_created,
-        a.audit->'general_information'->>'ready_for_certification_date'as ready_for_certification_date,
-        (select 'updated_at' from public.audit_history
+        to_char(a.created_at, 'YYYY-MM-DD') as date_created,
+        (select to_char(updated_at, 'YYYY-MM-DD') from public.audit_history h
+        where event = 'locked-for-certification'
+        and h.report_id = a.report_id
+        order by id desc limit 1) as ready_for_certification_date,
+        (select to_char(updated_at, 'YYYY-MM-DD') from public.audit_history h
         where event = 'auditor-certification-completed'
         and h.report_id = a.report_id
         order by id desc limit 1) as auditor_certified_date,        
-        (select 'updated_at' from public.audit_history
+        (select to_char(updated_at, 'YYYY-MM-DD') from public.audit_history h
         where event = 'auditee-certification-completed'
         and h.report_id = a.report_id
         order by id desc limit 1) as auditee_certified_date,
@@ -276,10 +289,10 @@ create view api_v1_2_0.general as
         yesnogsamigration(a.audit->'audit_information'->>'is_low_risk_auditee') as is_low_risk_auditee,
         coalesce(jsonb_array_to_string(a.audit->'audit_information'->'agencies'),'') as agencies_with_prior_findings,
         a.audit->'general_information'->>'user_provided_organization_type' as entity_type,
-        a.audit->'general_information'->>'number_months' as number_months,
-        a.audit->'general_information'->>'audit_period_other_months' as audit_period_covered,
-        a.audit->'federal_awards'->>'total_amount_expended' as total_amount_expended,
-        a.audit->'type_audit_code'->>'type_audit_code' as type_audit_code,
+        coalesce(a.audit->'general_information'->>'audit_period_other_months','') as number_months,
+        coalesce(a.audit->'general_information'->>'audit_period_covered','') as audit_period_covered,
+        (a.audit->'federal_awards'->>'total_amount_expended')::integer as total_amount_expended,
+        a.audit ->>'type_audit_code' as type_audit_code,
         a.is_public as is_public,
         a.data_source as data_source,
         yesnogsamigration(a.audit->'audit_information'->>'is_aicpa_audit_guide_included') as is_aicpa_audit_guide_included,
@@ -288,8 +301,8 @@ create view api_v1_2_0.general as
         yesno(a.audit->'general_information'->>'secondary_auditors_exist') as is_secondary_auditors     
     from
         audit_audit as a
-    join audit_history as h
-    on h.report_id = a.report_id;
+    where 
+    	a.submission_status='disseminated'
 ;
 ---------------------------------------
 -- auditor (secondary auditor)
