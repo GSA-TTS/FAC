@@ -37,6 +37,7 @@ class Command(BaseCommand):
             "view_secondaryauditor",
             "view_cognizantassignment",
             "view_staffuser",
+            "view_user",
             "view_userpermission",
             "view_tribalapiaccesskeyids",
         ]
@@ -90,9 +91,7 @@ class Command(BaseCommand):
                     # create staff user for each role.
                     with transaction.atomic():
 
-                        StaffUser(
-                            staff_email=email,
-                        ).save()
+                        StaffUser.objects.create(staff_email=email)
 
                         # attempt to update the user.
                         user = User.objects.filter(email=email, is_staff=True)
