@@ -1,5 +1,15 @@
 begin;
 ---------------------------------------
+-- indexes
+---------------------------------------
+create index if not exists idx_audit_submission_status on audit_audit (submission_status);
+create index if not exists idx_audit_auditee_uei on audit_audit ((audit->'general_information'->>'auditee_uei'));
+create index if not exists idx_audit_auditee_email on audit_audit ((audit->'general_information'->>'auditee_email'));
+create index if not exists idx_audit_auditor_email on audit_audit ((audit->'general_information'->>'auditor_email'));
+create index if not exists idx_audit_fac_accepted_date on audit_audit ((audit->>'fac_accepted_date'));
+create index if not exists idx_history_auditor_cert on audit_history (report_id, event, id DESC);
+create index if not exists idx_history_auditee_cert on audit_history (report_id, event, id DESC);
+---------------------------------------
 -- functions
 ---------------------------------------
 create or replace function yesnonull(input text)
@@ -245,13 +255,10 @@ create view api_v1_2_0.general as
         coalesce(a.audit->'general_information'->>'auditor_international_address', '') as auditor_foreign_address,
         a.audit->'general_information'->>'auditor_ein' as auditor_ein,
         -- agency
-        a.audit->>'cognizant_agency' as cognizant_agency,
-        a.audit->>'oversight_agency' as oversight_agency,
+        coalesce(a.audit->>'cognizant_agency','') as cognizant_agency,
+        coalesce(a.audit->>'oversight_agency','') as oversight_agency,
         -- dates
-        (select to_char(updated_at, 'YYYY-MM-DD') from public.audit_history h
-        where event = 'created'
-        and h.report_id = a.report_id
-        order by id desc limit 1) as date_created,
+        to_char(a.created_at, 'YYYY-MM-DD') as date_created,
         (select to_char(updated_at, 'YYYY-MM-DD') from public.audit_history h
         where event = 'locked-for-certification'
         and h.report_id = a.report_id
