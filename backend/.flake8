@@ -4,4 +4,3 @@ max-line-length = 88
 max-complexity = 10
 extend-ignore = E203
 exclude = ./node_modules/,.venv
-

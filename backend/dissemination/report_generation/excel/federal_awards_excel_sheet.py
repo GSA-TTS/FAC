@@ -18,7 +18,7 @@ def _get_entries(audit):
                 award.get("award_reference"),
                 program.get("federal_agency_prefix"),
                 program.get("three_digit_extension"),  # federal_award_extension
-                f"{program.get("federal_agency_prefix")}.{program.get("three_digit_extension")}",  # aln,
+                f"{program.get('federal_agency_prefix')}.{program.get('three_digit_extension')}",  # aln,
                 award.get("program").get("number_of_audit_findings"),  # findings_count
                 program.get("additional_award_identification"),
                 program.get("program_name"),  # federal_program_name

@@ -252,6 +252,47 @@ class SearchViewTests(TestMaterializedViewBuilder):
             self.assertContains(response, p.report_id)
 
 
+class PublicDataDownloadViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.mock_file_path = "public-data/historic/2022.zip"
+
+    @patch("dissemination.file_downloads.file_exists")
+    def test_no_file_returns_404(self, mock_file_exists):
+        """
+        Given a relative path to a file that doesn't exist
+        When a request is sent to the public data download URL
+        Then the response should be 404
+        """
+        mock_file_exists.return_value = False
+        url = reverse(
+            "dissemination:PublicDataDownload",
+            kwargs={"relative_path": self.mock_file_path},
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    @patch("dissemination.file_downloads.file_exists")
+    def test_exisiting_file_returns_redirect(self, mock_file_exists):
+        """
+        Given a relative path to a file that exists
+        When a request is sent to the public data download URL
+        Then the response should be a redirect to the file download
+        """
+        mock_file_exists.return_value = True
+        url = reverse(
+            "dissemination:PublicDataDownload",
+            kwargs={"relative_path": self.mock_file_path},
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(self.mock_file_path, response.url)
+
+
 class OneTimeAccessDownloadViewTests(TestCase):
     def setUp(self):
         self.client = Client()

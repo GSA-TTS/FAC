@@ -122,13 +122,16 @@ class Command(BaseCommand):
                 data_source=sac.data_source,
                 # FOR DEBUGGING
                 # Change the email to your local user (make sure you login once after app startup).
-                event_user=User.objects.get(email="robert.novak@gsa.gov"),
+                event_user=get_or_create_sot_migration_user(),
                 created_by=sac.submitted_by,
                 audit=audit_data,
                 report_id=sac.report_id,
                 submission_status=sac.submission_status,
                 audit_type=sac.audit_type,
             )
+
+            if sac.date_created:
+                audit.created_at = sac.date_created
 
             # update Access models.
             Access.objects.filter(sac__report_id=sac.report_id).update(audit=audit)
@@ -332,3 +335,20 @@ SAC_HANDLERS = [
     _convert_is_public,
     _convert_fac_accepted_date,
 ]
+
+
+def get_or_create_sot_migration_user():
+    """Returns the default migration user"""
+    user_email = "fac-sot-migration-auditee-official@fac.gsa.gov"
+    user_name = "fac-sot-migration-auditee-official"
+    user = None
+
+    users = User.objects.filter(email=user_email)
+    if users:
+        user = users.first()
+    else:
+        logger.info("Creating user %s %s", user_email, user_name)
+        user = User(username=user_name, email=user_email)
+        user.save()
+
+    return user
