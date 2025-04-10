@@ -1,16 +1,17 @@
+# 41. In-Progress Audit Deletion Workflow
+
+Date: 2025-04-10
+
+## Status
+
+Accepted
+
 ## Areas of impact
 
-- [ ]   Compliance
-- [ ]   Content
-- [x]   CX
-- [ ]   Design
-- [x]   Engineering
-- [x]   Policy
-- [x]   Product
-- [ ]   Process
-- [ ]   UX
-
-## Related documents/links
+- CX
+- Engineering
+- Policy
+- Product
 
 ## Context
 
