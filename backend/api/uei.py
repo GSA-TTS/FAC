@@ -6,6 +6,11 @@ import ssl
 from typing import Optional
 import urllib3
 
+from django.conf import settings
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
+
+
 from audit.models import UeiValidationWaiver
 from config.settings import SAM_API_URL, SAM_API_KEY, GSA_FAC_WAIVER
 from audit.models.utils import one_year_from_today
@@ -117,6 +122,19 @@ def parse_sam_uei_json(response: dict, filter_field: str) -> dict:
     return {"valid": True, "response": entry}
 
 
+def is_uei_valid(uei):
+    try:
+        with open(f"{settings.OUTPUT_BASE_DIR}/UeiSchema.json") as schema:
+            schema_json = json.load(schema)
+            uei_schema = schema_json.get("properties")["uei"]
+            validate(instance=uei, schema=uei_schema)
+            return True
+    except ValidationError:
+        return False
+    # We should not get here.
+    return False
+
+
 def get_uei_info_from_sam_gov(uei: str) -> dict:
     """
     This utility function will query sam.gov to determine the status and
@@ -133,6 +151,18 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
           a. Check for that possibly non-registered, inactive UEI.
           b. Worst case: Let it through with a placeholder name.
     """
+
+    # First, decide if this is a well-shaped UEI.
+    # Because we now handle 4xx errors differently, we should move
+    # a well-shaped test here, otherwise poorly-shaped UEIs could make it
+    # through and be validated as OK. Let's enforce our schema pattern.
+    is_valid = is_uei_valid(uei)
+    if not is_valid:
+        return {
+            "valid": False,
+            "errors": ["UEI does not match pattern defined by SAM.gov"],
+        }
+
     # SAM API Params
     api_params = {
         "ueiSAM": uei,
