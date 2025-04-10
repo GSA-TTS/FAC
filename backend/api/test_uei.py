@@ -7,6 +7,7 @@ import requests
 # from requests.exceptions import Timeout, TooManyRedirects
 
 from api.uei import get_uei_info_from_sam_gov, automatic_waiver_4xx_codes
+from audit.models import UeiValidationWaiver
 
 
 valid_uei_results_dict = {
@@ -619,6 +620,7 @@ class UtilsTesting(TestCase):
     # This is to handle the possibility that we were unable to update a key in a timely manner,
     # or the possibility that SAM's service is unavaiable for an extended period of time
     # at a critical moment.
+
     def test_automatic_waiver_issuance_for_sam_gov(self):
         test_uei = "EJLRWNCJTJF5"
         # Automatic waivers - 403, 404
@@ -628,8 +630,11 @@ class UtilsTesting(TestCase):
                 mock_get.return_value.status_code = status_code
                 mock_get.return_value.reason = "SAM.gov key expired"
 
+                before = UeiValidationWaiver.objects.all().count()
                 results = get_uei_info_from_sam_gov(uei=test_uei)
+                after = UeiValidationWaiver.objects.all().count()
 
+                self.assertTrue(after - before == 1)
                 self.assertTrue(results["valid"])
                 self.assertEqual(
                     results["response"]["entityRegistration"]["ueiSAM"], test_uei
