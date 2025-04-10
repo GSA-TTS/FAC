@@ -19,7 +19,8 @@ S3_CONNECTION = f"""{{
             "bucket": "{settings.AWS_PRIVATE_STORAGE_BUCKET_NAME}",
             "access_key_id": "{settings.AWS_PRIVATE_ACCESS_KEY_ID}",
             "secret_access_key": "{settings.AWS_PRIVATE_SECRET_ACCESS_KEY}",
-            "endpoint": "{settings.AWS_S3_ENDPOINT_URL}"
+            "endpoint": "{settings.AWS_S3_ENDPOINT_URL}",
+            "region":"{settings.AWS_S3_PRIVATE_REGION_NAME}"
          }}
     """
 DB_URL = os.environ.get("DATABASE_URL")
