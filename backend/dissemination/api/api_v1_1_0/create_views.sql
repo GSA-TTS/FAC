@@ -212,8 +212,8 @@ create view api_v1_1_0.general as
         gen.auditor_foreign_address,
         gen.auditor_ein,
         -- agency
-        gen.cognizant_agency,
-        gen.oversight_agency,
+        coalesce(gen.cognizant_agency,'') as cognizant_agency,
+        coalesce(gen.oversight_agency,'') as oversight_agency,
         -- dates
         gen.date_created,
         gen.ready_for_certification_date,
