@@ -131,8 +131,86 @@ def is_uei_valid(uei):
             return True
     except ValidationError:
         return False
-    # We should not get here.
+    except Exception as e:
+        return False
     return False
+
+
+def check_is_uei_valid(uei):
+    is_valid = is_uei_valid(uei)
+    if not is_valid:
+        return {
+            "valid": False,
+            "errors": ["UEI does not match pattern defined by SAM.gov"],
+        }
+    else:
+        return {"valid": True}
+
+
+def get_uei_info_step_1(uei, api_params, api_headers):
+    resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
+
+    if resp is None:
+        return {"valid": False, "errors": [error]}
+    if resp.status_code in automatic_waiver_4xx_codes:
+        # We need to handle the case where no one is able to update the API key.
+        # See ADR https://github.com/GSA-TTS/FAC/issues/4861
+        waiver = UeiValidationWaiver()
+        # Auditors queue audits up far in advance; give the automatic waiver
+        # plenty of time, so we don't have it expire mid-submission.
+        waiver.expiration = one_year_from_today()
+        waiver.approver_email = "fac_automatic_approver@fac.gsa.gov"
+        waiver.approver_name = "Federal Audit Clearinghouse System"
+        waiver.requester_email = "fac_automatic_requester@fac.gsa.gov"
+        waiver.requester_name = f"SAM.gov {resp.status_code}"
+        waiver.justification = json.dumps(
+            {
+                "status_code": resp.status_code,
+                "reason": resp.reason,
+                "justification": "This is an automatically issued waiver in the event of a SAM.gov error response.",
+                "uei": uei,
+            }
+        )
+        waiver.save()
+        return get_placeholder_sam403(uei)
+    if resp.status_code != 200:
+        error = f"SAM.gov API response status code invalid: {resp.status_code}"
+        return {"valid": False, "errors": [error]}
+    results = parse_sam_uei_json(resp.json(), "registrationStatus")
+    if results["valid"] and (not results.get("errors")):
+        return results
+
+
+def get_uei_info_step_2(api_params, api_headers):
+    api_params = api_params | {"samRegistered": "No"}
+    resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
+    if resp is None:
+        return {"valid": False, "errors": [error]}
+    if resp.status_code != 200:
+        error = f"SAM.gov API response status code invalid: {resp.status_code}"
+        return {"valid": False, "errors": [error]}
+    results = parse_sam_uei_json(resp.json(), "ueiStatus")
+    if results["valid"] and (not results.get("errors")):
+        return results
+    return resp
+
+
+def get_uei_info_step_3(uei, resp):
+    waiver = UeiValidationWaiver.objects.filter(
+        uei=uei, expiration__gte=django_timezone.now()
+    ).first()
+    if not waiver:
+        return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
+
+    logger.info(f"ueiValidationWaiver applied for {waiver}")
+
+    # 3a. Take the first samRegistered "No" from step 2, regardless of ueiStatus.
+    results = parse_sam_uei_json(resp.json(), "_")
+    if results["valid"] and (not results.get("errors")):
+        return results
+
+    # 3b. Worst case. Let it through with a placeholder name and no other data.
+    return get_placeholder_sam(uei)
 
 
 def get_uei_info_from_sam_gov(uei: str) -> dict:
@@ -156,12 +234,9 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     # Because we now handle 4xx errors differently, we should move
     # a well-shaped test here, otherwise poorly-shaped UEIs could make it
     # through and be validated as OK. Let's enforce our schema pattern.
-    is_valid = is_uei_valid(uei)
-    if not is_valid:
-        return {
-            "valid": False,
-            "errors": ["UEI does not match pattern defined by SAM.gov"],
-        }
+    uei_check = check_is_uei_valid(uei)
+    if not uei_check["valid"]:
+        return uei_check
 
     # SAM API Params
     api_params = {
@@ -174,66 +249,20 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     api_headers = {"X-Api-Key": SAM_API_KEY}
 
     # 1. Best case. samRegistered "Yes"
-    resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
-
-    if resp is None:
-        return {"valid": False, "errors": [error]}
-    if resp.status_code in automatic_waiver_4xx_codes:
-        # We need to handle the case where no one is able to update the API key.
-        # See ADR https://github.com/GSA-TTS/FAC/issues/4861
-        waiver = UeiValidationWaiver()
-        # Auditors queue audits up far in advance; give the automatic waiver
-        # plenty of time, so we don't have it expire mid-submission.
-        waiver.expiration = one_year_from_today()
-        waiver.approver_email = "fac+system@gsa.gov"
-        waiver.approver_name = "Federal Audit Clearinghouse System"
-        waiver.requester_email = "fac+samgov@gsa.gov"
-        waiver.requester_name = f"SAM.gov {resp.status_code}"
-        waiver.justification = json.dumps(
-            {
-                "status_code": resp.status_code,
-                "reason": resp.reason,
-                "justification": "This is an automatically issued waiver in the event of a SAM.gov error response.",
-                "uei": uei,
-            }
-        )
-        waiver.save()
-        return get_placeholder_sam403(uei)
-    if resp.status_code != 200:
-        error = f"SAM.gov API response status code invalid: {resp.status_code}"
-        return {"valid": False, "errors": [error]}
-    results = parse_sam_uei_json(resp.json(), "registrationStatus")
-    if results["valid"] and (not results.get("errors")):
-        return results
+    step_1_result = get_uei_info_step_1(uei, api_params, api_headers)
+    if step_1_result:
+        return step_1_result
 
     # 2. Check samRegistered "No"
-    api_params = api_params | {"samRegistered": "No"}
-    resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
-    if resp is None:
-        return {"valid": False, "errors": [error]}
-    if resp.status_code != 200:
-        error = f"SAM.gov API response status code invalid: {resp.status_code}"
-        return {"valid": False, "errors": [error]}
-    results = parse_sam_uei_json(resp.json(), "ueiStatus")
-    if results["valid"] and (not results.get("errors")):
-        return results
+    step_2_result = get_uei_info_step_2(api_params, api_headers)
+    # We will either get a dictionary or a response object here.
+    # A dictionary goes back to the frontent.
+    # A response object is needed in step three.
+    if isinstance(step_2_result, dict):
+        return step_2_result
 
     # 3. Check for a waiver.
-    waiver = UeiValidationWaiver.objects.filter(
-        uei=uei, expiration__gte=django_timezone.now()
-    ).first()
-    if not waiver:
-        return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
-
-    logger.info(f"ueiValidationWaiver applied for {waiver}")
-
-    # 3a. Take the first samRegistered "No" from step 2, regardless of ueiStatus.
-    results = parse_sam_uei_json(resp.json(), "_")
-    if results["valid"] and (not results.get("errors")):
-        return results
-
-    # 3b. Worst case. Let it through with a placeholder name and no other data.
-    return get_placeholder_sam(uei)
+    return get_uei_info_step_3(uei, step_2_result)
 
 
 def get_placeholder_sam(uei: str) -> dict:
