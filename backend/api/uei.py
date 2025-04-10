@@ -131,7 +131,7 @@ def is_uei_valid(uei):
             return True
     except ValidationError:
         return False
-    except Exception as e:
+    except Exception:
         return False
     return False
 
