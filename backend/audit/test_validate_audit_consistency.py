@@ -475,92 +475,92 @@ class TestValidateAuditConsistency(TestCase):
         result = validate_audit_consistency(audit)
         self.assertDictEqual(
             result[1][0],
-            {'field': 'additional_eins', 'sac_value': ['0'], 'audit_value': ['42'], 'error': "EIN values don't match between SAC and Audit"},
+            {'field': 'additional_eins', 'sac_value': ['0'], 'audit_value': ['42'], 'error': "Values don't match between SAC and Audit"},
         )
         self.assertFalse(result[0])
 
-    # def test_additional_ueis(self):
-    #     """Valid case for additional_ueis"""
-    #     audit = baker.make(Audit, version=0)
-    #     audit.audit = { "additional_ueis": ["42"] }
-    #     audit.save()
-    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-    #     sac.additional_ueis = {
-    #         "AdditionalUeis": {
-    #             "additional_ueis_entries": [
-    #                 {
-    #                     "additional_uei": "42"
-    #                 }
-    #             ]
-    #         }
-    #     }
-    #     sac.save()
-    #     result = validate_audit_consistency(audit)
-    #     self.assertEqual(result[1], [])
-    #     self.assertTrue(result[0])
+    def test_additional_ueis(self):
+        """Valid case for additional_ueis"""
+        audit = baker.make(Audit, version=0)
+        audit.audit = { "additional_ueis": ["42"] }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.additional_ueis = {
+            "AdditionalUeis": {
+                "additional_ueis_entries": [
+                    {
+                        "additional_uei": "42"
+                    }
+                ]
+            }
+        }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
 
-    # def test_additional_ueis_invalid(self):
-    #     """Invalid case for additional_ueis"""
-    #     audit = baker.make(Audit, version=0)
-    #     audit.audit = { "additional_ueis": ["42"] }
-    #     audit.save()
-    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-    #     sac.additional_ueis = {
-    #         "AdditionalUeis": {
-    #             "additional_ueis_entries": [
-    #                 {
-    #                     "additional_uei": "0"
-    #                 }
-    #             ]
-    #         }
-    #     }
-    #     sac.save()
-    #     result = validate_audit_consistency(audit)
-    #     self.assertDictEqual(
-    #         result[1][0],
-    #         {'field': 'additional_ueis', 'sac_value': ['0'], 'audit_value': ['42'], 'error': "EIN values don't match between SAC and Audit"},
-    #     )
-    #     self.assertFalse(result[0])
+    def test_additional_ueis_invalid(self):
+        """Invalid case for additional_ueis"""
+        audit = baker.make(Audit, version=0)
+        audit.audit = { "additional_ueis": ["42"] }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.additional_ueis = {
+            "AdditionalUeis": {
+                "additional_ueis_entries": [
+                    {
+                        "additional_uei": "0"
+                    }
+                ]
+            }
+        }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertDictEqual(
+            result[1][0],
+            {'field': 'additional_ueis', 'sac_value': ['0'], 'audit_value': ['42'], 'error': "Values don't match between SAC and Audit"},
+        )
+        self.assertFalse(result[0])
 
-    # def test_secondary_auditors(self):
-    #     """Valid case for secondary_auditors"""
-    #     audit = baker.make(Audit, version=0)
-    #     audit.audit = { "secondary_auditors": ["42"] }
-    #     audit.save()
-    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-    #     sac.secondary_auditors = {
-    #         "SecondaryAuditors": {
-    #             "secondary_auditors_entries": [
-    #                 {
-    #                     "secondary_auditor_ein": "42"
-    #                 }
-    #             ]
-    #         }
-    #     }
-    #     sac.save()
-    #     result = validate_audit_consistency(audit)
-    #     self.assertEqual(result[1], [])
-    #     self.assertTrue(result[0])
+    def test_secondary_auditors(self):
+        """Valid case for secondary_auditors"""
+        audit = baker.make(Audit, version=0)
+        audit.audit = { "secondary_auditors": ["42"] }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.secondary_auditors = {
+            "SecondaryAuditors": {
+                "secondary_auditors_entries": [
+                    {
+                        "secondary_auditor_ein": "42"
+                    }
+                ]
+            }
+        }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
 
-    # def test_secondary_auditors_invalid(self):
-    #     """Invalid case for secondary_auditors"""
-    #     audit = baker.make(Audit, version=0)
-    #     audit.audit = { "secondary_auditors": ["42"] }
-    #     audit.save()
-    #     sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-    #     sac.secondary_auditors = {
-    #         "SecondaryAuditors": {
-    #             "secondary_auditors_entries": [
-    #                 {
-    #                     "secondary_auditor_ein": "0"
-    #                 }
-    #             ]
-    #         }
-    #     }
-    #     sac.save()
-    #     result = validate_audit_consistency(audit)
-    #     self.assertDictEqual(
-    #         result[1][0],
-    #         {'field': 'secondary_auditors', 'sac_value': ['0'], 'audit_value': ['42'], 'error': "EIN values don't match between SAC and Audit"},
-    #     )
-    #     self.assertFalse(result[0])
+    def test_secondary_auditors_invalid(self):
+        """Invalid case for secondary_auditors"""
+        audit = baker.make(Audit, version=0)
+        audit.audit = { "secondary_auditors": ["42"] }
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.secondary_auditors = {
+            "SecondaryAuditors": {
+                "secondary_auditors_entries": [
+                    {
+                        "secondary_auditor_ein": "0"
+                    }
+                ]
+            }
+        }
+        sac.save()
+        result = validate_audit_consistency(audit)
+        self.assertDictEqual(
+            result[1][0],
+            {'field': 'secondary_auditors', 'sac_value': ['0'], 'audit_value': ['42'], 'error': "Values don't match between SAC and Audit"},
+        )
+        self.assertFalse(result[0])

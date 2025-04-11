@@ -243,8 +243,6 @@ def validate_audit_consistency(audit_instance):
         "findings_text",
         "findings_uniform_guidence",
         "corrective_action_plan",
-        "additional_ueis",
-        "secondary_auditors",
         "notes_to_sefa",
         "audit_information",
         "auditor_certification",
@@ -259,35 +257,59 @@ def validate_audit_consistency(audit_instance):
         "oversight_agency",
     ]
 
-    if hasattr(sac_instance, "additional_eins") and sac_instance.additional_eins:
-        sac_eins = []
-        if (
-            isinstance(sac_instance.additional_eins, dict)
-            and "AdditionalEINs" in sac_instance.additional_eins
-        ):
-            entries = sac_instance.additional_eins.get("AdditionalEINs", {}).get(
-                "additional_eins_entries", []
-            )
-            for entry in entries:
-                if "additional_ein" in entry:
-                    sac_eins.append(entry["additional_ein"])
+    entry_fields_to_check = {
+        "additional_eins": {
+            "top_level_name": "AdditionalEINs",
+            "entries_name": "additional_eins_entries",
+            "entry_name": "additional_ein",
+        },
+        "additional_ueis": {
+            "top_level_name": "AdditionalUeis",
+            "entries_name": "additional_ueis_entries",
+            "entry_name": "additional_uei",
+        },
+        "secondary_auditors": {
+            "top_level_name": "SecondaryAuditors",
+            "entries_name": "secondary_auditors_entries",
+            "entry_name": "secondary_auditor_ein",
+        },
+    }
 
-        audit_eins = []
-        if (
-            "additional_eins" in audit_instance.audit
-            and audit_instance.audit["additional_eins"]
-        ):
-            audit_eins = audit_instance.audit["additional_eins"]
+    for field, names in entry_fields_to_check.items():
+        top_level_name = names["top_level_name"]
+        entries_name = names["entries_name"]
+        entry_name = names["entry_name"]
 
-        if set(sac_eins) != set(audit_eins):
-            differences.append(
-                {
-                    "field": "additional_eins",
-                    "sac_value": sac_eins,
-                    "audit_value": audit_eins,
-                    "error": "EIN values don't match between SAC and Audit",
-                }
-            )
+        sac_data = getattr(sac_instance, field)
+        if sac_data:
+            sac_values = []
+
+            if (
+                isinstance(sac_data, dict)
+                and top_level_name in sac_data
+            ):
+                entries = sac_data.get(top_level_name, {}).get(
+                    entries_name, []
+                )
+                for entry in entries:
+                    sac_values.append(entry[entry_name])
+
+            audit_values = []
+            if (
+                field in audit_instance.audit
+                and audit_instance.audit[field]
+            ):
+                audit_values = audit_instance.audit[field]
+
+            if set(sac_values) != set(audit_values):
+                differences.append(
+                    {
+                        "field": field,
+                        "sac_value": sac_values,
+                        "audit_value": audit_values,
+                        "error": "Values don't match between SAC and Audit",
+                    }
+                )
 
     for field in simple_fields_to_check:
         sac_value = getattr(sac_instance, field, None)
