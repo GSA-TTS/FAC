@@ -32,3 +32,6 @@ jobs:
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 2G -m 4G --name export_audit_data_to_csv_scheduled --command "python manage.py export_data_audit --year ${{ inputs.year }}" --wait
+          # TO DO:  Update above line to 
+          # run bulk export for 2016 through (current_year +1) + bulk export all 
+          # one at a time waiting for one export to complete before kicking off the next
