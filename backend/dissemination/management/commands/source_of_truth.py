@@ -66,7 +66,9 @@ class Command(BaseCommand):
         for report_id in sot_sorted_report_ids:
             is_consistent, differences = validate_audit_consistency(sot_audits_by_report_id[report_id])
 
-            if not is_consistent:
+            if is_consistent:
+                logger.info(f"No differences found for {report_id}!")
+            else:
                 logger.error(f"Differences found for {report_id}:")
                 logger.error(differences)
 
