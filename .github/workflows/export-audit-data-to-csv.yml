@@ -1,9 +1,6 @@
 ---
 name: Export Audit Data to CSV
 on:
-  schedule:
-    # Every week on Sunday Midnight UTC
-    - cron: '0 0 * * 0'
   workflow_dispatch:
     inputs:
       environment:
@@ -21,26 +18,6 @@ on:
         description: Provide audit year.
 
 jobs:
-  scheduled-audit-data-export:
-    if: ${{ github.event_name == 'schedule' }}
-    strategy:
-      matrix:
-        environments: ["production"]  # For now, just do the scheduled job on production to save space
-    name: Run data export on ${{ inputs.environment }}
-    runs-on: ubuntu-latest
-    environment: ${{ matrix.environments }}
-    env:
-      space: ${{ matrix.environments }}
-    steps:
-      - name: Run Command
-        uses: cloud-gov/cg-cli-tools@main
-        with:
-          cf_username: ${{ secrets.CF_USERNAME }}
-          cf_password: ${{ secrets.CF_PASSWORD }}
-          cf_org: gsa-tts-oros-fac
-          cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 4G --name export_audit_data_to_csv --command "python manage.py export_data_audit --year ${{ inputs.year }}" --wait
-
   dispatch-audit-data-export:
     if: ${{ github.event.inputs.environment != '' }}
     name: Run data export on ${{ inputs.environment }}
