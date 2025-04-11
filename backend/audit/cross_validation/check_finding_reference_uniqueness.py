@@ -33,9 +33,9 @@ def check_finding_reference_uniqueness(sac_dict, *_args, **_kwargs):
         # Skip this validation if it is an historical audit report with duplicate reference numbers
         return errors
 
-    from audit.models import SacValidationWaiver
+    from audit.models import AuditValidationWaiver
 
-    if SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER in waiver_types:
+    if AuditValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER in waiver_types:
         return errors
 
     for finding in findings_uniform_guidance:

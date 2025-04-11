@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .access_roles import ACCESS_ROLES
-from .models import SingleAuditChecklist
 
 
 User = get_user_model()
@@ -29,10 +28,8 @@ class DeletedAccess(models.Model):
     EVENT_TYPES = ((RemovalEventType.ACCESS_CHANGE, _("Access change")),)
 
     # The first five fields are identical to Access:
-    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
-    # TODO: Update Post SOC Launch
-    # setting this temporarily to allow "null" to handle existing rows without audit fields.
-    audit = models.ForeignKey("audit.Audit", on_delete=models.CASCADE, null=True)
+
+    audit = models.ForeignKey("audit.Audit", on_delete=models.CASCADE)
     role = models.CharField(
         choices=ACCESS_ROLES,
         help_text="Access type granted to this user",

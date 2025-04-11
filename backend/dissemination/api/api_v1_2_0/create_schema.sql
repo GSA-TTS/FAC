@@ -36,7 +36,7 @@ $$
 -- https://postgrest.org/en/stable/references/api/openapi.html
 -- This is the title (version number) and description (text).
 COMMENT ON SCHEMA api_v1_2_0 IS
-$$v1.1.0
+$$v1.2.0
 
 A RESTful API that serves data from the SF-SAC.$$;
 

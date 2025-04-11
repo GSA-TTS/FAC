@@ -1,7 +1,7 @@
-from datetime import datetime
-from dissemination.summary_reports import set_column_widths, protect_sheet
+from datetime import datetime, timezone
 from dissemination.report_generation.excel.excel_sheet import ExcelSheet
 from django.conf import settings
+
 
 limit_disclaimer = f"This spreadsheet contains the first {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} results of your search. If you need to download more than {settings.SUMMARY_REPORT_DOWNLOAD_LIMIT} submissions, try limiting your search parameters to download in batches."
 can_read_tribal_disclaimer = "This document includes one or more Tribal entities that have chosen to keep their data private per 2 CFR 200.512(b)(2). Because your account has access to these submissions, this document includes their audit findings text, corrective action plan, and notes to SEFA. Don't share this data outside your agency."
@@ -9,16 +9,29 @@ cannot_read_tribal_disclaimer = "This document includes one or more Tribal entit
 
 
 def insert_precert_coversheet(workbook):
+    # Importing here to avoid circular dependencies.
+    from dissemination.report_generation.excel.utils import (
+        set_column_widths,
+        protect_sheet,
+    )
+
     sheet = workbook.create_sheet("Coversheet", 0)
-    sheet.append(["Time created", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")])
+    sheet.append(
+        ["Time created", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")]
+    )
     sheet.append(["Note", "This file is for review only and can't be edited."])
     set_column_widths(sheet)
     protect_sheet(sheet)
 
 
 def insert_dissemination_coversheet(workbook, contains_tribal, include_private):
+    # Importing here to avoid circular dependencies.
+    from dissemination.report_generation.excel.utils import set_column_widths
+
     sheet = workbook.create_sheet("Coversheet", 0)
-    sheet.append(["Time created", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")])
+    sheet.append(
+        ["Time created", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")]
+    )
     sheet.append(
         [
             "Note",

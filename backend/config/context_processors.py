@@ -76,12 +76,8 @@ def navigation_content(request):
                 "name": "Audit search",
                 "links": [
                     {
-                        "name": "Basic search",
+                        "name": "Search Audits",
                         "link": "/dissemination/search",
-                    },
-                    {
-                        "name": "Advanced search",
-                        "link": "/dissemination/search/advanced",
                     },
                     {
                         "name": "Tribal audit search",

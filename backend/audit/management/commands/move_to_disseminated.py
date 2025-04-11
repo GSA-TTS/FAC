@@ -2,16 +2,16 @@
 Allows the manual transition of an audit to dissemination.
 """
 
-from audit.models import (
-    SingleAuditChecklist,
-)
-from audit.models.models import STATUS
-from audit.models.viewflow import sac_revert_from_submitted, sac_transition
+from audit.models import Audit
+from audit.models.constants import STATUS
+from audit.models.utils import generate_audit_indexes
+from audit.models.viewflow import audit_revert_from_submitted, audit_transition
 from curation.curationlib.curation_audit_tracking import CurationTracking
-from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
 from django.core.management.base import BaseCommand
 from django.db import transaction
 import logging
+
+from dissemination.remove_workbook_artifacts import audit_remove_workbook_artifacts
 
 logger = logging.getLogger(__name__)
 
@@ -40,20 +40,20 @@ class Command(BaseCommand):
             exit(-1)
 
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        except SingleAuditChecklist.DoesNotExist:
+            audit = Audit.objects.get(report_id=report_id)
+        except Audit.DoesNotExist:
             logger.info(f"No report with report_id found: {report_id}")
             exit(-1)
 
         # must be stuck as 'submitted'.
-        if sac.submission_status != STATUS.SUBMITTED:
+        if audit.submission_status != STATUS.SUBMITTED:
             logger.info(
                 f"Unable to disseminate report that is not in submitted state: {report_id}"
             )
             exit(-1)
 
         # check for validation errors.
-        errors = sac.validate_full()
+        errors = audit.validate_full()
         if errors:
             logger.info(
                 f"Unable to disseminate report with validation errors: {report_id}."
@@ -61,17 +61,20 @@ class Command(BaseCommand):
             logger.info(errors["errors"])
 
             # return to auditee_certified.
-            sac_revert_from_submitted(sac)
+            audit_revert_from_submitted(audit)
             logger.info(f"Returned report to auditee_certified state: {report_id}")
             exit(0)
 
         with CurationTracking():
             # BEGIN ATOMIC BLOCK
             with transaction.atomic():
-                disseminated = sac.disseminate()
-                # `disseminated` is None if there were no errors.
-                if disseminated is None:
-                    sac_transition(None, sac, transition_to=STATUS.DISSEMINATED)
+                audit_indexes = generate_audit_indexes(audit)
+                audit.audit.update(audit_indexes)
+                audit_transition(
+                    request=None, audit=audit, transition_to=STATUS.DISSEMINATED
+                )
+                audit.save()
+                disseminated = True
             # END ATOMIC BLOCK
 
         # IF THE DISSEMINATION SUCCEEDED
@@ -81,7 +84,7 @@ class Command(BaseCommand):
             # We do this outside of the atomic block. No race between
             # two instances of the FAC should be able to get to this point.
             # If we do, something will fail.
-            remove_workbook_artifacts(sac)
+            audit_remove_workbook_artifacts(audit)
 
         # IF THE DISSEMINATION FAILED
         # If disseminated has a value, it is an error
@@ -94,7 +97,7 @@ class Command(BaseCommand):
             )
 
             # return to auditee_certified.
-            sac_revert_from_submitted(sac)
+            audit_revert_from_submitted(audit)
             exit(0)
 
         logger.info(f"DISSEMINATED REPORT: {report_id}")
