@@ -4,8 +4,9 @@ from django.db.models import Q
 import logging
 
 from audit.models import Audit
-from dissemination.models import General
+from audit.models import SingleAuditChecklist
 from audit.models.utils import validate_audit_consistency
+from dissemination.models import General
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,9 @@ class Command(BaseCommand):
         Alternatively, it can also test on a single report_id:
         manage.py source_of_truth
             --report_id 2023-12-GSAFAC-0000000001
+
+        Note that using a date range can only validate audits with the
+        disseminated status, while repoort_id audits can be of any status.
     """
 
     def add_arguments(self, parser):
@@ -44,11 +48,15 @@ class Command(BaseCommand):
             query = Q(fac_accepted_date__gte=start) & Q(fac_accepted_date__lte=end)
             limit = kwargs.get("limit", None)
 
-        sot_audits_query = Audit.objects.filter(query & Q(submission_status='disseminated')).order_by('report_id')[:limit]
+        sot_audits_query = Audit.objects.filter(query).order_by('report_id')[:limit]
         sot_sorted_report_ids = self._get_sorted_report_ids(sot_audits_query)
 
-        gen_audits_query = General.objects.filter(query).order_by('report_id')[:limit]
-        sac_sorted_report_ids = self._get_sorted_report_ids(gen_audits_query)
+        if report_id:
+            sac_audits_query = SingleAuditChecklist.objects.filter(query).order_by('report_id')[:limit]
+        else:
+            sac_audits_query = General.objects.filter(query).order_by('report_id')[:limit]
+
+        sac_sorted_report_ids = self._get_sorted_report_ids(sac_audits_query)
 
         logger.info(f"SOT report_ids: {sot_sorted_report_ids}")
         logger.info(f"SAC report_ids: {sac_sorted_report_ids}")
