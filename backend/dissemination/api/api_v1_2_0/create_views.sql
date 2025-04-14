@@ -144,7 +144,7 @@ create view api_v1_2_0.federal_awards as
         fa_elem->'program'->'federal_program_total' as federal_program_total,
         fa_elem->'program'->>'is_major' as is_major,
         fa_elem->'loan_or_loan_guarantee'->>'is_guaranteed' as is_loan,
-        coalesce(fa_elem->'loan_or_loan_guarantee'->'loan_balance_at_audit_period_end','') as loan_balance,
+        coalesce(fa_elem->'loan_or_loan_guarantee'->>'loan_balance_at_audit_period_end','') as loan_balance,
         fa_elem->'direct_or_indirect_award'->>'is_direct' as is_direct,
         coalesce(fa_elem->'program'->>'audit_report_type','') as audit_report_type,
         fa_elem->'program'->'number_of_audit_findings' as findings_count,
@@ -183,7 +183,7 @@ create view api_v1_2_0.notes_to_sefa as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->>'audit_year' as audit_year,
+        a.audit->'audit_year' as audit_year,
         note->>'note_title' as title,
         nts_elem->>'accounting_policies' as accounting_policies,
         nts_elem->>'is_minimis_rate_used' as is_minimis_rate_used,
@@ -225,7 +225,7 @@ create view api_v1_2_0.general as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->>'audit_year' as audit_year,
+        a.audit->'audit_year' as audit_year,
         -- auditee
         coalesce(a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_name','') as auditee_certify_name,
         coalesce(a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_title','') as auditee_certify_title,
