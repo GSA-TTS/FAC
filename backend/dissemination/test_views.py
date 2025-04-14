@@ -939,9 +939,7 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    @patch(
-        "dissemination.views.download.generate_audit_summary_report"
-    )
+    @patch("dissemination.views.download.generate_audit_summary_report")
     def test_authorized_user_with_private_data(
         self, mock_generate_audit_summary_report
     ):
@@ -966,9 +964,7 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch(
-        "dissemination.views.download.generate_audit_summary_report"
-    )
+    @patch("dissemination.views.download.generate_audit_summary_report")
     def test_unauthorized_user_with_private_data(
         self, mock_prepare_workbook_for_download
     ):
@@ -993,9 +989,7 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch(
-        "dissemination.views.download.generate_audit_summary_report"
-    )
+    @patch("dissemination.views.download.generate_audit_summary_report")
     def test_authorized_user_with_public_data(self, mock_prepare_workbook_for_download):
         """Test that an authorized user can access public data."""
         mock_filename = "mocked-report.xlsx"
@@ -1018,9 +1012,7 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch(
-        "dissemination.views.download.generate_audit_summary_report"
-    )
+    @patch("dissemination.views.download.generate_audit_summary_report")
     def test_unauthorized_user_with_public_data(
         self, mock_prepare_workbook_for_download
     ):
@@ -1045,9 +1037,7 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch(
-        "dissemination.views.download.generate_audit_summary_report"
-    )
+    @patch("dissemination.views.download.generate_audit_summary_report")
     def test_empty_search_params_returns_file(self, mock_prepare_workbook_for_download):
         """
         File should be generated on empty search parameters ("search all").
@@ -1075,9 +1065,7 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch(
-        "dissemination.views.download.generate_audit_summary_report"
-    )
+    @patch("dissemination.views.download.generate_audit_summary_report")
     def test_many_results_returns_file(self, mock_prepare_workbook_for_download):
         """
         File should still be generated if there are above SUMMARY_REPORT_DOWNLOAD_LIMIT total results.
