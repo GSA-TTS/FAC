@@ -24,7 +24,7 @@ module "fac-app" {
   }
   service_bindings = {
     "${module.s3-private.bucket_name}"                        = ""
-    "${module.s3-private.bucket_name}"                        = ""
+    "${module.s3-public.bucket_name}"                         = ""
     "${module.database.database_name}"                        = ""
     "${module.snapshot-database.database_name}"               = ""
     "${cloudfoundry_service_instance.newrelic_creds.name}"    = ""
