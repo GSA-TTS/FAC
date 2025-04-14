@@ -486,7 +486,7 @@ class TestValidateAuditConsistency(TestCase):
         audit.save()
         sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
         sac.additional_ueis = {
-            "AdditionalUeis": {
+            "AdditionalUEIs": {
                 "additional_ueis_entries": [
                     {
                         "additional_uei": "42"
@@ -506,7 +506,7 @@ class TestValidateAuditConsistency(TestCase):
         audit.save()
         sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
         sac.additional_ueis = {
-            "AdditionalUeis": {
+            "AdditionalUEIs": {
                 "additional_ueis_entries": [
                     {
                         "additional_uei": "0"
@@ -525,7 +525,13 @@ class TestValidateAuditConsistency(TestCase):
     def test_secondary_auditors(self):
         """Valid case for secondary_auditors"""
         audit = baker.make(Audit, version=0)
-        audit.audit = { "secondary_auditors": ["42"] }
+        audit.audit = {
+            "secondary_auditors": [
+                {
+                    "secondary_auditor_ein": "42",
+                }
+            ],
+        }
         audit.save()
         sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
         sac.secondary_auditors = {
@@ -545,7 +551,13 @@ class TestValidateAuditConsistency(TestCase):
     def test_secondary_auditors_invalid(self):
         """Invalid case for secondary_auditors"""
         audit = baker.make(Audit, version=0)
-        audit.audit = { "secondary_auditors": ["42"] }
+        audit.audit = {
+            "secondary_auditors": [
+                {
+                    "secondary_auditor_ein": "42",
+                }
+            ],
+        }
         audit.save()
         sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
         sac.secondary_auditors = {

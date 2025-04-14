@@ -264,7 +264,7 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
             "entry_name": "additional_ein",
         },
         "additional_ueis": {
-            "top_level_name": "AdditionalUeis",
+            "top_level_name": "AdditionalUEIs",
             "entries_name": "additional_ueis_entries",
             "entry_name": "additional_uei",
         },
@@ -283,7 +283,6 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
         sac_data = getattr(sac_instance, field)
         if sac_data:
             sac_values = []
-
             if (
                 isinstance(sac_data, dict)
                 and top_level_name in sac_data
@@ -299,7 +298,11 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
                 field in audit_instance.audit
                 and audit_instance.audit[field]
             ):
-                audit_values = audit_instance.audit[field]
+                if field == "secondary_auditors":
+                    for entry in audit_instance.audit[field]:
+                        audit_values.append(entry[entry_name])
+                else:
+                    audit_values = audit_instance.audit[field]
 
             if set(sac_values) != set(audit_values):
                 differences.append(
