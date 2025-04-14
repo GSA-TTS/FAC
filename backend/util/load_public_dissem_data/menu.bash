@@ -5,12 +5,12 @@ USERNAME=postgres
 HOST=localhost
 PORT=5432
 FINISHED_FILENAME=${FINISHED_FILENAME:-data/internal-and-external-20250402.dump}
-RAW_FILENAME=${RAW_FILENAME:-data/sac-user-access-valwaiver-pdf-xlsx-event-data-03-28-25.dump.dump}
+RAW_FILENAME=${RAW_FILENAME:-data/sac-user-access-valwaiver-pdf-xlsx-event-data-03-28-25.dump}
 DATE=$(date '+%Y%m%d')
 
 count_audit_singleauditchecklist=354222
-count_audit_access=1195595 
-count_auth_user=75461 
+count_audit_access=1195595
+count_auth_user=75461
 count_dissemination_additionalein=59251
 count_dissemination_additionaluei=15101
 count_dissemination_captext=116694
@@ -18,7 +18,7 @@ count_dissemination_federalaward=5811960
 count_dissemination_finding=507895
 count_dissemination_findingtext=120290
 count_dissemination_general=343116
-count_dissemination_note=530405
+count_dissemination_note=530407
 count_dissemination_passthrough=4025800
 count_dissemination_secondaryauditor=1803
 count_audit_ueivalidationwaiver=0
@@ -41,7 +41,7 @@ truncate () {
     -v ON_ERROR_STOP=1 \
     <<EOF
 	begin;
-		truncate 
+		truncate
       audit_access,
       audit_singleauditchecklist,
       auth_user,
@@ -247,8 +247,8 @@ check_row_counts () {
 check_all_row_counts () {
   echo "Checking counts"
   check_row_counts "audit_singleauditchecklist" ${count_audit_singleauditchecklist}
-  check_row_counts "audit_access" ${count_audit_access} 
-  check_row_counts "auth_user" ${count_auth_user} 
+  check_row_counts "audit_access" ${count_audit_access}
+  check_row_counts "auth_user" ${count_auth_user}
   check_row_counts "dissemination_additionalein" ${count_dissemination_additionalein}
   check_row_counts "dissemination_additionaluei" ${count_dissemination_additionaluei}
   check_row_counts "dissemination_captext" ${count_dissemination_captext}
