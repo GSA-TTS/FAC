@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("audit", "0018_auditflow_rename_audit_history_event_data_and_more"),
+        ("audit", "0019_update_json_array_to_text_array"),
     ]
 
     operations = [
