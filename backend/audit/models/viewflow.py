@@ -78,7 +78,7 @@ def audit_transition(request, audit, **kwargs):
     user = None
     flow = AuditFlow(audit)
 
-    target = kwargs.get("transition_to", None)
+    target = kwargs.get("event", None)
 
     event_to_action = {
         EventType.UNLOCKED_AFTER_CERTIFICATION: flow.transition_to_in_progress_again,

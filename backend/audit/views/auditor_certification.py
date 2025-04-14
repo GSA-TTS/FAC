@@ -174,7 +174,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
                 if audit_transition(
                     request=request,
                     audit=audit,
-                    transition_to=EventType.AUDITOR_CERTIFICATION_COMPLETED,
+                    event=EventType.AUDITOR_CERTIFICATION_COMPLETED,
                 ):
                     logger.info("Auditor certification saved.", auditor_certification)
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
