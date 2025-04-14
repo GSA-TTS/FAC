@@ -14,8 +14,10 @@ import datetime
 import random
 import unittest
 
-from audit.models.utils import generate_audit_indexes, \
-    convert_utc_to_american_samoa_zone
+from audit.models.utils import (
+    generate_audit_indexes,
+    convert_utc_to_american_samoa_zone,
+)
 from audit.test_views import (
     build_auditee_cert_dict,
     build_auditor_cert_dict,
@@ -53,13 +55,15 @@ def generate_valid_audit_for_search(
     is_public=True,
     overrides=None,
     report_id=None,
-    submission_status=STATUS.DISSEMINATED
+    submission_status=STATUS.DISSEMINATED,
 ):
     geninfofile = "general-information--test0001test--simple-pass.json"
     awardsfile = "federal-awards--test0001test--simple-pass.json"
     audit_data = {
         "is_public": is_public,
-        "fac_accepted_date": convert_utc_to_american_samoa_zone(datetime.datetime.today()),
+        "fac_accepted_date": convert_utc_to_american_samoa_zone(
+            datetime.datetime.today()
+        ),
         "auditee_certification": build_auditee_cert_dict(*fake_auditee_certification()),
         "auditor_certification": build_auditor_cert_dict(*fake_auditor_certification()),
         "audit_information": fake_audit_information(),
@@ -80,7 +84,7 @@ def generate_valid_audit_for_search(
             audit=audit_data,
             version=0,
             report_id=report_id,
-            submission_status=submission_status
+            submission_status=submission_status,
         )
         if report_id
         else baker.make(
@@ -218,7 +222,9 @@ class SearchGeneralTests(TestCase):
         Given a uei_or_ein, search_general should return records with a matching EIN
         """
         auditee_ein = "ABCDEFGHIJKL"
-        generate_valid_audit_for_search(overrides={"general_information": {"ein": auditee_ein}})
+        generate_valid_audit_for_search(
+            overrides={"general_information": {"ein": auditee_ein}}
+        )
 
         results = search(
             {"uei_or_eins": [auditee_ein]},

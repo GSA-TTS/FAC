@@ -1,4 +1,3 @@
-import datetime
 import io
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -13,10 +12,11 @@ from audit.models import (
 )
 
 from audit.fixtures.excel import FORM_SECTIONS
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, ORGANIZATION_TYPE
 from audit.models.utils import generate_sac_report_id
 from dissemination.models.one_time_access import OneTimeAccess
 from dissemination.test_search import generate_valid_audit_for_search
+from dissemination.views.utils import to_date
 
 from users.models import Permission, UserPermission
 
@@ -44,16 +44,26 @@ def _make_audit(is_public=True, submission_status=STATUS.DISSEMINATED):
     return audit
 
 
-def _make_multiple_audits(quantity=1,
-                          is_public=True,
+def _make_multiple_audits(
+    quantity=1,
+    is_public=True,
     overrides=None,
     report_id=None,
-    submission_status=STATUS.DISSEMINATED):
+    submission_status=STATUS.DISSEMINATED,
+):
     audits = []
     for i in range(quantity):
-        audits.append(generate_valid_audit_for_search(is_public=is_public, overrides=overrides, submission_status=submission_status, report_id=report_id))
+        audits.append(
+            generate_valid_audit_for_search(
+                is_public=is_public,
+                overrides=overrides,
+                submission_status=submission_status,
+                report_id=report_id,
+            )
+        )
 
     return audits
+
 
 class PdfDownloadViewTests(TestCase):
     def setUp(self):
@@ -152,7 +162,7 @@ class PdfDownloadViewTests(TestCase):
     def test_private_returns_302_for_permissioned(self, mock_file_exists):
         mock_file_exists.return_value = True
 
-        audit = _make_audit(is_public=False,submission_status=STATUS.IN_PROGRESS)
+        audit = _make_audit(is_public=False, submission_status=STATUS.IN_PROGRESS)
 
         user = baker.make(User)
         permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
@@ -211,7 +221,6 @@ class SearchViewTests(TestCase):
         self.assertNotContains(response, "results in")
 
     def test_anonymous_returns_private_and_public(self):
-
         """Anonymous users should see all reports (public and private included)."""
         public = _make_multiple_audits(quantity=5)
         private = _make_multiple_audits(quantity=5, is_public=False)
@@ -477,7 +486,9 @@ class XlsxDownloadViewTests(TestCase):
         mock_file_exists.return_value = True
 
         audit = _make_audit(submission_status=STATUS.IN_PROGRESS)
-        file = baker.make(ExcelFile, audit=audit, form_section=FORM_SECTIONS.FEDERAL_AWARDS)
+        file = baker.make(
+            ExcelFile, audit=audit, form_section=FORM_SECTIONS.FEDERAL_AWARDS
+        )
         audit.submission_status = STATUS.DISSEMINATED
         audit.save()
 
@@ -547,7 +558,9 @@ class XlsxDownloadViewTests(TestCase):
             user=user,
             permission=permission,
         )
-        file = baker.make(ExcelFile, audit=audit, form_section=FORM_SECTIONS.FEDERAL_AWARDS)
+        file = baker.make(
+            ExcelFile, audit=audit, form_section=FORM_SECTIONS.FEDERAL_AWARDS
+        )
         audit.submission_status = STATUS.DISSEMINATED
         audit.save()
 
@@ -565,8 +578,7 @@ class XlsxDownloadViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(file.filename, response.url)
 
- # TODO: dissemination.views.summary.AuditSummaryView has all new context... verify it.
-#  NOTE: The old context seemed to have a lot more information that wasn't displayed on the UI, the new context hides that. A lot of these tests can probably go away.
+
 class SummaryViewTests(TestCase):
     def setUp(self):
         super().setUp()
@@ -589,7 +601,9 @@ class SummaryViewTests(TestCase):
         """
         Anonymous requests for private audit summaries should return 200
         """
-        _make_multiple_audits(quantity=1, report_id="2022-12-GSAFAC-0000000001", is_public=False)
+        _make_multiple_audits(
+            quantity=1, report_id="2022-12-GSAFAC-0000000001", is_public=False
+        )
         url = reverse(
             "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
         )
@@ -614,126 +628,273 @@ class SummaryViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_summary_context(self):
+    def test_summary_header_context(self):
         """
         The summary context should include the same data that is in the models.
         Create a bunch of fake DB data under the same report_id. Then, check a few
         fields in the context for the summary page to verify that the fake data persists.
         """
-        audit = _make_multiple_audits(quantity=1, report_id="2022-12-GSAFAC-0000000001")[0]
+        audit = _make_multiple_audits(
+            quantity=1, report_id="2022-12-GSAFAC-0000000001"
+        )[0]
 
         url = reverse(
             "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
         )
 
+        response = self.client.get(url)
+        header = response.context.get("header")
+
+        self.assertEqual(header["auditee_name"], audit.auditee_name)
+        self.assertEqual(header["auditee_uei"], audit.auditee_uei)
+        self.assertEqual(header["fac_accepted_date"], to_date(audit.fac_accepted_date))
+        self.assertEqual(header["report_id"], audit.report_id)
+        self.assertEqual(
+            header["fy_start_date"],
+            to_date(audit.audit["general_information"]["auditee_fiscal_period_start"]),
+        )
+        self.assertEqual(
+            header["fy_end_date"],
+            to_date(audit.audit["general_information"]["auditee_fiscal_period_end"]),
+        )
+
+    def test_summary_auditee_info_context(self):
+        audit = _make_multiple_audits(
+            quantity=1, report_id="2022-12-GSAFAC-0000000001"
+        )[0]
+
+        url = reverse(
+            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
+        )
 
         response = self.client.get(url)
+        auditee_info = response.context.get("auditee_info")
 
-        # TODO: dissemination.views.summary.AuditSummaryView has all new context... verify it.
-        # self.assertEqual(
-        #     response.context["data"]["Audit Findings"][0]["reference_number"],
-        #     finding.reference_number,
-        # )
-        # self.assertEqual(
-        #     response.context["data"]["Audit Findings Text"][0]["finding_ref_number"],
-        #     finding_text.finding_ref_number,
-        # )
-        # self.assertEqual(
-        #     response.context["data"]["Corrective Action Plan"][0][
-        #         "contains_chart_or_table"
-        #     ],
-        #     cap_text.contains_chart_or_table,
-        # )
-        # self.assertEqual(
-        #     response.context["data"]["Notes to SEFA"][0]["accounting_policies"],
-        #     note.accounting_policies,
-        # )
+        self.assertEqual(
+            auditee_info["auditee_contact_name"],
+            audit.audit["general_information"]["auditee_contact_name"],
+        )
+        self.assertEqual(
+            auditee_info["auditee_contact_title"],
+            audit.audit["general_information"]["auditee_contact_title"],
+        )
+        self.assertEqual(
+            auditee_info["auditee_email"],
+            audit.audit["general_information"]["auditee_email"],
+        )
+        self.assertEqual(
+            auditee_info["auditee_phone"],
+            audit.audit["general_information"]["auditee_phone"],
+        )
+        self.assertEqual(
+            auditee_info["auditee_address_line_1"],
+            audit.audit["general_information"]["auditee_address_line_1"],
+        )
+        self.assertEqual(
+            auditee_info["auditee_city"],
+            audit.audit["general_information"]["auditee_city"],
+        )
+        self.assertEqual(
+            auditee_info["auditee_state"],
+            audit.audit["general_information"]["auditee_state"],
+        )
+        self.assertEqual(
+            auditee_info["auditee_zip"],
+            audit.audit["general_information"]["auditee_zip"],
+        )
+        self.assertEqual(auditee_info["ein"], audit.audit["general_information"]["ein"])
+        self.assertEqual(
+            auditee_info["auditee_certify_name"],
+            audit.audit["auditee_certification"]["auditee_signature"]["auditee_name"],
+        )
+        self.assertEqual(
+            auditee_info["auditee_certify_title"],
+            audit.audit["auditee_certification"]["auditee_signature"]["auditee_title"],
+        )
 
-    def test_distinct_findings_by_reference_number(self):
+    def test_summary_auditor_info_context(self):
+        audit = _make_multiple_audits(
+            quantity=1, report_id="2022-12-GSAFAC-0000000001"
+        )[0]
+
+        url = reverse(
+            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
+        )
+
+        response = self.client.get(url)
+        auditor_info = response.context.get("auditor_info")
+
+        self.assertEqual(
+            auditor_info["auditor_contact_name"],
+            audit.audit["general_information"]["auditor_contact_name"],
+        )
+        self.assertEqual(
+            auditor_info["auditor_contact_title"],
+            audit.audit["general_information"]["auditor_contact_title"],
+        )
+        self.assertEqual(
+            auditor_info["auditor_email"],
+            audit.audit["general_information"]["auditor_email"],
+        )
+        self.assertEqual(
+            auditor_info["auditor_phone"],
+            audit.audit["general_information"]["auditor_phone"],
+        )
+        self.assertEqual(
+            auditor_info["auditor_address_line_1"],
+            audit.audit["general_information"]["auditor_address_line_1"],
+        )
+        self.assertEqual(
+            auditor_info["auditor_city"],
+            audit.audit["general_information"]["auditor_city"],
+        )
+        self.assertEqual(
+            auditor_info["auditor_state"],
+            audit.audit["general_information"]["auditor_state"],
+        )
+        self.assertEqual(
+            auditor_info["auditor_zip"],
+            audit.audit["general_information"]["auditor_zip"],
+        )
+
+    def test_summary_additional_context(self):
+        """Tests the "additional" fields: i.e. Additional UEIs, Additional EINs, Secondary Auditors"""
+        audit_with_extras = _make_multiple_audits(
+            overrides={
+                "additional_eins": ["ADDITIONAL_EIN"],
+                "additional_ueis": ["ADDITIONAL_UEI"],
+            }
+        )[0]
+        audit_with_extras.audit["general_information"][
+            "secondary_auditors_exist"
+        ] = True
+        audit_with_extras.save()
+        url_with_extras = reverse(
+            "dissemination:Summary", kwargs={"report_id": audit_with_extras.report_id}
+        )
+
+        response_with_extras = self.client.get(url_with_extras)
+        auditor_info_with_extras = response_with_extras.context.get("auditor_info")
+        auditee_info_with_extras = response_with_extras.context.get("auditee_info")
+
+        self.assertEqual("Y", auditor_info_with_extras["has_secondary_auditors"])
+        self.assertEqual("Y", auditee_info_with_extras["additional_eins"])
+        self.assertEqual("Y", auditee_info_with_extras["additional_ueis"])
+
+        audit_no_extras = _make_multiple_audits(
+            overrides={"additional_eins": [], "additional_ueis": []}
+        )[0]
+        audit_no_extras.audit["general_information"]["secondary_auditors_exist"] = False
+        audit_no_extras.save()
+
+        url_no_extras = reverse(
+            "dissemination:Summary", kwargs={"report_id": audit_no_extras.report_id}
+        )
+
+        response_no_extras = self.client.get(url_no_extras)
+        auditor_info_no_extras = response_no_extras.context.get("auditor_info")
+        auditee_info_no_extras = response_no_extras.context.get("auditee_info")
+
+        self.assertEqual("N", auditor_info_no_extras["has_secondary_auditors"])
+        self.assertEqual("N", auditee_info_no_extras["additional_eins"])
+        self.assertEqual("N", auditee_info_no_extras["additional_ueis"])
+
+    def test_public_findings_notes_context(self):
         """
         Test that the Audit Findings in the context only include distinct findings
         based on the `reference_number` for a given report_id.
         """
-        gen = baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
+        audit = _make_multiple_audits()[0]
 
-        # Create multiple findings with the same reference_number
-        baker.make(Finding, report_id=gen, reference_number="REF001")
-        baker.make(Finding, report_id=gen, reference_number="REF001")
-        baker.make(Finding, report_id=gen, reference_number="REF002")
-
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
-        )
+        url = reverse("dissemination:Summary", kwargs={"report_id": audit.report_id})
 
         response = self.client.get(url)
-
-        # Verify that the response contains only distinct reference_numbers
-        findings = response.context["data"]["Audit Findings"]
-        reference_numbers = [finding["reference_number"] for finding in findings]
-        self.assertEqual(len(reference_numbers), len(set(reference_numbers)))
-        self.assertIn("REF001", reference_numbers)
-        self.assertIn("REF002", reference_numbers)
-        self.assertEqual(len(reference_numbers), 2)  # Only 2 distinct reference numbers
-
-    def test_unique_findings_no_duplicates(self):
-        """
-        Test that the Audit Findings in the context include all findings
-        when all `reference_number` values are unique for a given report_id.
-        """
-        gen = baker.make(General, report_id="2022-12-GSAFAC-0000000002", is_public=True)
-
-        # findings with unique reference_numbers
-        baker.make(Finding, report_id=gen, reference_number="REF003")
-        baker.make(Finding, report_id=gen, reference_number="REF004")
-
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000002"}
+        summary = response.context.get("summary")
+        self.assertEqual(
+            summary["number_of_federal_awards"],
+            len(audit.audit["federal_awards"].get("awards", [])),
+        )
+        self.assertEqual(
+            summary["number_of_findings"],
+            audit.audit["search_indexes"].get("unique_audit_findings_count", 0),
+        )
+        self.assertEqual(
+            summary["total_amount_expended"],
+            audit.audit["federal_awards"]["total_amount_expended"],
         )
 
-        response = self.client.get(url)
+        # These fields are based on is public
+        notes_count = (
+            max(
+                len(
+                    audit.audit.get("notes_to_sefa", {}).get(
+                        "notes_to_sefa_entries", []
+                    )
+                ),
+                1,
+            )
+            if audit.audit["notes_to_sefa"]
+            else 0
+        )
+        self.assertEqual(summary["number_of_notes"], notes_count)
+        self.assertEqual(
+            summary["number_of_findings_text"],
+            len(audit.audit.get("findings_text", [])),
+        )
+        self.assertEqual(
+            summary["number_of_caps"],
+            len(audit.audit.get("corrective_action_plan", [])),
+        )
 
-        # Verify that all unique reference_numbers are present
-        findings = response.context["data"]["Audit Findings"]
-        reference_numbers = [finding["reference_number"] for finding in findings]
-        self.assertEqual(len(reference_numbers), 2)  # all findings are returned
-        self.assertIn("REF003", reference_numbers)
-        self.assertIn("REF004", reference_numbers)
+    def test_private_findings_notes_context(self):
+        """
+        Test that the Audit Findings in the context only include distinct findings
+        based on the `reference_number` for a given report_id.
+        """
+        audit = _make_multiple_audits()[0]
+        audit.audit["general_information"][
+            "user_provided_organization_type"
+        ] = ORGANIZATION_TYPE.TRIBAL
+        audit.audit["is_public"] = False
+        audit.save()
+
+        url = reverse("dissemination:Summary", kwargs={"report_id": audit.report_id})
+
+        response = self.client.get(url)
+        summary = response.context.get("summary")
+        self.assertEqual(
+            summary["number_of_federal_awards"],
+            len(audit.audit["federal_awards"].get("awards", [])),
+        )
+        self.assertEqual(
+            summary["number_of_findings"],
+            audit.audit["search_indexes"].get("unique_audit_findings_count", 0),
+        )
+        self.assertEqual(
+            summary["total_amount_expended"],
+            audit.audit["federal_awards"]["total_amount_expended"],
+        )
+
+        # These fields are based on is public
+
+        self.assertEqual(summary["number_of_notes"], "N/A")
+        self.assertEqual(summary["number_of_findings_text"], "N/A")
+        self.assertEqual(summary["number_of_caps"], "N/A")
 
     def test_sac_download_available(self):
         """
-        Ensures is_sf_sac_downloadable is True when a submission's SF-SAC is downloadable
+        Ensures allow_download is True when a submission's SF-SAC is downloadable
         """
-        gen_object = baker.make(
-            General, is_public=True, report_id="2022-12-GSAFAC-0000000001"
-        )
-        baker.make(
-            FederalAward,
-            report_id=gen_object,
-        )
-        self.refresh_materialized_view()
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
-        )
+        audit = _make_multiple_audits()[0]
+        url = reverse("dissemination:Summary", kwargs={"report_id": audit.report_id})
 
         response = self.client.get(url)
-        self.assertEqual(response.context["is_sf_sac_downloadable"], True)
+        self.assertEqual(response.context.get("allow_download"), True)
 
-    def test_sac_download_not_available(self):
-        """
-        Ensures is_sf_sac_downloadable is False when a submission's SF-SAC is not downloadable
-        """
-        baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
-        )
-
-        response = self.client.get(url)
-        self.assertEqual(response.context["is_sf_sac_downloadable"], False)
 
 # TODO: Patching not working for some reason
 class SummaryReportDownloadViewTests(TestCase):
     def setUp(self):
-        super().setUp()
         self.anon_client = Client()
         self.perm_client = Client()
 
@@ -747,7 +908,6 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.perm_client.force_login(self.perm_user)
 
-
     def _summary_report_url(self):
         return reverse("dissemination:MultipleSummaryReportDownload")
 
@@ -756,7 +916,6 @@ class SummaryReportDownloadViewTests(TestCase):
 
     def _mock_download_url(self):
         return "http://example.com/gsa-fac-private-s3/temp/some-report-name.xlsx"
-
 
     def test_bad_search_returns_400(self):
         """
@@ -767,26 +926,31 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-
     def test_empty_results_returns_404(self):
         """
         Searches with no results should return a 404, not an empty excel file.
         """
-        _make_multiple_audits(is_public=False, overrides={"general_information": {"uei": "123456789012"}})
+        _make_multiple_audits(
+            is_public=False, overrides={"general_information": {"uei": "123456789012"}}
+        )
 
         response = self.anon_client.post(
             self._summary_report_url(), {"uei_or_ein": "NotTheOther1"}
         )
         self.assertEqual(response.status_code, 404)
 
-    @patch("dissemination.report_generation.audit_summary_reports.generate_audit_summary_report")
-    def test_authorized_user_with_private_data(self, mock_generate_audit_summary_report):
+    @patch(
+        "dissemination.report_generation.audit_summary_reports.generate_audit_summary_report"
+    )
+    def test_authorized_user_with_private_data(
+        self, mock_generate_audit_summary_report
+    ):
         """Test that an authorized user can access private data."""
         mock_filename = "mocked-report.xlsx"
         mock_workbook_bytes = io.BytesIO(b"fake file content")
         mock_generate_audit_summary_report.return_value = (
             mock_filename,
-            mock_workbook_bytes
+            mock_workbook_bytes,
         )
 
         _make_audit(is_public=False)
@@ -802,7 +966,9 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch("dissemination.report_generation.audit_summary_reports.generate_audit_summary_report")
+    @patch(
+        "dissemination.report_generation.audit_summary_reports.generate_audit_summary_report"
+    )
     def test_unauthorized_user_with_private_data(
         self, mock_prepare_workbook_for_download
     ):
@@ -811,7 +977,7 @@ class SummaryReportDownloadViewTests(TestCase):
         mock_workbook_bytes = io.BytesIO(b"fake file content")
         mock_prepare_workbook_for_download.return_value = (
             mock_filename,
-            mock_workbook_bytes
+            mock_workbook_bytes,
         )
 
         _make_audit(is_public=False)
@@ -827,14 +993,16 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch("dissemination.report_generation.audit_summary_reports.generate_audit_summary_report")
+    @patch(
+        "dissemination.report_generation.audit_summary_reports.generate_audit_summary_report"
+    )
     def test_authorized_user_with_public_data(self, mock_prepare_workbook_for_download):
         """Test that an authorized user can access public data."""
         mock_filename = "mocked-report.xlsx"
         mock_workbook_bytes = io.BytesIO(b"fake file content")
         mock_prepare_workbook_for_download.return_value = (
             mock_filename,
-            mock_workbook_bytes
+            mock_workbook_bytes,
         )
 
         _make_audit()
@@ -850,7 +1018,9 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch("dissemination.report_generation.audit_summary_reports.generate_audit_summary_report")
+    @patch(
+        "dissemination.report_generation.audit_summary_reports.generate_audit_summary_report"
+    )
     def test_unauthorized_user_with_public_data(
         self, mock_prepare_workbook_for_download
     ):
@@ -859,7 +1029,7 @@ class SummaryReportDownloadViewTests(TestCase):
         mock_workbook_bytes = io.BytesIO(b"fake file content")
         mock_prepare_workbook_for_download.return_value = (
             mock_filename,
-            mock_workbook_bytes
+            mock_workbook_bytes,
         )
 
         _make_audit()
@@ -875,7 +1045,9 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch("dissemination.report_generation.audit_summary_reports.generate_audit_summary_report")
+    @patch(
+        "dissemination.report_generation.audit_summary_reports.generate_audit_summary_report"
+    )
     def test_empty_search_params_returns_file(self, mock_prepare_workbook_for_download):
         """
         File should be generated on empty search parameters ("search all").
@@ -884,7 +1056,7 @@ class SummaryReportDownloadViewTests(TestCase):
         mock_workbook_bytes = io.BytesIO(b"fake file content")
         mock_prepare_workbook_for_download.return_value = (
             mock_filename,
-            mock_workbook_bytes
+            mock_workbook_bytes,
         )
 
         _make_audit()
@@ -903,7 +1075,9 @@ class SummaryReportDownloadViewTests(TestCase):
         )
         self.assertEqual(response.content, b"fake file content")
 
-    @patch("dissemination.report_generation.audit_summary_reports.generate_audit_summary_report")
+    @patch(
+        "dissemination.report_generation.audit_summary_reports.generate_audit_summary_report"
+    )
     def test_many_results_returns_file(self, mock_prepare_workbook_for_download):
         """
         File should still be generated if there are above SUMMARY_REPORT_DOWNLOAD_LIMIT total results.
@@ -912,7 +1086,7 @@ class SummaryReportDownloadViewTests(TestCase):
         mock_workbook_bytes = io.BytesIO(b"fake file content")
         mock_prepare_workbook_for_download.return_value = (
             mock_filename,
-            mock_workbook_bytes
+            mock_workbook_bytes,
         )
 
         _make_multiple_audits(quantity=4)
