@@ -8,6 +8,7 @@ from django.db.models.functions import Cast
 
 from audit.cross_validation.naming import SECTION_NAMES
 from audit.cross_validation.audit_validation_shape import audit_validation_shape
+from audit.exceptions import LateChangeError
 from audit.models.files import SingleAuditReportFile
 from audit.models.constants import AUDIT_TYPE_CODES, STATUS, STATUS_CHOICES, EventType
 from audit.models.history import History
@@ -35,7 +36,7 @@ class AuditManager(models.Manager):
             obj_data.pop("report_id")
             if "report_id" in obj_data
             else generate_sac_report_id(
-                count=self.model.objects.count(), end_date=end_date
+                count=self.model.objects.count() + 1, end_date=end_date
             )
         )  # TODO -> May want to adjust this
         version = 0
@@ -267,6 +268,9 @@ class Audit(CreatedMixin, UpdatedMixin):
 
     objects = AuditManager()
 
+    def __str__(self):
+        return f"#{self.id}--{self.report_id}--{self.auditee_uei}"
+
     @property
     def submitted_by(self):
         history = (
@@ -297,6 +301,9 @@ class Audit(CreatedMixin, UpdatedMixin):
         event_type = kwargs.get("event_type")
         report_id = self.report_id
         previous_version = self.version
+
+        if self.submission_status != STATUS.IN_PROGRESS:
+            self._reject_late_changes()
 
         self.updated_by = self.updated_by if self.updated_by else event_user
         self.version = previous_version + 1
@@ -390,6 +397,31 @@ class Audit(CreatedMixin, UpdatedMixin):
         if errors:
             return {"errors": errors, "data": shaped_audit}
         return {}
+
+    def _reject_late_changes(self):
+        """
+        This should only be called if status isn't STATUS.IN_PROGRESS.
+        If there have been relevant changes, raise an AssertionError.
+        Here, "relevant" means anything other than fields related to the status
+        transition change itself.
+        """
+        try:
+            prior_obj = Audit.objects.get(id=self.id)
+        except Audit.DoesNotExist:
+            # No prior instance exists, so it's a new submission.
+            return True
+
+        current = audit_validation_shape(self)
+        prior = audit_validation_shape(prior_obj)
+        if current["sf_sac_sections"] != prior["sf_sac_sections"]:
+            raise LateChangeError
+
+        meta_fields = ("submitted_by", "date_created", "report_id", "audit_type")
+        for field in meta_fields:
+            if current["sf_sac_meta"][field] != prior["sf_sac_meta"][field]:
+                raise LateChangeError
+
+        return True
 
     @Field.register_lookup
     class DateCast(Transform):
