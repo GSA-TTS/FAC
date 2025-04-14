@@ -23,7 +23,6 @@ class Command(BaseCommand):
             "view_audit",
             "view_auditvalidationwaiver",
             "view_ueivalidationwaiver",
-            "view_cognizantassignment",
             "view_staffuser",
             "view_user",
             "view_userpermission",
@@ -47,7 +46,6 @@ class Command(BaseCommand):
             "change_auditvalidationwaiver",
             "delete_auditvalidationwaiver",
             "add_ueivalidationwaiver",
-            "add_cognizantassignment",
         ]
         group_helpdesk.permissions.clear()
         for code in helpdesk_codenames:
