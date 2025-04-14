@@ -18,6 +18,11 @@ on:
 
 jobs:
   scheduled-audit-data-export:
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        years: ["2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","all"]
     name: Run bulk data export on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
@@ -31,7 +36,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 4G --name export_audit_data_to_csv_scheduled --command "python manage.py export_data_audit --year ${{ inputs.year }}" --wait
-          # TO DO:  Update above line to 
-          # run bulk export for 2016 through (current_year +1) + bulk export all 
-          # one at a time waiting for one export to complete before kicking off the next
+          command: cf run-task gsa-fac -k 2G -m 4G --name export_audit_data_to_csv_scheduled --command "python manage.py export_data_audit --year ${{ matrix.years }}" --wait
