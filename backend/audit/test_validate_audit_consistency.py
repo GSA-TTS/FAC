@@ -564,3 +564,47 @@ class TestValidateAuditConsistency(TestCase):
             {'field': 'secondary_auditors', 'sac_value': ['0'], 'audit_value': ['42'], 'error': "Values don't match between SAC and Audit"},
         )
         self.assertFalse(result[0])
+
+    def test_cog_over(self):
+        """Valid case for a cog/over not during real-time validation"""
+        audit = baker.make(Audit, version=0)
+        audit.cognizant_agency = '1'
+        audit.oversight_agency = '2'
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.cognizant_agency = '1'
+        sac.oversight_agency = '2'
+        sac.save()
+        result = validate_audit_consistency(audit, is_real_time=False)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])
+
+    def test_cog_over_invalid(self):
+        """Valid case for a cog/over not during real-time validation"""
+        audit = baker.make(Audit, version=0)
+        audit.cognizant_agency = '1'
+        audit.oversight_agency = '2'
+        audit.save()
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.cognizant_agency = 'a'
+        sac.oversight_agency = 'b'
+        sac.save()
+        result = validate_audit_consistency(audit, is_real_time=False)
+        self.assertEqual(
+            result[1][0],
+            {'field': 'cognizant_agency', 'sac_value': 'a', 'audit_value': '1'}, {'field': 'oversight_agency', 'sac_value': 'b', 'audit_value': '2'},
+        )
+        self.assertFalse(result[0])
+
+    def test_cog_over_real_time(self):
+        """Valid case for a cog/over during real-time validation"""
+        audit = baker.make(Audit, version=0)
+        audit.cognizant_agency = None
+        audit.oversight_agency = None
+        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
+        sac.cognizant_agency = '1'
+        sac.oversight_agency = '2'
+        sac.save()
+        result = validate_audit_consistency(audit, is_real_time=True)
+        self.assertEqual(result[1], [])
+        self.assertTrue(result[0])

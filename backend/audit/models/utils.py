@@ -218,7 +218,7 @@ def _index_general(audit_data):
 
 
 # TESTING functions to check data in SAC and Audit
-def validate_audit_consistency(audit_instance):
+def validate_audit_consistency(audit_instance, is_real_time=True):
     """
     Validates that all data in SingleAuditChecklist exists in Audit,
     ignores strucutre and searches for keys/values. All values in SAC,
@@ -312,6 +312,10 @@ def validate_audit_consistency(audit_instance):
                 )
 
     for field in simple_fields_to_check:
+        # These fields aren't guaranteed to be set for SOT during real-time validation
+        if is_real_time and field in ["cognizant_agency", "oversight_agency"]:
+            continue
+
         sac_value = getattr(sac_instance, field, None)
         audit_value = getattr(audit_instance, field, None)
 
