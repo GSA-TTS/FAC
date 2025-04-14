@@ -2,6 +2,8 @@ import json
 from unittest import TestCase
 
 from unittest.mock import patch
+
+from django.contrib.auth.models import User
 from django.utils import timezone as django_timezone
 from datetime import timedelta
 from django.test import SimpleTestCase
@@ -17,7 +19,8 @@ from api.serializers import (
     AccessAndSubmissionSerializer,
     CERTIFIERS_HAVE_DIFFERENT_EMAILS,
 )
-from audit.models import User, Access, UeiValidationWaiver
+from audit.models import Access, UeiValidationWaiver, Audit
+from audit.models.constants import STATUS
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -117,7 +120,7 @@ class UEIValidatorStepTests(TestCase):
         A UEI with an expired validation waiver should not pass.
         """
         yesterday = django_timezone.now() - timedelta(days=1)
-        expired = {"auditee_uei": "SUPERC00LUE1", "expiration": yesterday}
+        expired = {"auditee_uei": "SUPERC00LUE2", "expiration": yesterday}
 
         baker.make(
             UeiValidationWaiver,
@@ -570,20 +573,27 @@ class AccessAndSubmissionStepTests(TestCase):
 
 class AccessListSerializerTests(TestCase):
     def test_expected_fields_included(self):
-        access = baker.make(Access)
+        audit_data = {
+            "general_information": {
+                "auditee_uei": "TEST_UEI",
+                "auditee_fiscal_period_end": "2024-12-31",
+                "auditee_name": "Steve",
+            }
+        }
+
+        audit = baker.make(
+            Audit, version=0, audit=audit_data, submission_status=STATUS.IN_PROGRESS
+        )
+        access = baker.make(Access, audit=audit)
 
         serializer = AccessListSerializer(access)
 
-        # TODO: Update Post SOC Launch
-        # remove if/else when we deprecate SAC data.
         self.assertEqual(
             serializer.data["auditee_uei"],
             (
                 access.audit.audit.get("general_information", {}).get(
                     "auditee_uei", None
                 )
-                if access.audit
-                else access.sac.auditee_uei
             ),
         )
         self.assertEqual(
@@ -592,8 +602,6 @@ class AccessListSerializerTests(TestCase):
                 access.audit.audit.get("general_information", {}).get(
                     "auditee_fiscal_period_end", None
                 )
-                if access.audit
-                else access.sac.auditee_fiscal_period_end
             ),
         )
         self.assertEqual(
@@ -602,20 +610,11 @@ class AccessListSerializerTests(TestCase):
                 access.audit.audit.get("general_information", {}).get(
                     "auditee_name", None
                 )
-                if access.audit
-                else access.sac.auditee_name
             ),
         )
-        self.assertEqual(
-            serializer.data["report_id"],
-            access.audit.report_id if access.audit else access.sac.report_id,
-        )
+        self.assertEqual(serializer.data["report_id"], access.audit.report_id)
         self.assertEqual(
             serializer.data["submission_status"],
-            (
-                access.audit.submission_status
-                if access.audit
-                else access.sac.submission_status
-            ),
+            (access.audit.submission_status),
         )
         self.assertEqual(serializer.data["role"], access.role)

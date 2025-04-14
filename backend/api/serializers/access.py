@@ -119,7 +119,7 @@ class AccessListSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_auditee_name(access):
-        return access.audit.audit.auditee_name
+        return access.audit.auditee_name
 
     @staticmethod
     def get_report_id(access):
