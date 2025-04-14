@@ -3,7 +3,7 @@ Allows the manual transition of an audit to dissemination.
 """
 
 from audit.models import Audit
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, EventType
 from audit.models.utils import generate_audit_indexes
 from audit.models.viewflow import audit_revert_from_submitted, audit_transition
 from curation.curationlib.curation_audit_tracking import CurationTracking
@@ -71,7 +71,7 @@ class Command(BaseCommand):
                 audit_indexes = generate_audit_indexes(audit)
                 audit.audit.update(audit_indexes)
                 audit_transition(
-                    request=None, audit=audit, transition_to=STATUS.DISSEMINATED
+                    request=None, audit=audit, event=EventType.DISSEMINATED
                 )
                 audit.save()
                 disseminated = True

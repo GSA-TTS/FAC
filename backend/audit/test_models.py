@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
@@ -8,27 +9,25 @@ from viewflow.fsm import TransitionNotAllowed
 from model_bakery import baker
 
 from .exceptions import LateChangeError
-from .models import (
-    Access,
-    ExcelFile,
-    SingleAuditChecklist,
-    SingleAuditReportFile,
-    SubmissionEvent,
-    User,
-    generate_sac_report_id,
-)
+from .models import Access, ExcelFile, SingleAuditReportFile, History
 from audit.models import Audit
-from .models.models import STATUS
-from .models.viewflow import sac_transition, SingleAuditChecklistFlow
+from .models.constants import STATUS, AuditType, EventType, STATUS_CHOICES
+from .models.viewflow import audit_transition, AuditFlow
 
 
-class SingleAuditChecklistTests(TestCase):
+class MockRequest:
+    user = baker.make(User)
+
+
+class AuditTests(TestCase):
     """Model tests"""
 
     def test_str_is_id_and_uei(self):
         """String representation of SAC instance is #{ID} - UEI({UEI})"""
-        sac = baker.make(SingleAuditChecklist)
-        self.assertEqual(str(sac), f"#{sac.id}--{sac.report_id}--{sac.auditee_uei}")
+        audit = baker.make(Audit, version=0)
+        self.assertEqual(
+            str(audit), f"#{audit.id}--{audit.report_id}--{audit.auditee_uei}"
+        )
 
     def test_report_id(self):
         """
@@ -51,14 +50,16 @@ class SingleAuditChecklistTests(TestCase):
             "met_spending_threshold": True,
             "is_usa_based": True,
         }
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=user,
-            submission_status="in_progress",
-            general_information=general_information,
+        audit = Audit.objects.create(
+            submission_status=STATUS.IN_PROGRESS,
+            audit_type=AuditType.SINGLE_AUDIT,
+            audit={"general_information": general_information},
+            event_user=user,
+            event_type=EventType.CREATED,
         )
-        self.assertEqual(len(sac.report_id), 25)
+        self.assertEqual(len(audit.report_id), 25)
         separator = "-"
-        year, month, source, count = sac.report_id.split(separator)
+        year, month, source, count = audit.report_id.split(separator)
         self.assertEqual(year, "2023")
         self.assertEqual(month, "11")
         self.assertEqual(source, "GSAFAC")
@@ -73,11 +74,13 @@ class SingleAuditChecklistTests(TestCase):
         cases = (
             (
                 [STATUS.READY_FOR_CERTIFICATION],
+                EventType.AUDITOR_CERTIFICATION_COMPLETED,
                 STATUS.AUDITOR_CERTIFIED,
                 "transition_to_auditor_certified",
             ),
             (
                 [STATUS.AUDITOR_CERTIFIED, STATUS.SUBMITTED],
+                EventType.AUDITEE_CERTIFICATION_COMPLETED,
                 STATUS.AUDITEE_CERTIFIED,
                 "transition_to_auditee_certified",
             ),
@@ -85,6 +88,7 @@ class SingleAuditChecklistTests(TestCase):
                 [
                     STATUS.AUDITEE_CERTIFIED,
                 ],
+                EventType.SUBMITTED,
                 STATUS.SUBMITTED,
                 "transition_to_submitted",
             ),
@@ -95,6 +99,7 @@ class SingleAuditChecklistTests(TestCase):
                     STATUS.AUDITEE_CERTIFIED,
                     STATUS.FLAGGED_FOR_REMOVAL,
                 ],
+                EventType.UNLOCKED_AFTER_CERTIFICATION,
                 STATUS.IN_PROGRESS,
                 "transition_to_in_progress_again",
             ),
@@ -106,33 +111,38 @@ class SingleAuditChecklistTests(TestCase):
                     STATUS.AUDITEE_CERTIFIED,
                     STATUS.CERTIFIED,
                 ],
+                EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
                 STATUS.FLAGGED_FOR_REMOVAL,
                 "transition_to_flagged_for_removal",
             ),
         )
 
         now = datetime.now(timezone.utc)
-        for statuses_from, status_to, transition_name in cases:
+        for statuses_from, event, expected_status, transition_name in cases:
             for status_from in statuses_from:
-                sac = baker.make(SingleAuditChecklist, submission_status=status_from)
+                audit = baker.make(Audit, version=0, submission_status=status_from)
 
-                transition_method = getattr(
-                    SingleAuditChecklistFlow(sac), transition_name
+                transition_method = getattr(AuditFlow(audit), transition_name)
+                audit_transition(MockRequest(), audit, event=event)
+
+                self.assertEqual(audit.submission_status, expected_status)
+                history = (
+                    History.objects.filter(report_id=audit.report_id, event=event)
+                    .order_by("-updated_at")
+                    .first()
                 )
-                sac_transition(None, sac, transition_to=status_to)
 
-                self.assertEqual(sac.submission_status, status_to)
-                self.assertGreaterEqual(sac.get_transition_date(status_to), now)
+                self.assertGreaterEqual(history.updated_at, now)
 
                 bad_statuses = [
                     status[0]
-                    for status in SingleAuditChecklist.STATUS_CHOICES
+                    for status in STATUS_CHOICES
                     if status[0] not in statuses_from
                 ]
 
                 for bad_status in bad_statuses:
                     with self.subTest():
-                        sac.submission_status = bad_status
+                        audit.submission_status = bad_status
 
                         self.assertRaises(TransitionNotAllowed, transition_method)
 
@@ -142,20 +152,19 @@ class SingleAuditChecklistTests(TestCase):
         in_progress and get an expected error.
         """
         bad_statuses = [
-            status[0]
-            for status in SingleAuditChecklist.STATUS_CHOICES
-            if status[0] != STATUS.IN_PROGRESS
+            status[0] for status in STATUS_CHOICES if status[0] != STATUS.IN_PROGRESS
         ]
 
         for status_from in bad_statuses:
-            sac = baker.make(
-                SingleAuditChecklist,
+            audit = baker.make(
+                Audit,
+                version=0,
                 audit_type="single-audit",
                 submission_status=status_from,
             )
-            sac.audit_type = "program-specific"
+            audit.audit_type = "program-specific"
             with self.assertRaises(LateChangeError):
-                sac.save()
+                audit.save()
 
 
 class AccessTests(TestCase):
@@ -165,53 +174,58 @@ class AccessTests(TestCase):
         """
         String representation of Access instance is:
 
-            {email} as {role} for {sac}
+            {email} as {role} for {audit}
         """
-        access = baker.make(Access)
+        audit = baker.make(Audit, version=0)
+        access = baker.make(Access, audit=audit)
         expected = f"{access.email} as {access.get_role_display()}"
         self.assertEqual(str(access), expected)
 
     def test_multiple_auditee_contacts_allowed(self):
         """
-        There should be no constraint preventing multiple auditee contacts for a SAC
+        There should be no constraint preventing multiple auditee contacts for an Audit
         """
-        access_1 = baker.make(Access, role="auditee_contact")
+        audit = baker.make(Audit, version=0)
+        access_1 = baker.make(Access, audit=audit, role="auditee_contact")
 
-        baker.make(Access, sac=access_1.sac, role="auditee_contact")
+        baker.make(Access, audit=access_1.audit, role="auditee_contact")
 
     def test_multiple_auditor_contacts_allowed(self):
         """
-        There should be no constraint preventing multiple auditor contacts for a SAC
+        There should be no constraint preventing multiple auditor contacts for an Audit
         """
-        access_1 = baker.make(Access, role="auditor_contact")
+        audit = baker.make(Audit, version=0)
+        access_1 = baker.make(Access, audit=audit, role="auditor_contact")
 
-        baker.make(Access, sac=access_1.sac, role="auditor_contact")
+        baker.make(Access, audit=access_1.audit, role="auditor_contact")
 
     def test_multiple_certifying_auditee_contact_not_allowed(self):
         """
-        There should be a constraint preventing multiple certifying_auditee_contacts for a SAC
+        There should be a constraint preventing multiple certifying_auditee_contacts for an Audit
         """
-        access_1 = baker.make(Access, role="certifying_auditee_contact")
+        audit = baker.make(Audit, version=0)
+        access_1 = baker.make(Access, audit=audit, role="certifying_auditee_contact")
 
         self.assertRaises(
             IntegrityError,
             baker.make,
             Access,
-            sac=access_1.sac,
+            audit=access_1.audit,
             role="certifying_auditee_contact",
         )
 
     def test_multiple_certifying_auditor_contact_not_allowed(self):
         """
-        There should be a constraint preventing multiple certifying_auditor_contacts for a SAC
+        There should be a constraint preventing multiple certifying_auditor_contacts for an Audit
         """
-        access_1 = baker.make(Access, role="certifying_auditor_contact")
+        audit = baker.make(Audit, version=0)
+        access_1 = baker.make(Access, audit=audit, role="certifying_auditor_contact")
 
         self.assertRaises(
             IntegrityError,
             baker.make,
             Access,
-            sac=access_1.sac,
+            audit=access_1.audit,
             role="certifying_auditor_contact",
         )
 
@@ -229,15 +243,13 @@ class AccessTests(TestCase):
         baker.make(User, email="a@a.com")
         baker.make(User, email="a@a.com")
 
-        audit = baker.make(Audit, version=0)
-        sac = baker.make(SingleAuditChecklist, audit_type="single-audit")
+        audit = baker.make(Audit, version=0, audit_type="single-audit")
         access = Access.objects.create(
             audit=audit,
-            sac=sac,
             role="editor",
             email="a@a.com",
             event_user=creator,
-            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+            event_type=EventType.ACCESS_GRANTED,
         )
 
         self.assertEqual(access.email, "a@a.com")
@@ -252,19 +264,11 @@ class ExcelFileTests(TestCase):
         The filename field should be generated based on the FileField filename
         """
         file = SimpleUploadedFile("this is a file.xlsx", b"this is a file")
-
+        report_id = "FAKE_REPORT_ID"
+        audit = baker.make(Audit, report_id=report_id, version=0)
         excel_file = baker.make(
-            ExcelFile,
-            file=file,
-            form_section="sectionname",
-            sac=baker.make(
-                SingleAuditChecklist,
-                report_id=generate_sac_report_id(
-                    end_date=datetime.now().date().isoformat()
-                ),
-            ),
+            ExcelFile, file=file, form_section="sectionname", audit=audit
         )
-        report_id = SingleAuditChecklist.objects.get(id=excel_file.sac.id).report_id
 
         self.assertEqual(f"{report_id}--sectionname.xlsx", excel_file.filename)
 
@@ -278,33 +282,30 @@ class SingleAuditReportFileTests(TestCase):
         """
         file = SimpleUploadedFile("this is a file.pdf", b"this is a file")
 
+        report_id = "FAKE_REPORT_ID"
+        audit = baker.make(Audit, report_id=report_id, version=0)
         sar_file = baker.make(
             SingleAuditReportFile,
             file=file,
-            sac=baker.make(
-                SingleAuditChecklist,
-                report_id=generate_sac_report_id(
-                    end_date=datetime.now().date().isoformat()
-                ),
-            ),
+            audit=audit,
         )
-        report_id = SingleAuditChecklist.objects.get(id=sar_file.sac.id).report_id
 
         self.assertEqual(f"{report_id}.pdf", sar_file.filename)
 
     def test_no_late_upload(self):
         """
-        If the associated SAC isn't in progress, we should get an error.
+        If the associated Audit isn't in progress, we should get an error.
         """
         file = SimpleUploadedFile("this is a file.pdf", b"this is a file")
 
         bad_statuses = [
-            status[0]
-            for status in SingleAuditChecklist.STATUS_CHOICES
-            if status[0] != STATUS.IN_PROGRESS
+            status[0] for status in STATUS_CHOICES if status[0] != STATUS.IN_PROGRESS
         ]
 
         for status_from in bad_statuses:
-            sac = baker.make(SingleAuditChecklist, submission_status=status_from)
+            report_id = f"FAKE_REPORT_ID-{status_from}"
+            audit = baker.make(
+                Audit, version=0, submission_status=status_from, report_id=report_id
+            )
             with self.assertRaises(LateChangeError):
-                baker.make(SingleAuditReportFile, sac=sac, file=file)
+                baker.make(SingleAuditReportFile, audit=audit, file=file)

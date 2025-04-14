@@ -487,7 +487,7 @@ class AuditValidationWaiverAdmin(admin.ModelAdmin):
                 if audit_transition(
                     request,
                     audit,
-                    transition_to=EventType.AUDITOR_CERTIFICATION_COMPLETED,
+                    event=EventType.AUDITOR_CERTIFICATION_COMPLETED,
                 ):
                     logger.info(
                         f"Auditor certification completed for Audit {audit.report_id} by user: {request.user.email}."
@@ -524,7 +524,7 @@ class AuditValidationWaiverAdmin(admin.ModelAdmin):
                 if audit_transition(
                     request,
                     audit,
-                    transition_to=EventType.AUDITEE_CERTIFICATION_COMPLETED,
+                    event=EventType.AUDITEE_CERTIFICATION_COMPLETED,
                 ):
                     logger.info(
                         f"Auditee certification completed for Audit {audit.report_id} by user: {request.user.email}."

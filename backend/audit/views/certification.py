@@ -51,7 +51,7 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
                 audit_transition(
                     request=request,
                     audit=audit,
-                    transition_to=EventType.LOCKED_FOR_CERTIFICATION,
+                    event=EventType.LOCKED_FOR_CERTIFICATION,
                 )
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:

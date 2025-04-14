@@ -82,7 +82,7 @@ class UnlockAfterCertificationView(
                 if audit_transition(
                     request=request,
                     audit=audit,
-                    transition_to=EventType.UNLOCKED_AFTER_CERTIFICATION,
+                    event=EventType.UNLOCKED_AFTER_CERTIFICATION,
                 ):
                     logger.info("Submission unlocked after certification")
 

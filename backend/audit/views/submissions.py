@@ -125,13 +125,11 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
             # BEGIN ATOMIC BLOCK
             with transaction.atomic():
-                audit_transition(
-                    request=request, audit=audit, transition_to=STATUS.SUBMITTED
-                )
+                audit_transition(request=request, audit=audit, event=STATUS.SUBMITTED)
                 audit_indexes = generate_audit_indexes(audit)
                 audit.audit.update(audit_indexes)
                 audit_transition(
-                    request=request, audit=audit, transition_to=STATUS.DISSEMINATED
+                    request=request, audit=audit, event=STATUS.DISSEMINATED
                 )
                 disseminated = None
 
