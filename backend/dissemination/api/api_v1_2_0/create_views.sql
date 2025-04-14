@@ -80,11 +80,12 @@ create view api_v1_2_0.findings_text as
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'findings_text') as ft_elem on true
     where
-        a.is_public is true
+        a.submission_status='disseminated'
+        and (a.is_public is true
         or (
             a.is_public is false
             and api_v1_2_0_functions.has_tribal_data_access()
-        )
+        ))
 ;
 ---------------------------------------
 -- additional_ueis
@@ -94,10 +95,12 @@ create view api_v1_2_0.additional_ueis as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->'audit_year' as audit_year,
-        uei_elem::text as additional_uei
+        uei_elem as additional_uei
     from
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'additional_ueis') as uei_elem on true
+    where
+        a.submission_status='disseminated'
 ;
 ---------------------------------------
 -- finding
@@ -121,6 +124,8 @@ create view api_v1_2_0.findings as
     from
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'findings_uniform_guidance') as f_elem on true
+    where
+        a.submission_status='disseminated'
 ;
 
 ---------------------------------------
@@ -153,6 +158,8 @@ create view api_v1_2_0.federal_awards as
     from
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem on true
+    where
+        a.submission_status='disseminated'
 ;
 
 ---------------------------------------
@@ -170,11 +177,12 @@ create view api_v1_2_0.corrective_action_plans as
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'corrective_action_plan') as cap_elem on true
     where
-        a.is_public is true
+        a.submission_status='disseminated'
+        and (a.is_public is true
         or (
             a.is_public is false
             and api_v1_2_0_functions.has_tribal_data_access()
-        )
+        ))
 ;
 ---------------------------------------
 -- notes_to_sefa
@@ -184,23 +192,26 @@ create view api_v1_2_0.notes_to_sefa as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->'audit_year' as audit_year,
-        note->>'note_title' as title,
-        nts_elem->>'accounting_policies' as accounting_policies,
-        nts_elem->>'is_minimis_rate_used' as is_minimis_rate_used,
-        nts_elem->>'rate_explained' as rate_explained,
-        note->>'note_content' as content,
-        note->>'contains_chart_or_table' as contains_chart_or_table
+        coalesce(notes.note->>'note_title','') as title,
+        a.audit->'notes_to_sefa'->>'accounting_policies' as accounting_policies,
+        a.audit->'notes_to_sefa'->>'is_minimis_rate_used' as is_minimis_rate_used,
+        a.audit->'notes_to_sefa'->>'rate_explained' as rate_explained,
+        coalesce(notes.note->>'note_content','') as content,
+        coalesce(notes.note->>'contains_chart_or_table','') as contains_chart_or_table
 
     from
         audit_audit as a
-        join lateral jsonb_array_elements(a.audit->'notes_to_sefa') as nts_elem on true
-        join lateral jsonb_array_elements(nts_elem->'notes_to_sefa_entries') as note on true
+	    left join lateral (
+	        select jsonb_array_elements(a.audit->'notes_to_sefa'->'notes_to_sefa_entries') as note
+	    ) as notes
+	    on jsonb_typeof(a.audit->'notes_to_sefa'->'notes_to_sefa_entries') = 'array'
     where
-        a.is_public is true
+        a.submission_status='disseminated'
+        and (a.is_public is true
         or (
             a.is_public is false
             and api_v1_2_0_functions.has_tribal_data_access()
-        )
+        ))
 ;
 ---------------------------------------
 -- passthrough
@@ -217,6 +228,8 @@ create view api_v1_2_0.passthrough as
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'federal_awards'->'awards') as fa_elem on true
         join lateral jsonb_array_elements(fa_elem->'direct_or_indirect_award'->'entities') as pass_elem on true
+    where
+        a.submission_status='disseminated'
 ;
 ---------------------------------------
 -- general
@@ -325,6 +338,8 @@ create view api_v1_2_0.secondary_auditors as
     from
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'secondary_auditors') as sa_elem on true
+    where
+        a.submission_status='disseminated'
 ;
 ---------------------------------------
 -- additional_eins
@@ -334,10 +349,12 @@ create view api_v1_2_0.additional_eins as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->'audit_year' as audit_year,
-        ein_elem::text as additional_ein
+        ein_elem as additional_ein
     from
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'additional_eins') as ein_elem on true
+    where
+        a.submission_status='disseminated'
 ;
 commit;
 
