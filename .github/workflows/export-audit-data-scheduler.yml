@@ -17,7 +17,7 @@ jobs:
           - name: staging
           - name: production
     name: Run bulk data export on ${{ inputs.environment }}
-    uses: ../github/workflows/export-audit-data-to-csv-scheduled.yml
+    uses: ./.github/workflows/export-audit-data-to-csv-scheduled.yml
     secrets: inherit
     with:
       environment: ${{ matrix.environment.name }}
