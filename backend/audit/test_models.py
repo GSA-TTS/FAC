@@ -64,7 +64,12 @@ class SingleAuditChecklistTests(TestCase):
         self.assertEqual(year, "2023")
         self.assertEqual(month, "11")
         self.assertEqual(source, "GSAFAC")
-        self.assertEqual(count, str(SingleAuditChecklist.objects.aggregate(models.Max("id"))["id__max"]).zfill(10))
+        self.assertEqual(
+            count,
+            str(
+                SingleAuditChecklist.objects.aggregate(models.Max("id"))["id__max"]
+            ).zfill(10),
+        )
 
     def test_submission_status_transitions(self):
         """
