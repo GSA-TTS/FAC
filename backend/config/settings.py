@@ -620,6 +620,6 @@ MAINTENANCE_BANNER_DATES = [
         # April 15th 9 AM to April 21st 6 PM, EST, upgrading teraform modules
         "start": datetime(2025, 4, 15, 10, tzinfo=timezone.utc),
         "end": datetime(2025, 4, 21, 23, tzinfo=timezone.utc),
-        "message": "FAC.gov will be performing maintenance from Monday, April 21, 2025 between 9:00 AM and 6:00 PM ET. During this period, the entire website may be unavailable."
+        "message": "FAC.gov will be performing maintenance from Monday, April 21, 2025 between 9:00 AM and 6:00 PM ET. During this period, the entire website may be unavailable.",
     },
 ]
