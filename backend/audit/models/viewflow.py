@@ -30,7 +30,7 @@ def audit_revert_from_submitted(audit):
     return False
 
 
-def audit_revert_from_flagged_for_removal(user, audit=None):
+def audit_revert_from_flagged_for_removal(audit, user):
     """
     Transitions the submission_state for a SingleAuditChecklist back
     to "in_progress" so the user can continue working on it.
@@ -47,7 +47,7 @@ def audit_revert_from_flagged_for_removal(user, audit=None):
         )
 
 
-def audit_flag_for_removal(user, audit):
+def audit_flag_for_removal(audit, user):
     """
     Transitions the submission_state for a SingleAuditChecklist to "flagged_for_removal".
     This should be accessible to django admin.
