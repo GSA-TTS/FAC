@@ -13,11 +13,10 @@ from jsonschema.exceptions import ValidationError
 
 from audit.models import UeiValidationWaiver
 from config.settings import SAM_API_URL, SAM_API_KEY, GSA_FAC_WAIVER
-from audit.models.utils import one_year_from_today
+from audit.models.utils import one_month_from_today
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
-
-automatic_waiver_4xx_codes = [401, 403, 404, 405, 406, 410, 418, 429, 451]
 
 
 class CustomHttpAdapter(requests.adapters.HTTPAdapter):
@@ -147,18 +146,29 @@ def check_is_uei_valid(uei):
         return {"valid": True}
 
 
-def get_uei_info_step_1(uei, api_params, api_headers):
-    resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
+# AUTOMATIC WAIVERS
+# We decided to implement this in the event that there is no one to update the API
+# key for SAM.gov, or significant interruption to SAM services. We handle the following
+# 4xx errors by automatically granting a waiver to the UEI.
+automatic_waiver_4xx_codes = [401, 403, 404, 405, 406, 410, 418, 429, 451]
 
-    if resp is None:
-        return {"valid": False, "errors": [error]}
-    if resp.status_code in automatic_waiver_4xx_codes:
-        # We need to handle the case where no one is able to update the API key.
-        # See ADR https://github.com/GSA-TTS/FAC/issues/4861
+
+def create_waiver_if_not_exists(uei, resp):
+    # If a validation waiver exists for this UEI, and
+    # it is currently active---meaning that the waiver expiration date
+    # is sometime in the future---log and return
+    if UeiValidationWaiver.objects.filter(
+        Q(uei=uei) & Q(expiration__gt=django_timezone.now())
+    ):
+        logger.info(f"WAIVER: Active waiver exists UEI[{uei}]")
+        return
+    else:
+        # If there is no active waiver for this UEI, grant one now.
+        # Granting a 30 day waiver; they need to complete the first three steps
+        # in that time, which should be easily achieved.
         waiver = UeiValidationWaiver()
-        # Auditors queue audits up far in advance; give the automatic waiver
-        # plenty of time, so we don't have it expire mid-submission.
-        waiver.expiration = one_year_from_today()
+        waiver.uei = uei
+        waiver.expiration = one_month_from_today()
         waiver.approver_email = "fac_automatic_approver@fac.gsa.gov"
         waiver.approver_name = "Federal Audit Clearinghouse System"
         waiver.requester_email = "fac_automatic_requester@fac.gsa.gov"
@@ -172,6 +182,18 @@ def get_uei_info_step_1(uei, api_params, api_headers):
             }
         )
         waiver.save()
+        logger.info(f"WAIVER: Waiver granted UEI[{uei}]")
+
+
+def get_uei_info_step_1(uei, api_params, api_headers):
+    resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
+
+    if resp is None:
+        return {"valid": False, "errors": [error]}
+    if resp.status_code in automatic_waiver_4xx_codes:
+        # We need to handle the case where no one is able to update the API key.
+        # See ADR https://github.com/GSA-TTS/FAC/issues/4861
+        create_waiver_if_not_exists(uei, resp)
         return get_placeholder_sam403(uei)
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
