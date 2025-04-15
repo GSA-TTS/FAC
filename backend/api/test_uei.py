@@ -622,18 +622,20 @@ class UtilsTesting(TestCase):
     # at a critical moment.
 
     def test_automatic_waiver_issuance_for_sam_gov(self):
-        test_uei = "EJLRWNCJTJF5"
+        # We can't have duplicates for this test, so we test each
+        # error code with a unique UEI
+        test_uei_base = "EJLRWNCJTJF"
         # Automatic waivers - 403, 404
         # This should pass for all the session codes we list here.
         with patch("api.uei.SESSION.get") as mock_get:
-            for status_code in automatic_waiver_4xx_codes:
+            for ndx, status_code in enumerate(automatic_waiver_4xx_codes):
                 mock_get.return_value.status_code = status_code
                 mock_get.return_value.reason = "SAM.gov key expired"
-
+                test_uei = f"{test_uei_base}{ndx}"
                 before = UeiValidationWaiver.objects.all().count()
                 results = get_uei_info_from_sam_gov(uei=test_uei)
                 after = UeiValidationWaiver.objects.all().count()
-
+                print(f"{before} {after}")
                 self.assertTrue(after - before == 1)
                 self.assertTrue(results["valid"])
                 self.assertEqual(
