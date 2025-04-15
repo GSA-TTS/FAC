@@ -58,22 +58,17 @@ class StaffUser(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        try:
-            user = User.objects.get(email=self.staff_email)
-            user.is_staff = True
-            user.save()
-        except User.DoesNotExist:
-            pass  # silently ignore. User may be created later.
+        """Add a new staffuser based on email."""
+
+        User.objects.filter(email=self.staff_email).update(is_staff=True)
         super(StaffUser, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        try:
-            user = User.objects.get(email=self.staff_email)
-            user.is_staff = False
-            user.is_superuser = False
-            user.save()
-        except User.DoesNotExist:
-            pass  # silently ignore. Nothing to do.
+        """Removes any user associated with an email as a staffuser."""
+
+        User.objects.filter(email=self.staff_email).update(
+            is_staff=False, is_superuser=False
+        )
         super(StaffUser, self).delete(*args, **kwargs)
 
 
