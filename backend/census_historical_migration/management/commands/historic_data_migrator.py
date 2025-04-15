@@ -1,3 +1,5 @@
+# type: ignore
+# end_to_end_core has issues due to SOT, keeping for posterity.
 from census_historical_migration.sac_general_lib.utils import (
     normalize_year_string_or_exit,
 )
