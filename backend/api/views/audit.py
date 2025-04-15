@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from audit.models import Audit
+from audit.models import Audit, Access
 
 from audit.permissions import AuditPermission
 from ..serializers import AuditSerializer
@@ -26,7 +26,7 @@ def get_role_emails_for_audit(audit_id) -> dict:
         "certfying_auditee_contact": ["e@e.com"],
     }
     """
-    accesses = Audit.objects.filter(audit=audit_id)
+    accesses = Access.objects.filter(audit=audit_id)
 
     # Turn lists into single items or None for the certifier roles:
     only_one = lambda x: x[0] if x else None
@@ -69,7 +69,6 @@ class AuditView(APIView):
 
         base_data = dict(AuditSerializer(audit).data.items())
         full_data = base_data | get_role_emails_for_audit(audit.id)
-
         return JsonResponse(full_data)
 
 

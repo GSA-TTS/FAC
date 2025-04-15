@@ -150,7 +150,7 @@ class AccessListView(APIView):
     """
 
     def get(self, request):
-        accesses = Access.objects.select_related("sac").filter(user=request.user)
+        accesses = Access.objects.select_related("audit").filter(user=request.user)
 
         serializer = AccessListSerializer(accesses, many=True)
 
