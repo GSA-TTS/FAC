@@ -5,12 +5,9 @@ on:
     inputs:
       environment:
         required: true
-        type: choice
+        type: string
         description: The environment the workflow should run on.
-        options:
-          - dev
-          - staging
-          - production
+
   push:
     branches: [sk_bulk_export_patch]
 
