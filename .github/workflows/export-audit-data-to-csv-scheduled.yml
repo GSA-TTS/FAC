@@ -11,23 +11,23 @@ on:
           - dev
           - staging
           - production
-      year:
-        required: true
-        type: string
-        description: Provide audit year.
+  push:
+    branches: [sk_bulk_export_patch]
 
 jobs:
   scheduled-audit-data-export:
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 3
       matrix:
         years: ["2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","all"]
     name: Run bulk data export on ${{ inputs.environment }}
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    # environment: ${{ inputs.environment }}
+    environment: "dev"
     env:
-      space: ${{ inputs.environment }}
+      # space: ${{ inputs.environment }}
+      space: "dev"
     steps:
       - name: Run bulk data export
         uses: cloud-gov/cg-cli-tools@main
