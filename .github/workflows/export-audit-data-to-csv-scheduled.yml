@@ -5,22 +5,14 @@ on:
     inputs:
       environment:
         required: true
-        type: choice
-        description: The environment the workflow should run on.
-        options:
-          - dev
-          - staging
-          - production
-      year:
-        required: true
         type: string
-        description: Provide audit year.
+        description: The environment the workflow should run on.
 
 jobs:
   scheduled-audit-data-export:
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 3
       matrix:
         years: ["2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","all"]
     name: Run bulk data export on ${{ inputs.environment }}
