@@ -45,7 +45,7 @@ This will yield a dataset with the following counts:
 | table | count |
 | --- | --- |
 | audit_singleauditchecklist | 354,222 |
-| audit_access | 1,195,595| 
+| audit_access | 1,195,595|
 | auth_user | 75,461 |
 | dissemination_additionalein | 59,251 |
 | dissemination_additionaluei | 15,101 |
@@ -76,17 +76,19 @@ Use the menu script in this folder.
 This will give you several options:
 
 ```
-1) Truncate tables                   4) Re-disseminate SAC records        7) Reset migrated_to_audit
-2) Load data                         5) Check row counts                  8) Truncate audit_audit
-3) Generate fake suppressed reports  6) Dump tables for reuse             9) Quit
+1) Truncate tables                   6) Check row counts
+2) Load finished data                7) Dump tables for reuse
+3) Load raw data                     8) Reset migrated_to_audit
+4) Generate fake suppressed reports  9) Truncate audit_audit
+5) Re-disseminate SAC records	       10) Quit
 ```
 
-## truncate tables
+## 1) Truncate tables
 
 This runs the following SQL:
 
 ```
-		truncate 
+		truncate
       audit_access,
       audit_singleauditchecklist,
       auth_user,
@@ -108,10 +110,9 @@ This runs the following SQL:
     cascade;
 ```
 
-This effectively cleans all data that we might be working and testing with. 
+This effectively cleans all data that we might be working and testing with.
 
-## load data
-
+## 2) Load finished data
 This will reload:
 
 * audit_access
@@ -121,21 +122,27 @@ This will reload:
 
 This also runs `reset_migrated_to_audit`, so that the data is ready for migration to SOT.
 
-## generate fake suppressed reports
+## 3) Load raw data
 
-The data as loaded is 100% public data. This modifies 500 records per audit year so that they appear to be suppressed/Tribal audits. It inserts a tribal attestation record saying that the record should be suppressed, and then updates the organization type so that it is `tribal`. 
+This option allows you to load the data from production. That data then must be processed (e.g. fake tribal audits created + all data disseminated) before you have finished data.
+
+This requires `data/internal-and-external-20250402.dump`, which can be found [here](https://drive.google.com/file/d/1qocTTvgg-uyrz3bzJaKqNuROTyKeHWJ9/view?usp=sharing)
+
+## 4) Generate fake suppressed reports
+
+The data as loaded is 100% public data. This modifies 500 records per audit year so that they appear to be suppressed/Tribal audits. It inserts a tribal attestation record saying that the record should be suppressed, and then updates the organization type so that it is `tribal`.
 
 When done, it should report 4000 records updated.
 
-## re-disseminate SAC records
+## 5) Re-disseminate SAC records
 
 This truncates all of the `dissemination_` tables, and then re-disseminates every record in the SAC. This populates the dissemination tables, which is necessary for API testing.
 
 This takes a long time. Think at least an hour. Go make coffee. Hand grind it. Meaning "with your bare hands." You have time.
 
-## check counts
+## 6) Check row counts
 
-This verifies the row counts in every table we loaded. 
+This verifies the row counts in every table we loaded.
 
 ```
 Checking counts
@@ -159,13 +166,17 @@ Checking counts
 [PASS] audit_submissionevent has 1591563 rows
 ```
 
-## reset migrated_to_audit
+## 7) Dump tables for reuse
+
+Need desc for this
+
+## 8) Reset migrated_to_audit
 
 This option will set `migrated_to_audit` to `false` for all rows in the `singleauditchecklist`.
 
 This is run after data load, but is included in the menu as an option.
 
-## truncate audit_audit
+## 9) Truncate audit_audit
 
 This truncates the audit_audit table with `CASCADE`, and then runs the `migrated_to_audit` reset.
 
@@ -208,7 +219,7 @@ The organization type then needed to be updated for those audits.
 -- Should update 4000 rows
 update audit_singleauditchecklist
 set general_information = jsonb_set(general_information, '{user_provided_organization_type}', '"tribal"', false)
-where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false' 
+where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false'
 ```
 
 We can confirm that we have 4000 Tribal audits:
@@ -220,13 +231,13 @@ where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'f
 and general_information->>'user_provided_organization_type' = 'tribal'
 ```
 
-Next, we now empty our dissemination tables and run 
+Next, we now empty our dissemination tables and run
 
 ```
 fac delete_and_regenerate_dissemination_from_intake
 ```
 
-which 
+which
 
 1. Deletes the `dissemination_*` tables
 2. Loads all of the `audit_singleauditchecklist` records
@@ -247,14 +258,14 @@ select
 should yield 0. That is, every `sac` that is `disseminated` should also appear in `general`. Hence, the subtraction of those two counts should be zero.
 
 ```
-select count(*) from audit_singleauditchecklist 
+select count(*) from audit_singleauditchecklist
 	where tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false'
 	and submission_status = 'disseminated'
 ```
 
 will be less than 4000, because some audits that were marked as tribal are actually not complete. In the data in this dump, we get 3909.
 
-Next, we can check that all of the audits that we flagged as fake suppressed audits were disseminated as `is_public=false`. 
+Next, we can check that all of the audits that we flagged as fake suppressed audits were disseminated as `is_public=false`.
 
 ```
 select
@@ -270,14 +281,14 @@ This should difference to zero. There are 91 audits that were faked as suppresse
 
 ```
 -- This should be zero
-select 
+select
 	(select (
 		(select count(*) from audit_singleauditchecklist)
 		- (select count(*) from dissemination_general))
 	- (select count(*) from audit_singleauditchecklist where submission_status != 'disseminated')) as diff
 ```
 
-This means there are 11K records in the SAC table that were *not* disseminated, and therefore not in `dissemination_general`. 
+This means there are 11K records in the SAC table that were *not* disseminated, and therefore not in `dissemination_general`.
 
 At this point, we can dump
 
