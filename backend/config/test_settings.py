@@ -4,16 +4,16 @@ from django.conf import settings
 
 import boto3
 
+from audit.models import Audit
 from census_historical_migration.models import ELECAUDITHEADER as Gen
-from audit.models import SingleAuditChecklist
 
 
 class SettingsTestCase(TestCase):
     databases = {"default"}
 
     def test_models_are_in_appropriate_db(self):
-        sacs = SingleAuditChecklist.objects.all()
-        self.assertEqual(len(sacs), 0)
+        audits = Audit.objects.all()
+        self.assertEqual(len(audits), 0)
         gens = Gen.objects.using("default").all()
         self.assertEqual(len(gens), 0)
 

@@ -1,3 +1,5 @@
+# type: ignore
+# end_to_end_core has issues due to SOT, keeping for posterity.
 import logging
 from .models import ELECAUDITHEADER as AuditHeader
 from .migration_result import MigrationResult

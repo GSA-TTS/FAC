@@ -1,3 +1,5 @@
+# type: ignore
+# the class under test has issues due to SOT, keeping for posterity.
 from .sac_general_lib.sac_creator import setup_sac
 from audit.models import User
 

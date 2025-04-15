@@ -616,4 +616,10 @@ MAINTENANCE_BANNER_DATES = [
         "template_name": "maintenance_20241210.html",
         "message": "FAC.gov will be performing maintenance on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
     },
+    {
+        # April 15th 6 AM to April 21st 7 PM, EST, upgrading teraform modules
+        "start": datetime(2025, 4, 15, 10, tzinfo=timezone.utc),
+        "end": datetime(2025, 4, 21, 23, tzinfo=timezone.utc),
+        "message": "FAC.gov will be performing maintenance from Monday, April 21, 2025 between 9:00 AM and 6:00 PM ET. During this period, the entire website may be unavailable.",
+    },
 ]

@@ -64,7 +64,6 @@ def admin_message(request, message_type, ui_message, logger_message=None):
             logger.error(logger_message)
 
 
-# TODO: SoT
 @admin.action(description="Delete reports flagged for removal for over 6 months")
 def audit_delete_flagged_records(modeladmin, request, queryset):
     """
@@ -82,11 +81,14 @@ def audit_delete_flagged_records(modeladmin, request, queryset):
     )
 
     for audit in records_to_delete:
+
         try:
 
             # Delete the record and all its associated data.
             with transaction.atomic():
-                auditee_uei = audit.audit.get("general_information").get("auditee_uei")
+                auditee_uei = audit.audit.get("general_information", {}).get(
+                    "auditee_uei"
+                )
                 if auditee_uei:
                     UeiValidationWaiver.objects.filter(uei=auditee_uei).delete()
                 AuditValidationWaiver.objects.filter(report_id=audit).delete()
@@ -94,7 +96,7 @@ def audit_delete_flagged_records(modeladmin, request, queryset):
                 audit_remove_workbook_artifacts(audit)
                 Access.objects.filter(audit=audit).delete()
                 DeletedAccess.objects.filter(audit=audit).delete()
-                History.objects.filter(audit=audit).delete()
+                History.objects.filter(report_id=audit.report_id).delete()
                 ExcelFile.objects.filter(audit=audit).delete()
                 SingleAuditReportFile.objects.filter(audit=audit).delete()
                 report_ids.append(audit.report_id)

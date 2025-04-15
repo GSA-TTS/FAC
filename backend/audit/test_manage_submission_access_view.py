@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User as DjangoUser
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
@@ -6,25 +6,22 @@ from model_bakery import baker
 from .models import (
     Access,
     DeletedAccess,
-    SingleAuditChecklist,
-    User,
     Audit,
 )
 
 
-def _make_test_users_by_email(emails: list[str]) -> list[DjangoUser]:
+def _make_test_users_by_email(emails: list[str]) -> list[User]:
     return [baker.make(User, email=email) for email in emails]
 
 
-def _make_access(sac: SingleAuditChecklist, role: str, user: DjangoUser) -> Access:
-    return baker.make(Access, user=user, email=user.email, sac=sac, role=role)
+def _make_access(audit: Audit, role: str, user: User) -> Access:
+    return baker.make(Access, user=user, email=user.email, audit=audit, role=role)
 
 
-def _make_user_sac_and_audit(**kwargs):
+def _make_user_and_audit(**kwargs):
     user = baker.make(User)
-    sac = baker.make(SingleAuditChecklist, **kwargs)
     audit = baker.make(Audit, version=0, **kwargs)
-    return user, sac, audit
+    return user, audit
 
 
 class ChangeOrAddRoleViewTests(TestCase):
@@ -39,13 +36,13 @@ class ChangeOrAddRoleViewTests(TestCase):
         """
         A user should be able to access this page for a SAC they're associated with.
         """
-        user, sac, audit = _make_user_sac_and_audit()
-        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        sac.save()
+        user, audit = _make_user_and_audit(
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}}
+        )
+        baker.make(Access, user=user, audit=audit, role="editor")
 
         self.client.force_login(user)
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -56,15 +53,12 @@ class ChangeOrAddRoleViewTests(TestCase):
         Submitting the form with a new email address should create a new Access.
         """
         user = baker.make(User, email="adding_user@example.com")
-        sac = baker.make(SingleAuditChecklist)
         audit = baker.make(
             Audit,
             version=0,
             audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
         )
-        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        sac.save()
+        baker.make(Access, user=user, audit=audit, role="editor")
         self.client.force_login(user)
 
         data = {
@@ -72,12 +66,12 @@ class ChangeOrAddRoleViewTests(TestCase):
             "email": "neweditoruser@example.gov",
         }
 
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
 
         newaccess = Access.objects.get(
-            sac=sac, fullname=data["fullname"], email=data["email"]
+            audit=audit, fullname=data["fullname"], email=data["email"]
         )
         self.assertEqual(self.role, newaccess.role)
 
@@ -111,11 +105,11 @@ class ChangeOrAddRoleViewTests(TestCase):
 
     def test_inaccessible_audit_returns_403(self):
         """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
-        user, sac, _ = _make_user_sac_and_audit()
+        user, audit = _make_user_and_audit()
 
         self.client.force_login(user)
         response = self.client.post(
-            reverse(self.view, kwargs={"report_id": sac.report_id})
+            reverse(self.view, kwargs={"report_id": audit.report_id})
         )
 
         self.assertEqual(response.status_code, 403)
@@ -134,18 +128,16 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         """
         A user should be able to access this page for a SAC they're associated with.
         """
-        user, sac, audit = _make_user_sac_and_audit()
-        baker.make(Access, user=user, sac=sac, role="editor")
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        sac.save()
-        audit.audit.update({"general_information": {"auditee_uei": "YESIAMAREALUEI"}})
-        audit.save()
+        user, audit = _make_user_and_audit(
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}}
+        )
+        baker.make(Access, user=user, audit=audit, role="editor")
 
-        current_cac = baker.make(Access, sac=sac, audit=audit, role=self.role)
+        current_cac = baker.make(Access, audit=audit, role=self.role)
         current_role = str(current_cac.get_friendly_role())
 
         self.client.force_login(user)
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -158,15 +150,13 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         A user should be able to access this page for a SAC they're associated with
         even if there's no current assignment for the role.
         """
-        user, sac, audit = _make_user_sac_and_audit()
-        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        sac.save()
-        audit.audit.update({"general_information": {"auditee_uei": "YESIAMAREALUEI"}})
-        audit.save()
+        user, audit = _make_user_and_audit(
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}}
+        )
+        baker.make(Access, user=user, audit=audit, role="editor")
 
         self.client.force_login(user)
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -179,19 +169,20 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         Access, create a DeletedAccess, and create a new Access.
         """
         user = baker.make(User, email="removing_user@example.com")
-        sac = baker.make(SingleAuditChecklist)
-        audit = baker.make(Audit, version=0)
-        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
+        )
+        baker.make(Access, user=user, audit=audit, role="editor")
         baker.make(
             Access,
-            sac=sac,
             audit=audit,
             role=self.other_role,
             email="contact@example.com",
         )
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        sac.save()
-        current_cac = baker.make(Access, sac=sac, role=self.role)
+
+        current_cac = baker.make(Access, audit=audit, role=self.role)
 
         self.client.force_login(user)
 
@@ -200,16 +191,16 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
             "email": "newcacuser@example.com",
         }
 
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
 
         newaccess = Access.objects.get(
-            sac=sac, fullname=data["fullname"], email=data["email"]
+            audit=audit, fullname=data["fullname"], email=data["email"]
         )
         self.assertEqual(self.role, newaccess.role)
         oldaccess = DeletedAccess.objects.get(
-            sac=sac,
+            audit=audit,
             fullname=current_cac.fullname,
             email=current_cac.email,
         )
@@ -223,21 +214,18 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         However, if we have no existing Access, we should still create a new Access.
         """
         user = baker.make(User, email="removing_user@example.com")
-        sac = baker.make(SingleAuditChecklist)
-        audit = baker.make(Audit, version=0)
-        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
+        )
+        baker.make(Access, user=user, audit=audit, role="editor")
         baker.make(
             Access,
-            sac=sac,
             audit=audit,
             role=self.other_role,
             email="contact@example.com",
         )
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        sac.save()
-
-        audit.audit.update({"general_information": {"auditee_uei": "YESIAMAREALUEI"}})
-        audit.save()
 
         self.client.force_login(user)
 
@@ -246,12 +234,12 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
             "email": "newcacuser@example.com",
         }
 
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
 
         newaccess = Access.objects.get(
-            sac=sac, fullname=data["fullname"], email=data["email"]
+            audit=audit, fullname=data["fullname"], email=data["email"]
         )
         self.assertEqual(self.role, newaccess.role)
 
@@ -262,20 +250,20 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         """
         new_email = "newcacuser@example.com"
         user = baker.make(User, email="removing_user@example.com")
-        sac = baker.make(SingleAuditChecklist)
-        audit = baker.make(Audit, version=0)
-        baker.make(Access, audit=audit, user=user, sac=sac, role="editor")
-        baker.make(Access, audit=audit, sac=sac, role=self.other_role, email=new_email)
-        baker.make(Access, audit=audit, sac=sac, role=self.role)
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        sac.save()
-        audit.audit.update({"general_information": {"auditee_uei": "YESIAMAREALUEI"}})
-        audit.save()
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
+        )
+        baker.make(Access, audit=audit, user=user, role="editor")
+        baker.make(Access, audit=audit, role=self.other_role, email=new_email)
+        baker.make(Access, audit=audit, role=self.role)
+
         self.client.force_login(user)
 
         data = {"fullname": "The New CAC", "email": new_email}
 
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.post(url, data=data)
         self.assertEqual(400, response.status_code)
 
@@ -309,11 +297,11 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
 
     def test_inaccessible_audit_returns_403(self):
         """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
-        user, sac, _ = _make_user_sac_and_audit()
+        user, audit = _make_user_and_audit()
 
         self.client.force_login(user)
         response = self.client.post(
-            reverse(self.view, kwargs={"report_id": sac.report_id})
+            reverse(self.view, kwargs={"report_id": audit.report_id})
         )
 
         self.assertEqual(response.status_code, 403)

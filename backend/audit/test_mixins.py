@@ -13,7 +13,7 @@ from .mixins import (
     CertifyingAuditorRequiredMixin,
     SingleAuditChecklistAccessRequiredMixin,
 )
-from .models import Access, SingleAuditChecklist
+from .models import Access, Audit
 
 User = get_user_model()
 
@@ -32,7 +32,7 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
 
         self.assertRaises(PermissionDenied, view.dispatch, request)
 
-    def test_nonexistent_sac_raises(self):
+    def test_nonexistent_audit_raises(self):
         user = baker.make(User)
         request = RequestFactory().get("/")
         request.user = user
@@ -62,26 +62,26 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
 
     def test_no_access_raises(self):
         user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, version=0)
 
         request = RequestFactory().get("/")
         request.user = user
 
         view = self.ViewStub()
         self.assertRaises(
-            PermissionDenied, view.dispatch, request, report_id=sac.report_id
+            PermissionDenied, view.dispatch, request, report_id=audit.report_id
         )
 
     def test_has_access(self):
         user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, sac=sac, user=user)
+        audit = baker.make(Audit, version=0)
+        baker.make(Access, audit=audit, user=user)
 
         request = RequestFactory().get("/")
         request.user = user
 
         view = self.ViewStub()
-        view.dispatch(request, report_id=sac.report_id)
+        view.dispatch(request, report_id=audit.report_id)
 
 
 class CertifyingAuditeeRequiredMixinTests(TestCase):
@@ -98,7 +98,7 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
 
         self.assertRaises(PermissionDenied, view.dispatch, request)
 
-    def test_nonexistent_sac_raises(self):
+    def test_nonexistent_audit_raises(self):
         user = baker.make(User)
         request = RequestFactory().get("/")
         request.user = user
@@ -128,14 +128,14 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
 
     def test_no_access_raises(self):
         user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, version=0)
 
         request = RequestFactory().get("/")
         request.user = user
         view = self.ViewStub()
 
         self.assertRaises(
-            PermissionDenied, view.dispatch, request, report_id=sac.report_id
+            PermissionDenied, view.dispatch, request, report_id=audit.report_id
         )
 
     def test_bad_role_raises_cert_perm_denied(self):
@@ -145,18 +145,18 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
         for bad_role in bad_roles:
             with self.subTest():
                 user = baker.make(User)
-                sac = baker.make(SingleAuditChecklist)
-                baker.make(Access, sac=sac, user=user, role=bad_role)
+                audit = baker.make(Audit, version=0)
+                baker.make(Access, audit=audit, user=user, role=bad_role)
 
                 # create a second user with the appropriate role
                 eligible_user = baker.make(User)
-                baker.make(Access, sac=sac, user=eligible_user, role=role)
+                baker.make(Access, audit=audit, user=eligible_user, role=role)
 
                 request = RequestFactory().get("/")
                 request.user = user
 
                 try:
-                    self.ViewStub().dispatch(request, report_id=sac.report_id)
+                    self.ViewStub().dispatch(request, report_id=audit.report_id)
                     msg = "expected dispatch to raise CertificationPermissionDenied"
                     self.fail(msg)
                 except CertificationPermissionDenied as err:
@@ -168,15 +168,15 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
 
     def test_has_role(self):
         user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, version=0)
 
-        baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+        baker.make(Access, audit=audit, user=user, role="certifying_auditee_contact")
 
         request = RequestFactory().get("/")
         request.user = user
 
         view = self.ViewStub()
-        view.dispatch(request, report_id=sac.report_id)
+        view.dispatch(request, report_id=audit.report_id)
 
 
 class CertifyingAuditorRequiredMixinTests(TestCase):
@@ -193,7 +193,7 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
 
         self.assertRaises(PermissionDenied, view.dispatch, request)
 
-    def test_nonexistent_sac_raises(self):
+    def test_nonexistent_audit_raises(self):
         user = baker.make(User)
         request = RequestFactory().get("/")
         request.user = user
@@ -223,14 +223,14 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
 
     def test_no_access_raises(self):
         user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, version=0)
 
         request = RequestFactory().get("/")
         request.user = user
         view = self.ViewStub()
 
         self.assertRaises(
-            PermissionDenied, view.dispatch, request, report_id=sac.report_id
+            PermissionDenied, view.dispatch, request, report_id=audit.report_id
         )
 
     def test_bad_role_raises_cert_perm_denied(self):
@@ -240,18 +240,18 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
         for bad_role in bad_roles:
             with self.subTest():
                 user = baker.make(User)
-                sac = baker.make(SingleAuditChecklist)
-                baker.make(Access, sac=sac, user=user, role=bad_role)
+                audit = baker.make(Audit, version=0)
+                baker.make(Access, audit=audit, user=user, role=bad_role)
 
                 # create a second user with the appropriate role
                 eligible_user = baker.make(User)
-                baker.make(Access, sac=sac, user=eligible_user, role=role)
+                baker.make(Access, audit=audit, user=eligible_user, role=role)
 
                 request = RequestFactory().get("/")
                 request.user = user
 
                 try:
-                    self.ViewStub().dispatch(request, report_id=sac.report_id)
+                    self.ViewStub().dispatch(request, report_id=audit.report_id)
                     msg = "expected dispatch to raise CertificationPermissionDenied"
                     self.fail(msg)
                 except CertificationPermissionDenied as err:
@@ -263,12 +263,12 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
 
     def test_has_role(self):
         user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, version=0)
 
-        baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
+        baker.make(Access, audit=audit, user=user, role="certifying_auditor_contact")
 
         request = RequestFactory().get("/")
         request.user = user
 
         view = self.ViewStub()
-        view.dispatch(request, report_id=sac.report_id)
+        view.dispatch(request, report_id=audit.report_id)
