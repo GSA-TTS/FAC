@@ -7,15 +7,12 @@ from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 
 from audit.models import ExcelFile, SingleAuditReportFile, Audit
-from audit.models.constants import STATUS
 
 logger = logging.getLogger(__name__)
 
 
 def get_filename(report_id, file_type):
-    audit = Audit.objects.filter(
-        report_id=report_id, submission_status=STATUS.DISSEMINATED
-    ).first()
+    audit = Audit.objects.filter(report_id=report_id).first()
     if file_type == "report":
         try:
             if audit:
