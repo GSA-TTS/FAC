@@ -38,6 +38,7 @@ from audit.models import (
     Audit,
     ExcelFile,
 )
+from audit.models.utils import get_next_sequence_id
 from audit.models.constants import STATUS
 from audit.utils import FORM_SECTION_HANDLERS
 from audit.views import AuditeeCertificationStep2View, MySubmissions
@@ -140,9 +141,11 @@ def _load_json(target):
     return json.loads(raw)
 
 
-def _mock_gen_report_id():
+def _mock_gen_report_id(sequence):
     """Helper function for generate a sac report id"""
-    return generate_sac_report_id(end_date=datetime.now().date().isoformat())
+    return generate_sac_report_id(
+        sequence=sequence, end_date=datetime.now().date().isoformat()
+    )
 
 
 def _merge_dict_seq(seq):
@@ -488,6 +491,7 @@ class SubmissionViewTests(TestCase):
         just_ueis = _just_uei_workbooks("TEST0001TEST")
         geninfofile = "general-information--test0001test--simple-pass.json"
         awardsfile = "federal-awards--test0001test--simple-pass.json"
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
 
         sac_data = just_ueis | {
             "auditee_certification": _build_auditee_cert_dict(
@@ -504,7 +508,8 @@ class SubmissionViewTests(TestCase):
         sac_data["notes_to_sefa"]["NotesToSefa"]["accounting_policies"] = "Exhaustive"
         sac_data["notes_to_sefa"]["NotesToSefa"]["is_minimis_rate_used"] = "Y"
         sac_data["notes_to_sefa"]["NotesToSefa"]["rate_explained"] = "At great length"
-        sac_data["report_id"] = _mock_gen_report_id()
+        sac_data["id"] = sequence
+        sac_data["report_id"] = _mock_gen_report_id(sequence)
         user, sac = _make_user_and_sac(**sac_data)
 
         required_statuses = (
@@ -820,6 +825,7 @@ class SubmissionStatusTests(TransactionTestCase):
         just_ueis = _just_uei_workbooks("TEST0001TEST")
         geninfofile = "general-information--test0001test--simple-pass.json"
         awardsfile = "federal-awards--test0001test--simple-pass.json"
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
 
         sac_data = just_ueis | {
             "auditee_certification": _build_auditee_cert_dict(
@@ -836,7 +842,8 @@ class SubmissionStatusTests(TransactionTestCase):
         sac_data["notes_to_sefa"]["NotesToSefa"]["accounting_policies"] = "Exhaustive"
         sac_data["notes_to_sefa"]["NotesToSefa"]["is_minimis_rate_used"] = "Y"
         sac_data["notes_to_sefa"]["NotesToSefa"]["rate_explained"] = "At great length"
-        sac_data["report_id"] = _mock_gen_report_id()
+        sac_data["id"] = sequence
+        sac_data["report_id"] = _mock_gen_report_id(sequence)
         user, sac = _make_user_and_sac(**sac_data)
 
         required_statuses = (
@@ -1077,140 +1084,17 @@ class ExcelFileHandlerViewTests(TestCase):
 
             self.assertEqual(response.status_code, 400)
 
-    # @patch("audit.validators._scan_file")
-    # def test_valid_file_upload_for_federal_awards(self, mock_scan_file):
-    #     """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Federal Awards data"""
-
-    #     sac = _mock_login_and_scan(
-    #         self.client,
-    #         mock_scan_file,
-    #         report_id=_mock_gen_report_id(),
-    #     )
-    #     test_data = json.loads(
-    #         FEDERAL_AWARDS_ENTRY_FIXTURES.read_text(encoding="utf-8")
-    #     )
-
-    #     # add valid data to the workbook
-    #     workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
-    #     _set_by_name(workbook, "total_amount_expended", test_data[0]["amount_expended"])
-    #     _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
-    #     _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS)
-    #     _add_entry(workbook, 0, test_data[0])
-
-    #     with NamedTemporaryFile(suffix=".xlsx") as tmp:
-    #         workbook.save(tmp.name)
-    #         tmp.seek(0)
-
-    #         with open(tmp.name, "rb") as excel_file:
-    #             response = self.client.post(
-    #                 reverse(
-    #                     f"audit:{FORM_SECTIONS.FEDERAL_AWARDS}",
-    #                     kwargs={
-    #                         "report_id": sac.report_id,
-    #                         "form_section": FORM_SECTIONS.FEDERAL_AWARDS,
-    #                     },
-    #                 ),
-    #                 data={"FILES": excel_file},
-    #             )
-
-    #             self.assertEqual(response.status_code, 302)
-
-    #             updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
-
-    #             self.assertEqual(
-    #                 updated_sac.federal_awards["FederalAwards"]["auditee_uei"],
-    #                 ExcelFileHandlerViewTests.GOOD_UEI,
-    #             )
-    #             self.assertEqual(
-    #                 len(updated_sac.federal_awards["FederalAwards"]["federal_awards"]),
-    #                 1,
-    #             )
-
-    #             federal_awards_entry = updated_sac.federal_awards["FederalAwards"][
-    #                 "federal_awards"
-    #             ][0]
-
-    #             self.assertEqual(
-    #                 federal_awards_entry["cluster"]["cluster_name"],
-    #                 test_data[0]["cluster_name"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["direct_or_indirect_award"]["is_direct"],
-    #                 test_data[0]["is_direct"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["program"]["is_major"],
-    #                 test_data[0]["is_major"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["program"]["federal_agency_prefix"],
-    #                 test_data[0]["federal_agency_prefix"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["program"]["three_digit_extension"],
-    #                 test_data[0]["three_digit_extension"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["program"]["amount_expended"],
-    #                 test_data[0]["amount_expended"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["program"]["program_name"],
-    #                 test_data[0]["program_name"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["loan_or_loan_guarantee"]["is_guaranteed"],
-    #                 test_data[0]["is_guaranteed"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["program"]["number_of_audit_findings"],
-    #                 test_data[0]["number_of_audit_findings"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["program"]["audit_report_type"],
-    #                 test_data[0]["audit_report_type"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["subrecipients"]["is_passed"],
-    #                 test_data[0]["is_passed"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["subrecipients"]["subrecipient_amount"],
-    #                 test_data[0]["subrecipient_amount"],
-    #             )
-    #             self.assertEqual(
-    #                 federal_awards_entry["direct_or_indirect_award"]["entities"],
-    #                 [
-    #                     {
-    #                         "passthrough_name": "A",
-    #                         "passthrough_identifying_number": "1",
-    #                     },
-    #                     {
-    #                         "passthrough_name": "B",
-    #                         "passthrough_identifying_number": "2",
-    #                     },
-    #                 ],
-    #             )
-
-    #     submission_events = SubmissionEvent.objects.filter(sac=sac)
-
-    #     # the most recent event should be FEDERAL_AWARDS_UPDATED
-    #     event_count = len(submission_events)
-    #     self.assertGreaterEqual(event_count, 1)
-    #     self.assertEqual(
-    #         submission_events[event_count - 1].event,
-    #         SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
-    #     )
-
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_corrective_action_plan(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Corrective Action Plan data"""
 
         test_uei = "AAA12345678X"
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=_mock_gen_report_id(),
+            id=sequence,
+            report_id=_mock_gen_report_id(sequence),
         )
         test_data = json.loads(
             CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -1286,10 +1170,12 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_findings_uniform_guidance(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Uniform Guidance data"""
 
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=_mock_gen_report_id(),
+            id=sequence,
+            report_id=_mock_gen_report_id(sequence),
         )
         test_data = json.loads(
             FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -1376,10 +1262,12 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_findings_text(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Text data"""
 
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=_mock_gen_report_id(),
+            id=sequence,
+            report_id=_mock_gen_report_id(sequence),
         )
         test_data = json.loads(FINDINGS_TEXT_ENTRY_FIXTURES.read_text(encoding="utf-8"))
 
@@ -1454,10 +1342,12 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_secondary_auditors(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded secondary auditors data"""
 
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=_mock_gen_report_id(),
+            id=sequence,
+            report_id=_mock_gen_report_id(sequence),
         )
         test_data = json.loads(
             SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -1593,11 +1483,15 @@ class ExcelFileHandlerViewTests(TestCase):
         for test_case in test_cases:
             with self.subTest():
                 fixtures, template, section = test_case
+                sequence = get_next_sequence_id(
+                    "public.audit_singleauditchecklist_id_seq"
+                )
 
                 sac = _mock_login_and_scan(
                     self.client,
                     mock_scan_file,
-                    report_id=_mock_gen_report_id(),
+                    id=sequence,
+                    report_id=_mock_gen_report_id(sequence),
                     submission_status=STATUSES.READY_FOR_CERTIFICATION,
                 )
 
@@ -1797,10 +1691,12 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     @patch("audit.validators._scan_file")
     def test_valid_file_upload(self, mock_scan_file):
         """Test that uploading a valid SAR update the SAC accordingly"""
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=_mock_gen_report_id(),
+            id=sequence,
+            report_id=_mock_gen_report_id(sequence),
         )
 
         with open("audit/fixtures/basic.pdf", "rb") as pdf_file:
@@ -1830,10 +1726,12 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_additional_ueis(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional UEIs data"""
 
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=_mock_gen_report_id(),
+            id=sequence,
+            report_id=_mock_gen_report_id(sequence),
         )
         test_data = json.loads(
             ADDITIONAL_UEIS_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -1902,10 +1800,12 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional EINs data"""
 
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=_mock_gen_report_id(),
+            id=sequence,
+            report_id=_mock_gen_report_id(sequence),
         )
         test_data = json.loads(
             ADDITIONAL_EINS_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -1974,10 +1874,12 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_notes_to_sefa(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Notes to SEFA data"""
 
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=_mock_gen_report_id(),
+            id=sequence,
+            report_id=_mock_gen_report_id(sequence),
         )
         test_data = json.loads(NOTES_TO_SEFA_ENTRY_FIXTURES.read_text(encoding="utf-8"))
 

@@ -30,6 +30,7 @@ from audit.validators import (
     validate_audit_information_json,
 )
 from audit.utils import FORM_SECTION_HANDLERS
+from audit.models.utils import get_next_sequence_id
 from support.cog_over import compute_cog_over, record_cog_assignment
 from .files import SingleAuditReportFile
 from .submission_event import SubmissionEvent
@@ -42,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: Update Post SOC Launch -> This whole file should be able to be deleted.
-def generate_sac_report_id(end_date=None, source="GSAFAC", count=None):
+def generate_sac_report_id(sequence=None, end_date=None, source="GSAFAC"):
     """
     Convenience method for generating report_id, a value consisting of:
 
@@ -57,17 +58,17 @@ def generate_sac_report_id(end_date=None, source="GSAFAC", count=None):
     source = source.upper()
     if source not in ("CENSUS", "GSAFAC"):
         raise Exception("Unknown source for report_id")
+    if not sequence:
+        raise Exception("generate_sac_report_id requires a sequence number.")
     if not end_date:
         raise Exception("generate_sac_report_id requires end_date.")
-    if not count:
-        count = str(SingleAuditChecklist.objects.count() + 1).zfill(10)
     year, month, _ = end_date.split("-")
     if not (int(year) >= 2000 and int(year) < 2200):
         raise Exception("Unexpected year value for report_id")
     if int(month) not in range(1, 13):
         raise Exception("Unexpected month value for report_id")
     separator = "-"
-    report_id = separator.join([year, month, source, count])
+    report_id = separator.join([year, month, source, str(sequence).zfill(10)])
     return report_id
 
 
@@ -95,8 +96,11 @@ class SingleAuditChecklistManager(models.Manager):
         event_type = obj_data.pop("event_type", None)
 
         end_date = obj_data["general_information"]["auditee_fiscal_period_end"]
-        report_id = generate_sac_report_id(end_date=end_date, source="GSAFAC")
-        updated = obj_data | {"report_id": report_id}
+        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        report_id = generate_sac_report_id(
+            sequence=sequence, end_date=end_date, source="GSAFAC"
+        )
+        updated = obj_data | {"id": sequence, "report_id": report_id}
 
         result = super().create(**updated)
 
