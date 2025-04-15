@@ -51,8 +51,9 @@ ACCESS_ROLE_ERROR_MESSAGES = {
 
 def _validate_access(request, report_id, role=None):
     try:
-        audit = Audit.objects.get(report_id=report_id)
         check_authenticated(request)
+
+        audit = Audit.objects.get(report_id=report_id)
 
         if not has_access_to_audit(audit, request.user) and not settings.DISABLE_AUTH:
             raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
