@@ -3,13 +3,16 @@
 Load fixture data into the database.
 """
 
-# !!!!TODO!!!!
-
+import glob
 import logging
-
+import os
 
 from django.core.management.base import BaseCommand
 
+from audit.fixtures.audit import (
+    load_audits,
+    load_audits_for_email_address,
+)
 from users.fixtures import load_users
 
 logger = logging.getLogger(__name__)
@@ -28,15 +31,14 @@ class Command(BaseCommand):
         # load users first so later fixtures will load items for them
         if not options.get("email_addresses"):
             load_users()
+            load_audits()
             logger.info("All fixtures loaded.")
-        # else:
-        #     # We assume each arg is an email address:
-        #     for email_address in options["email_addresses"]:
-        #         if options["workbooks"] is None:
-        #             workbooks = []
-        #         else:
-        #             workbooks = glob.glob(os.path.join(options["workbooks"], "*.xlsx"))
-        #         # Currently, the following command does nothing with the workbooks.
-        #         # load_single_audit_checklists_for_email_address(
-        #         #     email_address, workbooks=workbooks
-        #         # )
+        else:
+            # We assume each arg is an email address:
+            for email_address in options["email_addresses"]:
+                if options["workbooks"] is None:
+                    workbooks = []
+                else:
+                    workbooks = glob.glob(os.path.join(options["workbooks"], "*.xlsx"))
+                # Currently, the following command does nothing with the workbooks.
+                load_audits_for_email_address(email_address, workbooks=workbooks)
