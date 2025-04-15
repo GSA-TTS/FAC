@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
 
-from audit.models import Access
+from audit.models import Access, Audit
 
 from .auth import FACAuthenticationBackend
 
@@ -72,7 +72,8 @@ class FACAuthenticationBackendTests(TestCase):
         email = "a@a.com"
 
         baker.make(User, username=login_id, email=email)
-        access = baker.make(Access, email=email)
+        audit = baker.make(Audit, version=0)
+        access = baker.make(Access, audit=audit, email=email)
 
         user_info = {"sub": login_id, "email": email, "all_emails": [email]}
 
@@ -93,8 +94,8 @@ class FACAuthenticationBackendTests(TestCase):
 
         login_id = str(uuid4())
         email = "a@a.com"
-
-        access = baker.make(Access, email=email)
+        audit = baker.make(Audit, version=0)
+        access = baker.make(Access, audit=audit, email=email)
 
         user_info = {"sub": login_id, "email": email, "all_emails": [email]}
 
@@ -115,9 +116,9 @@ class FACAuthenticationBackendTests(TestCase):
 
         login_id = str(uuid4())
         email = "a+a@a.com"
-
-        access1 = baker.make(Access, email=email)
-        access2 = baker.make(Access, email=email)
+        audit = baker.make(Audit, version=0)
+        access1 = baker.make(Access, audit=audit, email=email)
+        access2 = baker.make(Access, audit=audit, email=email)
 
         # use different casing in the user info to ensure we're not case sensitive
         user_info = {"sub": login_id, "email": "A@A.CoM", "all_emails": ["A+a@A.cOm"]}
@@ -146,17 +147,18 @@ class FACAuthenticationBackendTests(TestCase):
 
         # given that we have an existing user (user_1) with email a@a.com
         user_a_1 = baker.make(User, username=login_id_1, email=email)
+        audit = baker.make(Audit, version=0)
 
         # and that user has some claimed Accesses
-        access_1 = baker.make(Access, email=email, user=user_a_1)
-        access_2 = baker.make(Access, email=email, user=user_a_1)
+        access_1 = baker.make(Access, audit=audit, email=email, user=user_a_1)
+        access_2 = baker.make(Access, audit=audit, email=email, user=user_a_1)
 
         # and there are other claimed Accesses for other users
         user_b = baker.make(User, email="b@b.com")
-        access_3 = baker.make(Access, email="b@b.com", user=user_b)
+        access_3 = baker.make(Access, audit=audit, email="b@b.com", user=user_b)
 
         # and there are other unclaimed Accesses for other emails
-        access_4 = baker.make(Access, email="c@c.com", user=None)
+        access_4 = baker.make(Access, audit=audit, email="c@c.com", user=None)
 
         user_a_2_info = {"sub": login_id_2, "email": email, "all_emails": [email]}
 
