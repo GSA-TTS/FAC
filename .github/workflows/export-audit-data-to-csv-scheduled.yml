@@ -1,7 +1,7 @@
 ---
 name: Export Audit Data to CSV
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       environment:
         required: true
@@ -10,7 +10,6 @@ on:
         options:
           - dev
           - staging
-          - preview
           - production
       year:
         required: true
@@ -18,19 +17,23 @@ on:
         description: Provide audit year.
 
 jobs:
-  dispatch-audit-data-export:
-    if: ${{ github.event.inputs.environment != '' }}
-    name: Run data export on ${{ inputs.environment }}
+  scheduled-audit-data-export:
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        years: ["2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","all"]
+    name: Run bulk data export on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
       space: ${{ inputs.environment }}
     steps:
-      - name: Run Command
+      - name: Run bulk data export
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 4G --name export_audit_data_to_csv --command "python manage.py export_data_audit --year ${{ inputs.year }}" --wait
+          command: cf run-task gsa-fac -k 2G -m 4G --name export_audit_data_to_csv_scheduled --command "python manage.py export_data_audit --year ${{ matrix.years }}" --wait
