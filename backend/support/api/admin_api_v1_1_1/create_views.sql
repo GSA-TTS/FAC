@@ -27,12 +27,35 @@ CREATE OR REPLACE VIEW admin_api_v1_1_1.audit_access AS
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.singleauditchecklist AS
     SELECT
-        audit.*
+        sac.id,
+        sac.date_created,
+        sac.submission_status,
+        sac.data_source,
+        sac.transition_name,
+        sac.transition_date,
+        sac.report_id,
+        sac.audit_type,
+        sac.general_information,
+        sac.audit_information,
+        sac.federal_awards,
+        sac.corrective_action_plan,
+        sac.findings_text,
+        sac.findings_uniform_guidance,
+        sac.additional_ueis,
+        sac.additional_eins,
+        sac.secondary_auditors,
+        sac.notes_to_sefa,
+        sac.auditor_certification,
+        sac.auditee_certification,
+        sac.tribal_data_consent,
+        sac.cognizant_agency,
+        sac.oversight_agency,
+        sac.submitted_by_id
     from
-        public.audit_audit audit
+        public.audit_singleauditchecklist sac
     where
         admin_api_v1_1_1_functions.has_admin_data_access('READ')
-    order by audit.id
+    order by sac.id
 ;
 
 CREATE OR REPLACE VIEW admin_api_v1_1_1.tribal_access AS

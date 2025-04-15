@@ -3,28 +3,28 @@ begin;
 do
 $$
 begin
-    DROP SCHEMA IF EXISTS admin_api_v1_1_1 CASCADE;
-    DROP SCHEMA IF EXISTS admin_api_v1_1_1_functions CASCADE;
+    DROP SCHEMA IF EXISTS admin_api_v1_2_0 CASCADE;
+    DROP SCHEMA IF EXISTS admin_api_v1_2_0_functions CASCADE;
 
-    if not exists (select schema_name from information_schema.schemata where schema_name = 'admin_api_v1_1_1') then
-        create schema admin_api_v1_1_1;
-        create schema admin_api_v1_1_1_functions;
+    if not exists (select schema_name from information_schema.schemata where schema_name = 'admin_api_v1_2_0') then
+        create schema admin_api_v1_2_0;
+        create schema admin_api_v1_2_0_functions;
 
-        grant usage on schema admin_api_v1_1_1_functions to api_fac_gov;
+        grant usage on schema admin_api_v1_2_0_functions to api_fac_gov;
 
         -- Grant access to tables and views
         alter default privileges
-            in schema admin_api_v1_1_1
+            in schema admin_api_v1_2_0
             grant select
         -- this includes views
         on tables
         to api_fac_gov;
                 
         -- Grant access to sequences, if we have them
-        grant usage on schema admin_api_v1_1_1 to api_fac_gov;
-        grant select, usage on all sequences in schema admin_api_v1_1_1 to api_fac_gov;
+        grant usage on schema admin_api_v1_2_0 to api_fac_gov;
+        grant select, usage on all sequences in schema admin_api_v1_2_0 to api_fac_gov;
         alter default privileges
-            in schema admin_api_v1_1_1
+            in schema admin_api_v1_2_0
             grant select, usage
         on sequences
         to api_fac_gov;
@@ -40,7 +40,7 @@ begin
         -- And, it wants to read the UUIDs of administrative keys
         GRANT SELECT ON public.support_administrative_key_uuids TO api_fac_gov;
         -- We want to see data in flight as admins.
-        GRANT SELECT ON public.audit_singleauditchecklist TO api_fac_gov;
+        GRANT SELECT ON public.audit_audit TO api_fac_gov;
 
         GRANT INSERT, SELECT, DELETE on public.dissemination_tribalapiaccesskeyids to api_fac_gov;
         GRANT INSERT on public.dissemination_onetimeaccess to api_fac_gov;

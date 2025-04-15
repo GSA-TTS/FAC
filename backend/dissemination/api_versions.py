@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 # These are API versions we want live.
 live = {
     "dissemination": ["api_v1_2_0"],
-    "support": [],
+    "support": ["admin_api_v1_2_0"],
 }
 
 # These are API versions we have deprecated.
