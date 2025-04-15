@@ -4,8 +4,6 @@ on:
   schedule:
     # Every week on Sunday 1 AM UTC
     - cron: '0 0 * * 1'
-  workflow_dispatch:
-    null
 
 jobs:
   scheduled-audit-data-export:
@@ -13,10 +11,9 @@ jobs:
       fail-fast: false
       matrix:
         environment: 
-          - name: dev
           - name: staging
           - name: production
-    name: Run bulk data export on ${{ inputs.environment }}
+    name: Run bulk data export
     uses: ./.github/workflows/export-audit-data-to-csv-scheduled.yml
     secrets: inherit
     with:
