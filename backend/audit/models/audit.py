@@ -9,7 +9,13 @@ from django.db.models.functions import Cast
 from audit.cross_validation.naming import SECTION_NAMES
 from audit.cross_validation.audit_validation_shape import audit_validation_shape
 from audit.models import SingleAuditReportFile
-from audit.models.constants import AUDIT_TYPE_CODES, STATUS, STATUS_CHOICES, EventType
+from audit.models.constants import (
+    AUDIT_TYPE_CODES,
+    STATUS,
+    STATUS_CHOICES,
+    EventType,
+    AUDIT_SEQUENCE_ID,
+)
 from audit.models.history import History
 from audit.models.mixins import CreatedMixin, UpdatedMixin
 from audit.models.utils import (
@@ -46,7 +52,7 @@ class AuditManager(models.Manager):
                 report_id = obj_data.pop("report_id")
             else:
                 report_id = generate_sac_report_id(
-                    sequence=get_next_sequence_id("public.audit_audit_sequence_id"),
+                    sequence=get_next_sequence_id(AUDIT_SEQUENCE_ID),
                     end_date=end_date,
                 )
             version = 0

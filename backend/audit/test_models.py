@@ -19,6 +19,7 @@ from .models import (
     generate_sac_report_id,
 )
 from audit.models import Audit
+from audit.models.constants import SAC_SEQUENCE_ID
 from audit.models.utils import get_next_sequence_id
 from .models.models import STATUS
 from .models.viewflow import sac_transition, SingleAuditChecklistFlow
@@ -257,7 +258,7 @@ class ExcelFileTests(TestCase):
         The filename field should be generated based on the FileField filename
         """
         file = SimpleUploadedFile("this is a file.xlsx", b"this is a file")
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         excel_file = baker.make(
             ExcelFile,
@@ -284,7 +285,7 @@ class SingleAuditReportFileTests(TestCase):
         The filename field should be generated based on the FileField filename
         """
         file = SimpleUploadedFile("this is a file.pdf", b"this is a file")
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sar_file = baker.make(
             SingleAuditReportFile,

@@ -11,6 +11,7 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
 )
+from audit.models.constants import SAC_SEQUENCE_ID
 from audit.models.utils import get_next_sequence_id
 from dissemination.file_downloads import get_filename
 
@@ -31,7 +32,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, "GSAFAC")
 
         self.assertRaises(Http404, get_filename, report_id, "report")
@@ -45,7 +46,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, "GSAFAC")
 
         baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
@@ -58,7 +59,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, "GSAFAC")
 
         sac = baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
@@ -74,7 +75,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, "GSAFAC")
 
         baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
@@ -88,7 +89,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, "GSAFAC")
 
         sac = baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
@@ -105,7 +106,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
 
         filename = get_filename(report_id, "report")
@@ -118,7 +119,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, "GSAFAC")
 
         baker.make(SingleAuditChecklist, report_id=report_id)
@@ -131,7 +132,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
 
         sac = baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
@@ -147,7 +148,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
 
         baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
@@ -161,7 +162,7 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
 
         sac = baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)

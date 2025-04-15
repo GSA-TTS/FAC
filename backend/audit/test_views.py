@@ -39,7 +39,7 @@ from audit.models import (
     ExcelFile,
 )
 from audit.models.utils import get_next_sequence_id
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, SAC_SEQUENCE_ID
 from audit.utils import FORM_SECTION_HANDLERS
 from audit.views import AuditeeCertificationStep2View, MySubmissions
 from dissemination.models import FederalAward, General
@@ -491,7 +491,7 @@ class SubmissionViewTests(TestCase):
         just_ueis = _just_uei_workbooks("TEST0001TEST")
         geninfofile = "general-information--test0001test--simple-pass.json"
         awardsfile = "federal-awards--test0001test--simple-pass.json"
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac_data = just_ueis | {
             "auditee_certification": _build_auditee_cert_dict(
@@ -825,7 +825,7 @@ class SubmissionStatusTests(TransactionTestCase):
         just_ueis = _just_uei_workbooks("TEST0001TEST")
         geninfofile = "general-information--test0001test--simple-pass.json"
         awardsfile = "federal-awards--test0001test--simple-pass.json"
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac_data = just_ueis | {
             "auditee_certification": _build_auditee_cert_dict(
@@ -1089,7 +1089,7 @@ class ExcelFileHandlerViewTests(TestCase):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Corrective Action Plan data"""
 
         test_uei = "AAA12345678X"
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
@@ -1170,7 +1170,7 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_findings_uniform_guidance(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Uniform Guidance data"""
 
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
@@ -1262,7 +1262,7 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_findings_text(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Text data"""
 
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
@@ -1342,7 +1342,7 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_secondary_auditors(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded secondary auditors data"""
 
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
@@ -1483,9 +1483,7 @@ class ExcelFileHandlerViewTests(TestCase):
         for test_case in test_cases:
             with self.subTest():
                 fixtures, template, section = test_case
-                sequence = get_next_sequence_id(
-                    "public.audit_singleauditchecklist_id_seq"
-                )
+                sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
                 sac = _mock_login_and_scan(
                     self.client,
@@ -1691,7 +1689,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     @patch("audit.validators._scan_file")
     def test_valid_file_upload(self, mock_scan_file):
         """Test that uploading a valid SAR update the SAC accordingly"""
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
@@ -1726,7 +1724,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_additional_ueis(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional UEIs data"""
 
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
@@ -1800,7 +1798,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional EINs data"""
 
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
@@ -1874,7 +1872,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_notes_to_sefa(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Notes to SEFA data"""
 
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,

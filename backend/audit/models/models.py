@@ -30,6 +30,7 @@ from audit.validators import (
     validate_audit_information_json,
 )
 from audit.utils import FORM_SECTION_HANDLERS
+from audit.models.constants import SAC_SEQUENCE_ID
 from audit.models.utils import get_next_sequence_id
 from support.cog_over import compute_cog_over, record_cog_assignment
 from .files import SingleAuditReportFile
@@ -96,7 +97,7 @@ class SingleAuditChecklistManager(models.Manager):
         event_type = obj_data.pop("event_type", None)
 
         end_date = obj_data["general_information"]["auditee_fiscal_period_end"]
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = generate_sac_report_id(
             sequence=sequence, end_date=end_date, source="GSAFAC"
         )

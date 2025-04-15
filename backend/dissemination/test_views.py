@@ -12,7 +12,7 @@ from audit.models import (
     generate_sac_report_id,
 )
 from audit.models.utils import get_next_sequence_id
-
+from audit.models.constants import SAC_SEQUENCE_ID
 from audit.fixtures.excel import FORM_SECTIONS
 from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
@@ -40,7 +40,7 @@ class PdfDownloadViewTests(TestCase):
         self.client = Client()
 
     def _make_sac_and_general(self, is_public=True):
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = baker.make(
             SingleAuditChecklist,
             id=sequence,
@@ -332,7 +332,7 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac = baker.make(
             SingleAuditChecklist,
@@ -362,7 +362,7 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         report_id = generate_sac_report_id(sequence=sequence, end_date="2024-01-31")
         baker.make(OneTimeAccess, uuid=uuid, report_id=report_id)
@@ -380,7 +380,7 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac = baker.make(
             SingleAuditChecklist,
@@ -406,7 +406,7 @@ class OneTimeAccessDownloadViewTests(TestCase):
         """
         mock_file_exists.return_value = True
         uuid = uuid4()
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac = baker.make(
             SingleAuditChecklist,
@@ -433,7 +433,7 @@ class XlsxDownloadViewTests(TestCase):
         self.client = Client()
 
     def _make_sac_and_general(self, is_public=True):
-        sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = baker.make(
             SingleAuditChecklist,
             id=sequence,
@@ -959,7 +959,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         )
 
         for i in range(4):
-            sequence = get_next_sequence_id("public.audit_singleauditchecklist_id_seq")
+            sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
             general = self._make_general(
                 is_public=True,
                 report_id=generate_sac_report_id(
