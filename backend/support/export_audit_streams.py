@@ -35,7 +35,7 @@ class StreamGenerator:
     def generate_fed_year_stream(self, audit_year):
         table_name = (self.query.split(".")[1]).split(" ")[0]
         prev_audit_year = audit_year - 1
-        fac_accepted_date_start = str(prev_audit_year) + "-10-31"
+        fac_accepted_date_start = str(prev_audit_year) + "-10-01"
         fac_accepted_date_end = str(audit_year) + "-09-30"
         return (
             f"{table_name}_Federal_year.{audit_year}",
