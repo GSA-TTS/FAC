@@ -1,5 +1,3 @@
-# type: ignore
-# The class under test for this file is broke due to SOT. Keeping for posterity
 from unittest.mock import patch, MagicMock
 import datetime
 

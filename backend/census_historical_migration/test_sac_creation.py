@@ -1,7 +1,7 @@
-# type: ignore
-# the class under test has issues due to SOT, keeping for posterity.
-from .sac_general_lib.sac_creator import setup_sac
-from audit.models import User
+from django.contrib.auth.models import User
+
+from .sac_general_lib.sac_creator import setup_audit
+
 
 from model_bakery import baker
 from unittest import TestCase
@@ -84,36 +84,36 @@ class TestSacTribalConsent(TestCase):
         """Only 'tribal' entity types have tribal_data_consent populated"""
         audit_header = self._mock_audit_header("non-profit")
         user = baker.make(User)
-        sac = setup_sac(user, audit_header)
-
-        self.assertIsNone(sac.tribal_data_consent)
+        audit = setup_audit(user, audit_header)
+        consent = audit.audit.get("tribal_data_consent", None)
+        self.assertIsNone(consent)
 
     def test_tribal_public(self):
         """Misc suppression codes makes them public"""
         audit_header = self._mock_audit_header("tribal", "foo")
         user = baker.make(User)
-        sac = setup_sac(user, audit_header)
-        consent = sac.tribal_data_consent
+        audit = setup_audit(user, audit_header)
+        consent = audit.audit.get("tribal_data_consent", None)
 
-        self.assertIsNotNone(sac.tribal_data_consent)
+        self.assertIsNotNone(consent)
         self._test_consent(consent, True)
 
     def test_tribal_public_no_code(self):
         """A missing suppression code makes them public"""
         audit_header = self._mock_audit_header("tribal", "")
         user = baker.make(User)
-        sac = setup_sac(user, audit_header)
-        consent = sac.tribal_data_consent
+        audit = setup_audit(user, audit_header)
+        consent = audit.audit.get("tribal_data_consent", None)
 
-        self.assertIsNotNone(sac.tribal_data_consent)
+        self.assertIsNotNone(consent)
         self._test_consent(consent, True)
 
     def test_tribal_private(self):
         """A tribal audit with suppression code 'it' will be private"""
         audit_header = self._mock_audit_header("tribal", "it")
         user = baker.make(User)
-        sac = setup_sac(user, audit_header)
-        consent = sac.tribal_data_consent
+        audit = setup_audit(user, audit_header)
+        consent = audit.audit.get("tribal_data_consent", None)
 
-        self.assertIsNotNone(sac.tribal_data_consent)
+        self.assertIsNotNone(consent)
         self._test_consent(consent, False)

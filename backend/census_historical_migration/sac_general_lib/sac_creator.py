@@ -28,8 +28,15 @@ from ..transforms.xform_string_to_string import (
 logger = logging.getLogger(__name__)
 
 
-def setup_sac(user, audit_header):
-    """Create a SAC object for the historic data migration."""
+# !!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!
+# This was quickly updated to handle SOT, with minimal testing outside unit tests.
+# The idea was this code is legacy, and shouldn't actually be needed, but does have
+# some valuable tools for workbook translations. Rather than try and pull out the workbook
+# translations separately, in order to launch SOT quicly, I updated this code to pass
+# unit tests. Use of this code for its original purpose of migrating census data
+# into SAC data is not advised unless it is thoroughly tested.
+def setup_audit(user, audit_header):
+    """Create an Audit object for the historic data migration."""
     if user is None:
         raise DataMigrationError(
             "No user provided to setup sac object",
@@ -38,29 +45,49 @@ def setup_sac(user, audit_header):
 
     logger.info(f"Creating a SAC object for {user}")
 
-    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
+    Audit = apps.get_model("audit.Audit")
     generated_report_id = xform_dbkey_to_report_id(audit_header)
 
     try:
-        exists = SingleAuditChecklist.objects.get(report_id=generated_report_id)
-    except SingleAuditChecklist.DoesNotExist:
+        exists = Audit.objects.get(report_id=generated_report_id)
+    except Audit.DoesNotExist:
         exists = None
     if exists:
         exists.delete()
 
     general_info = general_information(audit_header)
 
-    sac = SingleAuditChecklist.objects.create(
-        submitted_by=user,
-        general_information=general_info,
-        audit_information=audit_information(audit_header),
+    cognizant, oversight = cognizant_oversight(audit_header)
+    audit_data = {
+        "general_information": general_info,
+        "audit_information": audit_information(audit_header),
+        "auditee_certification": auditee_certification(audit_header),
+        "auditor_certification": auditor_certification(audit_header),
+        "cognizant_agency": cognizant,
+        "oversight_agency": oversight,
+    }
+    if general_info["user_provided_organization_type"] == "tribal":
+        suppression_code = string_to_string(audit_header.SUPPRESSION_CODE).upper()
+        audit_data |= {
+            "tribal_data_consent": {
+                "tribal_authorization_certifying_official_title": settings.GSA_MIGRATION,
+                "is_tribal_information_authorized_to_be_public": suppression_code
+                != "IT",
+                "tribal_authorization_certifying_official_name": settings.GSA_MIGRATION,
+            }
+        }
+    audit = Audit.objects.create(
+        event_user=user,
+        event_type="CENSUS-MIGRATION",
+        audit=audit_data,
+        data_source=settings.CENSUS_DATA_SOURCE,
         audit_type=general_info["audit_type"],
     )
 
-    sac.report_id = generated_report_id
+    audit.report_id = generated_report_id
     Access = apps.get_model("audit.Access")
     Access.objects.create(
-        sac=sac,
+        audit=audit,
         user=user,
         email=user.email,
         role="editor",
@@ -68,34 +95,18 @@ def setup_sac(user, audit_header):
 
     # We need these to be different.
     Access.objects.create(
-        sac=sac,
+        audit=audit,
         user=user,
         email=user.email,
         role="certifying_auditee_contact",
     )
     Access.objects.create(
-        sac=sac,
+        audit=audit,
         user=user,
         email="fac-census-migration-auditor-official@fac.gsa.gov",
         role="certifying_auditor_contact",
     )
 
-    sac.auditee_certification = auditee_certification(audit_header)
-    sac.auditor_certification = auditor_certification(audit_header)
-    cognizant, oversight = cognizant_oversight(audit_header)
-    sac.cognizant_agency = cognizant
-    sac.oversight_agency = oversight
-    sac.data_source = settings.CENSUS_DATA_SOURCE
+    logger.info("Created audit %s", audit)
 
-    if general_info["user_provided_organization_type"] == "tribal":
-        suppression_code = string_to_string(audit_header.SUPPRESSION_CODE).upper()
-        sac.tribal_data_consent = {
-            "tribal_authorization_certifying_official_title": settings.GSA_MIGRATION,
-            "is_tribal_information_authorized_to_be_public": suppression_code != "IT",
-            "tribal_authorization_certifying_official_name": settings.GSA_MIGRATION,
-        }
-
-    sac.save()
-    logger.info("Created single audit checklist %s", sac)
-
-    return sac
+    return audit
