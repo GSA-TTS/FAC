@@ -9,10 +9,9 @@ S3_FILENAME = "runtime/MAINTENANCE_MODE"
 
 
 def is_maintenance_on():
-    """
-    Get current status of maintenance mode.
-    """
-
+    from django.conf import settings
+    if settings.ENVIRONMENT == "LOCAL":
+        return False
     return file_exists(S3_FILENAME, show_warning=False)
 
 

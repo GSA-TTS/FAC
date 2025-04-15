@@ -40,6 +40,7 @@ else:
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = environs.Path(__file__).resolve(strict=True).parent.parent
 
+env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -112,6 +113,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.postgres",
     "django.contrib.staticfiles",
+    "notifications",
 ]
 
 # Third-party apps
@@ -617,3 +619,5 @@ MAINTENANCE_BANNER_DATES = [
         "message": "FAC.gov will be performing maintenance on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
     },
 ]
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

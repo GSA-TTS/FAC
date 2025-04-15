@@ -30,6 +30,8 @@ urlpatterns = [
         views.EligibilityFormView.as_view(),
         name="api-eligibility",
     ),
+    path('notifications/', include('notifications.urls')
+    ),
     path(
         "api/sac/ueivalidation",
         views.UEIValidationFormView.as_view(),
@@ -69,6 +71,7 @@ urlpatterns = [
         views.AccessListView.as_view(),
         name="access-list",
     ),
+    path('notifications/', include('notifications.urls')),
     path(
         "schemas/<str:fiscal_year>/<str:schema_type>",
         views.SchemaView.as_view(),
