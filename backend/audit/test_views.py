@@ -139,7 +139,7 @@ def load_json(target):
 
 def _mock_gen_report_id():
     """Helper function for generate a sac report id"""
-    count = Audit.objects.count() + random.randint(1, 10000)
+    count = Audit.objects.count() + random.randint(1, 10000)  # nosec
     return generate_sac_report_id(
         count=count, end_date=datetime.now().date().isoformat()
     )
@@ -166,7 +166,7 @@ def build_auditee_cert_dict(certification: dict, signature: dict) -> dict:
     }
 
 
-def _build_additional_ueis(uei: []):
+def _build_additional_ueis(uei):
     return {"additional_ueis": uei}
 
 
