@@ -387,60 +387,62 @@ def _validate_json_fields(audit_instance, sac_instance, differences):
             flat_sac = flatten_json(sac_data)
             flat_audit = flatten_json(audit_instance.audit)
 
-            for (
-                sac_path,
-                sac_value,
-            ) in flat_sac.items():
-                # json_field.Meta data has not been included in SOT
-                if sac_path.startswith("Meta"):
-                    continue
+            _validate_flat_json(flat_sac, flat_audit, field, differences)
 
-                normalized_sac_path = sac_path.split(".")[-1]
-                match_found = False
 
-                for audit_path, audit_value in flat_audit.items():
-                    normalized_audit_path = audit_path.split(".")[-1]
+def _validate_flat_json(flat_sac, flat_audit, field, differences):
+    """Validate SOT and SAC data for flattened JSON formats"""
+    for sac_path, sac_value in flat_sac.items():
+        # json_field.Meta data has not been included in SOT
+        if sac_path.startswith("Meta"):
+            continue
 
-                    if (
-                        normalized_sac_path == normalized_audit_path
-                        and sac_value == audit_value
-                    ):
-                        match_found = True
-                        break
+        normalized_sac_path = sac_path.split(".")[-1]
+        match_found = False
 
-                if not match_found:
-                    result = value_exists_in_audit(sac_path, sac_value, flat_audit)
+        for audit_path, audit_value in flat_audit.items():
+            normalized_audit_path = audit_path.split(".")[-1]
 
-                    if not result.get("found"):
-                        differences.append(
-                            {
-                                "field": field,
-                                "sac_path": sac_path,
-                                "sac_value": sac_value,
-                                "error": f"Value from SAC.{field}.{sac_path} not found in Audit",
-                            }
-                        )
+            if (
+                normalized_sac_path == normalized_audit_path
+                and sac_value == audit_value
+            ):
+                match_found = True
+                break
 
-                    elif result.get("found_with_different_format"):
-                        differences.append(
-                            {
-                                "field": field,
-                                "sac_path": sac_path,
-                                "sac_value": sac_value,
-                                **result,
-                            }
-                        )
+        if not match_found:
+            result = value_exists_in_audit(sac_path, sac_value, flat_audit)
 
-                    elif result.get("found_with_different_key"):
-                        differences.append(
-                            {
-                                "field": field,
-                                "sac_path": sac_path,
-                                "sac_value": sac_value,
-                                "audit_path": result["audit_path"],
-                                "error": f"Value from SAC.{field}.{sac_path} found in Audit but with different structure/key",
-                            }
-                        )
+            if not result.get("found"):
+                differences.append(
+                    {
+                        "field": field,
+                        "sac_path": sac_path,
+                        "sac_value": sac_value,
+                        "error": f"Value from SAC.{field}.{sac_path} not found in Audit",
+                    }
+                )
+
+            elif result.get("found_with_different_format"):
+                differences.append(
+                    {
+                        "field": field,
+                        "sac_path": sac_path,
+                        "sac_value": sac_value,
+                        **result,
+                    }
+                )
+
+            elif result.get("found_with_different_key"):
+                differences.append(
+                    {
+                        "field": field,
+                        "sac_path": sac_path,
+                        "sac_value": sac_value,
+                        "audit_path": result["audit_path"],
+                        "error": f"Value from SAC.{field}.{sac_path} found in Audit but with different structure/key",
+                    }
+                )
 
 
 def flatten_json(obj, path="", result=None):
