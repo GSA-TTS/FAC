@@ -11,7 +11,7 @@ from audit.models import (
     SingleAuditReportFile,
 )
 from audit.models.utils import get_next_sequence_id
-from audit.models.constants import SAC_SEQUENCE_ID
+from audit.models.constants import AUDIT_SEQUENCE_ID
 from audit.fixtures.excel import FORM_SECTIONS
 from audit.models.constants import STATUS, ORGANIZATION_TYPE
 from audit.models.utils import generate_sac_report_id
@@ -31,7 +31,7 @@ User = get_user_model()
 
 
 def _make_audit(is_public=True, submission_status=STATUS.DISSEMINATED):
-    sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+    sequence = get_next_sequence_id(AUDIT_SEQUENCE_ID)
     audit_data = {
         "is_public": is_public,
     }
@@ -353,8 +353,6 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
-        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
-
 
         audit = _make_audit(submission_status=STATUS.IN_PROGRESS)
         baker.make(SingleAuditReportFile, audit=audit)
@@ -383,7 +381,7 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
-        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        sequence = get_next_sequence_id(AUDIT_SEQUENCE_ID)
         report_id = generate_sac_report_id(sequence=sequence, end_date="2024-01-31")
 
         baker.make(OneTimeAccess, uuid=uuid, report_id=report_id)
@@ -401,8 +399,6 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
-        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
-
 
         audit = _make_audit()
         baker.make(OneTimeAccess, uuid=uuid, report_id=audit.report_id)
@@ -1099,7 +1095,6 @@ class SummaryReportDownloadViewTests(TestCase):
             mock_filename,
             mock_workbook_bytes,
         )
-
 
         _make_multiple_audits(quantity=4)
 

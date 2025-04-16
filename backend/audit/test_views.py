@@ -41,7 +41,7 @@ from audit.models import (
 )
 from audit.models.utils import generate_sac_report_id
 from audit.models.utils import get_next_sequence_id
-from audit.models.constants import EventType, STATUS, SAC_SEQUENCE_ID
+from audit.models.constants import EventType, STATUS, AUDIT_SEQUENCE_ID
 from audit.utils import FORM_SECTION_HANDLERS
 from audit.views import AuditeeCertificationStep2View, MySubmissions
 from django.core.exceptions import PermissionDenied
@@ -139,7 +139,7 @@ def load_json(target):
 
 
 def _mock_gen_report_id(sequence=None):
-    sequence = sequence or get_next_sequence_id(SAC_SEQUENCE_ID)
+    sequence = sequence or get_next_sequence_id(AUDIT_SEQUENCE_ID)
     """Helper function for generate a sac report id"""
     return generate_sac_report_id(
         sequence=sequence, end_date=datetime.now().date().isoformat()
@@ -1522,7 +1522,6 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded Additional EINs data"""
-
 
         audit = _mock_login_and_scan(self.client, mock_scan_file)
         test_data = json.loads(

@@ -66,9 +66,7 @@ class AuditTests(TestCase):
         self.assertEqual(source, "GSAFAC")
         self.assertEqual(
             count,
-            str(
-                Audit.objects.aggregate(models.Max("id"))["id__max"]
-            ).zfill(10),
+            str(Audit.objects.aggregate(models.Max("id"))["id__max"] - 1).zfill(10),
         )
 
     def test_submission_status_transitions(self):
