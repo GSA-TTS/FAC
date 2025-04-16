@@ -27,4 +27,3 @@ def section_block(report_id, section_info):
     additional_info["title"] = title
     additional_info["ctx"] = section_info
     return section_info | additional_info
-

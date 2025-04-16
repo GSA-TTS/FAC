@@ -150,8 +150,12 @@ class FACAuthenticationBackendTests(TestCase):
         audit = baker.make(Audit, version=0)
 
         # and that user has some claimed Accesses
-        access_1 = baker.make(Access, audit=audit, email=email, user=user_a_1, role="auditee_contact")
-        access_2 = baker.make(Access, audit=audit, email=email, user=user_a_1, role="autior_contact")
+        access_1 = baker.make(
+            Access, audit=audit, email=email, user=user_a_1, role="auditee_contact"
+        )
+        access_2 = baker.make(
+            Access, audit=audit, email=email, user=user_a_1, role="autior_contact"
+        )
 
         # and there are other claimed Accesses for other users
         user_b = baker.make(User, email="b@b.com")
