@@ -377,7 +377,7 @@ class SubmissionViewTests(TestCase):
         mock_transition.assert_called_with(
             request=response.wsgi_request,
             audit=self.audit,
-            transition_to=STATUS.DISSEMINATED,
+            event=STATUS.DISSEMINATED,
         )
         mock_remove.assert_called_once()
 
@@ -1839,7 +1839,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         mock_transition.assert_called_once_with(
             request=response.wsgi_request,
             audit=self.audit,
-            transition_to=EventType.AUDITEE_CERTIFICATION_COMPLETED,
+            event=EventType.AUDITEE_CERTIFICATION_COMPLETED,
         )
         self.assertRedirects(
             response, reverse("audit:SubmissionProgress", args=[self.audit.report_id])
@@ -1912,7 +1912,7 @@ class CrossValidationViewTests(TestCase):
         self.audit.save()
 
         self.url = reverse(
-            "audit:CrossValidation", kwargs={"report_id": self.sac.report_id}
+            "audit:CrossValidation", kwargs={"report_id": self.audit.report_id}
         )
         self.client.force_login(self.user)
         baker.make(
@@ -1999,6 +1999,7 @@ class RemoveSubmissionViewTests(TestCase):
         self.reports = [
             baker.make(
                 Audit,
+                version=0,
                 report_id=f"test-report-id--{status}",
                 submission_status=status,
                 audit=audit_data,
