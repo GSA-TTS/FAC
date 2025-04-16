@@ -557,18 +557,24 @@ def other_formats_match(value1, value2):
         if value1 == 0 or value2 == 0:
             return {"found": False}
 
-        if isinstance(value1, (int, float)) and isinstance(value2, str):
-            if value1 == float(value2):
-                return {
-                    "found": True,
-                    "error": f"{value1} is int/float, found {value2} as string",
-                }
-        if isinstance(value2, (int, float)) and isinstance(value1, str):
-            if value2 == float(value1):
-                return {
-                    "found": True,
-                    "error": f"{value2} is int/float, found {value1} as string",
-                }
+        if (
+            isinstance(value1, (int, float))
+            and isinstance(value2, str)
+            and value1 == float(value2)
+        ):
+            return {
+                "found": True,
+                "error": f"{value1} is int/float, found {value2} as string",
+            }
+        if (
+            isinstance(value2, (int, float))
+            and isinstance(value1, str)
+            and value2 == float(value1)
+        ):
+            return {
+                "found": True,
+                "error": f"{value2} is int/float, found {value1} as string",
+            }
     except (ValueError, TypeError):
         pass
 
