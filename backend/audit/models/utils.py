@@ -242,7 +242,7 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
 
     try:
         sac_instance = sac.objects.get(report_id=audit_instance.report_id)
-    except:
+    except sac.DoesNotExist:
         return False, [
             {"error": f"No SAC found with report_id {audit_instance.report_id}"}
         ]
@@ -350,7 +350,7 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
             differences.append(
                 {
                     "field": field,
-                    "error": f"Field is empty in Audit, but not in SAC",
+                    "error": "Field is empty in Audit, but not in SAC",
                     "sac_value": sac_data,
                     "audit_value": None,
                 }
@@ -361,7 +361,7 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
             differences.append(
                 {
                     "field": field,
-                    "error": f"Field is empty in SAC, but not in Audit",
+                    "error": "Field is empty in SAC, but not in Audit",
                     "sac_value": None,
                     "audit_value": audit_field_data,
                 }
@@ -459,8 +459,6 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
     for audit_path, audit_value in audit_data.items():
         audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
         audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
-
-        audit_norm_field = normalize_key(audit_field)
 
         if normalize_key(audit_field) != sac_norm_field:
             continue

@@ -67,7 +67,7 @@ class Command(BaseCommand):
             sac_not_sot = [x for x in sac_sorted_report_ids if x not in sot_sorted_report_ids]
             logger.error(f"report_ids found in SAC but not SOT: {sac_not_sot}")
         else:
-            logger.info(f"SOT and SAC report_ids match; continuing")
+            logger.info("SOT and SAC report_ids match; continuing")
 
         sot_audits_by_report_id = self._get_audits_by_report_id(sot_audits_query)
 
