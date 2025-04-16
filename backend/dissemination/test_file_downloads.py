@@ -11,6 +11,8 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
 )
+from audit.models.constants import SAC_SEQUENCE_ID
+from audit.models.utils import get_next_sequence_id
 from dissemination.file_downloads import get_filename
 
 from model_bakery import baker
@@ -20,9 +22,9 @@ class GetFilenameTests(TestCase):
     def setUp(self):
         pass
 
-    def _report_id(self, source):
+    def _report_id(self, sequence, source):
         today = datetime.utcnow().date().isoformat()
-        return generate_sac_report_id(today, source)
+        return generate_sac_report_id(sequence=sequence, end_date=today, source=source)
 
     def test_gsafac_no_singleauditchecklist(self):
         """
@@ -30,7 +32,8 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
 
         self.assertRaises(Http404, get_filename, report_id, "report")
 
@@ -43,9 +46,10 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
 
-        baker.make(SingleAuditChecklist, report_id=report_id)
+        baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
 
         self.assertRaises(Http404, get_filename, report_id, "report")
 
@@ -55,9 +59,10 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
 
-        sac = baker.make(SingleAuditChecklist, report_id=report_id)
+        sac = baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
         baker.make(SingleAuditReportFile, sac=sac)
 
         filename = get_filename(report_id, "report")
@@ -70,9 +75,10 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
 
-        baker.make(SingleAuditChecklist, report_id=report_id)
+        baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
 
         for form_section in FORM_SECTIONS:
             self.assertRaises(Http404, get_filename, report_id, form_section)
@@ -83,9 +89,10 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
 
-        sac = baker.make(SingleAuditChecklist, report_id=report_id)
+        sac = baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
 
         for form_section in FORM_SECTIONS:
             baker.make(ExcelFile, sac=sac, form_section=form_section)
@@ -99,7 +106,8 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id(settings.CENSUS_DATA_SOURCE)
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
 
         filename = get_filename(report_id, "report")
 
@@ -111,7 +119,8 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
 
         baker.make(SingleAuditChecklist, report_id=report_id)
 
@@ -123,9 +132,10 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id(settings.CENSUS_DATA_SOURCE)
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
 
-        sac = baker.make(SingleAuditChecklist, report_id=report_id)
+        sac = baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
         baker.make(SingleAuditReportFile, sac=sac)
 
         filename = get_filename(report_id, "report")
@@ -138,9 +148,10 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        report_id = self._report_id(settings.CENSUS_DATA_SOURCE)
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
 
-        baker.make(SingleAuditChecklist, report_id=report_id)
+        baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
 
         for form_section in FORM_SECTIONS:
             self.assertRaises(Http404, get_filename, report_id, form_section)
@@ -151,9 +162,10 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id(settings.CENSUS_DATA_SOURCE)
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
 
-        sac = baker.make(SingleAuditChecklist, report_id=report_id)
+        sac = baker.make(SingleAuditChecklist, id=sequence, report_id=report_id)
 
         for form_section in FORM_SECTIONS:
             baker.make(ExcelFile, sac=sac, form_section=form_section)

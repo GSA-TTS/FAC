@@ -11,7 +11,8 @@ from audit.models import (
     SingleAuditReportFile,
     generate_sac_report_id,
 )
-
+from audit.models.utils import get_next_sequence_id
+from audit.models.constants import SAC_SEQUENCE_ID
 from audit.fixtures.excel import FORM_SECTIONS
 from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
@@ -39,9 +40,11 @@ class PdfDownloadViewTests(TestCase):
         self.client = Client()
 
     def _make_sac_and_general(self, is_public=True):
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2023-12-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2023-12-31"),
         )
         general = baker.make(General, is_public=is_public, report_id=sac.report_id)
         return sac, general
@@ -329,10 +332,12 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2024-01-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2024-01-31"),
         )
         baker.make(SingleAuditReportFile, sac=sac)
         ota = baker.make(OneTimeAccess, uuid=uuid, report_id=sac.report_id)
@@ -357,8 +362,9 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
-        report_id = generate_sac_report_id(end_date="2024-01-31")
+        report_id = generate_sac_report_id(sequence=sequence, end_date="2024-01-31")
         baker.make(OneTimeAccess, uuid=uuid, report_id=report_id)
 
         url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": uuid})
@@ -374,10 +380,12 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2024-01-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2024-01-31"),
         )
         baker.make(OneTimeAccess, uuid=uuid, report_id=sac.report_id)
 
@@ -398,10 +406,12 @@ class OneTimeAccessDownloadViewTests(TestCase):
         """
         mock_file_exists.return_value = True
         uuid = uuid4()
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2024-01-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2024-01-31"),
         )
         baker.make(SingleAuditReportFile, sac=sac)
         baker.make(OneTimeAccess, uuid=uuid, report_id=sac.report_id)
@@ -423,9 +433,11 @@ class XlsxDownloadViewTests(TestCase):
         self.client = Client()
 
     def _make_sac_and_general(self, is_public=True):
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2023-12-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2023-12-31"),
         )
         general = baker.make(General, is_public=is_public, report_id=sac.report_id)
         return sac, general
@@ -947,9 +959,12 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         )
 
         for i in range(4):
+            sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
             general = self._make_general(
                 is_public=True,
-                report_id=generate_sac_report_id(end_date="2023-12-31", count=str(i)),
+                report_id=generate_sac_report_id(
+                    end_date="2023-12-31", sequence=sequence
+                ),
             )
             baker.make(FederalAward, report_id=general)
         self.refresh_materialized_view()

@@ -120,6 +120,8 @@ def fake_auditee_certification():
 
 def _create_sac(user, auditee_name, submission_status="in_progress"):
     """Create a single example SAC."""
+    # TODO: SoT
+    # When we deprecate the SAC here, we want Audit to generate its own ids.
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
@@ -128,6 +130,7 @@ def _create_sac(user, auditee_name, submission_status="in_progress"):
     )
     Audit = apps.get_model("audit.Audit")
     audit = Audit.objects.create(
+        report_id=sac.report_id,
         audit={"general_information": _fake_general_information(auditee_name)},
         submission_status=submission_status,
         event_user=user,

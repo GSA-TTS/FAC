@@ -60,11 +60,9 @@ def access_and_submission_check(user, data):
         )
 
         # TODO: Update Post SOC Launch
-        # TODO: use this for generating report_id when we deprecate "sac" from this workflow.
-        # report_id = generate_sac_report_id(end_date=all_steps_user_form_data["auditee_fiscal_period_end"], source="GSAFAC")
+        # TODO: we will need to generate our own report_id when we deprecate "sac" from this workflow.
         audit = Audit.objects.create(
             report_id=sac.report_id,  # TODO Temporarily use the current id to mirror
-            # report_id=report_id,  # TODO Use this line rather than the above once the "sac" is deprecated.
             submission_status=STATUS.IN_PROGRESS,
             audit_type=AuditType.SINGLE_AUDIT,
             audit={"general_information": all_steps_user_form_data},
