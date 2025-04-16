@@ -15,7 +15,7 @@ module "fac-file-scanner" {
   scanner_memory    = "512M"
   disk_quota        = "512M"
   service_bindings = {
-    "${module.s3-private.name}"                 = ""
+    "${module.s3-private.bucket_name}"          = ""
     "${module.cg-logshipper.syslog_drain_name}" = ""
   }
   depends_on = [module.s3-private, module.cg-logshipper]
