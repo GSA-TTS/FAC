@@ -55,6 +55,7 @@ class UEISerializer(serializers.Serializer):
         return the empty strings.
 
         """
+
         sam_response = get_uei_info_from_sam_gov(value)
         if sam_response.get("errors"):
             raise serializers.ValidationError(sam_response.get("errors"))
