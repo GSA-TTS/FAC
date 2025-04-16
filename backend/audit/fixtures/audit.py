@@ -5,7 +5,7 @@ completion.
 """
 
 import logging
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 from django.apps import apps
 from django.conf import settings
@@ -15,8 +15,21 @@ from faker import Faker
 
 from audit import intakelib
 import audit.validators
+from audit.fixtures.audit_information import fake_audit_information
 
 from audit.fixtures.excel import FORM_SECTIONS
+from audit.models.constants import STATUS
+from audit.models.utils import (
+    generate_audit_indexes,
+    convert_utc_to_american_samoa_zone,
+)
+from audit.test_views import (
+    build_auditee_cert_dict,
+    build_auditor_cert_dict,
+    load_json,
+    AUDIT_JSON_FIXTURES,
+    load_json_audit_data,
+)
 from users.models import User
 
 logger = logging.getLogger(__name__)
@@ -223,7 +236,10 @@ def _load_audits_for_user(user):
         audit = Audit.objects.filter(created_by=user, auditee_name=auditee_name).first()
         if audit is None:
             # need to make this object
-            audit = _create_audit(user, auditee_name, submission_status)
+            if submission_status == STATUS.DISSEMINATED:
+                _create_fully_populated_disseminated_audit(user)
+            else:
+                _create_audit(user, auditee_name, submission_status)
 
 
 def load_audits():
@@ -250,3 +266,56 @@ def load_audits_for_email_address(user_email, workbooks=None):
         return
 
     _load_audits_for_user(user)
+
+
+def _create_fully_populated_disseminated_audit(user):
+    geninfofile = "general-information--test0001test--simple-pass.json"
+    awardsfile = "federal-awards--test0001test--simple-pass.json"
+    audit_data = {
+        "is_public": True,
+        "fac_accepted_date": convert_utc_to_american_samoa_zone(datetime.today()),
+        "auditee_certification": build_auditee_cert_dict(*fake_auditee_certification()),
+        "auditor_certification": build_auditor_cert_dict(*fake_auditor_certification()),
+        "audit_information": fake_audit_information(),
+        "general_information": load_json(AUDIT_JSON_FIXTURES / geninfofile),
+        "notes_to_sefa": {
+            "accounting_policies": "Exhaustive",
+            "is_minimis_rate_used": "Y",
+            "rate_explained": "At great length",
+        },
+        **load_json_audit_data(awardsfile, FORM_SECTIONS.FEDERAL_AWARDS),
+    }
+
+    Audit = apps.get_model("audit.Audit")
+    audit = Audit.objects.create(
+        audit=audit_data,
+        submission_status=STATUS.DISSEMINATED,
+        event_user=user,
+        event_type="created",
+    )
+
+    indexes = generate_audit_indexes(audit)
+    audit.audit.update(indexes)
+    audit.save()
+
+    Access = apps.get_model("audit.Access")
+    Access.objects.create(
+        audit=audit,
+        user=user,
+        email=user.email,
+        role="editor",
+    )
+    Access.objects.create(
+        audit=audit,
+        user=user,
+        email=user.email,
+        role="certifying_auditor_contact",
+    )
+    Access.objects.create(
+        audit=audit,
+        user=user,
+        email=user.email,
+        role="certifying_auditee_contact",
+    )
+    logger.info("Created audit %s", audit)
+    return audit
