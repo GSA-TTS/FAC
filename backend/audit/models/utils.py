@@ -229,7 +229,45 @@ def _index_general(audit_data):
     }
 
 
-# TESTING functions to check data in SAC and Audit
+json_fields_to_check = [
+    "general_information",
+    "federal_awards",
+    "findings_text",
+    "findings_uniform_guidence",
+    "corrective_action_plan",
+    "notes_to_sefa",
+    "audit_information",
+    "auditor_certification",
+    "auditee_certification",
+    "tribal_data_consent",
+]
+
+simple_fields_to_check = [
+    "audit_type",
+    "data_source",
+    "cognizant_agency",
+    "oversight_agency",
+]
+
+entry_fields_to_check = {
+    "additional_eins": {
+        "top_level_name": "AdditionalEINs",
+        "entries_name": "additional_eins_entries",
+        "entry_name": "additional_ein",
+    },
+    "additional_ueis": {
+        "top_level_name": "AdditionalUEIs",
+        "entries_name": "additional_ueis_entries",
+        "entry_name": "additional_uei",
+    },
+    "secondary_auditors": {
+        "top_level_name": "SecondaryAuditors",
+        "entries_name": "secondary_auditors_entries",
+        "entry_name": "secondary_auditor_ein",
+    },
+}
+
+
 def validate_audit_consistency(audit_instance, is_real_time=True):
     """
     Validates that all data in SingleAuditChecklist exists in Audit,
@@ -249,44 +287,15 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
 
     differences = []
 
-    json_fields_to_check = [
-        "general_information",
-        "federal_awards",
-        "findings_text",
-        "findings_uniform_guidence",
-        "corrective_action_plan",
-        "notes_to_sefa",
-        "audit_information",
-        "auditor_certification",
-        "auditee_certification",
-        "tribal_data_consent",
-    ]
+    _validate_entry_fields(audit_instance, sac_instance, differences)
+    _validate_simple_fields(audit_instance, sac_instance, differences, is_real_time)
+    _validate_json_fields(audit_instance, sac_instance, differences)
 
-    simple_fields_to_check = [
-        "audit_type",
-        "data_source",
-        "cognizant_agency",
-        "oversight_agency",
-    ]
+    return len(differences) == 0, differences
 
-    entry_fields_to_check = {
-        "additional_eins": {
-            "top_level_name": "AdditionalEINs",
-            "entries_name": "additional_eins_entries",
-            "entry_name": "additional_ein",
-        },
-        "additional_ueis": {
-            "top_level_name": "AdditionalUEIs",
-            "entries_name": "additional_ueis_entries",
-            "entry_name": "additional_uei",
-        },
-        "secondary_auditors": {
-            "top_level_name": "SecondaryAuditors",
-            "entries_name": "secondary_auditors_entries",
-            "entry_name": "secondary_auditor_ein",
-        },
-    }
 
+def _validate_entry_fields(audit_instance, sac_instance, differences):
+    """Validate SOT and SAC data where SAC uses an entry dict format"""
     for field, names in entry_fields_to_check.items():
         top_level_name = names["top_level_name"]
         entries_name = names["entries_name"]
@@ -318,6 +327,9 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
                     }
                 )
 
+
+def _validate_simple_fields(audit_instance, sac_instance, differences, is_real_time):
+    """Validate SOT and SAC data where SAC uses a simple format"""
     for field in simple_fields_to_check:
         # These fields aren't guaranteed to be set for SOT during real-time validation
         if is_real_time and field in ["cognizant_agency", "oversight_agency"]:
@@ -331,6 +343,9 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
                 {"field": field, "sac_value": sac_value, "audit_value": audit_value}
             )
 
+
+def _validate_json_fields(audit_instance, sac_instance, differences):
+    """Validate SOT and SAC data where SAC uses a JSON format"""
     for field in json_fields_to_check:
         sac_data = getattr(sac_instance, field, None)
         audit_field_data = audit_instance.audit.get(field)
@@ -426,8 +441,6 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
                                 "error": f"Value from SAC.{field}.{sac_path} found in Audit but with different structure/key",
                             }
                         )
-
-    return len(differences) == 0, differences
 
 
 def flatten_json(obj, path="", result=None):
