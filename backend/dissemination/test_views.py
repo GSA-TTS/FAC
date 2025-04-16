@@ -759,16 +759,23 @@ class SummaryViewTests(TestCase):
 
     def test_summary_additional_context(self):
         """Tests the "additional" fields: i.e. Additional UEIs, Additional EINs, Secondary Auditors"""
+
+        # The extra saves are required so we don't accidentally overwrite all of
+        # general information, and we can only update some fields if the status is in-progress
         audit_with_extras = _make_multiple_audits(
             overrides={
                 "additional_eins": ["ADDITIONAL_EIN"],
                 "additional_ueis": ["ADDITIONAL_UEI"],
-            }
+            },
+            submission_status=STATUS.IN_PROGRESS,
         )[0]
         audit_with_extras.audit["general_information"][
             "secondary_auditors_exist"
         ] = True
         audit_with_extras.save()
+        audit_with_extras.submission_status = STATUS.DISSEMINATED
+        audit_with_extras.save()
+
         url_with_extras = reverse(
             "dissemination:Summary", kwargs={"report_id": audit_with_extras.report_id}
         )
@@ -781,10 +788,15 @@ class SummaryViewTests(TestCase):
         self.assertEqual("Y", auditee_info_with_extras["additional_eins"])
         self.assertEqual("Y", auditee_info_with_extras["additional_ueis"])
 
+        # The extra saves are required so we don't accidentally overwrite all of
+        # general information, and we can only update some fields if the status is in-progress
         audit_no_extras = _make_multiple_audits(
-            overrides={"additional_eins": [], "additional_ueis": []}
+            overrides={"additional_eins": [], "additional_ueis": []},
+            submission_status=STATUS.IN_PROGRESS,
         )[0]
         audit_no_extras.audit["general_information"]["secondary_auditors_exist"] = False
+        audit_no_extras.save()
+        audit_no_extras.submission_status = STATUS.DISSEMINATED
         audit_no_extras.save()
 
         url_no_extras = reverse(
@@ -851,11 +863,15 @@ class SummaryViewTests(TestCase):
         Test that the Audit Findings in the context only include distinct findings
         based on the `reference_number` for a given report_id.
         """
-        audit = _make_multiple_audits()[0]
+        audit = _make_multiple_audits(submission_status=STATUS.IN_PROGRESS)[0]
+        # The extra saves are required so we don't accidentally overwrite all of
+        # general information, and we can only update some fields if the status is in-progress
         audit.audit["general_information"][
             "user_provided_organization_type"
         ] = ORGANIZATION_TYPE.TRIBAL
         audit.audit["is_public"] = False
+        audit.save()
+        audit.submission_status = STATUS.DISSEMINATED
         audit.save()
 
         url = reverse("dissemination:Summary", kwargs={"report_id": audit.report_id})
