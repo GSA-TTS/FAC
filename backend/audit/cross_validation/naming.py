@@ -33,7 +33,7 @@ class SectionBabelFish(NamedTuple):
     reverse_url_for_file_deletion: (
         str | None
     )  # Django value for finding the actual URL for deletion.
-    snake_case: str  # Mostly used for the field names in SingleAuditChecklist.
+    snake_case: str  # Mostly used for the field names in Audit.
     url_tail: str | None  # Hyphenated version of snake_case, mostly.
     workbook_number: int | None  # Our upload ordering of workbooks.
     submission_event: str  # The event type we log to the SubmissionEvents table when this section is updated

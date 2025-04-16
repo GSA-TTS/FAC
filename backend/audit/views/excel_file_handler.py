@@ -100,7 +100,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
             return redirect(download_url)
         except Audit.DoesNotExist as err:
-            logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
+            logger.warning("no Audit found with report ID %s", report_id)
             raise PermissionDenied() from err
 
     def post(self, request, *_args, **kwargs):
@@ -132,7 +132,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 return redirect("/")
 
         except Audit.DoesNotExist as err:
-            logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
+            logger.warning("no Audit found with report ID %s", report_id)
             raise PermissionDenied() from err
         except ValidationError as err:
             # The good error, where bad rows/columns are sent back in the request.

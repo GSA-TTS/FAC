@@ -23,11 +23,11 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
 
             context = {
                 "report_id": report_id,
-                "submission_status": sac.submission_status,
+                "submission_status": audit.submission_status,
             }
             return render(
                 request, "audit/cross-validation/cross-validation.html", context

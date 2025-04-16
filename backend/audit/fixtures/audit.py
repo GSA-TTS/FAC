@@ -197,7 +197,7 @@ def _post_create_federal_awards(this_audit, this_user):
     logger.info("Created Federal Awards workbook upload for Audit %s", this_audit.id)
 
 
-# list of the default SingleAuditChecklists to create for each user
+# list of the default Audits to create for each user
 # The auditee name is used to disambiguate them, so it must be unique
 # or another Audit won't be created.
 # If `post_create_callable` exists for an item, it should be a

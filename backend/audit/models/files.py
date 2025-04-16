@@ -31,7 +31,7 @@ def excel_file_path(instance, _filename):
 
 class ExcelFile(models.Model):
     """
-    Data model to track uploaded Excel files and associate them with SingleAuditChecklists
+    Data model to track uploaded Excel files and associate them with Audits
     """
 
     file = models.FileField(upload_to=excel_file_path, validators=[validate_excel_file])
@@ -78,7 +78,7 @@ def single_audit_report_path(instance, _filename):
 class SingleAuditReportFile(models.Model):
     """
     Data model to track uploaded Single Audit report PDFs and associate them
-    with SingleAuditChecklists
+    with Audits
     """
 
     file = models.FileField(

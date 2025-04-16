@@ -141,7 +141,7 @@ def remove_email_from_submission_access(
     """
     Given report_id, email address and role, deletes corresponding Access objects
     and creates corresponding DeletedAccess objects.
-    Will raise SingleAuditChecklist.DoesNotExist if no matching SAC exists.
+    Will raise Audit.DoesNotExist if no matching Audit exists.
     Will raise Access.DoesNotExist if no matching Access objects exist.
     """
     audit = Audit.objects.get(report_id=report_id)

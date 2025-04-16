@@ -308,7 +308,7 @@ class EditSubmissionViewTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-    def test_redirects_to_singleauditchecklist(self):
+    def test_redirects_to_Audit(self):
         """Test that accessing edit submission redirects to SAC view"""
         response = self.client.get(self.url)
         self.assertRedirects(response, reverse("audit", args=[self.audit.report_id]))
@@ -897,7 +897,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_corrective_action_plan(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Corrective Action Plan data"""
+        """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded Corrective Action Plan data"""
 
         test_uei = "AAA12345678X"
         audit = _mock_login_and_scan(
@@ -962,7 +962,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_findings_uniform_guidance(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Uniform Guidance data"""
+        """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded Findings Uniform Guidance data"""
 
         audit = _mock_login_and_scan(self.client, mock_scan_file)
         test_data = json.loads(
@@ -1034,7 +1034,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_findings_text(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Text data"""
+        """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded Findings Text data"""
 
         audit = _mock_login_and_scan(
             self.client,
@@ -1098,7 +1098,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_secondary_auditors(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded secondary auditors data"""
+        """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded secondary auditors data"""
 
         audit = _mock_login_and_scan(
             self.client,
@@ -1461,7 +1461,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_additional_ueis(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional UEIs data"""
+        """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded Additional UEIs data"""
 
         audit = _mock_login_and_scan(
             self.client,
@@ -1518,7 +1518,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional EINs data"""
+        """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded Additional EINs data"""
 
         audit = _mock_login_and_scan(self.client, mock_scan_file)
         test_data = json.loads(
@@ -1571,7 +1571,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_notes_to_sefa(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Notes to SEFA data"""
+        """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded Notes to SEFA data"""
 
         audit = _mock_login_and_scan(
             self.client,
@@ -1650,7 +1650,7 @@ class EditSubmissionTest(TestCase):
         )
         self.session = self.client.session
 
-    def test_redirects_to_singleauditchecklist(self):
+    def test_redirects_to_Audit(self):
         """Test that accessing edit submission redirects to SAC view"""
         response = self.client.get(self.url)
         self.assertRedirects(response, reverse("audit", args=[self.audit.report_id]))

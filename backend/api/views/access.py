@@ -146,7 +146,7 @@ class AccessAndSubmissionView(APIView):
 
 class AccessListView(APIView):
     """
-    Returns a summary list of SingleAuditChecklists that the user has Access to
+    Returns a summary list of Audits that the user has Access to
     """
 
     def get(self, request):

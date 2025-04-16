@@ -28,13 +28,3 @@ def section_block(report_id, section_info):
     additional_info["ctx"] = section_info
     return section_info | additional_info
 
-
-"""
-python manage.py test audit.test_submission_progress_view
-python manage.py shell
-from audit.templatetags.submission_progress_tags import section_block as sb
-sb('whatever', {}, "general_information")
-from audit.cross_validation.sac_validation_shape import get_shaped_section
-from audit.models import SingleAuditChecklist
-sac = SingleAuditChecklist.objects.get(id=2)
-"""

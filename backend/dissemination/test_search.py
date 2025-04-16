@@ -1202,7 +1202,6 @@ class SearchAdvancedFilterTests(TestCase):
             "AB",
         ]
         # For each type requirement, generate a general object and a matching award & finding.
-        # The award is necessary for the materialized view to pick up the Finding
         for tr in type_requirements:
             generate_valid_audit_for_search(
                 overrides={

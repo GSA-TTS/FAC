@@ -38,17 +38,17 @@ class UnlockAfterCertificationView(
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
             target_statuses = [
                 STATUS.READY_FOR_CERTIFICATION,
                 STATUS.AUDITOR_CERTIFIED,
                 STATUS.AUDITEE_CERTIFIED,
             ]
             context = {
-                "auditee_uei": sac.auditee_uei,
-                "auditee_name": sac.auditee_name,
+                "auditee_uei": audit.auditee_uei,
+                "auditee_name": audit.auditee_name,
                 "report_id": report_id,
-                "submission_status": sac.submission_status,
+                "submission_status": audit.submission_status,
                 "target_statuses": target_statuses,
             }
 

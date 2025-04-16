@@ -36,8 +36,7 @@ class CheckAwardRefExistenceTest(TestCase):
 
     def _make_audit(self, award_refs) -> Audit:
         audit_data = {**self._make_federal_awards(award_refs)}
-        sac = baker.make(Audit, version=0, audit=audit_data)
-        return sac
+        return baker.make(Audit, version=0, audit=audit_data)
 
     def test_all_awards_have_references(self):
         """When all awards have a reference, no errors should be raised."""

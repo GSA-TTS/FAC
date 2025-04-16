@@ -77,7 +77,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
-            sac = Audit.objects.get(report_id=report_id)
+            audit = Audit.objects.get(report_id=report_id)
             form = AuditInfoForm(request.POST)
 
             if form.is_valid():
@@ -95,7 +95,6 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
                 validated = validate_audit_information_json(form.cleaned_data, False)
 
-                audit = Audit.objects.get(report_id=report_id)
                 if audit:
                     audit.audit.update({"audit_information": validated})
                     audit.save(
@@ -110,7 +109,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                         logger.warn(f"ERROR in field {field} : {error}")
 
                 form.clean_booleans()
-                context = self._get_context(sac, form)
+                context = self._get_context(audit, form)
                 return render(request, "audit/audit-info-form.html", context)
 
         except Audit.DoesNotExist:

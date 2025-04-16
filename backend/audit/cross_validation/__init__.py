@@ -33,8 +33,8 @@ these are:
     transition_name
     transition_date
 
-The function cross_validation.sac_validation_shape will take a
-SingleAuditChecklist instance and convert it into a dictionary with the above
+The function cross_validation.audit_validation_shape will take a
+Audit instance and convert it into a dictionary with the above
 structure.
 
 Each validator function should return either an empty list if there are no

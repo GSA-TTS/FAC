@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def audit_revert_from_submitted(audit):
     """
-    Transitions the submission_state for a SingleAuditChecklist back
+    Transitions the submission_state for an Audit back
     to "auditee_certified" so the user can re-address issues and submit.
     This should only be executed via management command.
     """
@@ -32,7 +32,7 @@ def audit_revert_from_submitted(audit):
 
 def audit_revert_from_flagged_for_removal(audit, user):
     """
-    Transitions the submission_state for a SingleAuditChecklist back
+    Transitions the submission_state for an Audit back
     to "in_progress" so the user can continue working on it.
     This should be accessible to django admin.
     """
@@ -49,7 +49,7 @@ def audit_revert_from_flagged_for_removal(audit, user):
 
 def audit_flag_for_removal(audit, user):
     """
-    Transitions the submission_state for a SingleAuditChecklist to "flagged_for_removal".
+    Transitions the submission_state for an Audit to "flagged_for_removal".
     This should be accessible to django admin.
     """
     if audit.submission_status == STATUS.IN_PROGRESS:

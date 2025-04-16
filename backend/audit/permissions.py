@@ -9,7 +9,7 @@ class AuditPermission(BasePermission):
     different permissions for different roles, so it's not clear how we'd
     handle that yet.
     For the moment, we just assume that if there are more than zero results
-    for this query, we know the user has access to the SAC and return True.
+    for this query, we know the user has access to the Audit and return True.
     """
 
     def has_object_permission(self, request, view, obj):
