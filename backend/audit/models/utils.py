@@ -10,7 +10,7 @@ from datetime import timedelta
 import pytz
 from django.utils import timezone as django_timezone
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from django.db import models, connection
 from django.db.models import Func
 
 from audit.models.constants import FindingsBitmask, FINDINGS_FIELD_TO_BITMASK
@@ -19,7 +19,15 @@ from support.cog_over_w_audit import compute_cog_over
 logger = logging.getLogger(__name__)
 
 
-def generate_sac_report_id(count, end_date, source="GSAFAC"):
+def get_next_sequence_id(sequence_name):
+    """Get the next ID from the given sequence."""
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT nextval(%s);", [sequence_name])
+        return cursor.fetchall()[0][0]
+
+
+def generate_sac_report_id(sequence, end_date, source="GSAFAC"):
     """
     Convenience method for generating report_id, a value consisting of:
 
@@ -40,7 +48,7 @@ def generate_sac_report_id(count, end_date, source="GSAFAC"):
     if int(month) not in range(1, 13):
         raise Exception("Unexpected month value for report_id")
     separator = "-"
-    report_id = separator.join([year, month, source, str(count).zfill(10)])
+    report_id = separator.join([year, month, source, str(sequence).zfill(10)])
     return report_id
 
 
@@ -51,6 +59,10 @@ class JsonArrayToTextArray(Func):
 
 def one_month_from_today():
     return django_timezone.now() + timedelta(days=30)
+
+
+def one_year_from_today():
+    return django_timezone.now() + timedelta(days=365)
 
 
 def camel_to_snake(raw: str) -> str:
@@ -86,7 +98,7 @@ def generate_audit_indexes(audit):
         audit.submission_status,
         audit.auditee_ein,
         audit.auditee_uei,
-        audit.audit_year,
+        audit_year,
     )
 
     is_public = general_information.get(
