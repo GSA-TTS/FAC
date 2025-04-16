@@ -295,21 +295,13 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
         sac_data = getattr(sac_instance, field)
         if sac_data:
             sac_values = []
-            if (
-                isinstance(sac_data, dict)
-                and top_level_name in sac_data
-            ):
-                entries = sac_data.get(top_level_name, {}).get(
-                    entries_name, []
-                )
+            if isinstance(sac_data, dict) and top_level_name in sac_data:
+                entries = sac_data.get(top_level_name, {}).get(entries_name, [])
                 for entry in entries:
                     sac_values.append(entry[entry_name])
 
             audit_values = []
-            if (
-                field in audit_instance.audit
-                and audit_instance.audit[field]
-            ):
+            if field in audit_instance.audit and audit_instance.audit[field]:
                 if field == "secondary_auditors":
                     for entry in audit_instance.audit[field]:
                         audit_values.append(entry[entry_name])
