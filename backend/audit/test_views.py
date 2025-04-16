@@ -1,9 +1,10 @@
 import json
-import random
 from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from unittest.mock import patch
+
+from django.contrib.auth import get_user_model
 
 from audit.cross_validation.naming import SECTION_NAMES as SN
 from audit.fixtures.audit_information import fake_audit_information
@@ -38,11 +39,11 @@ from audit.models import (
     ExcelFile,
     History,
 )
-from audit.models.constants import STATUS, EventType
 from audit.models.utils import generate_sac_report_id
+from audit.models.utils import get_next_sequence_id
+from audit.models.constants import EventType, STATUS, SAC_SEQUENCE_ID
 from audit.utils import FORM_SECTION_HANDLERS
 from audit.views import AuditeeCertificationStep2View, MySubmissions
-from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, RequestFactory, TestCase, TransactionTestCase
@@ -125,7 +126,7 @@ def _make_user_and_audit(audit_data=None):
         Audit,
         version=0,
         created_by=user,
-        report_id=_mock_gen_report_id,
+        report_id=_mock_gen_report_id(),
         audit=audit_data if audit_data else {},
     )
     return user, audit
@@ -137,11 +138,11 @@ def load_json(target):
     return json.loads(raw)
 
 
-def _mock_gen_report_id():
+def _mock_gen_report_id(sequence=None):
+    sequence = sequence or get_next_sequence_id(SAC_SEQUENCE_ID)
     """Helper function for generate a sac report id"""
-    count = Audit.objects.count() + random.randint(1, 10000)  # nosec
     return generate_sac_report_id(
-        count=count, end_date=datetime.now().date().isoformat()
+        sequence=sequence, end_date=datetime.now().date().isoformat()
     )
 
 
@@ -740,6 +741,7 @@ class SubmissionStatusTests(TransactionTestCase):
         """
         geninfofile = "general-information--test0001test--simple-pass.json"
         awardsfile = "federal-awards--test0001test--simple-pass.json"
+
         audit_data = {
             "auditee_certification": build_auditee_cert_dict(
                 *fake_auditee_certification()
@@ -900,6 +902,7 @@ class ExcelFileHandlerViewTests(TestCase):
         """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded Corrective Action Plan data"""
 
         test_uei = "AAA12345678X"
+
         audit = _mock_login_and_scan(
             self.client,
             mock_scan_file,
@@ -1519,6 +1522,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the Audit should be updated to include the uploaded Additional EINs data"""
+
 
         audit = _mock_login_and_scan(self.client, mock_scan_file)
         test_data = json.loads(

@@ -1,5 +1,4 @@
 from datetime import datetime
-import random
 
 from django.conf import settings
 from django.http import Http404
@@ -11,8 +10,13 @@ from audit.models import (
     SingleAuditReportFile,
     Audit,
 )
+
 from audit.models.constants import STATUS
 from audit.models.utils import generate_sac_report_id
+
+from audit.models.constants import SAC_SEQUENCE_ID
+from audit.models.utils import get_next_sequence_id
+
 from dissemination.file_downloads import get_filename
 
 from model_bakery import baker
@@ -22,10 +26,9 @@ class GetFilenameTests(TestCase):
     def setUp(self):
         pass
 
-    def _report_id(self, source):
+    def _report_id(self, sequence, source):
         today = datetime.utcnow().date().isoformat()
-        count = random.randint(1, 10000)  # nosec
-        return generate_sac_report_id(count, today, source)
+        return generate_sac_report_id(sequence=sequence, end_date=today, source=source)
 
     def test_gsafac_no_audit(self):
         """
@@ -33,7 +36,8 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
 
         self.assertRaises(Http404, get_filename, report_id, "report")
 
@@ -46,7 +50,8 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
 
         baker.make(
             Audit, version=0, report_id=report_id, submission_status=STATUS.DISSEMINATED
@@ -60,7 +65,9 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
+
 
         audit = baker.make(Audit, version=0, report_id=report_id)
         baker.make(SingleAuditReportFile, audit=audit)
@@ -75,7 +82,9 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
+
 
         baker.make(
             Audit, version=0, report_id=report_id, submission_status=STATUS.DISSEMINATED
@@ -90,7 +99,9 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
+
 
         audit = baker.make(Audit, version=0, report_id=report_id)
 
@@ -106,7 +117,8 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id(settings.CENSUS_DATA_SOURCE)
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
 
         filename = get_filename(report_id, "report")
 
@@ -118,7 +130,8 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid
         """
-        report_id = self._report_id("GSAFAC")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, "GSAFAC")
 
         baker.make(
             Audit, version=0, report_id=report_id, submission_status=STATUS.DISSEMINATED
@@ -132,7 +145,9 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id(settings.CENSUS_DATA_SOURCE)
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
+
 
         audit = baker.make(Audit, version=0, report_id=report_id)
         baker.make(SingleAuditReportFile, audit=audit)
@@ -147,7 +162,9 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should throw an Http404 error
         """
-        report_id = self._report_id(settings.CENSUS_DATA_SOURCE)
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
+
 
         baker.make(
             Audit, version=0, report_id=report_id, submission_status=STATUS.DISSEMINATED
@@ -162,7 +179,9 @@ class GetFilenameTests(TestCase):
         When get_filename is called for that report ID
         Then get_filename should return a valid filename
         """
-        report_id = self._report_id(settings.CENSUS_DATA_SOURCE)
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
+        report_id = self._report_id(sequence, settings.CENSUS_DATA_SOURCE)
+
 
         audit = baker.make(Audit, version=0, report_id=report_id)
 

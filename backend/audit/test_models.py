@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
+from django.db import models
 from django.test import TestCase
 
 from viewflow.fsm import TransitionNotAllowed
@@ -12,7 +13,7 @@ from .exceptions import LateChangeError
 from .models import Access, ExcelFile, SingleAuditReportFile, History
 from audit.models import Audit
 from .models.constants import STATUS, AuditType, EventType, STATUS_CHOICES
-from .models.viewflow import audit_transition, AuditFlow
+from .models.viewflow import AuditFlow, audit_transition
 
 
 class MockRequest:
@@ -63,9 +64,12 @@ class AuditTests(TestCase):
         self.assertEqual(year, "2023")
         self.assertEqual(month, "11")
         self.assertEqual(source, "GSAFAC")
-        # This one is a little dubious because it assumes this will always be
-        # the first entry in the test database:
-        self.assertEqual(count, "0000000001")
+        self.assertEqual(
+            count,
+            str(
+                Audit.objects.aggregate(models.Max("id"))["id__max"]
+            ).zfill(10),
+        )
 
     def test_submission_status_transitions(self):
         """
@@ -264,6 +268,7 @@ class ExcelFileTests(TestCase):
         The filename field should be generated based on the FileField filename
         """
         file = SimpleUploadedFile("this is a file.xlsx", b"this is a file")
+
         report_id = "FAKE_REPORT_ID"
         audit = baker.make(Audit, report_id=report_id, version=0)
         excel_file = baker.make(

@@ -105,7 +105,7 @@ class UEIValidatorStepTests(TestCase):
         A UEI with an applicable validation waiver should still pass, regardless of the SAM result.
         It should still meet the UEI Technical Specifications defined in the UEI validator.
         """
-        valid = {"auditee_uei": "SUPERC00LUE1"}
+        valid = {"auditee_uei": "ZQGGHJH74DW7"}
 
         baker.make(UeiValidationWaiver, uei=valid["auditee_uei"])
 
@@ -120,7 +120,7 @@ class UEIValidatorStepTests(TestCase):
         A UEI with an expired validation waiver should not pass.
         """
         yesterday = django_timezone.now() - timedelta(days=1)
-        expired = {"auditee_uei": "SUPERC00LUE2", "expiration": yesterday}
+        expired = {"auditee_uei": "ZQGGHJH74DW7", "expiration": yesterday}
 
         baker.make(
             UeiValidationWaiver,

@@ -10,10 +10,22 @@ from audit.cross_validation.naming import SECTION_NAMES
 from audit.cross_validation.audit_validation_shape import audit_validation_shape
 from audit.exceptions import LateChangeError
 from audit.models.files import SingleAuditReportFile
-from audit.models.constants import AUDIT_TYPE_CODES, STATUS, STATUS_CHOICES, EventType
+
+from audit.models.constants import (
+    AUDIT_TYPE_CODES,
+    STATUS,
+    STATUS_CHOICES,
+    EventType,
+    AUDIT_SEQUENCE_ID,
+)
+
 from audit.models.history import History
 from audit.models.mixins import CreatedMixin, UpdatedMixin
-from audit.models.utils import generate_sac_report_id, JsonArrayToTextArray
+from audit.models.utils import (
+    get_next_sequence_id,
+    generate_sac_report_id,
+    JsonArrayToTextArray,
+)
 
 from itertools import chain
 from audit.cross_validation import functions as cross_validation_functions
@@ -32,22 +44,21 @@ class AuditManager(models.Manager):
         event_type = obj_data.pop("event_type")
         created_by = obj_data.pop("created_by") if "created_by" in obj_data else user
         end_date = obj_data["audit"]["general_information"]["auditee_fiscal_period_end"]
-        report_id = (
-            obj_data.pop("report_id")
-            if "report_id" in obj_data
-            else generate_sac_report_id(
-                count=self.model.objects.count() + 1, end_date=end_date
-            )
-        )  # TODO -> May want to adjust this
-        version = 0
 
-        updated = obj_data | {
-            "report_id": report_id,
-            "version": version,
-            "created_by": created_by,
-            "updated_by": user,
-        }
+        # Re-consider this. We moved the report_id generation into the transaction.
         with transaction.atomic():
+            report_id = generate_sac_report_id(
+                sequence=get_next_sequence_id(AUDIT_SEQUENCE_ID),
+                end_date=end_date,
+            )
+            version = 0
+            updated = obj_data | {
+                "report_id": report_id,
+                "version": version,
+                "created_by": created_by,
+                "updated_by": user,
+            }
+
             result = super().create(**updated)
             History.objects.create(
                 event=event_type,
