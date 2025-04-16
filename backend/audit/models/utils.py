@@ -98,7 +98,7 @@ def generate_audit_indexes(audit):
         audit.submission_status,
         audit.auditee_ein,
         audit.auditee_uei,
-        audit_year,
+        int(audit_year),
     )
 
     is_public = general_information.get(
