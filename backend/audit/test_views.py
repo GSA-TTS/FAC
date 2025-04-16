@@ -1765,6 +1765,7 @@ class AuditeeCertificationStep2ViewTests(TestCase):
         self.client = Client()
         self.user, self.audit = _make_user_and_audit()
         self.audit.submission_status = STATUS.AUDITOR_CERTIFIED
+        self.audit.save()
 
         self.url = reverse(
             "audit:AuditeeCertificationConfirm",
@@ -1942,10 +1943,10 @@ class CrossValidationViewTests(TestCase):
 
         self.assertEqual(response.status_code, 403)  # PermissionDenied results in 403
 
-    @patch("audit.models.SingleAuditChecklist.validate_full")
-    def test_post_view_renders_results_template(self, mock_validate_full):
+    @patch("audit.models.Audit.validate")
+    def test_post_view_renders_results_template(self, mock_validate):
         """Test that POST with validation errors renders template with errors"""
-        mock_validate_full.return_value = {"errors": ["Error 1", "Error 2"], "data": {}}
+        mock_validate.return_value = {"errors": ["Error 1", "Error 2"], "data": {}}
 
         response = self.client.post(self.url)
 
@@ -1955,7 +1956,7 @@ class CrossValidationViewTests(TestCase):
         )
         self.assertEqual(response.context["report_id"], self.audit.report_id)
         self.assertEqual(response.context["errors"]["errors"], ["Error 1", "Error 2"])
-        mock_validate_full.assert_called_once()
+        mock_validate.assert_called_once()
 
     def test_post_view_permission_denied(self):
         """Test that POST returns 403 if SAC report_id does not exist"""
