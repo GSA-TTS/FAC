@@ -464,13 +464,8 @@ def flatten_json(obj, path="", result=None):
     return result
 
 
-def value_exists_in_audit(sac_path, sac_value, audit_data):
-    """Check if a value from SAC exists somewhere in audit data with the same key-value"""
-    sac_field = sac_path.split(".")[-1] if "." in sac_path else sac_path
-    sac_field = sac_field.split("[")[0] if "[" in sac_field else sac_field
-
-    sac_norm_field = normalize_key(sac_field)
-
+def _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data):
+    """Attempts to match the SAC and SOT fields via field name"""
     for audit_path, audit_value in audit_data.items():
         audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
         audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
@@ -509,12 +504,13 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
             else:
                 return {"found_with_different_format": True, **comp_vals}
 
+
+def _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data):
+    """Attempts to match the SAC and SOT fields via values"""
     if not isinstance(sac_value, bool) and sac_value != 0:
         for audit_path, audit_value in audit_data.items():
             audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
-            audit_field = (
-                audit_field.split("[")[0] if "[" in audit_field else audit_field
-            )
+            audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
 
             if normalize_key(audit_field) == sac_norm_field:
                 continue
@@ -538,6 +534,21 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
                     "value": audit_value,
                     **comp_vals,
                 }
+
+
+def value_exists_in_audit(sac_path, sac_value, audit_data):
+    """Check if a value from SAC exists somewhere in audit data with the same key-value"""
+    sac_field = sac_path.split(".")[-1] if "." in sac_path else sac_path
+    sac_field = sac_field.split("[")[0] if "[" in sac_field else sac_field
+    sac_norm_field = normalize_key(sac_field)
+
+    key_match_results = _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data)
+    if key_match_results:
+        return key_match_results
+
+    value_match_results = _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data)
+    if value_match_results:
+        return value_match_results
 
     return {
         "found": False,
