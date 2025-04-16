@@ -117,8 +117,8 @@ class FACAuthenticationBackendTests(TestCase):
         login_id = str(uuid4())
         email = "a+a@a.com"
         audit = baker.make(Audit, version=0)
-        access1 = baker.make(Access, audit=audit, email=email)
-        access2 = baker.make(Access, audit=audit, email=email)
+        access1 = baker.make(Access, audit=audit, email=email, role="auditee_contact")
+        access2 = baker.make(Access, audit=audit, email=email, role="auditor_contact")
 
         # use different casing in the user info to ensure we're not case sensitive
         user_info = {"sub": login_id, "email": "A@A.CoM", "all_emails": ["A+a@A.cOm"]}
@@ -150,8 +150,8 @@ class FACAuthenticationBackendTests(TestCase):
         audit = baker.make(Audit, version=0)
 
         # and that user has some claimed Accesses
-        access_1 = baker.make(Access, audit=audit, email=email, user=user_a_1)
-        access_2 = baker.make(Access, audit=audit, email=email, user=user_a_1)
+        access_1 = baker.make(Access, audit=audit, email=email, user=user_a_1, role="auditee_contact")
+        access_2 = baker.make(Access, audit=audit, email=email, user=user_a_1, role="autior_contact")
 
         # and there are other claimed Accesses for other users
         user_b = baker.make(User, email="b@b.com")
