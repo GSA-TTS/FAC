@@ -40,7 +40,8 @@ class SubmissionProgressViewTests(TestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "home.html")
+        self.assertTrue(response.context["session_expired"])
 
     def test_phrase_in_page(self):
         """Check for 'General Information form'."""

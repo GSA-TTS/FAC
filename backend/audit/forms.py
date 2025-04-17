@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.postgres.forms import SimpleArrayField
-from audit.models import SacValidationWaiver, UeiValidationWaiver
+from audit.models import AuditValidationWaiver, SacValidationWaiver, UeiValidationWaiver
 from config.settings import (
     AGENCY_NAMES,
     GAAP_RESULTS,
@@ -80,7 +80,6 @@ class AuditorCertificationStep1Form(forms.Form):
     has_used_auditors_report = forms.BooleanField()
     has_no_auditee_procedures = forms.BooleanField()
     is_FAC_releasable = forms.BooleanField()
-    is_accurate_and_complete = forms.BooleanField()
 
 
 class AuditorCertificationStep2Form(forms.Form):
@@ -145,6 +144,24 @@ class SacValidationWaiverForm(forms.ModelForm):
 
     class Meta:
         model = SacValidationWaiver
+        fields = "__all__"
+
+
+class AuditValidationWaiverForm(forms.ModelForm):
+    class MultiSelectArrayWidget(forms.SelectMultiple):
+        def __init__(self, *args, **kwargs):
+            choices = kwargs.pop("choices", [])
+            super().__init__(*args, **kwargs)
+            self.choices = choices
+
+    waiver_types = SimpleArrayField(
+        forms.ChoiceField(choices=AuditValidationWaiver.WAIVER_CHOICES),
+        delimiter=",",
+        widget=MultiSelectArrayWidget(choices=AuditValidationWaiver.WAIVER_CHOICES),
+    )
+
+    class Meta:
+        model = AuditValidationWaiver
         fields = "__all__"
 
 

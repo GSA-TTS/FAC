@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+{% load sprite_helper %}
+
+{% block content %}
+    <div class="desktop:padding-x-10">
+        <div class="grid-row">
+            <div class="grid-col-auto audit-search-form">
+                <h3>Filters</h3>
+                <form class="usa-form"
+                      id="audit-search-form"
+                      enctype='multipart/form-data'
+                      method="post">
+                    {% csrf_token %}
+                    {% comment %} Submission {% endcomment %}
+                    <div class="search-submit">
+                        <input class="usa-button"
+                               type="submit"
+                               value="Search"
+                               form="audit-search-form" />
+                        <input class="usa-button usa-button--unstyled"
+                               type="reset"
+                               value="Reset Search" />
+                    </div>
+                    <div class="usa-accordion usa-accordion--multiselectable"
+                         data-allow-multiple>
+                            {% include "search_filters/audit-year.html" %}
+                            {% include "search_filters/uei-ein.html" %}
+                            {% include "search_filters/aln.html" %}
+                            {% include "search_filters/name.html" %}
+                            {% include "search_filters/acceptance-date.html" %}
+                            {% include "search_filters/state.html" %}
+                            {% include "search_filters/cog-over.html" %}
+                            {% include "search_filters/findings.html" %}
+                            {% include "search_filters/direct_funding.html" %}
+                            {% include "search_filters/major-program.html" %}
+                            {% include "search_filters/fy-end-month.html" %}
+                            {% include "search_filters/type-requirement.html" %}
+                            {% include "search_filters/entity-type.html" %}
+                            {% include "search_filters/passthrough-name.html" %}
+                            {% include "search_filters/federal-program-name.html" %}
+                            {% include "search_filters/report-id.html" %}
+                    </div>
+
+                    {% comment %} Submission {% endcomment %}
+                    <div class="search-submit">
+                        <input class="usa-button"
+                               type="submit"
+                               value="Search"
+                               form="audit-search-form" />
+                        <input class="usa-button usa-button--unstyled"
+                               type="reset"
+                               value="Reset Search" />
+                    </div>
+
+                    {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
+                    <input class="usa-input audit-search-pagination-hidden"
+                        id="page"
+                        name="page"
+                        type="number"
+                        value="{{ page }}"
+                        aria-hidden="true"
+                        hidden />
+
+                    {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
+                    <input class="usa-input audit-search-pagination-hidden"
+                        id="order_by"
+                        name="order_by"
+                        value="{{ order_by }}"
+                        aria-hidden="true"
+                        hidden />
+                    <input class="usa-input audit-search-pagination-hidden"
+                        id="order_direction"
+                        name="order_direction"
+                        value="{{ order_direction }}"
+                        aria-hidden="true"
+                        hidden />
+                </form>
+            </div>
+            <div class="grid-col audit-search-results">
+                {% include "includes/beta_warning.html" %}
+                <h1 class="font-sans-2xl">Audit Submissions Search</h1>
+                {% include "search-audit-alert-info.html" %}
+                {% if form.errors %}
+                  {% include "search-alert-error.html" %}
+                {% elif results|length > 0 %}
+                    <div class="margin-y-2 display-flex flex-justify-center">
+                        <img hidden id="loader"
+                            src="{% static 'img/loader.svg' %}"
+                            alt="spinner for processing search" />
+                    </div>
+
+                    <div class="margin-y-2 grid-row display-flex flex-justify">
+                        <p class="margin-0 flex-align-self-center">
+                            <span>{{ results.start_index }}-{{ results.end_index }} of <strong>{{ results_count|intcomma }}</strong> results in {{ total_time_s|floatformat }} seconds.</span>
+                        </p>
+                        {% if results_count <= summary_report_download_limit %}
+                            <button class="usa-button display-flex"
+                                    formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}?beta=Y"
+                                    form="audit-search-form">
+                                <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                    aria-hidden="true"
+                                    role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                                <p class="margin-0">Download all</p>
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="usa-table-container--scrollable margin-0" tabindex="0">
+                        <table class="usa-table usa-table--striped usa-table--compact width-full">
+                            <thead>
+                                <tr>
+                                    {% include "search-table-header.html" with friendly_title="Name" field_name="auditee_name" %}
+                                    {% include "search-table-header.html" with friendly_title="UEI or EIN" field_name="auditee_uei" %}
+                                    {% include "search-table-header.html" with friendly_title="Acc Date" field_name="fac_accepted_date" %}
+                                    {% include "search-table-header.html" with friendly_title="AY" field_name="audit_year" %}
+                                    {% include "search-table-header.html" with friendly_title="Cog or Over" field_name="cog_over" %}
+                                    <th scope="col" role="columnheader">View</th>
+                                    <th scope="col" role="columnheader">PDF</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                    <tr>
+                                        <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
+                                        {% comment %} Display UEI. If it's "GSA_MIGRATION", use the EIN instead. If no EIN, just show "GSA_MIGRATION". {% endcomment %}
+                                        <td>
+                                            {% if result.auditee_uei != "GSA_MIGRATION" %}
+                                                {{ result.auditee_uei }}
+                                            {% elif result.auditee_ein %}
+                                                {{ result.auditee_ein }}
+                                            {% else %}
+                                                {{ result.auditee_uei }}
+                                            {% endif %}
+                                        </td>
+                                        {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
+                                        <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}</td>
+                                        <td>{{ result.audit_year }}</td>
+                                        <td>
+                                            {% if result.audit.agency_name %}
+                                                {{ result.audit.agency_name|linebreaksbr  }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a class="usa-link display-flex flex-column flex-align-center"
+                                               href="{% url 'dissemination:Summary' report_id=result.report_id %}?beta=Y"
+                                               target="_blank">
+                                                <svg class="usa-icon usa-icon--size-4"
+                                                     aria-hidden="true"
+                                                     focusable="false"
+                                                     role="img">
+                                                    {% uswds_sprite "visibility" %}
+                                                </svg>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if result.is_public or include_private %}
+                                                <a class="usa-link display-flex flex-column flex-align-center"
+                                                href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}?beta=Y"
+                                                target="_blank">
+                                                    <svg class="usa-icon usa-icon--size-4"
+                                                        aria-hidden="true"
+                                                        focusable="false"
+                                                        role="img">
+                                                        {% uswds_sprite "file_download" %}
+                                                    </svg>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav aria-label="Pagination" class="usa-pagination">
+                        <ul class="usa-pagination__list">
+                            {% if results.has_previous %}
+                                <li class="usa-pagination__item usa-pagination__arrow">
+                                    <a class="usa-pagination__link usa-pagination__previous-page"
+                                        aria-label="Previous page">
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            {% uswds_sprite "navigate_before" %}
+                                        </svg>
+                                        <span class="usa-pagination__link-text">Previous</span></a>
+                                </li>
+                            {% endif %}
+                            {% for page_number in results.adjusted_elided_pages %}
+                                {% if page_number == results.paginator.ELLIPSIS %}
+                                    <li class="usa-pagination__item usa-pagination__overflow"
+                                        aria-label="ellipsis indicating non-visible pages">
+                                        <span>…</span>
+                                    </li>
+                                {% else %}
+                                    <li class="usa-pagination__item usa-pagination__page-no">
+                                        <a class="usa-pagination__button {% if results.number == page_number %}usa-current{% endif %}"
+                                            aria-label="Page {{ page_number }}">{{ page_number }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if results.has_next %}
+                                <li class="usa-pagination__item usa-pagination__arrow">
+                                    <a class="usa-pagination__link usa-pagination__next-page"
+                                        aria-label="Next page">
+                                        <span class="usa-pagination__link-text">Next</span>
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            {% uswds_sprite "navigate_next" %}
+                                        </svg>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% elif results is not None %}
+                    <div class="search-instructions">
+                        <img id="search_arrow"
+                            src="{% static 'img/circle-arrow.svg' %}"
+                            alt="an arrow points left, toward the search form" />
+                        <img hidden id="loader"
+                            src="{% static 'img/loader.svg' %}"
+                            alt="spinner for processing search" />
+                        <p>
+                            No results found.
+                        </p>
+                    </div>
+                {% else %}
+                    <div class="search-instructions">
+                        <img id="search_arrow"
+                            src="{% static 'img/circle-arrow.svg' %}"
+                            alt="an arrow points left, toward the search form" />
+                        <img hidden id="loader"
+                            src="{% static 'img/loader.svg' %}"
+                            alt="spinner for processing search" />
+                        <p>
+                            Enter your filters and select <em>Search</em> to begin
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="usa-modal"
+         id="device-orientation-modal"
+         aria-labelledby="device-orientation-modal-heading"
+         aria-describedby="device-orientation-modal-description">
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                <h2 class="usa-modal__heading" id="device-orientation-modal-heading">Please rotate your device</h2>
+                <div class="usa-prose">
+                    <p id="device-orientation-modal-description">Search works best with your device in landscape orientation.</p>
+                </div>
+            </div>
+            <button type="button"
+                    class="usa-button usa-modal__close dismiss-orientation-modal"
+                    aria-label="Close this window"
+                    data-close-modal>
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    {% uswds_sprite "close" %}
+                </svg>
+            </button>
+        </div>
+    </div>
+    <a href="#device-orientation-modal"
+       id="orientation-toggle"
+       aria-label="Orientation modal"
+       aria-controls="device-orientation-modal"
+       data-open-modal></a>
+    <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>
+    <script src="{% static 'compiled/js/search-results.js' %}"></script>
+{% endblock content %}

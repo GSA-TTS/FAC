@@ -3,12 +3,16 @@ locals {
 }
 
 resource "cloudfoundry_route" "postgrest" {
+  provider = cloudfoundry-community
+
   space    = data.cloudfoundry_space.apps.id
   domain   = data.cloudfoundry_domain.public.id
   hostname = "fac-${var.cf_space_name}-${local.postgrest_name}"
 }
 
 resource "cloudfoundry_service_key" "postgrest" {
+  provider = cloudfoundry-community
+
   name             = "postgrest"
   service_instance = module.database.instance_id
 }
@@ -18,6 +22,8 @@ data "docker_registry_image" "postgrest" {
 }
 
 resource "cloudfoundry_app" "postgrest" {
+  provider = cloudfoundry-community
+
   name         = local.postgrest_name
   space        = data.cloudfoundry_space.apps.id
   docker_image = "ghcr.io/gsa-tts/fac/postgrest@${data.docker_registry_image.postgrest.sha256_digest}"
@@ -32,7 +38,7 @@ resource "cloudfoundry_app" "postgrest" {
 
   environment = {
     PGRST_DB_URI : cloudfoundry_service_key.postgrest.credentials.uri
-    PGRST_DB_SCHEMAS : "api_v1_0_3,api_v1_1_0,admin_api_v1_1_0"
+    PGRST_DB_SCHEMAS : "api_v1_0_3,api_v1_1_0,api_v1_2_0,admin_api_v1_1_0"
     PGRST_DB_ANON_ROLE : "anon"
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
     PGRST_DB_MAX_ROWS : 20000

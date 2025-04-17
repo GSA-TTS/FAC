@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Create .env
         working-directory: ./backend
@@ -32,10 +32,6 @@ jobs:
       - name: Start services
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
-
-      - name: Load historical data
-        working-directory: ./backend
-        run: docker compose run web ./load_data.sh
 
       - name: Run Django test suite
         working-directory: ./backend

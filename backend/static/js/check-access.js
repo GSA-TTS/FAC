@@ -1,16 +1,10 @@
 import { checkValidity } from './validate';
 
-const FORM = document.forms[0];
 let addedContactNum = 1;
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('create');
   continueBtn.disabled = shouldDisable;
-}
-
-function allResponsesValid() {
-  const inputsWithErrors = document.querySelectorAll('[class *="-error"]');
-  return inputsWithErrors.length === 0;
 }
 
 function performValidations(nodes) {
@@ -91,10 +85,12 @@ function attachFocusoutMulti(elements) {
 }
 
 function attachEventHandlers() {
-  FORM.addEventListener('submit', (e) => {
+
+  const continueBtn = document.getElementById('create');
+  continueBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    if (!allResponsesValid()) return;
-    FORM.submit();
+    setFormDisabled(true);
+    document.getElementById('grant-access').submit();
   });
 
   const certifyingInputs = Array.from(

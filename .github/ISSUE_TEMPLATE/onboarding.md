@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-**Instructions for the issue creator:** 
-1. Fill in the GitHub username of the new person (if known) and the name of the onboarding buddy. 
+**Instructions for the issue creator:**
+1. Fill in the GitHub username of the new person (if known) and the name of the onboarding buddy.
 1. Remove irrelevant checklists (eg designers should never see the engineer checklist.]
 1. Remove the horizontal line below and everything above it (these instructions).
 
@@ -37,14 +37,14 @@ Here's a checklist to get you started and to make sure you've got access to :all
     Please add my GitHub account (https://github.com/myusername) to the following GitHub organizations:
     - https://github.com/GSA
     - https://github.com/GSA-TTS
-    
+
     I will be working on the FAC project:
     - https://github.com/GSA-TTS/FAC
-    
+
     I have cc'd the FAC Product Lead for awareness.
-        
+
     Thank you!
-    ```        
+    ```
     - (Note this step could take a few days; humans handle these requests.)
   - [ ] Once you are added to the GSA-TTS org, ask [the person(s) with the "Maintainer" role to add you to the `FAC-team` team](https://github.com/orgs/GSA-TTS/teams/fac-team/members). This will grant you read/write access to our repositories.
   - [ ] Have the team calendar owner (@jadudm) share the calendar invite link to our new team member.
@@ -52,20 +52,25 @@ Here's a checklist to get you started and to make sure you've got access to :all
 **For designers, also...**
 - [ ] Review the [design onboarding document](https://docs.google.com/document/d/1EILl0nZr59T4PFJJMtFbmnQDJPksgzIFPuoFDN0bk0g/edit#heading=h.bhu3dgydlbvr)
 - [ ] Visit https://touchpoints.digital.gov/ and set up a touchpoints account
-- [ ] If you don't already have a Figma license, request one from your supervisor. 
+- [ ] If you don't already have a Figma license, request one from your supervisor.
 - [ ] If you don't already have a Mural ccount, follow the instructions to get one [here](https://handbook.tts.gsa.gov/tools/mural/).
 
 **For engineers, also...**
-- [ ] Familiarize yourself with Python, Django, and Cloud.gov—all tools used in this project.
+- [ ] Familiarize yourself with Python, Django, Docker, Terraform and Cloud.gov—all tools used in this project.
   - [ ] If you need to catch up on the latest in Python development, check out the [Python developer's guide](https://devguide.python.org/).
   - [ ] Work through the [Django Tutorial](https://docs.djangoproject.com/en/4.0/intro/tutorial01/) and writing your first Django app.
   - [ ] If it's not already set up on your machine & account, enable [commit signing](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits). Also see the pinned messages in the Slack development channel.
-  - [ ] If you're not already, get [setup with Cloud.gov](https://cloud.gov/docs/getting-started/setup/)
-    - [ ] Once your account exists, make a PR to [add yourself to the list of developers](https://github.com/GSA-TTS/FAC/tree/main/terraform/meta/config.tf) with access to our spaces.
-  - [ ] Practice deploying a [python application](https://github.com/cloud-gov/cf-hello-worlds/tree/main/python-flask) to Cloud.gov using the Cloud.gov command line interface (CLI): https://cloud.gov/docs/getting-started/your-first-deploy/.
+  - [ ] If you need access to be able to view the cloud.gov interfaces, submit a request with the system owner and access will be provisioned on a case-by-case basis.
+    - [ ] Practice deploying a [python application](https://github.com/cloud-gov/cf-hello-worlds/tree/main/python-flask) to Cloud.gov using the Cloud.gov command line interface (CLI): https://cloud.gov/docs/getting-started/your-first-deploy/.
   - [ ] Survey existing TTS projects which use Django+Cloud.gov like: [Tock](https://github.com/18F/tock) and the [DOJ CRT Portal](https://github.com/usdoj-crt/crt-portal).
 - [ ] Get set up for [local development](https://github.com/GSA-TTS/FAC/blob/main/docs/development.md#local-development) so you can start contributing
 - [ ] Review [NIST SP 800-161 Rev.1](https://csrc.nist.gov/pubs/sp/800/161/r1/final) on supply chain risk management. Reply to this onboarding ticket in a comment when you have completed this review.
+- [ ] Make sure you have a `login.gov` account and have logged into the FAC application at least once.
+  - [ ] Then, add your email to the `readonly` list in [staffusers.json](../../backend/config/staffusers.json).
+
+**For helpdesk, also..**
+- [ ] Make sure you have a `login.gov` account and have logged into the FAC application at least once.
+  - [ ] Then, add your email to the `helpdesk` list in [staffusers.json](../../backend/config/staffusers.json).
 
 
 ## For your onboarding buddy
@@ -80,8 +85,6 @@ Note: If you're not able to do any of these yourself, you're still responsible f
 - [ ] [Add as a form manager to the touchpoints recruitment intercept](https://touchpoints.app.cloud.gov/admin/forms/9412c559/permissions)
 
 **For engineers, also...**
-- [ ] Make sure you have a `login.gov` account and have logged into the FAC application at least once. 
-  - [ ] Then, add your email to the `readonly` list in [staffusers.json](../../backend/config/staffusers.json).
 - [ ] [Add as a member of the FAC group in New Relic](https://one.newrelic.com/admin-portal/organizations/users-list) (@GSA-TTS/fac-admins can do this)
 
 **For product leads/owners, also...**
@@ -90,6 +93,4 @@ Note: If you're not able to do any of these yourself, you're still responsible f
 - [ ] Also give them the `Maintainer` role in [the FAC-team team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members).
 
 **For helpdesk, also...**
-- [ ] Make sure you have a `login.gov` account and have logged into the FAC application at least once. 
-  - [ ] Then, add your email to the `helpdesk` list in [staffusers.json](../../backend/config/staffusers.json).
 - [ ] Give them access to the [Help Desk](https://fac-gov.zendesk.com/admin/people/team/members) as a team member.

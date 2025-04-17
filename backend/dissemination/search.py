@@ -1,13 +1,16 @@
+import json
 import logging
 import time
-from .searchlib.search_constants import ORDER_BY, DIRECTION, DAS_LIMIT
+from .searchlib.search_constants import OrderBy, Direction, DAS_LIMIT
 from .searchlib.search_general import report_timing, search_general
 from .searchlib.search_alns import search_alns
+from .searchlib.search_cog_or_oversight import search_cog_or_oversight
 from .searchlib.search_findings import search_findings
+from .searchlib.search_federal_program_name import search_federal_program_name
 from .searchlib.search_direct_funding import search_direct_funding
 from .searchlib.search_major_program import search_major_program
-from .searchlib.search_type_requirement import search_type_requirement
 from .searchlib.search_passthrough_name import search_passthrough_name
+from .searchlib.search_type_requirement import search_type_requirement
 from dissemination.models import DisseminationCombined, General
 
 logger = logging.getLogger(__name__)
@@ -58,16 +61,17 @@ def search(params):
     ##############
     # GENERAL
 
-    logger.info(params)
     if is_advanced_search(params):
         logger.info("search Searching `DisseminationCombined`")
         results = search_general(DisseminationCombined, params)
         results = search_alns(results, params)
+        results = search_cog_or_oversight(results, params)
+        results = search_federal_program_name(results, params)
         results = search_findings(results, params)
         results = search_direct_funding(results, params)
         results = search_major_program(results, params)
-        results = search_type_requirement(results, params)
         results = search_passthrough_name(results, params)
+        results = search_type_requirement(results, params)
     else:
         logger.info("search Searching `General`")
         results = search_general(General, params)
@@ -85,9 +89,9 @@ def _set_general_defaults(params):
     # Set some defaults.
     # Set default order direction
     if not params.get("order_by", None):
-        params["order_by"] = ORDER_BY.fac_accepted_date
+        params["order_by"] = OrderBy.fac_accepted_date
     if not params.get("order_direction", None):
-        params["order_direction"] = DIRECTION.descending
+        params["order_direction"] = Direction.descending
 
     params["LIMIT"] = DAS_LIMIT
 
@@ -102,23 +106,23 @@ def _sort_results(results, params):
     # Instead of nesting conditions, we'll prep a string
     # for determining the sort direction.
     match params.get("order_direction"):
-        case DIRECTION.ascending:
+        case Direction.ascending:
             direction = ""
         case _:
             direction = "-"
 
     # Now, apply the sort that we pass in front the front-end.
     match params.get("order_by"):
-        case ORDER_BY.auditee_name:
+        case OrderBy.auditee_name:
             new_results = results.order_by(f"{direction}auditee_name")
-        case ORDER_BY.auditee_uei:
+        case OrderBy.auditee_uei:
             new_results = results.order_by(f"{direction}auditee_uei")
-        case ORDER_BY.fac_accepted_date:
+        case OrderBy.fac_accepted_date:
             new_results = results.order_by(f"{direction}fac_accepted_date")
-        case ORDER_BY.audit_year:
+        case OrderBy.audit_year:
             new_results = results.order_by(f"{direction}audit_year")
-        case ORDER_BY.cog_over:
-            if params.get("order_direction") == DIRECTION.ascending:
+        case OrderBy.cog_over:
+            if params.get("order_direction") == Direction.ascending:
                 # Ex. COG-01 -> COG-99, OVER-01 -> OVER-99
                 new_results = results.order_by("oversight_agency", "cognizant_agency")
             else:
@@ -147,3 +151,20 @@ def _make_distinct(results, params):
         results = results.distinct("report_id", order_by)
 
     return results
+
+
+def gather_errors(form):
+    """
+    Gather errors based on the form fields inputted by the user.
+    """
+    formatted_errors = []
+    if form.errors:
+        if not form.is_valid():
+            errors = json.loads(form.errors.as_json())
+            for error in reversed(errors):
+                if "start_date" in error:
+                    formatted_errors.append("The start date you entered is invalid.")
+                if "end_date" in error:
+                    formatted_errors.append("The end date you entered is invalid.")
+
+    return formatted_errors

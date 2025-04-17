@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from audit.models import SingleAuditChecklist
 from dissemination.models import TribalApiAccessKeyIds
 from users.models import UserPermission
-from .models import CognizantBaseline, CognizantAssignment, AssignmentTypeCode
+from .models import CognizantAssignment, AssignmentTypeCode
 
 import json
 from datetime import date
@@ -29,30 +29,6 @@ class SupportAdmin(admin.ModelAdmin):
         return request.user.is_staff
 
     def has_delete_permission(self, request, obj=None):
-        return False
-
-
-@admin.register(CognizantBaseline)
-class CognizantBaselineAdmin(SupportAdmin):
-    list_display = [
-        "uei",
-        "cognizant_agency",
-        "date_assigned",
-        "ein",
-        "dbkey",
-        "is_active",
-        "source",
-    ]
-    list_filter = [
-        "source",
-        "is_active",
-        "cognizant_agency",
-    ]
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
         return False
 
 
@@ -210,26 +186,30 @@ def add_custom_field_to_log(sender, instance, created, **kwargs):
     if created:
         model_class = instance.content_type.model_class()
         qset = model_class.objects.filter(pk=instance.object_id)
+        obj = None
         if qset.exists():
             obj = qset.first()
 
         # update content of record after save occurred.
-        change_message_json = json.loads(instance.change_message)
+        if instance.change_message:
+            change_message_json = json.loads(instance.change_message)
 
-        if change_message_json:
-            if model_class == UserPermission:
-                change_message_json[0]["content"] = list(
-                    qset.values("email", "permission__slug")
-                )
-            elif model_class == TribalApiAccessKeyIds:
-                change_message_json[0]["content"] = list(qset.values("email", "key_id"))
-            else:
-                change_message_json[0]["content"] = list(qset.values("id"))
+            if change_message_json:
+                if model_class == UserPermission:
+                    change_message_json[0]["content"] = list(
+                        qset.values("email", "permission__slug")
+                    )
+                elif model_class == TribalApiAccessKeyIds:
+                    change_message_json[0]["content"] = list(
+                        qset.values("email", "key_id")
+                    )
+                else:
+                    change_message_json[0]["content"] = list(qset.values("id"))
 
-            # record still exists.
-            if obj:
-                change_message_json[0]["id"] = obj.pk
+                # record still exists.
+                if obj:
+                    change_message_json[0]["id"] = obj.pk
 
-        # write changes to instance.
-        instance.change_message = json.dumps(change_message_json, cls=DateEncoder)
-        instance.save()
+            # write changes to instance.
+            instance.change_message = json.dumps(change_message_json, cls=DateEncoder)
+            instance.save()

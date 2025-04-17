@@ -35,18 +35,22 @@ disable = [
 
 [tool.bandit]
 # TDB 2022-12-07 - test_schemas and test_validators use random number generation, which bandit doesn't like
+# TDB 2025-03-06 - migrate_audits uses string-based query construction, but it is for internal use only.
 exclude_dirs = [
+    ".venv",
     "audit/cross_validation/test_check_has_federal_awards.py",
     "audit/test_schemas.py",
     "audit/test_validators.py",
-    "node_modules",
+    "dissemination/api/lib/test_compare_json_objects.py",
+    "dissemination/management/commands/migrate_audits.py",
     "dissemination/test_search.py",
     "dissemination/tests.py",
-    ".venv"
+    "node_modules",
 ]
 
 [tool.djlint]
 ignore="H006,H022,H023,H019,H031"
+include="H035"
 profile="django"
 use_gitignore=true
 # img_height,https,entity,javascript,lang

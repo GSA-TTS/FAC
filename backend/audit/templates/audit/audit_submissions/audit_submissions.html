@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+{% load sprite_helper %}
+{% block content %}
+    <div class="grid-container margin-y-6">
+        <div class="grid-row" id="submission-checklist-summary">
+            <div class="tablet:grid-col-fill">
+                <h1 class="font-sans-2xl margin-y-1">
+                    Audit submissions
+                </h1>
+                <p class="text-base-darker margin-top-0">View the audit submissions associated with your profile.</p>
+            </div>
+            <div>
+                <button class="usa-button grid-row margin-top-1"
+                        aria-controls="modal-terms-conditions"
+                        id="button-new-audit-submission"
+                        data-open-modal>
+                    <svg class="usa-icon usa-icon--size-3 margin-right-1"
+                         aria-hidden="true"
+                         focusable="false"
+                         role="img">
+                        {% uswds_sprite "add" %}
+                    </svg>
+                    <span>New Audit Submission</span>
+                </button>
+            </div>
+        </div>
+        {% if is_beta %}
+          {% include "includes/beta_warning.html" %}
+        {% endif %}
+        {% if data.in_progress_audits|length == 0 and data.completed_audits|length == 0 %}
+            <p class="margin-bottom-4">No submissions associated with your email address were found.</p>
+            {% include "./alert_find_report.html" %}
+        {% else %}
+            {% if data.in_progress_audits %}
+                {% include "./table_in_progress.html" %}
+                {% include "./alert_find_report.html" %}
+            {% endif %}
+            {% if data.completed_audits %}
+                {% include "./table_completed.html" %}
+            {% endif %}
+        {% endif %}
+        {% include "./modal_uei.html" %}
+        {% include "./modal_new_audit_submission.html" %}
+    </div>
+    <script src="{% static 'compiled/js/audit_submissions.js' %}"
+            type="text/javascript"></script>
+{% endblock content %}

@@ -10,18 +10,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from base64 import b64decode
-from datetime import date, datetime, timezone
+import json
+import logging
 import os
 import sys
-import logging
-import json
-from .db_url import get_db_url_from_vcap_services
-import environs
-from cfenv import AppEnv
-from audit.get_agency_names import get_agency_names, get_audit_info_lists
+from base64 import b64decode
+from datetime import date, datetime, timezone
+
 import dj_database_url
+import environs
 import newrelic.agent
+from audit.get_agency_names import get_agency_names, get_audit_info_lists
+from cfenv import AppEnv
+
+from .db_url import get_db_url_from_vcap_services
 
 newrelic.agent.initialize()
 
@@ -141,6 +143,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "config.middleware.HandleSessionException",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "config.middleware.MaintenanceCheck",
@@ -160,6 +163,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.static_site_url",
+                "config.context_processors.navigation_content",
                 "config.context_processors.omb_num_exp_date",
                 "config.context_processors.current_environment",
                 "config.context_processors.maintenance_banner",
@@ -355,15 +359,16 @@ else:
             )
 
         elif service["instance_name"] == "backups":
+            # Backups AWS S3 bucket for the app's backup files
             s3_creds = service["credentials"]
-            # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
-            DBBACKUP_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-            DBBACKUP_STORAGE_OPTIONS = {
-                "access_key": s3_creds["access_key_id"],
-                "secret_key": s3_creds["secret_access_key"],
-                "bucket_name": s3_creds["bucket"],
-                "default_acl": "private",  # type: ignore
-            }
+
+            AWS_BACKUPS_ACCESS_KEY_ID = s3_creds["access_key_id"]
+            AWS_BACKUPS_SECRET_ACCESS_KEY = s3_creds["secret_access_key"]
+            AWS_BACKUPS_STORAGE_BUCKET_NAME = s3_creds["bucket"]
+            AWS_S3_BACKUPS_REGION_NAME = s3_creds["region"]
+            AWS_S3_BACKUPS_ENDPOINT = s3_creds["endpoint"]
+            AWS_S3_BACKUPS_ENDPOINT_URL = f"https://{AWS_S3_BACKUPS_ENDPOINT}"
+            AWS_PRIVATE_DEFAULT_ACL = "private"
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
@@ -605,10 +610,16 @@ DOLLAR_THRESHOLDS = [
 # The default message states that maintenance will be ongoing for the duration of the banners uptime. This may be true in an emergency. Otherwise, be sure to set a custom message.
 MAINTENANCE_BANNER_DATES = [
     {
-        # December 5th to 10th, noon EST, uploading historical audits
+        # December 5th noon to December 10th 6 PM, EST, uploading historical audits
         "start": datetime(2024, 12, 5, 17, tzinfo=timezone.utc),
-        "end": datetime(2024, 12, 10, 17, tzinfo=timezone.utc),
+        "end": datetime(2024, 12, 10, 23, tzinfo=timezone.utc),
         "template_name": "maintenance_20241210.html",
         "message": "FAC.gov will be performing maintenance on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
+    },
+    {
+        # April 15th 6 AM to April 21st 7 PM, EST, upgrading teraform modules
+        "start": datetime(2025, 4, 15, 10, tzinfo=timezone.utc),
+        "end": datetime(2025, 4, 21, 23, tzinfo=timezone.utc),
+        "message": "FAC.gov will be performing maintenance from Monday, April 21, 2025 between 9:00 AM and 6:00 PM ET. During this period, the entire website may be unavailable.",
     },
 ]

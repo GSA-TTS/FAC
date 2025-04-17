@@ -41,6 +41,7 @@
                             {% include "search_filters/type-requirement.html" %}
                             {% include "search_filters/entity-type.html" %}
                             {% include "search_filters/passthrough-name.html" %}
+                            {% include "search_filters/federal-program-name.html" %}
                             {% include "search_filters/report-id.html" %}
                         {% else %}
                             {% comment %} Basic search contains filters only applicable to the general table. {% endcomment %}
@@ -67,30 +68,39 @@
                     </div>
 
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
-                    <input class="usa-input"
+                    <input class="usa-input audit-search-pagination-hidden"
                         id="page"
                         name="page"
                         type="number"
                         value="{{ page }}"
+                        aria-hidden="true"
                         hidden />
 
                     {% comment %} Hidden order and direction inputs for use when clicking a sort button in the table header {% endcomment %}
-                    <input class="usa-input"
+                    <input class="usa-input audit-search-pagination-hidden"
                         id="order_by"
                         name="order_by"
                         value="{{ order_by }}"
+                        aria-hidden="true"
                         hidden />
-                    <input class="usa-input"
+                    <input class="usa-input audit-search-pagination-hidden"
                         id="order_direction"
                         name="order_direction"
                         value="{{ order_direction }}"
+                        aria-hidden="true"
                         hidden />
                 </form>
             </div>
             <div class="grid-col audit-search-results">
-                <h1 class="font-sans-2xl">Search single audit reports</h1>
+                {% if advanced_search_flag %}
+                <h1 class="font-sans-2xl">Audit Submissions Advanced Search </h1>
+                {% else %}
+                <h1 class="font-sans-2xl">Audit Submissions Basic Search </h1>
+                {% endif %}
                 {% include "search-alert-info.html" %}
-                {% if results|length > 0 %}
+                {% if form.errors %}
+                  {% include "search-alert-error.html" %}
+                {% elif results|length > 0 %}
                     <div class="margin-y-2 display-flex flex-justify-center">
                         <img hidden id="loader"
                             src="{% static 'img/loader.svg' %}"
@@ -147,10 +157,8 @@
                                         </td>
                                         <td>{{ result.audit_year }}</td>
                                         <td>
-                                            {% if result.oversight_agency %}
-                                                OVER-{{ result.oversight_agency }}
-                                            {% elif result.cognizant_agency %}
-                                                COG-{{ result.cognizant_agency }}
+                                            {% if result.agency_name %}
+                                                {{ result.agency_name|linebreaksbr  }}
                                             {% else %}
                                                 N/A
                                             {% endif %}

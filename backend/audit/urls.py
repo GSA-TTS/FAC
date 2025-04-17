@@ -111,6 +111,11 @@ urlpatterns = [
         name="RemoveEditorView",
     ),
     path(
+        "manage-submission/remove-report/<str:report_id>",
+        views.RemoveSubmissionView.as_view(),
+        name="RemoveSubmissionInProgress",
+    ),
+    path(
         "workbook/xlsx/<str:file_type>/<str:report_id>",
         views.PredisseminationXlsxDownloadView.as_view(),
         name="PredisseminationXlsxDownload",

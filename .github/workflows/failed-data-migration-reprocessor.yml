@@ -47,4 +47,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 1G -m 1G --name failed_data_migration_reprocessor --command "python manage.py reprocess_failed_migration --year ${{ inputs.year }} --page_size ${{ inputs.page_size }} --pages ${{ inputs.pages }} --error_tag ${{ inputs.error_tag }}"
+          command: cf run-task gsa-fac -k 1G -m 1G --name failed_data_migration_reprocessor --command "python manage.py reprocess_failed_migration --year ${{ inputs.year }} --page_size ${{ inputs.page_size }} --pages ${{ inputs.pages }} --error_tag ${{ inputs.error_tag }}" --wait

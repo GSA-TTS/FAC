@@ -75,6 +75,10 @@ resource "cloudfoundry_app" "fac_app" {
   }
 
   service_binding {
+    service_instance = var.backups_s3_id
+  }
+
+  service_binding {
     service_instance = var.db_id
   }
 

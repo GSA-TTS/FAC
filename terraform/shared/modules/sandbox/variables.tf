@@ -75,9 +75,9 @@ variable "clamav_fs_instances" {
 }
 
 variable "clamav_memory" {
-  type        = number
+  type        = string
   description = "memory in MB to allocate to clamav app"
-  default     = 2048
+  default     = "2048M"
 }
 
 variable "pgrst_jwt_secret" {
@@ -132,4 +132,14 @@ variable "denylist" {
   default = {
     # appname    = [ "bad.example.com:443" ]
   }
+}
+
+variable "backups_s3_id" {
+  type        = string
+  description = "the full string of the backups s3 resource id"
+}
+
+variable "cf_space_id" {
+  type        = string
+  description = "the guid of the cf space"
 }

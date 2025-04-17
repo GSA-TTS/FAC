@@ -1,3 +1,4 @@
+from audit.exceptions import SessionExpiredException
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
@@ -29,7 +30,7 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
 
-        self.assertRaises(KeyError, view.dispatch, request)
+        self.assertRaises(PermissionDenied, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
         user = baker.make(User)
@@ -56,7 +57,7 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
         self.assertRaises(
-            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
+            SessionExpiredException, view.dispatch, request, report_id="not-logged-in"
         )
 
     def test_no_access_raises(self):
@@ -95,7 +96,7 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
 
-        self.assertRaises(KeyError, view.dispatch, request)
+        self.assertRaises(PermissionDenied, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
         user = baker.make(User)
@@ -122,7 +123,7 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
         self.assertRaises(
-            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
+            SessionExpiredException, view.dispatch, request, report_id="not-logged-in"
         )
 
     def test_no_access_raises(self):
@@ -190,7 +191,7 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
 
-        self.assertRaises(KeyError, view.dispatch, request)
+        self.assertRaises(PermissionDenied, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
         user = baker.make(User)
@@ -217,7 +218,7 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
         self.assertRaises(
-            PermissionDenied, view.dispatch, request, report_id="not-logged-in"
+            SessionExpiredException, view.dispatch, request, report_id="not-logged-in"
         )
 
     def test_no_access_raises(self):

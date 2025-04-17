@@ -4,15 +4,19 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse
+
 from audit.forms import UnlockAfterCertificationForm
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import (
     SingleAuditChecklist,
+    Audit,
 )
 from audit.models.models import STATUS
 from audit.models.viewflow import sac_transition
+from audit.decorators import verify_status
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +29,13 @@ class UnlockAfterCertificationView(
     READY_FOR_CERTIFICATION.
     """
 
+    @verify_status(
+        [
+            STATUS.READY_FOR_CERTIFICATION,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+        ]
+    )
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -51,6 +62,13 @@ class UnlockAfterCertificationView(
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
+    @verify_status(
+        [
+            STATUS.READY_FOR_CERTIFICATION,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+        ]
+    )
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -61,8 +79,11 @@ class UnlockAfterCertificationView(
             should_go_to_in_progress = (
                 form.data.get("unlock_after_certification") in acceptable
             )
+            audit = Audit.objects.find_audit_or_none(report_id=report_id)
             if form.is_valid() and should_go_to_in_progress:
-                if sac_transition(request, sac, transition_to=STATUS.IN_PROGRESS):
+                if sac_transition(
+                    request, sac, audit=audit, transition_to=STATUS.IN_PROGRESS
+                ):
                     logger.info("Submission unlocked after certification")
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))

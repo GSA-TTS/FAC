@@ -20,6 +20,8 @@ class Command(BaseCommand):
         readonly_codenames = [
             "view_access",
             "view_deletedaccess",
+            "view_audit",
+            "view_auditvalidationwaiver",
             "view_singleauditchecklist",
             "view_sacvalidationwaiver",
             "view_ueivalidationwaiver",
@@ -34,8 +36,8 @@ class Command(BaseCommand):
             "view_passthrough",
             "view_secondaryauditor",
             "view_cognizantassignment",
-            "view_cognizantbaseline",
             "view_staffuser",
+            "view_user",
             "view_userpermission",
             "view_tribalapiaccesskeyids",
         ]
@@ -53,6 +55,9 @@ class Command(BaseCommand):
             "add_tribalapiaccesskeyids",
             "change_tribalapiaccesskeyids",
             "delete_tribalapiaccesskeyids",
+            "add_auditvalidationwaiver",
+            "change_auditvalidationwaiver",
+            "delete_auditvalidationwaiver",
             "add_sacvalidationwaiver",
             "add_ueivalidationwaiver",
             "add_cognizantassignment",
@@ -86,20 +91,18 @@ class Command(BaseCommand):
                     # create staff user for each role.
                     with transaction.atomic():
 
-                        StaffUser(
-                            staff_email=email,
-                        ).save()
+                        StaffUser.objects.create(staff_email=email)
 
                         # attempt to update the user.
-                        try:
-                            user = User.objects.get(email=email, is_staff=True)
+                        user = User.objects.filter(email=email, is_staff=True)
 
+                        if user.exists():
+                            user = user.first()
                             user.groups.clear()
                             match role:
                                 case "readonly":
                                     user.groups.add(group_readonly)
                                 case "helpdesk":
-                                    user.groups.clear()
                                     user.groups.add(group_helpdesk)
                                 case "superuser":
                                     user.is_superuser = True
@@ -107,8 +110,7 @@ class Command(BaseCommand):
                             user.save()
                             logger.info(f"Synced {email} to a StaffUser role.")
 
-                        # for whatever reason, this failed. Revert staffuser creation.
-                        except User.DoesNotExist:
+                        else:
                             transaction.set_rollback(True)
                             logger.warning(
                                 f"StaffUser not created for {email}, they have not logged in yet."

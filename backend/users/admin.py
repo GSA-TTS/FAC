@@ -18,14 +18,13 @@ class PermissionAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = [
+        "username",
         "email",
         "can_read_tribal",
         "last_login",
         "date_joined",
-        "assigned_groups",
     ]
-    list_filter = ["is_staff", "is_superuser", "groups"]
-    exclude = ["user_permissions", "password"]
+    fields = ["username", "email", "can_read_tribal", "last_login", "date_joined"]
     readonly_fields = ["date_joined", "last_login"]
     search_fields = ("email", "username")
 
@@ -39,13 +38,15 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(UserPermission)
 class UserPermissionAdmin(admin.ModelAdmin):
     list_display = ["user", "email", "permission"]
-    search_fields = ("email", "permission", "user")
+    search_fields = ("email", "permission__slug", "user__username")
     fields = ["email", "permission"]
 
     def save_model(self, request, obj, form, change):
         obj.email = obj.email.lower()
         try:
-            obj.user = User.objects.get(email=obj.email)
+            obj.user = (
+                User.objects.filter(email=obj.email).order_by("last_login").last()
+            )
         except User.DoesNotExist:
             pass
         super().save_model(request, obj, form, change)
@@ -110,7 +111,10 @@ class StaffUserAdmin(admin.ModelAdmin):
         return request.user.is_superuser
 
     def privilege(self, obj):
-        user = User.objects.get(email=obj.staff_email, is_staff=True)
-        if user.is_superuser:
-            return "Superuser"
-        return ", ".join([g.name for g in user.groups.all()])
+        users = User.objects.filter(email=obj.staff_email, is_staff=True).order_by(
+            "last_login"
+        )
+        if users.exists():
+            if users.last().is_superuser:
+                return "Superuser"
+            return ", ".join([g.name for g in users.last().groups.all()])

@@ -85,7 +85,6 @@ def fake_auditor_certification():
         "is_auditee_responsible": True,
         "has_used_auditors_report": True,
         "has_no_auditee_procedures": True,
-        "is_accurate_and_complete": True,
         "is_FAC_releasable": True,
     }
     data_step_2 = {
@@ -121,34 +120,47 @@ def fake_auditee_certification():
 
 def _create_sac(user, auditee_name, submission_status="in_progress"):
     """Create a single example SAC."""
+    # TODO: SoT
+    # When we deprecate the SAC here, we want Audit to generate its own ids.
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
         general_information=_fake_general_information(auditee_name),
         submission_status=submission_status,
     )
+    Audit = apps.get_model("audit.Audit")
+    audit = Audit.objects.create(
+        report_id=sac.report_id,
+        audit={"general_information": _fake_general_information(auditee_name)},
+        submission_status=submission_status,
+        event_user=user,
+        event_type="created",
+    )
 
     Access = apps.get_model("audit.Access")
     Access.objects.create(
         sac=sac,
+        audit=audit,
         user=user,
         email=user.email,
         role="editor",
     )
     Access.objects.create(
         sac=sac,
+        audit=audit,
         user=user,
         email=user.email,
         role="certifying_auditor_contact",
     )
     Access.objects.create(
         sac=sac,
+        audit=audit,
         user=user,
         email=user.email,
         role="certifying_auditee_contact",
     )
-    logger.info("Created single audit checklist %s", sac)
-    return sac
+    logger.info("Created audit %s", audit)
+    return audit
 
 
 def _post_create_federal_awards(this_sac, this_user):

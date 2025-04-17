@@ -30,6 +30,9 @@ class DeletedAccess(models.Model):
 
     # The first five fields are identical to Access:
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
+    # TODO: Update Post SOC Launch
+    # setting this temporarily to allow "null" to handle existing rows without audit fields.
+    audit = models.ForeignKey("audit.Audit", on_delete=models.CASCADE, null=True)
     role = models.CharField(
         choices=ACCESS_ROLES,
         help_text="Access type granted to this user",

@@ -11,7 +11,8 @@ from audit.models import (
     SingleAuditReportFile,
     generate_sac_report_id,
 )
-
+from audit.models.utils import get_next_sequence_id
+from audit.models.constants import SAC_SEQUENCE_ID
 from audit.fixtures.excel import FORM_SECTIONS
 from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
@@ -39,9 +40,11 @@ class PdfDownloadViewTests(TestCase):
         self.client = Client()
 
     def _make_sac_and_general(self, is_public=True):
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2023-12-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2023-12-31"),
         )
         general = baker.make(General, is_public=is_public, report_id=sac.report_id)
         return sac, general
@@ -179,7 +182,9 @@ class SearchViewTests(TestMaterializedViewBuilder):
 
     def test_search(self):
         response = self.anon_client.post(self._search_url(), {})
-        self.assertContains(response, "Search single audit reports")
+        self.assertContains(
+            response, "is updated in real time and can be used to confirm"
+        )
         # If there are results, we'll see "results in x seconds" somewhere.
         self.assertNotContains(response, "results in")
 
@@ -250,6 +255,47 @@ class SearchViewTests(TestMaterializedViewBuilder):
             self.assertContains(response, p.report_id)
 
 
+class PublicDataDownloadViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.mock_file_path = "public-data/historic/2022.zip"
+
+    @patch("dissemination.file_downloads.file_exists")
+    def test_no_file_returns_404(self, mock_file_exists):
+        """
+        Given a relative path to a file that doesn't exist
+        When a request is sent to the public data download URL
+        Then the response should be 404
+        """
+        mock_file_exists.return_value = False
+        url = reverse(
+            "dissemination:PublicDataDownload",
+            kwargs={"relative_path": self.mock_file_path},
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    @patch("dissemination.file_downloads.file_exists")
+    def test_exisiting_file_returns_redirect(self, mock_file_exists):
+        """
+        Given a relative path to a file that exists
+        When a request is sent to the public data download URL
+        Then the response should be a redirect to the file download
+        """
+        mock_file_exists.return_value = True
+        url = reverse(
+            "dissemination:PublicDataDownload",
+            kwargs={"relative_path": self.mock_file_path},
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(self.mock_file_path, response.url)
+
+
 class OneTimeAccessDownloadViewTests(TestCase):
     def setUp(self):
         self.client = Client()
@@ -286,10 +332,12 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2024-01-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2024-01-31"),
         )
         baker.make(SingleAuditReportFile, sac=sac)
         ota = baker.make(OneTimeAccess, uuid=uuid, report_id=sac.report_id)
@@ -314,8 +362,9 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
-        report_id = generate_sac_report_id(end_date="2024-01-31")
+        report_id = generate_sac_report_id(sequence=sequence, end_date="2024-01-31")
         baker.make(OneTimeAccess, uuid=uuid, report_id=report_id)
 
         url = reverse("dissemination:OtaPdfDownload", kwargs={"uuid": uuid})
@@ -331,10 +380,12 @@ class OneTimeAccessDownloadViewTests(TestCase):
         Then the response should be 404
         """
         uuid = uuid4()
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2024-01-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2024-01-31"),
         )
         baker.make(OneTimeAccess, uuid=uuid, report_id=sac.report_id)
 
@@ -355,10 +406,12 @@ class OneTimeAccessDownloadViewTests(TestCase):
         """
         mock_file_exists.return_value = True
         uuid = uuid4()
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2024-01-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2024-01-31"),
         )
         baker.make(SingleAuditReportFile, sac=sac)
         baker.make(OneTimeAccess, uuid=uuid, report_id=sac.report_id)
@@ -380,9 +433,11 @@ class XlsxDownloadViewTests(TestCase):
         self.client = Client()
 
     def _make_sac_and_general(self, is_public=True):
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         sac = baker.make(
             SingleAuditChecklist,
-            report_id=generate_sac_report_id(end_date="2023-12-31"),
+            id=sequence,
+            report_id=generate_sac_report_id(sequence=sequence, end_date="2023-12-31"),
         )
         general = baker.make(General, is_public=is_public, report_id=sac.report_id)
         return sac, general
@@ -904,9 +959,12 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         )
 
         for i in range(4):
+            sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
             general = self._make_general(
                 is_public=True,
-                report_id=generate_sac_report_id(end_date="2023-12-31", count=str(i)),
+                report_id=generate_sac_report_id(
+                    end_date="2023-12-31", sequence=sequence
+                ),
             )
             baker.make(FederalAward, report_id=general)
         self.refresh_materialized_view()
@@ -925,3 +983,71 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
             )
 
             self.assertEqual(response.content, b"fake file content")
+
+
+class PageHandlingTests(TestCase):
+    """Test cases for ensuring page handling logic in AdvancedSearch and Search views"""
+
+    def setUp(self):
+        """Set up test client and sample form data"""
+        self.client = Client()
+        self.advanced_search_url = reverse("dissemination:AdvancedSearch")
+        self.basic_search_url = reverse("dissemination:Search")
+
+        self.valid_post_data = {
+            "audit_year": ["2023"],
+            "limit": "10",
+            "order_by": "name",
+            "order_direction": "asc",
+            "page": "1",
+        }
+
+    @patch("dissemination.views.search.run_search")
+    def test_advanced_search_post_page_too_high(self, mock_run_search):
+        """Ensure page resets to 1 when the requested page is greater than available pages"""
+        mock_run_search.return_value.count.return_value = (
+            5  # Mock result count (only 1 page available)
+        )
+
+        invalid_data = self.valid_post_data.copy()
+        invalid_data["page"] = "100"  # Too high
+
+        response = self.client.post(self.advanced_search_url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page"], 1)  # Should reset to 1
+
+    @patch("dissemination.views.search.run_search")
+    def test_advanced_search_post_page_zero(self, mock_run_search):
+        """Ensure page resets to 1 when the requested page is zero"""
+        mock_run_search.return_value.count.return_value = 5
+
+        invalid_data = self.valid_post_data.copy()
+        invalid_data["page"] = "0"
+
+        response = self.client.post(self.advanced_search_url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page"], 1)  # Should reset to 1
+
+    @patch("dissemination.views.search.run_search")
+    def test_advanced_search_post_page_empty(self, mock_run_search):
+        """Ensure page defaults to 1 when no page is provided"""
+        mock_run_search.return_value.count.return_value = 5
+
+        invalid_data = self.valid_post_data.copy()
+        invalid_data["page"] = ""
+
+        response = self.client.post(self.advanced_search_url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page"], 1)  # Should default to 1
+
+    @patch("dissemination.views.search.run_search")
+    def test_advanced_search_post_valid_page(self, mock_run_search):
+        """Ensure valid page number remains unchanged"""
+        mock_run_search.return_value.count.return_value = 20  # Multiple pages exist
+
+        valid_data = self.valid_post_data.copy()
+        valid_data["page"] = "2"  # Valid page
+
+        response = self.client.post(self.advanced_search_url, valid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page"], 2)  # Should remain 2

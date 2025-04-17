@@ -42,6 +42,8 @@ class SubmissionEvent(models.Model):
         SUBMITTED = "submitted"
         DISSEMINATED = "disseminated"
         TRIBAL_CONSENT_UPDATED = "tribal-consent-updated"
+        FLAGGED_SUBMISSION_FOR_REMOVAL = "flagged-submission-for-removal"
+        CANCEL_REMOVAL_FLAG = "cancel-removal-flag"
 
     EVENT_TYPES = (
         (EventType.ACCESS_GRANTED, _("Access granted")),
@@ -96,9 +98,17 @@ class SubmissionEvent(models.Model):
         (EventType.SUBMITTED, _("Submitted to the FAC for processing")),
         (EventType.DISSEMINATED, _("Copied to dissemination tables")),
         (EventType.TRIBAL_CONSENT_UPDATED, _("Tribal audit consent updated")),
+        (
+            EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
+            _("Flagged submission for removal"),
+        ),
+        (EventType.CANCEL_REMOVAL_FLAG, _("Cancel removal flag")),
     )
 
     sac = models.ForeignKey("audit.SingleAuditChecklist", on_delete=models.CASCADE)
+    # TODO: Update Post SOC Launch
+    # setting this temporarily to allow "null" to handle existing rows without audit fields.
+    audit = models.ForeignKey("audit.Audit", on_delete=models.CASCADE, null=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     timestamp = models.DateTimeField(auto_now_add=True)
     event = models.CharField(choices=EVENT_TYPES)

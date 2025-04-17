@@ -1,0 +1,67 @@
+{% comment %}
+Requires report_id to be passed in, like so:
+{% include "./modal_confirm_deletion.html" with report_id=some_value %}
+{% endcomment %}
+{% load sprite_helper %}
+<div class="usa-modal usa-modal--lg flex-justify-start"
+        id="modal-delete-submission-{{ report_id }}"
+        aria-labelledby="modal-delete-submission-{{ report_id }}-heading"
+        aria-describedby="modal-delete-submission-{{ report_id }}-description">
+    <div class="usa-modal__content">
+        <div class="padding-x-6 padding-bottom-4">
+            <h2 class="usa-modal__heading margin-bottom-1" id="modal-delete-submission-{{ report_id }}-heading">
+                Confirm audit submission deletion
+            </h2>
+            <div id="modal-delete-submission-{{ report_id }}-description">
+                <p>Are you sure you want to permanently delete this audit submission?</p>
+                <div class="grid-row" tabindex="0">
+                    <table class="usa-table margin-top-0">
+                        <thead>
+                            <tr>
+                                <th class="status-column" role="columnheader">Status</th>
+                                <th role="columnheader">Entity name</th>
+                                <th role="columnheader">Report ID</th>
+                                <th role="columnheader">Auditee UEI</th>
+                                <th role="columnheader">Fiscal period end date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="font-sans-sm">
+                                <td>{{ submission_status }}</td>
+                                <td>{{ auditee_name }}</td>
+                                <td>{{ report_id }}</td>
+                                <td>{{ auditee_uei }}</td>
+                                <td>{{ fiscal_year_end_date }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
+                    <div class="usa-alert usa-alert--warning width-full margin-top-0">
+                        <div class="usa-alert__body">
+                            <p class="usa-alert__text">
+                                Deleting this cannot be undone.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form id="delete-audit-submission" class="usa-form usa-form--large" method="post" action="{% url 'audit:RemoveSubmissionInProgress' report_id=report_id %}">
+                {% csrf_token %}
+                <div class="usa-button-group">
+                    <input type="submit"
+                            id="delete-submission"
+                            class="usa-button usa-button--secondary"
+                            value="Permanently Delete" />
+                    <a class="usa-button usa-button--outline margin-left-2" id="cancel-start-submission" aria-label="Close this window" data-close-modal>Cancel</a>
+                </div>
+            </form>
+        </div>
+        <button class="usa-button usa-modal__close"
+                aria-label="Close this window"
+                data-close-modal>
+            <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                {% uswds_sprite "close" %}
+            </svg>
+        </button>
+    </div>
+</div>

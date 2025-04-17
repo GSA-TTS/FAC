@@ -2,21 +2,25 @@ from datetime import datetime, timezone
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
+from django.db import models
 from django.test import TestCase
 
 from viewflow.fsm import TransitionNotAllowed
 from model_bakery import baker
 
+from .exceptions import LateChangeError
 from .models import (
     Access,
     ExcelFile,
-    LateChangeError,
     SingleAuditChecklist,
     SingleAuditReportFile,
     SubmissionEvent,
     User,
     generate_sac_report_id,
 )
+from audit.models import Audit
+from audit.models.constants import SAC_SEQUENCE_ID
+from audit.models.utils import get_next_sequence_id
 from .models.models import STATUS
 from .models.viewflow import sac_transition, SingleAuditChecklistFlow
 
@@ -61,9 +65,12 @@ class SingleAuditChecklistTests(TestCase):
         self.assertEqual(year, "2023")
         self.assertEqual(month, "11")
         self.assertEqual(source, "GSAFAC")
-        # This one is a little dubious because it assumes this will always be
-        # the first entry in the test database:
-        self.assertEqual(count, "0000000001")
+        self.assertEqual(
+            count,
+            str(
+                SingleAuditChecklist.objects.aggregate(models.Max("id"))["id__max"]
+            ).zfill(10),
+        )
 
     def test_submission_status_transitions(self):
         """
@@ -92,9 +99,21 @@ class SingleAuditChecklistTests(TestCase):
                     STATUS.READY_FOR_CERTIFICATION,
                     STATUS.AUDITOR_CERTIFIED,
                     STATUS.AUDITEE_CERTIFIED,
+                    STATUS.FLAGGED_FOR_REMOVAL,
                 ],
                 STATUS.IN_PROGRESS,
                 "transition_to_in_progress_again",
+            ),
+            (
+                [
+                    STATUS.IN_PROGRESS,
+                    STATUS.READY_FOR_CERTIFICATION,
+                    STATUS.AUDITOR_CERTIFIED,
+                    STATUS.AUDITEE_CERTIFIED,
+                    STATUS.CERTIFIED,
+                ],
+                STATUS.FLAGGED_FOR_REMOVAL,
+                "transition_to_flagged_for_removal",
             ),
         )
 
@@ -216,9 +235,10 @@ class AccessTests(TestCase):
         baker.make(User, email="a@a.com")
         baker.make(User, email="a@a.com")
 
-        sac = baker.make(SingleAuditChecklist)
-
+        audit = baker.make(Audit, version=0)
+        sac = baker.make(SingleAuditChecklist, audit_type="single-audit")
         access = Access.objects.create(
+            audit=audit,
             sac=sac,
             role="editor",
             email="a@a.com",
@@ -238,6 +258,7 @@ class ExcelFileTests(TestCase):
         The filename field should be generated based on the FileField filename
         """
         file = SimpleUploadedFile("this is a file.xlsx", b"this is a file")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         excel_file = baker.make(
             ExcelFile,
@@ -245,8 +266,9 @@ class ExcelFileTests(TestCase):
             form_section="sectionname",
             sac=baker.make(
                 SingleAuditChecklist,
+                id=sequence,
                 report_id=generate_sac_report_id(
-                    end_date=datetime.now().date().isoformat()
+                    sequence=sequence, end_date=datetime.now().date().isoformat()
                 ),
             ),
         )
@@ -263,14 +285,16 @@ class SingleAuditReportFileTests(TestCase):
         The filename field should be generated based on the FileField filename
         """
         file = SimpleUploadedFile("this is a file.pdf", b"this is a file")
+        sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
 
         sar_file = baker.make(
             SingleAuditReportFile,
             file=file,
             sac=baker.make(
                 SingleAuditChecklist,
+                id=sequence,
                 report_id=generate_sac_report_id(
-                    end_date=datetime.now().date().isoformat()
+                    sequence=sequence, end_date=datetime.now().date().isoformat()
                 ),
             ),
         )

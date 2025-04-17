@@ -8,6 +8,7 @@ from .models import (
     DeletedAccess,
     SingleAuditChecklist,
     User,
+    Audit,
 )
 
 
@@ -19,10 +20,11 @@ def _make_access(sac: SingleAuditChecklist, role: str, user: DjangoUser) -> Acce
     return baker.make(Access, user=user, email=user.email, sac=sac, role=role)
 
 
-def _make_user_and_sac(**kwargs):
+def _make_user_sac_and_audit(**kwargs):
     user = baker.make(User)
     sac = baker.make(SingleAuditChecklist, **kwargs)
-    return user, sac
+    audit = baker.make(Audit, version=0, **kwargs)
+    return user, sac, audit
 
 
 class ChangeOrAddRoleViewTests(TestCase):
@@ -37,8 +39,8 @@ class ChangeOrAddRoleViewTests(TestCase):
         """
         A user should be able to access this page for a SAC they're associated with.
         """
-        user, sac = _make_user_and_sac()
-        baker.make(Access, user=user, sac=sac, role="editor")
+        user, sac, audit = _make_user_sac_and_audit()
+        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
         sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         sac.save()
 
@@ -55,7 +57,12 @@ class ChangeOrAddRoleViewTests(TestCase):
         """
         user = baker.make(User, email="adding_user@example.com")
         sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=user, sac=sac, role="editor")
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
+        )
+        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
         sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         sac.save()
         self.client.force_login(user)
@@ -84,7 +91,8 @@ class ChangeOrAddRoleViewTests(TestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "home.html")
+        self.assertTrue(response.context["session_expired"])
 
     def test_bad_report_id_returns_403(self):
         """
@@ -103,7 +111,7 @@ class ChangeOrAddRoleViewTests(TestCase):
 
     def test_inaccessible_audit_returns_403(self):
         """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
-        user, sac = _make_user_and_sac()
+        user, sac, _ = _make_user_sac_and_audit()
 
         self.client.force_login(user)
         response = self.client.post(
@@ -126,11 +134,14 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         """
         A user should be able to access this page for a SAC they're associated with.
         """
-        user, sac = _make_user_and_sac()
+        user, sac, audit = _make_user_sac_and_audit()
         baker.make(Access, user=user, sac=sac, role="editor")
         sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         sac.save()
-        current_cac = baker.make(Access, sac=sac, role=self.role)
+        audit.audit.update({"general_information": {"auditee_uei": "YESIAMAREALUEI"}})
+        audit.save()
+
+        current_cac = baker.make(Access, sac=sac, audit=audit, role=self.role)
         current_role = str(current_cac.get_friendly_role())
 
         self.client.force_login(user)
@@ -147,10 +158,12 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         A user should be able to access this page for a SAC they're associated with
         even if there's no current assignment for the role.
         """
-        user, sac = _make_user_and_sac()
-        baker.make(Access, user=user, sac=sac, role="editor")
+        user, sac, audit = _make_user_sac_and_audit()
+        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
         sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         sac.save()
+        audit.audit.update({"general_information": {"auditee_uei": "YESIAMAREALUEI"}})
+        audit.save()
 
         self.client.force_login(user)
         url = reverse(self.view, kwargs={"report_id": sac.report_id})
@@ -167,10 +180,12 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         """
         user = baker.make(User, email="removing_user@example.com")
         sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=user, sac=sac, role="editor")
+        audit = baker.make(Audit, version=0)
+        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
         baker.make(
             Access,
             sac=sac,
+            audit=audit,
             role=self.other_role,
             email="contact@example.com",
         )
@@ -209,15 +224,20 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         """
         user = baker.make(User, email="removing_user@example.com")
         sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=user, sac=sac, role="editor")
+        audit = baker.make(Audit, version=0)
+        baker.make(Access, user=user, sac=sac, audit=audit, role="editor")
         baker.make(
             Access,
             sac=sac,
+            audit=audit,
             role=self.other_role,
             email="contact@example.com",
         )
         sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         sac.save()
+
+        audit.audit.update({"general_information": {"auditee_uei": "YESIAMAREALUEI"}})
+        audit.save()
 
         self.client.force_login(user)
 
@@ -243,12 +263,14 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         new_email = "newcacuser@example.com"
         user = baker.make(User, email="removing_user@example.com")
         sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=user, sac=sac, role="editor")
-        baker.make(Access, sac=sac, role=self.other_role, email=new_email)
-        baker.make(Access, sac=sac, role=self.role)
+        audit = baker.make(Audit, version=0)
+        baker.make(Access, audit=audit, user=user, sac=sac, role="editor")
+        baker.make(Access, audit=audit, sac=sac, role=self.other_role, email=new_email)
+        baker.make(Access, audit=audit, sac=sac, role=self.role)
         sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         sac.save()
-
+        audit.audit.update({"general_information": {"auditee_uei": "YESIAMAREALUEI"}})
+        audit.save()
         self.client.force_login(user)
 
         data = {"fullname": "The New CAC", "email": new_email}
@@ -267,7 +289,8 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "home.html")
+        self.assertTrue(response.context["session_expired"])
 
     def test_bad_report_id_returns_403(self):
         """
@@ -286,7 +309,7 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
 
     def test_inaccessible_audit_returns_403(self):
         """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
-        user, sac = _make_user_and_sac()
+        user, sac, _ = _make_user_sac_and_audit()
 
         self.client.force_login(user)
         response = self.client.post(
