@@ -80,9 +80,11 @@ def output_results(args, result):
                             "api_version_1": error.e1.version,
                             "key_1": error.e1.key,
                             "value_1": null_string(error.e1.value),
+                            "report_id_1": error.e1.report_id,
                             "api_version_2": error.e2.version,
                             "key_2": error.e2.key,
                             "value_2": null_string(error.e2.value),
+                            "report_id_2": error.e2.report_id,
                         }
                     )
 
@@ -104,9 +106,11 @@ def output_results(args, result):
                         "api_version_1",
                         "key_1",
                         "value_1",
+                        "report_id_1",
                         "api_version_2",
                         "key_2",
                         "value_2",
+                        "report_id_2",
                     ],
                     delimiter=separator,
                     quotechar=quote,
