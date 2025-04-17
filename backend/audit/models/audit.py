@@ -323,6 +323,7 @@ class Audit(CreatedMixin, UpdatedMixin):
         with transaction.atomic():
             current_version = Audit.objects.get_current_version(report_id)
             if previous_version != current_version:
+                # TODO: raise VersionMismatchException(expected=previous_version, actual=current_version)
                 logger.error(
                     f"Version Mismatch: Expected {previous_version} Got {current_version}"
                 )
