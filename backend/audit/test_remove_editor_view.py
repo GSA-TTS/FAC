@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
@@ -5,9 +6,10 @@ from model_bakery import baker
 from .models import (
     Access,
     DeletedAccess,
-    SingleAuditChecklist,
-    User,
+    Audit,
 )
+
+User = get_user_model()
 
 
 class RemoveEditorViewTests(TestCase):
@@ -26,14 +28,16 @@ class RemoveEditorViewTests(TestCase):
         user = baker.make(User, email="editor@example.com")
         self.client.force_login(user)
 
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        access = baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
-        sac.save()
-
-        url = (
-            f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id={access.id}"
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
         )
+        access = baker.make(
+            Access, user=user, email=user.email, audit=audit, role="editor"
+        )
+
+        url = f"{reverse(self.view, kwargs={'report_id': audit.report_id})}?id={access.id}"
         response = self.client.get(url)
 
         self.assertIn(
@@ -49,12 +53,14 @@ class RemoveEditorViewTests(TestCase):
         user = baker.make(User, email="editor@example.com")
         self.client.force_login(user)
 
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
-        sac.save()
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
+        )
+        baker.make(Access, user=user, email=user.email, audit=audit, role="editor")
 
-        url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id=999999999"  # Fake id
+        url = f"{reverse(self.view, kwargs={'report_id': audit.report_id})}?id=999999999"  # Fake id
 
         get_response = self.client.get(url)
         self.assertEqual(get_response.status_code, 404)
@@ -70,17 +76,19 @@ class RemoveEditorViewTests(TestCase):
         user = baker.make(User, email="editor@example.com")
         self.client.force_login(user)
 
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
+        )
+        baker.make(Access, user=user, email=user.email, audit=audit, role="editor")
         access_to_remove = baker.make(
             Access,
-            sac=sac,
+            audit=audit,
             role="foobar",  # Non-editor role
         )
-        sac.save()
 
-        url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id={access_to_remove.id}"
+        url = f"{reverse(self.view, kwargs={'report_id': audit.report_id})}?id={access_to_remove.id}"
 
         get_response = self.client.get(url)
         self.assertEqual(get_response.status_code, 404)
@@ -95,19 +103,21 @@ class RemoveEditorViewTests(TestCase):
         user = baker.make(User, email="editor@example.com")
         self.client.force_login(user)
 
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
+        )
         baker.make(
-            Access, user=user, email=user.email, sac=sac, role="foobar"
+            Access, user=user, email=user.email, audit=audit, role="foobar"
         )  # Non-editor role
         access_to_remove = baker.make(
             Access,
-            sac=sac,
+            audit=audit,
             role="editor",
         )
-        sac.save()
 
-        url = f"{reverse(self.view, kwargs={'report_id': sac.report_id})}?id={access_to_remove.id}"
+        url = f"{reverse(self.view, kwargs={'report_id': audit.report_id})}?id={access_to_remove.id}"
 
         get_response = self.client.get(url)
         self.assertEqual(get_response.status_code, 403)
@@ -122,15 +132,19 @@ class RemoveEditorViewTests(TestCase):
         user = baker.make(User, email="editor@example.com")
         self.client.force_login(user)
 
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        access = baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
-        sac.save()
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
+        )
+        access = baker.make(
+            Access, user=user, email=user.email, audit=audit, role="editor"
+        )
 
         data = {
             "editor_id": access.id,
         }
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.post(url, data=data)
 
         self.assertIn(
@@ -145,27 +159,29 @@ class RemoveEditorViewTests(TestCase):
         user = baker.make(User, email="removing_user@example.com")
         self.client.force_login(user)
 
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
-        baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={"general_information": {"auditee_uei": "YESIAMAREALUEI"}},
+        )
+        baker.make(Access, user=user, email=user.email, audit=audit, role="editor")
         access_to_remove = baker.make(
             Access,
-            sac=sac,
+            audit=audit,
             role="editor",
             email="contact@example.com",
         )
-        sac.save()
 
         data = {
             "editor_id": access_to_remove.id,
         }
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.post(url, data=data)
 
         self.assertEqual(302, response.status_code)
 
         deleted_access = DeletedAccess.objects.get(
-            sac=sac,
+            audit=audit,
             fullname=access_to_remove.fullname,
             email=access_to_remove.email,
         )

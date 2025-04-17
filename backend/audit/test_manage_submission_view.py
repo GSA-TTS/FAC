@@ -1,23 +1,19 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
 from model_bakery import baker
-from .models import (
-    ACCESS_ROLES,
-    Access,
-    SingleAuditChecklist,
-    User,
-)
+from .models import ACCESS_ROLES, Access, Audit
 
 
-def _make_access_by_email(sac: SingleAuditChecklist, role: str, email: str) -> Access:
-    return baker.make(Access, email=email, sac=sac, role=role)
+def _make_access_by_email(audit: Audit, role: str, email: str) -> Access:
+    return baker.make(Access, email=email, audit=audit, role=role)
 
 
-def _make_user_and_sac(**kwargs):
+def _make_user_and_audit():
     user = baker.make(User)
-    sac = baker.make(SingleAuditChecklist, **kwargs)
-    return user, sac
+    audit = baker.make(Audit, version=0)
+    return user, audit
 
 
 class ManageSubmissionViewTests(TestCase):
@@ -31,11 +27,11 @@ class ManageSubmissionViewTests(TestCase):
         """
         A user should be able to access this page for a SAC they're associated with.
         """
-        user, sac = _make_user_and_sac()
+        user, audit = _make_user_and_audit()
         baker.make(
             Access,
             user=user,
-            sac=sac,
+            audit=audit,
             role="editor",
             email="arealemail@arealdomain.tld",
         )
@@ -51,12 +47,12 @@ class ManageSubmissionViewTests(TestCase):
             ("editor", "someone@example.com"),
         )
         for row in rows:
-            _make_access_by_email(sac, row[0], row[1])
+            _make_access_by_email(audit, row[0], row[1])
 
-        sac.general_information = base_info
-        sac.save()
+        audit.audit.update({"general_information": base_info})
+        audit.save()
         self.client.force_login(user)
-        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        url = reverse(self.view, kwargs={"report_id": audit.report_id})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -102,11 +98,11 @@ class ManageSubmissionViewTests(TestCase):
 
     def test_inaccessible_audit_returns_403(self):
         """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
-        user, sac = _make_user_and_sac()
+        user, audit = _make_user_and_audit()
 
         self.client.force_login(user)
         response = self.client.post(
-            reverse(self.view, kwargs={"report_id": sac.report_id})
+            reverse(self.view, kwargs={"report_id": audit.report_id})
         )
 
         self.assertEqual(response.status_code, 403)

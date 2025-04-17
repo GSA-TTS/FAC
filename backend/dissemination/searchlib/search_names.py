@@ -20,5 +20,5 @@ def audit_search_names(params):
 
     query = Q()
     for name in flattened:
-        query |= Q(search_names__icontains=name)
+        query &= Q(search_names__icontains=name)
     return query if flattened else Q()

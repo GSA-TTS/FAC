@@ -8,7 +8,7 @@ from model_bakery import baker
 from rest_framework.test import APIClient
 
 from api.test_uei import valid_uei_results
-from audit.models import Access, Audit, SingleAuditChecklist
+from audit.models import Access, Audit
 
 User = get_user_model()
 
@@ -50,7 +50,7 @@ EMAIL_TO_ROLE = {
     "auditor_contacts_email": "editor",
 }
 
-SAMPLE_BASE_SAC_DATA = {
+SAMPLE_BASE_AUDIT_DATA = {
     # 0. Meta data
     "submitted_by": None,
     "date_created": "2022-08-11",
@@ -249,52 +249,6 @@ class AuditeeInfoTests(TestCase):
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA,
         )
 
-    # 2023-05-30: We're proceeding with the assumption that as a matter of
-    # policy we can reject audits without UEIs. If that turns out to be untrue,
-    # we'll uncomment these three tests.
-    # def test_null_auditee_uei(self):
-    #     """
-    #     Auditee UEI can be null
-    #     """
-    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-    #     self.user.profile.save()
-    #     input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": None}
-    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-    #     data = response.json()
-    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-    #     self.assertEqual(
-    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-    #     )
-
-    # def test_blank_auditee_uei(self):
-    #     """
-    #     Auditee UEI can be blank
-    #     """
-    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-    #     self.user.profile.save()
-    #     input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": ""}
-    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-    #     data = response.json()
-    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-    #     self.assertEqual(
-    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-    #     )
-
-    # def test_missing_auditee_uei(self):
-    #     """
-    #     Auditee UEI can be missing
-    #     """
-    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-    #     self.user.profile.save()
-    #     input_data = VALID_AUDITEE_INFO_DATA.copy()
-    #     del input_data["auditee_uei"]
-    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-    #     data = response.json()
-    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-    #     self.assertEqual(
-    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-    #     )
-
     def test_blank_auditee_name(self):
         """
         Auditee name can be blank
@@ -308,23 +262,6 @@ class AuditeeInfoTests(TestCase):
         self.assertEqual(
             self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
-
-    # FIXME MSHD: This test is wrong (None is not an option), the following
-    # test is more accurate. Also, we are going to remove the API post endpoint.
-    #
-    # def test_null_auditee_name(self):
-    #     """
-    #     Auditee name can be null
-    #     """
-    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-    #     self.user.profile.save()
-    #     input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": None}
-    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-    #     data = response.json()
-    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-    #     self.assertEqual(
-    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-    #     )
 
     def test_missing_auditee_name(self):
         """
@@ -393,8 +330,8 @@ class AccessAndSubmissionTests(TestCase):
         self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertTrue(data["errors"])
 
-    def test_valid_data_creates_SAC_and_Access(self):
-        """A new SAC is created along with related Access instances"""
+    def test_valid_data_creates_audit_and_access(self):
+        """A new Audit is created along with related Access instances"""
         # Add eligibility and Auditee Info data to profile
         self.user.profile.entry_form_data = (
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
@@ -433,7 +370,7 @@ class AccessAndSubmissionTests(TestCase):
         self.assertIn(catcdotcom, editor_users)
 
     def test_multiple_auditee_auditor_contacts(self):
-        """A new SAC is created along with related Access instances"""
+        """A new Audit is created along with related Access instances"""
         # Add eligibility and Auditee Info data to profile
         self.user.profile.entry_form_data = (
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
@@ -470,7 +407,7 @@ class AccessAndSubmissionTests(TestCase):
 
     def test_blank_contacts(self):
         """
-        A new SAC is created, but blank info in the data doesn't result in the
+        A new Audit is created, but blank info in the data doesn't result in the
         creation of Access objects with blank name and email fields.
         """
         # Add eligibility and Auditee Info data to profile
@@ -482,10 +419,8 @@ class AccessAndSubmissionTests(TestCase):
         access_and_submission_data = VALID_ACCESS_AND_SUBMISSION_DATA.copy()
         access_and_submission_data["auditee_contacts_email"].append("")
         access_and_submission_data["auditor_contacts_email"].append("")
-        # access_and_submission_data["auditor_contacts_email"].append("y")
         access_and_submission_data["auditee_contacts_fullname"].append("")
         access_and_submission_data["auditor_contacts_fullname"].append("")
-        # access_and_submission_data["auditor_contacts_fullname"].append("Y")
 
         response = self.client.post(
             ACCESS_AND_SUBMISSION_PATH, access_and_submission_data, format="json"
@@ -532,15 +467,15 @@ class AccessAndSubmissionTests(TestCase):
         )
 
 
-class SACCreationTests(TestCase):
-    """Integration tests covering all submission steps leading up to and including creation of a SingleAuditChecklist instance"""
+class AuditCreationTests(TestCase):
+    """Integration tests covering all submission steps leading up to and including creation of an Audit instance"""
 
     def setUp(self):
         self.user = baker.make(User)
         self.client = APIClient()
 
-    def test_valid_data_across_steps_creates_an_sac(self):
-        """Upon submitting valid data and following `next` responses, a new SAC is created"""
+    def test_valid_data_across_steps_creates_an_audit(self):
+        """Upon submitting valid data and following `next` responses, a new Audit is created"""
         self.client.force_authenticate(user=self.user)
 
         # Submit eligibility data
@@ -586,8 +521,7 @@ class SACCreationTests(TestCase):
         # Access objects related to this Audit instance.
 
 
-# TODO: Update Post SOC Launch
-class SingleAuditChecklistViewTests(TestCase):
+class AuditViewTests(TestCase):
     """
     Tests for /sac/edit/[report_id]
     """
@@ -599,12 +533,12 @@ class SingleAuditChecklistViewTests(TestCase):
 
     def path(self, report_id):
         """Convenience method to get the path for a report_id)"""
-        return reverse("singleauditchecklist", kwargs={"report_id": report_id})
+        return reverse("audit", kwargs={"report_id": report_id})
 
     def test_valid_data_across_steps_is_returned_in_get(self):
         """
-        After submitting the valid data and creating an SAC object, we return
-        all of the relevant data on GET.
+        After submitting the valid data and creating an Audit object, we return
+        all the relevant data on GET.
         """
         self.client.force_authenticate(user=self.user)
 
@@ -617,6 +551,7 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.post(ELIGIBILITY_PATH, eligibility_info, format="json")
         data = response.json()
         next_step = data["next"]
+        self.assertTrue(data["eligible"])
 
         # Submit auditee info
         response = self.client.post(next_step, VALID_AUDITEE_INFO_DATA, format="json")
@@ -638,8 +573,8 @@ class SingleAuditChecklistViewTests(TestCase):
             next_step, access_and_submission_data, format="json"
         )
         data = response.json()
-        audit = Audit.objects.get(report_id=data["report_id"])
-        response = self.client.get(self.path(audit.report_id))
+        response = self.client.get(self.path(data["report_id"]))
+
         full_data = response.json()
         for key, value in access_and_submission_data.items():
             if key in ["auditee_contacts_email", "auditor_contacts_email"]:
@@ -651,9 +586,9 @@ class SingleAuditChecklistViewTests(TestCase):
             ]:
                 self.assertEqual(full_data[EMAIL_TO_ROLE[key]], value)
         for key, value in eligibility_info.items():
-            self.assertEqual(full_data["general_information"][key], value)
+            self.assertEqual(full_data["audit"]["general_information"][key], value)
         for key, value in VALID_AUDITEE_INFO_DATA.items():
-            self.assertEqual(full_data["general_information"][key], value)
+            self.assertEqual(full_data["audit"]["general_information"][key], value)
 
     def test_get_authentication_required(self):
         """
@@ -675,7 +610,6 @@ class SingleAuditChecklistViewTests(TestCase):
         403.
         """
         audit = baker.make(Audit, version=0)
-        baker.make(SingleAuditChecklist, report_id=audit.report_id)
         response = self.client.get(self.path(audit.report_id))
         self.assertEqual(response.status_code, 403)
 
@@ -684,24 +618,23 @@ class SingleAuditChecklistViewTests(TestCase):
         If a user has an Access object for the Audit, they should get a 200.
         """
         audit = baker.make(Audit, version=0)
-        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-        access = baker.make(Access, user=self.user, sac=sac, audit=audit)
+        access = baker.make(Access, user=self.user, audit=audit)
         response = self.client.get(self.path(access.audit.report_id))
 
         self.assertEqual(response.status_code, 200)
 
     def test_get_bad_report_id(self):
         """
-        If the user is logged in and the report ID doesn't match a SAC, they should get a 404.
+        If the user is logged in and the report ID doesn't match a Audit, they should get a 404.
         """
         response = self.client.get(self.path("nonsensical_id"))
 
         self.assertEqual(response.status_code, 404)
 
 
-class SacFederalAwardsViewTests(TestCase):
+class AuditFederalAwardsViewTests(TestCase):
     """
-    Tests for /sac/edit/[report_id]/federal_awards
+    Tests for /audit/edit/[report_id]/federal_awards
     """
 
     def setUp(self):
@@ -730,8 +663,8 @@ class SacFederalAwardsViewTests(TestCase):
         )
 
         # Report details to be used for tests
-        self.sac_data = response.json()
-        self.sac_report_id = self.sac_data["report_id"]
+        self.audit_data = response.json()
+        self.audit_report_id = self.audit_data["report_id"]
 
     def path(self, report_id):
         """Convenience method to get the path for a report_id)"""
@@ -746,7 +679,7 @@ class SacFederalAwardsViewTests(TestCase):
 
         # use a different client that doesn't authenticate
         client = APIClient()
-        response = client.get(self.path(self.sac_report_id), format="json")
+        response = client.get(self.path(self.audit_report_id), format="json")
         self.assertEqual(response.status_code, 403)
 
     def test_get_no_audit_awards_access(self):
@@ -756,7 +689,6 @@ class SacFederalAwardsViewTests(TestCase):
         """
 
         audit = baker.make(Audit, version=0)
-        baker.make(SingleAuditChecklist, report_id=audit.report_id)
         response = self.client.get(self.path(audit.report_id))
         self.assertEqual(response.status_code, 403)
 
@@ -765,8 +697,8 @@ class SacFederalAwardsViewTests(TestCase):
         If the federal awards endpoint is hit, (for now) it should return an empty object
         """
 
-        # SAC created in setUp().
-        response = self.client.get(self.path(self.sac_report_id))
+        # Audit created in setUp().
+        response = self.client.get(self.path(self.audit_report_id))
         data = response.json()
         self.assertEqual(data, {})
 
@@ -907,17 +839,15 @@ class AccessListViewTests(TestCase):
         self.assertEqual(len(editor_accesses), 1)
         self.assertEqual(editor_accesses[0]["report_id"], audit.report_id)
 
-    def test_deleted_sac_not_returned(self):
+    def test_deleted_audit_not_returned(self):
         """
         If a user has their Audits deleted, it is no longer returned in their access list
         """
         audit_1 = baker.make(Audit, version=0)
-        sac_1 = baker.make(SingleAuditChecklist, report_id=audit_1.report_id)
-        access_1 = baker.make(Access, sac=sac_1, audit=audit_1, user=self.user)
+        access_1 = baker.make(Access, audit=audit_1, user=self.user)
 
         audit_2 = baker.make(Audit, version=0)
-        sac_2 = baker.make(SingleAuditChecklist, report_id=audit_2.report_id)
-        baker.make(Access, sac=sac_2, audit=audit_2, user=self.user)
+        baker.make(Access, audit=audit_2, user=self.user)
 
         response_1 = self.client.get(ACCESS_LIST_PATH, format="json")
         data_1 = response_1.json()
@@ -926,7 +856,6 @@ class AccessListViewTests(TestCase):
         self.assertEqual(len(data_1), 2)
 
         # now delete one access_2
-        sac_2.delete()
         audit_2.delete()
 
         response_2 = self.client.get(ACCESS_LIST_PATH, format="json")

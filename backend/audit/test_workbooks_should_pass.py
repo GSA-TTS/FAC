@@ -2,9 +2,9 @@ from django.test import TestCase
 import os
 from functools import reduce
 import re
-from audit.context import set_sac_to_context
+from audit.context import set_audit_to_context
 from model_bakery import baker
-from .models import SingleAuditChecklist
+from .models import Audit
 from audit.intakelib import (
     extract_additional_eins,
     extract_additional_ueis,
@@ -82,8 +82,8 @@ class PassingWorkbooks(TestCase):
         workbook_sets = reduce(
             os.path.join, ["audit", "fixtures", "workbooks", "should_pass"]
         )
-        sac = baker.make(SingleAuditChecklist)
-        with set_sac_to_context(sac):
+        audit = baker.make(Audit, version=0)
+        with set_audit_to_context(audit):
             for dirpath, dirnames, _ in os.walk(workbook_sets):
                 for workbook_set in dirnames:
                     print("Walking ", workbook_set)

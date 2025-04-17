@@ -1,3 +1,5 @@
+# type: ignore
+# historic_data_loader has issues due to SOT, keeping for posterity.
 import logging
 
 from .historic_data_loader import (

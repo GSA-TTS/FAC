@@ -3,8 +3,7 @@ import logging
 from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
 
-from audit.models import SingleAuditChecklist
-
+from audit.models import Audit
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
@@ -26,18 +25,18 @@ def verify_status(status):
             report_id = kwargs["report_id"]
 
             try:
-                sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            except SingleAuditChecklist.DoesNotExist:
+                audit = Audit.objects.get(report_id=report_id)
+            except Audit.DoesNotExist:
                 raise PermissionDenied("You do not have access to this audit.")
 
             statuses = status if isinstance(status, list) else [status]
 
-            if sac.submission_status not in statuses:
+            if audit.submission_status not in statuses:
                 # Return to checklist, the audit is not in the correct state
                 logger.warning(
-                    f"Expected submission status {status} but it's currently {sac.submission_status}"
+                    f"Expected submission status {status} but it's currently {audit.submission_status}"
                 )
-                return redirect(f"/audit/submission-progress/{sac.report_id}")
+                return redirect(f"/audit/submission-progress/{audit.report_id}")
             else:
                 return request_method(view, request, *args, **kwargs)
 
