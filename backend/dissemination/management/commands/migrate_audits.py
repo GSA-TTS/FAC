@@ -16,6 +16,7 @@
 #    - If you want to target ALL records, leave out the parameters.
 
 import logging
+import time
 
 from django.core.management.base import BaseCommand
 from django.db import connection
@@ -83,14 +84,37 @@ class Command(BaseCommand):
         logger.info(
             f"Selected {queryset.count()} records for the first batch of migrations."
         )
+        
         while queryset.count() != 0:
+            t_migrate_sac = 0
+            t_update_flag = 0
+            t_get_batch = 0
+            accesses = Access.objects.filter(sac__report_id__in=queryset.values('report_id'))
+            deletedaccesses = DeletedAccess.objects.filter(sac__report_id__in=queryset.values('report_id'))
+            submissionevents = SubmissionEvent.objects.filter(sac__id__in=queryset.values('id'))
+            sars = SingleAuditReportFile.objects.filter(sac__id__in=queryset.values('id'))
+            excels = ExcelFile.objects.filter(sac__id__in=queryset.values('id'))
+            validations = SacValidationWaiver.objects.filter(report_id__in=queryset.values('report_id'))
             for sac in queryset:
                 try:
-                    self._migrate_sac(sac)
+                    t0 = time.monotonic()
+                    self._migrate_sac(
+                        sac,
+                        accesses,
+                        deletedaccesses,
+                        submissionevents,
+                        sars,
+                        excels,
+                        validations
+                    )
+                    t_migrate_sac += time.monotonic() - t0
+
+                    t0 = time.monotonic()
                     with connection.cursor() as cursor:
                         cursor.execute(
                             f"update audit_singleauditchecklist set migrated_to_audit = true where report_id = '{sac.report_id}'"
                         )
+                    t_update_flag += time.monotonic() - t0
                     count += 1
                 except Exception as e:
                     logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
@@ -98,11 +122,17 @@ class Command(BaseCommand):
             logger.info(
                 f"Migration progress... ({count} / {total}) ({(count / total) * 100}%)"
             )
+            t0 = time.monotonic()
             queryset = _get_query(kwargs, BATCH_SIZE)
+            t_get_batch += time.monotonic() - t0
+            print(f" - Time to migrate batch of 100          - {t_migrate_sac}")
+            print(f" - Time to mark batch of 100 as migrated - {t_update_flag}")
+            print(f" - Time to query next batch              - {t_get_batch}")
+
         logger.info("Completed audit migrations.")
 
     @staticmethod
-    def _migrate_sac(sac: SingleAuditChecklist):
+    def _migrate_sac(sac: SingleAuditChecklist, accesses: Access, deletedaccesses: DeletedAccess, submissionevents: SubmissionEvent, sars: SingleAuditReportFile, excels: ExcelFile, validations: SacValidationWaiver):
         audit_data = dict()
         for idx, handler in enumerate(SAC_HANDLERS):
             audit_data.update(handler(sac))
@@ -126,8 +156,8 @@ class Command(BaseCommand):
                 audit.created_at = sac.date_created
 
             # update Access models.
-            Access.objects.filter(sac__report_id=sac.report_id).update(audit=audit)
-            DeletedAccess.objects.filter(sac__report_id=sac.report_id).update(
+            accesses.filter(sac__report_id=sac.report_id).update(audit=audit)
+            deletedaccesses.filter(sac__report_id=sac.report_id).update(
                 audit=audit
             )
 
@@ -144,7 +174,7 @@ class Command(BaseCommand):
             audit.save()
 
             # copy SubmissionEvents into History records.
-            events = SubmissionEvent.objects.filter(sac=sac)
+            events = submissionevents.filter(sac=sac)
             for event in events:
                 history = History.objects.create(
                     event=event.event,
@@ -157,14 +187,14 @@ class Command(BaseCommand):
                 history.save()
 
             # assign audit reference to file-based models.
-            SingleAuditReportFile.objects.filter(sac=sac).update(audit=audit)
-            ExcelFile.objects.filter(sac=sac).update(audit=audit)
+            sars.filter(sac=sac).update(audit=audit)
+            excels.filter(sac=sac).update(audit=audit)
 
             # copy SacValidationWaivers.
             if not AuditValidationWaiver.objects.filter(
                 report_id=sac.report_id
             ).exists():
-                waivers = SacValidationWaiver.objects.filter(report_id=sac.report_id)
+                waivers = validations.filter(report_id=sac.report_id)
                 for waiver in waivers:
                     AuditValidationWaiver.objects.create(
                         report_id=sac.report_id,
