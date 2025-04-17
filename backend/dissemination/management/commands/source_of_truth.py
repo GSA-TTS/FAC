@@ -30,10 +30,30 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument("--start", type=str, required=False, help="YYYYMMDD start fac_accepted_date")
-        parser.add_argument("--end", type=str, required=False, help="YYYYMMDD end fac_accepted_date")
-        parser.add_argument("--report_id", type=str, required=False, help="A report_id")
-        parser.add_argument("--limit", type=int, required=False, help="Limit the number of audits to test")
+        parser.add_argument(
+            "--start",
+            type=str,
+            required=False,
+            help="YYYYMMDD start fac_accepted_date",
+        )
+        parser.add_argument(
+            "--end",
+            type=str,
+            required=False,
+            help="YYYYMMDD end fac_accepted_date",
+        )
+        parser.add_argument(
+            "--report_id",
+            type=str,
+            required=False,
+            help="A report_id",
+        )
+        parser.add_argument(
+            "--limit",
+            type=int,
+            required=False,
+            help="Limit the number of audits to test",
+        )
 
     def handle(self, *args, **kwargs):
         report_id = kwargs.get("report_id", None)
@@ -48,13 +68,17 @@ class Command(BaseCommand):
             query = Q(fac_accepted_date__gte=start) & Q(fac_accepted_date__lte=end)
             limit = kwargs.get("limit", None)
 
-        sot_audits_query = Audit.objects.filter(query).order_by('report_id')[:limit]
+        sot_audits_query = Audit.objects.filter(query).order_by("report_id")[:limit]
         sot_sorted_report_ids = self._get_sorted_report_ids(sot_audits_query)
 
         if report_id:
-            sac_audits_query = SingleAuditChecklist.objects.filter(query).order_by('report_id')[:limit]
+            sac_audits_query = SingleAuditChecklist.objects.filter(query).order_by(
+                "report_id"
+            )[:limit]
         else:
-            sac_audits_query = General.objects.filter(query).order_by('report_id')[:limit]
+            sac_audits_query = General.objects.filter(query).order_by("report_id")[
+                :limit
+            ]
 
         sac_sorted_report_ids = self._get_sorted_report_ids(sac_audits_query)
 
@@ -62,9 +86,13 @@ class Command(BaseCommand):
         logger.info(f"SAC report_ids: {sac_sorted_report_ids}")
 
         if sot_sorted_report_ids != sac_sorted_report_ids:
-            sot_not_sac = [x for x in sot_sorted_report_ids if x not in sac_sorted_report_ids]
+            sot_not_sac = [
+                x for x in sot_sorted_report_ids if x not in sac_sorted_report_ids
+            ]
             logger.error(f"report_ids found in SOT but not SAC: {sot_not_sac}")
-            sac_not_sot = [x for x in sac_sorted_report_ids if x not in sot_sorted_report_ids]
+            sac_not_sot = [
+                x for x in sac_sorted_report_ids if x not in sot_sorted_report_ids
+            ]
             logger.error(f"report_ids found in SAC but not SOT: {sac_not_sot}")
         else:
             logger.info("SOT and SAC report_ids match; continuing")
@@ -72,7 +100,9 @@ class Command(BaseCommand):
         sot_audits_by_report_id = self._get_audits_by_report_id(sot_audits_query)
 
         for report_id in sot_sorted_report_ids:
-            is_consistent, differences = validate_audit_consistency(sot_audits_by_report_id[report_id])
+            is_consistent, differences = validate_audit_consistency(
+                sot_audits_by_report_id[report_id],
+            )
 
             if is_consistent:
                 logger.info(f"No differences found for {report_id}!")
