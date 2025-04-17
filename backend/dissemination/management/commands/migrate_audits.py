@@ -89,6 +89,16 @@ class Command(BaseCommand):
             t_migrate_sac = 0
             t_update_flag = 0
             t_get_batch = 0
+
+            self.t_audit = 0
+            self.t_create = 0
+            self.t_access = 0
+            self.t_indexes = 0
+            self.t_save = 0
+            self.t_history = 0
+            self.t_files = 0
+            self.t_waivers = 0
+
             accesses = Access.objects.filter(sac__report_id__in=queryset.values('report_id'))
             deletedaccesses = DeletedAccess.objects.filter(sac__report_id__in=queryset.values('report_id'))
             submissionevents = SubmissionEvent.objects.filter(sac__id__in=queryset.values('id'))
@@ -99,6 +109,7 @@ class Command(BaseCommand):
                 try:
                     t0 = time.monotonic()
                     self._migrate_sac(
+                        self,
                         sac,
                         accesses,
                         deletedaccesses,
@@ -126,19 +137,30 @@ class Command(BaseCommand):
             queryset = _get_query(kwargs, BATCH_SIZE)
             t_get_batch += time.monotonic() - t0
             print(f" - Time to migrate batch of 100          - {t_migrate_sac}")
+            print(f"    - Audit info - {self.t_audit}")
+            print(f"    - Creation   - {self.t_create}")
+            print(f"    - Access     - {self.t_access}")
+            print(f"    - Indexes    - {self.t_indexes}")
+            print(f"    - Re-saving  - {self.t_save}")
+            print(f"    - History    - {self.t_history}")
+            print(f"    - Files      - {self.t_files}")
+            print(f"    - Waivers    - {self.t_waivers}")
             print(f" - Time to mark batch of 100 as migrated - {t_update_flag}")
             print(f" - Time to query next batch              - {t_get_batch}")
 
         logger.info("Completed audit migrations.")
 
     @staticmethod
-    def _migrate_sac(sac: SingleAuditChecklist, accesses: Access, deletedaccesses: DeletedAccess, submissionevents: SubmissionEvent, sars: SingleAuditReportFile, excels: ExcelFile, validations: SacValidationWaiver):
+    def _migrate_sac(self, sac: SingleAuditChecklist, accesses: Access, deletedaccesses: DeletedAccess, submissionevents: SubmissionEvent, sars: SingleAuditReportFile, excels: ExcelFile, validations: SacValidationWaiver):
+        t1 = time.monotonic()
         audit_data = dict()
         for idx, handler in enumerate(SAC_HANDLERS):
             audit_data.update(handler(sac))
-
+        self.t_audit += time.monotonic() - t1
+        
         # create the audit.
         if not Audit.objects.filter(report_id=sac.report_id).exists():
+            t1 = time.monotonic()
             audit = Audit.objects.create(
                 event_type="MIGRATION",
                 data_source=sac.data_source,
@@ -154,14 +176,18 @@ class Command(BaseCommand):
 
             if sac.date_created:
                 audit.created_at = sac.date_created
+            self.t_create += time.monotonic() - t1
 
             # update Access models.
+            t1 = time.monotonic()
             accesses.filter(sac__report_id=sac.report_id).update(audit=audit)
             deletedaccesses.filter(sac__report_id=sac.report_id).update(
                 audit=audit
             )
+            self.t_access += time.monotonic() - t1
 
             # convert additional fields.
+            t1 = time.monotonic()
             if sac.submission_status == STATUS.DISSEMINATED:
                 audit.audit.update(generate_audit_indexes(audit))
 
@@ -170,10 +196,14 @@ class Command(BaseCommand):
                 audit.oversight_agency = sac.oversight_agency
                 audit.audit["cognizant_agency"] = sac.cognizant_agency
                 audit.audit["oversight_agency"] = sac.oversight_agency
+            self.t_indexes += time.monotonic() - t1
 
+            t1 = time.monotonic()
             audit.save()
+            self.t_save += time.monotonic() - t1
 
             # copy SubmissionEvents into History records.
+            t1 = time.monotonic()
             events = submissionevents.filter(sac=sac)
             for event in events:
                 history = History.objects.create(
@@ -185,12 +215,16 @@ class Command(BaseCommand):
                 )
                 history.updated_at = event.timestamp
                 history.save()
+            self.t_history += time.monotonic() - t1
 
             # assign audit reference to file-based models.
+            t1 = time.monotonic()
             sars.filter(sac=sac).update(audit=audit)
             excels.filter(sac=sac).update(audit=audit)
+            self.t_files += time.monotonic() - t1
 
             # copy SacValidationWaivers.
+            t1 = time.monotonic()
             if not AuditValidationWaiver.objects.filter(
                 report_id=sac.report_id
             ).exists():
@@ -206,6 +240,7 @@ class Command(BaseCommand):
                         justification=waiver.justification,
                         waiver_types=waiver.waiver_types,
                     )
+            self.t_waivers += time.monotonic() - t1
 
 
 def _get_query(kwargs, max_records):
