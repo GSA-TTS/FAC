@@ -3,7 +3,7 @@ name: Export Audit Data to CSV
 on:
   schedule:
     # Every week on Sunday 1 AM UTC
-    - cron: '0 0 * * 1'
+    - cron: '0 23 * * 4'
 
 jobs:
   scheduled-audit-data-export:
