@@ -28,12 +28,14 @@ from audit.models.utils import (
 from itertools import chain
 from audit.cross_validation import functions as cross_validation_functions
 from audit.utils import FORM_SECTION_HANDLERS
+import logging
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class AuditManager(models.Manager):
@@ -332,12 +334,11 @@ class Audit(CreatedMixin, UpdatedMixin):
         previous_version = self.version
 
         self.updated_by = self.updated_by if self.updated_by else event_user
-        self.version = previous_version + 1
 
         with transaction.atomic():
             current_version = Audit.objects.get_current_version(report_id)
             if previous_version != current_version:
-                raise Exception(
+                logger.error(
                     f"Version Mismatch: Expected {previous_version} Got {current_version}"
                 )  # TODO
 
@@ -347,6 +348,8 @@ class Audit(CreatedMixin, UpdatedMixin):
                 logger.warning(
                     f"Inconsistencies found between models for {report_id}: {discrepancies}"
                 )
+                
+            self.version = previous_version + 1
 
             if event_type and event_user:
                 History.objects.create(
