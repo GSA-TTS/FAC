@@ -1,33 +1,15 @@
 from audit.models import Audit
 from audit.models.constants import EventType, STATUS
-from audit.models.utils import convert_utc_to_american_samoa_zone
+from audit.models.utils import (
+    convert_utc_to_american_samoa_zone,
+    generate_audit_indexes,
+)
 from curation.curationlib.curation_audit_tracking import CurationTracking
 import datetime
 import logging
 import viewflow.fsm
 
 logger = logging.getLogger(__name__)
-
-
-def audit_revert_from_submitted(audit):
-    """
-    Transitions the submission_state for an Audit back
-    to "auditee_certified" so the user can re-address issues and submit.
-    This should only be executed via management command.
-    """
-
-    if audit.submission_status == STATUS.SUBMITTED:
-        flow = AuditFlow(audit)
-
-        flow.transition_to_auditee_certified()
-
-        with CurationTracking():
-            audit.save(
-                event_user=None,
-                event_type=EventType.AUDITEE_CERTIFICATION_COMPLETED,
-            )
-        return True
-    return False
 
 
 def audit_revert_from_flagged_for_removal(audit, user):
@@ -86,7 +68,6 @@ def audit_transition(request, audit, **kwargs):
         EventType.LOCKED_FOR_CERTIFICATION: flow.transition_to_ready_for_certification,
         EventType.AUDITEE_CERTIFICATION_COMPLETED: flow.transition_to_auditee_certified,
         EventType.AUDITOR_CERTIFICATION_COMPLETED: flow.transition_to_auditor_certified,
-        EventType.SUBMITTED: flow.transition_to_submitted,
         EventType.DISSEMINATED: flow.transition_to_disseminated,
     }
 
@@ -186,7 +167,7 @@ class AuditFlow(Audit):
         pass
 
     @state.transition(
-        source=[STATUS.AUDITOR_CERTIFIED, STATUS.SUBMITTED],
+        source=[STATUS.AUDITOR_CERTIFIED],
         target=STATUS.AUDITEE_CERTIFIED,
     )
     def transition_to_auditee_certified(self):
@@ -198,28 +179,19 @@ class AuditFlow(Audit):
 
     @state.transition(
         source=STATUS.AUDITEE_CERTIFIED,
-        target=STATUS.SUBMITTED,
-    )
-    def transition_to_submitted(self):
-        """
-        The permission checks verifying that the user attempting to do this has
-        the appropriate privileges will be done at the view level.
-        """
-        self.audit.audit.update(
-            {
-                "fac_accepted_date": convert_utc_to_american_samoa_zone(
-                    datetime.datetime.today()
-                )
-            }
-        )
-
-    @state.transition(
-        source=STATUS.SUBMITTED,
         target=STATUS.DISSEMINATED,
     )
     def transition_to_disseminated(self):
         """Transition to disseminated"""
-        pass
+        audit_indexes = generate_audit_indexes(self.audit)
+        self.audit.audit.update(
+            {
+                "fac_accepted_date": convert_utc_to_american_samoa_zone(
+                    datetime.datetime.today()
+                ),
+                **audit_indexes,
+            }
+        )
 
     @state.transition(
         source=[

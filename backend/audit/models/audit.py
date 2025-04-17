@@ -62,6 +62,20 @@ class AuditManager(models.Manager):
             }
 
             result = super().create(**updated)
+
+            # Disseminated is a special case.
+            # Historically an audit transitioned Certified -> Submitted -> Disseminated
+            # With SOT an audit transitions: Certified -> Disseminated
+            # Adding the history event, allows the logic for "submitted by" to remain consistent.
+            if event_type == EventType.DISSEMINATED:
+                History.objects.create(
+                    event=EventType.SUBMITTED,
+                    report_id=report_id,
+                    version=version,
+                    event_data=result.audit,
+                    updated_by=user,
+                )
+
             History.objects.create(
                 event=event_type,
                 report_id=report_id,
