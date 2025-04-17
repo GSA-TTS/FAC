@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 import logging
+import sys
 
 from audit.models import Audit
 from audit.models import SingleAuditChecklist
@@ -85,15 +86,21 @@ class Command(BaseCommand):
         logger.info(f"SOT report_ids: {sot_sorted_report_ids}")
         logger.info(f"SAC report_ids: {sac_sorted_report_ids}")
 
+        if not sot_sorted_report_ids and not sac_sorted_report_ids:
+            logger.error(f"No report_ids found for SOT or SAC")
+            sys.exit(1)
         if sot_sorted_report_ids != sac_sorted_report_ids:
             sot_not_sac = [
                 x for x in sot_sorted_report_ids if x not in sac_sorted_report_ids
             ]
             logger.error(f"report_ids found in SOT but not SAC: {sot_not_sac}")
+
             sac_not_sot = [
                 x for x in sac_sorted_report_ids if x not in sot_sorted_report_ids
             ]
             logger.error(f"report_ids found in SAC but not SOT: {sac_not_sot}")
+            
+            sys.exit(1)
         else:
             logger.info("SOT and SAC report_ids match; continuing")
 
