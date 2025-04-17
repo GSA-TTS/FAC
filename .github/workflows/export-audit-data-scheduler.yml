@@ -2,7 +2,9 @@
 name: Export Audit Data to CSV
 on:
   schedule:
-    # Every week on Sunday 1 AM UTC
+    # Prod - Every week on Sunday 1 AM UTC
+    # -cron: '0 1 * * 0'
+    # Staging test - Thursday at 11 PM UTC
     - cron: '0 23 * * 4'
 
 jobs:
