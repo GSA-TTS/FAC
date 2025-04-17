@@ -256,11 +256,11 @@ create view api_v1_2_0.general as
         coalesce(a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_name','') as auditor_certify_name,
         coalesce(a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_title','') as auditor_certify_title,
         a.audit->'general_information'->>'auditor_phone' as auditor_phone,
-        a.audit->'general_information'->>'auditor_state' as auditor_state,
-        a.audit->'general_information'->>'auditor_city' as auditor_city,
+        coalesce(a.audit->'general_information'->>'auditor_state','') as auditor_state,
+        coalesce(a.audit->'general_information'->>'auditor_city','') as auditor_city,
         a.audit->'general_information'->>'auditor_contact_title' as auditor_contact_title,
-        a.audit->'general_information'->>'auditor_address_line_1' as auditor_address_line_1,
-        a.audit->'general_information'->>'auditor_zip' as auditor_zip,
+        coalesce(a.audit->'general_information'->>'auditor_address_line_1','') as auditor_address_line_1,
+        coalesce(a.audit->'general_information'->>'auditor_zip','') as auditor_zip,
         a.audit->'general_information'->>'auditor_country' as auditor_country,
         a.audit->'general_information'->>'auditor_contact_name' as auditor_contact_name,
         a.audit->'general_information'->>'auditor_email' as auditor_email,
@@ -304,14 +304,29 @@ create view api_v1_2_0.general as
         a.audit->'general_information'->>'user_provided_organization_type' as entity_type,
         coalesce(a.audit->'general_information'->>'audit_period_other_months','') as number_months,
         coalesce(a.audit->'general_information'->>'audit_period_covered','') as audit_period_covered,
-        a.audit->'federal_awards'->'total_amount_expended' as total_amount_expended,
+        (a.audit->'federal_awards'->'total_amount_expended')::bigint  as total_amount_expended,
         a.audit ->>'type_audit_code' as type_audit_code,
         a.is_public as is_public,
         a.data_source as data_source,
         yesnogsamigration(a.audit->'audit_information'->>'is_aicpa_audit_guide_included') as is_aicpa_audit_guide_included,
-        yesno(a.audit->'general_information'->>'multiple_ueis_covered') as is_additional_ueis,
-        yesno(a.audit->'general_information'->>'multiple_eins_covered') as is_multiple_eins,
-        yesno(a.audit->'general_information'->>'secondary_auditors_exist') as is_secondary_auditors     
+        case 
+            when yesno(a.audit->'general_information'->>'multiple_ueis_covered') = 'Yes' 
+            and a.audit ? 'additional_ueis'
+            then 'Yes'
+            else 'No'
+        end as is_additional_ueis,
+        case 
+            when yesno(a.audit->'general_information'->>'multiple_eins_covered') = 'Yes' 
+            and a.audit ? 'additional_eins'
+            then 'Yes'
+            else 'No'
+        end as is_multiple_eins,
+        case 
+            when yesno(a.audit->'general_information'->>'secondary_auditors_exist') = 'Yes' 
+            and a.audit ? 'secondary_auditors'
+            then 'Yes'
+            else 'No'
+        end as is_secondary_auditors    
     from
         audit_audit as a
     where 
