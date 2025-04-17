@@ -510,7 +510,9 @@ def _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data):
     if not isinstance(sac_value, bool) and sac_value != 0:
         for audit_path, audit_value in audit_data.items():
             audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
-            audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
+            audit_field = (
+                audit_field.split("[")[0] if "[" in audit_field else audit_field
+            )
 
             if normalize_key(audit_field) == sac_norm_field:
                 continue
@@ -542,11 +544,15 @@ def value_exists_in_audit(sac_path, sac_value, audit_data):
     sac_field = sac_field.split("[")[0] if "[" in sac_field else sac_field
     sac_norm_field = normalize_key(sac_field)
 
-    key_match_results = _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data)
+    key_match_results = _attempt_field_match(
+        sac_field, sac_norm_field, sac_value, audit_data
+    )
     if key_match_results:
         return key_match_results
 
-    value_match_results = _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data)
+    value_match_results = _attempt_value_match(
+        sac_field, sac_norm_field, sac_value, audit_data
+    )
     if value_match_results:
         return value_match_results
 
