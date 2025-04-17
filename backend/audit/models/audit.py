@@ -30,10 +30,6 @@ from audit.cross_validation import functions as cross_validation_functions
 from audit.utils import FORM_SECTION_HANDLERS
 import logging
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
@@ -348,7 +344,7 @@ class Audit(CreatedMixin, UpdatedMixin):
                 logger.warning(
                     f"Inconsistencies found between models for {report_id}: {discrepancies}"
                 )
-                
+
             self.version = previous_version + 1
 
             if event_type and event_user:
