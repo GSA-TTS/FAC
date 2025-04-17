@@ -271,7 +271,7 @@ entry_fields_to_check = {
 def validate_audit_consistency(audit_instance, is_real_time=True):
     """
     Validates that all data in SingleAuditChecklist exists in Audit,
-    ignores strucutre and searches for keys/values. All values in SAC,
+    ignores strucutre and searches for keys/values. All values in SAC
     must exist in Audit.
     """
     from audit.models import SingleAuditChecklist
@@ -384,8 +384,8 @@ def _validate_json_fields(audit_instance, sac_instance, differences):
             continue
 
         if sac_data is not None:
-            flat_sac = flatten_json(sac_data)
-            flat_audit = flatten_json(audit_instance.audit)
+            flat_sac = _flatten_json(sac_data)
+            flat_audit = _flatten_json(audit_instance.audit)
 
             _validate_flat_json(flat_sac, flat_audit, field, differences)
 
@@ -411,7 +411,7 @@ def _validate_flat_json(flat_sac, flat_audit, field, differences):
                 break
 
         if not match_found:
-            result = value_exists_in_audit(sac_path, sac_value, flat_audit)
+            result = _value_exists_in_audit(sac_path, sac_value, flat_audit)
 
             if not result.get("found"):
                 differences.append(
@@ -445,7 +445,7 @@ def _validate_flat_json(flat_sac, flat_audit, field, differences):
                 )
 
 
-def flatten_json(obj, path="", result=None):
+def _flatten_json(obj, path="", result=None):
     """Flatten a nested JSON into kv pair with path"""
     if result is None:
         result = {}
@@ -453,15 +453,38 @@ def flatten_json(obj, path="", result=None):
     if isinstance(obj, dict):
         for key, value in obj.items():
             new_path = f"{path}.{key}" if path else key
-            flatten_json(value, new_path, result)
+            _flatten_json(value, new_path, result)
     elif isinstance(obj, list):
         for i, item in enumerate(obj):
             new_path = f"{path}[{i}]"
-            flatten_json(item, new_path, result)
+            _flatten_json(item, new_path, result)
     else:
         result[path] = obj
 
     return result
+
+
+def _value_exists_in_audit(sac_path, sac_value, audit_data):
+    """Check if a value from SAC exists somewhere in audit data with the same key-value"""
+    sac_field = sac_path.split(".")[-1] if "." in sac_path else sac_path
+    sac_field = sac_field.split("[")[0] if "[" in sac_field else sac_field
+    sac_norm_field = _normalize_key(sac_field)
+
+    key_match_results = _attempt_field_match(
+        sac_field, sac_norm_field, sac_value, audit_data
+    )
+    if key_match_results:
+        return key_match_results
+
+    value_match_results = _attempt_value_match(
+        sac_field, sac_norm_field, sac_value, audit_data
+    )
+    if value_match_results:
+        return value_match_results
+
+    return {
+        "found": False,
+    }
 
 
 def _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data):
@@ -470,7 +493,7 @@ def _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data):
         audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
         audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
 
-        if normalize_key(audit_field) != sac_norm_field:
+        if _normalize_key(audit_field) != sac_norm_field:
             continue
 
         if sac_value == audit_value:
@@ -488,9 +511,9 @@ def _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data):
         elif (
             not isinstance(sac_value, bool)
             and sac_value != 0
-            and other_formats_match(sac_value, audit_value).get("found")
+            and _other_formats_match(sac_value, audit_value).get("found")
         ):
-            comp_vals = other_formats_match(sac_value, audit_value)
+            comp_vals = _other_formats_match(sac_value, audit_value)
             if sac_field != audit_field:
                 return {
                     "found": True,
@@ -514,7 +537,7 @@ def _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data):
                 audit_field.split("[")[0] if "[" in audit_field else audit_field
             )
 
-            if normalize_key(audit_field) == sac_norm_field:
+            if _normalize_key(audit_field) == sac_norm_field:
                 continue
 
             if sac_value == audit_value:
@@ -525,8 +548,8 @@ def _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data):
                     "audit_path": audit_path,
                     "value": audit_value,
                 }
-            elif other_formats_match(sac_value, audit_value).get("found"):
-                comp_vals = other_formats_match(sac_value, audit_value)
+            elif _other_formats_match(sac_value, audit_value).get("found"):
+                comp_vals = _other_formats_match(sac_value, audit_value)
                 return {
                     "found": True,
                     "found_with_different_key": True,
@@ -538,30 +561,7 @@ def _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data):
                 }
 
 
-def value_exists_in_audit(sac_path, sac_value, audit_data):
-    """Check if a value from SAC exists somewhere in audit data with the same key-value"""
-    sac_field = sac_path.split(".")[-1] if "." in sac_path else sac_path
-    sac_field = sac_field.split("[")[0] if "[" in sac_field else sac_field
-    sac_norm_field = normalize_key(sac_field)
-
-    key_match_results = _attempt_field_match(
-        sac_field, sac_norm_field, sac_value, audit_data
-    )
-    if key_match_results:
-        return key_match_results
-
-    value_match_results = _attempt_value_match(
-        sac_field, sac_norm_field, sac_value, audit_data
-    )
-    if value_match_results:
-        return value_match_results
-
-    return {
-        "found": False,
-    }
-
-
-def normalize_key(key):
+def _normalize_key(key):
     """Normalize the keys for comparison"""
     if not isinstance(key, str):
         return key
@@ -570,7 +570,7 @@ def normalize_key(key):
     return normalized.lower()
 
 
-def other_formats_match(value1, value2):
+def _other_formats_match(value1, value2):
     """Determines if value1 matches value2 but in a different format"""
     if isinstance(value1, list) and value2 in value1:
         return {"found": True, "error": f"{value1} is list, found {value2}"}

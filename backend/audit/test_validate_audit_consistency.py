@@ -3,56 +3,56 @@ from model_bakery import baker
 
 from audit.models import Audit, SingleAuditChecklist
 from audit.models.utils import (
-    flatten_json,
-    value_exists_in_audit,
-    other_formats_match,
+    _flatten_json,
+    _other_formats_match,
+    _value_exists_in_audit,
     validate_audit_consistency,
 )
 
 
 class TestFlattenJson(TestCase):
-    """Tests for flatten_json"""
+    """Tests for _flatten_json"""
 
     def test_empty(self):
         test_json = {}
         expected_result = {}
-        result = flatten_json(test_json)
+        result = _flatten_json(test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_simple(self):
         test_json = {"a": 1, "b": 2}
         expected_result = {"a": 1, "b": 2}
-        result = flatten_json(test_json)
+        result = _flatten_json(test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_nested(self):
         test_json = {"a": {"b": 2}, "c": 3}
         expected_result = {"a.b": 2, "c": 3}
-        result = flatten_json(test_json)
+        result = _flatten_json(test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_list(self):
         test_json = {"a": [1, 2]}
         expected_result = {"a[0]": 1, "a[1]": 2}
-        result = flatten_json(test_json)
+        result = _flatten_json(test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_nested_list(self):
         test_json = {"a": {"b": [1, 2]}}
         expected_result = {"a.b[0]": 1, "a.b[1]": 2}
-        result = flatten_json(test_json)
+        result = _flatten_json(test_json)
         self.assertDictEqual(result, expected_result)
 
 
 class TestValueExistsInAudit(TestCase):
-    """Tests for value_exists_in_audit"""
+    """Tests for _value_exists_in_audit"""
 
     def test_empty(self):
         sac_path = "a"
         sac_value = 1
         test_json = {}
         expected_result = {"found": False}
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_simple(self):
@@ -60,7 +60,7 @@ class TestValueExistsInAudit(TestCase):
         sac_value = 1
         test_json = {"a": 1}
         expected_result = {"found": True}
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_nested(self):
@@ -68,7 +68,7 @@ class TestValueExistsInAudit(TestCase):
         sac_value = 2
         test_json = {"c.b": 2}
         expected_result = {"found": True}
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_list(self):
@@ -76,7 +76,7 @@ class TestValueExistsInAudit(TestCase):
         sac_value = 1
         test_json = {"a[0]": 1}
         expected_result = {"found": True}
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_nested_list(self):
@@ -84,7 +84,7 @@ class TestValueExistsInAudit(TestCase):
         sac_value = 1
         test_json = {"a.b[0]": 1}
         expected_result = {"found": True}
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_list_different_index(self):
@@ -96,7 +96,7 @@ class TestValueExistsInAudit(TestCase):
         sac_value = 1
         test_json = {"a[1]": 1}
         expected_result = {"found": True}
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_different_key(self):
@@ -111,7 +111,7 @@ class TestValueExistsInAudit(TestCase):
             "audit_path": "b",
             "value": 1,
         }
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_different_key_bool(self):
@@ -122,7 +122,7 @@ class TestValueExistsInAudit(TestCase):
         expected_result = {
             "found": False,
         }
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_bool_comparison(self):
@@ -133,7 +133,7 @@ class TestValueExistsInAudit(TestCase):
         expected_result = {
             "found": False,
         }
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
     def test_format_error(self):
@@ -142,68 +142,68 @@ class TestValueExistsInAudit(TestCase):
         sac_value = 1
         test_json = {"x": "01", "a": 1}
         expected_result = {"found": True}
-        result = value_exists_in_audit(sac_path, sac_value, test_json)
+        result = _value_exists_in_audit(sac_path, sac_value, test_json)
         self.assertDictEqual(result, expected_result)
 
 
 class TestCompareValues(TestCase):
-    """Tests for other_formats_match"""
+    """Tests for _other_formats_match"""
 
     def test_simple_equal(self):
         value_1 = 1
         value_2 = 1
         expected_result = {"found": False}
-        result = other_formats_match(value_1, value_2)
+        result = _other_formats_match(value_1, value_2)
         self.assertDictEqual(result, expected_result)
 
     def test_simple_not_equal(self):
         value_1 = 1
         value_2 = 2
         expected_result = {"found": False}
-        result = other_formats_match(value_1, value_2)
+        result = _other_formats_match(value_1, value_2)
         self.assertDictEqual(result, expected_result)
 
     def test_simple_zero(self):
         value_1 = 0
         value_2 = "0"
         expected_result = {"found": False}
-        result = other_formats_match(value_1, value_2)
+        result = _other_formats_match(value_1, value_2)
         self.assertDictEqual(result, expected_result)
 
     def test_int_str_1(self):
         value_1 = 1
         value_2 = "1"
-        result = other_formats_match(value_1, value_2)
+        result = _other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
     def test_int_str_2(self):
         value_1 = "1"
         value_2 = 1
-        result = other_formats_match(value_1, value_2)
+        result = _other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
     def test_list_1(self):
         value_1 = [1, 2]
         value_2 = 1
-        result = other_formats_match(value_1, value_2)
+        result = _other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
     def test_list_2(self):
         value_1 = 1
         value_2 = [1, 2]
-        result = other_formats_match(value_1, value_2)
+        result = _other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
     def test_dict_1(self):
         value_1 = {"a": 1}
         value_2 = 1
-        result = other_formats_match(value_1, value_2)
+        result = _other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
     def test_dict_2(self):
         value_1 = 1
         value_2 = {"a": 1}
-        result = other_formats_match(value_1, value_2)
+        result = _other_formats_match(value_1, value_2)
         self.assertTrue(result)
 
 
