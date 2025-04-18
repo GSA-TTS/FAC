@@ -22,12 +22,14 @@ from audit.models.utils import (
     get_next_sequence_id,
     generate_sac_report_id,
     JsonArrayToTextArray,
+    validate_audit_consistency,
 )
 
 from itertools import chain
 from audit.cross_validation import functions as cross_validation_functions
 from audit.utils import FORM_SECTION_HANDLERS
 import logging
+import time
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -78,7 +80,7 @@ class AuditManager(models.Manager):
                 updated_by=user,
             )
             return result
-
+    
     def get_current_version(self, report_id):
         """Returns the current version of the audit."""
         try:
@@ -336,6 +338,17 @@ class Audit(CreatedMixin, UpdatedMixin):
                 logger.error(
                     f"Version Mismatch: Expected {previous_version} Got {current_version}"
                 )  # TODO
+
+            # TESTING: During save of audit, check for matching data in SAC
+            # only trigger on update, not creation.
+            if not self._state.adding:
+                is_consistent, discrepancies = validate_audit_consistency(self)
+
+                if not is_consistent:
+                    logger.warning(
+                        f"Inconsistencies found between models for {report_id}: {discrepancies}"
+                    )
+                pass
 
             self.version = previous_version + 1
 
