@@ -156,8 +156,9 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     request, sac, audit=audit, transition_to=STATUS.SUBMITTED
                 )
                 disseminated = sac.disseminate()
-                audit_indexes = generate_audit_indexes(audit)
-                audit.audit.update(audit_indexes)
+                if audit:
+                    audit_indexes = generate_audit_indexes(audit)
+                    audit.audit.update(audit_indexes)
 
                 # `disseminated` is None if there were no errors.
                 if disseminated is None:
