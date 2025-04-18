@@ -56,10 +56,7 @@ class Command(BaseCommand):
 
         # Now, re-run dissemination for everything
         # in the intake tables.
-        regen_statuses = (
-            STATUS.DISSEMINATED,
-            STATUS.SUBMITTED,
-        )
+        regen_statuses = (STATUS.DISSEMINATED,)
 
         for sac in SingleAuditChecklist.objects.iterator():
             if sac.submission_status in regen_statuses:

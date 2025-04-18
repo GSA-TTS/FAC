@@ -6,13 +6,14 @@ from typing import Any
 
 
 class APIValue:
-    def __init__(self, version, key, value):
+    def __init__(self, version, key, value, report_id):
         self.version = version
         self.key = key
         self.value = value
+        self.report_id = report_id
 
     def __str__(self):
-        return f"<{self.version}, {self.key}, {self.value}>"
+        return f"<{self.version}, {self.key}, {self.value}, {self.report_id}>"
 
 
 class ErrorPair:
@@ -64,12 +65,20 @@ def check_dictionaries_have_same_keys(v1, o1, v2, o2):
         for k in key_set_1:
             if k not in key_set_2:
                 R.add_error(
-                    ErrorPair("dict_keys", APIValue(v1, k, k), APIValue(v2, k, None))
+                    ErrorPair(
+                        "dict_keys",
+                        APIValue(v1, k, k, o1["report_id"]),
+                        APIValue(v2, k, None, o2["report_id"]),
+                    )
                 )
         for k in key_set_2:
             if k not in key_set_1:
                 R.add_error(
-                    ErrorPair("dict_keys", APIValue(v1, k, None), APIValue(v2, k, k))
+                    ErrorPair(
+                        "dict_keys",
+                        APIValue(v1, k, None, o1["report_id"]),
+                        APIValue(v2, k, k, o2["report_id"]),
+                    )
                 )
     return R
 
@@ -84,13 +93,21 @@ def check_dictionaries_have_same_values(v1, o1, v2, o2):
             if v not in val_set_2:
                 # R.add_error("mismatched value", f"'{v}' not in object 2")
                 R.add_error(
-                    ErrorPair("dict_values", APIValue(v1, v, v), APIValue(v2, v, None))
+                    ErrorPair(
+                        "dict_values",
+                        APIValue(v1, v, v, o1["report_id"]),
+                        APIValue(v2, v, None, o2["report_id"]),
+                    )
                 )
         for v in val_set_2:
             if v not in val_set_1:
                 # R.add_error("mismatched value", f"'{v}' not in object 1")
                 R.add_error(
-                    ErrorPair("dict_values", APIValue(v1, v, None), APIValue(v2, v, v))
+                    ErrorPair(
+                        "dict_values",
+                        APIValue(v1, v, None, o1["report_id"]),
+                        APIValue(v2, v, v, o2["report_id"]),
+                    )
                 )
     return R
 
@@ -100,12 +117,20 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2):
     for k in o1.keys():
         if k not in o2:
             R.add_error(
-                ErrorPair("mappings", APIValue(v1, k, o1[k]), APIValue(v2, k, None))
+                ErrorPair(
+                    "mappings",
+                    APIValue(v1, k, o1[k], o1["report_id"]),
+                    APIValue(v2, k, None, o2["report_id"]),
+                )
             )
             R.set_result(False)
         elif o1[k] != o2[k]:
             R.add_error(
-                ErrorPair("mappings", APIValue(v1, k, o1[k]), APIValue(v2, k, o2[k]))
+                ErrorPair(
+                    "mappings",
+                    APIValue(v1, k, o1[k], o1["report_id"]),
+                    APIValue(v2, k, o2[k], o2["report_id"]),
+                )
             )
             R.set_result(False)
 
@@ -113,7 +138,11 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2):
     for k in o2:
         if k not in o1:
             R.add_error(
-                ErrorPair("mappings", APIValue(v1, k, None), APIValue(v2, k, o2[k]))
+                ErrorPair(
+                    "mappings",
+                    APIValue(v1, k, None, o1["report_id"]),
+                    APIValue(v2, k, o2[k], o2["report_id"]),
+                )
             )
             R.set_result(False)
     return R
@@ -173,8 +202,10 @@ def compare_any_order(
                     False,
                     ErrorPair(
                         "comparison_obj_not_found",
-                        APIValue(v1, comparison_key, o1[comparison_key]),
-                        APIValue(v2, None, None),
+                        APIValue(
+                            v1, comparison_key, o1[comparison_key], o1["report_id"]
+                        ),
+                        APIValue(v2, None, None, o2["report_id"]),
                     ),
                 )
             )
@@ -188,8 +219,15 @@ def compare_any_order(
                     False,
                     ErrorPair(
                         "comparison_key_not_matched",
-                        APIValue(v1, comparison_key, o1[comparison_key]),
-                        APIValue(v2, comparison_key, to_compare[comparison_key]),
+                        APIValue(
+                            v1, comparison_key, o1[comparison_key], o1["report_id"]
+                        ),
+                        APIValue(
+                            v2,
+                            comparison_key,
+                            to_compare[comparison_key],
+                            o2["report_id"],
+                        ),
                     ),
                 )
             )
@@ -213,8 +251,8 @@ def check_lists_same_length(v1, l1, v2, l2):
             False,
             ErrorPair(
                 "list_length",
-                APIValue(v1, "list_length", len(l1)),
-                APIValue(v2, "list_length", len(l2)),
+                APIValue(v1, "list_length", len(l1), None),
+                APIValue(v2, "list_length", len(l2), None),
             ),
         )
 
@@ -243,8 +281,8 @@ def check_equal_values_for_key(v1, l1, v2, l2, comparison_key):
         R.add_error(
             ErrorPair(
                 "eq_val_for_key",
-                APIValue(v1, comparison_key, kv1),
-                APIValue(v2, comparison_key, kv2),
+                APIValue(v1, comparison_key, kv1, None),
+                APIValue(v2, comparison_key, kv2, None),
             )
         )
     return R
@@ -263,6 +301,7 @@ def compare_lists_of_json_objects(
 
     # The lists must be the same length
     clsl = check_lists_same_length(v1, l1, v2, l2)
+    print(len(l1), len(l2))
     if not clsl:
         # print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
         return [clsl]
@@ -277,8 +316,8 @@ def compare_lists_of_json_objects(
                 False,
                 ErrorPair(
                     "check_in_both_lists",
-                    APIValue(v1, comparison_key, None),
-                    APIValue(v2, comparison_key, True),
+                    APIValue(v1, comparison_key, None, None),
+                    APIValue(v2, comparison_key, True, None),
                 ),
             )
         ]
@@ -288,8 +327,8 @@ def compare_lists_of_json_objects(
                 False,
                 ErrorPair(
                     "missing_comparison_key",
-                    APIValue(v1, comparison_key, None),
-                    APIValue(v2, comparison_key, True),
+                    APIValue(v1, comparison_key, None, None),
+                    APIValue(v2, comparison_key, True, None),
                 ),
             )
         ]
@@ -300,8 +339,8 @@ def compare_lists_of_json_objects(
                 False,
                 ErrorPair(
                     "impossible; should never be here",
-                    APIValue(v1, comparison_key, None),
-                    APIValue(v2, comparison_key, None),
+                    APIValue(v1, comparison_key, None, None),
+                    APIValue(v2, comparison_key, None, None),
                 ),
             )
         ]
