@@ -1,7 +1,5 @@
 {
   "readonly": [
-    "anastasia.gradova@gsa.gov",
-    "jason.rothacker@gsa.gov",
     "philip.dominguez@gsa.gov",
     "sudha.kumar@gsa.gov"
   ],
@@ -12,13 +10,9 @@
     "lynn.houston@gsa.gov",
     "marissa.henderson@gsa.gov",
     "james.p.mason@gsa.gov",
-    "james.person@gsa.gov",
-    "leigh.cox@gsa.gov",
-    "rochelle.ribeiro@gsa.gov",
-    "laura.herring@gsa.gov"
+    "james.person@gsa.gov"
   ],
   "superuser": [
-    "matthew.jadud@gsa.gov",
-    "daniel.swick@gsa.gov"
+    "matthew.jadud@gsa.gov"
   ]
 }
