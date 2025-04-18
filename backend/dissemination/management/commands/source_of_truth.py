@@ -25,9 +25,6 @@ class Command(BaseCommand):
         Alternatively, it can also test on a single report_id:
         manage.py source_of_truth
             --report_id 2023-12-GSAFAC-0000000001
-
-        Note that using a date range can only validate audits with the
-        disseminated status, while repoort_id audits can be of any status.
     """
 
     def add_arguments(self, parser):
@@ -73,13 +70,11 @@ class Command(BaseCommand):
         sot_sorted_report_ids = self._get_sorted_report_ids(sot_audits_query)
 
         if report_id:
-            sac_audits_query = SingleAuditChecklist.objects.filter(query).order_by(
-                "report_id"
-            )[:limit]
+            sac_audits_query = SingleAuditChecklist.objects \
+                .filter(query).order_by("report_id")[:limit]
         else:
-            sac_audits_query = General.objects.filter(query).order_by("report_id")[
-                :limit
-            ]
+            sac_audits_query = SingleAuditChecklist.objects \
+                .filter(report_id__in=sot_sorted_report_ids).order_by("report_id")[:limit]
 
         sac_sorted_report_ids = self._get_sorted_report_ids(sac_audits_query)
 
@@ -105,6 +100,7 @@ class Command(BaseCommand):
             logger.info("SOT and SAC report_ids match; continuing")
 
         sot_audits_by_report_id = self._get_audits_by_report_id(sot_audits_query)
+        report_ids_to_differences = {}
 
         for report_id in sot_sorted_report_ids:
             is_consistent, differences = validate_audit_consistency(
@@ -116,6 +112,13 @@ class Command(BaseCommand):
             else:
                 logger.error(f"Differences found for {report_id}:")
                 logger.error(differences)
+
+                report_ids_to_differences[report_id] = differences
+
+        if report_ids_to_differences:
+            logger.error(f"Found differences for {len(report_ids_to_differences)} report_ids:")
+            for report_id, differences in report_ids_to_differences.items():
+                logger.error(f"{report_id}: {differences}")
 
     def _get_sorted_report_ids(self, queryset):
         # The query results are already ORDER_BYed report_id, so no need to
