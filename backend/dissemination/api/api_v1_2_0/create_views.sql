@@ -7,9 +7,10 @@ create or replace function cast_text_to_date(the_date varchar)
    language sql
    immutable
 as
-$body$
+$$
   select to_date(the_date, 'yyyy-mm-dd');
-$body$
+$$;
+
 create or replace function yesnonull(input text)
 returns text as $$
 begin
