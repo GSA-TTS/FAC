@@ -70,11 +70,13 @@ class Command(BaseCommand):
         sot_sorted_report_ids = self._get_sorted_report_ids(sot_audits_query)
 
         if report_id:
-            sac_audits_query = SingleAuditChecklist.objects \
-                .filter(query).order_by("report_id")[:limit]
+            sac_audits_query = SingleAuditChecklist.objects.filter(query).order_by(
+                "report_id"
+            )[:limit]
         else:
-            sac_audits_query = SingleAuditChecklist.objects \
-                .filter(report_id__in=sot_sorted_report_ids).order_by("report_id")[:limit]
+            sac_audits_query = SingleAuditChecklist.objects.filter(
+                report_id__in=sot_sorted_report_ids
+            ).order_by("report_id")[:limit]
 
         sac_sorted_report_ids = self._get_sorted_report_ids(sac_audits_query)
 
@@ -116,7 +118,9 @@ class Command(BaseCommand):
                 report_ids_to_differences[report_id] = differences
 
         if report_ids_to_differences:
-            logger.error(f"Found differences for {len(report_ids_to_differences)} report_ids:")
+            logger.error(
+                f"Found differences for {len(report_ids_to_differences)} report_ids:"
+            )
             for report_id, differences in report_ids_to_differences.items():
                 logger.error(f"{report_id}: {differences}")
 
