@@ -3,7 +3,7 @@ The intent of this file is to group together audit related helpers.
 """
 
 import logging
-
+import time
 
 from datetime import timedelta
 
@@ -287,6 +287,7 @@ def validate_audit_consistency(audit_instance, is_real_time=True):
 
     differences = []
 
+    logger.info(f"Validating audit: {sac.report_id}")
     _validate_entry_fields(audit_instance, sac_instance, differences)
     _validate_simple_fields(audit_instance, sac_instance, differences, is_real_time)
     _validate_json_fields(audit_instance, sac_instance, differences)
@@ -384,15 +385,36 @@ def _validate_json_fields(audit_instance, sac_instance, differences):
             continue
 
         if sac_data is not None:
+            logger.info(f"Field: {field}")
+            t0 = time.monotonic()
             flat_sac = _flatten_json(sac_data)
+            logger.info(f" ~ flattening the SAC: {time.monotonic() - t0}")
+            t0 = time.monotonic()
             flat_audit = _flatten_json(audit_instance.audit)
+            logger.info(f" ~ flattening the Audit: {time.monotonic() - t0}")
 
+            t0 = time.monotonic()
             _validate_flat_json(flat_sac, flat_audit, field, differences)
-
+            logger.info(f" ~ validating the flat JSON: {time.monotonic() - t0}")
 
 def _validate_flat_json(flat_sac, flat_audit, field, differences):
     """Validate SOT and SAC data for flattened JSON formats"""
-    for sac_path, sac_value in flat_sac.items():
+    sac_items = flat_sac.items()
+    audit_items = flat_audit.items()
+
+    # hash audit data.
+    t0 = time.monotonic()
+    audit_map = {}
+    normalized_audit_map = {}
+    for audit_path, audit_value in audit_items:
+        normalized_audit_path = audit_path.split(".")[-1]
+        normalized_audit_map[normalized_audit_path] = audit_value
+        audit_map[audit_path] = audit_value
+    logger.info(f"      - Create audit map: {time.monotonic() - t0}")
+
+    t_validation = 0
+    t0 = time.monotonic()
+    for sac_path, sac_value in sac_items:
         # json_field.Meta data has not been included in SOT
         if sac_path.startswith("Meta"):
             continue
@@ -400,18 +422,31 @@ def _validate_flat_json(flat_sac, flat_audit, field, differences):
         normalized_sac_path = sac_path.split(".")[-1]
         match_found = False
 
-        for audit_path, audit_value in flat_audit.items():
-            normalized_audit_path = audit_path.split(".")[-1]
+        if (
+            normalized_sac_path in normalized_audit_map
+            and sac_value == audit_map[audit_path]
+        ):
+            match_found = True
 
-            if (
-                normalized_sac_path == normalized_audit_path
-                and sac_value == audit_value
-            ):
-                match_found = True
-                break
+        # TODO: This is the old loop below.
+        # I still have it here, but hashmap is faster and does not affect output.
+
+        # for audit_path, audit_value in audit_items:
+        #     normalized_audit_path = audit_path.split(".")[-1]
+
+        #     if (
+        #         normalized_sac_path == normalized_audit_path
+        #         and sac_value == audit_value
+        #     ):
+        #         match_found = True
+        #         break
 
         if not match_found:
-            result = _value_exists_in_audit(sac_path, sac_value, flat_audit)
+            t1 = time.monotonic()
+
+            # TODO: for testing the hashmap, pass audit_map instead of audit_items.
+            result = _value_exists_in_audit(sac_path, sac_value, audit_items)
+            t_validation += time.monotonic() - t1
 
             if not result.get("found"):
                 differences.append(
@@ -443,6 +478,8 @@ def _validate_flat_json(flat_sac, flat_audit, field, differences):
                         "error": f"Value from SAC.{field}.{sac_path} found in Audit but with different structure/key",
                     }
                 )
+    logger.info(f"      - Validate JSON loop: {time.monotonic() - t0}")
+    logger.info(f"          - _value_exists_in_audit: {t_validation}")
 
 
 def _flatten_json(obj, path="", result=None):
@@ -489,7 +526,46 @@ def _value_exists_in_audit(sac_path, sac_value, audit_data):
 
 def _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data):
     """Attempts to match the SAC and SOT fields via field name"""
-    for audit_path, audit_value in audit_data.items():
+    # TODO: HASHMAP ATTEMPT:
+    # This is performing better, but failing. Inconsistent output with the list version.
+
+    # if sac_field in audit_data:
+    #     audit_field = sac_field.split(".")[-1] if "." in sac_field else sac_field
+    #     audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
+    #     audit_value = audit_data[sac_field]
+
+    #     if sac_value == audit_value:
+    #         if sac_field != audit_field:
+    #             return {
+    #                 "found": True,
+    #                 "found_with_different_key": True,
+    #                 "sac_field": sac_field,
+    #                 "audit_path": sac_field,
+    #                 "value": audit_value,
+    #             }
+    #         return {
+    #             "found": True,
+    #         }
+    #     elif (
+    #         not isinstance(sac_value, bool)
+    #         and sac_value != 0
+    #         and _other_formats_match(sac_value, audit_value).get("found")
+    #     ):
+    #         comp_vals = _other_formats_match(sac_value, audit_value)
+    #         if sac_field != audit_field:
+    #             return {
+    #                 "found": True,
+    #                 "found_with_different_key": True,
+    #                 "found_with_different_format": True,
+    #                 "sac_field": sac_field,
+    #                 "audit_path": sac_field,
+    #                 "value": audit_value,
+    #                 **comp_vals,
+    #             }
+    #         else:
+    #             return {"found_with_different_format": True, **comp_vals}
+
+    for audit_path, audit_value in audit_data:
         audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
         audit_field = audit_field.split("[")[0] if "[" in audit_field else audit_field
 
@@ -530,35 +606,65 @@ def _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data):
 
 def _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data):
     """Attempts to match the SAC and SOT fields via values"""
-    if not isinstance(sac_value, bool) and sac_value != 0:
-        for audit_path, audit_value in audit_data.items():
-            audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
-            audit_field = (
-                audit_field.split("[")[0] if "[" in audit_field else audit_field
-            )
+    # TODO: HASHMAP ATTEMPT:
+    # This is performing better, but failing. Inconsistent output with the list version.
 
-            if _normalize_key(audit_field) == sac_norm_field:
-                continue
+    # if not isinstance(sac_value, bool) and sac_value != 0:
+    #     if sac_field in audit_data:
+    #         audit_field = sac_field.split(".")[-1] if "." in sac_field else sac_field
+    #         audit_field = (
+    #             audit_field.split("[")[0] if "[" in audit_field else audit_field
+    #         )
+    #         audit_value = audit_data[sac_field]
 
-            if sac_value == audit_value:
-                return {
-                    "found": True,
-                    "found_with_different_key": True,
-                    "sac_field": sac_field,
-                    "audit_path": audit_path,
-                    "value": audit_value,
-                }
-            elif _other_formats_match(sac_value, audit_value).get("found"):
-                comp_vals = _other_formats_match(sac_value, audit_value)
-                return {
-                    "found": True,
-                    "found_with_different_key": True,
-                    "found_with_different_format": True,
-                    "sac_field": sac_field,
-                    "audit_path": audit_path,
-                    "value": audit_value,
-                    **comp_vals,
-                }
+    #         if sac_value == audit_value:
+    #             return {
+    #                 "found": True,
+    #                 "found_with_different_key": True,
+    #                 "sac_field": sac_field,
+    #                 "audit_path": sac_field,
+    #                 "value": audit_value,
+    #             }
+    #         elif _other_formats_match(sac_value, audit_value).get("found"):
+    #             comp_vals = _other_formats_match(sac_value, audit_value)
+    #             return {
+    #                 "found": True,
+    #                 "found_with_different_key": True,
+    #                 "found_with_different_format": True,
+    #                 "sac_field": sac_field,
+    #                 "audit_path": sac_field,
+    #                 "value": audit_value,
+    #                 **comp_vals,
+    #             }
+
+    for audit_path, audit_value in audit_data:
+        audit_field = audit_path.split(".")[-1] if "." in audit_path else audit_path
+        audit_field = (
+            audit_field.split("[")[0] if "[" in audit_field else audit_field
+        )
+
+        if _normalize_key(audit_field) == sac_norm_field:
+            continue
+
+        if sac_value == audit_value:
+            return {
+                "found": True,
+                "found_with_different_key": True,
+                "sac_field": sac_field,
+                "audit_path": audit_path,
+                "value": audit_value,
+            }
+        elif _other_formats_match(sac_value, audit_value).get("found"):
+            comp_vals = _other_formats_match(sac_value, audit_value)
+            return {
+                "found": True,
+                "found_with_different_key": True,
+                "found_with_different_format": True,
+                "sac_field": sac_field,
+                "audit_path": audit_path,
+                "value": audit_value,
+                **comp_vals,
+            }
 
 
 def _normalize_key(key):
