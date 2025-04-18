@@ -7,7 +7,6 @@ import sys
 from audit.models import Audit
 from audit.models import SingleAuditChecklist
 from audit.models.utils import validate_audit_consistency
-from dissemination.models import General
 
 logger = logging.getLogger(__name__)
 
