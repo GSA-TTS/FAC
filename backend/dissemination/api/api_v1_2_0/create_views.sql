@@ -100,7 +100,9 @@ create view api_v1_2_0.additional_ueis as
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'additional_ueis') as uei_elem on true
     where
-        a.submission_status='disseminated'
+        a.submission_status = 'disseminated'
+        and a.audit->'general_information'->>'multiple_ueis_covered' = 'Yes'
+        and a.audit ? 'additional_ueis'
 ;
 ---------------------------------------
 -- finding
@@ -284,9 +286,8 @@ create view api_v1_2_0.general as
         where event = 'auditee-certification-completed'
         and h.report_id = a.report_id
         order by id desc limit 1) as auditee_certified_date,
-
-        a.audit->>'fac_accepted_date' as submitted_date,
-        a.audit->>'fac_accepted_date' as fac_accepted_date,   
+        h_submitted.updated_at_est::date as submitted_date,
+        h_submitted.updated_at_est::date as fac_accepted_date,
         a.audit->'general_information'->>'auditee_fiscal_period_end' as fy_end_date,
         a.audit->'general_information'->>'auditee_fiscal_period_start' as fy_start_date,
         a.audit->'general_information'->>'audit_type' as audit_type,
@@ -329,6 +330,14 @@ create view api_v1_2_0.general as
         end as is_secondary_auditors    
     from
         audit_audit as a
+    left join lateral (
+        select updated_at AT TIME ZONE 'America/New_York' as updated_at_est
+        from public.audit_history
+        where event = 'submitted'
+        and report_id = a.report_id
+        order by id desc
+        limit 1
+    ) h_submitted on true
     where 
     	a.submission_status='disseminated'
 ;
@@ -354,7 +363,9 @@ create view api_v1_2_0.secondary_auditors as
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'secondary_auditors') as sa_elem on true
     where
-        a.submission_status='disseminated'
+        a.submission_status = 'disseminated'
+        and a.audit->'general_information'->>'secondary_auditors_exist' = 'Yes'
+        and a.audit ? 'secondary_auditors'
 ;
 ---------------------------------------
 -- additional_eins
@@ -369,7 +380,9 @@ create view api_v1_2_0.additional_eins as
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'additional_eins') as ein_elem on true
     where
-        a.submission_status='disseminated'
+        a.submission_status = 'disseminated'
+        and a.audit->'general_information'->>'multiple_eins_covered' = 'Yes'
+        and a.audit ? 'additional_eins'
 ;
 commit;
 
