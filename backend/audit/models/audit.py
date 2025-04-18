@@ -339,15 +339,17 @@ class Audit(CreatedMixin, UpdatedMixin):
                     f"Version Mismatch: Expected {previous_version} Got {current_version}"
                 )  # TODO
 
-            # t0 = time.time()
-            # # TESTING: During save of audit, check for matching data in SAC
-            # is_consistent, discrepancies = validate_audit_consistency(self)
-            # if not is_consistent:
-            #     logger.warning(
-            #         f"Inconsistencies found between models for {report_id}: {discrepancies}"
-            #     )
-            # t1 = time.time()
-            # logger.info(f"{report_id} validation took {t1 - t0}")
+            # TESTING: During save of audit, check for matching data in SAC
+            logger.info(f"Validating {report_id}")
+            t0 = time.time()
+            is_consistent, discrepancies = validate_audit_consistency(self)
+            t1 = time.time()
+            logger.info(f"-- {t1 - t0}s")
+
+            if not is_consistent:
+                logger.warning(
+                    f"Inconsistencies found between models for {report_id}: {discrepancies}"
+                )
 
             self.version = previous_version + 1
 
