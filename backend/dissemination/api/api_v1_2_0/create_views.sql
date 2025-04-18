@@ -1,17 +1,15 @@
 begin;
 ---------------------------------------
--- indexes
----------------------------------------
-create index if not exists idx_audit_submission_status on audit_audit (submission_status);
-create index if not exists idx_audit_auditee_uei on audit_audit ((audit->'general_information'->>'auditee_uei'));
-create index if not exists idx_audit_auditee_email on audit_audit ((audit->'general_information'->>'auditee_email'));
-create index if not exists idx_audit_auditor_email on audit_audit ((audit->'general_information'->>'auditor_email'));
-create index if not exists idx_audit_fac_accepted_date on audit_audit ((audit->>'fac_accepted_date'));
-create index if not exists idx_history_auditor_cert on audit_history (report_id, event, id DESC);
-create index if not exists idx_history_auditee_cert on audit_history (report_id, event, id DESC);
----------------------------------------
 -- functions
 ---------------------------------------
+create or replace function cast_text_to_date(the_date varchar)
+   returns date
+   language sql
+   immutable
+as
+$body$
+  select to_date(the_date, 'yyyy-mm-dd');
+$body$
 create or replace function yesnonull(input text)
 returns text as $$
 begin
@@ -65,6 +63,17 @@ begin
   );
 end;
 $$ language plpgsql immutable;
+---------------------------------------
+-- indexes
+---------------------------------------
+create index if not exists idx_audit_submission_status on audit_audit (submission_status);
+create index if not exists idx_audit_auditee_uei on audit_audit ((audit->'general_information'->>'auditee_uei'));
+create index if not exists idx_audit_auditee_email on audit_audit ((audit->'general_information'->>'auditee_email'));
+create index if not exists idx_audit_auditor_email on audit_audit ((audit->'general_information'->>'auditor_email'));
+create index if not exists idx_audit_fac_accepted_date on audit_audit ((audit->>'fac_accepted_date'));
+create index if not exists idx_history_auditor_cert on audit_history (report_id, event, id DESC);
+create index if not exists idx_history_auditee_cert on audit_history (report_id, event, id DESC);
+create index if not exists idx_audit_date_index ON audit_audit (cast_text_to_date(audit_audit.fac_accepted_date));
 ---------------------------------------
 -- finding_text
 ---------------------------------------
@@ -286,8 +295,8 @@ create view api_v1_2_0.general as
         where event = 'auditee-certification-completed'
         and h.report_id = a.report_id
         order by id desc limit 1) as auditee_certified_date,
-        h_submitted.updated_at_est::date as submitted_date,
-        h_submitted.updated_at_est::date as fac_accepted_date,
+        a.fac_accepted_date as submitted_date,
+        a.fac_accepted_date,
         a.audit->'general_information'->>'auditee_fiscal_period_end' as fy_end_date,
         a.audit->'general_information'->>'auditee_fiscal_period_start' as fy_start_date,
         a.audit->'general_information'->>'audit_type' as audit_type,
@@ -330,14 +339,6 @@ create view api_v1_2_0.general as
         end as is_secondary_auditors    
     from
         audit_audit as a
-    left join lateral (
-        select updated_at AT TIME ZONE 'America/New_York' as updated_at_est
-        from public.audit_history
-        where event = 'submitted'
-        and report_id = a.report_id
-        order by id desc
-        limit 1
-    ) h_submitted on true
     where 
     	a.submission_status='disseminated'
 ;
