@@ -84,7 +84,7 @@ class Command(BaseCommand):
         logger.info(
             f"Selected {queryset.count()} records for the first batch of migrations."
         )
-        
+
         while queryset.count() != 0:
             t_migrate_sac = 0
             t_update_flag = 0
@@ -99,12 +99,22 @@ class Command(BaseCommand):
             self.t_files = 0
             self.t_waivers = 0
 
-            accesses = Access.objects.filter(sac__report_id__in=queryset.values('report_id'))
-            deletedaccesses = DeletedAccess.objects.filter(sac__report_id__in=queryset.values('report_id'))
-            submissionevents = SubmissionEvent.objects.filter(sac__id__in=queryset.values('id'))
-            sars = SingleAuditReportFile.objects.filter(sac__id__in=queryset.values('id'))
-            excels = ExcelFile.objects.filter(sac__id__in=queryset.values('id'))
-            validations = SacValidationWaiver.objects.filter(report_id__in=queryset.values('report_id'))
+            accesses = Access.objects.filter(
+                sac__report_id__in=queryset.values("report_id")
+            )
+            deletedaccesses = DeletedAccess.objects.filter(
+                sac__report_id__in=queryset.values("report_id")
+            )
+            submissionevents = SubmissionEvent.objects.filter(
+                sac__id__in=queryset.values("id")
+            )
+            sars = SingleAuditReportFile.objects.filter(
+                sac__id__in=queryset.values("id")
+            )
+            excels = ExcelFile.objects.filter(sac__id__in=queryset.values("id"))
+            validations = SacValidationWaiver.objects.filter(
+                report_id__in=queryset.values("report_id")
+            )
             for sac in queryset:
                 try:
                     t0 = time.monotonic()
@@ -116,7 +126,7 @@ class Command(BaseCommand):
                         submissionevents,
                         sars,
                         excels,
-                        validations
+                        validations,
                     )
                     t_migrate_sac += time.monotonic() - t0
 
@@ -151,13 +161,22 @@ class Command(BaseCommand):
         logger.info("Completed audit migrations.")
 
     @staticmethod
-    def _migrate_sac(self, sac: SingleAuditChecklist, accesses: Access, deletedaccesses: DeletedAccess, submissionevents: SubmissionEvent, sars: SingleAuditReportFile, excels: ExcelFile, validations: SacValidationWaiver):
+    def _migrate_sac(
+        self,
+        sac: SingleAuditChecklist,
+        accesses: Access,
+        deletedaccesses: DeletedAccess,
+        submissionevents: SubmissionEvent,
+        sars: SingleAuditReportFile,
+        excels: ExcelFile,
+        validations: SacValidationWaiver,
+    ):
         t1 = time.monotonic()
         audit_data = dict()
         for idx, handler in enumerate(SAC_HANDLERS):
             audit_data.update(handler(sac))
         self.t_audit += time.monotonic() - t1
-        
+
         # create the audit.
         if not Audit.objects.filter(report_id=sac.report_id).exists():
             t1 = time.monotonic()
@@ -181,9 +200,7 @@ class Command(BaseCommand):
             # update Access models.
             t1 = time.monotonic()
             accesses.filter(sac__report_id=sac.report_id).update(audit=audit)
-            deletedaccesses.filter(sac__report_id=sac.report_id).update(
-                audit=audit
-            )
+            deletedaccesses.filter(sac__report_id=sac.report_id).update(audit=audit)
             self.t_access += time.monotonic() - t1
 
             # convert additional fields.

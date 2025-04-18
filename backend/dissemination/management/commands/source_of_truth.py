@@ -87,7 +87,7 @@ class Command(BaseCommand):
         logger.info(f"SAC report_ids: {sac_sorted_report_ids}")
 
         if not sot_sorted_report_ids and not sac_sorted_report_ids:
-            logger.error(f"No report_ids found for SOT or SAC")
+            logger.error("No report_ids found for SOT or SAC")
             sys.exit(1)
         if sot_sorted_report_ids != sac_sorted_report_ids:
             sot_not_sac = [
@@ -99,7 +99,7 @@ class Command(BaseCommand):
                 x for x in sac_sorted_report_ids if x not in sot_sorted_report_ids
             ]
             logger.error(f"report_ids found in SAC but not SOT: {sac_not_sot}")
-            
+
             sys.exit(1)
         else:
             logger.info("SOT and SAC report_ids match; continuing")

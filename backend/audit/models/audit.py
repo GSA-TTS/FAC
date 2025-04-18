@@ -29,6 +29,7 @@ from itertools import chain
 from audit.cross_validation import functions as cross_validation_functions
 from audit.utils import FORM_SECTION_HANDLERS
 import logging
+import time
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -338,12 +339,15 @@ class Audit(CreatedMixin, UpdatedMixin):
                     f"Version Mismatch: Expected {previous_version} Got {current_version}"
                 )  # TODO
 
-            # TESTING: During save of audit, check for matching data in SAC
-            is_consistent, discrepancies = validate_audit_consistency(self)
-            if not is_consistent:
-                logger.warning(
-                    f"Inconsistencies found between models for {report_id}: {discrepancies}"
-                )
+            # t0 = time.time()
+            # # TESTING: During save of audit, check for matching data in SAC
+            # is_consistent, discrepancies = validate_audit_consistency(self)
+            # if not is_consistent:
+            #     logger.warning(
+            #         f"Inconsistencies found between models for {report_id}: {discrepancies}"
+            #     )
+            # t1 = time.time()
+            # logger.info(f"{report_id} validation took {t1 - t0}")
 
             self.version = previous_version + 1
 
