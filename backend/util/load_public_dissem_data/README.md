@@ -34,7 +34,7 @@ We need the stack running for this whole process.
 
 From GDrive, grab the data.
 
-https://drive.google.com/file/d/1_EmykQamgw9VhjhFAPzgjQdk7pMzHgJW/view?usp=drive_link
+Folder: https://drive.google.com/drive/folders/1gUsqD31Pkd17CruE4PWwwPKJVUssYNnI
 
 Grab the file `sac-user-access-valwaiver-pdf-xlsx-event-data-03-28-25.dump` (~6GB).
 Put it in util/load_public_dissem_data/data (a child of this directory).

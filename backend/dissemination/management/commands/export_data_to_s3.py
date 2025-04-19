@@ -1,0 +1,229 @@
+import logging
+import boto3
+from boto3.s3.transfer import TransferConfig
+from io import BytesIO
+from botocore.client import ClientError, Config
+from sys import exit
+from os import makedirs
+from pathlib import Path
+import shutil
+from config import settings
+import pandas as pd
+
+from django.core.management.base import BaseCommand
+from django.conf import settings
+from datetime import datetime
+from collections import namedtuple as NT
+
+from sqlalchemy import create_engine
+import time
+
+
+logger = logging.getLogger(__name__)
+
+Table = NT("Table", "name is_suppressed")
+TABLES = [
+    Table("general", False),
+    Table("federal_awards", False),
+    Table("findings", False),
+    Table("findings_text", True),
+    Table("corrective_action_plans", True),
+    Table("passthrough", False),
+    Table("notes_to_sefa", True),
+    Table("additional_eins", False),
+    Table("additional_ueis", False),
+    Table("secondary_auditors", False),
+]
+
+API_VERSION = "api_v1_1_0"
+
+CURRENT_YEAR = datetime.now().year
+NEXT_YEAR = datetime.now().year + 1
+FLAGS_INVALID = True
+FLAGS_VALID = False
+
+
+def get_conn_string():
+    return settings.SQLALCHEMY_CONNECTION_STRING
+
+
+def get_sqlalchemy_engine():
+    connection_string = get_conn_string()
+    engine = create_engine(connection_string)
+    return engine
+
+
+def destination_key(key, file):
+    if key.endswith("/"):
+        return key + file
+    else:
+        return key + "/" + file
+
+
+def get_s3_client():
+    s3 = boto3.client(
+        service_name="s3",
+        region_name=settings.AWS_S3_PRIVATE_REGION_NAME,
+        aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
+        endpoint_url=settings.AWS_S3_PRIVATE_INTERNAL_ENDPOINT,
+        config=Config(signature_version="s3v4"),
+    )
+    return s3
+
+
+def uploadFileS3(client, bucket, key, file):
+    config = TransferConfig(
+        multipart_threshold=1024 * 25,
+        max_concurrency=10,
+        multipart_chunksize=1024 * 25,
+        use_threads=True,
+    )
+    client.upload_file(
+        file,
+        bucket,
+        destination_key(key, file),
+        Config=config,
+    )
+
+
+def dump_table(dir, table, year, year_type, chunksize):
+    # Always try and make the destination directory
+    # The param exists_ok will prevent errors
+    FILEPATH = Path(dir) / f"{table.name}.csv"
+    if year_type == "ay":
+        where_clause = f"WHERE audit_year = '{year}'"
+    elif year_type == "ffy":
+        where_clause = " ".join(
+            [
+                " WHERE report_id IN "
+                f" (select report_id from {API_VERSION}.general "
+                f" WHERE fac_accepted_date >= '{year-1}-10-01'::DATE "
+                f" AND fac_accepted_date <= '{year}-09-30'::DATE) "
+            ]
+        )
+
+    query = " ".join([f"SELECT * from {API_VERSION}.{table.name} ", where_clause])
+
+    engine = get_sqlalchemy_engine()
+    header = True
+    for df in pd.read_sql(query, engine, chunksize=chunksize):
+        df.to_csv(FILEPATH, mode="a", header=header, index=False)
+        # Only drop the header on the first chunk.
+        header = False
+
+
+def sling_tables(bucket, key, year, year_types, chunksize):
+    s3 = get_s3_client()
+
+    # Given a year type ("`ay" or "fy")
+    # I want to dump all the tables and compress them.
+    # We'll put them at a path based on the year
+    for year_type in year_types:
+        if year_type == "ffy":
+            dest_key = destination_key(key, "fiscal-year/")
+        elif year_type == "ay":
+            dest_key = destination_key(key, "audit-year/")
+
+        DIRECTORY = f"fac-{year}-{year_type}"
+        makedirs(DIRECTORY, exist_ok=True)
+
+        # A .zip will be added automatically
+        ZIPNAME = DIRECTORY
+
+        # This will create one directory per year
+        # where each directory contains all the tables\
+        try:
+            for table in TABLES:
+                dump_table(DIRECTORY, table, year, year_type, chunksize)
+            # Now, compress that directory
+            shutil.make_archive(ZIPNAME, "zip", DIRECTORY)
+            # Remove the original directory
+            # Copy things to S3
+            uploadFileS3(s3, bucket, dest_key, f"{ZIPNAME}.zip")
+        except Exception as e:
+            logger.error("failed to dump and upload tables")
+            logger.error(e)
+            pass
+
+        # Always cleanup, even if we threw an exception
+        shutil.rmtree(DIRECTORY)
+        # Remove the zipfile
+        Path(f"{ZIPNAME}.zip").unlink(missing_ok=True)
+
+
+def invalid_flags(flags):
+    # Flags is a string
+    if flags["year"] in "ALL":
+        pass
+    elif int(flags["year"]) < 2016:
+        logger.error(f"{flags['year']} must be greater or equal to 2015.")
+        return FLAGS_INVALID
+    elif int(flags["year"]) > 2200:
+        logger.error(f"{flags['year']} must be less than 2200.")
+        return FLAGS_INVALID
+
+    if not flags["use_ay"] and not flags["use_ffy"] and not flags["use_ay_and_ffy"]:
+        logger.error(
+            "one of --audit-year, --fiscal-year, or --all-year-types must be present"
+        )
+        return FLAGS_INVALID
+
+    return FLAGS_VALID
+
+
+# By default, this will create two zipfiles for each year:
+# * One will be all tables by audit year
+# * The second will be all tables by fiscal year
+class Command(BaseCommand):
+    def add_arguments(self, parser):
+        # Source flags
+        parser.add_argument("--year", type=str, default="ALL")
+
+        # What date range?
+        parser.add_argument("--audit-year", dest="use_ay", action="store_true")
+        parser.add_argument("--fiscal-year", dest="use_ffy", action="store_true")
+        parser.add_argument(
+            "--all-year-types", dest="use_ay_and_ffy", action="store_true", default=True
+        )
+
+        # Destination flags
+        parser.add_argument("--bucket", type=str, required=True)
+        parser.add_argument("--path", type=str, required=True)
+
+        parser.add_argument("--chunksize", type=int, required=False, default=10_000)
+        pass
+
+    def handle(self, *args, **flags):
+        # Validate all of the flags; if they are
+        # invalid, exit.
+        if invalid_flags(flags):
+            exit(-1)
+
+        # Turn the singletons into lists.
+        # Even if we're only doing one year, make it a
+        # list so we can loop over it.
+        if flags["year"] in "ALL":
+            years = range(2016, NEXT_YEAR)
+        else:
+            years = [int(flags["year"])]
+
+        if flags["use_ay_and_ffy"]:
+            year_types = ["ay", "ffy"]
+        else:
+            year_types = []
+            if flags["use_ay"]:
+                year_types.append("ay")
+            if flags["use_ffy"]:
+                year_types.append("ffy")
+
+        start = time.time()
+        for year in years:
+            sling_tables(
+                flags["bucket"],
+                flags["path"],
+                year=year,
+                year_types=year_types,
+                chunksize=flags["chunksize"],
+            )
+        logger.info(f"CSV dump elapsed time: {time.time() - start}s")
