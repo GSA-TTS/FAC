@@ -31,6 +31,7 @@ resource "cloudfoundry_app" "postgrest" {
     PGRST_DB_MAX_ROWS : 20000
   }
   service_bindings = [{ service_instance = module.cg-logshipper.syslog_drain_name }]
+  depends_on       = [module.cg-logshipper]
 }
 
 # The following use the community provider as these have not been moved to the official provider.
