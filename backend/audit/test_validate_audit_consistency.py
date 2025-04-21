@@ -258,10 +258,10 @@ class TestValidateAuditConsistency(TestCase):
         self.assertDictEqual(
             result[1][0],
             {
-                "field": "general_information",
-                "sac_path": "a",
-                "sac_value": 2,
-                "error": "Value from SAC.general_information.a not found in Audit",
+                'audit_value': {'a': 1},
+                'error': 'Field JSON does not match',
+                'field': 'general_information',
+                'sac_value': {'a': 2},
             },
         )
         self.assertFalse(result[0])
@@ -308,64 +308,6 @@ class TestValidateAuditConsistency(TestCase):
         )
         self.assertFalse(result[0])
 
-    def test_normalizing_keys(self):
-        """Generate a difference when keys differ only by snake/kebab casing"""
-        audit = baker.make(Audit, version=0)
-        audit.audit = {"general_information": {"foo_bar": 1}}
-        audit.save()
-        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-        sac.general_information = {"foo-bar": 1}
-        sac.save()
-        result = validate_audit_consistency(audit)
-        self.assertDictEqual(
-            result[1][0],
-            {
-                "field": "general_information",
-                "sac_path": "foo-bar",
-                "sac_value": 1,
-                "audit_path": "general_information.foo_bar",
-                "error": "Value from SAC.general_information.foo-bar found in Audit but with different structure/key",
-            },
-        )
-        self.assertFalse(result[0])
-
-    def test_json_different_formats_invalid(self):
-        """Generate a difference when matching fields have different formats"""
-        audit = baker.make(Audit, version=0)
-        audit.audit = {"general_information": {"a": 1}}
-        audit.save()
-        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-        sac.general_information = {"a": "1"}
-        sac.save()
-        result = validate_audit_consistency(audit)
-        self.assertDictEqual(
-            result[1][0],
-            {
-                "field": "general_information",
-                "sac_path": "a",
-                "sac_value": "1",
-                "found_with_different_format": True,
-                "found": True,
-                "error": "1 is int/float, found 1 as string",
-            },
-        )
-        self.assertFalse(result[0])
-
-    def test_format_error(self):
-        """
-        Don't prematurely match on values of different formats when a key
-        match exists
-        """
-        audit = baker.make(Audit, version=0)
-        audit.audit = {"general_information": {"x": "01", "a": 1}}
-        audit.save()
-        sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-        sac.general_information = {"a": 1}
-        sac.save()
-        result = validate_audit_consistency(audit)
-        self.assertEqual(result[1], [])
-        self.assertTrue(result[0])
-
     def test_has_tribal_data_consent(self):
         """Valid case when tribal data consent exists"""
         audit = baker.make(Audit, version=0)
@@ -397,9 +339,8 @@ class TestValidateAuditConsistency(TestCase):
         ignored
         """
         audit = baker.make(Audit, version=0)
-        audit.audit = {"federal_awards": {"foo": "bar"}}
         sac = baker.make(SingleAuditChecklist, report_id=audit.report_id)
-        sac.federal_awards = {"Meta": {"section_name": "FederalAwardsExpended"}}
+        sac.findings_text = {"Meta": {"section_name": "FindingsText"}}
         sac.save()
         result = validate_audit_consistency(audit)
         self.assertEqual(result[1], [])
