@@ -346,35 +346,43 @@ def _validate_simple_fields(audit_instance, sac_instance, differences, is_real_t
             )
 
 
+fields_with_meta = {
+    "corrective_action_plan": "CorrectiveActionPlan",
+    "notes_to_sefa": "NotesToSefa",
+    "findings_text": "FindingsText",
+    "federal_awards": "FederalAwards",
+}
+
+
 def _validate_json_fields(audit_instance, sac_instance, differences):
     """Validate SOT and SAC data where SAC uses a JSON format"""
     for field in json_fields_to_check:
-        sac_data = getattr(sac_instance, field, None)
+        sac_field_data = getattr(sac_instance, field, None)
         audit_field_data = audit_instance.audit.get(field)
 
         # Ignore SAC fields that only contain metadata
-        if sac_data:
-            if field == "findings_text" and not sac_data.get("FindingsText", {}).get(
-                "findings_text_entries"
-            ):
-                sac_data = None
-            elif field == "corrective_action_plan" and not sac_data.get(
+        if sac_field_data:
+            if field == "findings_text" and not sac_field_data.get(
+                "FindingsText", {}
+            ).get("findings_text_entries"):
+                sac_field_data = None
+            elif field == "corrective_action_plan" and not sac_field_data.get(
                 "CorrectiveActionPlan", {}
             ).get("corrective_action_plan_entries"):
-                sac_data = None
+                sac_field_data = None
 
-        if sac_data is not None and audit_field_data in [None, {}]:
+        if sac_field_data is not None and audit_field_data in [None, {}]:
             differences.append(
                 {
                     "field": field,
                     "error": "Field is empty in Audit, but not in SAC",
-                    "sac_value": sac_data,
+                    "sac_value": sac_field_data,
                     "audit_value": None,
                 }
             )
             continue
 
-        if sac_data is None and audit_field_data not in [None, {}]:
+        if sac_field_data is None and audit_field_data not in [None, {}]:
             differences.append(
                 {
                     "field": field,
@@ -385,19 +393,57 @@ def _validate_json_fields(audit_instance, sac_instance, differences):
             )
             continue
 
-        if sac_data is not None:
-            # logger.info(f"Field: {field}")
-            t0 = time.monotonic()
-            flat_sac = _flatten_json(sac_data)
-            # logger.info(f" ~ flattening the SAC: {time.monotonic() - t0}")
-            t0 = time.monotonic()
-            flat_audit = _flatten_json(audit_instance.audit)
-            # logger.info(f" ~ flattening the Audit: {time.monotonic() - t0}")
+        if sac_field_data is not None:
+            # We don't need the Meta section of the SAC data
+            if field in fields_with_meta:
+                sac_field_data = sac_field_data[fields_with_meta[field]]
 
-            t0 = time.monotonic()
-            _validate_flat_json(flat_sac, flat_audit, field, differences)
-            # logger.info(f" ~ validating the flat JSON: {time.monotonic() - t0}")
+            # SACs sometimes have additional auditee_uei field
+            if "auditee_uei" in sac_field_data:
+                del sac_field_data["auditee_uei"]
 
+            # SOT gen_info has additional auditee_uei field
+            if field == "general_information" and "auditee_uei" in audit_field_data:
+                del audit_field_data["auditee_uei"]
+
+            # federal_awards -> awards key tweak for SAC data to match SOT
+            if field == "federal_awards":
+                sac_awards = sac_field_data.get("federal_awards", [])
+                sac_field_data = {
+                    "total_amount_expended": sac_field_data["total_amount_expended"],
+                }
+                sac_field_data["awards"] = sac_awards
+
+            # Handle SACs that have the actual data in *_entries
+            if field == "findings_text":
+                sac_field_data = sac_field_data["findings_text_entries"]
+            elif field == "corrective_action_plan":
+                sac_field_data = sac_field_data["corrective_action_plan_entries"]
+
+            if sac_field_data != audit_field_data:
+                differences.append(
+                    {
+                        "field": field,
+                        "error": "Field JSON does not match",
+                        "sac_value": sac_field_data,
+                        "audit_value": audit_field_data,
+                    }
+                )
+
+            # # logger.info(f"Field: {field}")
+            # t0 = time.monotonic()
+            # flat_sac = _flatten_json(sac_data)
+            # # logger.info(f" ~ flattening the SAC: {time.monotonic() - t0}")
+            # t0 = time.monotonic()
+            # flat_audit = _flatten_json(audit_instance.audit)
+            # # logger.info(f" ~ flattening the Audit: {time.monotonic() - t0}")
+
+            # t0 = time.monotonic()
+            # _validate_flat_json(flat_sac, flat_audit, field, differences)
+            # # logger.info(f" ~ validating the flat JSON: {time.monotonic() - t0}")
+
+
+# TODO: To be removed
 def _validate_flat_json(flat_sac, flat_audit, field, differences):
     """Validate SOT and SAC data for flattened JSON formats"""
     sac_items = flat_sac.items()
@@ -409,7 +455,11 @@ def _validate_flat_json(flat_sac, flat_audit, field, differences):
     normalized_audit_map = {}
     for audit_path, audit_value in audit_items:
         normalized_audit_path = audit_path.split(".")[-1]
-        audit_field = normalized_audit_path.split("[")[0] if "[" in normalized_audit_path else normalized_audit_path
+        audit_field = (
+            normalized_audit_path.split("[")[0]
+            if "[" in normalized_audit_path
+            else normalized_audit_path
+        )
         normalized_audit_map[normalized_audit_path] = audit_value
         audit_map[audit_field].append(audit_value)
     # logger.info(f"      - Create audit map: {time.monotonic() - t0}")
@@ -448,7 +498,9 @@ def _validate_flat_json(flat_sac, flat_audit, field, differences):
             t1 = time.monotonic()
 
             # TODO: for testing the hashmap, pass audit_map instead of audit_items.
-            result = _value_exists_in_audit(sac_path, sac_value, audit_map, normalized_audit_map)
+            result = _value_exists_in_audit(
+                sac_path, sac_value, audit_map, normalized_audit_map
+            )
             t_validation += time.monotonic() - t1
 
             if not result.get("found"):
@@ -485,6 +537,7 @@ def _validate_flat_json(flat_sac, flat_audit, field, differences):
     # logger.info(f"          - _value_exists_in_audit: {t_validation}")
 
 
+# TODO: To be removed
 def _flatten_json(obj, path="", result=None):
     """Flatten a nested JSON into kv pair with path"""
     if result is None:
@@ -504,6 +557,7 @@ def _flatten_json(obj, path="", result=None):
     return result
 
 
+# TODO: To be removed
 def _value_exists_in_audit(sac_path, sac_value, audit_data, normalized_audit_data):
     """Check if a value from SAC exists somewhere in audit data with the same key-value"""
     sac_field = sac_path.split(".")[-1] if "." in sac_path else sac_path
@@ -527,7 +581,10 @@ def _value_exists_in_audit(sac_path, sac_value, audit_data, normalized_audit_dat
     }
 
 
-def _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data, normalized_audit_data):
+# TODO: To be removed
+def _attempt_field_match(
+    sac_field, sac_norm_field, sac_value, audit_data, normalized_audit_data
+):
     """Attempts to match the SAC and SOT fields via field name"""
     # print(f"=========")
     # print(f"Searching field: {sac_field} in audit data. {sac_field in audit_data}")
@@ -618,7 +675,10 @@ def _attempt_field_match(sac_field, sac_norm_field, sac_value, audit_data, norma
     #             return {"found_with_different_format": True, **comp_vals}
 
 
-def _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data, normalized_audit_data):
+# TODO: To be removed
+def _attempt_value_match(
+    sac_field, sac_norm_field, sac_value, audit_data, normalized_audit_data
+):
     """Attempts to match the SAC and SOT fields via values"""
     # TODO: HASHMAP ATTEMPT:
     # This is performing better, but failing. Inconsistent output with the list version.
@@ -687,6 +747,7 @@ def _attempt_value_match(sac_field, sac_norm_field, sac_value, audit_data, norma
         #         }
 
 
+# TODO: To be removed
 def _normalize_key(key):
     """Normalize the keys for comparison"""
     if not isinstance(key, str):
@@ -696,6 +757,7 @@ def _normalize_key(key):
     return normalized.lower()
 
 
+# TODO: To be removed
 def _other_formats_match(value1, value2):
     """Determines if value1 matches value2 but in a different format"""
     if isinstance(value1, list) and value2 in value1:
