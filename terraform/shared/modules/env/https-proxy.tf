@@ -6,8 +6,8 @@ module "https-proxy" {
     id   = data.cloudfoundry_space.egress_space.id
     name = data.cloudfoundry_space.egress_space.name
   }
-  instances = var.https_proxy_instances
-  allowports = [443,61443]
+  instances  = var.https_proxy_instances
+  allowports = [443, 61443]
   allowlist = [
     "api.sam.gov:443",
     "*.newrelic.com:443",

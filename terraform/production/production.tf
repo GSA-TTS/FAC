@@ -45,6 +45,6 @@ data "cloudfoundry_space" "space" {
 
 data "cloudfoundry_app" "fac_app" {
   name       = "gsa-fac"
-  space_name = var.cf_space_name
-  org_name   = "production"
+  space_name = "production"
+  org_name   = var.cf_org_name
 }
