@@ -3,8 +3,6 @@ The intent of this file is to group together audit related helpers.
 """
 
 import logging
-
-
 from datetime import timedelta
 
 import pytz
@@ -233,6 +231,205 @@ def _index_general(audit_data):
     }
 
 
+json_fields_to_check = [
+    "general_information",
+    "federal_awards",
+    "findings_text",
+    "findings_uniform_guidence",
+    "corrective_action_plan",
+    "notes_to_sefa",
+    "audit_information",
+    "auditor_certification",
+    "auditee_certification",
+    "tribal_data_consent",
+]
+
+simple_fields_to_check = [
+    "audit_type",
+    "data_source",
+    "cognizant_agency",
+    "oversight_agency",
+]
+
+entry_fields_to_check = {
+    "additional_eins": {
+        "top_level_name": "AdditionalEINs",
+        "entries_name": "additional_eins_entries",
+        "entry_name": "additional_ein",
+    },
+    "additional_ueis": {
+        "top_level_name": "AdditionalUEIs",
+        "entries_name": "additional_ueis_entries",
+        "entry_name": "additional_uei",
+    },
+    "secondary_auditors": {
+        "top_level_name": "SecondaryAuditors",
+        "entries_name": "secondary_auditors_entries",
+        "entry_name": "secondary_auditor_ein",
+    },
+}
+
+
+def validate_audit_consistency(audit_instance, is_real_time=True):
+    """
+    Validates that all data in SingleAuditChecklist exists in Audit,
+    ignores strucutre and searches for keys/values. All values in SAC
+    must exist in Audit.
+    """
+    from audit.models import SingleAuditChecklist
+
+    sac = SingleAuditChecklist
+
+    try:
+        sac_instance = sac.objects.get(report_id=audit_instance.report_id)
+    except sac.DoesNotExist:
+        return False, [
+            {"error": f"No SAC found with report_id {audit_instance.report_id}"}
+        ]
+
+    differences = []
+
+    # logger.info(f"Validating audit: {sac.report_id}")
+    _validate_entry_fields(audit_instance, sac_instance, differences)
+    _validate_simple_fields(audit_instance, sac_instance, differences, is_real_time)
+    _validate_json_fields(audit_instance, sac_instance, differences)
+
+    return len(differences) == 0, differences
+
+
+def _validate_entry_fields(audit_instance, sac_instance, differences):
+    """Validate SOT and SAC data where SAC uses an entry dict format"""
+    for field, names in entry_fields_to_check.items():
+        top_level_name = names["top_level_name"]
+        entries_name = names["entries_name"]
+        entry_name = names["entry_name"]
+
+        sac_data = getattr(sac_instance, field)
+        if sac_data:
+            sac_values = []
+            if isinstance(sac_data, dict) and top_level_name in sac_data:
+                entries = sac_data.get(top_level_name, {}).get(entries_name, [])
+                for entry in entries:
+                    sac_values.append(entry[entry_name])
+
+            audit_values = []
+            if field in audit_instance.audit and audit_instance.audit[field]:
+                if field == "secondary_auditors":
+                    for entry in audit_instance.audit[field]:
+                        audit_values.append(entry[entry_name])
+                else:
+                    audit_values = audit_instance.audit[field]
+
+            if set(sac_values) != set(audit_values):
+                differences.append(
+                    {
+                        "field": field,
+                        "sac_value": sac_values,
+                        "audit_value": audit_values,
+                        "error": "Values don't match between SAC and Audit",
+                    }
+                )
+
+
+def _validate_simple_fields(audit_instance, sac_instance, differences, is_real_time):
+    """Validate SOT and SAC data where SAC uses a simple format"""
+    for field in simple_fields_to_check:
+        # These fields aren't guaranteed to be set for SOT during real-time validation
+        if is_real_time and field in ["cognizant_agency", "oversight_agency"]:
+            continue
+
+        sac_value = getattr(sac_instance, field, None)
+        audit_value = getattr(audit_instance, field, None)
+
+        if sac_value and sac_value != audit_value:
+            differences.append(
+                {"field": field, "sac_value": sac_value, "audit_value": audit_value}
+            )
+
+
+fields_with_meta = {
+    "corrective_action_plan": "CorrectiveActionPlan",
+    "notes_to_sefa": "NotesToSefa",
+    "findings_text": "FindingsText",
+    "federal_awards": "FederalAwards",
+}
+
+
+def _validate_json_fields(audit_instance, sac_instance, differences):
+    """Validate SOT and SAC data where SAC uses a JSON format"""
+    for field in json_fields_to_check:
+        sac_field_data = getattr(sac_instance, field, None)
+        audit_field_data = audit_instance.audit.get(field)
+
+        # Ignore SAC fields that only contain metadata
+        if sac_field_data:
+            if field == "findings_text" and not sac_field_data.get(
+                "FindingsText", {}
+            ).get("findings_text_entries"):
+                sac_field_data = None
+            elif field == "corrective_action_plan" and not sac_field_data.get(
+                "CorrectiveActionPlan", {}
+            ).get("corrective_action_plan_entries"):
+                sac_field_data = None
+
+        if sac_field_data is not None and audit_field_data in [None, {}]:
+            differences.append(
+                {
+                    "field": field,
+                    "error": "Field is empty in Audit, but not in SAC",
+                    "sac_value": sac_field_data,
+                    "audit_value": None,
+                }
+            )
+            continue
+
+        if sac_field_data is None and audit_field_data not in [None, {}]:
+            differences.append(
+                {
+                    "field": field,
+                    "error": "Field is empty in SAC, but not in Audit",
+                    "sac_value": None,
+                    "audit_value": audit_field_data,
+                }
+            )
+            continue
+
+        if sac_field_data is not None:
+            # We don't need the Meta section of the SAC data
+            if field in fields_with_meta:
+                sac_field_data = sac_field_data[fields_with_meta[field]]
+
+            # SACs sometimes have additional auditee_uei field
+            if "auditee_uei" in sac_field_data:
+                del sac_field_data["auditee_uei"]
+
+            # SOT gen_info has additional auditee_uei field
+            if field == "general_information" and "auditee_uei" in audit_field_data:
+                del audit_field_data["auditee_uei"]
+
+            # federal_awards -> awards key tweak for SAC data to match SOT
+            if field == "federal_awards":
+                sac_awards = sac_field_data.get("federal_awards", [])
+                sac_field_data = {
+                    "total_amount_expended": sac_field_data["total_amount_expended"],
+                }
+                sac_field_data["awards"] = sac_awards
+
+            # Handle SACs that have the actual data in *_entries
+            if field == "findings_text":
+                sac_field_data = sac_field_data["findings_text_entries"]
+            elif field == "corrective_action_plan":
+                sac_field_data = sac_field_data["corrective_action_plan_entries"]
+
+            if sac_field_data != audit_field_data:
+                differences.append(
+                    {
+                        "field": field,
+                        "error": "Field JSON does not match",
+                        "sac_value": sac_field_data,
+                        "audit_value": audit_field_data,
+                    }
+                )
 def get_friendly_submission_status(submission_status) -> str:
     """Return the friendly version of submission_status."""
     return dict(STATUS_CHOICES)[submission_status]
