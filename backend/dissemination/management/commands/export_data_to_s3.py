@@ -1,22 +1,50 @@
+#####################
+# HOW TO USE
+# This management command is intended to export our currently live
+# data to a set of CSV files.
+#
+# It exports data in both as audit-years and fiscal-years.
+# This means we get one set of data that is based on the
+# `audit_year` column in `general`, and the other set
+# is based on {year-1}-10-01 to {year}-09-30.
+#
+# We end up with a directory structure in S3 that looks like this:
+#
+# audit-year/
+#   fac-2016-ay.zip
+#   fac-2017-ay.zip
+#   ...
+# fiscal-year/
+#   fac-2016-ffy.zip
+#   fac-2017-ffy.zip
+#   ...
+#
+# We can put that in any bucket and root we want. A production usage might
+# look like:
+#
+# fac export_data_to_s3 --bucket fac-private-s3 --path public-data
+#
+# and a local usage might look like
+#
+# fac export_data_to_s3 --bucket gsa-fac-private-s3 --path test
+
 import logging
 import boto3
 from boto3.s3.transfer import TransferConfig
-from io import BytesIO
-from botocore.client import ClientError, Config
+from botocore.client import Config
 from sys import exit
 from os import makedirs
 from pathlib import Path
 import shutil
-from config import settings
 import pandas as pd
+from collections import namedtuple as NT
+from datetime import datetime
+from sqlalchemy import create_engine
+import time
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from datetime import datetime
-from collections import namedtuple as NT
-
-from sqlalchemy import create_engine
-import time
+from config import settings
 
 
 logger = logging.getLogger(__name__)
@@ -104,6 +132,8 @@ def dump_table(dir, table, year, year_type, chunksize):
         )
 
     query = " ".join([f"SELECT * from {API_VERSION}.{table.name} ", where_clause])
+
+    logger.info(query)
 
     engine = get_sqlalchemy_engine()
     header = True
