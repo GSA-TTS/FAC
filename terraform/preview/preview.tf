@@ -1,7 +1,9 @@
 module "preview" {
-  source                = "../shared/modules/env"
-  cf_space_name         = "preview"
-  cf_space_id           = data.cloudfoundry_space.space.id
+  source = "../shared/modules/env"
+  cf_space = {
+    id   = data.cloudfoundry_space.space.id
+    name = "preview"
+  }
   new_relic_license_key = var.new_relic_license_key
   new_relic_account_id  = var.new_relic_account_id
   new_relic_api_key     = var.new_relic_api_key
@@ -9,7 +11,7 @@ module "preview" {
 
   database_plan         = "medium-gp-psql"
   postgrest_instances   = 1
-  postgrest_memory      = 512
+  postgrest_memory      = "512M"
   swagger_instances     = 1
   https_proxy_instances = 1
   smtp_proxy_instances  = 1
@@ -34,7 +36,7 @@ data "cloudfoundry_space" "space" {
 }
 
 module "preview-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
 
   cf_space_id  = data.cloudfoundry_space.space.id
   name         = "backups"
