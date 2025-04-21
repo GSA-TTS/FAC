@@ -132,7 +132,7 @@ class Command(BaseCommand):
                         sars,
                         excels,
                         validations,
-                        audit_validations
+                        audit_validations,
                     )
                     t_migrate_sac += time.monotonic() - t0
 
@@ -229,21 +229,26 @@ class Command(BaseCommand):
 
         # copy SubmissionEvents into History records.
         t1 = time.monotonic()
-        events = submissionevents.filter(sac=sac).values('event', 'timestamp', 'user__id')
-        histories = [History(
-            event=event['event'],
-            report_id=sac.report_id,
-            event_data=audit.audit,
-            version=0,
-            updated_by_id=event['user__id']
-        ) for event in events]
+        events = submissionevents.filter(sac=sac).values(
+            "event", "timestamp", "user__id"
+        )
+        histories = [
+            History(
+                event=event["event"],
+                report_id=sac.report_id,
+                event_data=audit.audit,
+                version=0,
+                updated_by_id=event["user__id"],
+            )
+            for event in events
+        ]
         History.objects.bulk_create(histories)
 
         for history, event in zip(histories, events):
-            history.updated_at = event['timestamp']
+            history.updated_at = event["timestamp"]
 
         # Step 3: Bulk update
-        History.objects.bulk_update(histories, ['updated_at'])
+        History.objects.bulk_update(histories, ["updated_at"])
         self.t_history += time.monotonic() - t1
 
         # assign audit reference to file-based models.
@@ -256,16 +261,19 @@ class Command(BaseCommand):
         t1 = time.monotonic()
         if not audit_validations.exists():
             waivers = validations.filter(report_id=sac.report_id)
-            audit_waivers = [AuditValidationWaiver(
-                report_id=sac.report_id,
-                timestamp=waiver.timestamp,
-                approver_email=waiver.approver_email,
-                approver_name=waiver.approver_name,
-                requester_email=waiver.requester_email,
-                requester_name=waiver.requester_name,
-                justification=waiver.justification,
-                waiver_types=waiver.waiver_types,
-            ) for waiver in waivers]
+            audit_waivers = [
+                AuditValidationWaiver(
+                    report_id=sac.report_id,
+                    timestamp=waiver.timestamp,
+                    approver_email=waiver.approver_email,
+                    approver_name=waiver.approver_name,
+                    requester_email=waiver.requester_email,
+                    requester_name=waiver.requester_name,
+                    justification=waiver.justification,
+                    waiver_types=waiver.waiver_types,
+                )
+                for waiver in waivers
+            ]
             AuditValidationWaiver.objects.bulk_create(audit_waivers)
         self.t_waivers += time.monotonic() - t1
 
@@ -288,7 +296,7 @@ def _get_query(kwargs, max_records):
         queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False)
 
     # exclude SACs that have already migrated with an Audit.
-    queryset = queryset.exclude(report_id__in=Audit.objects.all().values('report_id'))
+    queryset = queryset.exclude(report_id__in=Audit.objects.all().values("report_id"))
 
     # only return up to "max_records" if applied.
     if max_records:
@@ -299,9 +307,7 @@ def _get_query(kwargs, max_records):
 
 def _convert_file_information(sac: SingleAuditChecklist, files: SingleAuditReportFile):
     file = (
-        files.filter(filename=f"{sac.report_id}.pdf")
-        .order_by("date_created")
-        .first()
+        files.filter(filename=f"{sac.report_id}.pdf").order_by("date_created").first()
     )
     return (
         {
