@@ -3,7 +3,7 @@ from django.test import SimpleTestCase
 from audit.intakelib.transforms.xform_reformat_prior_references import (
     reformat_prior_references,
 )
-from audit.context import set_sac_to_context
+from audit.context import set_audit_to_context
 
 
 EXPECTED = [
@@ -53,13 +53,13 @@ class TestFindingReferenceYear(SimpleTestCase):
                 ],
             }
         ]
-        self.mock_sac = Mock()
+        self.mock_audit = Mock()
 
     def test_success(self):
         """
         Test that spaces in prior reference years all get removed.
         """
-        with set_sac_to_context(self.mock_sac):
+        with set_audit_to_context(self.mock_audit):
             new_ir = reformat_prior_references(self.ir)
             values = new_ir[0]["ranges"][0]["values"]
             # We expect all spaces to be removed. So, each value in the

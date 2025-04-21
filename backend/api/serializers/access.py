@@ -109,44 +109,25 @@ class AccessListSerializer(serializers.ModelSerializer):
     report_id = serializers.SerializerMethodField()
     submission_status = serializers.SerializerMethodField()
 
-    # TODO: Update Post SOC Launch
     @staticmethod
     def get_auditee_uei(access):
-        return (
-            access.audit.audit.get("general_information", {}).get("auditee_uei", None)
-            if access.audit
-            else access.sac.auditee_uei
-        )
+        return access.audit.auditee_uei
 
     @staticmethod
     def get_auditee_fiscal_period_end(access):
-        return (
-            access.audit.audit.get("general_information", {}).get(
-                "auditee_fiscal_period_end", None
-            )
-            if access.audit
-            else access.sac.auditee_fiscal_period_end
-        )
+        return access.audit.auditee_fiscal_period_end
 
     @staticmethod
     def get_auditee_name(access):
-        return (
-            access.audit.audit.get("general_information", {}).get("auditee_name", None)
-            if access.audit
-            else access.sac.auditee_name
-        )
+        return access.audit.auditee_name
 
     @staticmethod
     def get_report_id(access):
-        return access.audit.report_id if access.audit else access.sac.report_id
+        return access.audit.report_id
 
     @staticmethod
     def get_submission_status(access):
-        return (
-            access.audit.submission_status
-            if access.audit
-            else access.sac.submission_status
-        )
+        return access.audit.submission_status
 
     class Meta:
         model = Access

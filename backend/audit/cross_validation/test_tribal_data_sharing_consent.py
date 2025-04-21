@@ -1,21 +1,21 @@
 from django.test import TestCase
 
-from audit.models import SingleAuditChecklist
-
+from .audit_validation_shape import audit_validation_shape
 from .errors import (
     err_missing_tribal_data_sharing_consent,
     err_unexpected_tribal_data_sharing_consent,
 )
 from .tribal_data_sharing_consent import tribal_data_sharing_consent
-from .sac_validation_shape import sac_validation_shape
 
 from model_bakery import baker
+
+from ..models import Audit
 
 
 class TribalDataSharingConsentTests(TestCase):
     def test_non_tribal_org(self):
         """SACs for non-tribal orgs should pass this validation"""
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, audit={}, version=0)
 
         non_tribal_org_types = [
             "state",
@@ -28,31 +28,34 @@ class TribalDataSharingConsentTests(TestCase):
 
         for type in non_tribal_org_types:
             with self.subTest():
-                sac.general_information = {"user_provided_organization_type": type}
+                audit.audit.update(
+                    {"general_information": {"user_provided_organization_type": type}}
+                )
 
-                shaped_sac = sac_validation_shape(sac)
+                shaped_audit = audit_validation_shape(audit)
 
-                validation_result = tribal_data_sharing_consent(shaped_sac)
+                validation_result = tribal_data_sharing_consent(shaped_audit)
 
                 self.assertEqual(validation_result, [])
 
     def test_tribal_org_without_consent(self):
         """SACs for tribal orgs should not pass this validation if there is not a completed data sharing consent form"""
-        sac = baker.make(SingleAuditChecklist)
+        audit_data = {
+            "general_information": {"user_provided_organization_type": "tribal"}
+        }
+        audit = baker.make(Audit, audit=audit_data, version=0)
 
-        sac.general_information = {"user_provided_organization_type": "tribal"}
+        shaped_audit = audit_validation_shape(audit)
 
-        shaped_sac = sac_validation_shape(sac)
-
-        validation_result = tribal_data_sharing_consent(shaped_sac)
+        validation_result = tribal_data_sharing_consent(shaped_audit)
 
         self.assertEqual(
             validation_result, [{"error": err_missing_tribal_data_sharing_consent()}]
         )
 
-        shaped_sac_missing = shaped_sac | {"tribal_data_consent": {}}
+        shaped_audit_missing = shaped_audit | {"tribal_data_consent": {}}
 
-        validation_missing = tribal_data_sharing_consent(shaped_sac_missing)
+        validation_missing = tribal_data_sharing_consent(shaped_audit_missing)
 
         self.assertEqual(
             validation_missing, [{"error": err_missing_tribal_data_sharing_consent()}]
@@ -66,8 +69,8 @@ class TribalDataSharingConsentTests(TestCase):
             }
         }
 
-        shaped_sac_falses = shaped_sac | falses
-        validation_falses = tribal_data_sharing_consent(shaped_sac_falses)
+        shaped_audit_falses = shaped_audit | falses
+        validation_falses = tribal_data_sharing_consent(shaped_audit_falses)
 
         self.assertEqual(
             validation_falses, [{"error": err_missing_tribal_data_sharing_consent()}]
@@ -80,9 +83,9 @@ class TribalDataSharingConsentTests(TestCase):
                 "tribal_authorization_certifying_official_name": False,
             }
         }
-        shaped_sac_not_even_wrong = shaped_sac | not_even_wrong
+        shaped_audit_not_even_wrong = shaped_audit | not_even_wrong
         validation_not_even_wrong = tribal_data_sharing_consent(
-            shaped_sac_not_even_wrong
+            shaped_audit_not_even_wrong
         )
 
         self.assertEqual(
@@ -92,31 +95,32 @@ class TribalDataSharingConsentTests(TestCase):
 
     def test_tribal_org_with_consent(self):
         """SACs for tribal orders should pass this validation if there is a completed data sharing consent form"""
-        sac = baker.make(SingleAuditChecklist)
-
-        sac.general_information = {"user_provided_organization_type": "tribal"}
-
-        sac.tribal_data_consent = {
-            "tribal_authorization_certifying_official_title": "Assistant Regional Manager",
-            "is_tribal_information_authorized_to_be_public": True,
-            "tribal_authorization_certifying_official_name": "A. Human",
+        audit_data = {
+            "general_information": {"user_provided_organization_type": "tribal"},
+            "tribal_data_consent": {
+                "tribal_authorization_certifying_official_title": "Assistant Regional Manager",
+                "is_tribal_information_authorized_to_be_public": True,
+                "tribal_authorization_certifying_official_name": "A. Human",
+            },
         }
+        audit = baker.make(Audit, audit=audit_data, version=0)
 
-        shaped_sac = sac_validation_shape(sac)
+        shaped_audit = audit_validation_shape(audit)
 
-        validation_result = tribal_data_sharing_consent(shaped_sac)
+        validation_result = tribal_data_sharing_consent(shaped_audit)
 
         self.assertEqual(validation_result, [])
 
     def test_non_tribal_org_with_consent(self):
         """SACS for non-tribal orgs should not pass if they have filled out a tribal consent form"""
-        sac = baker.make(SingleAuditChecklist)
-
-        sac.tribal_data_consent = {
-            "tribal_authorization_certifying_official_title": "Assistant Regional Manager",
-            "is_tribal_information_authorized_to_be_public": True,
-            "tribal_authorization_certifying_official_name": "A. Human",
+        audit_data = {
+            "tribal_data_consent": {
+                "tribal_authorization_certifying_official_title": "Assistant Regional Manager",
+                "is_tribal_information_authorized_to_be_public": True,
+                "tribal_authorization_certifying_official_name": "A. Human",
+            }
         }
+        audit = baker.make(Audit, audit=audit_data, version=0)
 
         non_tribal_org_types = [
             "state",
@@ -129,11 +133,13 @@ class TribalDataSharingConsentTests(TestCase):
 
         for type in non_tribal_org_types:
             with self.subTest():
-                sac.general_information = {"user_provided_organization_type": type}
+                audit.audit.update(
+                    {"general_information": {"user_provided_organization_type": type}}
+                )
 
-                shaped_sac = sac_validation_shape(sac)
+                shaped_audit = audit_validation_shape(audit)
 
-                validation_result = tribal_data_sharing_consent(shaped_sac)
+                validation_result = tribal_data_sharing_consent(shaped_audit)
 
                 self.assertEqual(
                     validation_result,

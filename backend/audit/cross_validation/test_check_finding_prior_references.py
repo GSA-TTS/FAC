@@ -1,16 +1,12 @@
 from django.test import TestCase
 from model_bakery import baker
 
+from .audit_validation_shape import audit_validation_shape
 from .check_finding_prior_references import (
     check_finding_prior_references,
     _get_prior_refs,
 )
-from .sac_validation_shape import sac_validation_shape
-from audit.models import SingleAuditChecklist, SacValidationWaiver
-from dissemination.models import (
-    Finding,
-    General,
-)
+from ..models import Audit, AuditValidationWaiver
 
 
 class CheckFindingPriorReferencesTests(TestCase):
@@ -42,60 +38,57 @@ class CheckFindingPriorReferencesTests(TestCase):
                 }
             )
 
-        # Create the sac using awards created
-        new_sac = baker.make(
-            SingleAuditChecklist,
-            general_information={
+        audit_data = {
+            "general_information": {
                 "auditee_uei": AUDITEE_UEI,
                 "auditee_fiscal_period_start": auditee_fiscal_period_start,
             },
-            findings_uniform_guidance={
-                "FindingsUniformGuidance": {
-                    "auditee_uei": "ABB123456CCC",
-                    "findings_uniform_guidance_entries": findings_uniform_guidance_entries,
-                }
-            },
-        )
+            "findings_uniform_guidance": findings_uniform_guidance_entries,
+        }
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
+        # Create the sac using awards created
         if use_waiver:
             baker.make(
-                SacValidationWaiver,
-                report_id=new_sac,
-                waiver_types=[SacValidationWaiver.TYPES.PRIOR_REFERENCES],
+                AuditValidationWaiver,
+                report_id=audit,
+                waiver_types=[AuditValidationWaiver.TYPES.PRIOR_REFERENCES],
             )
-            new_sac.waiver_types = [SacValidationWaiver.TYPES.PRIOR_REFERENCES]
-
-        new_sac.save()
+            audit.waiver_types = [AuditValidationWaiver.TYPES.PRIOR_REFERENCES]
+        audit.save()
 
         # Create the prior reports for each year provided
-        years_to_prior_gen = {}
         for year in prior_report_years:
-            prior_gen = baker.make(
-                General,
-                report_id=f"foo-report-id-{year}",
-                audit_year=year,
-                auditee_uei=AUDITEE_UEI,
+            audit_data = {
+                "audit_year": year,
+                "general_information": {
+                    "auditee_uei": AUDITEE_UEI,
+                },
+            }
+            if prior_refs_exist:
+                findings = self._generate_findings(awards_prior_refs, year)
+                audit_data = audit_data | {
+                    "findings_uniform_guidance": findings,
+                }
+            baker.make(
+                Audit, version=0, report_id=f"foo-report-id-{year}", audit=audit_data
             )
-            prior_gen.save()
-            years_to_prior_gen[year] = prior_gen
 
-        # Generate the findings needed to be associated with the reports
-        if prior_refs_exist:
-            for award_ref, prior_refs_str in awards_prior_refs.items():
-                prior_refs = prior_refs_str.split(",")
-                for prior_ref in prior_refs:
-                    year = prior_ref[:4]
-                    if year in years_to_prior_gen:
-                        prior_finding = baker.make(
-                            Finding,
-                            report_id=years_to_prior_gen[year],
-                            reference_number=prior_ref,
-                        )
-                        prior_finding.save()
-
-        result = check_finding_prior_references(sac_validation_shape(new_sac))
+        shaped_audit = audit_validation_shape(audit)
+        result = check_finding_prior_references(shaped_audit)
 
         self.assertEqual(expected_error_strs, result)
+
+    @staticmethod
+    def _generate_findings(awards_prior_refs, year):
+        prior_findings = []
+        for award_ref, prior_refs_str in awards_prior_refs.items():
+            prior_refs = prior_refs_str.split(",")
+            for prior_ref in prior_refs:
+                prior_year = prior_ref[:4]
+                if prior_year == year:
+                    prior_findings.append({"findings": {"reference_number": prior_ref}})
+        return prior_findings
 
     def test_check_finding_prior_references_single_prior(self):
         """

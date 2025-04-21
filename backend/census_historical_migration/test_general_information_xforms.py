@@ -379,7 +379,6 @@ class TestXformReplaceEmptyOrInvalidUEIs(SimpleTestCase):
         result = xform_replace_empty_or_invalid_auditee_uei_with_gsa_migration(
             self.audit_header
         )
-        print(result)
         self.assertEqual(result.UEI, "ZQGGHJH74DW7")
 
     def test_auditee_uei_invalid_replaced(self):

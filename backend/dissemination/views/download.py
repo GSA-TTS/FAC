@@ -7,20 +7,16 @@ from config.settings import SUMMARY_REPORT_DOWNLOAD_LIMIT
 from dissemination.file_downloads import (
     get_download_url,
     get_filename,
-    get_filename_from_audit,
 )
 from dissemination.forms import AdvancedSearchForm
 from dissemination.mixins import ReportAccessRequiredMixin
-from dissemination.models import (
-    General,
-    OneTimeAccess,
-)
+from dissemination.models.one_time_access import OneTimeAccess
+
 from dissemination.report_generation.audit_summary_reports import (
     generate_audit_summary_report,
 )
 from dissemination.searchlib.search_utils import run_search
 
-from dissemination.summary_reports import generate_summary_report
 from django.conf import settings
 from django.core.exceptions import BadRequest, ValidationError
 from django.http import Http404, HttpResponse
@@ -40,20 +36,12 @@ class PdfDownloadView(ReportAccessRequiredMixin, View):
         redirect to the download link.
         """
         # only allow PDF downloads for disseminated submissions
-        # TODO: Update Post SOC Launch
-        get_object_or_404(General, report_id=report_id)
 
-        use_audit = request.GET.get("beta", "N") == "Y"
-        if use_audit:
-            get_object_or_404(
-                Audit, report_id=report_id, submission_status=STATUS.DISSEMINATED
-            )
-
-        filename = (
-            get_filename_from_audit(report_id, "report")
-            if use_audit
-            else get_filename(report_id, "report")
+        get_object_or_404(
+            Audit, report_id=report_id, submission_status=STATUS.DISSEMINATED
         )
+
+        filename = get_filename(report_id, "report")
 
         return redirect(get_download_url(filename))
 
@@ -65,21 +53,11 @@ class XlsxDownloadView(ReportAccessRequiredMixin, View):
         find the relevant XLSX file in S3 and redirect to its download link.
         """
         # only allow xlsx downloads from disseminated submissions
-        # TODO: Update Post SOC Launch
-        # get_object_or_404(Audit, report_id=report_id, submission_status=STATUS.DISSEMINATED)
-        get_object_or_404(General, report_id=report_id)
-
-        use_audit = request.GET.get("beta", "N") == "Y"
-        if use_audit:
-            get_object_or_404(
-                Audit, report_id=report_id, submission_status=STATUS.DISSEMINATED
-            )
-
-        filename = (
-            get_filename_from_audit(report_id, file_type)
-            if use_audit
-            else get_filename(report_id, file_type)
+        get_object_or_404(
+            Audit, report_id=report_id, submission_status=STATUS.DISSEMINATED
         )
+
+        filename = get_filename(report_id, file_type)
 
         return redirect(get_download_url(filename))
 
@@ -122,12 +100,7 @@ class OneTimeAccessDownloadView(View):
             ota = OneTimeAccess.objects.get(uuid=uuid)
 
             # get the filename for the SingleAuditReport for this SAC
-            use_audit = request.GET.get("beta", "N") == "Y"
-            filename = (
-                get_filename_from_audit(ota.report_id, "report")
-                if use_audit
-                else get_filename(ota.report_id, "report")
-            )
+            filename = get_filename(ota.report_id, "report")
             download_url = get_download_url(filename)
 
             # delete the OTA object
@@ -148,17 +121,11 @@ class SingleSummaryReportDownloadView(View):
         Given a report_id in the URL, generate the summary report in S3 and
         redirect to its download link.
         """
-        use_audit = request.GET.get("beta", "N") == "Y"
-        if use_audit:
-            get_object_or_404(Audit, report_id=report_id)
-        else:
-            get_object_or_404(General, report_id=report_id)
+        get_object_or_404(Audit, report_id=report_id)
 
         include_private = include_private_results(request)
-        filename, workbook_bytes = (
-            generate_summary_report([report_id], include_private)
-            if not use_audit
-            else generate_audit_summary_report([report_id], include_private)
+        filename, workbook_bytes = generate_audit_summary_report(
+            [report_id], include_private
         )
 
         # Create an HTTP response with the workbook file for download
@@ -180,7 +147,7 @@ class MultipleSummaryReportDownloadView(View):
         4. Redirect to the download url of this new report
         """
         form = AdvancedSearchForm(request.POST)
-        use_audit = request.GET.get("beta", "N") == "Y"
+
         try:
             if form.is_valid():
                 form_data = form.cleaned_data
@@ -189,16 +156,14 @@ class MultipleSummaryReportDownloadView(View):
                 raise ValidationError("Form error in Search POST.")
 
             include_private = include_private_results(request)
-            results = run_search(form_data, use_audit)
+            results = run_search(form_data)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
-            filename, workbook_bytes = (
-                generate_summary_report(report_ids, include_private)
-                if not use_audit
-                else generate_audit_summary_report(report_ids, include_private)
+            filename, workbook_bytes = generate_audit_summary_report(
+                report_ids, include_private
             )
 
             # Create an HTTP response with the workbook file for download

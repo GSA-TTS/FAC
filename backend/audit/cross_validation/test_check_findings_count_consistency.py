@@ -1,8 +1,8 @@
 from django.test import TestCase
-from audit.models import SingleAuditChecklist
+from audit.models import Audit
+from .audit_validation_shape import audit_validation_shape
 from .errors import err_findings_count_inconsistent
 from .check_findings_count_consistency import check_findings_count_consistency
-from .sac_validation_shape import sac_validation_shape
 from .utils import generate_random_integer
 from model_bakery import baker
 
@@ -15,8 +15,8 @@ class CheckFindingsCountConsistencyTests(TestCase):
 
     def _make_federal_awards(self, findings_count) -> dict:
         return {
-            "FederalAwards": {
-                "federal_awards": [
+            "federal_awards": {
+                "awards": [
                     {
                         "program": {"number_of_audit_findings": findings_count},
                         "award_reference": f"AWARD-{self.AWARD_MIN}",
@@ -31,7 +31,7 @@ class CheckFindingsCountConsistencyTests(TestCase):
 
     def _make_findings_uniform_guidance(self, awards, mismatch, padding) -> dict:
         entries = []
-        for award in awards["FederalAwards"]["federal_awards"]:
+        for award in awards["federal_awards"]["awards"]:
             award_reference = award["award_reference"]
             if padding:
                 award_reference = f"{award_reference.split('-')[0]}-{padding}{award_reference.split('-')[1]}"
@@ -39,47 +39,40 @@ class CheckFindingsCountConsistencyTests(TestCase):
             for _ in range(count + mismatch):
                 entries.append({"program": {"award_reference": award_reference}})
 
-        findings = (
-            {
-                "auditee_uei": "AAA123456BBB",
-                "findings_uniform_guidance_entries": entries,
-            }
-            if len(entries) > 0
-            else {"auditee_uei": "AAA123456BBB"}
-        )
+        return {"findings_uniform_guidance": entries}
 
-        return {"FindingsUniformGuidance": findings}
-
-    def _make_sac(self, findings_count, mismatch=0, padding="") -> SingleAuditChecklist:
-        sac = baker.make(SingleAuditChecklist)
-        sac.federal_awards = self._make_federal_awards(findings_count)
-        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
-            sac.federal_awards, mismatch, padding
+    def _make_audit(self, findings_count, mismatch=0, padding="") -> Audit:
+        federal_awards = self._make_federal_awards(findings_count)
+        findings_uniform_guidance = self._make_findings_uniform_guidance(
+            federal_awards, mismatch, padding
         )
-        return sac
+        audit_data = {
+            **federal_awards,
+            **findings_uniform_guidance,
+        }
+        return baker.make(Audit, version=0, audit=audit_data)
 
     def test_zero_findings_count_report(self):
         """Ensure no error is returned for consistent zero findings."""
-        sac = self._make_sac(0)
-        errors = check_findings_count_consistency(sac_validation_shape(sac))
+        audit = self._make_audit(0)
+        errors = check_findings_count_consistency(audit_validation_shape(audit))
         self.assertEqual(errors, [])
 
     def test_findings_count_matches_across_workbooks(self):
         """Ensure no error is returned for consistent findings count."""
-        sac = self._make_sac(
+        audit = self._make_audit(
             generate_random_integer(self.FINDINGS_MIN, self.FINDINGS_MAX)
         )
-        errors = check_findings_count_consistency(sac_validation_shape(sac))
+        errors = check_findings_count_consistency(audit_validation_shape(audit))
         self.assertEqual(errors, [])
 
     def _test_findings_count_mismatch(self, base_count, mismatch):
-        sac = self._make_sac(base_count, mismatch)
-        errors = check_findings_count_consistency(sac_validation_shape(sac))
-        self.assertEqual(
-            len(errors), len(sac.federal_awards["FederalAwards"]["federal_awards"])
-        )
+        audit = self._make_audit(base_count, mismatch)
+        errors = check_findings_count_consistency(audit_validation_shape(audit))
+        federal_awards = audit.audit.get("federal_awards", {}).get("awards", [])
+        self.assertEqual(len(errors), len(federal_awards))
 
-        for award in sac.federal_awards["FederalAwards"]["federal_awards"]:
+        for award in federal_awards:
             award_reference = award["award_reference"]
             expected_error = err_findings_count_inconsistent(
                 base_count, base_count + mismatch, award_reference
@@ -109,8 +102,8 @@ class CheckFindingsCountConsistencyTests(TestCase):
         Ensure that award reference normalization occurs when declared and reported
         award reference lengths differ. Leading zeros are added appropriately.
         """
-        sac = self._make_sac(
+        audit = self._make_audit(
             generate_random_integer(self.FINDINGS_MIN, self.FINDINGS_MAX), 0, "0"
         )
-        errors = check_findings_count_consistency(sac_validation_shape(sac))
+        errors = check_findings_count_consistency(audit_validation_shape(audit))
         self.assertEqual(errors, [])

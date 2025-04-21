@@ -1,11 +1,11 @@
-"""Fixtures for SingleAuditChecklist.
+"""Fixtures for Audit.
 
-We want to create a variety of SACs in different states of
+We want to create a variety of Audits in different states of
 completion.
 """
 
 import logging
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 from django.apps import apps
 from django.conf import settings
@@ -15,8 +15,21 @@ from faker import Faker
 
 from audit import intakelib
 import audit.validators
+from audit.fixtures.audit_information import fake_audit_information
 
 from audit.fixtures.excel import FORM_SECTIONS
+from audit.models.constants import STATUS
+from audit.models.utils import (
+    generate_audit_indexes,
+    convert_utc_to_american_samoa_zone,
+)
+from audit.test_views import (
+    build_auditee_cert_dict,
+    build_auditor_cert_dict,
+    load_json,
+    AUDIT_JSON_FIXTURES,
+    load_json_audit_data,
+)
 from users.models import User
 
 logger = logging.getLogger(__name__)
@@ -118,19 +131,10 @@ def fake_auditee_certification():
     return data_step_1, data_step_2
 
 
-def _create_sac(user, auditee_name, submission_status="in_progress"):
-    """Create a single example SAC."""
-    # TODO: SoT
-    # When we deprecate the SAC here, we want Audit to generate its own ids.
-    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-    sac = SingleAuditChecklist.objects.create(
-        submitted_by=user,
-        general_information=_fake_general_information(auditee_name),
-        submission_status=submission_status,
-    )
+def _create_audit(user, auditee_name, submission_status="in_progress"):
+    """Create a single example Audit."""
     Audit = apps.get_model("audit.Audit")
     audit = Audit.objects.create(
-        report_id=sac.report_id,
         audit={"general_information": _fake_general_information(auditee_name)},
         submission_status=submission_status,
         event_user=user,
@@ -139,21 +143,18 @@ def _create_sac(user, auditee_name, submission_status="in_progress"):
 
     Access = apps.get_model("audit.Access")
     Access.objects.create(
-        sac=sac,
         audit=audit,
         user=user,
         email=user.email,
         role="editor",
     )
     Access.objects.create(
-        sac=sac,
         audit=audit,
         user=user,
         email=user.email,
         role="certifying_auditor_contact",
     )
     Access.objects.create(
-        sac=sac,
         audit=audit,
         user=user,
         email=user.email,
@@ -163,19 +164,19 @@ def _create_sac(user, auditee_name, submission_status="in_progress"):
     return audit
 
 
-def _post_create_federal_awards(this_sac, this_user):
-    """Upload a federal awards workbook for this SAC.
+def _post_create_federal_awards(this_audit, this_user):
+    """Upload a federal awards workbook for this Audit.
 
-    This should be idempotent if it is called on a SAC that already
+    This should be idempotent if it is called on a Audit that already
     has a federal awards file uploaded.
     """
     ExcelFile = apps.get_model("audit.ExcelFile")
 
     if (
         ExcelFile.objects.filter(
-            sac_id=this_sac.id, form_section=FORM_SECTIONS.FEDERAL_AWARDS
+            audit_id=this_audit.id, form_section=FORM_SECTIONS.FEDERAL_AWARDS
         ).exists()
-        and this_sac.federal_awards is not None
+        and this_audit.audit.get("federal_awards") is not None
     ):
         # there is already an uploaded file and data in the object so
         # nothing to do here
@@ -194,7 +195,7 @@ def _post_create_federal_awards(this_sac, this_user):
         file=file,
         filename="temp",
         user=this_user,
-        sac_id=this_sac.id,
+        audit_id=this_audit.id,
         form_section=FORM_SECTIONS.FEDERAL_AWARDS,
     )
     excel_file.full_clean()
@@ -203,54 +204,55 @@ def _post_create_federal_awards(this_sac, this_user):
     # function so we can call it here instead of aping it.
     audit_data = intakelib.extract_federal_awards(excel_file.file)
     audit.validators.validate_federal_award_json(audit_data)
-    this_sac.federal_awards = audit_data
-    this_sac.save()
+    this_audit.audit.update({"federal_awards": audit_data})
+    this_audit.save()
 
-    logger.info("Created Federal Awards workbook upload for SAC %s", this_sac.id)
+    logger.info("Created Federal Awards workbook upload for Audit %s", this_audit.id)
 
 
-# list of the default SingleAuditChecklists to create for each user
+# list of the default Audits to create for each user
 # The auditee name is used to disambiguate them, so it must be unique
-# or another SAC won't be created.
+# or another Audit won't be created.
 # If `post_create_callable` exists for an item, it should be a
-# callable(sac, user) that does further processing after the SAC
+# callable(audit, user) that does further processing after the Audit
 # is created.
-SACS = [
-    {"auditee_name": "SAC in progress"},
+AUDITS = [
+    {"auditee_name": "Audit in progress"},
     {
-        "auditee_name": "SAC ready for certification",
+        "auditee_name": "Audit ready for certification",
         "submission_status": "ready_for_certification",
     },
-    {"auditee_name": "SAC fully submitted", "submission_status": "disseminated"},
+    {"auditee_name": "Audit fully submitted", "submission_status": "disseminated"},
 ]
 
 
-def _load_single_audit_checklists_for_user(user):
-    """Create SACs for a given user."""
-    logger.info("Creating single audit checklists for %s", user)
-    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-    for item_info in SACS:
+def _load_audits_for_user(user):
+    """Create Audits for a given user."""
+    logger.info("Creating audit for %s", user)
+    Audit = apps.get_model("audit.Audit")
+    for item_info in AUDITS:
         auditee_name = item_info["auditee_name"]
         submission_status = item_info.get("submission_status", "in_progress")
-        sac = SingleAuditChecklist.objects.filter(
-            submitted_by=user, general_information__auditee_name=auditee_name
-        ).first()
-        if sac is None:
+        audit = Audit.objects.filter(created_by=user, auditee_name=auditee_name).first()
+        if audit is None:
             # need to make this object
-            sac = _create_sac(user, auditee_name, submission_status)
+            if submission_status == STATUS.DISSEMINATED:
+                _create_fully_populated_disseminated_audit(user)
+            else:
+                _create_audit(user, auditee_name, submission_status)
 
 
-def load_single_audit_checklists():
-    """Load example SACs for every user."""
+def load_audits():
+    """Load example Audits for every user."""
 
     all_users = User.objects.all()
 
     for user in all_users:
-        _load_single_audit_checklists_for_user(user)
+        _load_audits_for_user(user)
 
 
-def load_single_audit_checklists_for_email_address(user_email, workbooks=None):
-    """Load example SACs for user with this email address."""
+def load_audits_for_email_address(user_email, workbooks=None):
+    """Load example Audits for user with this email address."""
     # Unfinished code for handling specific workbooks was checked into the
     # load_fixtures command; this handles the additional argument so that in
     # future that work can be wired in.
@@ -263,4 +265,57 @@ def load_single_audit_checklists_for_email_address(user_email, workbooks=None):
         logger.info("No user found for %s, have you logged in once?", user_email)
         return
 
-    _load_single_audit_checklists_for_user(user)
+    _load_audits_for_user(user)
+
+
+def _create_fully_populated_disseminated_audit(user):
+    geninfofile = "general-information--test0001test--simple-pass.json"
+    awardsfile = "federal-awards--test0001test--simple-pass.json"
+    audit_data = {
+        "is_public": True,
+        "fac_accepted_date": convert_utc_to_american_samoa_zone(datetime.today()),
+        "auditee_certification": build_auditee_cert_dict(*fake_auditee_certification()),
+        "auditor_certification": build_auditor_cert_dict(*fake_auditor_certification()),
+        "audit_information": fake_audit_information(),
+        "general_information": load_json(AUDIT_JSON_FIXTURES / geninfofile),
+        "notes_to_sefa": {
+            "accounting_policies": "Exhaustive",
+            "is_minimis_rate_used": "Y",
+            "rate_explained": "At great length",
+        },
+        **load_json_audit_data(awardsfile, FORM_SECTIONS.FEDERAL_AWARDS),
+    }
+
+    Audit = apps.get_model("audit.Audit")
+    audit = Audit.objects.create(
+        audit=audit_data,
+        submission_status=STATUS.DISSEMINATED,
+        event_user=user,
+        event_type="created",
+    )
+
+    indexes = generate_audit_indexes(audit)
+    audit.audit.update(indexes)
+    audit.save()
+
+    Access = apps.get_model("audit.Access")
+    Access.objects.create(
+        audit=audit,
+        user=user,
+        email=user.email,
+        role="editor",
+    )
+    Access.objects.create(
+        audit=audit,
+        user=user,
+        email=user.email,
+        role="certifying_auditor_contact",
+    )
+    Access.objects.create(
+        audit=audit,
+        user=user,
+        email=user.email,
+        role="certifying_auditee_contact",
+    )
+    logger.info("Created audit %s", audit)
+    return audit

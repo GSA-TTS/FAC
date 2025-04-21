@@ -27,8 +27,8 @@ jobs:
       CYPRESS_API_GOV_KEY_ADMIN: ${{ secrets.CYPRESS_API_GOV_KEY_ADMIN }}
       CYPRESS_API_GOV_USER_ID_ADMIN: ${{ secrets.CYPRESS_API_GOV_USER_ID_ADMIN }}
       CYPRESS_API_GOV_JWT: ${{ secrets.CYPRESS_API_GOV_JWT }}
-      CYPRESS_API_VERSION: "api_v1_1_0"
-      CYPRESS_ADMIN_API_VERSION: "admin_api_v1_1_0"
+      CYPRESS_API_VERSION: "api_v1_2_0"
+      CYPRESS_ADMIN_API_VERSION: "admin_api_v1_2_0"
       CYPRESS_BASE_URL: "http://localhost:8000"
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
       CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
@@ -64,10 +64,6 @@ jobs:
       - name: Load fixtures
         working-directory: ./backend
         run: docker compose run web python manage.py load_fixtures
-
-      - name: Create materialized view
-        working-directory: ./backend
-        run: docker compose run web python manage.py materialized_views --create
 
       - uses: browser-actions/setup-chrome@v1
         with:

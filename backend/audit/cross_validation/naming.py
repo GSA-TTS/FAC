@@ -11,8 +11,9 @@ from audit.cross_validation.audit_translation import (
     translate_findings_uniform_guidance,
     translate_notes_to_sefa,
 )
-from audit.models.submission_event import SubmissionEvent
 from audit.fixtures.excel import FORM_SECTIONS
+from audit.models.constants import EventType
+
 
 # We need a canonical source of the different versions of each name.
 
@@ -32,7 +33,7 @@ class SectionBabelFish(NamedTuple):
     reverse_url_for_file_deletion: (
         str | None
     )  # Django value for finding the actual URL for deletion.
-    snake_case: str  # Mostly used for the field names in SingleAuditChecklist.
+    snake_case: str  # Mostly used for the field names in Audit.
     url_tail: str | None  # Hyphenated version of snake_case, mostly.
     workbook_number: int | None  # Our upload ordering of workbooks.
     submission_event: str  # The event type we log to the SubmissionEvents table when this section is updated
@@ -53,8 +54,8 @@ SECTION_NAMES = {
         snake_case="additional_eins",
         url_tail="additional-eins",
         workbook_number=8,
-        submission_event=SubmissionEvent.EventType.ADDITIONAL_EINS_UPDATED,
-        deletion_event=SubmissionEvent.EventType.ADDITIONAL_EINS_DELETED,
+        submission_event=EventType.ADDITIONAL_EINS_UPDATED,
+        deletion_event=EventType.ADDITIONAL_EINS_DELETED,
         audit_translation=translate_additional_eins,
     ),
     "additional_ueis": SectionBabelFish(
@@ -67,8 +68,8 @@ SECTION_NAMES = {
         snake_case="additional_ueis",
         url_tail="additional-ueis",
         workbook_number=6,
-        submission_event=SubmissionEvent.EventType.ADDITIONAL_UEIS_UPDATED,
-        deletion_event=SubmissionEvent.EventType.ADDITIONAL_UEIS_DELETED,
+        submission_event=EventType.ADDITIONAL_UEIS_UPDATED,
+        deletion_event=EventType.ADDITIONAL_UEIS_DELETED,
         audit_translation=translate_additional_ueis,
     ),
     "audit_information": SectionBabelFish(
@@ -81,7 +82,7 @@ SECTION_NAMES = {
         snake_case="audit_information",
         url_tail="audit-information",
         workbook_number=None,
-        submission_event=SubmissionEvent.EventType.AUDIT_INFORMATION_UPDATED,
+        submission_event=EventType.AUDIT_INFORMATION_UPDATED,
         deletion_event=None,
         audit_translation=None,
     ),
@@ -95,8 +96,8 @@ SECTION_NAMES = {
         reverse_url_for_file_deletion="report_submission:delete-CAP",
         url_tail="cap",
         workbook_number=5,
-        submission_event=SubmissionEvent.EventType.CORRECTIVE_ACTION_PLAN_UPDATED,
-        deletion_event=SubmissionEvent.EventType.CORRECTIVE_ACTION_PLAN_DELETED,
+        submission_event=EventType.CORRECTIVE_ACTION_PLAN_UPDATED,
+        deletion_event=EventType.CORRECTIVE_ACTION_PLAN_DELETED,
         audit_translation=translate_cap,
     ),
     "federal_awards": SectionBabelFish(
@@ -109,7 +110,7 @@ SECTION_NAMES = {
         snake_case="federal_awards",
         url_tail="federal-awards",
         workbook_number=1,
-        submission_event=SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
+        submission_event=EventType.FEDERAL_AWARDS_UPDATED,
         deletion_event=None,
         audit_translation=translate_federal_awards,
     ),
@@ -123,8 +124,8 @@ SECTION_NAMES = {
         snake_case="findings_text",
         url_tail="audit-findings-text",
         workbook_number=4,
-        submission_event=SubmissionEvent.EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED,
-        deletion_event=SubmissionEvent.EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_DELETED,
+        submission_event=EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED,
+        deletion_event=EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_DELETED,
         audit_translation=translate_findings_text,
     ),
     "findings_uniform_guidance": SectionBabelFish(
@@ -137,8 +138,8 @@ SECTION_NAMES = {
         snake_case="findings_uniform_guidance",
         url_tail="audit-findings",
         workbook_number=3,
-        submission_event=SubmissionEvent.EventType.FINDINGS_UNIFORM_GUIDANCE_UPDATED,
-        deletion_event=SubmissionEvent.EventType.FINDINGS_UNIFORM_GUIDANCE_DELETED,
+        submission_event=EventType.FINDINGS_UNIFORM_GUIDANCE_UPDATED,
+        deletion_event=EventType.FINDINGS_UNIFORM_GUIDANCE_DELETED,
         audit_translation=translate_findings_uniform_guidance,
     ),
     "general_information": SectionBabelFish(
@@ -151,7 +152,7 @@ SECTION_NAMES = {
         snake_case="general_information",
         url_tail="general-information",
         workbook_number=None,
-        submission_event=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+        submission_event=EventType.GENERAL_INFORMATION_UPDATED,
         deletion_event=None,
         audit_translation=None,
     ),
@@ -165,7 +166,7 @@ SECTION_NAMES = {
         snake_case="notes_to_sefa",
         url_tail="notes-to-sefa",
         workbook_number=2,
-        submission_event=SubmissionEvent.EventType.NOTES_TO_SEFA_UPDATED,
+        submission_event=EventType.NOTES_TO_SEFA_UPDATED,
         deletion_event=None,
         audit_translation=translate_notes_to_sefa,
     ),
@@ -179,7 +180,7 @@ SECTION_NAMES = {
         snake_case="single_audit_report",
         url_tail="upload-report",
         workbook_number=None,
-        submission_event=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+        submission_event=EventType.AUDIT_REPORT_PDF_UPDATED,
         deletion_event=None,
         audit_translation=None,
     ),
@@ -193,8 +194,8 @@ SECTION_NAMES = {
         snake_case="secondary_auditors",
         url_tail="secondary-auditors",
         workbook_number=7,
-        submission_event=SubmissionEvent.EventType.SECONDARY_AUDITORS_UPDATED,
-        deletion_event=SubmissionEvent.EventType.SECONDARY_AUDITORS_DELETED,
+        submission_event=EventType.SECONDARY_AUDITORS_UPDATED,
+        deletion_event=EventType.SECONDARY_AUDITORS_DELETED,
         audit_translation=translate_secondary_auditors,
     ),
     "tribal_data_consent": SectionBabelFish(
@@ -207,7 +208,7 @@ SECTION_NAMES = {
         snake_case="tribal_data_consent",
         url_tail=None,
         workbook_number=None,
-        submission_event=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
+        submission_event=EventType.TRIBAL_CONSENT_UPDATED,
         deletion_event=None,
         audit_translation=None,
     ),

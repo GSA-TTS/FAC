@@ -8,7 +8,9 @@ from django.db.models.functions import Cast
 
 from audit.cross_validation.naming import SECTION_NAMES
 from audit.cross_validation.audit_validation_shape import audit_validation_shape
-from audit.models import SingleAuditReportFile
+from audit.exceptions import LateChangeError
+from audit.models.files import SingleAuditReportFile
+
 from audit.models.constants import (
     AUDIT_TYPE_CODES,
     STATUS,
@@ -16,6 +18,7 @@ from audit.models.constants import (
     EventType,
     AUDIT_SEQUENCE_ID,
 )
+
 from audit.models.history import History
 from audit.models.mixins import CreatedMixin, UpdatedMixin
 from audit.models.utils import (
@@ -45,24 +48,13 @@ class AuditManager(models.Manager):
         created_by = obj_data.pop("created_by") if "created_by" in obj_data else user
         end_date = obj_data["audit"]["general_information"]["auditee_fiscal_period_end"]
 
-        # TODO: SoT
         # Re-consider this. We moved the report_id generation into the transaction.
         with transaction.atomic():
-
-            # We do not want the else condition to pass until we deprecate the SAC.
-            # This is so that the report_ids stay consistent between SAC and Audit.
-            if "report_id" in obj_data:
-                report_id = obj_data.pop("report_id")
-            else:
-                report_id = generate_sac_report_id(
-                    sequence=get_next_sequence_id(AUDIT_SEQUENCE_ID),
-                    end_date=end_date,
-                )
+            report_id = generate_sac_report_id(
+                sequence=get_next_sequence_id(AUDIT_SEQUENCE_ID),
+                end_date=end_date,
+            )
             version = 0
-
-            # TODO: SoT
-            # Once we deprecate the SAC, we need to pass the "id" here, which will = sequence.
-            # This prevents id sequencing from incrementing by 2.
             updated = obj_data | {
                 "report_id": report_id,
                 "version": version,
@@ -88,14 +80,6 @@ class AuditManager(models.Manager):
             return audit.version
         except self.model.DoesNotExist:
             return 0
-
-    # TODO: Update Post SOC Launch Delete
-    def find_audit_or_none(self, report_id):
-        """This is a temporary helper method to pass linting for too complex methods"""
-        try:
-            return self.get(report_id=report_id)
-        except Audit.DoesNotExist:
-            return None
 
 
 class Audit(CreatedMixin, UpdatedMixin):
@@ -298,6 +282,9 @@ class Audit(CreatedMixin, UpdatedMixin):
 
     objects = AuditManager()
 
+    def __str__(self):
+        return f"#{self.id}--{self.report_id}--{self.auditee_uei}"
+
     @property
     def submitted_by(self):
         history = (
@@ -310,7 +297,7 @@ class Audit(CreatedMixin, UpdatedMixin):
     @property
     def auditee_fiscal_period_end(self):
         return self.audit.get("general_information", {}).get(
-            "auditee_fiscal_period_end"
+            "auditee_fiscal_period_end", "N/A"
         )
 
     class Meta:
@@ -329,14 +316,18 @@ class Audit(CreatedMixin, UpdatedMixin):
         report_id = self.report_id
         previous_version = self.version
 
+        if self.submission_status != STATUS.IN_PROGRESS:
+            self._reject_late_changes()
+
         self.updated_by = self.updated_by if self.updated_by else event_user
 
         with transaction.atomic():
             current_version = Audit.objects.get_current_version(report_id)
             if previous_version != current_version:
+                # TODO: raise VersionMismatchException(expected=previous_version, actual=current_version)
                 logger.error(
                     f"Version Mismatch: Expected {previous_version} Got {current_version}"
-                )  # TODO
+                )
 
             # TESTING: During save of audit, check for matching data in SAC
             # only trigger on update, not creation.
@@ -351,6 +342,19 @@ class Audit(CreatedMixin, UpdatedMixin):
 
             self.version = previous_version + 1
 
+            # Disseminated is a special case.
+            # Historically an audit transitioned Certified -> Submitted -> Disseminated
+            # With SOT an audit transitions: Certified -> Disseminated
+            # Adding the history event, allows the logic for "submitted by" to remain consistent.
+            if event_type == EventType.DISSEMINATED:
+                History.objects.create(
+                    event=EventType.SUBMITTED,
+                    report_id=report_id,
+                    version=self.version,
+                    event_data=self.audit,
+                    updated_by=self.updated_by,
+                )
+            
             if event_type and event_user:
                 History.objects.create(
                     event=event_type,
@@ -419,7 +423,7 @@ class Audit(CreatedMixin, UpdatedMixin):
         """
         shaped_audit = audit_validation_shape(self)
         try:
-            sar = SingleAuditReportFile.objects.filter(sac_id=self.id).latest(
+            sar = SingleAuditReportFile.objects.filter(audit_id=self.id).latest(
                 "date_created"
             )
         except SingleAuditReportFile.DoesNotExist:
@@ -433,6 +437,31 @@ class Audit(CreatedMixin, UpdatedMixin):
         if errors:
             return {"errors": errors, "data": shaped_audit}
         return {}
+
+    def _reject_late_changes(self):
+        """
+        This should only be called if status isn't STATUS.IN_PROGRESS.
+        If there have been relevant changes, raise an AssertionError.
+        Here, "relevant" means anything other than fields related to the status
+        transition change itself.
+        """
+        try:
+            prior_obj = Audit.objects.get(id=self.id)
+        except Audit.DoesNotExist:
+            # No prior instance exists, so it's a new submission.
+            return True
+
+        current = audit_validation_shape(self)
+        prior = audit_validation_shape(prior_obj)
+        if current["sf_sac_sections"] != prior["sf_sac_sections"]:
+            raise LateChangeError
+
+        meta_fields = ("submitted_by", "date_created", "report_id", "audit_type")
+        for field in meta_fields:
+            if current["sf_sac_meta"][field] != prior["sf_sac_meta"][field]:
+                raise LateChangeError
+
+        return True
 
     @Field.register_lookup
     class DateCast(Transform):

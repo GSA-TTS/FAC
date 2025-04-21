@@ -41,23 +41,11 @@ urlpatterns = [
         views.AccessAndSubmissionView.as_view(),
         name="api-accessandsubmission",
     ),
-    # TODO: Update Post SOC Launch -> This is used in E2E tests.
-    path(
-        "sac/edit/<str:report_id>",
-        views.SingleAuditChecklistView.as_view(),
-        name="singleauditchecklist",
-    ),
     path("audit/edit/<str:report_id>", views.AuditView.as_view(), name="audit"),
     path(
         "audit/edit/<str:report_id>/federal_awards",
         views.AuditAwardsView.as_view(),
         name="sacfederalawards",
-    ),
-    # TODO: Update Post SOC Launch -> delete 66-70, change 63: views.AuditSubmissionsView.as_view()
-    path(
-        "submissions",
-        views.SubmissionsView.as_view(),
-        name="submissions",
     ),
     path(
         "audit-submissions",

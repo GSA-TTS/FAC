@@ -1,13 +1,13 @@
 from copy import deepcopy
 from audit.cross_validation.naming import NC, find_section_by_name
-from audit.models.submission_event import SubmissionEvent
+from audit.models.history import History
 from audit.validators import validate_general_information_complete_json
 from django.core.exceptions import ValidationError
 
 from audit.utils import Util
 
 
-def submission_progress_check(sac, sar=None, crossval=True):
+def submission_progress_check(audit, sar=None, crossval=True):
     """
     Because this function was initially created in a view and not as a
     cross-validation function, it needs the crossval argument to distinguish between
@@ -17,7 +17,7 @@ def submission_progress_check(sac, sar=None, crossval=True):
     crossval defaults to True because we don't want to have to change all the calls to
     the validation functions to include this argument.
 
-    Given the output of sac_validation_shape on a SingleAuditChecklist instance, and
+    Given the output of audit_validation_shape on an Audit instance, and
     a SingleAuditReportFile instance, return information about submission progress.
 
     Returns this shape:
@@ -43,12 +43,12 @@ def submission_progress_check(sac, sar=None, crossval=True):
     """
 
     # Add the status of the SAR into the list of sections:
-    sac["sf_sac_sections"][NC.SINGLE_AUDIT_REPORT] = bool(sar)
+    audit["sf_sac_sections"][NC.SINGLE_AUDIT_REPORT] = bool(sar)
 
-    result = {k: None for k in sac["sf_sac_sections"]}
+    result = {k: None for k in audit["sf_sac_sections"]}
 
-    for key in sac["sf_sac_sections"]:
-        result = result | progress_check(sac, sac["sf_sac_sections"], key)
+    for key in audit["sf_sac_sections"]:
+        result = result | progress_check(audit, audit["sf_sac_sections"], key)
 
     incomplete_sections = []
     for k in result:
@@ -70,9 +70,9 @@ def submission_progress_check(sac, sar=None, crossval=True):
     ]
 
 
-def progress_check(sac, sections, key):
+def progress_check(audit, sections, key):
     """
-    Given the content of sf_sac_sections from sac_validation_shape (plus a
+    Given the content of sf_sac_sections from audit_validation_shape (plus a
     single_audit_report key) and a key, determine whether that key is required, and
     return a dictionary containing that key with its progress as the value.
     """
@@ -115,13 +115,13 @@ def progress_check(sac, sections, key):
 
     # The General Information has its own condition, as it can be partially completed.
     if key == "general_information":
-        return general_information_progress_check(progress, general_info, sac)
+        return general_information_progress_check(progress, general_info, audit)
 
     # It's not required:
     if not conditions[key]:
         # If it's not required but has been completed, it remains active so user can remove the worksheet:
         if sections.get(key):
-            completed_by, completed_date = section_completed_metadata(sac, key)
+            completed_by, completed_date = section_completed_metadata(audit, key)
             if completed_by or completed_date:
                 return construct_progress_metadata(
                     key, progress, completed_by, completed_date
@@ -131,7 +131,7 @@ def progress_check(sac, sections, key):
 
     # If it is required, it should be present
     if sections.get(key):
-        completed_by, completed_date = section_completed_metadata(sac, key)
+        completed_by, completed_date = section_completed_metadata(audit, key)
         return construct_progress_metadata(key, progress, completed_by, completed_date)
 
     return {key: progress | {"display": "incomplete", "completed": False}}
@@ -155,26 +155,26 @@ def section_completed_metadata(sac, section_key):
         event_type = section.submission_event
         report_id = sac["sf_sac_meta"]["report_id"]
         try:
-            submission_event = SubmissionEvent.objects.filter(
-                sac__report_id=report_id, event=event_type
-            ).latest("timestamp")
-        except SubmissionEvent.DoesNotExist:
+            submission_event = History.objects.filter(
+                report_id=report_id, event=event_type
+            ).latest("updated_at")
+        except History.DoesNotExist:
             submission_event = None
         try:
-            deletion_event = SubmissionEvent.objects.filter(
-                sac__report_id=report_id, event=section.deletion_event
-            ).latest("timestamp")
-        except SubmissionEvent.DoesNotExist:
+            deletion_event = History.objects.filter(
+                report_id=report_id, event=section.deletion_event
+            ).latest("updated_at")
+        except History.DoesNotExist:
             deletion_event = None
         if deletion_event and (
             not submission_event
-            or deletion_event.timestamp > submission_event.timestamp
+            or deletion_event.updated_at > submission_event.updated_at
         ):
             # If the deletion event is more recent than the submission event, the section is not complete.
             return None, None
 
         if submission_event:
-            return submission_event.user.email, submission_event.timestamp
+            return submission_event.updated_by.email, submission_event.updated_at
 
         # If there is no submission event, the section is not complete.
         return None, None

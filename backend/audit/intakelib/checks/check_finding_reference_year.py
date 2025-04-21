@@ -8,7 +8,7 @@ from audit.intakelib.common import (
     build_cell_error_tuple,
 )
 
-from audit.context import get_sac_from_context
+from audit.context import get_audit_from_context
 from audit.intakelib.common.util import get_range_start_row
 
 logger = logging.getLogger(__name__)
@@ -23,13 +23,16 @@ def finding_reference_year(ir, is_gsa_migration=False):
     references = get_range_by_name(ir, "reference_number")
     range_start = int(get_range_start_row(references))
     errors = []
-    sac = get_sac_from_context()
-    if is_gsa_migration or sac and sac.general_information is None:
+    audit = get_audit_from_context()
+    general_information = (
+        audit.audit.get("general_information", None) if audit else None
+    )
+    if is_gsa_migration or (audit and not general_information):
         # In real use cases, no report can be created if general_information is missing, as it is a required field.
         # The condition sac.general_information is None can occur only in test cases
         # where general_information has been ignored purposefully (like in test_workbooks_should_pass.py).
         return
-    elif sac is None:
+    elif audit is None:
         raise ValidationError(
             (
                 "",
@@ -41,7 +44,7 @@ def finding_reference_year(ir, is_gsa_migration=False):
                 },
             )
         )
-    audit_date = sac.general_information["auditee_fiscal_period_end"]
+    audit_date = general_information["auditee_fiscal_period_end"]
     audit_year = int(audit_date.split("-")[0])
     for index, reference in enumerate(references["values"]):
         year = int(reference.split("-")[0])
