@@ -2,9 +2,7 @@ import logging
 
 from django.views import generic
 from django.shortcuts import render, redirect
-from django.db import transaction
 from django.db.models import F, Q
-from django.db.transaction import TransactionManagementError
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -17,7 +15,7 @@ from audit.models import (
     Access,
 )
 from audit.models.constants import STATUS
-from audit.models.utils import generate_audit_indexes, get_friendly_submission_status
+from audit.models.utils import get_friendly_submission_status
 from audit.models.viewflow import audit_transition
 from audit.decorators import verify_status
 from dissemination.remove_workbook_artifacts import audit_remove_workbook_artifacts
@@ -101,11 +99,6 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
     @verify_status(STATUS.AUDITEE_CERTIFIED)
     def post(self, request, *args, **kwargs):
-        # TODO: Post SOT, we should spend time to determine if this is still an issue.
-        # RACE HAZARD WARNING
-        # It is possible for a user to enter the submission multiple times,
-        # from multiple FAC instances. This race hazard is documented in
-        # backend/audit/views/README-fac-views-race-hazard-postmortem.md
         report_id = kwargs["report_id"]
         try:
             # remove try/except once we are ready to deprecate SAC.
@@ -120,59 +113,10 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     context,
                 )
 
-            # Only change this value if things work...
-            disseminated = "DID NOT DISSEMINATE"
-
-            # BEGIN ATOMIC BLOCK
-            with transaction.atomic():
-                audit_transition(request=request, audit=audit, event=STATUS.SUBMITTED)
-                audit_indexes = generate_audit_indexes(audit)
-                audit.audit.update(audit_indexes)
-                audit_transition(
-                    request=request, audit=audit, event=STATUS.DISSEMINATED
-                )
-                disseminated = None
-
-            # IF THE DISSEMINATION SUCCEEDED
-            # `disseminated` is None if there were no errors.
-            if disseminated is None:
-                # Remove workbook artifacts after the report has been disseminated.
-                # We do this outside of the atomic block. No race between
-                # two instances of the FAC should be able to get to this point.
-                # If we do, something will fail.
-                audit_remove_workbook_artifacts(audit)
-
-            # IF THE DISSEMINATION FAILED
-            # If disseminated has a value, it is an error
-            if disseminated is not None:
-                logger.info(
-                    "{} is a `not None` value report_id[{}] for `disseminated`".format(
-                        report_id, disseminated
-                    )
-                )
+            audit_transition(request=request, audit=audit, event=STATUS.DISSEMINATED)
+            audit_remove_workbook_artifacts(audit)
 
             return redirect(reverse("audit:MySubmissions"))
 
         except Audit.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
-        except TransactionManagementError:
-            # ORIGINAL COMMENT
-            # This is most likely the result of a race condition, where the user hits
-            # the submit button multiple times and the requests get round-robined to
-            # different instances, and the second attempt tries to insert an existing
-            # report_id into the dissemination.General table.
-            # Our assumption is that the first request succeeded (otherwise there
-            # wouldn't be an entry with that report_id to cause the error), and that we
-            # should log this but not report it to the user.
-            # See https://github.com/GSA-TTS/FAC/issues/3347
-            # UPDATED 2024-09-13
-            # We have not been able to trigger this error in the most recent race
-            # debugging. However, that does not mean it is impossible.
-            # Therefore, leaving this exception handler in place.
-            logger.info("IntegrityError on disseminating report_id: %s", report_id)
-            if (
-                Audit.objects.get(report_id=report_id).submission_status
-                == STATUS.DISSEMINATED
-            ):
-                return redirect(reverse("audit:MySubmissions"))
-            raise

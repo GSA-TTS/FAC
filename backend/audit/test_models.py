@@ -1,5 +1,6 @@
 # type: ignore
 from datetime import datetime, timezone
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -70,7 +71,8 @@ class AuditTests(TestCase):
             str(Audit.objects.aggregate(models.Max("id"))["id__max"] - 1).zfill(10),
         )
 
-    def test_submission_status_transitions(self):
+    @patch("audit.models.viewflow.generate_audit_indexes")
+    def test_submission_status_transitions(self, mock_audit_indexes):
         """
         Test that only the expected state transitions are allowed for submission_status
         """
@@ -82,7 +84,7 @@ class AuditTests(TestCase):
                 "transition_to_auditor_certified",
             ),
             (
-                [STATUS.AUDITOR_CERTIFIED, STATUS.SUBMITTED],
+                [STATUS.AUDITOR_CERTIFIED],
                 EventType.AUDITEE_CERTIFICATION_COMPLETED,
                 STATUS.AUDITEE_CERTIFIED,
                 "transition_to_auditee_certified",
@@ -91,9 +93,9 @@ class AuditTests(TestCase):
                 [
                     STATUS.AUDITEE_CERTIFIED,
                 ],
-                EventType.SUBMITTED,
-                STATUS.SUBMITTED,
-                "transition_to_submitted",
+                EventType.DISSEMINATED,
+                STATUS.DISSEMINATED,
+                "transition_to_disseminated",
             ),
             (
                 [
@@ -119,7 +121,7 @@ class AuditTests(TestCase):
                 "transition_to_flagged_for_removal",
             ),
         )
-
+        mock_audit_indexes.return_value = {}
         now = datetime.now(timezone.utc)
         for statuses_from, event, expected_status, transition_name in cases:
             for status_from in statuses_from:
@@ -127,6 +129,9 @@ class AuditTests(TestCase):
 
                 transition_method = getattr(AuditFlow(audit), transition_name)
                 audit_transition(MockRequest(), audit, event=event)
+
+                if expected_status == STATUS.DISSEMINATED:
+                    mock_audit_indexes.assert_called_once_with(audit)
 
                 self.assertEqual(audit.submission_status, expected_status)
                 history = (
