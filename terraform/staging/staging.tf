@@ -1,7 +1,9 @@
 module "staging" {
-  source                = "../shared/modules/env"
-  cf_space_name         = "staging"
-  cf_space_id           = data.cloudfoundry_space.space.id
+  source = "../shared/modules/env"
+  cf_space = {
+    id   = data.cloudfoundry_space.space.id
+    name = "staging"
+  }
   new_relic_license_key = var.new_relic_license_key
   new_relic_account_id  = var.new_relic_account_id
   new_relic_api_key     = var.new_relic_api_key
@@ -9,7 +11,7 @@ module "staging" {
 
   database_plan         = "medium-gp-psql"
   postgrest_instances   = 1
-  postgrest_memory      = 512
+  postgrest_memory      = "512M"
   swagger_instances     = 1
   https_proxy_instances = 1
   smtp_proxy_instances  = 1
@@ -24,7 +26,7 @@ module "staging" {
 }
 
 module "staging-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
 
   cf_space_id  = data.cloudfoundry_space.space.id
   name         = "backups"

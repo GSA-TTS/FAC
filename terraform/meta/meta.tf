@@ -1,8 +1,7 @@
 # Since we're not platform admins, we need to look for user details in the
 # context of our specific org.
 data "cloudfoundry_org" "org" {
-  provider = cloudfoundry-community
-  name     = local.org_name
+  name = local.org_name
 }
 
 # We need to include the meta deployer user in the set of users with the
@@ -10,10 +9,11 @@ data "cloudfoundry_org" "org" {
 # each space. We need to add it using the user ID rather than username in order
 # to ensure it has the expected permissions. See
 # https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/436
+
+# This id is accessed with data.cloudfoundry_user.meta_deployer.users.0.id
+# https://registry.terraform.io/providers/cloudfoundry/cloudfoundry/latest/docs/data-sources/user#nested-schema-for-users
 data "cloudfoundry_user" "meta_deployer" {
-  provider = cloudfoundry-community
-  name     = var.cf_user
-  org_id   = data.cloudfoundry_org.org.id
+  name = var.cf_user
 }
 
 module "environments" {
@@ -21,7 +21,7 @@ module "environments" {
   source                 = "./bootstrap-env"
   name                   = each.key
   org_name               = local.org_name
-  developers             = concat(local.developers, [data.cloudfoundry_user.meta_deployer.id])
+  developers             = concat(local.developers, [data.cloudfoundry_user.meta_deployer.users.0.id])
   managers               = local.managers
   reponame               = "GSA-TTS/FAC"
   allow_ssh              = lookup(each.value, "allow_ssh", true)
@@ -52,25 +52,9 @@ data "cloudfoundry_space" "space" {
 }
 
 module "s3-backups" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.2.0"
-
+  source       = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
   cf_space_id  = data.cloudfoundry_space.space.id
   name         = "backups"
   s3_plan_name = "basic"
   tags         = ["s3"]
 }
-
-# TODO: We should have a corresponding "unshar-backup-from-spaces" resource, in
-# case a space is removed from the list
-
-# resource "null_resource" "share-backup-to-spaces" {
-#   provisioner "local-exec" {
-#     environment = {
-#       SPACES = "${local.spaces_that_use_backups}"
-#     }
-#     command = "for space in $SPACES ; do cf share-service backups -s $space; done"
-#   }
-#   depends_on = [
-#     module.s3-backups
-#   ]
-# }
