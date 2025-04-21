@@ -14,6 +14,7 @@ module "https-proxy" {
     "${var.cf_org_name}-${var.cf_space.name}-egress-https-proxy.apps.internal",
     "idp.int.identitysandbox.gov:443",
     "secure.login.gov:443",
+    "*.github.com:443",
     "objects.githubusercontent.com:443",
     "awscli.amazonaws.com:443",
     "database.clamav.net:443"
