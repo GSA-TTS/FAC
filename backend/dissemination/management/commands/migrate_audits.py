@@ -83,6 +83,7 @@ class Command(BaseCommand):
         count = 0
         logger.info(f"Found {total} records to parse through.")
         migration_user = get_or_create_sot_migration_user()
+        logger.info(f"Starting migration...")
 
         while queryset.count() != 0:
             t_migrate_sac = 0
@@ -203,7 +204,7 @@ class Command(BaseCommand):
                 History(
                     event=event["event"],
                     report_id=sac.report_id,
-                    event_data=audit.audit,
+                    event_data={},
                     version=0,
                     updated_by_id=event["user__id"],
                 )
