@@ -270,22 +270,29 @@ class Command(BaseCommand):
 
             # copy SacValidationWaivers.
             t1 = time.monotonic()
-            if not audit_validations.exists():
-                waivers = validations.filter(report_id=sac.report_id)
-                audit_waivers = [
-                    AuditValidationWaiver(
-                        report_id=sac.report_id,
-                        timestamp=waiver.timestamp,
-                        approver_email=waiver.approver_email,
-                        approver_name=waiver.approver_name,
-                        requester_email=waiver.requester_email,
-                        requester_name=waiver.requester_name,
-                        justification=waiver.justification,
-                        waiver_types=waiver.waiver_types,
-                    )
-                    for waiver in waivers
-                ]
-                AuditValidationWaiver.objects.bulk_create(audit_waivers)
+            sac_waivers = SacValidationWaiver.objects.filter(report_id=sac.report_id).values(
+                "timestamp",
+                "approver_email",
+                "approver_name",
+                "requester_email",
+                "requester_name",
+                "justification",
+                "waiver_types",
+            )
+            audit_waivers = [
+                AuditValidationWaiver(
+                    report_id=sac.report_id,
+                    timestamp=waiver["timestamp"],
+                    approver_email=waiver["approver_email"],
+                    approver_name=waiver["approver_name"],
+                    requester_email=waiver["requester_email"],
+                    requester_name=waiver["requester_name"],
+                    justification=waiver["justification"],
+                    waiver_types=waiver["waiver_types"],
+                )
+                for waiver in sac_waivers
+            ]
+            AuditValidationWaiver.objects.bulk_create(audit_waivers)
             self.t_waivers += time.monotonic() - t1
 
 
