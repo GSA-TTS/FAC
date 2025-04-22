@@ -119,30 +119,18 @@ def navigation_content(request):
                 "id": "data",
                 "name": "Data",
                 "links": [
-                    {
-                        "name": "About the data",
-                        "link": f"{STATIC_URL}data"
-                    },
-                    {
-                        "name": "Download CSV data",
-                        "link": f"{STATIC_URL}data/download"
-                    },
-                    {
-                        "name": "Developer API resources",
-                        "link": f"{STATIC_URL}api"
-                    },
+                    {"name": "About the data", "link": f"{STATIC_URL}data"},
+                    {"name": "Download CSV data", "link": f"{STATIC_URL}data/download"},
+                    {"name": "Developer API resources", "link": f"{STATIC_URL}api"},
                     {
                         "name": "Data reliability",
-                        "link": f"{STATIC_URL}data/reliability"
+                        "link": f"{STATIC_URL}data/reliability",
                     },
                     {
                         "name": "Data curation",
-                        "link": f"{STATIC_URL}data/reliability/curation"
+                        "link": f"{STATIC_URL}data/reliability/curation",
                     },
-                    {
-                        "name": "Data migration",
-                        "link": f"{STATIC_URL}data/migration"
-                    }
+                    {"name": "Data migration", "link": f"{STATIC_URL}data/migration"},
                 ],
             },
             {
