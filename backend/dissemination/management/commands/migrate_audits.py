@@ -82,9 +82,7 @@ class Command(BaseCommand):
         total = _get_query(kwargs, None).count()
         count = 0
         logger.info(f"Found {total} records to parse through.")
-        logger.info(
-            f"Selected {queryset.count()} records for the first batch of migrations."
-        )
+        migration_user = get_or_create_sot_migration_user()
 
         while queryset.count() != 0:
             t_migrate_sac = 0
@@ -100,41 +98,13 @@ class Command(BaseCommand):
             self.t_files = 0
             self.t_waivers = 0
 
-            migration_user = get_or_create_sot_migration_user()
-            queryset_values = queryset.values("report_id")
-            accesses = Access.objects.select_related('sac').filter(
-                sac__report_id__in=queryset_values
-            )
-            deletedaccesses = DeletedAccess.objects.select_related('sac').filter(
-                sac__report_id__in=queryset_values
-            )
-            submissionevents = SubmissionEvent.objects.select_related('sac').filter(
-                sac__id__in=queryset.values("id")
-            )
-            sars = SingleAuditReportFile.objects.filter(
-                sac__id__in=queryset.values("id")
-            )
-            excels = ExcelFile.objects.select_related('sac').filter(sac__id__in=queryset.values("id"))
-            validations = SacValidationWaiver.objects.filter(
-                report_id__in=queryset_values
-            )
-            audit_validations = AuditValidationWaiver.objects.filter(
-                report_id__in=queryset_values
-            )
             for sac in queryset.iterator():
                 try:
                     t0 = time.monotonic()
                     self._migrate_sac(
                         self,
                         migration_user,
-                        sac,
-                        accesses,
-                        deletedaccesses,
-                        submissionevents,
-                        sars,
-                        excels,
-                        validations,
-                        audit_validations,
+                        sac
                     )
                     t_migrate_sac += time.monotonic() - t0
 
@@ -153,13 +123,6 @@ class Command(BaseCommand):
             )
             t0 = time.monotonic()
             del queryset
-            del accesses
-            del deletedaccesses
-            del submissionevents
-            del sars
-            del excels
-            del validations
-            del audit_validations
             queryset = _get_query(kwargs, BATCH_SIZE)
             t_get_batch += time.monotonic() - t0
             print(f" - Time to migrate batch of 100          - {t_migrate_sac}")
@@ -180,14 +143,7 @@ class Command(BaseCommand):
     def _migrate_sac(
         self,
         migration_user: User,
-        sac: SingleAuditChecklist,
-        accesses: Access,
-        deletedaccesses: DeletedAccess,
-        submissionevents: SubmissionEvent,
-        sars: SingleAuditReportFile,
-        excels: ExcelFile,
-        validations: SacValidationWaiver,
-        audit_validations: AuditValidationWaiver,
+        sac: SingleAuditChecklist
     ):
         with transaction.atomic():
             t1 = time.monotonic()
@@ -281,7 +237,7 @@ class Command(BaseCommand):
             )
             audit_waivers = [
                 AuditValidationWaiver(
-                    report_id=sac.report_id,
+                    report_id=audit,
                     timestamp=waiver["timestamp"],
                     approver_email=waiver["approver_email"],
                     approver_name=waiver["approver_name"],
