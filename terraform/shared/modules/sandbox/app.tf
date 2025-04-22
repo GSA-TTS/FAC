@@ -4,40 +4,32 @@ locals {
 
 module "fac-app" {
   source                  = "../app"
-  name                    = local.app_name
-  cf_org_name             = var.cf_org_name
-  cf_space_name           = var.cf_space_name
-  https_proxy             = module.https-proxy.https_proxy
-  https_proxy_creds_id    = module.https-proxy.creds_id
-  new_relic_creds_id      = cloudfoundry_user_provided_service.credentials.id
-  private_s3_id           = module.s3-private.bucket_id
-  public_s3_id            = module.s3-public.bucket_id
-  backups_s3_id           = var.backups_s3_id
-  db_id                   = module.database.instance_id
-  backup_db_id            = module.snapshot-database.instance_id
-  app_instances           = 1
-  app_memory              = 4096
-  disk_quota              = 3072
   gitref                  = "refs/heads/${var.branch_name}"
+  cf_org_name             = var.cf_org_name
+  cf_space_name           = var.cf_space.name
+  name                    = local.app_name
+  app_memory              = "2048M"
+  disk_quota              = "3072M"
+  app_instances           = 1
   django_secret_login_key = var.django_secret_login_key
   sam_api_key             = var.sam_api_key
   login_client_id         = var.login_client_id
   login_secret_key        = var.login_secret_key
-}
-
-resource "cloudfoundry_network_policy" "app-network-policy" {
-  provider = cloudfoundry-community
-
-  policy {
-    source_app      = module.fac-app.app_id
-    destination_app = module.https-proxy.app_id
-    port            = "61443"
-    protocol        = "tcp"
+  environment_variables = {
+    ENV                   = "SANDBOX"
+    DISABLE_COLLECTSTATIC = 1
+    DJANGO_BASE_URL       = "https://fac-${var.cf_space.name}.app.cloud.gov"
+    AV_SCAN_URL           = "https://fac-av-${var.cf_space.name}.apps.internal:61443/scan"
+    ALLOWED_HOSTS         = "fac-${var.cf_space.name}.app.cloud.gov"
   }
-  policy {
-    source_app      = module.fac-app.app_id
-    destination_app = module.clamav.app_id
-    port            = "61443"
-    protocol        = "tcp"
+  service_bindings = {
+    "${module.s3-private.bucket_name}"                        = ""
+    "${module.s3-public.bucket_name}"                         = ""
+    "${module.database.database_name}"                        = ""
+    "${module.snapshot-database.database_name}"               = ""
+    "${cloudfoundry_service_instance.newrelic_creds.name}"    = ""
+    "${cloudfoundry_service_instance.proxy_credentials.name}" = ""
+    "${module.logshipper.syslog_drain_name}"                  = ""
   }
+  depends_on = [cloudfoundry_service_instance.newrelic_creds, module.https-proxy, module.logshipper]
 }

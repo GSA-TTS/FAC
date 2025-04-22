@@ -20,7 +20,6 @@ class Command(BaseCommand):
             --start <YYYY-MM-DD start fac_accepted_date>
             --end <YYYY-MM-DD end fac_accepted_date>
             -- limit <int>
-
         Alternatively, it can also test on a single report_id:
         manage.py source_of_truth
             --report_id 2023-12-GSAFAC-0000000001
