@@ -28,4 +28,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 6G -m 12G --name export_audit_data_to_csv_scheduled --command "python manage.py export_data_audit --year ${{ matrix.years }}" --wait
+          command: cf run-task gsa-fac -k 4G -m 6G --name export_audit_data_to_csv_scheduled --command "python manage.py export_data_audit --year ${{ matrix.years }}" --wait
