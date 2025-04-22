@@ -91,14 +91,6 @@ def navigation_content(request):
                         "name": "Search resources",
                         "link": f"{STATIC_URL}search-resources",
                     },
-                    {
-                        "name": "Developer API resources",
-                        "link": f"{STATIC_URL}api",
-                    },
-                    {
-                        "name": "Data reliability",
-                        "link": f"{STATIC_URL}data-reliability",
-                    },
                 ],
             },
             {
@@ -106,12 +98,12 @@ def navigation_content(request):
                 "name": "Audit submission",
                 "links": [
                     {
-                        "name": "Submission resources",
-                        "link": f"{STATIC_URL}audit-resources/",
+                        "name": "Submit an audit",
+                        "link": "/openid/login",
                     },
                     {
-                        "name": "Submission home",
-                        "link": "/openid/login",
+                        "name": "Submission resources",
+                        "link": f"{STATIC_URL}audit-resources/",
                     },
                     {
                         "name": "Submission guide",
@@ -121,6 +113,36 @@ def navigation_content(request):
                         "name": "SF-SAC workbooks",
                         "link": f"{STATIC_URL}audit-resources/sf-sac",
                     },
+                ],
+            },
+            {
+                "id": "data",
+                "name": "Data",
+                "links": [
+                    {
+                        "name": "About the data",
+                        "link": f"{STATIC_URL}data"
+                    },
+                    {
+                        "name": "Download CSV data",
+                        "link": f"{STATIC_URL}data/download"
+                    },
+                    {
+                        "name": "Developer API resources",
+                        "link": f"{STATIC_URL}api"
+                    },
+                    {
+                        "name": "Data reliability",
+                        "link": f"{STATIC_URL}data/reliability"
+                    },
+                    {
+                        "name": "Data curation",
+                        "link": f"{STATIC_URL}data/reliability/curation"
+                    },
+                    {
+                        "name": "Data migration",
+                        "link": f"{STATIC_URL}data/migration"
+                    }
                 ],
             },
             {
