@@ -20,7 +20,6 @@ import time
 
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
-from django.db.models import QuerySet, Max
 
 from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
 from audit.intakelib.mapping_additional_ueis import additional_ueis_audit_view
@@ -83,7 +82,7 @@ class Command(BaseCommand):
         count = 0
         logger.info(f"Found {total} records to parse through.")
         migration_user = get_or_create_sot_migration_user()
-        logger.info(f"Starting migration...")
+        logger.info("Starting migration...")
 
         while queryset.count() != 0:
             t_migrate_sac = 0
@@ -102,11 +101,7 @@ class Command(BaseCommand):
             for sac in queryset.iterator():
                 try:
                     t0 = time.monotonic()
-                    self._migrate_sac(
-                        self,
-                        migration_user,
-                        sac
-                    )
+                    self._migrate_sac(self, migration_user, sac)
                     t_migrate_sac += time.monotonic() - t0
 
                     t0 = time.monotonic()
@@ -141,11 +136,7 @@ class Command(BaseCommand):
         logger.info("Completed audit migrations.")
 
     @staticmethod
-    def _migrate_sac(
-        self,
-        migration_user: User,
-        sac: SingleAuditChecklist
-    ):
+    def _migrate_sac(self, migration_user: User, sac: SingleAuditChecklist):
         with transaction.atomic():
             t1 = time.monotonic()
             audit_data = dict()
@@ -227,7 +218,9 @@ class Command(BaseCommand):
 
             # copy SacValidationWaivers.
             t1 = time.monotonic()
-            sac_waivers = SacValidationWaiver.objects.filter(report_id=sac.report_id).values(
+            sac_waivers = SacValidationWaiver.objects.filter(
+                report_id=sac.report_id
+            ).values(
                 "timestamp",
                 "approver_email",
                 "approver_name",
@@ -283,14 +276,12 @@ def _get_query(kwargs, max_records):
 def _convert_file_information(sac: SingleAuditChecklist):
     try:
         file = SingleAuditReportFile.objects.filter(sac=sac).latest("date_created")
-        return (
-            {
-                "file_information": {
-                    "pages": file.component_page_numbers,
-                    "filename": file.filename,
-                }
+        return {
+            "file_information": {
+                "pages": file.component_page_numbers,
+                "filename": file.filename,
             }
-        )
+        }
     except SingleAuditReportFile.DoesNotExist:
         return {}
 

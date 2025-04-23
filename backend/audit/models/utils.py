@@ -226,6 +226,7 @@ def _index_general(audit_data):
         "search_names": list(search_names),
     }
 
+
 json_fields_to_check = [
     "general_information",
     "federal_awards",
@@ -350,6 +351,34 @@ fields_with_meta = {
 }
 
 
+def _modify_sac_field_data(field, sac_field_data, audit_field_data):
+    # We don't need the Meta section of the SAC data
+    if field in fields_with_meta:
+        sac_field_data = sac_field_data[fields_with_meta[field]]
+
+    # SACs sometimes have additional auditee_uei field
+    if "auditee_uei" in sac_field_data:
+        del sac_field_data["auditee_uei"]
+
+    # SOT gen_info has additional auditee_uei field
+    if field == "general_information" and "auditee_uei" in audit_field_data:
+        del audit_field_data["auditee_uei"]
+
+    # federal_awards -> awards key tweak for SAC data to match SOT
+    if field == "federal_awards":
+        sac_awards = sac_field_data.get("federal_awards", [])
+        sac_field_data = {
+            "total_amount_expended": sac_field_data["total_amount_expended"],
+        }
+        sac_field_data["awards"] = sac_awards
+
+    # Handle SACs that have the actual data in *_entries
+    if field == "findings_text":
+        sac_field_data = sac_field_data["findings_text_entries"]
+    elif field == "corrective_action_plan":
+        sac_field_data = sac_field_data["corrective_action_plan_entries"]
+
+
 def _validate_json_fields(audit_instance, sac_instance, differences):
     """Validate SOT and SAC data where SAC uses a JSON format"""
     for field in json_fields_to_check:
@@ -390,31 +419,7 @@ def _validate_json_fields(audit_instance, sac_instance, differences):
             continue
 
         if sac_field_data is not None:
-            # We don't need the Meta section of the SAC data
-            if field in fields_with_meta:
-                sac_field_data = sac_field_data[fields_with_meta[field]]
-
-            # SACs sometimes have additional auditee_uei field
-            if "auditee_uei" in sac_field_data:
-                del sac_field_data["auditee_uei"]
-
-            # SOT gen_info has additional auditee_uei field
-            if field == "general_information" and "auditee_uei" in audit_field_data:
-                del audit_field_data["auditee_uei"]
-
-            # federal_awards -> awards key tweak for SAC data to match SOT
-            if field == "federal_awards":
-                sac_awards = sac_field_data.get("federal_awards", [])
-                sac_field_data = {
-                    "total_amount_expended": sac_field_data["total_amount_expended"],
-                }
-                sac_field_data["awards"] = sac_awards
-
-            # Handle SACs that have the actual data in *_entries
-            if field == "findings_text":
-                sac_field_data = sac_field_data["findings_text_entries"]
-            elif field == "corrective_action_plan":
-                sac_field_data = sac_field_data["corrective_action_plan_entries"]
+            _modify_sac_field_data(field, sac_field_data, audit_field_data)
 
             if sac_field_data != audit_field_data:
                 differences.append(
