@@ -18,6 +18,7 @@
 from datetime import datetime
 import logging
 import time
+import typing
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -444,7 +445,7 @@ def create_history_objects(
     transition_name: list[str],
     transition_date: list[str],
     report_id: str,
-    user: any,
+    user: typing.Any,
 ) -> list[History]:
 
     transitions = []
@@ -459,7 +460,7 @@ def create_history_objects(
         transitions.append((name, dt))
 
     # Only grab the most recent transition per status
-    latest_transitions = {}
+    latest_transitions: dict[str, datetime] = {}
     for name, dt in transitions:
         if name not in latest_transitions or dt > latest_transitions[name]:
             latest_transitions[name] = dt
