@@ -1,10 +1,10 @@
 from django.test import TestCase
 from model_bakery import baker
-from audit.models import SingleAuditChecklist
+from audit.models import Audit
 
 from .errors import err_total_amount_expended
 from .check_expenditure_threshold_met import check_expenditure_threshold_met
-from .sac_validation_shape import sac_validation_shape
+from .audit_validation_shape import audit_validation_shape
 
 from datetime import date, timedelta
 
@@ -33,10 +33,10 @@ class CheckExpenditureThresholdMetTests(TestCase):
     ]
 
     def _make_federal_awards(self, amount_expended_list):
-        result = {"FederalAwards": {"federal_awards": []}}
+        result = []
 
         for ae in amount_expended_list:
-            result["FederalAwards"]["federal_awards"].append(
+            result.append(
                 {
                     "program": {
                         "amount_expended": ae,
@@ -50,18 +50,24 @@ class CheckExpenditureThresholdMetTests(TestCase):
         """
         A single federal award at a "beginning of time" threshold date should pass.
         """
-        sac = baker.make(SingleAuditChecklist)
         auditee_fiscal_period_start = (
             self.thresholds[0]["end"] - timedelta(days=1)
         ).isoformat()
-        sac.general_information = {
-            "auditee_fiscal_period_start": auditee_fiscal_period_start
-        }
         total = self.thresholds[0]["minimum"]
-        sac.federal_awards = self._make_federal_awards([total])
+
+        audit = baker.make(
+            Audit,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_start": auditee_fiscal_period_start,
+                },
+                "federal_awards": {"awards": self._make_federal_awards([total])},
+            },
+            version=0,
+        )
 
         validation_result = check_expenditure_threshold_met(
-            sac_validation_shape(sac),
+            audit_validation_shape(audit),
             thresholds=self.thresholds,
         )
 
@@ -71,18 +77,24 @@ class CheckExpenditureThresholdMetTests(TestCase):
         """
         A single federal award below a "beginning of time" threshold date should fail.
         """
-        sac = baker.make(SingleAuditChecklist)
         auditee_fiscal_period_start = (
             self.thresholds[0]["end"] - timedelta(days=1)
         ).isoformat()
-        sac.general_information = {
-            "auditee_fiscal_period_start": auditee_fiscal_period_start
-        }
         total = self.thresholds[0]["minimum"] - 1
-        sac.federal_awards = self._make_federal_awards([total])
+
+        audit = baker.make(
+            Audit,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_start": auditee_fiscal_period_start,
+                },
+                "federal_awards": {"awards": self._make_federal_awards([total])},
+            },
+            version=0,
+        )
 
         validation_result = check_expenditure_threshold_met(
-            sac_validation_shape(sac),
+            audit_validation_shape(audit),
             thresholds=self.thresholds,
         )
 
@@ -94,16 +106,22 @@ class CheckExpenditureThresholdMetTests(TestCase):
         """
         A single federal award at a "middle" threshold date should pass.
         """
-        sac = baker.make(SingleAuditChecklist)
         auditee_fiscal_period_start = self.thresholds[1]["start"].isoformat()
-        sac.general_information = {
-            "auditee_fiscal_period_start": auditee_fiscal_period_start
-        }
         total = self.thresholds[1]["minimum"]
-        sac.federal_awards = self._make_federal_awards([total])
+
+        audit = baker.make(
+            Audit,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_start": auditee_fiscal_period_start,
+                },
+                "federal_awards": {"awards": self._make_federal_awards([total])},
+            },
+            version=0,
+        )
 
         validation_result = check_expenditure_threshold_met(
-            sac_validation_shape(sac),
+            audit_validation_shape(audit),
             thresholds=self.thresholds,
         )
 
@@ -113,16 +131,22 @@ class CheckExpenditureThresholdMetTests(TestCase):
         """
         A single federal award below a "middle" threshold date should fail.
         """
-        sac = baker.make(SingleAuditChecklist)
         auditee_fiscal_period_start = self.thresholds[1]["start"].isoformat()
-        sac.general_information = {
-            "auditee_fiscal_period_start": auditee_fiscal_period_start
-        }
         total = self.thresholds[1]["minimum"] - 1
-        sac.federal_awards = self._make_federal_awards([total])
+
+        audit = baker.make(
+            Audit,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_start": auditee_fiscal_period_start,
+                },
+                "federal_awards": {"awards": self._make_federal_awards([total])},
+            },
+            version=0,
+        )
 
         validation_result = check_expenditure_threshold_met(
-            sac_validation_shape(sac),
+            audit_validation_shape(audit),
             thresholds=self.thresholds,
         )
 
@@ -134,18 +158,24 @@ class CheckExpenditureThresholdMetTests(TestCase):
         """
         A single federal award at an "end of time" threshold date should pass.
         """
-        sac = baker.make(SingleAuditChecklist)
         auditee_fiscal_period_start = (
             self.thresholds[2]["start"] + timedelta(days=1)
         ).isoformat()
-        sac.general_information = {
-            "auditee_fiscal_period_start": auditee_fiscal_period_start
-        }
         total = self.thresholds[2]["minimum"]
-        sac.federal_awards = self._make_federal_awards([total])
+
+        audit = baker.make(
+            Audit,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_start": auditee_fiscal_period_start,
+                },
+                "federal_awards": {"awards": self._make_federal_awards([total])},
+            },
+            version=0,
+        )
 
         validation_result = check_expenditure_threshold_met(
-            sac_validation_shape(sac),
+            audit_validation_shape(audit),
             thresholds=self.thresholds,
         )
 
@@ -155,18 +185,24 @@ class CheckExpenditureThresholdMetTests(TestCase):
         """
         A single federal award below an "end of time" threshold date should fail.
         """
-        sac = baker.make(SingleAuditChecklist)
         auditee_fiscal_period_start = (
             self.thresholds[2]["start"] + timedelta(days=1)
         ).isoformat()
-        sac.general_information = {
-            "auditee_fiscal_period_start": auditee_fiscal_period_start
-        }
         total = self.thresholds[2]["minimum"] - 1
-        sac.federal_awards = self._make_federal_awards([total])
+
+        audit = baker.make(
+            Audit,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_start": auditee_fiscal_period_start,
+                },
+                "federal_awards": {"awards": self._make_federal_awards([total])},
+            },
+            version=0,
+        )
 
         validation_result = check_expenditure_threshold_met(
-            sac_validation_shape(sac),
+            audit_validation_shape(audit),
             thresholds=self.thresholds,
         )
 
@@ -178,19 +214,27 @@ class CheckExpenditureThresholdMetTests(TestCase):
         """
         Multiple awards whose absolute values meet the threshold should pass.
         """
-        sac = baker.make(SingleAuditChecklist)
         auditee_fiscal_period_start = self.thresholds[1]["start"].isoformat()
-        sac.general_information = {
-            "auditee_fiscal_period_start": auditee_fiscal_period_start
-        }
         amount_expended_list = [
             self.thresholds[1]["minimum"] - 500,
             -500,
         ]
-        sac.federal_awards = self._make_federal_awards(amount_expended_list)
+
+        audit = baker.make(
+            Audit,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_start": auditee_fiscal_period_start,
+                },
+                "federal_awards": {
+                    "awards": self._make_federal_awards(amount_expended_list)
+                },
+            },
+            version=0,
+        )
 
         validation_result = check_expenditure_threshold_met(
-            sac_validation_shape(sac),
+            audit_validation_shape(audit),
             thresholds=self.thresholds,
         )
 
