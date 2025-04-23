@@ -2,6 +2,7 @@
 The intent of this file is to group together audit related helpers.
 """
 
+import copy
 import logging
 from datetime import timedelta
 
@@ -354,8 +355,8 @@ fields_with_meta = {
 def _validate_json_fields(audit_instance, sac_instance, differences):
     """Validate SOT and SAC data where SAC uses a JSON format"""
     for field in json_fields_to_check:
-        sac_field_data = getattr(sac_instance, field, None)
-        audit_field_data = audit_instance.audit.get(field)
+        sac_field_data = copy.deepcopy(getattr(sac_instance, field, None))
+        audit_field_data = copy.deepcopy(audit_instance.audit.get(field))
 
         # Ignore SAC fields that only contain metadata
         if sac_field_data:
@@ -394,6 +395,14 @@ def _validate_json_fields(audit_instance, sac_instance, differences):
             # We don't need the Meta section of the SAC data
             if field in fields_with_meta:
                 sac_field_data = sac_field_data[fields_with_meta[field]]
+
+            # SACs sometimes have additional auditee_uei field
+            if "auditee_uei" in sac_field_data:
+                del sac_field_data["auditee_uei"]
+
+            # SOT gen_info has additional auditee_uei field
+            if field == "general_information" and "auditee_uei" in audit_field_data:
+                del audit_field_data["auditee_uei"]
 
             # federal_awards -> awards key tweak for SAC data to match SOT
             if field == "federal_awards":
