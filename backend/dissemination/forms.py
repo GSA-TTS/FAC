@@ -1,6 +1,10 @@
-from django import forms
-from .searchlib.search_constants import text_input_delimiters, report_id_delimiters
 from datetime import date
+
+from django import forms
+from django.core.exceptions import ValidationError
+
+from .searchlib.search_constants import text_input_delimiters, report_id_delimiters
+from config.settings import STATE_ABBREVS
 
 
 def clean_text_field(text_input, delimiters=text_input_delimiters):
@@ -146,6 +150,29 @@ class AdvancedSearchForm(forms.Form):
             return ["any"]
         return major_program
 
+    def clean_auditee_state(self):
+        """
+        If the auditee_state is present and is not a valid state (one of STATE_ABBREVS), provide an error.
+        """
+        choice_input = self.cleaned_data["auditee_state"]
+        if not choice_input:
+            return choice_input
+
+        if choice_input not in STATE_ABBREVS:
+            raise ValidationError(f"\"{choice_input}\" is not a valid state abbreviation.")
+
+    def clean_fy_end_month(self):
+        """
+        If the fy_end_month is present and is not a valid month (1-12), provide an error.
+        """
+        choice_input = self.cleaned_data["fy_end_month"]
+        if not choice_input:
+            return choice_input
+
+        valid_months = [str(x) for x in range(1, 13)]  # ["1", "2", ..., "12"]
+        if choice_input not in valid_months:
+            raise ValidationError(f"\"{choice_input}\" is not a valid month.")
+
     def clean_type_requirement(self):
         """
         Clean up the type requirement field. Uppercase all input. Replace common
@@ -264,6 +291,29 @@ class SearchForm(forms.Form):
         if "all_years" in audit_year:
             return []
         return audit_year
+    
+    def clean_auditee_state(self):
+        """
+        If the auditee_state is present and is not a valid state (one of STATE_ABBREVS), provide an error.
+        """
+        choice_input = self.cleaned_data["auditee_state"]
+        if not choice_input:
+            return choice_input
+
+        if choice_input not in STATE_ABBREVS:
+            raise ValidationError(f"\"{choice_input}\" is not a valid state abbreviation.")
+
+    def clean_fy_end_month(self):
+        """
+        If the fy_end_month is present and is not a valid month (1-12), provide an error.
+        """
+        choice_input = self.cleaned_data["fy_end_month"]
+        if not choice_input:
+            return choice_input
+
+        valid_months = [str(x) for x in range(1, 13)]  # ["1", "2", ..., "12"]
+        if choice_input not in valid_months:
+            raise ValidationError(f"\"{choice_input}\" is not a valid month.")
 
     def clean_report_id(self):
         """
