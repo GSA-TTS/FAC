@@ -226,6 +226,7 @@ def _index_general(audit_data):
         "search_names": list(search_names),
     }
 
+
 json_fields_to_check = [
     "general_information",
     "federal_awards",

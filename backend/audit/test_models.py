@@ -21,7 +21,7 @@ from .models import (
 from audit.models import Audit
 from audit.models.constants import SAC_SEQUENCE_ID
 from audit.models.utils import get_next_sequence_id
-from .models.models import STATUS
+from .models.constants import STATUS
 from .models.viewflow import sac_transition, SingleAuditChecklistFlow
 
 

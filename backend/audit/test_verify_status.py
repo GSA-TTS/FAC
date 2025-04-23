@@ -4,7 +4,7 @@ from .models import (
     SingleAuditChecklist,
     User,
 )
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 
 
 from django.core.exceptions import PermissionDenied

@@ -25,6 +25,7 @@ class STATUS:
     SUBMITTED = "submitted"
     DISSEMINATED = "disseminated"
     FLAGGED_FOR_REMOVAL = "flagged_for_removal"
+    SOURCE_OF_TRUTH_MIGRATION = "sot_migration"
 
 
 STATUS_CHOICES = (
@@ -36,6 +37,7 @@ STATUS_CHOICES = (
     (STATUS.CERTIFIED, "Certified"),
     (STATUS.SUBMITTED, "Submitted"),
     (STATUS.DISSEMINATED, "Disseminated"),
+    (STATUS.SOURCE_OF_TRUTH_MIGRATION, "Source of Truth Migration"),
 )
 
 

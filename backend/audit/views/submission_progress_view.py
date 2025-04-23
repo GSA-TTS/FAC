@@ -13,7 +13,7 @@ from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access, Audit
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 
 logger = logging.getLogger(__name__)
 

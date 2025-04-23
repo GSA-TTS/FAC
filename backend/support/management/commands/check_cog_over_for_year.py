@@ -5,7 +5,7 @@ from django.db.models import BigIntegerField, Q
 
 from dissemination.models import General, FederalAward
 from audit.models import SingleAuditChecklist, User
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from support.models import CognizantAssignment
 
 from config.settings import ENVIRONMENT

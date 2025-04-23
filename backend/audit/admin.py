@@ -22,7 +22,7 @@ from audit.models import (
     SacValidationWaiver,
     UeiValidationWaiver,
 )
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from audit.models.viewflow import (
     sac_flag_for_removal,
     sac_revert_from_flagged_for_removal,

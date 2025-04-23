@@ -102,11 +102,7 @@ class Command(BaseCommand):
             for sac in queryset.iterator():
                 try:
                     t0 = time.monotonic()
-                    self._migrate_sac(
-                        self,
-                        migration_user,
-                        sac
-                    )
+                    self._migrate_sac(self, migration_user, sac)
                     t_migrate_sac += time.monotonic() - t0
 
                     t0 = time.monotonic()
@@ -141,11 +137,7 @@ class Command(BaseCommand):
         logger.info("Completed audit migrations.")
 
     @staticmethod
-    def _migrate_sac(
-        self,
-        migration_user: User,
-        sac: SingleAuditChecklist
-    ):
+    def _migrate_sac(self, migration_user: User, sac: SingleAuditChecklist):
         with transaction.atomic():
             t1 = time.monotonic()
             audit_data = dict()
@@ -159,7 +151,7 @@ class Command(BaseCommand):
             # create the audit.
             t1 = time.monotonic()
             audit = Audit.objects.create(
-                event_type="MIGRATION",
+                event_type=STATUS.SOURCE_OF_TRUTH_MIGRATION,
                 data_source=sac.data_source,
                 event_user=migration_user,
                 created_by=sac.submitted_by,
@@ -227,7 +219,9 @@ class Command(BaseCommand):
 
             # copy SacValidationWaivers.
             t1 = time.monotonic()
-            sac_waivers = SacValidationWaiver.objects.filter(report_id=sac.report_id).values(
+            sac_waivers = SacValidationWaiver.objects.filter(
+                report_id=sac.report_id
+            ).values(
                 "timestamp",
                 "approver_email",
                 "approver_name",
@@ -283,14 +277,12 @@ def _get_query(kwargs, max_records):
 def _convert_file_information(sac: SingleAuditChecklist):
     try:
         file = SingleAuditReportFile.objects.filter(sac=sac).latest("date_created")
-        return (
-            {
-                "file_information": {
-                    "pages": file.component_page_numbers,
-                    "filename": file.filename,
-                }
+        return {
+            "file_information": {
+                "pages": file.component_page_numbers,
+                "filename": file.filename,
             }
-        )
+        }
     except SingleAuditReportFile.DoesNotExist:
         return {}
 

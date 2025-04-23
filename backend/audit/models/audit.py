@@ -22,7 +22,7 @@ from audit.models.utils import (
     get_next_sequence_id,
     generate_sac_report_id,
     JsonArrayToTextArray,
-    validate_audit_consistency
+    validate_audit_consistency,
 )
 
 from itertools import chain

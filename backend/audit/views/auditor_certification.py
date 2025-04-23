@@ -16,7 +16,7 @@ from audit.models import (
     SingleAuditChecklist,
     Audit,
 )
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from audit.models.viewflow import sac_transition
 from audit.validators import (
     validate_auditor_certification_json,
