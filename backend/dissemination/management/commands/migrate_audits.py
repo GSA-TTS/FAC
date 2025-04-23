@@ -218,7 +218,16 @@ class Command(BaseCommand):
                     report_id=sac.report_id,
                     user=migration_user,
                 )
+                # Extract updated_at values separately
+                updated_at_map = [h.updated_at for h in extra_histories]
+
+                # Step 1: Temporarily reset updated_at (so it's overwritten later)
+                for h in extra_histories:
+                    h.updated_at = None
                 History.objects.bulk_create(extra_histories, batch_size=25)
+                # Step 3: Re-assign updated_at and bulk update
+                for h, new_time in zip(extra_histories, updated_at_map):
+                    h.updated_at = new_time
                 History.objects.bulk_update(extra_histories, ["updated_at"])
             self.t_history += time.monotonic() - t1
 
