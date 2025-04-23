@@ -18,11 +18,11 @@
 from datetime import datetime
 import logging
 import time
+import typing
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
-from django.db.models import QuerySet, Max
 
 from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
 from audit.intakelib.mapping_additional_ueis import additional_ueis_audit_view
@@ -85,7 +85,7 @@ class Command(BaseCommand):
         count = 0
         logger.info(f"Found {total} records to parse through.")
         migration_user = get_or_create_sot_migration_user()
-        logger.info(f"Starting migration...")
+        logger.info("Starting migration...")
 
         while queryset.count() != 0:
             t_migrate_sac = 0
@@ -445,7 +445,7 @@ def create_history_objects(
     transition_name: list[str],
     transition_date: list[str],
     report_id: str,
-    user: any,
+    user: typing.Any,
 ) -> list[History]:
 
     transitions = []
@@ -460,7 +460,7 @@ def create_history_objects(
         transitions.append((name, dt))
 
     # Only grab the most recent transition per status
-    latest_transitions = {}
+    latest_transitions: dict[str, datetime] = {}
     for name, dt in transitions:
         if name not in latest_transitions or dt > latest_transitions[name]:
             latest_transitions[name] = dt
