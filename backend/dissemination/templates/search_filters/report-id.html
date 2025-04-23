@@ -1,8 +1,12 @@
 {% comment %} Report ID {% endcomment %}
-<label for="report-id">
-    <button type="button"
-            class="usa-accordion__button"
-            aria-expanded={% if form_user_input.report_id %}"true"{% else %}"false"{% endif %}
-            aria-controls="report-id">Report ID</button>
-</label>
-<textarea class="usa-textarea" id="report-id" name="report_id">{{form_user_input.report_id}}</textarea>
+<div class="usa-accordion">
+    <h4 class="usa-accordion__heading">
+        <button type="button"
+                class="usa-accordion__button"
+                aria-expanded={% if form_user_input.report_id %}"true"{% else %}"false"{% endif %}
+                aria-controls="report-id">Report ID</button>
+    </h4>
+    <div id="report-id">
+        <textarea class="usa-textarea" id="report-id" name="report_id">{{form_user_input.report_id}}</textarea>
+    </div>
+</div>
