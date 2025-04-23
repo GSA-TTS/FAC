@@ -3,14 +3,14 @@ name: Export Audit Data to CSV Scheduler
 on:
   schedule:
     # Staging, Prod test - Wednesday, Thursday at 11 PM UTC
-    - cron: '0 7 * * [3,4]'
+    - cron: '0 7 * * 3,4'
 
 jobs:
   scheduled-audit-data-export:
     strategy:
       fail-fast: false
       matrix:
-        environment: 
+        environment:
           - name: staging
           - name: production
     name: Run bulk data export
