@@ -3,7 +3,6 @@ import logging
 import math
 import time
 
-from django.core.exceptions import BadRequest
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -93,7 +92,7 @@ class AdvancedSearch(View):
                     "form_user_input": form_user_input,
                 },
             )
-        
+
         logger.info(f"Advanced searching on fields: {form_data}")
 
         # Generate results on valid user input.
@@ -193,7 +192,6 @@ class Search(View):
         form_data["advanced_search_flag"] = advanced_search_flag
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
 
-
         # The form contains an error list. Gather custom error messages for certain fields.
         context["errors"] = gather_errors(form)
 
@@ -208,7 +206,7 @@ class Search(View):
                     "form_user_input": form_user_input,
                 },
             )
-        
+
         logger.info(f"Searching on fields: {form_data}")
 
         # Generate results on valid user input.
@@ -313,7 +311,6 @@ class AuditSearch(View):
         # The form contains an error list. Gather custom error messages for certain fields.
         context["errors"] = gather_errors(form)
 
-
         # If the form failed to validate, don't search and return early with error messages.
         if not form.is_valid():
             return render(
@@ -325,9 +322,9 @@ class AuditSearch(View):
                     "form_user_input": form_user_input,
                 },
             )
-            
+
         logger.info(f"Searching on fields: {form_data}")
-        
+
         # Generate results on valid user input.
         results = run_search(form_data, True)
         results_count = results.count()

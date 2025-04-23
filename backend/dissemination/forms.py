@@ -159,7 +159,9 @@ class AdvancedSearchForm(forms.Form):
             return choice_input
 
         if choice_input not in STATE_ABBREVS:
-            raise ValidationError(f"\"{choice_input}\" is not a valid state abbreviation.")
+            raise ValidationError(
+                f'"{choice_input}" is not a valid state abbreviation.'
+            )
 
     def clean_fy_end_month(self):
         """
@@ -171,7 +173,7 @@ class AdvancedSearchForm(forms.Form):
 
         valid_months = [str(x) for x in range(1, 13)]  # ["1", "2", ..., "12"]
         if choice_input not in valid_months:
-            raise ValidationError(f"\"{choice_input}\" is not a valid month.")
+            raise ValidationError(f'"{choice_input}" is not a valid month.')
 
     def clean_type_requirement(self):
         """
@@ -291,7 +293,7 @@ class SearchForm(forms.Form):
         if "all_years" in audit_year:
             return []
         return audit_year
-    
+
     def clean_auditee_state(self):
         """
         If the auditee_state is present and is not a valid state (one of STATE_ABBREVS), provide an error.
@@ -301,7 +303,9 @@ class SearchForm(forms.Form):
             return choice_input
 
         if choice_input not in STATE_ABBREVS:
-            raise ValidationError(f"\"{choice_input}\" is not a valid state abbreviation.")
+            raise ValidationError(
+                f'"{choice_input}" is not a valid state abbreviation.'
+            )
 
     def clean_fy_end_month(self):
         """
@@ -313,7 +317,7 @@ class SearchForm(forms.Form):
 
         valid_months = [str(x) for x in range(1, 13)]  # ["1", "2", ..., "12"]
         if choice_input not in valid_months:
-            raise ValidationError(f"\"{choice_input}\" is not a valid month.")
+            raise ValidationError(f'"{choice_input}" is not a valid month.')
 
     def clean_report_id(self):
         """
