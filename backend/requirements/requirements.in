@@ -18,7 +18,7 @@ greenlet>=3.0rc3
 gunicorn[gevent]>=22.0.0
 jsonpath-ng
 jsonschema
-newrelic>=9.11.0
+newrelic>=10.9.0
 oic
 openpyxl
 pandas

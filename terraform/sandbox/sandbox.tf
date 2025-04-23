@@ -1,6 +1,9 @@
 module "sandbox" {
-  source                  = "../shared/modules/sandbox"
-  cf_space_name           = "sandbox"
+  source = "../shared/modules/sandbox"
+  cf_space = {
+    id   = data.cloudfoundry_space.space.id
+    name = "sandbox"
+  }
   pgrst_jwt_secret        = var.pgrst_jwt_secret
   new_relic_license_key   = var.new_relic_license_key
   django_secret_login_key = var.django_secret_login_key
@@ -9,7 +12,6 @@ module "sandbox" {
   login_secret_key        = var.login_secret_key
   branch_name             = var.branch_name
   backups_s3_id           = module.sandbox-backups-bucket.bucket_id
-  cf_space_id             = data.cloudfoundry_space.space.id
 
   database_plan         = "medium-gp-psql"
   https_proxy_instances = 1
@@ -21,7 +23,7 @@ module "sandbox" {
 }
 
 module "sandbox-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.1.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
 
   cf_space_id  = data.cloudfoundry_space.space.id
   name         = "backups"
