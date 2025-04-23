@@ -427,4 +427,3 @@ def _validate_json_fields(audit_instance, sac_instance, differences):
                         "audit_value": audit_field_data,
                     }
                 )
-
