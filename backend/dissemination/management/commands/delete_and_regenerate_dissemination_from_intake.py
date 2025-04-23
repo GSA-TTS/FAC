@@ -13,7 +13,7 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 from audit.models import SingleAuditChecklist
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 
 logger = logging.getLogger(__name__)
 

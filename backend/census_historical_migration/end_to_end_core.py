@@ -17,7 +17,7 @@ from .models import (
     MigrationErrorDetail,
 )
 from audit.intake_to_dissemination import IntakeToDissemination
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from audit.models.viewflow import SingleAuditChecklistFlow
 from dissemination.models import (
     AdditionalEin,

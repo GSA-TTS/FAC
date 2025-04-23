@@ -4,7 +4,7 @@
 # 1. Make sure you import the public prod data dump from the drive into your local DB.
 # 2. If you have already migrated some audits and want to reset to a clean slate,
 #    run these SQL queries in order:
-#    - DELETE FROM public.audit_history WHERE event='MIGRATION';
+#    - DELETE FROM public.audit_history WHERE event='sot_migration';
 #    - UPDATE public.audit_access SET audit_id=null;
 #    - UPDATE public.audit_deletedaccess SET audit_id=null;
 #    - UPDATE public.audit_submissionevent SET audit_id=null;
@@ -15,9 +15,11 @@
 #    - If you want to ONLY target intake records, pass the parameter "--intake".
 #    - If you want to target ALL records, leave out the parameters.
 
+from datetime import datetime
 import logging
 import time
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 
@@ -150,7 +152,7 @@ class Command(BaseCommand):
             # create the audit.
             t1 = time.monotonic()
             audit = Audit.objects.create(
-                event_type="MIGRATION",
+                event_type=STATUS.SOURCE_OF_TRUTH_MIGRATION,
                 data_source=sac.data_source,
                 event_user=migration_user,
                 created_by=sac.submitted_by,
@@ -208,6 +210,24 @@ class Command(BaseCommand):
 
             # Step 3: Bulk update
             History.objects.bulk_update(histories, ["updated_at"])
+            if sac.data_source == settings.CENSUS_DATA_SOURCE and not histories:
+                extra_histories = create_history_objects(
+                    transition_name=sac.transition_name,
+                    transition_date=sac.transition_date,
+                    report_id=sac.report_id,
+                    user=migration_user,
+                )
+                # Extract updated_at values separately
+                updated_at_map = [h.updated_at for h in extra_histories]
+
+                # Step 1: Temporarily reset updated_at (so it's overwritten later)
+                for h in extra_histories:
+                    h.updated_at = None
+                History.objects.bulk_create(extra_histories, batch_size=25)
+                # Step 3: Re-assign updated_at and bulk update
+                for h, new_time in zip(extra_histories, updated_at_map):
+                    h.updated_at = new_time
+                History.objects.bulk_update(extra_histories, ["updated_at"])
             self.t_history += time.monotonic() - t1
 
             # assign audit reference to file-based models.
@@ -409,3 +429,54 @@ def get_or_create_sot_migration_user():
         my_user.save()
 
     return my_user
+
+
+STATUS_TO_EVENT = {
+    STATUS.READY_FOR_CERTIFICATION: SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
+    STATUS.AUDITOR_CERTIFIED: SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
+    STATUS.AUDITEE_CERTIFIED: SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+    STATUS.SUBMITTED: SubmissionEvent.EventType.SUBMITTED,
+    STATUS.DISSEMINATED: SubmissionEvent.EventType.DISSEMINATED,
+}
+
+
+def create_history_objects(
+    transition_name: list[str],
+    transition_date: list[str],
+    report_id: str,
+    user: any,
+) -> list[History]:
+
+    transitions = []
+    for name, date_val in zip(transition_name, transition_date):
+        if isinstance(date_val, str):
+            try:
+                dt = datetime.strptime(date_val.split(".")[0], "%Y-%m-%d %H:%M:%S%z")
+            except ValueError:
+                dt = datetime.strptime(date_val, "%Y-%m-%d %H:%M:%S%z")
+        else:
+            dt = date_val
+        transitions.append((name, dt))
+
+    # Only grab the most recent transition per status
+    latest_transitions = {}
+    for name, dt in transitions:
+        if name not in latest_transitions or dt > latest_transitions[name]:
+            latest_transitions[name] = dt
+
+    history_objects = []
+    for status, dt in latest_transitions.items():
+        event = STATUS_TO_EVENT.get(status)
+        if not event:
+            continue  # not all status match an event type
+        history = History(
+            event=event,
+            report_id=report_id,
+            version=0,
+            event_data={},
+            updated_at=dt,
+            updated_by=user,
+        )
+        history_objects.append(history)
+
+    return history_objects

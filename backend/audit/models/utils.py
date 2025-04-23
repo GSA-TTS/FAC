@@ -356,14 +356,6 @@ def _modify_sac_field_data(field, sac_field_data, audit_field_data):
     if field in fields_with_meta:
         sac_field_data = sac_field_data[fields_with_meta[field]]
 
-    # SACs sometimes have additional auditee_uei field
-    if "auditee_uei" in sac_field_data:
-        del sac_field_data["auditee_uei"]
-
-    # SOT gen_info has additional auditee_uei field
-    if field == "general_information" and "auditee_uei" in audit_field_data:
-        del audit_field_data["auditee_uei"]
-
     # federal_awards -> awards key tweak for SAC data to match SOT
     if field == "federal_awards":
         sac_awards = sac_field_data.get("federal_awards", [])

@@ -7,7 +7,7 @@ from model_bakery import baker
 from faker import Faker
 
 from audit.models import SingleAuditChecklist, User
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from audit.intake_to_dissemination import IntakeToDissemination
 from audit.test_views import AUDIT_JSON_FIXTURES, _load_json
 from audit.utils import Util

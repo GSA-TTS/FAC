@@ -1,6 +1,5 @@
 from audit.models import SingleAuditChecklist, SubmissionEvent, Audit
-from audit.models.constants import EventType
-from audit.models.models import STATUS
+from audit.models.constants import EventType, STATUS
 from audit.models.utils import convert_utc_to_american_samoa_zone
 from curation.curationlib.curation_audit_tracking import CurationTracking
 import datetime
