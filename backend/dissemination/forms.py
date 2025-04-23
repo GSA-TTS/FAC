@@ -214,13 +214,19 @@ class AdvancedSearchForm(forms.Form):
         """
         Default page number to one.
         """
-        return int(self.cleaned_data["page"] or 1)
+        try:
+            return int(self.cleaned_data["page"] or 1)
+        except ValueError:
+            raise ValidationError(f'Page value is not an integer.')
 
     def clean_limit(self):
         """
         Default page limit to 30.
         """
-        return int(self.cleaned_data["limit"] or 30)
+        try:
+            return int(self.cleaned_data["limit"] or 30)
+        except ValueError:
+            raise ValidationError(f'Limit value is not an integer.')
 
 
 class SearchForm(forms.Form):
@@ -332,10 +338,16 @@ class SearchForm(forms.Form):
         """
         Default page number to one.
         """
-        return int(self.cleaned_data["page"] or 1)
+        try:
+            return int(self.cleaned_data["page"] or 1)
+        except ValueError:
+            raise ValidationError(f'Page value is not an integer.')
 
     def clean_limit(self):
         """
         Default page limit to 30.
         """
-        return int(self.cleaned_data["limit"] or 30)
+        try:
+            return int(self.cleaned_data["limit"] or 30)
+        except ValueError:
+            raise ValidationError(f'Limit value is not an integer.')
