@@ -403,9 +403,9 @@ def _validate_json_fields(audit_instance, sac_instance, differences):
 def _check_sac_meta(sac_field_data, field):
     """Returns None if the SAC field only contains metadata"""
     if sac_field_data:
-        if field == "findings_text" and not sac_field_data.get(
-            "FindingsText", {}
-        ).get("findings_text_entries"):
+        if field == "findings_text" and not sac_field_data.get("FindingsText", {}).get(
+            "findings_text_entries"
+        ):
             return None
         elif field == "corrective_action_plan" and not sac_field_data.get(
             "CorrectiveActionPlan", {}
