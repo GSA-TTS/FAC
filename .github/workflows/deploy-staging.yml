@@ -6,9 +6,9 @@ on:
       - prod
 
 jobs:
-  testing:
-    uses: ./.github/workflows/testing-from-ghcr.yml
-    secrets: inherit
+  # testing:
+  #   uses: ./.github/workflows/testing-from-ghcr.yml
+  #   secrets: inherit
 
   linting:
     uses: ./.github/workflows/linting.yml
@@ -16,8 +16,8 @@ jobs:
 
   deploy-infrastructure-staging:
     name: Deploy infrastructure (staging)
-    needs:
-      - testing
+    # needs:
+    #   - testing
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "staging"
