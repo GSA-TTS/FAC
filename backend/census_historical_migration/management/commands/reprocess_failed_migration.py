@@ -1,3 +1,5 @@
+# type: ignore
+# census_historical_migration has issues due to SOT, keeping for posterity.
 from census_historical_migration.process_failed_migration import (
     reprocess_failed_reports,
 )

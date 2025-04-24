@@ -1,11 +1,13 @@
-from unittest.mock import Mock
-from django.test import SimpleTestCase
+from unittest import TestCase
 from django.core.exceptions import ValidationError
+from model_bakery import baker
+
 from audit.intakelib.checks.check_finding_reference_year import finding_reference_year
-from audit.context import set_sac_to_context
+from audit.context import set_audit_to_context
+from audit.models import Audit
 
 
-class TestFindingReferenceYear(SimpleTestCase):
+class TestFindingReferenceYear(TestCase):
     def setUp(self):
         self.ir = [
             {
@@ -20,17 +22,22 @@ class TestFindingReferenceYear(SimpleTestCase):
                 ],
             }
         ]
-        self.mock_sac = Mock()
 
     def test_success(self):
         """
         Test case where all finding reference years match the audit year.
         """
-        self.mock_sac.general_information = {
-            "auditee_fiscal_period_end": "2022-12-31",
-            "auditee_uei": "UEI",
-        }
-        with set_sac_to_context(self.mock_sac):
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_end": "2022-12-31",
+                    "auditee_uei": "UEI",
+                }
+            },
+        )
+        with set_audit_to_context(audit):
 
             errors = finding_reference_year(self.ir)
 
@@ -40,11 +47,17 @@ class TestFindingReferenceYear(SimpleTestCase):
         """
         Test case where finding reference years do not match the audit year.
         """
-        self.mock_sac.general_information = {
-            "auditee_fiscal_period_end": "2023-12-31",
-            "auditee_uei": "UEI",
-        }
-        with set_sac_to_context(self.mock_sac):
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_end": "2023-12-31",
+                    "auditee_uei": "UEI",
+                }
+            },
+        )
+        with set_audit_to_context(audit):
             with self.assertRaises(ValidationError) as context:
                 finding_reference_year(self.ir)
 
@@ -66,11 +79,17 @@ class TestFindingReferenceYear(SimpleTestCase):
         """
         Test case where auditee_uei is None and the function returns without validation.
         """
-        self.mock_sac.general_information = {
-            "auditee_fiscal_period_end": "2022-12-31",
-            "auditee_uei": None,
-        }
-        with set_sac_to_context(self.mock_sac):
+        audit = baker.make(
+            Audit,
+            version=0,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_end": "2022-12-31",
+                    "auditee_uei": None,
+                }
+            },
+        )
+        with set_audit_to_context(audit):
             errors = finding_reference_year(self.ir)
             self.assertEqual(errors, None)
 
@@ -78,7 +97,7 @@ class TestFindingReferenceYear(SimpleTestCase):
         """
         Test case where sac is None and a ValidationError is raised.
         """
-        with set_sac_to_context(None):
+        with set_audit_to_context(None):
             with self.assertRaises(ValidationError) as context:
                 finding_reference_year(self.ir)
 

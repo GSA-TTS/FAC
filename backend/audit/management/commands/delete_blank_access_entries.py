@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 break
 
             logger.info(
-                f"Deleting blank Access for {blank_access.sac.report_id}, {blank_access.fullname}"
+                f"Deleting blank Access for {blank_access.audit.report_id}, {blank_access.fullname}"
             )
 
             _, deletion_record = delete_access_and_create_record(blank_access)

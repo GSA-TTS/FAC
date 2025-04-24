@@ -1,10 +1,10 @@
 from django.test import TestCase
-from audit.models import SingleAuditChecklist
+from audit.models import Audit
+from .audit_validation_shape import audit_validation_shape
 from .check_award_ref_existence import (
     check_award_ref_existence,
     FEDERAL_AWARDS_TEMPLATE,
 )
-from .sac_validation_shape import sac_validation_shape
 from .errors import err_missing_award_reference
 
 from model_bakery import baker
@@ -19,8 +19,8 @@ class CheckAwardRefExistenceTest(TestCase):
 
     def _make_federal_awards(self, award_refs) -> dict:
         return {
-            "FederalAwards": {
-                "federal_awards": [
+            "federal_awards": {
+                "awards": [
                     (
                         {
                             "program": {"federal_agency_prefix": "10"},
@@ -34,21 +34,20 @@ class CheckAwardRefExistenceTest(TestCase):
             }
         }
 
-    def _make_sac(self, award_refs) -> SingleAuditChecklist:
-        sac = baker.make(SingleAuditChecklist)
-        sac.federal_awards = self._make_federal_awards(award_refs)
-        return sac
+    def _make_audit(self, award_refs) -> Audit:
+        audit_data = {**self._make_federal_awards(award_refs)}
+        return baker.make(Audit, version=0, audit=audit_data)
 
     def test_all_awards_have_references(self):
         """When all awards have a reference, no errors should be raised."""
-        sac = self._make_sac([self.award1, self.award3])
-        errors = check_award_ref_existence(sac_validation_shape(sac))
+        audit = self._make_audit([self.award1, self.award3])
+        errors = check_award_ref_existence(audit_validation_shape(audit))
         self.assertEqual(errors, [])
 
     def test_missing_award_references_raise_errors(self):
         """When there are awards missing references, the appropriate errors should be raised."""
-        sac = self._make_sac([self.award1, self.award2, self.award3])
-        errors = check_award_ref_existence(sac_validation_shape(sac))
+        audit = self._make_audit([self.award1, self.award2, self.award3])
+        errors = check_award_ref_existence(audit_validation_shape(audit))
 
         self.assertEqual(len(errors), 1)
 

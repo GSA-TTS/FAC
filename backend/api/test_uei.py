@@ -635,7 +635,6 @@ class UtilsTesting(TestCase):
                 before = UeiValidationWaiver.objects.all().count()
                 results = get_uei_info_from_sam_gov(uei=test_uei)
                 after = UeiValidationWaiver.objects.all().count()
-                print(f"{before} {after}")
                 self.assertTrue(after - before == 1)
                 self.assertTrue(results["valid"])
                 self.assertEqual(

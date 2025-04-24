@@ -328,8 +328,6 @@ Detailed below is a reference to, with a description of, each of our various com
     * Invokes a django command to [export data](../backend/support/management/commands/export_data.py) to CSV format.
 * [Export Audit Data to CSV](../.github/workflows/export-audit-data-to-csv.yml)
     * Invokes a django command to [export data](../backend/support/management/commands/export_data_audit.py) to CSV format.
-* [Materialized Views](../.github/workflows/materialized-views.yml)
-    * Calls the Django function [materialized views](../backend/dissemination/management/commands/materialized_views.py) to run the [create materialized views](../backend/dissemination/sql/create_materialized_views.sql) sql.
 
 **Unused:**
 * [BPMN Renders](../.github/workflows/add-bpmm-renders.yml)

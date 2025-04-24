@@ -10,7 +10,6 @@ from audit.mixins import (
 )
 from audit.models import (
     LateChangeError,
-    SingleAuditChecklist,
     SingleAuditReportFile,
     Audit,
 )
@@ -21,8 +20,6 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )
 logger = logging.getLogger(__name__)
-
-# TODO: Update Post SOC Launch
 
 
 class PageInput:
@@ -39,7 +36,8 @@ class PageInput:
 
 
 class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
-    def page_number_inputs(self):
+    @staticmethod
+    def page_number_inputs():
         """
         Build the input elements to be passed to the context for use in
         audit/templates/audit/upload-report.html
@@ -93,8 +91,8 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            sar = SingleAuditReportFile.objects.filter(sac_id=sac.id)
+            audit = Audit.objects.get(report_id=report_id)
+            sar = SingleAuditReportFile.objects.filter(audit_id=audit.id)
             if sar.exists():
                 sar = sar.latest("date_created")
 
@@ -103,17 +101,17 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             }
 
             context = {
-                "auditee_name": sac.auditee_name,
+                "auditee_name": audit.auditee_name,
                 "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
+                "auditee_uei": audit.auditee_uei,
+                "user_provided_organization_type": audit.organization_type,
                 "page_number_inputs": self.page_number_inputs(),
                 "already_submitted": True if sar else False,
                 "form": current_info,
             }
 
             return render(request, "audit/upload-report.html", context)
-        except SingleAuditChecklist.DoesNotExist as err:
+        except Audit.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except Exception as err:
             logger.info("Enexpected error in UploadReportView get:\n%s", err)
@@ -123,24 +121,21 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            audit = Audit.objects.find_audit_or_none(report_id)
+            audit = Audit.objects.get(report_id=report_id)
             form = UploadReportForm(request.POST, request.FILES)
 
             # Standard context always needed on this page
             context = {
-                "auditee_name": sac.auditee_name,
+                "auditee_name": audit.auditee_name,
                 "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
+                "auditee_uei": audit.auditee_uei,
+                "user_provided_organization_type": audit.organization_type,
                 "page_number_inputs": self.page_number_inputs(),
             }
 
             if form.is_valid():
                 file = request.FILES["upload_report"]
-                sar_file = self.reformat_form_data(
-                    file, form, sac.id, audit.id if audit else None
-                )
+                sar_file = self.reformat_form_data(file, form, audit.id)
 
                 # Try to save the formatted form data. If it fails on the file
                 # (encryption issues, file size issues), add and pass back the file errors.
@@ -152,8 +147,17 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                         event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
                     )
 
-                    self._save_audit(
-                        report_id=report_id, sar_file=sar_file, request=request
+                    audit.audit.update(
+                        {
+                            "file_information": {
+                                "filename": sar_file.filename,
+                                "pages": sar_file.component_page_numbers,
+                            }
+                        }
+                    )
+                    audit.save(
+                        event_user=request.user,
+                        event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
                     )
                 except ValidationError as err:
                     for issue in err.error_dict.get("file"):
@@ -170,7 +174,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             # form.is_valid() failed (standard Django issues). Show the errors.
             return render(request, "audit/upload-report.html", context | {"form": form})
 
-        except SingleAuditChecklist.DoesNotExist as err:
+        except Audit.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
@@ -179,7 +183,8 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             logger.info("Unexpected error in UploadReportView post:\n %s", err)
             raise BadRequest() from err
 
-    def reformat_form_data(self, file, form, sac_id, audit_id):
+    @staticmethod
+    def reformat_form_data(file, form, audit_id):
         """
         Given the file, form, and report_id, return the formatted SingleAuditReportFile.
         Maps cleaned form data into an object to be passed alongside the file, filename, and report id.
@@ -211,26 +216,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "component_page_numbers": component_page_numbers,
                 "file": file,
                 "filename": file.name,
-                "sac_id": sac_id,
                 "audit_id": audit_id,
             }
         )
         return sar_file
-
-    @staticmethod
-    def _save_audit(report_id, sar_file, request):
-        # TODO: Update Post SOC Launch : Delete and move done for linting complexity
-        audit = Audit.objects.find_audit_or_none(report_id=report_id)
-        if audit:
-            audit.audit.update(
-                {
-                    "file_information": {
-                        "filename": sar_file.filename,
-                        "pages": sar_file.component_page_numbers,
-                    }
-                }
-            )
-            audit.save(
-                event_user=request.user,
-                event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
-            )

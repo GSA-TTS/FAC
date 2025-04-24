@@ -1,4 +1,6 @@
-from .sac_general_lib.utils import xform_census_date_to_utc_time
+from audit.models.constants import STATUS
+from audit.models.utils import generate_audit_indexes
+from audit.models.viewflow import AuditFlow
 from .workbooklib.post_upload_utils import record_dummy_pdf_object
 from .exception_utils import (
     CrossValidationError,
@@ -11,26 +13,14 @@ from .workbooklib.workbook_builder_loader import (
 from .workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )
-from .sac_general_lib.sac_creator import setup_sac
+from .sac_general_lib.sac_creator import setup_audit
 from .models import (
     ReportMigrationStatus,
     MigrationErrorDetail,
 )
-from audit.intake_to_dissemination import IntakeToDissemination
-from audit.models.models import STATUS
-from audit.models.viewflow import SingleAuditChecklistFlow
+
 from dissemination.models import (
-    AdditionalEin,
-    AdditionalUei,
-    CapText,
-    FederalAward,
-    Finding,
-    FindingText,
-    General,
     InvalidAuditRecord,
-    Note,
-    Passthrough,
-    SecondaryAuditor,
     MigrationInspectionRecord,
 )
 from census_historical_migration.migration_result import MigrationResult
@@ -44,7 +34,6 @@ from django.utils import timezone as django_timezone
 import argparse
 import logging
 import sys
-from datetime import datetime, timezone
 import traceback
 
 
@@ -54,63 +43,28 @@ logging.getLogger().setLevel(logging.INFO)
 parser = argparse.ArgumentParser()
 
 
-def step_through_certifications(sac, audit_header):
-    flow = SingleAuditChecklistFlow(sac)
+# !!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!
+# This was quickly updated to handle SOT, with minimal testing outside unit tests.
+# The idea was this code is legacy, and shouldn't actually be needed, but does have
+# some valuable tools for workbook translations. Rather than try and pull out the workbook
+# translations separately, in order to launch SOT quicly, I updated this code to pass
+# unit tests. Use of this code for its original purpose of migrating census data
+# into SAC data is not advised unless it is thoroughly tested.
+def step_through_certifications(audit, audit_header):
+    flow = AuditFlow(audit)
     flow.transition_to_ready_for_certification()
     flow.transition_to_auditor_certified()
     flow.transition_to_auditee_certified()
 
-    sac.transition_name.append(STATUS.CERTIFIED)
-    sac.transition_date.append(datetime.now(timezone.utc))
-
     flow.transition_to_submitted()
     flow.transition_to_disseminated()
 
-    # Patch for transition date
 
-    submitted_date = xform_census_date_to_utc_time(audit_header.FACACCEPTEDDATE)
-    auditor_certified_date = xform_census_date_to_utc_time(audit_header.CPADATESIGNED)
-    auditee_certified_date = xform_census_date_to_utc_time(
-        audit_header.AUDITEEDATESIGNED
-    )
-    patch_dates = []
-
-    # Transition to ready for certification
-    patch_dates.append(submitted_date)
-    # Transition to auditor certified
-    patch_dates.append(auditor_certified_date)
-    # Transition to auditee certified
-    patch_dates.append(auditee_certified_date)
-    # Transition to certified
-    patch_dates.append(submitted_date)
-    # Transition to submitted
-    patch_dates.append(submitted_date)
-    # Transition to disseminated
-    patch_dates.append(datetime.now(timezone.utc))
-    sac.transition_date = patch_dates
-    sac.save()
-
-
-def disseminate(sac):
-    logger.info("Invoking movement of data from Intake to Dissemination")
-    for model in [
-        AdditionalEin,
-        AdditionalUei,
-        CapText,
-        FederalAward,
-        Finding,
-        FindingText,
-        General,
-        Note,
-        Passthrough,
-        SecondaryAuditor,
-    ]:
-        model.objects.filter(report_id=sac.report_id).delete()
-
-    if sac.general_information:
-        etl = IntakeToDissemination(sac)
-        etl.load_all()
-        etl.save_dissemination_objects()
+def disseminate(audit):
+    audit.submission_status = STATUS.DISSEMINATED
+    indexes = generate_audit_indexes(audit)
+    audit.audit.update(indexes)
+    audit.save()
 
 
 def run_end_to_end(user, audit_header):
@@ -119,7 +73,7 @@ def run_end_to_end(user, audit_header):
     InvalidRecord.reset()
     AceFlag.reset()
     try:
-        sac = setup_sac(user, audit_header)
+        sac = setup_audit(user, audit_header)
         builder_loader = workbook_builder_loader(user, sac, audit_header)
 
         for section, fun in sections_to_handlers.items():

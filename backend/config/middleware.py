@@ -1,5 +1,9 @@
 import boto3
-from audit.exceptions import SessionExpiredException, SessionWarningException
+from audit.exceptions import (
+    SessionExpiredException,
+    SessionWarningException,
+    VersionMismatchException,
+)
 from dissemination.file_downloads import file_exists
 from django.conf import settings
 from django.shortcuts import redirect, render
@@ -80,7 +84,7 @@ class MaintenanceCheck:
         return response
 
 
-class HandleSessionException:
+class HandleExceptionsMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -95,4 +99,8 @@ class HandleSessionException:
         elif isinstance(exception, SessionWarningException):
             context = {"show_session_warning_banner": True}
             return render(request, "home.html", context)
+        elif isinstance(exception, VersionMismatchException):
+            # TODO: We will want to show some sort of error message.
+            previous_page = request.META.get("HTTP_REFERER")
+            return redirect(previous_page)
         return None

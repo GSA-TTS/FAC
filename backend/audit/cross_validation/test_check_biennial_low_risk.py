@@ -1,10 +1,10 @@
 from django.test import TestCase
 from model_bakery import baker
-from audit.models import SingleAuditChecklist
+from audit.models import Audit
+from .audit_validation_shape import audit_validation_shape
 
 from .errors import err_biennial_low_risk
 from .check_biennial_low_risk import check_biennial_low_risk
-from .sac_validation_shape import sac_validation_shape
 
 
 class CheckBiennialLowRiskTests(TestCase):
@@ -16,11 +16,13 @@ class CheckBiennialLowRiskTests(TestCase):
         """
         Non-biennial and non-low-risk should validate
         """
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"audit_period_covered": "annual"}
-        sac.audit_information = {"is_low_risk_auditee": False}
+        audit_data = {
+            "general_information": {"audit_period_covered": "annual"},
+            "audit_information": {"is_low_risk_auditee": False},
+        }
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        validation_result = check_biennial_low_risk(sac_validation_shape(sac))
+        validation_result = check_biennial_low_risk(audit_validation_shape(audit))
 
         self.assertEqual(validation_result, [])
 
@@ -28,11 +30,13 @@ class CheckBiennialLowRiskTests(TestCase):
         """
         Biennial and non-low-risk should validate
         """
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"audit_period_covered": "biennial"}
-        sac.audit_information = {"is_low_risk_auditee": False}
+        audit_data = {
+            "general_information": {"audit_period_covered": "biennial"},
+            "audit_information": {"is_low_risk_auditee": False},
+        }
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        validation_result = check_biennial_low_risk(sac_validation_shape(sac))
+        validation_result = check_biennial_low_risk(audit_validation_shape(audit))
 
         self.assertEqual(validation_result, [])
 
@@ -40,11 +44,13 @@ class CheckBiennialLowRiskTests(TestCase):
         """
         Non-biennial and low-risk should validate
         """
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"audit_period_covered": "annual"}
-        sac.audit_information = {"is_low_risk_auditee": True}
+        audit_data = {
+            "general_information": {"audit_period_covered": "annual"},
+            "audit_information": {"is_low_risk_auditee": True},
+        }
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        validation_result = check_biennial_low_risk(sac_validation_shape(sac))
+        validation_result = check_biennial_low_risk(audit_validation_shape(audit))
 
         self.assertEqual(validation_result, [])
 
@@ -52,11 +58,13 @@ class CheckBiennialLowRiskTests(TestCase):
         """
         Biennial and low-risk should NOT validate
         """
-        sac = baker.make(SingleAuditChecklist)
-        sac.general_information = {"audit_period_covered": "biennial"}
-        sac.audit_information = {"is_low_risk_auditee": True}
+        audit_data = {
+            "general_information": {"audit_period_covered": "biennial"},
+            "audit_information": {"is_low_risk_auditee": True},
+        }
+        audit = baker.make(Audit, version=0, audit=audit_data)
 
-        validation_result = check_biennial_low_risk(sac_validation_shape(sac))
+        validation_result = check_biennial_low_risk(audit_validation_shape(audit))
 
         self.assertEqual(len(validation_result), 1)
         self.assertEqual(validation_result[0], {"error": err_biennial_low_risk()})
@@ -65,25 +73,35 @@ class CheckBiennialLowRiskTests(TestCase):
         """
         Empty general information/audit information sections should validate
         """
-        sac_empty_gen_info = baker.make(SingleAuditChecklist)
-        sac_empty_gen_info.audit_information = {"is_low_risk_auditee": True}
+        audit_data_empty_gen_info = {
+            "general_information": {},
+            "audit_information": {"is_low_risk_auditee": True},
+        }
+        audit_empty_gen_info = baker.make(
+            Audit, version=0, audit=audit_data_empty_gen_info
+        )
 
-        sac_empty_audit_info = baker.make(SingleAuditChecklist)
-        sac_empty_audit_info.general_information = {"audit_period_covered": "biennial"}
+        audit_data_empty_audit_info = {
+            "general_information": {"audit_period_covered": "biennial"},
+            "audit_information": {},
+        }
+        audit_empty_audit_info = baker.make(
+            Audit, version=0, audit=audit_data_empty_audit_info
+        )
 
-        sac_empty = baker.make(SingleAuditChecklist)
+        audit_empty = baker.make(Audit, version=0, audit={})
 
         validation_result_empty_gen = check_biennial_low_risk(
-            sac_validation_shape(sac_empty_gen_info)
+            audit_validation_shape(audit_empty_gen_info)
         )
         self.assertEqual(validation_result_empty_gen, [])
 
         validation_result_empty_audit = check_biennial_low_risk(
-            sac_validation_shape(sac_empty_audit_info)
+            audit_validation_shape(audit_empty_audit_info)
         )
         self.assertEqual(validation_result_empty_audit, [])
 
         validation_result_empty = check_biennial_low_risk(
-            sac_validation_shape(sac_empty)
+            audit_validation_shape(audit_empty)
         )
         self.assertEqual(validation_result_empty, [])

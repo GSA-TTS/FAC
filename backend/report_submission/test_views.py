@@ -6,10 +6,12 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.conf import settings
 from unittest.mock import MagicMock, patch
+
+from audit.models.constants import EventType
 from report_submission.views import DeleteFileView
 from model_bakery import baker
 
-from audit.models import Access, SingleAuditChecklist, SubmissionEvent
+from audit.models import Access, Audit, History
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import PermissionDenied
@@ -21,49 +23,51 @@ def omit(remove, d) -> dict:
     return {k: d[k] for k in d if k not in remove}
 
 
-SAMPLE_BASE_SAC_DATA = {
+SAMPLE_BASE_AUDIT_DATA = {
     # 0. Meta data
-    "submitted_by": None,
-    "date_created": "2022-08-11",
+    "created_by": None,
+    "created_at": "2022-08-11",
     "submission_status": "in_progress",
     "report_id": "2022ABC1000023",
     "audit_type": "single-audit",
     # Part 1: General Information
-    "general_information": {
-        "auditee_fiscal_period_start": "2021-10-01",
-        "auditee_fiscal_period_end": "2022-10-01",
-        "audit_period_covered": "other",
-        "audit_period_other_months": "10",
-        "ein": "123456789",
-        "ein_not_an_ssn_attestation": True,
-        "multiple_eins_covered": False,
-        "auditee_uei": "zQGGHJH74DW7",
-        "multiple_ueis_covered": False,
-        "secondary_auditors_exist": True,
-        "auditee_name": "Auditee McAudited",
-        "auditee_address_line_1": "200 feet into left field",
-        "auditee_city": "New York",
-        "auditee_state": "NY",
-        "auditee_zip": "10451",
-        "auditee_contact_name": "Designate Representative",
-        "auditee_contact_title": "Lord of Doors",
-        "auditee_phone": "5558675309",
-        "auditee_email": "auditee.mcaudited@leftfield.com",
-        "user_provided_organization_type": "local",
-        "met_spending_threshold": True,
-        "is_usa_based": True,
-        "auditor_firm_name": "Dollar Audit Store",
-        "auditor_ein": "123456789",
-        "auditor_ein_not_an_ssn_attestation": True,
-        "auditor_country": "USA",
-        "auditor_address_line_1": "100 Percent Respectable St.",
-        "auditor_city": "Podunk",
-        "auditor_state": "NY",
-        "auditor_zip": "14886",
-        "auditor_contact_name": "Qualified Human Accountant",
-        "auditor_contact_title": "Just an ordinary person",
-        "auditor_phone": "0008675309",
-        "auditor_email": "qualified.human.accountant@dollarauditstore.com",
+    "audit": {
+        "general_information": {
+            "auditee_fiscal_period_start": "2021-10-01",
+            "auditee_fiscal_period_end": "2022-10-01",
+            "audit_period_covered": "other",
+            "audit_period_other_months": "10",
+            "ein": "123456789",
+            "ein_not_an_ssn_attestation": True,
+            "multiple_eins_covered": False,
+            "auditee_uei": "zQGGHJH74DW7",
+            "multiple_ueis_covered": False,
+            "secondary_auditors_exist": True,
+            "auditee_name": "Auditee McAudited",
+            "auditee_address_line_1": "200 feet into left field",
+            "auditee_city": "New York",
+            "auditee_state": "NY",
+            "auditee_zip": "10451",
+            "auditee_contact_name": "Designate Representative",
+            "auditee_contact_title": "Lord of Doors",
+            "auditee_phone": "5558675309",
+            "auditee_email": "auditee.mcaudited@leftfield.com",
+            "user_provided_organization_type": "local",
+            "met_spending_threshold": True,
+            "is_usa_based": True,
+            "auditor_firm_name": "Dollar Audit Store",
+            "auditor_ein": "123456789",
+            "auditor_ein_not_an_ssn_attestation": True,
+            "auditor_country": "USA",
+            "auditor_address_line_1": "100 Percent Respectable St.",
+            "auditor_city": "Podunk",
+            "auditor_state": "NY",
+            "auditor_zip": "14886",
+            "auditor_contact_name": "Qualified Human Accountant",
+            "auditor_contact_title": "Just an ordinary person",
+            "auditor_phone": "0008675309",
+            "auditor_email": "qualified.human.accountant@dollarauditstore.com",
+        }
     },
 }
 
@@ -224,25 +228,28 @@ class TestPreliminaryViews(TestCase):
         )
         report_id = path_segments[-1]
 
-        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        audit = Audit.objects.get(report_id=report_id)
+        general_information = audit.audit.get("general_information", {})
         combined = self.step1_data | step2_data
         for k in combined:
             # Test bools as strings
-            if isinstance(getattr(sac, k), bool):
-                self.assertEqual(combined[k], str(getattr(sac, k)))
+            audit_value = general_information.get(k, None)
+            expected_value = combined[k]
+            if isinstance(audit_value, bool):
+                self.assertEqual(expected_value, str(audit_value))
             # Test start/end dates formatted m/d/Y -> Y-m-d
             elif "fiscal_period" in k:
                 combined_date_formatted = datetime.strptime(
-                    combined[k], "%m/%d/%Y"
+                    expected_value, "%m/%d/%Y"
                 ).strftime("%Y-%m-%d")
-                self.assertEqual(combined_date_formatted, getattr(sac, k))
+                self.assertEqual(combined_date_formatted, audit_value)
             # Test everything else normally
             elif k == "auditee_uei":
-                self.assertEqual(combined[k].upper(), getattr(sac, k))
+                self.assertEqual(expected_value.upper(), audit_value)
             else:
-                self.assertEqual(combined[k], getattr(sac, k))
+                self.assertEqual(expected_value, audit_value)
 
-        accesses = Access.objects.filter(sac=sac)
+        accesses = Access.objects.filter(audit=audit)
         for key, val in self.step3_data.items():
             # Fields come in as auditee/auditor emails, become roles:
             if key in (
@@ -463,10 +470,11 @@ class TestPreliminaryViews(TestCase):
 class GeneralInformationFormViewTests(TestCase):
     def test_get_requires_login(self):
         """Requests to the GET endpoint require the user to be authenticated"""
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, version=0)
 
         url = reverse(
-            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+            "report_submission:general_information",
+            kwargs={"report_id": audit.report_id},
         )
 
         response = self.client.get(url)
@@ -491,12 +499,13 @@ class GeneralInformationFormViewTests(TestCase):
     def test_get_inaccessible_audit_returns_403(self):
         """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
         user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, version=0)
 
         self.client.force_login(user)
 
         url = reverse(
-            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+            "report_submission:general_information",
+            kwargs={"report_id": audit.report_id},
         )
 
         response = self.client.get(url)
@@ -507,14 +516,15 @@ class GeneralInformationFormViewTests(TestCase):
         """When a request is made for an audit that is accessible for this user, a populated general information form should be returned"""
         user = baker.make(User)
 
-        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
-        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
-        baker.make(Access, user=user, sac=sac)
+        audit_data = omit(["created_by"], SAMPLE_BASE_AUDIT_DATA)
+        audit = baker.make(Audit, version=0, created_by=user, **audit_data)
+        baker.make(Access, user=user, audit=audit)
 
         self.client.force_login(user)
 
         url = reverse(
-            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+            "report_submission:general_information",
+            kwargs={"report_id": audit.report_id},
         )
 
         response = self.client.get(url)
@@ -552,11 +562,11 @@ class GeneralInformationFormViewTests(TestCase):
                 field != "auditee_fiscal_period_start"
                 and field != "auditee_fiscal_period_end"
             ):
-                value = sac.general_information[field]
+                value = audit.audit.get("general_information")[field]
                 self.assertEqual(response.context[field], value)
             else:
                 # These are stored in YYYY-MM-DD but get sent as MM/DD/YYYY, so they get special treatment.
-                stored_value = sac.general_information[field]
+                stored_value = audit.audit.get("general_information")[field]
                 formatted_field = datetime.strptime(
                     response.context[field], "%m/%d/%Y"
                 ).strftime("%Y-%m-%d")
@@ -564,10 +574,11 @@ class GeneralInformationFormViewTests(TestCase):
 
     def test_post_requires_login(self):
         """Requests to the POST endpoint require the user to be authenticated"""
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, version=0)
 
         url = reverse(
-            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+            "report_submission:general_information",
+            kwargs={"report_id": audit.report_id},
         )
 
         response = self.client.post(url)
@@ -592,12 +603,13 @@ class GeneralInformationFormViewTests(TestCase):
     def test_post_inaccessible_audit_returns_403(self):
         """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
         user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        audit = baker.make(Audit, version=0)
 
         self.client.force_login(user)
 
         url = reverse(
-            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+            "report_submission:general_information",
+            kwargs={"report_id": audit.report_id},
         )
 
         response = self.client.post(url)
@@ -611,14 +623,15 @@ class GeneralInformationFormViewTests(TestCase):
         """When the general information form is submitted, the general information fields for the target audit are updated in the database"""
         user = baker.make(User)
 
-        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
-        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
-        baker.make(Access, user=user, sac=sac)
+        audit_data = omit(["created_by"], SAMPLE_BASE_AUDIT_DATA)
+        audit = baker.make(Audit, version=0, created_by=user, **audit_data)
+        baker.make(Access, user=user, audit=audit)
 
         self.client.force_login(user)
 
         url = reverse(
-            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+            "report_submission:general_information",
+            kwargs={"report_id": audit.report_id},
         )
 
         data = {
@@ -672,56 +685,46 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+        updated_audit = Audit.objects.get(pk=audit.id)
+        general_information = updated_audit.audit.get("general_information", {})
 
         for field in data:
-            if field == "auditee_uei":
-                self.assertEqual(
-                    getattr(updated_sac, field),
-                    data[field].upper(),
-                    f"mismatch for field: {field}",
-                )
-            if field not in (
-                "auditee_fiscal_period_start",
-                "auditee_fiscal_period_end",
-            ):
-                self.assertEqual(
-                    getattr(updated_sac, field),
-                    data[field],
-                    f"mismatch for field: {field}",
-                )
+            audit_value = general_information.get(field, None)
+            expected_value = data[field]
+            if "fiscal_period" in field:
+                combined_date_formatted = datetime.strptime(
+                    expected_value, "%m/%d/%Y"
+                ).strftime("%Y-%m-%d")
+                self.assertEqual(combined_date_formatted, audit_value)
+            # Test everything else normally
+            elif field == "auditee_uei":
+                self.assertEqual(expected_value.upper(), audit_value)
             else:
-                # These are stored in YYYY-MM-DD but are sent as MM/DD/YYYY, so they get special treatment.
-                stored_value = getattr(updated_sac, field)
-                formatted_field = datetime.strptime(data[field], "%m/%d/%Y").strftime(
-                    "%Y-%m-%d"
-                )
-                self.assertEqual(
-                    stored_value, formatted_field, f"mismatch for field: {field}"
-                )
+                self.assertEqual(expected_value, audit_value)
 
-        submission_events = SubmissionEvent.objects.filter(sac=sac)
+        submission_events = History.objects.filter(report_id=audit.report_id)
 
         # the most recent event should be GENERAL_INFORMATION_UPDATED
         event_count = len(submission_events)
         self.assertGreaterEqual(event_count, 1)
         self.assertEqual(
             submission_events[event_count - 1].event,
-            SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+            EventType.GENERAL_INFORMATION_UPDATED,
         )
 
     def test_post_requires_fields(self):
         """If there are fields missing from the submitted form, the submission should be rejected"""
         user = baker.make(User)
 
-        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
-        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
-        baker.make(Access, user=user, sac=sac)
+        audit_data = omit(["created_by"], SAMPLE_BASE_AUDIT_DATA)
+        audit = baker.make(Audit, version=0, created_by=user, **audit_data)
+        baker.make(Access, user=user, audit=audit)
 
         self.client.force_login(user)
 
         url = reverse(
-            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+            "report_submission:general_information",
+            kwargs={"report_id": audit.report_id},
         )
 
         # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
@@ -738,14 +741,15 @@ class GeneralInformationFormViewTests(TestCase):
         """If GSA_MIGRATION is present as an email, the submission should be rejected"""
         user = baker.make(User)
 
-        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
-        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
-        baker.make(Access, user=user, sac=sac)
+        audit_data = omit(["created_by"], SAMPLE_BASE_AUDIT_DATA)
+        audit = baker.make(Audit, version=0, created_by=user, **audit_data)
+        baker.make(Access, user=user, audit=audit)
 
         self.client.force_login(user)
 
         url = reverse(
-            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+            "report_submission:general_information",
+            kwargs={"report_id": audit.report_id},
         )
 
         data = {
@@ -791,14 +795,15 @@ class GeneralInformationFormViewTests(TestCase):
         """When the general information form is submitted, the data should be validated against the general information schema"""
         user = baker.make(User)
 
-        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
-        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
-        baker.make(Access, user=user, sac=sac)
+        audit_data = omit(["created_by"], SAMPLE_BASE_AUDIT_DATA)
+        audit = baker.make(Audit, version=0, created_by=user, **audit_data)
+        baker.make(Access, user=user, audit=audit)
 
         self.client.force_login(user)
 
         url = reverse(
-            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+            "report_submission:general_information",
+            kwargs={"report_id": audit.report_id},
         )
 
         # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
@@ -885,17 +890,17 @@ class DeleteFileViewTest(TestCase):
 
     def test_get_no_access(self):
         request = self.make_request("get")
-        with patch("audit.models.SingleAuditChecklist.objects.get") as mock_get:
-            mock_get.side_effect = SingleAuditChecklist.DoesNotExist
+        with patch("audit.models.Audit.objects.get") as mock_get:
+            mock_get.side_effect = Audit.DoesNotExist
             with self.assertRaises(PermissionDenied):
                 self.view.get(request, report_id=self.report_id)
 
     def test_get_successful_render(self):
-        sac = MagicMock(report_id=self.report_id)
+        audit = MagicMock(report_id=self.report_id, version=0)
         access = MagicMock(user=self.user)
         request = self.make_request("get")
 
-        with patch("audit.models.SingleAuditChecklist.objects.get", return_value=sac):
+        with patch("audit.models.Audit.objects.get", return_value=audit):
             with patch("audit.models.Access.objects.filter", return_value=[access]):
                 response = self.view.get(request, report_id=self.report_id)
                 self.assertEqual(response.status_code, 200)
@@ -906,18 +911,16 @@ class DeleteFileViewTest(TestCase):
         request.user = self.user
         request.path = "/delete/" + self.path_name + "/"
         request = self.make_request("get")
-
-        with patch("audit.models.Audit.objects.find_audit_or_none", return_value=None):
-            with patch("audit.models.SingleAuditChecklist.objects.get"):
-                with patch("audit.models.Access.objects.filter", return_value=[]):
-                    response = self.view.post(request, report_id=self.report_id)
-                    self.assertEqual(response.status_code, 302)
+        audit = MagicMock(report_id=self.report_id, version=0)
+        with patch("audit.models.Audit.objects.get", return_value=audit):
+            with patch("audit.models.Access.objects.filter", return_value=[]):
+                response = self.view.post(request, report_id=self.report_id)
+                self.assertEqual(response.status_code, 302)
 
         messages = [message.message for message in get_messages(request)]
         self.assertIn("You do not have access to this audit.", messages)
 
     def test_post_file_deletion_successful(self):
-        sac = MagicMock(report_id=self.report_id)
         access = MagicMock(user=self.user)
         audit = MagicMock(report_id=self.report_id, version=0)
         request = self.factory.post(self.url)
@@ -925,19 +928,16 @@ class DeleteFileViewTest(TestCase):
         request.path = "/delete/" + self.path_name + "/"
         request = self.make_request("get")
 
-        with patch("audit.models.Audit.objects.find_audit_or_none", return_value=audit):
-            with patch(
-                "audit.models.SingleAuditChecklist.objects.get", return_value=sac
-            ):
-                with patch("audit.models.Access.objects.filter", return_value=[access]):
-                    with patch("audit.models.ExcelFile.objects.filter") as mock_filter:
-                        mock_files = MagicMock()
-                        mock_filter.return_value = mock_files
-                        mock_files.count.return_value = 1
+        with patch("audit.models.Audit.objects.get", return_value=audit):
+            with patch("audit.models.Access.objects.filter", return_value=[access]):
+                with patch("audit.models.ExcelFile.objects.filter") as mock_filter:
+                    mock_files = MagicMock()
+                    mock_filter.return_value = mock_files
+                    mock_files.count.return_value = 1
 
-                        response = self.view.post(request, report_id=self.report_id)
-                        self.assertEqual(response.status_code, 302)
-                        mock_files.delete.assert_called_once()
+                    response = self.view.post(request, report_id=self.report_id)
+                    self.assertEqual(response.status_code, 302)
+                    mock_files.delete.assert_called_once()
 
     def test_post_unexpected_error(self):
         request = self.factory.post(self.url)
@@ -945,7 +945,7 @@ class DeleteFileViewTest(TestCase):
         request.path = "/delete/" + self.path_name + "/"
         request = self.make_request("get")
 
-        with patch("audit.models.SingleAuditChecklist.objects.get") as mock_get:
+        with patch("audit.models.Audit.objects.get") as mock_get:
             mock_get.side_effect = Exception("Unexpected error")
             response = self.view.post(request, report_id=self.report_id)
             self.assertEqual(response.status_code, 302)

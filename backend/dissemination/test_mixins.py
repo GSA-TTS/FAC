@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import View
 
-from dissemination.models import General
+from audit.models import Audit
 from dissemination.mixins import ReportAccessRequiredMixin
 
 from users.models import Permission, UserPermission
@@ -38,21 +38,21 @@ class ReportAccessRequiredMixinTests(TestCase):
     def test_public_report_passes(self):
         request = RequestFactory().get("/")
 
-        general = baker.make(General, is_public=True)
+        audit = baker.make(Audit, version=0, audit={"is_public": True})
 
-        self.ViewStub().dispatch(request, report_id=general.report_id)
+        self.ViewStub().dispatch(request, report_id=audit.report_id)
 
     def test_non_public_raises_for_anonymous(self):
         request = RequestFactory().get("/")
         request.user = None
 
-        general = baker.make(General, is_public=False)
+        audit = baker.make(Audit, version=0, audit={"is_public": False})
 
         self.assertRaises(
             PermissionDenied,
             self.ViewStub().dispatch,
             request,
-            report_id=general.report_id,
+            report_id=audit.report_id,
         )
 
     def test_non_public_raises_for_unpermissioned(self):
@@ -61,13 +61,13 @@ class ReportAccessRequiredMixinTests(TestCase):
         user = baker.make(User)
         request.user = user
 
-        general = baker.make(General, is_public=False)
+        audit = baker.make(Audit, version=0, audit={"is_public": False})
 
         self.assertRaises(
             PermissionDenied,
             self.ViewStub().dispatch,
             request,
-            report_id=general.report_id,
+            report_id=audit.report_id,
         )
 
     def test_non_public_passes_for_permissioned(self):
@@ -79,9 +79,9 @@ class ReportAccessRequiredMixinTests(TestCase):
         permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
         baker.make(UserPermission, user=user, email=user.email, permission=permission)
 
-        general = baker.make(General, is_public=False)
+        audit = baker.make(Audit, version=0, audit={"is_public": False})
 
-        self.ViewStub().dispatch(request, report_id=general.report_id)
+        self.ViewStub().dispatch(request, report_id=audit.report_id)
 
     def test_public_passes_for_unpermissioned(self):
         request = RequestFactory().get("/")
@@ -89,9 +89,9 @@ class ReportAccessRequiredMixinTests(TestCase):
         user = baker.make(User)
         request.user = user
 
-        general = baker.make(General, is_public=True)
+        audit = baker.make(Audit, version=0, audit={"is_public": True})
 
-        self.ViewStub().dispatch(request, report_id=general.report_id)
+        self.ViewStub().dispatch(request, report_id=audit.report_id)
 
     def test_public_passes_for_permissioned(self):
         request = RequestFactory().get("/")
@@ -102,6 +102,6 @@ class ReportAccessRequiredMixinTests(TestCase):
         permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
         baker.make(UserPermission, user=user, email=user.email, permission=permission)
 
-        general = baker.make(General, is_public=True)
+        audit = baker.make(Audit, version=0, audit={"is_public": True})
 
-        self.ViewStub().dispatch(request, report_id=general.report_id)
+        self.ViewStub().dispatch(request, report_id=audit.report_id)

@@ -1,12 +1,13 @@
 from django.conf import settings
 from django.test import TestCase
-from audit.models import SingleAuditChecklist, SacValidationWaiver
 from census_historical_migration.invalid_record import InvalidRecord
+from .audit_validation_shape import audit_validation_shape
 from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
-from .sac_validation_shape import sac_validation_shape
 from .errors import err_duplicate_finding_reference
 from .utils import generate_random_integer
 from model_bakery import baker
+
+from ..models import Audit, AuditValidationWaiver
 
 
 class CheckFindingReferenceUniquenessTests(TestCase):
@@ -39,10 +40,7 @@ class CheckFindingReferenceUniquenessTests(TestCase):
                 )
 
         return {
-            "FindingsUniformGuidance": {
-                "auditee_uei": "ABB123456CCC",
-                "findings_uniform_guidance_entries": entries,
-            }
+            "findings_uniform_guidance": entries,
         }
 
     def test_no_duplicate_references(self):
@@ -50,12 +48,17 @@ class CheckFindingReferenceUniquenessTests(TestCase):
         Check that no error is returned when there are no duplicate reference numbers.
         """
         range_size = generate_random_integer(2, 4)
-        sac = baker.make(SingleAuditChecklist)
-        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
+        findings_uniform_guidance = self._make_findings_uniform_guidance(
             [self._award_reference() for _ in range(range_size)],
             [[self._reference_number(self.REF_MIN + i)] for i in range(range_size)],
         )
-        errors = check_finding_reference_uniqueness(sac_validation_shape(sac))
+        audit_data = {
+            **findings_uniform_guidance,
+        }
+
+        audit = baker.make(Audit, version=0, audit=audit_data)
+
+        errors = check_finding_reference_uniqueness(audit_validation_shape(audit))
         self.assertEqual(errors, [])
 
     def test_duplicate_references_for_award(self):
@@ -63,8 +66,7 @@ class CheckFindingReferenceUniquenessTests(TestCase):
         Check that errors are returned for awards with duplicate reference numbers.
         """
         range_size = generate_random_integer(2, 4)
-        sac = baker.make(SingleAuditChecklist)
-        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
+        findings_uniform_guidance = self._make_findings_uniform_guidance(
             [self._award_reference() for _ in range(range_size)],
             [
                 [
@@ -74,10 +76,14 @@ class CheckFindingReferenceUniquenessTests(TestCase):
                 ]
             ],
         )
-        errors = check_finding_reference_uniqueness(sac_validation_shape(sac))
-        for finding in sac.findings_uniform_guidance["FindingsUniformGuidance"][
-            "findings_uniform_guidance_entries"
-        ]:
+        audit_data = {
+            **findings_uniform_guidance,
+        }
+        audit = baker.make(Audit, version=0, audit=audit_data)
+
+        errors = check_finding_reference_uniqueness(audit_validation_shape(audit))
+
+        for finding in findings_uniform_guidance["findings_uniform_guidance"]:
             expected_error = {
                 "error": err_duplicate_finding_reference(
                     finding["program"]["award_reference"],
@@ -91,8 +97,7 @@ class CheckFindingReferenceUniquenessTests(TestCase):
         Check that errors are not returned for historical awards with duplicate reference numbers.
         """
         range_size = generate_random_integer(2, 4)
-        sac = baker.make(SingleAuditChecklist)
-        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
+        findings_uniform_guidance = self._make_findings_uniform_guidance(
             [self._award_reference() for _ in range(range_size)],
             [
                 [
@@ -102,11 +107,17 @@ class CheckFindingReferenceUniquenessTests(TestCase):
                 ]
             ],
         )
-        sac.data_source = settings.CENSUS_DATA_SOURCE
+        audit_data = {
+            **findings_uniform_guidance,
+        }
+        audit = baker.make(
+            Audit, version=0, data_source=settings.CENSUS_DATA_SOURCE, audit=audit_data
+        )
+
         InvalidRecord.reset()
         InvalidRecord.append_validations_to_skip("check_finding_reference_uniqueness")
 
-        errors = check_finding_reference_uniqueness(sac_validation_shape(sac))
+        errors = check_finding_reference_uniqueness(audit_validation_shape(audit))
         self.assertEqual(errors, [])
 
     def test_duplicate_finding_reference_numbers_with_waivers(self):
@@ -114,13 +125,7 @@ class CheckFindingReferenceUniquenessTests(TestCase):
         Check that errors are not returned for report with duplicate reference numbers when the validation is waived.
         """
         range_size = generate_random_integer(2, 4)
-        sac = baker.make(SingleAuditChecklist)
-        baker.make(
-            SacValidationWaiver,
-            report_id=sac,
-            waiver_types=[SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER],
-        )
-        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
+        findings_uniform_guidance = self._make_findings_uniform_guidance(
             [self._award_reference() for _ in range(range_size)],
             [
                 [
@@ -130,6 +135,17 @@ class CheckFindingReferenceUniquenessTests(TestCase):
                 ]
             ],
         )
-        sac.waiver_types = [SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER]
-        errors = check_finding_reference_uniqueness(sac_validation_shape(sac))
+        audit_data = {
+            **findings_uniform_guidance,
+            "waiver_types": [AuditValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER],
+        }
+        audit = baker.make(Audit, version=0, audit=audit_data)
+
+        baker.make(
+            AuditValidationWaiver,
+            report_id=audit,
+            waiver_types=[AuditValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER],
+        )
+
+        errors = check_finding_reference_uniqueness(audit_validation_shape(audit))
         self.assertEqual(errors, [])

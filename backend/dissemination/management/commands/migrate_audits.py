@@ -16,9 +16,11 @@
 #    - If you want to target ALL records, leave out the parameters.
 
 import logging
+import time
 
 from django.core.management.base import BaseCommand
-from django.db import connection
+from django.db import connection, transaction
+from django.db.models import QuerySet, Max
 
 from audit.intakelib.mapping_additional_eins import additional_eins_audit_view
 from audit.intakelib.mapping_additional_ueis import additional_ueis_audit_view
@@ -80,17 +82,39 @@ class Command(BaseCommand):
         total = _get_query(kwargs, None).count()
         count = 0
         logger.info(f"Found {total} records to parse through.")
-        logger.info(
-            f"Selected {queryset.count()} records for the first batch of migrations."
-        )
+        migration_user = get_or_create_sot_migration_user()
+        logger.info(f"Starting migration...")
+
         while queryset.count() != 0:
-            for sac in queryset:
+            t_migrate_sac = 0
+            t_update_flag = 0
+            t_get_batch = 0
+
+            self.t_audit = 0
+            self.t_create = 0
+            self.t_access = 0
+            self.t_indexes = 0
+            self.t_save = 0
+            self.t_history = 0
+            self.t_files = 0
+            self.t_waivers = 0
+
+            for sac in queryset.iterator():
                 try:
-                    self._migrate_sac(sac)
+                    t0 = time.monotonic()
+                    self._migrate_sac(
+                        self,
+                        migration_user,
+                        sac
+                    )
+                    t_migrate_sac += time.monotonic() - t0
+
+                    t0 = time.monotonic()
                     with connection.cursor() as cursor:
                         cursor.execute(
                             f"update audit_singleauditchecklist set migrated_to_audit = true where report_id = '{sac.report_id}'"
                         )
+                    t_update_flag += time.monotonic() - t0
                     count += 1
                 except Exception as e:
                     logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
@@ -98,40 +122,66 @@ class Command(BaseCommand):
             logger.info(
                 f"Migration progress... ({count} / {total}) ({(count / total) * 100}%)"
             )
+            t0 = time.monotonic()
+            del queryset
             queryset = _get_query(kwargs, BATCH_SIZE)
+            t_get_batch += time.monotonic() - t0
+            print(f" - Time to migrate batch of 100          - {t_migrate_sac}")
+            print(f"    - Audit info - {self.t_audit}")
+            print(f"    - Creation   - {self.t_create}")
+            print(f"    - Access     - {self.t_access}")
+            print(f"    - Indexes    - {self.t_indexes}")
+            print(f"    - Re-saving  - {self.t_save}")
+            print(f"    - History    - {self.t_history}")
+            print(f"    - Files      - {self.t_files}")
+            print(f"    - Waivers    - {self.t_waivers}")
+            print(f" - Time to mark batch of 100 as migrated - {t_update_flag}")
+            print(f" - Time to query next batch              - {t_get_batch}")
+
         logger.info("Completed audit migrations.")
 
     @staticmethod
-    def _migrate_sac(sac: SingleAuditChecklist):
-        audit_data = dict()
-        for idx, handler in enumerate(SAC_HANDLERS):
-            audit_data.update(handler(sac))
+    def _migrate_sac(
+        self,
+        migration_user: User,
+        sac: SingleAuditChecklist
+    ):
+        with transaction.atomic():
+            t1 = time.monotonic()
+            audit_data = dict()
+            for idx, handler in enumerate(SAC_HANDLERS):
+                audit_data.update(handler(sac))
 
-        # create the audit.
-        if not Audit.objects.filter(report_id=sac.report_id).exists():
+            # convert file information.
+            audit_data.update(_convert_file_information(sac))
+            self.t_audit += time.monotonic() - t1
+
+            # create the audit.
+            t1 = time.monotonic()
             audit = Audit.objects.create(
                 event_type="MIGRATION",
                 data_source=sac.data_source,
-                # FOR DEBUGGING
-                # Change the email to your local user (make sure you login once after app startup).
-                event_user=get_or_create_sot_migration_user(),
+                event_user=migration_user,
                 created_by=sac.submitted_by,
                 audit=audit_data,
                 report_id=sac.report_id,
-                submission_status=sac.submission_status,
-                audit_type=sac.audit_type,
+                event_data=audit.audit,
+                version=0,
+                updated_by_id=event["user__id"],
             )
 
             if sac.date_created:
                 audit.created_at = sac.date_created
+            self.t_create += time.monotonic() - t1
 
             # update Access models.
-            Access.objects.filter(sac__report_id=sac.report_id).update(audit=audit)
-            DeletedAccess.objects.filter(sac__report_id=sac.report_id).update(
-                audit=audit
-            )
+            t1 = time.monotonic()
+            Access.objects.filter(sac=sac).update(audit=audit)
+            DeletedAccess.objects.filter(sac=sac).update(audit=audit)
+            self.t_access += time.monotonic() - t1
 
             # convert additional fields.
+            t1 = time.monotonic()
             if sac.submission_status == STATUS.DISSEMINATED:
                 audit.audit.update(generate_audit_indexes(audit))
 
@@ -140,42 +190,68 @@ class Command(BaseCommand):
                 audit.oversight_agency = sac.oversight_agency
                 audit.audit["cognizant_agency"] = sac.cognizant_agency
                 audit.audit["oversight_agency"] = sac.oversight_agency
+            self.t_indexes += time.monotonic() - t1
 
+            t1 = time.monotonic()
             audit.save()
+            self.t_save += time.monotonic() - t1
 
             # copy SubmissionEvents into History records.
-            events = SubmissionEvent.objects.filter(sac=sac)
-            for event in events:
-                history = History.objects.create(
-                    event=event.event,
+            t1 = time.monotonic()
+            events = SubmissionEvent.objects.filter(sac=sac).values(
+                "event", "timestamp", "user__id"
+            )
+            histories = [
+                History(
+                    event=event["event"],
                     report_id=sac.report_id,
-                    event_data=audit.audit,
+                    event_data={},
                     version=0,
-                    updated_by=event.user,
+                    updated_by_id=event["user__id"],
                 )
-                history.updated_at = event.timestamp
-                history.save()
+                for event in events
+            ]
+            History.objects.bulk_create(histories, batch_size=25)
+
+            for history, event in zip(histories, events):
+                history.updated_at = event["timestamp"]
+
+            # Step 3: Bulk update
+            History.objects.bulk_update(histories, ["updated_at"])
+            self.t_history += time.monotonic() - t1
 
             # assign audit reference to file-based models.
+            t1 = time.monotonic()
             SingleAuditReportFile.objects.filter(sac=sac).update(audit=audit)
             ExcelFile.objects.filter(sac=sac).update(audit=audit)
+            self.t_files += time.monotonic() - t1
 
             # copy SacValidationWaivers.
-            if not AuditValidationWaiver.objects.filter(
-                report_id=sac.report_id
-            ).exists():
-                waivers = SacValidationWaiver.objects.filter(report_id=sac.report_id)
-                for waiver in waivers:
-                    AuditValidationWaiver.objects.create(
-                        report_id=sac.report_id,
-                        timestamp=waiver.timestamp,
-                        approver_email=waiver.approver_email,
-                        approver_name=waiver.approver_name,
-                        requester_email=waiver.requester_email,
-                        requester_name=waiver.requester_name,
-                        justification=waiver.justification,
-                        waiver_types=waiver.waiver_types,
-                    )
+            t1 = time.monotonic()
+            sac_waivers = SacValidationWaiver.objects.filter(report_id=sac.report_id).values(
+                "timestamp",
+                "approver_email",
+                "approver_name",
+                "requester_email",
+                "requester_name",
+                "justification",
+                "waiver_types",
+            )
+            audit_waivers = [
+                AuditValidationWaiver(
+                    report_id=audit,
+                    timestamp=waiver["timestamp"],
+                    approver_email=waiver["approver_email"],
+                    approver_name=waiver["approver_name"],
+                    requester_email=waiver["requester_email"],
+                    requester_name=waiver["requester_name"],
+                    justification=waiver["justification"],
+                    waiver_types=waiver["waiver_types"],
+                )
+                for waiver in sac_waivers
+            ]
+            AuditValidationWaiver.objects.bulk_create(audit_waivers)
+            self.t_waivers += time.monotonic() - t1
 
 
 def _get_query(kwargs, max_records):
@@ -195,6 +271,9 @@ def _get_query(kwargs, max_records):
     else:
         queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False)
 
+    # exclude SACs that have already migrated with an Audit.
+    queryset = queryset.exclude(report_id__in=Audit.objects.all().values("report_id"))
+
     # only return up to "max_records" if applied.
     if max_records:
         return queryset[:max_records]
@@ -203,21 +282,18 @@ def _get_query(kwargs, max_records):
 
 
 def _convert_file_information(sac: SingleAuditChecklist):
-    file = (
-        SingleAuditReportFile.objects.filter(filename=f"{sac.report_id}.pdf")
-        .order_by("date_created")
-        .first()
-    )
-    return (
-        {
-            "file_information": {
-                "pages": file.component_page_numbers,
-                "filename": file.filename,
+    try:
+        file = SingleAuditReportFile.objects.filter(sac=sac).latest("date_created")
+        return (
+            {
+                "file_information": {
+                    "pages": file.component_page_numbers,
+                    "filename": file.filename,
+                }
             }
-        }
-        if file is not None
-        else {}
-    )
+        )
+    except SingleAuditReportFile.DoesNotExist:
+        return {}
 
 
 def _convert_program_names(sac: SingleAuditChecklist):
@@ -321,7 +397,6 @@ SAC_HANDLERS = [
     lambda sac: {"oversight_agency": sac.oversight_agency},
     lambda sac: {"type_audit_code": "UG"},
     _convert_program_names,
-    _convert_file_information,
     _convert_month_year,
     _convert_passthrough,
     _convert_is_public,
@@ -333,14 +408,14 @@ def get_or_create_sot_migration_user():
     """Returns the default migration user"""
     user_email = "fac-sot-migration-auditee-official@fac.gsa.gov"
     user_name = "fac-sot-migration-auditee-official"
-    user = None
+    my_user = None
 
     users = User.objects.filter(email=user_email)
     if users:
-        user = users.first()
+        my_user = users.first()
     else:
         logger.info("Creating user %s %s", user_email, user_name)
-        user = User(username=user_name, email=user_email)
-        user.save()
+        my_user = User(username=user_name, email=user_email)
+        my_user.save()
 
-    return user
+    return my_user

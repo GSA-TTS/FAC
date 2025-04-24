@@ -68,7 +68,7 @@ class FileWrapper:
 
 class FederalAwardsValidatorTests(SimpleTestCase):
     """
-    We want to make sure that SingleAuditChecklist.federal_awards is going
+    We want to make sure that audit.audit.federal_awards is going
     through JSON Schema validation, but the full set of JSON Schema tests is in
     test_schemas.py
     """
