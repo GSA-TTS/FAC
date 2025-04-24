@@ -358,72 +358,89 @@ def _validate_json_fields(audit_instance, sac_instance, differences):
         sac_field_data = copy.deepcopy(getattr(sac_instance, field, None))
         audit_field_data = copy.deepcopy(audit_instance.audit.get(field))
 
-        # Ignore SAC fields that only contain metadata
-        if sac_field_data:
-            if field == "findings_text" and not sac_field_data.get(
-                "FindingsText", {}
-            ).get("findings_text_entries"):
-                sac_field_data = None
-            elif field == "corrective_action_plan" and not sac_field_data.get(
-                "CorrectiveActionPlan", {}
-            ).get("corrective_action_plan_entries"):
-                sac_field_data = None
+        sac_field_data = _check_sac_meta(sac_field_data, field)
 
-        if sac_field_data is not None and audit_field_data in [None, {}]:
-            differences.append(
-                {
-                    "field": field,
-                    "error": "Field is empty in Audit, but not in SAC",
-                    "sac_value": sac_field_data,
-                    "audit_value": None,
-                }
-            )
+        if _check_for_none(audit_field_data, sac_field_data, field, differences):
             continue
 
-        if sac_field_data is None and audit_field_data not in [None, {}]:
+        # We don't need the Meta section of the SAC data
+        if field in fields_with_meta:
+            sac_field_data = sac_field_data[fields_with_meta[field]]
+
+        # SACs sometimes have additional auditee_uei field
+        if "auditee_uei" in sac_field_data:
+            del sac_field_data["auditee_uei"]
+
+        # SOT gen_info has additional auditee_uei field
+        if field == "general_information" and "auditee_uei" in audit_field_data:
+            del audit_field_data["auditee_uei"]
+
+        # federal_awards -> awards key tweak for SAC data to match SOT
+        if field == "federal_awards":
+            sac_awards = sac_field_data.get("federal_awards", [])
+            sac_field_data = {
+                "total_amount_expended": sac_field_data["total_amount_expended"],
+            }
+            sac_field_data["awards"] = sac_awards
+
+        # Handle SACs that have the actual data in *_entries
+        if field == "findings_text":
+            sac_field_data = sac_field_data["findings_text_entries"]
+        elif field == "corrective_action_plan":
+            sac_field_data = sac_field_data["corrective_action_plan_entries"]
+
+        if sac_field_data != audit_field_data:
             differences.append(
                 {
                     "field": field,
-                    "error": "Field is empty in SAC, but not in Audit",
-                    "sac_value": None,
+                    "error": "Field JSON does not match",
+                    "sac_value": sac_field_data,
                     "audit_value": audit_field_data,
                 }
             )
-            continue
 
-        if sac_field_data is not None:
-            # We don't need the Meta section of the SAC data
-            if field in fields_with_meta:
-                sac_field_data = sac_field_data[fields_with_meta[field]]
 
-            # SACs sometimes have additional auditee_uei field
-            if "auditee_uei" in sac_field_data:
-                del sac_field_data["auditee_uei"]
+def _check_sac_meta(sac_field_data, field):
+    """Returns None if the SAC field only contains metadata"""
+    if sac_field_data:
+        if field == "findings_text" and not sac_field_data.get(
+            "FindingsText", {}
+        ).get("findings_text_entries"):
+            return None
+        elif field == "corrective_action_plan" and not sac_field_data.get(
+            "CorrectiveActionPlan", {}
+        ).get("corrective_action_plan_entries"):
+            return None
 
-            # SOT gen_info has additional auditee_uei field
-            if field == "general_information" and "auditee_uei" in audit_field_data:
-                del audit_field_data["auditee_uei"]
+    return sac_field_data
 
-            # federal_awards -> awards key tweak for SAC data to match SOT
-            if field == "federal_awards":
-                sac_awards = sac_field_data.get("federal_awards", [])
-                sac_field_data = {
-                    "total_amount_expended": sac_field_data["total_amount_expended"],
-                }
-                sac_field_data["awards"] = sac_awards
 
-            # Handle SACs that have the actual data in *_entries
-            if field == "findings_text":
-                sac_field_data = sac_field_data["findings_text_entries"]
-            elif field == "corrective_action_plan":
-                sac_field_data = sac_field_data["corrective_action_plan_entries"]
+def _check_for_none(audit_field_data, sac_field_data, field, differences):
+    """
+    Returns True if audit and SAC fields are None/empty or equal, and False
+    otherwise
+    """
+    if sac_field_data is not None and audit_field_data in [None, {}]:
+        differences.append(
+            {
+                "field": field,
+                "error": "Field is empty in Audit, but not in SAC",
+                "sac_value": sac_field_data,
+                "audit_value": None,
+            }
+        )
+        return True
+    elif sac_field_data is None and audit_field_data not in [None, {}]:
+        differences.append(
+            {
+                "field": field,
+                "error": "Field is empty in SAC, but not in Audit",
+                "sac_value": None,
+                "audit_value": audit_field_data,
+            }
+        )
+        return True
+    elif sac_field_data is None and audit_field_data in [None, {}]:
+        return True
 
-            if sac_field_data != audit_field_data:
-                differences.append(
-                    {
-                        "field": field,
-                        "error": "Field JSON does not match",
-                        "sac_value": sac_field_data,
-                        "audit_value": audit_field_data,
-                    }
-                )
+    return False
