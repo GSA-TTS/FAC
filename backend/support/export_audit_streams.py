@@ -1,4 +1,4 @@
-import FAC.backend.support.export_audit_sql_trial as export_audit_sql_trial
+import support.export_audit_sql as export_audit_sql
 from sling import ReplicationStream
 
 API_VERSION = "api_v1_1_0"
@@ -54,101 +54,101 @@ class StreamGenerator:
 
 STREAM_GENERATORS = [
     StreamGenerator(
-        query=export_audit_sql_trial.select_general_information,
+        query=export_audit_sql.select_general_information,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_additional_eins,
+        query=export_audit_sql.select_additional_eins,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_additional_ueis,
+        query=export_audit_sql.select_additional_ueis,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_corrective_action_plans,
+        query=export_audit_sql.select_corrective_action_plans,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_federal_awards,
+        query=export_audit_sql.select_federal_awards,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_findings,
+        query=export_audit_sql.select_findings,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_findings_text,
+        query=export_audit_sql.select_findings_text,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_notes_to_sefa,
+        query=export_audit_sql.select_notes_to_sefa,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_passthrough,
+        query=export_audit_sql.select_passthrough,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_secondary_auditors,
+        query=export_audit_sql.select_secondary_auditors,
     ),
 ]
 
 
 STREAM_GENERATORS_ALL = [
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_general_information,
+        query=export_audit_sql.select_all_general_information,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_additional_eins,
+        query=export_audit_sql.select_all_additional_eins,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_additional_ueis,
+        query=export_audit_sql.select_all_additional_ueis,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_corrective_action_plans,
+        query=export_audit_sql.select_all_corrective_action_plans,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_federal_awards,
+        query=export_audit_sql.select_all_federal_awards,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_findings,
+        query=export_audit_sql.select_all_findings,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_findings_text,
+        query=export_audit_sql.select_all_findings_text,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_notes_to_sefa,
+        query=export_audit_sql.select_all_notes_to_sefa,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_passthrough,
+        query=export_audit_sql.select_all_passthrough,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_all_secondary_auditors,
+        query=export_audit_sql.select_all_secondary_auditors,
     ),
 ]
 
 
 STREAM_GENERATORS_FEDERAL_YEAR = [
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_general_information,
+        query=export_audit_sql.select_fed_year_general_information,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_additional_eins,
+        query=export_audit_sql.select_fed_year_additional_eins,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_additional_ueis,
+        query=export_audit_sql.select_fed_year_additional_ueis,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_corrective_action_plans,
+        query=export_audit_sql.select_fed_year_corrective_action_plans,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_findings,
+        query=export_audit_sql.select_fed_year_findings,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_findings_text,
+        query=export_audit_sql.select_fed_year_findings_text,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_notes_to_sefa,
+        query=export_audit_sql.select_fed_year_notes_to_sefa,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_passthrough,
+        query=export_audit_sql.select_fed_year_passthrough,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_secondary_auditors,
+        query=export_audit_sql.select_fed_year_secondary_auditors,
     ),
     StreamGenerator(
-        query=export_audit_sql_trial.select_fed_year_federal_awards,
+        query=export_audit_sql.select_fed_year_federal_awards,
     ),
 ]
