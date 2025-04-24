@@ -29,7 +29,7 @@ FAC_DB_URL = (
 )
 DEFAULT_OPTIONS = {
     "source_options": {
-        "chunk_size": 25600,
+        "chunk_size": 100000,
     },
     "target_options": {
         "format": "csv",
