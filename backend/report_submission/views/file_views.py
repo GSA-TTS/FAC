@@ -61,7 +61,7 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
                 # handle it gracefully.
                 try:
                     audit = Audit.objects.get(report_id=report_id)
-                except:
+                except Audit.DoesNotExist:
                     audit = None
 
                 shaped_sac = sac_validation_shape(sac)
