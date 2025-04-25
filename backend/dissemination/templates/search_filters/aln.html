@@ -1,8 +1,12 @@
 {% comment %} ALN/CFDA {% endcomment %}
-<label for="aln">
-    <button type="button"
-            class="usa-accordion__button"
-            aria-expanded={% if form_user_input.aln %}"true"{% else %}"false"{% endif %}
-            aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
-</label>
-<textarea class="usa-textarea" id="aln" name="aln">{{form_user_input.aln}}</textarea>
+<div class="usa-accordion">
+    <label class="usa-accordion__heading" for="input_aln">
+        <button type="button"
+                class="usa-accordion__button"
+                aria-expanded={% if form_user_input.aln %}"true"{% else %}"false"{% endif %}
+                aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
+    </label>
+    <div id="aln">
+        <textarea class="usa-textarea" id="input_aln" name="aln">{{form_user_input.aln}}</textarea>
+    </div>
+</div>

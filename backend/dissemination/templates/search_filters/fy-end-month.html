@@ -7,6 +7,7 @@
     <div class="usa-memorable-date">
         <div class="usa-form-group usa-form-group--month usa-form-group--select">
             <label class="usa-label" for="fy_end_month">Month</label>
+            <span class="usa-error-message margin-top-1">{{ form.fy_end_month.errors|striptags }}</span>
             <select class="usa-select"
                     id="fy_end_month"
                     name="fy_end_month">
