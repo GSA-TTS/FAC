@@ -124,14 +124,19 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
     toplevelproperty = toplevel or camel_to_snake(name)
     mixinname = classname or f"{name}Mixin"
 
+    # 20250425 The `debug` statements used to be `warning`. However, this code has
+    # been in production for 22 months. We clearly are not troubled by the
+    # keys not being present; every time we marshal a General Info object into
+    # JSON, we will see this for some keys. So, we're going to make this quieter
+    # in production at this point.
     def _wrapper(key):
         def inner(self):
             try:
                 return getattr(self, toplevelproperty)[key]
             except KeyError:
-                logger.warning("Key %s not found in SAC", key)
+                logger.debug("Key %s not found in SAC", key)
             except TypeError:
-                logger.warning("Type error trying to get %s from SAC %s", key, self)
+                logger.debug("Type error trying to get %s from SAC %s", key, self)
             return None
 
         return inner
