@@ -134,9 +134,6 @@ STREAM_GENERATORS_FEDERAL_YEAR = [
         query=export_audit_sql.select_fed_year_corrective_action_plans,
     ),
     StreamGenerator(
-        query=export_audit_sql.select_fed_year_federal_awards,
-    ),
-    StreamGenerator(
         query=export_audit_sql.select_fed_year_findings,
     ),
     StreamGenerator(
@@ -150,5 +147,8 @@ STREAM_GENERATORS_FEDERAL_YEAR = [
     ),
     StreamGenerator(
         query=export_audit_sql.select_fed_year_secondary_auditors,
+    ),
+    StreamGenerator(
+        query=export_audit_sql.select_fed_year_federal_awards,
     ),
 ]
