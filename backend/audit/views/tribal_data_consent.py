@@ -20,6 +20,8 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: This does not yet use `audit` at all, and
+            # will need to be updated.
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             tribal_audit_consent = sac.tribal_data_consent or {}
 
@@ -41,6 +43,8 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: This does not yet use `audit` at all, and
+            # will need to be updated.
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             form = TribalAuditConsentForm(request.POST or None)
 
@@ -56,16 +60,14 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 logger.info("Tribal data consent saved.", tribal_data_consent)
 
                 # TODO: Update Post SOC Launch
-                # remove try/except once we are ready to deprecate SAC.
-                try:
-                    audit = Audit.objects.get(report_id=report_id)
+                audit = Audit.objects.find_audit_or_none(report_id=report_id)
+                if audit:
+                    # audit = Audit.objects.get(report_id=report_id)
                     audit.audit.update({"tribal_data_consent": tribal_data_consent})
                     audit.save(
                         event_user=request.user,
                         event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
                     )
-                except Audit.DoesNotExist:
-                    pass
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 

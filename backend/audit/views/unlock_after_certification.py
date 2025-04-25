@@ -40,6 +40,7 @@ class UnlockAfterCertificationView(
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: Needs to use `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             target_statuses = [
                 STATUS.READY_FOR_CERTIFICATION,
@@ -73,13 +74,16 @@ class UnlockAfterCertificationView(
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: Needs to use `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            audit = Audit.objects.find_audit_or_none(report_id=report_id)
+
             form = UnlockAfterCertificationForm(request.POST or None)
             acceptable = ("True", True)
             should_go_to_in_progress = (
                 form.data.get("unlock_after_certification") in acceptable
             )
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
+
             if form.is_valid() and should_go_to_in_progress:
                 if sac_transition(
                     request, sac, audit=audit, transition_to=STATUS.IN_PROGRESS

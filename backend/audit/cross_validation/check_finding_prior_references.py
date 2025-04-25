@@ -54,23 +54,29 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
     from audit.models import Audit
 
     report_id = sac_dict.get("sf_sac_meta", {}).get("report_id")
-    use_audit = Audit.objects.find_audit_or_none(report_id=report_id) is not None
+    audit = Audit.objects.find_audit_or_none(report_id=report_id)
+
     previous_findings_refs = None
-    if use_audit:
+    if audit:
         previous_findings_refs = _get_previous_findings(report_id, auditee_uei)
 
     # Get the report_ids for previous reports
     previous_report_ids = General.objects.filter(auditee_uei=auditee_uei).values_list(
         "report_id", flat=True
     )
+
+    # SOT TODO: We set audit_errors an errors by reference.
+    # Perhaps those could become returns? It's kinda opaque.
     errors = []
     audit_errors = []
+
     # Validate all prior reference numbers for each award
     for award_ref, prior_refs_strings in all_prior_refs.items():
         # Make sure we have no leading or trailing whitespace on
         # any of the refs.
         prior_refs = list(map(lambda s: s.strip(), prior_refs_strings.split(",")))
-        if use_audit:
+
+        if audit:
             _validate_prior_refs_audit(
                 prior_refs,
                 award_ref,
@@ -85,12 +91,15 @@ def check_finding_prior_references(sac_dict, *_args, **_kwargs):
             previous_report_ids,
             errors,
         )
-    if use_audit:
+
+    if audit:
         _compare_errors(audit_errors, errors)
 
     return errors
 
 
+# SOT TODO: We should, if possible, never embed SQL in strings in our application.
+# This should use the model. If we can't, we need to rethink this.
 def _get_previous_findings(report_id, auditee_uei):
     with connection.cursor() as cursor:
         cursor.execute(

@@ -50,9 +50,11 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
             # TODO: Update Post SOC Launch
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
             errors = sac.validate_full()
-            audit_errors = audit.validate() if audit else None
 
-            _compare_errors(errors, audit_errors)
+            if audit:
+                audit_errors = audit.validate()
+                _compare_errors(errors, audit_errors)
+
             if not errors:
                 sac_transition(
                     request,

@@ -134,15 +134,16 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 sar = None
 
             shaped_sac = sac_validation_shape(sac)
-
-            shaped_audit = audit_validation_shape(audit) if audit else None
-
             subcheck = submission_progress_check(shaped_sac, sar, crossval=False)
-            audit_subcheck = (
-                submission_progress_check(shaped_audit, sar, crossval=False)
-                if shaped_audit
-                else None
-            )
+
+            if audit:
+                shaped_audit = audit_validation_shape(audit)
+                audit_subcheck = submission_progress_check(
+                    shaped_audit, sar, crossval=False
+                )
+            else:
+                shaped_audit = None
+                audit_subcheck = None
 
             _compare_progress_check(subcheck, audit_subcheck)
             # Update with the view-specific info from SECTIONS_BASE:
