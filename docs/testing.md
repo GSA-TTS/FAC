@@ -63,7 +63,8 @@ act test --platform ubuntu-latest=lucasalt/act_base:latest
 ## Accessibility
 We use a combination of [Cypress](https://www.cypress.io/) and [Axe](https://www.deque.com/axe/) for accessibility (A11y) testing. 
 
-<!-- TODO: Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch. -->
+Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
+
 Accessibility tests currently cover the full submission pipeline, the access management pages, and the search pages.
 They should run in less than half a minute for baseline coverage.
 

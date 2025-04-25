@@ -55,17 +55,29 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
                     sac, additional_context[path_name]["DB_id"]
                 )
 
-                audit = Audit.objects.get(report_id=report_id)
-                shaped_sac = sac_validation_shape(sac)
-                shaped_audit = audit_validation_shape(audit)
+                # DANGER
+                # If this was created before SOT, we could be in a situation where there is a SAC
+                # but no SOT. So, we should *try* and do a `get()`, and if nothing is there,
+                # handle it gracefully.
+                try:
+                    audit = Audit.objects.get(report_id=report_id)
+                except Audit.DoesNotExist:
+                    audit = None
 
-                _compare_shapes(shaped_sac, shaped_audit)
+                shaped_sac = sac_validation_shape(sac)
+
+                if audit:
+                    shaped_audit = audit_validation_shape(audit)
+                    _compare_shapes(shaped_sac, shaped_audit)
+                else:
+                    logger.debug("A SOT does not yet exist for this SAC.\n")
 
                 completed_metadata = section_completed_metadata(shaped_sac, path_name)
                 completed_audit_audit = section_completed_metadata(
                     shaped_sac, path_name
                 )
 
+                # LESS DANGER
                 _compare_completed_metadata(completed_metadata, completed_audit_audit)
 
                 context["last_uploaded_by"] = completed_metadata[0]

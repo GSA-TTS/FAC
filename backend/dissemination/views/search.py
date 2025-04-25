@@ -1,19 +1,17 @@
+from datetime import date
 import logging
 import math
-
 import time
-from datetime import date
 
-from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
-from dissemination.forms import AdvancedSearchForm, SearchForm
-
-from dissemination.search import gather_errors
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
+from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
+from dissemination.forms import AdvancedSearchForm, SearchForm
+from dissemination.search import gather_errors
 from dissemination.searchlib.search_utils import (
     populate_cog_over_name,
     run_search,
@@ -62,48 +60,59 @@ class AdvancedSearch(View):
         time_starting_post = time.time()
 
         form = AdvancedSearchForm(request.POST)
+        advanced_search_flag = True
         paginator_results = None
         results_count = None
         page = 1
         results = []
-        errors = []
-        context = {}
+        context = {
+            "advanced_search_flag": advanced_search_flag,  # Render advanced search filters
+            "include_private": include_private_results(request),
+            "state_abbrevs": STATE_ABBREVS,
+            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+        }
 
         # Obtain cleaned form data.
-        form.is_valid()
+        form.is_valid()  # Runs default cleaning functions AND "clean_*" functions in forms.py
         form_data = form.cleaned_data
+        form_data["advanced_search_flag"] = advanced_search_flag
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
 
-        # build error list.
-        errors = gather_errors(form)
+        # The form contains an error list. Gather custom error messages for certain fields.
+        context["errors"] = gather_errors(form)
 
-        # Tells the backend we're running advanced search.
-        form_data["advanced_search_flag"] = True
+        # If the form failed to validate, don't search and return early with error messages.
+        if not form.is_valid():
+            return render(
+                request,
+                "search.html",
+                context
+                | {
+                    "form": form,
+                    "form_user_input": form_user_input,
+                },
+            )
 
         logger.info(f"Advanced searching on fields: {form_data}")
 
-        include_private = include_private_results(request)
-
         # Generate results on valid user input.
-        if form.is_valid():
-            results = run_search(form_data)
+        results = run_search(form_data)
+        results_count = results.count()
 
-            results_count = results.count()
+        # Reset page number to one if the value already surpasses the number of feasible pages.
+        page = form_data["page"]
+        ceiling = math.ceil(results_count / form_data["limit"])
+        if not page or page > ceiling or page < 1:
+            page = 1
 
-            # Reset page to one if the page number surpasses how many pages there actually are
-            page = form_data["page"]
-            ceiling = math.ceil(results_count / form_data["limit"])
-            if not page or page > ceiling or page < 1:
-                page = 1
+        logger.info(f"TOTAL: results_count: [{results_count}]")
 
-            logger.info(f"TOTAL: results_count: [{results_count}]")
-
-            # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
-            paginator = Paginator(object_list=results, per_page=form_data["limit"])
-            paginator_results = paginator.get_page(page)
-            paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
-                page, on_each_side=1
-            )
+        # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
+        paginator = Paginator(object_list=results, per_page=form_data["limit"])
+        paginator_results = paginator.get_page(page)
+        paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
+            page, on_each_side=1
+        )
 
         # Reformat dates for pre-populating the USWDS date-picker.
         if form_data.get("start_date"):
@@ -111,23 +120,19 @@ class AdvancedSearch(View):
         if form_data.get("end_date"):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
-        # populate the agency name in cog/over field
-        paginator_results = populate_cog_over_name(paginator_results)
+        # If there are results, populate the agency name in cog/over field
+        if results_count > 0:
+            paginator_results = populate_cog_over_name(paginator_results)
 
         context = context | {
-            "advanced_search_flag": True,
             "form_user_input": form_user_input,
             "form": form,
-            "errors": errors,
-            "include_private": include_private,
             "limit": form_data["limit"],
             "order_by": form_data["order_by"],
             "order_direction": form_data["order_direction"],
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
-            "state_abbrevs": STATE_ABBREVS,
-            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
         time_beginning_render = time.time()
         total_time_ms = int(
@@ -169,48 +174,59 @@ class Search(View):
         time_starting_post = time.time()
 
         form = SearchForm(request.POST)
+        advanced_search_flag = False
         paginator_results = None
         results_count = None
         page = 1
         results = []
-        errors = []
-        context = {}
+        context = {
+            "advanced_search_flag": advanced_search_flag,  # Render only basic search filters
+            "include_private": include_private_results(request),
+            "state_abbrevs": STATE_ABBREVS,
+            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+        }
 
         # Obtain cleaned form data.
-        form.is_valid()
+        form.is_valid()  # Runs default cleaning functions AND "clean_*" functions in forms.py
         form_data = form.cleaned_data
+        form_data["advanced_search_flag"] = advanced_search_flag
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
 
-        # build error list.
-        errors = gather_errors(form)
+        # The form contains an error list. Gather custom error messages for certain fields.
+        context["errors"] = gather_errors(form)
 
-        # Tells the backend we're running basic search.
-        form_data["advanced_search_flag"] = False
+        # If the form failed to validate, don't search and return early with error messages.
+        if not form.is_valid():
+            return render(
+                request,
+                "search.html",
+                context
+                | {
+                    "form": form,
+                    "form_user_input": form_user_input,
+                },
+            )
 
         logger.info(f"Searching on fields: {form_data}")
 
-        include_private = include_private_results(request)
-
         # Generate results on valid user input.
-        if form.is_valid():
-            results = run_search(form_data)
+        results = run_search(form_data)
+        results_count = results.count()
 
-            results_count = results.count()
+        # Reset page to one if the page number surpasses how many pages there actually are
+        page = form_data["page"]
+        ceiling = math.ceil(results_count / form_data["limit"])
+        if not page or page > ceiling or page < 1:
+            page = 1
 
-            # Reset page to one if the page number surpasses how many pages there actually are
-            page = form_data["page"]
-            ceiling = math.ceil(results_count / form_data["limit"])
-            if not page or page > ceiling or page < 1:
-                page = 1
+        logger.info(f"TOTAL: results_count: [{results_count}]")
 
-            logger.info(f"TOTAL: results_count: [{results_count}]")
-
-            # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
-            paginator = Paginator(object_list=results, per_page=form_data["limit"])
-            paginator_results = paginator.get_page(page)
-            paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
-                page, on_each_side=1
-            )
+        # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
+        paginator = Paginator(object_list=results, per_page=form_data["limit"])
+        paginator_results = paginator.get_page(page)
+        paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
+            page, on_each_side=1
+        )
 
         # Reformat dates for pre-populating the USWDS date-picker.
         if form_data.get("start_date"):
@@ -218,23 +234,19 @@ class Search(View):
         if form_data.get("end_date"):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
-        # populate the agency name in cog/over field
-        paginator_results = populate_cog_over_name(paginator_results)
+        # If there are results, populate the agency name in cog/over field
+        if results_count > 0:
+            paginator_results = populate_cog_over_name(paginator_results)
 
         context = context | {
-            "advanced_search_flag": False,
             "form_user_input": form_user_input,
             "form": form,
-            "errors": errors,
-            "include_private": include_private,
             "limit": form_data["limit"],
             "order_by": form_data["order_by"],
             "order_direction": form_data["order_direction"],
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
-            "state_abbrevs": STATE_ABBREVS,
-            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
         time_beginning_render = time.time()
         total_time_ms = int(
@@ -271,7 +283,7 @@ class AuditSearch(View):
             },
         )
 
-    @newrelic_timing_metric("search")
+    @newrelic_timing_metric("search-audit")
     def post(self, request, *args, **kwargs):
         """
         When accessing the search page through post, run a search and display the results.
@@ -279,43 +291,58 @@ class AuditSearch(View):
         time_starting_post = time.time()
 
         form = AdvancedSearchForm(request.POST)
+        advanced_search_flag = True
         paginator_results = None
         results_count = None
         page = 1
-        context = {}
+        context = {
+            "advanced_search_flag": advanced_search_flag,  # Render advanced search filters
+            "include_private": include_private_results(request),
+            "state_abbrevs": STATE_ABBREVS,
+            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+        }
 
         # Obtain cleaned form data.
-        form.is_valid()
+        form.is_valid()  # Runs default cleaning functions AND "clean_*" functions in forms.py
         form_data = form.cleaned_data
+        form_data["advanced_search_flag"] = advanced_search_flag
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
 
-        # build error list.
-        errors = gather_errors(form)
+        # The form contains an error list. Gather custom error messages for certain fields.
+        context["errors"] = gather_errors(form)
+
+        # If the form failed to validate, don't search and return early with error messages.
+        if not form.is_valid():
+            return render(
+                request,
+                "search.html",
+                context
+                | {
+                    "form": form,
+                    "form_user_input": form_user_input,
+                },
+            )
 
         logger.info(f"Searching on fields: {form_data}")
 
-        include_private = include_private_results(request)
-
         # Generate results on valid user input.
-        if form.is_valid():
-            results = run_search(form_data, True)
+        results = run_search(form_data, True)
+        results_count = results.count()
 
-            results_count = results.count()
+        # Reset page to one if the page number surpasses how many pages there actually are
+        page = form_data["page"]
+        ceiling = math.ceil(results_count / form_data["limit"])
+        if not page or page > ceiling or page < 1:
+            page = 1
 
-            # Reset page to one if the page number surpasses how many pages there actually are
-            page = form_data["page"]
-            ceiling = math.ceil(results_count / form_data["limit"])
-            if not page or page > ceiling or page < 1:
-                page = 1
+        logger.info(f"TOTAL: results_count: [{results_count}]")
 
-            logger.info(f"TOTAL: results_count: [{results_count}]")
-
-            # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
-            paginator = Paginator(object_list=results, per_page=form_data["limit"])
-            paginator_results = paginator.get_page(page)
-            paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
-                page, on_each_side=1
-            )
+        # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
+        paginator = Paginator(object_list=results, per_page=form_data["limit"])
+        paginator_results = paginator.get_page(page)
+        paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
+            page, on_each_side=1
+        )
 
         # Reformat dates for pre-populating the USWDS date-picker.
         if form_data.get("start_date"):
@@ -324,21 +351,18 @@ class AuditSearch(View):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         # populate the agency name in cog/over field
-        paginator_results = audit_populate_cog_over_name(paginator_results)
+        if results_count > 0:
+            paginator_results = audit_populate_cog_over_name(paginator_results)
 
         context = context | {
             "form_user_input": form_user_input,
             "form": form,
-            "errors": errors,
-            "include_private": include_private,
             "limit": form_data["limit"],
             "order_by": form_data["order_by"],
             "order_direction": form_data["order_direction"],
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
-            "state_abbrevs": STATE_ABBREVS,
-            "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
         time_beginning_render = time.time()
         total_time_ms = int(

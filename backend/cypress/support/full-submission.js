@@ -17,7 +17,8 @@ import {
   testWorkbookCorrectiveActionPlan,
   testWorkbookAdditionalUEIs,
   testWorkbookSecondaryAuditors,
-  testWorkbookAdditionalEINs
+  testWorkbookAdditionalEINs,
+  testWorkbookDownloadLinkExists
 } from './workbook-uploads.js';
 
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
@@ -36,30 +37,38 @@ export function testFullSubmission(isTribal, isPublic) {
   // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
   cy.get(".usa-link").contains("Federal Awards").click();
   testWorkbookFederalAwards(false);
+  testWorkbookDownloadLinkExists("Federal Awards")
 
   cy.get(".usa-link").contains("Notes to SEFA").click();
   testWorkbookNotesToSEFA(false);
+  testWorkbookDownloadLinkExists("Notes to SEFA")
 
   cy.get(".usa-link").contains("Audit report PDF").click();
   testPdfAuditReport(false);
 
   cy.get(".usa-link").contains("Federal Awards Audit Findings").click();
   testWorkbookFindingsUniformGuidance(false);
+  testWorkbookDownloadLinkExists("Federal Awards Audit Findings")
 
   cy.get(".usa-link").contains("Federal Awards Audit Findings Text").click();
   testWorkbookFindingsText(false);
+  testWorkbookDownloadLinkExists("Federal Awards Audit Findings Text")
 
   cy.get(".usa-link").contains("Corrective Action Plan").click();
   testWorkbookCorrectiveActionPlan(false);
+  testWorkbookDownloadLinkExists("Corrective Action Plan")
 
   cy.get(".usa-link").contains("Additional UEIs").click();
   testWorkbookAdditionalUEIs(false);
+  testWorkbookDownloadLinkExists("Additional UEIs")
 
   cy.get(".usa-link").contains("Secondary Auditors").click();
   testWorkbookSecondaryAuditors(false);
+  testWorkbookDownloadLinkExists("Secondary Auditors")
 
   cy.get(".usa-link").contains("Additional EINs").click();
   testWorkbookAdditionalEINs(false);
+  testWorkbookDownloadLinkExists("Additional EINs")
 
   if (isTribal) {
     cy.url().then(url => {
