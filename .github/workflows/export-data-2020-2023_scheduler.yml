@@ -1,0 +1,20 @@
+---
+name: Export Audit Data to CSV Scheduler for 2020 through 2023
+on:
+  schedule:
+    # Staging, Prod 11 PM UTC on the 2nd of every month
+    - cron: '0 23 2 * *'
+
+jobs:
+  scheduled-data-export-2020-2023:
+    strategy:
+      fail-fast: false
+      matrix:
+        environment:
+          - name: staging
+          - name: production
+    name: Run bulk data export
+    uses: ./.github/workflows/export-data-2020-2023-to-csv-scheduled.yml
+    secrets: inherit
+    with:
+      environment: ${{ matrix.environment.name }}

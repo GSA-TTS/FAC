@@ -1,0 +1,31 @@
+---
+name: Export Audit Data to CSV for 2024 through 2026
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: The environment the workflow should run on.
+
+jobs:
+  scheduled-data-export-2024-2026:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        years: ["2024","2025","2026"]
+    name: Run bulk data export on ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Run bulk data export
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 4G -m 6G --name export_data_2024_2026_to_csv_scheduled --command "python manage.py export_data_audit --year ${{ matrix.years }}" --wait
