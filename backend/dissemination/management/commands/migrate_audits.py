@@ -47,7 +47,7 @@ from audit.models import (
     User,
 )
 from audit.models.history import History
-from audit.models.constants import STATUS
+from audit.models.constants import EventType
 from audit.models.utils import (
     generate_audit_indexes,
     convert_utc_to_american_samoa_zone,
@@ -153,7 +153,7 @@ class Command(BaseCommand):
             # create the audit.
             t1 = time.monotonic()
             audit = Audit.objects.create(
-                event_type=STATUS.SOURCE_OF_TRUTH_MIGRATION,
+                event_type=EventType.SOURCE_OF_TRUTH_MIGRATION,
                 data_source=sac.data_source,
                 event_user=migration_user,
                 created_by=sac.submitted_by,

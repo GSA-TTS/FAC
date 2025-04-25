@@ -55,7 +55,7 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
                     sac, additional_context[path_name]["DB_id"]
                 )
 
-                audit = Audit.objects.find_or_none(report_id=report_id)
+                audit = Audit.objects.get(report_id=report_id)
                 shaped_sac = sac_validation_shape(sac)
                 shaped_audit = audit_validation_shape(audit)
 
@@ -70,7 +70,6 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
 
                 context["last_uploaded_by"] = completed_metadata[0]
                 context["last_uploaded_at"] = completed_metadata[1]
-
             except Exception:
                 context["already_submitted"] = None
 
