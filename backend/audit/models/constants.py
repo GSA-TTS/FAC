@@ -135,7 +135,7 @@ EVENT_TYPES = (
         _("Flagged submission for removal"),
     ),
     (EventType.CANCEL_REMOVAL_FLAG, _("Cancel removal flag")),
-    (EventType.SOURCE_OF_TRUTH_MIGRATION, _("Source of Truth Migration"))
+    (EventType.SOURCE_OF_TRUTH_MIGRATION, _("Source of Truth Migration")),
 )
 
 
