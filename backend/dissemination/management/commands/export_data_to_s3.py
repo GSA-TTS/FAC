@@ -49,26 +49,30 @@ from config import settings
 
 logger = logging.getLogger(__name__)
 
-Table = NT("Table", "name is_suppressed")
-TABLES = [
-    Table("general", False),
-    Table("federal_awards", False),
-    Table("findings", False),
-    Table("findings_text", True),
-    Table("corrective_action_plans", True),
-    Table("passthrough", False),
-    Table("notes_to_sefa", True),
-    Table("additional_eins", False),
-    Table("additional_ueis", False),
-    Table("secondary_auditors", False),
-]
+Table = NT("Table", "name is_suppressed source")
 
 API_VERSION = "api_v1_1_0"
-
 CURRENT_YEAR = datetime.now().year
 NEXT_YEAR = datetime.now().year + 1
 FLAGS_INVALID = True
 FLAGS_VALID = False
+SOURCE_API = 0
+SOURCE_INTERNAL = 1
+
+TABLES = [
+    Table("general", False, SOURCE_API),
+    Table("federal_awards", False, SOURCE_API),
+    Table("findings", False, SOURCE_API),
+    Table("findings_text", True, SOURCE_API),
+    Table("corrective_action_plans", True, SOURCE_API),
+    Table("passthrough", False, SOURCE_API),
+    Table("notes_to_sefa", True, SOURCE_API),
+    Table("additional_eins", False, SOURCE_API),
+    Table("additional_ueis", False, SOURCE_API),
+    Table("secondary_auditors", False, SOURCE_API),
+    Table("migrationinspectionrecord", True, SOURCE_INTERNAL),
+    Table("invalidauditrecord", True, SOURCE_INTERNAL),
+]
 
 
 def get_conn_string():
@@ -115,32 +119,67 @@ def uploadFileS3(client, bucket, key, file):
     )
 
 
-def dump_table(dir, table, year, year_type, chunksize):
-    # Always try and make the destination directory
-    # The param exists_ok will prevent errors
-    FILEPATH = Path(dir) / f"{table.name}.csv"
-    if year_type == "ay":
-        where_clause = f"WHERE audit_year = '{year}'"
-    elif year_type == "ffy":
-        where_clause = " ".join(
-            [
-                " WHERE report_id IN "
-                f" (select report_id from {API_VERSION}.general "
-                f" WHERE fac_accepted_date >= '{year-1}-10-01'::DATE "
-                f" AND fac_accepted_date <= '{year}-09-30'::DATE) "
-            ]
-        )
-
-    query = " ".join([f"SELECT * from {API_VERSION}.{table.name} ", where_clause])
-
-    logger.info(query)
-
+def run_query(FILEPATH, query, chunksize):
     engine = get_sqlalchemy_engine()
     header = True
+    logger.info(query)
     for df in pd.read_sql(query, engine, chunksize=chunksize):
         df.to_csv(FILEPATH, mode="a", header=header, index=False)
         # Only drop the header on the first chunk.
         header = False
+
+
+def dump_api_table(dir, table, year, year_type, chunksize):
+    # Always try and make the destination directory
+    # The param exists_ok will prevent errors
+    FILEPATH = Path(dir) / f"{table.name}.csv"
+    if year_type == "ay":
+        where_clause = " ".join(
+            [
+                " WHERE report_id IN ",
+                f" (select report_id from {API_VERSION}.general ",
+                f" WHERE audit_year = '{year}' ",
+                f" AND is_public=true " if table.is_suppressed else "",
+                ")",
+            ]
+        )
+    elif year_type == "ffy":
+        where_clause = " ".join(
+            [
+                " WHERE report_id IN ",
+                f" (select report_id from {API_VERSION}.general ",
+                f" WHERE fac_accepted_date >= '{year-1}-10-01'::DATE ",
+                f" AND fac_accepted_date <= '{year}-09-30'::DATE ",
+                f" AND is_public=true " if table.is_suppressed else "",
+                ")",
+            ]
+        )
+    query = " ".join([f"SELECT * from {API_VERSION}.{table.name} ", where_clause])
+    run_query(FILEPATH, query, chunksize)
+
+
+def dump_internal_table(dir, table, year, year_type, chunksize):
+    FILEPATH = Path(dir) / f"{table.name}.csv"
+    if year_type == "ay":
+        where_clause = " ".join(
+            [
+                " WHERE report_id IN ",
+                f" (select report_id from {API_VERSION}.general ",
+                f" WHERE audit_year = '{year}' ",
+                f" AND is_public=true " if table.is_suppressed else "",
+                ")",
+            ]
+        )
+    elif year_type == "ffy":
+        where_clause = None
+
+    # Don't bother running the FFY for migration tables.
+    # We just need them in some form, not both.
+    if where_clause:
+        query = " ".join(
+            [f"SELECT * from public.dissemination_{table.name} ", where_clause]
+        )
+        run_query(FILEPATH, query, chunksize)
 
 
 def sling_tables(bucket, key, year, year_types, chunksize):
@@ -165,7 +204,11 @@ def sling_tables(bucket, key, year, year_types, chunksize):
         # where each directory contains all the tables\
         try:
             for table in TABLES:
-                dump_table(DIRECTORY, table, year, year_type, chunksize)
+                if table.source == SOURCE_API:
+                    dump_api_table(DIRECTORY, table, year, year_type, chunksize)
+                elif table.source == SOURCE_INTERNAL and year < 2023:
+                    # Migration tables only exist before 2023.
+                    dump_internal_table(DIRECTORY, table, year, year_type, chunksize)
             # Now, compress that directory
             shutil.make_archive(ZIPNAME, "zip", DIRECTORY)
             # Remove the original directory
@@ -248,7 +291,7 @@ class Command(BaseCommand):
                 year_types.append("ffy")
 
         start = time.time()
-        for year in years:
+        for year in reversed(years):
             sling_tables(
                 flags["bucket"],
                 flags["path"],
