@@ -221,14 +221,16 @@ class Command(BaseCommand):
                 # Extract updated_at values separately
                 updated_at_map = [h.updated_at for h in extra_histories]
 
-                # Step 1: Temporarily reset updated_at (so it's overwritten later)
                 for h in extra_histories:
                     h.updated_at = None
+
                 History.objects.bulk_create(extra_histories, batch_size=25)
-                # Step 3: Re-assign updated_at and bulk update
+
                 for h, new_time in zip(extra_histories, updated_at_map):
                     h.updated_at = new_time
+
                 History.objects.bulk_update(extra_histories, ["updated_at"])
+
             self.t_history += time.monotonic() - t1
 
             # assign audit reference to file-based models.
@@ -450,13 +452,7 @@ def create_history_objects(
 
     transitions = []
     for name, date_val in zip(transition_name, transition_date):
-        if isinstance(date_val, str):
-            try:
-                dt = datetime.strptime(date_val.split(".")[0], "%Y-%m-%d %H:%M:%S%z")
-            except ValueError:
-                dt = datetime.strptime(date_val, "%Y-%m-%d %H:%M:%S%z")
-        else:
-            dt = date_val
+        dt = date_val
         transitions.append((name, dt))
 
     # Only grab the most recent transition per status
