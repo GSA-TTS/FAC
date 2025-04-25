@@ -82,7 +82,7 @@ create view api_v1_2_0.findings_text as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         ft_elem->>'reference_number' as finding_ref_number,
         ft_elem->>'contains_chart_or_table' as contains_chart_or_table,
         ft_elem->>'text_of_finding' as finding_text
@@ -104,7 +104,7 @@ create view api_v1_2_0.additional_ueis as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         uei_elem as additional_uei
     from
         audit_audit as a
@@ -121,7 +121,7 @@ create view api_v1_2_0.findings as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         f_elem->'program'->>'award_reference' as award_reference,
         f_elem->'findings'->>'reference_number' as reference_number,
         f_elem->'material_weakness' as is_material_weakness,
@@ -147,7 +147,7 @@ create view api_v1_2_0.federal_awards as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         fa_elem->>'award_reference' as award_reference,
         fa_elem->'program'->>'federal_agency_prefix' as federal_agency_prefix,
         fa_elem->'program'->>'three_digit_extension' as federal_award_extension,
@@ -181,7 +181,7 @@ create view api_v1_2_0.corrective_action_plans as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         cap_elem->>'reference_number' as finding_ref_number,
         cap_elem->>'contains_chart_or_table' as contains_chart_or_table,
         cap_elem->>'planned_action' as planned_action
@@ -203,7 +203,7 @@ create view api_v1_2_0.notes_to_sefa as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         coalesce(notes.note->>'note_title','') as title,
         a.audit->'notes_to_sefa'->>'accounting_policies' as accounting_policies,
         a.audit->'notes_to_sefa'->>'is_minimis_rate_used' as is_minimis_rate_used,
@@ -232,7 +232,7 @@ create view api_v1_2_0.passthrough as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         fa_elem->>'award_reference' as award_reference,
         pass_elem->>'passthrough_identifying_number' as passthrough_id,
         pass_elem->>'passthrough_name' as passthrough_name
@@ -250,7 +250,7 @@ create view api_v1_2_0.general as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         -- auditee
         coalesce(a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_name','') as auditee_certify_name,
         coalesce(a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_title','') as auditee_certify_title,
@@ -309,7 +309,7 @@ create view api_v1_2_0.general as
         yesnogsamigration(a.audit->'audit_information'->>'is_internal_control_deficiency_disclosed') as is_internal_control_deficiency_disclosed,
         yesnogsamigration(a.audit->'audit_information'->>'is_internal_control_material_weakness_disclosed') as is_internal_control_material_weakness_disclosed,
         yesnogsamigration(a.audit->'audit_information'->>'is_material_noncompliance_disclosed') as is_material_noncompliance_disclosed,
-        a.audit->'audit_information'->'dollar_threshold' as dollar_threshold,
+        (a.audit->'audit_information'->'dollar_threshold')::bigint  as dollar_threshold,
         yesnogsamigration(a.audit->'audit_information'->>'is_low_risk_auditee') as is_low_risk_auditee,
         coalesce(jsonb_array_to_string(a.audit->'audit_information'->'agencies'),'') as agencies_with_prior_findings,
         a.audit->'general_information'->>'user_provided_organization_type' as entity_type,
@@ -350,7 +350,7 @@ create view api_v1_2_0.secondary_auditors as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         sa_elem->>'secondary_auditor_ein' as auditor_ein,
         sa_elem->>'secondary_auditor_name' as auditor_name,
         sa_elem->>'secondary_auditor_contact_name' as contact_name,
@@ -376,7 +376,7 @@ create view api_v1_2_0.additional_eins as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         ein_elem as additional_ein
     from
         audit_audit as a

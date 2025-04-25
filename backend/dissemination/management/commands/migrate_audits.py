@@ -47,7 +47,7 @@ from audit.models import (
     User,
 )
 from audit.models.history import History
-from audit.models.constants import EventType
+from audit.models.constants import STATUS, EventType
 from audit.models.utils import (
     generate_audit_indexes,
     convert_utc_to_american_samoa_zone,
