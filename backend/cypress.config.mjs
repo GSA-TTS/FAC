@@ -14,5 +14,6 @@ export default defineConfig({
     excludeSpecPattern: ['*/*/**/sf-sac-general-info.cy.js', '*/*/**/display-submissions.cy.js'],
     video: false,
     screenshotOnRunFailure: true,
+    redirectionLimit: 30,
   }
 });
