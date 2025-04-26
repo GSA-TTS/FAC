@@ -22,7 +22,7 @@
 # We can put that in any bucket and root we want. A production usage might
 # look like:
 #
-# fac export_data_to_s3 --bucket fac-private-s3 --path public-data
+# python manage.py export_data_to_s3 --bucket fac-private-s3 --path public-data/gsa
 #
 # and a local usage might look like
 #
