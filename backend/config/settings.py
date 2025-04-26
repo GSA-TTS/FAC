@@ -290,24 +290,6 @@ if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTI
     DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
     DBBACKUP_STORAGE_OPTIONS = {"location": BASE_DIR / "backup"}
 
-    # used for psycopg2 cursor connection
-    CONNECTION_STRING = "dbname='{}' user='{}' port='{}' host='{}'".format(
-        "postgres",
-        "postgres",
-        "5432",
-        "db",
-        "",
-    )
-
-    # Necessary for when working with pandas
-    SQLALCHEMY_CONNECTION_STRING = "postgresql+psycopg2://{}@{}:{}/{}".format(
-        "postgres",
-        "db",
-        5432,
-        "postgres",
-    )
-
-
 else:
     # One of the Cloud.gov environments
     STORAGES = {
@@ -439,16 +421,6 @@ else:
             rds_creds["password"],
         )
     )
-
-    # Necessary for when working with pandas
-    SQLALCHEMY_CONNECTION_STRING = "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
-        rds_creds["username"],
-        rds_creds["password"],
-        rds_creds["host"],
-        rds_creds["port"],
-        rds_creds["db_name"],
-    )
-
     # Will not be enabled in cloud environments
     DISABLE_AUTH = False
 

@@ -41,10 +41,14 @@ from collections import namedtuple as NT
 from datetime import datetime
 from sqlalchemy import create_engine
 import time
+from config.vcap import GET, FIND, get_vcap_services
+import os
+import sys
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from config import settings
+
+# from config import settings
 
 
 logger = logging.getLogger(__name__)
@@ -70,13 +74,35 @@ TABLES = [
     Table("additional_eins", False, SOURCE_API),
     Table("additional_ueis", False, SOURCE_API),
     Table("secondary_auditors", False, SOURCE_API),
+]
+
+MIGRATION_TABLES = [
     Table("migrationinspectionrecord", True, SOURCE_INTERNAL),
     Table("invalidauditrecord", True, SOURCE_INTERNAL),
 ]
 
 
 def get_conn_string():
-    return settings.SQLALCHEMY_CONNECTION_STRING
+    if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
+        creds = get_vcap_services(
+            [GET("aws-rds"), FIND("name", "fac-db"), GET("credentials")]
+        )
+        conn_string = "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
+            creds["username"],
+            creds["password"],
+            creds["host"],
+            creds["port"],
+            creds["db_name"],
+        )
+    else:  # LOCAL or TESTING
+        conn_string = "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
+            "postgres",
+            "",
+            "db",
+            5432,
+            "postgres",
+        )
+    return conn_string
 
 
 def get_sqlalchemy_engine():
@@ -92,19 +118,41 @@ def destination_key(key, file):
         return key + "/" + file
 
 
-def get_s3_client():
+def get_s3_client(bucket):
+    if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
+        creds = get_vcap_services([GET("s3"), FIND("name", bucket), GET("credentials")])
+    else:
+        creds = {
+            "region": settings.AWS_S3_PRIVATE_REGION_NAME,
+            "access_key_id": settings.AWS_PRIVATE_ACCESS_KEY_ID,
+            "secret_access_key": settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
+            "endpoint": settings.AWS_S3_PRIVATE_ENDPOINT,
+        }
+
     s3 = boto3.client(
         service_name="s3",
-        region_name=settings.AWS_S3_PRIVATE_REGION_NAME,
-        aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
-        endpoint_url=settings.AWS_S3_PRIVATE_INTERNAL_ENDPOINT,
+        region_name=creds["region"],
+        aws_access_key_id=creds["access_key_id"],
+        aws_secret_access_key=creds["secret_access_key"],
         config=Config(signature_version="s3v4"),
     )
     return s3
 
 
 def uploadFileS3(client, bucket, key, file):
+    if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
+        creds = get_vcap_services([GET("s3"), FIND("name", bucket), GET("credentials")])
+        # We have to unset the proxy for S3 operations.
+        os.environ["https_proxy"] = ""
+    else:
+        creds = {
+            "region": settings.AWS_S3_PRIVATE_REGION_NAME,
+            "access_key_id": settings.AWS_PRIVATE_ACCESS_KEY_ID,
+            "secret_access_key": settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
+            "endpoint": settings.AWS_S3_PRIVATE_ENDPOINT,
+            "bucket": bucket,
+        }
+
     config = TransferConfig(
         multipart_threshold=1024 * 25,
         max_concurrency=10,
@@ -113,7 +161,7 @@ def uploadFileS3(client, bucket, key, file):
     )
     client.upload_file(
         file,
-        bucket,
+        creds["bucket"],
         destination_key(key, file),
         Config=config,
     )
@@ -159,8 +207,8 @@ def dump_api_table(dir, table, year, year_type, chunksize):
 
 
 def dump_internal_table(dir, table, year, year_type, chunksize):
-    FILEPATH = Path(dir) / f"{table.name}.csv"
     if year_type == "ay":
+        FILEPATH = Path(dir) / f"{table.name}.csv"
         where_clause = " ".join(
             [
                 " WHERE report_id IN ",
@@ -170,20 +218,14 @@ def dump_internal_table(dir, table, year, year_type, chunksize):
                 ")",
             ]
         )
-    elif year_type == "ffy":
-        where_clause = None
-
-    # Don't bother running the FFY for migration tables.
-    # We just need them in some form, not both.
-    if where_clause:
         query = " ".join(
             [f"SELECT * from public.dissemination_{table.name} ", where_clause]
         )
         run_query(FILEPATH, query, chunksize)
 
 
-def sling_tables(bucket, key, year, year_types, chunksize):
-    s3 = get_s3_client()
+def sling_tables(bucket, tables, key, year, year_types, chunksize):
+    s3 = get_s3_client(bucket)
 
     # Given a year type ("`ay" or "fy")
     # I want to dump all the tables and compress them.
@@ -193,6 +235,8 @@ def sling_tables(bucket, key, year, year_types, chunksize):
             dest_key = destination_key(key, "fiscal-year/")
         elif year_type == "ay":
             dest_key = destination_key(key, "audit-year/")
+        elif year_type == "migration":
+            dest_key = destination_key(key, "migration/")
 
         DIRECTORY = f"fac-{year}-{year_type}"
         makedirs(DIRECTORY, exist_ok=True)
@@ -202,22 +246,32 @@ def sling_tables(bucket, key, year, year_types, chunksize):
 
         # This will create one directory per year
         # where each directory contains all the tables\
-        try:
-            for table in TABLES:
-                if table.source == SOURCE_API:
+        for table in tables:
+            if table.source == SOURCE_API:
+                try:
                     dump_api_table(DIRECTORY, table, year, year_type, chunksize)
-                elif table.source == SOURCE_INTERNAL and year < 2023:
-                    # Migration tables only exist before 2023.
+                except Exception as e:
+                    logger.error("failed to dump and upload API tables")
+                    logger.error(e)
+                    sys.exit(-1)
+            elif table.source == SOURCE_INTERNAL and year < 2023:
+                # Migration tables only exist before 2023.
+                try:
                     dump_internal_table(DIRECTORY, table, year, year_type, chunksize)
-            # Now, compress that directory
-            shutil.make_archive(ZIPNAME, "zip", DIRECTORY)
-            # Remove the original directory
-            # Copy things to S3
+                except Exception as e:
+                    logger.error("failed to dump and upload internal/migration tables")
+                    logger.error(e)
+                    sys.exit(-1)
+        # Now, compress that directory
+        shutil.make_archive(ZIPNAME, "zip", DIRECTORY)
+        # Remove the original directory
+        # Copy things to S3
+        try:
             uploadFileS3(s3, bucket, dest_key, f"{ZIPNAME}.zip")
         except Exception as e:
-            logger.error("failed to dump and upload tables")
+            logger.error("failed to upload to S3")
             logger.error(e)
-            pass
+            sys.exit(-1)
 
         # Always cleanup, even if we threw an exception
         shutil.rmtree(DIRECTORY)
@@ -294,9 +348,18 @@ class Command(BaseCommand):
         for year in reversed(years):
             sling_tables(
                 flags["bucket"],
+                TABLES,
                 flags["path"],
                 year=year,
                 year_types=year_types,
+                chunksize=flags["chunksize"],
+            )
+            sling_tables(
+                flags["bucket"],
+                MIGRATION_TABLES,
+                flags["path"],
+                year=year,
+                year_types=["migration"],
                 chunksize=flags["chunksize"],
             )
         logger.info(f"CSV dump elapsed time: {time.time() - start}s")
