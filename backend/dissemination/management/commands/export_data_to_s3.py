@@ -121,6 +121,8 @@ def destination_key(key, file):
 def get_s3_client(bucket):
     if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
         creds = get_vcap_services([GET("s3"), FIND("name", bucket), GET("credentials")])
+        # We have to unset the proxy for S3 operations.
+        os.environ["https_proxy"] = ""
     else:
         creds = {
             "region": settings.AWS_S3_PRIVATE_REGION_NAME,
@@ -142,8 +144,6 @@ def get_s3_client(bucket):
 def uploadFileS3(client, bucket, key, file):
     if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
         creds = get_vcap_services([GET("s3"), FIND("name", bucket), GET("credentials")])
-        # We have to unset the proxy for S3 operations.
-        os.environ["https_proxy"] = ""
     else:
         creds = {
             "region": settings.AWS_S3_PRIVATE_REGION_NAME,
