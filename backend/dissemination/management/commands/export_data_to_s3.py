@@ -210,21 +210,21 @@ def dump_api_table(dir, table, year, year_type, chunksize):
     if year_type == "ay":
         where_clause = " ".join(
             [
-                " WHERE report_id IN ",
-                f" (select report_id from {API_VERSION}.general ",
-                f" WHERE audit_year = '{year}' ",
-                f" AND is_public=true " if table.is_suppressed else "",
+                "WHERE report_id IN",
+                f"(select report_id from {API_VERSION}.general",
+                f"WHERE audit_year = '{year}'",
+                f"AND is_public=true" if table.is_suppressed else "",
                 ")",
             ]
         )
     elif year_type == "ffy":
         where_clause = " ".join(
             [
-                " WHERE report_id IN ",
-                f" (select report_id from {API_VERSION}.general ",
-                f" WHERE fac_accepted_date >= '{year-1}-10-01'::DATE ",
-                f" AND fac_accepted_date <= '{year}-09-30'::DATE ",
-                f" AND is_public=true " if table.is_suppressed else "",
+                "WHERE report_id IN",
+                f"(select report_id from {API_VERSION}.general",
+                f"WHERE fac_accepted_date >= '{year-1}-10-01'::DATE",
+                f"AND fac_accepted_date <= '{year}-09-30'::DATE",
+                f"AND is_public=true " if table.is_suppressed else "",
                 ")",
             ]
         )
@@ -239,13 +239,13 @@ def dump_full_api_table(bucket, key, table, chunksize):
     if table.is_suppressed:
         where_clause = " ".join(
             [
-                " WHERE report_id IN ",
-                f" (select report_id from {API_VERSION}.general WHERE is_public=true)",
+                "WHERE report_id IN",
+                f"(select report_id from {API_VERSION}.general WHERE is_public=true)",
             ]
         )
     else:
         where_clause = ""
-    query = " ".join([f"SELECT * from {API_VERSION}.{table.name} ", where_clause])
+    query = " ".join([f"SELECT * from {API_VERSION}.{table.name}", where_clause])
     run_query(FILEPATH, query, chunksize)
     # shutil.make_archive(table.name, "zip", FILEPATH)
     try:
@@ -268,15 +268,15 @@ def dump_internal_table(dir, table, year, year_type, chunksize):
         FILEPATH = Path(dir) / f"{table.name}.csv"
         where_clause = " ".join(
             [
-                " WHERE report_id IN ",
-                f" (select report_id from {API_VERSION}.general ",
-                f" WHERE audit_year = '{year}' ",
-                f" AND is_public=true " if table.is_suppressed else "",
+                "WHERE report_id IN",
+                f"(select report_id from {API_VERSION}.general",
+                f"WHERE audit_year = '{year}'",
+                f"AND is_public=true" if table.is_suppressed else "",
                 ")",
             ]
         )
         query = " ".join(
-            [f"SELECT * from public.dissemination_{table.name} ", where_clause]
+            [f"SELECT * from public.dissemination_{table.name}", where_clause]
         )
         run_query(FILEPATH, query, chunksize)
 
