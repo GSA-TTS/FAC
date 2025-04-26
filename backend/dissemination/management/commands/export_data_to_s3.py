@@ -44,6 +44,7 @@ import time
 from config.vcap import GET, FIND, get_vcap_services
 import os
 import sys
+import zipfile
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -119,7 +120,10 @@ def destination_key(key, file):
 
 
 def get_s3_client(bucket):
+    in_cloud = False
     if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
+        in_cloud = True
+    if in_cloud:
         creds = get_vcap_services([GET("s3"), FIND("name", bucket), GET("credentials")])
         # We have to unset the proxy for S3 operations.
         os.environ["https_proxy"] = ""
@@ -130,19 +134,35 @@ def get_s3_client(bucket):
             "secret_access_key": settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
             "endpoint": settings.AWS_S3_PRIVATE_ENDPOINT,
         }
-
-    s3 = boto3.client(
-        service_name="s3",
-        region_name=creds["region"],
-        aws_access_key_id=creds["access_key_id"],
-        aws_secret_access_key=creds["secret_access_key"],
-        config=Config(signature_version="s3v4"),
-    )
+    if in_cloud:
+        # Don't define the endpoint in the cloud
+        s3 = boto3.client(
+            service_name="s3",
+            region_name=creds["region"],
+            aws_access_key_id=creds["access_key_id"],
+            aws_secret_access_key=creds["secret_access_key"],
+            config=Config(signature_version="s3v4"),
+        )
+    else:
+        # Define the endpoint for containerized testing.
+        s3 = boto3.client(
+            service_name="s3",
+            region_name=creds["region"],
+            aws_access_key_id=creds["access_key_id"],
+            aws_secret_access_key=creds["secret_access_key"],
+            endpoint_url=creds["endpoint"],
+            config=Config(signature_version="s3v4"),
+        )
     return s3
 
 
-def uploadFileS3(client, bucket, key, file):
+def uploadFileS3(bucket, key, file):
+    client = get_s3_client(bucket)
+
+    in_cloud = False
     if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
+        in_cloud = True
+    if in_cloud:
         creds = get_vcap_services([GET("s3"), FIND("name", bucket), GET("credentials")])
     else:
         creds = {
@@ -152,7 +172,6 @@ def uploadFileS3(client, bucket, key, file):
             "endpoint": settings.AWS_S3_PRIVATE_ENDPOINT,
             "bucket": bucket,
         }
-
     config = TransferConfig(
         multipart_threshold=1024 * 25,
         max_concurrency=10,
@@ -165,6 +184,7 @@ def uploadFileS3(client, bucket, key, file):
         destination_key(key, file),
         Config=config,
     )
+    client.close()
 
 
 def run_query(FILEPATH, query, chunksize):
@@ -175,6 +195,12 @@ def run_query(FILEPATH, query, chunksize):
         df.to_csv(FILEPATH, mode="a", header=header, index=False)
         # Only drop the header on the first chunk.
         header = False
+
+
+def exit_with_message(msg, e):
+    logger.error(msg)
+    logger.error(e)
+    sys.exit(-1)
 
 
 def dump_api_table(dir, table, year, year_type, chunksize):
@@ -206,6 +232,37 @@ def dump_api_table(dir, table, year, year_type, chunksize):
     run_query(FILEPATH, query, chunksize)
 
 
+def dump_full_api_table(bucket, key, table, chunksize):
+    # Always try and make the destination directory
+    # The param exists_ok will prevent errors
+    FILEPATH = f"{table.name}.csv"
+    if table.is_suppressed:
+        where_clause = " ".join(
+            [
+                " WHERE report_id IN ",
+                f" (select report_id from {API_VERSION}.general WHERE is_public=true)",
+            ]
+        )
+    else:
+        where_clause = ""
+    query = " ".join([f"SELECT * from {API_VERSION}.{table.name} ", where_clause])
+    run_query(FILEPATH, query, chunksize)
+    # shutil.make_archive(table.name, "zip", FILEPATH)
+    try:
+        zipf = zipfile.ZipFile(f"{table.name}.zip", "w", zipfile.ZIP_DEFLATED)
+        zipf.write(f"{table.name}.csv")
+        zipf.close()
+    except Exception as e:
+        exit_with_message("could not create zip of csv", e)
+    try:
+        uploadFileS3(bucket, destination_key(key, "full/"), f"{table.name}.zip")
+    except Exception as e:
+        exit_with_message("failed to upload to S3", e)
+    # Remove the zipfile
+    Path(f"{table.name}.zip").unlink(missing_ok=True)
+    Path(f"{table.name}.csv").unlink(missing_ok=True)
+
+
 def dump_internal_table(dir, table, year, year_type, chunksize):
     if year_type == "ay":
         FILEPATH = Path(dir) / f"{table.name}.csv"
@@ -224,8 +281,7 @@ def dump_internal_table(dir, table, year, year_type, chunksize):
         run_query(FILEPATH, query, chunksize)
 
 
-def sling_tables(bucket, tables, key, year, year_types, chunksize):
-    s3 = get_s3_client(bucket)
+def sling_tables(bucket, tables, key, year, year_types, chunksize, run_full=False):
 
     # Given a year type ("`ay" or "fy")
     # I want to dump all the tables and compress them.
@@ -251,27 +307,23 @@ def sling_tables(bucket, tables, key, year, year_types, chunksize):
                 try:
                     dump_api_table(DIRECTORY, table, year, year_type, chunksize)
                 except Exception as e:
-                    logger.error("failed to dump and upload API tables")
-                    logger.error(e)
-                    sys.exit(-1)
+                    exit_with_message("failed to dump and upload API tables", e)
             elif table.source == SOURCE_INTERNAL and year < 2023:
                 # Migration tables only exist before 2023.
                 try:
                     dump_internal_table(DIRECTORY, table, year, year_type, chunksize)
                 except Exception as e:
-                    logger.error("failed to dump and upload internal/migration tables")
-                    logger.error(e)
-                    sys.exit(-1)
+                    exit_with_message(
+                        "failed to dump and upload internal/migration tables", e
+                    )
         # Now, compress that directory
         shutil.make_archive(ZIPNAME, "zip", DIRECTORY)
         # Remove the original directory
         # Copy things to S3
         try:
-            uploadFileS3(s3, bucket, dest_key, f"{ZIPNAME}.zip")
+            uploadFileS3(bucket, dest_key, f"{ZIPNAME}.zip")
         except Exception as e:
-            logger.error("failed to upload to S3")
-            logger.error(e)
-            sys.exit(-1)
+            exit_with_message("failed to upload to S3", e)
 
         # Always cleanup, even if we threw an exception
         shutil.rmtree(DIRECTORY)
@@ -345,6 +397,14 @@ class Command(BaseCommand):
                 year_types.append("ffy")
 
         start = time.time()
+
+        # Run the dump of the full tables.
+        for table in TABLES:
+            dump_full_api_table(
+                flags["bucket"], flags["path"], table, chunksize=flags["chunksize"]
+            )
+
+        # Run the yearly tables
         for year in reversed(years):
             sling_tables(
                 flags["bucket"],
