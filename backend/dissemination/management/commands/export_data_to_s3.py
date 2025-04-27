@@ -28,11 +28,14 @@
 #
 # fac export_data_to_s3 --bucket gsa-fac-private-s3 --path test
 
+# Regarding bandit: because the variables that are SQL-interpolated in this script
+# cannot come from outside/adversarial sources, there are some nosec flags
+# used to suppress concerns.
+
 import logging
 import boto3
 from boto3.s3.transfer import TransferConfig
 from botocore.client import Config
-from sys import exit
 from os import makedirs
 from pathlib import Path
 import shutil
@@ -223,9 +226,9 @@ def dump_api_table(dir, table, year, year_type, chunksize):
         where_clause = " ".join(
             [
                 "WHERE report_id IN",
-                f"(select report_id from {API_VERSION}.general",
+                f"(select report_id from {API_VERSION}.general",  # nosec
                 f"WHERE audit_year = '{year}'",
-                f"AND is_public=true" if table.is_suppressed else "",
+                "AND is_public=true" if table.is_suppressed else "",
                 ")",
             ]
         )
@@ -233,14 +236,16 @@ def dump_api_table(dir, table, year, year_type, chunksize):
         where_clause = " ".join(
             [
                 "WHERE report_id IN",
-                f"(select report_id from {API_VERSION}.general",
-                f"WHERE fac_accepted_date >= '{year-1}-10-01'::DATE",
+                f"(select report_id from {API_VERSION}.general",  # nosec
+                f"WHERE fac_accepted_date >= '{year - 1}-10-01'::DATE",
                 f"AND fac_accepted_date <= '{year}-09-30'::DATE",
-                f"AND is_public=true " if table.is_suppressed else "",
+                "AND is_public=true" if table.is_suppressed else "",
                 ")",
             ]
         )
-    query = " ".join([f"SELECT * from {API_VERSION}.{table.name} ", where_clause])
+    query = " ".join(
+        [f"SELECT * from {API_VERSION}.{table.name} ", where_clause]  # nosec
+    )  # nosec
     run_query(FILEPATH, query, chunksize)
 
 
@@ -257,12 +262,14 @@ def dump_full_api_table(bucket, key, table, chunksize):
         where_clause = " ".join(
             [
                 "WHERE report_id IN",
-                f"(select report_id from {API_VERSION}.general WHERE is_public=true)",
+                f"(select report_id from {API_VERSION}.general WHERE is_public=true)",  # nosec
             ]
         )
     else:
         where_clause = ""
-    query = " ".join([f"SELECT * from {API_VERSION}.{table.name}", where_clause])
+    query = " ".join(
+        [f"SELECT * from {API_VERSION}.{table.name}", where_clause]  # nosec
+    )  # nosec
     run_query(FILEPATH, query, chunksize)
     # shutil.make_archive(table.name, "zip", FILEPATH)
     try:
@@ -290,16 +297,51 @@ def dump_internal_table(dir, table, year, year_type, chunksize):
         where_clause = " ".join(
             [
                 "WHERE report_id IN",
-                f"(select report_id from {API_VERSION}.general",
+                f"(select report_id from {API_VERSION}.general",  # nosec
                 f"WHERE audit_year = '{year}'",
-                f"AND is_public=true" if table.is_suppressed else "",
+                "AND is_public=true" if table.is_suppressed else "",
                 ")",
             ]
         )
         query = " ".join(
-            [f"SELECT * from public.dissemination_{table.name}", where_clause]
+            [f"SELECT * from public.dissemination_{table.name}", where_clause]  # nosec
         )
         run_query(FILEPATH, query, chunksize)
+
+
+# Helper for sling_tables to reduce complexity
+def get_dest_key(year_type, key):
+    if year_type == "ffy":
+        dest_key = destination_key(key, "fiscal-year/")
+    elif year_type == "ay":
+        dest_key = destination_key(key, "audit-year/")
+    elif year_type == "migration":
+        dest_key = destination_key(key, "migration/")
+    return dest_key
+
+
+# Helper for sling_tables to reduce complexity
+def dump_table(DIRECTORY, table, year, year_type, chunksize):
+    if table.source == SOURCE_API:
+        try:
+            dump_api_table(DIRECTORY, table, year, year_type, chunksize)
+        except Exception as e:
+            exit_with_message("failed to dump and upload API tables", e)
+    elif table.source == SOURCE_INTERNAL and year < 2023:
+        # Migration tables only exist before 2023.
+        try:
+            dump_internal_table(DIRECTORY, table, year, year_type, chunksize)
+        except Exception as e:
+            exit_with_message("failed to dump and upload internal/migration tables", e)
+
+
+# Helper for sling_tables to reduce complexity
+def upload_to_s3(ZIPNAME, bucket, year_type, key):
+    try:
+        dest_key = get_dest_key(year_type, key)
+        uploadFileS3(bucket, dest_key, f"{ZIPNAME}.zip")
+    except Exception as e:
+        exit_with_message("failed to upload to S3", e)
 
 
 # sling_tables :: string array string int array int bool?
@@ -309,49 +351,14 @@ def dump_internal_table(dir, table, year, year_type, chunksize):
 # Slightly different logic for the API tables vs. the migration/inspection
 # tables, but otherwise are handled very similarly.
 def sling_tables(bucket, tables, key, year, year_types, chunksize, run_full=False):
-
-    # Given a year type ("`ay" or "fy")
-    # I want to dump all the tables and compress them.
-    # We'll put them at a path based on the year
     for year_type in year_types:
-        if year_type == "ffy":
-            dest_key = destination_key(key, "fiscal-year/")
-        elif year_type == "ay":
-            dest_key = destination_key(key, "audit-year/")
-        elif year_type == "migration":
-            dest_key = destination_key(key, "migration/")
-
         DIRECTORY = f"fac-{year}-{year_type}"
-        makedirs(DIRECTORY, exist_ok=True)
-
-        # A .zip will be added automatically
         ZIPNAME = DIRECTORY
-
-        # This will create one directory per year
-        # where each directory contains all the tables\
+        makedirs(DIRECTORY, exist_ok=True)
         for table in tables:
-            if table.source == SOURCE_API:
-                try:
-                    dump_api_table(DIRECTORY, table, year, year_type, chunksize)
-                except Exception as e:
-                    exit_with_message("failed to dump and upload API tables", e)
-            elif table.source == SOURCE_INTERNAL and year < 2023:
-                # Migration tables only exist before 2023.
-                try:
-                    dump_internal_table(DIRECTORY, table, year, year_type, chunksize)
-                except Exception as e:
-                    exit_with_message(
-                        "failed to dump and upload internal/migration tables", e
-                    )
-        # Now, compress that directory
+            dump_table(DIRECTORY, table, year, year_type, chunksize)
         shutil.make_archive(ZIPNAME, "zip", DIRECTORY)
-        # Remove the original directory
-        # Copy things to S3
-        try:
-            uploadFileS3(bucket, dest_key, f"{ZIPNAME}.zip")
-        except Exception as e:
-            exit_with_message("failed to upload to S3", e)
-
+        upload_to_s3(ZIPNAME, bucket, year_type, key)
         # Always cleanup, even if we threw an exception
         shutil.rmtree(DIRECTORY)
         # Remove the zipfile
@@ -376,7 +383,6 @@ def invalid_flags(flags):
             "one of --audit-year, --fiscal-year, or --all-year-types must be present"
         )
         return FLAGS_INVALID
-
     return FLAGS_VALID
 
 
@@ -397,7 +403,6 @@ class Command(BaseCommand):
         parser.add_argument("--path", type=str, required=True)
 
         parser.add_argument("--chunksize", type=int, required=False, default=10_000)
-        pass
 
     def handle(self, *args, **flags):
         # Validate all of the flags; if they are

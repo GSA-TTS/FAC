@@ -31,7 +31,7 @@ vcap_4 = {
 
 def _simple(vcap, cmds, result):
     os.environ["VCAP_SERVICES"] = json.dumps(vcap)
-    assert get_vcap_services(cmds) == result
+    assert get_vcap_services(cmds) == result  # nosec
 
 
 def test_simple_vcap1():
