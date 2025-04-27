@@ -83,6 +83,45 @@ MIGRATION_TABLES = [
 ]
 
 
+# get_s3_client :: string -> s3 client, creds dict, bool
+# Depending on the environment we are in, we either
+# get the local minio creds (defined in settings/docker container)
+# or we reach into the VCAP_SERVICES env var to get the credentials we need.
+def get_s3_client(bucket):
+    in_cloud = False
+    if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
+        in_cloud = True
+    if in_cloud:
+        creds = get_vcap_services([GET("s3"), FIND("name", bucket), GET("credentials")])
+        # We have to unset the proxy for S3 operations.
+        os.environ["https_proxy"] = ""
+    else:
+        creds = {
+            "region": settings.AWS_S3_PRIVATE_REGION_NAME,
+            "access_key_id": settings.AWS_PRIVATE_ACCESS_KEY_ID,
+            "secret_access_key": settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
+            "endpoint": settings.AWS_S3_PRIVATE_ENDPOINT,
+        }
+
+    creds["bucket"] = bucket
+    creds["in_cloud"] = in_cloud
+
+    # Define the endpoint for containerized testing.
+    client = boto3.client(
+        service_name="s3",
+        region_name=creds["region"],
+        aws_access_key_id=creds["access_key_id"],
+        aws_secret_access_key=creds["secret_access_key"],
+        endpoint_url=None if in_cloud else creds["endpoint"],
+        config=Config(signature_version="s3v4"),
+    )
+    return client, creds, in_cloud
+
+
+# get_conn_string
+# If we are in a cloud environment, it gets the brokered connection information for
+# the Postgres instance; if we are running locally, values are hard-coded against our
+# containerized stack.
 def get_conn_string():
     if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
         creds = get_vcap_services(
@@ -106,12 +145,20 @@ def get_conn_string():
     return conn_string
 
 
+# get_sqlalchemy_engine
+# This is a thin wrapper that gets a correct connection string
+# and builds an engine. We are using SQLAlchemy becuase Pandas
+# prefers it, and we want the chuncked data access that Pandas provides
+# for creating CSV files from SQL.
 def get_sqlalchemy_engine():
     connection_string = get_conn_string()
     engine = create_engine(connection_string)
     return engine
 
 
+# destination_key
+# Mangles strings so that they come out as clean
+# destination keys for S3.
 def destination_key(key, file):
     if key.endswith("/"):
         return key + file
@@ -119,59 +166,11 @@ def destination_key(key, file):
         return key + "/" + file
 
 
-def get_s3_client(bucket):
-    in_cloud = False
-    if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
-        in_cloud = True
-    if in_cloud:
-        creds = get_vcap_services([GET("s3"), FIND("name", bucket), GET("credentials")])
-        # We have to unset the proxy for S3 operations.
-        os.environ["https_proxy"] = ""
-    else:
-        creds = {
-            "region": settings.AWS_S3_PRIVATE_REGION_NAME,
-            "access_key_id": settings.AWS_PRIVATE_ACCESS_KEY_ID,
-            "secret_access_key": settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
-            "endpoint": settings.AWS_S3_PRIVATE_ENDPOINT,
-        }
-    if in_cloud:
-        # Don't define the endpoint in the cloud
-        s3 = boto3.client(
-            service_name="s3",
-            region_name=creds["region"],
-            aws_access_key_id=creds["access_key_id"],
-            aws_secret_access_key=creds["secret_access_key"],
-            config=Config(signature_version="s3v4"),
-        )
-    else:
-        # Define the endpoint for containerized testing.
-        s3 = boto3.client(
-            service_name="s3",
-            region_name=creds["region"],
-            aws_access_key_id=creds["access_key_id"],
-            aws_secret_access_key=creds["secret_access_key"],
-            endpoint_url=creds["endpoint"],
-            config=Config(signature_version="s3v4"),
-        )
-    return s3
-
-
+# uploadFileS3 :: string string string
+# Takes a bucket, destination key, and local filename
+# and uploads that file to S3.
 def uploadFileS3(bucket, key, file):
-    client = get_s3_client(bucket)
-
-    in_cloud = False
-    if os.getenv("ENV") in ["SANDBOX", "PREVIEW", "DEV", "STAGING", "PRODUCTION"]:
-        in_cloud = True
-    if in_cloud:
-        creds = get_vcap_services([GET("s3"), FIND("name", bucket), GET("credentials")])
-    else:
-        creds = {
-            "region": settings.AWS_S3_PRIVATE_REGION_NAME,
-            "access_key_id": settings.AWS_PRIVATE_ACCESS_KEY_ID,
-            "secret_access_key": settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
-            "endpoint": settings.AWS_S3_PRIVATE_ENDPOINT,
-            "bucket": bucket,
-        }
+    client, creds, _ = get_s3_client(bucket)
     config = TransferConfig(
         multipart_threshold=1024 * 25,
         max_concurrency=10,
@@ -187,6 +186,11 @@ def uploadFileS3(bucket, key, file):
     client.close()
 
 
+# run_query :: string, string, int
+# Runs an SQL query, generating a CSV file to the filepath.
+# Runs the SQL in chunksize rows per query, using Pandas.
+# This lets us keep the memory low on both the client and
+# the server. Recommended around 10K-20K rows.
 def run_query(FILEPATH, query, chunksize):
     engine = get_sqlalchemy_engine()
     header = True
@@ -197,12 +201,20 @@ def run_query(FILEPATH, query, chunksize):
         header = False
 
 
+# exit_with_message :: string, exception
+# A helper to log an error, log the exception, and
+# then system exit. This way, failures are clearly caught
+# in the job run via GH Action.
 def exit_with_message(msg, e):
     logger.error(msg)
     logger.error(e)
     sys.exit(-1)
 
 
+# dump_api_table :: string, string, int, string, int
+# Given a directory, it dumps a table to that directory.
+# The year_type is either "ay" for audit_year, or "ffy" for
+# Federal fiscal year. It chunks in `chunksize` rows per query.
 def dump_api_table(dir, table, year, year_type, chunksize):
     # Always try and make the destination directory
     # The param exists_ok will prevent errors
@@ -232,6 +244,11 @@ def dump_api_table(dir, table, year, year_type, chunksize):
     run_query(FILEPATH, query, chunksize)
 
 
+# dump_full_api_table :: string string string int
+# Uses the views defined in the API to access data. Dumps full
+# tables (e.g. all of general) to a CSV, zips that CSV, and uploads it.
+# The files are always cleaned up.
+# This only needs to run once; it is all data, not yearly.
 def dump_full_api_table(bucket, key, table, chunksize):
     # Always try and make the destination directory
     # The param exists_ok will prevent errors
@@ -263,6 +280,10 @@ def dump_full_api_table(bucket, key, table, chunksize):
     Path(f"{table.name}.csv").unlink(missing_ok=True)
 
 
+# dump_internal_table :: string string int string int
+# Dumps a table by audit year or federal fiscal year.
+# Chunks it, and puts it in a directory as a CSV.
+# We later zip the whole directory for upload, not here.
 def dump_internal_table(dir, table, year, year_type, chunksize):
     if year_type == "ay":
         FILEPATH = Path(dir) / f"{table.name}.csv"
@@ -281,6 +302,12 @@ def dump_internal_table(dir, table, year, year_type, chunksize):
         run_query(FILEPATH, query, chunksize)
 
 
+# sling_tables :: string array string int array int bool?
+# For all given audit year types, and all years, it goes through and dumps
+# tables to a folder auto-named for the year and audit year type.
+# That folder of all (by-year) tables is then zipped and uploaded.
+# Slightly different logic for the API tables vs. the migration/inspection
+# tables, but otherwise are handled very similarly.
 def sling_tables(bucket, tables, key, year, year_types, chunksize, run_full=False):
 
     # Given a year type ("`ay" or "fy")
@@ -331,6 +358,8 @@ def sling_tables(bucket, tables, key, year, year_types, chunksize, run_full=Fals
         Path(f"{ZIPNAME}.zip").unlink(missing_ok=True)
 
 
+# invalid_flags :: flags
+# Makes sure all flags passed to the script are valid
 def invalid_flags(flags):
     # Flags is a string
     if flags["year"] in "ALL":
@@ -351,9 +380,6 @@ def invalid_flags(flags):
     return FLAGS_VALID
 
 
-# By default, this will create two zipfiles for each year:
-# * One will be all tables by audit year
-# * The second will be all tables by fiscal year
 class Command(BaseCommand):
     def add_arguments(self, parser):
         # Source flags
@@ -377,7 +403,7 @@ class Command(BaseCommand):
         # Validate all of the flags; if they are
         # invalid, exit.
         if invalid_flags(flags):
-            exit(-1)
+            exit_with_message("invalid command-line flags", flags)
 
         # Turn the singletons into lists.
         # Even if we're only doing one year, make it a
