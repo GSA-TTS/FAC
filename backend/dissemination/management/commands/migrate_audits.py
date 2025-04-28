@@ -444,8 +444,8 @@ STATUS_TO_EVENT = {
 
 
 def create_history_objects(
-    transition_name: list[str],
-    transition_date: list[str],
+    transition_name: list,
+    transition_date: list,
     report_id: str,
     user: typing.Any,
 ) -> list[History]:
