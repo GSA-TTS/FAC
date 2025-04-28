@@ -189,6 +189,7 @@ class Search(View):
         # Obtain cleaned form data.
         form.is_valid()  # Runs default cleaning functions AND "clean_*" functions in forms.py
         form_data = form.cleaned_data
+        print("FORM_DATA", form_data)
         form_data["advanced_search_flag"] = advanced_search_flag
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
 
