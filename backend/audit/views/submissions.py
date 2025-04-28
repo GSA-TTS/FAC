@@ -105,6 +105,8 @@ class EditSubmission(LoginRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         return redirect(reverse("singleauditchecklist", args=[report_id]))
 
+def atomic_block():
+    
 
 class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
     @verify_status(STATUS.AUDITEE_CERTIFIED)
@@ -123,7 +125,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.AUDITEE_CERTIFIED)
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs): # noqa: C901
         # RACE HAZARD WARNING
         # It is possible for a user to enter the submission multiple times,
         # from multiple FAC instances. This race hazard is documented in
