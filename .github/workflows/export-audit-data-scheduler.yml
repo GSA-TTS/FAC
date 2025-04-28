@@ -3,7 +3,7 @@ name: Export Audit Data to CSV Scheduler
 on:
   schedule:
     # Staging, Prod test - All days 7 AM UTC
-    - cron: '0 7 * * *'
+    - cron: '0 7 * * 6'
 
 jobs:
   scheduled-audit-data-export:
