@@ -155,7 +155,6 @@ class AdvancedSearchForm(forms.Form):
         If the auditee_state is present and is not a valid state (one of STATE_ABBREVS), provide an error.
         """
         auditee_state = self.cleaned_data["auditee_state"]
-        print("choice_input", auditee_state)
         if not auditee_state:
             return auditee_state
 
@@ -309,7 +308,6 @@ class SearchForm(forms.Form):
         If the auditee_state is present and is not a valid state (one of STATE_ABBREVS), provide an error.
         """
         auditee_state = self.cleaned_data["auditee_state"]
-        print("choice_input", auditee_state)
         if not auditee_state:
             return auditee_state
 
