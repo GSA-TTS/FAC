@@ -32,7 +32,9 @@ class PredisseminationSummaryReportDownloadView(
     def get(self, request, report_id):
         sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
 
-        use_audit = request.GET.get("beta", "N") == "Y"
+        # TODO SOT: Enable for testing
+        # use_audit = request.GET.get("beta", "N") == "Y"
+        use_audit = False
         if use_audit:
             get_object_or_404(Audit, report_id=report_id)
 

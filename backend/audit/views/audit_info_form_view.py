@@ -24,6 +24,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
         try:
+            # SOT TODO: Switch to audit
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             current_info = {}
             if sac.audit_information:
@@ -77,6 +78,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: Switch to `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             form = AuditInfoForm(request.POST)
 
@@ -114,16 +116,20 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             else:
                 for field, errors in form.errors.items():
                     for error in errors:
-                        logger.warn(f"ERROR in field {field} : {error}")
+                        logger.warning(f"ERROR in field {field} : {error}")
 
                 form.clean_booleans()
+                # TODO: Update Post SOC Launch
                 context = self._get_context(sac, form)
                 return render(request, "audit/audit-info-form.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except Exception as e:
-            logger.info("Enexpected error in AuditInfoFormView post.\n%s", e)
+            # SOT TODO: This generic exception is rarely/never triggered. However,
+            # we think it would be better to not just throw back a BadRequest at the user.
+            # A more refined approach is warranted.
+            logger.error("Unexpected error in AuditInfoFormView post.\n%s", e)
             raise BadRequest()
 
     def _get_context(self, sac, form):
@@ -138,7 +144,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             "sp_framework_opinions": SP_FRAMEWORK_OPINIONS,
         }
         for field, value in context.items():
-            logger.warn(f"{field}:{value}")
+            logger.warning(f"{field}:{value}")
         context.update(
             {
                 "form": form,

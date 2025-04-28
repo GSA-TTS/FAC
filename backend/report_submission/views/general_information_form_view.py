@@ -37,13 +37,16 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 raise PermissionDenied("You do not have access to this audit.")
 
             sac_context = self._context_from_sac(sac)
+            sac_context = self._dates_to_slashes(sac_context)
+
             audit_context = self._context_from_audit(audit)
             audit_context = self._dates_to_slashes(audit_context)
 
-            context = self._dates_to_slashes(sac_context)
+            self._compare_contexts(sac_context, audit_context)
 
-            self._compare_contexts(context, audit_context)
-            return render(request, "report_submission/gen-form.html", context)
+            # SOT TODO What happens here when SOT is the only thing?
+            # Does this become audit_context?
+            return render(request, "report_submission/gen-form.html", sac_context)
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
 
@@ -57,6 +60,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
+            # SOT TODO: When we are only `audit`, this has to change.
             accesses = Access.objects.filter(sac=sac, user=request.user)
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
@@ -75,6 +79,8 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                     logger.warning(f"Error {field}: {errors}")
                 return render(request, "report_submission/gen-form.html", context)
 
+            # The form is valid.
+
             form = self._wipe_auditor_address(form)
             form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
             general_information = sac.general_information
@@ -86,6 +92,8 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             validated = validate_general_information_json(
                 patched_general_information, False
             )
+
+            # SOT TODO: Relies on the SAC
             sac.general_information = validated
             if general_information.get("audit_type"):
                 sac.audit_type = general_information["audit_type"]
@@ -114,7 +122,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             return render(request, "audit/no-late-changes.html")
         except Exception as err:
             message = f"Unexpected error in GeneralInformationFormView post. Report ID {report_id}"
-            logger.warning(message)
+            logger.error(message)
             raise err
 
     @staticmethod
@@ -172,116 +180,118 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
     @staticmethod
     def _context_from_audit(audit):
+        # When audit is None, return an empty dictionary
+        if not audit:
+            return {}
+
         audit_data = audit.audit if audit and audit.audit else {}
-        return (
-            {
-                "audit_type": audit.audit_type,
-                "auditee_fiscal_period_end": audit_data.get(
-                    "general_information", {}
-                ).get("auditee_fiscal_period_end", ""),
-                "auditee_fiscal_period_start": audit_data.get(
-                    "general_information", {}
-                ).get("auditee_fiscal_period_start", ""),
-                "audit_period_covered": audit_data.get("general_information", {}).get(
-                    "audit_period_covered"
-                ),
-                "audit_period_other_months": audit_data.get(
-                    "general_information", {}
-                ).get("audit_period_other_months", ""),
-                "ein": audit_data.get("general_information", {}).get("ein"),
-                "ein_not_an_ssn_attestation": audit_data.get(
-                    "general_information", {}
-                ).get("ein_not_an_ssn_attestation"),
-                "multiple_eins_covered": audit_data.get("general_information", {}).get(
-                    "multiple_eins_covered"
-                ),
-                "auditee_uei": audit_data.get("general_information", {}).get(
-                    "auditee_uei", ""
-                ),
-                "multiple_ueis_covered": audit_data.get("general_information", {}).get(
-                    "multiple_ueis_covered"
-                ),
-                "auditee_name": audit_data.get("general_information", {}).get(
-                    "auditee_name", ""
-                ),
-                "auditee_address_line_1": audit_data.get("general_information", {}).get(
-                    "auditee_address_line_1", ""
-                ),
-                "auditee_city": audit_data.get("general_information", {}).get(
-                    "auditee_city", ""
-                ),
-                "auditee_state": audit_data.get("general_information", {}).get(
-                    "auditee_state", ""
-                ),
-                "auditee_zip": audit_data.get("general_information", {}).get(
-                    "auditee_zip", ""
-                ),
-                "auditee_contact_name": audit_data.get("general_information", {}).get(
-                    "auditee_contact_name", ""
-                ),
-                "auditee_contact_title": audit_data.get("general_information", {}).get(
-                    "auditee_contact_title", ""
-                ),
-                "auditee_phone": audit_data.get("general_information", {}).get(
-                    "auditee_phone", ""
-                ),
-                "auditee_email": audit_data.get("general_information", {}).get(
-                    "auditee_email", ""
-                ),
-                "user_provided_organization_type": audit_data.get(
-                    "general_information", {}
-                ).get("user_provided_organization_type", ""),
-                "is_usa_based": audit_data.get("general_information", {}).get(
-                    "is_usa_based", ""
-                ),
-                "auditor_firm_name": audit_data.get("general_information", {}).get(
-                    "auditor_firm_name", ""
-                ),
-                "auditor_ein": audit_data.get("general_information", {}).get(
-                    "auditor_ein", ""
-                ),
-                "auditor_ein_not_an_ssn_attestation": audit_data.get(
-                    "general_information", {}
-                ).get("auditor_ein_not_an_ssn_attestation", ""),
-                "auditor_country": audit_data.get("general_information", {}).get(
-                    "auditor_country", ""
-                ),
-                "auditor_international_address": audit_data.get(
-                    "general_information", {}
-                ).get("auditor_international_address", ""),
-                "auditor_address_line_1": audit_data.get("general_information", {}).get(
-                    "auditor_address_line_1", ""
-                ),
-                "auditor_city": audit_data.get("general_information", {}).get(
-                    "auditor_city", ""
-                ),
-                "auditor_state": audit_data.get("general_information", {}).get(
-                    "auditor_state", ""
-                ),
-                "auditor_zip": audit_data.get("general_information", {}).get(
-                    "auditor_zip", ""
-                ),
-                "auditor_contact_name": audit_data.get("general_information", {}).get(
-                    "auditor_contact_name", ""
-                ),
-                "auditor_contact_title": audit_data.get("general_information", {}).get(
-                    "auditor_contact_title", ""
-                ),
-                "auditor_phone": audit_data.get("general_information", {}).get(
-                    "auditor_phone", ""
-                ),
-                "auditor_email": audit_data.get("general_information", {}).get(
-                    "auditor_email", ""
-                ),
-                "secondary_auditors_exist": audit_data.get(
-                    "general_information", {}
-                ).get("secondary_auditors_exist", ""),
-                "report_id": audit.report_id,
-                "state_abbrevs": STATE_ABBREVS,
-            }
-            if audit
-            else {}
-        )
+
+        # If we have an `audit`, return all the good things.
+        return {
+            "audit_type": audit.audit_type,
+            "auditee_fiscal_period_end": audit_data.get("general_information", {}).get(
+                "auditee_fiscal_period_end", ""
+            ),
+            "auditee_fiscal_period_start": audit_data.get(
+                "general_information", {}
+            ).get("auditee_fiscal_period_start", ""),
+            "audit_period_covered": audit_data.get("general_information", {}).get(
+                "audit_period_covered"
+            ),
+            "audit_period_other_months": audit_data.get("general_information", {}).get(
+                "audit_period_other_months", ""
+            ),
+            "ein": audit_data.get("general_information", {}).get("ein"),
+            "ein_not_an_ssn_attestation": audit_data.get("general_information", {}).get(
+                "ein_not_an_ssn_attestation"
+            ),
+            "multiple_eins_covered": audit_data.get("general_information", {}).get(
+                "multiple_eins_covered"
+            ),
+            "auditee_uei": audit_data.get("general_information", {}).get(
+                "auditee_uei", ""
+            ),
+            "multiple_ueis_covered": audit_data.get("general_information", {}).get(
+                "multiple_ueis_covered"
+            ),
+            "auditee_name": audit_data.get("general_information", {}).get(
+                "auditee_name", ""
+            ),
+            "auditee_address_line_1": audit_data.get("general_information", {}).get(
+                "auditee_address_line_1", ""
+            ),
+            "auditee_city": audit_data.get("general_information", {}).get(
+                "auditee_city", ""
+            ),
+            "auditee_state": audit_data.get("general_information", {}).get(
+                "auditee_state", ""
+            ),
+            "auditee_zip": audit_data.get("general_information", {}).get(
+                "auditee_zip", ""
+            ),
+            "auditee_contact_name": audit_data.get("general_information", {}).get(
+                "auditee_contact_name", ""
+            ),
+            "auditee_contact_title": audit_data.get("general_information", {}).get(
+                "auditee_contact_title", ""
+            ),
+            "auditee_phone": audit_data.get("general_information", {}).get(
+                "auditee_phone", ""
+            ),
+            "auditee_email": audit_data.get("general_information", {}).get(
+                "auditee_email", ""
+            ),
+            "user_provided_organization_type": audit_data.get(
+                "general_information", {}
+            ).get("user_provided_organization_type", ""),
+            "is_usa_based": audit_data.get("general_information", {}).get(
+                "is_usa_based", ""
+            ),
+            "auditor_firm_name": audit_data.get("general_information", {}).get(
+                "auditor_firm_name", ""
+            ),
+            "auditor_ein": audit_data.get("general_information", {}).get(
+                "auditor_ein", ""
+            ),
+            "auditor_ein_not_an_ssn_attestation": audit_data.get(
+                "general_information", {}
+            ).get("auditor_ein_not_an_ssn_attestation", ""),
+            "auditor_country": audit_data.get("general_information", {}).get(
+                "auditor_country", ""
+            ),
+            "auditor_international_address": audit_data.get(
+                "general_information", {}
+            ).get("auditor_international_address", ""),
+            "auditor_address_line_1": audit_data.get("general_information", {}).get(
+                "auditor_address_line_1", ""
+            ),
+            "auditor_city": audit_data.get("general_information", {}).get(
+                "auditor_city", ""
+            ),
+            "auditor_state": audit_data.get("general_information", {}).get(
+                "auditor_state", ""
+            ),
+            "auditor_zip": audit_data.get("general_information", {}).get(
+                "auditor_zip", ""
+            ),
+            "auditor_contact_name": audit_data.get("general_information", {}).get(
+                "auditor_contact_name", ""
+            ),
+            "auditor_contact_title": audit_data.get("general_information", {}).get(
+                "auditor_contact_title", ""
+            ),
+            "auditor_phone": audit_data.get("general_information", {}).get(
+                "auditor_phone", ""
+            ),
+            "auditor_email": audit_data.get("general_information", {}).get(
+                "auditor_email", ""
+            ),
+            "secondary_auditors_exist": audit_data.get("general_information", {}).get(
+                "secondary_auditors_exist", ""
+            ),
+            "report_id": audit.report_id,
+            "state_abbrevs": STATE_ABBREVS,
+        }
 
     # TODO: Post SOT Launch -> below can be deleted
     @staticmethod
