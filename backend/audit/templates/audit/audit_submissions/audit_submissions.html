@@ -25,9 +25,12 @@
                 </button>
             </div>
         </div>
-        {% if is_beta %}
-          {% include "includes/beta_warning.html" %}
-        {% endif %}
+        {% comment %}
+          <!-- SOT TODO: enable for testing with SOT inclusion -->
+          {% if is_beta %}
+            {% include "includes/beta_warning.html" %}
+          {% endif %}
+        {% endcomment %}
         {% if data.in_progress_audits|length == 0 and data.completed_audits|length == 0 %}
             <p class="margin-bottom-4">No submissions associated with your email address were found.</p>
             {% include "./alert_find_report.html" %}

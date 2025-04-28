@@ -14,6 +14,8 @@ from audit.models import (
 from audit.models.constants import STATUS, AuditType
 from .constants import ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED
 
+from audit.models.access_roles import AccessRole
+
 from ..serializers import AccessListSerializer, AccessAndSubmissionSerializer
 
 logger = logging.getLogger(__name__)
@@ -50,7 +52,7 @@ def access_and_submission_check(user, data):
 
         sac = SingleAuditChecklist.objects.create(
             submitted_by=user,
-            submission_status="in_progress",
+            submission_status=STATUS.IN_PROGRESS,
             general_information=all_steps_user_form_data,
             event_user=user,
             event_type=SubmissionEvent.EventType.CREATED,
@@ -85,7 +87,7 @@ def access_and_submission_check(user, data):
         Access.objects.create(
             sac=sac,
             audit=audit,
-            role="certifying_auditee_contact",
+            role=AccessRole.CERTIFYING_AUDITEE_CONTACT,
             fullname=serializer.data.get("certifying_auditee_contact_fullname"),
             email=serializer.data.get("certifying_auditee_contact_email").lower(),
             event_user=user,
@@ -94,13 +96,14 @@ def access_and_submission_check(user, data):
         Access.objects.create(
             sac=sac,
             audit=audit,
-            role="certifying_auditor_contact",
+            role=AccessRole.CERTIFYING_AUDITOR_CONTACT,
             fullname=serializer.data.get("certifying_auditor_contact_fullname"),
             email=serializer.data.get("certifying_auditor_contact_email").lower(),
             event_user=user,
             event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
 
+        # Once we get here, it should be impossible for these user values to be missing.
         # The contacts form should prevent users from submitting an incomplete contacts section
         auditee_contacts_info = zip(
             serializer.data.get("auditee_contacts_email"),
@@ -118,7 +121,7 @@ def access_and_submission_check(user, data):
                 Access.objects.create(
                     sac=sac,
                     audit=audit,
-                    role="editor",
+                    role=AccessRole.EDITOR,
                     fullname=name,
                     email=str(email).lower(),
                     event_user=user,
@@ -129,6 +132,9 @@ def access_and_submission_check(user, data):
         user.profile.entry_form_data = {}
         user.profile.save()
 
+        # 'next' is the next step, but we have changed how we determine what is next.
+        # And, we no longer strictly require general_info to be "next." This mechanism
+        # probably needs revisiting.
         return {"report_id": sac.report_id, "next": "TBD"}
 
     return {

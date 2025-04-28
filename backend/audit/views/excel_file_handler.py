@@ -74,11 +74,10 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             setattr(sac, handler_info["field_name"], audit_data)
             sac.save()
 
-            # TODO: Update Post SOC Launch
-            # TODO Audit Rework
-            # remove try/except once we are ready to deprecate SAC.
-            try:
-                audit = Audit.objects.get(report_id=sac.report_id)
+            # SOT TODO: Update Post SOC Launch
+            # SOT TODO Audit Rework
+            audit = Audit.objects.find_audit_or_none(report_id=sac.report_id)
+            if audit:
                 audit_update = FORM_SECTION_HANDLERS.get(form_section)["audit_object"](
                     audit_data
                 )
@@ -87,8 +86,6 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                     event_user=user,
                     event_type=self._event_type(form_section),
                 )
-            except Audit.DoesNotExist:
-                pass
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -120,6 +117,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
             form_section = kwargs["form_section"]
 
+            # SOT TODO: Need to use `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             file = request.FILES["FILES"]

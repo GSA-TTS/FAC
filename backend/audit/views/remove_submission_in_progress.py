@@ -41,6 +41,8 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
         Show the audit to be removed and confirmation form.
         """
         report_id = kwargs["report_id"]
+
+        # SOT TODO: Switch to audit
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         role_values = [role[0] for role in ACCESS_ROLES]
         if not Access.objects.filter(
@@ -73,6 +75,8 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
         Remove the audit and redirect to the audits list.
         """
         report_id = kwargs["report_id"]
+
+        # SOT TODO: Switch to audit
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         role_values = [role[0] for role in ACCESS_ROLES]
         if not Access.objects.filter(

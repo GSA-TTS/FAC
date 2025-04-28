@@ -105,7 +105,12 @@ def _extract_from_field_mapping(path, field_mapping, match=None):
 
 def _extract_error_details(error):
     if not bool(error.path):
-        logger.info("No path found in error object")
+        # Was previously `info`. However, for 18 months, we have
+        # not done anything with that information. Shifting it to a
+        # debug, and perhaps someday we will ask why this mattered.
+        # The calling code pathway happily continues if we return
+        # (None, None, None), so this is acceptable behavior.
+        logger.debug("No path found in error object")
         return None, None, None
 
     row_index = next((item for item in error.path if isinstance(item, int)), None)

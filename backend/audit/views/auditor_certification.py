@@ -36,6 +36,7 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: Switch to audit
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             initial = {
                 "AuditorCertificationStep1Session": request.session.get(
@@ -65,6 +66,7 @@ class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: Switch to audit
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             initial = {
                 "AuditorCertificationStep1Session": request.session.get(
@@ -103,6 +105,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: Switch to audit
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             initial = {
                 "AuditorCertificationStep2Session": request.session.get(
@@ -141,6 +144,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: Switch to audit
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             form1_cleaned = request.session.get(
                 "AuditorCertificationStep1Session", None
