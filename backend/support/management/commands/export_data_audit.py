@@ -28,11 +28,14 @@ FAC_DB_URL = (
     f"{DB_URL}?sslmode=disable" if settings.ENVIRONMENT in ["LOCAL", "TEST"] else DB_URL
 )
 DEFAULT_OPTIONS = {
+    "source_options": {
+        "chunk_size": 100000,
+    },
     "target_options": {
         "format": "csv",
         "compression": "none",
         "file_max_rows": 0,
-    }
+    },
 }
 
 
@@ -56,7 +59,10 @@ def _run_data_export(year):
         streams=streams,
         defaults=DEFAULT_OPTIONS,
         env=dict(
-            FAC_DB=FAC_DB_URL, BULK_DATA_EXPORT=S3_CONNECTION, SLING_ALLOW_EMPTY="TRUE"
+            FAC_DB=FAC_DB_URL,
+            BULK_DATA_EXPORT=S3_CONNECTION,
+            SLING_ALLOW_EMPTY="TRUE",
+            SLING_THREADS="3",
         ),
         debug=settings.DEBUG,
     )

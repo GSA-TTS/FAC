@@ -17,6 +17,8 @@ from audit.models import (
     Audit,
 )
 
+from audit.models.access_roles import AccessRole
+
 logger = logging.getLogger(__name__)
 
 
@@ -125,16 +127,8 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             context = {
                 "role": self.role,
                 "friendly_role": _get_friendly_role(self.role),
-                "auditee_uei": (
-                    audit.audit.get("general_information", {}).get("auditee_uei", None)
-                    if audit
-                    else sac.general_information["auditee_uei"]
-                ),
-                "auditee_name": (
-                    audit.audit.get("general_information", {}).get("auditee_name", None)
-                    if audit
-                    else sac.general_information.get("auditee_name")
-                ),
+                "auditee_uei": sac.general_information["auditee_uei"],
+                "auditee_name": sac.general_information.get("auditee_name"),
                 "certifier_name": access.fullname,
                 "email": access.email,
                 "report_id": report_id,
@@ -142,6 +136,15 @@ class ChangeOrAddRoleView(SingleAuditChecklistAccessRequiredMixin, generic.View)
                     "email": "Cannot use the same email address for both certifying officials."
                 },
             }
+
+            # SOT TODO: When we switch to audit, we should only use these values.
+            # For now, do not use parts of both SAC and SOT.
+            # if audit:
+            #     context = context | {
+            #         "auditee_uei": audit.audit.get("general_information", {}).get("auditee_uei", None),
+            #         "auditee_name": audit.audit.get("general_information", {}).get("auditee_name", None),
+            #     }
+
             return render(request, self.template, context, status=400)
 
         # Only Access, and not SimpleNamespace, has .delete:
@@ -305,8 +308,8 @@ class ChangeAuditorCertifyingOfficialView(ChangeOrAddRoleView):
     View for changing the auditor certifying official
     """
 
-    role = "certifying_auditor_contact"
-    other_role = "certifying_auditee_contact"
+    role = AccessRole.CERTIFYING_AUDITOR_CONTACT
+    other_role = AccessRole.CERTIFYING_AUDITEE_CONTACT
 
 
 class ChangeAuditeeCertifyingOfficialView(ChangeOrAddRoleView):
@@ -314,5 +317,5 @@ class ChangeAuditeeCertifyingOfficialView(ChangeOrAddRoleView):
     View for changing the auditee certifying official
     """
 
-    role = "certifying_auditee_contact"
-    other_role = "certifying_auditor_contact"
+    role = AccessRole.CERTIFYING_AUDITEE_CONTACT
+    other_role = AccessRole.CERTIFYING_AUDITOR_CONTACT

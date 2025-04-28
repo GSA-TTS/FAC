@@ -126,6 +126,7 @@ def sac_transition(request, sac, **kwargs):
     """
     audit = kwargs.get("audit", None)
     user = None
+    # SOT TODO: This needs to use `audit`
     flow = SingleAuditChecklistFlow(sac)
     audit_flow = AuditFlow(audit)
 
@@ -285,6 +286,7 @@ def audit_transition(request, audit, **kwargs):
     return True
 
 
+# SOT TODO: This goes away, because we have AuditFlow
 class SingleAuditChecklistFlow(SingleAuditChecklist):
     """
     Handles transitioning of states for an SAC.

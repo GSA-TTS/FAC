@@ -43,7 +43,10 @@ class PdfDownloadView(ReportAccessRequiredMixin, View):
         # TODO: Update Post SOC Launch
         get_object_or_404(General, report_id=report_id)
 
-        use_audit = request.GET.get("beta", "N") == "Y"
+        # TODO SOT: Enable for testing
+        # use_audit = request.GET.get("beta", "N") == "Y"
+        use_audit = False
+
         if use_audit:
             get_object_or_404(
                 Audit, report_id=report_id, submission_status=STATUS.DISSEMINATED
@@ -69,7 +72,10 @@ class XlsxDownloadView(ReportAccessRequiredMixin, View):
         # get_object_or_404(Audit, report_id=report_id, submission_status=STATUS.DISSEMINATED)
         get_object_or_404(General, report_id=report_id)
 
-        use_audit = request.GET.get("beta", "N") == "Y"
+        # TODO SOT: Enable for testing
+        # use_audit = request.GET.get("beta", "N") == "Y"
+        use_audit = False
+
         if use_audit:
             get_object_or_404(
                 Audit, report_id=report_id, submission_status=STATUS.DISSEMINATED
@@ -122,7 +128,10 @@ class OneTimeAccessDownloadView(View):
             ota = OneTimeAccess.objects.get(uuid=uuid)
 
             # get the filename for the SingleAuditReport for this SAC
-            use_audit = request.GET.get("beta", "N") == "Y"
+            # TODO SOT: Enable for testing
+            # use_audit = request.GET.get("beta", "N") == "Y"
+            use_audit = False
+
             filename = (
                 get_filename_from_audit(ota.report_id, "report")
                 if use_audit
@@ -143,12 +152,16 @@ class OneTimeAccessDownloadView(View):
 
 
 class SingleSummaryReportDownloadView(View):
+
     def get(self, request, report_id):
         """
         Given a report_id in the URL, generate the summary report in S3 and
         redirect to its download link.
         """
-        use_audit = request.GET.get("beta", "N") == "Y"
+        # TODO SOT: Enable for testing
+        # use_audit = request.GET.get("beta", "N") == "Y"
+        use_audit = False
+
         if use_audit:
             get_object_or_404(Audit, report_id=report_id)
         else:
@@ -180,7 +193,10 @@ class MultipleSummaryReportDownloadView(View):
         4. Redirect to the download url of this new report
         """
         form = AdvancedSearchForm(request.POST)
-        use_audit = request.GET.get("beta", "N") == "Y"
+        # TODO SOT: Enable for testing
+        # use_audit = request.GET.get("beta", "N") == "Y"
+        use_audit = False
+
         try:
             if form.is_valid():
                 form_data = form.cleaned_data

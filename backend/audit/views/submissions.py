@@ -38,7 +38,9 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         template_name = "audit/audit_submissions/audit_submissions.html"
         new_link = "report_submission"
         edit_link = "audit:EditSubmission"
-        use_audit = request.GET.get("beta", "N") == "Y"
+        # TODO SOT: Enable for testing
+        # use_audit = request.GET.get("beta", "N") == "Y"
+        use_audit = False
         submissions = MySubmissions.fetch_my_submissions(request.user, use_audit)
 
         data = {"completed_audits": [], "in_progress_audits": []}
@@ -121,7 +123,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
     @verify_status(STATUS.AUDITEE_CERTIFIED)
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: C901
         # RACE HAZARD WARNING
         # It is possible for a user to enter the submission multiple times,
         # from multiple FAC instances. This race hazard is documented in
@@ -129,13 +131,13 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            # TODO: Update Post SOC Launch
-            # remove try/except once we are ready to deprecate SAC.
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
-            audit_errors = audit.validate() if audit else None
             errors = sac.validate_full()
 
-            _compare_errors(errors, audit_errors)
+            # TODO: Update Post SOC Launch
+            audit = Audit.objects.find_audit_or_none(report_id=report_id)
+            if audit:
+                audit_errors = audit.validate()
+                _compare_errors(errors, audit_errors)
 
             if errors:
                 context = {"report_id": report_id, "errors": errors}

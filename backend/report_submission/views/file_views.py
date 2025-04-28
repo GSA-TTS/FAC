@@ -28,14 +28,16 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
-        if request.GET.get("beta", "N") == "Y":
-            return _handle_sot_beta_upload_get(request, *args, **kwargs)
+        # SOT TODO: Enable for testing
+        # if request.GET.get("beta", "N") == "Y":
+        #     return _handle_sot_beta_upload_get(request, *args, **kwargs)
 
         # Organized by URL name, page specific constants are defined here
         # Data can then be accessed by checking the current URL
         additional_context = create_upload_context(report_id)
 
         try:
+            # TODO SOT: Update for `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             # Context for every upload page
@@ -55,22 +57,30 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
                     sac, additional_context[path_name]["DB_id"]
                 )
 
-                audit = Audit.objects.find_or_none(report_id=report_id)
                 shaped_sac = sac_validation_shape(sac)
-                shaped_audit = audit_validation_shape(audit)
 
-                _compare_shapes(shaped_sac, shaped_audit)
+                audit = Audit.objects.find_audit_or_none(report_id=report_id)
+                if audit:
+                    shaped_audit = audit_validation_shape(audit)
+                    _compare_shapes(shaped_sac, shaped_audit)
+                else:
+                    logger.debug("A SOT does not yet exist for this SAC.\n")
 
-                completed_metadata = section_completed_metadata(shaped_sac, path_name)
-                completed_audit_audit = section_completed_metadata(
+                # This tuple can come back as None, None, which is fine.
+                uploaded_by, uploaded_at = section_completed_metadata(
                     shaped_sac, path_name
                 )
 
-                _compare_completed_metadata(completed_metadata, completed_audit_audit)
+                # SOT TODO: This needs to be changed/improved
+                # for the migration to SOT. I think it wants to operate on the
+                # shaped_audit, but we don't need it now/here.
+                # completed_audit_audit = section_completed_metadata(
+                #     shaped_sac, path_name
+                # )
+                # _compare_completed_metadata(completed_metadata, completed_audit_audit)
 
-                context["last_uploaded_by"] = completed_metadata[0]
-                context["last_uploaded_at"] = completed_metadata[1]
-
+                context["last_uploaded_by"] = uploaded_by
+                context["last_uploaded_at"] = uploaded_at
             except Exception:
                 context["already_submitted"] = None
 
@@ -85,10 +95,13 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
             return Util.validate_redirect_url(
                 "/audit/submission-progress/{report_id}".format(report_id=report_id)
             )
-
         except Exception as e:
-            logger.info("Unexpected error in UploadPageView post.\n", e)
+            logger.error("Unexpected error in UploadPageView post.\n", e)
 
+        # FIXME: This feels like a fragile control pathway.
+        # At the moment, you should ALWAYS return OR throw an exception.
+        # But, the future could change this. Therefore, what happens outside of
+        # the `except` could matter.
         raise BadRequest()
 
 
@@ -120,15 +133,16 @@ class DeleteFileView(SingleAuditChecklistAccessRequiredMixin, View):
             raise PermissionDenied("You do not have access to this audit.")
 
     def post(self, request, *args, **kwargs):
-        # TODO: Post SOT Launch -> Remove SAC / SubmissionEvent
+        # SOT TODO: Post SOT Launch -> Remove SAC / SubmissionEvent
         report_id = kwargs["report_id"]
         path_name = request.path.split("/")[2]
         section = self.additional_context[path_name]
         redirect_uri = f"/report_submission/{section['view_id']}/{report_id}"
         try:
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             accesses = Access.objects.filter(sac=sac, user=request.user)
+
+            audit = Audit.objects.find_audit_or_none(report_id=report_id)
             # accesses = Access.objects.filter(audit=audit, user=request.user)
 
             if not accesses:
@@ -151,18 +165,24 @@ class DeleteFileView(SingleAuditChecklistAccessRequiredMixin, View):
                         event_type=section["event_type"],
                         event_user=request.user,
                     )
-
             except ExcelFile.DoesNotExist:
                 messages.error(request, "File not found.")
                 return Util.validate_redirect_url(redirect_uri)
 
+            # SOT TODO: Switch to `audit`. Also, this should generate a
+            # History event, as opposed to a SubmissionEvent
             SubmissionEvent.objects.create(
                 sac_id=sac.id,
+                # SOT TODO: audit MUST exist at this point, but we're not
+                # connecting it up *yet* because we have never tested adding in
+                # this relationship. In theory, it is safe. Or, perhaps it is
+                # not needed, because we won't be keeping SubmissionEvents post-SOT.
+                # audit_id=audit.id if audit else None,
                 user=request.user,
                 event=section["event_type"],
             )
 
-            logger.info("The file has been successfully deleted.")
+            logger.info("The file(s) has been successfully deleted.")
             return Util.validate_redirect_url(
                 f"/audit/submission-progress/{sac.report_id}"
             )
