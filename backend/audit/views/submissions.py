@@ -17,7 +17,7 @@ from audit.models import (
     Audit,
     Access,
 )
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from audit.models.utils import generate_audit_indexes
 from audit.models.viewflow import sac_transition
 from audit.decorators import verify_status

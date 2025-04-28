@@ -11,7 +11,7 @@ from audit.models import (
     SingleAuditChecklist,
     Audit,
 )
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from audit.models.viewflow import SingleAuditChecklistFlow, AuditFlow
 from audit.models.submission_event import SubmissionEvent
 from audit.models.access_roles import ACCESS_ROLES

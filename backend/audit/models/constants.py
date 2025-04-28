@@ -74,6 +74,7 @@ class EventType:
     TRIBAL_CONSENT_UPDATED = "tribal-consent-updated"
     FLAGGED_SUBMISSION_FOR_REMOVAL = "flagged-submission-for-removal"
     CANCEL_REMOVAL_FLAG = "cancel-removal-flag"
+    SOURCE_OF_TRUTH_MIGRATION = "sot-migration"
 
 
 EVENT_TYPES = (
@@ -134,6 +135,7 @@ EVENT_TYPES = (
         _("Flagged submission for removal"),
     ),
     (EventType.CANCEL_REMOVAL_FLAG, _("Cancel removal flag")),
+    (EventType.SOURCE_OF_TRUTH_MIGRATION, _("Source of Truth Migration")),
 )
 
 

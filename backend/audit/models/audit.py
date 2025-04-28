@@ -22,6 +22,7 @@ from audit.models.utils import (
     get_next_sequence_id,
     generate_sac_report_id,
     JsonArrayToTextArray,
+    validate_audit_consistency,
 )
 
 from itertools import chain
@@ -338,6 +339,16 @@ class Audit(CreatedMixin, UpdatedMixin):
                 )  # TODO
 
             self.version = previous_version + 1
+
+            # TESTING: During save of audit, check for matching data in SAC
+            # only trigger on update, not creation.
+            if not self._state.adding:
+                is_consistent, discrepancies = validate_audit_consistency(self)
+
+                if not is_consistent:
+                    logger.warning(
+                        f"Inconsistencies found between models for {report_id}: {discrepancies}"
+                    )
 
             if event_type and event_user:
                 History.objects.create(
