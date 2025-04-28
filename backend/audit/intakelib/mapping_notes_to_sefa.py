@@ -66,8 +66,6 @@ def extract_notes_to_sefa(file, is_gsa_migration=False, auditee_uei=None):
 
 def notes_to_sefa_audit_view(data):
     updated = data.get("NotesToSefa", {})
-    # Removing auditee_uei because it's duplicated in general_information.
-    updated.pop("auditee_uei")
     return {"notes_to_sefa": updated} if updated else {}
 
 

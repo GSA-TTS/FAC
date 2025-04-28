@@ -3,9 +3,12 @@
 {% block content %}
     <div class="grid-container margin-top-6">
         <div class="grid-row">
+            {% comment %}
             {% if is_beta %}
+              <!-- # TODO SOT: Enable for testing -->
               {% include "includes/beta_warning.html" %}
             {% endif %}
+            {% endcomment %}
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}
             <form class="tablet:grid-col-8 tablet:grid-offset-2"
                   id="{{ view_id }}"

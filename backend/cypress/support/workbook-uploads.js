@@ -26,6 +26,15 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
   cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
 };
 
+export function testWorkbookDownloadLinkExists(workbook_name) {
+  // From the main page, click the edit link
+  cy.get(".usa-link").contains("Edit the " + workbook_name).click();
+  // Then, try and download
+  cy.get(".usa-link").contains("Download current workbook").click();
+  // Return to the main page.
+  cy.get(".usa-button").contains("Cancel").click();
+};
+
 export function testWorkbookFederalAwards(will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/federal-awards/*',

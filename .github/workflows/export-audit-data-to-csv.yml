@@ -1,5 +1,5 @@
 ---
-name: Export Audit Data to CSV
+name: Export Audit Data to CSV Dispatch
 on:
   workflow_dispatch:
     inputs:
@@ -33,4 +33,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 4G --name export_audit_data_to_csv --command "python manage.py export_data_audit --year ${{ inputs.year }}" --wait
+          command: cf run-task gsa-fac -k 2G -m 6G --name export_audit_data_to_csv --command "python manage.py export_data_audit --year ${{ inputs.year }}" --wait

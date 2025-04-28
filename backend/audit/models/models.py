@@ -30,7 +30,7 @@ from audit.validators import (
     validate_audit_information_json,
 )
 from audit.utils import FORM_SECTION_HANDLERS
-from audit.models.constants import SAC_SEQUENCE_ID
+from audit.models.constants import SAC_SEQUENCE_ID, STATUS
 from audit.models.utils import get_next_sequence_id
 from support.cog_over import compute_cog_over, record_cog_assignment
 from .files import SingleAuditReportFile
@@ -124,14 +124,19 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
     toplevelproperty = toplevel or camel_to_snake(name)
     mixinname = classname or f"{name}Mixin"
 
+    # 20250425 The `debug` statements used to be `warning`. However, this code has
+    # been in production for 22 months. We clearly are not troubled by the
+    # keys not being present; every time we marshal a General Info object into
+    # JSON, we will see this for some keys. So, we're going to make this quieter
+    # in production at this point.
     def _wrapper(key):
         def inner(self):
             try:
                 return getattr(self, toplevelproperty)[key]
             except KeyError:
-                logger.warning("Key %s not found in SAC", key)
+                logger.debug("Key %s not found in SAC", key)
             except TypeError:
-                logger.warning("Type error trying to get %s from SAC %s", key, self)
+                logger.debug("Type error trying to get %s from SAC %s", key, self)
             return None
 
         return inner
@@ -144,21 +149,6 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
 
 
 GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
-
-
-class STATUS:
-    """
-    The possible states of a submission.
-    """
-
-    IN_PROGRESS = "in_progress"
-    READY_FOR_CERTIFICATION = "ready_for_certification"
-    AUDITOR_CERTIFIED = "auditor_certified"
-    AUDITEE_CERTIFIED = "auditee_certified"
-    CERTIFIED = "certified"
-    SUBMITTED = "submitted"
-    DISSEMINATED = "disseminated"
-    FLAGGED_FOR_REMOVAL = "flagged_for_removal"
 
 
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
@@ -528,7 +518,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         return self.submission_status in [STATUS.DISSEMINATED]
 
     def get_transition_date(self, status):
-        index = self.transition_name.index(status)
-        if index >= 0:
-            return self.transition_date[index]
+        indices = [i for i, s in enumerate(self.transition_name) if s == status]
+        if indices:
+            return self.transition_date[indices[-1]]
         return None

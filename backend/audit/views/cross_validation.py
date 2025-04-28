@@ -10,7 +10,7 @@ from audit.models import (
     SingleAuditChecklist,
     Audit,
 )
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from audit.decorators import verify_status
 
 
@@ -26,6 +26,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: Switch to `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             context = {
@@ -43,12 +44,15 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         report_id = kwargs["report_id"]
 
         try:
+            # SOT TODO: Switch to `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            audit = Audit.objects.find_audit_or_none(report_id=report_id)
             errors = sac.validate_full()
-            audit_errors = audit.validate() if audit else None
 
-            _compare_errors(errors, audit_errors)
+            audit = Audit.objects.find_audit_or_none(report_id=report_id)
+            if audit:
+                audit_errors = audit.validate()
+                _compare_errors(errors, audit_errors)
+
             context = {"report_id": report_id, "errors": errors}
 
             return render(

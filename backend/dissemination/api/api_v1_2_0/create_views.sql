@@ -1,17 +1,16 @@
 begin;
 ---------------------------------------
--- indexes
----------------------------------------
-create index if not exists idx_audit_submission_status on audit_audit (submission_status);
-create index if not exists idx_audit_auditee_uei on audit_audit ((audit->'general_information'->>'auditee_uei'));
-create index if not exists idx_audit_auditee_email on audit_audit ((audit->'general_information'->>'auditee_email'));
-create index if not exists idx_audit_auditor_email on audit_audit ((audit->'general_information'->>'auditor_email'));
-create index if not exists idx_audit_fac_accepted_date on audit_audit ((audit->>'fac_accepted_date'));
-create index if not exists idx_history_auditor_cert on audit_history (report_id, event, id DESC);
-create index if not exists idx_history_auditee_cert on audit_history (report_id, event, id DESC);
----------------------------------------
 -- functions
 ---------------------------------------
+create or replace function cast_text_to_date(the_date varchar)
+   returns date
+   language sql
+   immutable
+as
+$$
+  select to_date(the_date, 'yyyy-mm-dd');
+$$;
+
 create or replace function yesnonull(input text)
 returns text as $$
 begin
@@ -66,13 +65,24 @@ begin
 end;
 $$ language plpgsql immutable;
 ---------------------------------------
+-- indexes
+---------------------------------------
+create index if not exists idx_audit_submission_status on audit_audit (submission_status);
+create index if not exists idx_audit_auditee_uei on audit_audit ((audit->'general_information'->>'auditee_uei'));
+create index if not exists idx_audit_auditee_email on audit_audit ((audit->'general_information'->>'auditee_email'));
+create index if not exists idx_audit_auditor_email on audit_audit ((audit->'general_information'->>'auditor_email'));
+create index if not exists idx_audit_fac_accepted_date on audit_audit ((audit->>'fac_accepted_date'));
+create index if not exists idx_history_auditor_cert on audit_history (report_id, event, id DESC);
+create index if not exists idx_history_auditee_cert on audit_history (report_id, event, id DESC);
+create index if not exists idx_audit_date_index ON audit_audit (cast_text_to_date(audit_audit.fac_accepted_date));
+---------------------------------------
 -- finding_text
 ---------------------------------------
 create view api_v1_2_0.findings_text as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         ft_elem->>'reference_number' as finding_ref_number,
         ft_elem->>'contains_chart_or_table' as contains_chart_or_table,
         ft_elem->>'text_of_finding' as finding_text
@@ -94,13 +104,15 @@ create view api_v1_2_0.additional_ueis as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         uei_elem as additional_uei
     from
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'additional_ueis') as uei_elem on true
     where
-        a.submission_status='disseminated'
+        a.submission_status = 'disseminated'
+        and a.audit->'general_information'->>'multiple_ueis_covered' = 'Yes'
+        and a.audit ? 'additional_ueis'
 ;
 ---------------------------------------
 -- finding
@@ -109,7 +121,7 @@ create view api_v1_2_0.findings as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         f_elem->'program'->>'award_reference' as award_reference,
         f_elem->'findings'->>'reference_number' as reference_number,
         f_elem->'material_weakness' as is_material_weakness,
@@ -135,7 +147,7 @@ create view api_v1_2_0.federal_awards as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         fa_elem->>'award_reference' as award_reference,
         fa_elem->'program'->>'federal_agency_prefix' as federal_agency_prefix,
         fa_elem->'program'->>'three_digit_extension' as federal_award_extension,
@@ -169,7 +181,7 @@ create view api_v1_2_0.corrective_action_plans as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         cap_elem->>'reference_number' as finding_ref_number,
         cap_elem->>'contains_chart_or_table' as contains_chart_or_table,
         cap_elem->>'planned_action' as planned_action
@@ -191,7 +203,7 @@ create view api_v1_2_0.notes_to_sefa as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         coalesce(notes.note->>'note_title','') as title,
         a.audit->'notes_to_sefa'->>'accounting_policies' as accounting_policies,
         a.audit->'notes_to_sefa'->>'is_minimis_rate_used' as is_minimis_rate_used,
@@ -220,7 +232,7 @@ create view api_v1_2_0.passthrough as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         fa_elem->>'award_reference' as award_reference,
         pass_elem->>'passthrough_identifying_number' as passthrough_id,
         pass_elem->>'passthrough_name' as passthrough_name
@@ -238,7 +250,7 @@ create view api_v1_2_0.general as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         -- auditee
         coalesce(a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_name','') as auditee_certify_name,
         coalesce(a.audit->'auditee_certification' -> 'auditee_signature' ->> 'auditee_title','') as auditee_certify_title,
@@ -256,11 +268,11 @@ create view api_v1_2_0.general as
         coalesce(a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_name','') as auditor_certify_name,
         coalesce(a.audit->'auditor_certification' -> 'auditor_signature' ->> 'auditor_title','') as auditor_certify_title,
         a.audit->'general_information'->>'auditor_phone' as auditor_phone,
-        a.audit->'general_information'->>'auditor_state' as auditor_state,
-        a.audit->'general_information'->>'auditor_city' as auditor_city,
+        coalesce(a.audit->'general_information'->>'auditor_state','') as auditor_state,
+        coalesce(a.audit->'general_information'->>'auditor_city','') as auditor_city,
         a.audit->'general_information'->>'auditor_contact_title' as auditor_contact_title,
-        a.audit->'general_information'->>'auditor_address_line_1' as auditor_address_line_1,
-        a.audit->'general_information'->>'auditor_zip' as auditor_zip,
+        coalesce(a.audit->'general_information'->>'auditor_address_line_1','') as auditor_address_line_1,
+        coalesce(a.audit->'general_information'->>'auditor_zip','') as auditor_zip,
         a.audit->'general_information'->>'auditor_country' as auditor_country,
         a.audit->'general_information'->>'auditor_contact_name' as auditor_contact_name,
         a.audit->'general_information'->>'auditor_email' as auditor_email,
@@ -284,9 +296,8 @@ create view api_v1_2_0.general as
         where event = 'auditee-certification-completed'
         and h.report_id = a.report_id
         order by id desc limit 1) as auditee_certified_date,
-
-        a.audit->>'fac_accepted_date' as submitted_date,
-        a.audit->>'fac_accepted_date' as fac_accepted_date,   
+        a.fac_accepted_date as submitted_date,
+        a.fac_accepted_date,
         a.audit->'general_information'->>'auditee_fiscal_period_end' as fy_end_date,
         a.audit->'general_information'->>'auditee_fiscal_period_start' as fy_start_date,
         a.audit->'general_information'->>'audit_type' as audit_type,
@@ -298,20 +309,35 @@ create view api_v1_2_0.general as
         yesnogsamigration(a.audit->'audit_information'->>'is_internal_control_deficiency_disclosed') as is_internal_control_deficiency_disclosed,
         yesnogsamigration(a.audit->'audit_information'->>'is_internal_control_material_weakness_disclosed') as is_internal_control_material_weakness_disclosed,
         yesnogsamigration(a.audit->'audit_information'->>'is_material_noncompliance_disclosed') as is_material_noncompliance_disclosed,
-        a.audit->'audit_information'->'dollar_threshold' as dollar_threshold,
+        (a.audit->'audit_information'->'dollar_threshold')::bigint  as dollar_threshold,
         yesnogsamigration(a.audit->'audit_information'->>'is_low_risk_auditee') as is_low_risk_auditee,
         coalesce(jsonb_array_to_string(a.audit->'audit_information'->'agencies'),'') as agencies_with_prior_findings,
         a.audit->'general_information'->>'user_provided_organization_type' as entity_type,
         coalesce(a.audit->'general_information'->>'audit_period_other_months','') as number_months,
         coalesce(a.audit->'general_information'->>'audit_period_covered','') as audit_period_covered,
-        a.audit->'federal_awards'->'total_amount_expended' as total_amount_expended,
+        (a.audit->'federal_awards'->'total_amount_expended')::bigint  as total_amount_expended,
         a.audit ->>'type_audit_code' as type_audit_code,
         a.is_public as is_public,
         a.data_source as data_source,
         yesnogsamigration(a.audit->'audit_information'->>'is_aicpa_audit_guide_included') as is_aicpa_audit_guide_included,
-        yesno(a.audit->'general_information'->>'multiple_ueis_covered') as is_additional_ueis,
-        yesno(a.audit->'general_information'->>'multiple_eins_covered') as is_multiple_eins,
-        yesno(a.audit->'general_information'->>'secondary_auditors_exist') as is_secondary_auditors     
+        case 
+            when yesno(a.audit->'general_information'->>'multiple_ueis_covered') = 'Yes' 
+            and a.audit ? 'additional_ueis'
+            then 'Yes'
+            else 'No'
+        end as is_additional_ueis,
+        case 
+            when yesno(a.audit->'general_information'->>'multiple_eins_covered') = 'Yes' 
+            and a.audit ? 'additional_eins'
+            then 'Yes'
+            else 'No'
+        end as is_multiple_eins,
+        case 
+            when yesno(a.audit->'general_information'->>'secondary_auditors_exist') = 'Yes' 
+            and a.audit ? 'secondary_auditors'
+            then 'Yes'
+            else 'No'
+        end as is_secondary_auditors    
     from
         audit_audit as a
     where 
@@ -324,7 +350,7 @@ create view api_v1_2_0.secondary_auditors as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         sa_elem->>'secondary_auditor_ein' as auditor_ein,
         sa_elem->>'secondary_auditor_name' as auditor_name,
         sa_elem->>'secondary_auditor_contact_name' as contact_name,
@@ -339,7 +365,9 @@ create view api_v1_2_0.secondary_auditors as
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'secondary_auditors') as sa_elem on true
     where
-        a.submission_status='disseminated'
+        a.submission_status = 'disseminated'
+        and a.audit->'general_information'->>'secondary_auditors_exist' = 'Yes'
+        and a.audit ? 'secondary_auditors'
 ;
 ---------------------------------------
 -- additional_eins
@@ -348,13 +376,15 @@ create view api_v1_2_0.additional_eins as
     select
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
-        a.audit->'audit_year' as audit_year,
+        a.audit->>'audit_year' as audit_year,
         ein_elem as additional_ein
     from
         audit_audit as a
         join lateral jsonb_array_elements(a.audit->'additional_eins') as ein_elem on true
     where
-        a.submission_status='disseminated'
+        a.submission_status = 'disseminated'
+        and a.audit->'general_information'->>'multiple_eins_covered' = 'Yes'
+        and a.audit ? 'additional_eins'
 ;
 commit;
 

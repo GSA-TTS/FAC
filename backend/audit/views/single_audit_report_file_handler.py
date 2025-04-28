@@ -50,5 +50,5 @@ class SingleAuditReportFileHandlerView(
             return redirect("/")
 
         except MultiValueDictKeyError:
-            logger.warn("No file found in request")
+            logger.warning("No file found in request")
             raise BadRequest()
