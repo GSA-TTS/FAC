@@ -73,8 +73,9 @@ sudo apt install zip
 
 A deployer account will be provided for each environment. Access to specific environments depends on successful merge and deploy of your onboarding ticket.
 
-To obtain the deployer credentials for a specific environment, run the following commands. You can view the specific services with `cf services` and associated key for the deployer service with `cf service-keys <service-name> <service-key-name>`
+You can view the specific services with `cf services` and associated key for the deployer service with `cf service-keys <service-name> <service-key-name>`. To obtain the deployer credentials for a specific environment, run the following commands:
 ```bash
+# This implies that you are in the environment specific folder
 cd terraform/<environment>
 ../../bin/ops/get_service_account.sh -o gsa-tts-oros-fac -s <environment> -u <service-key-name> >> secrets.auto.tfvars
 ```
@@ -84,7 +85,7 @@ This will update a `secrets.auto.tfvars` in the directory for use with terraform
 > You can use `bin/ops/create_service_account.sh` to create a new one if something happens to the existing one.
 
 ## Bootstrapping the state storage s3 bucket for the first time
-By default, we use a [partial s3 configuration](https://developer.hashicorp.com/terraform/language/settings/backends/configuration#partial-configuration) for all environments. This will be handled automatically when you run `terraform init`, and requires use of of a `backend.tfvars` file to store sensitive credentials to access the s3 bucket.
+By default, we use a [partial s3 configuration](https://developer.hashicorp.com/terraform/language/backend) for all environments. This will be handled automatically when you run `terraform init`, and requires use of of a `backend.tfvars` file to store sensitive credentials to access the s3 bucket.
 
 > [!WARNING]
 > *This should not be necessary in most cases.* Running the below command will initialize your directory to work directly with the LIVE terraform state that exists in the s3 bucket. As a best practice, it is imperative that if you are running terraform from your local machine, you create and utilize backups of the terraform.tfstate for your specific environment. You, by running this command, are taking authority of the terraform state underneath all of our other operations, and as such, assume full responsibility for infrastructure changes that are run after this point.
