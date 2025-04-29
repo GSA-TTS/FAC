@@ -1,3 +1,9 @@
+###
+# This management command exports data from dissemination_migrationinspectionrecord and dissemination_invalidauditrecord tables.
+# This command is for one-time-use only in Prod.
+# This command was run in Prod on 4/22/25
+###
+
 import os
 import logging
 

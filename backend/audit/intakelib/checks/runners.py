@@ -249,9 +249,7 @@ def process_check_result(res):
 
 def log_errors(errors):
     """Log the number of errors found in the IR passes."""
-    logger.info(f"Found {len(errors)} errors in the IR passes.")
-    if errors:
-        logger.info("Raising a validation error.")
+    logger.debug(f"Found {len(errors)} errors in the IR passes.")
 
 
 def run_all_general_checks(ir, section_name, is_data_migration=False, auditee_uei=None):

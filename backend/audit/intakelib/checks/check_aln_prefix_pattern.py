@@ -29,5 +29,4 @@ def aln_agency_prefix(ir):
             )
 
     if len(errors) > 0:
-        logger.info("Raising a validation error.")
         raise ValidationError(errors)

@@ -18,7 +18,7 @@ def uei_exists(ir):
     ):
         pass
     else:
-        logger.info("Did not find a UEI.")
+        logger.debug("Did not find a UEI.")
         return build_range_error_tuple(
             ir, uei_range, "auditee_uei", get_message("check_uei_exists")
         )

@@ -104,7 +104,7 @@ def replace_range_by_name(ir, name, new_values):
         new_ranges = []
         for range in sheet["ranges"]:
             if range["name"] == name:
-                logger.info(f"Replacing range {name}")
+                logger.debug(f"Replacing range {name}")
                 range["values"] = new_values
             new_ranges.append(range)
         sheet["ranges"] = new_ranges
@@ -200,7 +200,7 @@ def get_range_values_by_name(sheets, name):
         # logger.info("VALUES",  range["values"])
         return range["values"]
     else:
-        logger.info(f"No values found for range {name}")
+        logger.debug(f"No values found for range {name}")
         # FIXME: Raise an exception?
         # Returning none to break upstream code; an exception would be better.
         raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
@@ -212,7 +212,7 @@ def remove_range_by_name(ir, name):
         new_ranges = []
         for range in sheet["ranges"]:
             if range["name"] == name:
-                logger.info(f"Removing range {name}")
+                logger.debug(f"Removing range {name}")
                 pass
             else:
                 new_ranges.append(range)
@@ -277,14 +277,14 @@ def extract_workbook_as_ir(file):
         dn = workbook.defined_names[named_range_name]
         # If the user mangles the workbook enough, we get #REF errors
         if "#ref" in dn.attr_text.lower():
-            logger.info(f"Workbook has #REF errors for {named_range_name}.")
+            logger.error(f"Workbook has #REF errors for {named_range_name}.")
             raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
         else:
             try:
                 title, coord = next(dn.destinations)
                 process_destination(dn, title, coord, sheets_by_name, workbook)
             except StopIteration:
-                logger.info(f"No destinations found for {named_range_name}.")
+                logger.debug(f"No destinations found for {named_range_name}.")
                 # raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
 
     # Build the IR, which is a list of sheets.
