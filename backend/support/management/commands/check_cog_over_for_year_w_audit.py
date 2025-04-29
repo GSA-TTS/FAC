@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from support.cog_over_w_audit import compute_cog_over
 from django.apps import apps
 

@@ -59,6 +59,7 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             return reverse(f"audit:{viewname}", **kwargs)
 
         report_id = kwargs["report_id"]
+        # SOT TODO: Switch to audit
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         accesses = Access.objects.filter(sac=sac).order_by("role")
         base_entries = list(map(_user_entry, accesses))

@@ -12,7 +12,7 @@ from audit.models import (
     SingleAuditChecklist,
     Audit,
 )
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from audit.models.viewflow import sac_transition
 from audit.decorators import verify_status
 
@@ -50,9 +50,11 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
             # TODO: Update Post SOC Launch
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
             errors = sac.validate_full()
-            audit_errors = audit.validate() if audit else None
 
-            _compare_errors(errors, audit_errors)
+            if audit:
+                audit_errors = audit.validate()
+                _compare_errors(errors, audit_errors)
+
             if not errors:
                 sac_transition(
                     request,

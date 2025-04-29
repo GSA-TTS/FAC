@@ -116,14 +116,17 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except Exception as err:
-            logger.info("Enexpected error in UploadReportView get:\n%s", err)
+            logger.error("Enexpected error in UploadReportView get:\n%s", err)
             raise BadRequest() from err
 
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
+            # TODO SOT: Switch to `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            # In the transition (SOT1.5), the audit MUST exist at this point,
+            # becuase it was created with the SAC. So, we should at least get *something*.
             audit = Audit.objects.find_audit_or_none(report_id)
             form = UploadReportForm(request.POST, request.FILES)
 
@@ -138,9 +141,9 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 file = request.FILES["upload_report"]
-                sar_file = self.reformat_form_data(
-                    file, form, sac.id, audit.id if audit else None
-                )
+                # SOT TODO: The audit.id, per comment above, MUST exist at this point.
+                # (This was `audit.id if audit else None`)
+                sar_file = self.reformat_form_data(file, form, sac.id, audit.id)
 
                 # Try to save the formatted form data. If it fails on the file
                 # (encryption issues, file size issues), add and pass back the file errors.
@@ -176,7 +179,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             return render(request, "audit/no-late-changes.html")
 
         except Exception as err:
-            logger.info("Unexpected error in UploadReportView post:\n %s", err)
+            logger.error("Unexpected error in UploadReportView post:\n %s", err)
             raise BadRequest() from err
 
     def reformat_form_data(self, file, form, sac_id, audit_id):

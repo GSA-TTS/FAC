@@ -5,7 +5,7 @@ Allows the manual transition of an audit to dissemination.
 from audit.models import (
     SingleAuditChecklist,
 )
-from audit.models.models import STATUS
+from audit.models.constants import STATUS
 from audit.models.viewflow import sac_revert_from_submitted, sac_transition
 from curation.curationlib.curation_audit_tracking import CurationTracking
 from dissemination.remove_workbook_artifacts import remove_workbook_artifacts
