@@ -61,10 +61,17 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
 
                 audit = Audit.objects.find_audit_or_none(report_id=report_id)
                 if audit:
-                    shaped_audit = audit_validation_shape(audit)
-                    _compare_shapes(shaped_sac, shaped_audit)
+                    # SOT2 SOT TODO
+                    # This will become obsolete in 2.0. Also, we have better
+                    # checks in our validation code, both internal and API.
+                    # So, having this be noisy during submission does not, at this
+                    # point, matter/make sense. We should not run these two lines
+                    # while we are "on hold" during SOT 1.5.
+                    # shaped_audit = audit_validation_shape(audit)
+                    # _compare_shapes(shaped_sac, shaped_audit)
+                    pass
                 else:
-                    logger.debug("A SOT does not yet exist for this SAC.\n")
+                    logger.info("A SOT does not yet exist for this SAC.\n")
 
                 # This tuple can come back as None, None, which is fine.
                 uploaded_by, uploaded_at = section_completed_metadata(
