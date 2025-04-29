@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> Effective `April 30th, 5PM EST`, the Federal Audit Clearinghouse is entering a state of "Feature Complete". All outstanding Issues, Pull Requests and Features past this time are considered closed or not planned. The Federal Audit Clearinghouse may push critical version dependency updates and bug fixes, however, there will be no new features as of `May 1`. This state is subject to change at a later, undisclosed date.
+
 # FAC documentation
 
 Welcome to the FAC!  Below are a collection of useful resources about the project, including architectural decision records, dependency management, diagrams, team practices, onboarding, and more.
