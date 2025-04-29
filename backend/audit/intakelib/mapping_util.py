@@ -156,6 +156,6 @@ def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
         if key_found:
             named_ranges.append((key_found, row_index))
         else:
-            logger.info(f"No named range matches this error path: {error.path}")
+            logger.debug(f"No named range matches this error path: {error.path}")
 
     return named_ranges

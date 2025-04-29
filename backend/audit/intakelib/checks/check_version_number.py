@@ -42,5 +42,4 @@ def validate_workbook_version(ir):
             )
 
     if errors:
-        logger.info("Raising a validation error.")
         raise ValidationError(errors)

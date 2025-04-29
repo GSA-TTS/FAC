@@ -58,5 +58,4 @@ def finding_reference_year(ir, is_gsa_migration=False):
             )
 
     if len(errors) > 0:
-        logger.info("Raising a validation error.")
         raise ValidationError(errors)
