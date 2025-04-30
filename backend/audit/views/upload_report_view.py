@@ -142,8 +142,10 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             if form.is_valid():
                 file = request.FILES["upload_report"]
                 # SOT TODO: The audit.id, per comment above, MUST exist at this point.
-                # (This was `audit.id if audit else None`)
-                sar_file = self.reformat_form_data(file, form, sac.id, audit.id)
+                # Pass the audit ID if we have one. Otherwise, None is valid. Revert to just `audit.id` after TODO.
+                sar_file = self.reformat_form_data(
+                    file, form, sac.id, audit.id if audit else None
+                )
 
                 # Try to save the formatted form data. If it fails on the file
                 # (encryption issues, file size issues), add and pass back the file errors.
