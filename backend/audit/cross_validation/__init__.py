@@ -61,7 +61,8 @@ from .auditee_ueis_match import auditee_ueis_match
 from .check_award_ref_declaration import check_award_ref_declaration
 from .check_award_ref_existence import check_award_ref_existence
 from .check_award_reference_uniqueness import check_award_reference_uniqueness
-from .check_finding_prior_references import check_finding_prior_references
+
+# from .check_finding_prior_references import check_finding_prior_references
 from .check_biennial_low_risk import check_biennial_low_risk
 from .check_certifying_contacts import check_certifying_contacts
 from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
@@ -84,7 +85,11 @@ functions = [
     check_biennial_low_risk,
     check_certifying_contacts,
     check_finding_reference_uniqueness,
-    check_finding_prior_references,
+    # 20250430 This does not work if an auditee changes their UEI from one
+    # year to the next. At that point, we need a waiver. That fix is not something
+    # that can be done at this exact moment, and so we are turning off this validation
+    # for the time being.
+    # check_finding_prior_references,
     check_findings_count_consistency,
     check_has_federal_awards,
     check_ref_number_in_cap,

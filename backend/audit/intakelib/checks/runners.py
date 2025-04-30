@@ -55,7 +55,7 @@ from .check_y_or_n__fields import has_invalid_yorn_field
 from .check_no_repeat_findings import no_repeat_findings
 from .check_findings_grid_validation import findings_grid_validation
 
-# from .check_finding_prior_references_pattern import prior_references_pattern
+from .check_finding_prior_references_pattern import prior_references_pattern
 from .check_finding_reference_pattern import finding_reference_pattern
 from .check_finding_reference_year import finding_reference_year
 from .check_aln_prefix_pattern import aln_agency_prefix
@@ -111,11 +111,7 @@ audit_findings_checks = general_checks + [
     has_all_required_fields(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
     has_invalid_yorn_field(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
     award_references_pattern,
-    # 20250425 This does not work if an auditee changes their UEI from one
-    # year to the next. At that point, we need a waiver. That fix is not something
-    # that can be done at this exact moment, and so we are turning off this validation
-    # for the time being.
-    # prior_references_pattern,
+    prior_references_pattern,
     finding_reference_pattern,
     finding_reference_year,
     no_repeat_findings,
