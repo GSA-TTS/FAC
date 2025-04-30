@@ -43,9 +43,7 @@ jobs:
 
       - name: Install linters
         working-directory: ./backend
-        run: |
-          pip install --upgrade pip
-          pip install -r dev-requirements.txt
+        run: pip install -r dev-requirements.txt
 
       - name: Lint with flake8
         working-directory: ./backend
