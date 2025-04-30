@@ -36,7 +36,7 @@ resource "newrelic_one_dashboard" "log_review_dashboard" {
       height = 3
 
       nrql_query {
-        query = "FROM Metric SELECT count(*) AS 'Total uploads', average(apm.service.transaction.duration) AS 'Average time (s)' WHERE appName = 'gsa-fac-${var.cf_space_name}' AND path LIKE 'audit.views.views:ExcelFileHandlerView.post'"
+        query = "FROM Metric SELECT count(*) AS 'Total uploads', average(apm.service.transaction.duration) AS 'Average time (s)' WHERE appName = 'gsa-fac-${var.cf_space_name}' AND path LIKE 'audit.views.excel_file_handler:ExcelFileHandlerView.post'"
       }
 
       legend_enabled = true
