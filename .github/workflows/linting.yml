@@ -2,8 +2,6 @@
 name: Lint Files
 on:
   workflow_call:
-  push:
-    branches: [linting-test]
 
 jobs:
   linting:
