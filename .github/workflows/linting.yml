@@ -28,18 +28,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Restore pip cache
-        uses: actions/cache@v4.2.3
-        id: cache-pip
-        with:
-          path: |
-            ~/.cache/pip
-            /opt/hostedtoolcache/Python/
-          key: fac-build-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/dev-requirements.txt') }}
-          restore-keys: |
-            fac-build-pip-${{ hashFiles('**/requirements.txt') }}-
-            fac-build-pip-
-            fac-build-
+      # - name: Restore pip cache
+      #   uses: actions/cache@v4.2.3
+      #   id: cache-pip
+      #   with:
+      #     path: |
+      #       ~/.cache/pip
+      #       /opt/hostedtoolcache/Python/
+      #     key: fac-build-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/dev-requirements.txt') }}
+      #     restore-keys: |
+      #       fac-build-pip-${{ hashFiles('**/requirements.txt') }}-
+      #       fac-build-pip-
+      #       fac-build-
 
       - name: Install linters
         working-directory: ./backend
