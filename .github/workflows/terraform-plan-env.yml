@@ -42,7 +42,7 @@ jobs:
         # generated, and the same comment will be updated each time a new commit
         # on the PR branch triggers a re-plan.
       - name: terraform plan ( ${{ inputs.environment }} )
-        uses: dflook/terraform-plan@v1
+        uses: dflook/terraform-plan@v2
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
