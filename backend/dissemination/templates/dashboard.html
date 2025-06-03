@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load sprite_helper %}
+{% load static %}
+{% block content %}
+    {% comment %} Title {% endcomment %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-col grid-gap">
+            <h1 class="font-sans-2xl">Percent Funding by Entity Type</h1>
+        </div>
+    </div>
+
+    {% comment %} The big doughnut of doom {% endcomment %}
+    <div class="padding-y-6">
+        <div class="grid-container margin-y-6">
+            <div style="width: 800px;"><canvas id="dashboard_sample"></canvas></div>
+        </div>
+    </div>
+
+    {{ dashboard_data | json_script:"dashboard_data" }}
+    <script src="{% static 'compiled/js/dashboard_sample.js' %}"></script>
+{% endblock content %}
