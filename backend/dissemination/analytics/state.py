@@ -17,6 +17,10 @@ class DisseminationStateAnalytics:
         self.year = year
         self.state = state
 
+        # preload queries for faster performance.
+        self.records = self._get_records_by_state_and_year()
+        self.awards = self._get_awards_by_year()
+
     def _get_records_by_state_and_year(self):
         """ Get all disseminated records for a specified year and state. """
         return General.objects.filter(
@@ -27,37 +31,41 @@ class DisseminationStateAnalytics:
 
     def _get_awards_by_year(self):
         """ Get federal awards based on all the records that were disseminated for a specific state and year. """
-        return FederalAward.objects.filter(report_id__in=self._get_records_by_state_and_year())
+        return FederalAward.objects.filter(report_id__in=self.records)
 
     def single_dissemination_count(self):
         return {
-            "total": self._get_records_by_state_and_year().count()
+            "total": self.records.count()
         }
 
     def top_programs(self):
+        """ Top funded federal programs. """
         return list(
-            self._get_awards_by_year()
+            self.awards
             .values('federal_program_name')
             .annotate(total_expended=Sum('amount_expended'))
             .order_by('-total_expended')
         )
 
     def funding_by_entity_type(self):
+        """ Top funded federal programs based on entity type. """
         return list(
-            self._get_awards_by_year()
+            self.awards
             .values(entity_type=F('report_id__entity_type'))
             .annotate(total_expended=Sum('amount_expended'))
             .order_by('-total_expended')
         )
 
     def funding_by_county(self):
+        """ Top funded federal programs based on county. """
         # TODO: Analytics Dashboard
         # How do we get counties?
         pass
 
     def programs_with_repeated_findings(self):
+        """ Top federal programs with repeated findings. """
         return list(
-            self._get_awards_by_year()
+            self.awards
             .values(award_name=F('federal_program_name'))
             .annotate(
                 repeat_findings=Count(
