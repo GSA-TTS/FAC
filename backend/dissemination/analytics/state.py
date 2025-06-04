@@ -31,7 +31,8 @@ class DisseminationStateAnalytics:
 
     def _get_awards_by_year(self):
         """ Get federal awards based on all the records that were disseminated for a specific state and year. """
-        return FederalAward.objects.filter(report_id__in=self.records)
+        record_ids = self.records.values('report_id')
+        return FederalAward.objects.filter(report_id__in=record_ids)
 
     def single_dissemination_count(self):
         return {
