@@ -35,27 +35,30 @@ class DisseminationStateAnalytics:
         return FederalAward.objects.filter(report_id__in=record_ids)
 
     def single_dissemination_count(self):
-        return {
+        out = {
             "total": self.records.count()
         }
+        return out
 
     def top_programs(self):
         """ Top funded federal programs. """
-        return list(
+        out = list(
             self.awards
             .values('federal_program_name')
             .annotate(total_expended=Sum('amount_expended'))
             .order_by('-total_expended')
         )
+        return out
 
     def funding_by_entity_type(self):
         """ Top funded federal programs based on entity type. """
-        return list(
+        out = list(
             self.awards
             .values(entity_type=F('report_id__entity_type'))
             .annotate(total_expended=Sum('amount_expended'))
             .order_by('-total_expended')
         )
+        return out
 
     def funding_by_county(self):
         """ Top funded federal programs based on county. """
@@ -65,18 +68,20 @@ class DisseminationStateAnalytics:
 
     def programs_with_repeated_findings(self):
         """ Top federal programs with repeated findings. """
-        return list(
-            self.awards
+        awards = self.awards.filter(report_id__finding__is_repeat_finding='Y')
+        out = list(
+            awards
             .values(award_name=F('federal_program_name'))
             .annotate(
                 repeat_findings=Count(
                     'report_id__finding',
-                    filter=Q(report_id__finding__is_repeat_finding=True),
+                    filter=Q(report_id__finding__is_repeat_finding='Y'),
                     distinct=True
                 )
             )
             .order_by('-repeat_findings')
         )
+        return out
 
     def top_state_entities_with_questioned_costs(self):
         # TODO: Analytics Dashboad
