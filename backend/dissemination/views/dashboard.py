@@ -22,7 +22,7 @@ class DashboardView(View):
         ]
 
         # Funding by entity type, as a starter
-        context['dashboard_data'] = []
+        context['dashboard_data'] = {"labels": [], "values": []}
         for organization_type in types:
             sum = (
                 Audit.objects.filter(query)
@@ -35,6 +35,7 @@ class DashboardView(View):
                 .aggregate(sum=Sum("total_amount_expended_int"))
                 ['sum']
             )
-            context['dashboard_data'].append({"entity_type": organization_type, "sum": sum})
+            context['dashboard_data']['labels'].append(organization_type)
+            context['dashboard_data']['values'].append(sum)
 
         return render(request, "dashboard.html", context)

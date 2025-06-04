@@ -10,10 +10,10 @@
     </div>
 
     {% comment %} The big doughnut of doom {% endcomment %}
-    <div class="padding-y-6">
-        <div class="grid-container margin-y-6">
-            <div style="width: 800px;"><canvas id="dashboard_sample"></canvas></div>
-        </div>
+    <div class="grid-container padding-y-6">
+        {% comment %} Plotly draws into this div {% endcomment %}
+        <div id="dashboard_piechart_div"></div>
+        <div id="dashboard_barchart_div"></div>
     </div>
 
     {{ dashboard_data | json_script:"dashboard_data" }}
