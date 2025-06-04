@@ -45,7 +45,7 @@ class DisseminationTrendAnalytics:
         for year in self.years:
             out.append({
                 "year": year,
-                "total": self.records.filter(fac_accepted_date__year=year).count(),
+                "total": self._get_records_by_year(year).count(),
             })
         return out
 

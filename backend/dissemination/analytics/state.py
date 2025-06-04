@@ -19,17 +19,20 @@ class DisseminationStateAnalytics:
 
         # preload queries for faster performance.
         self.records = self._get_records_by_state_and_year()
-        self.awards = self._get_awards_by_year()
+        self.awards = self._get_awards_by_state_and_year()
 
     def _get_records_by_state_and_year(self):
         """ Get all disseminated records for a specified year and state. """
-        return General.objects.filter(
-            is_public=True,
-            auditee_state=self.state,
-            fac_accepted_date__year=self.year
-        )
+        records = General.objects.filter(is_public=True)
 
-    def _get_awards_by_year(self):
+        if self.state:
+            records = records.filter(auditee_state=self.state)
+        if self.year:
+            records = records.filter(fac_accepted_date__year=self.year)
+
+        return records
+
+    def _get_awards_by_state_and_year(self):
         """ Get federal awards based on all the records that were disseminated for a specific state and year. """
         record_ids = self.records.values('report_id')
         return FederalAward.objects.filter(report_id__in=record_ids)
