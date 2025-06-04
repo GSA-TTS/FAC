@@ -71,7 +71,7 @@ class DisseminationStateAnalytics:
         awards = self.awards.filter(report_id__finding__is_repeat_finding='Y')
         out = list(
             awards
-            .values(award_name=F('federal_program_name'))
+            .values('federal_program_name')
             .annotate(
                 repeat_findings=Count(
                     'report_id__finding',
