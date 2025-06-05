@@ -44,7 +44,6 @@ resource "cloudfoundry_network_policy" "app-network-policy" {
 }
 
 resource "cloudfoundry_network_policy" "scanner-network-policy" {
-
   policies = [
     {
       source_app      = module.fac-file-scanner.app_id
