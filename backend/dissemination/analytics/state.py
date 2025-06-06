@@ -73,14 +73,13 @@ class DisseminationStateAnalytics:
         """Top federal programs with repeated findings."""
         awards = self.awards.filter(
             report_id__finding__is_repeat_finding="Y",
-            award_reference=F("report_id__finding__award_reference"),
+            report_id__finding__award_reference=F("award_reference")
         )
         out = (
             awards.values("federal_program_name")
             .annotate(
                 repeat_findings=Count(
                     "report_id__finding",
-                    filter=Q(report_id__finding__is_repeat_finding="Y"),
                     distinct=True,
                 )
             )
