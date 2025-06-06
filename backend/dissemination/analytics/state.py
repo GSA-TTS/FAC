@@ -34,7 +34,7 @@ class DisseminationStateAnalytics:
         return FederalAward.objects.filter(report_id__in=record_ids)
 
     def single_dissemination_count(self):
-        out = {"total": self.records.count()}
+        out = self.records.count()
         return out
 
     def top_programs(self, limit=None):
