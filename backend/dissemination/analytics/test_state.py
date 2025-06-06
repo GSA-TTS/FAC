@@ -38,7 +38,7 @@ class StateAnalyticsTests(TestCase):
         baker.make(
             General,
             auditee_state=self.state,
-            fac_accepted_date=f"1776-01-01",
+            fac_accepted_date="1776-01-01",
             is_public=True,
         )
 

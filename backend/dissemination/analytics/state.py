@@ -4,7 +4,7 @@ from dissemination.models import (
     FederalAward,
     General,
 )
-from django.db.models import Count, F, Sum, Q
+from django.db.models import Count, F, Sum
 
 
 class DisseminationStateAnalytics:
