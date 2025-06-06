@@ -84,7 +84,7 @@ class DisseminationTrendAnalytics:
             findings_count = (
                 self._get_records_by_year(year).exclude(finding=None).count()
             )
-            out.append({"year": year, "total": (findings_count / audits_count) * 100})
+            out.append({"year": year, "total": (findings_count / audits_count) * 100 if audits_count > 0 else 0})
         return out
 
     def auditee_risk_profile(self):
@@ -96,17 +96,15 @@ class DisseminationTrendAnalytics:
                 .filter(is_low_risk_auditee="Yes")
                 .count()
             )
-            not_low_risk_count = (
-                self._get_records_by_year(year).filter(is_low_risk_auditee="No").count()
-            )
+            not_low_risk_count = total - low_risk_count
 
             out.append(
                 {
                     "year": year,
                     "low_risk": low_risk_count,
-                    "low_risk_percent": (low_risk_count / total) * 100,
+                    "low_risk_percent": (low_risk_count / total) * 100 if total > 0 else 0,
                     "not_low_risk": not_low_risk_count,
-                    "not_low_risk_percent": (not_low_risk_count / total) * 100,
+                    "not_low_risk_percent": (not_low_risk_count / total) * 100 if total > 0 else 0,
                 }
             )
         return out
@@ -124,8 +122,8 @@ class DisseminationTrendAnalytics:
             out.append(
                 {
                     "year": year,
-                    "not_low_risk": (not_low_risk_count / total) * 100,
-                    "audits_with_findings": (findings_count / total) * 100,
+                    "not_low_risk": (not_low_risk_count / total) * 100 if total > 0 else 0,
+                    "audits_with_findings": (findings_count / total) * 100 if total > 0 else 0,
                 }
             )
         return out

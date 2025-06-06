@@ -37,23 +37,31 @@ class DisseminationStateAnalytics:
         out = {"total": self.records.count()}
         return out
 
-    def top_programs(self):
+    def top_programs(self, limit=None):
         """Top funded federal programs."""
-        out = list(
+        out = (
             self.awards.values("federal_program_name")
             .annotate(total_expended=Sum("amount_expended"))
             .order_by("-total_expended")
         )
-        return out
 
-    def funding_by_entity_type(self):
+        if limit is not None:
+            out = out[:limit]
+
+        return list(out)
+
+    def funding_by_entity_type(self, limit=None):
         """Top funded federal programs based on entity type."""
-        out = list(
+        out = (
             self.awards.values(entity_type=F("report_id__entity_type"))
             .annotate(total_expended=Sum("amount_expended"))
             .order_by("-total_expended")
         )
-        return out
+
+        if limit is not None:
+            out = out[:limit]
+
+        return list(out)
 
     def funding_by_county(self):
         """Top funded federal programs based on county."""
@@ -61,10 +69,10 @@ class DisseminationStateAnalytics:
         # How do we get counties?
         pass
 
-    def programs_with_repeated_findings(self):
+    def programs_with_repeated_findings(self, limit=None):
         """Top federal programs with repeated findings."""
         awards = self.awards.filter(report_id__finding__is_repeat_finding="Y")
-        out = list(
+        out = (
             awards.values("federal_program_name")
             .annotate(
                 repeat_findings=Count(
@@ -75,7 +83,11 @@ class DisseminationStateAnalytics:
             )
             .order_by("-repeat_findings")
         )
-        return out
+
+        if limit is not None:
+            out = out[:limit]
+
+        return list(out)
 
     def top_state_entities_with_questioned_costs(self):
         # TODO: Analytics Dashboad

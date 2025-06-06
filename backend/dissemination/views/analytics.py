@@ -20,9 +20,9 @@ class AnalyticsView(View):
         output_state = {
             # STATE analytics.
             "total": analytics.single_dissemination_count(),
-            "programs_with_repeated_findings": analytics.programs_with_repeated_findings(),
-            "top_programs": analytics.top_programs(),
-            "funding_by_entity_type": analytics.funding_by_entity_type(),
+            "programs_with_repeated_findings": analytics.programs_with_repeated_findings(limit=10),
+            "top_programs": analytics.top_programs(limit=10),
+            "funding_by_entity_type": analytics.funding_by_entity_type(limit=10),
             # TREND analytics.
             "total_submissions": trend_analytics.total_submissions(),
             "total_award_volume": trend_analytics.total_award_volume(),
