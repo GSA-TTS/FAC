@@ -16,14 +16,14 @@ class AnalyticsFilterForm(forms.Form):
     audit_year = forms.MultipleChoiceField(
         choices=AY_choices, initial=[2023], required=True
     )
-    auditee_state = forms.CharField(required=True)
+    auditee_state = forms.CharField(required=False)
 
     # These cleaning functions will run when `form.is_valid()` is run
     def clean_auditee_state(self):
         """
         If the auditee_state is present and is not a valid state (one of STATE_ABBREVS), provide an error.
         """
-        auditee_state = self.cleaned_data["auditee_state"]
+        auditee_state = self.cleaned_data.get("auditee_state", "")
         if not auditee_state:
             return auditee_state
 
@@ -33,12 +33,16 @@ class AnalyticsFilterForm(forms.Form):
             )
         return auditee_state
 
-    # Only necessary if the trend_analytics includes an "All years" option.
-    # def clean_audit_year(self):
-    #     """
-    #     If "All years" is selected, don't include any years.
-    #     """
-    #     audit_year = self.cleaned_data["audit_year"]
-    #     if "all_years" in audit_year:
-    #         return []
-    #     return audit_year
+    def clean_audit_year(self):
+        """
+        If only one year has been selected, a state must also be chosen.
+        """
+        audit_year = self.cleaned_data.get("audit_year", [])
+        auditee_state = self.cleaned_data.get("auditee_state", "")
+
+        if len(audit_year) == 1 and not auditee_state:
+            raise ValidationError(
+                "Choose a single year and a state, or choose multiple years."
+            )
+
+        return audit_year

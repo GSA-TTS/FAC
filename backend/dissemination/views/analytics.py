@@ -7,7 +7,7 @@ from django.views.generic import View
 from config.settings import STATE_ABBREVS
 from dissemination.analytics.state import DisseminationStateAnalytics
 from dissemination.analytics.trends import DisseminationTrendAnalytics
-from dissemination.forms.dashboard_forms import AnalyticsFilterForm
+from dissemination.forms.analytics_forms import AnalyticsFilterForm
 from dissemination.templatetags.combine_years import combine_years
 
 logger = logging.getLogger(__name__)
@@ -37,11 +37,17 @@ class AnalyticsView(View):
             "state_abbrevs": STATE_ABBREVS,
         }
 
-        # No params, load the blank page
-        if not state and year:
+        # Four Cases:
+        # 1. No params are given. Render the blank page.
+        # 2. Several years were chose with one state. The trend analytics take precedence, redirect without the state.
+        # 3. One year and a state. Make the state analytics queries, and render.
+        # 4. Multiple years. Make the trend analytics queries, and render.
+        if not state and not year:
             return render(request, "dashboard.html", context)
+        
+        if len(years) > 1 and state:
+            return redirect(f'{reverse("dissemination:Analytics")}?year={year}')
 
-        # Single year state analytics
         if len(years) == 1:
             logger.info(f"Gathering state analytics for {state} {year}")
             analytics = DisseminationStateAnalytics(state, year)
@@ -58,7 +64,6 @@ class AnalyticsView(View):
                 },
             }
 
-        # Multi-year trend analytics
         if len(years) > 1:
             logger.info(f"Gathering trend analytics for {state} {years}")
             trend_analytics = DisseminationTrendAnalytics(years)
@@ -81,6 +86,10 @@ class AnalyticsView(View):
         if form.is_valid():
             state = form.cleaned_data.get("auditee_state")
             years = ",".join(form.cleaned_data.get("audit_year"))
+
+            # Remove the state if several years are selected.
+            if len(years) > 1:
+                return redirect(f'{reverse("dissemination:Analytics")}?year={years}')
 
             return redirect(
                 f'{reverse("dissemination:Analytics")}?state={state}&year={years}'
