@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 from config.settings import STATE_ABBREVS
 
+
 class AnalyticsFilterForm(forms.Form):
     # Multiple choice field Tuples. "choices" variable in field declaration.
     AY_choices = tuple(
@@ -13,7 +14,7 @@ class AnalyticsFilterForm(forms.Form):
 
     # Fields
     audit_year = forms.MultipleChoiceField(
-        choices=AY_choices, initial=[2023], required=False
+        choices=AY_choices, initial=[2023], required=True
     )
     auditee_state = forms.CharField(required=True)
 

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load combine_years %}
 {% load sprite_helper %}
 {% load static %}
 {% block content %}
@@ -33,19 +34,36 @@
                 <div class="grid-col grid-gap">
                     <h1 class="font-sans-2xl">Sample Dashboard Yippee</h1>
                 </div>
-                <h2 class="font-sans-xl">State: {{ dashboard_data.state }}, Year: {{ dashboard_data.year }}</h2>
-                <h3 class="font-sans-lg">Total Records: {{ dashboard_data.state_analytics.total }}</h3>
+                {{ dashboard_data | json_script:"dashboard_data" }}
+                {% if not dashboard_data.state and dashboard_data.years %}
+                    <h3 class="font-sans-lg">Select at least one year and a state on the filters to the left.</h3>
+                {% elif dashboard_data.years|length is 1 %}
+                    {% comment %} State Analytics {% endcomment %}
+                    <h2 class="font-sans-xl">State: {{ dashboard_data.state }}, Year: {{ dashboard_data.year }}</h2>
+                    <h3 class="font-sans-lg">Total Records: {{ dashboard_data.state_analytics.total }}</h3>
+                    
+                    <div class="grid-container padding-y-6" id="plotly-containers">
+                        <div id="div_entity_type"></div>  {% comment %} The big doughnut of doom {% endcomment %}
+                        <div id="div_repeated_findings"></div>
+                        <div id="div_top_programs"></div>
+                    </div>
+                    <script src="{% static 'compiled/js/analytics/state.js' %}"></script>
+                {% else %}
+                    {% comment %} Multi-year Trend Analytics {% endcomment %}
+                    <h2 class="font-sans-xl">State: {{ dashboard_data.state }}, Years: {{ dashboard_data.years|combine_years }}</h2>
+                    {% comment %} <h3 class="font-sans-lg">Total Submissions: {{ dashboard_data.trend_analytics.total_submissions }}</h3> {% endcomment %}
 
-                <div class="grid-container padding-y-6">
-                    {% comment %} Plotly draws into these divs {% endcomment %}
-                    <div id="div_entity_type"></div>  {% comment %} The big doughnut of doom {% endcomment %}
-                    <div id="div_repeated_findings"></div>
-                    <div id="div_top_programs"></div>
-                </div>
+                    <div class="grid-container padding-y-6" id="plotly-containers">
+                        <div id="div_total_award_volume"></div>
+                        <div id="div_total_findings"></div>
+                        <div id="div_total_submissions_with_findings"></div>
+                        <div id="div_auditee_risk_profile"></div>
+                        <div id="div_risk_profile_vs_findings"></div>
+                    </div>
+                    <script src="{% static 'compiled/js/analytics/trend.js' %}"></script>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    {{ dashboard_data | json_script:"dashboard_data" }}
-    <script src="{% static 'compiled/js/dashboard_sample.js' %}"></script>
 {% endblock content %}

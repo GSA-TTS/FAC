@@ -12,7 +12,7 @@
                   name="audit_year"
                   type="checkbox"
                   value={{ value }}
-                  {% if text == dashboard_data.year %}checked{% endif %}
+                  {% if text in dashboard_data.years %}checked{% endif %}
                   />
             <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
         </div>
