@@ -22,20 +22,20 @@ class DashboardView(View):
         ]
 
         # Funding by entity type, as a starter
-        context['dashboard_data'] = {"labels": [], "values": []}
+        context["dashboard_data"] = {"labels": [], "values": []}
         for organization_type in types:
             sum = (
                 Audit.objects.filter(query)
                 .filter(organization_type=organization_type)
                 .annotate(
                     total_amount_expended_int=Cast(
-                        "audit__federal_awards__total_amount_expended", BigIntegerField()
+                        "audit__federal_awards__total_amount_expended",
+                        BigIntegerField(),
                     )
                 )
-                .aggregate(sum=Sum("total_amount_expended_int"))
-                ['sum']
+                .aggregate(sum=Sum("total_amount_expended_int"))["sum"]
             )
-            context['dashboard_data']['labels'].append(organization_type)
-            context['dashboard_data']['values'].append(sum)
+            context["dashboard_data"]["labels"].append(organization_type)
+            context["dashboard_data"]["values"].append(sum)
 
         return render(request, "dashboard.html", context)

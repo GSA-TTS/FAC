@@ -84,8 +84,7 @@ class DisseminationStateAnalytics:
             .order_by("-repeat_findings")
         )
 
-        if limit is not None:
-            out = out[:limit]
+        out = out[:limit]
 
         return list(out)
 

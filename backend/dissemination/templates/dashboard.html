@@ -5,15 +5,19 @@
     {% comment %} Title {% endcomment %}
     <div class="grid-container margin-top-6">
         <div class="grid-col grid-gap">
-            <h1 class="font-sans-2xl">Percent Funding by Entity Type</h1>
+            <h1 class="font-sans-2xl">Sample Dashboard Yippee</h1>
         </div>
+        <h2 class="font-sans-xl">State: {{ state }}</h2>
+        <h2 class="font-sans-xl">Year: {{ year }}</h2>
+        <h3 class="font-sans-lg">Total Records: {{ dashboard_data.total.total }}</h3>
     </div>
 
     {% comment %} The big doughnut of doom {% endcomment %}
     <div class="grid-container padding-y-6">
-        {% comment %} Plotly draws into this div {% endcomment %}
-        <div id="dashboard_piechart_div"></div>
-        <div id="dashboard_barchart_div"></div>
+        {% comment %} Plotly draws into these divs {% endcomment %}
+        <div id="div_entity_type"></div>
+        <div id="div_repeated_findings"></div>
+        <div id="div_top_programs"></div>
     </div>
 
     {{ dashboard_data | json_script:"dashboard_data" }}
