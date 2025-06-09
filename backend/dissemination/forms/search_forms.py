@@ -3,7 +3,7 @@ from datetime import date
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .searchlib.search_constants import text_input_delimiters, report_id_delimiters
+from dissemination.searchlib.search_constants import text_input_delimiters, report_id_delimiters
 from config.settings import STATE_ABBREVS
 
 

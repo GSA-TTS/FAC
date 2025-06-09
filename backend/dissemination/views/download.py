@@ -16,7 +16,7 @@ from dissemination.file_downloads import (
     get_filename,
     get_filename_from_audit,
 )
-from dissemination.forms import AdvancedSearchForm
+from dissemination.forms.search_forms import AdvancedSearchForm
 from dissemination.mixins import ReportAccessRequiredMixin
 from dissemination.models import (
     General,
