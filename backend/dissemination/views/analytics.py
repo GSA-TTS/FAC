@@ -84,19 +84,23 @@ class AnalyticsView(View):
         form = AnalyticsFilterForm(request.POST)
 
         if form.is_valid():
-            state = form.cleaned_data.get("auditee_state")
-            years = ",".join(form.cleaned_data.get("audit_year"))
+            state = form.cleaned_data.get("auditee_state", '')
+            years_selected = form.cleaned_data.get("audit_year", [])
+            years_string = ",".join(years_selected)
 
             # Remove the state if several years are selected.
-            if len(years) > 1:
-                return redirect(f'{reverse("dissemination:Analytics")}?year={years}')
+            if len(years_selected) > 1:
+                print("not yeet")
+                return redirect(f'{reverse("dissemination:Analytics")}?year={years_string}')
 
+            print("yeet")
             return redirect(
-                f'{reverse("dissemination:Analytics")}?state={state}&year={years}'
+                f'{reverse("dissemination:Analytics")}?state={state}&year={years_string}'
             )
         else:
-            # It should never be, but if the form is invalid re-render with the errors
+            # If the form is invalid re-render with the errors
             context = {
                 "form": form,
+                "state_abbrevs": STATE_ABBREVS,
             }
             return render(request, "dashboard.html", context)

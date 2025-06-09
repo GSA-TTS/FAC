@@ -33,16 +33,15 @@ class AnalyticsFilterForm(forms.Form):
             )
         return auditee_state
 
-    def clean_audit_year(self):
+    def clean(self):
         """
+        'clean' will run after all other fields have been validated.
+        Since these fields depend on each other, it is required.
         If only one year has been selected, a state must also be chosen.
         """
-        audit_year = self.cleaned_data.get("audit_year", [])
-        auditee_state = self.cleaned_data.get("auditee_state", "")
+        cleaned_data = super().clean()
+        audit_year = cleaned_data.get("audit_year", [])
+        auditee_state = cleaned_data.get("auditee_state", "")
 
         if len(audit_year) == 1 and not auditee_state:
-            raise ValidationError(
-                "Choose a single year and a state, or choose multiple years."
-            )
-
-        return audit_year
+            self.add_error("audit_year", "Choose a single year and a state, or choose multiple years.")
