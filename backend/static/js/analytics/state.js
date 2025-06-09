@@ -66,6 +66,7 @@ var chart_layout_repeated_findings = {
   },
   showlegend: true,
   yaxis: { automargin: true },
+  minreducedwidth: 400
 }
 
 Plotly.newPlot(
@@ -100,6 +101,7 @@ var chart_layout_top_programs = {
   },
   showlegend: true,
   yaxis: { automargin: true },
+  minreducedwidth: 400
 }
 
 Plotly.newPlot(
