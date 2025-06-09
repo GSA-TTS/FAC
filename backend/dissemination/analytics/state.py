@@ -9,9 +9,9 @@ from django.db.models import Count, F, Sum
 
 class DisseminationStateAnalytics:
 
-    def __init__(self, year, state):
-        self.year = year
+    def __init__(self, state, year):
         self.state = state
+        self.year = year
 
         # preload queries for faster performance.
         self.records = self._get_records_by_state_and_year()

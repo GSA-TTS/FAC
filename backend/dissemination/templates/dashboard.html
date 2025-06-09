@@ -3,21 +3,47 @@
 {% load static %}
 {% block content %}
     {% comment %} Title {% endcomment %}
-    <div class="grid-container margin-top-6">
-        <div class="grid-col grid-gap">
-            <h1 class="font-sans-2xl">Sample Dashboard Yippee</h1>
-        </div>
-        <h2 class="font-sans-xl">State: {{ state }}</h2>
-        <h2 class="font-sans-xl">Year: {{ year }}</h2>
-        <h3 class="font-sans-lg">Total Records: {{ dashboard_data.total.total }}</h3>
-    </div>
+    <div class="desktop:margin-x-10">
+        <div class="grid-row">
+            <div class="grid-col-auto analytics-filter-form width-mobile">
+                <h3>Filters</h3>
+                <form class="usa-form"
+                        id="analytics-filter-form"
+                        enctype='multipart/form-data'
+                        method="post">
+                    {% csrf_token %}
+                    {% comment %} Submission {% endcomment %}
+                    <div class="display-flex flex-column flex-align-center border-top border-base-light">
+                        <input class="usa-button width-full"
+                                type="submit"
+                                value="Filter"
+                                form="analytics-filter-form" />
+                        <input class="usa-button usa-button--unstyled"
+                                type="reset"
+                                value="Reset Filter" />
+                    </div>
+                    <div class="usa-accordion usa-accordion--multiselectable"
+                            data-allow-multiple>
+                        {% include "analytics_filters/audit-year.html" %}
+                        {% include "analytics_filters/state.html" %}
+                    </div>
+                </form>
+            </div>
+            <div class="grid-col padding-left-2">
+                <div class="grid-col grid-gap">
+                    <h1 class="font-sans-2xl">Sample Dashboard Yippee</h1>
+                </div>
+                <h2 class="font-sans-xl">State: {{ dashboard_data.state }}, Year: {{ dashboard_data.year }}</h2>
+                <h3 class="font-sans-lg">Total Records: {{ dashboard_data.state_analytics.total }}</h3>
 
-    {% comment %} The big doughnut of doom {% endcomment %}
-    <div class="grid-container padding-y-6">
-        {% comment %} Plotly draws into these divs {% endcomment %}
-        <div id="div_entity_type"></div>
-        <div id="div_repeated_findings"></div>
-        <div id="div_top_programs"></div>
+                <div class="grid-container padding-y-6">
+                    {% comment %} Plotly draws into these divs {% endcomment %}
+                    <div id="div_entity_type"></div>  {% comment %} The big doughnut of doom {% endcomment %}
+                    <div id="div_repeated_findings"></div>
+                    <div id="div_top_programs"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{ dashboard_data | json_script:"dashboard_data" }}
