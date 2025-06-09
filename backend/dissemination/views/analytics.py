@@ -90,10 +90,8 @@ class AnalyticsView(View):
 
             # Remove the state if several years are selected.
             if len(years_selected) > 1:
-                print("not yeet")
                 return redirect(f'{reverse("dissemination:Analytics")}?year={years_string}')
 
-            print("yeet")
             return redirect(
                 f'{reverse("dissemination:Analytics")}?state={state}&year={years_string}'
             )
