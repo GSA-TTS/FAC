@@ -19,10 +19,15 @@ class AnalyticsView(View):
     def get(self, request):
         # URL Params
         state = request.GET.get("state", "")
-        year = request.GET.get("year", "")  # 'YYYY,YYYY,...'
-        years = year.split(",")  # ['YYYY', 'YYYY', ...]
-        years.sort()
-        combined_years = combine_years(years)  # 'YYYY-YYYY, YYYY'
+        year = request.GET.get("year", "")
+
+        if year:
+            years = year.split(",")
+            years.sort()
+            combined_years = combine_years(years)
+        else:
+            years = []
+            combined_years = ""
 
         # Setup Template Context
         form = AnalyticsFilterForm()
