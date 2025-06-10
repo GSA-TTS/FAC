@@ -52,9 +52,9 @@ class StateAnalyticsTests(TestCase):
         Having no submissions should yield 0 for single_dissemination_count()
         """
         analytics = DisseminationStateAnalytics(self.year, self.state)
-        single_dissemination_count = analytics.single_dissemination_count()
+        result = analytics.single_dissemination_count()
 
-        self.assertEqual(single_dissemination_count, 0)
+        self.assertEqual(result, 0)
 
     def test_top_programs(self):
         """
@@ -89,22 +89,22 @@ class StateAnalyticsTests(TestCase):
         )
 
         analytics = DisseminationStateAnalytics(self.year, self.state)
-        top_programs = analytics.top_programs()
+        result = analytics.top_programs()
         expected = [
             {"federal_program_name": "Bar Foo", "total_expended": 99},
             {"federal_program_name": "Foo Bar", "total_expended": 84},
         ]
 
-        self.assertEqual(top_programs, expected)
+        self.assertEqual(result, expected)
 
     def test_top_programs_none(self):
         """
         Having no submissions should not error for top_programs()
         """
         analytics = DisseminationStateAnalytics(self.year, self.state)
-        top_programs = analytics.top_programs()
+        result = analytics.top_programs()
 
-        self.assertEqual(top_programs, [])
+        self.assertEqual(result, [])
 
     def test_funding_by_entity_type(self):
         """
@@ -142,22 +142,22 @@ class StateAnalyticsTests(TestCase):
         )
 
         analytics = DisseminationStateAnalytics(self.year, self.state)
-        funding_by_entity_type = analytics.funding_by_entity_type()
+        result = analytics.funding_by_entity_type()
         expected = [
             {"entity_type": "state", "total_expended": 99},
             {"entity_type": "local", "total_expended": 84},
         ]
 
-        self.assertEqual(funding_by_entity_type, expected)
+        self.assertEqual(result, expected)
 
     def test_funding_by_entity_type_none(self):
         """
         Having no submissions should not error for funding_by_entity_type()
         """
         analytics = DisseminationStateAnalytics(self.year, self.state)
-        funding_by_entity_type = analytics.funding_by_entity_type()
+        result = analytics.funding_by_entity_type()
 
-        self.assertEqual(funding_by_entity_type, [])
+        self.assertEqual(result, [])
 
     def test_programs_with_repeated_findings(self):
         """
@@ -225,19 +225,19 @@ class StateAnalyticsTests(TestCase):
         )
 
         analytics = DisseminationStateAnalytics(self.year, self.state)
-        programs_with_repeated_findings = analytics.programs_with_repeated_findings()
+        result = analytics.programs_with_repeated_findings()
         expected = [
             {"federal_program_name": "Foo Bar", "repeat_findings": 2},
             {"federal_program_name": "Bar Foo", "repeat_findings": 1},
         ]
 
-        self.assertEqual(programs_with_repeated_findings, expected)
+        self.assertEqual(result, expected)
 
     def test_programs_with_repeated_findings_none(self):
         """
         Having no submissions should not error for programs_with_repeated_findings()
         """
         analytics = DisseminationStateAnalytics(self.year, self.state)
-        programs_with_repeated_findings = analytics.programs_with_repeated_findings()
+        result = analytics.programs_with_repeated_findings()
 
-        self.assertEqual(programs_with_repeated_findings, [])
+        self.assertEqual(result, [])

@@ -16,19 +16,19 @@ class TrendAnalyticsTests(TestCase):
         Supplying no years should yield [] for total_submissions()
         """
         analytics = DisseminationTrendAnalytics([])
-        total_submissions = analytics.total_submissions()
+        result = analytics.total_submissions()
 
-        self.assertEqual(total_submissions, [])
+        self.assertEqual(result, [])
 
     def test_total_submissions_none(self):
         """
         Having no submissions should not error for total_submissions()
         """
         analytics = DisseminationTrendAnalytics(["2024"])
-        total_submissions = analytics.total_submissions()
+        result = analytics.total_submissions()
         expected = [{"total": 0, "year": "2024"}]
 
-        self.assertEqual(total_submissions, expected)
+        self.assertEqual(result, expected)
 
     def test_total_submissions(self):
         """
@@ -54,10 +54,10 @@ class TrendAnalyticsTests(TestCase):
         )
 
         analytics = DisseminationTrendAnalytics(["2024"])
-        total_submissions = analytics.total_submissions()
+        result = analytics.total_submissions()
         expected = [{"total": 2, "year": "2024"}]
 
-        self.assertEqual(total_submissions, expected)
+        self.assertEqual(result, expected)
 
     def test_total_submissions_multi_year(self):
         """
@@ -83,13 +83,13 @@ class TrendAnalyticsTests(TestCase):
         )
 
         analytics = DisseminationTrendAnalytics(["1776", "2024"])
-        total_submissions = analytics.total_submissions()
+        result = analytics.total_submissions()
         expected = [
             {"total": 1, "year": "1776"},
             {"total": 2, "year": "2024"},
         ]
 
-        self.assertEqual(total_submissions, expected)
+        self.assertEqual(result, expected)
 
     def test_total_award_volume(self):
         """
@@ -129,28 +129,28 @@ class TrendAnalyticsTests(TestCase):
         )
 
         analytics = DisseminationTrendAnalytics(["2022", "2023", "2024"])
-        total_submissions = analytics.total_award_volume()
+        result = analytics.total_award_volume()
         expected = [
             {"total": 0, "year": "2022"},
             {"total": 99, "year": "2023"},
             {"total": 150, "year": "2024"},
         ]
 
-        self.assertEqual(total_submissions, expected)
+        self.assertEqual(result, expected)
 
     def test_total_award_volume_none(self):
         """
         Having no submissions should not error for total_award_volume()
         """
         analytics = DisseminationTrendAnalytics(["2022", "2023", "2024"])
-        total_award_volume = analytics.total_award_volume()
+        result = analytics.total_award_volume()
         expected = [
             {"total": 0, "year": "2022"},
             {"total": 0, "year": "2023"},
             {"total": 0, "year": "2024"},
         ]
 
-        self.assertEqual(total_award_volume, expected)
+        self.assertEqual(result, expected)
 
     def test_total_findings(self):
         """
@@ -210,28 +210,28 @@ class TrendAnalyticsTests(TestCase):
         )
 
         analytics = DisseminationTrendAnalytics(["2022", "2023", "2024"])
-        total_findings = analytics.total_findings()
+        result = analytics.total_findings()
         expected = [
             {"total": 0, "year": "2022"},
             {"total": 1, "year": "2023"},
             {"total": 3, "year": "2024"},
         ]
 
-        self.assertEqual(total_findings, expected)
+        self.assertEqual(result, expected)
 
     def test_total_findings_none(self):
         """
         Having no submissions should not error for total_findings()
         """
         analytics = DisseminationTrendAnalytics(["2022", "2023", "2024"])
-        total_findings = analytics.total_findings()
+        result = analytics.total_findings()
         expected = [
             {"total": 0, "year": "2022"},
             {"total": 0, "year": "2023"},
             {"total": 0, "year": "2024"},
         ]
 
-        self.assertEqual(total_findings, expected)
+        self.assertEqual(result, expected)
 
     def test_submissions_with_findings(self):
         """
@@ -290,28 +290,28 @@ class TrendAnalyticsTests(TestCase):
         )
 
         analytics = DisseminationTrendAnalytics(["2022", "2023", "2024"])
-        submissions_with_findings = analytics.submissions_with_findings()
+        result = analytics.submissions_with_findings()
         expected = [
             {"total": 0.0, "year": "2022"},
             {"total": 100.0, "year": "2023"},
             {"total": 50.0, "year": "2024"},
         ]
 
-        self.assertEqual(submissions_with_findings, expected)
+        self.assertEqual(result, expected)
 
     def test_submissions_with_findings_none(self):
         """
         Having no submissions should not error for submissions_with_findings()
         """
         analytics = DisseminationTrendAnalytics(["2022", "2023", "2024"])
-        submissions_with_findings = analytics.submissions_with_findings()
+        result = analytics.submissions_with_findings()
         expected = [
             {"total": 0, "year": "2022"},
             {"total": 0, "year": "2023"},
             {"total": 0, "year": "2024"},
         ]
 
-        self.assertEqual(submissions_with_findings, expected)
+        self.assertEqual(result, expected)
 
     def test_auditee_risk_profile(self):
         """
@@ -380,7 +380,7 @@ class TrendAnalyticsTests(TestCase):
         Having no submissions should not error for auditee_risk_profile()
         """
         analytics = DisseminationTrendAnalytics(["2022", "2023", "2024"])
-        auditee_risk_profile = analytics.auditee_risk_profile()
+        result = analytics.auditee_risk_profile()
         expected = [
             {
                 "low_risk": 0,
@@ -405,7 +405,7 @@ class TrendAnalyticsTests(TestCase):
             },
         ]
 
-        self.assertEqual(auditee_risk_profile, expected)
+        self.assertEqual(result, expected)
 
     def test_risk_profile_vs_findings(self):
         """
@@ -468,25 +468,25 @@ class TrendAnalyticsTests(TestCase):
         )
 
         analytics = DisseminationTrendAnalytics(["2022", "2023", "2024"])
-        risk_profile_vs_findings = analytics.risk_profile_vs_findings()
+        result = analytics.risk_profile_vs_findings()
         expected = [
             {"audits_with_findings": 0.0, "not_low_risk": 100.0, "year": "2022"},
             {"audits_with_findings": 100.0, "not_low_risk": 100.0, "year": "2023"},
             {"audits_with_findings": 50.0, "not_low_risk": 50.0, "year": "2024"},
         ]
 
-        self.assertEqual(risk_profile_vs_findings, expected)
+        self.assertEqual(result, expected)
 
     def test_risk_profile_vs_findings_none(self):
         """
         Having no submissions should not error for risk_profile_vs_findings()
         """
         analytics = DisseminationTrendAnalytics(["2022", "2023", "2024"])
-        risk_profile_vs_findings = analytics.risk_profile_vs_findings()
+        result = analytics.risk_profile_vs_findings()
         expected = [
             {"audits_with_findings": 0, "not_low_risk": 0, "year": "2022"},
             {"audits_with_findings": 0, "not_low_risk": 0, "year": "2023"},
             {"audits_with_findings": 0, "not_low_risk": 0, "year": "2024"},
         ]
 
-        self.assertEqual(risk_profile_vs_findings, expected)
+        self.assertEqual(result, expected)
