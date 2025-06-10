@@ -77,65 +77,80 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
+        logger.info("Starting migration...")
         BATCH_SIZE = 100
 
         # iterate through unmigrated SACs.
-        queryset = _get_query(kwargs, BATCH_SIZE)
-        total = _get_query(kwargs, None).count()
+        queryset = _get_query(kwargs, None)
+        logger.info("Got queryset... Get count...")
+        total = queryset.count()
         count = 0
+        total_migrated = 0
         logger.info(f"Found {total} records to parse through.")
         migration_user = get_or_create_sot_migration_user()
-        logger.info("Starting migration...")
 
-        while queryset.count() != 0:
-            t_migrate_sac = 0
-            t_update_flag = 0
-            t_get_batch = 0
+        self.t_audit = 0
+        self.t_create = 0
+        self.t_access = 0
+        self.t_indexes = 0
+        self.t_save = 0
+        self.t_history = 0
+        self.t_files = 0
+        self.t_waivers = 0
+        self.t_update_flag = 0
+        t_migrate_sac = 0
+        t_batch_start = time.monotonic()
 
-            self.t_audit = 0
-            self.t_create = 0
-            self.t_access = 0
-            self.t_indexes = 0
-            self.t_save = 0
-            self.t_history = 0
-            self.t_files = 0
-            self.t_waivers = 0
+        for sac in queryset.iterator():
+            try:
+                t0 = time.monotonic()
+                if Audit.objects.filter(report_id=sac.report_id).exists():
+                    logger.info(
+                        f"SAC with id {sac.report_id} already exists as an Audit... skipping."
+                    )
+                    continue
+                self._migrate_sac(self, migration_user, sac)
+                t_migrate_sac += time.monotonic() - t0
 
-            for sac in queryset.iterator():
-                try:
-                    t0 = time.monotonic()
-                    self._migrate_sac(self, migration_user, sac)
-                    t_migrate_sac += time.monotonic() - t0
+                count += 1
+                if count % BATCH_SIZE == 0:
+                    total_migrated += count
+                    logger.info(
+                        f"Migration progress... ({total_migrated} / {total}) ({(total_migrated / total) * 100}%)"
+                    )
+                    count = 0
+                    logger.info(
+                        f" - Time to migrate batch of 100          - {t_migrate_sac}"
+                    )
+                    logger.info(f"    - Audit info - {self.t_audit}")
+                    logger.info(f"    - Creation   - {self.t_create}")
+                    logger.info(f"    - Access     - {self.t_access}")
+                    logger.info(f"    - Indexes    - {self.t_indexes}")
+                    logger.info(f"    - Re-saving  - {self.t_save}")
+                    logger.info(f"    - History    - {self.t_history}")
+                    logger.info(f"    - Files      - {self.t_files}")
+                    logger.info(f"    - Waivers    - {self.t_waivers}")
+                    logger.info(
+                        f" - Time to mark batch of 100 as migrated - {self.t_update_flag}"
+                    )
 
-                    t0 = time.monotonic()
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            f"update audit_singleauditchecklist set migrated_to_audit = true where report_id = '{sac.report_id}'"
-                        )
-                    t_update_flag += time.monotonic() - t0
-                    count += 1
-                except Exception as e:
-                    logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
-                    raise e
-            logger.info(
-                f"Migration progress... ({count} / {total}) ({(count / total) * 100}%)"
-            )
-            t0 = time.monotonic()
-            del queryset
-            queryset = _get_query(kwargs, BATCH_SIZE)
-            t_get_batch += time.monotonic() - t0
-            print(f" - Time to migrate batch of 100          - {t_migrate_sac}")
-            print(f"    - Audit info - {self.t_audit}")
-            print(f"    - Creation   - {self.t_create}")
-            print(f"    - Access     - {self.t_access}")
-            print(f"    - Indexes    - {self.t_indexes}")
-            print(f"    - Re-saving  - {self.t_save}")
-            print(f"    - History    - {self.t_history}")
-            print(f"    - Files      - {self.t_files}")
-            print(f"    - Waivers    - {self.t_waivers}")
-            print(f" - Time to mark batch of 100 as migrated - {t_update_flag}")
-            print(f" - Time to query next batch              - {t_get_batch}")
+                    t_migrate_sac = 0
+                    self.t_update_flag = 0
+                    self.t_audit = 0
+                    self.t_create = 0
+                    self.t_access = 0
+                    self.t_indexes = 0
+                    self.t_save = 0
+                    self.t_history = 0
+                    self.t_files = 0
+                    self.t_waivers = 0
 
+            except Exception as e:
+                logger.error(f"Failed to migrate sac {sac.report_id} - {e}")
+                raise e
+
+        t_batch_end = time.monotonic()
+        logger.info(f" IN TOTAL - {t_batch_end - t_batch_start}")
         logger.info("Completed audit migrations.")
 
     @staticmethod
@@ -268,6 +283,13 @@ class Command(BaseCommand):
             AuditValidationWaiver.objects.bulk_create(audit_waivers)
             self.t_waivers += time.monotonic() - t1
 
+            t1 = time.monotonic()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    f"update audit_singleauditchecklist set migrated_to_audit = true where report_id = '{sac.report_id}'"
+                )
+            self.t_update_flag += time.monotonic() - t1
+
 
 def _get_query(kwargs, max_records):
     """Fetch unmigrated SACs, based on parameters."""
@@ -285,9 +307,6 @@ def _get_query(kwargs, max_records):
         )
     else:
         queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False)
-
-    # exclude SACs that have already migrated with an Audit.
-    queryset = queryset.exclude(report_id__in=Audit.objects.all().values("report_id"))
 
     # only return up to "max_records" if applied.
     if max_records:
