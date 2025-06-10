@@ -44,4 +44,7 @@ class AnalyticsFilterForm(forms.Form):
         auditee_state = cleaned_data.get("auditee_state", "")
 
         if len(audit_year) == 1 and not auditee_state:
-            self.add_error("audit_year", "Choose a single year and a state, or choose multiple years.")
+            self.add_error(
+                "audit_year",
+                "Choose a single year and a state, or choose multiple years.",
+            )

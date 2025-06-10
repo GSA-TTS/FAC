@@ -44,7 +44,7 @@ class AnalyticsView(View):
         # 4. Multiple years. Make the trend analytics queries, and render.
         if not state and not year:
             return render(request, "dashboard.html", context)
-        
+
         if len(years) > 1 and state:
             return redirect(f'{reverse("dissemination:Analytics")}?year={year}')
 
@@ -84,13 +84,15 @@ class AnalyticsView(View):
         form = AnalyticsFilterForm(request.POST)
 
         if form.is_valid():
-            state = form.cleaned_data.get("auditee_state", '')
+            state = form.cleaned_data.get("auditee_state", "")
             years_selected = form.cleaned_data.get("audit_year", [])
             years_string = ",".join(years_selected)
 
             # Remove the state if several years are selected.
             if len(years_selected) > 1:
-                return redirect(f'{reverse("dissemination:Analytics")}?year={years_string}')
+                return redirect(
+                    f'{reverse("dissemination:Analytics")}?year={years_string}'
+                )
 
             return redirect(
                 f'{reverse("dissemination:Analytics")}?state={state}&year={years_string}'
