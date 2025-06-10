@@ -196,6 +196,61 @@ Plotly.newPlot(
 
 
 /**
+ * AUDITEE RISK PROFILE
+ * Pie charts, one chart per year
+ */
+var data_auditee_risk_profile = api_data.auditee_risk_profile
+var chart_data_auditee_risk_profile = []
+data_auditee_risk_profile.forEach(
+  (object, index) => chart_data_auditee_risk_profile.push({
+      labels: ["Low Risk", "Not Low Risk"],
+      values: [object.low_risk, object.not_low_risk],
+      name: object.year,
+      hoverinfo: 'label+percent',
+      type: 'pie',
+      domain: {
+        row: Math.floor(index / 2),
+        column: index % 2
+      },
+      // automargin: true
+  })
+)
+var chart_layout_auditee_risk_profile = {
+  title: {
+    text: `Auditee Risk Profile`,
+  },
+  annotations: [],  // Populated dynamically below
+  // 'autosize' doesn't seem to work with subplots.
+  height: 450 + (150 * (data_auditee_risk_profile.length - 2)),
+  width: 850,
+  autosize: true,
+  grid: {rows: Math.ceil(data_auditee_risk_profile.length / 2), columns: 2},
+  showlegend: true,
+}
+// Note: The pie charts should all become their own charts, not subplots, in order to title them properly.
+// This is a strange solution to annotate each chart with the appropriate title.
+data_auditee_risk_profile.forEach(
+  (object, index) => chart_layout_auditee_risk_profile.annotations.push({
+      text: object.year,
+      showarrow: false,
+      x: index % 2 ? 0.77 : 0.24,
+      xref: "paper",
+      xanchor: "center",
+      y: 1.006 - ((Math.floor(index / 2)) / (Math.ceil(data_auditee_risk_profile.length / 2))),
+      yref: "paper",
+      yanchor: Math.floor(index / 2) ? "top" : "bottom",
+  })
+)
+
+Plotly.newPlot(
+  'div_auditee_risk_profile',
+  chart_data_auditee_risk_profile,
+  chart_layout_auditee_risk_profile,
+  config
+)
+
+
+/**
  * PERCENT RISK PROFILE VS PERCENT FINDINGS
  * Grouped bar chart, % not low risk vs % submissions with findings
  */
