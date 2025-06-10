@@ -31,6 +31,9 @@ var chart_layout_total_submissions = {
   title: {
     text: 'Total Submissions',
   },
+  margin: {
+    t: 25
+  },
   xaxis: {
     title: {
       text: 'Year',
@@ -79,6 +82,9 @@ var chart_layout_total_award_volume = {
   title: {
     text: 'Total Award Volume',
   },
+  margin: {
+    t: 25
+  },
   xaxis: {
     title: {
       text: 'Year',
@@ -125,6 +131,9 @@ var chart_data_total_findings = [
 var chart_layout_total_findings = {
   title: {
     text: 'Total Findings',
+  },
+  margin: {
+    t: 25
   },
   xaxis: {
     title: {
@@ -173,6 +182,9 @@ var chart_layout_submissions_with_findings = {
   title: {
     text: '% Submissions with Findings',
   },
+  margin: {
+    t: 25
+  },
   xaxis: {
     title: {
       text: 'Year',
@@ -183,6 +195,7 @@ var chart_layout_submissions_with_findings = {
     title: {
       text: 'Percentage',
     },
+    ticksuffix: '%',
   },
 }
 
@@ -297,6 +310,9 @@ var chart_data_risk_profile_vs_findings = [
 var chart_layout_risk_profile_vs_findings = {
   title: {
     text: '% Not Low-Risk vs % With Findings by Year',
+  },
+  margin: {
+    t: 25
   },
   xaxis: {
     title: {
