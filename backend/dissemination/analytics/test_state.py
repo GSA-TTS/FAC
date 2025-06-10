@@ -71,7 +71,7 @@ class StateAnalyticsTests(TestCase):
             FederalAward,
             report_id=audit,
             amount_expended=99,
-            federal_program_name="Bar Foo"
+            federal_program_name="Bar Foo",
         )
 
         # Same program, so they're summed
@@ -79,20 +79,20 @@ class StateAnalyticsTests(TestCase):
             FederalAward,
             report_id=audit,
             amount_expended=42,
-            federal_program_name="Foo Bar"
+            federal_program_name="Foo Bar",
         )
         baker.make(
             FederalAward,
             report_id=audit,
             amount_expended=42,
-            federal_program_name="Foo Bar"
+            federal_program_name="Foo Bar",
         )
 
         analytics = DisseminationStateAnalytics(self.year, self.state)
         top_programs = analytics.top_programs()
         expected = [
-            {'federal_program_name': 'Bar Foo', 'total_expended': 99},
-            {'federal_program_name': 'Foo Bar', 'total_expended': 84},
+            {"federal_program_name": "Bar Foo", "total_expended": 99},
+            {"federal_program_name": "Foo Bar", "total_expended": 84},
         ]
 
         self.assertEqual(top_programs, expected)
@@ -135,8 +135,8 @@ class StateAnalyticsTests(TestCase):
         analytics = DisseminationStateAnalytics(self.year, self.state)
         funding_by_entity_type = analytics.funding_by_entity_type()
         expected = [
-            {'entity_type': 'state', 'total_expended': 99},
-            {'entity_type': 'local', 'total_expended': 84},
+            {"entity_type": "state", "total_expended": 99},
+            {"entity_type": "local", "total_expended": 84},
         ]
 
         self.assertEqual(funding_by_entity_type, expected)
@@ -209,8 +209,8 @@ class StateAnalyticsTests(TestCase):
         analytics = DisseminationStateAnalytics(self.year, self.state)
         programs_with_repeated_findings = analytics.programs_with_repeated_findings()
         expected = [
-            {'federal_program_name': 'Foo Bar', 'repeat_findings': 2},
-            {'federal_program_name': 'Bar Foo', 'repeat_findings': 1},
+            {"federal_program_name": "Foo Bar", "repeat_findings": 2},
+            {"federal_program_name": "Bar Foo", "repeat_findings": 1},
         ]
 
         self.assertEqual(programs_with_repeated_findings, expected)
