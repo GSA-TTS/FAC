@@ -84,7 +84,6 @@ def has_all_required_fields(section_name):
             errors.extend(get_missing_value_errors(ir, range_name, error_message_name))
 
         if len(errors) > 0:
-            logger.info("Raising a validation error.")
             raise ValidationError(errors)
 
     return _missing_required_fields

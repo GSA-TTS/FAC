@@ -61,7 +61,8 @@ from .auditee_ueis_match import auditee_ueis_match
 from .check_award_ref_declaration import check_award_ref_declaration
 from .check_award_ref_existence import check_award_ref_existence
 from .check_award_reference_uniqueness import check_award_reference_uniqueness
-from .check_finding_prior_references import check_finding_prior_references
+
+# from .check_finding_prior_references import check_finding_prior_references
 from .check_biennial_low_risk import check_biennial_low_risk
 from .check_certifying_contacts import check_certifying_contacts
 from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
@@ -69,6 +70,7 @@ from .check_findings_count_consistency import check_findings_count_consistency
 from .check_has_federal_awards import check_has_federal_awards
 from .check_ref_number_in_cap import check_ref_number_in_cap
 from .check_ref_number_in_findings_text import check_ref_number_in_findings_text
+from .check_expenditure_threshold_met import check_expenditure_threshold_met
 from .sac_validation_shape import sac_validation_shape  # noqa: F401
 from .submission_progress_check import submission_progress_check
 from .tribal_data_sharing_consent import tribal_data_sharing_consent
@@ -83,11 +85,16 @@ functions = [
     check_biennial_low_risk,
     check_certifying_contacts,
     check_finding_reference_uniqueness,
-    check_finding_prior_references,
+    # 20250430 This does not work if an auditee changes their UEI from one
+    # year to the next. At that point, we need a waiver. That fix is not something
+    # that can be done at this exact moment, and so we are turning off this validation
+    # for the time being.
+    # check_finding_prior_references,
     check_findings_count_consistency,
     check_has_federal_awards,
     check_ref_number_in_cap,
     check_ref_number_in_findings_text,
+    check_expenditure_threshold_met,
     submission_progress_check,
     tribal_data_sharing_consent,
     validate_general_information,

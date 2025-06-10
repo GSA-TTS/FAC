@@ -17,7 +17,7 @@
 /terraform/preview/ @GSA-TTS/FAC-admins
 /terraform/production/ @GSA-TTS/FAC-admins
 /terraform/sandbox/ @GSA-TTS/FAC-admins
-/terraform/modules/ @GSA-TTS/FAC-admins
+/terraform/shared/modules/ @GSA-TTS/FAC-admins
 
 # Changes to the list of staff users impacts access control to Django admin. Any PR involving this file should get a review from someone in FAC-Admins.
 /backend/config/staffusers.json @GSA-TTS/FAC-admins

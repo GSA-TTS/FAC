@@ -54,6 +54,4 @@ def validate_ranges(ir):
                     )
 
     if errors:
-        logger.info("Raising a validation error.")
-
         raise ValidationError(errors)

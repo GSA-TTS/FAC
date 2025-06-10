@@ -30,7 +30,7 @@
                             class="usa-accordion__button usa-nav__link"
                             aria-expanded="false"
                             aria-controls="basic-nav-{{ category.id }}" >
-                            <span>{{ category.name }}</span>
+                            <span class="font-sans-3xs">{{ category.name }}</span>
                         </button>
                         <ul id="basic-nav-{{ category.id }}" class="usa-nav__submenu">
                             {% for link in category.links %}

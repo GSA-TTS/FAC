@@ -308,6 +308,9 @@ def _get_query(kwargs, max_records):
     else:
         queryset = SingleAuditChecklist.objects.filter(migrated_to_audit=False)
 
+    # exclude SACs that have already migrated with an Audit.
+    queryset = queryset.exclude(report_id__in=Audit.objects.all().values("report_id"))
+
     # only return up to "max_records" if applied.
     if max_records:
         return queryset[:max_records]
