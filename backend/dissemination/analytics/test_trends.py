@@ -37,12 +37,12 @@ class TrendAnalyticsTests(TestCase):
         # Correct year
         baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
         )
         baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
         )
 
@@ -66,12 +66,12 @@ class TrendAnalyticsTests(TestCase):
         # 2024
         baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
         )
         baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
         )
 
@@ -97,13 +97,13 @@ class TrendAnalyticsTests(TestCase):
         """
         baker.make(
             General,
-            fac_accepted_date=f"2022-01-01",
+            fac_accepted_date="2022-01-01",
             is_public=True,
         )
 
         audit_2023 = baker.make(
             General,
-            fac_accepted_date=f"2023-01-01",
+            fac_accepted_date="2023-01-01",
             is_public=True,
         )
         baker.make(
@@ -114,7 +114,7 @@ class TrendAnalyticsTests(TestCase):
 
         audit_2024 = baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
         )
         baker.make(
@@ -158,13 +158,13 @@ class TrendAnalyticsTests(TestCase):
         """
         baker.make(
             General,
-            fac_accepted_date=f"2022-01-01",
+            fac_accepted_date="2022-01-01",
             is_public=True,
         )
 
         audit_2023 = baker.make(
             General,
-            fac_accepted_date=f"2023-01-01",
+            fac_accepted_date="2023-01-01",
             is_public=True,
         )
         baker.make(
@@ -180,7 +180,7 @@ class TrendAnalyticsTests(TestCase):
 
         audit_2024 = baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
         )
         baker.make(
@@ -240,14 +240,14 @@ class TrendAnalyticsTests(TestCase):
         # No 2022 submissions have findings
         baker.make(
             General,
-            fac_accepted_date=f"2022-01-01",
+            fac_accepted_date="2022-01-01",
             is_public=True,
         )
 
         # All (1) 2023 submissions have findings
         audit_2023 = baker.make(
             General,
-            fac_accepted_date=f"2023-01-01",
+            fac_accepted_date="2023-01-01",
             is_public=True,
         )
         baker.make(
@@ -264,7 +264,7 @@ class TrendAnalyticsTests(TestCase):
         # 1 of 2 2024 submissions have findings
         audit_2024 = baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
         )
         baker.make(
@@ -280,7 +280,7 @@ class TrendAnalyticsTests(TestCase):
 
         audit_2024_no_finding = baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
         )
         baker.make(
@@ -320,7 +320,7 @@ class TrendAnalyticsTests(TestCase):
         # None low risk
         baker.make(
             General,
-            fac_accepted_date=f"2022-01-01",
+            fac_accepted_date="2022-01-01",
             is_public=True,
             is_low_risk_auditee="No",
         )
@@ -328,13 +328,13 @@ class TrendAnalyticsTests(TestCase):
         # 1 of 2 low risk
         baker.make(
             General,
-            fac_accepted_date=f"2023-01-01",
+            fac_accepted_date="2023-01-01",
             is_public=True,
             is_low_risk_auditee="No",
         )
         baker.make(
             General,
-            fac_accepted_date=f"2023-01-01",
+            fac_accepted_date="2023-01-01",
             is_public=True,
             is_low_risk_auditee="Yes",
         )
@@ -342,7 +342,7 @@ class TrendAnalyticsTests(TestCase):
         # All low risk
         baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
             is_low_risk_auditee="Yes",
         )
@@ -414,7 +414,7 @@ class TrendAnalyticsTests(TestCase):
         # 2022 submissions have findings and aren't low risk
         baker.make(
             General,
-            fac_accepted_date=f"2022-01-01",
+            fac_accepted_date="2022-01-01",
             is_public=True,
             is_low_risk_auditee="No",
         )
@@ -422,7 +422,7 @@ class TrendAnalyticsTests(TestCase):
         # All (1) 2023 submissions have findings and aren't low risk
         audit_2023 = baker.make(
             General,
-            fac_accepted_date=f"2023-01-01",
+            fac_accepted_date="2023-01-01",
             is_public=True,
             is_low_risk_auditee="No",
         )
@@ -440,7 +440,7 @@ class TrendAnalyticsTests(TestCase):
         # 1 of 2 2024 submissions have findings and 1 of 2 are low risk
         audit_2024 = baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
             is_low_risk_auditee="Yes",
         )
@@ -457,7 +457,7 @@ class TrendAnalyticsTests(TestCase):
 
         audit_2024_no_finding = baker.make(
             General,
-            fac_accepted_date=f"2024-01-01",
+            fac_accepted_date="2024-01-01",
             is_public=True,
             is_low_risk_auditee="No",
         )
