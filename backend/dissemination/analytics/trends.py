@@ -59,7 +59,8 @@ class DisseminationTrendAnalytics:
                     "year": year,
                     "total": self.awards.filter(
                         report_id__fac_accepted_date__year=year
-                    ).aggregate(Sum("amount_expended"))["amount_expended__sum"],
+                    ).aggregate(Sum("amount_expended"))["amount_expended__sum"]
+                    or 0,
                 }
             )
         return out
