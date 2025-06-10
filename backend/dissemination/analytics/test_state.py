@@ -49,7 +49,7 @@ class StateAnalyticsTests(TestCase):
 
     def test_single_dissemination_count_none(self):
         """
-        Having no submissions should yield 0
+        Having no submissions should yield 0 for single_dissemination_count()
         """
         analytics = DisseminationStateAnalytics(self.year, self.state)
         single_dissemination_count = analytics.single_dissemination_count()
@@ -97,6 +97,15 @@ class StateAnalyticsTests(TestCase):
 
         self.assertEqual(top_programs, expected)
 
+    def test_top_programs_none(self):
+        """
+        Having no submissions should not error for top_programs()
+        """
+        analytics = DisseminationStateAnalytics(self.year, self.state)
+        top_programs = analytics.top_programs()
+
+        self.assertEqual(top_programs, [])
+
     def test_funding_by_entity_type(self):
         """
         Standard case for funding_by_entity_type() should pass
@@ -140,6 +149,15 @@ class StateAnalyticsTests(TestCase):
         ]
 
         self.assertEqual(funding_by_entity_type, expected)
+
+    def test_funding_by_entity_type_none(self):
+        """
+        Having no submissions should not error for funding_by_entity_type()
+        """
+        analytics = DisseminationStateAnalytics(self.year, self.state)
+        funding_by_entity_type = analytics.funding_by_entity_type()
+
+        self.assertEqual(funding_by_entity_type, [])
 
     def test_programs_with_repeated_findings(self):
         """
@@ -214,3 +232,12 @@ class StateAnalyticsTests(TestCase):
         ]
 
         self.assertEqual(programs_with_repeated_findings, expected)
+
+    def test_programs_with_repeated_findings_none(self):
+        """
+        Having no submissions should not error for programs_with_repeated_findings()
+        """
+        analytics = DisseminationStateAnalytics(self.year, self.state)
+        programs_with_repeated_findings = analytics.programs_with_repeated_findings()
+
+        self.assertEqual(programs_with_repeated_findings, [])
