@@ -15,6 +15,9 @@ const config = { responsive: true };
  */
 function draw_total_submissions(mapping) {
   var data = api_data[mapping.field_name];
+
+  if (data.length == 0) return;
+
   var chart_data = [
     {
       x: data.map((object) => object.year),
@@ -59,6 +62,9 @@ function draw_total_submissions(mapping) {
  */
 function draw_total_award_volume(mapping) {
   var data = api_data[mapping.field_name];
+
+  if (data.length == 0) return;
+
   var chart_data = [
     {
       x: data.map((object) => object.year),
@@ -108,6 +114,9 @@ function draw_total_award_volume(mapping) {
  */
 function draw_total_findings(mapping) {
   var data = api_data[mapping.field_name];
+
+  if (data.length == 0) return;
+
   var chart_data = [
     {
       x: data.map((object) => object.year),
@@ -154,6 +163,9 @@ function draw_total_findings(mapping) {
  */
 function draw_percent_submissions_with_findings(mapping) {
   var data = api_data[mapping.field_name];
+
+  if (data.length == 0) return;
+
   var chart_data = [
     {
       x: data.map((object) => object.year),
@@ -202,6 +214,9 @@ function draw_percent_submissions_with_findings(mapping) {
  */
 function draw_auditee_risk_profile(mapping) {
   var data = api_data[mapping.field_name];
+
+  if (data.length == 0) return;
+
   var chart_data = [];
   data.forEach((object, index) =>
     chart_data.push({
@@ -252,6 +267,9 @@ function draw_auditee_risk_profile(mapping) {
  */
 function draw_risk_profile_vs_findings(mapping) {
   var data = api_data[mapping.field_name];
+
+  if (data.length == 0) return;
+
   var chart_data = [
     // Trace one, % not low risk
     {

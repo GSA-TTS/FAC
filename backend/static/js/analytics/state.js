@@ -18,6 +18,9 @@ var config = { responsive: true };
  */
 function draw_funding_by_entity_type(mapping) {
   var data = api_data[mapping.field_name];
+
+  if (data.length == 0) return;
+
   var chart_data = [
     {
       labels: data.map((object) => object.entity_type),
@@ -43,6 +46,9 @@ function draw_funding_by_entity_type(mapping) {
  */
 function draw_programs_with_repeated_findings(mapping) {
   var data = api_data[mapping.field_name];
+
+  if (data.length == 0) return;
+
   var chart_data = [
     {
       x: data.reverse().map((object) => object.repeat_findings),
@@ -74,6 +80,9 @@ function draw_programs_with_repeated_findings(mapping) {
  */
 function draw_top_programs(mapping) {
   var data = api_data[mapping.field_name];
+
+  if (data.length == 0) return;
+
   var chart_data = [
     {
       x: data.reverse().map((object) => object.total_expended),
