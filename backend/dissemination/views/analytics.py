@@ -70,8 +70,7 @@ class AnalyticsView(View):
                     ),
                 },
             }
-
-        if len(years) > 1:
+        elif len(years) > 1:
             logger.info(f"Gathering trend analytics for {state} {years}")
             trend_analytics = DisseminationTrendAnalytics(years)
             context["dashboard_data"] = context["dashboard_data"] | {
