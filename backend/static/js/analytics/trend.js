@@ -1,17 +1,19 @@
-import Plotly from 'plotly.js-dist'
+import Plotly from 'plotly.js-dist';
 
 // Pull the data from the Django template tag passthrough
-var api_data = JSON.parse(document.getElementById('dashboard_data').textContent)
+var api_data = JSON.parse(
+  document.getElementById('dashboard_data').textContent
+);
 
-api_data = api_data.trend_analytics
+api_data = api_data.trend_analytics;
 
-var config = { responsive: true }
+var config = { responsive: true };
 
 /**
  * TOTAL SUBMISSIONS
  * Bar chart, one bar per year
  */
-var data_total_submissions = api_data.total_submissions
+var data_total_submissions = api_data.total_submissions;
 var chart_data_total_submissions = [
   {
     x: data_total_submissions.map((object) => object.year),
@@ -26,13 +28,13 @@ var chart_data_total_submissions = [
     },
     type: 'bar',
   },
-]
+];
 var chart_layout_total_submissions = {
   title: {
     text: 'Total Submissions',
   },
   margin: {
-    t: 25
+    t: 25,
   },
   xaxis: {
     title: {
@@ -46,19 +48,19 @@ var chart_layout_total_submissions = {
     },
   },
   autosize: true,
-}
+};
 Plotly.newPlot(
   'div_total_submissions',
   chart_data_total_submissions,
   chart_layout_total_submissions,
   config
-)
+);
 
 /**
  * TOTAL AWARD VOLUME
  * Bar chart, one bar per year
  */
-var data_total_award_volume = api_data.total_award_volume
+var data_total_award_volume = api_data.total_award_volume;
 var chart_data_total_award_volume = [
   {
     x: data_total_award_volume.map((object) => object.year),
@@ -77,13 +79,13 @@ var chart_data_total_award_volume = [
     },
     type: 'bar',
   },
-]
+];
 var chart_layout_total_award_volume = {
   title: {
     text: 'Total Award Volume',
   },
   margin: {
-    t: 25
+    t: 25,
   },
   xaxis: {
     title: {
@@ -97,20 +99,20 @@ var chart_layout_total_award_volume = {
     },
   },
   autosize: true,
-}
+};
 
 Plotly.newPlot(
   'div_total_award_volume',
   chart_data_total_award_volume,
   chart_layout_total_award_volume,
   config
-)
+);
 
 /**
  * TOTAL FINDINGS
  * Bar chart, one bar per year
  */
-var data_total_findings = api_data.total_findings
+var data_total_findings = api_data.total_findings;
 var chart_data_total_findings = [
   {
     x: data_total_findings.map((object) => object.year),
@@ -127,13 +129,13 @@ var chart_data_total_findings = [
     },
     type: 'bar',
   },
-]
+];
 var chart_layout_total_findings = {
   title: {
     text: 'Total Findings',
   },
   margin: {
-    t: 25
+    t: 25,
   },
   xaxis: {
     title: {
@@ -146,20 +148,20 @@ var chart_layout_total_findings = {
       text: 'Count',
     },
   },
-}
+};
 
 Plotly.newPlot(
   'div_total_findings',
   chart_data_total_findings,
   chart_layout_total_findings,
   config
-)
+);
 
 /**
  * PERCENT SUBMISSIONS WITH FINDINGS
  * Bar chart, one bar per year
  */
-var data_submissions_with_findings = api_data.submissions_with_findings
+var data_submissions_with_findings = api_data.submissions_with_findings;
 var chart_data_submissions_with_findings = [
   {
     x: data_submissions_with_findings.map((object) => object.year),
@@ -177,13 +179,13 @@ var chart_data_submissions_with_findings = [
     },
     type: 'bar',
   },
-]
+];
 var chart_layout_submissions_with_findings = {
   title: {
     text: '% Submissions with Findings',
   },
   margin: {
-    t: 25
+    t: 25,
   },
   xaxis: {
     title: {
@@ -197,21 +199,21 @@ var chart_layout_submissions_with_findings = {
     },
     ticksuffix: '%',
   },
-}
+};
 
 Plotly.newPlot(
   'div_total_submissions_with_findings',
   chart_data_submissions_with_findings,
   chart_layout_submissions_with_findings,
   config
-)
+);
 
 /**
  * AUDITEE RISK PROFILE
  * Pie charts, one chart per year
  */
-var data_auditee_risk_profile = api_data.auditee_risk_profile
-var chart_data_auditee_risk_profile = []
+var data_auditee_risk_profile = api_data.auditee_risk_profile;
+var chart_data_auditee_risk_profile = [];
 data_auditee_risk_profile.forEach((object, index) =>
   chart_data_auditee_risk_profile.push({
     labels: ['Low Risk', 'Not Low Risk'],
@@ -225,7 +227,7 @@ data_auditee_risk_profile.forEach((object, index) =>
     },
     // automargin: true
   })
-)
+);
 var chart_layout_auditee_risk_profile = {
   title: {
     text: `Auditee Risk Profile`,
@@ -237,7 +239,7 @@ var chart_layout_auditee_risk_profile = {
   autosize: true,
   grid: { rows: Math.ceil(data_auditee_risk_profile.length / 2), columns: 2 },
   showlegend: true,
-}
+};
 // Note: The pie charts should all become their own charts, not subplots, in order to title them properly.
 // This is a strange solution to annotate each chart with the appropriate title.
 data_auditee_risk_profile.forEach((object, index) =>
@@ -253,20 +255,20 @@ data_auditee_risk_profile.forEach((object, index) =>
     yref: 'paper',
     yanchor: Math.floor(index / 2) ? 'top' : 'bottom',
   })
-)
+);
 
 Plotly.newPlot(
   'div_auditee_risk_profile',
   chart_data_auditee_risk_profile,
   chart_layout_auditee_risk_profile,
   config
-)
+);
 
 /**
  * PERCENT RISK PROFILE VS PERCENT FINDINGS
  * Grouped bar chart, % not low risk vs % submissions with findings
  */
-var data_risk_profile_vs_findings = api_data.risk_profile_vs_findings
+var data_risk_profile_vs_findings = api_data.risk_profile_vs_findings;
 var chart_data_risk_profile_vs_findings = [
   // Trace one, % not low risk
   {
@@ -306,13 +308,13 @@ var chart_data_risk_profile_vs_findings = [
     name: '% Submissions With Findings',
     type: 'bar',
   },
-]
+];
 var chart_layout_risk_profile_vs_findings = {
   title: {
     text: '% Not Low-Risk vs % With Findings by Year',
   },
   margin: {
-    t: 25
+    t: 25,
   },
   xaxis: {
     title: {
@@ -326,11 +328,11 @@ var chart_layout_risk_profile_vs_findings = {
     },
     ticksuffix: '%',
   },
-}
+};
 
 Plotly.newPlot(
   'div_risk_profile_vs_findings',
   chart_data_risk_profile_vs_findings,
   chart_layout_risk_profile_vs_findings,
   config
-)
+);
