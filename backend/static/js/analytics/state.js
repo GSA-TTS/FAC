@@ -104,7 +104,7 @@ function init() {
   draw_programs_with_repeated_findings(
     state_fields_mapping.programs_with_repeated_findings
   );
-  draw_top_programs();
+  draw_top_programs(state_fields_mapping.top_programs);
 }
 
 init();
