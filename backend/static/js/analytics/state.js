@@ -1,4 +1,4 @@
-import Plotly from 'plotly.js-dist';
+import Plotly from 'plotly.js-strict-dist';
 import { state_fields_mapping } from './field_mappings';
 
 // Pull the data from the Django template tag passthrough
