@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 # TODO: Analytics Dashboard
 # An example of how we can pull analytics data to the template.
 class AnalyticsView(View):
+    template = "analytics-state-and-trend.html"
+
     def get(self, request):
         # URL Params
         state = request.GET.get("state", "")
@@ -48,7 +50,7 @@ class AnalyticsView(View):
         # 3. One year and a state. Make the state analytics queries, and render.
         # 4. Multiple years. Make the trend analytics queries, and render.
         if not state and not year:
-            return render(request, "dashboard.html", context)
+            return render(request, self.template, context)
 
         if len(years) > 1 and state:
             return redirect(f'{reverse("dissemination:Analytics")}?year={year}')
@@ -83,7 +85,7 @@ class AnalyticsView(View):
                 },
             }
 
-        return render(request, "dashboard.html", context)
+        return render(request, self.template, context)
 
     def post(self, request):
         form = AnalyticsFilterForm(request.POST)
@@ -108,4 +110,4 @@ class AnalyticsView(View):
                 "form": form,
                 "state_abbrevs": STATE_ABBREVS,
             }
-            return render(request, "dashboard.html", context)
+            return render(request, self.template, context)
