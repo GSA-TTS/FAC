@@ -40,10 +40,10 @@ class AnalyticsFilterForm(forms.Form):
         If only one year has been selected, a state must also be chosen.
         """
         cleaned_data = super().clean()
-        audit_year = cleaned_data.get("audit_year", [])
+        audit_years = cleaned_data.get("audit_year", [])
         auditee_state = cleaned_data.get("auditee_state", "")
 
-        if len(audit_year) == 1 and not auditee_state:
+        if len(audit_years) == 1 and not auditee_state:
             self.add_error(
                 "audit_year",
                 "Choose a single year and a state, or choose multiple years.",
