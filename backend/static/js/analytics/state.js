@@ -43,7 +43,6 @@ function draw_funding_by_entity_type(mapping) {
  */
 function draw_programs_with_repeated_findings(mapping) {
   var data = api_data[mapping.field_name];
-  var data = api_data.programs_with_repeated_findings;
   var chart_data = [
     {
       x: data.reverse().map((object) => object.repeat_findings),
