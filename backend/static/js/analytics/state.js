@@ -1,4 +1,5 @@
 import Plotly from 'plotly.js-dist';
+import { state_fields_mapping } from './field_mappings';
 
 // Pull the data from the Django template tag passthrough
 var api_data = JSON.parse(
@@ -12,101 +13,99 @@ api_data = api_data.state_analytics;
 var config = { responsive: true };
 
 /**
- * FUNDING BY ENTITY TYPE
- * Pie chart, six sections
+ * Draws a pie chart for finding by entity type. Up to six sections.
+ * @param {object} mapping Field and friendly names for the chart pieces.
  */
-var data_entity_type = api_data.funding_by_entity_type;
-var chart_data_entity_type = [
-  {
-    labels: data_entity_type.map((object) => object.entity_type),
-    values: data_entity_type.map((object) => object.total_expended),
-    hoverinfo: 'label+percent',
-    hole: 0.4, // Donut style
-    type: 'pie',
-  },
-];
-var chart_layout_entity_type = {
-  title: {
-    text: `Funding By Entity Type - State: ${state}, Year: ${year}`,
-  },
-  showlegend: true,
-};
+function draw_funding_by_entity_type(mapping) {
+  var data = api_data[mapping.field_name];
+  var chart_data = [
+    {
+      labels: data.map((object) => object.entity_type),
+      values: data.map((object) => object.total_expended),
+      hoverinfo: 'label+percent',
+      hole: 0.4, // Donut style
+      type: 'pie',
+    },
+  ];
+  var chart_layout = {
+    title: {
+      text: `${mapping.friendly_name} - State: ${state}, Year: ${year}`,
+    },
+    showlegend: true,
+  };
 
-Plotly.newPlot(
-  'div_entity_type',
-  chart_data_entity_type,
-  chart_layout_entity_type,
-  config
-);
+  Plotly.newPlot(mapping.div_name, chart_data, chart_layout, config);
+}
 
 /**
- * PROGRAMS WITH REPEATED FINDINGS
- * Bar chart, X programs by entity count
+ * Draws a horizontal bar chart for top entities by repeated findings count.
+ * @param {object} mapping Field and friendly names for the chart pieces.
  */
-var data_repeated_findings = api_data.programs_with_repeated_findings;
-var chart_data_repeated_findings = [
-  {
-    x: data_repeated_findings.reverse().map((object) => object.repeat_findings),
-    y: data_repeated_findings
-      .reverse()
-      .map((object) => object.federal_program_name),
-    orientation: 'h',
-    name: 'Number of Entities',
-    marker: {
-      // color: '#152973',  // FAC logo dark blue
-      color: '#56B833', // FAC logo green
-      width: 1,
+function draw_programs_with_repeated_findings(mapping) {
+  var data = api_data[mapping.field_name];
+  var data = api_data.programs_with_repeated_findings;
+  var chart_data = [
+    {
+      x: data.reverse().map((object) => object.repeat_findings),
+      y: data.reverse().map((object) => object.federal_program_name),
+      orientation: 'h',
+      name: mapping.trace1_friendly_name,
+      marker: {
+        color: '#56B833', // FAC logo green
+        width: 1,
+      },
+      type: 'bar',
     },
-    type: 'bar',
-  },
-];
-var chart_layout_repeated_findings = {
-  title: {
-    text: `Programs With Repeated Findings - State: ${state}, Year: ${year}`,
-  },
-  showlegend: true,
-  yaxis: { automargin: true },
-  minreducedwidth: 400,
-};
+  ];
+  var chart_layout = {
+    title: {
+      text: `${mapping.friendly_name} - State: ${state}, Year: ${year}`,
+    },
+    showlegend: true,
+    yaxis: { automargin: true },
+    minreducedwidth: mapping.minreducedwidth,
+  };
 
-Plotly.newPlot(
-  'div_repeated_findings',
-  chart_data_repeated_findings,
-  chart_layout_repeated_findings,
-  config
-);
+  Plotly.newPlot(mapping.div_name, chart_data, chart_layout, config);
+}
 
 /**
- * TOP PROGRAMS
- * Bar chart, top X programs
+ * Draws a horizontal bar chart for top programs by dollar amount.
+ * @param {object} mapping Field and friendly names for the chart pieces.
  */
-var data_top_programs = api_data.top_programs;
-var chart_data_top_programs = [
-  {
-    x: data_top_programs.reverse().map((object) => object.total_expended),
-    y: data_top_programs.reverse().map((object) => object.federal_program_name),
-    orientation: 'h',
-    name: 'Dollars',
-    marker: {
-      color: '#152973', // FAC logo dark blue
-      // color: '#56B833',  // FAC logo green
-      width: 1,
+function draw_top_programs(mapping) {
+  var data = api_data[mapping.field_name];
+  var chart_data = [
+    {
+      x: data.reverse().map((object) => object.total_expended),
+      y: data.reverse().map((object) => object.federal_program_name),
+      orientation: 'h',
+      name: 'Dollars',
+      marker: {
+        color: '#152973', // FAC logo dark blue
+        width: 1,
+      },
+      type: 'bar',
     },
-    type: 'bar',
-  },
-];
-var chart_layout_top_programs = {
-  title: {
-    text: `Top Programs - State: ${state}, Year: ${year}`,
-  },
-  showlegend: true,
-  yaxis: { automargin: true },
-  minreducedwidth: 400,
-};
+  ];
+  var chart_layout = {
+    title: {
+      text: `${mapping.friendly_name} - State: ${state}, Year: ${year}`,
+    },
+    showlegend: true,
+    yaxis: { automargin: true },
+    minreducedwidth: mapping.minreducedwidth,
+  };
 
-Plotly.newPlot(
-  'div_top_programs',
-  chart_data_top_programs,
-  chart_layout_top_programs,
-  config
-);
+  Plotly.newPlot(mapping.div_name, chart_data, chart_layout, config);
+}
+
+function init() {
+  draw_funding_by_entity_type(state_fields_mapping.funding_by_entity_type);
+  draw_programs_with_repeated_findings(
+    state_fields_mapping.programs_with_repeated_findings
+  );
+  draw_top_programs();
+}
+
+init();
