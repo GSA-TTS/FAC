@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load combine_years %}
+{% load sprite_helper %}
+{% load static %}
+{% block content %}
+    {% comment %} Title {% endcomment %}
+    <div class="desktop:margin-x-10">
+        <div class="grid-row">
+            <div class="grid-col-auto analytics-filter-form width-mobile">
+                <h3>Filters</h3>
+                <form class="usa-form"
+                        id="analytics-filter-form"
+                        enctype='multipart/form-data'
+                        method="post">
+                    {% csrf_token %}
+                    {% comment %} Submission {% endcomment %}
+                    <div class="display-flex flex-column flex-align-center border-top border-base-light">
+                        <input class="usa-button width-full"
+                                type="submit"
+                                value="Filter"
+                                form="analytics-filter-form" />
+                        <input class="usa-button usa-button--unstyled"
+                                type="reset"
+                                value="Reset Filter" />
+                    </div>
+                    <div class="usa-accordion usa-accordion--multiselectable"
+                            data-allow-multiple>
+                        {% include "analytics_filters/audit-year.html" %}
+                        {% include "analytics_filters/state.html" %}
+                    </div>
+                </form>
+            </div>
+            <div class="grid-col padding-left-2">
+                <div class="grid-col grid-gap">
+                    <h1 class="font-sans-2xl">DEMO - Analytics Dashboard</h1>
+                </div>
+                {{ dashboard_data | json_script:"dashboard_data" }}
+                {% if not dashboard_data.state and not dashboard_data.years %}
+                    <h3 class="font-sans-lg">Select a single year and a state, or select multiple years, in the filters to the left.</h3>
+                {% elif dashboard_data.years|length is 1 %}
+                    {% comment %} State Analytics {% endcomment %}
+                    <h2 class="font-sans-xl">State: {{ dashboard_data.state }}, Year: {{ dashboard_data.year }}</h2>
+                    <h3 class="font-sans-lg">Total Records: {{ dashboard_data.state_analytics.total }}</h3>
+                    
+                    <div class="grid-container padding-y-6" id="plotly-containers">
+                        <div id="div_entity_type"></div>  {% comment %} The big doughnut of doom {% endcomment %}
+                        <div id="div_repeated_findings"></div>
+                        <div id="div_top_programs"></div>
+                    </div>
+                    <script src="{% static 'compiled/js/analytics/state.js' %}"></script>
+                {% else %}
+                    {% comment %} Multi-year Trend Analytics {% endcomment %}
+                    <h2 class="font-sans-xl">FAC Trends by Year: {{ dashboard_data.combined_years }}</h2>
+                    {% comment %} <h3 class="font-sans-lg">Total Submissions: {{ dashboard_data.trend_analytics.total_submissions }}</h3> {% endcomment %}
+
+                    <div class="grid-container padding-y-6 grid-row" id="plotly-containers">
+                        <div class="grid-col-6" id="div_total_submissions"></div>
+                        <div class="grid-col-6" id="div_total_award_volume"></div>
+                        <div class="grid-col-6" id="div_total_findings"></div>
+                        <div class="grid-col-6" id="div_submissions_with_findings"></div>
+                        <div class="grid-col-12" id="div_auditee_risk_profile"></div>
+                        <div class="grid-col-12" id="div_risk_profile_vs_findings"></div>
+                    </div>
+                    <script src="{% static 'compiled/js/analytics/trend.js' %}"></script>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'compiled/js/analytics/event_handlers.js' %}"></script>
+{% endblock content %}

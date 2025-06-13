@@ -11,7 +11,6 @@ from dissemination.searchlib.search_cog_or_oversight import (
 from dissemination.searchlib.search_compliance_requirements import (
     audit_search_compliance_requirement,
 )
-
 from dissemination.searchlib.search_constants import Direction, OrderBy, SearchFields
 from dissemination.searchlib.search_direct_funding import audit_search_direct_funding
 from dissemination.searchlib.search_federal_program_name import (

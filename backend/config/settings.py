@@ -386,14 +386,14 @@ else:
     CSP_DATA_SRC = allowed_sources
     CSP_SCRIPT_SRC = allowed_sources
     CSP_CONNECT_SRC = allowed_sources
-    CSP_IMG_SRC = allowed_sources
+    CSP_IMG_SRC = allowed_sources + ("data:",)
     CSP_MEDIA_SRC = allowed_sources
     CSP_FRAME_SRC = allowed_sources
     CSP_FONT_SRC = ("'self'", bucket)
     CSP_WORKER_SRC = allowed_sources
     CSP_FRAME_ANCESTORS = allowed_sources
-    CSP_STYLE_SRC = allowed_sources
-    CSP_INCLUDE_NONCE_IN = ["script-src"]
+    CSP_STYLE_SRC = allowed_sources + ("'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='",)
+    CSP_INCLUDE_NONCE_IN = ["default-src", "img-src", "script-src", "style-src"]
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = True

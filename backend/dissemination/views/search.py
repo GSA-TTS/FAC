@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
-from dissemination.forms import AdvancedSearchForm, SearchForm
+from dissemination.forms.search_forms import AdvancedSearchForm, SearchForm
 from dissemination.search import gather_errors
 from dissemination.searchlib.search_utils import (
     populate_cog_over_name,

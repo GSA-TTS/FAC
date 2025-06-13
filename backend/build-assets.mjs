@@ -11,7 +11,7 @@ import { sassPlugin } from 'esbuild-sass-plugin';
 
 (async () => {
   const watch = process.argv.includes('--watch');
-  const jsPath = sync(join('.', 'static', 'js', '*.js'));
+  const jsPath = sync(join('.', 'static', 'js', '**', '*.js'));  // JS files in './static/js' and its subdirectories
 
   const runPostcss = (cssIn, cssOut) => {
     console.info('Running postcss');

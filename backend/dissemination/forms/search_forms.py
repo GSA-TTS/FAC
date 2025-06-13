@@ -3,7 +3,10 @@ from datetime import date
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .searchlib.search_constants import text_input_delimiters, report_id_delimiters
+from dissemination.searchlib.search_constants import (
+    text_input_delimiters,
+    report_id_delimiters,
+)
 from config.settings import STATE_ABBREVS
 
 
@@ -64,7 +67,7 @@ class AdvancedSearchForm(forms.Form):
     # Multiple choice field Tuples. "choices" variable in field declaration.
     AY_choices = (("all_years", "All years"),) + tuple(
         (x, str(x)) for x in reversed(range(2016, date.today().year + 1))
-    )  # (("all_years", "All years"), (2016, "2016"), ..., (currentYear, "currentYear"))
+    )  # (("all_years", "All years"), (2016, "2016"), ..., (current_year, "current_year"))
     findings_choices = list(zip(*findings_field_mapping.values()))
     direct_funding_choices = (
         ("direct_funding", "Direct funding"),
@@ -256,7 +259,7 @@ class SearchForm(forms.Form):
     # Multiple choice field Tuples. "choices" variable in field declaration.
     AY_choices = (("all_years", "All years"),) + tuple(
         (x, str(x)) for x in reversed(range(2016, date.today().year + 1))
-    )  # (("all_years", "All years"), (2016, "2016"), ..., (currentYear, "currentYear"))
+    )  # (("all_years", "All years"), (2016, "2016"), ..., (current_year, "current_year"))
     entity_type_choices = list(zip(*entity_type_field_mapping.values()))
 
     # Query params
