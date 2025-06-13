@@ -21,9 +21,17 @@ function draw_funding_by_entity_type(mapping) {
 
   if (data.length == 0) return;
 
+  const label_mapping = {
+    'state': 'State',
+    'local': 'Local Government',
+    'tribal': 'Indian tribe or tribal organization',
+    'higher-ed': 'Institution of Higher Education (IHE)',
+    'non-profit': 'Non-profit',
+    'unknown': 'Unknown',
+  };
   var chart_data = [
     {
-      labels: data.map((object) => object.entity_type),
+      labels: data.map((object) => label_mapping[object.entity_type]),
       values: data.map((object) => object.total_expended),
       hoverinfo: 'label+percent',
       hole: 0.4, // Donut style
