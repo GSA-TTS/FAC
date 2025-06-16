@@ -58,6 +58,9 @@ def null_string(v):
         return v
 
 
+allow_multiple = ["missing_in_l1", "missing_in_l2"]
+
+
 def output_results(args, result):
     if isinstance(result, list):
         # for r in result:
@@ -70,13 +73,13 @@ def output_results(args, result):
         result_list = result if isinstance(result, list) else [result]
         for r in result_list:
             for error in r.get_errors():
-                if error.e1.key in used_keys:
-                    pass
-                elif error.e2.key in used_keys:
+                # was error.e1.key and error.e2.key...
+                if error.type in used_keys:
                     pass
                 else:
-                    used_keys.add(error.e1.key)
-                    used_keys.add(error.e2.key)
+                    if error.type not in allow_multiple:
+                        print(error.type)
+                        used_keys.add(error.type)
                     all_errors.append(
                         {
                             "error_type": error.type,

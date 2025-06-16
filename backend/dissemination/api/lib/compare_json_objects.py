@@ -89,8 +89,8 @@ def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore_columns=[]):
         o1.pop(ignorable["key"], None)
         o2.pop(ignorable["key"], None)
 
-    val_set_1 = set(o1.values())
-    val_set_2 = set(o2.values())
+    val_set_1 = set([safely_remove_spaces(o) for o in o1.values()])
+    val_set_2 = set([safely_remove_spaces(o) for o in o2.values()])
     result = val_set_1 == val_set_2
     R = Result(result)
     if not result:
@@ -124,6 +124,17 @@ def skippable(k, obj, ignore):
     return False
 
 
+def safely_remove_spaces(o):
+    if isinstance(o, str):
+        return o.replace(" ", "")
+    else:
+        return o
+
+
+def check_not_equal(o1, o2):
+    return safely_remove_spaces(o1) != safely_remove_spaces(o2)
+
+
 def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore_columns=[]):
     R = Result(True)
     for k in o1.keys():
@@ -139,7 +150,7 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore_columns=[]):
                 )
             )
             R.set_result(False)
-        elif o1[k] != o2[k]:
+        elif check_not_equal(o1[k], o2[k]):
             R.add_error(
                 ErrorPair(
                     "mappings",
@@ -275,10 +286,11 @@ def compare_strict_order(v1: str, l1: list, v2: str, l2: list, ignore_columns=[]
 
 def check_lists_same_length(v1, l1, v2, l2):
     result = len(l1) == len(l2)
+    R = None
     if result:
-        return Result(True)
+        R = Result(True)
     else:
-        return Result(
+        R = Result(
             False,
             ErrorPair(
                 "list_length",
@@ -286,6 +298,31 @@ def check_lists_same_length(v1, l1, v2, l2):
                 APIValue(v2, "list_length", len(l2), None),
             ),
         )
+
+    report_ids_1 = [o["report_id"] for o in l1]
+    report_ids_2 = [o["report_id"] for o in l2]
+
+    for rid in report_ids_1:
+        if rid not in report_ids_2:
+            # print(rid, "not in l2")
+            R.add_error(
+                ErrorPair(
+                    "missing_in_l2",
+                    APIValue(v1, "report_id", rid, None),
+                    APIValue(v2, "report_id", None, None),
+                )
+            )
+    for rid in report_ids_2:
+        if rid not in report_ids_1:
+            # print(rid, "not in l1")
+            R.add_error(
+                ErrorPair(
+                    "missing_in_l1",
+                    APIValue(v1, "report_id", None, None),
+                    APIValue(v2, "report_id", rid, None),
+                )
+            )
+    return R
 
 
 KEY_IN_BOTH = 0

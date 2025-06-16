@@ -12,5 +12,12 @@
     "acceptable_values": [
       "DEFAULT_AUDITOR_CERTIFY_TITLE"
     ]
+  },
+  {
+    "api_version": "api_v1_1_0",
+    "key": "date_created",
+    "acceptable_values": [
+      ".*"
+    ]
   }
 ]
