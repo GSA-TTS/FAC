@@ -1,0 +1,16 @@
+[
+  {
+    "api_version": "api_v1_1_0",
+    "key": "auditor_certify_name",
+    "acceptable_values": [
+      "DEFAULT_AUDITOR_CERTIFY_NAME"
+    ]
+  },
+  {
+    "api_version": "api_v1_1_0",
+    "key": "auditor_certify_title",
+    "acceptable_values": [
+      "DEFAULT_AUDITOR_CERTIFY_TITLE"
+    ]
+  }
+]

@@ -83,7 +83,12 @@ def check_dictionaries_have_same_keys(v1, o1, v2, o2):
     return R
 
 
-def check_dictionaries_have_same_values(v1, o1, v2, o2):
+def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore_columns=[]):
+    # Remove the ignores from the objects
+    for ignorable in ignore_columns:
+        o1.pop(ignorable["key"], None)
+        o2.pop(ignorable["key"], None)
+
     val_set_1 = set(o1.values())
     val_set_2 = set(o2.values())
     result = val_set_1 == val_set_2
@@ -112,9 +117,19 @@ def check_dictionaries_have_same_values(v1, o1, v2, o2):
     return R
 
 
-def check_dictionaries_have_same_mappings(v1, o1, v2, o2):
+def skippable(k, obj, ignore):
+    for ignorable in ignore:
+        if ignorable["key"] == k:
+            return True
+    return False
+
+
+def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore_columns=[]):
     R = Result(True)
     for k in o1.keys():
+        # Skip values that we say to ignore
+        if skippable(k, o1, ignore_columns):
+            continue
         if k not in o2:
             R.add_error(
                 ErrorPair(
@@ -136,6 +151,9 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2):
 
     # Loop through o2 keys that may not be in o1
     for k in o2:
+        # Skip values we say to ignore
+        if skippable(k, o2, ignore_columns):
+            continue
         if k not in o1:
             R.add_error(
                 ErrorPair(
@@ -148,7 +166,7 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2):
     return R
 
 
-def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict):
+def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore_columns=[]):
     # We want to confirm that these two objects are identical.
     # o1 must have the same keys as o2
     # o1 must have the same values as o2
@@ -157,7 +175,9 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict):
     # At this point, we have the same keys and the same
     # values in each object. Now, we have to make sure
     # that the keys in o1 and o2 map to identical values.
-    cdhsm = check_dictionaries_have_same_mappings(v1, o1, v2, o2)
+    cdhsm = check_dictionaries_have_same_mappings(
+        v1, o1, v2, o2, ignore_columns=ignore_columns
+    )
     if not cdhsm:
         # print(f"mappings not identical in objects")
         return cdhsm
@@ -167,7 +187,9 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict):
     if not cdhsk:
         return cdhsk
 
-    cdhsv = check_dictionaries_have_same_values(v1, o1, v2, o2)
+    cdhsv = check_dictionaries_have_same_values(
+        v1, o1, v2, o2, ignore_columns=ignore_columns
+    )
     if not cdhsv:
         return cdhsv
 
@@ -176,7 +198,12 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict):
 
 
 def compare_any_order(
-    v1: str, l1: list, v2: str, l2: list, comparison_key: str = "report_id"
+    v1: str,
+    l1: list,
+    v2: str,
+    l2: list,
+    comparison_key: str = "report_id",
+    ignore_columns=[],
 ):
     results = []
     for o1 in l1:
@@ -211,7 +238,11 @@ def compare_any_order(
             )
             break
         elif o1[comparison_key] == to_compare[comparison_key]:
-            results.append(compare_json_objects(v1, o1, v2, to_compare))
+            results.append(
+                compare_json_objects(
+                    v1, o1, v2, to_compare, ignore_columns=ignore_columns
+                )
+            )
         else:
             print(f"Values do not match for key {comparison_key}")
             results.append(
@@ -235,7 +266,7 @@ def compare_any_order(
     return results
 
 
-def compare_strict_order(v1: str, l1: list, v2: str, l2: list):
+def compare_strict_order(v1: str, l1: list, v2: str, l2: list, ignore_columns=[]):
     results = []
     for o1, o2 in zip(l1, l2):
         results.append(compare_json_objects(v1, o1, v2, o2))
@@ -271,7 +302,8 @@ def check_key_in_both_lists(v1, l1, v2, l2, comparison_key):
     return KEY_IN_BOTH
 
 
-def check_equal_values_for_key(v1, l1, v2, l2, comparison_key):
+def check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore_columns):
+
     kv1 = set(map(lambda o: o[comparison_key], l1))
     kv2 = set(map(lambda o: o[comparison_key], l2))
     result = kv1 == kv2
@@ -297,6 +329,7 @@ def compare_lists_of_json_objects(
     l2: list,
     comparison_key: str = "report_id",
     strict_order=True,
+    ignore_columns=[],
 ):
 
     # The lists must be the same length
@@ -347,13 +380,13 @@ def compare_lists_of_json_objects(
 
     # The set of values in l1 for this key must be the same as the set of
     # values in l2 for this key.
-    if not check_equal_values_for_key(v1, l1, v2, l2, comparison_key):
+    if not check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore_columns):
         print(f"Values not equal in all objects for {comparison_key}")
 
     if strict_order:
-        results = compare_strict_order(v1, l1, v2, l2)
+        results = compare_strict_order(v1, l1, v2, l2, ignore_columns=ignore_columns)
     else:
-        results = compare_any_order(v1, l1, v2, l2)
+        results = compare_any_order(v1, l1, v2, l2, ignore_columns=ignore_columns)
 
     # We don't have an andmap(). We want to return
     # True if everything in the list is True.

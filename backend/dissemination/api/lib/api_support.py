@@ -73,6 +73,7 @@ def compare(
     environment="local",
     comparison_key="report_id",
     strict_order=True,
+    ignore_columns=[],
 ):
 
     # The base headers are different in the local environment and in the cloud.
@@ -151,9 +152,9 @@ def compare(
             print(f"headers: {[headers_1, headers_2][ndx]}")
             sys.exit(-1)
 
-    # print(list_of_objects1.json())
+    # pprint(list_of_objects1.json())
     # print("=====================")
-    # print(list_of_objects2.json())
+    # pprint(list_of_objects2.json())
 
     # Compare the lists of objects
     # We get a comparison key passed in; it defaults to `report_id`.
@@ -172,6 +173,7 @@ def compare(
         list_of_objects2.json(),
         comparison_key=comparison_key,
         strict_order=strict_order,
+        ignore_columns=ignore_columns,
     )
 
     if isinstance(result, Result) and result:
