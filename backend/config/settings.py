@@ -374,6 +374,7 @@ else:
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
     # see settings options https://django-csp.readthedocs.io/en/latest/configuration.html#configuration-chapter
     bucket = f"{STATIC_URL}"
+    sha_plotly_js_strict_dist = "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='"
     allowed_sources = (
         "'self'",
         bucket,
@@ -386,14 +387,14 @@ else:
     CSP_DATA_SRC = allowed_sources
     CSP_SCRIPT_SRC = allowed_sources
     CSP_CONNECT_SRC = allowed_sources
-    CSP_IMG_SRC = allowed_sources
+    CSP_IMG_SRC = allowed_sources + ("data:",)  # "data:" for images inserted by NPM packages
     CSP_MEDIA_SRC = allowed_sources
     CSP_FRAME_SRC = allowed_sources
     CSP_FONT_SRC = ("'self'", bucket)
     CSP_WORKER_SRC = allowed_sources
     CSP_FRAME_ANCESTORS = allowed_sources
-    CSP_STYLE_SRC = allowed_sources
-    CSP_INCLUDE_NONCE_IN = ["script-src"]
+    CSP_STYLE_SRC = allowed_sources + (sha_plotly_js_strict_dist,)  # SHA for styles inserted inline by Plotly
+    CSP_INCLUDE_NONCE_IN = ["default-src", "img-src", "script-src", "style-src"]
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = True
