@@ -284,7 +284,7 @@ def compare_strict_order(v1: str, l1: list, v2: str, l2: list, ignore_columns=[]
     return results
 
 
-def check_lists_same_length(v1, l1, v2, l2):
+def check_lists_same_length(v1, l1, v2, l2, ignore_columns=[]):
     result = len(l1) == len(l2)
     R = None
     if result:
@@ -302,8 +302,15 @@ def check_lists_same_length(v1, l1, v2, l2):
     report_ids_1 = [o["report_id"] for o in l1]
     report_ids_2 = [o["report_id"] for o in l2]
 
+    # Get the report IDs we might skip because they are
+    # stuck.
+    ignore_stuck_report_ids = []
+    for rule in ignore_columns:
+        if rule["key"] == "stuck_reports":
+            ignore_stuck_report_ids = rule["skip"]
+
     for rid in report_ids_1:
-        if rid not in report_ids_2:
+        if rid not in report_ids_2 and rid not in ignore_stuck_report_ids:
             # print(rid, "not in l2")
             R.add_error(
                 ErrorPair(
@@ -313,7 +320,7 @@ def check_lists_same_length(v1, l1, v2, l2):
                 )
             )
     for rid in report_ids_2:
-        if rid not in report_ids_1:
+        if rid not in report_ids_1 and rid not in ignore_stuck_report_ids:
             # print(rid, "not in l1")
             R.add_error(
                 ErrorPair(
@@ -370,7 +377,7 @@ def compare_lists_of_json_objects(
 ):
 
     # The lists must be the same length
-    clsl = check_lists_same_length(v1, l1, v2, l2)
+    clsl = check_lists_same_length(v1, l1, v2, l2, ignore_columns=ignore_columns)
     print(len(l1), len(l2))
     if not clsl:
         # print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
