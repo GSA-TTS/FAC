@@ -83,11 +83,11 @@ def check_dictionaries_have_same_keys(v1, o1, v2, o2):
     return R
 
 
-def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore_columns=[]):
+def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore={}):
     # Remove the ignores from the objects
-    for ignorable in ignore_columns:
-        o1.pop(ignorable["key"], None)
-        o2.pop(ignorable["key"], None)
+    for k in ignore.keys():
+        o1.pop(k, None)
+        o2.pop(k, None)
 
     val_set_1 = set([safely_remove_spaces(o) for o in o1.values()])
     val_set_2 = set([safely_remove_spaces(o) for o in o2.values()])
@@ -117,10 +117,16 @@ def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore_columns=[]):
     return R
 
 
+import re
+
+
 def skippable(k, obj, ignore):
-    for ignorable in ignore:
-        if ignorable["key"] == k:
-            return True
+    if k in ignore:
+        for rule_k, rule_vs in ignore[k]["acceptable_values"].items():
+            for rule in rule_vs:
+                if re.search(rule, obj[rule_k]):
+                    # print("found", rule, obj[rule_k])
+                    return True
     return False
 
 
@@ -135,16 +141,22 @@ def check_not_equal(o1, o2):
     return safely_remove_spaces(o1) != safely_remove_spaces(o2)
 
 
-def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore_columns=[]):
+def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
     R = Result(True)
     for k in o1.keys():
         # Skip values that we say to ignore
-        if skippable(k, o1, ignore_columns):
+        # print(
+        #     k,
+        #     ignore[k]["api_version"] if k in ignore else "--",
+        #     v1,
+        #     skippable(k, o1, ignore),
+        # )
+        if k in ignore and ignore[k]["api_version"] == v1 and skippable(k, o1, ignore):
             continue
         if k not in o2:
             R.add_error(
                 ErrorPair(
-                    "mappings",
+                    "mappings_missing_o2",
                     APIValue(v1, k, o1[k], o1["report_id"]),
                     APIValue(v2, k, None, o2["report_id"]),
                 )
@@ -153,7 +165,7 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore_columns=[]):
         elif check_not_equal(o1[k], o2[k]):
             R.add_error(
                 ErrorPair(
-                    "mappings",
+                    "mappings_not_equal",
                     APIValue(v1, k, o1[k], o1["report_id"]),
                     APIValue(v2, k, o2[k], o2["report_id"]),
                 )
@@ -163,12 +175,12 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore_columns=[]):
     # Loop through o2 keys that may not be in o1
     for k in o2:
         # Skip values we say to ignore
-        if skippable(k, o2, ignore_columns):
+        if k in ignore and ignore[k]["api_version"] == v2 and skippable(k, o2, ignore):
             continue
         if k not in o1:
             R.add_error(
                 ErrorPair(
-                    "mappings",
+                    "mappings_missing_o1",
                     APIValue(v1, k, None, o1["report_id"]),
                     APIValue(v2, k, o2[k], o2["report_id"]),
                 )
@@ -177,7 +189,7 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore_columns=[]):
     return R
 
 
-def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore_columns=[]):
+def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore={}):
     # We want to confirm that these two objects are identical.
     # o1 must have the same keys as o2
     # o1 must have the same values as o2
@@ -186,9 +198,7 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore_columns=[]
     # At this point, we have the same keys and the same
     # values in each object. Now, we have to make sure
     # that the keys in o1 and o2 map to identical values.
-    cdhsm = check_dictionaries_have_same_mappings(
-        v1, o1, v2, o2, ignore_columns=ignore_columns
-    )
+    cdhsm = check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore=ignore)
     if not cdhsm:
         # print(f"mappings not identical in objects")
         return cdhsm
@@ -198,9 +208,7 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore_columns=[]
     if not cdhsk:
         return cdhsk
 
-    cdhsv = check_dictionaries_have_same_values(
-        v1, o1, v2, o2, ignore_columns=ignore_columns
-    )
+    cdhsv = check_dictionaries_have_same_values(v1, o1, v2, o2, ignore=ignore)
     if not cdhsv:
         return cdhsv
 
@@ -214,7 +222,7 @@ def compare_any_order(
     v2: str,
     l2: list,
     comparison_key: str = "report_id",
-    ignore_columns=[],
+    ignore={},
 ):
     results = []
     for o1 in l1:
@@ -249,11 +257,7 @@ def compare_any_order(
             )
             break
         elif o1[comparison_key] == to_compare[comparison_key]:
-            results.append(
-                compare_json_objects(
-                    v1, o1, v2, to_compare, ignore_columns=ignore_columns
-                )
-            )
+            results.append(compare_json_objects(v1, o1, v2, to_compare, ignore=ignore))
         else:
             print(f"Values do not match for key {comparison_key}")
             results.append(
@@ -277,14 +281,14 @@ def compare_any_order(
     return results
 
 
-def compare_strict_order(v1: str, l1: list, v2: str, l2: list, ignore_columns=[]):
+def compare_strict_order(v1: str, l1: list, v2: str, l2: list, ignore={}):
     results = []
     for o1, o2 in zip(l1, l2):
-        results.append(compare_json_objects(v1, o1, v2, o2))
+        results.append(compare_json_objects(v1, o1, v2, o2, ignore=ignore))
     return results
 
 
-def check_lists_same_length(v1, l1, v2, l2, ignore_columns=[]):
+def check_lists_same_length(v1, l1, v2, l2):
     result = len(l1) == len(l2)
     R = None
     if result:
@@ -302,15 +306,8 @@ def check_lists_same_length(v1, l1, v2, l2, ignore_columns=[]):
     report_ids_1 = [o["report_id"] for o in l1]
     report_ids_2 = [o["report_id"] for o in l2]
 
-    # Get the report IDs we might skip because they are
-    # stuck.
-    ignore_stuck_report_ids = []
-    for rule in ignore_columns:
-        if rule["key"] == "stuck_reports":
-            ignore_stuck_report_ids = rule["skip"]
-
     for rid in report_ids_1:
-        if rid not in report_ids_2 and rid not in ignore_stuck_report_ids:
+        if rid not in report_ids_2:
             # print(rid, "not in l2")
             R.add_error(
                 ErrorPair(
@@ -320,7 +317,7 @@ def check_lists_same_length(v1, l1, v2, l2, ignore_columns=[]):
                 )
             )
     for rid in report_ids_2:
-        if rid not in report_ids_1 and rid not in ignore_stuck_report_ids:
+        if rid not in report_ids_1:
             # print(rid, "not in l1")
             R.add_error(
                 ErrorPair(
@@ -346,10 +343,16 @@ def check_key_in_both_lists(v1, l1, v2, l2, comparison_key):
     return KEY_IN_BOTH
 
 
-def check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore_columns):
+def check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore={}):
 
     kv1 = set(map(lambda o: o[comparison_key], l1))
     kv2 = set(map(lambda o: o[comparison_key], l2))
+
+    # FIXME: Right here, we should look for a rule in `ignore` that uses
+    # this key. For example, `auditor_certify_name` could appear here.
+    # Then, we should do the right thing with the values---like check/ignore.
+    # Although... as used, this might *always* be "report_id."
+
     result = kv1 == kv2
     R = Result(result)
     if not result:
@@ -364,6 +367,28 @@ def check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore_columns):
     return R
 
 
+def remove_objects_from_lists(l1, l2, ignore):
+    # Get the report IDs we might skip because they are
+    # stuck. Pull from the dictionary.
+    ignore_stuck_report_ids = ignore["stuck_reports"]["report_ids"]
+
+    # Filter out stuck audits
+    newl1 = []
+    newl2 = []
+    for obj in l1:
+        if obj["report_id"] in ignore_stuck_report_ids:
+            pass
+        else:
+            newl1.append(obj)
+    for obj in l2:
+        if obj["report_id"] in ignore_stuck_report_ids:
+            pass
+        else:
+            newl2.append(obj)
+
+    return newl1, newl2
+
+
 # Compares two lists of JSON objects
 # Uses the key to find which objects should be compared
 def compare_lists_of_json_objects(
@@ -373,11 +398,16 @@ def compare_lists_of_json_objects(
     l2: list,
     comparison_key: str = "report_id",
     strict_order=True,
-    ignore_columns=[],
+    ignore={},
 ):
 
+    # Lets remove all of the report IDs from both lists that should be
+    # skipped. These are, currently, a list of stuck reports on the
+    # v1.1 side. They will not have comparisons in the SOT table.
+    l1, l2 = remove_objects_from_lists(l1, l2, ignore)
+
     # The lists must be the same length
-    clsl = check_lists_same_length(v1, l1, v2, l2, ignore_columns=ignore_columns)
+    clsl = check_lists_same_length(v1, l1, v2, l2)
     print(len(l1), len(l2))
     if not clsl:
         # print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
@@ -424,13 +454,13 @@ def compare_lists_of_json_objects(
 
     # The set of values in l1 for this key must be the same as the set of
     # values in l2 for this key.
-    if not check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore_columns):
+    if not check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore=ignore):
         print(f"Values not equal in all objects for {comparison_key}")
 
     if strict_order:
-        results = compare_strict_order(v1, l1, v2, l2, ignore_columns=ignore_columns)
+        results = compare_strict_order(v1, l1, v2, l2, ignore=ignore)
     else:
-        results = compare_any_order(v1, l1, v2, l2, ignore_columns=ignore_columns)
+        results = compare_any_order(v1, l1, v2, l2, ignore=ignore)
 
     # We don't have an andmap(). We want to return
     # True if everything in the list is True.

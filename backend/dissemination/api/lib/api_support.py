@@ -73,7 +73,7 @@ def compare(
     environment="local",
     comparison_key="report_id",
     strict_order=True,
-    ignore_columns=[],
+    ignore=[],
 ):
 
     # The base headers are different in the local environment and in the cloud.
@@ -173,7 +173,7 @@ def compare(
         list_of_objects2.json(),
         comparison_key=comparison_key,
         strict_order=strict_order,
-        ignore_columns=ignore_columns,
+        ignore=ignore,
     )
 
     if isinstance(result, Result) and result:
