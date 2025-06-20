@@ -1201,13 +1201,21 @@ six==1.16.0 \
     #   orderedmultidict
     #   pyjwkest
     #   python-dateutil
-sling==1.4.2 \
-    --hash=sha256:37366d47a3249de8ac43db3b45b0a5c1785124b5554c9c7a36ca1d5547fd5c60 \
-    --hash=sha256:8df3dd51eb73b1509d01600c657393a1d32ec90744f0736dfbc264883af952c5
+sling==1.4.10.post2 \
+    --hash=sha256:99298b5f369de4ddbd8f415cbee18ad3462babce567a1e018b0312d02280c94b \
+    --hash=sha256:de021fbf462592d6c8f3902079729265d11305ece0b17c8d46daa83f5e991e78
     # via -r ./requirements/requirements.in
-sling-linux-amd64==1.4.2 \
-    --hash=sha256:4935332ccefa56abafccb89ead7b743ecaafaf6059b8f5d9ce9e9ca21b9b2b36 \
-    --hash=sha256:cf9a41e4eb2bb5028e69313188eeb8b6328e21aa4e9718a528d2e6a92ee7d617
+sling-linux-amd64==1.4.10.post2 \
+    --hash=sha256:514a6c0b3baeb5e99a54ba9414126cd14dc437348aea36b52d1de3b19cea846c \
+    --hash=sha256:b93754c62753c6e51e8a26fe1750c6efc1717456e5aa089340c9f3ffdf5ad19f
+    # via -r ./requirements/requirements.in
+sling-linux-arm64==1.4.10.post2 \
+    --hash=sha256:2c8f4454090c9f2e5975bc743f53ed64038737fce7b6d282a07175b7b8b8474d \
+    --hash=sha256:dbcb00adbda465aeb6e16d22ec3c372dd35c782eeab540db3188d993b08e2f7f
+    # via -r ./requirements/requirements.in
+sling-mac-amd64==1.4.10.post2 \
+    --hash=sha256:362fb7b3d540440f9a7748835870bb0e50e87791d08b6c9bf97dd0f7aa414595 \
+    --hash=sha256:4f01ddc2a8c916996d452db078bfa942e32ae36783bf47bea5ec6f8375fedef5
     # via sling
 sqlalchemy==2.0.36 \
     --hash=sha256:03e08af7a5f9386a43919eda9de33ffda16b44eb11f3b313e6822243770e9763 \
@@ -1286,13 +1294,11 @@ typing-extensions==4.12.2 \
     --hash=sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d \
     --hash=sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8
     # via
-    #   asgiref
     #   dj-database-url
     #   faker
     #   pydantic
     #   pydantic-core
     #   pydash
-    #   pypdf
     #   sqlalchemy
 tzdata==2024.2 \
     --hash=sha256:7d85cc416e9382e69095b7bdf4afd9e3880418a2413feec7069d533d6b4e31cc \
