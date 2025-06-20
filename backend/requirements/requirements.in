@@ -34,7 +34,7 @@ python-dateutil==2.9.0.post0
 python-json-logger
 python-slugify
 pyyaml
-requests>=2.32.3
+requests>=2.32.4
 sqlalchemy
 sling>=1.4.2
 sling-linux-amd64>=1.4.2
