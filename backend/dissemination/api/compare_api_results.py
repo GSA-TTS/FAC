@@ -47,7 +47,7 @@ def setup_parser():
 
     parser.add_argument("--comparison_key", type=str, default="report_id")
 
-    parser.add_argument("--ignore_columns", type=str, default=None)
+    parser.add_argument("--ignore", type=str, default=None)
     return parser
 
 
@@ -180,17 +180,10 @@ def main():
         print("--environment must be either `local` or `cloud`")
         sys.exit(-1)
 
-    # The ignore file is a JSON document
-    # [
-    #   {
-    #     "api_version": "",
-    #     "column_name": "",
-    #     "acceptable_values": ["", "", ...]
-    #   }
-    # ]
-    ignore_columns = []
-    if args.ignore_columns is not None:
-        ignore_columns = json.load(open(args.ignore_columns))
+    # The ignore file is a JSON dictionary
+    ignore = {}
+    if args.ignore is not None:
+        ignore = json.load(open(args.ignore))
 
     result = compare(
         args.scheme,
@@ -206,7 +199,7 @@ def main():
         args.environment,
         args.comparison_key,
         args.strict_order,
-        ignore_columns,
+        ignore,
     )
 
     output_results(args, result)

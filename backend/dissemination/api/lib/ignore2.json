@@ -17,6 +17,15 @@
       ]
     }
   },
+  "auditee_certified_date": {
+    "action": "ignore",
+    "api_version": "api_v1_{1,2}_0",
+    "acceptable_values": {
+      "auditor_certify_title": [
+        ".*"
+      ]
+    }
+  },
   "date_created": {
     "action": "ignore",
     "api_version": "api_v1_1_0",
@@ -50,7 +59,7 @@
   ],
   "ready_for_certification_date": {
     "action": "ignore",
-    "api_version": "api_v1_1_0",
+    "api_version": "api_v1_{1,2}_0",
     "acceptable_values": {
       "report_id": [
         "2023-06-GSAFAC-0000036249",

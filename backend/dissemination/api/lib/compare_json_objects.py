@@ -4,6 +4,8 @@
 # objects instead of booleans.
 from typing import Any
 
+import re
+
 
 class APIValue:
     def __init__(self, version, key, value, report_id):
@@ -86,13 +88,18 @@ def check_dictionaries_have_same_keys(v1, o1, v2, o2):
 def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore={}):
     # Remove the ignores from the objects
     for k in ignore.keys():
+        # print(f"popping {k} before {len(o1)}")
         o1.pop(k, None)
+        # print(f"popping {k} after {len(o1)}")
         o2.pop(k, None)
 
     val_set_1 = set([safely_remove_spaces(o) for o in o1.values()])
     val_set_2 = set([safely_remove_spaces(o) for o in o2.values()])
+
     result = val_set_1 == val_set_2
+
     R = Result(result)
+
     if not result:
         for v in val_set_1:
             if v not in val_set_2:
@@ -100,8 +107,8 @@ def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore={}):
                 R.add_error(
                     ErrorPair(
                         "dict_values",
-                        APIValue(v1, v, v, o1["report_id"]),
-                        APIValue(v2, v, None, o2["report_id"]),
+                        APIValue(v1, k, v, o1["report_id"]),
+                        APIValue(v2, k, None, o2["report_id"]),
                     )
                 )
         for v in val_set_2:
@@ -110,14 +117,11 @@ def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore={}):
                 R.add_error(
                     ErrorPair(
                         "dict_values",
-                        APIValue(v1, v, None, o1["report_id"]),
-                        APIValue(v2, v, v, o2["report_id"]),
+                        APIValue(v1, k, None, o1["report_id"]),
+                        APIValue(v2, k, v, o2["report_id"]),
                     )
                 )
     return R
-
-
-import re
 
 
 def skippable(k, obj, ignore):
@@ -151,8 +155,14 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
         #     v1,
         #     skippable(k, o1, ignore),
         # )
-        if k in ignore and ignore[k]["api_version"] == v1 and skippable(k, o1, ignore):
+        if (
+            k in ignore
+            and re.search(ignore[k]["api_version"], v1)
+            and skippable(k, o1, ignore)
+        ):
+            # print(f"skipping {k} - {o1['report_id']} in {v1}")
             continue
+
         if k not in o2:
             R.add_error(
                 ErrorPair(
@@ -162,21 +172,18 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
                 )
             )
             R.set_result(False)
-        elif check_not_equal(o1[k], o2[k]):
-            R.add_error(
-                ErrorPair(
-                    "mappings_not_equal",
-                    APIValue(v1, k, o1[k], o1["report_id"]),
-                    APIValue(v2, k, o2[k], o2["report_id"]),
-                )
-            )
-            R.set_result(False)
 
     # Loop through o2 keys that may not be in o1
-    for k in o2:
+    for k in o2.keys():
         # Skip values we say to ignore
-        if k in ignore and ignore[k]["api_version"] == v2 and skippable(k, o2, ignore):
+        if (
+            k in ignore
+            and re.search(ignore[k]["api_version"], v2)
+            and skippable(k, o2, ignore)
+        ):
+            print(f"skipping {k} - {o2['report_id']} in {v1}")
             continue
+
         if k not in o1:
             R.add_error(
                 ErrorPair(
@@ -186,6 +193,28 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
                 )
             )
             R.set_result(False)
+
+    for k in o1.keys():
+        if (
+            k in ignore
+            and (
+                re.search(ignore[k]["api_version"], v1)
+                or re.search(ignore[k]["api_version"], v2)
+            )
+            and (skippable(k, o1, ignore) or skippable(k, o2, ignore))
+        ):
+            continue
+
+        if check_not_equal(o1[k], o2[k]):
+            R.add_error(
+                ErrorPair(
+                    "mappings_not_equal",
+                    APIValue(v1, k, o1[k], o1["report_id"]),
+                    APIValue(v2, k, o2[k], o2["report_id"]),
+                )
+            )
+            R.set_result(False)
+
     return R
 
 
@@ -251,7 +280,7 @@ def compare_any_order(
                         APIValue(
                             v1, comparison_key, o1[comparison_key], o1["report_id"]
                         ),
-                        APIValue(v2, None, None, o2["report_id"]),
+                        APIValue(v2, comparison_key, None, o2["report_id"]),
                     ),
                 )
             )
@@ -370,7 +399,10 @@ def check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore={}):
 def remove_objects_from_lists(l1, l2, ignore):
     # Get the report IDs we might skip because they are
     # stuck. Pull from the dictionary.
-    ignore_stuck_report_ids = ignore["stuck_reports"]["report_ids"]
+    if ignore:
+        ignore_stuck_report_ids = ignore["stuck_reports"]["report_ids"]
+    else:
+        ignore_stuck_report_ids = []
 
     # Filter out stuck audits
     newl1 = []

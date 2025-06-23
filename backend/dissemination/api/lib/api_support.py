@@ -1,5 +1,6 @@
 # flake8: noqa
 from requests import get
+import lib.fac as f
 
 from lib.compare_json_objects import compare_lists_of_json_objects as clojo, Result
 
@@ -73,7 +74,7 @@ def compare(
     environment="local",
     comparison_key="report_id",
     strict_order=True,
-    ignore=[],
+    ignore={},
 ):
 
     # The base headers are different in the local environment and in the cloud.
@@ -87,37 +88,21 @@ def compare(
     # Now, we build a query URL. We're building different URLs depending on whether
     # we're testing one single report, or a date range.
     if report_id:
-        url_1 = build_query_url(
-            scheme,
-            api_base_1,
-            port,
-            endpoint,
-            report_id=report_id,
-        )
-        url_2 = build_query_url(
-            scheme,
-            api_base_2,
-            port,
-            endpoint,
-            report_id=report_id,
-        )
+        client_1 = f.FAC()
+        client_1.scheme(scheme).port(port).base(api_base_1).endpoint(endpoint)
+        client_1.query("report_id", "eq", report_id)
+        client_2 = f.FAC()
+        client_2.scheme(scheme).port(port).base(api_base_2).endpoint(endpoint)
+        client_2.query("report_id", "eq", report_id)
     elif start_date and end_date:
-        url_1 = build_query_url(
-            scheme,
-            api_base_1,
-            port,
-            endpoint,
-            start_date=start_date,
-            end_date=end_date,
-        )
-        url_2 = build_query_url(
-            scheme,
-            api_base_2,
-            port,
-            endpoint,
-            start_date=start_date,
-            end_date=end_date,
-        )
+        client_1 = f.FAC()
+        client_1.scheme(scheme).port(port).base(api_base_1).endpoint(endpoint)
+        client_1.query("fac_accepted_date", "gte", start_date)
+        client_1.query("fac_accepted_date", "lt", end_date)
+        client_2 = f.FAC()
+        client_2.scheme(scheme).port(port).base(api_base_2).endpoint(endpoint)
+        client_2.query("fac_accepted_date", "gte", start_date)
+        client_2.query("fac_accepted_date", "lt", end_date)
 
     # Build the distinct headers for each API by adding unique values
     # to the common base. We explicitly want the same headers *except for the API version*.
@@ -125,32 +110,40 @@ def compare(
     headers_1 = append_headers(headers_base, {"accept-profile": api_version_1})
     headers_2 = append_headers(headers_base, {"accept-profile": api_version_2})
 
+    client_1.headers(headers_1)
+    client_2.headers(headers_2)
+
+    # print(client_1._params)
+    # print(client_1.get_url())
+
     # Retrieve the lists of objects from the API server for the first version.
-    try:
-        list_of_objects1 = get(url_1, headers=headers_1, timeout=100)
-    except Exception as e:
+    client_1.fetch()
+    if client_1.error_status() is not None:
         print("exception while calling API. exiting.")
-        print("url_1:", url_1)
-        print(e)
+        print("url_1:", client_1.get_url())
+        print(client_1.error)
         sys.exit(-1)
+    else:
+        list_of_objects1 = client_1.results()
 
     # Retrieve the objects from the second API.
-    try:
-        list_of_objects2 = get(url_2, headers=headers_2, timeout=1000)
-    except Exception as e:
+    client_2.fetch()
+    if client_2.error_status() is not None:
         print("exception while calling API. exiting.")
-        print("url_2:", url_2)
-        print(e)
+        print("url_2:", client_2.get_url())
+        print(client_2.error)
         sys.exit(-1)
+    else:
+        list_of_objects2 = client_2.results()
 
     # We should get only 200s.
-    for ndx, loo in enumerate([list_of_objects1, list_of_objects2]):
-        if loo.status_code != 200:
-            print(f"did not get status 200 for url {ndx}. exiting.")
-            print(f"url: {[url_1, url_2][ndx]}")
-            print(f"{loo.status_code}: {loo.reason}")
-            print(f"headers: {[headers_1, headers_2][ndx]}")
-            sys.exit(-1)
+    # for ndx, loo in enumerate([list_of_objects1, list_of_objects2]):
+    #     if loo.status_code != 200:
+    #         print(f"did not get status 200 for url {ndx}. exiting.")
+    #         print(f"url: {[client_1.get_url(), client_2.get_url()][ndx]}")
+    #         print(f"{loo.status_code}: {loo.reason}")
+    #         print(f"headers: {[headers_1, headers_2][ndx]}")
+    #         sys.exit(-1)
 
     # pprint(list_of_objects1.json())
     # print("=====================")
@@ -168,9 +161,9 @@ def compare(
     #  - A list of Result objects
     result = clojo(
         api_version_1,
-        list_of_objects1.json(),
+        list_of_objects1,  # list_of_objects1.json(),
         api_version_2,
-        list_of_objects2.json(),
+        list_of_objects2,  # list_of_objects2.json(),
         comparison_key=comparison_key,
         strict_order=strict_order,
         ignore=ignore,
@@ -181,5 +174,4 @@ def compare(
         return True
     else:
         print("different")
-        # print(result)
         return result
