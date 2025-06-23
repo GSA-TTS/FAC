@@ -184,7 +184,7 @@ def main():
     ignore = {}
     if args.ignore is not None:
         ignore = json.load(open(args.ignore))
-
+    
     result = compare(
         args.scheme,
         args.api_base_1,

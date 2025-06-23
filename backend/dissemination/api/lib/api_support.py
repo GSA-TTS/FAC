@@ -135,6 +135,13 @@ def compare(
         sys.exit(-1)
     else:
         list_of_objects2 = client_2.results()
+    
+    print("client_1")
+    for k, v in client_1.metadata().items():
+        print(f"\t{k}: {v}")
+    print("client_2")
+    for k, v in client_2.metadata().items():
+        print(f"\t{k}: {v}")
 
     # We should get only 200s.
     # for ndx, loo in enumerate([list_of_objects1, list_of_objects2]):

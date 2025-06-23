@@ -149,18 +149,14 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
     R = Result(True)
     for k in o1.keys():
         # Skip values that we say to ignore
-        # print(
-        #     k,
-        #     ignore[k]["api_version"] if k in ignore else "--",
-        #     v1,
-        #     skippable(k, o1, ignore),
-        # )
         if (
             k in ignore
-            and re.search(ignore[k]["api_version"], v1)
-            and skippable(k, o1, ignore)
+            and (
+                re.search(ignore[k]["api_version"], v1)
+                or re.search(ignore[k]["api_version"], v2)
+            )
+            and (skippable(k, o1, ignore) or skippable(k, o2, ignore))
         ):
-            # print(f"skipping {k} - {o1['report_id']} in {v1}")
             continue
 
         if k not in o2:
@@ -173,6 +169,17 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
             )
             R.set_result(False)
 
+        if check_not_equal(o1[k], o2[k]):
+            # print("check_not_equal", k, anded, k_in_ignore, ignorable_api, is_skippable)
+            R.add_error(
+                ErrorPair(
+                    "mappings_not_equal",
+                    APIValue(v1, k, o1[k], o1["report_id"]),
+                    APIValue(v2, k, o2[k], o2["report_id"]),
+                )
+            )
+            R.set_result(False)
+
     # Loop through o2 keys that may not be in o1
     for k in o2.keys():
         # Skip values we say to ignore
@@ -181,7 +188,7 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
             and re.search(ignore[k]["api_version"], v2)
             and skippable(k, o2, ignore)
         ):
-            print(f"skipping {k} - {o2['report_id']} in {v1}")
+            # print(f"skipping {k} - {o2['report_id']} in {v2}")
             continue
 
         if k not in o1:
@@ -189,27 +196,6 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
                 ErrorPair(
                     "mappings_missing_o1",
                     APIValue(v1, k, None, o1["report_id"]),
-                    APIValue(v2, k, o2[k], o2["report_id"]),
-                )
-            )
-            R.set_result(False)
-
-    for k in o1.keys():
-        if (
-            k in ignore
-            and (
-                re.search(ignore[k]["api_version"], v1)
-                or re.search(ignore[k]["api_version"], v2)
-            )
-            and (skippable(k, o1, ignore) or skippable(k, o2, ignore))
-        ):
-            continue
-
-        if check_not_equal(o1[k], o2[k]):
-            R.add_error(
-                ErrorPair(
-                    "mappings_not_equal",
-                    APIValue(v1, k, o1[k], o1["report_id"]),
                     APIValue(v2, k, o2[k], o2["report_id"]),
                 )
             )
@@ -254,6 +240,9 @@ def compare_any_order(
     ignore={},
 ):
     results = []
+
+    # print(f"cao {len(l1)} {len(l2)} {v1} {v2} {comparison_key}")
+
     for o1 in l1:
         to_compare = None
 
@@ -270,6 +259,7 @@ def compare_any_order(
         # If we can't find an object to compare to, we might
         # as well record a false and break now.
         if not to_compare:
+
             # print(f"No object found for comparison")
             results.append(
                 # Result(False, "empty comparison", "no object found to compare against")
@@ -280,11 +270,14 @@ def compare_any_order(
                         APIValue(
                             v1, comparison_key, o1[comparison_key], o1["report_id"]
                         ),
-                        APIValue(v2, comparison_key, None, o2["report_id"]),
+                        APIValue(
+                            v2, comparison_key, o2[comparison_key], o2["report_id"]
+                        ),
                     ),
                 )
             )
-            break
+            # 20240623 MCJ should this be continue or break?
+            continue
         elif o1[comparison_key] == to_compare[comparison_key]:
             results.append(compare_json_objects(v1, o1, v2, to_compare, ignore=ignore))
         else:
@@ -306,7 +299,7 @@ def compare_any_order(
                     ),
                 )
             )
-            break
+            continue
     return results
 
 
@@ -389,8 +382,8 @@ def check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore={}):
         R.add_error(
             ErrorPair(
                 "eq_val_for_key",
-                APIValue(v1, comparison_key, kv1, None),
-                APIValue(v2, comparison_key, kv2, None),
+                APIValue(v1, comparison_key, kv1 - kv2, None),
+                APIValue(v2, comparison_key, kv2 - kv1, None),
             )
         )
     return R
@@ -440,7 +433,9 @@ def compare_lists_of_json_objects(
 
     # The lists must be the same length
     clsl = check_lists_same_length(v1, l1, v2, l2)
-    print(len(l1), len(l2))
+    print(f"Objects from {v1}: {len(l1)}")
+    print(f"Objects from {v2}: {len(l2)}")
+
     if not clsl:
         # print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
         return [clsl]
@@ -486,8 +481,10 @@ def compare_lists_of_json_objects(
 
     # The set of values in l1 for this key must be the same as the set of
     # values in l2 for this key.
-    if not check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore=ignore):
+    set_eq = check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore=ignore)
+    if not set_eq:
         print(f"Values not equal in all objects for {comparison_key}")
+        return [set_eq]
 
     if strict_order:
         results = compare_strict_order(v1, l1, v2, l2, ignore=ignore)

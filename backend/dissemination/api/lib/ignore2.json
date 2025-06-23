@@ -8,6 +8,15 @@
       ]
     }
   },
+  "auditee_certify_name": {
+    "action": "ignore",
+    "api_version": "api_v1_1_0",
+    "acceptable_values": {
+      "auditee_certify_name": [
+        "DEFAULT_AUDITEE_CERTIFY_NAME"
+      ]
+    }
+  },
   "auditor_certify_title": {
     "action": "ignore",
     "api_version": "api_v1_1_0",
@@ -19,9 +28,18 @@
   },
   "auditee_certified_date": {
     "action": "ignore",
-    "api_version": "api_v1_{1,2}_0",
+    "api_version": "api_v1_[1,2]_0",
     "acceptable_values": {
-      "auditor_certify_title": [
+      "auditee_certified_date": [
+        ".*"
+      ]
+    }
+  },
+  "auditor_certified_date": {
+    "action": "ignore",
+    "api_version": "api_v1_[1,2]_0",
+    "acceptable_values": {
+      "auditor_certified_date": [
         ".*"
       ]
     }
@@ -59,7 +77,7 @@
   ],
   "ready_for_certification_date": {
     "action": "ignore",
-    "api_version": "api_v1_{1,2}_0",
+    "api_version": "api_v1_[1,2]_0",
     "acceptable_values": {
       "report_id": [
         "2023-06-GSAFAC-0000036249",

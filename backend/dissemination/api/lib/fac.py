@@ -124,7 +124,11 @@ class FAC:
         inc = 20000
         while fetching:
             self.param("offset", offset, noisy=False)
-            self.param("limit", ((offset + inc) - 1), noisy=False)
+            # self.param("limit", ((offset + inc) - 1), noisy=False)
+            # 2026-06-23 MCJ this off-by-one error matters.
+            # It is not clear from the Postgrest docs whether the end of the limit is
+            # inclusive or exclusive. But, it impacts our set intersection tests.
+            self.param("limit", (offset + inc), noisy=False)
             t0 = time()
             URL = f"{self._scheme}://{self._base}:{self._port}/{self._endpoint}"
             res = get(
