@@ -5,5 +5,9 @@ terraform {
       source  = "cloudfoundry/cloudfoundry"
       version = ">=1.6.0"
     }
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~>3.0.2"
+    }
   }
 }
