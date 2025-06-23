@@ -39,9 +39,9 @@ data "docker_registry_image" "metabase" {
 }
 
 resource "cloudfoundry_app" "metabase" {
-  name       = var.name
-  space_name = var.cf_space_name
-  org_name   = var.cf_org_name
+  name         = var.name
+  space_name   = var.cf_space_name
+  org_name     = var.cf_org_name
   docker_image = "metabase/metabase@${data.docker_registry_image.metabase.sha256_digest}"
   #path             = "${path.module}/${data.external.app_zip.result.path}"
   #source_code_hash = filesha256("${path.module}/${data.external.app_zip.result.path}")
@@ -54,7 +54,7 @@ resource "cloudfoundry_app" "metabase" {
   health_check_type          = "http"
   health_check_http_endpoint = "/api/health"
   #command                    = "java --add-opens java.base/java.nio=ALL-UNNAMED -jar metabase.jar"
-  command                    = <<-COMMAND
+  command = <<-COMMAND
     MB_DB_CONNECTION_URI=$(echo "$VCAP_SERVICES" | grep -o '"uri":\s*"[^"]*' | sed 's/"uri":\s*//' | cut -d '"' -f2 | tail -1)
     export MB_DB_CONNECTION_URI
 
@@ -69,6 +69,6 @@ resource "cloudfoundry_app" "metabase" {
   ]
   environment = merge({
     REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
-    SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt"
+    SSL_CERT_FILE      = "/etc/ssl/certs/ca-certificates.crt"
   }, var.environment_variables)
 }
