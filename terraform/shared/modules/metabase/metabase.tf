@@ -34,11 +34,15 @@ locals {
   }, var.service_bindings)
 }
 
+data "docker_registry_image" "metabase" {
+  name = "metabase/metabase:latest"
+}
+
 resource "cloudfoundry_app" "metabase" {
   name       = var.name
   space_name = var.cf_space_name
   org_name   = var.cf_org_name
-  docker_image = "metabase/metabase:latest"
+  docker_image = "metabase/metabase@${data.docker_registry_image.metabase.sha256_digest}"
   #path             = "${path.module}/${data.external.app_zip.result.path}"
   #source_code_hash = filesha256("${path.module}/${data.external.app_zip.result.path}")
   #buildpacks                 = var.buildpacks
