@@ -126,6 +126,10 @@ def compare(
     else:
         list_of_objects1 = client_1.results()
 
+    print("client_1")
+    for k, v in client_1.metadata().items():
+        print(f"\t{k}: {v}")
+
     # Retrieve the objects from the second API.
     client_2.fetch()
     if client_2.error_status() is not None:
@@ -135,10 +139,7 @@ def compare(
         sys.exit(-1)
     else:
         list_of_objects2 = client_2.results()
-    
-    print("client_1")
-    for k, v in client_1.metadata().items():
-        print(f"\t{k}: {v}")
+
     print("client_2")
     for k, v in client_2.metadata().items():
         print(f"\t{k}: {v}")

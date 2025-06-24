@@ -5,6 +5,7 @@
 from typing import Any
 
 import re
+import time
 
 
 class APIValue:
@@ -50,6 +51,12 @@ class Result:
     def __str__(self):
         return "\n".join([str(ep) for ep in self.errors])
 
+    def __add__(self, other):
+        newR = Result(self.bool and other.bool)
+        for e in self.get_errors() + other.get_errors():
+            newR.add_error(e)
+        return newR
+
 
 def andmap(ls):
     result = True
@@ -86,12 +93,7 @@ def check_dictionaries_have_same_keys(v1, o1, v2, o2):
 
 
 def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore={}):
-    # Remove the ignores from the objects
-    for k in ignore.keys():
-        # print(f"popping {k} before {len(o1)}")
-        o1.pop(k, None)
-        # print(f"popping {k} after {len(o1)}")
-        o2.pop(k, None)
+    # ASSUME IGNORABLES ARE ALREADY FILTERED OUT
 
     val_set_1 = set([safely_remove_spaces(o) for o in o1.values()])
     val_set_2 = set([safely_remove_spaces(o) for o in o2.values()])
@@ -107,8 +109,8 @@ def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore={}):
                 R.add_error(
                     ErrorPair(
                         "dict_values",
-                        APIValue(v1, k, v, o1["report_id"]),
-                        APIValue(v2, k, None, o2["report_id"]),
+                        APIValue(v1, "-", v, o1["report_id"]),
+                        APIValue(v2, "-", None, o2["report_id"]),
                     )
                 )
         for v in val_set_2:
@@ -117,8 +119,8 @@ def check_dictionaries_have_same_values(v1, o1, v2, o2, ignore={}):
                 R.add_error(
                     ErrorPair(
                         "dict_values",
-                        APIValue(v1, k, None, o1["report_id"]),
-                        APIValue(v2, k, v, o2["report_id"]),
+                        APIValue(v1, "-", None, o1["report_id"]),
+                        APIValue(v2, "-", v, o2["report_id"]),
                     )
                 )
     return R
@@ -146,29 +148,13 @@ def check_not_equal(o1, o2):
 
 
 def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
+    # ASSUME IGNORABLES ARE ALREADY FILTERED OUT
+
+    # We already checked that they have the same keys.
+    # This means we can just go through one object once for comparison.
     R = Result(True)
+
     for k in o1.keys():
-        # Skip values that we say to ignore
-        if (
-            k in ignore
-            and (
-                re.search(ignore[k]["api_version"], v1)
-                or re.search(ignore[k]["api_version"], v2)
-            )
-            and (skippable(k, o1, ignore) or skippable(k, o2, ignore))
-        ):
-            continue
-
-        if k not in o2:
-            R.add_error(
-                ErrorPair(
-                    "mappings_missing_o2",
-                    APIValue(v1, k, o1[k], o1["report_id"]),
-                    APIValue(v2, k, None, o2["report_id"]),
-                )
-            )
-            R.set_result(False)
-
         if check_not_equal(o1[k], o2[k]):
             # print("check_not_equal", k, anded, k_in_ignore, ignorable_api, is_skippable)
             R.add_error(
@@ -179,28 +165,6 @@ def check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore={}):
                 )
             )
             R.set_result(False)
-
-    # Loop through o2 keys that may not be in o1
-    for k in o2.keys():
-        # Skip values we say to ignore
-        if (
-            k in ignore
-            and re.search(ignore[k]["api_version"], v2)
-            and skippable(k, o2, ignore)
-        ):
-            # print(f"skipping {k} - {o2['report_id']} in {v2}")
-            continue
-
-        if k not in o1:
-            R.add_error(
-                ErrorPair(
-                    "mappings_missing_o1",
-                    APIValue(v1, k, None, o1["report_id"]),
-                    APIValue(v2, k, o2[k], o2["report_id"]),
-                )
-            )
-            R.set_result(False)
-
     return R
 
 
@@ -210,25 +174,48 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore={}):
     # o1 must have the same values as o2
     # the mapping from [k1, v1] must be the same for [k2, v2]
 
-    # At this point, we have the same keys and the same
-    # values in each object. Now, we have to make sure
-    # that the keys in o1 and o2 map to identical values.
-    cdhsm = check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore=ignore)
-    if not cdhsm:
-        # print(f"mappings not identical in objects")
-        return cdhsm
-
     # Check if the keys for both objects are the same
+    # This is faster to check first. Then we don't have to check again.
+    # As {k: v} dictionaries, this makes sure all `k` are the same
+    # in both objects via set comparisons.
     cdhsk = check_dictionaries_have_same_keys(v1, o1, v2, o2)
     if not cdhsk:
         return cdhsk
 
+    # Filter out what we're going to ignore up front.
+    for k_ig in ignore:
+        # For each ignorable key
+        if (
+            (k_ig in o1 or k_ig in o2)
+            and (
+                re.search(ignore[k_ig]["api_version"], v1)
+                or re.search(ignore[k_ig]["api_version"], v2)
+            )
+            and (skippable(k_ig, o1, ignore) or skippable(k_ig, o2, ignore))
+        ):
+            o1.pop(k_ig, None)
+            o2.pop(k_ig, None)
+
+    # This is a fast check. If it fails, do a more detailed check.
     cdhsv = check_dictionaries_have_same_values(v1, o1, v2, o2, ignore=ignore)
     if not cdhsv:
-        return cdhsv
+        # Now that we know we have the same keys, we should check to see
+        # if we have the same values mapped to the keys.
+        # Or, for each (k1, k2) in {k1: v1} and {k2: v2}, are v1 == v2?
+        cdhsm = check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore=ignore)
+        if not cdhsm:
+            # Both values will be Result objects, which we can add together into a single
+            # new Result object. We can just return cdhsm, because it will re-do (in more detail)
+            # the work of cdhsv
+            return cdhsm
 
     # If we made it this far, we think they are the same.
     return Result(True)
+
+
+# These values only have to be calculated once...
+l1_lookup = None
+l2_lookup = None
 
 
 def compare_any_order(
@@ -239,27 +226,38 @@ def compare_any_order(
     comparison_key: str = "report_id",
     ignore={},
 ):
-    results = []
+    global l1_lookup, l2_lookup
 
-    # print(f"cao {len(l1)} {len(l2)} {v1} {v2} {comparison_key}")
+    timing_window = {}
+    num_batches = 10
+    batch_no = 0
+    timing_window_size = len(l1) // num_batches
+    timing_index = 1
+    total_time = 0
 
-    for o1 in l1:
-        to_compare = None
+    results = list()
 
-        # We're taking one object (o1) and
-        # looking through the second result set to find the same object based on
-        # the key (by default) `report_id`. This way, we can then compare one object
-        # to another, and be certain we're comparing the same thing.
-        # We *should* be able to guarantee order.
-        for o2 in l2:
-            if comparison_key in o2 and o1[comparison_key] == o2[comparison_key]:
-                to_compare = o2
-                break
+    # Preload some dictionaries. We were doing a nested loop over l1 and l2, which
+    # was very expensive. This makes it an O(1) lookup on report_id in the lookup tables.
+    # FIXME: Need to think about what this looks for tables that are not `general`
+    if l1_lookup == None and l2_lookup == None:
+        l1_lookup = dict()
+        l2_lookup = dict()
+        for o in l1:
+            l1_lookup[o[comparison_key]] = o
+        for o in l2:
+            l2_lookup[o[comparison_key]] = o
+
+    for o1 in l1_lookup.values():
+        t0 = time.time()
+
+        # Assuming the lookup key is "report_id"...
+        # This will get the L2 object with that report ID.
+        to_compare = l2_lookup.get(o1[comparison_key], None)
 
         # If we can't find an object to compare to, we might
         # as well record a false and break now.
-        if not to_compare:
-
+        if to_compare == None:
             # print(f"No object found for comparison")
             results.append(
                 # Result(False, "empty comparison", "no object found to compare against")
@@ -271,17 +269,34 @@ def compare_any_order(
                             v1, comparison_key, o1[comparison_key], o1["report_id"]
                         ),
                         APIValue(
-                            v2, comparison_key, o2[comparison_key], o2["report_id"]
+                            v2,
+                            comparison_key,
+                            to_compare[comparison_key],
+                            to_compare["report_id"],
                         ),
                     ),
                 )
             )
-            # 20240623 MCJ should this be continue or break?
-            continue
-        elif o1[comparison_key] == to_compare[comparison_key]:
-            results.append(compare_json_objects(v1, o1, v2, to_compare, ignore=ignore))
+        elif to_compare:  # o1[comparison_key] == to_compare[comparison_key]:
+            compare_result = compare_json_objects(v1, o1, v2, to_compare, ignore=ignore)
+            t1 = time.time()
+            delta = t1 - t0
+            total_time += delta
+            timing_window[timing_index] = delta
+            timing_index = (timing_index + 1) % timing_window_size
+            if timing_index == 0:
+                sum = 0
+                for v in timing_window.values():
+                    sum += v
+                batch_no += 1
+                # This print at least gives us something to look forward to while running.
+                print(
+                    f"average time per comparison ({timing_window_size*batch_no} of {len(l1)}): {(sum/timing_window_size):0.6f}"
+                )
+            if not compare_result:
+                results.append(compare_result)
         else:
-            print(f"Values do not match for key {comparison_key}")
+            # print(f"Values do not match for key {comparison_key}")
             results.append(
                 Result(
                     False,
@@ -294,12 +309,13 @@ def compare_any_order(
                             v2,
                             comparison_key,
                             to_compare[comparison_key],
-                            o2["report_id"],
+                            to_compare["report_id"],
                         ),
                     ),
                 )
             )
-            continue
+
+    print(f"Time to compare_any_order: {total_time:0.2f}")
     return results
 
 
@@ -330,7 +346,6 @@ def check_lists_same_length(v1, l1, v2, l2):
 
     for rid in report_ids_1:
         if rid not in report_ids_2:
-            # print(rid, "not in l2")
             R.add_error(
                 ErrorPair(
                     "missing_in_l2",
@@ -340,7 +355,6 @@ def check_lists_same_length(v1, l1, v2, l2):
             )
     for rid in report_ids_2:
         if rid not in report_ids_1:
-            # print(rid, "not in l1")
             R.add_error(
                 ErrorPair(
                     "missing_in_l1",
@@ -358,6 +372,7 @@ KEY_MISSING_L2 = 2
 
 def check_key_in_both_lists(v1, l1, v2, l2, comparison_key):
     # Is the key in every object of l1?
+
     if not andmap(map(lambda o: comparison_key in o, l1)):
         return KEY_MISSING_L1
     if not andmap(map(lambda o: comparison_key in o, l2)):
@@ -378,7 +393,6 @@ def check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore={}):
     result = kv1 == kv2
     R = Result(result)
     if not result:
-        # R.add_error(f"{comparison_key} returned different values", f"{kv1 - kv2}")
         R.add_error(
             ErrorPair(
                 "eq_val_for_key",
@@ -437,11 +451,14 @@ def compare_lists_of_json_objects(
     print(f"Objects from {v2}: {len(l2)}")
 
     if not clsl:
-        # print(f"lists different lenths: l1 <- {len(l1)} l2 <- {len(l2)}")
         return [clsl]
 
     # Make sure all objects in both lists all have they key
+    t0 = time.time()
     key_in_lists = check_key_in_both_lists(v1, l1, v2, l2, comparison_key)
+    t1 = time.time()
+    print(f"key in both lists check: {(t1-t0):0.4f}s")
+
     if key_in_lists == KEY_IN_BOTH:
         pass
     elif key_in_lists == KEY_MISSING_L1:
@@ -467,7 +484,6 @@ def compare_lists_of_json_objects(
             )
         ]
     else:
-        # print("impossible key check condition found; should never be here.")
         return [
             Result(
                 False,
@@ -481,7 +497,11 @@ def compare_lists_of_json_objects(
 
     # The set of values in l1 for this key must be the same as the set of
     # values in l2 for this key.
+    t0 = time.time()
     set_eq = check_equal_values_for_key(v1, l1, v2, l2, comparison_key, ignore=ignore)
+    t1 = time.time()
+    print(f"equal values for key time: {(t1-t0):0.4f}s")
+
     if not set_eq:
         print(f"Values not equal in all objects for {comparison_key}")
         return [set_eq]

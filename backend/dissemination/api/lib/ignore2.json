@@ -80,6 +80,7 @@
     "api_version": "api_v1_[1,2]_0",
     "acceptable_values": {
       "report_id": [
+        ".*",
         "2023-06-GSAFAC-0000036249",
         "2023-05-GSAFAC-0000009830",
         "2023-06-GSAFAC-0000021203",

@@ -58,7 +58,7 @@ def null_string(v):
         return v
 
 
-allow_multiple = ["missing_in_l1", "missing_in_l2"]
+allow_multiple = ["missing_in_l1", "missing_in_l2", "mappings_not_equal", "dict_values"]
 
 
 def output_results(args, result):
@@ -78,7 +78,7 @@ def output_results(args, result):
                     pass
                 else:
                     if error.type not in allow_multiple:
-                        print(error.type)
+                        # print(error.type)
                         used_keys.add(error.type)
                     all_errors.append(
                         {
@@ -184,7 +184,7 @@ def main():
     ignore = {}
     if args.ignore is not None:
         ignore = json.load(open(args.ignore))
-    
+
     result = compare(
         args.scheme,
         args.api_base_1,
