@@ -196,12 +196,12 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore={}):
             o1.pop(k_ig, None)
             o2.pop(k_ig, None)
 
+    # Now that we know we have the same keys, we should check to see
+    # if we have the same values mapped to the keys.
+    # Or, for each (k1, k2) in {k1: v1} and {k2: v2}, are v1 == v2?
     # This is a fast check. If it fails, do a more detailed check.
     cdhsv = check_dictionaries_have_same_values(v1, o1, v2, o2, ignore=ignore)
     if not cdhsv:
-        # Now that we know we have the same keys, we should check to see
-        # if we have the same values mapped to the keys.
-        # Or, for each (k1, k2) in {k1: v1} and {k2: v2}, are v1 == v2?
         cdhsm = check_dictionaries_have_same_mappings(v1, o1, v2, o2, ignore=ignore)
         if not cdhsm:
             # Both values will be Result objects, which we can add together into a single
