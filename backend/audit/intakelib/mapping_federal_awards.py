@@ -88,7 +88,9 @@ def federal_awards_audit_view(data):
     pass_objects = []
     for award in awards:
         award["program"]["amount_expended"] = int(award["program"]["amount_expended"])
-        award["program"]["federal_program_total"] = int(award["program"]["federal_program_total"])
+        award["program"]["federal_program_total"] = int(
+            award["program"]["federal_program_total"]
+        )
         award["cluster"]["cluster_total"] = int(award["cluster"]["cluster_total"])
 
         entities = award.get("direct_or_indirect_award", {}).get("entities", [])
