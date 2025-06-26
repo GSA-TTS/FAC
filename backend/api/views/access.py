@@ -67,7 +67,10 @@ def access_and_submission_check(user, data):
             report_id=sac.report_id,  # TODO Temporarily use the current id to mirror
             submission_status=STATUS.IN_PROGRESS,
             audit_type=AuditType.SINGLE_AUDIT,
-            audit={"general_information": all_steps_user_form_data},
+            audit={
+                "general_information": all_steps_user_form_data,
+                "type_audit_code": "UG",
+            },
             event_user=user,
             event_type=SubmissionEvent.EventType.CREATED,
         )
