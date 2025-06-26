@@ -3,11 +3,35 @@ from audit.fixtures.excel import (
 )
 from .utils import format_refs
 
+def err_additional_eins_empty():
+    return (
+        "general_information.multiple_eins_covered is checked, "
+        "but no additional EINs were found. The workbook must be uploaded."
+    )
+
+
+def err_additional_eins_has_auditee_ein():
+    return "The additional EINs list includes the auditee EIN."
+
+
+def err_additional_eins_not_empty():
+    return (
+        "general_information.multiple_eins_covered is marked false, "
+        "but the Additional EINs workbook was found. "
+        "It must be marked true, or the workbook must be removed."
+    )
+
+
+def err_ein_attestation(field="ein_not_an_ssn_attestation"):
+    return (
+       f"general_information.{field} must be checked."
+    )
+
 
 def err_additional_ueis_empty():
     return (
         "general_information.multiple_ueis_covered is checked, "
-        "but no additonal UEIs were found."
+        "but no additional UEIs were found. The workbook must be uploaded."
     )
 
 
@@ -18,7 +42,23 @@ def err_additional_ueis_has_auditee_uei():
 def err_additional_ueis_not_empty():
     return (
         "general_information.multiple_ueis_covered is marked false, "
-        "but additonal UEIs were found."
+        "but the Additional UEIs workbook was found. "
+        "It must be marked true, or the workbook must be removed."
+    )
+
+
+def err_secondary_auditors_empty():
+    return (
+        "general_information.secondary_auditors_exist is checked, "
+        "but no secondary auditors were found. The workbook must be uploaded."
+    )
+
+
+def err_secondary_auditors_not_empty():
+    return (
+        "general_information.secondary_auditors_exist is marked false, "
+        "but the Secondary Auditors workbook was found. "
+        "It must be marked true, or the workbook must be removed."
     )
 
 
