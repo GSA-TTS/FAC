@@ -15,9 +15,11 @@ def check_secondary_auditors(sac_dict, *_args, **_kwargs):
         "secondary_auditors_exist"
     )
 
-    sec_auds = all_sections.get("secondary_auditors", {}).get(
-        "secondary_auditors_entries"
-    )
+    sec_auds = []
+    if all_sections.get("secondary_auditors"):
+        sec_auds = all_sections.get("secondary_auditors", {}).get(
+            "secondary_auditors_entries"
+        )
 
     # If secondary_auditors_exist is checked True, then make sure the workbook was provided.
     # If secondary_auditors_exist is unchecked, make sure the workbook is not present.
