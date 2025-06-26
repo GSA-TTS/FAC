@@ -14,13 +14,13 @@ def check_additional_eins(sac_dict, *_args, **_kwargs):
     all_sections = sac_dict["sf_sac_sections"]
     addl_eins_checked = all_sections["general_information"].get("multiple_eins_covered")
     auditee_ein = all_sections["general_information"].get("auditee_ein")
-    
+
     addl_eins = []
     if all_sections.get("additional_eins"):
         addl_eins = all_sections.get("additional_eins", {}).get(
             "additional_eins_entries"
         )
-    
+
     if addl_eins_checked:
         """
         We need to check that:

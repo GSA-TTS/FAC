@@ -3,6 +3,7 @@ from audit.fixtures.excel import (
 )
 from .utils import format_refs
 
+
 def err_additional_eins_empty():
     return (
         "general_information.multiple_eins_covered is checked, "
@@ -23,9 +24,7 @@ def err_additional_eins_not_empty():
 
 
 def err_ein_attestation(field="ein_not_an_ssn_attestation"):
-    return (
-       f"general_information.{field} must be checked."
-    )
+    return f"general_information.{field} must be checked."
 
 
 def err_additional_ueis_empty():

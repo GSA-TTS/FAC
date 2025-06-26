@@ -54,7 +54,7 @@ class CheckSecondaryAuditorsTests(TestCase):
         }
         validation_result = self.validate_audit()
         self.assertEqual(validation_result, [ERROR_PRESENT])
-    
+
     def test_flag_sec_auds_yes_sec_audits_no(self):
         """
         For a SAC with a yes answer and no secondary auditors, there should be an error.
@@ -62,7 +62,7 @@ class CheckSecondaryAuditorsTests(TestCase):
         self.sac.general_information = {"secondary_auditors_exist": True}
         validation_result = self.validate_audit()
         self.assertEqual(validation_result, [ERROR_EMPTY])
-    
+
     def test_flag_sec_auds_yes_sec_audits_yes(self):
         """
         For a SAC with a yes answer and secondary auditors, there should be no errors.

@@ -9,7 +9,9 @@ from .errors import (
 from .sac_validation_shape import sac_validation_shape
 
 ERROR_AUDITEE_UNCHECKED = {"error": err_ein_attestation("ein_not_an_ssn_attestation")}
-ERROR_AUDITOR_UNCHECKED = {"error": err_ein_attestation("auditor_ein_not_an_ssn_attestation")}
+ERROR_AUDITOR_UNCHECKED = {
+    "error": err_ein_attestation("auditor_ein_not_an_ssn_attestation")
+}
 
 
 class CheckEINAttestationsTests(TestCase):
@@ -31,7 +33,6 @@ class CheckEINAttestationsTests(TestCase):
         validation_result = check_ein_attestations(shaped_sac)
 
         self.assertEqual(validation_result, [])
-    
 
     def test_general_information_ein_attestations_one_unchecked(self):
         """
@@ -59,7 +60,6 @@ class CheckEINAttestationsTests(TestCase):
         validation_result = check_ein_attestations(shaped_sac)
         self.assertEqual(validation_result, [ERROR_AUDITOR_UNCHECKED])
 
-    
     def test_general_information_ein_attestations_both_unchecked(self):
         """
         For a SAC with General Information with both EIN attestations unchecked, there should be two errors.
@@ -73,5 +73,6 @@ class CheckEINAttestationsTests(TestCase):
         shaped_sac = sac_validation_shape(sac)
         validation_result = check_ein_attestations(shaped_sac)
 
-        self.assertEqual(validation_result, [ERROR_AUDITEE_UNCHECKED, ERROR_AUDITOR_UNCHECKED])
-
+        self.assertEqual(
+            validation_result, [ERROR_AUDITEE_UNCHECKED, ERROR_AUDITOR_UNCHECKED]
+        )

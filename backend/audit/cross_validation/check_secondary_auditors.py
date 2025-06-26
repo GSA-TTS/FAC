@@ -11,12 +11,14 @@ def check_secondary_auditors(sac_dict, *_args, **_kwargs):
     none if it's not True.
     """
     all_sections = sac_dict["sf_sac_sections"]
-    sec_aud_checked = all_sections["general_information"].get("secondary_auditors_exist")
-    
+    sec_aud_checked = all_sections["general_information"].get(
+        "secondary_auditors_exist"
+    )
+
     sec_auds = all_sections.get("secondary_auditors", {}).get(
         "secondary_auditors_entries"
     )
-    
+
     # If secondary_auditors_exist is checked True, then make sure the workbook was provided.
     # If secondary_auditors_exist is unchecked, make sure the workbook is not present.
     if sec_aud_checked:
