@@ -87,6 +87,12 @@ def federal_awards_audit_view(data):
     awards = data.get("FederalAwards", {}).get("federal_awards", [])
     pass_objects = []
     for award in awards:
+        award["program"]["amount_expended"] = int(award["program"]["amount_expended"])
+        award["program"]["federal_program_total"] = int(
+            award["program"]["federal_program_total"]
+        )
+        award["cluster"]["cluster_total"] = int(award["cluster"]["cluster_total"])
+
         entities = award.get("direct_or_indirect_award", {}).get("entities", [])
         for entity in entities:
             passthrough = {
@@ -95,7 +101,7 @@ def federal_awards_audit_view(data):
                 "passthrough_name": entity.get("passthrough_name", ""),
             }
             pass_objects.append(passthrough)
-    total_expended = data.get("FederalAwards", {}).get("total_amount_expended", "")
+    total_expended = int(data.get("FederalAwards", {}).get("total_amount_expended", ""))
 
     return {
         "federal_awards": {"awards": awards, "total_amount_expended": total_expended},
