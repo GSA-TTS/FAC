@@ -6,8 +6,9 @@ from .utils import format_refs
 
 def err_additional_eins_empty():
     return (
-        "general_information.multiple_eins_covered is checked, "
-        "but no additional EINs were found. The workbook must be uploaded."
+        "The checkbox in the General Information form indicates that this "
+        "submission covers multiple EINs. However, no additional EINs were found. "
+        "The checkbox must be unmarked, or the workbook must be uploaded."
     )
 
 
@@ -17,20 +18,26 @@ def err_additional_eins_has_auditee_ein():
 
 def err_additional_eins_not_empty():
     return (
-        "general_information.multiple_eins_covered is marked false, "
-        "but the Additional EINs workbook was found. "
-        "It must be marked true, or the workbook must be removed."
+        "The checkbox in the General Information form indicates that this "
+        "submission covers only one EIN. However, the Additional EINs workbook was found. "
+        "The checkbox must be marked, or the workbook must be removed."
     )
 
 
 def err_ein_attestation(field="ein_not_an_ssn_attestation"):
-    return f"general_information.{field} must be checked."
+    if field == "ein_not_an_ssn_attestation":
+        return "In the General Information form, you must attest that the auditee EIN is not an SSN."
+    elif field == "auditor_ein_not_an_ssn_attestation":
+        return "In the General Information form, you must attest that the auditor EIN is not an SSN."
+    else:
+        return f"general_information.{field} must be checked."
 
 
 def err_additional_ueis_empty():
     return (
-        "general_information.multiple_ueis_covered is checked, "
-        "but no additional UEIs were found. The workbook must be uploaded."
+        "The checkbox in the General Information form indicates that this "
+        "submission covers multiple UEIs. However, no additional UEIs were found. "
+        "The checkbox must be unmarked, or the workbook must be uploaded."
     )
 
 
@@ -40,24 +47,25 @@ def err_additional_ueis_has_auditee_uei():
 
 def err_additional_ueis_not_empty():
     return (
-        "general_information.multiple_ueis_covered is marked false, "
-        "but the Additional UEIs workbook was found. "
-        "It must be marked true, or the workbook must be removed."
+        "The checkbox in the General Information form indicates that this "
+        "submission covers only one UEI. However, the Additional UEIs workbook was found. "
+        "The checkbox must be marked, or the workbook must be removed."
     )
 
 
 def err_secondary_auditors_empty():
     return (
-        "general_information.secondary_auditors_exist is checked, "
-        "but no secondary auditors were found. The workbook must be uploaded."
+        "The checkbox in the General Information form indicates that this "
+        "submission contains secondary auditors. However, the Secondary Auditors workbook was not found. "
+        "The checkbox must be unmarked, or the workbook must be uploaded."
     )
 
 
 def err_secondary_auditors_not_empty():
     return (
-        "general_information.secondary_auditors_exist is marked false, "
-        "but the Secondary Auditors workbook was found. "
-        "It must be marked true, or the workbook must be removed."
+        "The checkbox in the General Information form indicates that this "
+        "submission contains no secondary auditors. However, the Secondary Auditors workbook was found. "
+        "The checkbox must be marked, or the workbook must be removed."
     )
 
 
