@@ -402,15 +402,15 @@ SAC_HANDLERS = [
     lambda sac: (
         additional_ueis_audit_view(sac.additional_ueis)
         if sac.additional_ueis
-          and sac.general_information
-          and sac.general_information.get("multiple_ueis_covered")
+        and sac.general_information
+        and sac.general_information.get("multiple_ueis_covered")
         else {}
     ),
     lambda sac: (
         additional_eins_audit_view(sac.additional_eins)
         if sac.additional_eins
-          and sac.general_information
-          and sac.general_information.get("multiple_eins_covered")
+        and sac.general_information
+        and sac.general_information.get("multiple_eins_covered")
         else {}
     ),
     lambda sac: (
@@ -426,8 +426,8 @@ SAC_HANDLERS = [
     lambda sac: (
         secondary_auditors_audit_view(sac.secondary_auditors)
         if sac.secondary_auditors
-          and sac.general_information
-          and sac.general_information.get("secondary_auditors_exist")
+        and sac.general_information
+        and sac.general_information.get("secondary_auditors_exist")
         else {}
     ),
     lambda sac: (
