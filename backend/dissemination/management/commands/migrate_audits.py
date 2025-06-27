@@ -400,10 +400,18 @@ SAC_HANDLERS = [
         audit_findings_text_audit_view(sac.findings_text) if sac.findings_text else {}
     ),
     lambda sac: (
-        additional_ueis_audit_view(sac.additional_ueis) if sac.additional_ueis else {}
+        additional_ueis_audit_view(sac.additional_ueis)
+        if sac.additional_ueis
+          and sac.general_information
+          and sac.general_information.get("multiple_ueis_covered")
+        else {}
     ),
     lambda sac: (
-        additional_eins_audit_view(sac.additional_eins) if sac.additional_eins else {}
+        additional_eins_audit_view(sac.additional_eins)
+        if sac.additional_eins
+          and sac.general_information
+          and sac.general_information.get("multiple_eins_covered")
+        else {}
     ),
     lambda sac: (
         findings_audit_view(sac.findings_uniform_guidance)
