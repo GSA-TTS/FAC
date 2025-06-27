@@ -43,3 +43,21 @@ variable "branch_name" {
   description = "the heads value for the branch you wish to deploy (default would be main)"
   # We don't specify a default here because we want to specify a branch to deploy
 }
+
+variable "process_models_ssh_key" {
+  type        = string
+  description = "Private SSH key with read/write access to var.process_models_repository repository"
+  sensitive   = true
+  # Should look like:
+  # -----BEGIN OPENSSH PRIVATE KEY-----
+  # ...
+  # ...
+  # ...
+  # -----END OPENSSH PRIVATE KEY-----
+}
+
+variable "git_pat_token" {
+  type = string
+  description = "the secret pat to clone the github process model repo"
+  sensitive   = true
+}

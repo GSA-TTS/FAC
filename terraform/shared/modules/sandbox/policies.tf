@@ -65,3 +65,26 @@ resource "cloudfoundry_network_policy" "scanner-network-policy" {
     }
   ]
 }
+
+resource "cloudfoundry_network_policy" "spiffworkflow-network-policy" {
+  policies = [
+    {
+      source_app      = module.SpiffWorkflow.backend_app_id
+      destination_app = module.https-proxy.app_id
+      port            = "61443"
+      protocol        = "tcp"
+    },
+    {
+      source_app      = module.SpiffWorkflow.frontend_app_id
+      destination_app = module.https-proxy.app_id
+      port            = "61443"
+      protocol        = "tcp"
+    },
+    {
+      source_app      = module.SpiffWorkflow.frontend_app_id
+      destination_app = module.SpiffWorkflow.backend_app_id
+      port            = "61443"
+      protocol        = "tcp"
+    }
+  ]
+}
