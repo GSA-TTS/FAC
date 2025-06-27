@@ -426,6 +426,8 @@ SAC_HANDLERS = [
     lambda sac: (
         secondary_auditors_audit_view(sac.secondary_auditors)
         if sac.secondary_auditors
+          and sac.general_information
+          and sac.general_information.get("secondary_auditors_exist")
         else {}
     ),
     lambda sac: (
