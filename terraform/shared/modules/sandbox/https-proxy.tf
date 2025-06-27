@@ -14,8 +14,10 @@ module "https-proxy" {
     "idp.int.identitysandbox.gov:443",
     "secure.login.gov:443",
     "objects.githubusercontent.com:443",
+    "ssh.github.com:443",
     "awscli.amazonaws.com:443",
-    "database.clamav.net:443"
+    "database.clamav.net:443",
+    "spiffworkflow-${var.cf_space.name}.app.cloud.gov:443"
   ]
 }
 

@@ -75,4 +75,8 @@ resource "cloudfoundry_app" "fac_app" {
   environment = merge({
     REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
   }, var.environment_variables)
+
+  lifecycle {
+    ignore_changes = all
+  }
 }

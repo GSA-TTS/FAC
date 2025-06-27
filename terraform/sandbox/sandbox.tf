@@ -12,6 +12,8 @@ module "sandbox" {
   login_secret_key        = var.login_secret_key
   branch_name             = var.branch_name
   backups_s3_id           = module.sandbox-backups-bucket.bucket_id
+  process_models_ssh_key  = var.process_models_ssh_key
+  git_pat_token           = var.git_pat_token
 
   database_plan         = "medium-gp-psql"
   https_proxy_instances = 1

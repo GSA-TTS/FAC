@@ -31,7 +31,6 @@ variable "cf_space" {
   # shouldn't assume it!
 }
 
-
 variable "database_plan" {
   type        = string
   description = "name of the cloud.gov RDS service plan name to create"
@@ -138,5 +137,23 @@ variable "denylist" {
 variable "backups_s3_id" {
   type        = string
   description = "the full string of the backups s3 resource id"
+}
+
+variable "process_models_ssh_key" {
+  type        = string
+  description = "Private SSH key with read/write access to var.process_models_repository repository"
+  sensitive   = true
+  # Should look like:
+  # -----BEGIN OPENSSH PRIVATE KEY-----
+  # ...
+  # ...
+  # ...
+  # -----END OPENSSH PRIVATE KEY-----
+}
+
+variable "git_pat_token" {
+  type = string
+  description = "the secret pat to clone the github process model repo"
+  sensitive = true
 }
 
