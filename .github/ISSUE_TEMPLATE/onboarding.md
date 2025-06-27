@@ -66,11 +66,11 @@ Here's a checklist to get you started and to make sure you've got access to :all
 - [ ] Get set up for [local development](https://github.com/GSA-TTS/FAC/blob/main/docs/development.md#local-development) so you can start contributing
 - [ ] Review [NIST SP 800-161 Rev.1](https://csrc.nist.gov/pubs/sp/800/161/r1/final) on supply chain risk management. Reply to this onboarding ticket in a comment when you have completed this review.
 - [ ] Make sure you have a `login.gov` account and have logged into the FAC application at least once.
-  - [ ] Then, add your email to the `readonly` list in [staffusers.json](../../backend/config/staffusers.json).
+  - [ ] Then, add your email to the `readonly` list in [staffusers.json](https://github.com/GSA-TTS/FAC/blob/main/backend/config/staffusers.json).
 
 **For helpdesk, also..**
 - [ ] Make sure you have a `login.gov` account and have logged into the FAC application at least once.
-  - [ ] Then, add your email to the `helpdesk` list in [staffusers.json](../../backend/config/staffusers.json).
+  - [ ] Then, add your email to the `helpdesk` list in [staffusers.json](https://github.com/GSA-TTS/FAC/blob/main/backend/config/staffusers.json).
 
 
 ## For your onboarding buddy

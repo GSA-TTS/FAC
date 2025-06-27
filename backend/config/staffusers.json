@@ -1,16 +1,13 @@
 {
   "readonly": [
-    "philip.dominguez@gsa.gov",
-    "sudha.kumar@gsa.gov"
   ],
   "helpdesk": [
     "alexander.steel@gsa.gov",
-    "robert.novak@gsa.gov",
-    "hassandeme.mamasambo@gsa.gov",
+    "james.person@gsa.gov",
     "lynn.houston@gsa.gov",
     "marissa.henderson@gsa.gov",
-    "james.p.mason@gsa.gov",
-    "james.person@gsa.gov"
+    "philip.dominguez@gsa.gov",
+    "ranye.mclendon@gsa.gov"
   ],
   "superuser": [
     "matthew.jadud@gsa.gov"
