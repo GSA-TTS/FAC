@@ -5,7 +5,7 @@ from .errors import (
 )
 
 
-def additional_ueis(sac_dict, *_args, **_kwargs):
+def check_additional_ueis(sac_dict, *_args, **_kwargs):
     """
     Checks that there are additional UEIs if
     general_information.multiple_ueis_covered is True, and that there are
