@@ -57,7 +57,7 @@ variable "process_models_ssh_key" {
 }
 
 variable "git_pat_token" {
-  type = string
+  type        = string
   description = "the secret pat to clone the github process model repo"
   sensitive   = true
 }

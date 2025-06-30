@@ -59,10 +59,10 @@ resource "cloudfoundry_app" "backend" {
     # Get the postgres URI from the service binding. (SQL Alchemy insists on "postgresql://".🙄)
     export SPIFFWORKFLOW_BACKEND_DATABASE_URI=$( echo $VCAP_SERVICES | jq -r '.["aws-rds"][].credentials.uri' | sed -e s/postgres/postgresql/ )
     export https_proxy="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.https_uri")"
+    git config --global https.proxy $https_proxy
 
     #https://stackoverflow.com/questions/15589682/how-to-fix-ssh-connect-to-host-github-com-port-22-connection-timed-out-for-g
     #export GITHUB_TOKEN="${var.git_pat_token}"
-    git config --global https.proxy $https_proxy
     #git config --global https.sslVerify false
 
 

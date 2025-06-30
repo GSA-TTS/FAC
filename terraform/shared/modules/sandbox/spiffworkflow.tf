@@ -7,12 +7,16 @@ module "SpiffWorkflow" {
 
   process_models_ssh_key = var.process_models_ssh_key
 
-  process_models_repository = "git@github.com:GSA-TTS/gsa-process-models.git"
-  #process_models_repository = "https://github.com/asteel-gsa/gsa-process-models.git"
+  #process_models_repository = "git@github.com:GSA-TTS/gsa-process-models.git"
+  process_models_repository = "https://${var.git_pat_token}@github.com/asteel-gsa/gsa-process-models.git"
   # This should be a branch (non-main), to load the examples. Edits to existing models will be pushed here.
   source_branch_for_example_models = "process-models-playground"
   # This should be an existing branch in the model repo. New models will be pushed here.
   target_branch_for_saving_changes = "publish-staging-branch"
+
+  frontend_imageref  = "ghcr.io/gsa-tts/spiffworkflow-frontend:spiff-sync-latest"
+  connector_imageref = "ghcr.io/gsa-tts/connector-proxy-demo:spiff-sync-latest"
+  backend_imageref   = "ghcr.io/gsa-tts/spiffworkflow-backend:spiff-sync-latest"
 
   service_bindings = {
     "${module.spiffworkflowdb.database_name}"                 = ""
