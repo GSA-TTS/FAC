@@ -145,8 +145,8 @@ variable "service_bindings" {
 }
 
 variable "git_pat_token" {
-  type = string
+  type        = string
   description = "the secret pat to clone the github process model repo"
-  sensitive = true
+  sensitive   = true
 }
 
