@@ -1,0 +1,20 @@
+{% comment %} Audit Year {% endcomment %}
+<button type="button"
+        class="usa-accordion__button"
+        aria-expanded="true"
+        aria-controls="audit-year">Audit Year</button>
+<div id="audit-year">
+    <span class="usa-error-message margin-top-1">{{ form.audit_year.errors|striptags }}</span>
+    {% for value, text in form.audit_year.field.choices %}
+      <div class="usa-checkbox bg-base-lighter">
+          <input class="usa-checkbox__input"
+                  id="audit-year-{{ text }}"
+                  name="audit_year"
+                  type="checkbox"
+                  value={{ value }}
+                  {% if text in dashboard_data.years %}checked{% endif %}
+                  />
+            <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
+        </div>
+    {% endfor %}
+</div>
