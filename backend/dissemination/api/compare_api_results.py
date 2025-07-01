@@ -35,6 +35,7 @@ def setup_parser():
 
     parser.add_argument("--start_date", type=str)
     parser.add_argument("--end_date", type=str)
+    parser.add_argument("--audit_year", type=str)
     parser.add_argument(
         "--output_csv",
         type=str,
@@ -154,26 +155,30 @@ def main():
     # Check that we have api versions.
     for api_version in ["api_version_1", "api_version_2"]:
         if getattr(args, api_version) is None:
-            print(f"You must provide an API version (missing {api_version}). exiting.")
+            print(f"You must provide an API version (missing {api_version}). Exiting.")
             sys.exit(-1)
 
     # Make sure we have a table
     if args.endpoint is None:
-        print("You must provide an endpoint (e.g. `general`). exiting.")
+        print("You must provide an endpoint (e.g. `general`). Exiting.")
         sys.exit(-1)
 
-    # We must have a report_id or a start/end date.
-    if (not args.report_id) and (not args.start_date and not args.end_date):
-        print("You must provide either a report_id or a start/end date range. exiting.")
+    # We must have a report_id, a start/end date, or an audit year.
+    if (not args.report_id) and (not args.start_date and not args.end_date) and (not args.audit_year):
+        print("You must provide either a report_id, a start/end date range, or an audit year. Exiting.")
         sys.exit(-1)
 
     if args.start_date or args.end_date:
         if args.start_date and not args.end_date:
-            print("You provided a start date with no end date. exiting.")
+            print("You provided a start date with no end date. Exiting.")
             sys.exit(-1)
 
         if not args.start_date and args.end_date:
-            print("You provided an end date without a start date. exiting.")
+            print("You provided an end date without a start date. Exiting.")
+            sys.exit(-1)
+        
+        if args.audit_year:
+            print("You provided a start/end date with an audit year. Choose one. Exiting.")
             sys.exit(-1)
 
     if not args.environment and args.environment not in ["local", "cloud"]:
@@ -196,6 +201,7 @@ def main():
         args.report_id,
         args.start_date,
         args.end_date,
+        args.audit_year,
         args.environment,
         args.comparison_key,
         args.strict_order,

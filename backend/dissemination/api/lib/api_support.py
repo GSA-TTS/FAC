@@ -71,6 +71,7 @@ def compare(
     report_id=None,
     start_date=None,
     end_date=None,
+    audit_year=None,
     environment="local",
     comparison_key="report_id",
     strict_order=True,
@@ -86,7 +87,7 @@ def compare(
         sys.exit(-1)
 
     # Now, we build a query URL. We're building different URLs depending on whether
-    # we're testing one single report, or a date range.
+    # we're testing one single report, a date range, or an audit year.
     if report_id:
         client_1 = f.FAC()
         client_1.scheme(scheme).port(port).base(api_base_1).endpoint(endpoint)
@@ -103,6 +104,13 @@ def compare(
         client_2.scheme(scheme).port(port).base(api_base_2).endpoint(endpoint)
         client_2.query("fac_accepted_date", "gte", start_date)
         client_2.query("fac_accepted_date", "lt", end_date)
+    elif audit_year:
+        client_1 = f.FAC()
+        client_1.scheme(scheme).port(port).base(api_base_1).endpoint(endpoint)
+        client_1.query("audit_year", "eq", audit_year)
+        client_2 = f.FAC()
+        client_2.scheme(scheme).port(port).base(api_base_2).endpoint(endpoint)
+        client_2.query("audit_year", "eq", audit_year)
 
     # Build the distinct headers for each API by adding unique values
     # to the common base. We explicitly want the same headers *except for the API version*.
