@@ -231,7 +231,7 @@ def compare_any_order(
     timing_window = {}
     num_batches = 10
     batch_no = 0
-    timing_window_size = len(l1) // num_batches
+    timing_window_size = len(l1) // num_batches or 1
     timing_index = 1
     total_time = 0
 
