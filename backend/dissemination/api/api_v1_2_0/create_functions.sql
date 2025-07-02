@@ -32,28 +32,74 @@ begin
 end;
 $gaku$ LANGUAGE plpgsql;
 
-create or replace function api_v1_2_0_functions.has_tribal_data_access() 
+create or replace function api_v1_2_0_functions.has_tribal_data_access()
 returns boolean
 as $has_tribal_data_access$
-DECLARE 
+DECLARE
     uuid_header UUID;
     key_exists boolean;
 BEGIN
 
     SELECT api_v1_2_0_functions.get_api_key_uuid() INTO uuid_header;
-    SELECT 
+    SELECT
         CASE WHEN EXISTS (
-            SELECT key_id 
+            SELECT key_id
             FROM public.dissemination_TribalApiAccessKeyIds taaki
             WHERE taaki.key_id = uuid_header::TEXT)
             THEN 1::BOOLEAN
             ELSE 0::BOOLEAN
-            END 
+            END
         INTO key_exists;
     RAISE INFO 'api_v1_2_0 has_tribal % %', uuid_header, key_exists;
     RETURN key_exists;
 END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION api_v1_2_0.request_file_access(
+    report_id TEXT
+) RETURNS JSON LANGUAGE plpgsql AS
+$$
+DECLARE
+    v_uuid_header TEXT;
+    v_access_uuid VARCHAR(200);
+    v_key_exists BOOLEAN;
+    v_key_added_date DATE;
+BEGIN
+
+    SELECT api_v1_2_0_functions.get_api_key_uuid() INTO v_uuid_header;
+
+    -- Check if the provided API key exists in public.dissemination_TribalApiAccessKeyIds
+    SELECT
+        EXISTS(
+            SELECT 1
+            FROM public.dissemination_TribalApiAccessKeyIds
+            WHERE key_id = v_uuid_header
+        ) INTO v_key_exists;
+
+
+    -- Get the added date of the key from public.dissemination_TribalApiAccessKeyIds
+    SELECT date_added
+    INTO v_key_added_date
+    FROM public.dissemination_TribalApiAccessKeyIds
+    WHERE key_id = v_uuid_header;
+
+
+    -- Check if the key is less than 6 months old
+    IF v_uuid_header IS NOT NULL AND v_key_exists AND v_key_added_date >= CURRENT_DATE - INTERVAL '6 months' THEN
+        -- Generate UUID (using PostgreSQL's gen_random_uuid function)
+        SELECT gen_random_uuid() INTO v_access_uuid;
+
+        -- Inserting data into the one_time_access table
+        INSERT INTO public.dissemination_onetimeaccess (uuid, api_key_id, timestamp, report_id)
+        VALUES (v_access_uuid::UUID, v_uuid_header, CURRENT_TIMESTAMP, report_id);
+
+        -- Return the UUID to the user
+        RETURN json_build_object('access_uuid', v_access_uuid);
+    ELSE
+        -- Return an error for unauthorized access
+        RETURN json_build_object('error', 'Unauthorized access or key older than 6 months')::JSON;
+    END IF;
+END;
+$$;
 
 NOTIFY pgrst, 'reload schema';

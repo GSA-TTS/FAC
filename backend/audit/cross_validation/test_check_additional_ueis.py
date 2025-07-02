@@ -2,7 +2,7 @@ from django.test import TestCase
 from model_bakery import baker
 from audit.models import SingleAuditChecklist
 
-from .additional_ueis import additional_ueis
+from .check_additional_ueis import check_additional_ueis
 from .errors import (
     err_additional_ueis_empty,
     err_additional_ueis_has_auditee_uei,
@@ -15,10 +15,12 @@ ERROR_PRESENT = {"error": err_additional_ueis_not_empty()}
 ERROR_AUEI = {"error": err_additional_ueis_has_auditee_uei()}
 
 
-class AdditionalUEIsTests(TestCase):
+class CheckAdditionalUEIsTests(TestCase):
     """
     General Information asks if there are additional UEIs; this answer needs to be
     consistent with the Additional UEIs section.
+
+    Note: This class is essentially a copy of its EIN counterpart. When updating one, it is likely appropriate to update the other.
     """
 
     def test_general_information_no_addl_ueis(self):
@@ -30,7 +32,7 @@ class AdditionalUEIsTests(TestCase):
         sac.general_information = {"multiple_ueis_covered": False}
 
         shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        validation_result = check_additional_ueis(shaped_sac)
 
         self.assertEqual(validation_result, [])
 
@@ -50,7 +52,7 @@ class AdditionalUEIsTests(TestCase):
         }
 
         shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        validation_result = check_additional_ueis(shaped_sac)
 
         self.assertEqual(validation_result, [ERROR_PRESENT])
 
@@ -63,7 +65,7 @@ class AdditionalUEIsTests(TestCase):
         sac.general_information = {"multiple_ueis_covered": True}
 
         shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        validation_result = check_additional_ueis(shaped_sac)
 
         self.assertEqual(validation_result, [ERROR_EMPTY])
 
@@ -77,7 +79,7 @@ class AdditionalUEIsTests(TestCase):
         sac.additional_ueis = {}
 
         shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        validation_result = check_additional_ueis(shaped_sac)
 
         self.assertEqual(validation_result, [ERROR_EMPTY])
 
@@ -89,7 +91,7 @@ class AdditionalUEIsTests(TestCase):
         }
 
         shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        validation_result = check_additional_ueis(shaped_sac)
 
         self.assertEqual(validation_result, [ERROR_EMPTY])
 
@@ -109,7 +111,7 @@ class AdditionalUEIsTests(TestCase):
         }
 
         shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        validation_result = check_additional_ueis(shaped_sac)
 
         self.assertEqual(validation_result, [])
 
@@ -135,6 +137,6 @@ class AdditionalUEIsTests(TestCase):
         }
 
         shaped_sac = sac_validation_shape(sac)
-        validation_result = additional_ueis(shaped_sac)
+        validation_result = check_additional_ueis(shaped_sac)
 
         self.assertEqual(validation_result, [ERROR_AUEI])
