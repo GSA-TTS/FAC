@@ -24,7 +24,7 @@
   "license": "ISC",
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.3.0",
-    "@babel/eslint-parser": "^7.27.0",
+    "@babel/eslint-parser": "^7.28.0",
     "@eslint/js": "^9.28.0",
     "cypress": "^14.1.0",
     "cypress-axe": "^1.6.0",
