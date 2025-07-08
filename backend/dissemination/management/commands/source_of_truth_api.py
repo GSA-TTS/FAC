@@ -277,6 +277,7 @@ class Command(BaseCommand):
                 "Accept-Profile": api,
                 "X-Api-User-Id": API_GOV_USER_ID,
             },
+            timeout=300,
         )
 
         return response.json()

@@ -135,6 +135,7 @@ class FAC:
                 URL,
                 params=self._params_to_list(),
                 headers=self._headers,
+                timeout=300,
             )
 
             t1 = time()
