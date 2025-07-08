@@ -213,9 +213,7 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore={}):
     return Result(True)
 
 
-# These values only have to be calculated once...
-l1_lookup = None  # type: dict | None
-l2_lookup = None  # type: dict | None
+dicts_are_preloaded = False
 
 
 def compare_any_order(
@@ -226,7 +224,9 @@ def compare_any_order(
     comparison_key: str = "report_id",
     ignore={},
 ):
-    global l1_lookup, l2_lookup
+    global dicts_are_preloaded
+    l1_lookup = dict()
+    l2_lookup = dict()
 
     timing_window = {}
     num_batches = 10
@@ -240,9 +240,9 @@ def compare_any_order(
     # Preload some dictionaries. We were doing a nested loop over l1 and l2, which
     # was very expensive. This makes it an O(1) lookup on report_id in the lookup tables.
     # FIXME: Need to think about what this looks for tables that are not `general`
-    if l1_lookup == None and l2_lookup == None:
-        l1_lookup = dict()
-        l2_lookup = dict()
+    if not dicts_are_preloaded:
+        dicts_are_preloaded = True
+
         for o in l1:
             l1_lookup[o[comparison_key]] = o
         for o in l2:
