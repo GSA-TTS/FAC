@@ -21,6 +21,7 @@ services:
 
   db2:
     image: "postgres:15"
+    hostname: db2
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
@@ -33,19 +34,20 @@ services:
       timeout: 5s
       retries: 10
 
-  # metabasedb:
-  #   image: "postgres:15"
-  #   environment:
-  #     POSTGRES_HOST_AUTH_METHOD: "trust"
-  #   volumes:
-  #     - postgres-data3:/var/lib/postgresql/data/
-  #   ports:
-  #     - "5433:5432"
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 10
+  db3:
+    image: "postgres:15"
+    hostname: db3
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    volumes:
+      - postgres-data3:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   #---------------------------------------------
   # Metabase app
@@ -64,7 +66,11 @@ services:
       MB_DB_PORT: 5432
       MB_DB_USER: postgres
       MB_DB_PASS: postgres
+<<<<<<< HEAD
       MB_DB_HOST: db1
+=======
+      MB_DB_HOST: db3
+>>>>>>> 5a6334120da50225d63a125301059b0fc2ad1882
       # This appears to be an open issue, and one that the community would like, though is not implemented https://github.com/metabase/metabase/issues/37836
       # It would appear we are locked to public schema, and we will have to accept that the metabase tables will be with our tables.
       #MB_DB_CONNECTION_URI: postgres://postgres@db/postgres?currentSchema=metabase

@@ -111,7 +111,7 @@ create view api_v1_2_0.additional_ueis as
         join lateral jsonb_array_elements(a.audit->'additional_ueis') as uei_elem on true
     where
         a.submission_status = 'disseminated'
-        and a.audit->'general_information'->>'multiple_ueis_covered' = 'Yes'
+        and ((a.audit->'general_information'->>'multiple_ueis_covered')::boolean = TRUE)
         and a.audit ? 'additional_ueis'
 ;
 ---------------------------------------
@@ -210,7 +210,6 @@ create view api_v1_2_0.notes_to_sefa as
         a.audit->'notes_to_sefa'->>'rate_explained' as rate_explained,
         coalesce(notes.note->>'note_content','') as content,
         coalesce(notes.note->>'contains_chart_or_table','') as contains_chart_or_table
-
     from
         audit_audit as a
 	    left join lateral (
@@ -366,7 +365,7 @@ create view api_v1_2_0.secondary_auditors as
         join lateral jsonb_array_elements(a.audit->'secondary_auditors') as sa_elem on true
     where
         a.submission_status = 'disseminated'
-        and a.audit->'general_information'->>'secondary_auditors_exist' = 'Yes'
+        and ((a.audit->'general_information'->>'secondary_auditors_exist')::boolean = TRUE)
         and a.audit ? 'secondary_auditors'
 ;
 ---------------------------------------
@@ -383,7 +382,7 @@ create view api_v1_2_0.additional_eins as
         join lateral jsonb_array_elements(a.audit->'additional_eins') as ein_elem on true
     where
         a.submission_status = 'disseminated'
-        and a.audit->'general_information'->>'multiple_eins_covered' = 'Yes'
+        and ((a.audit->'general_information'->>'multiple_eins_covered')::boolean = TRUE)
         and a.audit ? 'additional_eins'
 ;
 commit;
