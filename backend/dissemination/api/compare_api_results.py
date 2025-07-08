@@ -164,8 +164,14 @@ def main():
         sys.exit(-1)
 
     # We must have a report_id, a start/end date, or an audit year.
-    if (not args.report_id) and (not args.start_date and not args.end_date) and (not args.audit_year):
-        print("You must provide either a report_id, a start/end date range, or an audit year. Exiting.")
+    if (
+        (not args.report_id)
+        and (not args.start_date and not args.end_date)
+        and (not args.audit_year)
+    ):
+        print(
+            "You must provide either a report_id, a start/end date range, or an audit year. Exiting."
+        )
         sys.exit(-1)
 
     if args.start_date or args.end_date:
@@ -176,9 +182,11 @@ def main():
         if not args.start_date and args.end_date:
             print("You provided an end date without a start date. Exiting.")
             sys.exit(-1)
-        
+
         if args.audit_year:
-            print("You provided a start/end date with an audit year. Choose one. Exiting.")
+            print(
+                "You provided a start/end date with an audit year. Choose one. Exiting."
+            )
             sys.exit(-1)
 
     if not args.environment and args.environment not in ["local", "cloud"]:
