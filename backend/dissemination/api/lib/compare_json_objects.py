@@ -214,8 +214,8 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore={}):
 
 
 # These values only have to be calculated once...
-l1_lookup = None
-l2_lookup = None
+l1_lookup = None # type: dict
+l2_lookup = None # type: dict
 
 
 def compare_any_order(
@@ -233,7 +233,7 @@ def compare_any_order(
     batch_no = 0
     timing_window_size = len(l1) // num_batches or 1
     timing_index = 1
-    total_time = 0
+    total_time = 0.0
 
     results = list()
 
@@ -285,7 +285,7 @@ def compare_any_order(
             timing_window[timing_index] = delta
             timing_index = (timing_index + 1) % timing_window_size
             if timing_index == 0:
-                sum = 0
+                sum = 0.0
                 for v in timing_window.values():
                     sum += v
                 batch_no += 1
