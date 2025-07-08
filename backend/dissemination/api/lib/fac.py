@@ -1,7 +1,7 @@
 from collections import namedtuple as NT
+from json import JSONDecodeError
 from requests import get
 from requests import Request
-from typing import Union
 from time import time
 from datetime import timedelta
 from math import floor
@@ -149,8 +149,9 @@ class FAC:
 
             try:
                 resj = res.json()
-            except:
+            except JSONDecodeError:
                 resj = None
+
             # Look to see if things died.
             if not resj:
                 fetching = False

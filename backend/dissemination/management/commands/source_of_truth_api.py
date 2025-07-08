@@ -139,7 +139,7 @@ class Command(BaseCommand):
             logger.error("Exiting.")
             sys.exit(1)
         else:
-            logger.info(f"SOT and SAC report_ids match; continuing")
+            logger.info("SOT and SAC report_ids match; continuing")
 
     def _get_endpoint_differences(
         self, report_ids, sac_data_by_report_id, sot_data_by_report_id, is_general=False
