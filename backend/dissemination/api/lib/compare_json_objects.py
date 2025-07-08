@@ -214,8 +214,8 @@ def compare_json_objects(v1: str, o1: dict, v2: str, o2: dict, ignore={}):
 
 
 # These values only have to be calculated once...
-l1_lookup = None  # type: dict
-l2_lookup = None  # type: dict
+l1_lookup = None  # type: dict | None
+l2_lookup = None  # type: dict | None
 
 
 def compare_any_order(
