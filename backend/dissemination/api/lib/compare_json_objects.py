@@ -520,3 +520,94 @@ def compare_lists_of_json_objects(
         return Result(True)
     else:
         return results
+
+
+def compare_sefa(
+    v1: str,
+    l1: list,
+    v2: str,
+    l2: list,
+    ignore={},
+):
+    R = Result(False)
+    l1, l2 = remove_objects_from_lists(l1, l2, ignore)
+    v1_by_rid = v_by_rid(l1)
+    v2_by_rid = v_by_rid(l2)
+    all_rids = set(list(v1_by_rid.keys()) + list(v2_by_rid.keys()))
+
+    for rid in all_rids:
+        if rid not in v1_by_rid:
+            R.add_error(
+                ErrorPair(
+                    "missing_comparison_key",
+                    APIValue(v1, "report_id", None, None),
+                    APIValue(v2, "report_id", rid, rid),
+                ),
+            )
+        elif rid not in v2_by_rid:
+            R.add_error(
+                ErrorPair(
+                    "missing_comparison_key",
+                    APIValue(v1, "report_id", rid, rid),
+                    APIValue(v2, "report_id", None, None),
+                ),
+            )
+        else:
+            v1_notes = v1_by_rid[rid]
+            v2_notes = v2_by_rid[rid]
+            v1_notes_len = len(v1_notes)
+            v2_notes_len = len(v2_notes)
+
+            if v1_notes_len != v2_notes_len:
+                R.add_error(
+                    ErrorPair(
+                        "len_notes_mismatch",
+                        APIValue(v1, "report_id", v1_notes_len, rid),
+                        APIValue(v2, "report_id", v2_notes_len, rid),
+                    ),
+                )
+            else:
+                for v1_note in v1_notes:
+                    match_found = False
+                    for v2_note in v2_notes:
+                        if v1_note == v2_note:
+                            match_found = True
+                            break
+                    if not match_found:
+                        R.add_error(
+                            ErrorPair(
+                                "note_not_found",
+                                APIValue(v1, "report_id", v1_note, rid),
+                                APIValue(v2, "report_id", None, rid),
+                            ),
+                        )
+
+                for v2_note in v2_notes:
+                    match_found = False
+                    for v1_note in v1_notes:
+                        if v2_note == v1_note:
+                            match_found = True
+                            break
+                    if not match_found:
+                        R.add_error(
+                            ErrorPair(
+                                "note_not_found",
+                                APIValue(v1, "report_id", None, rid),
+                                APIValue(v2, "report_id", v2_note, rid),
+                            ),
+                        )
+
+    return R
+
+
+def v_by_rid(l):
+    v_by_rid = {}
+
+    for o in l:
+        rid = o["report_id"]
+        if rid in v_by_rid:
+            v_by_rid[rid].append(o)
+        else:
+            v_by_rid[rid] = [o]
+
+    return v_by_rid

@@ -2,7 +2,11 @@
 from requests import get
 import lib.fac as f
 
-from lib.compare_json_objects import compare_lists_of_json_objects as clojo, Result
+from lib.compare_json_objects import (
+    compare_lists_of_json_objects as clojo,
+    compare_sefa,
+    Result,
+)
 
 import os
 import sys
@@ -175,15 +179,24 @@ def compare(
     # Either returns:
     #  - A single Result object, or
     #  - A list of Result objects
-    result = clojo(
-        api_version_1,
-        list_of_objects1,  # list_of_objects1.json(),
-        api_version_2,
-        list_of_objects2,  # list_of_objects2.json(),
-        comparison_key=comparison_key,
-        strict_order=strict_order,
-        ignore=ignore,
-    )
+    if endpoint == "notes_to_sefa":
+        result = compare_sefa(
+            api_version_1,
+            list_of_objects1,
+            api_version_2,
+            list_of_objects2,
+            ignore=ignore,
+        )
+    else:
+        result = clojo(
+            api_version_1,
+            list_of_objects1,  # list_of_objects1.json(),
+            api_version_2,
+            list_of_objects2,  # list_of_objects2.json(),
+            comparison_key=comparison_key,
+            strict_order=strict_order,
+            ignore=ignore,
+        )
 
     if isinstance(result, Result) and result:
         print("identical")
