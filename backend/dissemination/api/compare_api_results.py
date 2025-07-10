@@ -199,21 +199,21 @@ def main():
         ignore = json.load(open(args.ignore))
 
     result = compare(
-        args.scheme,
-        args.api_base_1,
-        args.api_base_2,
-        args.api_version_1,
-        args.api_version_2,
-        args.endpoint,
-        args.port,
-        args.report_id,
-        args.start_date,
-        args.end_date,
-        args.audit_year,
-        args.environment,
-        args.comparison_key,
-        args.strict_order,
-        ignore,
+        scheme=args.scheme,
+        api_base_1=args.api_base_1,
+        api_base_2=args.api_base_2,
+        api_version_1=args.api_version_1,
+        api_version_2=args.api_version_2,
+        endpoint=args.endpoint,
+        port=args.port,
+        report_id=args.report_id,
+        start_date=args.start_date,
+        end_date=args.end_date,
+        audit_year=args.audit_year,
+        environment=args.environment,
+        comparison_key=args.comparison_key,
+        strict_order=args.strict_order,
+        ignore=ignore,
     )
 
     output_results(args, result)
