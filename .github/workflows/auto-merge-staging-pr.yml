@@ -5,13 +5,13 @@ on:
     types: [ ready-to-merge ]
 jobs:
   auto-merge:
-    name: Auto Merge The Created Pull Request
+    name: Auto Merge Pull Request
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
       - id: automerge
-        name: Auto Merge a PR with the correct labels
+        name: Auto Merge Pull Requests
         uses: pascalgn/automerge-action@v0.16.4
         env:
           GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }}

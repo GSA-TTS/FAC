@@ -1,5 +1,5 @@
 ---
-name: Run the Materialized Views Function
+name: Execute Materialized Views Function
 on:
   schedule:
     # Invoke at 6 UTC EST every day
@@ -15,7 +15,6 @@ on:
           - staging
           - preview
           - production
-
 jobs:
   scheduled-materialized-views:
     if: ${{ github.event_name == 'schedule' }}

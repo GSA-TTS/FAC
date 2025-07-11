@@ -1,5 +1,5 @@
 ---
-name: Deploy to Development and Management Environment
+name: Deploy to Development and Meta Environments
 on:
   push:
     branches:

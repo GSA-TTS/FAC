@@ -1,5 +1,5 @@
 ---
-name: Lint Files
+name: Lint and Validate Files
 on:
   workflow_call:
 

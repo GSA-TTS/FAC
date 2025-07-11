@@ -1,5 +1,5 @@
 ---
-name: Deploy to Production Environment
+name: Deploy to the Production Environment
 on:
   push:
     tags:
