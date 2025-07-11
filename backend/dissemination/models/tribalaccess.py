@@ -1,5 +1,4 @@
 from django.db import models
-from .constants import REPORT_ID_FK_HELP_TEXT
 
 
 class TribalApiAccessKeyIds(models.Model):
