@@ -1,5 +1,5 @@
 ---
-name: Export Audit Data to CSV
+name: Export Audit Data to CSV on Schedule
 on:
   workflow_call:
     inputs:
