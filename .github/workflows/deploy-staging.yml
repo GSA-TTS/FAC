@@ -1,5 +1,5 @@
 ---
-name: Deploy to Staging Environment
+name: Deploy to the Staging Environment
 on:
   push:
     branches:

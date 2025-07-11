@@ -66,7 +66,7 @@ jobs:
         run: echo "pull_request_number=$(gh pr view --json number -q .number || echo "")" >> $GITHUB_OUTPUT
 
   auto-approve:
-    name: Auto Approve The Created Pull Request
+    name: Approve The Created Pull Request
     needs: [pull-request]
     if: ${{ needs.pull-request.outputs.pr_number != null }}
     runs-on: ubuntu-latest

@@ -1,11 +1,12 @@
 ---
-name: Check existing tables in an environment
+name: Table Integrity Check
 ### Common Commands:
 # ./fac-backup-util.sh v0.1.11 check_tables
 on:
   workflow_dispatch:
     inputs:
       environment:
+        description: Environement Selection
         required: true
         type: choice
         options:

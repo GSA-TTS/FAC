@@ -1,5 +1,5 @@
 ---
-name: Run Cypress on Container
+name: Cypress Testing
 on:
   workflow_call:
     inputs:
