@@ -1,5 +1,5 @@
 ---
-name: Terraform apply (single env)
+name: Terraform Apply
 on:
   workflow_call:
     inputs:
@@ -14,7 +14,7 @@ on:
 
 jobs:
   apply:
-    name: apply ( ${{ inputs.environment }} )
+    name: Terraform Apply on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
@@ -43,7 +43,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Apply ( ${{ inputs.environment }} )
+      - name: Apply ${{ inputs.environment }}
         uses: dflook/terraform-apply@v1
         with:
           path: terraform/${{ inputs.environment }}
