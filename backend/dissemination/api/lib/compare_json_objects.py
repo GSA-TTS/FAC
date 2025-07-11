@@ -529,7 +529,7 @@ def compare_sefa(
     l2: list,
     ignore={},
 ):
-    R = Result(False)
+    results = []
     l1, l2 = remove_objects_from_lists(l1, l2, ignore)
     v1_by_rid = v_by_rid(l1)
     v2_by_rid = v_by_rid(l2)
@@ -537,20 +537,26 @@ def compare_sefa(
 
     for rid in all_rids:
         if rid not in v1_by_rid:
-            R.add_error(
-                ErrorPair(
-                    "missing_comparison_key",
-                    APIValue(v1, "report_id", None, None),
-                    APIValue(v2, "report_id", rid, rid),
-                ),
+            results.append(
+                Result(
+                    False,
+                    ErrorPair(
+                        "missing_comparison_key",
+                        APIValue(v1, "report_id", None, None),
+                        APIValue(v2, "report_id", rid, rid),
+                    ),
+                )
             )
         elif rid not in v2_by_rid:
-            R.add_error(
-                ErrorPair(
-                    "missing_comparison_key",
-                    APIValue(v1, "report_id", rid, rid),
-                    APIValue(v2, "report_id", None, None),
-                ),
+            results.append(
+                Result(
+                    False,
+                    ErrorPair(
+                        "missing_comparison_key",
+                        APIValue(v1, "report_id", rid, rid),
+                        APIValue(v2, "report_id", None, None),
+                    ),
+                )
             )
         else:
             v1_notes = v1_by_rid[rid]
@@ -559,12 +565,15 @@ def compare_sefa(
             v2_notes_len = len(v2_notes)
 
             if v1_notes_len != v2_notes_len:
-                R.add_error(
-                    ErrorPair(
-                        "len_notes_mismatch",
-                        APIValue(v1, "report_id", v1_notes_len, rid),
-                        APIValue(v2, "report_id", v2_notes_len, rid),
-                    ),
+                results.append(
+                    Result(
+                        False,
+                        ErrorPair(
+                            "len_notes_mismatch",
+                            APIValue(v1, "report_id", v1_notes_len, rid),
+                            APIValue(v2, "report_id", v2_notes_len, rid),
+                        ),
+                    )
                 )
             else:
                 for v1_note in v1_notes:
@@ -574,12 +583,15 @@ def compare_sefa(
                             match_found = True
                             break
                     if not match_found:
-                        R.add_error(
-                            ErrorPair(
-                                "note_not_found",
-                                APIValue(v1, "report_id", v1_note, rid),
-                                APIValue(v2, "report_id", None, rid),
-                            ),
+                        results.append(
+                            Result(
+                                False,
+                                ErrorPair(
+                                    "note_not_found",
+                                    APIValue(v1, "report_id", v1_note, rid),
+                                    APIValue(v2, "report_id", None, rid),
+                                ),
+                            )
                         )
 
                 for v2_note in v2_notes:
@@ -589,15 +601,18 @@ def compare_sefa(
                             match_found = True
                             break
                     if not match_found:
-                        R.add_error(
-                            ErrorPair(
-                                "note_not_found",
-                                APIValue(v1, "report_id", None, rid),
-                                APIValue(v2, "report_id", v2_note, rid),
-                            ),
+                        results.append(
+                            Result(
+                                False,
+                                ErrorPair(
+                                    "note_not_found",
+                                    APIValue(v1, "report_id", None, rid),
+                                    APIValue(v2, "report_id", v2_note, rid),
+                                ),
+                            )
                         )
 
-    return R
+    return results or Result(True)
 
 
 def v_by_rid(l):
