@@ -13,6 +13,6 @@ dir=$(pwd)
 cd ..
 basename=$(basename "$(pwd)")
 terraform init \
-  --backend-config=../shared/config/backend.tfvars \
+  --backend-config=../shared/config/sandbox-backend.tfvars \
   --backend-config=key=terraform.tfstate."$basename"
 cd "$dir"

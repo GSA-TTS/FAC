@@ -26,6 +26,7 @@ locals {
     "sudha.kumar@gsa.gov",
     "philip.dominguez@gsa.gov",
     "robert.novak@gsa.gov",
+    "ranye.mclendon@gsa.gov",
   ]
 
   # All spaces have the same SpaceManagers for now
