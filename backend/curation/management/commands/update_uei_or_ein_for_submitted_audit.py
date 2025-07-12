@@ -21,7 +21,6 @@ from dissemination.models import (
     Passthrough,
     SecondaryAuditor,
 )
-from audit.intake_to_dissemination import IntakeToDissemination
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +88,7 @@ def validate_inputs(options):
     elif "old_ein" in options and "new_ein" in options:
         # Does the old UEI exist?
         crit1 = Q(report_id=options["report_id"])
-        crit2 = Q(general_information__auditee_ein=options["old_ein"])
+        crit2 = Q(general_information__ein=options["old_ein"])
         count = SingleAuditChecklist.objects.filter(crit1 & crit2).count()
         if count == 1:
             ok_new_ein = True

@@ -183,6 +183,12 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     def __str__(self):
         return f"#{self.id}--{self.report_id}--{self.auditee_uei}"
 
+    def __hash__(self):
+        return hash(str(self))
+
+    def __eq__(self, other):
+        return str(self) == str(other)
+
     def create_submission_event(self, event_user, event_type):
         if event_user and event_type:
             SubmissionEvent.objects.create(
