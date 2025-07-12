@@ -2,6 +2,7 @@ from .management.commands.identify_resubmission_linkages import generate_cluster
 from model_bakery import baker
 from django.test import TestCase
 from audit.models import SingleAuditChecklist
+from copy import deepcopy
 
 sac_01 = {
     "audit_year": "2022",
@@ -88,7 +89,7 @@ class ClusteringTests(TestCase):
 
         # Add a single character typo to the email address.
         # We should still get a cluster.
-        gi = sac_01["general_information"]
+        gi = deepcopy(sac_01["general_information"])
         gi["auditee_email"] = gi["auditee_email"][:-1] + "x"
 
         baker.make(
@@ -109,7 +110,7 @@ class ClusteringTests(TestCase):
         rid_count = 0
         for state in ["PA", "ME"]:
             rid_count += 1
-            gi = sac_01["general_information"]
+            gi = deepcopy(sac_01["general_information"])
             gi["auditee_state"] = state
             baker.make(
                 SingleAuditChecklist,
@@ -135,7 +136,7 @@ class ClusteringTests(TestCase):
             for ein in ["123456789", "123123123"]:
                 rid_count += 1
 
-                gi = sac_01["general_information"]
+                gi = deepcopy(sac_01["general_information"])
                 gi["ein"] = ein
 
                 rid = sac_01["report_id"][:-1] + f"{rid_count}"
