@@ -1,0 +1,38 @@
+[
+  {
+    "api_version": "api_v1_1_0",
+    "key": "auditor_certify_name",
+    "acceptable_values": [
+      "DEFAULT_AUDITOR_CERTIFY_NAME"
+    ]
+  },
+  {
+    "api_version": "api_v1_1_0",
+    "key": "auditor_certify_title",
+    "acceptable_values": [
+      "DEFAULT_AUDITOR_CERTIFY_TITLE"
+    ]
+  },
+  {
+    "api_version": "api_v1_1_0",
+    "key": "date_created",
+    "acceptable_values": [
+      ".*"
+    ]
+  },
+  {
+    "api_version": "api_v1_1_0",
+    "key": "stuck_reports",
+    "skip": [
+      "2023-12-GSAFAC-0000054681",
+      "2023-12-GSAFAC-0000054055",
+      "2023-12-GSAFAC-0000041308",
+      "2023-09-GSAFAC-0000038716",
+      "2023-06-GSAFAC-0000034013",
+      "2022-09-GSAFAC-0000014208",
+      "2023-06-GSAFAC-0000005723",
+      "2021-09-GSAFAC-0000004846",
+      "2023-06-GSAFAC-0000003498"
+    ]
+  }
+]
