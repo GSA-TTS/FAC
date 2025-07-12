@@ -248,14 +248,17 @@ def generate_clusters(AY):
     # print(ueis[:2])
 
     # Now, I want the records for those UEIs
-    # Order by report_id, so that the first in a set goes in first.
-    # We'll have a strict ordering on the report ID that helps out here.
+    # Order by the first date in the transition_date array.
     records = base.filter(
         general_information__auditee_uei__in=ueis.values("uei"),
-    ).order_by("report_id")
+    )
+    # Doing it in the model is hard.
+    records = sorted(
+        records, key=lambda r: r.transition_date[0].strftime("%Y-%m-%d %H:%M:%S")
+    )
 
     print("-----")
-    print(f"{records.count()} records for the duplicated UEIs")
+    print(f"{len(records)} records for the duplicated UEIs")
     time.sleep(3)
 
     # print("----")
@@ -268,9 +271,7 @@ def generate_clusters(AY):
     THRESHOLD = 3
 
     for rndx, r in enumerate(records):
-        print(
-            f"Processing {rndx} of {records.count()}: {r.report_id} sets: {len(sets)}"
-        )
+        print(f"Processing {rndx} of {len(records)}: {r.report_id} sets: {len(sets)}")
         # Start infinitely far apart
         md = MinDist()
         md.distance = float("inf")
