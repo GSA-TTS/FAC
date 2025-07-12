@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
 from django.utils.translation import gettext_lazy as _
 
@@ -36,7 +37,20 @@ from support.cog_over import compute_cog_over, record_cog_assignment
 from .files import SingleAuditReportFile
 from .submission_event import SubmissionEvent
 from .utils import camel_to_snake
-from ..exceptions import LateChangeError
+from ..exceptions import LateChangeError, AdministrativeOverrideError
+
+from dissemination.models import (
+    AdditionalEin,
+    AdditionalUei,
+    CapText,
+    FederalAward,
+    Finding,
+    FindingText,
+    General,
+    Note,
+    Passthrough,
+    SecondaryAuditor,
+)
 
 User = get_user_model()
 
@@ -169,26 +183,35 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     def __str__(self):
         return f"#{self.id}--{self.report_id}--{self.auditee_uei}"
 
-    def save(self, *args, **kwargs):
-        """
-        Call _reject_late_changes() to verify that a submission that's no longer
-        in progress isn't being altered; skip this if we know this submission is
-        in progress.
-        """
-        if self.submission_status != STATUS.IN_PROGRESS:
-            try:
-                self._reject_late_changes()
-            except LateChangeError as err:
-                raise LateChangeError from err
-
-        event_user = kwargs.get("event_user")
-        event_type = kwargs.get("event_type")
+    def create_submission_event(self, event_user, event_type):
         if event_user and event_type:
             SubmissionEvent.objects.create(
                 sac=self,
                 user=event_user,
                 event=event_type,
             )
+
+    def save(self, *args, **kwargs):
+        """
+        Call _throw_exception_if_late_changes() to verify that a submission that's no longer
+        in progress isn't being altered; skip this if we know this submission is
+        in progress.
+        """
+        if self.submission_status != STATUS.IN_PROGRESS:
+            # If the FAC wants to administratively change a record after submission
+            # (e.g. fix an incorrect UEI), a management command will
+            # pass in the "administrative_override" flag.
+            administrative_override = kwargs.get("administrative_override", None)
+            event_user = kwargs.get("event_user")
+            event_type = kwargs.get("event_type")
+
+            # If we indicated we want to do an ovveride, we must provide
+            # BOTH the user and type.
+            if administrative_override and event_user and event_type:
+                self.create_submission_event(event_user, event_type)
+            else:
+                self._throw_exception_if_late_changes()
+                self.create_submission_event(event_user, event_type)
 
         return super().save()
 
@@ -216,6 +239,32 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             return {"errors": [err]}
 
         return None
+
+    def redisseminate(self):
+        named_models = {
+            "AdditionalEins": AdditionalEin,
+            "AdditionalUeis": AdditionalUei,
+            "CorrectiveActionPlan": CapText,
+            "FederalAwards": FederalAward,
+            "FindingsText": FindingText,
+            "FindingsUniformGuidance": Finding,
+            "NotesToSefa": Note,
+            "SecondaryAuditors": SecondaryAuditor,
+            "General": General,
+            "Passthrough": Passthrough,
+        }
+        with transaction.atomic():
+            try:
+                # Delete this record from the dissemination tables
+                for name, model in named_models:
+                    rows = model.objects.filter(report_id=self.report_id)
+                    rows.delete()
+                # Disseminate this record once more
+                self.disseminate()
+            except TransactionManagementError as err:
+                raise err
+            except Exception as err:
+                return {"errors": [err]}
 
     def assign_cog_over(self):
         """
@@ -245,7 +294,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.save()
             record_cog_assignment(self.report_id, self.submitted_by, cognizant_agency)
 
-    def _reject_late_changes(self):
+    def _throw_exception_if_late_changes(self):
         """
         This should only be called if status isn't STATUS.IN_PROGRESS.
         If there have been relevant changes, raise an AssertionError.
