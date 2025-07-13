@@ -1,4 +1,4 @@
-from .management.commands.identify_resubmission_linkages import generate_clusters
+from curation.curationlib.cluster_resubmitted_reports import generate_clusters
 from model_bakery import baker
 from django.test import TestCase
 from audit.models import SingleAuditChecklist
