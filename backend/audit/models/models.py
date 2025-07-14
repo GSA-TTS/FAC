@@ -323,7 +323,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES
     )
     resubmission_status = models.CharField(
-        default=STATUS.ORIGINAL_SUBMISSION, choices=RESUBMISSION_STATUS_CHOICES
+        default=None, choices=RESUBMISSION_STATUS_CHOICES, null=True,          
     )
     data_source = models.CharField(default="GSAFAC")
 
