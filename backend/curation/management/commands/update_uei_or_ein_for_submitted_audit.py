@@ -1,60 +1,27 @@
 from django.core.management.base import BaseCommand
 
-from audit.models import SingleAuditChecklist, User, SubmissionEvent
+from audit.models import SingleAuditChecklist
 import logging
-from curation.curationlib.curation_audit_tracking import CurationTracking
+from curation.curationlib.update_uei_or_ein import (
+    update_uei,
+    update_ein,
+    get_uei_to_update,
+    get_ein_to_update,
+)
+
 import sys
 from users.models import StaffUser
 from audit.validators import validate_uei
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.db import transaction
-from dissemination.models import (
-    AdditionalEin,
-    AdditionalUei,
-    CapText,
-    FederalAward,
-    Finding,
-    FindingText,
-    General,
-    Note,
-    Passthrough,
-    SecondaryAuditor,
-)
+import re
 
 logger = logging.getLogger(__name__)
 
 
-def get_named_models():
-    return {
-        "AdditionalEins": AdditionalEin,
-        "AdditionalUeis": AdditionalUei,
-        "CorrectiveActionPlan": CapText,
-        "FederalAwards": FederalAward,
-        "FindingsText": FindingText,
-        "FindingsUniformGuidance": Finding,
-        "NotesToSefa": Note,
-        "SecondaryAuditors": SecondaryAuditor,
-        "General": General,
-        "Passthrough": Passthrough,
-    }
-
-
-def get_named_parts(sac):
-    return {
-        "AdditionalEins": sac.additional_eins,
-        "AdditionalUeis": sac.additional_ueis,
-        "CorrectiveActionPlan": sac.corrective_action_plan,
-        "FederalAwards": sac.federal_awards,
-        "FindingsText": sac.findings_text,
-        "FindingsUniformGuidance": sac.findings_uniform_guidance,
-        "NotesToSefa": sac.notes_to_sefa,
-        "SecondaryAuditors": sac.secondary_auditors,
-    }
-
-
 def validate_inputs(options):
     # We have to check all of the options passed.
+    # Those checks need to be against the database.
 
     # Does the report id exist?
     try:
@@ -63,12 +30,20 @@ def validate_inputs(options):
         logger.error("report_id not found")
         ok_report_id = False
 
+    # And, did they provide a staff user email?
+    # (Note that they had to have privs in TF and be able to
+    # enable SSH inproduction in order to get here.)
+    try:
+        ok_staff_user = StaffUser.objects.get(staff_email=options["email"])
+    except StaffUser.DoesNotExist:
+        logger.error("staff user does not exist")
+        ok_staff_user = False
+
     # We either need a pair of UEIs, or a pair of EINs.
-    if "old_uei" in options and "new_uei" in options:
-        # Does the old UEI exist?
-        crit1 = Q(report_id=options["report_id"])
-        crit2 = Q(general_information__auditee_uei=options["old_uei"])
-        count = SingleAuditChecklist.objects.filter(crit1 & crit2).count()
+    # Do we have a pair of UEIs?
+    if options["old_uei"] is not None and options["new_uei"] is not None:
+        sac_q = get_uei_to_update(options)
+        count = sac_q.count()
         if count == 1:
             ok_old_uei = True
         else:
@@ -84,103 +59,28 @@ def validate_inputs(options):
         except ValidationError:
             logger.error("new_uei is not valid")
             ok_new_uei = False
-
-    elif "old_ein" in options and "new_ein" in options:
-        # Does the old UEI exist?
-        crit1 = Q(report_id=options["report_id"])
-        crit2 = Q(general_information__ein=options["old_ein"])
-        count = SingleAuditChecklist.objects.filter(crit1 & crit2).count()
+        return ok_report_id and (ok_old_uei and ok_new_uei) and ok_staff_user
+    # Do we have a pair of EINs?
+    elif options["old_ein"] is not None and options["new_ein"] is not None:
+        sac_q = get_ein_to_update(options)
+        count = sac_q.count()
         if count == 1:
-            ok_new_ein = True
+            ok_old_ein = re.match("[0-9]{9}", options["old_ein"])
         else:
             logger.error("old_ein not found for report_id")
-            ok_new_ein = False
+            ok_old_ein = False
 
-        # New UEI?
-        # Hm. The new UEI might not be in the database.
-        # We could validate against SAM here. For now, we'll make sure
-        # it is a valid-shaped UEI.
+        # All we can assert is an EIN is nine digits.
         try:
-            ok_new_uei = validate_uei(options["new_uei"])
+            ok_new_ein = re.match("[0-9]{9}", options["new_ein"])
         except ValidationError:
-            logger.error("new_uei is not valid")
-            ok_new_uei = False
+            logger.error("new_ein is not valid")
+            ok_new_ein = False
+        return ok_report_id and (ok_old_ein and ok_new_ein) and ok_staff_user
+    # Otherwise, let the user know this won't work.
     else:
         logger.error("You must provide either an old/new UEI or old/new EIN")
         return False
-
-    # And, did they provide a staff user email?
-    # (Note that they had to have privs in TF and be able to
-    # enable SSH inproduction in order to get here.)
-    try:
-        ok_staff_user = StaffUser.objects.get(staff_email=options["email"])
-    except StaffUser.DoesNotExist:
-        logger.error("staff user does not exist")
-        ok_staff_user = False
-
-    return ok_report_id and ok_old_uei and (ok_new_uei or ok_new_ein) and ok_staff_user
-
-
-def update_uei(options):
-    # If we get here, the parameters validated.
-    # Now we need to pull the SAC, update the record, and
-    # save the new UEI.
-    THE_NEW_UEI = options["new_uei"]
-
-    # Note that the UEI is not only in the general info, but
-    # also in every one of the workbooks. Too bad we stored it that way.
-    crit1 = Q(report_id=options["report_id"])
-    crit2 = Q(general_information__auditee_uei=options["old_uei"])
-    # We already validated that there will only be one object coming back.
-    sac = SingleAuditChecklist.objects.get(crit1 & crit2)
-    named_parts = get_named_parts(sac)
-
-    logger.info("Updating SAC: " + str(sac))
-    THE_USER_OBJ = User.objects.get(email=options["email"])
-
-    sac.general_information["auditee_uei"] = THE_NEW_UEI
-    for json_field, object in named_parts.items():
-        # We might not have this workbook.
-        if object:
-            # If we do have the workbook, we MUST have auditee_uei as a field.
-            if json_field in object:
-                object[json_field]["auditee_uei"] = THE_NEW_UEI
-            else:
-                logger.error("Could not find auditee_uei in XLSX JSON object")
-                sys.exit(-1)
-
-    with transaction.atomic():
-        sac.save(
-            administrative_override=True,
-            event_user=THE_USER_OBJ,
-            event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_UEI_REPLACEMENT,
-        )
-        sac.redisseminate()
-
-
-def update_ein(options):
-    # Now we need to pull the SAC, update the record, and
-    # save the new EIN.
-    THE_NEW_EIN = options["new_ein"]
-
-    # The EIN is only in the general info.
-    crit1 = Q(report_id=options["report_id"])
-    crit2 = Q(general_information__auditee_uei=options["old_ein"])
-    # We already validated that there will only be one object coming back.
-    sac = SingleAuditChecklist.objects.get(crit1 & crit2)
-
-    logger.info("Updating SAC: " + str(sac))
-    THE_USER_OBJ = User.objects.get(email=options["email"])
-
-    sac.general_information["auditee_ein"] = THE_NEW_EIN
-
-    with transaction.atomic():
-        sac.save(
-            administrative_override=True,
-            event_user=THE_USER_OBJ,
-            event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
-        )
-        sac.redisseminate()
 
 
 class Command(BaseCommand):
@@ -194,6 +94,9 @@ class Command(BaseCommand):
             help="Report id that we will modify",
         )
 
+        # Apparently I cannot build a mutex of groups?
+        # https://github.com/python/cpython/issues/101337
+        # So, I'll enforce the mutual exclusion in `validate_inputs`
         parser.add_argument(
             "--old_uei",
             type=str,
@@ -205,7 +108,6 @@ class Command(BaseCommand):
             help="The new UEI for this report",
         )
 
-        # FIX: group one or the other
         parser.add_argument(
             "--old_ein",
             type=str,
@@ -225,13 +127,13 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-
+        print(options)
         valid_inputs = validate_inputs(options)
         if not valid_inputs:
             logger.error("inputs were not valid")
             sys.exit(-1)
 
-        if "old_uei" in options and "new_uei" in options:
+        if options["old_uei"] is not None and options["new_uei"] is not None:
             update_uei(options)
-        elif "old_ein" in options and "new_ein" in options:
+        elif options["old_ein"] is not None and options["new_ein"] is not None:
             update_ein(options)

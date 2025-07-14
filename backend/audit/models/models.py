@@ -214,6 +214,9 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             # If we indicated we want to do an ovveride, we must provide
             # BOTH the user and type.
             if administrative_override and event_user and event_type:
+                logger.info(
+                    f"administrative_override: creating submission event for {event_user} as {event_type}"
+                )
                 self.create_submission_event(event_user, event_type)
             else:
                 self._throw_exception_if_late_changes()
@@ -262,14 +265,16 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         with transaction.atomic():
             try:
                 # Delete this record from the dissemination tables
-                for name, model in named_models:
+                for _, model in named_models.items():
                     rows = model.objects.filter(report_id=self.report_id)
                     rows.delete()
                 # Disseminate this record once more
                 self.disseminate()
             except TransactionManagementError as err:
+                logger.error(f"transaction management error in redissemination: {err}")
                 raise err
             except Exception as err:
+                logger.error(f"errors in redissemination: {err}")
                 return {"errors": [err]}
 
     def assign_cog_over(self):
