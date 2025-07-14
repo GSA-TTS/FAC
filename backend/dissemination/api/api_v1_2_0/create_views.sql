@@ -282,16 +282,16 @@ create view api_v1_2_0.general as
         coalesce(a.audit->>'cognizant_agency','') as cognizant_agency,
         coalesce(a.audit->>'oversight_agency','') as oversight_agency,
         -- dates
-        to_char(a.created_at AT TIME ZONE 'America/New_York', 'YYYY-MM-DD') as date_created,
-        (select to_char(updated_at AT TIME ZONE 'America/New_York', 'YYYY-MM-DD') from public.audit_history h
+        to_char(a.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') as date_created,
+        (select to_char(updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') from public.audit_history h
         where event = 'locked-for-certification'
         and h.report_id = a.report_id
         order by id desc limit 1) as ready_for_certification_date,
-        (select to_char(updated_at AT TIME ZONE 'America/New_York', 'YYYY-MM-DD') from public.audit_history h
+        (select to_char(updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') from public.audit_history h
         where event = 'auditor-certification-completed'
         and h.report_id = a.report_id
         order by id desc limit 1) as auditor_certified_date,        
-        (select to_char(updated_at AT TIME ZONE 'America/New_York', 'YYYY-MM-DD') from public.audit_history h
+        (select to_char(updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') from public.audit_history h
         where event = 'auditee-certification-completed'
         and h.report_id = a.report_id
         order by id desc limit 1) as auditee_certified_date,
