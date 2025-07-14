@@ -288,9 +288,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         (STATUS.CERTIFIED, "Certified"),
         (STATUS.SUBMITTED, "Submitted"),
         (STATUS.DISSEMINATED, "Disseminated"),
-        (STATUS.ORIGINAL_SUBMISSION, "Original Submission"),
-        (STATUS.MOST_RECENT, "Most Recent"),
-        (STATUS.DEPRECATED_VIA_RESUBMISSION, "Depracated via Resubmission"),
     )
 
     USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
@@ -319,11 +316,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     date_created = models.DateTimeField(auto_now_add=True)
     submission_status = models.CharField(
         default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES
-    )
-    resubmission_status = models.CharField(
-        default=None,
-        choices=STATUS_CHOICES,
-        null=True,
     )
     data_source = models.CharField(default="GSAFAC")
 
@@ -436,12 +428,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Resubmission Meta
     resubmission_meta = models.JSONField(
         blank=True, null=True, help_text="Resubmission JSON structure"
-    )
-
-    # Resubmission Version
-    resubmission_version = models.BigIntegerField(
-        default=0,
-        help_text="Version counter of how many times this SAC was resubmitted.",
     )
 
     def validate_full(self):
