@@ -288,8 +288,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         (STATUS.CERTIFIED, "Certified"),
         (STATUS.SUBMITTED, "Submitted"),
         (STATUS.DISSEMINATED, "Disseminated"),
-    )
-    RESUBMISSION_STATUS_CHOICES = (
         (STATUS.ORIGINAL_SUBMISSION, "Original Submission"),
         (STATUS.MOST_RECENT, "Most Recent"),
         (STATUS.DEPRECATED_VIA_RESUBMISSION, "Depracated via Resubmission"),
@@ -324,7 +322,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     )
     resubmission_status = models.CharField(
         default=None,
-        choices=RESUBMISSION_STATUS_CHOICES,
+        choices=STATUS_CHOICES,
         null=True,
     )
     data_source = models.CharField(default="GSAFAC")

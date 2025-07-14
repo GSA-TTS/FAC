@@ -25,6 +25,9 @@ class STATUS:
     SUBMITTED = "submitted"
     DISSEMINATED = "disseminated"
     FLAGGED_FOR_REMOVAL = "flagged_for_removal"
+    ORIGINAL_SUBMISSION = "Original Submission"
+    MOST_RECENT = "Most Recent"
+    DEPRECATED_VIA_RESUBMISSION = "Depracated via Resubmission"
 
 
 STATUS_CHOICES = (
@@ -36,6 +39,9 @@ STATUS_CHOICES = (
     (STATUS.CERTIFIED, "Certified"),
     (STATUS.SUBMITTED, "Submitted"),
     (STATUS.DISSEMINATED, "Disseminated"),
+    (STATUS.ORIGINAL_SUBMISSION, "Original Submission"),
+    (STATUS.MOST_RECENT, "Most Recent"),
+    (STATUS.DEPRECATED_VIA_RESUBMISSION, "Depracated via Resubmission"),
 )
 
 
