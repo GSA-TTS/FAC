@@ -425,6 +425,27 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         default=False,
     )
 
+    # Resubmission Meta
+    resubmission_meta = models.JSONField(
+        blank=True,
+        null=True,
+        help_text="Resubmission JSON structure"
+    )
+
+    # Resubmission Status
+    resubmission_status = models.CharField(
+        max_length=30,
+        blank=True,
+        null=True,
+        help_text="Current status of the resubmission (e.g. ORIGINAL_SUBMISSION, MOST_RECENT, DEPRECATED_VIA_RESUBMISSION)."
+    )
+
+    # Resubmission Version
+    resubmission_version = models.BigIntegerField(
+        default=0,
+        help_text="Version counter of how many times this SAC was resubmitted."
+    )
+
     def validate_full(self):
         """
         Full validation, intended for use when the user indicates that the
