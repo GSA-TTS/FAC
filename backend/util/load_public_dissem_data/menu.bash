@@ -4,7 +4,6 @@ DATABASE=postgres
 USERNAME=postgres
 HOST=localhost
 PORT=5432
-FINISHED_FILENAME=${FINISHED_FILENAME:-data/internal-and-external-20250402.dump}
 RAW_FILENAME=${RAW_FILENAME:-data/sac-user-access-valwaiver-pdf-xlsx-event-data-03-28-25.dump}
 DATE=$(date '+%Y%m%d')
 
@@ -70,7 +69,7 @@ EOF
 }
 
 ############################################################
-# load_raw_data
+# reset_migrated_to_audit
 ############################################################
 reset_migrated_to_audit () {
 
@@ -138,8 +137,14 @@ load_raw_data () {
 # load_finished_data
 ############################################################
 load_finished_data () {
-  echo "Loading ${FINISHED_FILENAME}"
-  cat ${FINISHED_FILENAME} | \
+  read -p "Enter the finished file (default: data/internal-and-external-20250402.dump): " finished_filename
+  if [ -z "$finished_filename" ]; then
+    finished_filename="data/internal-and-external-20250402.dump"
+  fi
+
+  echo "Loading ${finished_filename}"
+  
+  cat ${finished_filename} | \
     grep -v "transaction_timeout" | \
     psql \
 		-d ${DATABASE} \
@@ -271,20 +276,29 @@ check_all_row_counts () {
 # dump_for_reuse
 ############################################################
 dump_for_reuse () {
-  DUMPFILE=internal-and-external-${DATE}.dump
+  default_dumpfile=data/internal-and-external-${DATE}.dump
 
-  rm -f ${DUMPFILE}
+  read -p "Enter the finished file (default: $default_dumpfile): " dumpfile
+  if [ -z "$dumpfile" ]; then
+    echo "Using default dump file: $default_dumpfile"
+    dumpfile=$default_dumpfile
+  fi
+
+  echo "Dumping data to ${dumpfile}"
+
+  rm -f "${dumpfile}"
 
   pg_dump \
   -a \
   -F p \
-  -f ${DUMPFILE} \
+  -f "${dumpfile}" \
   -d postgres \
   -h localhost \
   -p 5432 \
   -U postgres \
   -w \
   -t audit_singleauditchecklist \
+  -t audit_audit \
   -t audit_access \
   -t auth_user \
   -t dissemination_additionalein \
