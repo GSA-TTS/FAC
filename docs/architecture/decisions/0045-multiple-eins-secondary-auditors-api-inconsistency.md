@@ -34,48 +34,54 @@ To get this inconsistency, the user selected "No" _after_ uploading the relevant
 
 Validations were introduced to block submissions with conflicting data. This validation already existed for `multiple_ueis_covered`, which is why it is the only of the three "Yes/No" questions to have no issues. 
 
+Issue to validate Multiple EINs: https://github.com/GSA-TTS/FAC/issues/5049
+Issue to validate Secondary Auditors: https://github.com/GSA-TTS/FAC/issues/5050
+PR to introduce validations: https://github.com/GSA-TTS/FAC/pull/5056
+
 ### A curation action must fix old records.
 
 For a `secondary_auditors_exist` value of False, these records have rows in `dissemination_secondaryauditor`:
 
-report_id                   acceptance_date
-2023-12-GSAFAC-0000037438	2024-04-11
-2023-06-GSAFAC-0000001071	2023-11-12
-2023-09-GSAFAC-0000010054	2024-01-03
-2023-06-GSAFAC-0000001127	2023-11-14
-2022-12-GSAFAC-0000013563	2024-01-16
-2023-06-GSAFAC-0000014239	2024-02-05
-2022-06-GSAFAC-0000000725	2024-02-15
-2023-12-GSAFAC-0000036995	2024-04-10
-2023-06-GSAFAC-0000033008	2024-04-01
-2023-06-GSAFAC-0000001201	2024-04-29
-2023-06-GSAFAC-0000030357	2024-03-28
-2023-12-GSAFAC-0000036850	2024-04-10
-2023-12-GSAFAC-0000036947	2024-04-10
-2023-12-GSAFAC-0000036990	2024-04-10
-2023-12-GSAFAC-0000036992	2024-04-10
-2023-06-GSAFAC-0000001188	2024-05-30
-2023-06-GSAFAC-0000001225	2024-05-30
+| report_id                     | acceptance_date |
+| ----------------------------- | --------------- |
+| 2023-12-GSAFAC-0000037438	    | 2024-04-11      |
+| 2023-06-GSAFAC-0000001071	    | 2023-11-12      |
+| 2023-09-GSAFAC-0000010054	    | 2024-01-03      |
+| 2023-06-GSAFAC-0000001127	    | 2023-11-14      |
+| 2022-12-GSAFAC-0000013563	    | 2024-01-16      |
+| 2023-06-GSAFAC-0000014239	    | 2024-02-05      |
+| 2022-06-GSAFAC-0000000725	    | 2024-02-15      |
+| 2023-12-GSAFAC-0000036995	    | 2024-04-10      |
+| 2023-06-GSAFAC-0000033008	    | 2024-04-01      |
+| 2023-06-GSAFAC-0000001201	    | 2024-04-29      |
+| 2023-06-GSAFAC-0000030357	    | 2024-03-28      |
+| 2023-12-GSAFAC-0000036850	    | 2024-04-10      |
+| 2023-12-GSAFAC-0000036947	    | 2024-04-10      |
+| 2023-12-GSAFAC-0000036990	    | 2024-04-10      |
+| 2023-12-GSAFAC-0000036992	    | 2024-04-10      |
+| 2023-06-GSAFAC-0000001188	    | 2024-05-30      |
+| 2023-06-GSAFAC-0000001225	    | 2024-05-30      |
 
 
 For a `multiple_eins_covered` value of False, these records have rows in `dissemination_additionalein`:
 
-report_id                   acceptance_date
-2023-06-GSAFAC-0000011123	2023-12-21
-2023-06-GSAFAC-0000019237	2024-02-27
-2024-06-GSAFAC-0000010871	2023-12-14
-2023-06-GSAFAC-0000017475	2024-03-12
-2023-03-GSAFAC-0000015691	2024-01-02
-2023-06-GSAFAC-0000002637	2024-01-22
-2021-05-GSAFAC-0000000970	2024-02-22
-2023-09-GSAFAC-0000005934	2024-02-20
-2023-06-GSAFAC-0000006347	2024-03-12
-2023-06-GSAFAC-0000031380	2024-03-28
-2023-06-GSAFAC-0000018003	2024-01-11
-2023-12-GSAFAC-0000035082	2024-04-10
-2023-06-GSAFAC-0000032873	2024-03-28
-2023-06-GSAFAC-0000025518	2024-02-21
-2022-06-GSAFAC-0000054181	2024-09-04
+| report_id                     | acceptance_date |
+| ----------------------------- | --------------- |
+| 2023-06-GSAFAC-0000011123	    | 2023-12-21      |
+| 2023-06-GSAFAC-0000019237	    | 2024-02-27      |
+| 2024-06-GSAFAC-0000010871	    | 2023-12-14      |
+| 2023-06-GSAFAC-0000017475	    | 2024-03-12      |
+| 2023-03-GSAFAC-0000015691	    | 2024-01-02      |
+| 2023-06-GSAFAC-0000002637	    | 2024-01-22      |
+| 2021-05-GSAFAC-0000000970	    | 2024-02-22      |
+| 2023-09-GSAFAC-0000005934	    | 2024-02-20      |
+| 2023-06-GSAFAC-0000006347	    | 2024-03-12      |
+| 2023-06-GSAFAC-0000031380	    | 2024-03-28      |
+| 2023-06-GSAFAC-0000018003	    | 2024-01-11      |
+| 2023-12-GSAFAC-0000035082	    | 2024-04-10      |
+| 2023-06-GSAFAC-0000032873	    | 2024-03-28      |
+| 2023-06-GSAFAC-0000025518	    | 2024-02-21      |
+| 2022-06-GSAFAC-0000054181	    | 2024-09-04      |
 
 
 ## Consequences
