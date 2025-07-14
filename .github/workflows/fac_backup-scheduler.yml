@@ -15,7 +15,7 @@ jobs:
           - name: dev
           - name: staging
           - name: production
-    uses: ./.github/workflows/fac-backup-util-scheduled.yml
+    uses: ./.github/workflows/fac_backup-util-scheduled.yml
     secrets: inherit
     with:
       environment: ${{ matrix.environment.name }}

@@ -8,7 +8,7 @@ on:
 
 jobs:
   trivy-scan:
-    uses: ./.github/workflows/trivy.yml
+    uses: ./.github/workflows/scanning-trivy.yml
     secrets: inherit
     permissions:
       contents: read
@@ -19,7 +19,7 @@ jobs:
   build-container:
     needs:
       - trivy-scan
-    uses: ./.github/workflows/build-docker-container.yml
+    uses: ./.github/workflows/containers-build-fac-container.yml
     secrets: inherit
     permissions:
       contents: read
@@ -38,12 +38,12 @@ jobs:
     secrets: inherit
 
   linting:
-    uses: ./.github/workflows/linting.yml
+    uses: ./.github/workflows/pull_request-linting.yml
     secrets: inherit
 
   create-pr:
     needs:
       - testing
     name: Create Pull Request to Staging
-    uses: ./.github/workflows/create-pull-request-to-staging.yml
+    uses: ./.github/workflows/pull_request-to-staging.yml
     secrets: inherit
