@@ -11,7 +11,7 @@ jobs:
   #   secrets: inherit
 
   linting:
-    uses: ./.github/workflows/linting.yml
+    uses: ./.github/workflows/pull_request-linting.yml
     secrets: inherit
 
   deploy-infrastructure-production:
@@ -28,7 +28,7 @@ jobs:
     name: Record deployment to New Relic
     needs:
       - deploy-infrastructure-production
-    uses: ./.github/workflows/new-relic-deployment.yml
+    uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
     with:
       environment: "production"
     secrets: inherit
@@ -46,6 +46,6 @@ jobs:
     name: Zap Scan
     needs:
       - deploy-production
-    uses: ./.github/workflows/zap-scan.yml
+    uses: ./.github/workflows/scanning-zap-scan.yml
     with:
       url: "https://app.fac.gov/"

@@ -128,7 +128,7 @@ jobs:
 
   check-tables:
     needs: [push-with-creds]
-    uses: ./.github/workflows/fac-check-tables.yml
+    uses: ./.github/workflows/fac_backup-check-tables.yml
     secrets: inherit
     with:
       environment: ${{ inputs.environment }}

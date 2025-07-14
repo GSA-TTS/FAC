@@ -271,7 +271,7 @@ Detailed below is a reference to, with a description of, each of our various com
 **Ops:**
 * [Auto Merge Staging PR](../.github/workflows/auto-merge-staging-pr.yml)
     * This works in parallel with [Create PR to Staging](../.github/workflows/create-pull-request-to-staging.yml) as a means to automate staging merges. This approves the PR with a PAT.
-* [Build Docker Container](../.github/workflows/build-docker-container.yml)
+* [Build Docker Container](../.github/workflows/containers-build-fac-container.yml)
     * This workflow does a `docker build` on our system, much like if you were performing this locally, gives the container a tag, and then pushes it to GHCR.
 * [Create PR to Staging](../.github/workflows/create-pull-request-to-staging.yml)
     * This checks to see if there has been a commit in 24 hours, and if so, creates a pull request, tags it, and then approves it with the Github secret access token [GITHUB_TOKEN](https://docs.github.com/en/enterprise-server@3.16/actions/security-for-github-actions/security-guides/automatic-token-authentication#about-the-github_token-secret).
@@ -283,25 +283,25 @@ Detailed below is a reference to, with a description of, each of our various com
     * Used to create a terraform plan on pull requests to illustrate what operations will be performed when merging to a specific environment, impacting changes on the infrastructure.
 * [Terraform Apply](../.github/workflows/terraform-apply-env.yml)
     * Used to run a terraform app on merge events to execute the operations generated in a pull requests plan to a specific environment, impacting changes on the infrastructure.
-* [Trivy](../.github/workflows/trivy.yml)
+* [Trivy](../.github/workflows/scanning-trivy.yml)
     * Runs [Aquasecurity's Trivy](https://github.com/aquasecurity/trivy) against our containers.
-* [Trivy Cache Updater](../.github/workflows/trivy-cache.yml)
+* [Trivy Cache Updater](../.github/workflows/scanning-rebuild-trivy-cache.yml)
     * Rebuilds the vulnerability database for Trivy and stores in the Github Cache
-* [ZAP](../.github/workflows/zap-scan.yml)
+* [ZAP](../.github/workflows/scanning-zap-scan.yml)
     * Crawls a live environment with [ZAP](https://www.zaproxy.org/) using our [configuration](../zap.conf).
 
 **Testing:**
-* [Cypress Test (Container)](../.github/workflows/cypress-testing-from-container.yml)
+* [Cypress Test (Container)](../.github/workflows/testing-cypress-container.yml)
     * This sets up everything necessary for cypress to run in a headless environment, on a github runner that enables it to run as a pull request check.
-* [Cypress](../.github/workflows/regression-tests.yml)
+* [Cypress](../.github/workflows/testing-cypress-regression-tests.yml)
     * This file handles all non-container run tests using Cypress against a live environment.
-* [Daily Regressions Tests](../.github/workflows/daily-regression-tests.yml)
+* [Daily Regressions Tests](../.github/workflows/testing-daily-regression.yml)
     * A lightweight cron and caller file that invokes a regression test run on `staging` daily.
-* [Lint](../.github/workflows/linting.yml)
+* [Lint](../.github/workflows/pull_request-linting.yml)
     * Used to perform linting across the board for main application code and fail if necessary, preventing a merge/deploy if there are errors.
 * [Lint (Terraform)](../.github/workflows/terraform-lint.yml)
     * Used to perform linting on terraform specific files.
-* [Pull Request Checks](../.github/workflows/pull-request-checks.yml)
+* [Pull Request Checks](../.github/workflows/pull_request-checks.yml)
     * All logic used to perform tests and ensure that a pending pull request can be eligable to merge into a branch.
 * [Testing From Build](../.github/workflows/testing-from-build.yml)
     * Runs the test suite on a built docker container. Used when there are changes to core dependencies (`requirements.txt`, `dev-requirements.txt`, `Dockerfile`, `package.json` and `static files`).
@@ -313,7 +313,7 @@ Detailed below is a reference to, with a description of, each of our various com
     * This workflow is the basis for deploying an application to any environement, starting by setting up all necessary dependencies and then deploying to cloud.gov. It is called by multiple files, based on the environment that is set to deploy.
 * [Deploy Development](../.github/workflows/deploy-development.yml), [Deploy Preview](../.github/workflows/deploy-preview.yml), [Deploy Staging](../.github/workflows/deploy-staging.yml) and [Deploy Production](../.github/workflows/deploy-production.yml)
     * The main caller files that describe the steps necessary for a workflow run to deploy a specific environment. Only small changes differ between these files.
-* [Record Deployment on New Relic](../.github/workflows/new-relic-deployment.yml)
+* [Record Deployment on New Relic](../.github/workflows/deploy-record-newrelic-deployment.yml)
     * Creates a "marker" on the New Relic activity chart, accessible via the New Relic application, to signify that a deployment has occured.
 * [Staging Scheduled Deployment](../.github/workflows/staging-scheduled-deploy.yml)
     * Necessary steps to ensure code from main(dev) is eligable to move to the prod(staging) environment.
