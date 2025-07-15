@@ -1,5 +1,6 @@
 from audit.models import SingleAuditChecklist, User, SubmissionEvent
 from audit.models.viewflow import SingleAuditChecklistFlow
+from curation.curationlib.curation_audit_tracking import CurationTracking
 
 import logging
 import sys
@@ -86,14 +87,16 @@ def get_ein_to_update(options):
 
 
 def update_db(sac, THE_USER_OBJ, event_type):
-    flow = SingleAuditChecklistFlow(sac)
-    flow.transition_via_redissemination()
-    sac.save(
-        administrative_override=True,
-        event_user=THE_USER_OBJ,
-        event_type=event_type,
-    )
-    sac.redisseminate()
+    with transaction.atomic():
+        with CurationTracking():
+            flow = SingleAuditChecklistFlow(sac)
+            flow.transition_via_redissemination()
+            sac.save(
+                administrative_override=True,
+                event_user=THE_USER_OBJ,
+                event_type=event_type,
+            )
+            sac.redisseminate()
 
 
 def update_uei(options):
@@ -117,16 +120,12 @@ def update_uei(options):
                 logger.error("Could not find auditee_uei in XLSX JSON object")
                 sys.exit(-1)
 
-    with transaction.atomic():
-        logger.info("Updating UEI for SAC: " + str(sac))
-        update_db(
-            sac,
-            THE_USER_OBJ,
-            SubmissionEvent.EventType.FAC_ADMINISTRATIVE_UEI_REPLACEMENT,
-        )
-        return True
-
-    return False
+    logger.info("Updating UEI for SAC: " + str(sac))
+    update_db(
+        sac,
+        THE_USER_OBJ,
+        SubmissionEvent.EventType.FAC_ADMINISTRATIVE_UEI_REPLACEMENT,
+    )
 
 
 def update_ein(options):
@@ -142,12 +141,9 @@ def update_ein(options):
 
     sac.general_information["ein"] = THE_NEW_EIN
 
-    with transaction.atomic():
-        logger.info("Updating EIN for SAC: " + str(sac))
-        update_db(
-            sac,
-            THE_USER_OBJ,
-            SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
-        )
-        return True
-    return False
+    logger.info("Updating EIN for SAC: " + str(sac))
+    update_db(
+        sac,
+        THE_USER_OBJ,
+        SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
+    )
