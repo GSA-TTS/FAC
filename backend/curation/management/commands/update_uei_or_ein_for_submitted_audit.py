@@ -14,13 +14,12 @@ import sys
 from users.models import StaffUser
 from audit.validators import validate_uei
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 import re
 
 logger = logging.getLogger(__name__)
 
 
-def validate_uei(options):
+def validate_uei_options(options):
     try:
         # We use a .get(), which will fail if there is more than one.
         _ = get_uei_to_update(options)
@@ -41,7 +40,7 @@ def validate_uei(options):
     return ok_old_uei, ok_new_uei
 
 
-def validate_ein(options):
+def validate_ein_options(options):
     try:
         _ = get_ein_to_update(options)
         ok_old_ein = re.match("[0-9]{9}", options["old_ein"])
@@ -75,10 +74,10 @@ def validate_inputs(options):
         ok_report_id = False
 
     # Is it disseminated?
-    # is_disseminated = check_report_disseminated(options)
-    # if not is_disseminated:
-    #     logger.error(f"The report {options['report_id']} is not disseminated. Exiting.")
-    #     return False
+    is_disseminated = check_report_disseminated(options)
+    if not is_disseminated:
+        logger.error(f"The report {options['report_id']} is not disseminated. Exiting.")
+        return False
 
     # And, did they provide a staff user email?
     # (Note that they had to have privs in TF and be able to
@@ -92,12 +91,12 @@ def validate_inputs(options):
     # We either need a pair of UEIs, or a pair of EINs.
     # Do we have a pair of UEIs?
     if options["old_uei"] is not None and options["new_uei"] is not None:
-        ok_old_uei, ok_new_uei = validate_uei(options)
+        ok_old_uei, ok_new_uei = validate_uei_options(options)
         return ok_report_id and (ok_old_uei and ok_new_uei) and ok_staff_user
 
     # Do we have a pair of EINs?
     elif options["old_ein"] is not None and options["new_ein"] is not None:
-        ok_old_ein, ok_new_ein = validate_ein(options)
+        ok_old_ein, ok_new_ein = validate_ein_options(options)
         return ok_report_id and (ok_old_ein and ok_new_ein) and ok_staff_user
     # Did we mix-and-match between EIN and UEI?
     elif options["old_ein"] is not None and options["new_uei"] is not None:

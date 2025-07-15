@@ -259,7 +259,7 @@ class EINReplacementTests(TestCase):
         try:
             update_uei(options)
             result = "succeeded"
-        except:
+        except:  # noqa: E722
             result = "failed"
         # We expect this to fail. The validation code will normally catch this.
         # It should fail to work on an audit that is not yet disseminated.

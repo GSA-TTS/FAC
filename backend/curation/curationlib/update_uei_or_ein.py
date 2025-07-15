@@ -59,7 +59,7 @@ def check_report_disseminated(options):
     try:
         _ = SingleAuditChecklist.objects.get(crit1 & crit3)
         return True
-    except:
+    except:  # noqa: E722
         return False
 
 
