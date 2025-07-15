@@ -1,6 +1,6 @@
-from django.core.management.base import BaseCommand
-
 from audit.models import SingleAuditChecklist, User, SubmissionEvent
+from audit.models.viewflow import SingleAuditChecklistFlow
+
 import logging
 import sys
 from django.db.models import Q
@@ -85,6 +85,17 @@ def get_ein_to_update(options):
     return sac
 
 
+def update_db(sac, THE_USER_OBJ, event_type):
+    flow = SingleAuditChecklistFlow(sac)
+    flow.transition_via_redissemination()
+    sac.save(
+        administrative_override=True,
+        event_user=THE_USER_OBJ,
+        event_type=event_type,
+    )
+    sac.redisseminate()
+
+
 def update_uei(options):
     # If we get here, the parameters validated.
     # Now we need to pull the SAC, update the record, and
@@ -108,12 +119,11 @@ def update_uei(options):
 
     with transaction.atomic():
         logger.info("Updating UEI for SAC: " + str(sac))
-        sac.save(
-            administrative_override=True,
-            event_user=THE_USER_OBJ,
-            event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_UEI_REPLACEMENT,
+        update_db(
+            sac,
+            THE_USER_OBJ,
+            SubmissionEvent.EventType.FAC_ADMINISTRATIVE_UEI_REPLACEMENT,
         )
-        sac.redisseminate()
         return True
 
     return False
@@ -134,11 +144,10 @@ def update_ein(options):
 
     with transaction.atomic():
         logger.info("Updating EIN for SAC: " + str(sac))
-        sac.save(
-            administrative_override=True,
-            event_user=THE_USER_OBJ,
-            event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
+        update_db(
+            sac,
+            THE_USER_OBJ,
+            SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
         )
-        sac.redisseminate()
         return True
     return False

@@ -263,6 +263,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             "Passthrough": Passthrough,
         }
         with transaction.atomic():
+            # FIXME: This needs to be in the DISSEMINATED state in order
+            # to be redisseminated. Check that here.
             try:
                 # Delete this record from the dissemination tables
                 for _, model in named_models.items():
