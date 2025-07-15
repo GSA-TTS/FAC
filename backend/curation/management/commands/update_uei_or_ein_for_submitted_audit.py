@@ -25,8 +25,9 @@ def validate_uei(options):
         # We use a .get(), which will fail if there is more than one.
         _ = get_uei_to_update(options)
         ok_old_uei = True
-    except:
-        logger.error("old_uei not found for report_id")
+    except Exception as e:
+        logger.error(e)
+        logger.error(f"could not fetch report_id {options['report_id']}")
         ok_old_uei = False
     # New UEI?
     # Hm. The new UEI might not be in the database.
@@ -46,8 +47,9 @@ def validate_ein(options):
         ok_old_ein = re.match("[0-9]{9}", options["old_ein"])
         if not ok_old_ein:
             logger.error(f"The EIN {options['old_ein']} is not nine digits.")
-    except:
-        logger.error("old_ein not found for report_id")
+    except Exception as e:
+        logger.error(e)
+        logger.error(f"could not fetch {options['report_id']}")
         ok_old_ein = False
 
     # All we can assert is an EIN is nine digits.
@@ -73,10 +75,10 @@ def validate_inputs(options):
         ok_report_id = False
 
     # Is it disseminated?
-    is_disseminated = check_report_disseminated(options)
-    if not is_disseminated:
-        logger.error(f"The report {options['report_id']} is not disseminated. Exiting.")
-        return False
+    # is_disseminated = check_report_disseminated(options)
+    # if not is_disseminated:
+    #     logger.error(f"The report {options['report_id']} is not disseminated. Exiting.")
+    #     return False
 
     # And, did they provide a staff user email?
     # (Note that they had to have privs in TF and be able to

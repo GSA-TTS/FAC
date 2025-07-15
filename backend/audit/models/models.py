@@ -1,6 +1,7 @@
 from itertools import chain
 import json
 import logging
+from datetime import datetime, timezone
 
 from django.db import models
 from django.db.transaction import TransactionManagementError
@@ -263,8 +264,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             "Passthrough": Passthrough,
         }
         with transaction.atomic():
-            # FIXME: This needs to be in the DISSEMINATED state in order
+            # This needs to be in the DISSEMINATED state in order
             # to be redisseminated. Check that here.
+            if not self.submission_status == STATUS.DISSEMINATED:
+                logger.error("Trying to resubmit an audit that is not disseminated.")
+                raise LateChangeError
             try:
                 # Delete this record from the dissemination tables
                 for _, model in named_models.items():
