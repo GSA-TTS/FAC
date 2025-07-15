@@ -7,6 +7,7 @@ from curation.curationlib.update_uei_or_ein import (
     update_ein,
     get_uei_to_update,
     get_ein_to_update,
+    check_report_disseminated,
 )
 
 import sys
@@ -17,6 +18,47 @@ from django.db.models import Q
 import re
 
 logger = logging.getLogger(__name__)
+
+
+def validate_uei(options):
+    try:
+        # We use a .get(), which will fail if there is more than one.
+        _ = get_uei_to_update(options)
+        ok_old_uei = True
+    except:
+        logger.error("old_uei not found for report_id")
+        ok_old_uei = False
+    # New UEI?
+    # Hm. The new UEI might not be in the database.
+    # We could validate against SAM here. For now, we'll make sure
+    # it is a valid-shaped UEI.
+    try:
+        ok_new_uei = validate_uei(options["new_uei"])
+    except ValidationError:
+        logger.error("new_uei is not valid")
+        ok_new_uei = False
+    return ok_old_uei, ok_new_uei
+
+
+def validate_ein(options):
+    try:
+        _ = get_ein_to_update(options)
+        ok_old_ein = re.match("[0-9]{9}", options["old_ein"])
+        if not ok_old_ein:
+            logger.error(f"The EIN {options['old_ein']} is not nine digits.")
+    except:
+        logger.error("old_ein not found for report_id")
+        ok_old_ein = False
+
+    # All we can assert is an EIN is nine digits.
+    try:
+        ok_new_ein = re.match("[0-9]{9}", options["new_ein"])
+        if not ok_new_ein:
+            logger.error(f"The EIN {options['new_ein']} is not nine digits.")
+    except ValidationError:
+        logger.error("new_ein is not valid")
+        ok_new_ein = False
+    return ok_old_ein, ok_new_ein
 
 
 def validate_inputs(options):
@@ -30,6 +72,12 @@ def validate_inputs(options):
         logger.error("report_id not found")
         ok_report_id = False
 
+    # Is it disseminated?
+    is_disseminated = check_report_disseminated(options)
+    if not is_disseminated:
+        logger.error(f"The report {options['report_id']} is not disseminated. Exiting.")
+        return False
+
     # And, did they provide a staff user email?
     # (Note that they had to have privs in TF and be able to
     # enable SSH inproduction in order to get here.)
@@ -42,41 +90,21 @@ def validate_inputs(options):
     # We either need a pair of UEIs, or a pair of EINs.
     # Do we have a pair of UEIs?
     if options["old_uei"] is not None and options["new_uei"] is not None:
-        sac_q = get_uei_to_update(options)
-        count = sac_q.count()
-        if count == 1:
-            ok_old_uei = True
-        else:
-            logger.error("old_uei not found for report_id")
-            ok_old_uei = False
-
-        # New UEI?
-        # Hm. The new UEI might not be in the database.
-        # We could validate against SAM here. For now, we'll make sure
-        # it is a valid-shaped UEI.
-        try:
-            ok_new_uei = validate_uei(options["new_uei"])
-        except ValidationError:
-            logger.error("new_uei is not valid")
-            ok_new_uei = False
+        ok_old_uei, ok_new_uei = validate_uei(options)
         return ok_report_id and (ok_old_uei and ok_new_uei) and ok_staff_user
+
     # Do we have a pair of EINs?
     elif options["old_ein"] is not None and options["new_ein"] is not None:
-        sac_q = get_ein_to_update(options)
-        count = sac_q.count()
-        if count == 1:
-            ok_old_ein = re.match("[0-9]{9}", options["old_ein"])
-        else:
-            logger.error("old_ein not found for report_id")
-            ok_old_ein = False
-
-        # All we can assert is an EIN is nine digits.
-        try:
-            ok_new_ein = re.match("[0-9]{9}", options["new_ein"])
-        except ValidationError:
-            logger.error("new_ein is not valid")
-            ok_new_ein = False
+        ok_old_ein, ok_new_ein = validate_ein(options)
         return ok_report_id and (ok_old_ein and ok_new_ein) and ok_staff_user
+    # Did we mix-and-match between EIN and UEI?
+    elif options["old_ein"] is not None and options["new_uei"] is not None:
+        logger.error("You provided an old EIN and new UEI. Exiting.")
+        return False
+    # or the other way around?
+    elif options["old_uei"] is not None and options["new_ein"] is not None:
+        logger.error("You provided an old UEI and new EIN. Exiting.")
+        return False
     # Otherwise, let the user know this won't work.
     else:
         logger.error("You must provide either an old/new UEI or old/new EIN")

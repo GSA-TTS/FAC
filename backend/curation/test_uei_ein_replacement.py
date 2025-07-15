@@ -194,3 +194,73 @@ class EINReplacementTests(TestCase):
         # was not updated. This makes sure we only update by report ID.
         sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000002")
         self.assertEqual(sac.general_information["ein"], ORIG_EIN)
+
+    def test_change_uei_then_ein_same_record(self):
+        user = baker.make(User)
+        user.email = "test@fac.gsa.gov"
+        user.save()
+
+        # Test on a single audit.
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+        )
+
+        options = dict()
+        options["report_id"] = "2022-42-MAGIC-0000000001"
+        options["old_uei"] = ORIG_UEI
+        options["new_uei"] = NEW_UEI
+        options["email"] = user.email
+
+        update_uei(options)
+        # Make sure the first audit changed
+        sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
+        # This record should have a new UEI
+        self.assertEqual(sac.general_information["auditee_uei"], NEW_UEI)
+        # It should not have the old UEI (redundant)
+        self.assertNotEqual(sac.general_information["auditee_uei"], ORIG_UEI)
+
+        options = dict()
+        options["report_id"] = "2022-42-MAGIC-0000000001"
+        options["old_ein"] = ORIG_EIN
+        options["new_ein"] = NEW_EIN
+        options["email"] = user.email
+
+        update_ein(options)
+        # Make sure the first audit changed
+        sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
+        # This record should have a new EIN
+        self.assertEqual(sac.general_information["ein"], NEW_EIN)
+        # It should not have the old EIN (redundant)
+        self.assertNotEqual(sac.general_information["ein"], ORIG_EIN)
+
+    def test_fail_on_non_dissminated_report(self):
+
+        # Test on a single audit.
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status="in_progress",
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+        )
+
+        options = dict()
+        options["report_id"] = "2022-42-MAGIC-0000000001"
+        options["old_uei"] = ORIG_UEI
+        options["new_uei"] = NEW_UEI
+        options["email"] = "does not matter"
+
+        try:
+            update_uei(options)
+            result = "succeeded"
+        except:
+            result = "failed"
+        # We expect this to fail. The validation code will normally catch this.
+        # It should fail to work on an audit that is not yet disseminated.
+        self.assertEqual("failed", result)

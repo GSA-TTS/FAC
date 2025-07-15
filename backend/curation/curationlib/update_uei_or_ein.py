@@ -53,15 +53,26 @@ def get_named_parts_containing_ueis(sac):
     }
 
 
+def check_report_disseminated(options):
+    crit1 = Q(report_id=options["report_id"])
+    crit3 = Q(submission_status="disseminated")
+    try:
+        _ = SingleAuditChecklist.objects.get(crit1 & crit3)
+        return True
+    except:
+        return False
+
+
 # options hash -> Django queryset
 def get_uei_to_update(options):
     # Note that the UEI is not only in the general info, but
     # also in every one of the workbooks. Too bad we stored it that way.
     crit1 = Q(report_id=options["report_id"])
     crit2 = Q(general_information__auditee_uei=options["old_uei"])
+    crit3 = Q(submission_status="disseminated")
     # We already validated that there will only be one object coming back.
-    sac_q = SingleAuditChecklist.objects.get(crit1 & crit2)
-    return sac_q
+    sac = SingleAuditChecklist.objects.get(crit1 & crit2 & crit3)
+    return sac
 
 
 # options hash -> Django queryset
@@ -69,8 +80,9 @@ def get_ein_to_update(options):
     # Does the old EIN exist?
     crit1 = Q(report_id=options["report_id"])
     crit2 = Q(general_information__ein=options["old_ein"])
-    sac_q = SingleAuditChecklist.objects.filter(crit1 & crit2)
-    return sac_q
+    crit3 = Q(submission_status="disseminated")
+    sac = SingleAuditChecklist.objects.get(crit1 & crit2 & crit3)
+    return sac
 
 
 def update_uei(options):
@@ -102,10 +114,13 @@ def update_uei(options):
             event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_UEI_REPLACEMENT,
         )
         sac.redisseminate()
+        return True
+
+    return False
 
 
 def update_ein(options):
-    print("NEW_EIN", options)
+    # print("NEW_EIN", options)
     # Now we need to pull the SAC, update the record, and
     # save the new EIN.
     THE_NEW_EIN = options["new_ein"]
@@ -125,3 +140,5 @@ def update_ein(options):
             event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
         )
         sac.redisseminate()
+        return True
+    return False
