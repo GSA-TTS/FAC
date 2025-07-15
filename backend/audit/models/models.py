@@ -490,6 +490,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         default=False,
     )
 
+    # Resubmission Meta
+    resubmission_meta = models.JSONField(
+        blank=True, null=True, help_text="Resubmission JSON structure"
+    )
+
     def validate_full(self):
         """
         Full validation, intended for use when the user indicates that the

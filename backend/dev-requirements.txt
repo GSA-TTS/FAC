@@ -640,3 +640,5 @@ setuptools==75.2.0 \
     # via
     #   -c ./requirements/../requirements.txt
     #   pip-tools
+sling-mac-arm64==1.4.2 \
+    --hash=sha256:8f3f072f7984166715e876f4b311164596394f52733ba532187764d54e6fa689 
