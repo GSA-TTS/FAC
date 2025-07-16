@@ -43,6 +43,7 @@ truncate () {
 		truncate
       audit_access,
       audit_singleauditchecklist,
+      audit_audit,
       auth_user,
       dissemination_additionalein,
       dissemination_additionaluei,
@@ -137,13 +138,13 @@ load_raw_data () {
 # load_finished_data
 ############################################################
 load_finished_data () {
-  read -p "Enter the finished file (default: data/internal-and-external-20250402.dump): " finished_filename
+  read -p "Enter the finished file (default: data/use_with_generate_resubmissions.dump): " finished_filename
   if [ -z "$finished_filename" ]; then
-    finished_filename="data/internal-and-external-20250402.dump"
+    finished_filename="data/use_with_generate_resubmissions.dump"
   fi
 
   echo "Loading ${finished_filename}"
-  
+
   cat ${finished_filename} | \
     grep -v "transaction_timeout" | \
     psql \
