@@ -1,7 +1,6 @@
 from django.db import models
-from .constants import REPORT_ID_FK_HELP_TEXT
+from .constants import REPORT_ID_FK_HELP_TEXT, ResubmissionStatus
 from dissemination.models import docs
-from dissemination.models.constants import RESUBMISSION_STATUS
 
 
 class General(models.Model):
@@ -242,20 +241,11 @@ class General(models.Model):
     #     help_text=docs.type_report_major_program_general,
     # )
 
-    # Resubmission Constants:
-    RESUBMISSION_STATUS_CHOICES = (
-        (RESUBMISSION_STATUS.ORIGINAL_SUBMISSION, "Original Submission"),
-        (RESUBMISSION_STATUS.MOST_RECENT, "Most Recent"),
-        (
-            RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
-            "Depracated via Resubmission",
-        ),
-    )
-
     # Resubmission Status
-    resubmission_status = models.CharField(
+    rresubmission_status = models.CharField(
+        max_length=30,
+        choices=ResubmissionStatus.choices,
         default=None,
-        choices=RESUBMISSION_STATUS_CHOICES,
         null=True,
     )
 
