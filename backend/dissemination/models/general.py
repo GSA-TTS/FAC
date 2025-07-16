@@ -256,11 +256,12 @@ class General(models.Model):
         null=True,
     )
 
-   # Resubmission Version
+    # Resubmission Version
     resubmission_version = models.BigIntegerField(
         default=0,
         help_text="Version counter of how many times this SAC was resubmitted.",
     )
+
     class Meta:
         unique_together = (("report_id",),)
 
