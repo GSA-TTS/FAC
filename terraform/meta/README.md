@@ -1,40 +1,7 @@
 # Meta environment
 
-The "meta" module applies configuration pertaining to spaces and users across
-environments. In an initial bring-up or contingency recovery situation:
-1. run `./bootstrap.sh`
-1. run `./init.sh`
+The meta module is responsible for all environments configuration and common files. Any file with `-managed.tf` is a file managed by this module, and should not be changed manually. All changes should be done by changing the template, creating a backup of the `terraform.tfstate.meta`, running `terraform init`, `terraform plan`, and `terraform apply` to generate the local files, create a `pull request`, and merge into `main` before any other `pull requests` can merge, as doing so will cause issues with the terraform state, since the merge that does not have the new files will overwrite the updated `terraform.tfstate.meta`.
 
-After that you should be able to run `terraform apply` whenever needed.
+In the use case of updating a provider version, we want to go into `meta/bootstrap-env/templates/providers.tf-template` and make the change there, and when we run a `terraform plan` on meta locally, doing so will use the `meta/bootstrap-env/modulefiles.tf` to update those files locally for all environments.
 
-Among other things, this module...
-- Configures the environment modules consistently
-- (future) configures the spaces for dev, staging, and production
-  - _See https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/436_
-- (future) configures user access to those spaces
-- configures application security groups (ASGs) for the spaces
-- ensures the production space does not have SSH enabled
-- (future) sets up the deployer cred secrets in the corresponding GitHub environment
-- (future) sets up egress spaces and proxy configuration
-- (future) sets up log drains
-- (future) sets up backup/restore of content across environments
-
-NOTE: The deploying account must have the OrgManager role in the target
-organization.
-
-
-## TODO:
-
-* Make bootstrap.sh script
-  * Checks that the user is logged into GitHub as repo admin and Cloud Foundry as OrgAdmin
-  * Runs Terraform with the "bootstrap" sub-module that...
-    * creates the "meta" space and backend S3 instance+key
-    * populates S3 creds as repo secrets
-    * if specified, populates shared/config/backend.tfvars
-  * Try to make this idempotent!
-  * Try to make this invokable via a GitHub workflow!
-* Move the services currently in "management" into the "meta" space; we're not really using that space anyway
-* Double-check that the "management" space can be blown away (first confirming that the *actual* Terraform state is in the S3 instance in the "production" space)
-* Update/simplify ../terraform/README.md!
-* Meta module handing sharing the spaces
-
+NOTE: The deploying account must have the OrgManager role in the target organization.
