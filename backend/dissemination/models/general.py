@@ -242,7 +242,7 @@ class General(models.Model):
     # )
 
     # Resubmission Status
-    rresubmission_status = models.CharField(
+    resubmission_status = models.CharField(
         max_length=30,
         choices=ResubmissionStatus.choices,
         default=None,
