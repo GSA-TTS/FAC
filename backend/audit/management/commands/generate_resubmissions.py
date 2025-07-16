@@ -16,6 +16,7 @@ class Command(BaseCommand):
     Django management command for generating resubmission test data.
     Only run after using menu.bash to load resubmissions.dump.
     """
+
     def handle(self, *args, **options):
         ueis_to_modifiers = {
             "TCMPSMEX54P3": [self.modify_address],
@@ -64,7 +65,7 @@ class Command(BaseCommand):
 
         # This doesn't seem to actually upload anything
         sac_sar = SingleAuditReportFile.objects.filter(sac=sac).first()
-        sac_sar.file.name = f'singleauditreport/{new_sac.report_id}.pdf'
+        sac_sar.file.name = f"singleauditreport/{new_sac.report_id}.pdf"
         new_sac_sar = SingleAuditReportFile.objects.create(
             file=sac_sar.file,
             sac=new_sac,
@@ -109,12 +110,14 @@ class Command(BaseCommand):
         sac.general_information["auditor_phone"] = "7777777777"
         sac.general_information["auditor_contact_name"] = "Jill Doe"
         sac.general_information["auditor_firm_name"] = "Other House of Auditor"
-        sac.general_information["auditor_email"] = "other.qualified.human.accountant@auditor.com"
+        sac.general_information["auditor_email"] = (
+            "other.qualified.human.accountant@auditor.com"
+        )
 
     def modify_workbook(self, sac):
         """
         Modify a resubmission with a changed workbook
         """
         sac.additional_eins["AdditionalEINs"]["additional_eins_entries"].append(
-            { "additional_ein": "111222333" },
+            {"additional_ein": "111222333"},
         )
