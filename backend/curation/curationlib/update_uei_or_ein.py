@@ -7,18 +7,7 @@ import sys
 from django.db.models import Q
 from django.db import transaction
 
-from dissemination.models import (
-    AdditionalEin,
-    AdditionalUei,
-    CapText,
-    FederalAward,
-    Finding,
-    FindingText,
-    General,
-    Note,
-    Passthrough,
-    SecondaryAuditor,
-)
+from dissemination.models import _dissemination_models
 
 
 logger = logging.getLogger(__name__)
@@ -27,18 +16,19 @@ logger = logging.getLogger(__name__)
 # FIXME: Should this be added to `naming.py`
 # so we can take a name and convert it to a model?
 def get_named_models():
-    return {
-        "AdditionalEins": AdditionalEin,
-        "AdditionalUeis": AdditionalUei,
-        "CorrectiveActionPlan": CapText,
-        "FederalAwards": FederalAward,
-        "FindingsText": FindingText,
-        "FindingsUniformGuidance": Finding,
-        "NotesToSefa": Note,
-        "SecondaryAuditors": SecondaryAuditor,
-        "General": General,
-        "Passthrough": Passthrough,
-    }
+    # return {
+    #     "AdditionalEins": AdditionalEin,
+    #     "AdditionalUeis": AdditionalUei,
+    #     "CorrectiveActionPlan": CapText,
+    #     "FederalAwards": FederalAward,
+    #     "FindingsText": FindingText,
+    #     "FindingsUniformGuidance": Finding,
+    #     "NotesToSefa": Note,
+    #     "SecondaryAuditors": SecondaryAuditor,
+    #     "General": General,
+    #     "Passthrough": Passthrough,
+    # }
+    return _dissemination_models
 
 
 def get_named_parts_containing_ueis(sac):
@@ -87,8 +77,13 @@ def get_ein_to_update(options):
 
 
 def update_db(sac, THE_USER_OBJ, event_type):
-    with transaction.atomic():
-        with CurationTracking():
+    # If curation tracking is enabled *inside* of an atomic block
+    # it blocks when we try and disable it. I think (without evidence)
+    # that is because we enable and disable triggers as part of this
+    # process, and I suspect that does not work (to enable *and* disable)
+    # while in a BEGIN/transaction.
+    with CurationTracking():
+        with transaction.atomic():
             flow = SingleAuditChecklistFlow(sac)
             flow.transition_via_redissemination()
             sac.save(
