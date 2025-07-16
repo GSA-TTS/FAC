@@ -1,0 +1,3 @@
+BIGINT_MAX_DIGITS = 25
+
+REPORT_ID_FK_HELP_TEXT = "GSAFAC generated identifier"
