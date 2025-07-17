@@ -1,5 +1,5 @@
 from django.db import models
-from .constants import REPORT_ID_FK_HELP_TEXT
+from .constants import REPORT_ID_FK_HELP_TEXT, ResubmissionStatus
 from dissemination.models import docs
 
 
@@ -240,6 +240,20 @@ class General(models.Model):
     #     null=True,
     #     help_text=docs.type_report_major_program_general,
     # )
+
+    # Resubmission Status
+    resubmission_status = models.CharField(
+        max_length=30,
+        choices=ResubmissionStatus.choices,
+        default=None,
+        null=True,
+    )
+
+    # Resubmission Version
+    resubmission_version = models.BigIntegerField(
+        default=0,
+        help_text="Version counter of how many times this SAC was resubmitted.",
+    )
 
     class Meta:
         unique_together = (("report_id",),)
