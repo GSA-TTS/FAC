@@ -25,7 +25,7 @@ class Command(BaseCommand):
             "TCMPSMEX54P3": [self.modify_address],
             "LJL3QNRFCKA7": [self.modify_workbook],
             "JP7BM2J3BKT8": [self.modify_address, self.modify_workbook],
-            "CN2SV2P5ZL82": [], # This is available in the dump for future modifications
+            "CN2SV2P5ZL82": [],  # This is available in the dump for future modifications
         }
 
         sacs = SingleAuditChecklist.objects.filter(
@@ -71,7 +71,7 @@ class Command(BaseCommand):
         new_sac_sar = SingleAuditReportFile.objects.create(
             file=sac_sar.file,
             sac=new_sac,
-            audit=sac_sar.audit, # We're not bothering to make a new audit
+            audit=sac_sar.audit,  # We're not bothering to make a new audit
             user=sac_sar.user,
             component_page_numbers=sac_sar.component_page_numbers,
         )
