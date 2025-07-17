@@ -203,25 +203,34 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         in progress isn't being altered; skip this if we know this submission is
         in progress.
         """
+        administrative_override = kwargs.get("administrative_override", None)
+        event_user = kwargs.get("event_user")
+        event_type = kwargs.get("event_type")
+
         if self.submission_status != STATUS.IN_PROGRESS:
             # If the FAC wants to administratively change a record after submission
             # (e.g. fix an incorrect UEI), a management command will
             # pass in the "administrative_override" flag.
-            administrative_override = kwargs.get("administrative_override", None)
-            event_user = kwargs.get("event_user")
-            event_type = kwargs.get("event_type")
-
-            # If we indicated we want to do an ovveride, we must provide
-            # BOTH the user and type.
             if administrative_override and event_user and event_type:
+                # If we are administratively changing a SAC after submission
+                # (for example, fixing a bad UEI), we need to skip the late
+                # change check. Or, we log that this is happening as opposed
+                # to doing the check. An administrative event will
+                # be registered via .create_submission_event() below.
                 logger.info(
                     f"administrative_override: creating submission event for {event_user} as {event_type}"
                 )
-                self.create_submission_event(event_user, event_type)
             else:
+                # If any critical parts of the submission changed
+                # (e.g. any sections, or the report id, or...), then
+                # we need to throw an exception. We should get here
+                # almost always, but throwing an exception is the defense
+                # of last resort to protect us as a system.
                 self._throw_exception_if_late_changes()
-                self.create_submission_event(event_user, event_type)
 
+        # Always create an event
+        self.create_submission_event(event_user, event_type)
+        # Save the model.
         return super().save()
 
     def disseminate(self):
