@@ -13,16 +13,19 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Django management command for generating resubmission test data.
-    Only run after using menu.bash to load resubmissions.dump.
+    Django management command for generating resubmission test data. Only run
+    after using menu.bash to truncate tables and load
+    use_with_generate_resubmissions.dump.
     """
 
     def handle(self, *args, **options):
+        # Note: D7A4J33FUMJ1 is also in the dump, buy it's our
+        # control/no-resubmission case
         ueis_to_modifiers = {
             "TCMPSMEX54P3": [self.modify_address],
             "LJL3QNRFCKA7": [self.modify_workbook],
             "JP7BM2J3BKT8": [self.modify_address, self.modify_workbook],
-            # "CN2SV2P5ZL82": [self.modify_pdf],
+            "CN2SV2P5ZL82": [], # This is available in the dump for future modifications
         }
 
         sacs = SingleAuditChecklist.objects.filter(
@@ -63,13 +66,12 @@ class Command(BaseCommand):
 
         logger.info(f"Created new SAC with ID: {new_sac.id}")
 
-        # This doesn't seem to actually upload anything
         sac_sar = SingleAuditReportFile.objects.filter(sac=sac).first()
         sac_sar.file.name = f"singleauditreport/{new_sac.report_id}.pdf"
         new_sac_sar = SingleAuditReportFile.objects.create(
             file=sac_sar.file,
             sac=new_sac,
-            audit=sac_sar.audit,
+            audit=sac_sar.audit, # We're not bothering to make a new audit
             user=sac_sar.user,
             component_page_numbers=sac_sar.component_page_numbers,
         )
@@ -90,7 +92,8 @@ class Command(BaseCommand):
 
             disseminated = new_sac.disseminate()
             if disseminated is None:
-                # How to set new_sac.submission_status to `disseminated`? Throws LateChangeError
+                # TODO: Change submission_status to disseminated once Matt's
+                # "late change" workaround is merged
                 logger.info(f"DISSEMINATED REPORT: {new_sac.report_id}")
             else:
                 logger.error(
