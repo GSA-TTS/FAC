@@ -59,7 +59,8 @@ truncate () {
       audit_sacvalidationwaiver,
       audit_singleauditreportfile,
       audit_excelfile,
-      audit_submissionevent
+      audit_submissionevent,
+      users_userprofile
     cascade;
 	commit;
 EOF
@@ -316,7 +317,8 @@ dump_for_reuse () {
   -t audit_sacvalidationwaiver \
   -t audit_singleauditreportfile \
   -t audit_excelfile \
-  -t audit_submissionevent
+  -t audit_submissionevent \
+  -t users_userprofile
 }
 
 
