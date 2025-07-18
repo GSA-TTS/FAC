@@ -18,6 +18,7 @@ SAC_WITH_DIFFERENT_PDF = {
     "uei": "QQ13BKWSCWB5",
 }
 
+
 class Command(BaseCommand):
     """
     Django management command for generating resubmission test data. Only run
