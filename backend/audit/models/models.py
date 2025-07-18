@@ -539,7 +539,9 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             ).exists()
 
             if existing_resub:
-                raise ValidationError(f"A resubmission already exists for report_id {self.report_id}.")
+                raise ValidationError(
+                    f"A resubmission already exists for report_id {self.report_id}."
+                )
 
             resub = SingleAuditChecklist.objects.create(
                 submitted_by=self.submitted_by,

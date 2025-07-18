@@ -15,7 +15,7 @@ class ResubmissionTest(TestCase):
         user = User.objects.create_user(username="testuser", password="password")
         general_info = {
             "auditee_fiscal_period_end": "2024-12-31",
-            "uei": "TESTUEI123456"
+            "uei": "TESTUEI123456",
         }
 
         orig = SingleAuditChecklist.objects.create(
@@ -30,7 +30,9 @@ class ResubmissionTest(TestCase):
         self.assertRegex(resub.report_id, r"\d{4}-\d{2}-GSAFAC-\d{10}")
 
         # ✅ UEI and audit year match original
-        self.assertEqual(resub.general_information["uei"], orig.general_information["uei"])
+        self.assertEqual(
+            resub.general_information["uei"], orig.general_information["uei"]
+        )
         self.assertEqual(
             resub.general_information["auditee_fiscal_period_end"],
             orig.general_information["auditee_fiscal_period_end"],
@@ -43,14 +45,14 @@ class ResubmissionTest(TestCase):
         # ✅ resubmission_meta is populated correctly
         self.assertEqual(resub.resubmission_meta["previous_report_id"], orig.report_id)
         self.assertEqual(resub.resubmission_meta["previous_row_id"], orig.id)
-        self.assertIn("MOST_RECENT_SUBMISSION", resub.resubmission_meta["resubmission_state"])
+        self.assertIn(
+            "MOST_RECENT_SUBMISSION", resub.resubmission_meta["resubmission_state"]
+        )
         self.assertGreater(resub.resubmission_meta["version"], 1)
 
         # Confirm SubmissionEvent created
         self.assertTrue(
             SubmissionEvent.objects.filter(
-                sac=resub,
-                user=user,
-                event="resubmission_started"
+                sac=resub, user=user, event="resubmission_started"
             ).exists()
         )
