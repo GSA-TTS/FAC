@@ -67,10 +67,17 @@ ErrorDetails = list[tuple[str, str, str, str]]
 
 def validate_uei(value):
     """Validates the UEI using the UEI Spec"""
+    validate_uei_length(value)
     validate_uei_alphanumeric(value)
     validate_uei_valid_chars(value)
     validate_uei_leading_char(value)
     validate_uei_nine_digit_sequences(value)
+    return value
+
+
+def validate_uei_length(value):
+    if not len(value) == 12:
+        raise ValidationError(_("The UEI should be 12 characters long"))
     return value
 
 

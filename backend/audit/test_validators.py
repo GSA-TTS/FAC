@@ -44,6 +44,7 @@ from .validators import (
     validate_file_infection,
     validate_pdf_file_integrity,
     validate_uei,
+    validate_uei_length,
     validate_uei_alphanumeric,
     validate_uei_valid_chars,
     validate_uei_leading_char,
@@ -376,6 +377,19 @@ class UEIValidatorTests(SimpleTestCase):
 
         # Invalid UEI
         self.assertRaises(ValidationError, validate_uei, invalid)
+        # Valid UEI
+        validate_uei(self.valid)
+
+    def test_uei_length(self):
+        invalid1 = "ABC"
+        invalid2 = self.valid + "X"
+        invalid3 = self.valid[:-1]
+
+        # Invalid UEI
+        self.assertRaises(ValidationError, validate_uei_length, invalid1)
+        self.assertRaises(ValidationError, validate_uei_length, invalid2)
+        self.assertRaises(ValidationError, validate_uei_length, invalid3)
+
         # Valid UEI
         validate_uei(self.valid)
 

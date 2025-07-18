@@ -404,6 +404,14 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
 
     @state.transition(
+        source=STATUS.DISSEMINATED,
+        target=STATUS.DISSEMINATED,
+    )
+    def transition_via_redissemination(self):
+        self.sac.transition_name.append(STATUS.DISSEMINATED)
+        self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
+
+    @state.transition(
         source=[
             STATUS.READY_FOR_CERTIFICATION,
             STATUS.AUDITOR_CERTIFIED,
