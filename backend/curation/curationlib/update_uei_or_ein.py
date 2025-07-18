@@ -16,25 +16,13 @@ logger = logging.getLogger(__name__)
 # FIXME: Should this be added to `naming.py`
 # so we can take a name and convert it to a model?
 def get_named_models():
-    # return {
-    #     "AdditionalEins": AdditionalEin,
-    #     "AdditionalUeis": AdditionalUei,
-    #     "CorrectiveActionPlan": CapText,
-    #     "FederalAwards": FederalAward,
-    #     "FindingsText": FindingText,
-    #     "FindingsUniformGuidance": Finding,
-    #     "NotesToSefa": Note,
-    #     "SecondaryAuditors": SecondaryAuditor,
-    #     "General": General,
-    #     "Passthrough": Passthrough,
-    # }
     return _dissemination_models
 
 
 def get_named_parts_containing_ueis(sac):
     return {
-        "AdditionalEins": sac.additional_eins,
-        "AdditionalUeis": sac.additional_ueis,
+        "AdditionalEINs": sac.additional_eins,
+        "AdditionalUEIs": sac.additional_ueis,
         "CorrectiveActionPlan": sac.corrective_action_plan,
         "FederalAwards": sac.federal_awards,
         "FindingsText": sac.findings_text,
@@ -50,12 +38,12 @@ def check_report_disseminated(options):
     try:
         _ = SingleAuditChecklist.objects.get(crit1 & crit3)
         return True
-    except:  # noqa: E722
+    except SingleAuditChecklist.DoesNotExist:
         return False
 
 
 # options hash -> Django queryset
-def get_uei_to_update(options):
+def get_sac_with_uei(options):
     # Note that the UEI is not only in the general info, but
     # also in every one of the workbooks. Too bad we stored it that way.
     crit1 = Q(report_id=options["report_id"])
@@ -67,7 +55,7 @@ def get_uei_to_update(options):
 
 
 # options hash -> Django queryset
-def get_ein_to_update(options):
+def get_sac_with_ein_to_update(options):
     # Does the old EIN exist?
     crit1 = Q(report_id=options["report_id"])
     crit2 = Q(general_information__ein=options["old_ein"])
@@ -99,7 +87,7 @@ def update_uei(options):
     # Now we need to pull the SAC, update the record, and
     # save the new UEI.
     THE_NEW_UEI = options["new_uei"]
-    sac = get_uei_to_update(options)
+    sac = get_sac_with_uei(options)
     named_parts = get_named_parts_containing_ueis(sac)
 
     THE_USER_OBJ = User.objects.get(email=options["email"])
@@ -112,7 +100,9 @@ def update_uei(options):
             if json_field in object:
                 object[json_field]["auditee_uei"] = THE_NEW_UEI
             else:
-                logger.error("Could not find auditee_uei in XLSX JSON object")
+                logger.error(
+                    f"Could not find auditee_uei in XLSX JSON object {json_field}"
+                )
                 sys.exit(-1)
 
     logger.info("Updating UEI for SAC: " + str(sac))
@@ -124,13 +114,12 @@ def update_uei(options):
 
 
 def update_ein(options):
-    # print("NEW_EIN", options)
     # Now we need to pull the SAC, update the record, and
     # save the new EIN.
     THE_NEW_EIN = options["new_ein"]
 
     # The EIN is only in the general info.
-    sac = get_ein_to_update(options)
+    sac = get_sac_with_ein_to_update(options)
 
     THE_USER_OBJ = User.objects.get(email=options["email"])
 

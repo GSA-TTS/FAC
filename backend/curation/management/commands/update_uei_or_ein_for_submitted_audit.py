@@ -85,7 +85,7 @@ def validate_inputs(options):
     try:
         ok_staff_user = StaffUser.objects.get(staff_email=options["email"])
     except StaffUser.DoesNotExist:
-        logger.error("staff user does not exist")
+        logger.error(f"Staff user {options["email"]} does not exist")  
         ok_staff_user = False
 
     # We either need a pair of UEIs, or a pair of EINs.
@@ -156,7 +156,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        print(options)
         valid_inputs = validate_inputs(options)
         if not valid_inputs:
             logger.error("inputs were not valid")
