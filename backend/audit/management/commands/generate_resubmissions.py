@@ -10,6 +10,13 @@ import sys
 
 logger = logging.getLogger(__name__)
 
+# After loading the dump, this is the ID of a SAC that has a different PDF
+# from the others. We will be pointing a resubmission's SingleAuditReportFile
+# at this to simulate a resubmission with a different PDF.
+SAC_WITH_DIFFERENT_PDF = {
+    "id": 6,
+    "uei": "QQ13BKWSCWB5",
+}
 
 class Command(BaseCommand):
     """
@@ -19,27 +26,35 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        # Note: D7A4J33FUMJ1 is also in the dump, buy it's our
+        # Note: D7A4J33FUMJ1 is also in the dump, but it's our
         # control/no-resubmission case
         ueis_to_modifiers = {
             "TCMPSMEX54P3": [self.modify_address],
             "LJL3QNRFCKA7": [self.modify_workbook],
             "JP7BM2J3BKT8": [self.modify_address, self.modify_workbook],
-            "CN2SV2P5ZL82": [],  # This is available in the dump for future modifications
+            "CN2SV2P5ZL82": [self.modify_pdf],
         }
 
-        sacs = SingleAuditChecklist.objects.filter(
+        sacs_for_resubs = SingleAuditChecklist.objects.filter(
             general_information__auditee_uei__in=ueis_to_modifiers.keys()
         )
-
-        if len(sacs) == len(ueis_to_modifiers.keys()):
-            for sac in sacs:
-                self.generate_resubmission(sac, ueis_to_modifiers[sac.auditee_uei])
-        else:
+        if len(sacs_for_resubs) != len(ueis_to_modifiers.keys()):
             logger.error(
-                f"Expected {len(ueis_to_modifiers.keys())} SACs, found {len(sacs)}. Make sure to truncate and load tables via menu.bash first."
+                f"Expected {len(ueis_to_modifiers.keys())} SACs, found {len(sacs_for_resubs)}. Make sure to truncate and load tables via menu.bash first."
             )
             sys.exit(1)
+
+        sac_with_different_pdf = SingleAuditChecklist.objects.get(
+            general_information__auditee_uei=SAC_WITH_DIFFERENT_PDF["uei"]
+        )
+        if not sac_with_different_pdf:
+            logger.error(
+                f"Expected SAC with UEI {SAC_WITH_DIFFERENT_PDF['uei']} not found."
+            )
+            sys.exit(1)
+
+        for sac in sacs_for_resubs:
+            self.generate_resubmission(sac, ueis_to_modifiers[sac.auditee_uei])
 
     def generate_resubmission(self, sac, modifiers):
         new_sac = SingleAuditChecklist.objects.create(
@@ -78,6 +93,7 @@ class Command(BaseCommand):
 
         logger.info(f"Created new SAR with ID: {new_sac_sar.id}")
 
+        # Perform modifications on the new resubmission
         for modification in modifiers:
             modification(new_sac)
 
@@ -124,3 +140,12 @@ class Command(BaseCommand):
         sac.additional_eins["AdditionalEINs"]["additional_eins_entries"].append(
             {"additional_ein": "111222333"},
         )
+
+    def modify_pdf(self, sac):
+        """
+        Modify a resubmission with a changed PDF
+        """
+        sar = SingleAuditReportFile.objects.get(sac=sac)
+        sar.sac_id = SAC_WITH_DIFFERENT_PDF["id"]
+        # TODO: This also causes a LateChangeError
+        sar.save()
