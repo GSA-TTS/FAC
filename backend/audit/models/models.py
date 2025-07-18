@@ -39,7 +39,6 @@ from .submission_event import SubmissionEvent
 from .utils import camel_to_snake
 from ..exceptions import LateChangeError
 from django.utils.timezone import now
-from uuid import uuid4
 
 User = get_user_model()
 
@@ -532,7 +531,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         return None
 
     # Resubmission SAC Creations
-    #Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
+    # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
     def initiate_resubmission(self, user=None, event_type=None):
         with transaction.atomic():
             existing_resub = SingleAuditChecklist.objects.filter(

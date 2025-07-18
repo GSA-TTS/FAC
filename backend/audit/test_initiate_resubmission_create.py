@@ -9,6 +9,7 @@ from audit.models import SubmissionEvent
 
 User = get_user_model()
 
+
 class ResubmissionTest(TestCase):
     def test_initiate_resubmission_creates_valid_copy(self):
         user = User.objects.create_user(username="testuser", password="password")
