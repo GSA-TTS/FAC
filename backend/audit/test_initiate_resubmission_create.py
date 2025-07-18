@@ -12,7 +12,9 @@ User = get_user_model()
 
 class ResubmissionTest(TestCase):
     def test_initiate_resubmission_creates_valid_copy(self):
-        user = User.objects.create_user(username="testuser", password="password")
+        user_password = "test_password"  # nosec B106
+        user = User.objects.create_user(username="testuser", password=user_password)
+
         general_info = {
             "auditee_fiscal_period_end": "2024-12-31",
             "uei": "TESTUEI123456",
