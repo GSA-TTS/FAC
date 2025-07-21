@@ -2,58 +2,78 @@
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-
-from audit.models import SingleAuditChecklist
+from django.core.exceptions import ValidationError
+from audit.models import SingleAuditChecklist, SubmissionEvent
 from audit.models.constants import STATUS
-from audit.models import SubmissionEvent
 
 User = get_user_model()
 
 
 class ResubmissionTest(TestCase):
-    def test_initiate_resubmission_creates_valid_copy(self):
-        user = User.objects.create_user(username="testuser")
-
-        general_info = {
+    def setUp(self):
+        self.user = User.objects.create_user(username="resubuser")
+        self.general_info = {
             "auditee_fiscal_period_end": "2024-12-31",
-            "uei": "TESTUEI123456",
+            "uei": "TESTUEI999999",
         }
-
-        orig = SingleAuditChecklist.objects.create(
-            submitted_by=user,
+        self.orig = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
             submission_status=STATUS.IN_PROGRESS,
-            general_information=general_info,
+            general_information=self.general_info,
         )
 
-        resub = orig.initiate_resubmission(user=user, event_type="resubmission_started")
+    def test_resubmission_is_created_atomically_and_correctly(self):
+        resub = self.orig.initiate_resubmission(
+            user=self.user, event_type="resubmission_started"
+        )
 
-        # ✅ Report ID should follow the strict format
+        # Report ID format check
         self.assertRegex(resub.report_id, r"\d{4}-\d{2}-GSAFAC-\d{10}")
 
-        # ✅ UEI and audit year match original
+        # Audit year and UEI match
         self.assertEqual(
-            resub.general_information["uei"], orig.general_information["uei"]
+            resub.general_information["uei"], self.orig.general_information["uei"]
         )
         self.assertEqual(
             resub.general_information["auditee_fiscal_period_end"],
-            orig.general_information["auditee_fiscal_period_end"],
+            self.orig.general_information["auditee_fiscal_period_end"],
         )
 
-        # ✅ Submission status and transition state
+        # Submission status and transition
         self.assertEqual(resub.submission_status, STATUS.IN_PROGRESS)
         self.assertEqual(resub.transition_name, [STATUS.IN_PROGRESS])
 
-        # ✅ resubmission_meta is populated correctly
-        self.assertEqual(resub.resubmission_meta["previous_report_id"], orig.report_id)
-        self.assertEqual(resub.resubmission_meta["previous_row_id"], orig.id)
-        self.assertIn(
-            "MOST_RECENT_SUBMISSION", resub.resubmission_meta["resubmission_state"]
+        # Resubmission meta structure
+        self.assertEqual(
+            resub.resubmission_meta["previous_report_id"], self.orig.report_id
+        )
+        self.assertEqual(resub.resubmission_meta["previous_row_id"], self.orig.id)
+        self.assertEqual(
+            resub.resubmission_meta["resubmission_state"], "MOST_RECENT_SUBMISSION"
         )
         self.assertGreater(resub.resubmission_meta["version"], 1)
 
-        # Confirm SubmissionEvent created
+        # SubmissionEvent created on both SACs
         self.assertTrue(
             SubmissionEvent.objects.filter(
-                sac=resub, user=user, event="resubmission_started"
+                sac=resub, user=self.user, event="resubmission_started"
             ).exists()
         )
+
+        self.assertTrue(
+            SubmissionEvent.objects.filter(
+                sac=self.orig, user=self.user, event="resubmission_initiated"
+            ).exists()
+        )
+
+    def test_cannot_create_duplicate_resubmission(self):
+        # First resubmission should succeed
+        self.orig.initiate_resubmission(
+            user=self.user, event_type="resubmission_started"
+        )
+
+        # Second resubmission should raise ValidationError
+        with self.assertRaises(ValidationError):
+            self.orig.initiate_resubmission(
+                user=self.user, event_type="resubmission_started"
+            )

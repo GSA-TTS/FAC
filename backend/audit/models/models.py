@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.db import models
+from django.forms.models import model_to_dict
 from django.db import transaction
 from django.db.transaction import TransactionManagementError
 from django.conf import settings
@@ -534,50 +535,55 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
     def initiate_resubmission(self, user=None, event_type=None):
         with transaction.atomic():
-            existing_resub = SingleAuditChecklist.objects.filter(
+            if SingleAuditChecklist.objects.filter(
                 resubmission_meta__previous_report_id=self.report_id
-            ).exists()
-
-            if existing_resub:
+            ).exists():
                 raise ValidationError(
                     f"A resubmission already exists for report_id {self.report_id}."
                 )
 
-            resub = SingleAuditChecklist.objects.create(
-                submitted_by=self.submitted_by,
-                submission_status=STATUS.IN_PROGRESS,
-                audit_type=self.audit_type,
-                general_information=self.general_information,
-                audit_information=self.audit_information,
-                federal_awards=self.federal_awards,
-                corrective_action_plan=self.corrective_action_plan,
-                findings_text=self.findings_text,
-                findings_uniform_guidance=self.findings_uniform_guidance,
-                additional_ueis=self.additional_ueis,
-                additional_eins=self.additional_eins,
-                secondary_auditors=self.secondary_auditors,
-                notes_to_sefa=self.notes_to_sefa,
-                auditor_certification=self.auditor_certification,
-                auditee_certification=self.auditee_certification,
-                tribal_data_consent=self.tribal_data_consent,
-                cognizant_agency=self.cognizant_agency,
-                oversight_agency=self.oversight_agency,
-                resubmission_meta={
-                    "previous_report_id": self.report_id,
-                    "previous_row_id": self.id,
-                    "resubmission_state": "MOST_RECENT_SUBMISSION",
-                    "version": 2,
-                },
-                data_source=self.data_source,
-                transition_name=[STATUS.IN_PROGRESS],
-                transition_date=[now()],
+            # Convert to dict and exclude fields that should not be copied
+            excluded_fields = [
+                "id",
+                "report_id",
+                "created_at",
+                "updated_at",
+                "submitted_by",
+            ]
+            data = model_to_dict(self, exclude=excluded_fields)
+
+            # Manually add back foreign key as instance
+            data["submitted_by"] = self.submitted_by
+
+            # Add/override fields
+            data.update(
+                {
+                    "submission_status": STATUS.IN_PROGRESS,
+                    "resubmission_meta": {
+                        "previous_report_id": self.report_id,
+                        "previous_row_id": self.id,
+                        "resubmission_state": "MOST_RECENT_SUBMISSION",
+                        "version": 2,
+                    },
+                    "transition_name": [STATUS.IN_PROGRESS],
+                    "transition_date": [now()],
+                }
             )
 
+            resub = SingleAuditChecklist.objects.create(**data)
+
             if event_type and user:
+                # Event on the new RESUB
                 SubmissionEvent.objects.create(
                     sac=resub,
                     user=user,
                     event=event_type,
+                )
+                # Event on the original ORIG
+                SubmissionEvent.objects.create(
+                    sac=self,
+                    user=user,
+                    event="resubmission_initiated",
                 )
 
             return resub
