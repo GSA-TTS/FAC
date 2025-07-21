@@ -40,6 +40,8 @@ from .submission_event import SubmissionEvent
 from .utils import camel_to_snake
 from ..exceptions import LateChangeError
 from django.utils.timezone import now
+from dissemination.models.general import ResubmissionStatus
+
 
 User = get_user_model()
 
@@ -562,7 +564,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                     "resubmission_meta": {
                         "previous_report_id": self.report_id,
                         "previous_row_id": self.id,
-                        "resubmission_state": "MOST_RECENT_SUBMISSION",
+                        "resubmission_status": ResubmissionStatus.MOST_RECENT,
                         "version": 2,
                     },
                     "transition_name": [STATUS.IN_PROGRESS],
