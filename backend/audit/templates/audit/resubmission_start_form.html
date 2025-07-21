@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-row grid-gap">
+            <form id="form-resubmission-start" method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large" id="legend-resubmission-start">Resubmitting an Audit</legend>
+                    <p>Resubmitting an audit should not be undertaken lightly. For example, resubmission may be warranted if:</p>
+                    <ul class="usa-list">
+                        <li>
+                            A material issue is found with the report by the auditor or auditee, and both parties agree a resubmission is warranted.
+                        </li>
+                        <li>A Federal oversight official requests a resubmission of an audit.</li>
+                    </ul>
+                    <p>
+                        Resubmission must be completed in coordination between certifying officials, and resubmission will change the acceptance date for your audit.
+                    </p>
+
+                    <label class="usa-label" id="report_id-label" for="report_id">Report ID of audit to resubmit:</label>
+                    <div class="usa-hint" id="report_id-hint">YYYY-MM-SOURCE-0123456789</div>
+                    <span class="usa-error-message margin-top-1">{{ form.report_id.errors|striptags }}</span>
+                    <input class="usa-input"
+                           id="report_id"
+                           name="report_id"
+                           aria-labelledby="report_id-label"
+                           aria-describedby="report_id-hint"
+                           value="{{ form_user_input.report_id }}" />
+                    <button class="usa-button margin-y-2" id="continue">Continue</button>
+                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center"
+                       href="{% url 'audit:MySubmissions' %}">Cancel</a>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

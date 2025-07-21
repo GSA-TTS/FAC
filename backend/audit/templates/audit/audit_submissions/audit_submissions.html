@@ -31,6 +31,7 @@
             {% include "includes/beta_warning.html" %}
           {% endif %}
         {% endcomment %}
+        {% include "./audit_actions.html" %}
         {% if data.in_progress_audits|length == 0 and data.completed_audits|length == 0 %}
             <p class="margin-bottom-4">No submissions associated with your email address were found.</p>
             {% include "./alert_find_report.html" %}
@@ -43,9 +44,12 @@
                 {% include "./table_completed.html" %}
             {% endif %}
         {% endif %}
-        {% include "./modal_uei.html" %}
-        {% include "./modal_new_audit_submission.html" %}
     </div>
+    
+    {% comment %} Activated by elements in other blocks. Not required to be within the main body. {% endcomment %}
+    {% include "./modal_uei.html" %}
+    {% include "./modal_new_audit_submission.html" %}
+    
     <script src="{% static 'compiled/js/audit_submissions.js' %}"
             type="text/javascript"></script>
 {% endblock content %}
