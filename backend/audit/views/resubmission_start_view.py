@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.views.generic import View
 
 from audit.formlib import ResubmissionStartForm
+from config.settings import ENVIRONMENT
 
 
 class ResubmissionStartView(LoginRequiredMixin, View):
@@ -14,10 +15,17 @@ class ResubmissionStartView(LoginRequiredMixin, View):
     template_name = "audit/resubmission_start_form.html"
 
     def get(self, request, *args, **kwargs):
-        # Just load the resub start form
+        # Only run in non-production environments for now.
+        if ENVIRONMENT == "PRODUCTION":
+            return redirect(reverse("config:Home"))
+
         return render(request, self.template_name)
 
     def post(self, request):
+        # Only run in non-production environments for now.
+        if ENVIRONMENT == "PRODUCTION":
+            return redirect(reverse("config:Home"))
+
         form = ResubmissionStartForm(request.POST)
 
         # If the form is not valid, reload to display the errors
