@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from audit.models import SingleAuditChecklist, SubmissionEvent
 from audit.models.constants import STATUS
+from dissemination.models.general import ResubmissionStatus
 
 User = get_user_model()
 
@@ -49,7 +50,8 @@ class ResubmissionTest(TestCase):
         )
         self.assertEqual(resub.resubmission_meta["previous_row_id"], self.orig.id)
         self.assertEqual(
-            resub.resubmission_meta["resubmission_state"], "MOST_RECENT_SUBMISSION"
+            resub.resubmission_meta["resubmission_status"],
+            ResubmissionStatus.MOST_RECENT,
         )
         self.assertGreater(resub.resubmission_meta["version"], 1)
 
