@@ -1,13 +1,9 @@
-from datetime import datetime, timezone
-
-from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import View
 
 from audit.formlib import ResubmissionStartForm
-from audit.models import SingleAuditChecklist
 
 
 class ResubmissionStartView(LoginRequiredMixin, View):
@@ -47,6 +43,5 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         user = request.user
         user.profile.entry_form_data = resub_meta
         user.profile.save()
-    
 
         return redirect(reverse("report_submission:eligibility"))

@@ -19,7 +19,7 @@ class ResubmissionStartForm(forms.Form):
         # 2. Field validations. Maybe regex? If it's not going to end up in eighty places.
         if len(text_input) != 25:
             raise ValidationError("Report IDs should be of length 25.")
-    
+
         # 3. Try to find the specified report and add the row ID to the form data.
         try:
             sac = SingleAuditChecklist.objects.get(
@@ -28,6 +28,6 @@ class ResubmissionStartForm(forms.Form):
             self.cleaned_data["sac_row_id"] = sac.id
         except SingleAuditChecklist.DoesNotExist:
             raise ValidationError("Audit to resubmit not found.")
-        
+
         # The field is clean, return it.
         return text_input
