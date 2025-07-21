@@ -31,7 +31,10 @@
             {% include "includes/beta_warning.html" %}
           {% endif %}
         {% endcomment %}
-        {% include "./audit_actions.html" %}
+        {% comment %}
+            ENABLE FOR RESUBMISSION LINK:
+            {% include "./audit_actions.html" %}
+        {% endcomment %}
         {% if data.in_progress_audits|length == 0 and data.completed_audits|length == 0 %}
             <p class="margin-bottom-4">No submissions associated with your email address were found.</p>
             {% include "./alert_find_report.html" %}
