@@ -17,8 +17,10 @@ class ResubmissionStartForm(forms.Form):
         text_input = "".join(text_input.split())
 
         # 2. Field validations. Maybe regex? If it's not going to end up in eighty places.
-        if len(text_input) != 25:
-            raise ValidationError("Report IDs should be of length 25.")
+        if len(text_input) > 25:
+            raise ValidationError("The given report ID is too long!")
+        elif len(text_input) < 25:
+            raise ValidationError("The given report ID is too short!")
 
         # 3. Try to find the specified report and add the row ID to the form data.
         try:
