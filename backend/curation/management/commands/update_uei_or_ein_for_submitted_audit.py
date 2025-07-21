@@ -5,8 +5,8 @@ import logging
 from curation.curationlib.update_uei_or_ein import (
     update_uei,
     update_ein,
-    get_uei_to_update,
-    get_ein_to_update,
+    get_sac_with_uei,
+    get_sac_with_ein_to_update,
     check_report_disseminated,
 )
 
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 def validate_uei_options(options):
     try:
         # We use a .get(), which will fail if there is more than one.
-        _ = get_uei_to_update(options)
+        _ = get_sac_with_uei(options)
         ok_old_uei = True
     except Exception as e:
         logger.error(e)
@@ -42,7 +42,7 @@ def validate_uei_options(options):
 
 def validate_ein_options(options):
     try:
-        _ = get_ein_to_update(options)
+        _ = get_sac_with_ein_to_update(options)
         ok_old_ein = re.match("[0-9]{9}", options["old_ein"])
         if not ok_old_ein:
             logger.error(f"The EIN {options['old_ein']} is not nine digits.")
@@ -85,7 +85,7 @@ def validate_inputs(options):
     try:
         ok_staff_user = StaffUser.objects.get(staff_email=options["email"])
     except StaffUser.DoesNotExist:
-        logger.error(f"Staff user {options["email"]} does not exist")  
+        logger.error(f'Staff user {options["email"]} does not exist')
         ok_staff_user = False
 
     # We either need a pair of UEIs, or a pair of EINs.
