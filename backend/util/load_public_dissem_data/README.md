@@ -128,6 +128,8 @@ This option allows you to load the data from production. That data then must be 
 
 This requires `data/internal-and-external-20250402.dump`, which can be found [here](https://drive.google.com/file/d/1qocTTvgg-uyrz3bzJaKqNuROTyKeHWJ9/view?usp=sharing)
 
+If you want to load resubmission-prepped data for testing, you will want to grab `use_with_generate_resubmissions.dump` from `2025-07` in GDrive here: https://drive.google.com/drive/folders/1TvXhdUyd56jLBwToO5NHzgaXwazQBwF2. Place it in `data`.
+
 ## 4) Generate fake suppressed reports
 
 The data as loaded is 100% public data. This modifies 500 records per audit year so that they appear to be suppressed/Tribal audits. It inserts a tribal attestation record saying that the record should be suppressed, and then updates the organization type so that it is `tribal`.

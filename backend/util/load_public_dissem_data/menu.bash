@@ -347,6 +347,13 @@ EOF
   reset_migrated_to_audit
 }
 
+generate_resubmissions () {
+  echo "Running `docker compose` for generate_resubmissions"
+  docker compose run \
+    --rm web \
+    python manage.py generate_resubmissions
+}
+
 
 PS3='Please enter your choice: '
 options=(\
@@ -359,6 +366,7 @@ options=(\
   "Dump tables for reuse" \
   "Reset migrated_to_audit" \
   "Truncate audit_audit" \
+  "Generate resubmissions"
   "Quit"\
 )
 select opt in "${options[@]}"
@@ -390,6 +398,9 @@ do
             ;;
         "Truncate audit_audit")
             truncate_sourceoftruth
+            ;;
+        "Generate resubmissions")
+            generate_resubmissions
             ;;
         "Quit")
             break
