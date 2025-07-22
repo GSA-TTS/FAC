@@ -56,6 +56,18 @@ from dissemination.models import (
 from django.utils.timezone import now
 from dissemination.models.general import ResubmissionStatus
 
+from dissemination.models import (
+    AdditionalEin,
+    AdditionalUei,
+    CapText,
+    FederalAward,
+    Finding,
+    FindingText,
+    General,
+    Note,
+    Passthrough,
+    SecondaryAuditor,
+)
 
 User = get_user_model()
 
