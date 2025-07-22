@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.views import generic
 
 
-# class based views for posts
 class Home(generic.View):
     """
     This is for the root path: /

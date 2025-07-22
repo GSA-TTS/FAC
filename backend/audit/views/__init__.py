@@ -26,6 +26,7 @@ from .pre_dissemination_download_view import (
     PredisseminationSummaryReportDownloadView,
 )
 from .remove_submission_in_progress import RemoveSubmissionView
+from .resubmission_start_view import ResubmissionStartView
 from .single_audit_report_file_handler import SingleAuditReportFileHandlerView
 from .submission_progress_view import (  # noqa
     SubmissionProgressView,
@@ -38,17 +39,16 @@ from .unlock_after_certification import UnlockAfterCertificationView
 
 # In case we want to iterate through all the views for some reason:
 views_list = [
-    AuditInfoFormView,
     AuditeeCertificationStep1View,
     AuditeeCertificationStep2View,
+    AuditInfoFormView,
     AuditInfoFormView,
     AuditorCertificationStep1View,
     AuditorCertificationStep2View,
     CertificationView,
-    ChangeOrAddRoleView,
     ChangeAuditeeCertifyingOfficialView,
     ChangeAuditorCertifyingOfficialView,
-    RemoveEditorView,
+    ChangeOrAddRoleView,
     CrossValidationView,
     EditSubmission,
     ExcelFileHandlerView,
@@ -61,11 +61,13 @@ views_list = [
     PredisseminationSummaryReportDownloadView,
     PredisseminationXlsxDownloadView,
     ReadyForCertificationView,
+    RemoveEditorView,
+    RemoveSubmissionView,
+    ResubmissionStartView,
     SingleAuditReportFileHandlerView,
     SubmissionProgressView,
     SubmissionView,
     TribalDataConsent,
     UnlockAfterCertificationView,
     UploadReportView,
-    RemoveSubmissionView,
 ]
