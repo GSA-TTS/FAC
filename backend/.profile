@@ -51,6 +51,11 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     # gonogo "materialized_views"
 
     #####
+    # CURATION AUDIT TRACKING
+    curation_audit_tracking_init
+    gonogo "curation_audit_tracking_init"
+
+    #####
     # CREATE STAFF USERS
     # Prepares staff users for Django admin
     create_staffusers

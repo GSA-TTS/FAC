@@ -15,3 +15,14 @@ class LateChangeError(Exception):
     Exception covering attempts to change submissions that don't have the in_progress
     status.
     """
+
+    pass
+
+
+class AdministrativeOverrideError(Exception):
+    """
+    Exception covering attempts to perform an administrative override
+    that is malformed in some way.
+    """
+
+    pass

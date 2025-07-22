@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
 from django.utils.translation import gettext_lazy as _
 
@@ -38,7 +39,20 @@ from support.cog_over import compute_cog_over, record_cog_assignment
 from .files import SingleAuditReportFile
 from .submission_event import SubmissionEvent
 from .utils import camel_to_snake
-from ..exceptions import LateChangeError
+from ..exceptions import LateChangeError, AdministrativeOverrideError
+
+from dissemination.models import (
+    AdditionalEin,
+    AdditionalUei,
+    CapText,
+    FederalAward,
+    Finding,
+    FindingText,
+    General,
+    Note,
+    Passthrough,
+    SecondaryAuditor,
+)
 from django.utils.timezone import now
 from dissemination.models.general import ResubmissionStatus
 
@@ -174,20 +188,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     def __str__(self):
         return f"#{self.id}--{self.report_id}--{self.auditee_uei}"
 
-    def save(self, *args, **kwargs):
-        """
-        Call _reject_late_changes() to verify that a submission that's no longer
-        in progress isn't being altered; skip this if we know this submission is
-        in progress.
-        """
-        if self.submission_status != STATUS.IN_PROGRESS:
-            try:
-                self._reject_late_changes()
-            except LateChangeError as err:
-                raise LateChangeError from err
+    def __hash__(self):
+        return hash(str(self))
 
-        event_user = kwargs.get("event_user")
-        event_type = kwargs.get("event_type")
+    def __eq__(self, other):
+        return str(self) == str(other)
+
+    def create_submission_event(self, event_user, event_type):
         if event_user and event_type:
             SubmissionEvent.objects.create(
                 sac=self,
@@ -195,6 +202,40 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 event=event_type,
             )
 
+    def save(self, *args, **kwargs):
+        """
+        Call _throw_exception_if_late_changes() to verify that a submission that's no longer
+        in progress isn't being altered; skip this if we know this submission is
+        in progress.
+        """
+        administrative_override = kwargs.get("administrative_override", None)
+        event_user = kwargs.get("event_user")
+        event_type = kwargs.get("event_type")
+
+        if self.submission_status != STATUS.IN_PROGRESS:
+            # If the FAC wants to administratively change a record after submission
+            # (e.g. fix an incorrect UEI), a management command will
+            # pass in the "administrative_override" flag.
+            if administrative_override and event_user and event_type:
+                # If we are administratively changing a SAC after submission
+                # (for example, fixing a bad UEI), we need to skip the late
+                # change check. Or, we log that this is happening as opposed
+                # to doing the check. An administrative event will
+                # be registered via .create_submission_event() below.
+                logger.info(
+                    f"administrative_override: creating submission event for {event_user} as {event_type}"
+                )
+            else:
+                # If any critical parts of the submission changed
+                # (e.g. any sections, or the report id, or...), then
+                # we need to throw an exception. We should get here
+                # almost always, but throwing an exception is the defense
+                # of last resort to protect us as a system.
+                self._throw_exception_if_late_changes()
+
+        # Always create an event
+        self.create_submission_event(event_user, event_type)
+        # Save the model.
         return super().save()
 
     def disseminate(self):
@@ -221,6 +262,39 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             return {"errors": [err]}
 
         return None
+
+    def redisseminate(self):
+        named_models = {
+            "AdditionalEins": AdditionalEin,
+            "AdditionalUeis": AdditionalUei,
+            "CorrectiveActionPlan": CapText,
+            "FederalAwards": FederalAward,
+            "FindingsText": FindingText,
+            "FindingsUniformGuidance": Finding,
+            "NotesToSefa": Note,
+            "SecondaryAuditors": SecondaryAuditor,
+            "General": General,
+            "Passthrough": Passthrough,
+        }
+        with transaction.atomic():
+            # This needs to be in the DISSEMINATED state in order
+            # to be redisseminated. Check that here.
+            if not self.submission_status == STATUS.DISSEMINATED:
+                logger.error("Trying to resubmit an audit that is not disseminated.")
+                raise AdministrativeOverrideError
+            try:
+                # Delete this record from the dissemination tables
+                for model in named_models.values():
+                    rows = model.objects.filter(report_id=self.report_id)
+                    rows.delete()
+                # Disseminate this record once more
+                self.disseminate()
+            except TransactionManagementError as err:
+                logger.error(f"transaction management error in redissemination: {err}")
+                raise err
+            except Exception as err:
+                logger.error(f"errors in redissemination: {err}")
+                return {"errors": [err]}
 
     def assign_cog_over(self):
         """
@@ -250,7 +324,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.save()
             record_cog_assignment(self.report_id, self.submitted_by, cognizant_agency)
 
-    def _reject_late_changes(self):
+    def _throw_exception_if_late_changes(self):
         """
         This should only be called if status isn't STATUS.IN_PROGRESS.
         If there have been relevant changes, raise an AssertionError.
