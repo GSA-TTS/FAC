@@ -10,8 +10,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
-from django.db import transaction
-
 from django.utils.translation import gettext_lazy as _
 
 import audit.cross_validation
@@ -56,18 +54,6 @@ from dissemination.models import (
 from django.utils.timezone import now
 from dissemination.models.general import ResubmissionStatus
 
-from dissemination.models import (
-    AdditionalEin,
-    AdditionalUei,
-    CapText,
-    FederalAward,
-    Finding,
-    FindingText,
-    General,
-    Note,
-    Passthrough,
-    SecondaryAuditor,
-)
 
 User = get_user_model()
 
