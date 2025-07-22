@@ -3,13 +3,13 @@ import json
 import logging
 
 from django.db import models
+from django.forms.models import model_to_dict
+from django.db import transaction
 from django.db.transaction import TransactionManagementError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
-from django.db import transaction
-
 from django.utils.translation import gettext_lazy as _
 
 import audit.cross_validation
@@ -51,6 +51,9 @@ from dissemination.models import (
     Passthrough,
     SecondaryAuditor,
 )
+from django.utils.timezone import now
+from dissemination.models.general import ResubmissionStatus
+
 
 User = get_user_model()
 
@@ -601,3 +604,60 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         if indices:
             return self.transition_date[indices[-1]]
         return None
+
+    # Resubmission SAC Creations
+    # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
+    def initiate_resubmission(self, user=None, event_type=None):
+        with transaction.atomic():
+            if SingleAuditChecklist.objects.filter(
+                resubmission_meta__previous_report_id=self.report_id
+            ).exists():
+                raise ValidationError(
+                    f"A resubmission already exists for report_id {self.report_id}."
+                )
+
+            # Convert to dict and exclude fields that should not be copied
+            excluded_fields = [
+                "id",
+                "report_id",
+                "created_at",
+                "updated_at",
+                "submitted_by",
+            ]
+            data = model_to_dict(self, exclude=excluded_fields)
+
+            # Manually add back foreign key as instance
+            data["submitted_by"] = self.submitted_by
+
+            # Add/override fields
+            data.update(
+                {
+                    "submission_status": STATUS.IN_PROGRESS,
+                    "resubmission_meta": {
+                        "previous_report_id": self.report_id,
+                        "previous_row_id": self.id,
+                        "resubmission_status": ResubmissionStatus.MOST_RECENT,
+                        "version": 2,
+                    },
+                    "transition_name": [STATUS.IN_PROGRESS],
+                    "transition_date": [now()],
+                }
+            )
+
+            resub = SingleAuditChecklist.objects.create(**data)
+
+            if event_type and user:
+                # Event on the new RESUB
+                SubmissionEvent.objects.create(
+                    sac=resub,
+                    user=user,
+                    event=event_type,
+                )
+                # Event on the original ORIG
+                SubmissionEvent.objects.create(
+                    sac=self,
+                    user=user,
+                    event="resubmission_initiated",
+                )
+
+            return resub
