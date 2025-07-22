@@ -14,6 +14,11 @@ def camel_to_hyphen(raw: str) -> str:
 
 urlpatterns = [
     path("", views.MySubmissions.as_view(), name="MySubmissions"),
+    path(
+        "resubmission-start",
+        views.ResubmissionStartView.as_view(),
+        name="ResubmissionStart",
+    ),
     path("<str:report_id>", views.EditSubmission.as_view(), name="EditSubmission"),
     path(
         "single-audit-report/<str:report_id>",
