@@ -1,0 +1,33 @@
+<legend class="usa-legend usa-legend--large" id="audit-actions">Audit Actions</legend>
+<ul class="usa-list">
+    <li>
+        <a class="usa-link"
+           aria-controls="modal-terms-conditions"
+           id="li-new-audit-submission"
+           data-open-modal>Start a new audit submission</a>
+    </li>
+    {% if data.in_progress_audits %}
+        <li>
+            <a class="usa-link" href="#table_in_progress">
+            View audits in progress
+            </a>
+        </li>
+    {% endif %}
+    {% if data.completed_audits %}
+        <li>
+            <a class="usa-link" href="#table_completed">
+                View completed audits
+            </a>
+        </li>
+    {% endif %}
+    <li>
+        <a href="{% url 'audit:ResubmissionStart' %}" class="usa-link">
+            Resubmit an audit
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'dissemination:Search' %}" class="usa-link">
+            Search for audits
+        </a>
+    </li>
+</ul>
