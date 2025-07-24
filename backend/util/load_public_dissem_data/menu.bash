@@ -347,11 +347,25 @@ EOF
   reset_migrated_to_audit
 }
 
+############################################################
+# generate_resubmissions
+############################################################
 generate_resubmissions () {
   echo "Running `docker compose` for generate_resubmissions"
   docker compose run \
+    -e RESUBMISSION_EMAIL=${RESUBMISSION_EMAIL} \
     --rm web \
     python manage.py generate_resubmissions
+}
+
+############################################################
+# generate_materialized_view
+############################################################
+generate_materialized_view () {
+  echo "Generate MATERIALIZED VIEW"
+  docker compose run \
+    --rm web \
+    python manage.py materialized_views --create
 }
 
 
@@ -362,6 +376,7 @@ options=(\
   "Load raw data" \
   "Generate fake suppressed reports" \
   "Re-disseminate SAC records" \
+  "Generate MATERIALIZED VIEW" \
   "Check row counts" \
   "Dump tables for reuse" \
   "Reset migrated_to_audit" \
@@ -386,6 +401,9 @@ do
             ;;
         "Re-disseminate SAC records")
             re_disseminate_sacs
+            ;;
+        "Generate MATERIALIZED VIEW")
+            generate_materialized_view
             ;;
         "Check row counts")
             check_all_row_counts

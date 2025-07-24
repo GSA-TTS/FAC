@@ -64,18 +64,21 @@ class ResubmissionTest(TestCase):
 
         self.assertTrue(
             SubmissionEvent.objects.filter(
-                sac=self.orig, user=self.user, event="resubmission_initiated"
+                sac=self.orig,
+                user=self.user,
+                event=SubmissionEvent.EventType.RESUBMISSION_INITIATED,
             ).exists()
         )
 
     def test_cannot_create_duplicate_resubmission(self):
         # First resubmission should succeed
         self.orig.initiate_resubmission(
-            user=self.user, event_type="resubmission_started"
+            user=self.user, event_type=SubmissionEvent.EventType.RESUBMISSION_STARTED
         )
 
         # Second resubmission should raise ValidationError
         with self.assertRaises(ValidationError):
             self.orig.initiate_resubmission(
-                user=self.user, event_type="resubmission_started"
+                user=self.user,
+                event_type=SubmissionEvent.EventType.RESUBMISSION_INITIATED,
             )

@@ -108,11 +108,19 @@ class SingleAuditReportFile(models.Model):
     def save(self, *args, **kwargs):
         report_id = self.sac.report_id
         self.filename = f"{report_id}.pdf"
-        if self.sac.submission_status != STATUS.IN_PROGRESS:
-            raise LateChangeError("Attempted PDF upload")
 
+        administrative_override = kwargs.pop("administrative_override", None)
         event_user = kwargs.pop("event_user", None)
         event_type = kwargs.pop("event_type", None)
+
+        if self.sac.submission_status != STATUS.IN_PROGRESS:
+            if administrative_override:
+                logger.info(
+                    f"administrative override on SAR upload for {self.sac.report_id}"
+                )
+            else:
+                raise LateChangeError("Attempted PDF upload")
+
         if event_user and event_type:
             self.user = event_user
             SubmissionEvent.objects.create(

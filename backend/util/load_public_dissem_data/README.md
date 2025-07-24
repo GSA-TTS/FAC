@@ -32,38 +32,50 @@ We need the stack running for this whole process.
 
 ## Grab the data
 
-From GDrive, grab the data.
+From GDrive, grab the data. You'll want two files:
 
+singleauditreportfile, excelfile, submissionevent:
 https://drive.google.com/file/d/1_EmykQamgw9VhjhFAPzgjQdk7pMzHgJW/view?usp=drive_link
 
 Grab the file `sac-user-access-valwaiver-pdf-xlsx-event-data-03-28-25.dump` (~6GB).
 Put it in util/load_public_dissem_data/data (a child of this directory).
 
-This will yield a dataset with the following counts:
-
-
-| table | count |
-| --- | --- |
-| audit_singleauditchecklist | 354,222 |
-| audit_access | 1,195,595|
-| auth_user | 75,461 |
-| dissemination_additionalein | 59,251 |
-| dissemination_additionaluei | 15,101 |
-| dissemination_captext | 116,694 |
-| dissemination_federalaward | 5,811,948 |
-| dissemination_finding | 507,895 |
-| dissemination_findingtext | 120,290 |
-| dissemination_general | 343,114 |
-| dissemination_note | 530,405 |
-| dissemination_passthrough | 4,025,800 |
-| dissemination_secondaryauditor | 1,803 |
-| audit_ueivalidationwaiver | 0 |
-| audit_sacvalidationwaiver | 1 |
-| audit_singleauditreportfile | 362229 |
-| audit_excelfile | 339149 |
-| audit_submissionevent | 1591563 |
-
 We use a subdirectory to make the .gitignore work easier/safer.
+
+# steps to get a local database ready for testing
+
+
+When you load the above file, you can check the counts, and you'll see things look bad:
+
+[PASS] audit_singleauditchecklist has 354222 rows
+[PASS] audit_access has 1195595 rows
+[PASS] auth_user has 75461 rows
+[FAIL] dissemination_additionalein should have 59251 rows; it has      0
+[FAIL] dissemination_additionaluei should have 15101 rows; it has      0
+[FAIL] dissemination_captext should have 116694 rows; it has      0
+[FAIL] dissemination_federalaward should have 5811960 rows; it has      0
+[FAIL] dissemination_finding should have 507895 rows; it has      0
+[FAIL] dissemination_findingtext should have 120290 rows; it has      0
+[FAIL] dissemination_general should have 343116 rows; it has      0
+[FAIL] dissemination_note should have 530407 rows; it has      0
+[FAIL] dissemination_passthrough should have 4025800 rows; it has      0
+[FAIL] dissemination_secondaryauditor should have 1803 rows; it has      0
+[PASS] audit_ueivalidationwaiver has 0 rows
+[PASS] audit_sacvalidationwaiver has 1 rows
+[PASS] audit_singleauditreportfile has 362229 rows
+[PASS] audit_excelfile has 339149 rows
+[PASS] audit_submissionevent has 1591563 rows
+
+This is because we've loaded the *internal* tables. Now, you can generate the external tables with the menu item `Re-disseminate SAC records`. This is slow. 
+
+We also need a `combined` table, which is a `MATERIALIZED VIEW`. Choose the `Generate MATERIALIZED VIEW` after disseminating SAC records to generate the MV.
+
+After these two steps, we can re-run the count check:
+
+
+
+
+
 
 # truncate and load
 
