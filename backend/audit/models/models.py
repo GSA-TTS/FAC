@@ -301,14 +301,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             return True
         return False
 
-    def duplicate_single_audit_checklist(self, excluded_fields=[]):
-        # Always exclude the row id.
-        excluded_fields.append("id")
-        data = model_to_dict(self, exclude=excluded_fields)
-        # Manually add back foreign key as instance
-        data["submitted_by"] = self.submitted_by
-        return SingleAuditChecklist.objects.create(**data)
-
     # Resubmission SAC Creations
     # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
     # FIXME: Do we need to pass event_type?
