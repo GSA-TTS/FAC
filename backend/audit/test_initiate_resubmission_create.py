@@ -25,7 +25,7 @@ class ResubmissionTest(TestCase):
 
     def test_resubmission_is_created_atomically_and_correctly(self):
         resub = self.orig.initiate_resubmission(
-            user=self.user, event_type="resubmission_started"
+            user=self.user, event_type=SubmissionEvent.EventType.RESUBMISSION_STARTED
         )
 
         # Report ID format check
@@ -58,7 +58,9 @@ class ResubmissionTest(TestCase):
         # SubmissionEvent created on both SACs
         self.assertTrue(
             SubmissionEvent.objects.filter(
-                sac=resub, user=self.user, event="resubmission_started"
+                sac=resub,
+                user=self.user,
+                event=SubmissionEvent.EventType.RESUBMISSION_STARTED,
             ).exists()
         )
 
