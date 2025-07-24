@@ -1,5 +1,5 @@
 ---
-name: Deploy to Staging Environment
+name: Deploy to the Staging Environment
 on:
   push:
     branches:
@@ -11,7 +11,7 @@ jobs:
   #   secrets: inherit
 
   linting:
-    uses: ./.github/workflows/linting.yml
+    uses: ./.github/workflows/pull_request-linting.yml
     secrets: inherit
 
   deploy-infrastructure-staging:
@@ -28,7 +28,7 @@ jobs:
     name: Record deployment to New Relic
     needs:
       - deploy-infrastructure-staging
-    uses: ./.github/workflows/new-relic-deployment.yml
+    uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
     with:
       environment: "staging"
     secrets: inherit
@@ -46,7 +46,7 @@ jobs:
     needs:
       - deploy-staging
     name: Zap Scan
-    uses: ./.github/workflows/zap-scan.yml
+    uses: ./.github/workflows/scanning-zap-scan.yml
     with:
       url: "https://fac-staging.app.cloud.gov/"
 
@@ -54,7 +54,7 @@ jobs:
     needs:
       - deploy-staging
     name: Run Regression Tests
-    uses: ./.github/workflows/regression-tests.yml
+    uses: ./.github/workflows/testing-cypress-regression-tests.yml
     secrets: inherit
     with:
       url: "https://fac-staging.app.cloud.gov"

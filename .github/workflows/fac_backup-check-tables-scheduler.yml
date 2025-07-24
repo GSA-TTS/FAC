@@ -1,5 +1,5 @@
 ---
-name: Check Tables Daily
+name: Daily Table Integrity Check Scheduler
 on:
   schedule:
     # Invoke every 12 hours
@@ -16,7 +16,7 @@ jobs:
           - name: staging
           - name: production
           - name: preview
-    uses: ./.github/workflows/fac-check-tables.yml
+    uses: ./.github/workflows/fac_backup-check-tables.yml
     secrets: inherit
     with:
       environment: ${{ matrix.environment.name }}

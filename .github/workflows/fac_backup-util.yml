@@ -1,11 +1,13 @@
 ---
-name: Check existing tables in an environment
+name: Backup the database with fac-backup-utility
 ### Common Commands:
-# ./fac-backup-util.sh v0.1.11 check_tables
+# ./fac-backup-util.sh v0.1.11 initial_backup
+# ./fac-backup-util.sh v0.1.11 deploy_backup
 on:
   workflow_dispatch:
     inputs:
       environment:
+        description: Environment Selection
         required: true
         type: choice
         options:
@@ -22,33 +24,22 @@ on:
         required: true
         type: choice
         options:
-          - 'check_tables'
-  workflow_call:
-    inputs:
-      environment:
-        required: true
-        type: string
-      util_version:
-        description: Version for fac backup utility to use (ex. vX.Y.Z)
-        required: true
-        type: string
-      backup_operation:
-        description: Operation for fac-backup-utility
-        required: true
-        type: string
+          - 'initial_backup'
+          - 'deploy_backup'
+          - 'on_demand_backup'
 jobs:
-  fac-check-tables:
-    name: Check tables in FAC Database
+  fac-backup:
+    name: Perform Database Backup
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
       space: ${{ inputs.environment }}
     steps:
-      - name: Check tables in ${{ env.space }}
+      - name: Backup FAC Database and Sync Media
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 3G --name check_tables --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}" --wait
+          command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}" --wait

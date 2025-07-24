@@ -1,9 +1,9 @@
 ---
-name: Export Data to CSV
+name: Execute Materialized Views Function
 on:
-  # schedule:
-  # Monthly, on the 5th, at 8am UTC (3am EST)
-  #  - cron: '0 8 5 * *'
+  schedule:
+    # Invoke at 6 UTC EST every day
+    - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
       environment:
@@ -15,14 +15,13 @@ on:
           - staging
           - preview
           - production
-
 jobs:
-  scheduled-data-export:
+  scheduled-materialized-views:
     if: ${{ github.event_name == 'schedule' }}
     strategy:
       matrix:
-        environments: ["production"]  # For now, just do the scheduled job on production to save space
-    name: Run data export on ${{ inputs.environment }}
+        environments: ["dev", "staging", "production"]
+    name: Run materialized views create on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ matrix.environments }}
     env:
@@ -35,11 +34,11 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name export_data_to_csv --command "python manage.py export_data" --wait
+          command: cf run-task gsa-fac -k 2G -m 2G --name scheduled_create_materialized_views --command "python manage.py materialized_views --create" --wait
 
-  dispatch-data-export:
+  dispatch-materialized-views:
     if: ${{ github.event.inputs.environment != '' }}
-    name: Run data export on ${{ inputs.environment }}
+    name: Run materialized views create on ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
@@ -52,4 +51,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name export_data_to_csv --command "python manage.py export_data" --wait
+          command: cf run-task gsa-fac -k 2G -m 2G --name dispatch_create_materialized_views --command "python manage.py materialized_views --create" --wait

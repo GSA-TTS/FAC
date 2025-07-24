@@ -1,5 +1,5 @@
 ---
-name: Run Daily Regression Tests
+name: Daily Cypress Regression Tests
 on:
   schedule:
     - cron: '0 9 * * 1-5'
@@ -7,7 +7,7 @@ on:
 jobs:
   regression-test:
     name: Run Regression Tests
-    uses: ./.github/workflows/regression-tests.yml
+    uses: ./.github/workflows/testing-cypress-regression-tests.yml
     secrets: inherit
     with:
       url: "https://fac-staging.app.cloud.gov"
