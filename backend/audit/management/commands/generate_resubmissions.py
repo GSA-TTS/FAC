@@ -156,6 +156,8 @@ def complete_resubmission(
     # The original SAC needs to have its status set to "RESUBMITTED"
     source_sac.transition_name.append(STATUS.RESUBMITTED)
     source_sac.transition_date.append(datetime.now().replace(tzinfo=pytz.utc))
+    # Go ahead and reassign this SAC to us, so we might see it in the UI at some point.
+    source_sac.submitted_by = USER_OBJ
     source_sac.save(
         administrative_override=True,
         event_user=USER_OBJ,
