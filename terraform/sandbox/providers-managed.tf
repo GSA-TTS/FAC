@@ -1,9 +1,13 @@
+# The content of this file is managed by Terraform. If you modify it, it may
+# be reverted the next time Terraform runs. If you want to make changes, do it
+# in ../meta/bootstrap-env/templates.
+
 terraform {
   required_version = "~> 1.0"
   required_providers {
     cloudfoundry = {
       source  = "cloudfoundry/cloudfoundry"
-      version = ">=1.6.0"
+      version = ">=1.8.0"
     }
     cloudfoundry-community = {
       source  = "cloudfoundry-community/cloudfoundry"
@@ -22,14 +26,13 @@ terraform {
   }
 }
 
-
 provider "cloudfoundry" {
   api_url  = "https://api.fr.cloud.gov"
   user     = var.cf_user
   password = var.cf_password
 }
 
-# Backwards compatability provider for all modules < v2.0.0
+# Backwards compatability provider
 # https://github.com/GSA-TTS/terraform-cloudgov/blob/main/UPGRADING.md#using-v1-and-v2-together
 provider "cloudfoundry-community" {
   api_url  = "https://api.fr.cloud.gov"

@@ -4,17 +4,6 @@ variable "cf_org_name" {
   default     = "gsa-tts-oros-fac"
 }
 
-variable "cf_user" {
-  type        = string
-  description = "cloud.gov deployer account user"
-}
-
-variable "cf_password" {
-  type        = string
-  description = "secret; cloud.gov deployer account password"
-  sensitive   = true
-}
-
 variable "pgrst_jwt_secret" {
   type        = string
   description = "the JWT signing secret for validating JWT tokens from api.data.gov"
