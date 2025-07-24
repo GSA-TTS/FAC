@@ -162,8 +162,10 @@ def complete_resubmission(
         event_type="bogus-event-finalize-resubmission-test-data",
     )
 
-    # Finally, redisseminate the new SAC record.
-    return resubmitted_sac.redisseminate()
+    # Finally, redisseminate the old and new SAC records.
+    new_status = source_sac.redisseminate()
+    old_status = resubmitted_sac.redisseminate()
+    return old_status and new_status
 
 
 class Command(BaseCommand):
