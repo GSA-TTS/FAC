@@ -1,6 +1,10 @@
 from django.utils.translation import gettext_lazy as _
 from collections import namedtuple as nt
 
+DATA_SOURCE_GSAFAC = "GSAFAC"
+DATA_SOURCE_CENSUS = "CENSUS"
+VALID_DATA_SOURCES = [DATA_SOURCE_GSAFAC, DATA_SOURCE_CENSUS]
+
 
 class ORGANIZATION_TYPE:
     STATE = "state"
@@ -24,6 +28,7 @@ class STATUS:
     CERTIFIED = "certified"
     SUBMITTED = "submitted"
     DISSEMINATED = "disseminated"
+    RESUBMITTED = "resubmitted"
     FLAGGED_FOR_REMOVAL = "flagged_for_removal"
 
 
@@ -36,6 +41,7 @@ STATUS_CHOICES = (
     (STATUS.CERTIFIED, "Certified"),
     (STATUS.SUBMITTED, "Submitted"),
     (STATUS.DISSEMINATED, "Disseminated"),
+    (STATUS.RESUBMITTED, "Resubmitted"),
 )
 
 

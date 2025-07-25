@@ -4,7 +4,6 @@ DATABASE=postgres
 USERNAME=postgres
 HOST=localhost
 PORT=5432
-FINISHED_FILENAME=${FINISHED_FILENAME:-data/internal-and-external-20250402.dump}
 RAW_FILENAME=${RAW_FILENAME:-data/sac-user-access-valwaiver-pdf-xlsx-event-data-03-28-25.dump}
 DATE=$(date '+%Y%m%d')
 
@@ -44,6 +43,7 @@ truncate () {
 		truncate
       audit_access,
       audit_singleauditchecklist,
+      audit_audit,
       auth_user,
       dissemination_additionalein,
       dissemination_additionaluei,
@@ -59,7 +59,8 @@ truncate () {
       audit_sacvalidationwaiver,
       audit_singleauditreportfile,
       audit_excelfile,
-      audit_submissionevent
+      audit_submissionevent,
+      users_userprofile
     cascade;
 	commit;
 EOF
@@ -70,7 +71,7 @@ EOF
 }
 
 ############################################################
-# load_raw_data
+# reset_migrated_to_audit
 ############################################################
 reset_migrated_to_audit () {
 
@@ -138,8 +139,14 @@ load_raw_data () {
 # load_finished_data
 ############################################################
 load_finished_data () {
-  echo "Loading ${FINISHED_FILENAME}"
-  cat ${FINISHED_FILENAME} | \
+  read -p "Enter the finished file (default: data/use_with_generate_resubmissions.dump): " finished_filename
+  if [ -z "$finished_filename" ]; then
+    finished_filename="data/use_with_generate_resubmissions.dump"
+  fi
+
+  echo "Loading ${finished_filename}"
+
+  cat ${finished_filename} | \
     grep -v "transaction_timeout" | \
     psql \
 		-d ${DATABASE} \
@@ -271,20 +278,29 @@ check_all_row_counts () {
 # dump_for_reuse
 ############################################################
 dump_for_reuse () {
-  DUMPFILE=internal-and-external-${DATE}.dump
+  default_dumpfile=data/internal-and-external-${DATE}.dump
 
-  rm -f ${DUMPFILE}
+  read -p "Enter the finished file (default: $default_dumpfile): " dumpfile
+  if [ -z "$dumpfile" ]; then
+    echo "Using default dump file: $default_dumpfile"
+    dumpfile=$default_dumpfile
+  fi
+
+  echo "Dumping data to ${dumpfile}"
+
+  rm -f "${dumpfile}"
 
   pg_dump \
   -a \
   -F p \
-  -f ${DUMPFILE} \
+  -f "${dumpfile}" \
   -d postgres \
   -h localhost \
   -p 5432 \
   -U postgres \
   -w \
   -t audit_singleauditchecklist \
+  -t audit_audit \
   -t audit_access \
   -t auth_user \
   -t dissemination_additionalein \
@@ -301,7 +317,8 @@ dump_for_reuse () {
   -t audit_sacvalidationwaiver \
   -t audit_singleauditreportfile \
   -t audit_excelfile \
-  -t audit_submissionevent
+  -t audit_submissionevent \
+  -t users_userprofile
 }
 
 
@@ -330,6 +347,26 @@ EOF
   reset_migrated_to_audit
 }
 
+############################################################
+# generate_resubmissions
+############################################################
+generate_resubmissions () {
+  echo "Running `docker compose` for generate_resubmissions"
+  docker compose run \
+    --rm web \
+    python manage.py generate_resubmissions --email ${RESUBMISSION_EMAIL}
+}
+
+############################################################
+# generate_materialized_view
+############################################################
+generate_materialized_view () {
+  echo "Generate MATERIALIZED VIEW"
+  docker compose run \
+    --rm web \
+    python manage.py materialized_views --create
+}
+
 
 PS3='Please enter your choice: '
 options=(\
@@ -338,10 +375,12 @@ options=(\
   "Load raw data" \
   "Generate fake suppressed reports" \
   "Re-disseminate SAC records" \
+  "Generate MATERIALIZED VIEW" \
   "Check row counts" \
   "Dump tables for reuse" \
   "Reset migrated_to_audit" \
   "Truncate audit_audit" \
+  "Generate resubmissions"
   "Quit"\
 )
 select opt in "${options[@]}"
@@ -362,6 +401,9 @@ do
         "Re-disseminate SAC records")
             re_disseminate_sacs
             ;;
+        "Generate MATERIALIZED VIEW")
+            generate_materialized_view
+            ;;
         "Check row counts")
             check_all_row_counts
             ;;
@@ -373,6 +415,9 @@ do
             ;;
         "Truncate audit_audit")
             truncate_sourceoftruth
+            ;;
+        "Generate resubmissions")
+            generate_resubmissions
             ;;
         "Quit")
             break
