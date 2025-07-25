@@ -40,9 +40,15 @@ class ResubmissionTest(TestCase):
             self.orig.general_information["auditee_fiscal_period_end"],
         )
 
+        # Fields that should NOT be carried over (assuming they were set in orig)
+        self.assertNotIn("some_extra_field", resub.general_information)
+        self.assertNotEqual(resub.report_id, self.orig.report_id)
+        self.assertNotEqual(resub.id, self.orig.id)
+
         # Submission status and transition
         self.assertEqual(resub.submission_status, STATUS.IN_PROGRESS)
         self.assertEqual(resub.transition_name, [STATUS.IN_PROGRESS])
+        self.assertEqual(len(resub.transition_date), 1)
 
         # Resubmission meta structure
         self.assertEqual(
