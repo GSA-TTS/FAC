@@ -2,6 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from audit.models import SingleAuditChecklist
+from audit.check_resubmission_allowed import check_resubmission_allowed
 
 
 class ResubmissionStartForm(forms.Form):
@@ -27,9 +28,15 @@ class ResubmissionStartForm(forms.Form):
             sac = SingleAuditChecklist.objects.get(
                 report_id=text_input, submission_status="disseminated"
             )
-            self.cleaned_data["sac_row_id"] = sac.id
         except SingleAuditChecklist.DoesNotExist:
             raise ValidationError("Audit to resubmit not found.")
+        # 4. Check if resubmission is allowed
+        allowed, reason = check_resubmission_allowed(sac)
+        if not allowed:
+            raise ValidationError(reason)
+
+        # Store sac ID for use in the view
+        self.cleaned_data["sac_row_id"] = sac.id
 
         # The field is clean, return it.
         return text_input
