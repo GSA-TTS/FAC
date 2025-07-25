@@ -39,17 +39,26 @@ def check_resubmission_allowed(sac: SingleAuditChecklist) -> Tuple[bool, str]:
     ):
         return True, "Most recent audit is eligible for resubmission."
 
-    # Legacy audit (meta = None, version = 0)
+        # Legacy audit (meta = None, version = 0)
     if not meta and version == 0:
         siblings = SingleAuditChecklist.objects.filter(
             general_information__uei=uei,
             general_information__audit_year=year,
-        ).filter(resubmission_meta__isnull=True)
+            resubmission_meta__isnull=True,
+        )
 
         if siblings.count() == 1:
             return True, "Legacy audit is eligible for first resubmission."
 
-        most_recent = siblings.order_by("-transition_date__0", "-id").first()
+        sorted_siblings = sorted(
+            siblings,
+            key=lambda s: (
+                s.transition_date[0] if s.transition_date else timezone.datetime.min,
+                s.id,
+            ),
+        )
+        most_recent = sorted_siblings[-1]
+
         if sac.id != most_recent.id:
             return False, (
                 f"Multiple legacy audits found for this UEI and audit year. "
@@ -57,14 +66,12 @@ def check_resubmission_allowed(sac: SingleAuditChecklist) -> Tuple[bool, str]:
             )
 
         # Check timestamp clustering
-        dates = list(siblings.values_list("transition_date", flat=True))
-        if dates:
-            all_dates = [d[0] if isinstance(d, list) else d for d in dates]
-            if max(all_dates) - min(all_dates) < timezone.timedelta(seconds=10):
-                return False, (
-                    "Multiple legacy audits with close timestamps were found for the same UEI and year. "
-                    "This may indicate incorrect UEI use across unrelated entities. Please contact support."
-                )
+        dates = [s.transition_date[0] for s in siblings if s.transition_date]
+        if len(dates) > 1 and max(dates) - min(dates) < timezone.timedelta(seconds=10):
+            return False, (
+                "Multiple legacy audits with close timestamps were found for the same UEI and year. "
+                "This may indicate incorrect UEI use across unrelated entities. Please contact support."
+            )
 
         return (
             True,

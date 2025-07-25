@@ -70,11 +70,18 @@ class TestCheckResubmissionAllowed(TestCase):
         self.assertIn("legacy", message.lower())
 
     def test_legacy_multiple_records_not_most_recent(self):
+        create_sac(
+            version=0,
+            meta=None,
+            transition_date=timezone.now(),
+        )
+
         earlier = create_sac(
             version=0,
             meta=None,
-            transition_date=timezone.now() - timezone.timedelta(seconds=20),
+            transition_date=timezone.now() - timezone.timedelta(seconds=30),
         )
+
         allowed, message = check_resubmission_allowed(earlier)
         self.assertFalse(allowed)
         self.assertIn("most recent", message.lower())
@@ -92,11 +99,19 @@ class TestCheckResubmissionAllowed(TestCase):
 
     def test_legacy_suspicious_timestamp_cluster(self):
         ts_base = timezone.now()
+
+        create_sac(
+            version=0,
+            meta=None,
+            transition_date=ts_base,
+        )
         sac2 = create_sac(
             version=0,
             meta=None,
             transition_date=ts_base + timezone.timedelta(seconds=5),
         )
+
+        # sac2 is the most recent and should fail due to close timestamps
         allowed, message = check_resubmission_allowed(sac2)
         self.assertFalse(allowed)
         self.assertIn("timestamps", message.lower())
