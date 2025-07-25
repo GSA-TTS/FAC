@@ -16,6 +16,8 @@ from dissemination.models import (
 )
 from audit.utils import Util
 
+from audit.intakelib.transforms.xform_resize_award_references import _format_reference
+
 logger = logging.getLogger(__name__)
 
 
@@ -112,7 +114,10 @@ class IntakeToDissemination(object):
                 program = entry["program"]
 
                 finding = Finding(
-                    award_reference=program["award_reference"],
+                    # 20250725 MCJ
+                    # When we redisseminate, we'll normalize everything on the
+                    # longer award reference number.
+                    award_reference=_format_reference(program["award_reference"]),
                     reference_number=findings["reference_number"],
                     is_material_weakness=entry["material_weakness"],
                     is_modified_opinion=entry["modified_opinion"],
@@ -143,7 +148,10 @@ class IntakeToDissemination(object):
                     "additional_award_identification", ""
                 ),
                 amount_expended=program["amount_expended"],
-                award_reference=entry["award_reference"],
+                # 20250725 MCJ
+                # When we redisseminate, we'll normalize everything on the
+                # longer award reference number.
+                award_reference=_format_reference(entry["award_reference"]),
                 cluster_name=cluster["cluster_name"],
                 cluster_total=cluster["cluster_total"],
                 federal_agency_prefix=program["federal_agency_prefix"],
@@ -237,7 +245,10 @@ class IntakeToDissemination(object):
             entities = entry.get("direct_or_indirect_award", {}).get("entities", [])
             for entity in entities:
                 passthrough = Passthrough(
-                    award_reference=entry["award_reference"],
+                    # 20250725 MCJ
+                    # When we redisseminate, we'll normalize everything on the
+                    # longer award reference number.
+                    award_reference=_format_reference(entry["award_reference"]),
                     report_id=self.loaded_objects["Generals"][0],
                     passthrough_id=entity.get("passthrough_identifying_number", ""),
                     passthrough_name=entity["passthrough_name"],

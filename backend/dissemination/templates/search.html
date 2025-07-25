@@ -123,7 +123,7 @@
                                 <p class="margin-0">Download all</p>
                             </button>
                         {% endif %}
-                        {% if results_count <= summary_report_download_limit %}
+                        {% if results_count <= findings_report_download_limit %}
                             <button class="usa-button display-flex"
                                     formaction="{% url 'dissemination:FindingsSummaryReportDownload' %}"
                                     form="audit-search-form">
