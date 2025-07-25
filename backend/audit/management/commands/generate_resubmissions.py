@@ -5,10 +5,10 @@ from audit.models import (
 from django.core.management.base import BaseCommand
 from audit.models.constants import STATUS
 from dissemination.models.general import ResubmissionStatus
+from django.forms.models import model_to_dict
 
 from datetime import datetime
 import pytz
-import os
 
 import logging
 import sys
@@ -17,16 +17,13 @@ from django.contrib.auth import get_user_model
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-SAC_WITH_DIFFERENT_PDF = {"report_id": "2019-06-CENSUS-0000191689"}
-
 User = get_user_model()
-from audit.models.submission_event import SubmissionEvent
 
 
 #############################################
 # modify_total_amount_expended
 #############################################
-def modify_total_amount_expended(sac):
+def modify_total_amount_expended(sac, user_obj):
     logger.info("MODIFIER: modify_total_amount_expended")
     current_amount = sac.federal_awards["FederalAwards"]["total_amount_expended"]
     new_amount = current_amount - 100000
@@ -36,7 +33,7 @@ def modify_total_amount_expended(sac):
 #############################################
 # modify_auditee_ein
 #############################################
-def modify_auditee_ein(sac):
+def modify_auditee_ein(sac, user_obj):
     logger.info("MODIFIER: modify_auditee_ein")
     sac.general_information["ein"] = "999888777"
 
@@ -44,7 +41,7 @@ def modify_auditee_ein(sac):
 #############################################
 # modify_auditor_address
 #############################################
-def modify_auditor_address(sac):
+def modify_auditor_address(sac, user_obj):
     """
     Modify a resubmission with a new address
     """
@@ -64,7 +61,7 @@ def modify_auditor_address(sac):
 #############################################
 # modify_additional_eins_workbook
 #############################################
-def modify_additional_eins_workbook(sac):
+def modify_additional_eins_workbook(sac, user_obj):
     """
     Modify a resubmission with a changed workbook
     """
@@ -77,25 +74,56 @@ def modify_additional_eins_workbook(sac):
 #############################################
 # modify_pdf_point_at_this_instead
 #############################################
-def modify_pdf_point_at_this_instead(report_id):
+def modify_pdf_point_at_this_instead(old_report_id):
     """
     Modify a resubmission with a changed PDF
     This function returns a function (breaking the pattern)
     so we can pass in a report id for the PDF that we want to *point to*.
     """
 
-    def _do_modify(sac):
+    def _do_modify(new_sac, user_obj):
         logger.info("MODIFIER: modify_pdf")
-        sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        sar = SingleAuditReportFile.objects.get(sac=sac)
+        logger.info(
+            f"old_report_id: {old_report_id} new_report_id: {new_sac.report_id}"
+        )
+        old_sac = SingleAuditChecklist.objects.get(report_id=old_report_id)
 
-        sar.sac_id = sac.id
-        # TODO: This also causes a LateChangeError
-        sar.save(
+        # Now we have a new SAC, and it points to a report.
+        # We also have the old SAC.
+        # I want delete the SAR currently associated with the new_sac
+        # Then, I want to copy the SAR associated with the old SAC
+        # Then, I want that copy to refer back to the new sac.
+
+        # First, delete the SAR(s) we created as a default part of this test data generator.
+        recently_created_sars = SingleAuditReportFile.objects.filter(sac=new_sac)
+        logger.info(f"Found new SARS: {len(recently_created_sars)}")
+        recently_created_sars.delete()
+        logger.info(f"After delete: {len(recently_created_sars)}")
+
+        # Then, copy the SAR associated with the old SAC.
+        old_sar = (
+            SingleAuditReportFile.objects.filter(sac=old_sac)
+            .order_by("date_created")
+            .first()
+        )
+        logger.info(f"SAR we are copying ID: {old_sar.id}")
+        old_filename = f"{old_sar.filename}"
+
+        # Null out the PK, and it will create a new one that is a copy.
+        old_sar.pk = None
+        # Now, this is effectively a NEW sar
+        new_sar = old_sar
+        # Now, point the SAC id of the new SAR at the new SAC id.
+        new_sar.sac_id = new_sac.id
+        # Save it as a new row
+        logger.info(f"Trying to update filename to {old_filename}")
+        new_sar.save(
             administrative_override=True,
-            event_user=User.objects.first(),
+            filename_override=old_filename,
+            event_user=user_obj,
             event_type="bogus-event-generate-test-pdf",
         )
+        logger.info(f"Saved as id {new_sar.id}")
 
     return _do_modify
 
@@ -178,6 +206,9 @@ class Command(BaseCommand):
     modifies the data of the resubmitted reports so we can test if there were changes.
     """
 
+    def add_arguments(self, parser):
+        parser.add_argument("--email", required=False)
+
     def handle(self, *args, **options):
         reportids_to_modifiers = REPORTIDS_TO_MODIFIERS()
 
@@ -211,12 +242,10 @@ class Command(BaseCommand):
         # FIXME: Allow an email address to be passed in, so we can see these things
         # in our dashboards. For now: any user will do.
         try:
-            THE_USER_OBJ = User.objects.get(email=os.getenv("RESUBMISSION_EMAIL"))
-        except:
+            THE_USER_OBJ = User.objects.get(email=options["email"])
+        except User.DoesNotExist or User.MultipleObjectsReturned:
             THE_USER_OBJ = User.objects.first()
-        logger.info(
-            f"Using user {os.getenv('RESUBMISSION_EMAIL')} {THE_USER_OBJ.email}"
-        )
+        logger.info(f"Passed email: {options['email']}, Using user {THE_USER_OBJ}")
 
         # Start by taking a record and duplicating it, save for
         # some of the state around the transitions.
@@ -228,7 +257,7 @@ class Command(BaseCommand):
         # Get the PDF report associated with this SAC, and
         # create a "resubmitted" PDF
         sac_sar = SingleAuditReportFile.objects.filter(sac=sac).first()
-        sac_sar.file.name = f"singleauditreport/{new_sac.report_id}.pdf"
+        sac_sar.filename = f"singleauditreport/{new_sac.report_id}.pdf"
         new_sac_sar = SingleAuditReportFile.objects.create(
             file=sac_sar.file,
             sac=new_sac,
@@ -241,7 +270,7 @@ class Command(BaseCommand):
         # Perform modifications on the new resubmission
         # Invokes one or more modification functions (below)
         for modification in modifiers:
-            modification(new_sac)
+            modification(new_sac, THE_USER_OBJ)
 
         # Make sure we created a valid SAC entry.
         # If not, error out.

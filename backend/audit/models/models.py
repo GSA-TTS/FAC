@@ -630,15 +630,21 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         errors = []
         result = {}
 
-        for section, section_handlers in FORM_SECTION_HANDLERS.items():
+        for section_handlers in FORM_SECTION_HANDLERS.values():
             validation_method = section_handlers["validator"]
             section_name = section_handlers["field_name"]
             audit_data = getattr(self, section_name)
 
+            # If audit_data is None, we don't want to try and validate it.
+            # That means it is missing/not uploaded yet.
+            # We should instead "validate" an empty object.
+            if audit_data is None:
+                audit_data = {}
+
+            # Run the validations always
             try:
                 validation_method(audit_data)
             except ValidationError as err:
-                # err.error_list will be [] if the workbook wasn't uploaded yet
                 if err.error_list:
                     errors.append(
                         {

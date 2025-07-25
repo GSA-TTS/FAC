@@ -113,12 +113,34 @@ class SingleAuditReportFile(models.Model):
         event_user = kwargs.pop("event_user", None)
         event_type = kwargs.pop("event_type", None)
 
-        if self.sac.submission_status != STATUS.IN_PROGRESS:
-            if administrative_override:
-                logger.info(
-                    f"administrative override on SAR upload for {self.sac.report_id}"
-                )
-            else:
+        match self.sac.submission_status:
+            # If we are in-progress, we may want to do something odd,
+            # like override the filename. In that case, we'll do so,
+            # and continue on through to save. Why? Because it is IN_PROGRESS.
+            case STATUS.IN_PROGRESS:
+                if administrative_override:
+                    filename_override = kwargs.pop("filename_override", None)
+                    if filename_override:
+                        self.filename = filename_override
+                    logger.info(
+                        f"administrative override on SAR upload for {self.sac.report_id}"
+                    )
+            # If we are already DISSEMINATED, we should not be doing any editing.
+            # The only way we will fall through this is if we have an administrative
+            # override. That lets us edit/do a save. We do not
+            # currently use this, but might in the future.
+            case STATUS.DISSEMINATED:
+                if administrative_override:
+                    logger.info(
+                        f"administrative override on SAR upload for {self.sac.report_id}"
+                    )
+                # Without an administrative override, this should be a late change
+                # error. Throw it.
+                else:
+                    raise LateChangeError("Attempted PDF upload")
+            # If we are NOT IN_PROGRESS, we should absolutely throw
+            # a late change error. This is all other states.
+            case _:
                 raise LateChangeError("Attempted PDF upload")
 
         if event_user and event_type:
@@ -138,4 +160,4 @@ class SingleAuditReportFile(models.Model):
                     },
                 )
 
-        super().save(*args, **kwargs)
+        super().save()

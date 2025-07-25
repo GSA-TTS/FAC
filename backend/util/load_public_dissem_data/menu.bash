@@ -353,9 +353,8 @@ EOF
 generate_resubmissions () {
   echo "Running `docker compose` for generate_resubmissions"
   docker compose run \
-    -e RESUBMISSION_EMAIL=${RESUBMISSION_EMAIL} \
     --rm web \
-    python manage.py generate_resubmissions
+    python manage.py generate_resubmissions --email ${RESUBMISSION_EMAIL}
 }
 
 ############################################################
