@@ -615,16 +615,15 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 raise ValidationError(
                     f"A resubmission already exists for report_id {self.report_id}."
                 )
-
-            # Convert to dict and exclude fields that should not be copied
-            excluded_fields = [
-                "id",
-                "report_id",
-                "created_at",
-                "updated_at",
-                "submitted_by",
+            # Fields to keep in resubmission
+            include_fields = [
+                "general_information",
+                "UEI",
+                "fy_start_date",
+                "fy_end_date",
             ]
-            data = model_to_dict(self, exclude=excluded_fields)
+
+            data = model_to_dict(self, fields=include_fields)
 
             # Manually add back foreign key as instance
             data["submitted_by"] = self.submitted_by
