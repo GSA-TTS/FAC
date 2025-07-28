@@ -5,7 +5,6 @@ from audit.models import (
 from django.core.management.base import BaseCommand
 from audit.models.constants import STATUS
 from dissemination.models.general import ResubmissionStatus
-from django.forms.models import model_to_dict
 
 from datetime import datetime
 import pytz
