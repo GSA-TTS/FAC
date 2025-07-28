@@ -24,9 +24,7 @@ class ResubmissionTest(TestCase):
         )
 
     def test_resubmission_is_created_atomically_and_correctly(self):
-        resub = self.orig.initiate_resubmission(
-            user=self.user, event_type=SubmissionEvent.EventType.RESUBMISSION_STARTED
-        )
+        resub = self.orig.initiate_resubmission(user=self.user, log_events=True)
 
         # Report ID format check
         self.assertRegex(resub.report_id, r"\d{4}-\d{2}-GSAFAC-\d{10}")
@@ -80,13 +78,8 @@ class ResubmissionTest(TestCase):
 
     def test_cannot_create_duplicate_resubmission(self):
         # First resubmission should succeed
-        self.orig.initiate_resubmission(
-            user=self.user, event_type=SubmissionEvent.EventType.RESUBMISSION_STARTED
-        )
+        self.orig.initiate_resubmission(user=self.user, log_events=True)
 
         # Second resubmission should raise ValidationError
         with self.assertRaises(ValidationError):
-            self.orig.initiate_resubmission(
-                user=self.user,
-                event_type=SubmissionEvent.EventType.RESUBMISSION_INITIATED,
-            )
+            self.orig.initiate_resubmission(user=self.user, log_events=True)
