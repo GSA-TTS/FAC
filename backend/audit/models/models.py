@@ -312,15 +312,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                     f"A resubmission already exists for report_id {self.report_id}."
                 )
 
-            # Fields to keep in resubmission
-            include_fields = [
-                "general_information",
-                "UEI",
-                "fy_start_date",
-                "fy_end_date",
-            ]
+            # Clone the record
+            data = model_to_dict(self)
 
-            data = model_to_dict(self, fields=include_fields)
+            # Update individual fields
+            data["general_information"]["auditee_uei"] = self.auditee_uei
+            data["general_information"][
+                "auditee_fiscal_period_start"
+            ] = self.auditee_fiscal_period_start
+            data["general_information"][
+                "auditee_fiscal_period_end"
+            ] = self.auditee_fiscal_period_end
 
             # Manually add back foreign key as instance
             data["submitted_by"] = self.submitted_by
