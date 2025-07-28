@@ -32,13 +32,10 @@ We need the stack running for this whole process.
 
 ## Grab the data
 
-From GDrive, grab the data. You'll want two files:
-
-singleauditreportfile, excelfile, submissionevent:
-https://drive.google.com/file/d/1_EmykQamgw9VhjhFAPzgjQdk7pMzHgJW/view?usp=drive_link
-
 Grab the file `sac-user-access-valwaiver-pdf-xlsx-event-data-03-28-25.dump` (~6GB).
 Put it in util/load_public_dissem_data/data (a child of this directory).
+
+https://drive.google.com/file/d/1_EmykQamgw9VhjhFAPzgjQdk7pMzHgJW/view?usp=drive_link
 
 We use a subdirectory to make the .gitignore work easier/safer.
 
@@ -70,12 +67,7 @@ This is because we've loaded the *internal* tables. Now, you can generate the ex
 
 We also need a `combined` table, which is a `MATERIALIZED VIEW`. Choose the `Generate MATERIALIZED VIEW` after disseminating SAC records to generate the MV.
 
-After these two steps, we can re-run the count check:
-
-
-
-
-
+After these two steps, we can re-run the count check. Everything *should* pass.
 
 # truncate and load
 
