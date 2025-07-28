@@ -31,7 +31,12 @@ from audit.validators import (
     validate_audit_information_json,
 )
 from audit.utils import FORM_SECTION_HANDLERS
-from audit.models.constants import SAC_SEQUENCE_ID, STATUS
+from audit.models.constants import (
+    SAC_SEQUENCE_ID,
+    STATUS,
+    DATA_SOURCE_GSAFAC,
+    VALID_DATA_SOURCES,
+)
 from audit.models.utils import get_next_sequence_id
 from support.cog_over import compute_cog_over, record_cog_assignment
 from .files import SingleAuditReportFile
@@ -61,7 +66,7 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: Update Post SOC Launch -> This whole file should be able to be deleted.
-def generate_sac_report_id(sequence=None, end_date=None, source="GSAFAC"):
+def generate_sac_report_id(sequence=None, end_date=None, source=DATA_SOURCE_GSAFAC):
     """
     Convenience method for generating report_id, a value consisting of:
 
@@ -74,7 +79,7 @@ def generate_sac_report_id(sequence=None, end_date=None, source="GSAFAC"):
     For example: `2023-09-GSAFAC-0000000001`, `2020-09-CENSUS-0000000001`.
     """
     source = source.upper()
-    if source not in ("CENSUS", "GSAFAC"):
+    if source not in VALID_DATA_SOURCES:
         raise Exception("Unknown source for report_id")
     if not sequence:
         raise Exception("generate_sac_report_id requires a sequence number.")
@@ -116,7 +121,7 @@ class SingleAuditChecklistManager(models.Manager):
         end_date = obj_data["general_information"]["auditee_fiscal_period_end"]
         sequence = get_next_sequence_id(SAC_SEQUENCE_ID)
         report_id = generate_sac_report_id(
-            sequence=sequence, end_date=end_date, source="GSAFAC"
+            sequence=sequence, end_date=end_date, source=DATA_SOURCE_GSAFAC
         )
         updated = obj_data | {"id": sequence, "report_id": report_id}
 
@@ -293,6 +298,70 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             except Exception as err:
                 logger.error(f"errors in redissemination: {err}")
                 return {"errors": [err]}
+            return True
+        return False
+
+    # Resubmission SAC Creations
+    # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
+    # FIXME: Do we need to pass event_type?
+    def initiate_resubmission(self, user=None, event_type=None):
+        with transaction.atomic():
+            if SingleAuditChecklist.objects.filter(
+                resubmission_meta__previous_report_id=self.report_id
+            ).exists():
+                raise ValidationError(
+                    f"A resubmission already exists for report_id {self.report_id}."
+                )
+
+            # Fields to keep in resubmission
+            include_fields = [
+                "general_information",
+                "UEI",
+                "fy_start_date",
+                "fy_end_date",
+            ]
+
+            data = model_to_dict(self, fields=include_fields)
+
+            # Manually add back foreign key as instance
+            data["submitted_by"] = self.submitted_by
+
+            # We always need to update the data source on a resubmission.
+            # It is GSAFAC.
+            data["data_source"] = DATA_SOURCE_GSAFAC
+
+            # Add/override fields
+            data.update(
+                {
+                    "submission_status": STATUS.IN_PROGRESS,
+                    "resubmission_meta": {
+                        "previous_report_id": self.report_id,
+                        "previous_row_id": self.id,
+                        "resubmission_status": ResubmissionStatus.MOST_RECENT,
+                        "version": 2,
+                    },
+                    "transition_name": [STATUS.IN_PROGRESS],
+                    "transition_date": [now()],
+                }
+            )
+
+            resub = SingleAuditChecklist.objects.create(**data)
+
+            if event_type and user:
+                # Event on the new RESUB
+                SubmissionEvent.objects.create(
+                    sac=resub,
+                    user=user,
+                    event=SubmissionEvent.EventType.RESUBMISSION_STARTED,
+                )
+                # Event on the original ORIG
+                SubmissionEvent.objects.create(
+                    sac=self,
+                    user=user,
+                    event=SubmissionEvent.EventType.RESUBMISSION_INITIATED,
+                )
+
+            return resub
 
     def assign_cog_over(self):
         """
@@ -394,7 +463,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     submission_status = models.CharField(
         default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES
     )
-    data_source = models.CharField(default="GSAFAC")
+    data_source = models.CharField(default=DATA_SOURCE_GSAFAC)
 
     # implement an array of tuples as two arrays since we can only have simple fields inside an array
     transition_name = ArrayField(
@@ -559,15 +628,21 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         errors = []
         result = {}
 
-        for section, section_handlers in FORM_SECTION_HANDLERS.items():
+        for section_handlers in FORM_SECTION_HANDLERS.values():
             validation_method = section_handlers["validator"]
             section_name = section_handlers["field_name"]
             audit_data = getattr(self, section_name)
 
+            # If audit_data is None, we don't want to try and validate it.
+            # That means it is missing/not uploaded yet.
+            # We should instead "validate" an empty object.
+            if audit_data is None:
+                audit_data = {}
+
+            # Run the validations always
             try:
                 validation_method(audit_data)
             except ValidationError as err:
-                # err.error_list will be [] if the workbook wasn't uploaded yet
                 if err.error_list:
                     errors.append(
                         {
@@ -604,59 +679,3 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         if indices:
             return self.transition_date[indices[-1]]
         return None
-
-    # Resubmission SAC Creations
-    # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
-    def initiate_resubmission(self, user=None, event_type=None):
-        with transaction.atomic():
-            if SingleAuditChecklist.objects.filter(
-                resubmission_meta__previous_report_id=self.report_id
-            ).exists():
-                raise ValidationError(
-                    f"A resubmission already exists for report_id {self.report_id}."
-                )
-            # Fields to keep in resubmission
-            include_fields = [
-                "general_information",
-                "UEI",
-                "fy_start_date",
-                "fy_end_date",
-            ]
-
-            data = model_to_dict(self, fields=include_fields)
-
-            # Manually add back foreign key as instance
-            data["submitted_by"] = self.submitted_by
-
-            # Add/override fields
-            data.update(
-                {
-                    "submission_status": STATUS.IN_PROGRESS,
-                    "resubmission_meta": {
-                        "previous_report_id": self.report_id,
-                        "previous_row_id": self.id,
-                        "resubmission_status": ResubmissionStatus.MOST_RECENT,
-                        "version": 2,
-                    },
-                    "transition_name": [STATUS.IN_PROGRESS],
-                    "transition_date": [now()],
-                }
-            )
-
-            resub = SingleAuditChecklist.objects.create(**data)
-
-            if event_type and user:
-                # Event on the new RESUB
-                SubmissionEvent.objects.create(
-                    sac=resub,
-                    user=user,
-                    event=event_type,
-                )
-                # Event on the original ORIG
-                SubmissionEvent.objects.create(
-                    sac=self,
-                    user=user,
-                    event="resubmission_initiated",
-                )
-
-            return resub
