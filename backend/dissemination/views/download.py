@@ -20,7 +20,7 @@ from dissemination.file_downloads import (
     get_filename_from_audit,
 )
 from dissemination.forms.search_forms import AdvancedSearchForm
-from dissemination.mixins import ReportAccessRequiredMixin
+from dissemination.mixins import ReportAccessRequiredMixin, FederalAccessRequiredMixin
 from dissemination.models import (
     General,
     OneTimeAccess,
@@ -244,7 +244,7 @@ class MultipleSummaryReportDownloadView(View):
             raise BadRequest(err)
 
 
-class FindingsSummaryReportDownloadView(View):
+class FindingsSummaryReportDownloadView(FederalAccessRequiredMixin, View):
     def post(self, request):
         """
         1. Run a fresh search with the provided search parameters

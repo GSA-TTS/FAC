@@ -62,9 +62,9 @@ def get_findings_for_agency_number(report_ids):
                     report_id__in=report_ids_with_findings, findings_count__gte=1
                 ),
             )
-        # lmap(lambda d: d["report_id"], awards_with_findings))
 
         # To speed things up, key those by report-id/award-ref
+        # This builds a lookup table to directly find awards associated with a report.
         with Timing("FINDINGS GFFAN AWFK"):
             awards_with_findings_keyed = {}
             for a in awards_with_findings:
@@ -143,11 +143,12 @@ def get_findings_for_agency_number(report_ids):
                         d["prior_finding_ref_numbers"] = fobj[
                             "prior_finding_ref_numbers"
                         ]
+                        # This builds a dictionary based on agency prefix.
+                        # Each agency number becomes a tab in the spreadsheet.
                         if aobj["federal_agency_prefix"] in results:
                             results[aobj["federal_agency_prefix"]].append(d)
                         else:
                             results[aobj["federal_agency_prefix"]] = [d]
-    # Order these
     return results
 
 
@@ -196,20 +197,25 @@ yes_fill = PatternFill(start_color="FFD700", end_color="FFD700", fill_type="soli
 
 def cleanup_report_ids(ws):
     report_ids = []
-    for cell in ws["A"]:
-        if ("GSAFAC" in cell.value) or ("CENSUS" in cell.value):
-            report_ids.append(cell.value)
-            cell.hyperlink = (
-                f"https://app.fac.gov/dissemination/report/pdf/{cell.value}"
-            )
-        else:
-            pass
-    return report_ids
+    if ws:
+        for cell in ws["A"]:
+            if ("GSAFAC" in str(cell.value)) or ("CENSUS" in str(cell.value)):
+                report_ids.append(cell.value)
+                cell.hyperlink = (
+                    f"https://app.fac.gov/dissemination/report/pdf/{cell.value}"
+                )
+            else:
+                pass
+        return report_ids
 
 
 def cleanup_summary_links(ws, report_ids):
-    for ndx, cell in enumerate(ws["B"][1:]):
-        cell.hyperlink = f"https://app.fac.gov/dissemination/summary/{report_ids[ndx]}"
+    if ws:
+        for ndx, cell in enumerate(ws["B"][1:]):
+            if cell:
+                cell.hyperlink = (
+                    f"https://app.fac.gov/dissemination/summary/{report_ids[ndx]}"
+                )
 
 
 def cleanup_booleans(ws):
@@ -234,12 +240,9 @@ def cleanup_sheet(ws):
     # 2. Cleanup all the booleans.
     # The columns are hard-coded to the order
     # they appear from the dump into the sheet.
-    try:
-        report_ids = cleanup_report_ids(ws)
-        cleanup_summary_links(ws, report_ids)
-        cleanup_booleans(ws)
-    except Exception as e:
-        e == e
+    report_ids = cleanup_report_ids(ws)
+    cleanup_summary_links(ws, report_ids)
+    cleanup_booleans(ws)
 
 
 def remove_default_sheet(wb):
@@ -250,12 +253,7 @@ def remove_default_sheet(wb):
         e == e
 
 
-def gather_report_data(report_ids=None, start_date=None, end_date=None):
-    # We start by getting the report ids in this range.
-    if report_ids is None:
-        report_ids = General.objects.filter(
-            fac_accepted_date__gte=start_date, fac_accepted_date__lt=end_date
-        ).values_list("report_id")
+def gather_report_data(report_ids=[]):
     # Now, lets start building our workbook. It's an iterative
     # set of queries.
     wb = Workbook()
@@ -298,10 +296,10 @@ def prepare_workbook_for_download(workbook):
 #
 # These reports *only* contain public data, and therefore
 # do not have access control concerns.
-def generate_findings_summary_report(report_ids=None, start_date=None, end_date=None):
+def generate_findings_summary_report(report_ids=[]):
     with Timing("FINDINGS TOTAL"):
         with Timing("FINDINGS GATHER DATA"):
-            wb = gather_report_data(report_ids, start_date, end_date)
+            wb = gather_report_data(report_ids)
         with Timing("FINDINGS PREP WORKBOOK DOWNLOAD"):
             (filename, workbook_bytes) = prepare_workbook_for_download(wb)
     return filename, workbook_bytes
