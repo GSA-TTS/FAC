@@ -4,7 +4,7 @@ from audit.models import SingleAuditChecklist
 
 
 def check_resubmission_allowed(sac: SingleAuditChecklist) -> Tuple[bool, str]:
-    meta = sac.resubmission_meta
+    meta = sac.resubmission_meta or {}
     gi = sac.general_information or {}
 
     uei = gi.get("uei")
