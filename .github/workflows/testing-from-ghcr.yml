@@ -1,5 +1,5 @@
 ---
-name: Run Django and A11y Tests
+name: Run Django and A11y Tests with GHCR Build
 on:
   workflow_call:
   workflow_dispatch:

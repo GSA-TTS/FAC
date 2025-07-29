@@ -1,5 +1,5 @@
 ---
-name: Run Regression Tests
+name: Cypress Regression Tests
 on:
   workflow_dispatch:
     inputs:
@@ -12,6 +12,7 @@ on:
         required: true
         type: string
         default: "staging"
+        description: "Target environment for variables"
   workflow_call:
     inputs:
       url:
