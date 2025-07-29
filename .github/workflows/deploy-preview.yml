@@ -1,5 +1,5 @@
 ---
-name: Deploy to Preview Environment
+name: Deploy to the Preview Environment
 on:
   workflow_dispatch:
 
@@ -9,7 +9,7 @@ jobs:
   #   secrets: inherit
 
   # linting:
-  #   uses: ./.github/workflows/linting.yml
+  #   uses: ./.github/workflows/pull_request-linting.yml
   #   secrets: inherit
 
   deploy-infrastructure-preview:
@@ -36,6 +36,6 @@ jobs:
     name: Zap Scan
     needs:
         - deploy-preview
-    uses: ./.github/workflows/zap-scan.yml
+    uses: ./.github/workflows/scanning-zap-scan.yml
     with:
         url: "https://fac-preview.app.cloud.gov/"

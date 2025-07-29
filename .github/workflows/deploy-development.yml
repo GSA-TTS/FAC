@@ -1,5 +1,5 @@
 ---
-name: Deploy to Development and Management Environment
+name: Deploy to Development and Meta Environments
 on:
   push:
     branches:
@@ -11,7 +11,7 @@ on:
 jobs:
   # ensure that every time a push to main occurs, the container is built and published to ghcr
   build-container:
-    uses: ./.github/workflows/build-docker-container.yml
+    uses: ./.github/workflows/containers-build-fac-container.yml
     secrets: inherit
     permissions:
       contents: read
@@ -28,7 +28,7 @@ jobs:
     secrets: inherit
 
   linting:
-    uses: ./.github/workflows/linting.yml
+    uses: ./.github/workflows/pull_request-linting.yml
     secrets: inherit
 
   # deploy to Dev & Management spaces
@@ -56,7 +56,7 @@ jobs:
     name: Record deployment to New Relic
     needs:
       - deploy-infrastructure-dev
-    uses: ./.github/workflows/new-relic-deployment.yml
+    uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
     with:
       environment: "dev"
     secrets: inherit
@@ -74,7 +74,7 @@ jobs:
     name: ZAP Scan
     needs:
       - deploy-dev
-    uses: ./.github/workflows/zap-scan.yml
+    uses: ./.github/workflows/scanning-zap-scan.yml
     with:
       url: "https://fac-dev.app.cloud.gov/"
 
