@@ -28,6 +28,12 @@ class ResubmissionStartForm(forms.Form):
                 report_id=text_input, submission_status="disseminated"
             )
             self.cleaned_data["sac_row_id"] = sac.id
+            # If the previous SAC had a version, bump by one and pass it back.
+            # If not, we assume this is version 2 for now.
+            if getattr(sac, "resubmission_meta"):
+                self.cleaned_data["version"] = sac.resubmission_meta["version"] + 1
+            else:
+                self.cleaned_data["version"] = 2
         except SingleAuditChecklist.DoesNotExist:
             raise ValidationError("Audit to resubmit not found.")
 

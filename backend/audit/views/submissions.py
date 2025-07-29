@@ -65,7 +65,11 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         user.profile.entry_form_data, to avoid carryover of other submission or resubmission data.
         """
         user = request.user
-        user.profile.entry_form_data = {"is_resubmission": False}
+        # TODO: Add resubmission status here, once the constants have gone in.
+        user.profile.entry_form_data = {
+            "is_resubmission": False,
+            "resubmission_meta": {"version": 1},
+        }
         user.profile.save()
 
         return redirect(reverse("report_submission:auditeeinfo"))
