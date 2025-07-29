@@ -6,8 +6,13 @@ def fetch_sac_resubmission_records_postgres(AY, duplication_threshold=2, noisy=F
     # Begin with a small set.
     # Take a full year, grab the UEIs, and look for duplicated UEIs.
     base = SingleAuditChecklist.objects.filter(
-        Q(general_information__auditee_fiscal_period_end__startswith=AY)
+        # We should only be clustering things that have no metadata.
+        Q(resubmission_meta__isnull=True)
+        # and are in the fiscal year we're interested in
+        & Q(general_information__auditee_fiscal_period_end__startswith=AY)
+        # and are disseminated (not in_progress)
         & Q(submission_status="disseminated")
+        # and have a real UEI, not GSA_MIGRATION
         & ~Q(general_information__auditee_uei="GSA_MIGRATION")
     )
 
@@ -22,7 +27,8 @@ def fetch_sac_resubmission_records_postgres(AY, duplication_threshold=2, noisy=F
     records = base.filter(
         general_information__auditee_uei__in=ueis.values("uei"),
     )
-    # Doing it in the model is hard.
+    # Doing it in the model is hard. Breaking it out into a
+    # python sort.
     records = sorted(
         records, key=lambda r: r.transition_date[0].strftime("%Y-%m-%d %H:%M:%S")
     )

@@ -1,4 +1,6 @@
-from curation.curationlib.cluster_resubmitted_reports import generate_clusters
+from curation.curationlib.generate_resubmission_clusters import (
+    generate_resbmission_clusters,
+)
 from model_bakery import baker
 from django.test import TestCase
 from audit.models import SingleAuditChecklist
@@ -49,7 +51,7 @@ class ClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=sac_01["general_information"],
         )
-        sorted_sets = generate_clusters("2022")
+        sorted_sets = generate_resbmission_clusters("2022")
         # No audits should be clustered. There is only one.
         self.assertEqual(len(sorted_sets), 0)
 
@@ -71,8 +73,9 @@ class ClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=sac_01["general_information"],
         )
-        sorted_sets = generate_clusters("2022")
-        # No audits should be clustered. There is only one.
+        sorted_sets = generate_resbmission_clusters("2022")
+        # These audits should cluster, because they have the
+        # same information in the critical fields.
         self.assertEqual(len(sorted_sets), 1)
 
     def test_email_difference(self):
@@ -100,8 +103,10 @@ class ClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=gi,
         )
-        sorted_sets = generate_clusters("2022")
-        # No audits should be clustered. There is only one.
+        sorted_sets = generate_resbmission_clusters("2022")
+        # A single-character typo in the email should not prevent
+        # clustering. Unlike entity names, we'll assume that email
+        # addresses can be slightly inconsistent.
         self.assertEqual(len(sorted_sets), 1)
 
     def test_different_state(self):
@@ -120,7 +125,7 @@ class ClusteringTests(TestCase):
                 transition_date=sac_01["transition_date"],
                 general_information=gi,
             )
-        sorted_sets = generate_clusters("2022")
+        sorted_sets = generate_resbmission_clusters("2022")
         # I expect each audit to be in its own cluster.
         self.assertEqual(len(sorted_sets), 2)
 
@@ -150,7 +155,7 @@ class ClusteringTests(TestCase):
                     general_information=gi,
                 )
 
-        sorted_sets = generate_clusters("2022")
+        sorted_sets = generate_resbmission_clusters("2022")
         # I expect two clusters, one for each UEI, and each
         # set to be of size two.
         self.assertEqual(len(sorted_sets), 2)

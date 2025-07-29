@@ -1,5 +1,5 @@
-from prettytable import PrettyTable
-from audit_distance import prep_string, get_audit_year
+# from prettytable import PrettyTable
+from curation.curationlib.audit_distance import prep_string, get_audit_year
 import csv
 
 # All of the code in here is fiddly, and output-type
@@ -47,44 +47,44 @@ def order_reports_key(r):
 #     +---------------+---------------------------+
 
 
-def export_sets_as_text_tables(AY, sets, noisy=False):
-    with open(f"{AY}-resubmission-sets-{len(sets)}.txt", "w") as table_file:
-        for ndx, s in enumerate(sets):
-            if len(s) > 1:
-                table = PrettyTable()
-                table.align = "l"
-                table.field_names = ["field", "value"]
+# def export_sets_as_text_tables(AY, sets, noisy=False):
+#     with open(f"{AY}-resubmission-sets-{len(sets)}.txt", "w") as table_file:
+#         for ndx, s in enumerate(sets):
+#             if len(s) > 1:
+#                 table = PrettyTable()
+#                 table.align = "l"
+#                 table.field_names = ["field", "value"]
 
-                table_file.write(f"\n===============\n")
-                table_file.write(f"SET {ndx}\n")
-                table_file.write(f"===============\n")
+#                 table_file.write(f"\n===============\n")
+#                 table_file.write(f"SET {ndx}\n")
+#                 table_file.write(f"===============\n")
 
-                for r in sorted(s, key=order_reports_key):
-                    table.add_row(["report_id", r.report_id])
-                    table.add_row(["distance", r.distance])
-                    table.add_row(["order", r.order])
-                    table.add_row(["audit year", get_audit_year(r)])
-                    table.add_row(
-                        [
-                            "accepted date",
-                            order_reports_key(r).strftime("%Y-%m-%d %H:%M"),
-                        ]
-                    )
-                    table.add_row(["uei", r.general_information["auditee_uei"]])
-                    table.add_row(["ein", r.general_information["ein"]])
-                    table.add_row(
-                        ["email", prep_string(r.general_information["auditee_email"])]
-                    )
-                    table.add_row(
-                        ["name", prep_string(r.general_information["auditee_name"])]
-                    )
-                    table.add_row(
-                        ["state", prep_string(r.general_information["auditee_state"])]
-                    )
-                    table.add_divider()
+#                 for r in sorted(s, key=order_reports_key):
+#                     table.add_row(["report_id", r.report_id])
+#                     table.add_row(["distance", r.distance])
+#                     table.add_row(["order", r.order])
+#                     table.add_row(["audit year", get_audit_year(r)])
+#                     table.add_row(
+#                         [
+#                             "accepted date",
+#                             order_reports_key(r).strftime("%Y-%m-%d %H:%M"),
+#                         ]
+#                     )
+#                     table.add_row(["uei", r.general_information["auditee_uei"]])
+#                     table.add_row(["ein", r.general_information["ein"]])
+#                     table.add_row(
+#                         ["email", prep_string(r.general_information["auditee_email"])]
+#                     )
+#                     table.add_row(
+#                         ["name", prep_string(r.general_information["auditee_name"])]
+#                     )
+#                     table.add_row(
+#                         ["state", prep_string(r.general_information["auditee_state"])]
+#                     )
+#                     table.add_divider()
 
-                table_file.write(str(table))
-                table_file.write("\n\n")
+#                 table_file.write(str(table))
+#                 table_file.write("\n\n")
 
 
 # Exports the same data in CSV format for analysis in a spreadsheet tool.

@@ -1,23 +1,13 @@
 from curation.curationlib.generate_resubmission_clusters import (
-    generate_clusters_from_records,
+    generate_resbmission_clusters,
 )
-from curation.curationlib.sac_resubmission_records_postgres import (
-    fetch_sac_resubmission_records_postgres,
-)
-
 from curation.curationlib.export_resubmission_clusters import (
-    export_sets_as_text_tables,
+    # export_sets_as_text_tables,
     export_sets_as_csv,
     export_sets_as_markdown,
 )
 
 from django.core.management.base import BaseCommand
-
-
-def generate_resbmission_clusters(AY, noisy=False):
-    records = fetch_sac_resubmission_records_postgres(AY, noisy=noisy)
-    sorted_sets = generate_clusters_from_records(records, AY, noisy)
-    return sorted_sets
 
 
 class Command(BaseCommand):
@@ -39,9 +29,9 @@ class Command(BaseCommand):
             options["audit_year"], noisy=options["noisy"]
         )
 
-        export_sets_as_text_tables(
-            options["audit_year"], sorted_sets, noisy=options["noisy"]
-        )
+        # export_sets_as_text_tables(
+        #     options["audit_year"], sorted_sets, noisy=options["noisy"]
+        # )
         export_sets_as_csv(options["audit_year"], sorted_sets, noisy=options["noisy"])
         export_sets_as_markdown(
             options["audit_year"], sorted_sets, noisy=options["noisy"]

@@ -280,9 +280,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             "Passthrough": Passthrough,
         }
         with transaction.atomic():
-            # This needs to be in the DISSEMINATED state in order
-            # to be redisseminated. Check that here.
-            if not self.submission_status == STATUS.DISSEMINATED:
+            # This needs to be in the DISSEMINATED or RESUBMITTED state in order
+            # to be redisseminated. Why? A DISSEMINATED audit is complete, and needs to
+            # be published. A RESUBMITTED audit is also complete, but it will now
+            # have metadata that supprseses it from public view.
+            if not self.submission_status in [STATUS.DISSEMINATED, STATUS.RESUBMITTED]:
                 logger.error("Trying to resubmit an audit that is not disseminated.")
                 raise AdministrativeOverrideError
             try:
