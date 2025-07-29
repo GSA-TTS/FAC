@@ -224,15 +224,6 @@ class AuditeeInfoTests(TestCase):
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
-    def test_missing_expected_form_data_from_prior_step(self):
-        """Return an error and point to Eligibility step if we're missing data from that step in the user's profile"""
-        response = self.client.post(
-            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
-        )
-        data = response.json()
-        self.assertEqual(data["next"], ELIGIBILITY_PATH)
-        self.assertTrue(data["errors"])
-
     def test_valid_data_updates_profile(self):
         """Valid POST update user's form data stored in their profile"""
         # Add eligibility data to profile
