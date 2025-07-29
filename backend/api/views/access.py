@@ -12,7 +12,7 @@ from audit.models import (
     Audit,
 )
 from audit.models.constants import STATUS, AuditType
-from .constants import ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED
+from .constants import ACCESS_SUBMISSION_DATA_REQUIRED
 
 from audit.models.access_roles import AccessRole
 
@@ -36,12 +36,12 @@ def access_and_submission_check(user, data):
     }
     missing_fields = [
         field
-        for field in ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED
+        for field in ACCESS_SUBMISSION_DATA_REQUIRED
         if field not in all_steps_user_form_data
     ]
     if missing_fields:
         return {
-            "next": reverse("api-eligibility"),
+            "next": reverse("api-auditee-info"),
             "errors": "We're missing required fields, please try again.",
             "missing_fields": missing_fields,
         }

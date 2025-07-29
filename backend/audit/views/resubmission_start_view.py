@@ -42,14 +42,17 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         previous_row_id = form.cleaned_data["sac_row_id"]
 
         # Save the resub metadata to the user profile. Overwrites other user profile data.
-        resub_meta = {
+        resubmission_meta = {
+            "is_resubmission": True,
             "resub_meta": {
                 "previous_report_id": report_id,
                 "previous_row_id": previous_row_id,
             }
         }
         user = request.user
-        user.profile.entry_form_data = resub_meta
+        user.profile.entry_form_data = resubmission_meta
         user.profile.save()
 
-        return redirect(reverse("report_submission:eligibility"))
+        # Send to step 1 of presubmission eligibility.
+        # resubmission_meta will be used again on audit creation after step 3.
+        return redirect(reverse("report_submission:auditeeinfo"))
