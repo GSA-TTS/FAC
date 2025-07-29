@@ -157,11 +157,8 @@ def adjust_columns(ws):
         max_length = 0
         column = col[0].column_letter  # Get the column name
         for cell in col:
-            try:  # Necessary to avoid error on empty cells
-                if len(str(cell.value)) > max_length:
-                    max_length = len(str(cell.value))
-            except Exception as e:
-                e == e
+            if cell and cell.value and len(str(cell.value)) > max_length:
+                max_length = len(str(cell.value))
         adjusted_width = (max_length + 2) * 1.2
         ws.column_dimensions[column].width = adjusted_width
     return ws
@@ -249,8 +246,8 @@ def remove_default_sheet(wb):
     # Try removing the default sheet.
     try:
         del wb["Sheet"]
-    except Exception as e:
-        e == e
+    except KeyError:
+        pass
 
 
 def gather_report_data(report_ids=[]):
