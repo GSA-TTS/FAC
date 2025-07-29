@@ -1,0 +1,20 @@
+---
+name: Export Audit Data to CSV Scheduler
+on:
+  schedule:
+    # Staging, Prod test - All days 7 AM UTC
+    - cron: '0 7 * * 6'
+
+jobs:
+  scheduled-audit-data-export:
+    strategy:
+      fail-fast: false
+      matrix:
+        environment:
+          - name: staging
+          - name: production
+    name: Run bulk data export
+    uses: ./.github/workflows/weekly-export-audit-data-to-csv-scheduled.yml
+    secrets: inherit
+    with:
+      environment: ${{ matrix.environment.name }}

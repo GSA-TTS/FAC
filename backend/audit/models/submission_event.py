@@ -44,6 +44,10 @@ class SubmissionEvent(models.Model):
         TRIBAL_CONSENT_UPDATED = "tribal-consent-updated"
         FLAGGED_SUBMISSION_FOR_REMOVAL = "flagged-submission-for-removal"
         CANCEL_REMOVAL_FLAG = "cancel-removal-flag"
+        FAC_ADMINISTRATIVE_UEI_REPLACEMENT = "fac-administrative-uei-replacement"
+        FAC_ADMINISTRATIVE_EIN_REPLACEMENT = "fac-administrative-ein-replacement"
+        RESUBMISSION_STARTED = "resubmission-started"
+        RESUBMISSION_INITIATED = "resubmission-initiated"
 
     EVENT_TYPES = (
         (EventType.ACCESS_GRANTED, _("Access granted")),
@@ -103,6 +107,22 @@ class SubmissionEvent(models.Model):
             _("Flagged submission for removal"),
         ),
         (EventType.CANCEL_REMOVAL_FLAG, _("Cancel removal flag")),
+        (
+            EventType.FAC_ADMINISTRATIVE_UEI_REPLACEMENT,
+            _("FAC administrative replacement of UEI"),
+        ),
+        (
+            EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
+            _("FAC administrative replacement of EIN"),
+        ),
+        (
+            EventType.RESUBMISSION_INITIATED,
+            _("A resubmission was started on this report."),
+        ),
+        (
+            EventType.RESUBMISSION_STARTED,
+            _("This report was started as a resubmission of another report."),
+        ),
     )
 
     sac = models.ForeignKey("audit.SingleAuditChecklist", on_delete=models.CASCADE)

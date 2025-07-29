@@ -9,6 +9,7 @@ source tools/util_startup.sh
 # This will choose the correct environment
 # for local envs (LOCAL or TESTING) and cloud.gov
 source tools/setup_env.sh
+source tools/curation_audit_tracking_init.sh
 source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
@@ -49,6 +50,11 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
 
     # materialized_views
     # gonogo "materialized_views"
+
+    #####
+    # CURATION AUDIT TRACKING
+    curation_audit_tracking_init
+    gonogo "curation_audit_tracking_init"
 
     #####
     # CREATE STAFF USERS

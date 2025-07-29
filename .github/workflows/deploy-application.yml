@@ -1,5 +1,5 @@
 ---
-name: Deploy application to cloud.gov
+name: Deploy Application
 on:
   workflow_call:
     inputs:
@@ -9,12 +9,11 @@ on:
 
 jobs:
   push-with-creds:
-    name: Deploy to cloud.gov with updated credentials
+    name: Deploy to cloud.gov Environment
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
       space: ${{ inputs.environment }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -79,7 +78,7 @@ jobs:
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup --command "./fac-backup-util.sh v0.1.11 deploy_backup" --wait
 
-      - name: Deploy Preview to cloud.gov
+      - name: Deploy FAC Application to cloud.gov in the preview Environment
         if: ${{ inputs.environment == 'preview' }}
         uses: cloud-gov/cg-cli-tools@main
         with:
@@ -91,7 +90,7 @@ jobs:
           cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
           command: bin/ops/deploy_preview.sh
 
-      - name: Deploy fac to cloud.gov
+      - name: Deploy FAC Application to cloud.gov in the ${{ env.space }} Environment
         if: ${{ inputs.environment  != 'preview' }}
         uses: cloud-gov/cg-cli-tools@main
         with:
@@ -129,7 +128,7 @@ jobs:
 
   check-tables:
     needs: [push-with-creds]
-    uses: ./.github/workflows/fac-check-tables.yml
+    uses: ./.github/workflows/fac_backup-check-tables.yml
     secrets: inherit
     with:
       environment: ${{ inputs.environment }}

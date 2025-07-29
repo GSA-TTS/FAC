@@ -1,0 +1,49 @@
+---
+name: Scheduled Deploy From Dev to Staging
+on:
+  schedule:
+    # Invoke every Mon-Sat
+    - cron: '0 10 * * 1-6'
+  workflow_dispatch:
+
+jobs:
+  trivy-scan:
+    uses: ./.github/workflows/scanning-trivy.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+      security-events: write
+
+  build-container:
+    needs:
+      - trivy-scan
+    uses: ./.github/workflows/containers-build-fac-container.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+    with:
+      docker-name: fac
+      image-name: web-container
+      repo-name: gsa-tts/fac
+      work-dir: ./backend
+
+  testing:
+    name: Run Django and lint
+    needs:
+      - build-container
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/pull_request-linting.yml
+    secrets: inherit
+
+  create-pr:
+    needs:
+      - testing
+    name: Create Pull Request to Staging
+    uses: ./.github/workflows/pull_request-to-staging.yml
+    secrets: inherit

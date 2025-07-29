@@ -1,0 +1,137 @@
+---
+name: Pull Request Checks
+on:
+  pull_request:
+    branches:
+      - main
+      - prod
+    paths:
+      - '**'
+      - '!docs/**'
+      - 'docs/bpmn-workflow-models/**'
+      - '!.github/ISSUE_TEMPLATE/**'
+  workflow_dispatch: null
+
+env:
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  check-for-changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      requirements: ${{ steps.filter.outputs.requirements }}
+      dev-requirements: ${{ steps.filter.outputs.devrequirements }}
+      docker: ${{ steps.filter.outputs.docker }}
+      package: ${{ steps.filter.outputs.package }}
+      staticfiles: ${{ steps.filter.outputs.staticfiles }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            requirements:
+              - './backend/requirements.txt'
+            devrequirements:
+              - './backend/dev-requirements.txt'
+            docker:
+              - './backend/Dockerfile'
+            package:
+              - './backend/package.json'
+            staticfiles:
+              - './backend/static/**'
+
+  check-if-branch-is-ahead-of-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if branch is ahead of main
+        run: |
+          if ! git merge-base --is-ancestor origin/main ${{ github.event.pull_request.head.sha }};
+          then echo "This branch is not up to date with main";
+          gh pr comment ${{ github.event.pull_request.number }} \
+          --body "This pull request is not up to date with main. Please merge main into this brach or rebase this branch onto main. This PR should not be approved until all status checks pass. If you see this message, please rerun all status checks before merging."
+          exit 1; fi
+
+  # Tests and Linting invoked on a Pull Request
+  testing-from-build:
+    needs: [check-for-changes, check-if-branch-is-ahead-of-main]
+    if: ${{ needs.check-for-changes.outputs.requirements == 'true' || needs.check-for-changes.outputs.dev-requirements == 'true' || needs.check-for-changes.outputs.docker == 'true' || needs.check-for-changes.outputs.package == 'true' || needs.check-for-changes.outputs.staticfiles == 'true' }}
+    uses: ./.github/workflows/testing-from-build.yml
+    secrets: inherit
+
+  testing-from-ghcr:
+    needs: [check-for-changes, check-if-branch-is-ahead-of-main]
+    if: ${{ needs.check-for-changes.outputs.requirements != 'true' && needs.check-for-changes.outputs.dev-requirements != 'true' && needs.check-for-changes.outputs.docker != 'true' && needs.check-for-changes.outputs.package != 'true' && needs.check-for-changes.outputs.staticfiles != 'true'  }}
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  cypress-from-container:
+    needs: [check-if-branch-is-ahead-of-main]
+    uses: ./.github/workflows/testing-cypress-container.yml
+    with:
+      environment: testing
+    secrets: inherit
+
+  linting:
+    needs: [check-if-branch-is-ahead-of-main]
+    uses: ./.github/workflows/pull_request-linting.yml
+    secrets: inherit
+
+  # Update BPMN Diagrams
+  # We are removing this as we are not editing, and we do not wish for it to run with lib updates.
+  # Uncomment if changes to models are necessary
+  # sync-BPMN:
+  #   uses: ./.github/workflows/add-bpmn-renders.yml
+  #   secrets: inherit
+
+  # Generate Terraform Plans
+  terraform-plan:
+    if: ${{ github.base_ref == 'main' }}
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+      environment: "dev"
+    secrets: inherit
+
+  terraform-plan-meta:
+    if: ${{ github.base_ref == 'main' }}
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+      environment: "meta"
+    secrets: inherit
+
+  terraform-plan-staging:
+    if: ${{ github.base_ref == 'prod' }}
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+      environment: "staging"
+    secrets: inherit
+
+# uses tags "v1.*"
+  terraform-plan-prod:
+    if: ${{ github.base_ref == 'prod' }}
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+      environment: "production"
+    secrets: inherit
+
+  repo-event:
+    if: ${{ github.base_ref == 'prod' && always() }}
+    name: Set Repository Event
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    needs: [terraform-plan-staging, testing-from-ghcr, testing-from-build]
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: ready-to-merge
+          client-payload: '{"github": ${{ toJson(github) }}}'
+        if: github.event_name == 'pull_request'
