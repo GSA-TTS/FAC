@@ -73,7 +73,7 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 # Step 2
 class EligibilityFormView(LoginRequiredMixin, View):
     template_name = "report_submission/eligibility.html"
-    
+
     def get(self, request):
         entry_form_data = request.user.profile.entry_form_data
         info_check = api.views.auditee_info_check(request.user, entry_form_data)
@@ -84,8 +84,8 @@ class EligibilityFormView(LoginRequiredMixin, View):
 
         # Prevent users from skipping step 1, the auditee info
         if not info_check.get("info_check_passed"):
-            return redirect(reverse("audit:MySubmissions"))
-        
+            return redirect(reverse("report_submission:auditeeinfo"))
+
         args = {
             "step": 2,
             "dollar_thresholds": [
@@ -110,9 +110,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
 
     def get(self, request):
         entry_form_data = request.user.profile.entry_form_data
-        info_check = api.views.auditee_info_check(
-            request.user, entry_form_data
-        )
+        info_check = api.views.auditee_info_check(request.user, entry_form_data)
 
         # Prevent users from skipping the submission checkbox or resubmission start form
         if entry_form_data.get("is_resubmission") is None:
@@ -139,6 +137,4 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
                     f"/report_submission/general-information/{report_id}"
                 )
             else:
-                return render(
-                    request, self.template_name, context=result, status=400
-                )
+                return render(request, self.template_name, context=result, status=400)

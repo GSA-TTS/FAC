@@ -130,8 +130,10 @@ class EligibilityViewTests(TestCase):
         client.force_authenticate(user=user)
 
         # Add auditee info first, so the eligibility check can pass.
-        response = client.post(AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json")
-        
+        response = client.post(
+            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
+        )
+
         response = client.post(ELIGIBILITY_PATH, VALID_ELIGIBILITY_DATA, format="json")
         data = response.json()
         self.assertEqual(response.status_code, 200)
@@ -476,7 +478,9 @@ class SACCreationTests(TestCase):
         self.client.force_authenticate(user=self.user)
 
         # Submit auditee info
-        response = self.client.post(AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json")
+        response = self.client.post(
+            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
+        )
         data = response.json()
         next_step = data["next"]
 
@@ -541,7 +545,9 @@ class SingleAuditChecklistViewTests(TestCase):
         self.client.force_authenticate(user=self.user)
 
         # Submit auditee info
-        response = self.client.post(AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json")
+        response = self.client.post(
+            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
+        )
         data = response.json()
         next_step = data["next"]
 
@@ -642,7 +648,9 @@ class SacFederalAwardsViewTests(TestCase):
         self.client.force_authenticate(user=self.user)
 
         # Submit auditee info
-        response = self.client.post(AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json")
+        response = self.client.post(
+            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
+        )
         data = response.json()
         next_step = data["next"]
 

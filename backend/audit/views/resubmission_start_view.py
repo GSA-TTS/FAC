@@ -44,10 +44,10 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         # Save the resub metadata to the user profile. Overwrites other user profile data.
         resubmission_meta = {
             "is_resubmission": True,
-            "resub_meta": {
+            "resubmission_meta": {
                 "previous_report_id": report_id,
                 "previous_row_id": previous_row_id,
-            }
+            },
         }
         user = request.user
         user.profile.entry_form_data = resubmission_meta

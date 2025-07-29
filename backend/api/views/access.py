@@ -27,12 +27,17 @@ def access_and_submission_check(user, data):
     serializer = AccessAndSubmissionSerializer(data=data)
 
     # Need Eligibility and AuditeeInfo already collected to proceed.
-    # We probably need to exclude more than just csrfmiddlewaretoken from
+    # We may want to exclude more than just these fields from the
     # stray properties that might end up present in the submitted data:
+    omitted_fields = [
+        "csrfmiddlewaretoken",
+        "is_resubmission",  # Bool used to ensure users go through all forms
+        "resubmission_meta",  # Stored in its own column
+    ]
     all_steps_user_form_data = {
         k: user.profile.entry_form_data[k]
         for k in user.profile.entry_form_data
-        if k != "csrfmiddlewaretoken"
+        if k not in omitted_fields
     }
     missing_fields = [
         field
@@ -46,6 +51,10 @@ def access_and_submission_check(user, data):
             "missing_fields": missing_fields,
         }
 
+    resubmission_meta = user.profile.entry_form_data.get(
+        "resubmission_meta"
+    )  # None is a valid value at this point.
+
     if serializer.is_valid():
         # Create SF-SAC instance and add data from previous steps saved in the
         # user profile
@@ -54,6 +63,7 @@ def access_and_submission_check(user, data):
             submitted_by=user,
             submission_status=STATUS.IN_PROGRESS,
             general_information=all_steps_user_form_data,
+            resubmission_meta=resubmission_meta,
             event_user=user,
             event_type=SubmissionEvent.EventType.CREATED,
             # TODO: Update Post SOC Launch

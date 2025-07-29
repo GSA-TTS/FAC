@@ -11,11 +11,11 @@ export function testInitializeAudit(isTribal = false) {
   cy.get('.usa-button').contains('Begin New Submission').click();
   cy.url().should('match', /\/report_submission\/eligibility\/$/);
 
-  // Completes the eligibility screen
-  testValidEligibility(isTribal);
-
   // Now the auditee info screen
   testValidAuditeeInfo();
+
+  // Completes the eligibility screen
+  testValidEligibility(isTribal);
 
   // Now the accessandsubmission screen
   testValidAccess();
