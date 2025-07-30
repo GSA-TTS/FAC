@@ -19,6 +19,15 @@ def get_named_models():
     return _dissemination_models
 
 
+def status_to_bool(s):
+    if str(s).lower() in ["y", "yes", "true", True]:
+        return True
+    if str(s).lower() in ["n", "no", "false", False]:
+        return False
+    else:
+        raise Exception("Failing hard because of bad boolean conversion.")
+
+
 def get_named_parts_containing_ueis(sac):
     return {
         "AdditionalEINs": sac.additional_eins,
@@ -61,6 +70,14 @@ def get_sac_with_ein_to_update(options):
     crit2 = Q(general_information__ein=options["old_ein"])
     crit3 = Q(submission_status="disseminated")
     sac = SingleAuditChecklist.objects.get(crit1 & crit2 & crit3)
+    return sac
+
+
+# options hash -> Django queryset
+def get_sac_with_report_id(options):
+    crit1 = Q(report_id=options["report_id"])
+    crit2 = Q(submission_status="disseminated")
+    sac = SingleAuditChecklist.objects.get(crit1 & crit2)
     return sac
 
 
@@ -130,4 +147,64 @@ def update_ein(options):
         sac,
         THE_USER_OBJ,
         SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
+    )
+
+
+# JSON fields
+# is_tribal_information_authorized_to_be_public
+# tribal_authorization_certifying_official_name
+# tribal_authorization_certifying_official_title
+def update_authorized_public(options):
+    sac = get_sac_with_report_id(options)
+    if sac.tribal_data_consent is None:
+        logger.error(
+            "It is not possible to update the consent of a record without an existing attestation."
+        )
+        sys.exit(-1)
+    else:
+        current_status = sac.tribal_data_consent[
+            "is_tribal_information_authorized_to_be_public"
+        ]
+
+    current_status = status_to_bool(current_status)
+    new_status = status_to_bool(options["new_authorized"])
+
+    logger.info(f"current authorized to be public: {current_status} new: {new_status}")
+
+    THE_USER_OBJ = User.objects.get(email=options["email"])
+
+    # Change the status
+    # Try and keep the original certifying name, but annotate it.
+    # If it is currently authorized to be public (true), and we want to suppress it (false),
+    # we need to add a new, fake consent that says it may not be public.
+    if current_status and not new_status:
+        certification = {
+            "is_tribal_information_authorized_to_be_public": False,
+        }
+
+    # If it is currently not authorized to be public (false) and we want to make
+    # it public (true), then we need to set the cert to True.
+    if not current_status and new_status:
+        certification = {
+            "is_tribal_information_authorized_to_be_public": True,
+        }
+
+    name = sac.tribal_data_consent["tribal_authorization_certifying_official_name"]
+    title = sac.tribal_data_consent["tribal_authorization_certifying_official_title"]
+    suffix = "/FAC"
+    if suffix not in name:
+        name = name + suffix
+    if suffix not in title:
+        title = title + suffix
+    certification["tribal_authorization_certifying_official_name"] = name
+    certification["tribal_authorization_certifying_official_title"] = title
+
+    # Set the object
+    sac.tribal_data_consent = certification
+    # Save it.
+    logger.info("Updating suppression for: " + str(sac))
+    update_db(
+        sac,
+        THE_USER_OBJ,
+        SubmissionEvent.EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
     )
