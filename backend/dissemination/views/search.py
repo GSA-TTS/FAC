@@ -9,7 +9,11 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
-from config.settings import STATE_ABBREVS, SUMMARY_REPORT_DOWNLOAD_LIMIT
+from config.settings import (
+    STATE_ABBREVS,
+    SUMMARY_REPORT_DOWNLOAD_LIMIT,
+    FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
+)
 from dissemination.forms.search_forms import AdvancedSearchForm, SearchForm
 from dissemination.search import gather_errors
 from dissemination.searchlib.search_utils import (
@@ -49,6 +53,7 @@ class AdvancedSearch(View):
                 "form_user_input": {"audit_year": default_checked_audit_years},
                 "state_abbrevs": STATE_ABBREVS,
                 "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
             },
         )
 
@@ -70,6 +75,7 @@ class AdvancedSearch(View):
             "include_private": include_private_results(request),
             "state_abbrevs": STATE_ABBREVS,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+            "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
 
         # Obtain cleaned form data.
@@ -163,6 +169,7 @@ class Search(View):
                 "form_user_input": {"audit_year": default_checked_audit_years},
                 "state_abbrevs": STATE_ABBREVS,
                 "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
             },
         )
 
@@ -184,6 +191,7 @@ class Search(View):
             "include_private": include_private_results(request),
             "state_abbrevs": STATE_ABBREVS,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+            "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
 
         # Obtain cleaned form data.
@@ -280,6 +288,7 @@ class AuditSearch(View):
                 "form_user_input": {"audit_year": default_checked_audit_years},
                 "state_abbrevs": STATE_ABBREVS,
                 "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
             },
         )
 
@@ -300,6 +309,7 @@ class AuditSearch(View):
             "include_private": include_private_results(request),
             "state_abbrevs": STATE_ABBREVS,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+            "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
         }
 
         # Obtain cleaned form data.
