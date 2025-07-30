@@ -303,7 +303,7 @@ class UpdatePublicAuthorizationForTribalAudits(TestCase):
         try:
             update_authorized_public(options)
             result = "succeeded"
-        except Exception as e:  # noqa: E722
+        except Exception:  # noqa: E722
             # with open("MESSAGE", "a") as f:
             #     f.write(str(e))
             #     f.write("\n")
@@ -323,6 +323,51 @@ class UpdatePublicAuthorizationForTribalAudits(TestCase):
             in sac.tribal_data_consent["tribal_authorization_certifying_official_name"]
         )
         self.assertTrue(
+            "/FAC"
+            in sac.tribal_data_consent["tribal_authorization_certifying_official_title"]
+        )
+
+    def test_fail_no_flip(self):
+        user = baker.make(User)
+        user.email = "test@fac.gsa.gov"
+        user.save()
+
+        # Test on a single audit.
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+            tribal_data_consent=sac_01["tribal_data_consent"],
+        )
+
+        options = dict()
+        options["report_id"] = "2022-42-MAGIC-0000000001"
+        options["old_authorization"] = "false"
+        options["new_authorization"] = "true"
+        options["email"] = user.email
+
+        try:
+            update_authorized_public(options)
+            result = "succeeded"
+        except Exception:  # noqa: E722
+            result = "failed"
+
+        self.assertEqual("failed", result)
+        # Make sure it exists, and we did not flip value.
+        sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
+        self.assertEqual(
+            True,
+            sac.tribal_data_consent["is_tribal_information_authorized_to_be_public"],
+        )
+        # Check we did not tag the fields with /FAC
+        self.assertFalse(
+            "/FAC"
+            in sac.tribal_data_consent["tribal_authorization_certifying_official_name"]
+        )
+        self.assertFalse(
             "/FAC"
             in sac.tribal_data_consent["tribal_authorization_certifying_official_title"]
         )
