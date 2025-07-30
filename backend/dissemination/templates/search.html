@@ -111,18 +111,33 @@
                         <p class="margin-0 flex-align-self-center">
                             <span>{{ results.start_index }}-{{ results.end_index }} of <strong>{{ results_count|intcomma }}</strong> results in {{ total_time_s|floatformat }} seconds.</span>
                         </p>
-                        {% if results_count <= summary_report_download_limit %}
-                            <button class="usa-button display-flex"
-                                    formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
-                                    form="audit-search-form">
-                                <svg class="usa-icon margin-right-1 flex-align-self-center"
-                                    aria-hidden="true"
-                                    role="img">
-                                    {% uswds_sprite "file_download" %}
-                                </svg>
-                                <p class="margin-0">Download all</p>
-                            </button>
-                        {% endif %}
+                        <div class="display-flex flex-row padding-top-2 tablet-lg:padding-top-0">
+                            {% if results_count <= summary_report_download_limit %}
+                                <button class="usa-button display-flex"
+                                        formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
+                                        form="audit-search-form">
+                                    <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                        aria-hidden="true"
+                                        role="img">
+                                        {% uswds_sprite "file_download" %}
+                                    </svg>
+                                    <p class="margin-0">Download all</p>
+                                </button>
+                            {% endif %}
+                            {% comment %} If there are few enough records AND the user has access to suppressed/federal records. {% endcomment %}
+                            {% if results_count <= findings_report_download_limit and include_private %}
+                                <button class="usa-button display-flex"
+                                        formaction="{% url 'dissemination:FindingsSummaryReportDownload' %}"
+                                        form="audit-search-form">
+                                    <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                        aria-hidden="true"
+                                        role="img">
+                                        {% uswds_sprite "file_download" %}
+                                    </svg>
+                                    <p class="margin-0">Download findings</p>
+                                </button>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <div class="usa-table-container--scrollable margin-0" tabindex="0">
