@@ -1,5 +1,5 @@
 ---
-name: Build and Publish Docker Container
+name: Build and Publish Docker Container to GHCR
 on:
   workflow_dispatch:
     inputs:
@@ -7,18 +7,22 @@ on:
         required: true
         type: string
         default: fac
+        description: "Name of the base component"
       image-name:
         required: true
         type: string
         default: web-container
+        description: "Name of the container"
       repo-name:
         required: true
         type: string
         default: gsa-tts/fac
+        description: "Name of the repository for GHCR"
       work-dir:
         required: true
         type: string
         default: ./backend
+        description: "Path of the files to build"
   workflow_call:
     inputs:
       docker-name:
@@ -78,5 +82,5 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push Web Container
+      - name: Push Web Container to GHCR
         run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}
