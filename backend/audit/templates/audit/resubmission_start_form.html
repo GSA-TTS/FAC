@@ -20,7 +20,7 @@
 
                     <label class="usa-label" id="report_id-label" for="report_id">Report ID of audit to resubmit:</label>
                     <div class="usa-hint" id="report_id-hint">YYYY-MM-SOURCE-0123456789</div>
-                    <span class="usa-error-message margin-top-1">{{ form.report_id.errors|striptags }}</span>
+                    <span class="usa-error-message margin-top-1" id="error">{{ form.report_id.errors|striptags }}</span>
                     <input class="usa-input"
                            id="report_id"
                            name="report_id"
@@ -29,6 +29,7 @@
                            value="{{ form_user_input.report_id }}" />
                     <button class="usa-button margin-y-2" id="continue">Continue</button>
                     <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center"
+                       id="cancel"
                        href="{% url 'audit:MySubmissions' %}">Cancel</a>
                 </fieldset>
             </form>
