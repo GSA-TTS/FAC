@@ -6,7 +6,7 @@ from django.test.client import RequestFactory
 from django.views.generic import View
 
 from dissemination.models import General
-from dissemination.mixins import ReportAccessRequiredMixin
+from dissemination.mixins import ReportAccessRequiredMixin, FederalAccessRequiredMixin
 
 from users.models import Permission, UserPermission
 
@@ -105,3 +105,44 @@ class ReportAccessRequiredMixinTests(TestCase):
         general = baker.make(General, is_public=True)
 
         self.ViewStub().dispatch(request, report_id=general.report_id)
+
+
+class FederalAccessRequiredMixinTests(TestCase):
+    class ViewStub(FederalAccessRequiredMixin, View):
+        def get(self, request, *args, **kwargs):
+            pass
+
+    def test_unauthenticated_raises_403(self):
+        """
+        An unauthenticated user should not be able to access the gated view.
+        """
+        request = RequestFactory().get("/")
+
+        self.assertRaises(PermissionDenied, self.ViewStub().dispatch, request)
+
+    def test_unprivileged_raises_403(self):
+        """
+        An authenitcated but unprivileged user should not be able to access the gated view.
+        """
+        request = RequestFactory().get("/")
+
+        user = baker.make(User)
+        request.user = user
+
+        self.assertRaises(PermissionDenied, self.ViewStub().dispatch, request)
+
+    def test_privileged_passes(self):
+        """
+        An autheniticated and privileged user should be able to access the gated view.
+        """
+        user = baker.make(User)
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(UserPermission, user=user, email=user.email, permission=permission)
+
+        request = RequestFactory().get("/")
+        request.user = user
+
+        try:
+            self.ViewStub().dispatch(request)
+        except PermissionDenied:
+            self.fail("Authenticated users should have access.")
