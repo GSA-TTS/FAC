@@ -103,16 +103,36 @@ class TestPreliminaryViews(TestCase):
 
     """
 
-    step1_data = {
-        "user_provided_organization_type": "state",
-        "met_spending_threshold": "True",
-        "is_usa_based": "True",
+    # Comes either from creating a new submission or starting a resubmission
+    # Only the bool is required to test presubmission eligibility
+    step0_data = {
+        "is_resubmission": "True",
+        "resubmission_meta": {
+            "previous_row_id": 123456,
+            "previous_report_id": "2022-06-GSAFAC-0000123456",
+        },
+    }
+
+    # Form submissions use MM/DD/YYYY
+    # Use when making a POST to a view.
+    step1_form_data = {
+        "auditee_uei": "D7A4J33FUMJ1",
+        "auditee_fiscal_period_start": "01/01/2022",
+        "auditee_fiscal_period_end": "01/01/2023",
+    }
+
+    # After being validated, dates are stroed YYYY-MM-DD
+    # Use when mocking userprofile data.
+    step1_profile_data = {
+        "auditee_uei": "D7A4J33FUMJ1",
+        "auditee_fiscal_period_start": "2022-01-01",
+        "auditee_fiscal_period_end": "2023-01-01",
     }
 
     step2_data = {
-        "auditee_uei": "D7A4J33FUMJ1",
-        "auditee_fiscal_period_start": "2021-01-01",
-        "auditee_fiscal_period_end": "2021-12-31",
+        "user_provided_organization_type": "state",
+        "met_spending_threshold": "True",
+        "is_usa_based": "True",
     }
 
     step3_data = {
@@ -126,39 +146,38 @@ class TestPreliminaryViews(TestCase):
         "auditor_contacts_email": "d@d.com",
     }
 
-    def test_step_one_eligibility_submission_pass(self):
+    def test_step_one_auditeeinfo_submission_pass(self):
         """
-        /report_submissions/eligibility
+        /report_submission/auditeeinfo
         Check that the correct templates are loaded on GET.
         Check that the POST succeeds with appropriate data.
         """
         user = baker.make(User)
         self.client.force_login(user)
-        url = reverse("report_submission:eligibility")
+        url = reverse("report_submission:auditeeinfo")
 
+        # Post to step 0. Prepoluates userprofile.
+        step0_post = self.client.post(reverse("audit:MySubmissions"))
+        self.assertEqual(step0_post.status_code, 302)
+
+        # Test on step 1.
         get_response = self.client.get(url)
         self.assertTrue(user.is_authenticated)
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
-        self.assertTemplateUsed(get_response, "report_submission/step-1.html")
-        self.assertEqual(
-            get_response.context["dollar_thresholds"],
-            [
-                "$750,000 or more with a Fiscal Year starting BEFORE October 01, 2024",
-                "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
-            ],
-        )
+        self.assertTemplateUsed(get_response, "report_submission/auditee-info.html")
 
-        response = self.client.post(url, data=self.step1_data)
+        response = self.client.post(url, data=self.step1_form_data)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/report_submission/auditeeinfo/")
+        self.assertEqual(response.url, "/report_submission/eligibility/")
         user.refresh_from_db()
         saved = user.profile.entry_form_data
-        self.assertEqual(saved["user_provided_organization_type"], "state")
-        self.assertEqual(saved["met_spending_threshold"], True)
-        self.assertEqual(saved["is_usa_based"], True)
+        self.assertEqual(saved["auditee_uei"], "D7A4J33FUMJ1")
+        # Should have converted from MM/dd/YYYY
+        self.assertEqual(saved["auditee_fiscal_period_start"], "2022-01-01")
+        self.assertEqual(saved["auditee_fiscal_period_end"], "2023-01-01")
 
-    def test_step_one_eligibility_submission_fail(self):
+    def test_step_two_eligibility_submission_fail(self):
         """
         /report_submissions/eligibility
         Check that the POST fails when missing data.
@@ -181,41 +200,51 @@ class TestPreliminaryViews(TestCase):
         }
 
         user = baker.make(User)
+        user.profile.entry_form_data = self.step0_data  # Prepopulate as a resubmission
+        user.profile.save()
         self.client.force_login(user)
-        step1 = reverse("report_submission:eligibility")
 
-        get_response = self.client.get(step1)
+        step1_url = reverse("report_submission:auditeeinfo")
+        step2_url = reverse("report_submission:eligibility")
+        step3_url = reverse("report_submission:accessandsubmission")
+
+        # Get step 1. Post. Verify redirect to step 2.
+        step1_get = self.client.get(step1_url)
         self.assertTrue(user.is_authenticated)
-        self.assertEqual(get_response.status_code, 200)
-        self.assertTemplateUsed(get_response, "report_submission/step-base.html")
-        self.assertTemplateUsed(get_response, "report_submission/step-1.html")
+        self.assertEqual(step1_get.status_code, 200)
+        self.assertTemplateUsed(step1_get, "report_submission/step-base.html")
+        self.assertTemplateUsed(step1_get, "report_submission/auditee-info.html")
 
-        response = self.client.post(step1, data=self.step1_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/report_submission/auditeeinfo/")
+        step1_post = self.client.post(step1_url, data=self.step1_form_data)
+        self.assertEqual(step1_post.status_code, 302)
+        self.assertEqual(step1_post.url, step2_url)
 
-        step2 = reverse("report_submission:auditeeinfo")
-        step2_get = self.client.get(step2)
+        # Get step 2. Post. Verify redirect to step 3.
+        step2_get = self.client.get(step2_url)
         self.assertEqual(step2_get.status_code, 200)
         self.assertTemplateUsed(step2_get, "report_submission/step-base.html")
-        self.assertTemplateUsed(step2_get, "report_submission/step-2.html")
+        self.assertTemplateUsed(step2_get, "report_submission/eligibility.html")
+        self.assertEqual(
+            step2_get.context["dollar_thresholds"],
+            [
+                "$750,000 or more with a Fiscal Year starting BEFORE October 01, 2024",
+                "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
+            ],
+        )
 
-        step2_data = {
-            "auditee_uei": "kZV2XNZZN3A8",
-            "auditee_fiscal_period_start": "01/01/2022",
-            "auditee_fiscal_period_end": "01/01/2023",
-        }
-        step2_post = self.client.post(step2, data=step2_data)
+        step2_post = self.client.post(step2_url, data=self.step2_data)
         self.assertEqual(step2_post.status_code, 302)
-        self.assertEqual(step2_post.url, "/report_submission/accessandsubmission/")
+        self.assertEqual(step2_post.url, step3_url)
 
-        step3 = reverse("report_submission:accessandsubmission")
-        step3_get = self.client.get(step3)
+        # Get step 3. Post. Verify redirect to general information.
+        step3_get = self.client.get(step3_url)
         self.assertEqual(step3_get.status_code, 200)
         self.assertTemplateUsed(step3_get, "report_submission/step-base.html")
-        self.assertTemplateUsed(step3_get, "report_submission/step-3.html")
+        self.assertTemplateUsed(
+            step3_get, "report_submission/access-and-submission.html"
+        )
 
-        step3_post = self.client.post(step3, data=self.step3_data)
+        step3_post = self.client.post(step3_url, data=self.step3_data)
 
         self.assertEqual(step3_post.status_code, 302)
         path_segments = step3_post.url.split("/")
@@ -225,7 +254,7 @@ class TestPreliminaryViews(TestCase):
         report_id = path_segments[-1]
 
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        combined = self.step1_data | step2_data
+        combined = self.step1_form_data | self.step2_data
         for k in combined:
             # Test bools as strings
             if isinstance(getattr(sac, k), bool):
@@ -241,6 +270,10 @@ class TestPreliminaryViews(TestCase):
                 self.assertEqual(combined[k].upper(), getattr(sac, k))
             else:
                 self.assertEqual(combined[k], getattr(sac, k))
+        # Ensure resubmission metadata is stored in its own column
+        self.assertEqual(
+            self.step0_data["resubmission_meta"], getattr(sac, "resubmission_meta")
+        )
 
         accesses = Access.objects.filter(sac=sac)
         for key, val in self.step3_data.items():
@@ -256,7 +289,7 @@ class TestPreliminaryViews(TestCase):
                 self.assertEqual(matches[0].role, key)
 
     @patch("report_submission.forms.get_uei_info_from_sam_gov")
-    def test_step_two_auditeeinfo_submission_empty(self, mock_get_uei_info):
+    def test_step_one_auditeeinfo_submission_empty(self, mock_get_uei_info):
         """
         /report_submissions/auditeeinfo
         Check that the correct templates are loaded on GET.
@@ -267,16 +300,20 @@ class TestPreliminaryViews(TestCase):
         }
 
         user = baker.make(User)
-        user.profile.entry_form_data = self.step1_data
+        user.profile.entry_form_data = self.step1_form_data
         user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
+
+        # Post to step 0. Prepoluates userprofile.
+        step0_post = self.client.post(reverse("audit:MySubmissions"))
+        self.assertEqual(step0_post.status_code, 302)
 
         get_response = self.client.get(url)
         self.assertTrue(user.is_authenticated)
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
-        self.assertTemplateUsed(get_response, "report_submission/step-2.html")
+        self.assertTemplateUsed(get_response, "report_submission/auditee-info.html")
 
         data = {}
         response = self.client.post(
@@ -297,23 +334,27 @@ class TestPreliminaryViews(TestCase):
         )
 
     @patch("report_submission.forms.get_uei_info_from_sam_gov")
-    def test_step_two_auditeeinfo_invalid_dates(self, mock_get_uei_info):
+    def test_step_one_auditeeinfo_invalid_dates(self, mock_get_uei_info):
         """
         Check that the server validates that start date preceeds end date
         """
         mock_get_uei_info.return_value = {"valid": True}
 
         user = baker.make(User)
-        user.profile.entry_form_data = self.step1_data
+        user.profile.entry_form_data = self.step1_form_data
         user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
+
+        # Post to step 0. Prepoluates userprofile.
+        step0_post = self.client.post(reverse("audit:MySubmissions"))
+        self.assertEqual(step0_post.status_code, 302)
 
         get_response = self.client.get(url)
         self.assertTrue(user.is_authenticated)
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
-        self.assertTemplateUsed(get_response, "report_submission/step-2.html")
+        self.assertTemplateUsed(get_response, "report_submission/auditee-info.html")
 
         data = {
             "auditee_uei": "ZqGGHJH74DW7",
@@ -333,23 +374,27 @@ class TestPreliminaryViews(TestCase):
         )
 
     @patch("report_submission.forms.get_uei_info_from_sam_gov")
-    def test_step_two_auditeeinfo_future_enddate(self, mock_get_uei_info):
+    def test_step_one_auditeeinfo_future_enddate(self, mock_get_uei_info):
         """
         Check that the server validates that end date preceeds current date
         """
         mock_get_uei_info.return_value = {"valid": True}
 
         user = baker.make(User)
-        user.profile.entry_form_data = self.step1_data
+        user.profile.entry_form_data = self.step1_form_data
         user.profile.save()
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
+
+        # Post to step 0. Prepoluates userprofile.
+        step0_post = self.client.post(reverse("audit:MySubmissions"))
+        self.assertEqual(step0_post.status_code, 302)
 
         get_response = self.client.get(url)
         self.assertTrue(user.is_authenticated)
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
-        self.assertTemplateUsed(get_response, "report_submission/step-2.html")
+        self.assertTemplateUsed(get_response, "report_submission/auditee-info.html")
 
         tomorrow = date.today() + timedelta(days=1)
 
@@ -376,7 +421,8 @@ class TestPreliminaryViews(TestCase):
         """
         user = baker.make(User)
         user.profile.entry_form_data = {
-            **self.step1_data,
+            **self.step0_data,
+            **self.step1_profile_data,
             **self.step2_data,
             **self.step3_data,
         }
@@ -388,7 +434,9 @@ class TestPreliminaryViews(TestCase):
         self.assertTrue(user.is_authenticated)
         self.assertEqual(get_response.status_code, 200)
         self.assertTemplateUsed(get_response, "report_submission/step-base.html")
-        self.assertTemplateUsed(get_response, "report_submission/step-3.html")
+        self.assertTemplateUsed(
+            get_response, "report_submission/access-and-submission.html"
+        )
 
         data = {}
         response = self.client.post(url, data=data)
@@ -430,32 +478,42 @@ class TestPreliminaryViews(TestCase):
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertTrue("openid/login" in response.url)
 
-    def test_auditeeinfo_no_eligibility(self):
+    def test_eligibility_no_auditeeinfo(self):
+        """
+        Given a userprofile with step 0 info but no auditeeinfo, the user should be redirected back
+        to the auditeeinfo page when attempting to visit the eligibility page.
+        """
         user = baker.make(User)
         user.profile.entry_form_data = {
-            **self.step1_data,
-            "is_usa_based": False,  # Ineligible
+            **self.step0_data,
         }
         user.profile.save()
         self.client.force_login(user)
 
-        url = reverse("report_submission:auditeeinfo")
+        url = reverse("report_submission:eligibility")
         response = self.client.get(url)
 
-        # Should redirect to step 1 page due to no eligibility
+        # Should redirect to step 1 page due to no auditee info
         self.assertIsInstance(response, HttpResponseRedirect)
-        self.assertTrue("report_submission/eligibility" in response.url)
+        self.assertTrue("report_submission/auditeeinfo" in response.url)
 
     def test_accessandsubmission_no_auditee_info(self):
+        """
+        Given a userprofile with step 0 and eligibility info, but no auditee info, the user should
+         be redirected back to the auditeeinfo page when attempting to visit the eligibility page.
+        """
         user = baker.make(User)
-        user.profile.entry_form_data = self.step1_data
+        user.profile.entry_form_data = {
+            **self.step0_data,
+            **self.step2_data,
+        }
         user.profile.save()
         self.client.force_login(user)
 
         url = reverse("report_submission:accessandsubmission")
         response = self.client.get(url)
 
-        # Should redirect to step 2 page since auditee info isn't present
+        # Should redirect to step 1 page since auditee info isn't present
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertTrue("report_submission/auditeeinfo" in response.url)
 

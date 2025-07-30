@@ -12,7 +12,7 @@ from audit.models import (
     Audit,
 )
 from audit.models.constants import STATUS, AuditType
-from .constants import ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED
+from .constants import ACCESS_SUBMISSION_DATA_REQUIRED
 
 from audit.models.access_roles import AccessRole
 
@@ -27,24 +27,33 @@ def access_and_submission_check(user, data):
     serializer = AccessAndSubmissionSerializer(data=data)
 
     # Need Eligibility and AuditeeInfo already collected to proceed.
-    # We probably need to exclude more than just csrfmiddlewaretoken from
+    # We may want to exclude more than just these fields from the
     # stray properties that might end up present in the submitted data:
+    omitted_fields = [
+        "csrfmiddlewaretoken",
+        "is_resubmission",  # Bool used to ensure users go through all forms
+        "resubmission_meta",  # Stored in its own column
+    ]
     all_steps_user_form_data = {
         k: user.profile.entry_form_data[k]
         for k in user.profile.entry_form_data
-        if k != "csrfmiddlewaretoken"
+        if k not in omitted_fields
     }
     missing_fields = [
         field
-        for field in ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED
+        for field in ACCESS_SUBMISSION_DATA_REQUIRED
         if field not in all_steps_user_form_data
     ]
     if missing_fields:
         return {
-            "next": reverse("api-eligibility"),
+            "next": reverse("api-auditee-info"),
             "errors": "We're missing required fields, please try again.",
             "missing_fields": missing_fields,
         }
+
+    resubmission_meta = user.profile.entry_form_data.get(
+        "resubmission_meta"
+    )  # None is a valid value at this point.
 
     if serializer.is_valid():
         # Create SF-SAC instance and add data from previous steps saved in the
@@ -54,6 +63,7 @@ def access_and_submission_check(user, data):
             submitted_by=user,
             submission_status=STATUS.IN_PROGRESS,
             general_information=all_steps_user_form_data,
+            resubmission_meta=resubmission_meta,
             event_user=user,
             event_type=SubmissionEvent.EventType.CREATED,
             # TODO: Update Post SOC Launch

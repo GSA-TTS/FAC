@@ -33,12 +33,13 @@ Modal content, triggered outside the component. Displays terms and conditions, c
                     If you have questions about these conditions, please email <a class="usa-link" href="mailto:fac-support@gsa.gov">fac-support@gsa.gov</a>.
                 </p>
             </div>
-            <form id="start-new-submission" class="usa-form usa-form--large">
+            <form id="start-new-submission" class="usa-form usa-form--large" method="post">
+                {% csrf_token %}
                 <div class="usa-checkbox margin-y-4">
-                    <input id="check-start-new-submission"
+                    <input id="check_start_new_submission"
                             class="usa-checkbox__input"
                             type="checkbox"/>
-                    <label class="usa-checkbox__label display-inline-flex" for="check-start-new-submission">
+                    <label class="usa-checkbox__label display-inline-flex" for="check_start_new_submission">
                         I agree to the&nbsp;
                         <p id="terms-conditions-trigger" class="margin-0 text-underline">
                             terms and conditions.
@@ -47,11 +48,12 @@ Modal content, triggered outside the component. Displays terms and conditions, c
                     </label>
                 </div>
                 <div class="usa-button-group">
-                    <input type="submit"
+                    <button type="submit"
                             id="start-submission"
                             class="usa-button"
-                            value="Begin New Submission"
-                            disabled/>
+                            disabled >
+                            Begin New Submission
+                    </button>
                     <a class="usa-button usa-button--outline tablet:margin-left-2" id="cancel-start-submission" aria-label="Close this window" data-close-modal>Cancel</a>
                 </div>
             </form>

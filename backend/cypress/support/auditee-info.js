@@ -21,5 +21,5 @@ export function testValidAuditeeInfo() {
   cy.get('.usa-button').contains('Continue').click();
 
   // and assert on the URL we end up at
-  cy.url().should('match', /\/report_submission\/accessandsubmission\/$/);
+  cy.url().should('match', /\/report_submission\/eligibility\/$/);
 }
