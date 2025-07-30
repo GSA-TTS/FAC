@@ -162,12 +162,11 @@ def update_authorized_public(options):
         )
         sys.exit(-1)
     else:
-        current_status = sac.tribal_data_consent[
-            "is_tribal_information_authorized_to_be_public"
-        ]
+        current_status = status_to_bool(
+            sac.tribal_data_consent["is_tribal_information_authorized_to_be_public"]
+        )
 
-    current_status = status_to_bool(current_status)
-    new_status = status_to_bool(options["new_authorized"])
+    new_status = status_to_bool(options["new_authorization"])
 
     logger.info(f"current authorized to be public: {current_status} new: {new_status}")
 
@@ -208,3 +207,4 @@ def update_authorized_public(options):
         THE_USER_OBJ,
         SubmissionEvent.EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
     )
+    return True

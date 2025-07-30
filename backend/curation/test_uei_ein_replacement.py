@@ -1,4 +1,8 @@
-from curation.curationlib.update_uei_or_ein import update_uei, update_ein
+from curation.curationlib.update_after_submission import (
+    update_uei,
+    update_ein,
+    update_authorized_public,
+)
 from model_bakery import baker
 from django.test import TestCase
 from audit.models import SingleAuditChecklist
@@ -42,6 +46,12 @@ sac_01 = {
         "auditee_email": "MS74CCHS@ATLANTICBB.NET",
         "auditee_state": "PA",
         "auditee_fiscal_period_end": "2022-12-31",
+        "user_provided_organization_type": "tribal",
+    },
+    "tribal_data_consent": {
+        "is_tribal_information_authorized_to_be_public": True,
+        "tribal_authorization_certifying_official_name": "Bob",
+        "tribal_authorization_certifying_official_title": "Certifier",
     },
 }
 
@@ -264,3 +274,55 @@ class EINReplacementTests(TestCase):
         # We expect this to fail. The validation code will normally catch this.
         # It should fail to work on an audit that is not yet disseminated.
         self.assertEqual("failed", result)
+
+
+class UpdatePublicAuthorizationForTribalAudits(TestCase):
+
+    def test_update_authorized_public_status(self):
+        user = baker.make(User)
+        user.email = "test@fac.gsa.gov"
+        user.save()
+
+        # Test on a single audit.
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+            tribal_data_consent=sac_01["tribal_data_consent"],
+        )
+
+        options = dict()
+        options["report_id"] = "2022-42-MAGIC-0000000001"
+        options["old_authorization"] = "true"
+        options["new_authorization"] = "false"
+        options["email"] = user.email
+
+        try:
+            update_authorized_public(options)
+            result = "succeeded"
+        except Exception as e:  # noqa: E722
+            # with open("MESSAGE", "a") as f:
+            #     f.write(str(e))
+            #     f.write("\n")
+            #     f.close()
+            result = "failed"
+
+        self.assertEqual("succeeded", result)
+        # Make sure it exists, and we flipped the value.
+        sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
+        self.assertEqual(
+            False,
+            sac.tribal_data_consent["is_tribal_information_authorized_to_be_public"],
+        )
+        # Check we tagged the fields with /FAC
+        self.assertTrue(
+            "/FAC"
+            in sac.tribal_data_consent["tribal_authorization_certifying_official_name"]
+        )
+        self.assertTrue(
+            "/FAC"
+            in sac.tribal_data_consent["tribal_authorization_certifying_official_title"]
+        )

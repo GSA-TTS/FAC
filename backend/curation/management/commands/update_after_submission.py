@@ -70,8 +70,8 @@ def validate_ein_options(options):
 
 
 def validate_authorized_options(options):
-    old_authorized_opt = status_to_bool(options["old_authorized"])
-    new_authorized_opt = status_to_bool(options["new_authorized"])
+    old_authorized_opt = status_to_bool(options["old_authorization"])
+    new_authorized_opt = status_to_bool(options["new_authorization"])
 
     # The old value needs to match what is in the DB.
     try:
@@ -132,7 +132,7 @@ def just_one_pair(flags, options):
 
 def validate_combos(options):
     # We should only get one pair at a time.
-    if not just_one_pair(["uei", "ein", "authorized"], options):
+    if not just_one_pair(["uei", "ein", "authorization"], options):
         return False
 
     # We either need a pair of UEIs, or a pair of EINs.
@@ -147,7 +147,7 @@ def validate_combos(options):
         return ok_old_ein and ok_new_ein
 
     # Or a pair of suppression flags?
-    elif have_pair_of("authorized", options):
+    elif have_pair_of("authorization", options):
         ok_old_suppression, ok_new_suppression = validate_authorized_options(options)
         return ok_old_suppression and ok_new_suppression
 
@@ -228,14 +228,14 @@ class Command(BaseCommand):
             help="The new EIN for this report",
         )
         parser.add_argument(
-            "--new_authorized",
+            "--new_authorization",
             type=str,
-            help="Current authorized to be public status (YES/NO)",
+            help="Current authorization to be public status (YES/NO)",
         )
         parser.add_argument(
-            "--old_authorized",
+            "--old_authorization",
             type=str,
-            help="Old authorized to be public status (YES/NO)",
+            help="Old authorization to be public status (YES/NO)",
         )
         parser.add_argument(
             "--email",
@@ -254,7 +254,7 @@ class Command(BaseCommand):
             update_uei(options)
         elif not nonelike(options["old_ein"]) and not nonelike(options["new_ein"]):
             update_ein(options)
-        elif not nonelike(options["old_authorized"]) and not nonelike(
-            options["new_authorized"]
+        elif not nonelike(options["old_authorization"]) and not nonelike(
+            options["new_authorization"]
         ):
             update_authorized_public(options)
