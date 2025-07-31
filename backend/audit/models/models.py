@@ -303,7 +303,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     # Resubmission SAC Creations
     # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
-    def initiate_resubmission(self, user=None, log_events=False):
+    def initiate_resubmission(self, user=None):
         with transaction.atomic():
             if SingleAuditChecklist.objects.filter(
                 resubmission_meta__previous_report_id=self.report_id
@@ -348,7 +348,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
             resub = SingleAuditChecklist.objects.create(**data)
 
-            if log_events and user:
+            if user:
                 # Event on the new RESUB
                 SubmissionEvent.objects.create(
                     sac=resub,
