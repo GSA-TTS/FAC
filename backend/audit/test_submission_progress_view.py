@@ -58,13 +58,13 @@ class SubmissionProgressViewTests(TestCase):
     def test_resubmission_context(self):
         """Check context when resubmission_meta is set"""
         previous_report_id = "some_fake_id"
-        self.sac.resubmission_meta = { "previous_report_id": previous_report_id }
+        self.sac.resubmission_meta = {"previous_report_id": previous_report_id}
         self.sac.save()
         baker.make(Access, user=self.user, sac=self.sac)
         self.client.force_login(user=self.user)
         res = self.client.get(
             reverse(
-                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id }
+                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
             )
         )
         self.assertEqual(res.context["previous_report_id"], previous_report_id)
@@ -77,7 +77,7 @@ class SubmissionProgressViewTests(TestCase):
         self.client.force_login(user=self.user)
         res = self.client.get(
             reverse(
-                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id }
+                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
             )
         )
         self.assertEqual(res.context["previous_report_id"], None)
