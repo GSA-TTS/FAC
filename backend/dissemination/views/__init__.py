@@ -5,6 +5,7 @@ from dissemination.views.download import (
     OneTimeAccessDownloadView,
     SingleSummaryReportDownloadView,
     MultipleSummaryReportDownloadView,
+    FindingsSummaryReportDownloadView,
 )
 from dissemination.views.analytics import AnalyticsView
 from dissemination.views.search import AdvancedSearch, Search, AuditSearch
@@ -17,6 +18,7 @@ views_list = [
     OneTimeAccessDownloadView,
     SingleSummaryReportDownloadView,
     MultipleSummaryReportDownloadView,
+    FindingsSummaryReportDownloadView,
     AdvancedSearch,
     Search,
     AuditSearch,
