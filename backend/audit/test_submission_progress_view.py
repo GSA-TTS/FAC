@@ -55,6 +55,33 @@ class SubmissionProgressViewTests(TestCase):
         )
         self.assertIn(phrase, res.content.decode("utf-8"))
 
+    def test_resubmission_context(self):
+        """Check context when resubmission_meta is set"""
+        previous_report_id = "some_fake_id"
+        self.sac.resubmission_meta = { "previous_report_id": previous_report_id }
+        self.sac.save()
+        baker.make(Access, user=self.user, sac=self.sac)
+        self.client.force_login(user=self.user)
+        res = self.client.get(
+            reverse(
+                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
+            )
+        )
+        self.assertEqual(res.context["previous_report_id"], previous_report_id)
+
+    def test_resubmission_context_none(self):
+        """Check context when resubmission_meta not set"""
+        self.sac.resubmission_meta = None
+        self.sac.save()
+        baker.make(Access, user=self.user, sac=self.sac)
+        self.client.force_login(user=self.user)
+        res = self.client.get(
+            reverse(
+                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
+            )
+        )
+        self.assertEqual(res.context["previous_report_id"], None)
+
     def test_submission_progress_check_geninfo_only(self):
         """
         Check the function containing the logic around which sections are required.
