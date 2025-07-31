@@ -64,7 +64,7 @@ class SubmissionProgressViewTests(TestCase):
         self.client.force_login(user=self.user)
         res = self.client.get(
             reverse(
-                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
+                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id }
             )
         )
         self.assertEqual(res.context["previous_report_id"], previous_report_id)
@@ -77,7 +77,7 @@ class SubmissionProgressViewTests(TestCase):
         self.client.force_login(user=self.user)
         res = self.client.get(
             reverse(
-                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
+                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id }
             )
         )
         self.assertEqual(res.context["previous_report_id"], None)
