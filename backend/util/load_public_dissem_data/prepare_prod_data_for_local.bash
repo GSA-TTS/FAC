@@ -44,8 +44,6 @@ if [[ -z "${EMAIL}" ]]; then
   exit
 fi
 
-
-
 # https://stackoverflow.com/a/6569837
 cmd=jq
 [[ $(type -P "$cmd") ]] && echo "$cmd is in PATH. Good."  || { echo "$cmd is NOT in PATH" 1>&2; exit 1; }
@@ -53,7 +51,26 @@ cmd=jq
 cmd=cf
 [[ $(type -P "$cmd") ]] && echo "$cmd is in PATH. Good."  || { echo "$cmd is NOT in PATH" 1>&2; exit 1; }
 
+# Make sure we are in `production` via `cf`.
+cf t | grep -q 'production'
+
+if [ $? -ne 0 ];
+then
+  echo "You are not in production."
+  read -p "Switch to production via cf? (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || false
+  # The above prompt exits if you say no.
+  if [[ $confirm =~ 'y' ]];
+  then
+    echo "Switching to production."
+    cf t -s production
+  else
+    echo "Did not switch."
+  fi
+fi
+
 echo -e "\n"
+
+
 
 # This can be changed via the menu.
 # Better, when a new backup is targeted, to 
