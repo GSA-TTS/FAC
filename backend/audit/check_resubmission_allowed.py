@@ -15,8 +15,10 @@ def check_resubmission_allowed(sac: SingleAuditChecklist) -> Tuple[bool, str]:
     meta = sac.resubmission_meta or {}
     gi = sac.general_information or {}
 
-    uei = gi.get("uei")
+    uei = gi.get("auditee_uei")
     year = gi.get("audit_year")
+    end_date = gi.get("auditee_fiscal_period_end")
+    audit_year = int(end_date.split("-")[0])
     version = meta.get("version") if meta else sac.version
     submission_status = sac.submission_status
     resub_status = meta.get("resubmission_status")
@@ -29,7 +31,7 @@ def check_resubmission_allowed(sac: SingleAuditChecklist) -> Tuple[bool, str]:
         )
 
     # Fallback check when version, year, uei is missing or incorrect data
-    if not uei or not year or version is None or sac.id is None:
+    if not uei or not audit_year or version is None or sac.id is None:
         return (
             False,
             "Audit record is incomplete and cannot be evaluated for resubmission.",
@@ -50,8 +52,8 @@ def check_resubmission_allowed(sac: SingleAuditChecklist) -> Tuple[bool, str]:
     # Legacy audit (meta = None) At this point, we assume data has been curated: valid submission_status, uei, year.
     if not meta:
         siblings = SingleAuditChecklist.objects.filter(
-            general_information__uei=uei,
-            general_information__audit_year=year,
+            general_information__aduitee_uei=uei,
+            general_information__auditee_fiscal_period_end__year=year,
             resubmission_meta__isnull=True,
         )
 
