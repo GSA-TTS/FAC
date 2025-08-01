@@ -25,7 +25,7 @@ def create_sac(
 
     if general_information is None:
         general_information = {
-            "uei": "TESTUEI123",
+            "auditee_uei": "TESTUEI123",
             "audit_year": 2023,
             "auditee_fiscal_period_end": timezone.now().date().isoformat(),
         }
@@ -37,10 +37,14 @@ def create_sac(
         submitted_by=user,
         submission_status=status,
         general_information=general_information,
-        resubmission_meta=meta,
         transition_name=[status],
     )
+
+    if meta is not None:
+        sac.resubmission_meta = meta
+
     sac.version = version
+
     if transition_date:
         sac.transition_date = [transition_date]
         sac.save(update_fields=["transition_date", "version"])
@@ -93,7 +97,7 @@ class TestCheckResubmissionAllowed(TestCase):
             meta=None,
             status=STATUS.DISSEMINATED,
             general_information={
-                "uei": "TESTUEI1",
+                "auditee_uei": "TESTUEI1",
                 "audit_year": 2023,
                 "auditee_fiscal_period_end": timezone.now().date().isoformat(),
             },
@@ -105,7 +109,7 @@ class TestCheckResubmissionAllowed(TestCase):
 
     def test_legacy_multiple_records_not_most_recent(self):
         shared_info = {
-            "uei": "TESTUEI1",
+            "auditee_uei": "TESTUEI1",
             "audit_year": 2023,
             "auditee_fiscal_period_end": timezone.now().date().isoformat(),
         }
@@ -133,7 +137,7 @@ class TestCheckResubmissionAllowed(TestCase):
 
     def test_legacy_multiple_records_most_recent_allowed(self):
         shared_info = {
-            "uei": "TESTUEI1",
+            "auditee_uei": "TESTUEI1",
             "audit_year": 2023,
             "auditee_fiscal_period_end": timezone.now().date().isoformat(),
         }
@@ -192,7 +196,7 @@ class TestCheckResubmissionAllowed(TestCase):
     def test_resubmission_blocked_when_status_is_none(self):
         sac = SingleAuditChecklist(
             general_information={
-                "uei": "TESTUEI123",
+                "auditee_uei": "TESTUEI123",
                 "audit_year": 2023,
                 "auditee_fiscal_period_end": timezone.now().date().isoformat(),
             },
