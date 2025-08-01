@@ -18,6 +18,7 @@ set +e
 # Fetch the command line arguments in an array.
 # https://stackoverflow.com/a/2740967
 args=("$@")
+
 # args[0] is the first argument, and not the name of the script.
 
 DESTINATION=${args[0]}
@@ -130,9 +131,7 @@ download_dumpfiles () {
   for dump in ${TARGET_TABLES[@]}; 
   do
     SRC="s3://${BUCKET_NAME}/backups/scheduled/${DESIRED_BACKUP}/${dump}"
-    # `readlink` canonicalizes the filepath locally. It gets rid of 
-    # extra // characters, and turns it into a full path.
-    DST=$(readlink -m "${DESTINATION}/${dump}")
+    DST="${DESTINATION}/${dump}"
     echo -e "Downloading...\n\t${SRC}\n\t->\n\t${DST}"
     # Remove any lingering files from previous runs if they exist.
     rm -f "${DST}"
@@ -160,7 +159,7 @@ load_raw_prod_dump () {
   for ndx in ${!TARGET_TABLES[@]};
   do
     dump=${TARGET_TABLES[$ndx]}
-    DUMPFILE=$(readlink -m "${DESTINATION}/${dump}")
+    DUMPFILE="${DESTINATION}/${dump}"
     prefix="public-"
     suffix=".dump"
     TABLENAME=${dump/#$prefix}
