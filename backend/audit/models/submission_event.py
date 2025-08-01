@@ -48,6 +48,7 @@ class SubmissionEvent(models.Model):
         FAC_ADMINISTRATIVE_EIN_REPLACEMENT = "fac-administrative-ein-replacement"
         RESUBMISSION_STARTED = "resubmission-started"
         RESUBMISSION_INITIATED = "resubmission-initiated"
+        FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE = "fac-administrative-suppression-change"
 
     EVENT_TYPES = (
         (EventType.ACCESS_GRANTED, _("Access granted")),
@@ -122,6 +123,10 @@ class SubmissionEvent(models.Model):
         (
             EventType.RESUBMISSION_STARTED,
             _("This report was started as a resubmission of another report."),
+        ),
+        (
+            EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
+            _("FAC administrative change of Tribal suppression status."),
         ),
     )
 
