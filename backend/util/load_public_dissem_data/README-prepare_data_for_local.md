@@ -47,8 +47,10 @@ Log in to the `cf` API.
 Run the script. Pass a path to a directory where you want to download `.dump` files from the `production` bucket.
 
 ```
-./prepare_dump.bash <path>
+./prepare_data_for_local.bash <path> <email>
 ```
+
+The `<email>` is your GSA email address.
 
 Run steps 2, 3, 4, 5, 6, and 7 in order.
 
