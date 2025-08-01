@@ -230,14 +230,6 @@ generate_materialized_view () {
 }
 
 ############################################################
-# redisseminate_all_sac_records
-############################################################
-redisseminate_all_sac_records () {
-  echo "redisseminate_all_sac_records"
-  docker compose exec web python manage.py delete_and_regenerate_dissemination_from_intake
-}
-
-############################################################
 # truncate_dissemination_tables
 ############################################################
 truncate_dissemination_tables () {
@@ -281,6 +273,15 @@ truncate_dissemination_tables () {
 }
 
 ############################################################
+# redisseminate_all_sac_records
+############################################################
+redisseminate_all_sac_records () {
+  echo "redisseminate_all_sac_records"
+  docker compose exec web python manage.py delete_and_regenerate_dissemination_from_intake
+}
+
+
+############################################################
 # DAS MENU
 ############################################################
 PS3='Please enter your choice: '
@@ -292,49 +293,49 @@ options=(\
   "TRUNCATE the dissemination tables" \
   "Re-disseminate all SAC records" \
   "Generate MATERIALIZED VIEW" \
-  "TRUNCATE *all* tables" \ 
-  "Run (most) all back-to-back" \
+  "TRUNCATE all tables" \
+  "Run most all back-to-back" \
   "Quit"
 )
 select opt in "${options[@]}"
 do
-    case $opt in
-      "Load sanitized data dump")
-        load_sanitized_data_dump
-        ;;
-      "Shrink the dump to 20K records")
-        shrink_to_20k_records
-        ;;
-      "Generate fake suppressed reports")
-        generate_fake_suppressed_reports
-        ;;
-      "Generate resubmissions")
-        generate_resubmissions
-        ;;
-      "Generate MATERIALIZED VIEW")
-        generate_materialized_view
-        ;;
-      "TRUNCATE the dissemination tables")
-        truncate_dissemination_tables
-        ;;
-      "Re-disseminate all SAC records")
-        redisseminate_all_sac_records
-        ;;
-      "TRUNCATE *all* tables")
-        truncate_all_local_tables
-        ;;
-      "Run (most) all back-to-back")
-        load_sanitized_data_dump
-        shrink_to_20k_records
-        generate_fake_suppressed_reports
-        generate_resubmissions
-        truncate_dissemination_tables
-        redisseminate_all_sac_records
-        generate_materialized_view
-        ;;
-      "Quit")
-          break
-          ;;
-      *) echo "invalid option $REPLY";;
-    esac
+  case $opt in
+    "Load sanitized data dump")
+      load_sanitized_data_dump
+      ;;
+    "Shrink the dump to 20K records")
+      shrink_to_20k_records
+      ;;
+    "Generate fake suppressed reports")
+      generate_fake_suppressed_reports
+      ;;
+    "Generate resubmissions")
+      generate_resubmissions
+      ;;
+    "Generate MATERIALIZED VIEW")
+      generate_materialized_view
+      ;;
+    "TRUNCATE the dissemination tables")
+      truncate_dissemination_tables
+      ;;
+    "Re-disseminate all SAC records")
+      redisseminate_all_sac_records
+      ;;
+    "TRUNCATE all tables")
+      truncate_all_local_tables
+      ;;
+    "Run most all back-to-back")
+      load_sanitized_data_dump
+      shrink_to_20k_records
+      generate_fake_suppressed_reports
+      generate_resubmissions
+      truncate_dissemination_tables
+      redisseminate_all_sac_records
+      generate_materialized_view
+      ;;
+    "Quit")
+      break
+      ;;
+    *) echo "invalid option $REPLY";;
+  esac
 done

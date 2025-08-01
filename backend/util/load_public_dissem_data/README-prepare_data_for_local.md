@@ -12,11 +12,8 @@ We want to load the same starting data and then modify it to meet our needs. Thi
 
 ## requirements
 
-* The local database needs to be Postgres v17 or higher.
-* `psql`, `pg_dump`, and `pg_restore` need to be v17 or higher
+* `psql`, `pg_dump`, and `pg_restore` need to be v15 (or higher?)
 * `jq` must be installed
-
-We are using version 17 because the dumpfiles created in `production` are using tooling that generates dumps that can only be manipulated by `pg_dump` and `pg_restore` v17 and higher.
 
 ## cleanup locally, at least once
 
