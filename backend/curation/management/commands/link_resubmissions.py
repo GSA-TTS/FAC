@@ -34,7 +34,7 @@ def point_old_to_new(
 
     # If the first has no resubmission metadata, it must be the first in a chain.
     # This is like calling 'initiate_resubmission' on an audit.
-    if first.resubmission_meta == None:
+    if first.resubmission_meta is None:
         logger.info(f"First in chain: {first.report_id} -> {second.report_id}")
         first.resubmission_meta = {
             "version": 1,
@@ -69,7 +69,7 @@ def point_old_to_new(
 
     # If the first one has metadata, that means we're linking things
     # that are part of a chain.
-    elif first.resubmission_meta != None:
+    elif first.resubmission_meta is not None:
         logger.info(f"Middle of chain: {first.report_id} -> {second.report_id}")
         # Extend the metadata of the first report with information about
         # it's next. It probably had a previous_, but no next.
@@ -110,7 +110,56 @@ def point_old_to_new(
         sys.exit(-1)
 
 
-import time
+def annotate_old(options):
+    # Now, everything in that audit year that has no metadata is
+    # an unknown to us. We should annotate it. This way, all audits in that
+    # year have resubmission metadata. We won't do anything to in-flight audits.
+    # They will get annotated when they are saved.
+    u = User.objects.get(email=options["email"])
+    for sac in SingleAuditChecklist.objects.filter(
+        resubmission_meta__isnull=True,
+        submission_status="disseminated",
+        general_information__auditee_fiscal_period_end__startswith=options[
+            "audit_year"
+        ],
+    ):
+        sac.resubmission_meta = {
+            "version": 0,
+            "resubmission_status": "no_resubmission_data",
+        }
+        sac.save(
+            administrative_override=True,
+            event_user=u,
+            event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_RESUBMISSION_ANNOTATION,
+        )
+        sac.redisseminate()
+
+
+def annotate_linked_reports(options, sorted_sets):
+    u = User.objects.get(email=options["email"])
+    for linked in sorted_sets:
+        # Order the sets internally by their first submitted transition.
+        # These are SAC records.
+        linked_sorted = sorted(linked, key=order_reports_key)
+        # Now, each element wants to link to the next and previous.
+        the_length = len(linked_sorted)
+        # range() is from [0, length) (inclusive, exclusive)
+        for ndx in range(the_length - 1):
+            # I want to link this to next, and visa-versa.
+            this_ndx = ndx
+            next_ndx = ndx + 1
+            # Are they both less than the length? If so, they can be linked.
+            if this_ndx < the_length and next_ndx <= the_length:
+                try:
+                    this_sac = linked_sorted[this_ndx]
+                    next_sac = linked_sorted[next_ndx]
+                    point_old_to_new(this_sac, next_sac, u)
+                except IndexError:
+                    # Should not get here.
+                    logger.error(
+                        f"length: {the_length} first: {this_ndx} second: {next_ndx}"
+                    )
+                    pass
 
 
 class Command(BaseCommand):
@@ -162,56 +211,12 @@ class Command(BaseCommand):
 
         export_sets_as_csv(options["audit_year"], sorted_sets, noisy=options["noisy"])
 
-        # k = input("Review markdown and press `c` to continue...")
-        k = "c"
+        k = input("Review markdown and press `c` to continue...")
         if k != "c":
             logger.error("Exiting.")
             sys.exit()
         else:
-            u = User.objects.get(email=options["email"])
-            for linked in sorted_sets:
-                # Order the sets internally by their first submitted transition.
-                # These are SAC records.
-                linked_sorted = sorted(linked, key=order_reports_key)
-                # Now, each element wants to link to the next and previous.
-                the_length = len(linked_sorted)
-                # range() is from [0, length) (inclusive, exclusive)
-                for ndx in range(the_length - 1):
-                    # I want to link this to next, and visa-versa.
-                    this_ndx = ndx
-                    next_ndx = ndx + 1
-                    # Are they both less than the length? If so, they can be linked.
-                    if this_ndx < the_length and next_ndx <= the_length:
-                        try:
-                            this_sac = linked_sorted[this_ndx]
-                            next_sac = linked_sorted[next_ndx]
-                            point_old_to_new(this_sac, next_sac, u)
-                        except IndexError:
-                            # Should not get here.
-                            logger.error(
-                                f"length: {the_length} first: {this_ndx} second: {next_ndx}"
-                            )
-                            pass
+            annotate_linked_reports(options, sorted_sets)
 
-            # Now, everything in that audit year that has no metadata is
-            # an unknown to us. We should annotate it. This way, all audits in that
-            # year have resubmission metadata. We won't do anything to in-flight audits.
-            # They will get annotated when they are saved.
-            if options["annotate_old"]:
-                for sac in SingleAuditChecklist.objects.filter(
-                    resubmission_meta__isnull=True,
-                    submission_status="disseminated",
-                    general_information__auditee_fiscal_period_end__startswith=options[
-                        "audit_year"
-                    ],
-                ):
-                    sac.resubmission_meta = {
-                        "version": 0,
-                        "resubmission_status": "no_resubmission_data",
-                    }
-                    sac.save(
-                        administrative_override=True,
-                        event_user=u,
-                        event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_RESUBMISSION_ANNOTATION,
-                    )
-                    sac.redisseminate()
+        if options["annotate_old"]:
+            annotate_old(options)

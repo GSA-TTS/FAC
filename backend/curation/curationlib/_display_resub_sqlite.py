@@ -10,9 +10,6 @@ from export_resubmission_clusters import (
 )
 
 
-from datetime import datetime
-
-
 def main(args):
     sacked = fetch_sac_resubmission_records_sqlite(args.audit_year, args.sqlite)
     sorted_sets = generate_clusters_from_records(sacked, args.audit_year, True)

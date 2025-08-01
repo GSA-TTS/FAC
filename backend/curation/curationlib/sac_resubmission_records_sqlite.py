@@ -1,7 +1,6 @@
 import sqlite3
 import json
 from collections import defaultdict
-from pprint import pprint
 from datetime import datetime
 
 
