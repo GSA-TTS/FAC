@@ -16,6 +16,7 @@ We want to load the same starting data and then modify it to meet our needs. Thi
 
 * `psql`, `pg_dump`, and `pg_restore` need to be v15 (or higher?)
 * `jq` must be installed
+* a current sanitized dumpfile
 
 ## cleanup locally, at least once
 
@@ -32,6 +33,12 @@ docker volume prune -f
 Then, `docker compose up`. This only needs to be done once. Probably.
 
 ## BLUF
+
+Fetch a santizied dumpfile from GDrive:
+
+https://drive.google.com/drive/folders/1WymwJtdQ287SdgrOx__aEraoVTx7ig9D
+
+These are approximately 2GB.
 
 ```
 ./manage_local_data.bash <path> <email>
