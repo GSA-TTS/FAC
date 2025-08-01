@@ -160,6 +160,8 @@ class Command(BaseCommand):
             options["audit_year"], sorted_sets, noisy=options["noisy"]
         )
 
+        export_sets_as_csv(options["audit_year"], sorted_sets, noisy=options["noisy"])
+
         # k = input("Review markdown and press `c` to continue...")
         k = "c"
         if k != "c":
