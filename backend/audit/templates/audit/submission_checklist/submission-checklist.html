@@ -3,17 +3,21 @@
 {% load sprite_helper %}
 {% load submission_progress_tags %}
 
-{% comment %} 
+{% comment %}
     "The Big One"
-    This is the greater checklist component, which imports all the necessary sub-components. 
+    This is the greater checklist component, which imports all the necessary sub-components.
 {% endcomment %}
 
 {% block content %}
     <div class="grid-row">
         <div class="grid-container margin-top-6 margin-bottom-6">
-            
+
             {% include "./title.html" with auditee_name=auditee_name %}
-            
+
+            {% if previous_report_id %}
+                {% include "includes/resubmission_banner.html" %}
+            {% endif %}
+
             <div id="submission-checklist-content">
                 <ul class="usa-icon-list usa-icon-list--size-sm font-sans-md">
 
@@ -37,7 +41,7 @@
                         {% include "./key-info-certification.html" %}
                         {% include "./preview-button-group.html" %}
                     {% endif %}
-                    
+
                     {% comment %} Auditor Certification {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105 margin-top-5"
                         id="auditor-certification-completed">
@@ -70,7 +74,7 @@
                             </div>
                         {% endif %}
                     </li>
-                    
+
                     {% comment %} Auditee Certification {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-3"
                         id="auditee-certification-completed">
@@ -103,7 +107,7 @@
                             </div>
                         {% endif %}
                     </li>
-                    
+
                     {% comment %} Submit to the FAC for processing {% endcomment %}
                     {% if submission.enabled %}
                     <li class="padding-bottom-3" id="submit-audit">
