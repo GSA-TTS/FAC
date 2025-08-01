@@ -35,6 +35,15 @@ else
   exit
 fi
 
+# https://stackoverflow.com/a/6569837
+cmd=jq
+[[ $(type -P "$cmd") ]] && echo "$cmd is in PATH. Good."  || { echo "$cmd is NOT in PATH" 1>&2; exit 1; }
+
+cmd=cf
+[[ $(type -P "$cmd") ]] && echo "$cmd is in PATH. Good."  || { echo "$cmd is NOT in PATH" 1>&2; exit 1; }
+
+echo -e "\n"
+
 # This can be changed via the menu.
 # Better, when a new backup is targeted, to 
 # make the change and commit back to the repo.
