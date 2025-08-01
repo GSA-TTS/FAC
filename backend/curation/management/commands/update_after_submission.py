@@ -135,7 +135,7 @@ def validate_combos(options):
     if not just_one_pair(["uei", "ein", "authorization"], options):
         return False
 
-    # We either need a pair of UEIs, or a pair of EINs.
+    # We either need a pair of UEIs, EINs, or authorizations.
     # Do we have a pair of UEIs?
     if have_pair_of("uei", options):
         ok_old_uei, ok_new_uei = validate_uei_options(options)
