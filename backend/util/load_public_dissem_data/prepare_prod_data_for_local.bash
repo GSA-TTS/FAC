@@ -66,6 +66,8 @@ then
   else
     echo "Did not switch."
   fi
+else
+  echo "You are in 'production' via 'cf'. Beware of dragons."
 fi
 
 echo -e "\n"
