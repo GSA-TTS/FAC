@@ -370,18 +370,15 @@ generate_materialized_view () {
 
 PS3='Please enter your choice: '
 options=(\
-  "Truncate tables" \
-  "Load finished data" \
-  "Load raw data" \
+  "Load sanitized data dump" \
+  "Shrink the dump to 20K records" \
   "Generate fake suppressed reports" \
-  "Re-disseminate SAC records" \
+  "Generate resubmissions" \
   "Generate MATERIALIZED VIEW" \
-  "Check row counts" \
-  "Dump tables for reuse" \
-  "Reset migrated_to_audit" \
-  "Truncate audit_audit" \
-  "Generate resubmissions"
-  "Quit"\
+  "Re-disseminate all SAC records" \
+  "TRUNCATE the dissemination tables" \
+  "TRUNCATE *all* tables" \ 
+  "Quit"
 )
 select opt in "${options[@]}"
 do

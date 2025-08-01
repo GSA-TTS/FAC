@@ -1,0 +1,101 @@
+# This file is sourced in to other scripts.
+#
+# 1. The dump files pulled from S3.
+# 2. The dump files pushed into a local instance.
+
+# These are the tables we're going to pull
+# https://docs.vultr.com/how-to-use-arrays-in-bash
+
+# The order of the tables matters for foreign key constraint reasons.
+# Do not alphabetize. These tables must load in this order.
+TARGET_TABLES=(
+  "public-auth_user.dump"
+  # NOTICE:  truncate cascades to table "audit_access"
+  # NOTICE:  truncate cascades to table "audit_audit"
+  # NOTICE:  truncate cascades to table "audit_auditflow"
+  # NOTICE:  truncate cascades to table "audit_auditvalidationwaiver"
+  # NOTICE:  truncate cascades to table "audit_deletedaccess"
+  # NOTICE:  truncate cascades to table "audit_excelfile"
+  # NOTICE:  truncate cascades to table "audit_history"
+  # NOTICE:  truncate cascades to table "audit_sacvalidationwaiver"
+  # NOTICE:  truncate cascades to table "audit_singleauditchecklist"
+  # NOTICE:  truncate cascades to table "audit_singleauditchecklistflow"
+  # NOTICE:  truncate cascades to table "audit_singleauditreportfile"
+  # NOTICE:  truncate cascades to table "audit_submissionevent"
+  # NOTICE:  truncate cascades to table "auth_user_groups"
+  # NOTICE:  truncate cascades to table "auth_user_user_permissions"
+  # NOTICE:  truncate cascades to table "authtoken_token"
+  # NOTICE:  truncate cascades to table "django_admin_log"
+  # NOTICE:  truncate cascades to table "users_userpermission"
+  # NOTICE:  truncate cascades to table "users_userprofile"
+  "public-audit_audit.dump"
+  # NOTICE:  truncate cascades to table "audit_access"
+  # NOTICE:  truncate cascades to table "audit_auditflow"
+  # NOTICE:  truncate cascades to table "audit_auditvalidationwaiver"
+  # NOTICE:  truncate cascades to table "audit_deletedaccess"
+  # NOTICE:  truncate cascades to table "audit_excelfile"
+  # NOTICE:  truncate cascades to table "audit_singleauditreportfile"
+  # NOTICE:  truncate cascades to table "audit_submissionevent"
+  "public-audit_singleauditchecklist.dump"
+  # NOTICE:  truncate cascades to table "audit_access"
+  # NOTICE:  truncate cascades to table "audit_deletedaccess"
+  # NOTICE:  truncate cascades to table "audit_excelfile"
+  # NOTICE:  truncate cascades to table "audit_sacvalidationwaiver"
+  # NOTICE:  truncate cascades to table "audit_singleauditchecklistflow"
+  # NOTICE:  truncate cascades to table "audit_singleauditreportfile"
+  # NOTICE:  truncate cascades to table "audit_submissionevent"
+  "public-dissemination_general.dump"
+  # NOTICE:  truncate cascades to table "dissemination_additionalein"
+  # NOTICE:  truncate cascades to table "dissemination_additionaluei"
+  # NOTICE:  truncate cascades to table "dissemination_captext"
+  # NOTICE:  truncate cascades to table "dissemination_federalaward"
+  # NOTICE:  truncate cascades to table "dissemination_finding"
+  # NOTICE:  truncate cascades to table "dissemination_findingtext"
+  # NOTICE:  truncate cascades to table "dissemination_note"
+  # NOTICE:  truncate cascades to table "dissemination_passthrough"
+  # NOTICE:  truncate cascades to table "dissemination_secondaryauditor"
+
+  # The tables from this point forward can be in any order.
+  # Or, this alphabetized order seems to work just fine.
+  "public-audit_access.dump"
+  "public-audit_auditflow.dump"
+  "public-audit_auditvalidationwaiver.dump"
+  "public-audit_excelfile.dump"
+  "public-audit_history.dump"
+  "public-audit_sacvalidationwaiver.dump"
+  "public-audit_singleauditchecklistflow.dump"
+  "public-audit_singleauditreportfile.dump"
+  "public-audit_submissionevent.dump"
+  "public-audit_ueivalidationwaiver.dump"
+  "public-census_historical_migration_elecauditfindings.dump"
+  "public-census_historical_migration_elecauditheader.dump"
+  "public-census_historical_migration_elecaudits.dump"
+  "public-census_historical_migration_eleccaptext.dump"
+  "public-census_historical_migration_eleccpas.dump"
+  "public-census_historical_migration_eleceins.dump"
+  "public-census_historical_migration_elecfindingstext.dump"
+  "public-census_historical_migration_elecnotes.dump"
+  "public-census_historical_migration_elecpassthrough.dump"
+  "public-census_historical_migration_elecueis.dump"
+  "public-census_historical_migration_migrationerrordetail.dump"
+  "public-census_historical_migration_reportmigrationstatus.dump"
+  # dissemination_general must load before these.
+  "public-dissemination_additionalein.dump"
+  "public-dissemination_additionaluei.dump"
+  "public-dissemination_captext.dump"
+  "public-dissemination_federalaward.dump"
+  "public-dissemination_finding.dump"
+  "public-dissemination_findingtext.dump"
+  "public-dissemination_invalidauditrecord.dump"
+  # Not bothering with these at this point.
+  # "public-dissemination_issuedescriptionrecord.dump"
+  "public-dissemination_migrationinspectionrecord.dump"
+  "public-dissemination_note.dump"
+  "public-dissemination_onetimeaccess.dump"
+  "public-dissemination_passthrough.dump"
+  "public-dissemination_secondaryauditor.dump"
+  "public-support_cognizantassignment.dump"
+) 
+
+TRUNCATE_ONLY=(
+)
