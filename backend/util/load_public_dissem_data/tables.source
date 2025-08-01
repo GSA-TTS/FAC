@@ -96,3 +96,6 @@ TARGET_TABLES=(
   "public-dissemination_secondaryauditor.dump"
   "public-support_cognizantassignment.dump"
 ) 
+
+TRUNCATE_ONLY=(
+)

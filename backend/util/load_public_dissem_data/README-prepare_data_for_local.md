@@ -48,7 +48,7 @@ If you are feeling bold, select the option for running everything straight throu
 
 Upload the resulting file (e.g. `sanitized-20250731.dump`) to GDrive for sharing with the team. It is now ready for load via `manage_local_data.bash`.
 
-This file will contain 100% public *disseminated* data, and *may* contain *undisseminated* data. To make sure no in-progress audits are Tribal submissions for which an attestation has not yet been made, we delete all `tribal` audits that do not yet have an attestation. This should guarantee that 100% of all in-progress is *also* public data.
+This file will contain 100% public data (disseminated and in-progress). To make sure no in-progress audits are Tribal submissions for which an attestation has not yet been made, we delete all `tribal` audits that do not yet have an attestation. This should guarantee that 100% of all in-progress is *also* public data.
 
 ## the menu
 
@@ -74,7 +74,7 @@ When the script was launched, a path had to be provided.
 
 This command creates a service key, downloads dumpfiles to our local path, and then removes the service key.
 
-The files targeted are in the file `tables.bash`. This file is sourced in. Note that this file drives several processes in the script; it also serves as a list of table names. This file should be modified carefully, and it should always indicate names of files in the backup bucket at the keypath hard-coded into the script.
+The files targeted are in the file `tables.source`. This file is sourced in. Note that this file drives several processes in the script; it also serves as a list of table names. This file should be modified carefully, and it should always indicate names of files in the backup bucket at the keypath hard-coded into the script.
 
 ### load_raw_prod_dump
 
@@ -109,7 +109,7 @@ This is one of the steps that require `pg_dump` version 17 or higher. It uses th
 1. Generate a `dump_filters.pg` file, containing filter rules
 2. Dump the entire database according to those rules
 
-Normally, `pg_dump` dumps all tables, or takes command-line parameters to control which tables are exported. This is hard, given the nature of our script. Instead of trying to build up a command list, we first dump a list of filters that specify exactly which tables we want to include in the dump. This is generated using the array in `tables.bash`. Each line has the form
+Normally, `pg_dump` dumps all tables, or takes command-line parameters to control which tables are exported. This is hard, given the nature of our script. Instead of trying to build up a command list, we first dump a list of filters that specify exactly which tables we want to include in the dump. This is generated using the array in `tables.source`. Each line has the form
 
 ```
 include table <tablename>
@@ -119,7 +119,7 @@ Then, `pg_dump` is called `--data-only` on that filtered set of tables. This pro
 
 ### truncate_all_local_tables
 
-This runs a `TRUNCATE CASCADE` on every single table in the `tables.bash` array. 
+This runs a `TRUNCATE CASCADE` on every single table in the `tables.source` array. 
 
 Removing all local data is a necessary step for testing a local re-load of the local data that was just dumped.
 

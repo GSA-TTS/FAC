@@ -50,7 +50,7 @@ PORT=5432
 DATE=$(date '+%Y%m%d')
 
 # This gives us TARGET_TABLES
-source "tables.bash"
+source "tables.source"
 
 # read -p "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
@@ -101,9 +101,19 @@ download_dumpfiles () {
   for dump in ${TARGET_TABLES[@]}; 
   do
     SRC="s3://${BUCKET_NAME}/backups/scheduled/${DESIRED_BACKUP}/${dump}"
-    DST="${DESTINATION}/${dump}"
-    echo "Downloading ${SRC}"
+    # `readlink` canonicalizes the filepath locally. It gets rid of 
+    # extra // characters, and turns it into a full path.
+    DST=$(readlink -m "${DESTINATION}/${dump}")
+    echo -e "Downloading...\n\t${SRC}\n\t->\n\t${DST}"
+    # Remove any lingering files from previous runs if they exist.
+    rm -f "${DST}"
+    # Download a fresh dumpfile
     aws s3 cp "${SRC}" "${DST}"
+    if [ $? -ne 0 ]; then 
+      echo "DOWNLOAD FAILED."
+      echo "Exiting."
+      exit
+    fi
   done
  
   cf delete-service-key -f "${BACKUP_SERVICE_INSTANCE_NAME}" "${BACKUP_KEY_NAME}" || true
@@ -115,8 +125,9 @@ download_dumpfiles () {
 load_raw_prod_dump () {
   echo "load_raw_prod_dump"
  
-  for dump in ${TARGET_TABLES[@]};
+  for ndx in ${!TARGET_TABLES[@]};
   do
+    dump=${TARGET_TABLES[$ndx]}
     DUMPFILE=$(readlink -m "${DESTINATION}/${dump}")
     prefix="public-"
     suffix=".dump"
@@ -127,26 +138,51 @@ load_raw_prod_dump () {
     echo "SQL: ${SQL}"
 
     # Truncate the table.
-    psql \
+    PGOPTIONS='--client-min-messages=warning' psql \
+    -q \
 		-d ${DATABASE} \
 		-U ${USERNAME} \
 		-p ${PORT} \
 		-h ${HOST} \
-		-w \
     -v ON_ERROR_STOP=1 \
+		-w \
     -c "${SQL}"
 
     echo "Locally loading ${DUMPFILE}"
 
     # Custom dumpfiles have to be restored with
-    # pg_restore
-    cat ${DUMPFILE} | \
-    pg_restore \
-      --data-only \
+    # pg_restore. What is absolutely unclear here is why we need to
+    # filter out the "transaction_timeout". This should be a Pg v17 flag,
+    # and there is no way it should be in our v15 pipeline. But. Here we are.
+    # So, we have to dump the file through pg_restore (to unpack the custom format)
+    # and then pipe the result through `psql` to load it into the DB.
+
+    # For each file, dump it to a temp SQL file.
+    TEMPFILE="_tmp.sql"
+    echo -e "\t...restoring to tempfile"
+    rm -f "${TEMPFILE}"
+    pg_restore --data-only -f "${TEMPFILE}" "${DUMPFILE}"
+
+    # Then load that file
+    echo -e "\t...loading via psql"
+    psql \
+      -q \
       -d ${DATABASE} \
-		  -U ${USERNAME} \
-		  -p ${PORT} \
-		  -h ${HOST}
+      -U ${USERNAME} \
+      -p ${PORT} \
+      -h ${HOST} \
+      -v ON_ERROR_STOP=1 \
+      -w < "${TEMPFILE}"
+    
+    if [ $? -ne 0 ]; then
+      echo "RESTORE FAILED: ${TABLENAME}"
+      echo "Exiting."
+      exit
+    fi
+
+    # Then remove the tmpfile
+    rm -f "${TEMPFILE}"
+    
   done
 }
 
@@ -157,11 +193,19 @@ load_raw_prod_dump () {
 remove_suppressed_tribal_audits () {
   echo "remove_suppressed_tribal_audits"
   psql \
+    -q \
     -d ${DATABASE} \
     -U ${USERNAME} \
     -p ${PORT} \
     -h ${HOST} \
+    -v ON_ERROR_STOP=1 \
     -w < remove_tribal_audits.sql
+
+  if [ $? -ne 0 ]; then
+    echo "Removal of Tribal audits failed."
+    echo "Exiting."
+    exit
+  fi
 }
 
 ############################################################
@@ -170,92 +214,150 @@ remove_suppressed_tribal_audits () {
 export_sanitized_dump_for_reuse () {
   echo "export_sanitized_dump_for_reuse"
 
-  rm -f dump_filters.pg
-  for dump in ${TARGET_TABLES[@]};
+  table_flags=""
+  for ndx in ${!TARGET_TABLES[@]};
   do
+    dump=${TARGET_TABLES[$ndx]}
     prefix="public-"
     suffix=".dump"
     TABLENAME=${dump/#$prefix}
     TABLENAME=${TABLENAME/%$suffix}
-    echo "include table ${TABLENAME}" >> dump_filters.pg
+    # echo "include table ${TABLENAME}" >> dump_filters.pg
+    table_flags="${table_flags} -t ${TABLENAME}"
   done
 
-  pg_dump -F c \
-    --no-acl \
-    --no-owner \
-    --data-only \
-    --filter dump_filters.pg \
-    -f sanitized-${DATE}.dump \
-    postgresql://${USERNAME}@${HOST}:${PORT}/${DATABASE}
+  # Make sure this isn't stale when we're done/if we fail.
+  rm -f "sanitized-${DATE}.dump"
+
+  cmd="pg_dump -d ${DATABASE} -h ${HOST} -p ${PORT} -U ${USERNAME} -w -F c --no-acl --no-owner --data-only ${table_flags} "
+  cmd="${cmd} -f sanitized-${DATE}.dump"
+  echo "${cmd}"
+  eval "${cmd}"
+
+  if [ $? -ne 0 ]; then
+    echo "Dump failed."
+    echo "Exiting."
+    exit
+  fi
 }
 
-declare -a PRE_TRUNCATE_TABLE_COUNTS
 ############################################################
 # truncate_all_local_tables
 ############################################################
+declare -a PRE_TRUNCATE_TABLE_COUNTS
 truncate_all_local_tables () {
   echo "truncate_all_local_tables"
+  # Combining two arrays into one.
+  # (This may not be strictly necessary.)
+  FOR_TRUNCATE=( "${TARGET_TABLES[@]}" "${TRUNCATE_ONLY[@]}" )
 
-  for dump in ${TARGET_TABLES[@]};
+  # Truncate in reverse order. Why? Because otherwise,
+  # the counts get messed up. The first table cascades.
+  # https://stackoverflow.com/a/13360181
+  for (( ndx=${#FOR_TRUNCATE[@]}-1 ; ndx>=0 ; ndx-- ));
   do
+    dump=${FOR_TRUNCATE[$ndx]}
     prefix="public-"
     suffix=".dump"
     TABLENAME=${dump/#$prefix}
     TABLENAME=${TABLENAME/%$suffix}
+  
+  cmd="SELECT COUNT(*) FROM ${TABLENAME}"
   PRE_TRUNCATE_TABLE_COUNTS+=($(psql \
     -t \
+    -q \
     -d ${DATABASE} \
     -U ${USERNAME} \
     -p ${PORT} \
     -h ${HOST} \
+    -v ON_ERROR_STOP=1 \
     -w \
-    -c "SELECT COUNT(*) FROM ${TABLENAME}"))
+    -c "${cmd}"))
 
-  psql \
+  echo "${cmd}: ${PRE_TRUNCATE_TABLE_COUNTS[$ndx]}"
+
+  # TRUNCATE is not guaranteed to be complete if we call a 
+  # `pg_restore` immediately after. Wrap it in a transaction.
+  # https://petereisentraut.blogspot.com/2010/03/running-sql-scripts-with-psql.html
+  PGOPTIONS='--client-min-messages=warning' psql \
+    -q \
     -d ${DATABASE} \
     -U ${USERNAME} \
     -p ${PORT} \
     -h ${HOST} \
+    -v ON_ERROR_STOP=1 \
     -w \
-    -c "TRUNCATE ${TABLENAME} CASCADE"
+    -c "BEGIN; TRUNCATE ${TABLENAME} CASCADE; COMMIT;"
   
+  if [ $? -ne 0 ]; then
+    echo "Truncate failed: ${TABLENAME}"
+    echo "Exiting."
+    exit
+  fi
+
   done
 }
 
 
-declare -a TEST_LOAD_TABLE_COUNTS
 ############################################################
 # test_sanitized_production_dump
 ############################################################
+declare -a TEST_LOAD_TABLE_COUNTS
 test_sanitized_production_dump () {
   echo "test_sanitized_production_dump"
-  pg_restore \
-      --data-only \
-      -d ${DATABASE} \
-		  -U ${USERNAME} \
-		  -p ${PORT} \
-		  -h ${HOST} < sanitized-${DATE}.dump
 
-  for dump in ${TARGET_TABLES[@]};
-  do
-    prefix="public-"
-    suffix=".dump"
-    TABLENAME=${dump/#$prefix}
-    TABLENAME=${TABLENAME/%$suffix}
-  TEST_LOAD_TABLE_COUNTS+=($(psql \
-    -t \
+  # We must truncate everything before loading.
+  truncate_all_local_tables
+
+  echo "Restoring data from sanitized-${DATE}.dump"
+
+  cat "sanitized-${DATE}.dump" | \
+  pg_restore \
+    --data-only \
+    --no-privileges \
+    --no-owner \
+    -U ${USERNAME} \
+    -p ${PORT} \
+    -h ${HOST} \
+    -f - | grep -v "transaction_timeout" | psql \
+    -q \
     -d ${DATABASE} \
     -U ${USERNAME} \
     -p ${PORT} \
     -h ${HOST} \
-    -w \
-    -c "SELECT COUNT(*) FROM ${TABLENAME}"))
+    -v ON_ERROR_STOP=1 \
+    -w    
+
+  if [ $? -ne 0 ]; then
+    echo "pg_restore failed."
+    exit
+  fi
+
+  FOR_TRUNCATE=( "${TARGET_TABLES[@]}" "${TRUNCATE_ONLY[@]}" )
+  for (( ndx=${#FOR_TRUNCATE[@]}-1 ; ndx>=0 ; ndx-- ));
+  do
+    dump=${FOR_TRUNCATE[$ndx]}
+    prefix="public-"
+    suffix=".dump"
+    TABLENAME=${dump/#$prefix}
+    TABLENAME=${TABLENAME/%$suffix}
+
+    cmd="SELECT COUNT(*) FROM ${TABLENAME}"
+    TEST_LOAD_TABLE_COUNTS+=($(psql \
+      -t \
+      -q \
+      -d ${DATABASE} \
+      -U ${USERNAME} \
+      -p ${PORT} \
+      -h ${HOST} \
+      -w \
+      -c "${cmd}"))
   done
 
   all_same=1
   for i in "${!TEST_LOAD_TABLE_COUNTS[@]}"; do
-      if [ "${PRE_TRUNCATE_TABLE_COUNTS[i]}" != "${TEST_LOAD_TABLE_COUNTS[i]}" ]; then
-        printf '${%s}=%s %s\n' "$i" "${PRE_TRUNCATE_TABLE_COUNTS[i]}" "${TEST_LOAD_TABLE_COUNTS[i]}"
+      if [ "${PRE_TRUNCATE_TABLE_COUNTS[$i]}" != "${TEST_LOAD_TABLE_COUNTS[$i]}" ]; then
+        printf '${%s}=%s %s\n' "$i" "${PRE_TRUNCATE_TABLE_COUNTS[$i]}" "${TEST_LOAD_TABLE_COUNTS[$i]}"
         all_same=0
       fi
   done
@@ -267,6 +369,9 @@ test_sanitized_production_dump () {
   fi
 }
 
+############################################################
+# DAS MENU
+############################################################
 PS3='Please enter your choice: '
 options=(\
   "Select target backup date for download" \
