@@ -14,6 +14,17 @@ We want to load the same starting data and then modify it to meet our needs. Thi
 
 * `psql`, `pg_dump`, and `pg_restore` need to be v15 (or higher?)
 * `jq` must be installed
+* `cf` must be installed
+
+This script requires you to intentionally set your environment with `cf`.
+
+In order to download `production` data, you must
+
+```
+cf t -s production
+```
+
+This can work on lower environments for testing. The script automatically sets `cf t -s preview` after downloading data as a precaution.
 
 ## cleanup locally, at least once
 

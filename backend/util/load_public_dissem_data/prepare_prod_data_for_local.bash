@@ -6,7 +6,7 @@
 ############################################################
 
 # Do not exit on error.
-set -e
+set +e
 
 # When called from the command line, pass a target
 # destination directory for the downloaded files.
@@ -34,6 +34,16 @@ else
   echo "Exiting."
   exit
 fi
+
+EMAIL=${args[1]}
+
+if [[ -z "${EMAIL}" ]]; then
+  echo "Please pass a staff user email as the second arg."
+  echo "Exiting."
+  exit
+fi
+
+
 
 # https://stackoverflow.com/a/6569837
 cmd=jq
@@ -82,17 +92,27 @@ download_dumpfiles () {
   # Source in the tables we want to download.
 
   # Target the production environment
-  cf target -s production
+  # You need to do this yourself.
+  # cf t -s production
+  # Be careful when connecting to prod.
+  
   # We want the backups bucket
   BACKUP_SERVICE_INSTANCE_NAME=backups
 
   # Create a key for this operation
   # If two people run this at the same time, this could collide.
   # This is not likely an issue.
-  BACKUP_KEY_NAME=data_prep_service_key
-  cf create-service-key "${BACKUP_SERVICE_INSTANCE_NAME}" "${BACKUP_KEY_NAME}" || true
-  BACKUP_S3_CREDENTIALS=$(cf service-key "${BACKUP_SERVICE_INSTANCE_NAME}" "${BACKUP_KEY_NAME}" | tail -n +2) || true
 
+  CLEANED_EMAIL=$(echo "${EMAIL}" | tr -cd '[:alnum:]_-')
+  BACKUP_KEY_NAME="data_prep_service_key-${CLEANED_EMAIL}"
+
+  cf service-key "${BACKUP_SERVICE_INSTANCE_NAME}" "${BACKUP_KEY_NAME}" > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "Service key does not exist. Creating."
+    cf create-service-key "${BACKUP_SERVICE_INSTANCE_NAME}" "${BACKUP_KEY_NAME}" || true
+  fi
+
+  BACKUP_S3_CREDENTIALS=$(cf service-key "${BACKUP_SERVICE_INSTANCE_NAME}" "${BACKUP_KEY_NAME}" | tail -n +2) || true
   # Extract data from the JSON that comes back.
   BACKUP_AWS_ACCESS_KEY_ID=$(echo "${BACKUP_S3_CREDENTIALS}" | jq -r '.credentials.access_key_id')
   BACKUP_AWS_SECRET_ACCESS_KEY=$(echo "${BACKUP_S3_CREDENTIALS}" | jq -r '.credentials.secret_access_key')
@@ -101,10 +121,10 @@ download_dumpfiles () {
   BACKUP_AWS_DEFAULT_REGION=$(echo "${BACKUP_S3_CREDENTIALS}" | jq -r '.credentials.region')
 
   # Set variables in this script for use with the AWS CLI.
-  AWS_ACCESS_KEY_ID=$BACKUP_AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY=$BACKUP_AWS_SECRET_ACCESS_KEY
-  AWS_DEFAULT_REGION=$BACKUP_AWS_DEFAULT_REGION
-  BUCKET_NAME=${BACKUP_BUCKET_NAME}
+  export AWS_ACCESS_KEY_ID=$BACKUP_AWS_ACCESS_KEY_ID
+  export AWS_SECRET_ACCESS_KEY=$BACKUP_AWS_SECRET_ACCESS_KEY
+  export AWS_DEFAULT_REGION=$BACKUP_AWS_DEFAULT_REGION
+  export BUCKET_NAME=${BACKUP_BUCKET_NAME}
 
   # Download the tables.
   for dump in ${TARGET_TABLES[@]}; 
@@ -126,6 +146,9 @@ download_dumpfiles () {
   done
  
   cf delete-service-key -f "${BACKUP_SERVICE_INSTANCE_NAME}" "${BACKUP_KEY_NAME}" || true
+
+  # We automatically dump back to preview, just-in-case.
+  cf t -s preview
 }
 
 ############################################################
