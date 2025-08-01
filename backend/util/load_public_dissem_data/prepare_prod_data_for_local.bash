@@ -213,6 +213,11 @@ load_raw_prod_dump () {
     rm -f "${TEMPFILE}"
     pg_restore --data-only -f "${TEMPFILE}" "${DUMPFILE}"
 
+    # Now, filter out 'transaction_timeout'
+    TEMP2="_tmp2.sql"
+    cat "$TEMPFILE" | grep -v 'transaction_timeout' > "${TEMP2}"
+    mv "${TEMP2}" "${TEMPFILE}"
+
     # Then load that file
     echo -e "\t...loading via psql"
     psql \
