@@ -11,7 +11,9 @@ def get_last_transition_date(sac):
     return datetime.min.replace(tzinfo=dt_timezone.utc)
 
 
-def check_resubmission_allowed(sac: SingleAuditChecklist) -> Tuple[bool, str]:
+def check_resubmission_allowed(
+    sac: SingleAuditChecklist,
+) -> Tuple[bool, str]:  # noqa: C901
     meta = sac.resubmission_meta or {}
     gi = sac.general_information or {}
 
@@ -28,47 +30,25 @@ def check_resubmission_allowed(sac: SingleAuditChecklist) -> Tuple[bool, str]:
             f"Resubmission is only allowed when the current submission is in '{STATUS.DISSEMINATED}' status. Current status: '{submission_status}'",
         )
 
-    # DEPRECATED audits can never be resubmitted
-    if resub_status == RESUBMISSION_STATUS.DEPRECATED:
-        return False, "This audit has been deprecated and cannot be resubmitted."
-
-    audit_year = None
+    # Audit Year
     try:
         audit_year = int(end_date.split("-")[0])
     except Exception:
-        pass
+        audit_year = None
 
     # Fallback check when version, year, uei is missing or incorrect data
-    if (
-        not uei
-        or not end_date
-        or audit_year is None
-        or version is None
-        or sac.id is None
-    ):
-        missing = []
-        if not uei:
-            missing.append("auditee_uei")
-        if not end_date:
-            missing.append("audit_fiscal_period_end")
-        if audit_year is None:
-            missing.append("audit_year (invaled end_date format)")
-        if version is None:
-            missing.append("version")
-        if not sac.id:
-            missing.append("sac_id")
+    if not all([uei, end_date, audit_year, sac.id]) or version is None:
         return (
             False,
-            "Audit record is incomplete ({', '.join(missing)}) and cannot be evaluated for resubmission.",
+            "Audit record is incomplete and cannot be evaluated for resubmission.",
         )
 
-    # ORIGINAL_SUBMISSION + version 1 can be resubmitted
-    if resub_status == RESUBMISSION_STATUS.ORIGINAL and version == 1:
-        return True, "Original audit is eligible for resubmission."
-
-    # MOST_RECENT + version > 1 can be resubmitted
-    if resub_status == RESUBMISSION_STATUS.MOST_RECENT and version > 1:
-        return True, "Most recent audit is eligible for resubmission."
+    # ORIGINAL_SUBMISSION + version 1 can be resubmitted or MOST_RECENT + version > 1 can be resubmitted
+    if resub_status in [RESUBMISSION_STATUS.ORIGINAL, RESUBMISSION_STATUS.MOST_RECENT]:
+        if (resub_status == RESUBMISSION_STATUS.ORIGINAL and version == 1) or (
+            resub_status == RESUBMISSION_STATUS.MOST_RECENT and version > 1
+        ):
+            return True, "Audit is eligible for resubmission."
 
     # Legacy audit (meta = None) At this point, we assume data has been curated: valid submission_status, uei, year.
     if sac.resubmission_meta is None:
@@ -106,4 +86,9 @@ def check_resubmission_allowed(sac: SingleAuditChecklist) -> Tuple[bool, str]:
             "Most recent legacy audit is eligible. Others will be linked automatically.",
         )
 
-    return False, "Audit does not meet the criteria for resubmission."
+    message = (
+        "This audit has been deprecated and cannot be resubmitted."
+        if resub_status == RESUBMISSION_STATUS.DEPRECATED
+        else "Audit does not meet the criteria for resubmission."
+    )
+    return False, message
