@@ -303,8 +303,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     # Resubmission SAC Creations
     # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
-    # FIXME: Do we need to pass event_type?
-    def initiate_resubmission(self, user=None, event_type=None):
+    def initiate_resubmission(self, user=None):
         with transaction.atomic():
             if SingleAuditChecklist.objects.filter(
                 resubmission_meta__previous_report_id=self.report_id
@@ -313,21 +312,21 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                     f"A resubmission already exists for report_id {self.report_id}."
                 )
 
-            # Convert to dict and exclude fields that should not be copied
-            excluded_fields = [
-                "id",
-                "report_id",
-                "created_at",
-                "updated_at",
-                "submitted_by",
-            ]
+            # Clone the record
+            data = model_to_dict(self)
 
-            # FIXME: Is this copying everything? We may have missed something in the ticket:
-            # we should copy very, very little.
-            data = model_to_dict(self, exclude=excluded_fields)
+            # Update individual fields
+            data["general_information"]["auditee_uei"] = self.auditee_uei
+            data["general_information"][
+                "auditee_fiscal_period_start"
+            ] = self.auditee_fiscal_period_start
+            data["general_information"][
+                "auditee_fiscal_period_end"
+            ] = self.auditee_fiscal_period_end
 
             # Manually add back foreign key as instance
             data["submitted_by"] = self.submitted_by
+
             # We always need to update the data source on a resubmission.
             # It is GSAFAC.
             data["data_source"] = DATA_SOURCE_GSAFAC
@@ -349,7 +348,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
             resub = SingleAuditChecklist.objects.create(**data)
 
-            if event_type and user:
+            if user:
                 # Event on the new RESUB
                 SubmissionEvent.objects.create(
                     sac=resub,
