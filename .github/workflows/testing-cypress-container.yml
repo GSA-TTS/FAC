@@ -69,7 +69,7 @@ jobs:
         working-directory: ./backend
         run: docker compose run web python manage.py materialized_views --create
 
-      - uses: browser-actions/setup-chrome@v1
+      - uses: browser-actions/setup-chrome@v2
         with:
           install-chromedriver: true
       - run: chrome --version

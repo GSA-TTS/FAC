@@ -4,8 +4,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from audit.models import SingleAuditChecklist, SubmissionEvent
-from audit.models.constants import STATUS
-from dissemination.models.general import ResubmissionStatus
+from audit.models.constants import STATUS, RESUBMISSION_STATUS
 
 User = get_user_model()
 
@@ -24,25 +23,34 @@ class ResubmissionTest(TestCase):
         )
 
     def test_resubmission_is_created_atomically_and_correctly(self):
-        resub = self.orig.initiate_resubmission(
-            user=self.user, event_type=SubmissionEvent.EventType.RESUBMISSION_STARTED
-        )
+        resub = self.orig.initiate_resubmission(user=self.user)
 
         # Report ID format check
         self.assertRegex(resub.report_id, r"\d{4}-\d{2}-GSAFAC-\d{10}")
+        self.assertNotEqual(resub.report_id, self.orig.report_id)
+        self.assertNotEqual(resub.id, self.orig.id)
 
-        # Audit year and UEI match
+        # Validate copied fields inside general_information
         self.assertEqual(
-            resub.general_information["uei"], self.orig.general_information["uei"]
+            resub.general_information["auditee_uei"],
+            self.orig.general_information["auditee_uei"],
+        )
+        self.assertEqual(
+            resub.general_information["auditee_fiscal_period_start"],
+            self.orig.general_information["auditee_fiscal_period_start"],
         )
         self.assertEqual(
             resub.general_information["auditee_fiscal_period_end"],
             self.orig.general_information["auditee_fiscal_period_end"],
         )
 
+        # Check that irrelevant fields are not copied
+        self.assertNotIn("some_extra_field", resub.general_information)
+
         # Submission status and transition
         self.assertEqual(resub.submission_status, STATUS.IN_PROGRESS)
         self.assertEqual(resub.transition_name, [STATUS.IN_PROGRESS])
+        self.assertEqual(len(resub.transition_date), 1)
 
         # Resubmission meta structure
         self.assertEqual(
@@ -51,7 +59,7 @@ class ResubmissionTest(TestCase):
         self.assertEqual(resub.resubmission_meta["previous_row_id"], self.orig.id)
         self.assertEqual(
             resub.resubmission_meta["resubmission_status"],
-            ResubmissionStatus.MOST_RECENT,
+            RESUBMISSION_STATUS.MOST_RECENT,
         )
         self.assertGreater(resub.resubmission_meta["version"], 1)
 
@@ -63,7 +71,6 @@ class ResubmissionTest(TestCase):
                 event=SubmissionEvent.EventType.RESUBMISSION_STARTED,
             ).exists()
         )
-
         self.assertTrue(
             SubmissionEvent.objects.filter(
                 sac=self.orig,
@@ -74,13 +81,8 @@ class ResubmissionTest(TestCase):
 
     def test_cannot_create_duplicate_resubmission(self):
         # First resubmission should succeed
-        self.orig.initiate_resubmission(
-            user=self.user, event_type=SubmissionEvent.EventType.RESUBMISSION_STARTED
-        )
+        self.orig.initiate_resubmission(user=self.user)
 
         # Second resubmission should raise ValidationError
         with self.assertRaises(ValidationError):
-            self.orig.initiate_resubmission(
-                user=self.user,
-                event_type=SubmissionEvent.EventType.RESUBMISSION_INITIATED,
-            )
+            self.orig.initiate_resubmission(user=self.user)

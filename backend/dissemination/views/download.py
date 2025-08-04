@@ -10,14 +10,17 @@ from django.views.generic import View
 
 from audit.models import Audit
 from audit.models.constants import STATUS
-from config.settings import SUMMARY_REPORT_DOWNLOAD_LIMIT
+from config.settings import (
+    SUMMARY_REPORT_DOWNLOAD_LIMIT,
+    FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
+)
 from dissemination.file_downloads import (
     get_download_url,
     get_filename,
     get_filename_from_audit,
 )
 from dissemination.forms.search_forms import AdvancedSearchForm
-from dissemination.mixins import ReportAccessRequiredMixin
+from dissemination.mixins import ReportAccessRequiredMixin, FederalAccessRequiredMixin
 from dissemination.models import (
     General,
     OneTimeAccess,
@@ -26,7 +29,12 @@ from dissemination.report_generation.audit_summary_reports import (
     generate_audit_summary_report,
 )
 from dissemination.searchlib.search_utils import run_search
-from dissemination.summary_reports import generate_summary_report
+from dissemination.summary_reports import (
+    generate_summary_report,
+)
+from dissemination.report_generation.findings_summary_report import (
+    generate_findings_summary_report,
+)
 from dissemination.views.utils import include_private_results
 
 logger = logging.getLogger(__name__)
@@ -232,5 +240,55 @@ class MultipleSummaryReportDownloadView(View):
         except Exception as err:
             logger.info(
                 "Unexpected error in MultipleSummaryReportDownloadView post:\n%s", err
+            )
+            raise BadRequest(err)
+
+
+class FindingsSummaryReportDownloadView(FederalAccessRequiredMixin, View):
+    def post(self, request):
+        """
+        1. Run a fresh search with the provided search parameters
+        2. Get the report_id's from the search
+        3. Generate a summary report with the report_ids, which goes into into S3
+        4. Redirect to the download url of this new report
+        """
+        form = AdvancedSearchForm(request.POST)
+
+        try:
+            if form.is_valid():
+                form_data = form.cleaned_data
+                form_data["advanced_search_flag"] = True
+            else:
+                raise ValidationError("Form error in Search POST.")
+            results = run_search(form_data)
+            # We're not worried about row limits here
+            results = results[
+                :FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT
+            ]  # Hard limit XLSX size
+
+            if len(results) == 0:
+                raise Http404("Cannot generate summary report. No results found.")
+            report_ids = [result.report_id for result in results]
+            filename, workbook_bytes = generate_findings_summary_report(
+                report_ids=report_ids
+            )
+
+            # Create an HTTP response with the workbook file for download
+            response = HttpResponse(
+                workbook_bytes,
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+            response["Content-Disposition"] = f"attachment; filename={filename}"
+
+            return response
+
+        except Http404 as err:
+            logger.info(
+                "No results found for FindingsSummaryReportDownloadView post. Suggests an improper or old form submission."
+            )
+            raise Http404 from err
+        except Exception as err:
+            logger.info(
+                "Unexpected error in FindingsSummaryReportDownloadView post:\n%s", err
             )
             raise BadRequest(err)
