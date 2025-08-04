@@ -6,6 +6,10 @@ from audit.models.constants import STATUS, RESUBMISSION_STATUS
 
 
 def get_last_transition_date(sac):
+    """
+    Given a SingleAuditChecklist, return a datetime object of the most recent transition date.
+    If no transition dates exists, return the zero date.
+    """
     if sac.transition_date:
         return max(sac.transition_date)
     return datetime.min.replace(tzinfo=dt_timezone.utc)
