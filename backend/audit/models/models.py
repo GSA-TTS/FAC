@@ -306,7 +306,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     def initiate_resubmission(self, user=None):
         with transaction.atomic():
             if SingleAuditChecklist.objects.filter(
-                resubmission_meta__previous_report_id=self.report_id
+                resubmission_meta__previous_report_id=self.report_id,
+                submission_status=STATUS.DISSEMINATED,
             ).exists():
                 raise ValidationError(
                     f"A resubmission already exists for report_id {self.report_id}."
@@ -331,6 +332,9 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             # It is GSAFAC.
             data["data_source"] = DATA_SOURCE_GSAFAC
 
+            # By default, this is version 1. This means all resubmissions will be of at least version 2.
+            current_version = data.get("resubmission_meta", {}).get("version", 1)
+
             # Add/override fields
             data.update(
                 {
@@ -339,7 +343,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                         "previous_report_id": self.report_id,
                         "previous_row_id": self.id,
                         "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
-                        "version": 2,
+                        "version": current_version + 1,
                     },
                     "transition_name": [STATUS.IN_PROGRESS],
                     "transition_date": [now()],

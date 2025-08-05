@@ -24,6 +24,15 @@ UserModel = get_user_model()
 
 
 def access_and_submission_check(user, data):
+    """
+    Validate the access passed in by the user. Then, create a SAC and its associated access objects.
+    When successful, returns the report_id of the newly created SAC. Otherwise, returns formatted errors.
+
+    1. Check that all other steps have been completed.
+    2. Validate the accesses given by the user.
+    3. Create a new SAC row. In the case of resubmission, do so via `initiate_resubmission` on the previous SAC.
+    4. Create the required access objects for the SAC.
+    """
     serializer = AccessAndSubmissionSerializer(data=data)
 
     # Need Eligibility and AuditeeInfo already collected to proceed.
@@ -59,17 +68,23 @@ def access_and_submission_check(user, data):
         # Create SF-SAC instance and add data from previous steps saved in the
         # user profile
 
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=user,
-            submission_status=STATUS.IN_PROGRESS,
-            general_information=all_steps_user_form_data,
-            resubmission_meta=resubmission_meta,
-            event_user=user,
-            event_type=SubmissionEvent.EventType.CREATED,
-            # TODO: Update Post SOC Launch
-            # migrated_to_audit should be true IF AND ONLY IF the Audit is being generated alongside the checklist.
-            migrated_to_audit=True,
-        )
+        # If the user profile indicates this is a resubmission, create a new SAC row via initiate_resubmission on the old SAC.
+        # Otherwise, create a new SAC from scratch.
+        if resubmission_meta:
+            previous_row_id = resubmission_meta.get("previous_row_id")
+            previous_sac = SingleAuditChecklist.objects.get(id=previous_row_id)
+            sac = previous_sac.initiate_resubmission(user=user)
+        else:
+            sac = SingleAuditChecklist.objects.create(
+                submitted_by=user,
+                submission_status=STATUS.IN_PROGRESS,
+                general_information=all_steps_user_form_data,
+                event_user=user,
+                event_type=SubmissionEvent.EventType.CREATED,
+                # TODO: Update Post SOC Launch
+                # migrated_to_audit should be true IF AND ONLY IF the Audit is being generated alongside the checklist.
+                migrated_to_audit=True,
+            )
 
         # TODO: Update Post SOC Launch
         # TODO: we will need to generate our own report_id when we deprecate "sac" from this workflow.

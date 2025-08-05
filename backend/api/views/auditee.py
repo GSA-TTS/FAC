@@ -6,7 +6,10 @@ from ..serializers import AuditeeInfoSerializer
 
 
 def auditee_info_check(user, data):
-    serializer = AuditeeInfoSerializer(data=data)
+    # By default, `data` will conform to the Serializer fields.
+    # To include additional fields, we must use a `context` object.
+    additional_context = {"is_resubmission": data.get("is_resubmission", False)}
+    serializer = AuditeeInfoSerializer(data=data, context=additional_context)
 
     if serializer.is_valid():
         next_step = reverse("api-eligibility")
