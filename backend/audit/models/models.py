@@ -333,7 +333,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             data["data_source"] = DATA_SOURCE_GSAFAC
 
             # By default, this is version 1. This means all resubmissions will be of at least version 2.
-            current_version = data.get("resubmission_meta", {}).get("version", 1)
+            if data.get("resubmission_meta"):
+                old_version = data.get("resubmission_meta").get("version", 1)
+            else:
+                old_version = 1
 
             # Add/override fields
             data.update(
@@ -343,7 +346,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                         "previous_report_id": self.report_id,
                         "previous_row_id": self.id,
                         "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
-                        "version": current_version + 1,
+                        "version": old_version + 1,
                     },
                     "transition_name": [STATUS.IN_PROGRESS],
                     "transition_date": [now()],

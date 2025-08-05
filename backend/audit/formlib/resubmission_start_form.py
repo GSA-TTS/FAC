@@ -51,7 +51,7 @@ def _gather_previous_report_data(sac):
     Given a sac, return an object containing the UEI and fiscal period.
     """
     return {
-        "auditee_uei": getattr(sac, "auditee_uei"),
+        "auditee_uei": getattr(sac, "auditee_uei").upper(),
         "auditee_name": getattr(sac, "auditee_name"),
         "auditee_fiscal_period_start": getattr(sac, "auditee_fiscal_period_start"),
         "auditee_fiscal_period_end": getattr(sac, "auditee_fiscal_period_end"),

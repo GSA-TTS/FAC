@@ -61,8 +61,11 @@ def access_and_submission_check(user, data):
         }
 
     resubmission_meta = user.profile.entry_form_data.get(
-        "resubmission_meta"
-    )  # None is a valid value at this point.
+        "resubmission_meta", {}
+    )  # Should always exist with our current flow.
+    previous_report_id = resubmission_meta.get(
+        "previous_report_id"
+    )  # Will only exist in resubmissions
 
     if serializer.is_valid():
         # Create SF-SAC instance and add data from previous steps saved in the
@@ -70,9 +73,10 @@ def access_and_submission_check(user, data):
 
         # If the user profile indicates this is a resubmission, create a new SAC row via initiate_resubmission on the old SAC.
         # Otherwise, create a new SAC from scratch.
-        if resubmission_meta:
-            previous_row_id = resubmission_meta.get("previous_row_id")
-            previous_sac = SingleAuditChecklist.objects.get(id=previous_row_id)
+        if previous_report_id:
+            previous_sac = SingleAuditChecklist.objects.get(
+                report_id=previous_report_id
+            )
             sac = previous_sac.initiate_resubmission(user=user)
         else:
             sac = SingleAuditChecklist.objects.create(

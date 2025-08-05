@@ -103,16 +103,6 @@ class TestPreliminaryViews(TestCase):
 
     """
 
-    # Comes either from creating a new submission or starting a resubmission
-    # Only the bool is required to test presubmission eligibility
-    step0_data = {
-        "is_resubmission": "True",
-        "resubmission_meta": {
-            "previous_row_id": 123456,
-            "previous_report_id": "2022-06-GSAFAC-0000123456",
-        },
-    }
-
     # Form submissions use MM/DD/YYYY
     # Use when making a POST to a view.
     step1_form_data = {
@@ -121,7 +111,7 @@ class TestPreliminaryViews(TestCase):
         "auditee_fiscal_period_end": "01/01/2023",
     }
 
-    # After being validated, dates are stroed YYYY-MM-DD
+    # After being validated, dates are stored YYYY-MM-DD
     # Use when mocking userprofile data.
     step1_profile_data = {
         "auditee_uei": "D7A4J33FUMJ1",
@@ -144,6 +134,23 @@ class TestPreliminaryViews(TestCase):
         "auditee_contacts_email": "c@c.com",
         "auditor_contacts_fullname": "Fuller D. Namesmith",
         "auditor_contacts_email": "d@d.com",
+    }
+
+    # Comes from creating a new resubmission.
+    # Will contain step1 data pulled from the previous submission.
+    resubmission_profile_data = {
+        "auditee_uei": "ZQGGHJH74DW7",
+        "auditee_fiscal_period_start": "2021-10-01",
+        "auditee_fiscal_period_end": "2022-10-01",
+        "is_resubmission": "True",
+        "resubmission_meta": {
+            "previous_row_id": 123456,
+            "previous_report_id": "2022-06-GSAFAC-0000123456",
+        },
+    }
+
+    original_submission_profile_data = {
+        "is_resubmission": "False",
     }
 
     def test_step_one_auditeeinfo_submission_pass(self):
@@ -191,7 +198,7 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(response.url, "/report_submission/eligibility/")
 
     @patch("report_submission.forms.get_uei_info_from_sam_gov")
-    def test_end_to_end_submission_pass(self, mock_get_uei_info):
+    def test_end_to_end_original_submission_pass(self, mock_get_uei_info):
         """
         Go through all three and verify that we end up with a SAC.
         """
@@ -200,7 +207,7 @@ class TestPreliminaryViews(TestCase):
         }
 
         user = baker.make(User)
-        user.profile.entry_form_data = self.step0_data  # Prepopulate as a resubmission
+        user.profile.entry_form_data = self.original_submission_profile_data
         user.profile.save()
         self.client.force_login(user)
 
@@ -270,10 +277,82 @@ class TestPreliminaryViews(TestCase):
                 self.assertEqual(combined[k].upper(), getattr(sac, k))
             else:
                 self.assertEqual(combined[k], getattr(sac, k))
-        # Ensure resubmission metadata is stored in its own column
-        self.assertEqual(
-            self.step0_data["resubmission_meta"], getattr(sac, "resubmission_meta")
+
+        accesses = Access.objects.filter(sac=sac)
+        for key, val in self.step3_data.items():
+            # Fields come in as auditee/auditor emails, become roles:
+            if key in (
+                "auditee_contacts_email",
+                "auditor_contacts_email",
+                "certifying_auditee_contact_email",
+                "certifying_auditor_contact_email",
+            ):
+                key = EMAIL_TO_ROLE[key]
+                matches = [acc for acc in accesses if acc.email == val]
+                self.assertEqual(matches[0].role, key)
+
+    def test_end_to_end_resubmission_pass(self):
+        """
+        Begin a resubmission. Verify that auditeeinfo is skipped.
+        """
+        user = baker.make(User)
+        user.profile.entry_form_data = (
+            self.resubmission_profile_data
+        )  # Prepopulate as a resubmission
+        user.profile.save()
+        self.client.force_login(user)
+
+        previous_report_id = self.resubmission_profile_data["resubmission_meta"][
+            "previous_report_id"
+        ]
+        old_sac_data = omit(["submitted_by", "report_id"], SAMPLE_BASE_SAC_DATA)
+        baker.make(
+            SingleAuditChecklist,
+            submitted_by=user,
+            report_id=previous_report_id,
+            **old_sac_data,
         )
+
+        step2_url = reverse("report_submission:eligibility")
+        step3_url = reverse("report_submission:accessandsubmission")
+
+        # Get step 2. Post. Verify redirect to step 3.
+        step2_get = self.client.get(step2_url)
+        self.assertEqual(step2_get.status_code, 200)
+        self.assertTemplateUsed(step2_get, "report_submission/step-base.html")
+        self.assertTemplateUsed(step2_get, "report_submission/eligibility.html")
+
+        step2_post = self.client.post(step2_url, data=self.step2_data)
+        self.assertEqual(step2_post.status_code, 302)
+        self.assertEqual(step2_post.url, step3_url)
+
+        # Get step 3. Post. Verify redirect to general information.
+        step3_get = self.client.get(step3_url)
+        self.assertEqual(step3_get.status_code, 200)
+        self.assertTemplateUsed(step3_get, "report_submission/step-base.html")
+        self.assertTemplateUsed(
+            step3_get, "report_submission/access-and-submission.html"
+        )
+
+        step3_post = self.client.post(step3_url, data=self.step3_data)
+
+        self.assertEqual(step3_post.status_code, 302)
+        path_segments = step3_post.url.split("/")
+        self.assertEqual(
+            "/".join(path_segments[:3]), "/report_submission/general-information"
+        )
+        report_id = path_segments[-1]
+
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        combined = self.resubmission_profile_data | self.step2_data
+        # Only verify that the fiscal period and UEI carried over identically. Everything else is allowed to be different.
+        for k in combined:
+            # Test start/end dates formatted m/d/Y -> Y-m-d
+            if "fiscal_period" in k:
+                self.assertEqual(combined[k], getattr(sac, k))
+            # Test everything else normally
+            elif k == "auditee_uei":
+                self.assertEqual(combined[k], getattr(sac, k).upper())
 
         accesses = Access.objects.filter(sac=sac)
         for key, val in self.step3_data.items():
@@ -421,7 +500,7 @@ class TestPreliminaryViews(TestCase):
         """
         user = baker.make(User)
         user.profile.entry_form_data = {
-            **self.step0_data,
+            **self.original_submission_profile_data,
             **self.step1_profile_data,
             **self.step2_data,
             **self.step3_data,
@@ -485,7 +564,7 @@ class TestPreliminaryViews(TestCase):
         """
         user = baker.make(User)
         user.profile.entry_form_data = {
-            **self.step0_data,
+            **self.original_submission_profile_data,
         }
         user.profile.save()
         self.client.force_login(user)
@@ -504,7 +583,7 @@ class TestPreliminaryViews(TestCase):
         """
         user = baker.make(User)
         user.profile.entry_form_data = {
-            **self.step0_data,
+            **self.original_submission_profile_data,
             **self.step2_data,
         }
         user.profile.save()
