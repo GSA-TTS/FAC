@@ -3,16 +3,31 @@ from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .constants import AUDITEE_INFO_DATA
 from ..serializers import EligibilitySerializer
 
 
 def eligibility_check(user, data):
     serializer = EligibilitySerializer(data=data)
-    if serializer.is_valid():
-        next_step = reverse("api-auditee-info")
 
-        # Store step 0 data in profile, overwriting any pre-existing.
-        user.profile.entry_form_data = serializer.data
+    # Need Eligibility info to proceed
+    entry_form_data = user.profile.entry_form_data
+
+    missing_fields = [
+        field for field in AUDITEE_INFO_DATA if field not in entry_form_data
+    ]
+    if missing_fields:
+        return {
+            "next": reverse("api-auditee-info"),
+            "errors": "We're missing required fields, please try again.",
+            "missing_fields": missing_fields,
+        }
+
+    if serializer.is_valid():
+        next_step = reverse("api-accessandsubmission")
+
+        # Store step 2 data in profile, combined with the existing.
+        user.profile.entry_form_data = user.profile.entry_form_data | serializer.data
         user.profile.save()
         return {"eligible": True, "next": next_step}
 

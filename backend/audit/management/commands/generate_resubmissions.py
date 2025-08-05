@@ -241,7 +241,10 @@ class Command(BaseCommand):
         # in our dashboards. For now: any user will do.
         try:
             THE_USER_OBJ = User.objects.get(email=options["email"])
-        except User.DoesNotExist or User.MultipleObjectsReturned:
+        except User.MultipleObjectsReturned:
+            # Mangled local DB's may have duplicate users.
+            THE_USER_OBJ = User.objects.filter(email=options["email"]).first()
+        except User.DoesNotExist:
             THE_USER_OBJ = User.objects.first()
         logger.info(f"Passed email: {options['email']}, Using user {THE_USER_OBJ}")
 

@@ -12,7 +12,7 @@ from audit.models import (
     Audit,
 )
 from audit.models.constants import STATUS, AuditType
-from .constants import ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED
+from .constants import ACCESS_SUBMISSION_DATA_REQUIRED
 
 from audit.models.access_roles import AccessRole
 
@@ -24,42 +24,71 @@ UserModel = get_user_model()
 
 
 def access_and_submission_check(user, data):
+    """
+    Validate the access passed in by the user. Then, create a SAC and its associated access objects.
+    When successful, returns the report_id of the newly created SAC. Otherwise, returns formatted errors.
+
+    1. Check that all other steps have been completed.
+    2. Validate the accesses given by the user.
+    3. Create a new SAC row. In the case of resubmission, do so via `initiate_resubmission` on the previous SAC.
+    4. Create the required access objects for the SAC.
+    """
     serializer = AccessAndSubmissionSerializer(data=data)
 
     # Need Eligibility and AuditeeInfo already collected to proceed.
-    # We probably need to exclude more than just csrfmiddlewaretoken from
+    # We may want to exclude more than just these fields from the
     # stray properties that might end up present in the submitted data:
+    omitted_fields = [
+        "csrfmiddlewaretoken",
+        "is_resubmission",  # Bool used to ensure users go through all forms
+        "resubmission_meta",  # Stored in its own column
+    ]
     all_steps_user_form_data = {
         k: user.profile.entry_form_data[k]
         for k in user.profile.entry_form_data
-        if k != "csrfmiddlewaretoken"
+        if k not in omitted_fields
     }
     missing_fields = [
         field
-        for field in ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED
+        for field in ACCESS_SUBMISSION_DATA_REQUIRED
         if field not in all_steps_user_form_data
     ]
     if missing_fields:
         return {
-            "next": reverse("api-eligibility"),
+            "next": reverse("api-auditee-info"),
             "errors": "We're missing required fields, please try again.",
             "missing_fields": missing_fields,
         }
+
+    resubmission_meta = user.profile.entry_form_data.get(
+        "resubmission_meta", {}
+    )  # Should always exist with our current flow.
+    previous_report_id = resubmission_meta.get(
+        "previous_report_id"
+    )  # Will only exist in resubmissions
 
     if serializer.is_valid():
         # Create SF-SAC instance and add data from previous steps saved in the
         # user profile
 
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=user,
-            submission_status=STATUS.IN_PROGRESS,
-            general_information=all_steps_user_form_data,
-            event_user=user,
-            event_type=SubmissionEvent.EventType.CREATED,
-            # TODO: Update Post SOC Launch
-            # migrated_to_audit should be true IF AND ONLY IF the Audit is being generated alongside the checklist.
-            migrated_to_audit=True,
-        )
+        # If the user profile indicates this is a resubmission, create a new SAC row via initiate_resubmission on the old SAC.
+        # Otherwise, create a new SAC from scratch.
+        if previous_report_id:
+            previous_sac = SingleAuditChecklist.objects.get(
+                report_id=previous_report_id
+            )
+            sac = previous_sac.initiate_resubmission(user=user)
+        else:
+            sac = SingleAuditChecklist.objects.create(
+                submitted_by=user,
+                submission_status=STATUS.IN_PROGRESS,
+                general_information=all_steps_user_form_data,
+                event_user=user,
+                event_type=SubmissionEvent.EventType.CREATED,
+                # TODO: Update Post SOC Launch
+                # migrated_to_audit should be true IF AND ONLY IF the Audit is being generated alongside the checklist.
+                migrated_to_audit=True,
+            )
 
         # TODO: Update Post SOC Launch
         # TODO: we will need to generate our own report_id when we deprecate "sac" from this workflow.
