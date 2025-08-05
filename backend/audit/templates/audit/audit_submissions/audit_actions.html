@@ -3,13 +3,16 @@
     <li>
         <a class="usa-link"
            aria-controls="modal-terms-conditions"
+           href="{% url 'report_submission:auditeeinfo' %}"
            id="li-new-audit-submission"
-           data-open-modal>Start a new audit submission</a>
+           data-open-modal>
+           Start a new audit submission
+        </a>
     </li>
     {% if data.in_progress_audits %}
         <li>
             <a class="usa-link" href="#table_in_progress">
-            View audits in progress
+                View audits in progress
             </a>
         </li>
     {% endif %}
