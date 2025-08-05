@@ -23,7 +23,11 @@ class AuditeeInfoSerializer(serializers.Serializer):
 
     def validate(self, data):
         try:
-            validate_general_information_json(data, False)
+            # If it's a resubmission, we should validate as though it was migrated.
+            # For example, GSA_MIGRATION UEI's should pass the validation.
+            validate_general_information_json(
+                data, self.context.get("is_resubmission", False)
+            )
             return data
         except ValidationError as err:
             raise serializers.ValidationError(_(err.message)) from err

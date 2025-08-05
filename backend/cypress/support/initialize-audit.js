@@ -4,12 +4,14 @@ import { testValidAuditeeInfo } from './auditee-info.js';
 import { testValidGeneralInfo } from './general-info.js';
 import { testWithUnprivilegedKey } from './dissemination-table.js';
 
-export function testInitializeAudit(isTribal = false) {
+export function testInitializeAudit(isTribal=false, isResubmission=false) {
+  if (!isResubmission) {
+    // Now the auditee info screen
+    testValidAuditeeInfo();
+  }
+
   // Completes the eligibility screen
   testValidEligibility(isTribal);
-
-  // Now the auditee info screen
-  testValidAuditeeInfo();
 
   // Now the accessandsubmission screen
   testValidAccess();

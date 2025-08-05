@@ -3,8 +3,7 @@ from audit.models import (
     SingleAuditReportFile,
 )
 from django.core.management.base import BaseCommand
-from audit.models.constants import STATUS
-from dissemination.models.general import ResubmissionStatus
+from audit.models.constants import STATUS, RESUBMISSION_STATUS
 
 from datetime import datetime
 import pytz
@@ -178,7 +177,7 @@ def complete_resubmission(
         "next_report_id": resubmitted_sac.report_id,
         "next_row_id": resubmitted_sac.id,
         "version": prev_version,
-        "resubmission_status": ResubmissionStatus.DEPRECATED,
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
     }
     # The original SAC needs to have its status set to "RESUBMITTED"
     source_sac.transition_name.append(STATUS.RESUBMITTED)
@@ -242,7 +241,10 @@ class Command(BaseCommand):
         # in our dashboards. For now: any user will do.
         try:
             THE_USER_OBJ = User.objects.get(email=options["email"])
-        except User.DoesNotExist or User.MultipleObjectsReturned:
+        except User.MultipleObjectsReturned:
+            # Mangled local DB's may have duplicate users.
+            THE_USER_OBJ = User.objects.filter(email=options["email"]).first()
+        except User.DoesNotExist:
             THE_USER_OBJ = User.objects.first()
         logger.info(f"Passed email: {options['email']}, Using user {THE_USER_OBJ}")
 

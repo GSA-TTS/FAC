@@ -36,20 +36,19 @@ class ResubmissionStartView(LoginRequiredMixin, View):
                 {"form": form, "form_user_input": form.cleaned_data},
             )
 
-        # The form is valid. Populate resubmission_meta and store it to the user profile.
-        # Then, send them to step 1.
-        report_id = form.cleaned_data["report_id"]
-        previous_row_id = form.cleaned_data["sac_row_id"]
+        # The form is valid. Populate previous_report_data and resubmission_meta, and store it to the user profile.
+        previous_report_data = form.cleaned_data["previous_report_data"]
+        resubmission_meta = form.cleaned_data["resubmission_meta"]
 
-        # Save the resub metadata to the user profile. Overwrites other user profile data.
-        resub_meta = {
-            "resub_meta": {
-                "previous_report_id": report_id,
-                "previous_row_id": previous_row_id,
-            }
+        # Save the previous report data and resubmission metadata to the user profile. Overwrites other user profile data.
+        profile_data = previous_report_data | {
+            "is_resubmission": True,
+            "resubmission_meta": resubmission_meta,
         }
         user = request.user
-        user.profile.entry_form_data = resub_meta
+        user.profile.entry_form_data = profile_data
         user.profile.save()
 
+        # Send to step 2 of presubmission eligibility.
+        # Step 1 (UEI and fiscal period) must remain unchanged.
         return redirect(reverse("report_submission:eligibility"))

@@ -45,11 +45,11 @@ describe('Resubmit an Audit', () => {
   it('Valid report ID', () => {
     // This assumes full-submission has been run after a make-clean. You can
     // instead replace this with any other valid report ID you have locally.
-    const previous_report_id = '2023-12-GSAFAC-0000000003'
+    const previous_report_id = '2023-03-GSAFAC-0000000730'
     cy.get('[id=report_id]').type(previous_report_id);
     cy.get('[id=continue]').click();
     cy.url().should('include', '/report_submission/eligibility/');
-    testInitializeAudit(false);
+    testInitializeAudit(false, true);
     cy.url().should('include', '/audit/submission-progress/');
     cy.get('[id=resubmission-banner]').contains(`Resubmission of ${previous_report_id} in progress.`);
   });
