@@ -32,9 +32,10 @@ from audit.validators import (
 )
 from audit.utils import FORM_SECTION_HANDLERS
 from audit.models.constants import (
+    DATA_SOURCE_GSAFAC,
     SAC_SEQUENCE_ID,
     STATUS,
-    DATA_SOURCE_GSAFAC,
+    RESUBMISSION_STATUS,
     VALID_DATA_SOURCES,
 )
 from audit.models.utils import get_next_sequence_id
@@ -57,7 +58,6 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 from django.utils.timezone import now
-from dissemination.models.general import ResubmissionStatus
 
 
 User = get_user_model()
@@ -338,7 +338,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                     "resubmission_meta": {
                         "previous_report_id": self.report_id,
                         "previous_row_id": self.id,
-                        "resubmission_status": ResubmissionStatus.MOST_RECENT,
+                        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
                         "version": 2,
                     },
                     "transition_name": [STATUS.IN_PROGRESS],
