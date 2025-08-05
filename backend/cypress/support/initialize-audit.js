@@ -4,15 +4,11 @@ import { testValidAuditeeInfo } from './auditee-info.js';
 import { testValidGeneralInfo } from './general-info.js';
 import { testWithUnprivilegedKey } from './dissemination-table.js';
 
-export function testInitializeAudit(isTribal = false) {
-  // Check the terms and conditions link and click "Accept and start..."
-  cy.get('[id=button-new-audit-submission]').click();
-  cy.get('label[for=check_start_new_submission]').click();
-  cy.get('.usa-button').contains('Begin New Submission').click();
-  cy.url().should('match', /\/report_submission\/auditeeinfo\/$/);
-
-  // Now the auditee info screen
-  testValidAuditeeInfo();
+export function testInitializeAudit(isTribal=false, isResubmission=false) {
+  if (!isResubmission) {
+    // Now the auditee info screen
+    testValidAuditeeInfo();
+  }
 
   // Completes the eligibility screen
   testValidEligibility(isTribal);
