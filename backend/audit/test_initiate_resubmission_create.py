@@ -80,9 +80,16 @@ class ResubmissionTest(TestCase):
         )
 
     def test_cannot_create_duplicate_resubmission(self):
-        # First resubmission should succeed
-        self.orig.initiate_resubmission(user=self.user)
+        """
+        When a resubmission has been completed, another resubmission cannot be started for the same record.
 
-        # Second resubmission should raise ValidationError
+        Prevents `A -> C` if `A -> B` exists
+        """
+        # The first resubmission (B) should be successfully created, and marked as completed.
+        sac = self.orig.initiate_resubmission(user=self.user)
+        sac.submission_status = STATUS.DISSEMINATED
+        sac.save()
+
+        # The second resubmission (C) should raise ValidationError
         with self.assertRaises(ValidationError):
             self.orig.initiate_resubmission(user=self.user)

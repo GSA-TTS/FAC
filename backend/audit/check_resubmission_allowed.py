@@ -6,6 +6,10 @@ from audit.models.constants import STATUS, RESUBMISSION_STATUS
 
 
 def get_last_transition_date(sac):
+    """
+    Given a SingleAuditChecklist, return a datetime object of the most recent transition date.
+    If no transition dates exists, return the zero date.
+    """
     if sac.transition_date:
         return max(sac.transition_date)
     return datetime.min.replace(tzinfo=dt_timezone.utc)
@@ -34,7 +38,9 @@ def check_resubmission_allowed(
     resub_status = meta.get("resubmission_status")
     submission_status = sac.submission_status
     auditee_uei = gi.get("auditee_uei")
-    version = meta.get("version") if meta else sac.version
+    version = meta.get(
+        "version", 0
+    )  # TODO: Remove default value of 0 when all records have versions.
 
     # Further derived from string variables
     audit_year = int(end_date.split("-")[0])
@@ -44,6 +50,13 @@ def check_resubmission_allowed(
         return (
             False,
             f"Resubmission is only allowed when the current submission is in '{STATUS.DISSEMINATED}' status. Current status: '{submission_status}'",
+        )
+
+    # Resubmission status cannot be DEPRECATED
+    if resub_status == RESUBMISSION_STATUS.DEPRECATED:
+        return (
+            False,
+            "This audit has been deprecated and cannot be resubmitted.",
         )
 
     # Fallback check when version, year, uei is missing or incorrect data
@@ -96,9 +109,4 @@ def check_resubmission_allowed(
             "Most recent legacy audit is eligible. Others will be linked automatically.",
         )
 
-    message = (
-        "This audit has been deprecated and cannot be resubmitted."
-        if resub_status == RESUBMISSION_STATUS.DEPRECATED
-        else "Audit does not meet the criteria for resubmission."
-    )
-    return False, message
+    return False, "Audit does not meet the criteria for resubmission."

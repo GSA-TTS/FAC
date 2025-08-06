@@ -20,7 +20,9 @@
 
                     <label class="usa-label" id="report_id-label" for="report_id">Report ID of audit to resubmit:</label>
                     <div class="usa-hint" id="report_id-hint">YYYY-MM-SOURCE-0123456789</div>
-                    <span class="usa-error-message margin-top-1" id="error">{{ form.report_id.errors|striptags }}</span>
+                    {% if form.report_id.errors %}
+                        <span class="usa-error-message margin-top-1" id="error">{{ form.report_id.errors|striptags }}</span>
+                    {% endif %}
                     <input class="usa-input"
                            id="report_id"
                            name="report_id"

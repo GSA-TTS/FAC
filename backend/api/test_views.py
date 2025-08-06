@@ -12,6 +12,7 @@ from audit.models import Access, Audit, SingleAuditChecklist
 
 User = get_user_model()
 
+AUDIT_SUBMISSIONS_PATH = reverse("audit:MySubmissions")
 ELIGIBILITY_PATH = reverse("api-eligibility")
 AUDITEE_INFO_PATH = reverse("api-auditee-info")
 ACCESS_AND_SUBMISSION_PATH = reverse("api-accessandsubmission")
@@ -128,6 +129,11 @@ class EligibilityViewTests(TestCase):
         user = baker.make(User)
         client.force_authenticate(user=user)
 
+        # Add auditee info first, so the eligibility check can pass.
+        response = client.post(
+            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
+        )
+
         response = client.post(ELIGIBILITY_PATH, VALID_ELIGIBILITY_DATA, format="json")
         data = response.json()
         self.assertEqual(response.status_code, 200)
@@ -224,15 +230,6 @@ class AuditeeInfoTests(TestCase):
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
-    def test_missing_expected_form_data_from_prior_step(self):
-        """Return an error and point to Eligibility step if we're missing data from that step in the user's profile"""
-        response = self.client.post(
-            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
-        )
-        data = response.json()
-        self.assertEqual(data["next"], ELIGIBILITY_PATH)
-        self.assertTrue(data["errors"])
-
     def test_valid_data_updates_profile(self):
         """Valid POST update user's form data stored in their profile"""
         # Add eligibility data to profile
@@ -243,57 +240,11 @@ class AuditeeInfoTests(TestCase):
             AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
         )
         data = response.json()
-        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
+        self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertEqual(
             self.user.profile.entry_form_data,
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA,
         )
-
-    # 2023-05-30: We're proceeding with the assumption that as a matter of
-    # policy we can reject audits without UEIs. If that turns out to be untrue,
-    # we'll uncomment these three tests.
-    # def test_null_auditee_uei(self):
-    #     """
-    #     Auditee UEI can be null
-    #     """
-    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-    #     self.user.profile.save()
-    #     input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": None}
-    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-    #     data = response.json()
-    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-    #     self.assertEqual(
-    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-    #     )
-
-    # def test_blank_auditee_uei(self):
-    #     """
-    #     Auditee UEI can be blank
-    #     """
-    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-    #     self.user.profile.save()
-    #     input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": ""}
-    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-    #     data = response.json()
-    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-    #     self.assertEqual(
-    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-    #     )
-
-    # def test_missing_auditee_uei(self):
-    #     """
-    #     Auditee UEI can be missing
-    #     """
-    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-    #     self.user.profile.save()
-    #     input_data = VALID_AUDITEE_INFO_DATA.copy()
-    #     del input_data["auditee_uei"]
-    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-    #     data = response.json()
-    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-    #     self.assertEqual(
-    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-    #     )
 
     def test_blank_auditee_name(self):
         """
@@ -304,27 +255,10 @@ class AuditeeInfoTests(TestCase):
         input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": ""}
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
-        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
+        self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertEqual(
             self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
-
-    # FIXME MSHD: This test is wrong (None is not an option), the following
-    # test is more accurate. Also, we are going to remove the API post endpoint.
-    #
-    # def test_null_auditee_name(self):
-    #     """
-    #     Auditee name can be null
-    #     """
-    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-    #     self.user.profile.save()
-    #     input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": None}
-    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-    #     data = response.json()
-    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-    #     self.assertEqual(
-    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-    #     )
 
     def test_missing_auditee_name(self):
         """
@@ -336,7 +270,7 @@ class AuditeeInfoTests(TestCase):
         del input_data["auditee_name"]
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
-        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
+        self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertEqual(
             self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
@@ -373,13 +307,13 @@ class AccessAndSubmissionTests(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_missing_expected_form_data_from_prior_steps(self):
-        """Return an error and point to Eligibility step if we're missing data from any prior step"""
+        """Return an error and point to auditee info page if we're missing data from any prior step"""
         # Missing Eligibility data
         response = self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
         data = response.json()
-        self.assertEqual(data["next"], ELIGIBILITY_PATH)
+        self.assertEqual(data["next"], AUDITEE_INFO_PATH)
         self.assertTrue(data["errors"])
 
         self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
@@ -390,8 +324,8 @@ class AccessAndSubmissionTests(TestCase):
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
         data = response.json()
-        self.assertEqual(data["next"], ELIGIBILITY_PATH)
-        self.assertTrue(data["errors"])
+        self.assertEqual(data["next"], AUDITEE_INFO_PATH)
+        self.assertTrue(data.get("errors"))
 
     def test_valid_data_creates_SAC_and_Access(self):
         """A new SAC is created along with related Access instances"""
@@ -539,9 +473,16 @@ class SACCreationTests(TestCase):
         self.user = baker.make(User)
         self.client = APIClient()
 
-    def test_valid_data_across_steps_creates_an_sac(self):
+    def test_valid_data_across_steps_creates_a_sac(self):
         """Upon submitting valid data and following `next` responses, a new SAC is created"""
         self.client.force_authenticate(user=self.user)
+
+        # Submit auditee info
+        response = self.client.post(
+            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
+        )
+        data = response.json()
+        next_step = data["next"]
 
         # Submit eligibility data
         eligibility_info = {
@@ -549,12 +490,7 @@ class SACCreationTests(TestCase):
             "met_spending_threshold": True,
             "user_provided_organization_type": "state",
         }
-        response = self.client.post(ELIGIBILITY_PATH, eligibility_info, format="json")
-        data = response.json()
-        next_step = data["next"]
-
-        # Submit auditee info
-        response = self.client.post(next_step, VALID_AUDITEE_INFO_DATA, format="json")
+        response = self.client.post(next_step, eligibility_info, format="json")
         data = response.json()
         next_step = data["next"]
 
@@ -608,18 +544,20 @@ class SingleAuditChecklistViewTests(TestCase):
         """
         self.client.force_authenticate(user=self.user)
 
+        # Submit auditee info
+        response = self.client.post(
+            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
+        )
+        data = response.json()
+        next_step = data["next"]
+
         # Submit eligibility data
         eligibility_info = {
             "is_usa_based": True,
             "met_spending_threshold": True,
             "user_provided_organization_type": "state",
         }
-        response = self.client.post(ELIGIBILITY_PATH, eligibility_info, format="json")
-        data = response.json()
-        next_step = data["next"]
-
-        # Submit auditee info
-        response = self.client.post(next_step, VALID_AUDITEE_INFO_DATA, format="json")
+        response = self.client.post(next_step, eligibility_info, format="json")
         data = response.json()
         next_step = data["next"]
 
@@ -709,18 +647,20 @@ class SacFederalAwardsViewTests(TestCase):
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
+        # Submit auditee info
+        response = self.client.post(
+            AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
+        )
+        data = response.json()
+        next_step = data["next"]
+
         # Submit eligibility data
         eligibility_info = {
             "is_usa_based": True,
             "met_spending_threshold": True,
             "user_provided_organization_type": "state",
         }
-        response = self.client.post(ELIGIBILITY_PATH, eligibility_info, format="json")
-        data = response.json()
-        next_step = data["next"]
-
-        # Submit auditee info
-        response = self.client.post(next_step, VALID_AUDITEE_INFO_DATA, format="json")
+        response = self.client.post(next_step, eligibility_info, format="json")
         data = response.json()
         next_step = data["next"]
 
