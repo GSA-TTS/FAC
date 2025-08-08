@@ -5,10 +5,9 @@
 ############################################################
 DATABASE=postgres
 USERNAME=postgres
-HOST=localhost
+HOST=db
 PORT=5432
 DATE=$(date '+%Y%m%d')
-
 
 ############################################################
 # process command-line arguments
@@ -18,8 +17,11 @@ DATE=$(date '+%Y%m%d')
 args=("$@")
 # args[0] is the first argument, and not the name of the script.
 
-DUMPFILE=${args[0]}
-EMAIL=${args[1]}
+# export DUMPFILE=${args[0]}
+# export EMAIL=${args[1]}
+
+DUMPFILE="${DUMPFILE}"
+EMAIL="${EMAIL}"
 
 if [[ -z "${DUMPFILE}" ]]; then
   echo "Please pass a sanitized dumpfile as the first command-line argument."
@@ -115,6 +117,7 @@ load_sanitized_data_dump () {
   echo "Restoring data from sanitized-${DATE}.dump"
 
   TEMPFILE="_tmp.sql"
+
   pg_restore --data-only -f "${TEMPFILE}" "${DUMPFILE}"
 
   if [ $? -ne 0 ]; then
@@ -122,6 +125,13 @@ load_sanitized_data_dump () {
     exit
   fi
 
+  # Now, filter out 'transaction_timeout'
+  TEMP2="_tmp2.sql"
+  cat "$TEMPFILE" | grep -v 'transaction_timeout' > "${TEMP2}"
+  mv "${TEMP2}" "${TEMPFILE}"
+
+  # Then load that file
+  echo -e "\t...loading via psql"
   psql \
     -q \
     -d ${DATABASE} \
@@ -130,9 +140,13 @@ load_sanitized_data_dump () {
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
     -w < "${TEMPFILE}"
+  
+  # Then remove the tmpfile
+  rm -f "${TEMPFILE}"
 
   if [ $? -ne 0 ]; then
-    echo "psql failed."
+    echo "RESTORE FAILED: ${TABLENAME}"
+    echo "Exiting."
     exit
   fi
 

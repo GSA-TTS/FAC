@@ -10,22 +10,6 @@ The goal is for devs to have the same data in their local stacks. This makes fea
 
 We want to load the same starting data and then modify it to meet our needs. This eliminates a proliferation of different dumps and subsequent confusion (e.g. "What dump are you using?"). Instead, we start with one file/database state, and modify it to match the needs of the moment.
 
-## requirements
-
-* `psql`, `pg_dump`, and `pg_restore` need to be v15 (or higher?)
-* `jq` must be installed
-* `cf` must be installed
-
-This script requires you to intentionally set your environment with `cf`.
-
-In order to download `production` data, you must
-
-```
-cf t -s production
-```
-
-This can work on lower environments for testing. The script automatically sets `cf t -s preview` after downloading data as a precaution.
-
 ## cleanup locally, at least once
 
 Before using this for the first time, the local stack will need to be cleaned up.
@@ -38,21 +22,33 @@ docker system prune -f
 docker volume prune -f
 ```
 
-Then, `docker compose up`. This only needs to be done once, but it is necessary to bring the stack up with v17 Postges containers.
+Then, `docker compose up` on the local application stack. This only needs to be done once.
+
+## requirements
+
+These scripts are Dockerized. Therefore, you must have Docker installed. (This is a FAC dev requirement, so FAC devs should be good to go.)
+
+Before using the `prepare` script, you must build the container for it.
+
+```
+docker build -t prepare:latest -f Dockerfile.prepare .
+```
+
 
 ## BLUF
 
-Log in to the `cf` API.
-
-Run the script. Pass a path to a directory where you want to download `.dump` files from the `production` bucket.
+To run the scripts that prepare local data for use:
 
 ```
-./prepare_data_for_local.bash <path> <email>
+docker run -it --rm --env DESTINATION=data --env EMAIL="YOUR_EMAIL" -v .:/app --network backend_default prepare
 ```
 
-The `<email>` is your GSA email address.
+Two things to note:
 
-Run steps 2, 3, 4, 5, 6, and 7 in order.
+1. The email address needs to be an active user in the FAC data dump.
+2. You may have to change the network; it should match the network of your local FAC stack. `docker network ls` will let you see which network is being used.
+
+Once you run the container, run steps 2, 3, 4, 5, 6, and 7 in order.
 
 If you are feeling bold, select the option for running everything straight through. This runs steps 2-7.
 

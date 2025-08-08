@@ -21,12 +21,15 @@ args=("$@")
 
 # args[0] is the first argument, and not the name of the script.
 
-DESTINATION=${args[0]}
-if [[ -z "${DESTINATION}" ]]; then
-  echo "Please pass a destination folder as the first argument."
-  echo "Exiting."
-  exit
-fi
+# DESTINATION=${args[0]}
+DESTINATION="${DESTINATION}"
+EMAIL="${EMAIL}"
+
+# if [[ -z "${DESTINATION}" ]]; then
+#   echo "Please pass a destination folder as the first argument."
+#   echo "Exiting."
+#   exit
+# fi
 
 if [ -d "$DESTINATION" ]; then
   echo "Found destination '$DESTINATION'."
@@ -36,7 +39,7 @@ else
   exit
 fi
 
-EMAIL=${args[1]}
+# EMAIL=${args[1]}
 
 if [[ -z "${EMAIL}" ]]; then
   echo "Please pass a staff user email as the second arg."
@@ -62,6 +65,7 @@ then
   if [[ $confirm =~ 'y' ]];
   then
     echo "Switching to production."
+    cf login -a api.fr.cloud.gov --sso
     cf t -s production
   else
     echo "Did not switch."
@@ -84,7 +88,7 @@ DESIRED_BACKUP="07-27-12"
 ############################################################
 DATABASE=postgres
 USERNAME=postgres
-HOST=localhost
+HOST=db
 PORT=5432
 DATE=$(date '+%Y%m%d')
 
@@ -285,7 +289,7 @@ export_sanitized_dump_for_reuse () {
   rm -f "sanitized-${DATE}.dump"
 
   cmd="pg_dump -d ${DATABASE} -h ${HOST} -p ${PORT} -U ${USERNAME} -w -F c --no-acl --no-owner --data-only ${table_flags} "
-  cmd="${cmd} -f sanitized-${DATE}.dump"
+  cmd="${cmd} -f ${DESTINATION}/sanitized-${DATE}.dump"
   echo "${cmd}"
   eval "${cmd}"
 

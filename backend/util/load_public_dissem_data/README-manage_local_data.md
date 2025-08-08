@@ -14,8 +14,7 @@ We want to load the same starting data and then modify it to meet our needs. Thi
 
 ## requirements
 
-* `psql`, `pg_dump`, and `pg_restore` need to be v15 (or higher?)
-* `jq` must be installed
+* `docker`
 * a current sanitized dumpfile
 
 ## cleanup locally, at least once
@@ -32,19 +31,32 @@ docker volume prune -f
 
 Then, `docker compose up`. This only needs to be done once. Probably.
 
+
+## building the script container
+
+These scripts are Dockerized. Therefore, you must have Docker installed. (This is a FAC dev requirement, so FAC devs should be good to go.)
+
+Before using the `manage` script, you must build the container for it.
+
+```
+docker build -t manage:latest -f Dockerfile.manage .
+```
+
 ## BLUF
 
 Fetch a santizied dumpfile from GDrive:
 
 https://drive.google.com/drive/folders/1WymwJtdQ287SdgrOx__aEraoVTx7ig9D
 
-These are approximately 2GB.
+These are approximately 2GB. Put it in the `data` folder.
 
 ```
-./manage_local_data.bash <path> <email>
+docker run -i --rm --env DUMPFILE=data/sanitized-<DATE>.dump --env EMAIL_ADDRESS="YOUR_EMAIL" -v .:/app --network backend_default prepare
 ```
 
-The path is to a `sanitized-<DATE>.dump` dumpfile, and you need to provide a staff user email address. It could be yours or someone else's. (Because this is from a prod dump, using your prod email address should "just work.")
+The path is to a `sanitized-<DATE>.dump` dumpfile (relative to the container root), and you need to provide a staff user email address. It could be yours or someone else's. (Because this is from a prod dump, using your prod email address should "just work.")
+
+Note that you need to be running on the same Docker network as the app stack. `docker network ls` will let you see where things are running if you need to change that parameter.
 
 Run 1, 2, 3, 4, 5, 6, and 7.
 
