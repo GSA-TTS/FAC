@@ -136,6 +136,12 @@ REPORTIDS_TO_MODIFIERS = lambda: {
         modify_auditor_address,
         modify_additional_eins_workbook,
     ],
+    # Same modifications as above, but will make a new resub for each
+    # See REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY below
+    "2024-06-GSAFAC-0000069337": [
+        modify_auditor_address,
+        modify_additional_eins_workbook,
+    ],
     # modify_pdf simulates a new PDF submission.
     # The report on the left has its SAR pointer modified so that it instead
     # points to the report for the entity on the right. That way,
@@ -153,6 +159,8 @@ REPORTIDS_TO_MODIFIERS = lambda: {
         modify_pdf_point_at_this_instead("2023-05-GSAFAC-0000000499"),
     ],
 }
+
+REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2024-06-GSAFAC-0000069337"]
 
 
 def complete_resubmission(
@@ -179,9 +187,11 @@ def complete_resubmission(
         "version": prev_version,
         "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
     }
+
     # The original SAC needs to have its status set to "RESUBMITTED"
     source_sac.transition_name.append(STATUS.RESUBMITTED)
     source_sac.transition_date.append(datetime.now().replace(tzinfo=pytz.utc))
+
     # Go ahead and reassign this SAC to us, so we might see it in the UI at some point.
     source_sac.submitted_by = USER_OBJ
     source_sac.save(
@@ -219,23 +229,61 @@ class Command(BaseCommand):
             )
             sys.exit(1)
 
-        # Delete any prior resubmissions, so we regenerate this data clean each time.
-        for sac in sacs_for_resubs:
-            for resub in SingleAuditChecklist.objects.filter(
-                resubmission_meta__previous_report_id=sac.report_id
-            ):
-                logger.info(f"Deleting {resub.report_id}, a resub of {sac.report_id}")
-                resub.delete()
+        self.delete_prior_resubs(sacs_for_resubs)
+        self.generate_resubmissions(sacs_for_resubs, reportids_to_modifiers, options)
 
-        for sac in sacs_for_resubs:
-            logger.info("-------------------------------")
-            logger.info(f"Generating resubmission for {sac.report_id}")
-            self.generate_resubmission(
-                sac, options, reportids_to_modifiers[sac.report_id]
+    def delete_prior_resubs(self, sacs):
+        """
+        Delete any prior resubmissions, so we regenerate this data clean each time
+        """
+        for sac in sacs:
+            resubs = SingleAuditChecklist.objects.filter(
+                resubmission_meta__previous_report_id=sac.report_id
             )
+            self.recursively_delete_resubs_for_sac(sac, resubs)
+
+    def recursively_delete_resubs_for_sac(self, sac, resubs):
+        """
+        Since resubmissions can have resubmissions, we have to keep digging
+        down for SACs that have previous_report_ids
+        """
+        if not resubs:
+            return
+
+        for resub in resubs:
+            re_resubs = SingleAuditChecklist.objects.filter(
+                resubmission_meta__previous_report_id=resub.report_id
+            )
+            self.recursively_delete_resubs_for_sac(resub, re_resubs)
+
+            logger.info(f"Deleting {resub.report_id}, a resub of {sac.report_id}")
+            resub.delete()
+
+    def generate_resubmissions(self, sacs, reportids_to_modifiers, options):
+        """
+        Generates all the resubmissions
+        """
+        for sac in sacs:
+            logger.info("-------------------------------")
+
+            if sac.report_id in REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY:
+                logger.info(f"Generating resubmission chain for {sac.report_id}")
+                previous_sac = sac
+                for modifier in reportids_to_modifiers[sac.report_id]:
+                    new_sac = self.generate_resubmission(
+                        previous_sac, options, [modifier]
+                    )
+                    previous_sac = new_sac
+            else:
+                logger.info(f"Generating resubmission for {sac.report_id}")
+                self.generate_resubmission(
+                    sac, options, reportids_to_modifiers[sac.report_id]
+                )
 
     def generate_resubmission(self, sac: SingleAuditChecklist, options, modifiers):
-
+        """
+        Generates a single resubmission
+        """
         # We need a user.
         # FIXME: Allow an email address to be passed in, so we can see these things
         # in our dashboards. For now: any user will do.
@@ -291,6 +339,7 @@ class Command(BaseCommand):
             # TODO: Change submission_status to disseminated once Matt's
             # "late change" workaround is merged
             logger.info(f"DISSEMINATED REPORT: {new_sac.report_id}")
+            return new_sac
         else:
             logger.error(
                 "{} is a `not None` value report_id[{}] for `disseminated`".format(
