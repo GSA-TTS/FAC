@@ -44,7 +44,7 @@ function testTribal(previous_report_id, was_private) {
   });
 }
 
-describe('Valid report_ids', () => {
+describe('Resubmission banners', () => {
   beforeEach(() => {
     cy.visit('/');
     testLoginGovLogin();
@@ -56,8 +56,7 @@ describe('Valid report_ids', () => {
   });
 
   it('Checklist banner', () => {
-    // Replace with a report_id of a normal audit:
-    // submission_status = 'disseminated'
+    // Replace with a report_id of a normal audit
     const previous_report_id = '2019-06-CENSUS-0000205917'
     cy.get('[id=report_id]').type(previous_report_id);
     cy.get('[id=continue]').click();
@@ -68,17 +67,15 @@ describe('Valid report_ids', () => {
   });
 
   // Replace with a report_id of a public, tribal audit:
-  // submission_status = 'disseminated'
-  // and tribal_data_consent->is_tribal_information_authorized_to_be_public = true
-  it.only('Previous was tribal public', () => {
+  // tribal_data_consent.is_tribal_information_authorized_to_be_public = true
+  it.only('Tribal public banner', () => {
     const previous_report_id = '2021-12-CENSUS-0000185126'
     testTribal(previous_report_id, false);
   });
 
   // Replace with a report_id of a non-public, tribal audit:
-  // submission_status = 'disseminated'
-  // and tribal_data_consent->is_tribal_information_authorized_to_be_public = false
-  it('Previous was tribal non-public', () => {
+  // tribal_data_consent->is_tribal_information_authorized_to_be_public = false
+  it('Tribal non-public banner', () => {
     const previous_report_id = '2022-09-CENSUS-0000203688'
     testTribal(previous_report_id, true);
   });
