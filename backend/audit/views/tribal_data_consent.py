@@ -37,9 +37,9 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 )
                 context = context | {
                     "previous_report_id": previous_sac.report_id,
-                    "previous_is_public": previous_sac.tribal_data_consent[
+                    "previous_is_public": tribal_audit_consent.get(
                         "is_tribal_information_authorized_to_be_public"
-                    ],
+                    ),
                 }
 
             return render(
