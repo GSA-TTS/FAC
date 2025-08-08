@@ -22,14 +22,14 @@ args=("$@")
 # args[0] is the first argument, and not the name of the script.
 
 # DESTINATION=${args[0]}
-DESTINATION="${DESTINATION}"
-EMAIL="${EMAIL}"
+DESTINATION="data/"
+EMAIL=${args[0]}
 
-# if [[ -z "${DESTINATION}" ]]; then
-#   echo "Please pass a destination folder as the first argument."
-#   echo "Exiting."
-#   exit
-# fi
+if [[ -z "${DESTINATION}" ]]; then
+  echo "Please pass a destination folder as the first argument."
+  echo "Exiting."
+  exit
+fi
 
 if [ -d "$DESTINATION" ]; then
   echo "Found destination '$DESTINATION'."
@@ -38,8 +38,6 @@ else
   echo "Exiting."
   exit
 fi
-
-# EMAIL=${args[1]}
 
 if [[ -z "${EMAIL}" ]]; then
   echo "Please pass a staff user email as the second arg."
@@ -76,8 +74,6 @@ fi
 
 echo -e "\n"
 
-
-
 # This can be changed via the menu.
 # Better, when a new backup is targeted, to 
 # make the change and commit back to the repo.
@@ -94,8 +90,6 @@ DATE=$(date '+%Y%m%d')
 
 # This gives us TARGET_TABLES
 source "tables.source"
-
-# read -p "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
 ############################################################
 # select_target_backup_for_download
@@ -370,7 +364,7 @@ test_sanitized_production_dump () {
 
   echo "Restoring data from sanitized-${DATE}.dump"
 
-  cat "sanitized-${DATE}.dump" | \
+  cat "${DESTINATION}/sanitized-${DATE}.dump" | \
   pg_restore \
     --data-only \
     --no-privileges \

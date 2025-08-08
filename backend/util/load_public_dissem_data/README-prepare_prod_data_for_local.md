@@ -26,29 +26,31 @@ Then, `docker compose up` on the local application stack. This only needs to be 
 
 ## requirements
 
-These scripts are Dockerized. Therefore, you must have Docker installed. (This is a FAC dev requirement, so FAC devs should be good to go.)
-
-Before using the `prepare` script, you must build the container for it.
-
-```
-docker build -t prepare:latest -f Dockerfile.prepare .
-```
-
+These scripts are meant to be run from within the application container context. So, stand up the container, and exec in.
 
 ## BLUF
 
-To run the scripts that prepare local data for use:
+To run the scripts that prepare local data for use, exec into the `web` container:
 
 ```
-docker run -it --rm --env DESTINATION=data --env EMAIL="YOUR_EMAIL" -v .:/app --network backend_default prepare
+docker compose exec -it web /bin/bash
 ```
 
-Two things to note:
+`cd` into the `load_public_dissem_data` folder:
 
-1. The email address needs to be an active user in the FAC data dump.
-2. You may have to change the network; it should match the network of your local FAC stack. `docker network ls` will let you see which network is being used.
+```
+cd util/load_public_dissem_data
+```
 
-Once you run the container, run steps 2, 3, 4, 5, 6, and 7 in order.
+Then, run this script:
+
+```
+./prepare_prod_data_for_local.bash YOUR_EMAIL
+```
+
+The email address needs to be an active user in the FAC data dump.
+
+Once you run the script, run steps 2, 3, 4, 5, 6, and 7 in order.
 
 If you are feeling bold, select the option for running everything straight through. This runs steps 2-7.
 

@@ -42,17 +42,17 @@ WITH keepers AS (
     DELETE FROM 
       dissemination_note
     WHERE
-      report_id not IN (SELECT * FROM keepers)
+      report_id not IN (SELECT report_id FROM keepers)
   ),
   -- Now, the tables dependent on 'audit' and 'singleauditchecklist'
   access_deleted AS (
-    DELETE FROM audit_access WHERE sac_id NOT IN (SELECT sac_id FROM sac_ids_to_keep) 
+    DELETE FROM audit_access WHERE sac_id NOT IN (SELECT sac_id FROM keepers) 
   ),
   deletedaccess_deleted AS (
-    DELETE FROM audit_deletedaccess WHERE sac_id NOT IN (SELECT sac_id FROM sac_ids_to_keep)
+    DELETE FROM audit_deletedaccess WHERE sac_id NOT IN (SELECT sac_id FROM keepers)
   ),
   deleted_excelfile AS (
-    DELETE FROM audit_excelfile WHERE sac_id NOT IN (SELECT sac_id FROM sac_ids_to_keep)
+    DELETE FROM audit_excelfile WHERE sac_id NOT IN (SELECT sac_id FROM keepers)
   ),
   deleted_validationwaiver AS (
     DELETE FROM audit_sacvalidationwaiver WHERE report_id NOT IN (SELECT report_id FROM keepers)

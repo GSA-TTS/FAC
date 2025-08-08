@@ -12,11 +12,6 @@ The goal is for devs to have the same data in their local stacks. This makes fea
 
 We want to load the same starting data and then modify it to meet our needs. This eliminates a proliferation of different dumps and subsequent confusion (e.g. "What dump are you using?"). Instead, we start with one file/database state, and modify it to match the needs of the moment.
 
-## requirements
-
-* `docker`
-* a current sanitized dumpfile
-
 ## cleanup locally, at least once
 
 Before using this for the first time, the local stack will need to be cleaned up.
@@ -31,17 +26,6 @@ docker volume prune -f
 
 Then, `docker compose up`. This only needs to be done once. Probably.
 
-
-## building the script container
-
-These scripts are Dockerized. Therefore, you must have Docker installed. (This is a FAC dev requirement, so FAC devs should be good to go.)
-
-Before using the `manage` script, you must build the container for it.
-
-```
-docker build -t manage:latest -f Dockerfile.manage .
-```
-
 ## BLUF
 
 Fetch a santizied dumpfile from GDrive:
@@ -50,13 +34,22 @@ https://drive.google.com/drive/folders/1WymwJtdQ287SdgrOx__aEraoVTx7ig9D
 
 These are approximately 2GB. Put it in the `data` folder.
 
+Then, exec into the app container:
+
 ```
-docker run -i --rm --env DUMPFILE=data/sanitized-<DATE>.dump --env EMAIL_ADDRESS="YOUR_EMAIL" -v .:/app --network backend_default prepare
+docker compose exec -it web /bin/bash
 ```
 
-The path is to a `sanitized-<DATE>.dump` dumpfile (relative to the container root), and you need to provide a staff user email address. It could be yours or someone else's. (Because this is from a prod dump, using your prod email address should "just work.")
+`cd` into the load public data folder and run the script:
 
-Note that you need to be running on the same Docker network as the app stack. `docker network ls` will let you see where things are running if you need to change that parameter.
+```
+cd util/load_public_dissem_data
+./manage_local_data.bash data/sanitized-<DATE>.dump <YOUR_EMAIL>
+```
+
+The path is to a `sanitized-<DATE>.dump` dumpfile (relative to the `load_public_dissem_data` folder; perhaps in `data`), and you need to provide a staff user email address. It could be yours or someone else's. (Because this is from a prod dump, using your prod email address should "just work.")
+
+E.g.
 
 Run 1, 2, 3, 4, 5, 6, and 7.
 

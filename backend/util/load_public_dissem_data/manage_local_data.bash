@@ -17,11 +17,8 @@ DATE=$(date '+%Y%m%d')
 args=("$@")
 # args[0] is the first argument, and not the name of the script.
 
-# export DUMPFILE=${args[0]}
-# export EMAIL=${args[1]}
-
-DUMPFILE="${DUMPFILE}"
-EMAIL="${EMAIL}"
+export DUMPFILE=${args[0]}
+export EMAIL=${args[1]}
 
 if [[ -z "${DUMPFILE}" ]]; then
   echo "Please pass a sanitized dumpfile as the first command-line argument."
@@ -187,7 +184,7 @@ load_sanitized_data_dump () {
 }
 
 ############################################################
-# test_sanitized_production_dump
+# shrink_to_20k_records
 ############################################################
 shrink_to_20k_records () {
   echo "Shrinking to 20K records. Deleting from many tables."
@@ -232,7 +229,9 @@ generate_fake_suppressed_reports () {
 ############################################################
 generate_resubmissions () {
   echo "generate_resubmissions"
-  docker compose exec web python manage.py generate_resubmissions --email ${EMAIL}
+  pushd ../.. 
+  python manage.py generate_resubmissions --email ${EMAIL}
+  popd
 }
 
 ############################################################
@@ -240,7 +239,9 @@ generate_resubmissions () {
 ############################################################
 generate_materialized_view () {
   echo "generate_materialized_view"
-  docker compose exec web python manage.py materialized_views --create
+  pushd ../..
+  python manage.py materialized_views --create
+  popd
 }
 
 ############################################################
@@ -291,7 +292,9 @@ truncate_dissemination_tables () {
 ############################################################
 redisseminate_all_sac_records () {
   echo "redisseminate_all_sac_records"
-  docker compose exec web python manage.py delete_and_regenerate_dissemination_from_intake
+  pushd ../..
+  python manage.py delete_and_regenerate_dissemination_from_intake
+  popd
 }
 
 
