@@ -1,0 +1,7 @@
+# docker build -t -f Dockerfile.manage manage:latest . 
+FROM debian:12-slim
+
+RUN apt-get update && apt-get install -y postgresql-client-15
+
+WORKDIR /app
+CMD [ "/app/manage_local_data.bash" ]

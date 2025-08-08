@@ -126,13 +126,16 @@ def modify_pdf_point_at_this_instead(old_report_id):
     return _do_modify
 
 
+# Using the new tools to generate data for local testing,
+# we want to make sure these are selected from our
+# 20K record subset, so that the command always works.
 REPORTIDS_TO_MODIFIERS = lambda: {
     # Lets rewrite the auditor's address
-    "2023-01-GSAFAC-0000000854": [modify_auditor_address],
-    "2019-12-CENSUS-0000230175": [modify_auditee_ein],
+    "2023-06-GSAFAC-0000000697": [modify_auditor_address],
+    "2023-06-GSAFAC-0000002166": [modify_auditee_ein],
     # Modifying the workbook requires there to be additional EINs
-    "2023-06-GSAFAC-0000008301": [modify_additional_eins_workbook],
-    "2023-12-GSAFAC-0000027107": [
+    "2022-12-GSAFAC-0000001787": [modify_additional_eins_workbook],
+    "2023-06-GSAFAC-0000002901": [
         modify_auditor_address,
         modify_additional_eins_workbook,
     ],
@@ -146,17 +149,17 @@ REPORTIDS_TO_MODIFIERS = lambda: {
     # The report on the left has its SAR pointer modified so that it instead
     # points to the report for the entity on the right. That way,
     # it looks like a completely different PDF is attached to (say) 19157.
-    "2023-06-GSAFAC-0000019157": [
-        modify_pdf_point_at_this_instead("2019-06-CENSUS-0000191689")
+    "2023-06-GSAFAC-0000005147": [
+        modify_pdf_point_at_this_instead("2023-06-GSAFAC-0000002901")
     ],
     "2023-06-GSAFAC-0000001699": [modify_total_amount_expended],
     # Do all the things
-    "2023-06-GSAFAC-0000003056": [
+    "2022-12-GSAFAC-0000007921": [
         modify_auditor_address,
         modify_auditee_ein,
         modify_additional_eins_workbook,
         modify_total_amount_expended,
-        modify_pdf_point_at_this_instead("2023-05-GSAFAC-0000000499"),
+        modify_pdf_point_at_this_instead("2023-06-GSAFAC-0000000697"),
     ],
 }
 
@@ -219,7 +222,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         reportids_to_modifiers = REPORTIDS_TO_MODIFIERS()
-
+        logger.info("Modifying the following report IDs")
+        for rid in reportids_to_modifiers:
+            logger.info(f"\t{rid}")
         sacs_for_resubs = SingleAuditChecklist.objects.filter(
             report_id__in=reportids_to_modifiers.keys()
         )

@@ -52,19 +52,3 @@ class Command(BaseCommand):
                 logger.info(f"Redisseminating {sac.report_id}")
                 sac.redisseminate()
                 redisseminated[sac.report_id] = True
-
-        # Repeat until we've redisseminated everything.
-        # As long as something comes in, we do it again.
-        changed = False
-        while not changed:
-            for year in range(2015, date.today().year + 1):
-                logger.info(f"Re-working year {year}")
-                for sac in SingleAuditChecklist.objects.filter(
-                    submission_status=STATUS.DISSEMINATED,
-                    general_information__auditee_fiscal_period_end__startswith=f"{year}",
-                ):
-                    if sac.report_id not in redisseminated:
-                        logger.info(f"Double-check redisseminating {sac.report_id}")
-                        sac.redisseminate()
-                        changed = True
-                        redisseminated[sac.report_id] = True
