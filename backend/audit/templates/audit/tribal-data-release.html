@@ -30,6 +30,10 @@
                         </p>
                     </div>
 
+                    {% if previous_report_id %}
+                      {% include "includes/tribal_consent_banner.html" %}
+                    {% endif %}
+
                     {% comment %} This div is the grey box, and should handle its own margins and padding. {% endcomment %}
                     <div class="bg-base-lightest padding-5">
                         <fieldset class="usa-fieldset radio margin-bottom-6" id="question-opt-in-out">
@@ -93,7 +97,7 @@
                                         value="{{ tribal_authorization_certifying_official_title }}" />
                                 <span class="usa-error-message font-sans-md margin-top-1">{{ errors.tribal_authorization_certifying_official_title|striptags }}</span>
                             </fieldset>
-                            
+
                             <fieldset class="usa-fieldset margin-top-2 tablet:grid-col-12" id="agree-or-cancel">
                                 <button class="usa-button" id="continue">Agree to Tribal data release</button>
                                 <a class="usa-button usa-button--unstyled margin-left-2 margin-top-2 tablet:margin-top-0"
