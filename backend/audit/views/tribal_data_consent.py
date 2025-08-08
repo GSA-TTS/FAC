@@ -31,6 +31,17 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "report_id": report_id,
             }
 
+            if sac.resubmission_meta:
+                previous_sac = SingleAuditChecklist.objects.get(
+                    report_id=sac.resubmission_meta["previous_report_id"]
+                )
+                context = context | {
+                    "previous_report_id": previous_sac.report_id,
+                    "previous_is_public": tribal_audit_consent.get(
+                        "is_tribal_information_authorized_to_be_public"
+                    ),
+                }
+
             return render(
                 request,
                 "audit/tribal-data-release.html",
