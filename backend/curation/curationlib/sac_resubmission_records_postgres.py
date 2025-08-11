@@ -7,12 +7,24 @@ def fetch_sac_resubmission_records_postgres(AY, duplication_threshold=2, noisy=F
     # Take a full year, grab the UEIs, and look for duplicated UEIs.
     base = SingleAuditChecklist.objects.filter(
         # We should only be clustering things that have no metadata.
+        # The assumption is we will be using the clustering of these records
+        # to then link them. Therefore, those records will get metadata, meaning
+        # those records should no longer become part of automatic cluster generation.
         Q(resubmission_meta__isnull=True)
-        # and are in the fiscal year we're interested in
+        # It can only be a "resubmission" if it is from the same audit year/fiscal period.
+        # Otherwise, we must assume it is a different audit.
         & Q(general_information__auditee_fiscal_period_end__startswith=AY)
-        # and are disseminated (not in_progress)
+        # An audit that is in-progress cannot be linked.
+        # An audit that has a "redisseminated" status should never be linked,
+        # because that would imply branching (a tree). Therefore, only
+        # records that are "disseminated" can represent the end of a chain.
         & Q(submission_status="disseminated")
-        # and have a real UEI, not GSA_MIGRATION
+        # We have to have a real UEI, not GSA_MIGRATION
+        # FIXME: Could the start of a chain have GSA_MIGRATION, and a
+        # "resubmission" have a real UEI? Meaning, it spanned systems? I think
+        # this is possible. Elch. Possibly ignore this, or allow the
+        # distance algorithm to consider "GSA_MIGRATION" to be distance zero
+        # from any real UEI?
         & ~Q(general_information__auditee_uei="GSA_MIGRATION")
     )
 
