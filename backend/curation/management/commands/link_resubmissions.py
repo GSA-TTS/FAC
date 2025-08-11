@@ -1,6 +1,10 @@
-from audit.models import SingleAuditChecklist, SubmissionEvent, User
+from audit.models import (
+    SingleAuditChecklist,
+    SubmissionEvent,
+    User,
+)
+from audit.models.constants import RESUBMISSION_STATUS
 from users.models import StaffUser
-from dissemination.models.constants import ResubmissionStatus
 from audit.models.constants import STATUS
 from django.db import transaction
 
@@ -40,14 +44,14 @@ def point_old_to_new(
             "version": 1,
             "next_row_id": second.id,
             "next_report_id": second.report_id,
-            "resubmission_status": ResubmissionStatus.DEPRECATED,
+            "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
         }
         first.submission_status = STATUS.RESUBMITTED
         second.resubmission_meta = {
             "version": 2,
             "previous_row_id": first.id,
             "previous_report_id": first.report_id,
-            "resubmission_status": ResubmissionStatus.MOST_RECENT,
+            "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
         }
         second.submission_status = STATUS.DISSEMINATED
 
@@ -77,7 +81,7 @@ def point_old_to_new(
         first.resubmission_meta = first.resubmission_meta | {
             "next_row_id": second.id,
             "next_report_id": second.report_id,
-            "resubmission_status": ResubmissionStatus.DEPRECATED,
+            "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
         }
         first.submission_status = STATUS.RESUBMITTED
         # The second is new to the chain, so we just provide the previous.
@@ -86,7 +90,7 @@ def point_old_to_new(
             "version": first.resubmission_meta["version"] + 1,
             "previous_row_id": first.id,
             "previous_report_id": first.report_id,
-            "resubmission_status": ResubmissionStatus.MOST_RECENT,
+            "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
         }
         second.submission_status = STATUS.DISSEMINATED
         with transaction.atomic():

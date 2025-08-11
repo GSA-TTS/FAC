@@ -35,8 +35,6 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
-
-
 create table if not exists curation.record_version(
     -- unique auto-incrementing id
     id             bigserial primary key,
@@ -231,7 +229,6 @@ begin
 end;
 $$;
 
-
 create or replace function curation.enable_tracking(regclass)
     returns void
     volatile
@@ -241,7 +238,7 @@ create or replace function curation.enable_tracking(regclass)
 as $$
 declare
     statement_row text = format('
-        create trigger curation_i_u_d
+        create or replace trigger curation_i_u_d
             after insert or update or delete
             on %s
             for each row
@@ -250,7 +247,7 @@ declare
     );
 
     statement_stmt text = format('
-        create trigger curation_t
+        create or replace trigger curation_t
             after truncate
             on %s
             for each statement
