@@ -32,6 +32,12 @@ export function testFullSubmission(isTribal, isPublic) {
   // Logs in with Login.gov'
   testLoginGovLogin();
 
+  // Check the terms and conditions link and click "Accept and start..."
+  cy.get('[id=button-new-audit-submission]').click();
+  cy.get('label[for=check_start_new_submission]').click();
+  cy.get('.usa-button').contains('Begin New Submission').click();
+  cy.url().should('match', /\/report_submission\/auditeeinfo\/$/);
+
   testInitializeAudit(isTribal);
 
   // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.

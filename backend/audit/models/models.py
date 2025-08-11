@@ -32,9 +32,10 @@ from audit.validators import (
 )
 from audit.utils import FORM_SECTION_HANDLERS
 from audit.models.constants import (
+    DATA_SOURCE_GSAFAC,
     SAC_SEQUENCE_ID,
     STATUS,
-    DATA_SOURCE_GSAFAC,
+    RESUBMISSION_STATUS,
     VALID_DATA_SOURCES,
 )
 from audit.models.utils import get_next_sequence_id
@@ -57,7 +58,6 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 from django.utils.timezone import now
-from dissemination.models.general import ResubmissionStatus
 
 
 User = get_user_model()
@@ -305,34 +305,40 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     # Resubmission SAC Creations
     # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
-    # FIXME: Do we need to pass event_type?
-    def initiate_resubmission(self, user=None, event_type=None):
+    def initiate_resubmission(self, user=None):
         with transaction.atomic():
             if SingleAuditChecklist.objects.filter(
-                resubmission_meta__previous_report_id=self.report_id
+                resubmission_meta__previous_report_id=self.report_id,
+                submission_status=STATUS.DISSEMINATED,
             ).exists():
                 raise ValidationError(
                     f"A resubmission already exists for report_id {self.report_id}."
                 )
 
-            # Convert to dict and exclude fields that should not be copied
-            excluded_fields = [
-                "id",
-                "report_id",
-                "created_at",
-                "updated_at",
-                "submitted_by",
-            ]
+            # Clone the record
+            data = model_to_dict(self)
 
-            # FIXME: Is this copying everything? We may have missed something in the ticket:
-            # we should copy very, very little.
-            data = model_to_dict(self, exclude=excluded_fields)
+            # Update individual fields
+            data["general_information"]["auditee_uei"] = self.auditee_uei
+            data["general_information"][
+                "auditee_fiscal_period_start"
+            ] = self.auditee_fiscal_period_start
+            data["general_information"][
+                "auditee_fiscal_period_end"
+            ] = self.auditee_fiscal_period_end
 
             # Manually add back foreign key as instance
             data["submitted_by"] = self.submitted_by
+
             # We always need to update the data source on a resubmission.
             # It is GSAFAC.
             data["data_source"] = DATA_SOURCE_GSAFAC
+
+            # By default, this is version 1. This means all resubmissions will be of at least version 2.
+            if data.get("resubmission_meta"):
+                old_version = data.get("resubmission_meta").get("version", 1)
+            else:
+                old_version = 1
 
             # Add/override fields
             data.update(
@@ -341,8 +347,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                     "resubmission_meta": {
                         "previous_report_id": self.report_id,
                         "previous_row_id": self.id,
-                        "resubmission_status": ResubmissionStatus.MOST_RECENT,
-                        "version": 2,
+                        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
+                        "version": old_version + 1,
                     },
                     "transition_name": [STATUS.IN_PROGRESS],
                     "transition_date": [now()],
@@ -351,7 +357,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
             resub = SingleAuditChecklist.objects.create(**data)
 
-            if event_type and user:
+            if user:
                 # Event on the new RESUB
                 SubmissionEvent.objects.create(
                     sac=resub,

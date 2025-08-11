@@ -48,12 +48,16 @@ class SubmissionEvent(models.Model):
         FAC_ADMINISTRATIVE_EIN_REPLACEMENT = "fac-administrative-ein-replacement"
         RESUBMISSION_STARTED = "resubmission-started"
         RESUBMISSION_INITIATED = "resubmission-initiated"
+<<<<<<< HEAD
         FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE = (
             "fac-administrative-resubmission-linkage"
         )
         FAC_ADMINISTRATIVE_RESUBMISSION_ANNOTATION = (
             "fac-administrative-resubmission-annotation"
         )
+=======
+        FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE = "fac-administrative-suppression-change"
+>>>>>>> main
 
     EVENT_TYPES = (
         (EventType.ACCESS_GRANTED, _("Access granted")),
@@ -130,6 +134,7 @@ class SubmissionEvent(models.Model):
             _("This report was started as a resubmission of another report."),
         ),
         (
+<<<<<<< HEAD
             EventType.FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE,
             _(
                 "Administratively linking reports that appear to be resubmissions based on their similarity."
@@ -138,6 +143,10 @@ class SubmissionEvent(models.Model):
         (
             EventType.FAC_ADMINISTRATIVE_RESUBMISSION_ANNOTATION,
             _("Administratively annotating a report's resubmission metadata."),
+=======
+            EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
+            _("FAC administrative change of Tribal suppression status."),
+>>>>>>> main
         ),
     )
 
