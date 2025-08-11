@@ -139,6 +139,8 @@ class SubmissionEvent(models.Model):
         (
             EventType.FAC_ADMINISTRATIVE_RESUBMISSION_ANNOTATION,
             _("Administratively annotating a report's resubmission metadata."),
+        ),
+        (
             EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
             _("FAC administrative change of Tribal suppression status."),
         ),
