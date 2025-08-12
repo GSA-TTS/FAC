@@ -29,7 +29,7 @@ fi
 if [ -f "$DUMPFILE" ]; then
   echo "Found file '$DUMPFILE'."
 else
-  echo "File '$DESTINATION' does not exist."
+  echo "File '$DUMPFILE' does not exist."
   echo "Exiting."
   exit
 fi
@@ -46,7 +46,6 @@ source "tables.source"
 ############################################################
 # truncate_all_local_tables
 ############################################################
-declare -a PRE_TRUNCATE_TABLE_COUNTS
 truncate_all_local_tables () {
   echo "truncate_all_local_tables"
   # Combining two arrays into one.
@@ -63,20 +62,6 @@ truncate_all_local_tables () {
     suffix=".dump"
     TABLENAME=${dump/#$prefix}
     TABLENAME=${TABLENAME/%$suffix}
-  
-  cmd="SELECT COUNT(*) FROM ${TABLENAME}"
-  PRE_TRUNCATE_TABLE_COUNTS+=($(psql \
-    -t \
-    -q \
-    -d ${DATABASE} \
-    -U ${USERNAME} \
-    -p ${PORT} \
-    -h ${HOST} \
-    -v ON_ERROR_STOP=1 \
-    -w \
-    -c "${cmd}"))
-
-  echo "${cmd}: ${PRE_TRUNCATE_TABLE_COUNTS[$ndx]}"
 
   # TRUNCATE is not guaranteed to be complete if we call a 
   # `pg_restore` immediately after. Wrap it in a transaction.
@@ -102,14 +87,14 @@ truncate_all_local_tables () {
 
 
 ############################################################
-# test_sanitized_production_dump
+# load_sanitized_production_dump
 ############################################################
-declare -a TEST_LOAD_TABLE_COUNTS
 load_sanitized_data_dump () {
   echo "test_sanitized_production_dump"
 
   # We must truncate everything before loading.
   truncate_all_local_tables
+
 
   echo "Restoring data from sanitized-${DATE}.dump"
 
@@ -147,40 +132,6 @@ load_sanitized_data_dump () {
     exit
   fi
 
-  FOR_TRUNCATE=( "${TARGET_TABLES[@]}" "${TRUNCATE_ONLY[@]}" )
-  for (( ndx=${#FOR_TRUNCATE[@]}-1 ; ndx>=0 ; ndx-- ));
-  do
-    dump=${FOR_TRUNCATE[$ndx]}
-    prefix="public-"
-    suffix=".dump"
-    TABLENAME=${dump/#$prefix}
-    TABLENAME=${TABLENAME/%$suffix}
-
-    cmd="SELECT COUNT(*) FROM ${TABLENAME}"
-    TEST_LOAD_TABLE_COUNTS+=($(psql \
-      -t \
-      -q \
-      -d ${DATABASE} \
-      -U ${USERNAME} \
-      -p ${PORT} \
-      -h ${HOST} \
-      -w \
-      -c "${cmd}"))
-  done
-
-  all_same=1
-  for i in "${!TEST_LOAD_TABLE_COUNTS[@]}"; do
-      if [ "${PRE_TRUNCATE_TABLE_COUNTS[$i]}" != "${TEST_LOAD_TABLE_COUNTS[$i]}" ]; then
-        printf '${%s}=%s %s\n' "$i" "${PRE_TRUNCATE_TABLE_COUNTS[$i]}" "${TEST_LOAD_TABLE_COUNTS[$i]}"
-        all_same=0
-      fi
-  done
-
-  if [ "${all_same}" == "1" ]; then
-    echo "All table counts the same."
-  else
-    echo "Table counts differed."
-  fi
 }
 
 ############################################################
