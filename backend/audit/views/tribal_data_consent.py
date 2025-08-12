@@ -35,12 +35,26 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 previous_sac = SingleAuditChecklist.objects.get(
                     report_id=sac.resubmission_meta["previous_report_id"]
                 )
-                context = context | {
-                    "previous_report_id": previous_sac.report_id,
-                    "previous_is_public": tribal_audit_consent.get(
-                        "is_tribal_information_authorized_to_be_public"
-                    ),
-                }
+                # This arose accidentally via testing, but might be an actual case.
+                # We assume the previous audit was tribal. What if it wasn't?
+                # What if they submitted "incorrectly," and are resubmitting to set their status
+                # to tribal, and then add consent. This would mean that the previous tribal_data_consent
+                # field was NULL in the DB (or None).
+                previous_consent = previous_sac.tribal_data_consent
+
+                # If previous_consent is None, we should not build a banner. As a result, we'll set no context.
+                # If there is a value, we'll use it to build the context we pass back to the frontend.
+                if previous_consent is not None:
+                    context = context | {
+                        "previous_report_id": previous_sac.report_id,
+                        # The .get() should always work here, because we determined that
+                        # previous_consent is not None.
+                        "previous_is_public": (
+                            previous_consent.get(
+                                "is_tribal_information_authorized_to_be_public"
+                            )
+                        ),
+                    }
 
             return render(
                 request,
