@@ -38,7 +38,7 @@ jobs:
       CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
         uses: actions/setup-node@v4
