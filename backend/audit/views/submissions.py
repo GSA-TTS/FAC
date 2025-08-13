@@ -32,10 +32,9 @@ logger = logging.getLogger(__name__)
 
 
 class MySubmissions(LoginRequiredMixin, generic.View):
-    redirect_field_name = "Home"
+    template_name = "audit/audit_submissions/audit_submissions.html"
 
     def get(self, request, *args, **kwargs):
-        template_name = "audit/audit_submissions/audit_submissions.html"
         new_link = "report_submission"
         edit_link = "audit:EditSubmission"
         # TODO SOT: Enable for testing
@@ -58,7 +57,22 @@ class MySubmissions(LoginRequiredMixin, generic.View):
             "is_beta": use_audit,
             "non_beta_url": "audit:MySubmissions",
         }
-        return render(request, template_name, context)
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Accept a POST request to begin a new submission. First overwrites
+        user.profile.entry_form_data, to avoid carryover of other submission or resubmission data.
+        """
+        user = request.user
+        # TODO: Add resubmission status here, once the constants have gone in.
+        user.profile.entry_form_data = {
+            "is_resubmission": False,
+            "resubmission_meta": {"version": 1},
+        }
+        user.profile.save()
+
+        return redirect(reverse("report_submission:auditeeinfo"))
 
     @classmethod
     def fetch_my_submissions(cls, user, use_audit):

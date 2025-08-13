@@ -2,38 +2,24 @@ from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .constants import AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED
 from ..serializers import AuditeeInfoSerializer
 
 
 def auditee_info_check(user, data):
-    serializer = AuditeeInfoSerializer(data=data)
-
-    # Need Eligibility info to proceed
-    entry_form_data = user.profile.entry_form_data
-
-    missing_fields = [
-        field
-        for field in AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED
-        if field not in entry_form_data
-    ]
-    if missing_fields:
-        return {
-            "next": reverse("api-eligibility"),
-            "errors": "We're missing required fields, please try again.",
-            "missing_fields": missing_fields,
-        }
+    # By default, `data` will conform to the Serializer fields.
+    # To include additional fields, we must use a `context` object.
+    additional_context = {"is_resubmission": data.get("is_resubmission", False)}
+    serializer = AuditeeInfoSerializer(data=data, context=additional_context)
 
     if serializer.is_valid():
-        next_step = reverse("api-accessandsubmission")
+        next_step = reverse("api-eligibility")
 
-        # combine with expected eligibility info from session
+        # Store step 1 data in profile, combined with the existing.
         user.profile.entry_form_data = user.profile.entry_form_data | data
         user.profile.save()
+        return {"info_check_passed": True, "next": next_step}
 
-        return {"next": next_step}
-
-    return {"errors": serializer.errors}
+    return {"info_check_passed": False, "errors": serializer.errors}
 
 
 class AuditeeInfoView(APIView):

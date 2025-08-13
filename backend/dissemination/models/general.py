@@ -1,5 +1,7 @@
 from django.db import models
-from .constants import REPORT_ID_FK_HELP_TEXT, ResubmissionStatus
+
+from audit.models.constants import RESUBMISSION_STATUS_CHOICES
+from .constants import REPORT_ID_FK_HELP_TEXT
 from dissemination.models import docs
 
 
@@ -244,7 +246,7 @@ class General(models.Model):
     # Resubmission Status
     resubmission_status = models.CharField(
         max_length=30,
-        choices=ResubmissionStatus.choices,
+        choices=RESUBMISSION_STATUS_CHOICES,
         default=None,
         null=True,
     )
