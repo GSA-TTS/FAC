@@ -2,7 +2,7 @@
 # FOUNDATION
 ###############################
 
-FROM python:3.12-slim AS foundation
+FROM python:3.12.11-slim-bookworm AS foundation
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
