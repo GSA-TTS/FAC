@@ -173,6 +173,8 @@ generate_fake_suppressed_reports () {
     echo "psql failed."
     exit
   fi
+  
+  echo "Done."
 }
 
 ############################################################
