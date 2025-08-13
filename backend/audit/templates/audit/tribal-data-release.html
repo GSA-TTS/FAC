@@ -29,7 +29,16 @@
                             For the full citation, see Uniform Guidance <a class="usa-link" href="https://www.ecfr.gov/current/title-2/subtitle-A/chapter-II/part-200/subpart-F/subject-group-ECFRc3bd6ae97de5a40/section-200.512#p-200.512(b)(2)" target="_blank">2 CFR 200.512(b)(2)</a>
                         </p>
                     </div>
+                    
+                    {% comment %}
+                    The value for `previous_report_id` can only be set IF
+                    
+                      1. There is resubmission metadata, and 
+                      2. The previous report had tribal consent attached to it.
 
+                    Therefore, this will not appear until resubmission is live, and people have started to 
+                    resubmit audits. It is able to go to production as-is.
+                    {% endcomment %}
                     {% if previous_report_id %}
                       {% include "includes/tribal_consent_banner.html" %}
                     {% endif %}
