@@ -1,0 +1,9 @@
+<section class="usa-alert usa-alert--warning margin-top-0 margin-bottom-1"
+        aria-label="Tribal consent banner"
+        id="tribal-consent-banner">
+    <div class="usa-alert__body grid-container">
+        <p class="usa-alert__text">
+            Note: The <a class="usa-link" href="{% url 'audit:SubmissionProgress' previous_report_id %}">previous submission</a> of this audit <b> opted {% if not previous_is_public %} not {% endif %} </b> to authorize the FAC to make the reporting package publicly available.
+        </p>
+    </div>
+</section>
