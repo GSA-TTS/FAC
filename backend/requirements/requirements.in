@@ -18,6 +18,7 @@ greenlet>=3.0rc3
 gunicorn[gevent]>=22.0.0
 jsonpath-ng
 jsonschema
+levenshtein
 newrelic>=10.9.0
 oic
 openpyxl

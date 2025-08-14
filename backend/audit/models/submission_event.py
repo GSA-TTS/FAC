@@ -48,6 +48,12 @@ class SubmissionEvent(models.Model):
         FAC_ADMINISTRATIVE_EIN_REPLACEMENT = "fac-administrative-ein-replacement"
         RESUBMISSION_STARTED = "resubmission-started"
         RESUBMISSION_INITIATED = "resubmission-initiated"
+        FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE = (
+            "fac-administrative-resubmission-linkage"
+        )
+        FAC_ADMINISTRATIVE_RESUBMISSION_ANNOTATION = (
+            "fac-administrative-resubmission-annotation"
+        )
         FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE = "fac-administrative-suppression-change"
 
     EVENT_TYPES = (
@@ -123,6 +129,16 @@ class SubmissionEvent(models.Model):
         (
             EventType.RESUBMISSION_STARTED,
             _("This report was started as a resubmission of another report."),
+        ),
+        (
+            EventType.FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE,
+            _(
+                "Administratively linking reports that appear to be resubmissions based on their similarity."
+            ),
+        ),
+        (
+            EventType.FAC_ADMINISTRATIVE_RESUBMISSION_ANNOTATION,
+            _("Administratively annotating a report's resubmission metadata."),
         ),
         (
             EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
