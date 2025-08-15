@@ -38,15 +38,34 @@ class Command(BaseCommand):
         SecondaryAuditor,
     ]
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--report_id",
+            type=str,
+            help="The ID of the SAC.",
+            default=None,
+        )
+
     def handle(self, *args, **_kwargs):
+        report_id = _kwargs.get("report_id")
+
+        if report_id:
+            try:
+                sac = SingleAuditChecklist.objects.get(report_id=report_id)
+                sac.redisseminate()
+                logger.info(f"Redisseminated: {report_id}")
+                exit(0)
+            except SingleAuditChecklist.DoesNotExist:
+                logger.info(f"No report with report_id found: {report_id}")
+                exit(-1)
+
         logger.info("Re-running dissemination for all records.")
 
         redisseminated = {}
-        # FIXME: This wants to be __in (DISSEMINATED, REDISSEMINATED)
         for year in range(2015, date.today().year + 1):
             logger.info(f"Working year {year}")
             for sac in SingleAuditChecklist.objects.filter(
-                submission_status=STATUS.DISSEMINATED,
+                submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
                 general_information__auditee_fiscal_period_end__startswith=f"{year}",
             ):
                 logger.info(f"Redisseminating {sac.report_id}")

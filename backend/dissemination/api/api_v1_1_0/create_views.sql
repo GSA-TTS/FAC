@@ -299,6 +299,24 @@ create view api_v1_1_0.additional_eins as
     order by ein.id
 ;
 
+create view api_v1_1_0.resubmission as
+    select
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        ---
+        resub.resubmission_version,  -- Just version?
+        resub.resubmission_status,  -- Likewise, just status?
+        resub.previous_report_id,
+        resub.next_report_id
+    from
+        dissemination_general gen,
+        dissemination_resubmission resub
+    where
+        gen.report_id = resub.report_id
+    order by resub.id
+;
+
 commit;
 
 notify pgrst,

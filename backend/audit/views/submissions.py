@@ -145,6 +145,8 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            resubmission_meta = sac.resubmission_meta
+            previous_report_id = resubmission_meta.get("previous_report_id")
             errors = sac.validate_full()
 
             # TODO: Update Post SOC Launch
@@ -172,6 +174,18 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     request, sac, audit=audit, transition_to=STATUS.SUBMITTED
                 )
                 disseminated = sac.disseminate()
+
+                # If this is a resubmission, deprecate the old version.
+                if previous_report_id:
+                    old_sac = SingleAuditChecklist.objects.get(
+                        report_id=previous_report_id
+                    )
+                    old_sac.resubmission_meta = old_sac.resubmission_meta | {
+                        "next_report_id": sac.report_id,
+                        "next_row_id": sac.id,
+                    }
+                    old_sac.redisseminate()
+
                 if audit:
                     audit_indexes = generate_audit_indexes(audit)
                     audit.audit.update(audit_indexes)
