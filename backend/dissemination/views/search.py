@@ -2,7 +2,7 @@ from datetime import date
 import logging
 import math
 import time
-
+from audit.models.constants import RESUBMISSION_STATUS
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -30,6 +30,43 @@ default_checked_audit_years = [
     date.today().year,
     date.today().year - 1,
 ]  # Auto-check this and last year
+
+from audit.models.constants import RESUBMISSION_STATUS
+
+def _get(obj, key, default=None):
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
+
+def compute_resubmission_tag(row):
+    """
+    Return: "Most Recent" | "Resubmitted" | None
+
+    Rules:
+      - Show a tag ONLY if it has resubmission_meta (i.e., it is a resubmission).
+      - MOST_RECENT  -> "Most Recent"
+      - ORIGINAL/DEPRECATED -> "Resubmitted"
+      - Legacy (no resubmission_meta) -> None
+    """
+    meta = _get(row, "resubmission_meta") or None
+    if not meta:
+        return None  # legacy or never-resubmitted
+
+    status = meta.get("resubmission_status")
+    if status == RESUBMISSION_STATUS.MOST_RECENT:
+        return "Most Recent"
+    if status in (RESUBMISSION_STATUS.ORIGINAL, RESUBMISSION_STATUS.DEPRECATED):
+        return "Resubmitted"
+    return None
+
+def populate_resubmission_tag(paginator_page):
+    for row in paginator_page.object_list:
+        tag = compute_resubmission_tag(row)
+        try:
+            setattr(row, "resubmission_tag", tag)  # model instance
+        except Exception:
+            row["resubmission_tag"] = tag          # dict row
+    return paginator_page
 
 
 # TODO: Update Post SOC Launch -> Delete Advanced/Search, have 1 search.
@@ -129,6 +166,8 @@ class AdvancedSearch(View):
         # If there are results, populate the agency name in cog/over field
         if results_count > 0:
             paginator_results = populate_cog_over_name(paginator_results)
+            paginator_results = populate_resubmission_tag(paginator_results)
+
 
         context = context | {
             "form_user_input": form_user_input,
@@ -245,6 +284,8 @@ class Search(View):
         # If there are results, populate the agency name in cog/over field
         if results_count > 0:
             paginator_results = populate_cog_over_name(paginator_results)
+            paginator_results = populate_resubmission_tag(paginator_results)
+
 
         context = context | {
             "form_user_input": form_user_input,
@@ -363,6 +404,7 @@ class AuditSearch(View):
         # populate the agency name in cog/over field
         if results_count > 0:
             paginator_results = audit_populate_cog_over_name(paginator_results)
+            paginator_results = populate_resubmission_tag(paginator_results)
 
         context = context | {
             "form_user_input": form_user_input,
