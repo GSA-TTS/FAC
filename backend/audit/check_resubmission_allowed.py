@@ -1,8 +1,11 @@
 from typing import Tuple
-from django.utils import timezone
 from datetime import datetime, timezone as dt_timezone
+
+from django.utils import timezone
+
 from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
+from dissemination.models import General
 
 
 def get_last_transition_date(sac):
@@ -75,9 +78,14 @@ def check_resubmission_allowed(
 
     # Legacy audit (meta = None) At this point, we assume data has been curated: valid submission_status, uei, year.
     if sac.resubmission_meta is None:
+        # Faster to find these in General and use the report_ids to search SAC
+        gen_siblings = General.objects.filter(
+            auditee_uei=auditee_uei,
+            audit_year=str(audit_year),
+        )
+        report_ids = list(gen_siblings.values_list("report_id", flat=True))
         siblings = SingleAuditChecklist.objects.filter(
-            general_information__auditee_uei=auditee_uei,
-            general_information__auditee_fiscal_period_end__startswith=str(audit_year),
+            report_id__in=report_ids,
             resubmission_meta__isnull=True,
         )
 
