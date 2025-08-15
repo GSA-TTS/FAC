@@ -8,6 +8,7 @@ from .findingtext import FindingText
 from .general import General
 from .note import Note
 from .passthrough import Passthrough
+from .resubmission import Resubmission
 from .secondaryauditor import SecondaryAuditor
 
 from .censusmigration import (
@@ -31,6 +32,7 @@ _dissemination_models = [
     General,
     Note,
     Passthrough,
+    Resubmission,
     SecondaryAuditor,
 ]
 

@@ -106,6 +106,16 @@ class DisseminationCombined(models.Model):
         help_text=docs.auditor_ein,
     )
 
+    # Resubmission Metadata
+    resubmission_version = models.BigIntegerField(
+        "Resubmission Version",
+        # help_text=docs.resubmission_version,  # "Original submissions are version 1. Subsequent resubmissions increment the value."
+    )
+    resubmission_status = models.TextField(
+        "Resubmission Status (Original, Deprecated, Resubmission)",
+        # help_text=docs.resubmission_status,  # "The resubmission status of this record. Displays whether it is a singular original, a resubmission, or a previous version."
+    )
+
     # Agency
     cognizant_agency = models.TextField(
         "Two digit Federal agency prefix of the cognizant agency",

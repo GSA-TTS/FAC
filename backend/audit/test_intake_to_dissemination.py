@@ -22,6 +22,7 @@ from dissemination.models import (
     SecondaryAuditor,
     AdditionalEin,
     AdditionalUei,
+    Resubmission,
 )
 
 
@@ -113,6 +114,7 @@ class IntakeToDisseminationTests(TestCase):
             tribal_data_consent=self._fake_tribal_data_consent(privacy_flag),
             cognizant_agency=cognizant_agency,
             oversight_agency=oversight_agency,
+            resubmission_meta=self._fake_resubmission(),
         )
         return sac
 
@@ -416,6 +418,17 @@ class IntakeToDisseminationTests(TestCase):
             }
         }
 
+    @staticmethod
+    def _fake_resubmission():
+        return {
+            "version": 2,
+            "resubmission_status": "deprecated_via_resubmission",
+            "next_row_id": 8675310,
+            "next_report_id": "2024-06-GSAFAC-0008675310",
+            "previous_row_id": 8675308,
+            "previous_report_id": "2024-06-GSAFAC-0008675308",
+        }
+
     def test_load_general(self):
         self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.save_dissemination_objects()
@@ -588,6 +601,17 @@ class IntakeToDisseminationTests(TestCase):
         ]
         self.assertEqual(set(dissem_eins), set(intake_eins))
 
+    def test_load_resubmission(self):
+        self.intake_to_dissemination.load_general()
+        self.intake_to_dissemination.load_resubmission()
+        self.intake_to_dissemination.save_dissemination_objects()
+
+        # Make sure only one is created, and that it's from the given report.
+        resubmissions = Resubmission.objects.all()
+        self.assertEqual(len(resubmissions), 1)
+        resubmission = resubmissions.first()
+        self.assertEqual(self.report_id, resubmission.report_id.report_id)
+
     def test_load_all(self):
         """On a happy path through load_all(), item(s) should be added to all of the
         tables."""
@@ -633,6 +657,7 @@ class IntakeToDisseminationTests(TestCase):
             "Revisions",
             "AdditionalUEIs",
             "AdditionalEINs",
+            "Resubmissions",
         ]
 
         for k, v in objs.items():
