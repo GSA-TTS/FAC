@@ -1,12 +1,16 @@
 from django.test import TestCase
 from django.utils import timezone
+
 from datetime import datetime, timezone as dt_timezone
+from model_bakery import baker
+
 from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from audit.check_resubmission_allowed import (
     check_resubmission_allowed,
     get_last_transition_date,
 )
+from dissemination.models import General
 
 
 def create_sac(
@@ -26,7 +30,6 @@ def create_sac(
     if general_information is None:
         general_information = {
             "auditee_uei": "TESTUEI123",
-            "audit_year": 2023,
             "auditee_fiscal_period_end": timezone.now().date().isoformat(),
         }
 
@@ -38,6 +41,14 @@ def create_sac(
         submission_status=status,
         general_information=general_information,
         transition_name=[status],
+    )
+
+    # The SAC's corresponding General entry also created
+    baker.make(
+        General,
+        report_id=sac.report_id,
+        auditee_uei=general_information["auditee_uei"],
+        audit_year=general_information["auditee_fiscal_period_end"].split("-")[0],
     )
 
     if meta is not None:
@@ -98,7 +109,6 @@ class TestCheckResubmissionAllowed(TestCase):
             status=STATUS.DISSEMINATED,
             general_information={
                 "auditee_uei": "TESTUEI1",
-                "audit_year": 2023,
                 "auditee_fiscal_period_end": timezone.now().date().isoformat(),
             },
         )
@@ -110,7 +120,6 @@ class TestCheckResubmissionAllowed(TestCase):
     def test_legacy_multiple_records_not_most_recent(self):
         shared_info = {
             "auditee_uei": "TESTUEI1",
-            "audit_year": 2023,
             "auditee_fiscal_period_end": timezone.now().date().isoformat(),
         }
 
@@ -138,7 +147,6 @@ class TestCheckResubmissionAllowed(TestCase):
     def test_legacy_multiple_records_most_recent_allowed(self):
         shared_info = {
             "auditee_uei": "TESTUEI1",
-            "audit_year": 2023,
             "auditee_fiscal_period_end": timezone.now().date().isoformat(),
         }
 
@@ -197,7 +205,6 @@ class TestCheckResubmissionAllowed(TestCase):
         sac = SingleAuditChecklist(
             general_information={
                 "auditee_uei": "TESTUEI123",
-                "audit_year": 2023,
                 "auditee_fiscal_period_end": timezone.now().date().isoformat(),
             },
             resubmission_meta={"version": 2, "resubmission_status": "most_recent"},

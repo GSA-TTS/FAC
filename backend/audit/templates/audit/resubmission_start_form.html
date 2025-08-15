@@ -29,7 +29,10 @@
                            aria-labelledby="report_id-label"
                            aria-describedby="report_id-hint"
                            value="{{ form_user_input.report_id }}" />
-                    <button class="usa-button margin-y-2" id="continue">Continue</button>
+                    <div hidden id="loader" class="cross-validation-loader margin-top-6">
+                        <img src="{% static 'img/loader.svg' %}" alt="spinner for processing resubmission" />
+                    </div>
+                    <button class="usa-button margin-y-2" id="continue" disable-submit-after-click>Continue</button>
                     <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center"
                        id="cancel"
                        href="{% url 'audit:MySubmissions' %}">Cancel</a>
@@ -37,4 +40,5 @@
             </form>
         </div>
     </div>
+    <script src="{% static 'compiled/js/util.js' %}"></script>
 {% endblock content %}
