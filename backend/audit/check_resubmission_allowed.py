@@ -46,7 +46,7 @@ def check_resubmission_allowed(
     )  # TODO: Remove default value of 0 when all records have versions.
 
     # Further derived from string variables
-    audit_year = int(end_date.split("-")[0])
+    audit_year = end_date.split("-")[0]
 
     # SAC Status must be DISSEMINATED
     if submission_status != STATUS.DISSEMINATED:
@@ -81,7 +81,7 @@ def check_resubmission_allowed(
         # Faster to find these in General and use the report_ids to search SAC
         gen_siblings = General.objects.filter(
             auditee_uei=auditee_uei,
-            audit_year=str(audit_year),
+            audit_year=audit_year,
         )
         report_ids = list(gen_siblings.values_list("report_id", flat=True))
         siblings = SingleAuditChecklist.objects.filter(
