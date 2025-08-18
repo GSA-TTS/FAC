@@ -12,6 +12,7 @@ from dissemination.models import (
     Passthrough,
     SecondaryAuditor,
 )
+from audit.intake_to_dissemination import IntakeToDissemination
 from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS
 from datetime import date
@@ -23,6 +24,9 @@ class Command(BaseCommand):
     """
     Regenerates all dissemination_ records from SingleAuditChecklist.
     Does this one record at a time; can be run while the system is operating.
+
+    Optionally, use `--report_id` to attempt to force the redissemination of a particular record.
+    Useful for debugging.
     """
 
     dissemination_models = [

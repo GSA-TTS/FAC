@@ -291,7 +291,7 @@ class IntakeToDissemination(object):
 
         return formatted_date
 
-    def _determine_resubmission_status(resubmission_version=1, next_report_id=None):
+    def _determine_resubmission_status(self, resubmission_version=1, next_report_id=None):
         """
         Given a version number and the next report ID, determine the current record's resubmission_status.
         Relatively simple, but used more than one place. Potentially updated in the future with more options.
@@ -431,12 +431,8 @@ class IntakeToDissemination(object):
 
         # We only want the version and status from resubmission meta
         # If an in_progress record hasn't picked up resubmission_meta, we use version 1 by default.
-        resubmission_version = resubmission_meta.get("resubmission_version", 1)
-        resubmission_status = (
-            RESUBMISSION_STATUS.MOST_RECENT
-            if resubmission_version > 1
-            else RESUBMISSION_STATUS.ORIGINAL
-        )
+        resubmission_version = resubmission_meta.get("version", 1)
+        resubmission_status = self._determine_resubmission_status(resubmission_version, resubmission_meta.get("next_report_id"))
 
         general = General(
             report_id=self.report_id,
@@ -541,7 +537,7 @@ class IntakeToDissemination(object):
                 "resubmission_status": RESUBMISSION_STATUS.ORIGINAL,
             }
 
-        resubmission_version = resubmission_meta.get("resubmission_version", 1)
+        resubmission_version = resubmission_meta.get("version", 1)
         previous_report_id = resubmission_meta.get("previous_report_id", None)
         next_report_id = resubmission_meta.get("next_report_id", None)
         resubmission_status = self._determine_resubmission_status(

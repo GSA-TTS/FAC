@@ -286,7 +286,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         with transaction.atomic():
             # This needs to be in the DISSEMINATED state in order
             # to be redisseminated. Check that here.
-            if not self.submission_status not in [
+            if self.submission_status not in [
                 STATUS.DISSEMINATED,
                 STATUS.RESUBMITTED,
             ]:
@@ -323,7 +323,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 )
 
             # Clone the record
-            data = model_to_dict(self, fields=[])
+            data = model_to_dict(self)
 
             # Update individual fields
             data["general_information"]["auditee_uei"] = self.auditee_uei
