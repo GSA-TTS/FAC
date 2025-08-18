@@ -2,6 +2,7 @@ from datetime import date
 import logging
 import math
 import time
+from audit.models import SingleAuditChecklist
 from audit.models.constants import RESUBMISSION_STATUS
 from django.core.paginator import Paginator
 from django.shortcuts import render
@@ -31,43 +32,47 @@ default_checked_audit_years = [
     date.today().year - 1,
 ]  # Auto-check this and last year
 
-from audit.models.constants import RESUBMISSION_STATUS
-
 def _get(obj, key, default=None):
     if isinstance(obj, dict):
         return obj.get(key, default)
     return getattr(obj, key, default)
 
-def compute_resubmission_tag(row):
-    """
-    Return: "Most Recent" | "Resubmitted" | None
+def _tag_from_resubmission_fields(status: str, version: str):
+    if not status or not version:
+        return None
 
-    Rules:
-      - Show a tag ONLY if it has resubmission_meta (i.e., it is a resubmission).
-      - MOST_RECENT  -> "Most Recent"
-      - ORIGINAL/DEPRECATED -> "Resubmitted"
-      - Legacy (no resubmission_meta) -> None
-    """
-    meta = _get(row, "resubmission_meta") or None
-    if not meta:
-        return None  # legacy or never-resubmitted
+    status = str(status).lower().strip()
+    version = str(version).lower().strip()
 
-    status = meta.get("resubmission_status")
-    if status == RESUBMISSION_STATUS.MOST_RECENT:
-        return "Most Recent"
-    if status in (RESUBMISSION_STATUS.ORIGINAL, RESUBMISSION_STATUS.DEPRECATED):
+    if status in ("original_submission", "deprecated_via_resubmission") and version:
         return "Resubmitted"
+    elif status == "most_recent" and version:
+        return "Most Recent"
     return None
 
-def populate_resubmission_tag(paginator_page):
-    for row in paginator_page.object_list:
-        tag = compute_resubmission_tag(row)
-        try:
-            setattr(row, "resubmission_tag", tag)  # model instance
-        except Exception:
-            row["resubmission_tag"] = tag          # dict row
-    return paginator_page
+def build_resub_tag_map(paginator_page):
+    """
+    Return a dict: {report_id: tag_or_None} for all rows on this page.
+    Uses dissemination_general.resubmission_status and resubmission_version.
+    """
+    objs = list(paginator_page.object_list)
 
+    # Collect report_ids from current page
+    report_ids = [_get(row, "report_id") for row in objs if _get(row, "report_id")]
+
+    tag_map = {}
+    if not report_ids:
+        return tag_map
+
+    for row in objs:
+        rid = _get(row, "report_id")
+        status = _get(row, "resubmission_status")
+        version = _get(row, "resubmission_version")
+        tag = _tag_from_resubmission_fields(status, version)
+        if rid:
+            tag_map[rid] = tag
+
+    return tag_map
 
 # TODO: Update Post SOC Launch -> Delete Advanced/Search, have 1 search.
 class AdvancedSearch(View):
@@ -166,8 +171,21 @@ class AdvancedSearch(View):
         # If there are results, populate the agency name in cog/over field
         if results_count > 0:
             paginator_results = populate_cog_over_name(paginator_results)
-            paginator_results = populate_resubmission_tag(paginator_results)
+            resub_tag_map = build_resub_tag_map(paginator_results)
+        else:
+            resub_tag_map = {}
 
+        # Attach tag to each result so the template can use result.resubmission_tag
+        for row in paginator_results.object_list:
+            rid = _get(row, "report_id")
+            tag = resub_tag_map.get(rid)
+            try:
+                setattr(row, "resubmission_tag", tag)   # model instance
+            except Exception:
+                try:
+                    row["resubmission_tag"] = tag      # dict-like row
+                except Exception:
+                    pass
 
         context = context | {
             "form_user_input": form_user_input,
@@ -178,6 +196,8 @@ class AdvancedSearch(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
+            "resub_tag_map": resub_tag_map,
+
         }
         time_beginning_render = time.time()
         total_time_ms = int(
@@ -186,6 +206,7 @@ class AdvancedSearch(View):
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
         return render(request, "search.html", context | {"total_time_s": total_time_s})
+    
 
 
 class Search(View):
@@ -284,8 +305,21 @@ class Search(View):
         # If there are results, populate the agency name in cog/over field
         if results_count > 0:
             paginator_results = populate_cog_over_name(paginator_results)
-            paginator_results = populate_resubmission_tag(paginator_results)
+            resub_tag_map = build_resub_tag_map(paginator_results)
+        else:
+            resub_tag_map = {}
 
+        # Attach tag to each result so the template can use result.resubmission_tag
+        for row in paginator_results.object_list:
+            rid = _get(row, "report_id")
+            tag = resub_tag_map.get(rid)
+            try:
+                setattr(row, "resubmission_tag", tag)   # model instance
+            except Exception:
+                try:
+                    row["resubmission_tag"] = tag      # dict-like row
+                except Exception:
+                    pass
 
         context = context | {
             "form_user_input": form_user_input,
@@ -296,6 +330,8 @@ class Search(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
+            "resub_tag_map": resub_tag_map,
+            
         }
         time_beginning_render = time.time()
         total_time_ms = int(
@@ -404,7 +440,22 @@ class AuditSearch(View):
         # populate the agency name in cog/over field
         if results_count > 0:
             paginator_results = audit_populate_cog_over_name(paginator_results)
-            paginator_results = populate_resubmission_tag(paginator_results)
+            resub_tag_map = build_resub_tag_map(paginator_results)
+        else:
+            resub_tag_map = {}
+        
+        # Attach tag to each result so the template can use result.resubmission_tag
+        for row in paginator_results.object_list:
+            rid = _get(row, "report_id")
+            tag = resub_tag_map.get(rid)
+            try:
+                setattr(row, "resubmission_tag", tag)   # model instance
+            except Exception:
+                try:
+                    row["resubmission_tag"] = tag      # dict-like row
+                except Exception:
+                    pass
+
 
         context = context | {
             "form_user_input": form_user_input,
@@ -415,6 +466,8 @@ class AuditSearch(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
+            "resub_tag_map": resub_tag_map,
+
         }
         time_beginning_render = time.time()
         total_time_ms = int(
