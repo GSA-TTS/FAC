@@ -145,7 +145,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            resubmission_meta = sac.resubmission_meta
+            resubmission_meta = sac.resubmission_meta or {}
             previous_report_id = resubmission_meta.get("previous_report_id")
             errors = sac.validate_full()
 
