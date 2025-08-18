@@ -110,10 +110,12 @@ class DisseminationCombined(models.Model):
     resubmission_version = models.BigIntegerField(
         "Resubmission Version",
         # help_text=docs.resubmission_version,  # "Original submissions are version 1. Subsequent resubmissions increment the value."
+        null=True,
     )
     resubmission_status = models.TextField(
         "Resubmission Status (Original, Deprecated, Resubmission)",
         # help_text=docs.resubmission_status,  # "The resubmission status of this record. Displays whether it is a singular original, a resubmission, or a previous version."
+        null=True,
     )
 
     # Agency

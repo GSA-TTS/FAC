@@ -22,11 +22,11 @@ class Resubmission(models.Model):
     )
 
     # Required to be non-null.
-    resubmission_version = models.BigIntegerField(
+    version = models.BigIntegerField(
         "Resubmission Version",
         # help_text=docs.resubmission_version,  # "Original submissions are version 1. Subsequent resubmissions increment the value."
     )
-    resubmission_status = models.CharField(
+    status = models.CharField(
         "Resubmission Status (Original, Deprecated, Resubmission)",
         max_length=30,
         choices=RESUBMISSION_STATUS_CHOICES,

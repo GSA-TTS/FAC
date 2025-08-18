@@ -302,15 +302,15 @@ class IntakeToDissemination(object):
         If there is no next report, this one is ORIGINAL in version 1, and MOST_RECENT in higher versions.
         """
         if next_report_id:
-            resubmission_status = RESUBMISSION_STATUS.DEPRECATED
+            return RESUBMISSION_STATUS.DEPRECATED
+        elif resubmission_version > 1:
+            return RESUBMISSION_STATUS.MOST_RECENT
+        elif resubmission_version == 1:
+            return RESUBMISSION_STATUS.ORIGINAL
+        elif resubmission_version == 0:
+            return RESUBMISSION_STATUS.UNKNOWN
         else:
-            resubmission_status = (
-                RESUBMISSION_STATUS.MOST_RECENT
-                if resubmission_version > 1
-                else RESUBMISSION_STATUS.ORIGINAL
-            )
-
-        return resubmission_status
+            raise ValueError("This SAC has an invalid resubmission_version.")
 
     def load_general(self):
         """
@@ -537,7 +537,7 @@ class IntakeToDissemination(object):
         # If no existing data, use the defaults. Otherwise, pull what does exist.
         if not resubmission_meta:
             resubmission_meta = {
-                "resubmission_version": 1,  # 0, potentially?
+                "version": 1,
                 "resubmission_status": RESUBMISSION_STATUS.ORIGINAL,
             }
 
@@ -552,8 +552,8 @@ class IntakeToDissemination(object):
             report_id=self.loaded_objects["Generals"][
                 0
             ],  # FK to the relevant General object
-            resubmission_version=resubmission_version,
-            resubmission_status=resubmission_status,
+            version=resubmission_version,
+            status=resubmission_status,
             previous_report_id=previous_report_id,
             next_report_id=next_report_id,
         )

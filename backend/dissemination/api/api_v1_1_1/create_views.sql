@@ -311,8 +311,8 @@ create view api_v1_1_1.resubmission as
         gen.auditee_uei,
         gen.audit_year,
         ---
-        resub.resubmission_version,  -- Just version?
-        resub.resubmission_status,  -- Likewise, just status?
+        resub.version,
+        resub.status,
         resub.previous_report_id,
         resub.next_report_id
     from
