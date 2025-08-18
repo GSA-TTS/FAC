@@ -170,8 +170,7 @@ def complete_resubmission(
     source_sac: SingleAuditChecklist, resubmitted_sac: SingleAuditChecklist, USER_OBJ
 ):
     # The new SAC wants to be shifted to a disseminated state.
-    resubmitted_sac.transition_name.append(STATUS.DISSEMINATED)
-    resubmitted_sac.transition_date.append(datetime.now().replace(tzinfo=pytz.utc))
+    append_transition_names(resubmitted_sac)
     resubmitted_sac.submission_status = STATUS.DISSEMINATED
     resubmitted_sac.submitted_by = USER_OBJ
     resubmitted_sac.save(
@@ -208,6 +207,22 @@ def complete_resubmission(
     old_status = resubmitted_sac.redisseminate()
     return old_status and new_status
 
+def append_transition_names(sac: SingleAuditChecklist):
+    """
+    Given a SAC, append transition names and dates to bring it to "disseminated".
+    """
+    sac.transition_name.append(STATUS.AUDITEE_CERTIFIED)
+    sac.transition_date.append(datetime.now().replace(tzinfo=pytz.utc))
+    sac.transition_name.append(STATUS.AUDITOR_CERTIFIED)
+    sac.transition_date.append(datetime.now().replace(tzinfo=pytz.utc))
+    sac.transition_name.append(STATUS.READY_FOR_CERTIFICATION)
+    sac.transition_date.append(datetime.now().replace(tzinfo=pytz.utc))
+    sac.transition_name.append(STATUS.SUBMITTED)
+    sac.transition_date.append(datetime.now().replace(tzinfo=pytz.utc))
+    sac.transition_name.append(STATUS.DISSEMINATED)
+    sac.transition_date.append(datetime.now().replace(tzinfo=pytz.utc))
+
+    return sac
 
 class Command(BaseCommand):
     """
