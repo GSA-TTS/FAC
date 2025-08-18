@@ -207,6 +207,7 @@ def complete_resubmission(
     old_status = resubmitted_sac.redisseminate()
     return old_status and new_status
 
+
 def append_transition_names(sac: SingleAuditChecklist):
     """
     Given a SAC, append transition names and dates to bring it to "disseminated".
@@ -223,6 +224,7 @@ def append_transition_names(sac: SingleAuditChecklist):
     sac.transition_date.append(datetime.now().replace(tzinfo=pytz.utc))
 
     return sac
+
 
 class Command(BaseCommand):
     """

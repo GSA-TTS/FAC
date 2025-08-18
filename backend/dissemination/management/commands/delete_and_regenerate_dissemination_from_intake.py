@@ -12,7 +12,6 @@ from dissemination.models import (
     Passthrough,
     SecondaryAuditor,
 )
-from audit.intake_to_dissemination import IntakeToDissemination
 from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS
 from datetime import date
