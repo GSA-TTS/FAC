@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     """
     Django management command for disseminating an audit.
+    The record must be "stuck" in the "Submitted" state.
     """
 
     def add_arguments(self, parser):

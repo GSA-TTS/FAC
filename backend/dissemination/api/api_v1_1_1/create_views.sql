@@ -284,6 +284,9 @@ create view api_v1_1_1.secondary_auditors as
     order by sa.id
 ;
 
+---------------------------------------
+-- additional eins
+---------------------------------------
 create view api_v1_1_1.additional_eins as
     select
         gen.report_id,
@@ -297,6 +300,27 @@ create view api_v1_1_1.additional_eins as
     where
         gen.report_id = ein.report_id
     order by ein.id
+;
+
+---------------------------------------
+-- resubmission metadata
+---------------------------------------
+create view api_v1_1_1.resubmission as
+    select
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        ---
+        resub.version,
+        resub.status,
+        resub.previous_report_id,
+        resub.next_report_id
+    from
+        dissemination_general gen,
+        dissemination_resubmission resub
+    where
+        gen.report_id = resub.report_id
+    order by resub.id
 ;
 
 -- Specify every field in dissemination_combined, omitting the id.
@@ -340,6 +364,8 @@ create view api_v1_1_1.combined as
         combined.auditor_phone,
         combined.auditor_state,
         combined.auditor_zip,
+        combined.resubmission_version,
+        combined.resubmission_status,
         combined.cognizant_agency,
         combined.data_source,
         combined.date_created,

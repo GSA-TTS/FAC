@@ -49,6 +49,7 @@ class RESUBMISSION_STATUS:
     ORIGINAL = "original_submission"
     MOST_RECENT = "most_recent"
     DEPRECATED = "deprecated_via_resubmission"
+    UNKNOWN = "unknown_resubmission_status"
 
 
 RESUBMISSION_STATUS_CHOICES = (
