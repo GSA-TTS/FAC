@@ -2,7 +2,7 @@
 # FOUNDATION
 ###############################
 
-FROM python:3.12-slim AS foundation
+FROM python:3.12.11-slim-bookworm AS foundation
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -18,7 +18,14 @@ RUN apt-get -yq update && \
         gcc \
         gnupg \
         gnupg2 \
-        postgresql-client \
+        jq \
+        # Make sure the client version
+        # matchse the DB version, locally
+        # and in production. AWD RDS is v15 in 
+        # cloud.gov as of August 2025.
+        postgresql-client-15 \
+        sudo \
+        unzip \
         wget
 
 ###############################
@@ -37,6 +44,16 @@ RUN curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin
     chmod +x /usr/local/bin/mc
 
 ###############################
+# CLOUD FOUNDRY API CLI
+###############################
+RUN wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key \
+  | gpg --dearmor -o /usr/share/keyrings/cli.cloudfoundry.org.gpg \
+  && echo "deb [signed-by=/usr/share/keyrings/cli.cloudfoundry.org.gpg] https://packages.cloudfoundry.org/debian stable main" \
+  | tee /etc/apt/sources.list.d/cloudfoundry-cli.list \
+  && apt update \
+  && apt install cf8-cli
+
+###############################
 # PIP
 ###############################
 FROM storage AS pip
@@ -47,6 +64,7 @@ RUN set -ex && \
     pip install -r /tmp/requirements.txt && \
     pip install -r /tmp/dev-requirements.txt && \
     rm -rf /root/.cache/
+
 
 ###############################
 # NODE
@@ -70,3 +88,5 @@ RUN npm run build
 FROM node AS dev
 WORKDIR /src/
 RUN python manage.py collectstatic
+
+

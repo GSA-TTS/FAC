@@ -23,6 +23,9 @@ class Command(BaseCommand):
     """
     Regenerates all dissemination_ records from SingleAuditChecklist.
     Does this one record at a time; can be run while the system is operating.
+
+    Optionally, use `--report_id` to attempt to force the redissemination of a particular record.
+    Useful for debugging.
     """
 
     dissemination_models = [
@@ -38,33 +41,36 @@ class Command(BaseCommand):
         SecondaryAuditor,
     ]
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--report_id",
+            type=str,
+            help="The ID of the SAC.",
+            default=None,
+        )
+
     def handle(self, *args, **_kwargs):
+        report_id = _kwargs.get("report_id")
+
+        if report_id:
+            try:
+                sac = SingleAuditChecklist.objects.get(report_id=report_id)
+                sac.redisseminate()
+                logger.info(f"Redisseminated: {report_id}")
+                exit(0)
+            except SingleAuditChecklist.DoesNotExist:
+                logger.info(f"No report with report_id found: {report_id}")
+                exit(-1)
+
         logger.info("Re-running dissemination for all records.")
 
         redisseminated = {}
-        # FIXME: This wants to be __in (DISSEMINATED, REDISSEMINATED)
         for year in range(2015, date.today().year + 1):
             logger.info(f"Working year {year}")
             for sac in SingleAuditChecklist.objects.filter(
-                submission_status=STATUS.DISSEMINATED,
+                submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
                 general_information__auditee_fiscal_period_end__startswith=f"{year}",
             ):
                 logger.info(f"Redisseminating {sac.report_id}")
                 sac.redisseminate()
                 redisseminated[sac.report_id] = True
-
-        # Repeat until we've redisseminated everything.
-        # As long as something comes in, we do it again.
-        changed = False
-        while not changed:
-            for year in range(2015, date.today().year + 1):
-                logger.info(f"Re-working year {year}")
-                for sac in SingleAuditChecklist.objects.filter(
-                    submission_status=STATUS.DISSEMINATED,
-                    general_information__auditee_fiscal_period_end__startswith=f"{year}",
-                ):
-                    if sac.report_id not in redisseminated:
-                        logger.info(f"Double-check redisseminating {sac.report_id}")
-                        sac.redisseminate()
-                        changed = True
-                        redisseminated[sac.report_id] = True
