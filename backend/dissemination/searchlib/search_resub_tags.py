@@ -1,5 +1,6 @@
 from typing import Any, Dict, Iterable, Mapping, Optional, Union
 from collections.abc import MutableMapping
+
 Row = Union[object, Mapping[str, Any]]
 
 
