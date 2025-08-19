@@ -141,7 +141,7 @@ REPORTIDS_TO_MODIFIERS = lambda: {
     ],
     # Same modifications as above, but will make a new resub for each
     # See REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY below
-    "2024-06-GSAFAC-0000069337": [
+    "2022-12-GSAFAC-0000001117": [
         modify_auditor_address,
         modify_additional_eins_workbook,
     ],
@@ -163,7 +163,7 @@ REPORTIDS_TO_MODIFIERS = lambda: {
     ],
 }
 
-REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2024-06-GSAFAC-0000069337"]
+REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2022-12-GSAFAC-0000001117"]
 
 
 def complete_resubmission(
@@ -249,6 +249,9 @@ class Command(BaseCommand):
             logger.error(
                 f"Expected {len(reportids_to_modifiers.keys())} SACs, found {len(sacs_for_resubs)}. Make sure to truncate and load tables via menu.bash first."
             )
+            logger.error(f"Found: {[getattr(o, 'report_id') for o in sacs_for_resubs]}")
+            diff = set([getattr(o, 'report_id') for o in sacs_for_resubs]) - set(reportids_to_modifiers.keys())
+            logger.error(f"Missing: {diff}")
             sys.exit(1)
 
         self.delete_prior_resubs(sacs_for_resubs)
