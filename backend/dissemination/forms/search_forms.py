@@ -79,8 +79,8 @@ class AdvancedSearchForm(forms.Form):
         ("False", "N"),
     )
     resubmissions_choices = (
-        ("True", "Include deprecated submissions"),
-        ("False", "Exclude deprecated submissions"),
+        ("True", "Include prior submissions "),
+        ("False", "Exclude prior submissions"),
     )
 
     # Query params
