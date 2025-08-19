@@ -18,7 +18,7 @@ def order_reports_key(r):
 # Exports the same data in CSV format for analysis in a spreadsheet tool.
 def export_sets_as_csv(AY, sets, noisy=False):
     with open(f"{AY}-resubmission-sets-{len(sets)}.csv", "w") as csv_file:
-        wr = csv.writer(csv_file)  # , quoting=csv.QUOTE_ALL
+        wr = csv.writer(csv_file)
         wr.writerow(
             [
                 "set_index",
@@ -139,7 +139,7 @@ def export_sets_as_markdown(AY, sets, noisy=False):
 # lets leave this code here for reference.
 def export_mailmerge(AY, sets, noisy=False):
     with open(f"{AY}-mailmerge-{len(sets)}.csv", "w") as csv_file:
-        wr = csv.writer(csv_file)  # , quoting=csv.QUOTE_ALL
+        wr = csv.writer(csv_file)
         wr.writerow(
             [
                 "audit_year",
