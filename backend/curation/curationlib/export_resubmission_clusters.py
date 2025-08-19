@@ -204,7 +204,7 @@ def export_sets_as_markdown(AY, sets, noisy=False):
 
 def export_mailmerge(AY, sets, noisy=False):
     with open(f"{AY}-mailmerge-{len(sets)}.csv", "w") as csv_file:
-        wr = csv.writer(csv_file)  # , quoting=csv.QUOTE_ALL
+        wr = csv.writer(csv_file)
         wr.writerow(
             [
                 "audit_year",
