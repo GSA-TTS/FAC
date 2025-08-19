@@ -1,5 +1,5 @@
 from typing import Any, Dict, Iterable, Mapping, Optional, Union
-
+from collections.abc import MutableMapping
 Row = Union[object, Mapping[str, Any]]
 
 
@@ -76,7 +76,7 @@ def attach_resubmission_tags(
     for row in rows:
         report_id = _resolve_report_id(row)
         tag = tag_map.get(report_id)
-        if isinstance(row, Mapping):
+        if isinstance(row, MutableMapping):
             row["resubmission_tag"] = tag
         else:
             setattr(row, "resubmission_tag", tag)
