@@ -1,8 +1,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from audit.models import SingleAuditChecklist
 from audit.check_resubmission_allowed import check_resubmission_allowed
+from audit.models.constants import STATUS
+from audit.models import SingleAuditChecklist
 
 
 class ResubmissionStartForm(forms.Form):
@@ -44,7 +45,8 @@ def _validate_report_id_for_resubmission(report_id):
     # See if a previous submission matches with the given report_id.
     try:
         sac = SingleAuditChecklist.objects.get(
-            report_id=report_id, submission_status="disseminated"
+            report_id=report_id,
+            submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
         )
     except SingleAuditChecklist.DoesNotExist:
         raise ValidationError("Audit to resubmit not found.")

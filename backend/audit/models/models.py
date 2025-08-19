@@ -35,6 +35,7 @@ from audit.models.constants import (
     DATA_SOURCE_GSAFAC,
     SAC_SEQUENCE_ID,
     STATUS,
+    STATUS_CHOICES,
     RESUBMISSION_STATUS,
     VALID_DATA_SOURCES,
 )
@@ -56,6 +57,7 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
+    Resubmission,
 )
 from django.utils.timezone import now
 
@@ -278,11 +280,16 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             "SecondaryAuditors": SecondaryAuditor,
             "General": General,
             "Passthrough": Passthrough,
+            "Resubmission": Resubmission,
         }
+        # BEGIN ATOMIC BLOCK
         with transaction.atomic():
             # This needs to be in the DISSEMINATED state in order
             # to be redisseminated. Check that here.
-            if not self.submission_status == STATUS.DISSEMINATED:
+            if self.submission_status not in [
+                STATUS.DISSEMINATED,
+                STATUS.RESUBMITTED,
+            ]:
                 logger.error("Trying to resubmit an audit that is not disseminated.")
                 raise AdministrativeOverrideError
             try:
@@ -299,15 +306,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 logger.error(f"errors in redissemination: {err}")
                 return {"errors": [err]}
             return True
+        # END ATOMIC BLOCK
         return False
 
     # Resubmission SAC Creations
     # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
     def initiate_resubmission(self, user=None):
+        # BEGIN ATOMIC BLOCK
         with transaction.atomic():
             if SingleAuditChecklist.objects.filter(
                 resubmission_meta__previous_report_id=self.report_id,
-                submission_status=STATUS.DISSEMINATED,
+                submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
             ).exists():
                 raise ValidationError(
                     f"A resubmission already exists for report_id {self.report_id}."
@@ -370,6 +379,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 )
 
             return resub
+        # END ATOMIC BLOCK
 
     def assign_cog_over(self):
         """
@@ -426,23 +436,14 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     def get_friendly_status(self) -> str:
         """Return the friendly version of submission_status."""
-        return dict(self.STATUS_CHOICES)[self.submission_status]
+        return dict(STATUS_CHOICES)[self.submission_status]
 
     def get_statuses(self) -> type[STATUS]:
         """Return all possible statuses."""
         return STATUS
 
     # Constants:
-    STATUS_CHOICES = (
-        (STATUS.IN_PROGRESS, "In Progress"),
-        (STATUS.FLAGGED_FOR_REMOVAL, "Flagged for Removal"),
-        (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
-        (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
-        (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
-        (STATUS.CERTIFIED, "Certified"),
-        (STATUS.SUBMITTED, "Submitted"),
-        (STATUS.DISSEMINATED, "Disseminated"),
-    )
+    STATUS_CHOICES = STATUS_CHOICES  # Wants to be a member of the model, but wants to be defined with the constants.
 
     USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
         ("state", _("State")),

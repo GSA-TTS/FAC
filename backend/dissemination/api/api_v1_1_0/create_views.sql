@@ -183,7 +183,7 @@ create view api_v1_1_0.general as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
-        ---
+        --- auditee
         gen.auditee_certify_name,
         gen.auditee_certify_title,
         gen.auditee_contact_name,
@@ -223,6 +223,7 @@ create view api_v1_1_0.general as
         gen.fac_accepted_date,
         gen.fy_end_date,
         gen.fy_start_date,
+        --- audit info and metadata
         gen.audit_type,
         gen.gaap_results,
         gen.sp_framework_basis,
@@ -244,6 +245,8 @@ create view api_v1_1_0.general as
         gen.data_source,
         gen.is_aicpa_audit_guide_included,
         gen.is_additional_ueis,
+        gen.resubmission_version,
+        gen.resubmission_status,
         CASE EXISTS(SELECT ein.report_id FROM dissemination_additionalein ein WHERE ein.report_id = gen.report_id)
             WHEN FALSE THEN 'No'
             ELSE 'Yes'
@@ -297,6 +300,24 @@ create view api_v1_1_0.additional_eins as
     where
         gen.report_id = ein.report_id
     order by ein.id
+;
+
+create view api_v1_1_0.resubmission as
+    select
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        ---
+        resub.version,
+        resub.status,
+        resub.previous_report_id,
+        resub.next_report_id
+    from
+        dissemination_general gen,
+        dissemination_resubmission resub
+    where
+        gen.report_id = resub.report_id
+    order by resub.id
 ;
 
 commit;
