@@ -137,9 +137,7 @@ def write_row(s, md, row_tag, key_fun):
         md.write("| ")
         md.write(key_fun(r))
 
-        if FIRST:
-            pass
-        elif LAST:
+        if LAST and not FIRST:
             md.write(" |")
     md.write(NEWLINE)
 
