@@ -250,7 +250,9 @@ class Command(BaseCommand):
                 f"Expected {len(reportids_to_modifiers.keys())} SACs, found {len(sacs_for_resubs)}. Make sure to truncate and load tables via menu.bash first."
             )
             logger.error(f"Found: {[getattr(o, 'report_id') for o in sacs_for_resubs]}")
-            diff = set([getattr(o, 'report_id') for o in sacs_for_resubs]) - set(reportids_to_modifiers.keys())
+            diff = set([getattr(o, "report_id") for o in sacs_for_resubs]) - set(
+                reportids_to_modifiers.keys()
+            )
             logger.error(f"Missing: {diff}")
             sys.exit(1)
 
