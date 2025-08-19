@@ -80,6 +80,7 @@ def run_search(form_data, is_soc=False):
             "major_program": form_data["major_program"],
             "passthrough_name": form_data["passthrough_name"],
             "type_requirement": form_data["type_requirement"],
+            "resubmissions": form_data["resubmissions"],
         }
         search_parameters.update(advanced_parameters)
 
