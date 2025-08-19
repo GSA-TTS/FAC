@@ -131,15 +131,8 @@ def write_row(s, md, row_tag, key_fun):
 
     for ndx, r in enumerate(sorted(s, key=order_reports_key)):
         # Printing data is annoying.
-        if ndx == 0:
-            FIRST = True
-        else:
-            FIRST = False
-
-        if ndx == len(s) - 1:
-            LAST = True
-        else:
-            LAST = False
+        FIRST = ndx == 0
+        LAST = ndx == len(s) - 1
 
         md.write("| ")
         md.write(key_fun(r))
