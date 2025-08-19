@@ -50,6 +50,8 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 		dg.auditor_phone,
 		dg.auditor_state,
 		dg.auditor_zip,
+		dg.resubmission_version,
+        dg.resubmission_status,
 		dg.cognizant_agency,
 		dg.data_source,
 		dg.date_created,

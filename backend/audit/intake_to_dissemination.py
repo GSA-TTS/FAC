@@ -2,6 +2,10 @@ import logging
 import pytz
 from django.db import IntegrityError
 
+from audit.intakelib.transforms.xform_resize_award_references import _format_reference
+from audit.models.constants import RESUBMISSION_STATUS
+from audit.utils import Util
+
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -12,11 +16,10 @@ from dissemination.models import (
     General,
     Note,
     Passthrough,
+    Resubmission,
     SecondaryAuditor,
 )
-from audit.utils import Util
 
-from audit.intakelib.transforms.xform_resize_award_references import _format_reference
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +54,7 @@ class IntakeToDissemination(object):
             "Notes": self.load_notes,
             "AdditionalUEIs": self.load_additional_ueis,
             "AdditionalEINs": self.load_additional_eins,
+            "Resubmission": self.load_resubmission,
         }
         for _, load_method in load_methods.items():
             try:
@@ -287,6 +291,27 @@ class IntakeToDissemination(object):
 
         return formatted_date
 
+    def _determine_resubmission_status(
+        self, resubmission_version=1, next_report_id=None
+    ):
+        """
+        Given a version number and the next report ID, determine the current record's resubmission_status.
+        Relatively simple, but used more than one place. Potentially updated in the future with more options.
+
+        If there is a next report, this one is DEPRECATED.
+        If there is no next report, this one is ORIGINAL in version 1, and MOST_RECENT in higher versions.
+        """
+        if next_report_id:
+            return RESUBMISSION_STATUS.DEPRECATED
+        elif resubmission_version > 1:
+            return RESUBMISSION_STATUS.MOST_RECENT
+        elif resubmission_version == 1:
+            return RESUBMISSION_STATUS.ORIGINAL
+        elif resubmission_version == 0:
+            return RESUBMISSION_STATUS.UNKNOWN
+        else:
+            raise ValueError("This SAC has an invalid resubmission_version.")
+
     def load_general(self):
         """
         Transforms general_information and other content into the structure required for
@@ -294,6 +319,7 @@ class IntakeToDissemination(object):
         dissemination.models.General instance.
         """
         general_information = self.single_audit_checklist.general_information
+        resubmission_meta = self.single_audit_checklist.resubmission_meta or {}
         audit_information = self.single_audit_checklist.audit_information
         auditee_certification = self.single_audit_checklist.auditee_certification
         auditor_certification = self.single_audit_checklist.auditor_certification or {}
@@ -405,6 +431,13 @@ class IntakeToDissemination(object):
         for key in audit_keys_opt_bool:
             audit_data[key] = Util.optional_bool(audit_information.get(key, None))
 
+        # We only want the version and status from resubmission meta
+        # If an in_progress record hasn't picked up resubmission_meta, we use version 1 by default.
+        resubmission_version = resubmission_meta.get("version", 1)
+        resubmission_status = self._determine_resubmission_status(
+            resubmission_version, resubmission_meta.get("next_report_id")
+        )
+
         general = General(
             report_id=self.report_id,
             auditee_certify_name=auditee_certify_name,
@@ -424,6 +457,8 @@ class IntakeToDissemination(object):
             type_audit_code="UG",
             is_public=is_public,
             data_source=self.single_audit_checklist.data_source,
+            resubmission_version=resubmission_version,
+            resubmission_status=resubmission_status,
             **general_data,
             **audit_data,
         )
@@ -495,3 +530,32 @@ class IntakeToDissemination(object):
                 ein_objs.append(ein)
         self.loaded_objects["AdditionalEINs"] = ein_objs
         return ein_objs
+
+    def load_resubmission(self):
+        resubmission_meta = self.single_audit_checklist.resubmission_meta or {}
+
+        # If no existing data, use the defaults. Otherwise, pull what does exist.
+        if not resubmission_meta:
+            resubmission_meta = {
+                "version": 1,
+                "resubmission_status": RESUBMISSION_STATUS.ORIGINAL,
+            }
+
+        resubmission_version = resubmission_meta.get("version", 1)
+        previous_report_id = resubmission_meta.get("previous_report_id", None)
+        next_report_id = resubmission_meta.get("next_report_id", None)
+        resubmission_status = self._determine_resubmission_status(
+            resubmission_version, next_report_id
+        )
+
+        resubmission = Resubmission(
+            report_id=self.loaded_objects["Generals"][
+                0
+            ],  # FK to the relevant General object
+            version=resubmission_version,
+            status=resubmission_status,
+            previous_report_id=previous_report_id,
+            next_report_id=next_report_id,
+        )
+        self.loaded_objects["Resubmissions"] = [resubmission]
+        return [resubmission]
