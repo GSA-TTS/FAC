@@ -43,7 +43,9 @@
                             {% include "search_filters/passthrough-name.html" %}
                             {% include "search_filters/federal-program-name.html" %}
                             {% include "search_filters/report-id.html" %}
+                            {% if can_view_resubmissions %}
                             {% include "search_filters/resubmissions.html" %}
+                            {% endif %}
                         {% else %}
                             {% comment %} Basic search contains filters only applicable to the general table. {% endcomment %}
                             {% include "search_filters/audit-year.html" %}

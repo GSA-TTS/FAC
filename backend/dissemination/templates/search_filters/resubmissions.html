@@ -10,7 +10,12 @@
                     id="resubmissions-{{ text }}"
                     name="resubmissions" type="radio"
                     value={{ value }}
-                    {% if value in form_user_input.resubmissions %}checked{% endif %} />
+                    {% if form_user_input.resubmissions %}
+                        {% if value in form_user_input.resubmissions %}checked{% endif %}
+                    {% elif form.resubmissions.initial == value %}
+                        checked
+                    {% endif %}
+                    />
             <label class="usa-radio__label" for="resubmissions-{{ text }}">{{ text }}</label>
         </div>
     {% endfor %}

@@ -8,3 +8,7 @@ def can_read_tribal(user):
         ).count()
         > 0
     )
+
+
+def is_federal_user(user):
+    return user.is_authenticated and can_read_tribal(user)

@@ -79,8 +79,8 @@ class AdvancedSearchForm(forms.Form):
         ("False", "N"),
     )
     resubmissions_choices = (
-        ("True", "Include prior submissions "),
-        ("False", "Exclude prior submissions"),
+        ("include", "Include prior submissions "),
+        ("exclude", "Exclude prior submissions"),
     )
 
     # Query params
@@ -110,7 +110,7 @@ class AdvancedSearchForm(forms.Form):
     uei_or_ein = forms.CharField(required=False)
     resubmissions = forms.ChoiceField(
         choices=resubmissions_choices,
-        initial="False",  # Why doesn't this work?
+        initial="include",
         required=True,
     )
 

@@ -47,7 +47,7 @@ def is_advanced_search(params_dict):
     return params_dict.get("advanced_search_flag", False)
 
 
-def search(params):
+def search(request, params):
     """
     Given any (or no) search fields, build and execute a query on the General table and return the results.
     Empty searches return everything.
@@ -73,7 +73,7 @@ def search(params):
         results = search_major_program(results, params)
         results = search_passthrough_name(results, params)
         results = search_type_requirement(results, params)
-        results = search_resubmissions(results, params)
+        results = search_resubmissions(request, results, params)
     else:
         logger.info("search Searching `General`")
         results = search_general(General, params)

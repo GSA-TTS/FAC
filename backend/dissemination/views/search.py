@@ -23,6 +23,7 @@ from dissemination.searchlib.search_utils import (
 )
 from dissemination.views.utils import include_private_results
 from support.decorators import newrelic_timing_metric
+from users.permissions import is_federal_user
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,7 @@ class AdvancedSearch(View):
                 "state_abbrevs": STATE_ABBREVS,
                 "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
                 "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                "can_view_resubmissions": is_federal_user(request.user),
             },
         )
 
@@ -76,6 +78,7 @@ class AdvancedSearch(View):
             "state_abbrevs": STATE_ABBREVS,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
             "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
+            "can_view_resubmissions": is_federal_user(request.user),
         }
 
         # Obtain cleaned form data.
@@ -102,7 +105,7 @@ class AdvancedSearch(View):
         logger.info(f"Advanced searching on fields: {form_data}")
 
         # Generate results on valid user input.
-        results = run_search(form_data)
+        results = run_search(request, form_data)
         results_count = results.count()
 
         # Reset page number to one if the value already surpasses the number of feasible pages.
