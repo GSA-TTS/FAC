@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, Mapping, Optional
+from typing import Dict, Iterable, Mapping, Optional
 from collections.abc import MutableMapping
 from dissemination.models import General
 from audit.models.constants import RESUBMISSION_STATUS
@@ -16,11 +16,11 @@ def _tag_from_resubmission_fields(row: General) -> Optional[str]:
     return None
 
 
-def build_resub_tag_map(rows: Iterable[General]) -> Dict[Any, Optional[str]]:
+def build_resub_tag_map(rows: Iterable[General]) -> Dict[str, Optional[str]]:
     """
     Builds a mapping of report_id → tag using already-loaded data from general search results.
     """
-    tag_map: Dict[Any, Optional[str]] = {}
+    tag_map: Dict[str, Optional[str]] = {}
 
     for row in rows:
         tag = _tag_from_resubmission_fields(row)
@@ -31,7 +31,7 @@ def build_resub_tag_map(rows: Iterable[General]) -> Dict[Any, Optional[str]]:
 
 
 def attach_resubmission_tags(
-    rows: Iterable[General], tag_map: Mapping[Any, Optional[str]]
+    rows: Iterable[General], tag_map: Mapping[str, Optional[str]]
 ) -> None:
     """
     Injects .resubmission_tag or ['resubmission_tag'] into each row based on the tag_map.
