@@ -29,60 +29,101 @@
       {% else %}
       <div class="grid-row">
         <div class="tablet:grid-col">
-          <h3>{{r1}}</h3>
+          <h3>Field</h3>
         </div>
         <div class="tablet:grid-col">
-          <h3>{{r2}}</h3>
+          <h3>Report {{r1|slice:"15:"}}</h3>
         </div>
-      </div>
-      <div class="grid-row">
         <div class="tablet:grid-col">
-        <!-- if it is a dictionary section -->
-        {% if section in "general_information,audit_information" %}
-          {% for item in changed.in_r1 %}
-            {% for key, value in item.items %}
-              <div class="grid-row">
-                <div class="tablet:grid-col">
-                  <b>{{key | repl:"_| " | title}}</b>
-                </div>
-                <div class="tablet:grid-col">
-                  {{value}}
-                </div>
-              </div>          
-            {% endfor %}
-          {% endfor %}
-        {% else %}
-            <ul>
-              {% for item in changed.in_r1 %}
-                <li>{{item}}</li>
-              {% endfor %}
-            </ul>
+          <h3>Report {{r2|slice:"15:"}}</h3>
+        </div>
+      </div> <!-- Header row end -->
+      {% if changed.in_r1|length > 0 %}
+        <div class="grid-row">
+          <div class=""tablet:grid-col"><h4>In first report</h4></div>
+        </div>
+      {% endif %}
+      {% for d in changed.in_r1|dictsort:"key" %}
+        {% comment %} {'key': 'auditee_address_line_1', 'from': '143 East 9th Avenue', 'to': '143 E 9TH AVENUE'} {% endcomment %}
+        <div class="grid-row">
+          <div class="tablet:grid-col">
+            {{d.key|repl:"_| "|title}}
+          </div>
+          <div class="tablet:grid-col">
+            {% if d.from is None %}
+              No value
+            {% else %}
+              {{d.from}}
+            {% endif %}
+          </div>
+          <div class="tablet:grid-col">
+            {% if d.to is None %}
+              No value
+            {% else %}
+              {{d.to}}
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+      {% if changed.in_r2|length > 0 %}
+        <div class="grid-row">
+          <div class=""tablet:grid-col"><h4>In second report</h4></div>
+        </div>
+      {% endif %}
+      {% for d in changed.in_r2|dictsort:"key" %}
+        <div class="grid-row">
+          <div class="tablet:grid-col">
+            {{d.key|repl:"_| "|title}}
+          </div>
+          <div class="tablet:grid-col">
+            {% if d.from == None %}
+              No value
+            {% else %}
+              {{d.from}}
+            {% endif %}
+          </div>
+          <div class="tablet:grid-col">
+            {% if d.to == None %}
+              No value
+            {% else %}
+              {{d.to}}
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+      {% if changed.in_both|length > 0 %}
+        <div class="grid-row">
+          <div class=""tablet:grid-col"><h4>Changed from first to second report</h4></div>
+        </div>
+      {% endif %}
+      {% for d in changed.in_both|dictsort:"key" %}
+        <div class="grid-row">
+          <div class="tablet:grid-col">
+            {{d.key|repl:"_| "|title}}
+          </div>
+          {% if d.from == d.to %}
+          <div class="tablet:grid-col"></div>
+          <div class="tablet:grid-col"></div>
+          {% else %}
+          <div class="tablet:grid-col">
+            {% if d.from == None %}
+              No value
+            {% else %}
+              {{d.from}}
+            {% endif %}
+          </div>
+          <div class="tablet:grid-col">
+            {% if d.to == None %}
+              No value
+            {% else %}
+              {{d.to}}
+            {% endif %}
+          </div>
         {% endif %}
+        </div> <!-- end row -->
+      {% endfor %}
 
-        </div>
-        <div class="tablet:grid-col">
-        {% if section in "general_information,audit_information" %}
-          {% for item in changed.in_r2 %}
-            {% for key, value in item.items %}
-              <div class="grid-row">
-                <div class="tablet:grid-col">
-                  <b>{{key | repl:"_| " | title}}</b>
-                </div>
-                <div class="tablet:grid-col">
-                  {{value}}
-                </div>
-              </div>          
-            {% endfor %}
-          {% endfor %}
-        {% else %}
-            <ul>
-              {% for item in changed.in_r1 %}
-                <li>{{item}}</li>
-              {% endfor %}
-            </ul>
-        {% endif %}
-      </div>
-    </div>
+
       {% endif %}
     {% endfor %}
 </div>

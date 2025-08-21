@@ -31,3 +31,8 @@ def repl(string, orig_new):
 @register.filter
 def get_type(value):
     return type(value)
+
+
+@register.filter
+def split_string(value, char):
+    return value.split(char)

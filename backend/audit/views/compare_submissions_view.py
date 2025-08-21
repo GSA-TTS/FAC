@@ -64,7 +64,9 @@ class CompareSubmissionsView(generic.View):
             context = context | {"nice_names": nice_names}
             context = context | {"r1": report_id_1}
             context = context | {"r2": report_id_2}
-            logger.info(context)
+
+            print(context)
+
             return render(request, "audit/compare_submissions.html", context)
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied(

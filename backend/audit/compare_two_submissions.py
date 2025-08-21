@@ -5,46 +5,88 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+#########################################
+# The first set of functions compare dictionary-based
+# fields from the SAC. This would be general_info and
+# audit_info, for example.
+
 
 # s1 ^ s2 is roughly (s1 - s2) U (s2 - s1) if needed.
 def in_first_not_second(d1: dict, d2: dict):
     differences = []
+    d1 = d1 or {}
+    d2 = d2 or {}
     for k, v in d1.items():
-        if k in d2 and d1[k] == d2[k]:
+        if k in d2:
             continue
-        elif k in d2 and d1[k] != d2[k]:
-            differences.append({k: v})
         else:  # k not in d2:
-            differences.append({k: v})
+            differences.append({"key": k, "from": v, "to": None})
     return differences
 
 
 def in_second_not_first(d1: dict, d2: dict):
     differences = []
+    d1 = d1 or {}
+    d2 = d2 or {}
     for k, v in d2.items():
-        if k in d1 and d2[k] == d1[k]:
+        if k in d1:
             continue
-        elif k in d1 and d2[k] != d1[k]:
-            differences.append({k: v})
         else:  # k not in d1
-            differences.append({k: v})
+            differences.append({"key": k, "from": v, "to": None})
     return differences
 
 
-# The `in_*_not_*` functions return sets; we want dictionaries.
-# def set_tuples_to_dict(st):
-#     # Given a set containing tuples, convert it to a dict.
-#     res = {}
-#     for o in st:
-#         res[o[0]] = o[1]
-#     return res
+def in_both(d1: dict, d2: dict):
+    both = []
+    d1 = d1 or {}
+    d2 = d2 or {}
+    for k in d1.keys():
+        if k in d2 and d1.get(k, None) == d2.get(k, None):
+            # Unchanged; skip
+            continue
+        elif k in d2 and d1.get(k, None) != d2.get(k, None):
+            both.append({"key": k, "from": d1[k], "to": d2[k]})
+        else:
+            continue
+    return both
+
+
+# These are dictionaries
+def analyze_pair(d1, d2):
+    # First, we find what is in one or the other.
+    fns = in_first_not_second(d1, d2)
+    snf = in_second_not_first(d1, d2)
+    both = in_both(d1, d2)
+    if fns == {} and snf == {} and both == {}:
+        return {"status": "same"}
+    return {
+        "status": "changed",
+        "in_r1": sorted(fns, key=lambda d: d["key"]),
+        "in_r2": sorted(snf, key=lambda d: d["key"]),
+        "in_both": sorted(both, key=lambda d: d["key"]),
+    }
+
+
+# Compare a given JSON field in the SAC object.
+def compare_dictionary_fields(
+    sac1: SingleAuditChecklist,
+    sac2: SingleAuditChecklist,
+    column: str,
+):
+    if getattr(sac1, column) == getattr(sac2, column):
+        return {"status": "same"}
+    else:
+        res = analyze_pair(
+            getattr_default(sac1, column, {}), getattr_default(sac2, column, {})
+        )
+        return res
 
 
 def getattr_default(obj, key, default=None):
-    res = getattr(obj, key)
-    if res:
+    try:
+        res = getattr(obj, key)
         return res
-    else:
+    except AttributeError:
         return default
 
 
@@ -56,9 +98,12 @@ def deep_getattr(o, lok, default=None):
             return default
         else:
             if isinstance(oprime, dict):
-                oprime = oprime.get(key, {})
+                oprime = oprime.get(key, default)
             else:
-                oprime = getattr(oprime, key)
+                try:
+                    oprime = getattr(oprime, key)
+                except AttributeError:
+                    oprime = default
     return oprime
 
 
@@ -90,13 +135,10 @@ def compare_lists_of_objects(
     if map1 == map2:
         return {"status": "same"}
     else:
-        res = {
-            "status": "changed",
-            "in_r1": list(),
-            "in_r2": list(),
-        }
-        # For each hash in the first map, if it is in the second map,
-        # skip it. That means the values are the same.
+        res = {"status": "changed", "in_r1": list(), "in_r2": list(), "in_both": list()}
+        # I now want to go through the hash maps.
+        # If the key appears in both, we want to skip it.
+        # That is because the hash is identical.
         for h1, o1 in map1.items():
             if h1 in map2:
                 continue
@@ -104,7 +146,8 @@ def compare_lists_of_objects(
                 # If they're different, then we'll put that into the
                 # first map. That means it is present in the first submission,
                 # but not the second.
-                res["in_r1"].append(extract_fun(o1))
+                v = extract_fun(o1)
+                res["in_r1"].append({"key": v, "from": v, "to": None})
         # For each in the second, do a reverse check.
         for h2, o2 in map2.items():
             # If it is in both, skip.
@@ -114,33 +157,60 @@ def compare_lists_of_objects(
                 # If it is different in R2, keep it. We may end up
                 # with the same object in both (because it is present in both,
                 # but the object changed in some way), which we'll handle in a sec.
-                res["in_r2"].append(extract_fun(o2))
+                v = extract_fun(o2)
+                res["in_r2"].append({"key": v, "from": None, "to": v})
 
-    # Sort things.
-    res["in_r1"] = sorted(res["in_r1"])
-    res["in_r2"] = sorted(res["in_r2"])
+    # Now, if we find the `from` from r1 in the `to` of r2, we need to move it to
+    # `both`, and remove it from the other dictionaries.
+    from_in_r1 = set([o["from"] for o in res["in_r1"]])
+    to_in_r2 = set([o["to"] for o in res["in_r2"]])
+    in_both = from_in_r1.union(to_in_r2)
+
+    res["in_r1"] = list(filter(lambda o: o["from"] not in in_both, res["in_r1"]))
+    res["in_r2"] = list(filter(lambda o: o["to"] not in in_both, res["in_r2"]))
+    res["in_both"] = list(map(lambda s: {"key": s, "from": s, "to": s}, in_both))
 
     return res
 
 
-# Compare a given JSON field in the SAC object.
-def compare_dictionary_fields(
-    sac1: SingleAuditChecklist,
-    sac2: SingleAuditChecklist,
-    column: str,
-):
-    if getattr(sac1, column) == getattr(sac2, column):
-        return {"status": "same"}
+def report_id_to_sac(rid):
+    if isinstance(rid, str):
+        return SingleAuditChecklist.objects.get(report_id=rid)
+    elif isinstance(rid, SingleAuditChecklist):
+        return rid
     else:
-        return {
-            "status": "changed",
-            "in_r1": in_first_not_second(
-                getattr_default(sac1, column, {}), getattr_default(sac2, column, {})
-            ),
-            "in_r2": in_second_not_first(
-                getattr_default(sac1, column, {}), getattr_default(sac2, column, {})
-            ),
-        }
+        logger.error(f"{rid} is not a report_id string")
+        return None
+
+
+def are_two_sacs_identical(sac1, sac2):
+    fields = [
+        "submission_status",
+        "data_source",
+        # "transition_name",
+        # "transition_date",
+        "report_id",
+        "audit_type",
+        "general_information",
+        "audit_information",
+        "federal_awards",
+        "corrective_action_plan",
+        "findings_text",
+        "findings_uniform_guidance",
+        "additional_ueis",
+        "additional_eins",
+        "secondary_auditors",
+        "notes_to_sefa",
+        "tribal_data_consent",
+        "cognizant_agency",
+        "oversight_agency",
+    ]
+    they_are_the_same = True
+    for field in fields:
+        if getattr_default(sac1, field, None) != getattr_default(sac2, field, None):
+            they_are_the_same = False
+            break
+    return they_are_the_same
 
 
 # We want to take two report IDs, and return something that looks like
@@ -157,27 +227,26 @@ def compare_dictionary_fields(
 # https://miguendes.me/the-best-way-to-compare-two-dictionaries-in-python
 # This walks a JSON tree and finds the differences, and nicely spells them out.
 def compare_report_ids(rid_1, rid_2):
-    if isinstance(rid_1, str) and isinstance(rid_2, str):
-        sac_r1 = SingleAuditChecklist.objects.get(report_id=rid_1)
-        sac_r2 = SingleAuditChecklist.objects.get(report_id=rid_2)
-    elif isinstance(rid_1, SingleAuditChecklist) and isinstance(
-        rid_2, SingleAuditChecklist
-    ):
-        sac_r1 = rid_1
-        sac_r2 = rid_2
-    else:
-        print("ERROR DANGER WILL ROBINSON")
+    sac_r1 = report_id_to_sac(rid_1)
+    sac_r2 = report_id_to_sac(rid_2)
+    if sac_r1 is None or sac_r2 is None:
+        logger.error(
+            f"compare_report_ids expects two report ID strings or two SAC objects, given {sac_r1} and {sac_r2}"
+        )
+        return {"status": "error"}
+
+    # Do an early check, and bail if the same.
+    if are_two_sacs_identical(sac_r1, sac_r2):
+        return {"status": "identical"}
 
     summary = {}
     ###############
     # general_information
-    logger.info("general_information")
     res = compare_dictionary_fields(sac_r1, sac_r2, "general_information")
     summary["general_information"] = res
 
     ###############
     # audit_information
-    logger.info("audit_information")
     res = compare_dictionary_fields(sac_r1, sac_r2, "audit_information")
     summary["audit_information"] = res
 
