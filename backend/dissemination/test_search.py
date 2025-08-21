@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model
 
+from audit.models.constants import RESUBMISSION_STATUS
 from dissemination.models import (
     DisseminationCombined,
     Finding,
@@ -17,6 +18,7 @@ from dissemination.search import (
     is_advanced_search,
 )
 from dissemination.test_materialized_view_builder import TestMaterializedViewBuilder
+from users.models import Permission, UserPermission
 
 from model_bakery import baker
 
@@ -903,6 +905,44 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         }
         results = search(self.request, params)
         self.assertEqual(len(results), 2)
+
+    def test_search_resubmissions(self):
+        """
+        Correctly filter out resubmissions based on form selections and user privileges
+        """
+        general_deprecated = baker.make(
+            General,
+            is_public=True,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
+        )
+        baker.make(FederalAward, report_id=general_deprecated)
+
+        general_most_recent = baker.make(
+            General,
+            is_public=True,
+            resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
+        )
+        baker.make(FederalAward, report_id=general_most_recent)
+
+        self.refresh_materialized_view()
+
+        # Not a Fed, so can only see most recent
+        params = {"resubmissions": "include", "advanced_search_flag": True}
+        results = search(self.request, params)
+        self.assertEqual(len(results), 1)
+
+        # Now a Fed, so can also see deprecated
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(
+            UserPermission, user=self.user, email=self.user.email, permission=permission
+        )
+        results = search(self.request, params)
+        self.assertEqual(len(results), 2)
+
+        # A Fed, but excluding deprecated via filter
+        params = {"form.resubmissions": "exclude", "advanced_search_flag": True}
+        results = search(self.request, params)
+        self.assertEqual(len(results), 1)
 
 
 class SearchSortTests(TestCase):
