@@ -56,7 +56,7 @@ def deep_getattr(o, lok, default=None):
             return default
         else:
             if isinstance(oprime, dict):
-                oprime = oprime[key]
+                oprime = oprime.get(key, {})
             else:
                 oprime = getattr(oprime, key)
     return oprime

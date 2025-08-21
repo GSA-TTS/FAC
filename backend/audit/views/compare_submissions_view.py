@@ -30,8 +30,19 @@ logger = logging.getLogger(__name__)
 #     "tribal_data_consent": "Tribal Data Consent",
 # }
 
+# For examples
+# https://github.com/GSA-TTS/FAC/issues/5102#issuecomment-3065360843
+
+# Two very similar
 # http://localhost:8000/audit/compare/2023-12-GSAFAC-0000058119/2023-12-GSAFAC-0000065436
+# Two completely different (not actually resubs)
 # http://localhost:8000/audit/compare/2023-12-GSAFAC-0000058119/2023-09-GSAFAC-0000016690
+# Here's one that is a resub, but has some interesting changes
+# http://localhost:8000/audit/compare/2022-09-CENSUS-0000258487/2022-09-CENSUS-0000258486
+# Ooh. Interesting. They were missing a section? Seems odd.
+# http://localhost:8000/audit/compare/2023-09-GSAFAC-0000046021/2023-09-GSAFAC-0000040598
+
+# http://localhost:8000/audit/compare/2023-03-GSAFAC-0000000881/2023-03-GSAFAC-0000007892
 
 
 class CompareSubmissionsView(generic.View):

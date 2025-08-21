@@ -38,7 +38,7 @@
       <div class="grid-row">
         <div class="tablet:grid-col">
         <!-- if it is a dictionary section -->
-        {% if section in "general_information,audit_info" %}
+        {% if section in "general_information,audit_information" %}
           {% for item in changed.in_r1 %}
             {% for key, value in item.items %}
               <div class="grid-row">
@@ -61,7 +61,7 @@
 
         </div>
         <div class="tablet:grid-col">
-        {% if section in "general_information,audit_info" %}
+        {% if section in "general_information,audit_information" %}
           {% for item in changed.in_r2 %}
             {% for key, value in item.items %}
               <div class="grid-row">
