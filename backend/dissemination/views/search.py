@@ -221,7 +221,7 @@ class Search(View):
         logger.info(f"Searching on fields: {form_data}")
 
         # Generate results on valid user input.
-        results = run_search(form_data)
+        results = run_search(request, form_data)
         results_count = results.count()
 
         # Reset page to one if the page number surpasses how many pages there actually are
@@ -339,7 +339,7 @@ class AuditSearch(View):
         logger.info(f"Searching on fields: {form_data}")
 
         # Generate results on valid user input.
-        results = run_search(form_data, True)
+        results = run_search(request, form_data, True)
         results_count = results.count()
 
         # Reset page to one if the page number surpasses how many pages there actually are

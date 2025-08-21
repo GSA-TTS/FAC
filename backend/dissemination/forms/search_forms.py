@@ -111,7 +111,7 @@ class AdvancedSearchForm(forms.Form):
     resubmissions = forms.ChoiceField(
         choices=resubmissions_choices,
         initial="include",
-        required=True,
+        required=False,
     )
 
     # Display params

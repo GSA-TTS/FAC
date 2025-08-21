@@ -211,7 +211,7 @@ class MultipleSummaryReportDownloadView(View):
                 raise ValidationError("Form error in Search POST.")
 
             include_private = include_private_results(request)
-            results = run_search(form_data, use_audit)
+            results = run_search(request, form_data, use_audit)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:
@@ -260,7 +260,7 @@ class FindingsSummaryReportDownloadView(FederalAccessRequiredMixin, View):
                 form_data["advanced_search_flag"] = True
             else:
                 raise ValidationError("Form error in Search POST.")
-            results = run_search(form_data)
+            results = run_search(request, form_data)
             # We're not worried about row limits here
             results = results[
                 :FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT
