@@ -11,41 +11,43 @@
  'findings_uniform_guidance': {'status': 'same'}, 
  'additional_ueis': {'status': 'same'}, 'additional_eins': {'status': 'same'}, 'secondary_auditors': {'status': 'same'}, 'notes_to_sefa': {'status': 'same'}, 'tribal_data_consent': {'status': 'same'}}
 {% endcomment%}
+
 <div class="grid-container">
-    {% comment %} each key is a section, mapped to what changed {% endcomment %}
-    {% for section, changed in comparison.items %}
     <div class="grid-row">
       <div class="tablet:grid-col">
-        <h2>{{nice_names | KV:section}}</h2>
-      </div>        
-    </div>
+        <h3> </h3>
+      </div>
+      <div class="tablet:grid-col">
+        <h3>Report {{r1|slice:"15:"}}</h3>
+      </div>
+      <div class="tablet:grid-col">
+        <h3>Report {{r2|slice:"15:"}}</h3>
+      </div>
+    </div> <!-- Header row end -->
+    
+    {% comment %} each key is a section, mapped to what changed {% endcomment %}
+    {% for section, changed in comparison.items %}
 
     {% comment %} 
       each section contains a tag "status" (same, changed) and "in_r1", "in_r2" as lists
     {% endcomment %}
     
       {% if changed.status == "same" %}
-        <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div>
+        <!-- <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div> -->
       {% else %}
-      <div class="grid-row">
-        <div class="tablet:grid-col">
-          <h3>Field</h3>
-        </div>
-        <div class="tablet:grid-col">
-          <h3>Report {{r1|slice:"15:"}}</h3>
-        </div>
-        <div class="tablet:grid-col">
-          <h3>Report {{r2|slice:"15:"}}</h3>
-        </div>
-      </div> <!-- Header row end -->
+    <div class="grid-row">
+      <div class="tablet:grid-col">
+        <h2>{{nice_names | KV:section}}</h2>
+      </div>        
+    </div>
+
       {% if changed.in_r1|length > 0 %}
         <div class="grid-row">
           <div class=""tablet:grid-col"><h4>In first report</h4></div>
         </div>
       {% endif %}
       {% for d in changed.in_r1|dictsort:"key" %}
-        {% comment %} {'key': 'auditee_address_line_1', 'from': '143 East 9th Avenue', 'to': '143 E 9TH AVENUE'} {% endcomment %}
-        <div class="grid-row">
+        <div class="grid-row margin-top-2 margin-bottom-2">
           <div class="tablet:grid-col">
             {{d.key|repl:"_| "|title}}
           </div>
@@ -71,7 +73,7 @@
         </div>
       {% endif %}
       {% for d in changed.in_r2|dictsort:"key" %}
-        <div class="grid-row">
+        <div class="grid-row margin-top-2 margin-bottom-2">
           <div class="tablet:grid-col">
             {{d.key|repl:"_| "|title}}
           </div>
@@ -97,7 +99,7 @@
         </div>
       {% endif %}
       {% for d in changed.in_both|dictsort:"key" %}
-        <div class="grid-row">
+        <div class="grid-row margin-top-2 margin-bottom-2">
           <div class="tablet:grid-col">
             {{d.key|repl:"_| "|title}}
           </div>
