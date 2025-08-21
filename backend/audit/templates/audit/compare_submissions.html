@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="grid-container margin-top-6">
+{% comment %}
+{'general_information': {'status': 'same'}, 
+ 'audit_information': {'status': 'same'}, 
+ 'federal_awards': {'status': 'same'}, 
+ 'corrective_action_plan': {'status': 'same'}, 
+ 'findings_text': {'status': 'same'}, 
+ 'findings_uniform_guidance': {'status': 'same'}, 
+ 'additional_ueis': {'status': 'same'}, 'additional_eins': {'status': 'same'}, 'secondary_auditors': {'status': 'same'}, 'notes_to_sefa': {'status': 'same'}, 'tribal_data_consent': {'status': 'same'}}
+{% endcomment%}
+<div class="grid-container">
+    {% comment %} each key is a section, mapped to what changed {% endcomment %}
+    {% for section, changed in comparison.items %}
+    <div class="grid-row">
+      <div class="tablet:grid-col">
+        <h2>{{nice_names | KV:section}}</h2>
+      </div>        
+    </div>
+
+    {% comment %} 
+      each section contains a tag "status" (same, changed) and "in_r1", "in_r2" as lists
+    {% endcomment %}
+    
+      {% if changed.status == "same" %}
+        <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div>
+      {% else %}
+      <div class="grid-row">
+        <div class="tablet:grid-col">
+          <h3>{{r1}}</h3>
+        </div>
+        <div class="tablet:grid-col">
+          <h3>{{r2}}</h3>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="tablet:grid-col">
+        <!-- if it is a dictionary section -->
+        {% if section in "general_information,audit_info" %}
+          {% for item in changed.in_r1 %}
+            {% for key, value in item.items %}
+              <div class="grid-row">
+                <div class="tablet:grid-col">
+                  <b>{{key | repl:"_| " | title}}</b>
+                </div>
+                <div class="tablet:grid-col">
+                  {{value}}
+                </div>
+              </div>          
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+            <ul>
+              {% for item in changed.in_r1 %}
+                <li>{{item}}</li>
+              {% endfor %}
+            </ul>
+        {% endif %}
+
+        </div>
+        <div class="tablet:grid-col">
+        {% if section in "general_information,audit_info" %}
+          {% for item in changed.in_r2 %}
+            {% for key, value in item.items %}
+              <div class="grid-row">
+                <div class="tablet:grid-col">
+                  <b>{{key | repl:"_| " | title}}</b>
+                </div>
+                <div class="tablet:grid-col">
+                  {{value}}
+                </div>
+              </div>          
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+            <ul>
+              {% for item in changed.in_r1 %}
+                <li>{{item}}</li>
+              {% endfor %}
+            </ul>
+        {% endif %}
+      </div>
+    </div>
+      {% endif %}
+    {% endfor %}
+</div>
+{% endblock content %}

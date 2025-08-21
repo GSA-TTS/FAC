@@ -1,28 +1,43 @@
 from audit.models import SingleAuditChecklist
 from copy import deepcopy
 from pprint import pprint
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # s1 ^ s2 is roughly (s1 - s2) U (s2 - s1) if needed.
 def in_first_not_second(d1: dict, d2: dict):
-    s1 = set(d1.items())
-    s2 = set(d2.items())
-    return s1 - s2
+    differences = []
+    for k, v in d1.items():
+        if k in d2 and d1[k] == d2[k]:
+            continue
+        elif k in d2 and d1[k] != d2[k]:
+            differences.append({k: v})
+        else:  # k not in d2:
+            differences.append({k: v})
+    return differences
 
 
 def in_second_not_first(d1: dict, d2: dict):
-    s1 = set(d1.items())
-    s2 = set(d2.items())
-    return s2 - s1
+    differences = []
+    for k, v in d2.items():
+        if k in d1 and d2[k] == d1[k]:
+            continue
+        elif k in d1 and d2[k] != d1[k]:
+            differences.append({k: v})
+        else:  # k not in d1
+            differences.append({k: v})
+    return differences
 
 
 # The `in_*_not_*` functions return sets; we want dictionaries.
-def set_tuples_to_dict(st):
-    # Given a set containing tuples, convert it to a dict.
-    res = {}
-    for o in st:
-        res[o[0]] = o[1]
-    return res
+# def set_tuples_to_dict(st):
+#     # Given a set containing tuples, convert it to a dict.
+#     res = {}
+#     for o in st:
+#         res[o[0]] = o[1]
+#     return res
 
 
 def getattr_default(obj, key, default=None):
@@ -48,7 +63,7 @@ def deep_getattr(o, lok, default=None):
 
 
 def compare_lists_of_objects(
-    sac1: SingleAuditChecklist, sac2: SingleAuditChecklist, keys: list, extract: str
+    sac1: SingleAuditChecklist, sac2: SingleAuditChecklist, keys: list, extract_fun: str
 ):
     # Use a list of keys to dive into an object.
     # Expect a list of objects to come back, in this case.
@@ -89,7 +104,7 @@ def compare_lists_of_objects(
                 # If they're different, then we'll put that into the
                 # first map. That means it is present in the first submission,
                 # but not the second.
-                res["in_r1"].append(extract(o1))
+                res["in_r1"].append(extract_fun(o1))
         # For each in the second, do a reverse check.
         for h2, o2 in map2.items():
             # If it is in both, skip.
@@ -99,17 +114,7 @@ def compare_lists_of_objects(
                 # If it is different in R2, keep it. We may end up
                 # with the same object in both (because it is present in both,
                 # but the object changed in some way), which we'll handle in a sec.
-                res["in_r2"].append(extract(o2))
-
-    # If an object changed and is present in both maps, we only want one.
-    # That is, we want to say that "AWARD-0003" is different, and we'll only
-    # highlight it in R2. (Although... will this be confusing? Is that visually different
-    # than if it was only present in R2, vs being changed from R1 to R2?)
-    # keep_in_r1 = []
-    # for item in res["in_r1"]:
-    #     if item not in res["in_r2"]:
-    #         keep_in_r1.append(item)
-    # res["in_r1"] = keep_in_r1
+                res["in_r2"].append(extract_fun(o2))
 
     # Sort things.
     res["in_r1"] = sorted(res["in_r1"])
@@ -129,15 +134,11 @@ def compare_dictionary_fields(
     else:
         return {
             "status": "changed",
-            "in_r1": set_tuples_to_dict(
-                in_first_not_second(
-                    getattr_default(sac1, column, {}), getattr_default(sac2, column, {})
-                )
+            "in_r1": in_first_not_second(
+                getattr_default(sac1, column, {}), getattr_default(sac2, column, {})
             ),
-            "in_r2": set_tuples_to_dict(
-                in_second_not_first(
-                    getattr_default(sac1, column, {}), getattr_default(sac2, column, {})
-                )
+            "in_r2": in_second_not_first(
+                getattr_default(sac1, column, {}), getattr_default(sac2, column, {})
             ),
         }
 
@@ -156,17 +157,27 @@ def compare_dictionary_fields(
 # https://miguendes.me/the-best-way-to-compare-two-dictionaries-in-python
 # This walks a JSON tree and finds the differences, and nicely spells them out.
 def compare_report_ids(rid_1, rid_2):
-    sac_r1 = SingleAuditChecklist.objects.get(report_id=rid_1)
-    sac_r2 = SingleAuditChecklist.objects.get(report_id=rid_2)
+    if isinstance(rid_1, str) and isinstance(rid_2, str):
+        sac_r1 = SingleAuditChecklist.objects.get(report_id=rid_1)
+        sac_r2 = SingleAuditChecklist.objects.get(report_id=rid_2)
+    elif isinstance(rid_1, SingleAuditChecklist) and isinstance(
+        rid_2, SingleAuditChecklist
+    ):
+        sac_r1 = rid_1
+        sac_r2 = rid_2
+    else:
+        print("ERROR DANGER WILL ROBINSON")
 
     summary = {}
     ###############
     # general_information
+    logger.info("general_information")
     res = compare_dictionary_fields(sac_r1, sac_r2, "general_information")
     summary["general_information"] = res
 
     ###############
     # audit_information
+    logger.info("audit_information")
     res = compare_dictionary_fields(sac_r1, sac_r2, "audit_information")
     summary["audit_information"] = res
 
@@ -233,11 +244,12 @@ def compare_report_ids(rid_1, rid_2):
                 "NotesToSefa",
                 "notes_to_sefa_entries",
             ],
-            lambda entry: entry["seq_number"] + ": " + entry["note_title"],
+            lambda entry: str(entry["seq_number"]) + ": " + entry["note_title"],
         ],
     ]
 
     for ls in accessors:
+        logger.info(f"{ls[0][0]}")
         res = compare_lists_of_objects(sac_r1, sac_r2, ls[0], ls[1])
         summary[ls[0][0]] = res
 
