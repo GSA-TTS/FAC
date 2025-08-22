@@ -339,17 +339,19 @@ def compare_with_prev(rid):
         logger.error(f"{rid} is not a report ID or SAC object")
         return {"status": "error"}
 
-    if "previous_report_id" in sac.resubmission_meta:
-        prev = sac.resubmission_meta["previous_report_id"]
-    elif "next_report_id" in sac.resubmission_meta:
-        prev = sac.report_id
-        rid = sac.resubmission_meta["next_report_id"]
-    else:
-        logger.error(f"No previous report ID for {rid}")
-        return {"status": "error"}
+    if sac.resubmission_meta:
+        if "previous_report_id" in sac.resubmission_meta:
+            prev = sac.resubmission_meta["previous_report_id"]
+        elif "next_report_id" in sac.resubmission_meta:
+            prev = sac.report_id
+            rid = sac.resubmission_meta["next_report_id"]
+        else:
+            logger.error(f"No previous report ID for {rid}")
+            return {"status": "error", "message": f"no previous report for {rid}"}
+        logger.info(f"COMPARING PREV {prev} WITH NEXT {rid}")
+        return compare_report_ids(prev, rid)
 
-    logger.info(f"COMPARING PREV {prev} WITH NEXT {rid}")
-    return compare_report_ids(prev, rid)
+    return {"status": "error", "message": "No resubmission_meta in sac."}
 
 
 # The summary comes back as:

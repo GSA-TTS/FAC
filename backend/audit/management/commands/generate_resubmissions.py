@@ -66,7 +66,6 @@ REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2023-06-GSAFAC-0000013043"]
 #############################################
 def modify_total_amount_expended(old_sac, new_sac, user_obj):
     logger.info("MODIFIER: modify_total_amount_expended")
-    new_sac.federal_awards = deepcopy(old_sac.federal_awards)
     current_amount = old_sac.federal_awards["FederalAwards"]["total_amount_expended"]
     new_amount = current_amount - 100000
     new_sac.federal_awards["FederalAwards"]["total_amount_expended"] = new_amount
@@ -78,7 +77,6 @@ def modify_total_amount_expended(old_sac, new_sac, user_obj):
 #############################################
 def modify_auditee_ein(old_sac, new_sac, user_obj):
     logger.info("MODIFIER: modify_auditee_ein")
-    new_sac.general_information = deepcopy(old_sac.general_information)
     new_sac.general_information["ein"] = "999888777"
     return new_sac
 
@@ -91,7 +89,6 @@ def modify_auditor_address(old_sac, new_sac, user_obj):
     Modify a resubmission with a new address
     """
     logger.info("MODIFIER: modify_address")
-    new_sac.general_information = deepcopy(old_sac.general_information)
     new_sac.general_information["auditor_address_line_1"] = "123 Across the street"
     new_sac.general_information["auditor_zip"] = "17921"
     new_sac.general_information["auditor_city"] = "Centralia"
@@ -113,7 +110,7 @@ def modify_additional_eins_workbook(old_sac, new_sac, user_obj):
     Modify a resubmission with a changed workbook
     """
     logger.info("MODIFIER: modify_eins_workbook")
-    if not new_sac.additional_eins or old_sac.additional_eins:
+    if not old_sac.additional_eins:
         logger.info(f"AUDIT {old_sac.report_id} HAS NO ADDITIONAL EINS TO MODIFY")
         logger.info("Fakin' it till I make it.")
         new_sac.additional_eins = {
@@ -123,6 +120,7 @@ def modify_additional_eins_workbook(old_sac, new_sac, user_obj):
                 "additional_eins_entries": [],
             },
         }
+
     new_sac.additional_eins["AdditionalEINs"]["additional_eins_entries"].append(
         {"additional_ein": "111222333"},
     )
@@ -280,18 +278,20 @@ def generate_resubmissions(sacs, reportids_to_modifiers, options):
     """
     Generates all the resubmissions
     """
-    for sac in sacs:
+    for old_sac in sacs:
         logger.info("-------------------------------")
 
-        if sac.report_id in REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY:
-            logger.info(f"Generating resubmission chain for {sac.report_id}")
-            previous_sac = sac
-            for modifier in reportids_to_modifiers[sac.report_id]:
+        if old_sac.report_id in REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY:
+            logger.info(f"Generating resubmission chain for {old_sac.report_id}")
+            previous_sac = deepcopy(old_sac)
+            for modifier in reportids_to_modifiers[old_sac.report_id]:
                 new_sac = generate_resubmission(previous_sac, options, [modifier])
-                previous_sac = new_sac
+                previous_sac = deepcopy(new_sac)
         else:
-            logger.info(f"Generating resubmission for {sac.report_id}")
-            generate_resubmission(sac, options, reportids_to_modifiers[sac.report_id])
+            logger.info(f"Generating resubmission for {old_sac.report_id}")
+            generate_resubmission(
+                old_sac, options, reportids_to_modifiers[old_sac.report_id]
+            )
 
 
 def create_resubmitted_pdf(sac, new_sac):
@@ -334,10 +334,27 @@ def copy_data_over(old_sac, new_sac):
     sac_fields = SECTION_NAMES.keys()
     for field in sac_fields:
         if field not in ["single_audit_report"]:
-            setattr(new_sac, field, getattr(old_sac, field))
+            # Don't clobber what was created when we initialized the audit resubmission.
+            if field == "general_information":
+                from pprint import pprint
+
+                pprint("OLD")
+                pprint(old_sac.general_information)
+                pprint("NEW")
+                pprint(new_sac.general_information)
+
+                for k, v in old_sac.general_information.items():
+                    if k not in [
+                        "auditee_uei",
+                        "auditee_fiscal_period_start",
+                        "auditee_fiscal_period_end",
+                    ]:
+                        new_sac.general_information[k] = v
+            else:
+                setattr(new_sac, field, getattr(old_sac, field))
 
 
-def generate_resubmission(sac: SingleAuditChecklist, options, modifiers):
+def generate_resubmission(old_sac: SingleAuditChecklist, options, modifiers):
     """
     Generates a single resubmission
     """
@@ -346,22 +363,22 @@ def generate_resubmission(sac: SingleAuditChecklist, options, modifiers):
 
     # Start by taking a record and duplicating it, save for
     # some of the state around the transitions.
-    new_sac = sac.initiate_resubmission(user=THE_USER_OBJ, duplicate_for_test=True)
+    new_sac = old_sac.initiate_resubmission(user=THE_USER_OBJ)
 
     logger.info(f"New SAC: {new_sac.report_id}")
     logger.info(f"Created new SAC with ID: {new_sac.id}")
 
     # Copy a PDF and create a new SAR record for it.
-    create_resubmitted_pdf(sac, new_sac)
+    create_resubmitted_pdf(old_sac, new_sac)
 
     # Now, copy a lot of data over from the old to the new.
     # This is not how we would normally do it, but we get a lot of errors otherwise.
-    copy_data_over(sac, new_sac)
+    copy_data_over(old_sac, new_sac)
 
     # Perform modifications on the new resubmission
     # Invokes one or more modification functions (below)
     for modification in modifiers:
-        new_sac = modification(sac, new_sac, THE_USER_OBJ)
+        new_sac = modification(old_sac, new_sac, THE_USER_OBJ)
 
     # Make sure we created a valid SAC entry.
     # If not, error out.
@@ -371,23 +388,21 @@ def generate_resubmission(sac: SingleAuditChecklist, options, modifiers):
             f"Unable to disseminate report with validation errors: {new_sac.report_id}."
         )
         logger.info(errors["errors"])
-
-    # If we're here, we make sure the new SAC (which is a resubmission)
-    # has all the right data/fields to be used for resubmission testing.
-    # Need to be in the disseminated state in order to re-disseminated
-    disseminated = complete_resubmission(sac, new_sac, THE_USER_OBJ)
-
-    if disseminated:
-        # TODO: Change submission_status to disseminated once Matt's
-        # "late change" workaround is merged
-        logger.info(f"DISSEMINATED REPORT: {new_sac.report_id}")
-        return new_sac
     else:
-        logger.error(
-            "{} is a `not None` value report_id[{}] for `disseminated`".format(
-                disseminated, new_sac.report_id
+        # If we're here, we make sure the new SAC (which is a resubmission)
+        # has all the right data/fields to be used for resubmission testing.
+        # Need to be in the disseminated state in order to re-disseminated
+        disseminated = complete_resubmission(old_sac, new_sac, THE_USER_OBJ)
+
+        if disseminated:
+            logger.info(f"DISSEMINATED REPORT: {new_sac.report_id}")
+            return new_sac
+        else:
+            logger.error(
+                "{} is a `not None` value report_id[{}] for `disseminated`".format(
+                    disseminated, new_sac.report_id
+                )
             )
-        )
 
 
 class Command(BaseCommand):

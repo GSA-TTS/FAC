@@ -324,7 +324,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Resubmission SAC Creations
     # Atomically create a new SAC row as a resubmission of this SAC.
     # Assert that a resubmission does not already exist
-    def initiate_resubmission(self, user=None, duplicate_for_test=False):
+    def initiate_resubmission(self, user=None):
         # First, we raise an error if a resubmission already exists for this SAC.
         self._raise_if_resubmission_already_exists()
         # If we get past that, we then can do the work of initializing a resubmission.
