@@ -20,6 +20,85 @@ logger.setLevel(logging.INFO)
 
 User = get_user_model()
 
+from inspect import currentframe
+
+
+#########################################################
+# WARNING
+#
+# When copying records, we *must* be super-duper careful. That is really
+# technical language for "hypervigilence."
+#
+# SACs are objects. Therefore, an assignment like
+#
+# new_sac = old_sac
+#
+# is a pointer assignment. The new_sac and the old_sac variables are now
+# pointing to the exact same location in memory---the same object.
+#
+# We can get around this by creating a new SAC (we do). But, then,
+# in this script, data is copied from the old SAC to the new.
+#
+# This is fine for constants that are interned by the interpreter: integers
+# and strings that we put in the code. (E.g. x="hi" and y="hi" both point to
+# the same string in memory.) This is not an issue for us at this time.
+#
+# It is an issue for elements in the SAC that are *lists*. For example
+# everything inside of every workbook field.
+#
+# If we copy the `general_information` over like this:
+#
+# new_sac.general_information = old_sac.general_information
+#
+# We have just set a pointer in the new_sac object to a dictionary inside
+# the old_sac object.
+#
+# I have *no idea* why the old_sac objects are saving in this script. But, the old_sac
+# objects are being modified. So, I have sprinkled two things throughout the code:
+#
+# * APNE
+# * deepcopy
+#
+# APNE is "assert_pointer_not_equal." It makes sure two variables are pointing
+# at different things in memory. It throws an assertion---forcing an exit---if the pointers
+# are the same. It correctly (?) skips ints and strings.
+#
+# deepcopy should be copying values and not pointers. However, I've seen it not work.
+# So, you'll see places where I walk a dictionary, and copy the k/v pairs over
+# the hard way... with a deepcopy on the value.
+#
+# No idea. It's all bonkers. It shouldn't be this hard to create a clone of a SAC, but it is.
+# This will matter a great deal in the future if we're going to allow users to edit live records.
+# We have to be very, very careful to make sure that we are not modifying the original record
+# through some kind of pointer confusion.
+#
+# MCJ 20250822
+
+
+def get_linenumber():
+    cf = currentframe()
+    return cf.f_back.f_lineno
+
+
+# asert_pointer_not_equal
+def APNE(a, b, loc=None):
+    if id(a) == id(b):
+        if isinstance(a, int) and isinstance(b, int) and a == b:
+            logger.info("POINTERS EQUAL: INT")
+            # We don't assert for integers; they always have the same pointer.
+            return
+        elif isinstance(a, str) and isinstance(b, str) and a == b:
+            logger.info("POINTERS EQUAL: STR")
+            return
+        else:
+            logger.info(f"POINTERS EQUAL: {id(a)}")
+            logger.info(f"VALUE: {a}")
+            if loc is not None:
+                logger.info(f"LOCATION: {loc}")
+    else:
+        logger.info(f"POINTERS NOT EQUAL")
+    assert id(a) != id(b)
+
 
 # Using the new tools to generate data for local testing,
 # we want to make sure these are selected from our
@@ -66,6 +145,7 @@ REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2023-06-GSAFAC-0000013043"]
 #############################################
 def modify_total_amount_expended(old_sac, new_sac, user_obj):
     logger.info("MODIFIER: modify_total_amount_expended")
+    APNE(old_sac, new_sac)
     current_amount = old_sac.federal_awards["FederalAwards"]["total_amount_expended"]
     new_amount = current_amount - 100000
     new_sac.federal_awards["FederalAwards"]["total_amount_expended"] = new_amount
@@ -77,6 +157,7 @@ def modify_total_amount_expended(old_sac, new_sac, user_obj):
 #############################################
 def modify_auditee_ein(old_sac, new_sac, user_obj):
     logger.info("MODIFIER: modify_auditee_ein")
+    APNE(old_sac, new_sac)
     new_sac.general_information["ein"] = "999888777"
     return new_sac
 
@@ -89,6 +170,7 @@ def modify_auditor_address(old_sac, new_sac, user_obj):
     Modify a resubmission with a new address
     """
     logger.info("MODIFIER: modify_address")
+    APNE(old_sac, new_sac)
     new_sac.general_information["auditor_address_line_1"] = "123 Across the street"
     new_sac.general_information["auditor_zip"] = "17921"
     new_sac.general_information["auditor_city"] = "Centralia"
@@ -110,6 +192,7 @@ def modify_additional_eins_workbook(old_sac, new_sac, user_obj):
     Modify a resubmission with a changed workbook
     """
     logger.info("MODIFIER: modify_eins_workbook")
+    APNE(old_sac, new_sac)
     if not old_sac.additional_eins:
         logger.info(f"AUDIT {old_sac.report_id} HAS NO ADDITIONAL EINS TO MODIFY")
         logger.info("Fakin' it till I make it.")
@@ -139,6 +222,7 @@ def modify_pdf_point_at_this_instead(old_report_id):
 
     def _do_modify(old_sac, new_sac, user_obj):
         logger.info("MODIFIER: modify_pdf")
+        APNE(old_sac, new_sac)
         logger.info(
             f"old_report_id: {old_report_id} new_report_id: {new_sac.report_id}"
         )
@@ -284,9 +368,11 @@ def generate_resubmissions(sacs, reportids_to_modifiers, options):
         if old_sac.report_id in REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY:
             logger.info(f"Generating resubmission chain for {old_sac.report_id}")
             previous_sac = deepcopy(old_sac)
+            APNE(previous_sac, old_sac)
             for modifier in reportids_to_modifiers[old_sac.report_id]:
                 new_sac = generate_resubmission(previous_sac, options, [modifier])
                 previous_sac = deepcopy(new_sac)
+                APNE(previous_sac, new_sac)
         else:
             logger.info(f"Generating resubmission for {old_sac.report_id}")
             generate_resubmission(
@@ -331,6 +417,8 @@ def copy_data_over(old_sac, new_sac):
     # This simulates the auditee/auditor completing the submission.
     # So, we'll copy everything over from the old to the new.
     # In a real submission, they'd have to upload stuff.
+    logger.info("ACTION: copy_data_over")
+    APNE(old_sac, new_sac)
     sac_fields = SECTION_NAMES.keys()
     for field in sac_fields:
         if field not in ["single_audit_report"]:
@@ -349,12 +437,27 @@ def copy_data_over(old_sac, new_sac):
                         "auditee_fiscal_period_start",
                         "auditee_fiscal_period_end",
                     ]:
-                        new_sac.general_information[k] = v
+                        new_sac.general_information[k] = deepcopy(v)
             else:
-                setattr(new_sac, field, getattr(old_sac, field))
+                section = getattr(old_sac, field)
+                if section is None:
+                    # Should this be None, or dict()?
+                    setattr(new_sac, field, dict())
+                else:
+                    d = dict()
+                    for k, v in section.items():
+                        new_v = deepcopy(v)
+                        APNE(new_v, v, loc=get_linenumber())
+                        d[k] = new_v
+                    setattr(new_sac, field, d)
+                    APNE(
+                        getattr(new_sac, field),
+                        getattr(old_sac, field),
+                        loc=get_linenumber(),
+                    )
 
 
-def generate_resubmission(old_sac: SingleAuditChecklist, options, modifiers):
+def generate_resubmission(old_sac: SingleAuditChecklist, options, modifiers):  #
     """
     Generates a single resubmission
     """
@@ -364,21 +467,25 @@ def generate_resubmission(old_sac: SingleAuditChecklist, options, modifiers):
     # Start by taking a record and duplicating it, save for
     # some of the state around the transitions.
     new_sac = old_sac.initiate_resubmission(user=THE_USER_OBJ)
+    APNE(old_sac, new_sac)
 
     logger.info(f"New SAC: {new_sac.report_id}")
     logger.info(f"Created new SAC with ID: {new_sac.id}")
 
     # Copy a PDF and create a new SAR record for it.
     create_resubmitted_pdf(old_sac, new_sac)
+    APNE(old_sac, new_sac)
 
     # Now, copy a lot of data over from the old to the new.
     # This is not how we would normally do it, but we get a lot of errors otherwise.
     copy_data_over(old_sac, new_sac)
+    APNE(old_sac, new_sac)
 
     # Perform modifications on the new resubmission
     # Invokes one or more modification functions (below)
     for modification in modifiers:
         new_sac = modification(old_sac, new_sac, THE_USER_OBJ)
+    APNE(old_sac, new_sac)
 
     # Make sure we created a valid SAC entry.
     # If not, error out.
@@ -393,6 +500,7 @@ def generate_resubmission(old_sac: SingleAuditChecklist, options, modifiers):
         # has all the right data/fields to be used for resubmission testing.
         # Need to be in the disseminated state in order to re-disseminated
         disseminated = complete_resubmission(old_sac, new_sac, THE_USER_OBJ)
+        APNE(old_sac, new_sac)
 
         if disseminated:
             logger.info(f"DISSEMINATED REPORT: {new_sac.report_id}")
