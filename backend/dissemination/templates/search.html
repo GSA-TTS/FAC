@@ -159,7 +159,16 @@
                             <tbody>
                                 {% for result in results %}
                                     <tr>
-                                        <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
+                                        <th>
+                                            {{ result.auditee_name }}
+                                            {% if result.resubmission_tag %}
+                                                {% if result.resubmission_tag == "Most Recent" %}
+                                                    <span class="usa-tag bg-green margin-left-1">MOST RECENT</span>
+                                                {% elif result.resubmission_tag == "Resubmitted" %}
+                                                    <span class="usa-tag bg-red margin-left-1">RESUBMITTED</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </th>
                                         {% comment %} Display UEI. If it's "GSA_MIGRATION", use the EIN instead. If no EIN, just show "GSA_MIGRATION". {% endcomment %}
                                         <td>
                                             {% if result.auditee_uei != "GSA_MIGRATION" %}
