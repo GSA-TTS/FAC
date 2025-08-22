@@ -22,12 +22,52 @@ User = get_user_model()
 
 from inspect import currentframe
 
+# Using the new tools to generate data for local testing,
+# we want to make sure these are selected from our
+# 20K record subset, so that the command always works.
+REPORTIDS_TO_MODIFIERS = lambda: {
+    # Lets rewrite the auditor's address
+    "2023-06-GSAFAC-0000000697": [modify_auditor_address],
+    "2023-06-GSAFAC-0000002166": [modify_auditee_ein],
+    # Modifying the workbook requires there to be additional EINs
+    "2022-12-GSAFAC-0000001787": [modify_additional_eins_workbook, add_an_award],
+    "2023-06-GSAFAC-0000002901": [
+        modify_auditor_address,
+        modify_additional_eins_workbook,
+    ],
+    # Same modifications as above, but will make a new resub for each
+    # See REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY below
+    "2023-06-GSAFAC-0000013043": [
+        modify_auditor_address,
+        modify_additional_eins_workbook,
+    ],
+    # modify_pdf simulates a new PDF submission.
+    # The report on the left has its SAR pointer modified so that it instead
+    # points to the report for the entity on the right. That way,
+    # it looks like a completely different PDF is attached to (say) 19157.
+    "2023-06-GSAFAC-0000005147": [
+        modify_pdf_point_at_this_instead("2023-06-GSAFAC-0000002901")
+    ],
+    "2023-06-GSAFAC-0000001699": [modify_total_amount_expended],
+    # Do all the things
+    "2022-12-GSAFAC-0000007921": [
+        modify_auditor_address,
+        modify_auditee_ein,
+        modify_additional_eins_workbook,
+        modify_total_amount_expended,
+        modify_pdf_point_at_this_instead("2023-06-GSAFAC-0000000697"),
+    ],
+}
+
+REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2023-06-GSAFAC-0000013043"]
+
 
 #########################################################
-# WARNING
+# WARNING WARNING WARNING
+#########################################################
 #
 # When copying records, we *must* be super-duper careful. That is really
-# technical language for "hypervigilence."
+# technical language for "hypervigilant."
 #
 # SACs are objects. Therefore, an assignment like
 #
@@ -72,6 +112,10 @@ from inspect import currentframe
 # We have to be very, very careful to make sure that we are not modifying the original record
 # through some kind of pointer confusion.
 #
+# For all I know, something like this is at play: https://www.reddit.com/r/django/comments/14vq6s7/comment/jrdxttz
+# There are times when a Django model will auto-save itself. So, that may have been happening to the old_sac
+# somewhere in this code. I wouldn't know.
+#
 # MCJ 20250822
 
 
@@ -100,44 +144,32 @@ def APNE(a, b, loc=None):
     assert id(a) != id(b)
 
 
-# Using the new tools to generate data for local testing,
-# we want to make sure these are selected from our
-# 20K record subset, so that the command always works.
-REPORTIDS_TO_MODIFIERS = lambda: {
-    # Lets rewrite the auditor's address
-    "2023-06-GSAFAC-0000000697": [modify_auditor_address],
-    "2023-06-GSAFAC-0000002166": [modify_auditee_ein],
-    # Modifying the workbook requires there to be additional EINs
-    "2022-12-GSAFAC-0000001787": [modify_additional_eins_workbook],
-    "2023-06-GSAFAC-0000002901": [
-        modify_auditor_address,
-        modify_additional_eins_workbook,
-    ],
-    # Same modifications as above, but will make a new resub for each
-    # See REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY below
-    "2023-06-GSAFAC-0000013043": [
-        modify_auditor_address,
-        modify_additional_eins_workbook,
-    ],
-    # modify_pdf simulates a new PDF submission.
-    # The report on the left has its SAR pointer modified so that it instead
-    # points to the report for the entity on the right. That way,
-    # it looks like a completely different PDF is attached to (say) 19157.
-    "2023-06-GSAFAC-0000005147": [
-        modify_pdf_point_at_this_instead("2023-06-GSAFAC-0000002901")
-    ],
-    "2023-06-GSAFAC-0000001699": [modify_total_amount_expended],
-    # Do all the things
-    "2022-12-GSAFAC-0000007921": [
-        modify_auditor_address,
-        modify_auditee_ein,
-        modify_additional_eins_workbook,
-        modify_total_amount_expended,
-        modify_pdf_point_at_this_instead("2023-06-GSAFAC-0000000697"),
-    ],
-}
+#############################################
+# remove_an_award
+#############################################
+def remove_an_award(old_sac, new_sac, user_obj):
+    logger.info("MODIFIER: remove_an_award")
+    APNE(old_sac, new_sac)
+    new_sac.federal_awards["FederalAwards"]["federal_awards"] = new_sac.federal_awards[
+        "FederalAwards"
+    ]["federal_awards"][:-1]
+    return new_sac
 
-REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2023-06-GSAFAC-0000013043"]
+
+#############################################
+# add_an_award
+#############################################
+def add_an_award(old_sac, new_sac, user_obj):
+    logger.info("MODIFIER: add_an_award")
+    APNE(old_sac, new_sac)
+    new_sac.federal_awards["FederalAwards"]["federal_awards"].append(
+        deepcopy(new_sac.federal_awards["FederalAwards"]["federal_awards"][0])
+    )
+    new_sac.federal_awards["FederalAwards"]["federal_awards"][1][
+        "award_reference"
+    ] = "AWARD-0002"
+
+    return new_sac
 
 
 #############################################
@@ -424,21 +456,25 @@ def copy_data_over(old_sac, new_sac):
         if field not in ["single_audit_report"]:
             # Don't clobber what was created when we initialized the audit resubmission.
             if field == "general_information":
-                from pprint import pprint
-
-                pprint("OLD")
-                pprint(old_sac.general_information)
-                pprint("NEW")
-                pprint(new_sac.general_information)
-
                 for k, v in old_sac.general_information.items():
                     if k not in [
                         "auditee_uei",
                         "auditee_fiscal_period_start",
                         "auditee_fiscal_period_end",
                     ]:
-                        new_sac.general_information[k] = deepcopy(v)
+                        new_v = deepcopy(v)
+                        APNE(new_v, v, loc=get_linenumber())
+                        new_sac.general_information[k] = new_v
+
             else:
+                # This is a convoluted way to copy the section objects.
+                # deepcopy(section) is not working. It is carrying pointers forward.
+                # So, I go through the section, copying the keys/values the hard way.
+                # At every step, assert that pointers are not equal.
+                # This literally fixed a bug in this script, where lists of entries in
+                # workbook sections were *pointer* copies, and as a result, modifying the
+                # new_sac was also modifying the old_sac.
+                # What I don't understand is why the old_sac was saving to the DB...
                 section = getattr(old_sac, field)
                 if section is None:
                     # Should this be None, or dict()?

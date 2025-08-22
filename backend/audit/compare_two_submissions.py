@@ -117,6 +117,10 @@ def compare_lists_of_objects(
     # print(f"deep on {sac2}")
     ls2 = deep_getattr(sac2, keys, [])
 
+    print("COMPARING")
+    pprint(ls1)
+    pprint(ls2)
+
     # Hash the objects.
     # Key order will matter. Here's to hoping
     # our system is very consistent.
@@ -131,44 +135,37 @@ def compare_lists_of_objects(
     for h, o in zip(loh2, ls2):
         map2[h] = o
 
-    # If the hashes are all the same, nothing changed.
+    print("MAP 1")
+    pprint(map1)
+    print("MAP 2")
+    pprint(map2)
+
+    # If the maps are identical, we can just return now.
     if map1 == map2:
         return {"status": "same"}
-    else:
-        res = {"status": "changed", "in_r1": list(), "in_r2": list(), "in_both": list()}
-        # I now want to go through the hash maps.
-        # If the key appears in both, we want to skip it.
-        # That is because the hash is identical.
-        for h1, o1 in map1.items():
-            if h1 in map2:
-                continue
-            else:
-                # If they're different, then we'll put that into the
-                # first map. That means it is present in the first submission,
-                # but not the second.
-                v = extract_fun(o1)
-                res["in_r1"].append({"key": v, "from": v, "to": None})
-        # For each in the second, do a reverse check.
-        for h2, o2 in map2.items():
-            # If it is in both, skip.
-            if h2 in map1:
-                continue
-            else:
-                # If it is different in R2, keep it. We may end up
-                # with the same object in both (because it is present in both,
-                # but the object changed in some way), which we'll handle in a sec.
-                v = extract_fun(o2)
-                res["in_r2"].append({"key": v, "from": None, "to": v})
 
-    # Now, if we find the `from` from r1 in the `to` of r2, we need to move it to
-    # `both`, and remove it from the other dictionaries.
-    from_in_r1 = set([o["from"] for o in res["in_r1"]])
-    to_in_r2 = set([o["to"] for o in res["in_r2"]])
-    in_both = from_in_r1.union(to_in_r2)
+    # The keys can be sets
+    ks1 = set(map1.keys())
+    ks2 = set(map2.keys())
 
-    res["in_r1"] = list(filter(lambda o: o["from"] not in in_both, res["in_r1"]))
-    res["in_r2"] = list(filter(lambda o: o["to"] not in in_both, res["in_r2"]))
-    res["in_both"] = list(map(lambda s: {"key": s, "from": s, "to": s}, in_both))
+    # Keys only in ks1
+    only_in_1 = ks1 - ks2
+    # Keys only in ks2
+    only_in_2 = ks2 - ks1
+
+    res = {"status": "changed", "in_r1": list(), "in_r2": list(), "in_both": list()}
+
+    for k in only_in_1:
+        res["in_r1"].append(extract_fun(map1[k]))
+    for k in only_in_2:
+        res["in_r2"].append(extract_fun(map2[k]))
+
+    # Finally, to find everything "in both", we'll take all of the keys from both,
+    # map them through the extract_fun, turn it into a set, and call it done.
+    # Take the intersection.
+    res["in_both"] = set(map(extract_fun, map1.values())) & set(
+        map(extract_fun, map2.values())
+    )
 
     return res
 
@@ -294,7 +291,7 @@ def compare_report_ids(rid_1, rid_2):
         [
             [
                 "additional_eins",
-                "AdditionalEins",
+                "AdditionalEINs",
                 "additional_eins_entries",
             ],
             lambda entry: entry["additional_ein"],
