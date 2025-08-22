@@ -21,10 +21,17 @@ class ReportAccessRequiredMixin:
             if not general.resubmission_status:
                 pass
             # If the resubmission is a recent/current one
-            elif general.resubmission_status in [RESUBMISSION_STATUS.MOST_RECENT, RESUBMISSION_STATUS.ORIGINAL]:
+            elif general.resubmission_status in [
+                RESUBMISSION_STATUS.MOST_RECENT,
+                RESUBMISSION_STATUS.ORIGINAL,
+            ]:
                 pass
             # If you have privileged access, you can see old/resubmitted reports
-            elif general.resubmission_status == RESUBMISSION_STATUS.DEPRECATED and request.user and can_read_tribal(request.user):
+            elif (
+                general.resubmission_status == RESUBMISSION_STATUS.DEPRECATED
+                and request.user
+                and can_read_tribal(request.user)
+            ):
                 pass
             # If you are not logged in, or not privileged, and it is deprecated,
             # we need to deny.
