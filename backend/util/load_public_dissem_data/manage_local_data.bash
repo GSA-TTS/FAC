@@ -96,7 +96,7 @@ load_sanitized_data_dump () {
   truncate_all_local_tables
 
 
-  echo "Restoring data from sanitized-${DATE}.dump"
+  echo "Restoring data from ${DUMPFILE}"
 
   TEMPFILE="_tmp.sql"
 
@@ -252,6 +252,40 @@ redisseminate_all_sac_records () {
 
 
 ############################################################
+# snapshot_current_db
+############################################################
+snapshot_current_db () {
+  echo "snapshot_current_db"
+
+  table_flags=""
+  for ndx in ${!TARGET_TABLES[@]};
+  do
+    dump=${TARGET_TABLES[$ndx]}
+    prefix="public-"
+    suffix=".dump"
+    TABLENAME=${dump/#$prefix}
+    TABLENAME=${TABLENAME/%$suffix}
+    # echo "include table ${TABLENAME}" >> dump_filters.pg
+    table_flags="${table_flags} -t ${TABLENAME}"
+  done
+
+  # Make sure this isn't stale when we're done/if we fail.
+  TS=$(date '+%Y%m%d-%T')
+  rm -f "snapshot-${TS}.dump"
+
+  cmd="pg_dump -d ${DATABASE} -h ${HOST} -p ${PORT} -U ${USERNAME} -w -F c --no-acl --no-owner --data-only ${table_flags} "
+  cmd="mkdir -p data/ ; ${cmd} -f data/snapshot-${TS}.dump"
+  echo "${cmd}"
+  eval "${cmd}"
+
+  if [ $? -ne 0 ]; then
+    echo "Dump failed."
+    echo "Exiting."
+    exit
+  fi
+}
+
+############################################################
 # DAS MENU
 ############################################################
 PS3='Please enter your choice: '
@@ -263,6 +297,7 @@ options=(\
   "TRUNCATE the dissemination tables" \
   "Re-disseminate all SAC records" \
   "Generate MATERIALIZED VIEW" \
+  "Snapshot the current DB" \
   "TRUNCATE all tables" \
   "Run most all back-to-back" \
   "Quit"
@@ -290,6 +325,9 @@ do
       ;;
     "Re-disseminate all SAC records")
       redisseminate_all_sac_records
+      ;;
+    "Snapshot the current DB")
+      snapshot_current_db
       ;;
     "TRUNCATE all tables")
       truncate_all_local_tables

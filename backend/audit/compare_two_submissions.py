@@ -330,6 +330,28 @@ def compare_report_ids(rid_1, rid_2):
     return summary
 
 
+def compare_with_prev(rid):
+    if isinstance(rid, str):
+        sac = SingleAuditChecklist.objects.get(report_id=rid)
+    elif isinstance(rid, SingleAuditChecklist):
+        sac = rid
+    else:
+        logger.error(f"{rid} is not a report ID or SAC object")
+        return {"status": "error"}
+
+    if "previous_report_id" in sac.resubmission_meta:
+        prev = sac.resubmission_meta["previous_report_id"]
+    elif "next_report_id" in sac.resubmission_meta:
+        prev = sac.report_id
+        rid = sac.resubmission_meta["next_report_id"]
+    else:
+        logger.error(f"No previous report ID for {rid}")
+        return {"status": "error"}
+
+    logger.info(f"COMPARING PREV {prev} WITH NEXT {rid}")
+    return compare_report_ids(prev, rid)
+
+
 # The summary comes back as:
 # {
 #     "general_information": {
