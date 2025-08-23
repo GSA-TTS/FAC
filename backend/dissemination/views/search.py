@@ -2,7 +2,6 @@ from datetime import date
 import logging
 import math
 import time
-
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -19,10 +18,14 @@ from dissemination.search import gather_errors
 from dissemination.searchlib.search_utils import (
     populate_cog_over_name,
     run_search,
-    audit_populate_cog_over_name,
+)
+from dissemination.searchlib.search_resub_tags import (
+    build_resub_tag_map,
+    attach_resubmission_tags,
 )
 from dissemination.views.utils import include_private_results
 from support.decorators import newrelic_timing_metric
+from users.permissions import is_federal_user
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +57,7 @@ class AdvancedSearch(View):
                 "state_abbrevs": STATE_ABBREVS,
                 "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
                 "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                "can_view_resubmissions": is_federal_user(request.user),
             },
         )
 
@@ -76,6 +80,7 @@ class AdvancedSearch(View):
             "state_abbrevs": STATE_ABBREVS,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
             "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
+            "can_view_resubmissions": is_federal_user(request.user),
         }
 
         # Obtain cleaned form data.
@@ -102,7 +107,7 @@ class AdvancedSearch(View):
         logger.info(f"Advanced searching on fields: {form_data}")
 
         # Generate results on valid user input.
-        results = run_search(form_data)
+        results = run_search(request, form_data)
         results_count = results.count()
 
         # Reset page number to one if the value already surpasses the number of feasible pages.
@@ -129,6 +134,13 @@ class AdvancedSearch(View):
         # If there are results, populate the agency name in cog/over field
         if results_count > 0:
             paginator_results = populate_cog_over_name(paginator_results)
+            resub_tag_map = build_resub_tag_map(paginator_results.object_list)
+        else:
+            resub_tag_map = {}
+
+        # Attach tag to each result so the template can use result.resubmission_tag
+        if include_private_results(request):
+            attach_resubmission_tags(paginator_results.object_list, resub_tag_map)
 
         context = context | {
             "form_user_input": form_user_input,
@@ -139,6 +151,7 @@ class AdvancedSearch(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
+            "resub_tag_map": resub_tag_map,
         }
         time_beginning_render = time.time()
         total_time_ms = int(
@@ -218,7 +231,7 @@ class Search(View):
         logger.info(f"Searching on fields: {form_data}")
 
         # Generate results on valid user input.
-        results = run_search(form_data)
+        results = run_search(request, form_data)
         results_count = results.count()
 
         # Reset page to one if the page number surpasses how many pages there actually are
@@ -245,6 +258,13 @@ class Search(View):
         # If there are results, populate the agency name in cog/over field
         if results_count > 0:
             paginator_results = populate_cog_over_name(paginator_results)
+            resub_tag_map = build_resub_tag_map(paginator_results.object_list)
+        else:
+            resub_tag_map = {}
+
+        # Attach tag to each result so the template can use result.resubmission_tag
+        if include_private_results(request):
+            attach_resubmission_tags(paginator_results.object_list, resub_tag_map)
 
         context = context | {
             "form_user_input": form_user_input,
@@ -255,7 +275,9 @@ class Search(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
+            "resub_tag_map": resub_tag_map,
         }
+
         time_beginning_render = time.time()
         total_time_ms = int(
             math.ceil((time_beginning_render - time_starting_post) * 1000)
@@ -336,7 +358,7 @@ class AuditSearch(View):
         logger.info(f"Searching on fields: {form_data}")
 
         # Generate results on valid user input.
-        results = run_search(form_data, True)
+        results = run_search(request, form_data, True)
         results_count = results.count()
 
         # Reset page to one if the page number surpasses how many pages there actually are
@@ -362,7 +384,7 @@ class AuditSearch(View):
 
         # populate the agency name in cog/over field
         if results_count > 0:
-            paginator_results = audit_populate_cog_over_name(paginator_results)
+            paginator_results = populate_cog_over_name(paginator_results)
 
         context = context | {
             "form_user_input": form_user_input,
