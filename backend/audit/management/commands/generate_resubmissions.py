@@ -1,3 +1,6 @@
+##########################################################################
+# THIS SHOULD NEVER BE RUN IN PRODUCTION
+##########################################################################
 from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
@@ -28,6 +31,14 @@ User = get_user_model()
 
 from inspect import currentframe
 
+import os, sys
+
+if os.getenv("ENV") == "PRODUCTION":
+    # https://en.wikipedia.org/wiki/Long-term_nuclear_waste_warning_messages
+    logger.error("The danger is still present, in your time, as it was in ours.")
+    logger.error("DO NOT RUN THIS IN PRODUCTION")
+    sys.exit(-1)
+
 # Using the new tools to generate data for local testing,
 # we want to make sure these are selected from our
 # 20K record subset, so that the command always works.
@@ -35,14 +46,24 @@ REPORTIDS_TO_MODIFIERS = lambda: {
     # Lets rewrite the auditor's address
     "2023-06-GSAFAC-0000000697": [
         modify_auditor_address,
-        upload_pdfs("ocaptain.pdf", "ocaptain-2.pdf"),
+        # These two files have no changes that are visible, but
+        # the PDFs were generated at two different times. Invisible to the user.
+        upload_pdfs("o-captain.pdf", "o-captain-2.pdf"),
     ],
     "2023-06-GSAFAC-0000002166": [
         modify_auditee_ein,
+        # The second file contains an image; the second does not
         upload_pdfs("federalist.pdf", "federalist-2.pdf"),
     ],
     # Modifying the workbook requires there to be additional EINs
-    "2022-12-GSAFAC-0000001787": [modify_additional_eins_workbook, add_an_award],
+    "2022-12-GSAFAC-0000001787": [
+        modify_additional_eins_workbook,
+        add_an_award,
+        # The second file had its XML metadata changed. Instead of
+        # being created by Acrobat Distiller 6.0, the second
+        # was created by Acrobat Distiller 9.0. Invisible to the user.
+        upload_pdfs("permanent-markers.pdf", "permanent-markers-2.pdf"),
+    ],
     "2023-06-GSAFAC-0000002901": [
         modify_auditor_address,
         modify_additional_eins_workbook,
