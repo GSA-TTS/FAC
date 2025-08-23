@@ -13,6 +13,12 @@ import logging
 import sys
 from django.contrib.auth import get_user_model
 
+import boto3
+
+# In case it is needed for S3 operations.
+# from boto3.s3.transfer import S3Transfer
+from django.conf import settings
+
 from copy import deepcopy
 
 logger = logging.getLogger(__name__)
@@ -27,8 +33,14 @@ from inspect import currentframe
 # 20K record subset, so that the command always works.
 REPORTIDS_TO_MODIFIERS = lambda: {
     # Lets rewrite the auditor's address
-    "2023-06-GSAFAC-0000000697": [modify_auditor_address],
-    "2023-06-GSAFAC-0000002166": [modify_auditee_ein],
+    "2023-06-GSAFAC-0000000697": [
+        modify_auditor_address,
+        upload_pdfs("ocaptain.pdf", "ocaptain-2.pdf"),
+    ],
+    "2023-06-GSAFAC-0000002166": [
+        modify_auditee_ein,
+        upload_pdfs("federalist.pdf", "federalist-2.pdf"),
+    ],
     # Modifying the workbook requires there to be additional EINs
     "2022-12-GSAFAC-0000001787": [modify_additional_eins_workbook, add_an_award],
     "2023-06-GSAFAC-0000002901": [
@@ -57,6 +69,9 @@ REPORTIDS_TO_MODIFIERS = lambda: {
         modify_total_amount_expended,
         modify_pdf_point_at_this_instead("2023-06-GSAFAC-0000000697"),
     ],
+    # Because we randomly fake tribal audits, this is tricky.
+    # We may need to intentionally set one in here, and then flip it.
+    # "2019-06-GSAFAC-0000005301": [flip_tribal_consent_status],
 }
 
 REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2023-06-GSAFAC-0000013043"]
@@ -114,7 +129,7 @@ REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2023-06-GSAFAC-0000013043"]
 #
 # For all I know, something like this is at play: https://www.reddit.com/r/django/comments/14vq6s7/comment/jrdxttz
 # There are times when a Django model will auto-save itself. So, that may have been happening to the old_sac
-# somewhere in this code. I wouldn't know.
+# somewhere in this code. I wouldn't know. But I do know that the original was changing.
 #
 # MCJ 20250822
 
@@ -128,20 +143,89 @@ def get_linenumber():
 def APNE(a, b, loc=None):
     if id(a) == id(b):
         if isinstance(a, int) and isinstance(b, int) and a == b:
-            logger.info("POINTERS EQUAL: INT")
             # We don't assert for integers; they always have the same pointer.
             return
         elif isinstance(a, str) and isinstance(b, str) and a == b:
-            logger.info("POINTERS EQUAL: STR")
+            # Same for strings and other builtin types.
+            return
+        elif isinstance(a, bool) and isinstance(b, bool) and a == b:
             return
         else:
             logger.info(f"POINTERS EQUAL: {id(a)}")
             logger.info(f"VALUE: {a}")
             if loc is not None:
                 logger.info(f"LOCATION: {loc}")
-    else:
-        logger.info(f"POINTERS NOT EQUAL")
     assert id(a) != id(b)
+
+
+#############################################
+# upload_pdfs
+#############################################
+# This uploads the orig to the old sac, and the second
+# to the new sac. We need to stuff real PDFs into the
+# S3/Minio bucket in order to compare them.
+def upload_pdfs(orig_pdf, revised_pdf):
+    def _fun(old_sac, new_sac, user_obj):
+        logger.info("MODIFIER: upload_pdfs")
+        APNE(old_sac, new_sac)
+
+        orig_sar = (
+            SingleAuditReportFile.objects.filter(sac=old_sac)
+            .order_by("date_created")
+            .first()
+        )
+
+        revised_sar = (
+            SingleAuditReportFile.objects.filter(sac=new_sac)
+            .order_by("date_created")
+            .first()
+        )
+
+        # These SARs will provide the filenames that we upload *to*.
+        # The filenames given are the filenames in the fixtures directory.
+        client = boto3.client(
+            "s3",
+            aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
+            endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+        )
+        # In the event that the transfer mode doesn't work, this is another
+        # way to do it.
+        # transfer = S3Transfer(client)
+        # transfer.upload_file('/tmp/myfile', 'bucket', 'key')
+
+        fixture_1 = f"audit/fixtures/{orig_pdf}"
+        with open(fixture_1, "rb") as file:
+            logger.info(f"Uploading {fixture_1} to {orig_sar.filename}")
+            client.upload_fileobj(
+                file,
+                settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
+                f"singleauditreport/{orig_sar.filename}",
+            )
+
+        fixture_2 = f"audit/fixtures/{revised_pdf}"
+        with open(fixture_2, "rb") as file:
+            logger.info(f"Uploading {fixture_2} to {revised_sar.filename}")
+            client.upload_fileobj(
+                file,
+                settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
+                f"singleauditreport/{revised_sar.filename}",
+            )
+
+        return new_sac
+
+    return _fun
+
+
+#############################################
+# flip_tribal_consent_status
+#############################################
+def flip_tribal_consent_status(old_sac, new_sac, user_obj):
+    logger.info("MODIFIER: flip_tribal_consent_status")
+    APNE(old_sac, new_sac)
+    new_sac.general_information["user_provided_organization_type"] = "tribal"
+    new_sac.tribal_data_consent["is_tribal_information_authorized_to_be_public"] = True
+    return new_sac
 
 
 #############################################
@@ -478,7 +562,8 @@ def copy_data_over(old_sac, new_sac):
                 section = getattr(old_sac, field)
                 if section is None:
                     # Should this be None, or dict()?
-                    setattr(new_sac, field, dict())
+                    # IT SHOULD BE NONE. That will match the prior DB row.
+                    setattr(new_sac, field, None)
                 else:
                     d = dict()
                     for k, v in section.items():

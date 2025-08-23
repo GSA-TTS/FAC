@@ -1,7 +1,12 @@
-from audit.models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist, SingleAuditReportFile
 from copy import deepcopy
 from pprint import pprint
 import logging
+import boto3
+from io import BytesIO
+from botocore.exceptions import ClientError
+from django.conf import settings
+from hashlib import sha256
 
 logger = logging.getLogger(__name__)
 
@@ -117,10 +122,6 @@ def compare_lists_of_objects(
     # print(f"deep on {sac2}")
     ls2 = deep_getattr(sac2, keys, [])
 
-    print("COMPARING")
-    pprint(ls1)
-    pprint(ls2)
-
     # Hash the objects.
     # Key order will matter. Here's to hoping
     # our system is very consistent.
@@ -134,11 +135,6 @@ def compare_lists_of_objects(
     map2 = {}
     for h, o in zip(loh2, ls2):
         map2[h] = o
-
-    print("MAP 1")
-    pprint(map1)
-    print("MAP 2")
-    pprint(map2)
 
     # If the maps are identical, we can just return now.
     if map1 == map2:
@@ -168,6 +164,82 @@ def compare_lists_of_objects(
     )
 
     return res
+
+
+def get_s3_object(client, bucket_name, key):
+    file = BytesIO()
+    try:
+        client.download_fileobj(Bucket=bucket_name, Key=key, Fileobj=file)
+    except ClientError:
+        logger.error("Could not download {}".format(key))
+        return None
+    logger.info(f"Obtained {key} from S3")
+    return file
+
+
+def compare_single_audit_reports(
+    sac1: SingleAuditChecklist, sac2: SingleAuditChecklist
+):
+    # I don't think we've ever grabbed PDFs from within an app/command before.
+    # FIXME: Should these be ordered, if there is more than one?
+    sar1 = SingleAuditReportFile.objects.filter(sac=sac1)
+    sar2 = SingleAuditReportFile.objects.filter(sac=sac2)
+
+    # Make sure they both exist/have PDFs associated with them.
+    if len(sar1) == 0:
+        return {"status": f"no single audit report found for {sac1.report_id}"}
+    if len(sar2) == 0:
+        return {"status": f"no single audit report found for {sac2.report_id}"}
+
+    # Use the first. Why? Why are there possibly multiple?
+    # I think there shouldn't be.
+    sar1 = sar1.first()
+    sar2 = sar2.first()
+
+    client = boto3.client(
+        "s3",
+        aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
+        endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+    )
+
+    logger.info(f"FETCHING PDF: {sar1.filename}")
+    pdf1 = get_s3_object(
+        client,
+        settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
+        f"singleauditreport/{sar1.filename}",
+    )
+    logger.info(f"FETCHING PDF: {sar2.filename}")
+    pdf2 = get_s3_object(
+        client,
+        settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
+        f"singleauditreport/{sar2.filename}",
+    )
+
+    if pdf1 and pdf2:
+        pdf1_bytes = pdf1.getvalue()
+        pdf2_bytes = pdf2.getvalue()
+        sha1 = sha256(pdf1_bytes).hexdigest()
+        sha2 = sha256(pdf2_bytes).hexdigest()
+        logger.info(f"SHA1: {sha1}:{len(pdf1_bytes)} SHA2: {sha2}:{len(pdf2_bytes)}")
+        if sha1 == sha2:
+            return {"status": "same"}
+        else:
+            return {
+                "status": "changed",
+                "in_r1": list(),
+                "in_r2": list(),
+                "in_both": [
+                    {
+                        "from": f"{sha1[0:4]}...{sha1[-4:]}",
+                        "to": f"{sha2[0:4]}...{sha2[-4:]}",
+                        "key": "SHA256",
+                    },
+                    {"from": len(pdf1_bytes), "to": len(pdf2_bytes), "key": "length"},
+                ],
+            }
+
+    return {"status": "error", "message": "pdf objects could not be retrieved"}
 
 
 def report_id_to_sac(rid):
@@ -323,6 +395,11 @@ def compare_report_ids(rid_1, rid_2):
     # tribal_data_consent
     res = compare_dictionary_fields(sac_r1, sac_r2, "tribal_data_consent")
     summary["tribal_data_consent"] = res
+
+    ###############
+    # the SAR (single audit report, or PDF)
+    res = compare_single_audit_reports(sac_r1, sac_r2)
+    summary["single_audit_report"] = res
 
     return summary
 
