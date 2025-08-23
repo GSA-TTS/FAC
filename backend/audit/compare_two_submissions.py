@@ -1,6 +1,5 @@
 from audit.models import SingleAuditChecklist, SingleAuditReportFile
 from copy import deepcopy
-from pprint import pprint
 import logging
 import boto3
 from io import BytesIO
@@ -173,7 +172,6 @@ def get_s3_object(client, bucket_name, key):
     except ClientError:
         logger.error("Could not download {}".format(key))
         return None
-    logger.info(f"Obtained {key} from S3")
     return file
 
 
@@ -203,13 +201,14 @@ def compare_single_audit_reports(
         endpoint_url=settings.AWS_S3_ENDPOINT_URL,
     )
 
-    logger.info(f"FETCHING PDF: {sar1.filename}")
+    # logger.info(f"FETCHING PDF: {sar1.filename}")
     pdf1 = get_s3_object(
         client,
         settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
         f"singleauditreport/{sar1.filename}",
     )
-    logger.info(f"FETCHING PDF: {sar2.filename}")
+
+    # logger.info(f"FETCHING PDF: {sar2.filename}")
     pdf2 = get_s3_object(
         client,
         settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
@@ -221,7 +220,7 @@ def compare_single_audit_reports(
         pdf2_bytes = pdf2.getvalue()
         sha1 = sha256(pdf1_bytes).hexdigest()
         sha2 = sha256(pdf2_bytes).hexdigest()
-        logger.info(f"SHA1: {sha1}:{len(pdf1_bytes)} SHA2: {sha2}:{len(pdf2_bytes)}")
+        # logger.info(f"SHA1: {sha1}:{len(pdf1_bytes)} SHA2: {sha2}:{len(pdf2_bytes)}")
         if sha1 == sha2:
             return {"status": "same"}
         else:
@@ -387,7 +386,7 @@ def compare_report_ids(rid_1, rid_2):
     ]
 
     for ls in accessors:
-        logger.info(f"{ls[0][0]}")
+        # logger.info(f"{ls[0][0]}")
         res = compare_lists_of_objects(sac_r1, sac_r2, ls[0], ls[1])
         summary[ls[0][0]] = res
 
@@ -422,8 +421,8 @@ def compare_with_prev(rid):
         else:
             logger.error(f"No previous report ID for {rid}")
             return {"status": "error", "message": f"no previous report for {rid}"}
-        logger.info(f"COMPARING PREV {prev} WITH NEXT {rid}")
-        return compare_report_ids(prev, rid)
+        logger.info(f"[DIFF] {prev} <-> {rid}")
+        return prev, rid, compare_report_ids(prev, rid)
 
     return {"status": "error", "message": "No resubmission_meta in sac."}
 

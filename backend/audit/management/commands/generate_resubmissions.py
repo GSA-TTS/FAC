@@ -8,30 +8,23 @@ from audit.models import (
 from django.core.management.base import BaseCommand
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from audit.cross_validation.naming import SECTION_NAMES
+from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from datetime import datetime
 import pytz
+import os
+import sys
+import boto3
+from copy import deepcopy
+from inspect import currentframe
 
 import logging
-import sys
-from django.contrib.auth import get_user_model
-
-import boto3
-
-# In case it is needed for S3 operations.
-# from boto3.s3.transfer import S3Transfer
-from django.conf import settings
-
-from copy import deepcopy
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 User = get_user_model()
-
-from inspect import currentframe
-
-import os, sys
 
 if os.getenv("ENV") == "PRODUCTION":
     # https://en.wikipedia.org/wiki/Long-term_nuclear_waste_warning_messages

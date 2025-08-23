@@ -28,7 +28,7 @@ def setup_mock_db():
     rids = {}
     for ndx, rid in enumerate(report_ids):
         baker.make(SingleAuditChecklist, report_id=rid)
-        rids[f"rid_{ndx+1}"] = rid
+        rids[f"rid_{ndx + 1}"] = rid
 
     sac_r1 = SingleAuditChecklist.objects.get(report_id=rids["rid_1"])
     sac_r2 = SingleAuditChecklist.objects.get(report_id=rids["rid_2"])

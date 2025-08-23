@@ -1,11 +1,6 @@
-from audit.models import (
-    SingleAuditChecklist,
-    SingleAuditReportFile,
-)
 from django.core.management.base import BaseCommand
 
 import logging
-import sys
 from django.contrib.auth import get_user_model
 from pprint import pprint
 

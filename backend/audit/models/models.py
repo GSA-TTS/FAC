@@ -3,7 +3,6 @@ import json
 import logging
 
 from django.db import models
-from django.forms.models import model_to_dict
 from django.db import transaction
 from django.db.transaction import TransactionManagementError
 from django.conf import settings
