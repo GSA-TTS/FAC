@@ -1,5 +1,5 @@
 from django.test import TestCase
-from audit.compare_two_submissions import (
+from audit.viewlib.compare_two_submissions import (
     compare_report_ids,
     in_first_not_second,
     in_second_not_first,
@@ -291,6 +291,8 @@ def setup_mock_db():
     ]
 
     sac_r3.save()
+
+    return [sac_r1, sac_r2, sac_r3]
 
 
 class CompareSubmissionTests(TestCase):

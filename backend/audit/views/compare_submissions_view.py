@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 from django.core.exceptions import PermissionDenied
-from audit.compare_two_submissions import compare_with_prev
+from audit.viewlib.compare_two_submissions import compare_with_prev
 from audit.models import (
     SingleAuditChecklist,
     ACCESS_ROLES,
@@ -59,37 +59,10 @@ logger = logging.getLogger(__name__)
 # We have to check the second.
 
 
-def _get_friendly_role(role):
-    return dict(ACCESS_ROLES)[role]
-
-
-def _user_entry(access: Access) -> dict:
-    """Given an Access, return a dict of relevant info."""
-    return {
-        "name": access.fullname,
-        "email": access.email,
-        "role": _get_friendly_role(access.role),
-        "user_exists": bool(access.user),
-        "never_logged_in_flag": "" if bool(access.user) else "*",
-        "id": access.id,
-    }
-
-
-# The access control we're implementing:
-# IF the status == `DISSEMINATED` and I'm logged in as a Federal user
-# THEN I can see both reports
-#
-# IF the status == `IN_PROGRESS` and I own the first report
-# THEN I can see both reports
-
-# Does it matter if the audit is done?
-# Should I be allowed to see the differences for all time?
-
-
 class CompareSubmissionsView(LoginRequiredMixin, generic.View):
 
     def get(self, request, *args, **kwargs):
-        report_id_1 = kwargs["report_id_1"]
+        report_id_1 = kwargs["report_id"]
         current_user = request.user
         try:
             sac_1 = SingleAuditChecklist.objects.get(report_id=report_id_1)

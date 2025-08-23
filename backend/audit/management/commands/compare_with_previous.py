@@ -4,7 +4,7 @@ import logging
 from django.contrib.auth import get_user_model
 from pprint import pprint
 
-from audit.compare_two_submissions import compare_with_prev
+from audit.viewlib.compare_two_submissions import compare_with_prev
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
