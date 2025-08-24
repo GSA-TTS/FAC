@@ -403,6 +403,13 @@ def compare_report_ids(rid_1, rid_2):
     return summary
 
 
+def report_id_as_string(o):
+    if isinstance(o, SingleAuditChecklist):
+        return o.report_id
+    else:
+        return o
+
+
 def compare_with_prev(rid):
     if isinstance(rid, str):
         sac = SingleAuditChecklist.objects.get(report_id=rid)
@@ -422,6 +429,10 @@ def compare_with_prev(rid):
             logger.error(f"No previous report ID for {rid}")
             return {"status": "error", "message": f"no previous report for {rid}"}
         logger.info(f"[DIFF] {prev} <-> {rid}")
-        return prev, rid, compare_report_ids(prev, rid)
+        return (
+            report_id_as_string(prev),
+            report_id_as_string(rid),
+            compare_report_ids(prev, rid),
+        )
 
     return {"status": "error", "message": "No resubmission_meta in sac."}

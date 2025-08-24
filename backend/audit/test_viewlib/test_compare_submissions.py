@@ -292,6 +292,20 @@ def setup_mock_db():
 
     sac_r3.save()
 
+    # Make these a resubmission sequence
+    sac_r1.resubmission_meta = {"next_report_id": sac_r2.report_id}
+
+    sac_r2.resubmission_meta = {
+        "previous_report_id": sac_r1.report_id,
+        "next_report_id": sac_r3.report_id,
+    }
+
+    sac_r3.resubmission_meta = {"previous_report_id": sac_r2.report_id}
+
+    sac_r1.save()
+    sac_r2.save()
+    sac_r3.save()
+
     return [sac_r1, sac_r2, sac_r3]
 
 
