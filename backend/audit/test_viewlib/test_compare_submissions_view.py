@@ -33,8 +33,7 @@ def setup_test(is_federal=False):
     if is_federal:
         try:
             rtp = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
-        except IntegrityError:
-            # This exception is wrong. I'm trying to work around the test DB holding on to things.
+        except Permission.DoesNotExist:
             rtp = baker.make(Permission, slug=Permission.PermissionType.READ_TRIBAL)
 
     # I need to be a valid user...
@@ -42,21 +41,17 @@ def setup_test(is_federal=False):
     p.user = baker.make(User)
 
     if is_federal:
+        print("Granting federal access")
         baker.make(
             UserPermission,
             user=p.user,
             permission=rtp,
         )
-    else:
-        baker.make(
-            UserPermission,
-            user=p.user,
-        )
 
     p.sacs = setup_mock_db()
 
     for sac in p.sacs:
-        print(f"Creating access for user {p.user.id} report {sac.report_id}")
+        # print(f"Creating access for user {p.user.id} report {sac.report_id}")
         baker.make(Access, user=p.user, sac=sac)
 
     p.client = Client()
@@ -90,5 +85,43 @@ class CompareSubmissionsViewTests(TestCase):
             ),
             follow=True,
         )
-        # I get an auth error.
         self.assertIn("2025-01-FAKEDB-0000000002", res.content.decode("utf-8"))
+        self.assertIn("2025-01-FAKEDB-0000000001", res.content.decode("utf-8"))
+
+    def test_fail_without_access_to_audit(self):
+        """Check I cannot access a report if I don't have an access object"""
+        p = setup_test()
+
+        # This should delete the access objects
+        # That way, I cannot access anything in this test.
+        for a in Access.objects.all():
+            a.delete()
+
+        p.client.force_login(user=p.user)
+        res = p.client.get(
+            reverse(
+                self.view,
+                kwargs={"report_id": "2025-01-FAKEDB-0000000002"},
+            ),
+            follow=True,
+        )
+        self.assertEqual(res.status_code, 403)
+
+    def test_feds_have_access(self):
+        """Check I cannot access a report if I don't have an access object"""
+        p = setup_test(is_federal=True)
+
+        # This should delete the access objects
+        # The only way I can have access is if it recognizes my Federal status
+        for a in Access.objects.all():
+            a.delete()
+
+        p.client.force_login(user=p.user)
+        res = p.client.get(
+            reverse(
+                self.view,
+                kwargs={"report_id": "2025-01-FAKEDB-0000000002"},
+            ),
+            follow=True,
+        )
+        self.assertEqual(res.status_code, 200)
