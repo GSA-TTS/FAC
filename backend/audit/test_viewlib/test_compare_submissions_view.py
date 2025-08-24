@@ -55,6 +55,7 @@ def setup_test(is_federal=False):
         baker.make(Access, user=p.user, sac=sac)
 
     p.client = Client()
+    p.audit_range = len(p.sacs) + 1
     return p
 
 
@@ -78,15 +79,24 @@ class CompareSubmissionsViewTests(TestCase):
         """Check for report ID in form."""
         p = setup_test()
         p.client.force_login(user=p.user)
-        res = p.client.get(
-            reverse(
-                self.view,
-                kwargs={"report_id": "2025-01-FAKEDB-0000000002"},
-            ),
-            follow=True,
-        )
-        self.assertIn("2025-01-FAKEDB-0000000002", res.content.decode("utf-8"))
-        self.assertIn("2025-01-FAKEDB-0000000001", res.content.decode("utf-8"))
+
+        # Three tests
+        # If we look for #2, we will default to comparing with its prev, which is 1
+        # If we look for 3, we default to its prev, which is 2
+        # If we look for #1, we have no prev, but we have a next, so we compare against #2
+        # This helps users get *something* back in most/all cases when in a resubmission chain.
+        # EG if you look for the first or last, you get *something* compared as a result.
+        for pair in [[1, 2], [2, 3], [2, 1]]:
+            res = p.client.get(
+                reverse(
+                    self.view,
+                    kwargs={"report_id": f"2025-01-FAKEDB-000000000{pair[1]}"},
+                ),
+                follow=True,
+            )
+            content = res.content.decode("utf-8")
+            self.assertIn(f"000000000{pair[0]}", content)
+            self.assertIn(f"000000000{pair[1]}", content)
 
     def test_fail_without_access_to_audit(self):
         """Check I cannot access a report if I don't have an access object"""
@@ -98,14 +108,17 @@ class CompareSubmissionsViewTests(TestCase):
             a.delete()
 
         p.client.force_login(user=p.user)
-        res = p.client.get(
-            reverse(
-                self.view,
-                kwargs={"report_id": "2025-01-FAKEDB-0000000002"},
-            ),
-            follow=True,
-        )
-        self.assertEqual(res.status_code, 403)
+
+        # All of the  test audits should fail, as we wiped out the access objects.
+        for counter in range(1, p.audit_range):
+            res = p.client.get(
+                reverse(
+                    self.view,
+                    kwargs={"report_id": f"2025-01-FAKEDB-000000000{counter}"},
+                ),
+                follow=True,
+            )
+            self.assertEqual(res.status_code, 403)
 
     def test_feds_have_access(self):
         """Check I cannot access a report if I don't have an access object"""
@@ -117,11 +130,14 @@ class CompareSubmissionsViewTests(TestCase):
             a.delete()
 
         p.client.force_login(user=p.user)
-        res = p.client.get(
-            reverse(
-                self.view,
-                kwargs={"report_id": "2025-01-FAKEDB-0000000002"},
-            ),
-            follow=True,
-        )
-        self.assertEqual(res.status_code, 200)
+
+        # All of the audits should pass, becuase I am now a Federal user.
+        for counter in range(1, p.audit_range):
+            res = p.client.get(
+                reverse(
+                    self.view,
+                    kwargs={"report_id": f"2025-01-FAKEDB-000000000{counter}"},
+                ),
+                follow=True,
+            )
+            self.assertEqual(res.status_code, 200)
