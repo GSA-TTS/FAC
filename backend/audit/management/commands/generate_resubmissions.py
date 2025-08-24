@@ -1,16 +1,25 @@
 ##########################################################################
 # THIS SHOULD NEVER BE RUN IN PRODUCTION
 ##########################################################################
-from audit.models import (
-    SingleAuditChecklist,
-    SingleAuditReportFile,
-)
+from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access
 from django.core.management.base import BaseCommand
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from audit.cross_validation.naming import SECTION_NAMES
 from django.contrib.auth import get_user_model
 from django.conf import settings
-
+from dissemination.models import (
+    AdditionalEin,
+    AdditionalUei,
+    CapText,
+    FederalAward,
+    Finding,
+    FindingText,
+    General,
+    Note,
+    Passthrough,
+    SecondaryAuditor,
+    Resubmission,
+)
 from datetime import datetime
 import pytz
 import os
@@ -26,10 +35,11 @@ logger.setLevel(logging.INFO)
 
 User = get_user_model()
 
-if os.getenv("ENV") == "PRODUCTION":
+if "PROD" in os.getenv("ENV"):
     # https://en.wikipedia.org/wiki/Long-term_nuclear_waste_warning_messages
     logger.error("The danger is still present, in your time, as it was in ours.")
     logger.error("DO NOT RUN THIS IN PRODUCTION")
+    logger.error("IT WILL DESTROY PRODUCTION DATA")
     sys.exit(-1)
 
 # Using the new tools to generate data for local testing,
@@ -90,6 +100,15 @@ REPORTIDS_TO_MODIFIERS = lambda: {
 
 REPORTIDS_TO_RESUBMIT_MODIFIERS_SEPARATELY = ["2023-06-GSAFAC-0000013043"]
 
+# These are reports that get modified after the submission is complete.
+# This is useful for "rolling back" a resubmission into a IN_PROGRESS state or similar.
+# These must appear in the above table.
+POST_SUBMISSION_MODIFIERS = lambda: {
+    "2023-06-GSAFAC-0000000697": [
+        delete_disseminated_data_new_sac,
+        move_to_in_progress_new_sac,
+    ]
+}
 
 #########################################################
 # WARNING WARNING WARNING
@@ -229,6 +248,45 @@ def upload_pdfs(orig_pdf, revised_pdf):
         return new_sac
 
     return _fun
+
+
+#############################################
+# move_to_in_progress_new_sac
+#############################################
+def move_to_in_progress_new_sac(
+    old_sac: SingleAuditChecklist, new_sac: SingleAuditChecklist, user_obj
+):
+    new_sac.submission_status = STATUS.IN_PROGRESS
+    new_sac.transition_date = new_sac.transition_date[0:-1]
+    new_sac.transition_name = new_sac.transition_name[0:-1]
+    new_sac.save()
+    return new_sac
+
+
+#############################################
+# delete_disseminated_data_new_sac
+#############################################
+# Only deletes the disseminated data for the new_sac
+def delete_disseminated_data_new_sac(old_sac, new_sac, user_obj):
+    logger.info("MODIFIER: delete_disseminated_data_new_sac")
+    named_models = {
+        "AdditionalEins": AdditionalEin,
+        "AdditionalUeis": AdditionalUei,
+        "CorrectiveActionPlan": CapText,
+        "FederalAwards": FederalAward,
+        "FindingsText": FindingText,
+        "FindingsUniformGuidance": Finding,
+        "NotesToSefa": Note,
+        "SecondaryAuditors": SecondaryAuditor,
+        "General": General,
+        "Passthrough": Passthrough,
+        "Resubmission": Resubmission,
+    }
+    for model in named_models.values():
+        objs = model.objects.filter(report_id=new_sac.report_id)
+        for o in objs:
+            o.delete()
+    return new_sac
 
 
 #############################################
@@ -438,6 +496,26 @@ def complete_resubmission(
     # Finally, redisseminate the old and new SAC records.
     new_status = source_sac.redisseminate()
     old_status = resubmitted_sac.redisseminate()
+
+    # Grant access to the audits
+    for a in Access.objects.filter(sac_id=source_sac.id):
+        a.delete()
+    for a in Access.objects.filter(sac_id=resubmitted_sac.id):
+        a.delete()
+
+    if not Access.objects.filter(sac_id=source_sac.id).exists():
+        a = Access(user=USER_OBJ, sac=source_sac, email=USER_OBJ.email)
+        a.save()
+        logger.info(
+            f"ACTION creating access: {a.sac.report_id} for user {a.user.email}"
+        )
+    if not Access.objects.filter(sac_id=resubmitted_sac.id).exists():
+        a = Access(user=USER_OBJ, sac=resubmitted_sac, email=USER_OBJ.email)
+        a.save()
+        logger.info(
+            f"ACTION creating access: {a.sac.report_id} for user {a.user.email}"
+        )
+
     return old_status and new_status
 
 
@@ -488,7 +566,9 @@ def recursively_delete_resubs_for_sac(sac, resubs):
         resub.delete()
 
 
-def generate_resubmissions(sacs, reportids_to_modifiers, options):
+def generate_resubmissions(
+    sacs, reportids_to_modifiers, post_submission_modifiers, options
+):
     """
     Generates all the resubmissions
     """
@@ -500,13 +580,16 @@ def generate_resubmissions(sacs, reportids_to_modifiers, options):
             previous_sac = deepcopy(old_sac)
             APNE(previous_sac, old_sac)
             for modifier in reportids_to_modifiers[old_sac.report_id]:
-                new_sac = generate_resubmission(previous_sac, options, [modifier])
+                new_sac = generate_resubmission(previous_sac, options, [modifier], [])
                 previous_sac = deepcopy(new_sac)
                 APNE(previous_sac, new_sac)
         else:
             logger.info(f"Generating resubmission for {old_sac.report_id}")
             generate_resubmission(
-                old_sac, options, reportids_to_modifiers[old_sac.report_id]
+                old_sac,
+                options,
+                reportids_to_modifiers[old_sac.report_id],
+                post_submission_modifiers.get(old_sac.report_id, []),
             )
 
 
@@ -530,8 +613,6 @@ def create_resubmitted_pdf(sac, new_sac):
 
 def get_user_object(options):
     # We need a user.
-    # FIXME: Allow an email address to be passed in, so we can see these things
-    # in our dashboards. For now: any user will do.
     try:
         THE_USER_OBJ = User.objects.get(email=options["email"])
     except User.MultipleObjectsReturned:
@@ -539,6 +620,7 @@ def get_user_object(options):
         THE_USER_OBJ = User.objects.filter(email=options["email"]).first()
     except User.DoesNotExist:
         THE_USER_OBJ = User.objects.first()
+        logger.info(f"ERROR: USING FIRST USER IN DB FOR TESTING: {THE_USER_OBJ.email}")
     logger.info(f"Passed email: {options['email']}, Using user {THE_USER_OBJ}")
     return THE_USER_OBJ
 
@@ -592,7 +674,9 @@ def copy_data_over(old_sac, new_sac):
                     )
 
 
-def generate_resubmission(old_sac: SingleAuditChecklist, options, modifiers):  #
+def generate_resubmission(
+    old_sac: SingleAuditChecklist, options, modifiers, post_modifiers
+):  #
     """
     Generates a single resubmission
     """
@@ -639,6 +723,11 @@ def generate_resubmission(old_sac: SingleAuditChecklist, options, modifiers):  #
 
         if disseminated:
             logger.info(f"DISSEMINATED REPORT: {new_sac.report_id}")
+
+            # Now that we're done, run the post-dissemination actions, if they exist:
+            for modification in post_modifiers:
+                new_sac = modification(old_sac, new_sac, THE_USER_OBJ)
+
             return new_sac
         else:
             logger.error(
@@ -646,6 +735,7 @@ def generate_resubmission(old_sac: SingleAuditChecklist, options, modifiers):  #
                     disseminated, new_sac.report_id
                 )
             )
+    return None
 
 
 class Command(BaseCommand):
@@ -661,6 +751,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         reportids_to_modifiers = REPORTIDS_TO_MODIFIERS()
+        post_submission_modifiers = POST_SUBMISSION_MODIFIERS()
         logger.info("Modifying the following report IDs")
         for rid in reportids_to_modifiers:
             logger.info(f"\t{rid}")
@@ -674,4 +765,6 @@ class Command(BaseCommand):
             sys.exit(1)
 
         delete_prior_resubs(sacs_for_resubs)
-        generate_resubmissions(sacs_for_resubs, reportids_to_modifiers, options)
+        generate_resubmissions(
+            sacs_for_resubs, reportids_to_modifiers, post_submission_modifiers, options
+        )
