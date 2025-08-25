@@ -4,13 +4,12 @@ from django.core.exceptions import PermissionDenied
 from audit.viewlib.compare_two_submissions import compare_with_prev
 from audit.models import (
     SingleAuditChecklist,
-    ACCESS_ROLES,
     Access,
 )
 from audit.mixins import (
     LoginRequiredMixin,
 )
-from users.models import Permission, UserPermission
+from users.models import UserPermission
 
 
 import logging

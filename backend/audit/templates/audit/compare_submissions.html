@@ -1,31 +1,21 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="grid-container margin-top-6">
-{% comment %}
-{'general_information': {'status': 'same'}, 
- 'audit_information': {'status': 'same'}, 
- 'federal_awards': {'status': 'same'}, 
- 'corrective_action_plan': {'status': 'same'}, 
- 'findings_text': {'status': 'same'}, 
- 'findings_uniform_guidance': {'status': 'same'}, 
- 'additional_ueis': {'status': 'same'}, 'additional_eins': {'status': 'same'}, 'secondary_auditors': {'status': 'same'}, 'notes_to_sefa': {'status': 'same'}, 'tribal_data_consent': {'status': 'same'}}
-{% endcomment%}
 
 {% comment %} Perhaps only show the text at the top if this is a public/non-federal user? {% endcomment %}
 <div class="grid-container">
     <div class="grid-row">
       <div class="tablet:grid-col">
-      <h1>Resubmission comparison</h1>
-      <p>To assist auditees and auditors in completing the resubmission of audits, the Clearinghouse provides an automated comparison between {{r1}} and {{r2}}.</p>
-      <p>This comparison is not comprehensive; it is a summary of changes detected between sections of the SF-SAC.</p>
-      <section class="usa-alert usa-alert--warning margin-top-0 margin-bottom-1"
-            aria-label="Resubmission check"
-              id="resubmission-check">
-        <div class="usa-alert__body grid-container">
-          <p>This comparison tool does not absolve submitters from their responsibility to independently validate and assert the correctness of their submission to the FAC.</p>
-        </div>
-      </section>
+        <h1>Resubmission comparison</h1>
+        <p>To assist auditees and auditors in completing the resubmission of audits, the Clearinghouse provides an automated comparison between {{ r1 }} and {{ r2 }}.</p>
+        <p>This comparison is not comprehensive; it is a summary of changes detected between sections of the SF-SAC.</p>
+        <section class="usa-alert usa-alert--warning margin-top-0 margin-bottom-1"
+              aria-label="Resubmission check"
+                id="resubmission-check">
+          <div class="usa-alert__body grid-container">
+            <p>This comparison tool does not absolve submitters from their responsibility to independently validate and assert the correctness of their submission to the FAC.</p>
+          </div>
+        </section>
       </div>
     </div>
 
@@ -41,22 +31,22 @@
       {% else %}
     <div class="grid-row">
       <div class="tablet:grid-col">
-        <h2>{{nice_names | KV:section}}</h2>
+        <h2>{{ nice_names | KV:section }}</h2>
       </div>        
     </div>
 
       {% if changed.in_r1|length > 0 %}
         <div class="grid-row">
-          <div class=""tablet:grid-col"><h4>In first report</h4></div>
+          <div class="tablet:grid-col"><h4>In first report</h4></div>
         </div>
         <div class="grid-row">
           <div class="tablet:grid-col">
           </div>
           <div class="tablet:grid-col">
-            <b>{{r1|slice:"15:"}}</b> <!-- |slice:"15:" -->
+            <b>{{ r1 | slice:"15:" }}</b> <!-- |slice:"15:" -->
           </div>
           <div class="tablet:grid-col">
-            <b>{{r2|slice:"15:"}}</b>
+            <b>{{ r2 | slice:"15:" }}</b>
           </div>
         </div> <!-- Header row end -->
         
@@ -64,37 +54,37 @@
       {% for d in changed.in_r1|dictsort:"key" %}
         <div class="grid-row margin-top-2 margin-bottom-2">
           <div class="tablet:grid-col">
-            {{d.key|repl:"_| "|title}}
+            {{ d.key|repl:"_| "|title }}
           </div>
           <div class="tablet:grid-col">
             {% if d.from is None %}
               No value
             {% else %}
-              {{d.from}}
+              {{ d.from }}
             {% endif %}
           </div>
           <div class="tablet:grid-col">
             {% if d.to is None %}
               No value
             {% else %}
-              {{d.to}}
+              {{ d.to }}
             {% endif %}
           </div>
         </div>
       {% endfor %}
       {% if changed.in_r2|length > 0 %}
         <div class="grid-row">
-          <div class=""tablet:grid-col"><h4>In second report</h4></div>
+          <div class="tablet:grid-col"><h4>In second report</h4></div>
         </div>
 
         <div class="grid-row">
           <div class="tablet:grid-col">
           </div>
           <div class="tablet:grid-col">
-            <b>{{r1|slice:"15:"}}</b> <!-- |slice:"15:" -->
+            <b>{{ r1|slice:"15:" }}</b> <!-- |slice:"15:" -->
           </div>
           <div class="tablet:grid-col">
-            <b>{{r2|slice:"15:"}}</b>
+            <b>{{ 2|slice:"15:" }}</b>
           </div>
         </div> <!-- Header row end -->
         
@@ -102,37 +92,37 @@
       {% for d in changed.in_r2|dictsort:"key" %}
         <div class="grid-row margin-top-2 margin-bottom-2">
           <div class="tablet:grid-col">
-            {{d.key|repl:"_| "|title}}
+            {{ d.key|repl:"_| "|title }}
           </div>
           <div class="tablet:grid-col">
             {% if d.from == None %}
               No value
             {% else %}
-              {{d.from}}
+              {{ d.from }}
             {% endif %}
           </div>
           <div class="tablet:grid-col">
             {% if d.to == None %}
               No value
             {% else %}
-              {{d.to}}
+              {{ d.to }}
             {% endif %}
           </div>
         </div>
       {% endfor %}
       {% if changed.in_both|length > 0 %}
         <div class="grid-row">
-          <div class=""tablet:grid-col"><h4>Changed from first to second report</h4></div>
+          <div class="tablet:grid-col"><h4>Changed from first to second report</h4></div>
         </div>
 
         <div class="grid-row">
           <div class="tablet:grid-col">
           </div>
           <div class="tablet:grid-col">
-            <b>{{r1|slice:"15:"}}</b> <!-- |slice:"15:" -->
+            <b>{{ r1 | slice:"15:" }}</b> <!-- |slice:"15:" -->
           </div>
           <div class="tablet:grid-col">
-            <b>{{r2|slice:"15:"}}</b>
+            <b>{{ r2 | slice:"15:" }}</b>
           </div>
         </div> <!-- Header row end -->
         
@@ -140,7 +130,7 @@
       {% for d in changed.in_both|dictsort:"key" %}
         <div class="grid-row margin-top-2 margin-bottom-2">
           <div class="tablet:grid-col">
-            {{d.key|repl:"_| "|title}}
+            {{ d.key|repl:"_| "|title }}
           </div>
           {% if d.from == d.to %}
           <div class="tablet:grid-col"></div>
@@ -150,26 +140,24 @@
             {% if d.from == None %}
               No value
             {% else %}
-              {{d.from}}
+              {{ d.from }}
             {% endif %}
           </div>
           <div class="tablet:grid-col">
             {% if d.to == None %}
               No value
             {% else %}
-              {{d.to}}
+              {{ d.to }}
             {% endif %}
           </div>
         {% endif %}
         </div> <!-- end row -->
       {% endfor %}
-
-
       {% endif %}
     {% endfor %}
 
     <hr/>
     {% comment %} FIXME: This could be a blue button on the right? {% endcomment %}
-    <a href="/audit/submission-progress/{{r2}}">Return to the submission checklist.</a>
+    <a href="/audit/submission-progress/{{ r2 }}">Return to the submission checklist.</a>
 </div>
 {% endblock content %}

@@ -35,7 +35,7 @@ logger.setLevel(logging.INFO)
 
 User = get_user_model()
 
-if "PROD" in os.getenv("ENV"):
+if "PROD" in os.getenv("ENV", "NOENV"):
     # https://en.wikipedia.org/wiki/Long-term_nuclear_waste_warning_messages
     logger.error("The danger is still present, in your time, as it was in ours.")
     logger.error("DO NOT RUN THIS IN PRODUCTION")
@@ -188,7 +188,9 @@ def APNE(a, b, loc=None):
             logger.info(f"VALUE: {a}")
             if loc is not None:
                 logger.info(f"LOCATION: {loc}")
-    assert id(a) != id(b)
+    # Leave this; this command is for testing/dev only, and never runs
+    # in a production environment. We want the assert.
+    assert id(a) != id(b)  # nosec: B101
 
 
 #############################################
@@ -762,6 +764,11 @@ class Command(BaseCommand):
             logger.error(
                 f"Expected {len(reportids_to_modifiers.keys())} SACs, found {len(sacs_for_resubs)}. Make sure to truncate and load tables via menu.bash first."
             )
+            logger.error(f"Found: {[getattr(o, 'report_id') for o in sacs_for_resubs]}")
+            diff = set([getattr(o, "report_id") for o in sacs_for_resubs]) - set(
+                reportids_to_modifiers.keys()
+            )
+            logger.error(f"Missing: {diff}")
             sys.exit(1)
 
         delete_prior_resubs(sacs_for_resubs)

@@ -6,6 +6,7 @@ from io import BytesIO
 from botocore.exceptions import ClientError
 from django.conf import settings
 from hashlib import sha256
+from typing import Callable, Any, Union
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +113,13 @@ def deep_getattr(o, lok, default=None):
 
 
 def compare_lists_of_objects(
-    sac1: SingleAuditChecklist, sac2: SingleAuditChecklist, keys: list, extract_fun: str
+    sac1: SingleAuditChecklist,
+    sac2: SingleAuditChecklist,
+    keys: list,
+    extract_fun: Callable[
+        [dict],
+        Any,
+    ],
 ):
     # Use a list of keys to dive into an object.
     # Expect a list of objects to come back, in this case.
@@ -148,19 +155,26 @@ def compare_lists_of_objects(
     # Keys only in ks2
     only_in_2 = ks2 - ks1
 
-    res = {"status": "changed", "in_r1": list(), "in_r2": list(), "in_both": list()}
+    res: dict[str, Union[str, list]] = {"status": "changed"}
+    in_r1 = list()
+    in_r2 = list()
+    in_both = list()
 
     for k in only_in_1:
-        res["in_r1"].append(extract_fun(map1[k]))
+        in_r1.append(extract_fun(map1[k]))
     for k in only_in_2:
-        res["in_r2"].append(extract_fun(map2[k]))
+        in_r2.append(extract_fun(map2[k]))
 
     # Finally, to find everything "in both", we'll take all of the keys from both,
     # map them through the extract_fun, turn it into a set, and call it done.
     # Take the intersection.
-    res["in_both"] = set(map(extract_fun, map1.values())) & set(
-        map(extract_fun, map2.values())
+    in_both = list(
+        set(map(extract_fun, map1.values())) & set(map(extract_fun, map2.values()))
     )
+
+    res["in_r1"] = in_r1
+    res["in_r2"] = in_r2
+    res["in_both"] = in_both
 
     return res
 

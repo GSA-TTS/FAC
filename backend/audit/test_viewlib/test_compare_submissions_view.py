@@ -1,4 +1,3 @@
-from pathlib import Path
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -6,7 +5,6 @@ from model_bakery import baker
 from audit.test_viewlib.test_compare_submissions import setup_mock_db
 from audit.models import Access, SingleAuditChecklist
 from users.models import UserPermission, Permission
-from django.db.utils import IntegrityError
 
 User = get_user_model()
 
