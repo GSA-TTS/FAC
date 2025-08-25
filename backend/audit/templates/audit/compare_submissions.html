@@ -157,7 +157,7 @@
     {% endfor %}
 
     <hr/>
-    {% comment %} FIXME: This could be a blue button on the right? {% endcomment %}
-    <a href="/audit/submission-progress/{{ r2 }}">Return to the submission checklist.</a>
+    {% comment %} FIXME: This could be a blue button on the right? Also, which should we redirect them to? {% endcomment %}
+    <a href="{% url 'audit:SubmissionProgress' r2 %}">Return to the submission checklist.</a>
 </div>
 {% endblock content %}
