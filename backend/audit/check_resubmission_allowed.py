@@ -69,9 +69,9 @@ def check_resubmission_allowed(
             "Audit record is incomplete and cannot be evaluated for resubmission.",
         )
 
-    # ORIGINAL_SUBMISSION + version 1 can be resubmitted or MOST_RECENT + version > 1 can be resubmitted
-    if resub_status in [RESUBMISSION_STATUS.ORIGINAL, RESUBMISSION_STATUS.MOST_RECENT]:
-        if (resub_status == RESUBMISSION_STATUS.ORIGINAL and version == 1) or (
+    # MOST_RECENT + version > 1 can be resubmitted
+    if resub_status in [RESUBMISSION_STATUS.MOST_RECENT]:
+        if (
             resub_status == RESUBMISSION_STATUS.MOST_RECENT and version > 1
         ):
             return True, "Audit is eligible for resubmission."
