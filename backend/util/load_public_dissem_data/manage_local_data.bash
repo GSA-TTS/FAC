@@ -178,6 +178,28 @@ generate_fake_suppressed_reports () {
 }
 
 ############################################################
+# generate_fake_resubmission_dissemination_data
+############################################################
+generate_fake_resubmission_dissemination_data () {
+  echo "generate_fake_resubmission_dissemination_data"
+    psql \
+    -q \
+    -d ${DATABASE} \
+    -U ${USERNAME} \
+    -p ${PORT} \
+    -h ${HOST} \
+    -v ON_ERROR_STOP=1 \
+    -w < "gen_fake_resub_dissem_data.sql"
+
+  if [ $? -ne 0 ]; then
+    echo "psql failed."
+    exit
+  fi
+  
+  echo "Done."
+}
+
+############################################################
 # generate_resubmissions
 ############################################################
 generate_resubmissions () {
@@ -259,6 +281,7 @@ options=(\
   "Load sanitized data dump" \
   "Shrink the dump to 20K records" \
   "Generate fake suppressed reports" \
+  "Generate fake resubmission dissemination data" \
   "Generate resubmissions" \
   "TRUNCATE the dissemination tables" \
   "Re-disseminate all SAC records" \
@@ -279,6 +302,9 @@ do
     "Generate fake suppressed reports")
       generate_fake_suppressed_reports
       ;;
+    "Generate fake resubmission dissemination data")
+      generate_fake_resubmission_dissemination_data
+      ;;
     "Generate resubmissions")
       generate_resubmissions
       ;;
@@ -298,6 +324,7 @@ do
       load_sanitized_data_dump
       shrink_to_20k_records
       generate_fake_suppressed_reports
+      generate_fake_resubmission_dissemination_data
       generate_resubmissions
       truncate_dissemination_tables
       redisseminate_all_sac_records

@@ -78,6 +78,10 @@ class AdvancedSearchForm(forms.Form):
         ("True", "Y"),
         ("False", "N"),
     )
+    resubmissions_choices = (
+        ("include", "Include prior submissions "),
+        ("exclude", "Exclude prior submissions"),
+    )
 
     # Query params
     agency_name = forms.CharField(required=False)
@@ -104,6 +108,11 @@ class AdvancedSearchForm(forms.Form):
     start_date = forms.DateField(required=False)
     type_requirement = forms.CharField(required=False)
     uei_or_ein = forms.CharField(required=False)
+    resubmissions = forms.ChoiceField(
+        choices=resubmissions_choices,
+        initial="include",
+        required=False,
+    )
 
     # Display params
     limit = forms.CharField(required=False)

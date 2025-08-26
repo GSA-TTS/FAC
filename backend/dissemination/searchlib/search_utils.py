@@ -45,7 +45,7 @@ def _add_search_params_to_newrelic(search_parameters):
 
 
 # TODO: Update Post SOC Launch -> Clean up to ignore basic/advanced
-def run_search(form_data, is_soc=False):
+def run_search(request, form_data, is_soc=False):
     """
     Given cleaned form data, run the search.
     Returns the results QuerySet.
@@ -80,6 +80,7 @@ def run_search(form_data, is_soc=False):
             "major_program": form_data["major_program"],
             "passthrough_name": form_data["passthrough_name"],
             "type_requirement": form_data["type_requirement"],
+            "resubmissions": form_data["resubmissions"],
         }
         search_parameters.update(advanced_parameters)
 
@@ -88,7 +89,7 @@ def run_search(form_data, is_soc=False):
     return (
         _compare_searches(search_parameters)
         if is_soc
-        else search_sac(search_parameters)
+        else search_sac(request, search_parameters)
     )
 
 
@@ -148,14 +149,14 @@ def audit_populate_cog_over_name(results):
 
 
 # TODO: Update Post SOC Launch -> Pull out the extra search, logging.
-def _compare_searches(search_parameters):
+def _compare_searches(request, search_parameters):
     audit_t0 = time.time()
     audit_results = search_audit(search_parameters)
     audit_count = audit_results.count()
     audit_t1 = time.time()
 
     sac_t0 = time.time()
-    sac_results = search_sac(search_parameters)
+    sac_results = search_sac(request, search_parameters)
     sac_results_count = sac_results.count()
     sca_t1 = time.time()
 
