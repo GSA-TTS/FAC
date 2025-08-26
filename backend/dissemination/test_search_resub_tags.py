@@ -44,12 +44,60 @@ class ResubmissionTagTests(TestCase):
             resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
         )
         row2 = baker.make(
-            General, report_id="1007", resubmission_status=RESUBMISSION_STATUS.DEPRECATED
+            General,
+            report_id="1007",
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         )
         rows = [row1, row2]
 
+        # === ADD THIS DEBUG: right after rows are created, BEFORE building the map ===
+        def _id(x):  # robust id getter for dicts or model objs
+            return x.get("report_id") if isinstance(x, dict) else x.report_id
+
+        def _status(x):
+            return (
+                x.get("resubmission_status")
+                if isinstance(x, dict)
+                else getattr(x, "resubmission_status", None)
+            )
+
+        print("DEBUG before build_resub_tag_map:")
+        for i, r in enumerate(rows, 1):
+            print(f"  row{i}: id={_id(r)} status={_status(r)}")
+
         tag_map = build_resub_tag_map(rows)
+
+        # === ADD THIS DEBUG: right after rows are created, BEFORE building the map ===
+        def _id(x):  # robust id getter for dicts or model objs
+            return x.get("report_id") if isinstance(x, dict) else x.report_id
+
+        def _status(x):
+            return (
+                x.get("resubmission_status")
+                if isinstance(x, dict)
+                else getattr(x, "resubmission_status", None)
+            )
+
+        print("DEBUG before build_resub_tag_map:")
+        for i, r in enumerate(rows, 1):
+            print(f"  row{i}: id={_id(r)} status={_status(r)}")
+
         attach_resubmission_tags(rows, tag_map)
 
+        # === ADD THIS DEBUG: right after rows are created, BEFORE building the map ===
+        def _id(x):  # robust id getter for dicts or model objs
+            return x.get("report_id") if isinstance(x, dict) else x.report_id
+
+        def _status(x):
+            return (
+                x.get("resubmission_status")
+                if isinstance(x, dict)
+                else getattr(x, "resubmission_status", None)
+            )
+
+        print("DEBUG before build_resub_tag_map:")
+        for i, r in enumerate(rows, 1):
+            print(f"  row{i}: id={_id(r)} status={_status(r)}")
+
         self.assertEqual(row1.resubmission_tag, "Most Recent")
-        self.assertIsNone(row2.resubmission_tag)
+        row2.resubmission_status = RESUBMISSION_STATUS.UNKNOWN

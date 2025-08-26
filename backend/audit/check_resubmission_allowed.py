@@ -71,9 +71,7 @@ def check_resubmission_allowed(
 
     # MOST_RECENT + version > 1 can be resubmitted
     if resub_status in [RESUBMISSION_STATUS.MOST_RECENT]:
-        if (
-            resub_status == RESUBMISSION_STATUS.MOST_RECENT and version > 1
-        ):
+        if resub_status == RESUBMISSION_STATUS.MOST_RECENT and version > 1:
             return True, "Audit is eligible for resubmission."
 
     # Legacy audit (meta = None) At this point, we assume data has been curated: valid submission_status, uei, year.
