@@ -41,14 +41,28 @@ if [[ "$ENV" = "LOCAL" ]]; then
   export REGION="usa-east-1"
   export AWS_ENDPOINT="http://minio:9000"
   export AWSCLI="${AWSCLI} --endpoint-url ${AWS_ENDPOINT}"
+  export DAS_DB_HOST="db"
+  export DAS_DB_USER="postgres"
+  export DAS_DB_NAME="postgres"
+  export DAS_DB_PASSWORD=""
+  export PGPASSWORD="${DAS_DB_PASSWORD}"
+
 else
   echo "WE ARE ON CGOV"
   export AWS_ACCESS_KEY_ID=$(echo $VCAP_SERVICES |  jq -rc '.s3[] | select(.name | contains("fac-private-s3")) | .credentials.access_key_id')
   export AWS_SECRET_ACCESS_KEY=$(echo $VCAP_SERVICES |  jq -rc '.s3[] | select(.name | contains("fac-private-s3")) | .credentials.secret_access_key')
   export BUCKET=$(echo $VCAP_SERVICES |  jq -rc '.s3[] | select(.name | contains("fac-private-s3")) | .credentials.bucket')
-  export REGION=$(echo $VCAP_SERVICES |  jq -rc '.s3[] | select(.name | contains("fac-private-s3")) | .credentials.region')
-  export AWS_ENDPOINT=$(echo $VCAP_SERVICES |  jq -rc '.s3[] | select(.name | contains("fac-private-s3")) | .credentials.endpoint')
-  export AWS_FIPS_ENDPOINT=$(echo $VCAP_SERVICES |  jq -rc '.s3[] | select(.name | contains("fac-private-s3")) | .credentials.fips_endpoint')
+  export AWS_REGION=$(echo $VCAP_SERVICES |  jq -rc '.s3[] | select(.name | contains("fac-private-s3")) | .credentials.region')
+  export AWS_DEFAULT_REGION=${AWS_REGION}
+  
+  export DAS_DB_HOST=$(echo $VCAP_SERVICES |  jq -rc '."aws-rds"[] | select(.name | contains("fac-db")) | .credentials.host')
+  export DAS_DB_USER=$(echo $VCAP_SERVICES |  jq -rc '."aws-rds"[] | select(.name | contains("fac-db")) | .credentials.username')
+  export DAS_DB_NAME=$(echo $VCAP_SERVICES |  jq -rc '."aws-rds"[] | select(.name | contains("fac-db")) | .credentials.db_name')
+  export DAS_DB_PASSWORD=$(echo $VCAP_SERVICES |  jq -rc '."aws-rds"[] | select(.name | contains("fac-db")) | .credentials.password')
+  export PGPASSWORD="${DAS_DB_PASSWORD}"
+
+  alias psql='/home/vcap/deps/0/apt/usr/lib/postgresql/*/bin/psql'
+  export PATH=/home/vcap/deps/0/apt/usr/lib/postgresql/15/bin:$PATH
 fi
 
 ####################################################
@@ -56,9 +70,14 @@ fi
 # These keep things further down more readable.
 install_aws_cli() {
   rm -rf /tmp/aws-cli
+  cd /tmp
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  unzip -u awscliv2.zip
-  sudo ./aws/install --install-dir /tmp/aws-cli --update
+  unzip -u -q awscliv2.zip
+  /tmp/aws/install -i /tmp/aws-cli -b /tmp/sym --update
+  if [ $? -ne 0 ]; then
+    echo FAILED TO INSTALL AWS
+    exit -1
+  fi
   rm -f awscliv2.zip
   rm -rf aws
 }
@@ -67,18 +86,41 @@ cleanup_aws() {
   rm -rf /tmp/aws-cli
 }
 
+SAVED_PROXY=""
+unset_proxy() {
+  SAVED_PROXY="${https_proxy}"
+  unset https_proxy
+  # echo "PROXY AFTER UNSET: ${https_proxy}"
+}
+
+restore_proxy() {
+  set https_proxy "${SAVED_PROXY}"
+  # echo "PROXY AFTER RESTORE: ${https_proxy}"
+}
+
 download_full_csv() {
   local endpoint=$1
 
   echo downloading csv for ${endpoint}
-  psql \
-    -d postgres \
-    -h db \
-    -U postgres \
+  env PGOPTIONS='-c client_min_messages=WARNING' psql \
+    -d "${DAS_DB_NAME}" \
+    -h "${DAS_DB_HOST}" \
+    -U "${DAS_DB_USER}" \
     -t -A \
-    -c "\COPY (SELECT * FROM ${API_VERSION}.${endpoint}) TO '${ROOT}/${endpoint}.csv' WITH (FORMAT CSV, HEADER, DELIMITER ',');"
+    -c "\COPY (SELECT * FROM ${API_VERSION}.${endpoint}) TO '${ROOT}/${endpoint}.csv' WITH (FORMAT CSV, HEADER, DELIMITER ',');" \
+    |& grep -v "has_tribal"
+
+  if [ $? -ne 0 ]; then
+    echo "PSQL FAILED IN FULL TABLE DOWNLOAD"
+    exit -1
+  fi
 }
 
+# NEAT TRICK
+# Note the pipe-ampersand (|&) below. It says
+# "keep all the lines except for the ones where this matches"
+# https://stackoverflow.com/a/16321435
+# We do this to quiet some INFO messages from psql.
 download_date_range_csv () {
   local endpoint=$1
   local start_date=$2
@@ -97,12 +139,21 @@ download_date_range_csv () {
   echo "${query}"
 
   echo downloading audit year csv for ${endpoint}
-  psql \
-    -d postgres \
-    -h db \
-    -U postgres \
+  # TODO: Consider adding a quiet flag or routing output to /dev/null to suppress
+  # warnings like "INFO:  api_v1_1_0 has_tribal <NULL> f". We will see a lot of them
+  # because we're using the API in an un-authenticated way (which is intentional!).
+  env PGOPTIONS='-c client_min_messages=WARNING' psql \
+    -d "${DAS_DB_NAME}" \
+    -h "${DAS_DB_HOST}" \
+    -U "${DAS_DB_USER}" \
     -t -A \
-    -c "${query}"
+    -c "${query}" |& \
+    grep -v "has_tribal"
+
+  if [ $? -ne 0 ]; then
+    echo "PSQL FAILED IN DATE RANGE DOWNLOAD"
+    exit -1
+  fi
 }
 
 copy_to_s3() {
@@ -116,7 +167,14 @@ copy_to_s3() {
     echo $cmd
     eval $cmd
   else
-    ${AWSCLI} s3 cp "${ROOT}/${endpoint}.csv" "s3://${BUCKET}/${path_in_s3}"
+    cmd=$(echo ${AWSCLI} s3 cp "${ROOT}/${endpoint}.csv" "s3://${BUCKET}/${path_in_s3}")
+    # cmd=$(echo ${AWSCLI} s3api put-object --bucket ${BUCKET} --key "${path_in_s3}" --body "${ROOT}/${endpoint}.csv")
+    echo $cmd
+    eval $cmd
+
+    if [ $? -ne 0 ]; then
+      echo "S3 COPY FAILED FOR ${path_in_s3}"
+    fi
   fi
 }
 
@@ -125,9 +183,23 @@ copy_to_s3() {
 install_aws_cli
 
 ####################################################
+# Unset the proxy (so we can upload to S3)
+unset_proxy
+
+####################################################
 # Create a destination directory (in the container/cloud env.)
 mkdir -p "${ROOT}"
 
+
+####################################################
+# In a loop, download, upload, and delete the full CSVs.
+# public-data/gsa/full/{table_name}.csv
+for endpoint in ${endpoints[@]}; do
+  # Download the endpoint from Postgres as a CSV.
+  download_full_csv ${endpoint}
+  copy_to_s3 ${endpoint} "public-data/gsa/full/${endpoint}.csv"
+  rm -f "${ROOT}/${endpoint}.csv"
+done
 
 ####################################################
 # federal fiscal year year CSVs.
@@ -142,16 +214,6 @@ for endpoint in ${endpoints[@]}; do
     copy_to_s3 ${endpoint} "public-data/gsa/federal-fiscal-year/${year}-ffy-${endpoint}.csv"
     rm -f "${ROOT}/${endpoint}.csv"
   done
-done
-
-####################################################
-# In a loop, download, upload, and delete the full CSVs.
-# public-data/gsa/full/{table_name}.csv
-for endpoint in ${endpoints[@]}; do
-  # Download the endpoint from Postgres as a CSV.
-  download_full_csv ${endpoint}
-  copy_to_s3 ${endpoint} "public-data/gsa/full/${endpoint}.csv"
-  rm -f "${ROOT}/${endpoint}.csv"
 done
 
 ####################################################
