@@ -1,4 +1,8 @@
 from django.test import TestCase
+from django.test.client import RequestFactory
+from django.contrib.auth import get_user_model
+
+from audit.models.constants import RESUBMISSION_STATUS
 from dissemination.models import (
     DisseminationCombined,
     Finding,
@@ -14,12 +18,15 @@ from dissemination.search import (
     is_advanced_search,
 )
 from dissemination.test_materialized_view_builder import TestMaterializedViewBuilder
+from users.models import Permission, UserPermission
 
 from model_bakery import baker
 
 import datetime
 import random
 import unittest
+
+User = get_user_model()
 
 
 def assert_all_results_public(cls, results):
@@ -627,6 +634,12 @@ class SearchALNTests(TestMaterializedViewBuilder):
 
 
 class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
+    def setUp(self):
+        self.user = baker.make(User)
+        self.request = RequestFactory().get("/")
+        self.request.user = self.user
+        super().setUp()
+
     def test_search_federal_program_name(self):
         """
         When making a search on federal program name, search_federal_program_name
@@ -656,7 +669,7 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
 
         # Search for multiple program valid names
         params = {"federal_program_name": ["Foo", "Bar"], **adv_params}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 2)
         name_results = [result.federal_program_name for result in results]
         self.assertIn("Foo", name_results)
@@ -664,18 +677,18 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
 
         # Search for a single valid program name
         params = {"federal_program_name": ["Foo"], **adv_params}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].federal_program_name, "Foo")
 
         # Search for an invalid program name
         params = {"federal_program_name": ["Baz"], **adv_params}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 0)
 
         # Handle delimiters, ignore case
         params = {"federal_program_name": ["nub,yub"], **adv_params}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].federal_program_name, "Yub Nub")
 
@@ -702,29 +715,29 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
 
         # Either cog or over with no agency should return all
         params = {"agency_name": None, "cog_or_oversight": "either", **adv_params}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 2)
 
         # Unused agency should return nothing
         params = {"agency_name": 99, "cog_or_oversight": "either", **adv_params}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 0)
 
         # Either cog or over with valid agency
         params = {"agency_name": 42, "cog_or_oversight": "either", **adv_params}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_cog.report_id)
 
         # Cog with valid agency
         params = {"agency_name": 42, "cog_or_oversight": "cog", **adv_params}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_cog.report_id)
 
         # Over with valid agency
         params = {"agency_name": 24, "cog_or_oversight": "oversight", **adv_params}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_over.report_id)
 
@@ -766,7 +779,7 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         self.refresh_materialized_view()
         # One field returns the one appropriate general
         params = {"findings": ["is_modified_opinion"], "advanced_search_flag": True}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
 
         # Three fields returns three appropriate generals
@@ -778,12 +791,12 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
             ],
             "advanced_search_flag": True,
         }
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 3)
 
         # Garbage fields don't apply any filters, so everything comes back
         params = {"findings": ["a_garbage_field"], "advanced_search_flag": True}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 7)
 
     def test_search_direct_funding(self):
@@ -804,7 +817,7 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         self.refresh_materialized_view()
 
         params = {"direct_funding": ["direct_funding"], "advanced_search_flag": True}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_direct.report_id)
 
@@ -812,7 +825,7 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
             "direct_funding": ["passthrough_funding"],
             "advanced_search_flag": True,
         }
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_passthrough.report_id)
 
@@ -821,7 +834,7 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
             "direct_funding": ["direct_funding", "passthrough_funding"],
             "advanced_search_flag": True,
         }
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 2)
 
     def test_search_major_program(self):
@@ -842,12 +855,12 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         self.refresh_materialized_view()
 
         params = {"major_program": ["True"], "advanced_search_flag": True}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_major.report_id)
 
         params = {"major_program": ["False"], "advanced_search_flag": True}
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_non_major.report_id)
 
@@ -883,18 +896,61 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
             "type_requirement": [type_requirements[0]],
             "advanced_search_flag": True,
         }
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 1)
 
         params = {
             "type_requirement": type_requirements[2:4],
             "advanced_search_flag": True,
         }
-        results = search(params)
+        results = search(self.request, params)
         self.assertEqual(len(results), 2)
+
+    def test_search_resubmissions(self):
+        """
+        Correctly filter out resubmissions based on form selections and user privileges
+        """
+        general_deprecated = baker.make(
+            General,
+            is_public=True,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
+        )
+        baker.make(FederalAward, report_id=general_deprecated)
+
+        general_most_recent = baker.make(
+            General,
+            is_public=True,
+            resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
+        )
+        baker.make(FederalAward, report_id=general_most_recent)
+
+        self.refresh_materialized_view()
+
+        # Not a Fed, so can only see most recent
+        params = {"resubmissions": "include", "advanced_search_flag": True}
+        results = search(self.request, params)
+        self.assertEqual(len(results), 1)
+
+        # Now a Fed, so can also see deprecated
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(
+            UserPermission, user=self.user, email=self.user.email, permission=permission
+        )
+        results = search(self.request, params)
+        self.assertEqual(len(results), 2)
+
+        # A Fed, but excluding deprecated via filter
+        params = {"form.resubmissions": "exclude", "advanced_search_flag": True}
+        results = search(self.request, params)
+        self.assertEqual(len(results), 1)
 
 
 class SearchSortTests(TestCase):
+    def setUp(self):
+        self.user = baker.make(User)
+        self.request = RequestFactory().get("/")
+        self.request.user = self.user
+
     def test_sort_cog_over(self):
         """
         When sorting on COG/OVER, the appropriate records should come back first.
@@ -914,6 +970,7 @@ class SearchSortTests(TestCase):
             )
 
         results_cognizant = search(
+            self.request,
             {
                 "order_by": "cog_over",
                 "order_direction": "ascending",
@@ -926,6 +983,7 @@ class SearchSortTests(TestCase):
         )
 
         results_oversight = search(
+            self.request,
             {
                 "order_by": "cog_over",
                 "order_direction": "descending",
