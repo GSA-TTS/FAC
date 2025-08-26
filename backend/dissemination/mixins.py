@@ -76,6 +76,7 @@ class ReportAccessRequiredMixin:
         else:
             raise PermissionDenied
 
+
 class FederalAccessRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         try:
