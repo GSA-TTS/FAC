@@ -265,4 +265,10 @@ class AuditSummaryView(View):
             resubs.append(next_resub)
             next_report_id = next_resub.next_report_id
 
+        # If there's only one object, there's no chain to show. So instead, we'll return none.
+        # One could instead check early for a resubmission status of ORIGINAL.
+        # However, this method protects against potential future status additions or deletions.
+        if len(resubs) == 1:
+            return []
+
         return resubs
