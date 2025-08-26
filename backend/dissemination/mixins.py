@@ -44,7 +44,7 @@ class ReportAccessRequiredMixin:
 
         return super().dispatch(request, *args, **kwargs)
 
-    def _check_resubmission_permission(request, general):
+    def _check_resubmission_permission(self, request, general):
         """
         Check permissions related to resubmissions. Raises PermissionDenied if
         not permitted.
