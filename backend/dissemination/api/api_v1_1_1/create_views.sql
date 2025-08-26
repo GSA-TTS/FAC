@@ -8,6 +8,7 @@ create view api_v1_1_1.findings_text as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ft.finding_ref_number,
         ft.contains_chart_or_table,
         ft.finding_text
@@ -30,6 +31,7 @@ create view api_v1_1_1.additional_ueis as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         uei.additional_uei
     from
@@ -48,6 +50,7 @@ create view api_v1_1_1.findings as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         finding.award_reference,
         finding.reference_number,
         finding.is_material_weakness,
@@ -75,6 +78,7 @@ create view api_v1_1_1.federal_awards as
         award.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         award.award_reference,
         award.federal_agency_prefix,
@@ -112,6 +116,7 @@ create view api_v1_1_1.corrective_action_plans as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         ct.finding_ref_number,
         ct.contains_chart_or_table,
@@ -135,6 +140,7 @@ create view api_v1_1_1.notes_to_sefa as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         note.note_title as title,
         note.accounting_policies,
@@ -161,6 +167,7 @@ create view api_v1_1_1.passthrough as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         pass.award_reference,
         pass.passthrough_id,
@@ -265,6 +272,7 @@ create view api_v1_1_1.secondary_auditors as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         sa.auditor_ein,
         sa.auditor_name,
@@ -292,6 +300,7 @@ create view api_v1_1_1.additional_eins as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         ein.additional_ein
     from
@@ -310,6 +319,7 @@ create view api_v1_1_1.resubmission as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         resub.version,
         resub.status,
