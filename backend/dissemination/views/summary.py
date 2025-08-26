@@ -245,8 +245,13 @@ class AuditSummaryView(View):
         if not current_report_id:
             return []
 
+        # First ensure this isn't a pre-resubmission record, and has existing data.
+        current_resub = Resubmission.objects.filter(report_id=current_report_id).first()
+        if not current_resub:
+            return []
+
+        # Begin building the list
         resubs = []
-        current_resub = Resubmission.objects.get(report_id=current_report_id)
         previous_report_id = current_resub.previous_report_id
         next_report_id = current_resub.next_report_id
 
