@@ -1,12 +1,9 @@
-
 {% comment %} 
   each key is a section, mapped to what changed 
   each section contains a tag "status" (same, changed) and "in_r1", "in_r2" as lists
   this is broken out so that it can be embedded in a Federal view without the trappings, 
     if we decide that is desirable/necessary.  
 {% endcomment %}
-
-
 {% for section, changed in comparison.items %}
   {% if changed.status == "same" %}
     <!-- <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div> -->
@@ -23,7 +20,6 @@
         <h2>Changes in {{ nice_names | KV:section }}</h2>
       </div>        
     </div>
-
     {% if changed.in_r1|length > 0 %}
     <div class="grid-row">
       <div class="tablet:grid-col">
@@ -61,7 +57,6 @@
       </div>
     </div>
     {% endif %}
-
     {% if changed.in_r2|length > 0 %}
     <div class="grid-row">
       <div class="tablet:grid-col">
@@ -99,7 +94,6 @@
       </div>
     </div>
     {% endif %}
-
     {% if changed.in_both|length > 0 %}
     <div class="grid-row">
       <div class="tablet:grid-col">

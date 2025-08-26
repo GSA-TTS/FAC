@@ -112,15 +112,7 @@ def deep_getattr(o, lok, default=None):
     return oprime
 
 
-def compare_lists_of_objects(
-    sac1: SingleAuditChecklist,
-    sac2: SingleAuditChecklist,
-    keys: list,
-    extract_fun: Callable[
-        [dict],
-        Any,
-    ],
-):
+def _get_keysets(sac1, sac2, keys):
     # Use a list of keys to dive into an object.
     # Expect a list of objects to come back, in this case.
     # print(f"deep on {sac1}")
@@ -142,28 +134,30 @@ def compare_lists_of_objects(
     for h, o in zip(loh2, ls2):
         map2[h] = o
 
-    # If the maps are identical, we can just return now.
-    if map1 == map2:
-        return {"status": "same"}
-
     # The keys can be sets
     ks1 = set(map1.keys())
     ks2 = set(map2.keys())
+    return ks1, ks2, map1, map2
 
+
+def _only_in(ks1, ks2, map1, map2, extract_fun, keys):
+    in_r1 = in_r2 = list()
     # Keys only in ks1
     only_in_1 = ks1 - ks2
     # Keys only in ks2
     only_in_2 = ks2 - ks1
 
     res: dict[str, Union[str, list]] = {"status": "changed"}
-    in_r1 = list()
-    in_r2 = list()
-    in_both = list()
 
     for k in only_in_1:
         in_r1.append({"from": None, "to": extract_fun(map1[k]), "key": keys[0]})
     for k in only_in_2:
         in_r2.append({"from": None, "to": extract_fun(map2[k]), "key": keys[0]})
+    return in_r1, in_r2, res
+
+
+def _filter_r1_r2(map1, map2, in_r1, in_r2, extract_fun, keys):
+    in_both = list()
 
     # Finally, to find everything "in both", that means we need to find the things that changed
     # from one to the other. To do that, we need two lists of the values.
@@ -190,11 +184,31 @@ def compare_lists_of_objects(
 
     in_r1 = list(filter(lambda v: v["to"] not in filter_out, in_r1))
     in_r2 = list(filter(lambda v: v["to"] not in filter_out, in_r2))
+    return in_r1, in_r2, in_both
+
+
+def compare_lists_of_objects(
+    sac1: SingleAuditChecklist,
+    sac2: SingleAuditChecklist,
+    keys: list,
+    extract_fun: Callable[
+        [dict],
+        Any,
+    ],
+):
+    ks1, ks2, map1, map2 = _get_keysets(sac1, sac2, keys)
+
+    # If the maps are identical, we can just return now.
+    if map1 == map2:
+        return {"status": "same"}
+
+    in_r1, in_r2, res = _only_in(ks1, ks2, map1, map2, extract_fun, keys)
+    in_r1, in_r2, in_both = _filter_r1_r2(map1, map2, in_r1, in_r2, extract_fun, keys)
 
     # Now, a final mangling of "in_both".
     # This lets us present the data differently when something changes from one to the other and we're dealing with objects.
     in_both = list()
-    for obj1, obj2 in zip(ib_r1, ib_r2):
+    for obj1, obj2 in zip(map1.values(), map2.values()):
         if obj1 == obj2:
             pass
         else:
