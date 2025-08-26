@@ -19,6 +19,36 @@ class ReportAccessRequiredMixin:
         except General.DoesNotExist:
             raise Http404()
 
+        self._check_resubmission_permission(request, general)
+
+        if general.is_public:
+            return super().dispatch(request, *args, **kwargs)
+
+        if not request.user:
+            logger.debug(
+                f"denying anonymous user access to non-public report {report_id}"
+            )
+            raise PermissionDenied
+
+        if not request.user.is_authenticated:
+            logger.debug(
+                f"denying anonymous user access to non-public report {report_id}"
+            )
+            raise PermissionDenied
+
+        if not can_read_tribal(request.user):
+            logger.debug(
+                f"denying user {request.user.email} access to non-public report {report_id}"
+            )
+            raise PermissionDenied
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def _check_resubmission_permission(request, general):
+        """
+        Check permissions related to resubmissions. Raises PermissionDenied if
+        not permitted.
+        """
         # If the resubmission_status is None
         if not general.resubmission_status:
             pass
@@ -45,30 +75,6 @@ class ReportAccessRequiredMixin:
         # the conditions we 'pass' in case of resubmissions.
         else:
             raise PermissionDenied
-
-        if general.is_public:
-            return super().dispatch(request, *args, **kwargs)
-
-        if not request.user:
-            logger.debug(
-                f"denying anonymous user access to non-public report {report_id}"
-            )
-            raise PermissionDenied
-
-        if not request.user.is_authenticated:
-            logger.debug(
-                f"denying anonymous user access to non-public report {report_id}"
-            )
-            raise PermissionDenied
-
-        if not can_read_tribal(request.user):
-            logger.debug(
-                f"denying user {request.user.email} access to non-public report {report_id}"
-            )
-            raise PermissionDenied
-
-        return super().dispatch(request, *args, **kwargs)
-
 
 class FederalAccessRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
