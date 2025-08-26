@@ -61,6 +61,7 @@ REPORTIDS_TO_MODIFIERS = lambda: {
     # Modifying the workbook requires there to be additional EINs
     "2022-12-GSAFAC-0000001787": [
         modify_additional_eins_workbook,
+        change_first_award,
         add_an_award,
         # The second file had its XML metadata changed. Instead of
         # being created by Acrobat Distiller 6.0, the second
@@ -327,6 +328,18 @@ def add_an_award(old_sac, new_sac, user_obj):
         "award_reference"
     ] = "AWARD-0002"
 
+    return new_sac
+
+
+#############################################
+# change_first_award
+#############################################
+def change_first_award(old_sac, new_sac, user_obj):
+    logger.info("MODIFIER: change_first_award")
+    APNE(old_sac, new_sac)
+    new_sac.federal_awards["FederalAwards"]["federal_awards"][0]["program"][
+        "amount_expended"
+    ] = 1_000_000
     return new_sac
 
 

@@ -3,7 +3,7 @@
 {% block content %}
 
 {% comment %} Perhaps only show the text at the top if this is a public/non-federal user? {% endcomment %}
-<div class="grid-container">
+<div class="grid-container width-full">
     <div class="grid-row">
       <div class="tablet:grid-col">
         <h1>Resubmission comparison</h1>
@@ -19,142 +19,11 @@
       </div>
     </div>
 
-    {% comment %} each key is a section, mapped to what changed {% endcomment %}
-    {% for section, changed in comparison.items %}
-
-    {% comment %} 
-      each section contains a tag "status" (same, changed) and "in_r1", "in_r2" as lists
-    {% endcomment %}
-    
-      {% if changed.status == "same" %}
-        <!-- <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div> -->
-      {% else %}
-    <div class="grid-row">
-      <div class="tablet:grid-col">
-        <h2>{{ nice_names | KV:section }}</h2>
-      </div>        
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col width-full">
+        {% include "./comparison_sections_only.html" %}
+      </div>
     </div>
-
-      {% if changed.in_r1|length > 0 %}
-        <div class="grid-row">
-          <div class="tablet:grid-col"><h4>In first report</h4></div>
-        </div>
-        <div class="grid-row">
-          <div class="tablet:grid-col">
-          </div>
-          <div class="tablet:grid-col">
-            <b>{{ r1 | slice:"15:" }}</b> <!-- |slice:"15:" -->
-          </div>
-          <div class="tablet:grid-col">
-            <b>{{ r2 | slice:"15:" }}</b>
-          </div>
-        </div> <!-- Header row end -->
-        
-      {% endif %}
-      {% for d in changed.in_r1|dictsort:"key" %}
-        <div class="grid-row margin-top-2 margin-bottom-2">
-          <div class="tablet:grid-col">
-            {{ d.key|repl:"_| "|title }}
-          </div>
-          <div class="tablet:grid-col">
-            {% if d.from is None %}
-              No value
-            {% else %}
-              {{ d.from }}
-            {% endif %}
-          </div>
-          <div class="tablet:grid-col">
-            {% if d.to is None %}
-              No value
-            {% else %}
-              {{ d.to }}
-            {% endif %}
-          </div>
-        </div>
-      {% endfor %}
-      {% if changed.in_r2|length > 0 %}
-        <div class="grid-row">
-          <div class="tablet:grid-col"><h4>In second report</h4></div>
-        </div>
-
-        <div class="grid-row">
-          <div class="tablet:grid-col">
-          </div>
-          <div class="tablet:grid-col">
-            <b>{{ r1|slice:"15:" }}</b> <!-- |slice:"15:" -->
-          </div>
-          <div class="tablet:grid-col">
-            <b>{{ 2|slice:"15:" }}</b>
-          </div>
-        </div> <!-- Header row end -->
-        
-      {% endif %}
-      {% for d in changed.in_r2|dictsort:"key" %}
-        <div class="grid-row margin-top-2 margin-bottom-2">
-          <div class="tablet:grid-col">
-            {{ d.key|repl:"_| "|title }}
-          </div>
-          <div class="tablet:grid-col">
-            {% if d.from == None %}
-              No value
-            {% else %}
-              {{ d.from }}
-            {% endif %}
-          </div>
-          <div class="tablet:grid-col">
-            {% if d.to == None %}
-              No value
-            {% else %}
-              {{ d.to }}
-            {% endif %}
-          </div>
-        </div>
-      {% endfor %}
-      {% if changed.in_both|length > 0 %}
-        <div class="grid-row">
-          <div class="tablet:grid-col"><h4>Changed from first to second report</h4></div>
-        </div>
-
-        <div class="grid-row">
-          <div class="tablet:grid-col">
-          </div>
-          <div class="tablet:grid-col">
-            <b>{{ r1 | slice:"15:" }}</b> <!-- |slice:"15:" -->
-          </div>
-          <div class="tablet:grid-col">
-            <b>{{ r2 | slice:"15:" }}</b>
-          </div>
-        </div> <!-- Header row end -->
-        
-      {% endif %}
-      {% for d in changed.in_both|dictsort:"key" %}
-        <div class="grid-row margin-top-2 margin-bottom-2">
-          <div class="tablet:grid-col">
-            {{ d.key|repl:"_| "|title }}
-          </div>
-          {% if d.from == d.to %}
-          <div class="tablet:grid-col"></div>
-          <div class="tablet:grid-col"></div>
-          {% else %}
-          <div class="tablet:grid-col">
-            {% if d.from == None %}
-              No value
-            {% else %}
-              {{ d.from }}
-            {% endif %}
-          </div>
-          <div class="tablet:grid-col">
-            {% if d.to == None %}
-              No value
-            {% else %}
-              {{ d.to }}
-            {% endif %}
-          </div>
-        {% endif %}
-        </div> <!-- end row -->
-      {% endfor %}
-      {% endif %}
-    {% endfor %}
 
     <hr/>
     {% comment %} FIXME: This could be a blue button on the right? Also, which should we redirect them to? {% endcomment %}

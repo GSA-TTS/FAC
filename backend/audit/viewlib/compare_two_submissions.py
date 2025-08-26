@@ -161,16 +161,60 @@ def compare_lists_of_objects(
     in_both = list()
 
     for k in only_in_1:
-        in_r1.append(extract_fun(map1[k]))
+        in_r1.append({"from": None, "to": extract_fun(map1[k]), "key": keys[0]})
     for k in only_in_2:
-        in_r2.append(extract_fun(map2[k]))
+        in_r2.append({"from": None, "to": extract_fun(map2[k]), "key": keys[0]})
 
-    # Finally, to find everything "in both", we'll take all of the keys from both,
-    # map them through the extract_fun, turn it into a set, and call it done.
-    # Take the intersection.
-    in_both = list(
-        set(map(extract_fun, map1.values())) & set(map(extract_fun, map2.values()))
-    )
+    # Finally, to find everything "in both", that means we need to find the things that changed
+    # from one to the other. To do that, we need two lists of the values.
+    ib_r1 = map1.values()
+    ib_r2 = map2.values()
+    # Now, I want to highlight where something was in both, but changed. Thsi is a list of objects,
+    # so the question is which *objects* changed.
+    for obj1, obj2 in zip(ib_r1, ib_r2):
+        if obj1 == obj2:
+            pass
+        else:
+            in_both.append(
+                {"from": extract_fun(obj1), "to": extract_fun(obj2), "key": keys[0]}
+            )
+
+    # At this point, if an object changed, we're going to have it in R1, R2, and in both.
+    # look for situations where the "to" value is the same in all three, and remove it from R1/R2
+    filter_out = list()
+    for v in in_both:
+        if v["to"] in map(lambda o: o["to"], in_r1) and v["to"] in map(
+            lambda o: o["to"], in_r1
+        ):
+            filter_out.append(v["to"])
+
+    in_r1 = list(filter(lambda v: v["to"] not in filter_out, in_r1))
+    in_r2 = list(filter(lambda v: v["to"] not in filter_out, in_r2))
+
+    # Now, a final mangling of "in_both".
+    # This lets us present the data differently when something changes from one to the other and we're dealing with objects.
+    in_both = list()
+    for obj1, obj2 in zip(ib_r1, ib_r2):
+        if obj1 == obj2:
+            pass
+        else:
+            fields_different = list()
+            difference_count = 0
+            for k, v in obj1.items():
+                if obj1.get(k, 0) != obj2.get(k, 1):
+                    difference_count += 1
+                    fields_different.append(k)
+            in_both.append(
+                {
+                    "from": "Related to: " + ", ".join(fields_different),
+                    "to": (
+                        f"{difference_count} difference"
+                        if difference_count == 1
+                        else f"{difference_count} difference"
+                    ),
+                    "key": extract_fun(obj1),
+                }
+            )
 
     res["in_r1"] = in_r1
     res["in_r2"] = in_r2
@@ -251,8 +295,26 @@ def compare_single_audit_reports(
                     {"from": len(pdf1_bytes), "to": len(pdf2_bytes), "key": "length"},
                 ],
             }
+    elif not pdf1 and not pdf2:
+        return {
+            "status": "error",
+            "message": f"Could not retrieve report for {sac1.report_id} or {sac2.report_id}. Possibly contact the FAC helpdesk.",
+        }
+    elif not pdf1:
+        return {
+            "status": "error",
+            "message": f"Could not retrieve report for {sac1.report_id}. Possibly contact the FAC helpdesk.",
+        }
+    elif not pdf2:
+        return {
+            "status": "error",
+            "message": f"Could not retrieve report for {sac2.report_id}. Possibly contact the FAC helpdesk.",
+        }
 
-    return {"status": "error", "message": "pdf objects could not be retrieved"}
+    return {
+        "status": "error",
+        "message": "Uknown error comparing PDF objects. Please contact the FAC helpdesk.",
+    }
 
 
 def report_id_to_sac(rid):
@@ -315,7 +377,10 @@ def compare_report_ids(rid_1, rid_2):
         logger.error(
             f"compare_report_ids expects two report ID strings or two SAC objects, given {sac_r1} and {sac_r2}"
         )
-        return {"status": "error"}
+        return {
+            "status": "error",
+            "message": f"Could not compare {sac_r1} and {sac_r2} as given. Contact the FAC helpdesk.",
+        }
 
     # Do an early check, and bail if the same.
     if are_two_sacs_identical(sac_r1, sac_r2):
@@ -431,7 +496,10 @@ def compare_with_prev(rid):
         sac = rid
     else:
         logger.error(f"{rid} is not a report ID or SAC object")
-        return {"status": "error"}
+        return {
+            "status": "error",
+            "message": f"It seems {rid} is not a report; if you think this is an error, please contact the FAC helpdesk.",
+        }
 
     if sac.resubmission_meta:
         if "previous_report_id" in sac.resubmission_meta:
@@ -441,7 +509,10 @@ def compare_with_prev(rid):
             rid = sac.resubmission_meta["next_report_id"]
         else:
             logger.error(f"No previous report ID for {rid}")
-            return {"status": "error", "message": f"no previous report for {rid}"}
+            return {
+                "status": "error",
+                "message": f"No previous report for {rid}. If this seems to be an error, contact the FAC helpdesk.",
+            }
         logger.info(f"[DIFF] {prev} <-> {rid}")
         return (
             report_id_as_string(prev),
