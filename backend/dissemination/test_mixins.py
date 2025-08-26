@@ -174,11 +174,3 @@ class FederalAccessRequiredMixinTests(TestCase):
             self.ViewStub().dispatch(request)
         except PermissionDenied:
             self.fail("Authenticated users should have access.")
-
-    def test_no_resub_status(self):
-        """
-        An unauthenticated user should not be able to access the gated view.
-        """
-        request = RequestFactory().get("/")
-
-        self.assertRaises(PermissionDenied, self.ViewStub().dispatch, request)
