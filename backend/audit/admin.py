@@ -49,6 +49,10 @@ from dissemination.remove_workbook_artifacts import (
     remove_workbook_artifacts,
 )
 
+from django import forms
+from django.core.exceptions import PermissionDenied
+
+
 logger = logging.getLogger(__name__)
 
 # As per ADR #0041, the retention period for flagged reports is 6 months. That is 180 days.
@@ -435,12 +439,43 @@ class AuditHistoryAdmin(admin.ModelAdmin):
     event_display.admin_order_field = "event"  # type: ignore
     event_display.short_description = _("Event")  # type: ignore
 
+class UEIOverrideForm(forms.ModelForm):
+    auditee_uei = forms.CharField(label="New UEI", required=True)
+    auditee_ein = forms.CharField(label="New EIN", required=False)
+
+    class Meta:
+        model = SingleAuditChecklist
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.general_information:
+            self.fields['auditee_uei'].initial = self.instance.general_information.get("auditee_uei", "")
+            self.fields['auditee_ein'].initial = self.instance.general_information.get("auditee_ein", "")
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        gi = instance.general_information or {}
+        gi["auditee_uei"] = self.cleaned_data["auditee_uei"]
+        if self.cleaned_data.get("auditee_ein"):
+            gi["auditee_ein"] = self.cleaned_data["auditee_ein"]
+        instance.general_information = gi
+        return instance
 
 class SACAdmin(admin.ModelAdmin):
+    form = UEIOverrideForm
     """
     Support for read-only staff access, and control of what fields are present and
     filterable/searchable.
     """
+    def save_model(self, request, obj, form, change):
+        obj.save(
+            administrative_override=True,
+            event_user=request.user,
+            event_type="admin-override",
+        )
+        super().save_model(request, obj, form, change)
+
 
     def has_module_permission(self, request, obj=None):
         return request.user.is_staff
