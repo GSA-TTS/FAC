@@ -50,8 +50,6 @@ from dissemination.remove_workbook_artifacts import (
 )
 
 from django import forms
-from django.core.exceptions import PermissionDenied
-
 
 logger = logging.getLogger(__name__)
 
@@ -439,6 +437,7 @@ class AuditHistoryAdmin(admin.ModelAdmin):
     event_display.admin_order_field = "event"  # type: ignore
     event_display.short_description = _("Event")  # type: ignore
 
+
 class UEIOverrideForm(forms.ModelForm):
     auditee_uei = forms.CharField(label="New UEI", required=True)
     auditee_ein = forms.CharField(label="New EIN", required=False)
@@ -462,6 +461,7 @@ class UEIOverrideForm(forms.ModelForm):
         instance.general_information = gi
         return instance
 
+
 class SACAdmin(admin.ModelAdmin):
     form = UEIOverrideForm
     """
@@ -475,7 +475,6 @@ class SACAdmin(admin.ModelAdmin):
             event_type="admin-override",
         )
         super().save_model(request, obj, form, change)
-
 
     def has_module_permission(self, request, obj=None):
         return request.user.is_staff
