@@ -85,7 +85,7 @@ jobs:
             fac-build-npm-
             fac-build-
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 18
 
