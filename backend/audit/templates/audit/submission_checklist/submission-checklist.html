@@ -14,9 +14,7 @@
 
             {% include "./title.html" with auditee_name=auditee_name %}
 
-            {% if previous_report_id %}
-                {% include "includes/resubmission_banner.html" %}
-            {% endif %}
+            {% include "./resubmission_banner.html" %}
 
             <div id="submission-checklist-content">
                 <ul class="usa-icon-list usa-icon-list--size-sm font-sans-md">
@@ -35,6 +33,7 @@
                         {% section_block report_id secondary_auditors %}
                         {% section_block report_id additional_eins %}
                         {% include "./key-info-pre-validation.html" %}
+                        {% include "./resubmission_change_check.html" %}
                         {% include "./tribal-data-release.html" %}
                         {% include "./validation.html" %}
                     {% else %}
