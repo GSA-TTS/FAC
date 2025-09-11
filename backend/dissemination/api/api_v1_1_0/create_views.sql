@@ -94,7 +94,8 @@ create view api_v1_1_0.federal_awards as
         award.audit_report_type,
         award.findings_count,
         award.is_passthrough_award,
-        award.passthrough_amount
+        award.passthrough_amount,
+        award.hash
     from
         dissemination_federalaward award,
         dissemination_general gen
@@ -254,7 +255,8 @@ create view api_v1_1_0.general as
         CASE EXISTS(SELECT aud.report_id FROM dissemination_secondaryauditor aud WHERE aud.report_id = gen.report_id)
             WHEN FALSE THEN 'No'
             ELSE 'Yes'
-        END AS is_secondary_auditors
+        END AS is_secondary_auditors,
+        gen.hash
     from
         dissemination_general gen
     order by gen.id

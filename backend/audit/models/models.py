@@ -585,6 +585,21 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, help_text="Resubmission JSON structure"
     )
 
+    # Data hash for integrity
+    # This can be empty/null while data is being created, but it must be not-null
+    # at the point of dissemination. It should be the case that it is a hash of data, not fields,
+    # and the hash should match when calculated both on the internal table/data as well as the external data.
+    # That is, it should be possible to verify the hash via the API. Therefore, we compute this after
+    # submission, or as part of intake->dissemination. We store it in the internal table because it is then
+    # something that we expect to NOT CHANGE over time. (Resubmission metadata is not part of the hash.) Why?
+    # Because it is internal/administrative data tracking the connectedness of audits, not the audit data itself.
+    # (A later group/team may decide this is an incorrect decision.)
+    data_hash = models.CharField(
+        help_text="A hash of the SAC data",
+        blank=True,
+        null=True,
+    )
+
     def validate_full(self):
         """
         Full validation, intended for use when the user indicates that the
