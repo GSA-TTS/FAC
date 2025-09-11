@@ -305,8 +305,6 @@ class IntakeToDissemination(object):
             return RESUBMISSION_STATUS.DEPRECATED
         elif resubmission_version > 1:
             return RESUBMISSION_STATUS.MOST_RECENT
-        elif resubmission_version == 1:
-            return RESUBMISSION_STATUS.ORIGINAL
         elif resubmission_version == 0:
             return RESUBMISSION_STATUS.UNKNOWN
         else:
@@ -538,7 +536,6 @@ class IntakeToDissemination(object):
         if not resubmission_meta:
             resubmission_meta = {
                 "version": 1,
-                "resubmission_status": RESUBMISSION_STATUS.ORIGINAL,
             }
 
         resubmission_version = resubmission_meta.get("version", 1)
