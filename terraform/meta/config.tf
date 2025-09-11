@@ -21,11 +21,7 @@ locals {
     "bret.mogilefsky@gsa.gov",
     "james.person@gsa.gov",
     "matthew.jadud@gsa.gov",
-    "hassandeme.mamasambo@gsa.gov",
-    "alexander.steel@gsa.gov",
-    "sudha.kumar@gsa.gov",
     "philip.dominguez@gsa.gov",
-    "robert.novak@gsa.gov",
     "ranye.mclendon@gsa.gov",
   ]
 
@@ -39,7 +35,6 @@ locals {
     # TODO: Automate updates via GitHub's GraphQL API
     "bret.mogilefsky@gsa.gov",
     "matthew.jadud@gsa.gov",
-    "alexander.steel@gsa.gov",
   ]
 
   internal_asgs = [
