@@ -6,6 +6,14 @@ from dissemination.models import docs
 class FindingText(models.Model):
     """Specific findings details. References General"""
 
+    HASH_FIELDS = [
+        "id",
+        "report_id",
+        "finding_ref_number",
+        "contains_chart_or_table",
+        "finding_text",
+    ]
+
     report_id = models.ForeignKey(
         "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
@@ -24,4 +32,9 @@ class FindingText(models.Model):
     finding_text = models.TextField(
         "Content of the finding text",
         help_text=docs.text_findingstext,
+    )
+    hash = models.CharField(
+        help_text="A hash of the row",
+        blank=True,
+        null=True,
     )

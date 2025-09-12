@@ -257,9 +257,7 @@ field_name_ordered = {
         "contact_email",
         "contact_phone",
     ],
-    # FIXME: This would need to be expanded anyway.
-    # It probably should be picked up in the resubmission work.
-    "resubmission": [],
+    # "resubmission": ["report_id", "version", "status", "previous_report_id", "next_report_id"],
 }
 
 restricted_model_names = ["captext", "findingtext", "note"]

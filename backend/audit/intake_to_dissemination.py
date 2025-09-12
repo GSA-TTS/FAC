@@ -34,22 +34,6 @@ def omit(remove, d) -> dict:
     return {k: d[k] for k in d if k not in remove}
 
 
-# https://stackoverflow.com/a/25341965
-def is_date(string, fuzzy=False):
-    """
-    Return whether the string can be interpreted as a date.
-
-    :param string: str, string to check for date
-    :param fuzzy: bool, ignore unknown tokens in string if True
-    """
-    try:
-        parse(string, fuzzy=fuzzy)
-        return True
-
-    except ValueError:
-        return False
-
-
 # Date-type things need to be converted from datetimes to dates.
 def convert_to_string(o):
     if isinstance(o, datetime):
@@ -75,22 +59,17 @@ def hash_dissemination_object(obj):
     # for reference. It isn't obvious how to do this well, and in particular,
     # while leaving the JSON object keys out of the hash.
 
-    # -1. Get the fields we're going to hash from the object
-    # We use the field names that are define for the SF-SAC export.
-    # Those names might want to be moved into the model classes, so they become "canonical",
-    # and then the object could just reference obj.export_fields or similar.
-    fields_to_hash = field_name_ordered[obj._meta.model_name.lower()]
-    # 0. We are given a Django object. Convert it to a dictionary.
+    # 1. Get the fields we're going to hash from the object
+    fields_to_hash = obj.HASH_FIELDS
+    # 2. We are given a Django object. Convert it to a dictionary.
     d = model_to_dict(obj)
-    # 1. Dictionary to tuples
+    # 3. Dictionary to tuples
     tupes = list(d.items())
-    # 2. Tuples sorted by key
+    # 4. Tuples sorted by key
     sorted_tupes = sorted(tupes, key=lambda k: k[0])
-    # 2b. Get rid of fields that we're not hashing
+    # 5. Get rid of fields that we're not hashing
     filtered_sorted = list(filter(lambda t: t[0] in fields_to_hash, sorted_tupes))
-    # logger.info(filtered_sorted)
-    # logger.info(list(map(lambda p: p[0], filtered_sorted)))
-    # 3. Strip the keys
+    # 6. Strip the keys
     # Why strip the keys? We don't want our field names to impact
     # the hashing value. We want to make sure the values in the object, in a consistent sort
     # order, are what get hashed. If we change field names, yes, the hash will change. But
@@ -101,15 +80,12 @@ def hash_dissemination_object(obj):
     # p[0] is the key, p[1] is the value in the tuple list.
     # Strings must be encoded to bytes before hashing.
     just_values = list(map(lambda p: convert_to_string(p[1]), filtered_sorted))
-    # logger.info(just_values)
-    # 4. Append the values with no spaces.
-    smooshed = "".join(just_values).strip().encode("utf-8")
-    # logger.info(smooshed)
+    # 7. Append the values with no spaces.
+    smooshed = "".join(just_values).strip().encode("ascii", "ignore")
     # This is now hashable. Run a SHA1.
     shaobj = sha1()
     shaobj.update(smooshed)
     digest = shaobj.hexdigest()
-    # logger.info(f"[SHA] {digest}")
     return digest
 
 
@@ -159,7 +135,7 @@ class IntakeToDissemination(object):
         for key, object_list in self.loaded_objects.items():
             try:
                 if object_list:
-                    # Add the hashes at the last possible moment.
+                    # # Add the hashes at the last possible moment.
                     for obj in object_list:
                         sha = hash_dissemination_object(obj)
                         obj.hash = sha

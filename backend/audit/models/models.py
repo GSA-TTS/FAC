@@ -255,20 +255,24 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             intake_to_dissem.load_all()
             intake_to_dissem.save_dissemination_objects()
             if intake_to_dissem.errors:
+                logger.info(f"I2D ERRORS: {intake_to_dissem.errors}")
                 return {"errors": intake_to_dissem.errors}
         except TransactionManagementError as err:
             # We want to re-raise this to catch at the view level because we
             # think it's due to a race condition where the user's submission
             # has been disseminated successfully; see
             # https://github.com/GSA-TTS/FAC/issues/3347
+            logger.error("Possible race in disseminate")
             raise err
         # TODO: figure out what narrower exceptions to catch here
         except Exception as err:
+            logger.error(f"Unknown error in disseminate: {err}")
             return {"errors": [err]}
 
         return None
 
     def redisseminate(self):
+
         named_models = {
             "AdditionalEins": AdditionalEin,
             "AdditionalUeis": AdditionalUei,
@@ -594,8 +598,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # something that we expect to NOT CHANGE over time. (Resubmission metadata is not part of the hash.) Why?
     # Because it is internal/administrative data tracking the connectedness of audits, not the audit data itself.
     # (A later group/team may decide this is an incorrect decision.)
-    data_hash = models.CharField(
-        help_text="A hash of the SAC data",
+    hash = models.CharField(
+        help_text="A hash of the row",
         blank=True,
         null=True,
     )

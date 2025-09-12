@@ -19,6 +19,29 @@ class FederalAward(models.Model):
     #             "findings_count"
     #             ]),
     #     ]
+    HASH_FIELDS = [
+        "report_id",
+        "award_reference",
+        "federal_agency_prefix",
+        "federal_award_extension",
+        "aln",
+        "findings_count",
+        "additional_award_identification",
+        "federal_program_name",
+        "amount_expended",
+        "federal_program_total",
+        "cluster_name",
+        "state_cluster_name",
+        "other_cluster_name",
+        "cluster_total",
+        "is_direct",
+        "is_passthrough_award",
+        "passthrough_amount",
+        "is_major",
+        "audit_report_type",
+        "is_loan",
+        "loan_balance",
+    ]
 
     additional_award_identification = models.TextField(
         "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
@@ -100,4 +123,9 @@ class FederalAward(models.Model):
         on_delete=models.CASCADE,
         to_field="report_id",
         db_column="report_id",
+    )
+    hash = models.CharField(
+        help_text="A hash of the row",
+        blank=True,
+        null=True,
     )
