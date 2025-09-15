@@ -27,5 +27,6 @@ assignees: ''
 
 ## For admins
 - [ ] If the departing team member is a Google Group manager, designate a new manager for any groups they manage.
-- [ ] If they are the on Make someone else the Maintainer and remove the departing team member from [the FAC-admins team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-admins/members) and [the FAC-team team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members).
+- [ ] Make someone else the Maintainer and remove the departing team member from [the FAC-admins team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-admins/members) and [the FAC-team team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members).
 - [ ] Remove any deployment tokens associated with the PL/PO from the repository.
+- [ ] Ensure there's someone with "manage sharing" permission on the Google Calendar (fac-team-two)
