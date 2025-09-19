@@ -104,6 +104,18 @@ class SingleAuditReportFile(models.Model):
     component_page_numbers = models.JSONField(
         blank=True, null=True, validators=[validate_component_page_numbers]
     )
+    # TODO: This value probably wants to be calculated at the point that the file is uploaded.
+    # If we do it on save(), it means we have to pull the object from S3 for hashing. It might
+    # be that we want to use the S3 checksum, however, instead of computing it ourselves:
+    # https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html
+    # That would have the benefit of storying the S3 hash in our application, and being something
+    # we can then verify between the DB and the store. However, it would be good if users could verify
+    # the checksum on the PDFs as well.
+    hash = models.CharField(
+        help_text="A hash of the report",
+        blank=True,
+        null=True,
+    )
 
     def save(self, *args, **kwargs):
         report_id = self.sac.report_id
