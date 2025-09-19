@@ -1,4 +1,101 @@
 Program Title,Program Number
+Dry-Redwater Rural Water Project Feasibility Study,15.582
+Tribal Special Criminal Jurisdiction Reimbursement,16.059
+COPS Hiring Program,16.068
+Preparing for Active Shooter Situations,16.069
+Law Enforcement Mental Health and Wellness Act,16.070
+School Violence Prevention Program,16.071
+COPS Anti-Methamphetamine Program,16.072
+COPS Anti-Heroin Task Force Program,16.073
+Oral Diseases and Disorders Research,93.121
+Enhanced Aquifer Use and Recharge Program,66.522
+Non-State Member Support for the Gulf Hypoxia Action Plan,66.487
+Support for the Gulf Hypoxia Action Plan,66.485
+Good Neighbor Authority for Restoration,15.987
+National Fish Habitat Partnership,15.686
+National Fish Passage,15.685
+Candidate Species Conservation,15.660
+Prescott Marine Mammal Rescue Assistance,15.683
+Partners for Fish and Wildlife,15.631
+Yukon River Salmon Research and Management Assistance,15.671
+National Wetlands Inventory,15.665
+Coastal,15.630
+Texas 1944 Water Treaty Grant,10.126
+National Park Service Centennial Challenge,15.406
+Emergency Commodity Assistance Program,10.121
+Social Impact Partnerships to Pay for Results Act (SIPPRA),21.017
+PHMSA Pipeline Safety Research and Development Other Transaction Agreements,20.723
+Emergency Watershed Protection Program - Floodplain Easements  Disaster Relief Appropriations Act,10.928
+Partnerships for Climate-Smart Commodities,10.937
+Geographic Programs - Gulf of America Program,66.475
+Experienced Services Program,15.016
+Geographic Programs - Gulf Coast Ecosystem Restoration Council Comprehensive Plan Component,66.130
+Health Data Access Program (HeDAP),93.695
+Child Health and Human Development Extramural Research,93.865
+Wetland Mitigation Banking Program,10.933
+Healthy Forests Reserve Program (HFRP),10.922
+Agriculture Risk Coverage Program,10.113
+Workforce Opportunities in Regional Careers II,81.281
+Extramural Research Restoration Program:  Hurricanes Fiona and Ian,93.661
+Section 8 Moderate Rehabilitation Single Room Occupancy,14.249
+Recreation and Visitor Services,15.225
+BLM Fuels Management and Community Fire Assistance Program Activities,15.228
+Plant Conservation and Restoration Management,15.245
+Joint Fire Science Program,15.232
+Good Neighbor Authority,15.015
+National Landscape Conservation System,15.248
+Aquatics Resources Management,15.244
+Rangeland Resource Management,15.237
+Forest and Woodlands Resource Management,15.233
+Invasive and Noxious Plant Management,15.230
+Threatened and Endangered Species,15.246
+Environmental Quality and Protection,15.236
+Wildlife Resource Management,15.247
+Youth Conservation Opportunities on Public Lands,15.243
+"National Guard Morale, Welfare, and Recreation Program",12.030
+National Geospatial Program: Building The National Map,15.817
+Denali Commission Program,90.100
+Tribal Justice Assistance,16.596
+"Economic, Social, and Political Development of the Territories",15.875
+National Center for Preservation Technology and Training,15.923
+Aeronautics,43.002
+Space Operations,43.007
+Mission Support,43.009
+Science,43.001
+Office of Stem Engagement (OSTEM),43.008
+Exploration,43.003
+Space Technology,43.012
+Midsize and Large Drinking Water System Infrastructure Resilience and Sustainability Program  Safe Drinking Water Act 1459F,66.488
+AmeriCorps Seniors Senior Demonstration Program (FGP) 94.017,94.017
+South Carolina Support for Foreign Research Reactor Spent Nuclear Fuel (FRRSNF) Shipments,81.180
+Borlaug Executive Leadership Program,10.776
+"Rural Health Care Services Outreach, Rural Health Network Development and Small Health Care Provider Quality Improvement",93.912
+Humanities Data and Evaluation,45.159
+Grants to States for Medicaid,93.778
+IAF Assistance for Overseas Programs,85.752
+Telehealth Programs,93.211
+"Navy  Command, Control, Communications, Computers, Intelligence, Surveillance, and Reconnaissance",12.335
+Urban Agriculture and Innovative Production Grants Program (UAIP),10.935
+"Underground Storage Tank (UST) Prevention, Detection, and Compliance Program",66.804
+Water Resources Development Act,15.581
+Shelter and Services Program,97.141
+Collaborative Research and Development,12.114
+"Management of Undersirable Plants on Federal Lands, 7 U.S.C. 2814",12.012
+"DOD, NDEP, DOTC-STEM Education Outreach Implementation",12.560
+Bison Production and Marketing Grant Program,10.192
+Post-Vietnam Era Veterans' Educational Assistance,64.120
+Montgomery GI Bill Selected Reserve,64.032
+Volunteer Income Tax Assistance (VITA) Matching Grant Program,21.009
+Veteran Rapid Retraining Assistance Program,64.130
+Survivors and Dependents Educational Assistance,64.117
+Tax Counseling for the Elderly,21.006
+Post-9/11 Veterans Educational Assistance,64.028
+All-Volunteer Force Educational Assistance,64.124
+Watershed Rehabilitation Program,10.916
+U.S. Military Academy Athletic Programs at West Point,12.432
+Intercity Passenger Rail Program,97.157
+Marketing Assistance for Specialty Crops,10.096
+National Research Service Award in Primary Care Medicine,93.186
 Tribal Cybersecurity Grant Program,97.156
 Primary Care Medicine and Dentistry Clinician Educator Career Development Awards,93.976
 PPHF Geriatric Education Centers,93.969
@@ -23,7 +120,6 @@ Law Enforcement Support of Pantex Plant,81.279
 PL-480 Market Development and Technical Assistance,10.617
 Organic Dairy Marketing Assistance Program,10.977
 Organic Certification Cost Share Programs,10.171
-Agriculture Risk Coverage Program,10.113
 Native Hawaiian Health Care Systems,93.932
 Ryan White HIV/AIDS Dental Reimbursement and Community Based Dental Partnership Grants,93.924
 Grants to States for Operation of State Offices of Rural Health,93.913
@@ -41,7 +137,6 @@ Watershed Protection and Flood Prevention,10.904
 Soil and Water Conservation,10.902
 State Rural Hospital Flexibility Program,93.241
 "Health Center Program (Community Health Centers, Migrant Health Centers, Health Care for the Homeless, and Public Housing Primary Care)",93.224
-Telehealth Programs,93.211
 HIV-Related Training and Technical Assistance,93.145
 State Administrative Matching Grants for the Supplemental Nutrition Assistance Program,10.561
 Summer Electronic Benefit Transfer Program for Children,10.646
@@ -142,7 +237,6 @@ Protection and Advocacy for Individuals with Mental Illness,93.138
 Integrated Programs,10.303
 Wholesale Farmers and Alternative Market Development,10.164
 Specialty Crop Block Grant Program - Farm Bill,10.170
-Section 8 Moderate Rehabilitation Single Room Occupancy,14.249
 Organic Agriculture Research and Extension Initiative,10.307
 Projects for Assistance in Transition from Homelessness (PATH),93.150
 Rural Business Investment Program,10.860
@@ -333,7 +427,6 @@ Agricultural Management Assistance,10.917
 Wildlife Habitat Incentive Program,10.914
 Voluntary Public Access and Habitat Incentive Program,10.093
 "Conservation Outreach, Education and Technical Assistance",10.938
-Child Health and Human Development Extramural Research,93.865
 Southwest Forest Health and Wildfire Prevention,10.694
 Wood  Education and Resource  Center (WERC),10.681
 Forest Health Protection,10.680
@@ -370,7 +463,6 @@ Agricultural Market and Economic Research,10.290
 Local Meat Capacity Grants,10.189
 WIC Grants To States (WGS),10.578
 Conservation Reserve Program,10.069
-Urban Agriculture and Innovative Production,10.935
 Snow Survey and Water Supply Forecasting,10.907
 SNAP Partnership Grant,10.577
 Nutrition Assistance For Puerto Rico,10.566
@@ -406,10 +498,8 @@ Senior Farmers Market Nutrition Program,10.576
 Emergency Food Assistance Program (Administrative Costs),10.568
 WIC Farmers' Market Nutrition Program (FMNP),10.572
 Biofuel Producer Program,10.378
-"Management of Undersirable Plants on Federal Lands, 7 U.S.C. 2814",12.012
 Food Safety Certification for Specialty Crops Program,10.142
 Livestock Indemnity Program-2014 Farm Bill,10.108
-Marketing Assistance for Specialty Crops,10.096
 "Public Safety and Violence Prevention Research, Evaluation, and Implementation",97.108
 Molybdenum-99 Program,81.009
 Nonproliferation and Arms Control,81.505
@@ -426,8 +516,6 @@ Drinking Water State Revolving Fund,66.468
 Nursing Home Staffing Campaign,93.693
 Drug-Free Communities Support Program Grants,93.276
 Clean Water State Revolving Fund,66.458
-Non-State Member Support for the Gulf Hypoxia Action Plan,66.487
-Support for the Gulf Hypoxia Action Plan,66.485
 Improving the Investigation and Prosecution of Child Abuse and the Regional and Local Children's Advocacy Centers,16.758
 Girls in the Juvenile Justice System,16.830
 State Agency: Farm to School Program Training and Curricula,10.531
@@ -515,7 +603,6 @@ HIV Care Formula Grants,93.917
 "Coordinated Services and Access to Research for Women, Infants, Children, and Youth",93.153
 Grants to Provide Outpatient Early Intervention Services with Respect to HIV Disease,93.918
 Ending the HIV Epidemic:  A Plan for America  Ryan White HIV/AIDS Program Parts A and B,93.686
-"Rural Health Care Services Outreach, Rural Health Network Development and Small Health Care Provider Quality Improvement",93.912
 HIV Emergency Relief Project Grants,93.914
 Anti-Doping Activities,95.004
 Interventional Cooperative Agreement Program,96.012
@@ -577,7 +664,6 @@ State Public Water System Supervision,66.432
 Reducing Lead in Drinking Water (SDWA 1459B),66.443
 Drinking Water System Infrastructure Resilience and Sustainability Program  SDWA 1459A(l),66.448
 Tribal Justice Systems,16.608
-Tribal Special Criminal Jurisdiction Reimbursement,16.059
 Violence Against Women Formula Grants,16.588
 Health Professions Recruitment Program for Indians,93.970
 Tribal Self-Governance Program: Planning and Negotiation Cooperative Agreement,93.444
@@ -670,7 +756,6 @@ Veterans Treatment Court Discretionary Grant Program,16.043
 Consolidated And Technical Assistance Grant Program to Address Children and Youth Experiencing Domestic and Sexual Violence and Engage Men and Boys as Allies,16.888
 Indian Health Service Educational Loan Repayment,93.164
 Tribal Work Grants,93.594
-Health Equity Data Access Program,93.695
 Family Planning Service Delivery Improvement Research,93.974
 Indian Health Service Community Health Aide Program,93.382
 "Legally-directed Academic Programs, Workforce Development and Community Support",81.252
@@ -680,7 +765,6 @@ Grants to States for Loan Repayment,93.165
 Nurse Anesthetist Traineeship,93.124
 Cooperative Agreements to States/Territories for the Coordination and Development of Primary Care Offices,93.130
 National Health Center for Health Workforce Analysis,93.300
-National Research Service Award in Primary Care Medicine,93.186
 Grants to States to Support Oral Health Workforce Activities,93.236
 Nurse Faculty Loan Program (NFLP),93.264
 Nursing Student Loans,93.364
@@ -787,13 +871,6 @@ Grants to States for Construction of State Home Facilities,64.005
 Promotion of the Arts Partnership Agreements,45.025
 Promotion of the Arts Grants to Organizations and Individuals,45.024
 Congressionally Directed Programs,43.014
-Space Technology,43.012
-Mission Support,43.009
-Office of Stem Engagement (OSTEM),43.008
-Space Operations,43.007
-Exploration,43.003
-Aeronautics,43.002
-Science,43.001
 "Training, Investigations, and Special Purpose Activities of Federally-Recognized Indian Tribes Consistent With the Clean Air Act (CAA), Tribal Sovereignty and the Protection and Management of Air Quality",66.038
 Public Safety Officers' Benefits Program,16.571
 Community Project Funding/Congressionally Directed Spending,17.289
@@ -803,7 +880,6 @@ State and Local Anti-Terrorism Training,16.614
 Nationally Significant Freight and Highway Projects,20.934
 State Heating Oil and Propane Program,81.138
 Manufacturing and Energy Supply Chain Demonstrations and Commercial Applications,81.253
-Trible Justice Assistance,16.596
 Demonstration Grants for Domestic Victims of Human Trafficking,93.327
 Veterans Dependency and Indemnity Compensation for Service-Connected Death,64.110
 Burial Expenses Allowance for Veterans,64.101
@@ -816,7 +892,6 @@ YouthBuild,17.274
 National Sexual Assault Kit Initiative,16.833
 Khalid Jabara and Heather Heyer NO HATE Act,16.048
 Missing and Unidentified Human Remains (MUHR) Program,16.050
-Social Impact Partnerships to Pay for Results Act (SIPPRA),21.017
 "Matthew Shepard and James Byrd, Jr. Hate Crimes Education, Investigation and Prosecution Program",16.040
 Brookwood-Sago Grant,17.603
 Equitable  Sharing,21.016
@@ -1020,7 +1095,6 @@ Protection of Children from Environmental Health Risks,66.609
 "Surveys, Studies, Investigations, Demonstrations, and Training Grants - Section 1442 of the Safe Drinking Water Act",66.424
 Centers for Disease Control and Prevention Collaboration with Academia to Strengthen Public Health,93.967
 "Water Pollution Control State, Interstate, and Tribal Program Support",66.419
-Enhanced Aquifer Use and Recharge Program,66.522
 Environmental Justice Government-to-Government (EJG2G) Program,66.312
 Family Self-Sufficiency Program,14.896
 Jobs-Plus Pilot Initiative,14.895
@@ -1041,7 +1115,6 @@ ADVANCED RESEARCH PROJECTS AGENCY for HEALTH (ARPA-H),93.384
 Rail Line Relocation and Improvement,20.320
 Federal Transit Capital Investment Grants,20.500
 Passenger Rail Investment and Improvement (PRIIA)  Projects for Washington Metropolitan Area Transit Authority (WMATA),20.524
-Tax Counseling for the Elderly,21.006
 "Buses and Bus Facilities Formula, Competitive, and Low or No Emissions Programs",20.526
 National Infrastructure Investments,20.933
 Community Project Funding Congressionally Directed Spending,20.534
@@ -1051,7 +1124,6 @@ All Stations Accessibility Program,20.533
 Directed Grants and Awards,84.417
 Transportation Demonstration Program,20.936
 National Criminal History Improvement Program (NCHIP),16.554
-Volunteer Income Tax Assistance (VITA) Matching Grant Program,21.009
 Enhanced Mobility of Seniors and Individuals with Disabilities,20.513
 Railroad Research and Development,20.313
 Consolidated Rail Infrastructure and Safety Improvements,20.325
@@ -1224,7 +1296,6 @@ Occupational Safety and Health Program,93.262
 Immunization Cooperative Agreements,93.268
 AmeriCorps Seniors Retired and Senior Volunteer Program (RSVP) 94.002,94.002
 AmeriCorps State Commissions Support Grant,94.003
-AmeriCorps Seniors Senior Demonstration Program (FGP) 94.017,94.017
 AmeriCorps Commission Investment Fund 94.008,94.008
 AmeriCorps State and National 94.006,94.006
 Viral Hepatitis Prevention and Control,93.270
@@ -1271,7 +1342,6 @@ Adoption and Legal Guardianship Incentive Payments Program,93.603
 Community-Based Child Abuse Prevention Grants,93.590
 State Court Improvement Program,93.586
 Title IV-E Kinship Navigator Program,93.471
-"Arthritis, Musculoskeletal and Skin Diseases Research",93.846
 CHIPS Incentives Program,11.037
 Money Follows the Person Rebalancing Demonstration,93.791
 Congressionally-Identified Projects,11.617
@@ -1365,7 +1435,6 @@ National Laboratory Jobs Apprenticeship for Complete and Committed Employment fo
 Hydrofluorocarbon Reclaim and Innovative Destruction Grants,66.047
 Uniformed Services University Medical Research Projects,12.750
 Military Medical Research and Development,12.420
-Geographic Programs  Gulf of Mexico Program,66.475
 Geographic Programs  Lake Champlain Basin Program,66.481
 Geographic Programs - Southeast New England Coastal Watershed Restoration Program,66.129
 Healthy Watersheds Consortium Grant Program,66.441
@@ -1524,7 +1593,6 @@ CONTAMINATED ALASKA NATIVE CLAIMS SETTLEMENT ACT LANDS ASSISTANCE AGREEMENTS,66.
 Brownfields Job Training Cooperative Agreements,66.815
 Hazardous Waste Management Grant Program for Tribes,66.812
 Leaking Underground Storage Tank Trust Fund Corrective Action Program,66.805
-"Underground Storage Tank (UST) Prevention, Detection, and Compliance Program",66.804
 PRIA 5: Farm Worker and Health Care Provider Training and Education Grants,66.720
 Healthy Communities Grant Program,66.110
 Boating Safety Financial Assistance,97.012
@@ -1538,7 +1606,6 @@ Environmental Health,93.113
 NIEHS Hazardous Waste Worker Health and Safety Training,93.142
 NIH Office of Research on Women's Health,93.313
 National Institutes of Health Extramural Loan Repayment Program,93.280
-Oral Diseases and Disorders Research,93.121
 Support for Ombudsman and Beneficiary Counseling Programs for States Participating in Financial Alignment Model Demonstrations for Dually Eligible Individuals,93.634
 Section 223 Demonstration Programs to Improve Community Mental Health Services,93.829
 Minority Health and Health Disparities Research,93.307
@@ -1553,7 +1620,6 @@ Army National Guard Army Compatible Use Buffer Program,12.021
 National Defense Education Program,12.006
 Fort Huachuca Sentinel Landscapes for Military Training,12.004
 "Surveys, Studies, Investigations, Demonstrations, and Training Grants and Cooperative Agreements - Section 104(b)(3) of the Clean Water Act",66.436
-Geographic Programs - Gulf Coast Ecosystem Restoration Council Comprehensive Plan Component,66.130
 Fort Peck Reservation Rural Water System,15.516
 State and Community Highway Safety,20.600
 San Gabriel Basin Restoration,15.526
@@ -1635,10 +1701,8 @@ Native Hawaiian Climate Resilience Program,15.098
 Department of Interior Wildfire Management - Preparedness,15.088
 Staff Sergeant Parker Gordon Fox Suicide Prevention Grant Program,64.055
 BIA Wildland Urban Interface Community Fire Assistance,15.160
-"Economic, Social, and Political Development of the Territories",15.875
 Alaska Coastal Marine Institute,15.421
 Elder Abuse Prevention Interventions Program,93.747
-Youth Conservation Opportunities on Public Lands,15.243
 Alzheimers Disease Program Initiative (ADPI),93.470
 Indian Economic Development,15.032
 Indian Social Services Welfare Assistance,15.113
@@ -1655,12 +1719,9 @@ Juvenile Detention Education,15.150
 Endangered Species on Indian Lands,15.051
 Education Enhancements,15.151
 Real Estate Programs Indian Lands,15.040
-National Landscape Conservation System,15.248
-Plant Conservation and Restoration Management,15.245
 Tribal Climate Resilience,15.156
 "Indian Education Facilities, Operations, and Maintenance",15.047
 Supporting the Lower Mississippi Delta Initiative,15.014
-BLM Fuels Management and Community Fire Assistance Program Activities,15.228
 Voting Access for Individuals with Disabilities-Grants for Protection and Advocacy Systems,93.618
 Indian Employment Assistance,15.108
 Environmental Management Indian,15.041
@@ -1670,7 +1731,6 @@ ACL Assistive Technology State Grants for Protection and Advocacy,93.843
 Indian Post Secondary Schools,15.058
 "ACL National Institute on Disability, Independent Living, and Rehabilitation Research",93.433
 Indian Child Welfare Act Title II Grants,15.144
-Environmental Quality and Protection,15.236
 Strengthening Tribal Nations,15.067
 Alaska Subsistence Management,15.636
 Traumatic Brain Injury State Demonstration Grant Program,93.234
@@ -1688,14 +1748,11 @@ Developmental Disabilities Projects of National Significance,93.631
 Cooperative Inspection Agreements with States and Tribes,15.222
 ROTC Language and Culture Training Grants,12.357
 ACL Assistive Technology,93.464
-Threatened and Endangered Species,15.246
 Indian Education Assistance to Schools,15.130
 Research on Chemical and Biological Defense,12.360
 Cultural and Paleontological Resources Management,15.224
 Attorney Fees Indian Rights,15.053
-Experienced Services Program,15.016
 Training and Support  Combating Weapons of Mass Destruction,12.501
-Forest and Woodlands Resource Management,15.233
 Alcohol Open Container Requirements,20.607
 Indian Education Higher Education Grant,15.114
 Outdoor Schools in National Parks,15.012
@@ -1707,7 +1764,6 @@ Experienced Services,15.019
 "Services to Indian Children, Elderly and Families",15.025
 Indian School Equalization,15.042
 Administrative Cost Grants for Indian Schools,15.046
-Invasive and Noxious Plant Management,15.230
 Bureau of Indian Affairs Facilities Operations and Maintenance,15.048
 Indian Law Enforcement,15.030
 Secure Rural Schools and Community Self-Determination,15.234
@@ -1715,9 +1771,7 @@ Secure Rural Schools and Community Self-Determination,15.234
 Wild Horse and Burro Resource Management,15.229
 Litigation Support for Indian Rights,15.052
 Minerals and Mining on Indian Lands,15.038
-Wildlife Resource Management,15.247
 Southern Nevada Public Land Management,15.235
-Aquatics Resources Management,15.244
 Indian Adult Education,15.026
 Alzheimers Disease Initiative: Specialized Supportive Services Project (ADI-SSS) thru Prevention and Public Health Funds (PPHF),93.763
 Tribal Courts Trust Reform Initiative,15.147
@@ -1725,18 +1779,14 @@ Tribal Courts Trust Reform Initiative,15.147
 Indian Child and Family Education,15.043
 "Eastern Nevada Conservation, Recreation and Development",15.017
 State Health Insurance Assistance Program,93.324
-Joint Fire Science Program,15.232
 Paralysis Resource Center,93.325
 Indian Graduate Student Scholarships,15.059
 Assistance to Tribally Controlled Community Colleges and Universities,15.027
-Good Neighbor Authority,15.015
 Forestry on Indian Lands,15.035
 Road Maintenance Indian Roads,15.033
-Recreation and Visitor Services,15.225
 Indian Rights Protection,15.036
 Improvement and Repair of Indian Detention Facilities,15.063
 Safety of Dams on Indian Lands,15.065
-Rangeland Resource Management,15.237
 Tribal Great Lakes Restoration Initiative,15.066
 Cultural Resources Management,15.159
 Tribal Electrification Program,15.165
@@ -1772,7 +1822,6 @@ Connecting Minority Communities Pilot Program,11.028
 Broadband Infrastructure Program,11.031
 Middle Mile (Broadband) Grant Program,11.033
 Tribal Broadband Connectivity Program,11.029
-Medical Assistance Program,93.778
 State Medicaid Fraud Control Units,93.775
 PHMSA Pipeline Safety Underground Natural Gas Storage Grant,20.725
 Natural Gas Distribution Infrastructure Safety and Modernization Grant Program,20.708
@@ -1784,7 +1833,6 @@ Cell and Gene Therapy (CGT) Access Model,93.885
 Ocean Acidification Program (OAP),11.017
 Cooperative Institute (Inter-Agency Funded Activities),11.405
 Pipeline Emergency Response Grant (PERG),20.706
-PHMSA Pipeline Safety Research and Development Other Transaction Agreements,20.723
 Technical Assistance Grants,20.710
 U.S. Geological Survey Research and Data Collection,15.808
 Women on the Water (WOW),20.821
@@ -1817,7 +1865,6 @@ National Cooperative Geologic Mapping,15.810
 Cooperative Research Units,15.812
 National Geological and Geophysical Data Preservation,15.814
 National Land Remote Sensing Education Outreach and Research,15.815
-National Geospatial Program: Building The National Map,15.817
 Volcano Hazards Program Research and Monitoring,15.818
 National and Regional Climate Adaptation Science Centers,15.820
 USGS Cooperative Landslide Hazard Mapping and Assessment Program,15.821
@@ -1870,7 +1917,6 @@ Abandoned Hardrock Mine Reclamation (AHMR/AML) Grants,15.099
 Rhinoceros and Tiger Conservation Fund,15.619
 Zoonotic Disease Initiative,15.069
 Cooperative Ecosystem Studies Units,15.678
-Federal Historic Preservation Tax Incentive,15.961
 Battlefield Land Acquisition Grants,15.928
 Groundwork - Brownfield to Greenspace,15.965
 National Trails System Projects,15.935
@@ -1878,7 +1924,6 @@ Challenge Cost Share,15.943
 Cooperative Management of Ebey's Landing National Historical Reserve.,15.956
 Route 66 Corridor Preservation,15.958
 Great Lakes Fish and Wildlife Restoration Act,15.688
-National Center for Preservation Technology and Training,15.923
 Historic Preservation Fund Grants-in-Aid for Competitive Grants,15.966
 Boston African-American National Historic Site,15.938
 Migratory Bird Joint Ventures,15.637
@@ -1908,7 +1953,6 @@ American Battlefield Protection,15.926
 National Maritime Heritage Grants,15.925
 Native American Graves Protection and Repatriation Act,15.922
 Keweenaw National Historical Park (NHP) Preservation Grants,15.407
-National Park Service Centennial Challenge,15.406
 Experienced Services Program (ESP),15.079
 Pacific Northwest and Hawaiian Islands Arts,15.071
 "Rivers, Trails and Conservation Assistance",15.921
@@ -1948,7 +1992,6 @@ Tribal Education Departments,15.163
 Land Acquisition Funding Program,15.164
 Native Language Immersion Grant,15.161
 Endangered Species Conservation-Wolf Livestock Loss Compensation and Prevention,15.666
-Yukon River Salmon Research and Management Assistance,15.671
 "Coastal Wetlands Planning, Protection and Restoration",15.614
 Indian Loans Economic Development,15.124
 Experienced Services,15.682
@@ -1980,7 +2023,6 @@ Minerals Leasing Act,15.437
 Nicodemus National Historic Site,15.785
 Flood Control Act Lands,15.433
 Lower Colorado River Multi-Species Conservation,15.538
-Partners for Fish and Wildlife,15.631
 Implementation of the Taos Pueblo Indian water rights settlement,15.565
 "Section 206 Consolidated Appropriations Act, 2024: State Planning Grants to Promote Continuity of Care for Medicaid & CHIP Beneficiaries",93.694
 Agricultural Water Use Efficiency Program,15.572
@@ -1990,7 +2032,6 @@ Bureau of International Organization Affairs Grants Program,19.793
 Multistate Conservation Grant,15.628
 Central Africa Regional,15.651
 Tribal Wildlife Grants,15.639
-National Fish Habitat Partnership,15.686
 Cooperative Agriculture,15.681
 Combating Wildlife Trafficking,15.679
 National Outreach and Communication,15.653
@@ -1998,18 +2039,13 @@ Central Valley Project Improvement Act (CVPIA),15.648
 Great Lakes Restoration,15.662
 National Fire Plan-Wildland Urban Interface Community Fire Assistance,15.674
 National Wildlife Refuge System Enhancements,15.654
-Management Initiatives,15.239
 "Youth Engagement, Education, and Employment",15.676
 Adaptive Science,15.670
 Endangered Species Recovery Implementation,15.657
 Mexican Wolf Recovery,15.680
-National Wetlands Inventory,15.665
 Migratory Bird Conservation,15.647
 White-nose Syndrome National Response Implementation,15.684
 Natural Resource Damage Assessment and Restoration,15.658
-Candidate Species Conservation,15.660
-Prescott Marine Mammal Rescue Assistance,15.683
-National Fish Passage,15.685
 Alaska Migratory Bird Co-Management Council,15.643
 "Homeland Security Research, Development, Testing, Evaluation and Demonstration of Technologies Related to Countering Weapons of Mass Destruction",97.077
 North American Wetlands Conservation Fund,15.623
@@ -2034,7 +2070,6 @@ Clean Vessel Act,15.616
 Sportfishing and Boating Safety Act,15.622
 Non-Sale Disposals of Mineral Material,15.214
 Enhanced Hunter Education and Safety,15.626
-Coastal,15.630
 Sport Fish Restoration,15.605
 Wildlife Restoration and Basic Hunter Education and Safety,15.611
 Student Programs and Fellowships,19.209
@@ -2085,10 +2120,8 @@ Geosciences,47.050
 Engineering,47.041
 Mathematical and Physical Sciences,47.049
 U.S. Nuclear Regulatory Commission Minority Serving Institutions Program (MSIP),77.007
-Veteran Rapid Retraining Assistance Program,64.130
 Equity Investments,87.004
 Tracking Electronic Health Record Adoption and Capturing Related Insights in U.S. Hospitals,93.851
-Post-9/11 Veterans Educational Assistance,64.028
 Project-Based Rental Assistance (PBRA),14.195
 Pension Plan Termination Insurance,86.001
 "Research, Evaluation, and Demonstrations",14.536
@@ -2157,7 +2190,6 @@ Ombudsman and Regulatory Fairness Boards,59.053
 State Trade Expansion,59.061
 7(a) Loan Guarantees,59.012
 Good Neighbor Next Door Sales Program,14.198
-Shelter and Services Program,97.141
 State and Local Cybersecurity Grant Program Tribal Cybersecurity Grant Program,97.137
 Presidential Residence Protection Security Grant,97.134
 Homeland Security Grant Program,97.067
@@ -2168,7 +2200,6 @@ Housing Counseling Program Homeownership Initiative,14.022
 Mortgage Insurance Homes,14.117
 Byrne Criminal Justice Innovation Program,16.817
 Performance Based Contract Administrator Program,14.327
-Montgomery GI Bill Selected Reserve,64.032
 Foreign Assistance to American Schools and Hospitals Abroad (ASHA),98.006
 Lower Income Housing Assistance Program Section 8 Moderate Rehabilitation,14.856
 Food for Peace Development Assistance Program (DAP),98.007
@@ -2185,15 +2216,10 @@ USAID Development Partnerships for University Cooperation and Development,98.012
 Denton Program,98.010
 504 Certified Development Loans,59.041
 John Ogonowski Farmer-to-Farmer Program,98.009
-Emergency Watershed Protection Program - Floodplain Easements  Disaster Relief Appropriations Act,10.928
 Emergency Watershed Protection Program - Disaster Relief Appropriations Act,10.927
 Conservation Stewardship Program,10.924
-Healthy Forests Reserve Program (HFRP),10.922
-Watershed Rehabilitation Program,10.916
 Farm and Ranch Lands Protection Program,10.913
 Plant Materials for Conservation,10.905
-Wetland Mitigation Banking Program,10.933
-Partnerships for Climate-Smart Commodities,10.937
 Family Unification Program (FUP),14.880
 Community Development Block Grants/Special Purpose Grants/Insular Areas,14.225
 Community Development Block Grants/Entitlement Grants,14.218
@@ -2233,9 +2259,6 @@ National Coast Guard Museum Construction,97.140
 Disaster Assistance Loans,59.008
 OnRampII,12.014
 Social Insurance for Railroad Workers,57.001
-Post-Vietnam Era Veterans' Educational Assistance,64.120
-All-Volunteer Force Educational Assistance,64.124
-Survivors and Dependents Educational Assistance,64.117
 Self-Help Homeownership Opportunity Program,14.247
 Emergency Management Baseline Assessments Grant (EMBAG),97.131
 Next Generation Warning System Grant Program,97.138
@@ -2326,7 +2349,6 @@ Middle East Partnership Initiative,19.500
 Housing Counseling Assistance Program,14.169
 Dollar Home Sales,14.313
 Single Family Property Disposition,14.311
-"Navy  Command, Control, Communications, Computers, Intelligence, Surveillance, and Reconnaissance",12.335
 Promotion of the Humanities Challenge Grants,45.130
 U.S. Ambassadors Fund for Cultural Preservation,19.025
 Weapons Removal and Abatement,19.800
@@ -2354,8 +2376,6 @@ Hurricane Sandy Community Development Block Grant Disaster Recovery Grants (CDBG
 Supportive Housing for the Elderly,14.157
 Supportive Housing for Persons with Disabilities,14.181
 Language Grant Program,12.900
-Collaborative Research and Development,12.114
-Loan Repayment Program for General Research,93.232
 Promotion of the Humanities Research,45.161
 Promotion of the Humanities Federal/State Partnership,45.129
 Promotion of the Humanities Division of Preservation and Access,45.149
@@ -2364,14 +2384,12 @@ Promotion of the Humanities Public Programs,45.164
 Promotion of the Humanities Teaching and Learning Resources and Curriculum Development,45.162
 Promotion of the Humanities Office of Digital Humanities,45.169
 Promotion of the Humanities Fellowships and Stipends,45.160
-"DOD, NDEP, DOTC-STEM Education Outreach Implementation",12.560
 Delta Regional Authority,90.200
 Community Development Block Grant- PRICE Competition,14.024
 "Migratory Bird Monitoring, Assessment and Conservation",15.655
 Lewis-Houghton Civics and Democracy Initiative,42.015
 Barry M. Goldwater Scholarship Program,85.200
 Global Defense Reform Program,19.888
-Extramural Research Restoration Program:  Hurricanes Fiona and Ian,93.661
 Green and Resilient Retrofit Program,14.021
 Youth Homeless System Improvement Grants,14.277
 BRIC: Building Resilient Infrastructure and Communities,97.047
@@ -2437,7 +2455,6 @@ Appalachian Development Highway System,23.003
 Appalachian Area Development,23.002
 Appalachian Regional Development (See individual Appalachian Programs),23.001
 Public Safety Partnership and Community Policing Grants,16.710
-Denali Commission Program,90.100
 Shared Services,90.199
 Indian Country Investigations,16.308
 Combined DNA Index System,16.307
@@ -2447,6 +2464,9 @@ Equitable Sharing Program,16.922
 Japan-U.S. Friendship Commission Grants,90.300
 International Broadcasting Independent Grantee Organizations,90.500
 Export - Loan Guarantee/Insured Loans,31.007
+Federal Historic Preservation Tax Incentive,15.961
+Stewardship of Natural and Cultural Resources in Offshore Energy and Mineral Activities,15.080
+Loan Repayment Program for General Research,93.232
 Expand and Extend Clean Coal Power Initiative,81.131
 Dissertation Year Fellowship,12.028
 Urban Waters Small Grants,66.440
@@ -2588,7 +2608,6 @@ Upper Mississippi River System Navigation and Ecosystem Sustainability Program,1
 Landowner Incentive,15.633
 State and Local Government Data Analysis Tools for Roadway Safety,20.935
 OED Resource Partners Training Portal (RPTP),59.074
-U.S. Military Academy Athletic Programs at West Point,12.432
 Assets for Independence Demonstration Program,93.602
 Medicare Access and CHIP Reauthorization Act (MACRA) Funding Opportunity: Measure Development for the Quality Payment Program,93.986
 Section 9813: State Planning Grants for Qualifying Community-Based Mobile Crisis Intervention Services,93.639
