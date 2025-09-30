@@ -10,6 +10,7 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
   } else {
     cy.intercept('POST', interceptUrl + '*').as('uploadSuccess');
   };
+cy.get('#info_box').scrollIntoView();
 
   cy.get(uploadSelector).attachFile(filename);
   // Upload url (POST /audit/excel/workbookname) returns a redirect to "/" on successful upload. So, 302.
