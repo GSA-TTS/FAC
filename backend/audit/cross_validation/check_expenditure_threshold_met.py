@@ -1,6 +1,6 @@
 from config.settings import DOLLAR_THRESHOLDS
 from .errors import err_total_amount_expended
-from ..common.util import is_int
+from ..intakelib.common.util import is_int
 
 from datetime import date
 
