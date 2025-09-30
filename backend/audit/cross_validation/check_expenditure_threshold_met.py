@@ -15,7 +15,7 @@ def check_expenditure_threshold_met(
     
     Includes both federal expenditures (Column K) and loan balances (Column M).
     Loan balances above the amount expended threshold are typically not required to submit, 
-    under 2 CFR 200.502 (b). However, guidance from specific agencies requires submission in 
+    under 2 CFR 200.502 (d). However, guidance from specific agencies requires submission in 
     this case. Erring on the side of caution, we add oustanding loan balances to the total
     expenditure in order to allow these records through.
     """
