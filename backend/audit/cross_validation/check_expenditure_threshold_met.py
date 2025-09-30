@@ -12,7 +12,12 @@ def check_expenditure_threshold_met(
     Check that the total amount expended meets the minimum threshold for its fy_start_date.
     For now, we are counting reimbursements as positive values, hence using abs().
     See ticket #4198 for more info.
-    Now includes both federal expenditures (Column K) and loan balances (Column M).
+    
+    Includes both federal expenditures (Column K) and loan balances (Column M).
+    Loan balances above the amount expended threshold are typically not required to submit, 
+    under 2 CFR 200.502 (b). However, guidance from specific agencies requires submission in 
+    this case. Erring on the side of caution, we add oustanding loan balances to the total
+    expenditure in order to allow these records through.
     """
     all_sections = sac_dict["sf_sac_sections"]
     general_information = all_sections.get("general_information", {})
@@ -26,8 +31,8 @@ def check_expenditure_threshold_met(
         amount = award["program"]["amount_expended"]
         abs_total += abs(amount)
 
-        # NEW: Include loan balance (Column M)
-        loan_balance = award["program"].get("loan_balance_at_audit_period_end")
+        # Include loan balance (Column M)
+        loan_balance = award["loan_or_loan_guarantee"].get("loan_balance_at_audit_period_end")
         if is_int(loan_balance):
             abs_total += abs(loan_balance)
 
