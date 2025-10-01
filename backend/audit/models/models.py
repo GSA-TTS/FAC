@@ -3,7 +3,6 @@ import json
 import logging
 
 from django.db import models
-from django.forms.models import model_to_dict
 from django.db import transaction
 from django.db.transaction import TransactionManagementError
 from django.conf import settings
@@ -309,65 +308,72 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         # END ATOMIC BLOCK
         return False
 
+    def _raise_if_resubmission_already_exists(self):
+        if SingleAuditChecklist.objects.filter(
+            # If I am someone's previous report
+            resubmission_meta__previous_report_id=self.report_id,
+            # And my submission status is either disseminated or resubmitted
+            submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
+        ).exists():
+            # Then we should throw an exception.
+            raise ValidationError(
+                f"A resubmission already exists for report_id {self.report_id}."
+            )
+
     # Resubmission SAC Creations
-    # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
+    # Atomically create a new SAC row as a resubmission of this SAC.
+    # Assert that a resubmission does not already exist
     def initiate_resubmission(self, user=None):
-        # BEGIN ATOMIC BLOCK
+        # First, we raise an error if a resubmission already exists for this SAC.
+        self._raise_if_resubmission_already_exists()
+        # If we get past that, we then can do the work of initializing a resubmission.
+
         with transaction.atomic():
-            if SingleAuditChecklist.objects.filter(
-                resubmission_meta__previous_report_id=self.report_id,
-                submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
-            ).exists():
-                raise ValidationError(
-                    f"A resubmission already exists for report_id {self.report_id}."
-                )
-
-            # Clone the record
-            data = model_to_dict(self)
-
-            # Update individual fields
-            data["general_information"]["auditee_uei"] = self.auditee_uei
-            data["general_information"][
-                "auditee_fiscal_period_start"
-            ] = self.auditee_fiscal_period_start
-            data["general_information"][
-                "auditee_fiscal_period_end"
-            ] = self.auditee_fiscal_period_end
-
-            # Manually add back foreign key as instance
-            data["submitted_by"] = self.submitted_by
-
-            # We always need to update the data source on a resubmission.
-            # It is GSAFAC.
-            data["data_source"] = DATA_SOURCE_GSAFAC
-
-            # By default, this is version 1. This means all resubmissions will be of at least version 2.
-            if data.get("resubmission_meta"):
-                old_version = data.get("resubmission_meta").get("version", 1)
+            # We know what the resubmission metadata will be.
+            # By default, this is version 1.
+            # This means all resubmissions will be of at least version 2.
+            if self.resubmission_meta:
+                old_version = self.resubmission_meta.get("version", 1)
             else:
                 old_version = 1
 
-            # Add/override fields
-            data.update(
-                {
-                    "submission_status": STATUS.IN_PROGRESS,
-                    "resubmission_meta": {
-                        "previous_report_id": self.report_id,
-                        "previous_row_id": self.id,
-                        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
-                        "version": old_version + 1,
-                    },
-                    "transition_name": [STATUS.IN_PROGRESS],
-                    "transition_date": [now()],
-                }
-            )
+            creation_data = {
+                "general_information": {
+                    "auditee_uei": self.auditee_uei,
+                    "auditee_fiscal_period_start": self.general_information[
+                        "auditee_fiscal_period_start"
+                    ],
+                    "auditee_fiscal_period_end": self.general_information[
+                        "auditee_fiscal_period_end"
+                    ],
+                },
+                "submitted_by": self.submitted_by,
+                "data_source": DATA_SOURCE_GSAFAC,
+            }
+            # Start by creating a clean, new SAC.
+            # FIXME: What should the user be here?
+            new_sac = SingleAuditChecklist.objects.create(**creation_data)
 
-            resub = SingleAuditChecklist.objects.create(**data)
+            # Go ahead and add the metadata for resubmission
+            new_sac.submission_status = STATUS.IN_PROGRESS
+            new_sac.resubmission_meta = {
+                "previous_report_id": self.report_id,
+                "previous_row_id": self.id,
+                "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
+                "version": old_version + 1,
+            }
+            new_sac.transition_name = [STATUS.IN_PROGRESS]
+            # FIXME: Do we have to do anything else datewise?
+            new_sac.transition_date = [now()]
+
+            ########
+            # Save the new SAC
+            new_sac.save()
 
             if user:
                 # Event on the new RESUB
                 SubmissionEvent.objects.create(
-                    sac=resub,
+                    sac=new_sac,
                     user=user,
                     event=SubmissionEvent.EventType.RESUBMISSION_STARTED,
                 )
@@ -378,7 +384,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                     event=SubmissionEvent.EventType.RESUBMISSION_INITIATED,
                 )
 
-            return resub
+            return new_sac
         # END ATOMIC BLOCK
 
     def assign_cog_over(self):
