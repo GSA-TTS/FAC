@@ -1,0 +1,78 @@
+{% comment %}
+    Within the summary page. Assumes "resubmissions_list" exists and is populated.
+
+    "resubmissions_list" is list of Resubmission models in order of version. "report_id" is a foreign key to the related General model.
+    Therefore, all fields in the Resubmission and General models is available for all versions.
+    "object.report_id.column_name" is akin to "Resubmission object -> General object -> column_name field".
+{% endcomment %}
+{% load sprite_helper %}
+<div class="grid-container margin-y-6">
+    <h2 class="font-sans-2xl text-semibold margin-bottom-2 margin-top-3">Resubmission history</h2>
+    <p>
+        {% with resubmissions_list|last as most_recent_resubmission %}
+            {% if report_id == most_recent_resubmission.report_id.report_id %}
+                This is the most recent version.
+            {% else %}
+                This is version {{ general.resubmission_version }}. The most recent submission is version {{ resubmissions_list|length }}.
+            {% endif %}
+        {% endwith %}
+    </p>
+
+    <div class="usa-table-container--scrollable margin-0" tabindex="0">
+        <table class="usa-table usa-table--striped usa-table--compact width-full">
+            <thead>
+                <tr>
+                    <th scope="col" role="columnheader">Version</th>
+                    <th scope="col" role="columnheader">Date</th>
+                    <th scope="col" role="columnheader">Submission summary</th>
+                    <th scope="col" role="columnheader">SF-SAC</th>
+                    <th scope="col" role="columnheader">Report</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resub in resubmissions_list %}
+                    {% comment %} Highlight the active row with a "focus" border.
+                    The transparent border is necessary to bring the focus out far enough to be visible. {% endcomment %}
+                    <tr {% if report_id == resub.report_id.report_id %}class="usa-focus border-1 border-transparent"{% endif %}>
+                        <td>
+                            {{ resub.version }}
+                        </td>
+                        <td>
+                            {{ resub.report_id.fac_accepted_date }} 
+                        </td>
+                        <td>
+                            <a class="usa-link"
+                                href="{% url 'dissemination:Summary' report_id=resub.report_id.report_id %}">
+                                {{ resub.report_id.report_id }}
+                            </a>
+                        </td>
+                        <td>
+                            <a class="usa-link display-flex flex-column flex-align-center"
+                                href="{% url 'dissemination:SummaryReportDownload' report_id=resub.report_id.report_id %}"
+                                target="_blank">
+                                <svg class="usa-icon usa-icon--size-4"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                            </a>
+                        </td>
+                        <td>
+                            <a class="usa-link display-flex flex-column flex-align-center"
+                                href="{% url 'dissemination:PdfDownload' report_id=resub.report_id.report_id %}"
+                                target="_blank">
+                                <svg class="usa-icon usa-icon--size-4"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
