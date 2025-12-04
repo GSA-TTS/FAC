@@ -6,6 +6,24 @@ from dissemination.models import docs
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
 
+    HASH_FIELDS = [
+        "report_id",
+        "federal_agency_prefix",
+        "federal_award_extension",
+        "aln",
+        "award_reference",
+        "reference_number",
+        "type_requirement",
+        "is_modified_opinion",
+        "is_other_findings",
+        "is_material_weakness",
+        "is_significant_deficiency",
+        "is_other_matters",
+        "is_questioned_costs",
+        "is_repeat_finding",
+        "prior_finding_ref_numbers",
+    ]
+
     award_reference = models.TextField(
         "Order that the award line was reported in Award",
     )
@@ -52,4 +70,9 @@ class Finding(models.Model):
     type_requirement = models.TextField(
         "Type Requirement Failure",
         help_text=docs.type_requirement_findings,
+    )
+    hash = models.CharField(
+        help_text="A hash of the row",
+        blank=True,
+        null=True,
     )
