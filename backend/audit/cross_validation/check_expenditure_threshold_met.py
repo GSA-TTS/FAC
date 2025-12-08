@@ -24,6 +24,12 @@ def check_expenditure_threshold_met(
         amount = award["program"]["amount_expended"]
         abs_total += abs(amount)
 
+        # Entities with an outstanding balance over the threshold are also required to submit.
+        # In the name of keeping it simple, we simply add any loan balance amounts to the total.
+        is_loan_or_loan_guarantee = award["loan_or_loan_guarantee"]["is_guaranteed"] == "Y"
+        if is_loan_or_loan_guarantee:
+            abs_total += abs(award["loan_or_loan_guarantee"]["loan_balance_at_audit_period_end"])
+
     fy_start_date = date.fromisoformat(
         general_information["auditee_fiscal_period_start"]
     )
