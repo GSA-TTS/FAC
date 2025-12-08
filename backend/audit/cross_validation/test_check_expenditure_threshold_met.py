@@ -33,10 +33,14 @@ class CheckExpenditureThresholdMetTests(TestCase):
         },
     ]
 
-    def _make_federal_awards(self, amount_expended_list: list, loan_balance_list: list = []):
+    def _make_federal_awards(
+        self, amount_expended_list: list, loan_balance_list: list = []
+    ):
         result = []
 
-        expended_loaned_combined_list = list(zip_longest(amount_expended_list, loan_balance_list, fillvalue=0))
+        expended_loaned_combined_list = list(
+            zip_longest(amount_expended_list, loan_balance_list, fillvalue=0)
+        )
         for expended_loaned_tuple in expended_loaned_combined_list:
             result.append(
                 {
@@ -46,7 +50,7 @@ class CheckExpenditureThresholdMetTests(TestCase):
                     "loan_or_loan_guarantee": {
                         "is_guaranteed": "Y" if expended_loaned_tuple[1] else "N",
                         "loan_balance_at_audit_period_end": expended_loaned_tuple[1],
-                    }
+                    },
                 }
             )
 
