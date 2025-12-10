@@ -6,7 +6,7 @@ In the use case of updating a provider version, we want to go into `meta/bootstr
 
 NOTE: The deploying account must have the OrgManager role in the target organization.
 
-## Updateing shared files
+## Updating shared files
 In order to update the providers.tf across all environments, we do not want to update them manually in each. Inside `terraform/meta/bootstrap-env/templates/` we have a list of files that serve as the common templates. Update those according to your changes, and then navigate to `terraform/meta/` and run `python update-managed-files.py`. This will update the shared files across all environments like so:
 ```
 $ python update-managed-files.py
