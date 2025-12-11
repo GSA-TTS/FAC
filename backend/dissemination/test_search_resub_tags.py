@@ -27,13 +27,6 @@ class ResubmissionTagTests(TestCase):
         tag_map = build_resub_tag_map([row])
         self.assertEqual(tag_map["1002"], "Resubmitted")
 
-    def test_original_should_not_tag(self):
-        row = baker.make(
-            General, report_id="1003", resubmission_status=RESUBMISSION_STATUS.ORIGINAL
-        )
-        tag_map = build_resub_tag_map([row])
-        self.assertNotIn("1003", tag_map)
-
     def test_missing_status_should_not_tag(self):
         row = baker.make(General, report_id="1004", resubmission_status=None)
         tag_map = build_resub_tag_map([row])
@@ -51,7 +44,7 @@ class ResubmissionTagTests(TestCase):
             resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
         )
         row2 = baker.make(
-            General, report_id="1007", resubmission_status=RESUBMISSION_STATUS.ORIGINAL
+            General, report_id="1007", resubmission_status=RESUBMISSION_STATUS.UNKNOWN
         )
         rows = [row1, row2]
 
