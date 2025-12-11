@@ -16,6 +16,75 @@ class General(models.Model):
 
     #     ]
 
+    # NOTE: This list was pulled from the `summary_reports.py` file. It is the list of fields we
+    # export as part of the SF-SAC XLSX download.
+    HASH_FIELDS = [
+        "agencies_with_prior_findings",
+        "audit_period_covered",
+        "audit_type",
+        "audit_year",
+        "auditee_address_line_1",
+        "auditee_certified_date",
+        "auditee_certify_name",
+        "auditee_certify_title",
+        "auditee_city",
+        "auditee_contact_name",
+        "auditee_contact_title",
+        "auditee_ein",
+        "auditee_email",
+        "auditee_name",
+        "auditee_phone",
+        "auditee_state",
+        "auditee_uei",
+        "auditee_zip",
+        "auditor_address_line_1",
+        "auditor_certified_date",
+        "auditor_certify_name",
+        "auditor_certify_title",
+        "auditor_city",
+        "auditor_contact_name",
+        "auditor_contact_title",
+        "auditor_country",
+        "auditor_ein",
+        "auditor_email",
+        "auditor_firm_name",
+        "auditor_foreign_address",
+        "auditor_phone",
+        "auditor_state",
+        "auditor_zip",
+        "cognizant_agency",
+        "data_source",
+        "dollar_threshold",
+        "entity_type",
+        "fac_accepted_date",
+        "fy_end_date",
+        "fy_start_date",
+        "gaap_results",
+        "is_additional_ueis",
+        "is_aicpa_audit_guide_included",
+        "is_going_concern_included",
+        "is_internal_control_deficiency_disclosed",
+        "is_internal_control_material_weakness_disclosed",
+        "is_low_risk_auditee",
+        "is_material_noncompliance_disclosed",
+        "is_public",
+        "is_sp_framework_required",
+        "number_months",
+        "oversight_agency",
+        "report_id",
+        "sp_framework_basis",
+        "sp_framework_opinions",
+        "total_amount_expended",
+        "type_audit_code",
+        # 20250912 MCJ: Because of the off-by-one issues in timezones, it might be best
+        # to leave these out of the hash until those issues are resolved. Or, figure out what is
+        # going on that the hashing is happening before the timezone issue, because (somehow)
+        # the hash is being computed before the data changes and hits the dissem tables.
+        # "date_created",
+        # "ready_for_certification_date",
+        # "submitted_date",
+    ]
+
     report_id = models.TextField(
         "Report ID",
         help_text=REPORT_ID_FK_HELP_TEXT,
@@ -255,6 +324,11 @@ class General(models.Model):
     resubmission_version = models.BigIntegerField(
         default=0,
         help_text="Version counter of how many times this SAC was resubmitted.",
+    )
+    hash = models.CharField(
+        help_text="A hash of the row",
+        blank=True,
+        null=True,
     )
 
     class Meta:

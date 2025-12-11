@@ -6,6 +6,13 @@ from dissemination.models import docs
 class Passthrough(models.Model):
     """The pass-through entity information, when it is not a direct federal award"""
 
+    HASH_FIELDS = [
+        "report_id",
+        "award_reference",
+        "passthrough_name",
+        "passthrough_id",
+    ]
+
     award_reference = models.TextField(
         "Order that the award line was reported",
     )
@@ -23,4 +30,9 @@ class Passthrough(models.Model):
     passthrough_name = models.TextField(
         "Name of Pass-through Entity",
         help_text=docs.passthrough_name,
+    )
+    hash = models.CharField(
+        help_text="A hash of the row",
+        blank=True,
+        null=True,
     )
