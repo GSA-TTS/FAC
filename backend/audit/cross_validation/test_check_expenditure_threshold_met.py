@@ -7,6 +7,7 @@ from .check_expenditure_threshold_met import check_expenditure_threshold_met
 from .audit_validation_shape import audit_validation_shape
 
 from datetime import date, timedelta
+from itertools import zip_longest
 
 
 class CheckExpenditureThresholdMetTests(TestCase):
@@ -32,15 +33,24 @@ class CheckExpenditureThresholdMetTests(TestCase):
         },
     ]
 
-    def _make_federal_awards(self, amount_expended_list):
+    def _make_federal_awards(
+        self, amount_expended_list: list, loan_balance_list: list = []
+    ):
         result = []
 
-        for ae in amount_expended_list:
+        expended_loaned_combined_list = list(
+            zip_longest(amount_expended_list, loan_balance_list, fillvalue=0)
+        )
+        for expended_loaned_tuple in expended_loaned_combined_list:
             result.append(
                 {
                     "program": {
-                        "amount_expended": ae,
-                    }
+                        "amount_expended": expended_loaned_tuple[0],
+                    },
+                    "loan_or_loan_guarantee": {
+                        "is_guaranteed": "Y" if expended_loaned_tuple[1] else "N",
+                        "loan_balance_at_audit_period_end": expended_loaned_tuple[1],
+                    },
                 }
             )
 
@@ -228,6 +238,33 @@ class CheckExpenditureThresholdMetTests(TestCase):
                 },
                 "federal_awards": {
                     "awards": self._make_federal_awards(amount_expended_list)
+                },
+            },
+            version=0,
+        )
+
+        validation_result = check_expenditure_threshold_met(
+            audit_validation_shape(audit),
+            thresholds=self.thresholds,
+        )
+
+        self.assertEqual(validation_result, [])
+
+    def test_loan_balance_at_audit_period_end_meets_threshold(self):
+        """
+        Awards with loan balances should contribute to the threshold.
+        """
+        auditee_fiscal_period_start = self.thresholds[1]["start"].isoformat()
+        amount_loaned_list = [5000000]
+
+        audit = baker.make(
+            Audit,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_start": auditee_fiscal_period_start,
+                },
+                "federal_awards": {
+                    "awards": self._make_federal_awards([], amount_loaned_list)
                 },
             },
             version=0,
