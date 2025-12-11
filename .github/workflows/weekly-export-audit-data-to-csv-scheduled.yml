@@ -29,3 +29,7 @@ jobs:
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 4G -m 6G --name export_audit_data_to_csv_scheduled --command "python manage.py export_data_audit --year ${{ matrix.years }}" --wait
+          # This will be the new command for the bash script instead of the sling management command.
+          # We will no longer need the matrix, because the bash script handles it.
+          # Or: we can just run one command, un-matrixed.
+          # command: cf run-task gsa-fac -k 4G -m 6G --name export_audit_data_to_csv_scheduled --command "./util/csv-export-to-s3/csv-export-to-s3.bash" --wait
