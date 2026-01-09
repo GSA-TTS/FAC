@@ -23,7 +23,6 @@ locals {
     "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
     "philip.dominguez@gsa.gov",
-    "ranye.mclendon@gsa.gov",
     "candace.campbell@gsa.gov",
     "daryll.pierre@gsa.gov",
     "annie.rodriguezdelacruz@gsa.gov"
