@@ -8,7 +8,6 @@ from django.db.transaction import TransactionManagementError
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
-
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
 )
