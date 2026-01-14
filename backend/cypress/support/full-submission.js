@@ -33,7 +33,6 @@ export function testFullSubmission(isTribal, isPublic) {
   testLoginGovLogin();
 
   // Check the terms and conditions link and click "Accept and start..."
-  cy.get('[id=button-new-audit-submission]').click();
   cy.get('label[for=check_start_new_submission]').click();
   cy.get('.usa-button').contains('Begin New Submission').click();
   cy.url().should('match', /\/report_submission\/auditeeinfo\/$/);
