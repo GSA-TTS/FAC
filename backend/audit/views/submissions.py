@@ -44,10 +44,18 @@ class MySubmissions(LoginRequiredMixin, generic.View):
 
         data = {"completed_audits": [], "in_progress_audits": []}
         for audit in submissions:
-            audit["submission_status"] = _friendly_status(audit["submission_status"])
-            if audit["submission_status"] in ["Submitted", "Disseminated"]:
+            raw_status = audit["submission_status"]
+            friendly = _friendly_status(raw_status)
+
+            is_resubmission = (audit.get("resubmission_version") or 0) > 1
+
+            if friendly in ["Submitted", "Disseminated"]:
+                audit["submission_status"] = friendly
                 data["completed_audits"].append(audit)
             else:
+                audit["submission_status"] = (
+                    "Resubmission in progress" if is_resubmission else friendly
+                )
                 data["in_progress_audits"].append(audit)
 
         context = {
@@ -108,6 +116,7 @@ class MySubmissions(LoginRequiredMixin, generic.View):
                 fiscal_year_end_date=F(
                     "general_information__auditee_fiscal_period_end"
                 ),
+                resubmission_version=F("resubmission_meta__version"),
             )
             return data
 

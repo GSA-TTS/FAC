@@ -36,14 +36,21 @@ Table component. Lists all unsubmitted records. Contains Links to each record, a
             {% for item in data.in_progress_audits %}
                 <tr>
                     <td>
-                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
-                        {% if item.submission_status in "Ready for Certification,Auditor Certified,Auditee Certified" %}
-                            <p class="margin-0">
-                                <a class="usa-link" href="{% url 'audit:UnlockAfterCertification' item.report_id %}">
-                                    (Unlock)
-                                </a>
-                            </p>
+                    <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">
+                        {% if item.resubmission_version|default:0|add:0 > 1 %}
+                        Resubmission In Progress
+                        {% else %}
+                        {{ item.submission_status }}
                         {% endif %}
+                    </a>
+
+                    {% if item.submission_status == "Ready for Certification" or item.submission_status == "Auditor Certified" or item.submission_status == "Auditee Certified" %}
+                        <p class="margin-0">
+                        <a class="usa-link" href="{% url 'audit:UnlockAfterCertification' item.report_id %}">
+                            (Unlock)
+                        </a>
+                        </p>
+                    {% endif %}
                     </td>
                     <td>{{ item.auditee_name }}</td>
                     <td>{{ item.report_id }}</td>
