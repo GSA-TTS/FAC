@@ -10,6 +10,20 @@
                 </h1>
                 <p class="text-base-darker margin-top-0">View the audit submissions associated with your profile.</p>
             </div>
+            <div>
+                <button class="usa-button grid-row margin-top-1"
+                        aria-controls="modal-terms-conditions"
+                        id="button-new-audit-submission"
+                        data-open-modal>
+                    <svg class="usa-icon usa-icon--size-3 margin-right-1"
+                         aria-hidden="true"
+                         focusable="false"
+                         role="img">
+                        {% uswds_sprite "add" %}
+                    </svg>
+                    <span>New Audit Submission</span>
+                </button>
+            </div>
         </div>
         {% comment %}
           <!-- SOT TODO: enable for testing with SOT inclusion -->
@@ -33,6 +47,7 @@
             {% endif %}
         {% endif %}
     </div>
+    
     {% comment %} Activated by elements in other blocks. Not required to be within the main body. {% endcomment %}
     {% include "./modal_uei.html" %}
     {% include "./modal_new_audit_submission.html" %}
