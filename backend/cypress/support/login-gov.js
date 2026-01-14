@@ -17,12 +17,16 @@ export function testLoginGovLogin(
 
   // Wait until we are EITHER on the IdP or already back on /audit/
   cy.url({ timeout: 30000 }).should((url) => {
-    expect(url.includes(IDP_ORIGIN) || /\/audit\/$/.test(url)).to.eq(true);
+    const parsed = new URL(url);
+    const onIdp = parsed.origin === IDP_ORIGIN;
+    const onAudit = /\/audit\/$/.test(parsed.pathname);
+    expect(onIdp || onAudit).to.eq(true);
   });
 
   // Only do cy.origin() if we actually navigated to the IdP
   cy.url().then((url) => {
-    if (!url.includes(IDP_ORIGIN)) {
+    const parsed = new URL(url);
+    if (parsed.origin !== IDP_ORIGIN) {
       return; // already authenticated and back on localhost
     }
 
