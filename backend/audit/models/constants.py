@@ -46,14 +46,12 @@ STATUS_CHOICES = (
 
 
 class RESUBMISSION_STATUS:
-    ORIGINAL = "original_submission"
     MOST_RECENT = "most_recent"
     DEPRECATED = "deprecated_via_resubmission"
     UNKNOWN = "unknown_resubmission_status"
 
 
 RESUBMISSION_STATUS_CHOICES = (
-    (RESUBMISSION_STATUS.ORIGINAL, "Original Submission"),
     (RESUBMISSION_STATUS.MOST_RECENT, "Most Recent"),
     (RESUBMISSION_STATUS.DEPRECATED, "Deprecated via Resubmission"),
 )
