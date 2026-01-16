@@ -45,5 +45,8 @@ export function testLoginGovLogin(
     }
   });
 
-  cy.url().should('match', /\/audit\/$/);
+  // Explicitly return to localhost context after all IdP interactions
+  cy.origin('http://localhost:8000', () => {
+    cy.url().should('match', /\/audit\/$/);
+  });
 };
