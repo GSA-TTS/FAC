@@ -30,9 +30,9 @@ def check_expenditure_threshold_met(
             award["loan_or_loan_guarantee"]["is_guaranteed"] == "Y"
         )
         if is_loan_or_loan_guarantee:
-            abs_total += abs(
-                award["loan_or_loan_guarantee"]["loan_balance_at_audit_period_end"]
-            )
+            loan_balance = award["loan_or_loan_guarantee"]["loan_balance_at_audit_period_end"]
+            if isinstance(loan_balance, (int, float)):  # 20260115 - Hotfix. This is not guaranteed to be either empty or an integer.
+                abs_total += abs(loan_balance)
 
     fy_start_date = date.fromisoformat(
         general_information["auditee_fiscal_period_start"]

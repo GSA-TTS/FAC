@@ -255,7 +255,7 @@ class CheckExpenditureThresholdMetTests(TestCase):
         Awards with loan balances should contribute to the threshold.
         """
         auditee_fiscal_period_start = self.thresholds[1]["start"].isoformat()
-        amount_loaned_list = [5000000]
+        amount_loaned_list = [5000000, "garbage_string", "", None]
 
         audit = baker.make(
             Audit,
