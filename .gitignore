@@ -113,6 +113,8 @@ celerybeat.pid
 /env
 venv/
 ENV/
+# Exception for previous rule to allow changes to terraform modules
+!terraform/shared/modules/env/
 env.bak/
 venv.bak/
 
