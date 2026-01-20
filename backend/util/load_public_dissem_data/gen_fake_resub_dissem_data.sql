@@ -9,7 +9,6 @@ WITH chains AS (
     WHERE auditee_uei IS NOT NULL
     GROUP BY auditee_uei, audit_year
     HAVING COUNT(*) >= 2
-    ORDER BY random()
     LIMIT 200
 ),
 

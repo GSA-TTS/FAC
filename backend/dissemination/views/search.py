@@ -139,7 +139,8 @@ class AdvancedSearch(View):
             resub_tag_map = {}
 
         # Attach tag to each result so the template can use result.resubmission_tag
-        attach_resubmission_tags(paginator_results.object_list, resub_tag_map)
+        if include_private_results(request):
+            attach_resubmission_tags(paginator_results.object_list, resub_tag_map)
 
         context = context | {
             "form_user_input": form_user_input,
@@ -262,7 +263,8 @@ class Search(View):
             resub_tag_map = {}
 
         # Attach tag to each result so the template can use result.resubmission_tag
-        attach_resubmission_tags(paginator_results.object_list, resub_tag_map)
+        if include_private_results(request):
+            attach_resubmission_tags(paginator_results.object_list, resub_tag_map)
 
         context = context | {
             "form_user_input": form_user_input,
