@@ -53,10 +53,7 @@ class ReportAccessRequiredMixin:
         if not general.resubmission_status:
             pass
         # If the resubmission is a recent/current one
-        elif general.resubmission_status in [
-            RESUBMISSION_STATUS.MOST_RECENT,
-            RESUBMISSION_STATUS.ORIGINAL,
-        ]:
+        elif general.resubmission_status == RESUBMISSION_STATUS.MOST_RECENT:
             pass
         # If you have privileged access, you can see old/resubmitted reports
         elif (
