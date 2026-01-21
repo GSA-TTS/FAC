@@ -22,12 +22,6 @@ INSERT INTO support_administrative_key_uuids
     (email, uuid, permissions, added)
     VALUES
     (
-        'matthew.jadud@gsa.gov',
-        '61ba59b2-f545-4c2f-9b24-9655c706a06c',
-        'CREATE,READ,DELETE',
-        '2023-12-04'
-    ),
-    (
         'fac-gov-test-users+api-tester-admin@gsa.gov',
         'dd60c3f9-053d-4d82-a309-c89da53559f4',
         'CREATE,READ,DELETE',

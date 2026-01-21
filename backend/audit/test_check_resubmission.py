@@ -83,10 +83,10 @@ class TestCheckResubmissionAllowed(TestCase):
         self.assertFalse(allowed)
         self.assertIn("deprecated", message.lower())
 
-    def test_original_submission_v1_allowed(self):
+    def test_most_recent_v1_allowed(self):
         sac = create_sac(
             version=1,
-            meta={"resubmission_status": RESUBMISSION_STATUS.ORIGINAL},
+            meta={"resubmission_status": RESUBMISSION_STATUS.MOST_RECENT},
             status=STATUS.DISSEMINATED,
         )
         allowed, message = check_resubmission_allowed(sac)
