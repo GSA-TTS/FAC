@@ -6,6 +6,13 @@ from dissemination.models import docs
 class CapText(models.Model):
     """Corrective action plan text. Referebces General"""
 
+    HASH_FIELDS = [
+        "report_id",
+        "finding_ref_number",
+        "planned_action",
+        "contains_chart_or_table",
+    ]
+
     contains_chart_or_table = models.TextField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
         help_text=docs.charts_tables_captext,
@@ -24,4 +31,9 @@ class CapText(models.Model):
         on_delete=models.CASCADE,
         to_field="report_id",
         db_column="report_id",
+    )
+    hash = models.CharField(
+        help_text="A hash of the row",
+        blank=True,
+        null=True,
     )

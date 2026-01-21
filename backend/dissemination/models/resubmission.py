@@ -12,6 +12,14 @@ class Resubmission(models.Model):
     and next versions, if they exist. No default values - all fields are assumed to be filled or NULL.
     """
 
+    HASH_FIELDS = [
+        "report_id",
+        "version",
+        "status",
+        "previous_report_id",
+        "next_report_id",
+    ]
+
     # Foreign key links to all the other parts of the record. Unique in this table.
     report_id = models.ForeignKey(
         "General",
@@ -44,10 +52,17 @@ class Resubmission(models.Model):
         # help_text=docs.next_report_id,  # "The report_id of the next version. Points up the chain from a deprecated record."
         null=True,
     )
+    hash = models.CharField(
+        help_text="A hash of the row",
+        blank=True,
+        null=True,
+    )
 
     # Eventually:
     # resubmission_justification. Either a TextField provided by the user, or a CharField with choices for predetermined justifications.
     # changed_fields. A TextField with a string of comma separated field names. i.e. "one_field, two_field, red_field, blue_field".
 
     def __str__(self):
-        return f"report_id:{self.report_id} Version:{self.resubmission_version}, Status:{self.resubmission_status}"
+        return (
+            f"report_id:{self.report_id} Version:{self.version}, Status:{self.status}"
+        )

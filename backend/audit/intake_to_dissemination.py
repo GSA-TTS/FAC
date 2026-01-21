@@ -1,7 +1,11 @@
 import logging
 import pytz
 from django.db import IntegrityError
+from hashlib import sha1
+from dateutil.parser import parse
+from datetime import datetime
 
+from django.forms.models import model_to_dict
 from audit.intakelib.transforms.xform_resize_award_references import _format_reference
 from audit.models.constants import RESUBMISSION_STATUS
 from audit.utils import Util
@@ -20,6 +24,7 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 
+from dissemination.summary_reports import field_name_ordered
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +32,61 @@ logger = logging.getLogger(__name__)
 def omit(remove, d) -> dict:
     """omit(["a"], {"a":1, "b": 2}) => {"b": 2}"""
     return {k: d[k] for k in d if k not in remove}
+
+
+# Date-type things need to be converted from datetimes to dates.
+def convert_to_string(o):
+    if isinstance(o, datetime):
+        return f"{o.date()}"
+    if o is None:
+        return ""
+    else:
+        return f"{o}"
+
+
+def hashable_types(o):
+    logger.info(f"{type(o)} {o}")
+    return o
+
+
+# This is used to calculate a hash of the data for both internal and external integrity.
+def hash_dissemination_object(obj):
+    # Given a hash, alpha sort the keys. We do this by taking
+    # the object to a list of tuples, and then sorting
+    # the resulting list on the first element of the tuple.
+    #
+    # See https://stackoverflow.com/a/22003440
+    # for reference. It isn't obvious how to do this well, and in particular,
+    # while leaving the JSON object keys out of the hash.
+
+    # 1. Get the fields we're going to hash from the object
+    fields_to_hash = obj.HASH_FIELDS
+    # 2. We are given a Django object. Convert it to a dictionary.
+    d = model_to_dict(obj)
+    # 3. Dictionary to tuples
+    tupes = list(d.items())
+    # 4. Tuples sorted by key
+    sorted_tupes = sorted(tupes, key=lambda k: k[0])
+    # 5. Get rid of fields that we're not hashing
+    filtered_sorted = list(filter(lambda t: t[0] in fields_to_hash, sorted_tupes))
+    # 6. Strip the keys
+    # Why strip the keys? We don't want our field names to impact
+    # the hashing value. We want to make sure the values in the object, in a consistent sort
+    # order, are what get hashed. If we change field names, yes, the hash will change. But
+    # our object field names are very consistent.
+    # It is unclear if we're going to get consistent, cross-language hashing here.
+    # It depends on how Python chooses to reprseent values as strings. If we don't quite get this right
+    # the first time, it will have to be improved, and the full dataset re-disseminated.
+    # p[0] is the key, p[1] is the value in the tuple list.
+    # Strings must be encoded to bytes before hashing.
+    just_values = list(map(lambda p: convert_to_string(p[1]), filtered_sorted))
+    # 7. Append the values with no spaces.
+    smooshed = "".join(just_values).strip().encode("ascii", "ignore")
+    # This is now hashable. Run a SHA1.
+    shaobj = sha1()
+    shaobj.update(smooshed)
+    digest = shaobj.hexdigest()
+    return digest
 
 
 class IntakeToDissemination(object):
@@ -75,6 +135,10 @@ class IntakeToDissemination(object):
         for key, object_list in self.loaded_objects.items():
             try:
                 if object_list:
+                    # # Add the hashes at the last possible moment.
+                    for obj in object_list:
+                        sha = hash_dissemination_object(obj)
+                        obj.hash = sha
                     model_class = type(object_list[0])
                     model_class.objects.bulk_create(object_list)
             except IntegrityError as e:

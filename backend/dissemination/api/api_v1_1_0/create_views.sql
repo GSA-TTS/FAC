@@ -8,9 +8,12 @@ create view api_v1_1_0.findings_text as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
+        ---
         ft.finding_ref_number,
         ft.contains_chart_or_table,
-        ft.finding_text
+        ft.finding_text,
+        ft.hash
     from
         dissemination_findingtext ft,
         dissemination_general gen
@@ -30,8 +33,10 @@ create view api_v1_1_0.additional_ueis as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
-        uei.additional_uei
+        uei.additional_uei,
+        uei.hash
     from
         dissemination_general gen,
         dissemination_additionaluei uei
@@ -48,6 +53,8 @@ create view api_v1_1_0.findings as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
+        ---
         finding.award_reference,
         finding.reference_number,
         finding.is_material_weakness,
@@ -58,7 +65,8 @@ create view api_v1_1_0.findings as
         finding.is_questioned_costs,
         finding.is_repeat_finding,
         finding.is_significant_deficiency,
-        finding.type_requirement
+        finding.type_requirement,
+        finding.hash
     from
         dissemination_finding finding,
         dissemination_general gen
@@ -75,6 +83,7 @@ create view api_v1_1_0.federal_awards as
         award.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         award.award_reference,
         award.federal_agency_prefix,
@@ -94,7 +103,8 @@ create view api_v1_1_0.federal_awards as
         award.audit_report_type,
         award.findings_count,
         award.is_passthrough_award,
-        award.passthrough_amount
+        award.passthrough_amount,
+        award.hash
     from
         dissemination_federalaward award,
         dissemination_general gen
@@ -112,10 +122,12 @@ create view api_v1_1_0.corrective_action_plans as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         ct.finding_ref_number,
         ct.contains_chart_or_table,
-        ct.planned_action
+        ct.planned_action,
+        ct.hash
     from
         dissemination_CAPText ct,
         dissemination_General gen
@@ -135,13 +147,15 @@ create view api_v1_1_0.notes_to_sefa as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         note.note_title as title,
         note.accounting_policies,
         note.is_minimis_rate_used,
         note.rate_explained,
         note.content,
-        note.contains_chart_or_table
+        note.contains_chart_or_table,
+        note.hash
     from
         dissemination_general gen,
         dissemination_note note
@@ -161,10 +175,12 @@ create view api_v1_1_0.passthrough as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         pass.award_reference,
         pass.passthrough_id,
-        pass.passthrough_name
+        pass.passthrough_name,
+        pass.hash
     from
         dissemination_general as gen,
         dissemination_passthrough as pass
@@ -254,7 +270,8 @@ create view api_v1_1_0.general as
         CASE EXISTS(SELECT aud.report_id FROM dissemination_secondaryauditor aud WHERE aud.report_id = gen.report_id)
             WHEN FALSE THEN 'No'
             ELSE 'Yes'
-        END AS is_secondary_auditors
+        END AS is_secondary_auditors,
+        gen.hash
     from
         dissemination_general gen
     order by gen.id
@@ -268,6 +285,7 @@ create view api_v1_1_0.secondary_auditors as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         sa.auditor_ein,
         sa.auditor_name,
@@ -278,7 +296,8 @@ create view api_v1_1_0.secondary_auditors as
         sa.address_street,
         sa.address_city,
         sa.address_state,
-        sa.address_zipcode
+        sa.address_zipcode,
+        sa.hash
     from
         dissemination_General gen,
         dissemination_SecondaryAuditor sa
@@ -292,8 +311,10 @@ create view api_v1_1_0.additional_eins as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
-        ein.additional_ein
+        ein.additional_ein,
+        ein.hash
     from
         dissemination_general gen,
         dissemination_additionalein ein
@@ -307,11 +328,13 @@ create view api_v1_1_0.resubmission as
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
+        gen.fac_accepted_date,
         ---
         resub.version,
         resub.status,
         resub.previous_report_id,
-        resub.next_report_id
+        resub.next_report_id,
+        resub.hash
     from
         dissemination_general gen,
         dissemination_resubmission resub

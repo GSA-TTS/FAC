@@ -6,6 +6,17 @@ from dissemination.models import docs
 class Note(models.Model):
     """Note to Schedule of Expenditures of Federal Awards (SEFA)"""
 
+    HASH_FIELDS = [
+        "id",
+        "report_id",
+        "note_title",
+        "accounting_policies",
+        "rate_explained",
+        "is_minimis_rate_used",
+        "content",
+        "contains_chart_or_table",
+    ]
+
     accounting_policies = models.TextField(
         "A description of the significant accounting policies used in preparing the SEFA (2 CFR 200.510(b)(6))",
     )
@@ -23,4 +34,9 @@ class Note(models.Model):
     contains_chart_or_table = models.TextField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
         help_text=docs.charts_tables_note,
+    )
+    hash = models.CharField(
+        help_text="A hash of the row",
+        blank=True,
+        null=True,
     )
