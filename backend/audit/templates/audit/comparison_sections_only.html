@@ -1,0 +1,135 @@
+{% comment %} 
+  each key is a section, mapped to what changed 
+  each section contains a tag "status" (same, changed) and "in_r1", "in_r2" as lists
+  this is broken out so that it can be embedded in a Federal view without the trappings, 
+    if we decide that is desirable/necessary.  
+{% endcomment %}
+{% for section, changed in comparison.items %}
+  {% if changed.status == "same" %}
+    <!-- <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div> -->
+  {% elif changed.status == "error" %}
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col">
+        <h2>Changes in {{ nice_names | KV:section }}</h2>
+      </div>        
+    </div>
+    <div class="grid-row"><div class="tablet:grid-col"><p>Error: {{ changed.message }} </p></div></div>
+  {% else %}
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col">
+        <h2>Changes in {{ nice_names | KV:section }}</h2>
+      </div>        
+    </div>
+    {% if changed.in_r1|length > 0 %}
+    <div class="grid-row">
+      <div class="tablet:grid-col">
+        <table class="usa-table width-full">
+          <caption>Changes only in {{ r1 }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Element</th>
+              <th scope="col">{{ r1 | slice:"15:" }}</th>
+              <th scope="col">{{ r2 | slice:"15:" }}</th>
+            </tr>
+          </thead>
+          {% for d in changed.in_r1|dictsort:"key" %}
+            <tr>
+              <td>
+                {{ d.key|repl:"_| "|title }}
+              </td>
+              <td>
+                {% if d.from is None %}
+                  No value
+                {% else %}
+                  {{ d.from }}
+                {% endif %}
+              </td>
+              <td>
+                {% if d.to is None %}
+                  No value
+                {% else %}
+                  {{ d.to }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+    {% endif %}
+    {% if changed.in_r2|length > 0 %}
+    <div class="grid-row">
+      <div class="tablet:grid-col">
+        <table class="usa-table usa-table--borderless">
+          <caption>Changes only in {{ r2 }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Element</th>
+              <th scope="col">{{ r1 | slice:"15:" }}</th>
+              <th scope="col">{{ r2 | slice:"15:" }}</th>
+            </tr>
+          </thead>
+          {% for d in changed.in_r2|dictsort:"key" %}
+            <tr>
+              <th scope="row">
+                {{ d.key|repl:"_| "|title }}
+              </th>
+              <td>
+                {% if d.from is None %}
+                  No value
+                {% else %}
+                  {{ d.from }}
+                {% endif %}
+              </td>
+              <td>
+                {% if d.to is None %}
+                  No value
+                {% else %}
+                  {{ d.to }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+    {% endif %}
+    {% if changed.in_both|length > 0 %}
+    <div class="grid-row">
+      <div class="tablet:grid-col">
+        <table class="usa-table usa-table--borderless">
+          <caption>Changes from {{ r1 }} to {{ r2 }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Element</th>
+              <th scope="col">{{ r1 | slice:"15:" }}</th>
+              <th scope="col">{{ r2 | slice:"15:" }}</th>
+            </tr>
+          </thead>
+          {% for d in changed.in_both|dictsort:"key" %}
+          <tr>
+              <th scope="row">
+                {{ d.key|repl:"_| "|title }}
+              </th>
+              <td>
+                {% if d.from is None %}
+                  No value 
+                {% else %}
+                  {{ d.from }}
+                {% endif %}
+              </td>
+              <td>
+                {% if d.to is None %}
+                  No value
+                {% else %}
+                  {{ d.to }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  {% endif %} <!-- for the big is changed/same -->
+{% endfor %} <!-- end section loop -->

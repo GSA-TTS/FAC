@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+{% comment %} Perhaps only show the text at the top if this is a public/non-federal user? {% endcomment %}
+<div class="grid-container width-full">
+    <div class="grid-row">
+      <div class="tablet:grid-col">
+        <h1>Resubmission comparison</h1>
+        <p>To assist auditees and auditors in completing the resubmission of audits, the Clearinghouse provides an automated comparison between {{ r1 }} and {{ r2 }}.</p>
+        <p>This comparison is not comprehensive; it is a summary of changes detected between sections of the SF-SAC.</p>
+        <section class="usa-alert usa-alert--warning margin-top-0 margin-bottom-1"
+              aria-label="Resubmission check"
+                id="resubmission-check">
+          <div class="usa-alert__body grid-container">
+            <p>This comparison tool does not absolve submitters from their responsibility to independently validate and assert the correctness of their submission to the FAC.</p>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col width-full">
+        {% include "./comparison_sections_only.html" %}
+      </div>
+    </div>
+
+    <hr/>
+    {% comment %} FIXME: This could be a blue button on the right? Also, which should we redirect them to? {% endcomment %}
+    <a href="{% url 'audit:SubmissionProgress' r2 %}">Return to the submission checklist.</a>
+</div>
+{% endblock content %}

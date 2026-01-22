@@ -135,6 +135,11 @@ urlpatterns = [
         views.PredisseminationSummaryReportDownloadView.as_view(),
         name="PredisseminationSummaryReportDownload",
     ),
+    path(
+        "compare/<str:report_id>",
+        views.CompareSubmissionsView.as_view(),
+        name="CompareSubmissions",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:
