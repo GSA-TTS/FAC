@@ -7,12 +7,12 @@ django-debug-toolbar
 djlint
 faker
 flake8
-gitpython>=3.1.41
+gitpython>=3.1.46
 jsonnet
 model_bakery
 mypy
 pandas
-pip-tools>=7.4.1
+pip-tools>=7.5.2
 tblib
 toml
 types-python-slugify
