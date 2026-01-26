@@ -15,7 +15,6 @@ from api.views.common import SchemaView, Sprite
 from api.views.eligibility import EligibilityFormView, eligibility_check
 from api.views.uei import UEIValidationFormView
 
-
 views = [
     AccessAndSubmissionView,
     AccessListView,
