@@ -74,7 +74,7 @@ jobs:
           install-chromedriver: true
       - run: chrome --version
 
-      - uses: cypress-io/github-action@v6
+      - uses: cypress-io/github-action@v7
         with:
           browser: chrome
           working-directory: ./backend
