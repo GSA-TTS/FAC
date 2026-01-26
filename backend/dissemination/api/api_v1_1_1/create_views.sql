@@ -223,6 +223,7 @@ create view api_v1_1_1.general as
         gen.fac_accepted_date,
         gen.fy_end_date,
         gen.fy_start_date,
+        --- audit info and metadata
         gen.audit_type,
         gen.gaap_results,
         gen.sp_framework_basis,
@@ -244,6 +245,8 @@ create view api_v1_1_1.general as
         gen.data_source,
         gen.is_aicpa_audit_guide_included,
         gen.is_additional_ueis,
+        gen.resubmission_version,
+        gen.resubmission_status,
         CASE EXISTS(SELECT ein.report_id FROM dissemination_additionalein ein WHERE ein.report_id = gen.report_id)
             WHEN FALSE THEN 'No'
             ELSE 'Yes'
