@@ -20,7 +20,6 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 
-
 logger = logging.getLogger(__name__)
 
 
