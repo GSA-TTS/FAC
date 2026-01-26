@@ -58,7 +58,7 @@ jobs:
         run: touch .env
 
       - name: Run Cypress full submission test
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           browser: chrome
           working-directory: ./backend
