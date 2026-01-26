@@ -5,7 +5,6 @@ from django.core.exceptions import PermissionDenied
 
 from audit.models import SingleAuditChecklist
 
-
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )
