@@ -20,17 +20,17 @@ def generate_audit_summary_report(
     report_ids, include_private=False, pre_submission=False
 ):
     t0 = time.time()
-    (data, tgad) = _gather_audit_data(report_ids, include_private)
-    (workbook, tcw) = create_workbook(data)
+    data, tgad = _gather_audit_data(report_ids, include_private)
+    workbook, tcw = create_workbook(data)
 
     tht = 0
     if pre_submission:
         insert_precert_coversheet(workbook)
     else:
-        (has_tribal, tht) = _contains_private_tribal(report_ids)
+        has_tribal, tht = _contains_private_tribal(report_ids)
         insert_dissemination_coversheet(workbook, has_tribal, include_private)
 
-    (filename, workbook_bytes, tpw) = _prepare_workbook_for_download(workbook)
+    filename, workbook_bytes, tpw = _prepare_workbook_for_download(workbook)
     t1 = time.time()
     logger.info(
         f"SUMMARY_REPORTS generate_summary_report\n\ttotal: {t1 - t0} has_tribal: {tht} audit_data: {tgad} create_workbook: {tcw} prepare_workbook: {tpw}"
