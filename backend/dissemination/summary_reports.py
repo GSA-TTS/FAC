@@ -172,6 +172,8 @@ field_name_ordered = {
         "submitted_date",
         "data_source",
         "is_public",
+        "resubmission_version",
+        "resubmission_status",
     ],
     "federalaward": [
         "report_id",
