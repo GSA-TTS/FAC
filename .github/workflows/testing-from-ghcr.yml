@@ -20,7 +20,7 @@ jobs:
       PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - uses: actions/setup-node@v6
         with:
@@ -78,7 +78,7 @@ jobs:
       DISABLE_AUTH: True
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -110,13 +110,13 @@ jobs:
         run: docker compose run web python manage.py materialized_views --create
 
       - name: Run A11y tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           browser: chrome
           working-directory: ./backend
           spec: cypress/e2e/accessibility.cy.js
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         # add the line below to store screenshots only on failures
         if: failure()
         with:
