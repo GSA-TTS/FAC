@@ -10,7 +10,6 @@ import argparse
 import pprint
 import logging
 
-
 pp = pprint.PrettyPrinter(indent=2)
 
 parser = argparse.ArgumentParser()
