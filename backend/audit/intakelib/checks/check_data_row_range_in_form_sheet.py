@@ -6,6 +6,7 @@ from audit.intakelib.intermediate_representation import (
 )
 from audit.intakelib.common import get_message, build_cell_error_tuple
 
+
 logger = logging.getLogger(__name__)
 
 

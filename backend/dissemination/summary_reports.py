@@ -624,14 +624,14 @@ def prepare_workbook_for_download(workbook):
 
 def generate_summary_report(report_ids, include_private=False):
     t0 = time.time()
-    tribal_report_ids, ttri = get_tribal_report_ids(report_ids)
-    data, tgrdd = gather_report_data_dissemination(
+    (tribal_report_ids, ttri) = get_tribal_report_ids(report_ids)
+    (data, tgrdd) = gather_report_data_dissemination(
         report_ids, tribal_report_ids, include_private
     )
     data = separate_notes_single_fields_from_array_fields(data)
-    workbook, tcw = create_workbook(data)
+    (workbook, tcw) = create_workbook(data)
     insert_dissem_coversheet(workbook, bool(tribal_report_ids), include_private)
-    filename, workbook_bytes, tpw = prepare_workbook_for_download(workbook)
+    (filename, workbook_bytes, tpw) = prepare_workbook_for_download(workbook)
     t1 = time.time()
     logger.info(
         f"SUMMARY_REPORTS generate_summary_report\n\ttotal: {t1 - t0} ttri: {ttri} tgrdd: {tgrdd} tcw: {tcw} tpw: {tpw}"
@@ -643,11 +643,11 @@ def generate_summary_report(report_ids, include_private=False):
 def generate_presubmission_report(i2d_data):
     data = gather_report_data_pre_certification(i2d_data)
     data = separate_notes_single_fields_from_array_fields(data)
-    workbook, _ = create_workbook(data, protect_sheets=True)
+    (workbook, _) = create_workbook(data, protect_sheets=True)
     insert_precert_coversheet(workbook)
     workbook.security.workbookPassword = str(uuid.uuid4())
     workbook.security.lockStructure = True
-    filename, workbook_bytes, _ = prepare_workbook_for_download(workbook)
+    (filename, workbook_bytes, _) = prepare_workbook_for_download(workbook)
 
     return (filename, workbook_bytes)
 

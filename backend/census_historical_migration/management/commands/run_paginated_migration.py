@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 import logging
 import sys
 
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 

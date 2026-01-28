@@ -6,6 +6,7 @@ from django.core.validators import RegexValidator
 from api.uei import get_uei_info_from_sam_gov
 from config.settings import CHARACTER_LIMITS_GENERAL, STATE_ABBREVS
 
+
 # Regex for words, includes non-[A-Z] ASCII characters like ñ and ī.
 # \A and \Z start and terminate the string.
 # [^\W\d] - matches values _not_ in W (non-word characters) or d (digits), which is all alphas, including diacritics.

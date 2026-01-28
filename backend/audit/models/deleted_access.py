@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from .access_roles import ACCESS_ROLES
 from .models import SingleAuditChecklist
 
+
 User = get_user_model()
 
 

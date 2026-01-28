@@ -12,6 +12,7 @@ from .constants import (
     AWARD_ENTITY_ID_KEY,
 )
 
+
 logger = logging.getLogger(__name__)
 
 

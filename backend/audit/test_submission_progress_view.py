@@ -14,6 +14,7 @@ from .test_views import _load_json
 
 import datetime
 
+
 AUDIT_JSON_FIXTURES = Path(__file__).parent / "fixtures" / "json"
 User = get_user_model()
 
