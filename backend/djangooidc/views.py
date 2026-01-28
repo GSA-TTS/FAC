@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlencode
 from djangooidc.oidc import Client
 from djangooidc import exceptions as o_e
 
+
 logger = logging.getLogger(__name__)
 
 try:

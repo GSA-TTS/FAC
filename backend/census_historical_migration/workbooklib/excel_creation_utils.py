@@ -24,6 +24,7 @@ from openpyxl.utils.cell import (
 
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 

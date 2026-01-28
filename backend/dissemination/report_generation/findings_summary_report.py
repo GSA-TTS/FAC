@@ -298,5 +298,5 @@ def generate_findings_summary_report(report_ids=[]):
         with Timing("FINDINGS GATHER DATA"):
             wb = gather_report_data(report_ids)
         with Timing("FINDINGS PREP WORKBOOK DOWNLOAD"):
-            filename, workbook_bytes = prepare_workbook_for_download(wb)
+            (filename, workbook_bytes) = prepare_workbook_for_download(wb)
     return filename, workbook_bytes

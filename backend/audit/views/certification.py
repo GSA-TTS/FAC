@@ -16,6 +16,7 @@ from audit.models.constants import STATUS
 from audit.models.viewflow import sac_transition
 from audit.decorators import verify_status
 
+
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )

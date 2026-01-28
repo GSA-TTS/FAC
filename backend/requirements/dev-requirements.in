@@ -1,18 +1,18 @@
 -c ../requirements.txt
 
 bandit
-black>=26.1.0
+black>=24.3.0
 coverage
 django-debug-toolbar
 djlint
 faker
 flake8
-gitpython>=3.1.46
+gitpython>=3.1.41
 jsonnet
 model_bakery
 mypy
 pandas
-pip-tools>=7.5.2
+pip-tools>=7.4.1
 tblib
 toml
 types-python-slugify

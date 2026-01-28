@@ -39,6 +39,7 @@ import openpyxl as pyxl
 import logging
 import re
 
+
 logger = logging.getLogger(__name__)
 
 # Transformation Method Change Recording
@@ -968,7 +969,7 @@ def generate_federal_awards(audit_header, outfile):
         conversion_fun=str,
     )
 
-    passthrough_names, passthrough_ids = xform_populate_default_passthrough_names_ids(
+    (passthrough_names, passthrough_ids) = xform_populate_default_passthrough_names_ids(
         audits
     )
     set_range(wb, "passthrough_name", passthrough_names)

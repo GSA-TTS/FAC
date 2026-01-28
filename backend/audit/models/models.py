@@ -61,6 +61,7 @@ from dissemination.models import (
 )
 from django.utils.timezone import now
 
+
 User = get_user_model()
 
 logger = logging.getLogger(__name__)
