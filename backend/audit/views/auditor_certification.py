@@ -23,7 +23,6 @@ from audit.validators import (
 )
 from audit.decorators import verify_status
 
-
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )

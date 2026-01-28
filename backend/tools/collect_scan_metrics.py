@@ -6,7 +6,6 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 
-
 logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler()])
 
 

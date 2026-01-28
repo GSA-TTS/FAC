@@ -23,7 +23,6 @@ import argparse
 import pprint
 import logging
 
-
 pp = pprint.PrettyPrinter(indent=2)
 
 parser = argparse.ArgumentParser()
@@ -70,7 +69,7 @@ class Command(BaseCommand):
         audit_header = get_audit_header(options["dbkey"], year)
         output_type = options["output_type"]
         for section, fun in sections_to_handlers.items():
-            (wb, _, filename) = generate_workbook(fun, audit_header, section)
+            wb, _, filename = generate_workbook(fun, audit_header, section)
 
             if wb and output_type == "json":
                 filename = filename.split(".")[0]
