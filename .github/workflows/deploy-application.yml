@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Restore npm cache
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v5
         id: cache-npm
         with:
           path: ~/.npm
@@ -34,7 +34,7 @@ jobs:
           python-version: '3.12'
 
       - name: Restore pip cache
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v5
         id: cache-pip
         with:
           path: |
