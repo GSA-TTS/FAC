@@ -38,7 +38,7 @@ jobs:
       CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -74,13 +74,13 @@ jobs:
           install-chromedriver: true
       - run: chrome --version
 
-      - uses: cypress-io/github-action@v6
+      - uses: cypress-io/github-action@v7
         with:
           browser: chrome
           working-directory: ./backend
           spec: cypress/e2e/full-submission.cy.js
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         # add the line below to store screenshots only on failures
         if: failure()
         with:
