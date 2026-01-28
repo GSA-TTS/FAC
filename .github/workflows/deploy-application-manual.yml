@@ -1,0 +1,147 @@
+---
+name: Deploy Application Manual Trigger
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch or commit to deploy to the FAC application
+        type: string
+        default: main
+        required: true
+      environment:
+        required: true
+        type: choice
+        options:
+          - dev
+          - preview
+          - staging
+
+jobs:
+  push-with-creds:
+    name: Deploy to cloud.gov Environment
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+            ref: ${{ inputs.ref }}
+            fetch-depth: 0 # So we can get tags
+      - name: Restore npm cache
+        uses: actions/cache@v4.2.3
+        id: cache-npm
+        with:
+          path: ~/.npm
+          key: fac-build-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            fac-build-npm-
+            fac-build-
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Restore pip cache
+        uses: actions/cache@v4.2.3
+        id: cache-pip
+        with:
+          path: |
+            ~/.cache/pip
+            /opt/hostedtoolcache/Python/
+          key: fac-build-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/dev-requirements.txt') }}
+          restore-keys: |
+            fac-build-pip-${{ hashFiles('**/requirements.txt') }}-
+            fac-build-pip-
+            fac-build-
+
+      - name: Install npm dependencies
+        working-directory: ./backend
+        run: npm ci --production
+
+      - name: Compile JS/CSS assets
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Update service keys
+        uses: cloud-gov/cg-cli-tools@main
+        env:
+          SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+          DJANGO_SECRET_LOGIN_KEY: $${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+          LOGIN_CLIENT_ID: $${{ secrets.LOGIN_CLIENT_ID }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          cf_command: update-user-provided-service fac-key-service -p '"{\"SAM_API_KEY\":\"${{ secrets.SAM_API_KEY }}\", \"DJANGO_SECRET_LOGIN_KEY\":\"${{ secrets.DJANGO_SECRET_LOGIN_KEY }}\", \"LOGIN_CLIENT_ID\":\"${{ secrets.LOGIN_CLIENT_ID }}\", \"SECRET_KEY\":\"${{ secrets.SECRET_KEY}}\"}"'
+
+      - name: Backup the database
+        if: startsWith(github.ref, 'refs/tags/v1.')
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup --command "./fac-backup-util.sh v0.1.11 deploy_backup" --wait
+
+      - name: Deploy FAC Application to cloud.gov in the preview Environment
+        if: ${{ inputs.environment == 'preview' }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          cf_manifest: backend/manifests/manifest-preview.yml
+          cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
+          command: bin/ops/deploy_preview.sh
+
+      - name: Deploy FAC Application to cloud.gov in the ${{ env.space }} Environment
+        if: ${{ inputs.environment  != 'preview' }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          cf_manifest: backend/manifests/manifest-fac.yml
+          cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
+          command: bin/ops/deploy.sh
+
+      # Similar to below with the logshipper, we have found that restarting the proxy helps things move along post deploy.
+      - name: Restart the proxy application
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: "${{ env.space }}-egress"
+          command: cf restart https-proxy
+
+      # This has to happen after an application deployment because the manifest (currently) is responsible
+      # for binding the "logdrain service" to the "gsa-fac application". This also needs to be done
+      # based on the suspicion that fluentbit cannot register the incoming logs when it is initially
+      # created, resulting in a 502. Restarting the application after everything is configured results
+      # in a 201, or, the expected status when transmitting logs.
+      - name: Restart the logshipper application
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf restart logshipper
+
+  check-tables:
+    needs: [push-with-creds]
+    uses: ./.github/workflows/fac_backup-check-tables.yml
+    secrets: inherit
+    with:
+      environment: ${{ inputs.environment }}
+      util_version: "v0.1.11"
+      backup_operation: "check_tables"
