@@ -7,6 +7,7 @@ from django.urls import reverse
 from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS
 
+
 User = get_user_model()
 
 

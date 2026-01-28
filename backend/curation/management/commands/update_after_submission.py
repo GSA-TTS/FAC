@@ -227,7 +227,6 @@ class Command(BaseCommand):
             type=str,
             help="The new EIN for this report",
         )
-
         parser.add_argument(
             "--new_authorization",
             type=str,
@@ -238,7 +237,6 @@ class Command(BaseCommand):
             type=str,
             help="Old authorization to be public status (YES/NO)",
         )
-
         parser.add_argument(
             "--email",
             type=str,

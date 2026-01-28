@@ -6,6 +6,7 @@ from ..sac_general_lib.utils import (
 
 from datetime import date
 
+
 # The following fields represent checkboxes on the auditee certification form.
 # Since all checkboxes must be checked (meaning all fields are set to True),
 # the default value for these fields is set to `Y`. These fields are not disseminated.

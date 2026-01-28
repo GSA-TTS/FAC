@@ -5,6 +5,7 @@ from audit.intakelib.transforms.xform_reformat_prior_references import (
 )
 from audit.context import set_sac_to_context
 
+
 EXPECTED = [
     "2022-002",
     "2022-002,2021-001",

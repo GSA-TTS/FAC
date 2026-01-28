@@ -12,6 +12,7 @@ from .models import (
     SubmissionEvent,
 )
 
+
 User = get_user_model()
 
 
