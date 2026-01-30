@@ -31,7 +31,7 @@ jobs:
 
       - name: Run Migration Check
         env:
-          DJANGO_SETTINGS_MODULE: settings.py
+          DJANGO_SETTINGS_MODULE: config/settings.py
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           # --check: Exits with a non-zero status if migrations are missing
