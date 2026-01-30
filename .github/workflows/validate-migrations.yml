@@ -39,10 +39,6 @@ jobs:
           # --check: Exits with a non-zero status if migrations are missing
           # --dry-run: Doesn't actually create the files
           if ! python manage.py makemigrations --check --dry-run dissemination; then
-            echo "::error title=Missing Migrations Detected::\
-              It looks like you've changed the models in 'dissemination' \
-              but haven't added the corresponding migration file(s) that are generated. \
-              Look for newly created files with a path similar to \
-              'backend/dissemination/migrations/####_foo.py'."
+            echo "::error title=Missing Migrations Detected::It looks like you've changed the models in 'dissemination' but haven't added the corresponding migration file(s) that are generated. Look for newly created files with a path similar to 'backend/dissemination/migrations/####_foo.py'."
             exit 1
           fi
