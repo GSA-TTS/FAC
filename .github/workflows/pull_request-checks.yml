@@ -16,12 +16,6 @@ env:
   GH_TOKEN: ${{ github.token }}
 
 jobs:
-  check-migration-integrity:
-    needs: [check-for-changes, check-if-branch-is-ahead-of-main]
-    if: ${{ needs.check-for-changes.outputs.requirements == 'true' || needs.check-for-changes.outputs.dev-requirements == 'true' || needs.check-for-changes.outputs.docker == 'true' || needs.check-for-changes.outputs.package == 'true' || needs.check-for-changes.outputs.staticfiles == 'true' }}
-    uses: ./.github/workflows/check-migration-integrity.yml
-    secrets: inherit
-
   check-for-changes:
     runs-on: ubuntu-latest
     permissions:
@@ -141,3 +135,8 @@ jobs:
           event-type: ready-to-merge
           client-payload: '{"github": ${{ toJson(github) }}}'
         if: github.event_name == 'pull_request'
+
+  validate-migrations:
+    needs: [check-if-branch-is-ahead-of-main]
+    uses: ./.github/workflows/validate-migrations.yml
+    secrets: inherit
