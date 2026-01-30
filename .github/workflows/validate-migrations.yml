@@ -38,4 +38,7 @@ jobs:
         run: |
           # --check: Exits with a non-zero status if migrations are missing
           # --dry-run: Doesn't actually create the files
-          python manage.py makemigrations --check --dry-run dissemination
+          if ! python manage.py makemigrations --check --dry-run dissemination; then
+            echo "::error title=Missing Migrations Detected::It looks like you've changed the models in 'dissemination' but haven't generated the corresponding migration files. Please run 'python manage.py makemigrations' locally and commit the new files."
+            exit 1
+          fi
