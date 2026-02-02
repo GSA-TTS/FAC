@@ -13,6 +13,3 @@ class AdditionalEin(models.Model):
         db_column="report_id",
     )
     additional_ein = models.TextField()
-    fake_field = models.TextField(
-        null=True,
-    )
