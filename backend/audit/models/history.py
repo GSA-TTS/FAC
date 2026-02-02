@@ -19,10 +19,6 @@ class History(models.Model):
     updated_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
-    fake_field = models.TextField(
-        null=True,
-    )
-
     class Meta:
         verbose_name = "Audit History"
         verbose_name_plural = "Audit History"
