@@ -4,11 +4,11 @@ permissions:
   pull-requests: read
 
 on:
-  pull_request:
-    paths:
-      - 'backend/dissemination/models/**'
-      - 'backend/dissemination/migrations/**'
-      - 'requirements.txt' # Run if dependencies change too
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
 
 jobs:
   validate-migrations:
