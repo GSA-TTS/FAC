@@ -5,11 +5,7 @@ permissions:
 
 on:
   workflow_call:
-    inputs:
-      environment:
-        required: true
-        type: string
-
+    
 jobs:
   validate-migrations:
     runs-on: ubuntu-latest
