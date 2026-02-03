@@ -1,5 +1,8 @@
 name: Django Migration Integrity Check
 
+# This check will fail if a model was changed but the resulting migration file
+# was not.
+
 permissions:
   pull-requests: read
 
