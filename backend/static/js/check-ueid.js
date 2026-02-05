@@ -1,110 +1,114 @@
 import { checkValidity } from './validate.js';
 import { queryAPI } from './api';
 
-const FORM = document.forms[0];
-var isUEIValidated = false;
+const FORM = document.getElementById('check-eligibility');
 
-function handleUEIDResponse({ valid, response, errors }) {
-  if (valid) {
-    handleValidUei(response);
-  } else {
-    handleInvalidUei(errors);
-  }
+// modal-only state
+let duplicateReportIds = [];
+
+/**
+ * Helpers
+ */
+function getValue(id) {
+  return document.getElementById(id)?.value ?? '';
 }
 
-function handleValidUei(response) {
-  document.getElementById('auditee_name').value = response.auditee_name;
-  populateModal('success', response.auditee_name);
+function getTrimmedValue(id) {
+  return getValue(id).trim();
 }
 
-function handleInvalidUei(errors) {
-  if (Object.keys(errors).includes('auditee_uei')) {
-    populateModal('not-found');
-  }
+// FY start is required, so we treat missing/invalid as invalid-year
+function parseAuditYearFromFyStart() {
+  const raw = getTrimmedValue('auditee_fiscal_period_start');
+  if (!raw) return undefined;
+
+  // USWDS date picker often produces MM/DD/YYYY in the visible input
+  // Some flows might still give YYYY-MM-DD.
+  const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (iso) return Number(iso[1]);
+
+  const mdy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (mdy) return Number(mdy[3]);
+
+  const parsed = new Date(raw);
+  if (!Number.isNaN(parsed.getTime())) return parsed.getFullYear();
+
+  return undefined;
 }
 
-function handleApiError(e) {
-  populateModal('connection-error');
-  console.error(e);
-}
-
-function hideUeiStuff() {
-  const ueiFormGroup =
-    document.getElementById('auditee_uei').parentNode.parentNode;
-  const ueiExplanations = Array.from(
-    document.querySelectorAll('.uei-explanation')
+function requiredFieldsFilled() {
+  return Boolean(
+    getTrimmedValue('auditee_uei') &&
+      getTrimmedValue('auditee_fiscal_period_start') &&
+      getTrimmedValue('auditee_fiscal_period_end')
   );
-  [...ueiExplanations, ueiFormGroup].forEach((node) =>
-    node.setAttribute('hidden', 'hidden')
+}
+
+function allResponsesValid() {
+  // Your validate.js toggles these classes; gating on any --error presence
+  const inputsWithErrors = document.querySelectorAll('[class *="--error"]');
+  return inputsWithErrors.length === 0;
+}
+
+function setValidateDisabled(shouldDisable) {
+  const btn = document.getElementById('continue'); // bottom "Validate UEI" button
+  if (btn) btn.disabled = Boolean(shouldDisable);
+}
+
+function updateValidateButtonState() {
+  // Native required + your custom validation state
+  const nativeValid = FORM.checkValidity();
+  setValidateDisabled(!(requiredFieldsFilled() && nativeValid && allResponsesValid()));
+}
+
+function validatorSupportsField(el) {
+  if (!el) return false;
+
+  const id = el.type === 'radio' ? el.name : el.id;
+  if (!id) return false;
+
+  // Must have validate-* attributes
+  const hasValidateDataset = Object.keys(el.dataset || {}).some((k) =>
+    k.toLowerCase().includes('validate')
   );
+  if (!hasValidateDataset) return false;
+
+  // Must have the matching error container in the DOM
+  return Boolean(document.getElementById(`${id}-error-message`));
 }
 
-function showValidUeiInfo() {
-  const auditeeUei = document.getElementById('auditee_uei').value;
-  const auditeeName = document.getElementById('auditee_name');
-  const ueiInfoEl = document.createElement('div');
-
-  let dl; let dtUei; let ddUei; let dtName; let ddName;
-  dl = document.createElement('dl');
-  dtUei = document.createElement('dt');
-  ddUei = document.createElement('dd');
-  dtName = document.createElement('dt');
-  ddName = document.createElement('dd');
-
-  dl.setAttribute('data-testid', 'uei-info');
-  dtUei.textContent = 'Unique Entity ID';
-  ddUei.textContent = auditeeUei;
-  dtName.textContent = 'Auditee name';
-  ddName.textContent = auditeeName.value;
-
-  dl.append(dtUei,ddUei,dtName,ddName);
-  ueiInfoEl.appendChild(dl);
-
-  auditeeName.removeAttribute('disabled');
-  auditeeName.parentNode.setAttribute('hidden', 'hidden');
-  document.getElementById('no-uei-warning').replaceWith(ueiInfoEl);
-}
-
-function setupFormWithValidUei() {
-  hideUeiStuff();
-  showValidUeiInfo();
-  isUEIValidated = true;
-  setFormDisabled(false);
-}
-
+/**
+ * Modal helpers
+ */
 function resetModal() {
-  const modalContainerEl = document.querySelector(
-    '#uei-search-result .usa-modal__main'
-  );
-  const modalHeadingEl = modalContainerEl.querySelector('h2');
-  const modalDescriptionEl = modalContainerEl.querySelector(
-    '#uei-search-result-description'
-  );
-  const modalButtonPrimaryEl = modalContainerEl.querySelector('button.primary');
-  const modalButtonSecondaryEl =
-    modalContainerEl.querySelector('button.secondary');
+  const modalMain = document.querySelector('#uei-search-result .usa-modal__main');
+  const headingEl = modalMain.querySelector('h2');
+  const descEl = modalMain.querySelector('#uei-search-result-description');
+  const primaryBtn = modalMain.querySelector('button.primary');
+  const secondaryBtn = modalMain.querySelector('button.secondary');
 
-  modalHeadingEl.textContent = '';
-  modalDescriptionEl.innerHTML = '';
-  modalButtonPrimaryEl.textContent = '';
-  modalButtonSecondaryEl.textContent = '';
+  headingEl.textContent = '';
+  descEl.innerHTML = '';
+
+  primaryBtn.textContent = '';
+  secondaryBtn.textContent = '';
+
+  primaryBtn.onclick = null;
+  secondaryBtn.onclick = null;
 
   document.querySelector('.uei-search-result').classList.add('loading');
 }
 
-// 'connection-error' | 'not-found' | 'success'
-function populateModal(formStatus, auditeeName) {
-  const auditeeUei = document.getElementById('auditee_uei').value;
-  const modalContainerEl = document.querySelector(
-    '#uei-search-result .usa-modal__main'
-  );
-  const modalHeadingEl = modalContainerEl.querySelector('h2');
-  const modalDescriptionEl = modalContainerEl.querySelector(
-    '#uei-search-result-description'
-  );
-  const modalButtonPrimaryEl = modalContainerEl.querySelector('button.primary');
-  const modalButtonSecondaryEl =
-    modalContainerEl.querySelector('button.secondary');
+// 'connection-error' | 'not-found' | 'success' | 'duplicate-submission' | 'invalid-year'
+function populateModal(formStatus, auditeeName = '') {
+  const auditeeUei = getTrimmedValue('auditee_uei');
+  const auditYear = parseAuditYearFromFyStart();
+
+  const modalMain = document.querySelector('#uei-search-result .usa-modal__main');
+  const headingEl = modalMain.querySelector('h2');
+  const descEl = modalMain.querySelector('#uei-search-result-description');
+  const primaryBtn = modalMain.querySelector('button.primary');
+  const secondaryBtn = modalMain.querySelector('button.secondary');
 
   const modalContent = {
     'connection-error': {
@@ -115,13 +119,10 @@ function populateModal(formStatus, auditeeName) {
           <dd>${auditeeUei}</dd>
         </dl>
         <p>We can't proceed without confirming your UEI with SAM.gov. We’re sorry for the delay.</p>
-        `,
-      buttons: {
-        primary: {
-          text: `Go back`,
-        },
-      },
+      `,
+      buttons: { primary: { text: 'Go back' } },
     },
+
     success: {
       heading: 'Search Result',
       description: `
@@ -134,13 +135,9 @@ function populateModal(formStatus, auditeeName) {
         <p>Click continue to create a new audit submission for this auditee.</p>
         <p>Not the auditee you’re looking for? Go back, check the UEI you entered, and try again.</p>
       `,
-      buttons: {
-        primary: {
-          text: `Continue`,
-        },
-        secondary: { text: `Go back` },
-      },
+      buttons: { primary: { text: 'Continue' }, secondary: { text: 'Go back' } },
     },
+
     'not-found': {
       heading: 'Your UEI is not recognized',
       description: `
@@ -151,56 +148,188 @@ function populateModal(formStatus, auditeeName) {
         <p>We can't proceed without confirming that you have a valid UEI. We’re sorry for the delay.</p>
         <p>You can try re-entering the UEI. If you don’t have the UEI, you may find it at <a href="https://sam.gov">SAM.gov</a>.</p>
       `,
-      buttons: {
-        primary: {
-          text: `Go back`,
-        },
-      },
+      buttons: { primary: { text: 'Go back' } },
+    },
+
+    'duplicate-submission': {
+      heading: 'Are you sure you want to start a new submission?',
+      description: `
+        <p>We found other submissions that match the UEI and audit year you entered.</p>
+        <dl>
+          <dt>UEI</dt>
+          <dd>${auditeeUei}</dd>
+          ${auditYear ? `<dt>Audit year</dt><dd>${auditYear}</dd>` : ''}
+        </dl>
+      `,
+      buttons: { primary: { text: 'Yes, continue' }, secondary: { text: 'No, go back' } },
+    },
+
+    'invalid-year': {
+      heading: 'Invalid year',
+      description: `
+        <p>We can't proceed without a valid fiscal period start date (audit year).</p>
+        <p>Please enter a valid fiscal period start date and try again.</p>
+      `,
+      buttons: { primary: { text: 'Go back' } },
     },
   };
 
-  const contentForStatus = modalContent[formStatus];
-  modalHeadingEl.textContent = contentForStatus.heading;
-  modalDescriptionEl.innerHTML = contentForStatus.description;
-  modalButtonPrimaryEl.textContent = contentForStatus.buttons.primary.text;
+  const content = modalContent[formStatus];
 
-  if (contentForStatus.buttons.secondary) {
-    modalButtonSecondaryEl.textContent =
-      contentForStatus.buttons.secondary.text;
+  headingEl.textContent = content.heading;
+  descEl.innerHTML = content.description;
+
+  // Duplicates list + resubmission nudge
+  if (formStatus === 'duplicate-submission') {
+    if (duplicateReportIds.length > 0) {
+      descEl.innerHTML += `
+        <p>These submissions match what you entered:</p>
+        <ul>
+          ${duplicateReportIds.map((id) => `<li>${id}</li>`).join('')}
+        </ul>
+      `;
+    }
+    descEl.innerHTML += `
+      <p><strong>Are you sure?</strong> If you meant to correct an already submitted or accepted audit, you may need to resubmit instead.</p>
+    `;
   }
 
-  if (formStatus == 'success') {
-    modalButtonPrimaryEl.onclick = setupFormWithValidUei;
-  }
+// ✅ Always set button labels
+primaryBtn.textContent = content.buttons.primary.text;
+secondaryBtn.textContent = content.buttons.secondary?.text ?? '';
 
+// Button behavior:
+primaryBtn.onclick = null;
+secondaryBtn.onclick = null;
+
+// Secondary always just closes (template already has data-close-modal)
+secondaryBtn.setAttribute('data-close-modal', '');
+
+if (formStatus === 'success' || formStatus === 'duplicate-submission') {
+  // Let us control behavior
+  primaryBtn.removeAttribute('data-close-modal');
+
+  primaryBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Optional: if you still want the old “hide UEI field and show uei-info” behavior:
+    // setupFormWithValidUei();
+
+    // Trigger the real form submit (old Continue behavior)
+    const submitter = document.getElementById('real-continue');
+
+    // Close the modal first (USWDS can swallow clicks sometimes)
+    document.querySelector('.uei-search-result')?.classList.remove('is-visible');
+
+    window.setTimeout(() => {
+      // ✅ Only pass submitter if it actually belongs to FORM
+      if (FORM.requestSubmit) {
+        if (submitter && submitter.form === FORM) {
+          FORM.requestSubmit(submitter);
+        } else {
+          FORM.requestSubmit(); // no submitter -> no NotFoundError
+        }
+      } else {
+        // fallback
+        if (submitter && submitter.form === FORM) submitter.click();
+        else FORM.submit();
+      }
+    }, 0);
+  };
+} else {
+  primaryBtn.setAttribute('data-close-modal', '');
+}
   document.querySelector('.uei-search-result').classList.remove('loading');
+}
+
+/**
+ * API handlers
+ */
+function handleUEIDResponse({ valid, response, errors }) {
+  // ✅ If backend returns duplicates even on "valid: true", treat as duplicate modal
+  if (valid && Array.isArray(response?.duplicates) && response.duplicates.length > 0) {
+    duplicateReportIds = response.duplicates.map((d) => d.report_id).filter(Boolean);
+    populateModal('duplicate-submission', response?.auditee_name ?? '');
+    return;
+  }
+
+  if (valid) {
+    duplicateReportIds = [];
+    document.getElementById('auditee_name').value = response.auditee_name;
+    populateModal('success', response.auditee_name);
+    return;
+  }
+
+  // not-found: field errors object
+  if (errors && !Array.isArray(errors) && Object.keys(errors).includes('auditee_uei')) {
+    populateModal('not-found');
+    return;
+  }
+
+  // duplicates: errors array includes 'duplicate-submission'
+  if (Array.isArray(errors) && errors.includes('duplicate-submission')) {
+    duplicateReportIds = Array.isArray(response?.duplicates)
+      ? response.duplicates.map((d) => d.report_id).filter(Boolean)
+      : [];
+    populateModal('duplicate-submission');
+    return;
+  }
+
+  if (Array.isArray(errors) && errors.includes('invalid-year')) {
+    populateModal('invalid-year');
+    return;
+  }
+
+  populateModal('connection-error');
+}
+
+function handleApiError(e) {
+  populateModal('connection-error');
+  console.error(e);
 }
 
 function validateUEID() {
   resetModal();
 
-  const auditee_uei = document.getElementById('auditee_uei').value;
+  const auditee_uei = getTrimmedValue('auditee_uei').toUpperCase();
+  document.getElementById('auditee_uei').value = auditee_uei;
+
+  const audit_year = parseAuditYearFromFyStart();
+  if (!audit_year) {
+    populateModal('invalid-year');
+    document.querySelector('.uei-search-result').classList.remove('loading');
+    return;
+  }
+
+  console.log('UEI validation payload', {
+    auditee_uei,
+    audit_year,
+    fy_start_raw: getTrimmedValue('auditee_fiscal_period_start'),
+  });
 
   queryAPI(
     '/api/sac/ueivalidation',
-    { auditee_uei },
-    {
-      method: 'POST',
-    },
+    { auditee_uei, audit_year },
+    { method: 'POST' },
     [handleUEIDResponse, handleApiError]
   );
 }
 
+/**
+ * FY16 check (keep your existing behavior)
+ */
 function validateFyStartDate(fyInput) {
-  if (fyInput.value == '') return;
+  if (!fyInput.value) return;
 
   const fyFormGroup = document.querySelector('.usa-form-group.validate-fy');
   const fyErrorContainer = document.getElementById('fy-error-message');
-  const userFy = {};
-  [userFy.year, userFy.month, userFy.day] = fyInput.value.split('-');
+
+  // supports both YYYY-MM-DD and MM/DD/YYYY
+  const year = parseAuditYearFromFyStart();
   fyErrorContainer.innerHTML = '';
 
-  if (userFy.year < 2016) {
+  if (year && Number(year) < 2016) {
     const errorEl = document.createElement('li');
     errorEl.innerHTML =
       'We are currently only accepting audits from FY16 or later.\
@@ -212,81 +341,62 @@ function validateFyStartDate(fyInput) {
   } else {
     fyFormGroup.classList.remove('usa-form-group--error');
   }
-
-  setFormDisabled(!allResponsesValid());
 }
 
-function setFormDisabled(shouldDisable) {
-  const continueBtn = document.getElementById('continue');
-  // If we want to disable the button, do it.
-  if (shouldDisable) {
-    continueBtn.disabled = true;
-    return;
-  }
+/**
+ * Wiring
+ */
+function attachValidateButtonHandler() {
+  const btnValidate = document.getElementById('continue');
 
-  // If we want to enable the button, the UEI validation should be done.
-  if (!shouldDisable && isUEIValidated) {
-    continueBtn.disabled = false;
-  } else {
-    continueBtn.disabled = true;
-  }
-}
-
-function allResponsesValid() {
-  const inputsWithErrors = document.querySelectorAll('[class *="--error"]');
-  return inputsWithErrors.length == 0;
-}
-
-function performValidations(field) {
-  const errors = checkValidity(field);
-  setFormDisabled(errors.length > 0);
-}
-
-function attachEventHandlers() {
-  const btnValidateUEI = document.getElementById('auditee_uei-btn');
-  btnValidateUEI.addEventListener('click', (e) => {
+  btnValidate.addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById('auditee_uei').value = document
-      .getElementById('auditee_uei')
-      .value.toUpperCase();
+
+    // guard (should already be disabled)
+    if (!(requiredFieldsFilled() && FORM.checkValidity() && allResponsesValid())) return;
+
+    duplicateReportIds = [];
     validateUEID();
   });
+}
 
-  FORM.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (!allResponsesValid()) return;
-    FORM.submit();
-  });
+function wireFieldValidation() {
+  const inputs = Array.from(document.querySelectorAll('#check-eligibility input'));
 
-  const fieldsNeedingValidation = Array.from(
-    document.querySelectorAll('#check-eligibility input')
-  );
-  fieldsNeedingValidation.forEach((q) => {
-    q.addEventListener('blur', (e) => {
-      performValidations(e.target);
+  inputs.forEach((el) => {
+    el.addEventListener('blur', (e) => {
+      if (validatorSupportsField(e.target)) {
+        checkValidity(e.target);
+      }
+      updateValidateButtonState();
+    });
+
+    el.addEventListener('input', () => {
+      duplicateReportIds = [];
+      updateValidateButtonState();
+    });
+
+    el.addEventListener('change', (e) => {
+      duplicateReportIds = [];
+
+      if (e.target.id === 'auditee_fiscal_period_start') {
+        validateFyStartDate(e.target);
+      }
+
+      if (validatorSupportsField(e.target)) {
+        checkValidity(e.target);
+      }
+
+      updateValidateButtonState();
     });
   });
+}
 
-  const fyInput = document.getElementById('auditee_fiscal_period_start');
-  fyInput.addEventListener('change', (e) => {
-    validateFyStartDate(e.target);
-  });
-}
-function attachDatePickerHandlers() {
-  const dateInputsNeedingValidation = Array.from(
-    document.querySelectorAll('.usa-date-picker__wrapper input[type=text]')
-  );
-  dateInputsNeedingValidation.forEach((q) => {
-    q.addEventListener('blur', (e) => {
-      performValidations(e.target);
-    });
-  });
-}
 
 function init() {
-  attachEventHandlers();
-  window.addEventListener('load', attachDatePickerHandlers, false); // Need to wait for date-picker text input to render.
-  setFormDisabled(true); // Disabled initially, re-enables after filling everything out.
+  attachValidateButtonHandler();
+  wireFieldValidation();
+  updateValidateButtonState(); // initial disabled state
 }
 
 init();
