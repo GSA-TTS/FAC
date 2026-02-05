@@ -259,6 +259,7 @@ field_name_ordered = {
         "contact_email",
         "contact_phone",
     ],
+    # "resubmission": ["report_id", "version", "status", "previous_report_id", "next_report_id"],
 }
 
 restricted_model_names = ["captext", "findingtext", "note"]

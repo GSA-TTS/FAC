@@ -145,7 +145,10 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 shaped_audit = None
                 audit_subcheck = None
 
-            _compare_progress_check(subcheck, audit_subcheck)
+            # MCJ 20250911 this should have been gated behind an `if`.
+            if audit:
+                _compare_progress_check(subcheck, audit_subcheck)
+
             # Update with the view-specific info from SECTIONS_BASE:
             for key, value in SECTIONS_BASE.items():
                 subcheck[key] = subcheck[key] | value

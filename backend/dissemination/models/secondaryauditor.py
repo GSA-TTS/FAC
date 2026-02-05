@@ -4,6 +4,20 @@ from dissemination.models import docs
 
 
 class SecondaryAuditor(models.Model):
+    HASH_FIELDS = [
+        "report_id",
+        "auditor_name",
+        "auditor_ein",
+        "address_street",
+        "address_city",
+        "address_state",
+        "address_zipcode",
+        "contact_name",
+        "contact_title",
+        "contact_email",
+        "contact_phone",
+    ]
+
     address_city = models.TextField(
         "CPA City",
         help_text=docs.auditor_city,
@@ -49,4 +63,9 @@ class SecondaryAuditor(models.Model):
         on_delete=models.CASCADE,
         to_field="report_id",
         db_column="report_id",
+    )
+    hash = models.CharField(
+        help_text="A hash of the row",
+        blank=True,
+        null=True,
     )

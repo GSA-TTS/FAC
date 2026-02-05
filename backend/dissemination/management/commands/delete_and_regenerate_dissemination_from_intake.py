@@ -56,7 +56,6 @@ class Command(BaseCommand):
             try:
                 sac = SingleAuditChecklist.objects.get(report_id=report_id)
                 sac.redisseminate()
-                logger.info(f"Redisseminated: {report_id}")
                 exit(0)
             except SingleAuditChecklist.DoesNotExist:
                 logger.info(f"No report with report_id found: {report_id}")
