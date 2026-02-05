@@ -4,7 +4,7 @@ messages = {
     "check_uei_match": "The auditee UEI on the coversheet does not match the UEI entered in the General Information section",
     "check_cluster_names_state_cluster_missing": "You need to provide a state cluster name when selecting STATE CLUSTER",
     "check_cluster_names_no_state_cluster_needed": "State cluster must be blank unless you are selecting STATE CLUSTER",
-    "check_other_cluster_names_cluster_name_missing": "You need to provide an altername cluster name when selecting OTHER CLUSTER",
+    "check_other_cluster_names_cluster_name_missing": "You need to provide an alternate cluster name when selecting OTHER CLUSTER",
     "check_other_cluster_names_no_other_cluster_needed": "Other cluster must be blank unless you are selecting OTHER CLUSTER",
     "check_direct_award_is_not_blank": "Direct award cannot be blank; it must be <b>Y</b> or <b>N</b>",
     "check_passthrough_name_when_no_direct": "If direct award is <b>N</b>, then you must provide a passthrough name",
