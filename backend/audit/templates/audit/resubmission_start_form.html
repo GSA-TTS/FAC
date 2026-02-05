@@ -7,15 +7,40 @@
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large" id="legend-resubmission-start">Resubmitting an Audit</legend>
-                    <p>Resubmitting an audit should not be undertaken lightly. For example, resubmission may be warranted if:</p>
-                    <ul class="usa-list">
-                        <li>
-                            A material issue is found with the report by the auditor or auditee, and both parties agree a resubmission is warranted.
-                        </li>
-                        <li>A Federal oversight official requests a resubmission of an audit.</li>
-                    </ul>
+                    <p><b>Resubmitting an audit should not be undertaken lightly.</b> A resubmission replaces the previously accepted audit and results in a new Federal Audit Clearinghouse (FAC) acceptance date. 
+                        <b>Because of this impact, resubmissions must be completed in coordination between the auditee and certifying officials.</b>
+                        A resubmission can never change the UEI or the audit year from the original submission. 
+                        <br><br>
+
+                        Before proceeding, review the guidance below to determine whether resubmission is appropriate. 
+                        <b>A resubmission is generally appropriate when material changes are required, including but not limited to: </b></p>
+                        <ul class="usa-list">
+                            <li>Material change to audit findings</li>
+                            <li>Addition or revision of corrective action plans </li>
+                            <li>Incusion of missing finding elements (such as condition, criteria, cause, or effect)</li>
+                            <li>Correction to questioned costs or compliance determination</li>
+                            <li>Error in major program determination or low-risk auditee status</li>
+                            <li>Change to federal award amounts in the Schedule of Expenditures of Federa Awards (SEFA)</li>
+                            <li>Correction to Assitance Listing Number </li>
+                            <li>Supplementing an incomplete Singe Audit package (for example, missing financial statements or required reports)</li>
+                            <li>Addition or correction to the required auditor report elements</li>
+                            <li>Revision to the auditor's report</li>
+                        </ul>
+                    <hr>
+                    <p> Do <b>not</b> resubmit an audit for changes that do not affect FAC acceptance date, including:</p>
+                        <ul class="usa-list">
+                            <li>Minor typographica or formatting errors</li>
+                            <li>Minor numerical rounding differences without material impact </li>
+                            <li>Non-material errors that do not change audit opnions, findings, or compliance determinations</li>
+                            <li>Updates that do not change audit opinions, findings, or compliance determinations</li>
+                            <li>Issues documented for resolution in a future audit</li>
+                            <li>SF-SAC-ony correctiona where the audit report itself is unchanged</li>
+                            <li>Updates to contact information or other non-substantive metadata</li>
+                            <li>Clarifications to narrative text that do not alter meaning</li>
+                        </ul>
                     <p>
-                        Resubmission must be completed in coordination between certifying officials, and resubmission may change the acceptance date for your audit.
+                        <b>If your update falls into one of these catagories, resubmission is not appropriate.</b> <br><br>
+                        Resubmission must be completed in coordination with certifying officials, and resubmision will change the acceptance date for your audit. 
                     </p>
 
                     <label class="usa-label" id="report_id-label" for="report_id">Report ID of audit to resubmit:</label>
