@@ -26,6 +26,7 @@ jobs:
       docker: ${{ steps.filter.outputs.docker }}
       package: ${{ steps.filter.outputs.package }}
       staticfiles: ${{ steps.filter.outputs.staticfiles }}
+      migration: ${{ steps.filter.outputs.migration }}
     steps:
       - uses: dorny/paths-filter@v3
         id: filter
@@ -41,6 +42,9 @@ jobs:
               - './backend/package.json'
             staticfiles:
               - './backend/static/**'
+            migration:
+              - './backend/audit/models/**'
+              - './backend/dissemination/models/**'
 
   check-if-branch-is-ahead-of-main:
     runs-on: ubuntu-latest
@@ -129,9 +133,15 @@ jobs:
     needs: [terraform-plan-staging, testing-from-ghcr, testing-from-build]
     steps:
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           event-type: ready-to-merge
           client-payload: '{"github": ${{ toJson(github) }}}'
         if: github.event_name == 'pull_request'
+
+  validate-migrations:
+    needs: [check-for-changes, check-if-branch-is-ahead-of-main]
+    if: ${{ needs.check-for-changes.outputs.requirements == 'true' || needs.check-for-changes.outputs.migration == 'true' }}
+    uses: ./.github/workflows/validate-migrations.yml
+    secrets: inherit
