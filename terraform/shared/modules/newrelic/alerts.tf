@@ -143,6 +143,7 @@ resource "newrelic_nrql_alert_condition" "infected_file" {
   name        = "Infected File Found!"
   enabled     = true
   fill_option = "static"
+  fill_value  = 0
 
   nrql {
     query = "SELECT count(*) FROM Log WHERE tags.space_name ='${var.cf_space_name}' and message LIKE '%ScanResult.INFECTED%'"
