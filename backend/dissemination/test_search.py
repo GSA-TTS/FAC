@@ -24,7 +24,6 @@ from model_bakery import baker
 
 import datetime
 import random
-import unittest
 
 User = get_user_model()
 
