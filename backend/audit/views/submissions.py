@@ -188,7 +188,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     old_sac = SingleAuditChecklist.objects.get(
                         report_id=previous_report_id
                     )
-                    old_sac.resubmission_meta = old_sac.resubmission_meta | {
+                    old_sac.resubmission_meta = old_sac.resubmission_meta or {
                         "next_report_id": sac.report_id,
                         "next_row_id": sac.id,
                     }

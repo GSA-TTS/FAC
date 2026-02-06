@@ -302,7 +302,7 @@ BEGIN
         INTO user_exists;
 
         -- If the user already exists, it means they have access.
-        -- For purposes of this function, lets call that "succses", and return true.
+        -- For purposes of this function, lets call that "success", and return true.
         IF user_exists THEN
             RAISE INFO 'ADMIN_API add_tribal_api_key_access ALREADY_EXISTS %', LOWER(params->>'email');
             RETURN json_build_object(
