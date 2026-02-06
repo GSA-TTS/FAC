@@ -322,8 +322,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                     f"A resubmission already exists for report_id {self.report_id}."
                 )
 
-            # Clone the record
-            data = model_to_dict(self)
+            # Clone the record, excluding certification data
+            data = model_to_dict(self, exclude=["auditee_certification", "auditor_certification"])
 
             # Update individual fields
             data["general_information"]["auditee_uei"] = self.auditee_uei
