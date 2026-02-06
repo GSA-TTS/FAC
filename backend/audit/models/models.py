@@ -323,7 +323,9 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 )
 
             # Clone the record, excluding certification data
-            data = model_to_dict(self, exclude=["auditee_certification", "auditor_certification"])
+            data = model_to_dict(
+                self, exclude=["auditee_certification", "auditor_certification"]
+            )
 
             # Update individual fields
             data["general_information"]["auditee_uei"] = self.auditee_uei
