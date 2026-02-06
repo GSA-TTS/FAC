@@ -6,6 +6,7 @@ def post_fork(server, worker):
     worker.log.info("Made Psycopg2 Green")
 
 
+forwarded_allow_ips = "*"
 max_requests = 500
 max_requests_jitter = 50
 timeout = 240

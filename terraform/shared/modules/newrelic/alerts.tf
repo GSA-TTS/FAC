@@ -1,8 +1,8 @@
-data "newrelic_entity" "gsa-fac" {
-  name   = "gsa-fac-${var.cf_space_name}"
-  type   = "APPLICATION"
-  domain = "APM"
-}
+# data "newrelic_entity" "gsa-fac" {
+#   name   = "gsa-fac-${var.cf_space_name}"
+#   type   = "APPLICATION"
+#   domain = "APM"
+# }
 
 resource "newrelic_alert_policy" "alert_policy" {
   name = "${var.cf_space_name}-alert-policy"
@@ -15,7 +15,7 @@ resource "newrelic_notification_destination" "email_destination" {
 
   property {
     key   = "email"
-    value = "matthew.jadud@gsa.gov, alexander.steel@gsa.gov"
+    value = "bret.mogilefsky@gsa.gov"
   }
 }
 

@@ -2,14 +2,16 @@
   "readonly": [
   ],
   "helpdesk": [
-    "alexander.steel@gsa.gov",
     "james.person@gsa.gov",
     "lynn.houston@gsa.gov",
     "marissa.henderson@gsa.gov",
     "philip.dominguez@gsa.gov",
-    "ranye.mclendon@gsa.gov"
+    "ranye.mclendon@gsa.gov",
+    "candace.campbell@gsa.gov",
+    "annie.rodriguezdelacruz@gsa.gov"
   ],
   "superuser": [
-    "matthew.jadud@gsa.gov"
+    "bret.mogilefsky@gsa.gov",
+    "daryll.pierre@gsa.gov"
   ]
 }
