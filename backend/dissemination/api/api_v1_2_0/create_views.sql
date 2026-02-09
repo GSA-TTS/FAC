@@ -83,6 +83,7 @@ create view api_v1_2_0.findings_text as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
+        a.fac_accepted_date,
         ft_elem->>'reference_number' as finding_ref_number,
         ft_elem->>'contains_chart_or_table' as contains_chart_or_table,
         ft_elem->>'text_of_finding' as finding_text
@@ -105,6 +106,7 @@ create view api_v1_2_0.additional_ueis as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
+        a.fac_accepted_date,
         uei_elem as additional_uei
     from
         audit_audit as a
@@ -122,6 +124,7 @@ create view api_v1_2_0.findings as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
+        a.fac_accepted_date,
         f_elem->'program'->>'award_reference' as award_reference,
         f_elem->'findings'->>'reference_number' as reference_number,
         f_elem->'material_weakness' as is_material_weakness,
@@ -148,6 +151,7 @@ create view api_v1_2_0.federal_awards as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
+        a.fac_accepted_date,
         fa_elem->>'award_reference' as award_reference,
         fa_elem->'program'->>'federal_agency_prefix' as federal_agency_prefix,
         fa_elem->'program'->>'three_digit_extension' as federal_award_extension,
@@ -182,6 +186,7 @@ create view api_v1_2_0.corrective_action_plans as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
+        a.fac_accepted_date,
         cap_elem->>'reference_number' as finding_ref_number,
         cap_elem->>'contains_chart_or_table' as contains_chart_or_table,
         cap_elem->>'planned_action' as planned_action
@@ -204,6 +209,7 @@ create view api_v1_2_0.notes_to_sefa as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
+        a.fac_accepted_date,
         coalesce(notes.note->>'note_title','') as title,
         a.audit->'notes_to_sefa'->>'accounting_policies' as accounting_policies,
         a.audit->'notes_to_sefa'->>'is_minimis_rate_used' as is_minimis_rate_used,
@@ -232,6 +238,7 @@ create view api_v1_2_0.passthrough as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
+        a.fac_accepted_date,
         fa_elem->>'award_reference' as award_reference,
         pass_elem->>'passthrough_identifying_number' as passthrough_id,
         pass_elem->>'passthrough_name' as passthrough_name
@@ -350,6 +357,7 @@ create view api_v1_2_0.secondary_auditors as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
+        a.fac_accepted_date,
         sa_elem->>'secondary_auditor_ein' as auditor_ein,
         sa_elem->>'secondary_auditor_name' as auditor_name,
         sa_elem->>'secondary_auditor_contact_name' as contact_name,
@@ -376,6 +384,7 @@ create view api_v1_2_0.additional_eins as
         a.report_id,
         a.audit->'general_information'->>'auditee_uei' as auditee_uei,
         a.audit->>'audit_year' as audit_year,
+        a.fac_accepted_date,
         ein_elem as additional_ein
     from
         audit_audit as a
