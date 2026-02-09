@@ -11,7 +11,6 @@ class UEIValidationFormView(APIView):
     """
     Accepts UEI to validate and returns either a message describing the validation errors, or valid.
     """
-
     
     def post(self, request):
         data = request.data.copy()

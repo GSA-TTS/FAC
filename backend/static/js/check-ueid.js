@@ -194,7 +194,7 @@ function populateModal(formStatus, auditeeName = '') {
     `;
   }
 
-// ✅ Always set button labels
+// Always set button labels
 primaryBtn.textContent = content.buttons.primary.text;
 secondaryBtn.textContent = content.buttons.secondary?.text ?? '';
 
@@ -206,48 +206,30 @@ secondaryBtn.onclick = null;
 secondaryBtn.setAttribute('data-close-modal', '');
 
 if (formStatus === 'success' || formStatus === 'duplicate-submission') {
-  // Let us control behavior
   primaryBtn.removeAttribute('data-close-modal');
 
   primaryBtn.onclick = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Optional: if you still want the old “hide UEI field and show uei-info” behavior:
-    // setupFormWithValidUei();
-
-    // Trigger the real form submit (old Continue behavior)
-    const submitter = document.getElementById('real-continue');
-
-    // Close the modal first (USWDS can swallow clicks sometimes)
-    document.querySelector('.uei-search-result')?.classList.remove('is-visible');
-
     window.setTimeout(() => {
-      // ✅ Only pass submitter if it actually belongs to FORM
       if (FORM.requestSubmit) {
-        if (submitter && submitter.form === FORM) {
-          FORM.requestSubmit(submitter);
-        } else {
-          FORM.requestSubmit(); // no submitter -> no NotFoundError
-        }
+        FORM.requestSubmit();
       } else {
-        // fallback
-        if (submitter && submitter.form === FORM) submitter.click();
-        else FORM.submit();
+        FORM.submit();
       }
     }, 0);
   };
 } else {
   primaryBtn.setAttribute('data-close-modal', '');
 }
-  document.querySelector('.uei-search-result').classList.remove('loading');
 }
 
 /**
  * API handlers
  */
 function handleUEIDResponse({ valid, response, errors }) {
-  // ✅ If backend returns duplicates even on "valid: true", treat as duplicate modal
+  // If backend returns duplicates even on "valid: true", treat as duplicate modal
   if (valid && Array.isArray(response?.duplicates) && response.duplicates.length > 0) {
     duplicateReportIds = response.duplicates.map((d) => d.report_id).filter(Boolean);
     populateModal('duplicate-submission', response?.auditee_name ?? '');
