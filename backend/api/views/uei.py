@@ -16,7 +16,6 @@ class UEIValidationFormView(APIView):
     def post(self, request):
         data = request.data.copy()
         data["auditee_uei"] = (data.get("auditee_uei") or "").upper().strip()
-
         serializer = UEISerializer(data=data)
 
         if serializer.is_valid():
