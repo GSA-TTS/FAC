@@ -239,8 +239,6 @@ class UEIValidationViewTests(TestCase):
             self.assertEqual(data["valid"], False)
             self.assertEqual(data["errors"], ["invalid-year"])
 
-
-
 class AuditeeInfoTests(TestCase):
     def setUp(self):
         self.user = baker.make(User)
