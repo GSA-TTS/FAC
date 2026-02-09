@@ -1,3 +1,5 @@
+# See docs/dependency-management.md for compilation instructions
+
 -c ../requirements.txt
 
 bandit
