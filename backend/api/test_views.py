@@ -238,6 +238,7 @@ class UEIValidationViewTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(data["valid"], False)
             self.assertEqual(data["errors"], ["invalid-year"])
+            
 
 class AuditeeInfoTests(TestCase):
     def setUp(self):
