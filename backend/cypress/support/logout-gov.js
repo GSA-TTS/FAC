@@ -10,7 +10,7 @@ export function testLogoutGov() {
     try {
       const urlObj = new URL(href);
       onLoginGov = urlObj.hostname === 'idp.int.identitysandbox.gov';
-    } catch (e) {
+    } catch {
       onLoginGov = false;
     }
 

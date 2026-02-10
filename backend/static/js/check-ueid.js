@@ -208,7 +208,9 @@ secondaryBtn.setAttribute('data-close-modal', '');
 if (formStatus === 'success' || formStatus === 'duplicate-submission') {
   primaryBtn.removeAttribute('data-close-modal');
 
-  primaryBtn.onclick = () => {
+  primaryBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
     window.setTimeout(() => {
       if (FORM.requestSubmit) {
