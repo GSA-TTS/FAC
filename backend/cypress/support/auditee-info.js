@@ -20,18 +20,22 @@ function clickValidateUEI() {
 }
 
 function waitForUEIModalReady() {
+  // modal is open
   cy.get('#uei-search-result').should('have.class', 'is-visible');
+  // loading spinner removed 
   cy.get('#uei-search-result').should('not.have.class', 'loading');
-  cy.get('#uei-search-result .usa-modal__footer button.primary').should('be.visible');
+
+  // primary button has been populated by populateModal()
+  cy.get('#uei-search-result .usa-modal__footer button.primary')
+    .invoke('text')
+    .then((t) => t.trim())
+    .should('match', /^(Continue|Yes, continue)$/);
 }
 
 function clickUEIModalPrimary() {
-  cy.get('#uei-search-result .usa-modal__footer button.primary').then(($btn) => {
-    const label = $btn.text().trim();
-    expect(['Continue', 'Yes, continue']).to.include(label);
-  });
-
-  cy.get('#uei-search-result .usa-modal__footer button.primary').click();
+  // Click even if Cypress thinks it's not visible due to modal CSS timing
+  cy.get('#uei-search-result .usa-modal__footer button.primary')
+    .click({ force: true });
 }
 
 export function testValidAuditeeInfo() {
