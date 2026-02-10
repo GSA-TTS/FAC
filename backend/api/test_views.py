@@ -232,7 +232,9 @@ class UEIValidationViewTests(TestCase):
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = json.loads(valid_uei_results)
 
-            response = client.post(self.PATH, {"auditee_uei": "ZQGGHJH74DW7"}, format="json")
+            response = client.post(
+                self.PATH, {"auditee_uei": "ZQGGHJH74DW7"}, format="json"
+            )
             data = response.json()
 
             self.assertEqual(response.status_code, 200)
