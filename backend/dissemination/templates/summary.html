@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load field_name_to_label %}
 {% load getkey %}
+{% load resubmission_status_presentation %}
 {% load humanize %}
 {% load sprite_helper %}
 {% load static %}
@@ -28,9 +29,35 @@
                             <strong>Fiscal Year:&nbsp;</strong>{{ general.fy_start_date }} to {{ general.fy_end_date }}
                         </p>
                     </div>
+
+                    {% comment %} Separate part of the metadata. Only for records in a resubmission chain. {% endcomment %}
+                    {% if resubmissions_list and resubmissions_list|length > 1 %}
+                        <div class="font-sans-lg margin-top-4">
+                            <p class="margin-y-1">
+                                <strong>First FAC submitted date:&nbsp;</strong>{{ resubmissions_list.0.report_id.fac_accepted_date }}
+                            </p>
+                            <p class="margin-y-1">
+                                {% with resubmissions_list|last as last_submission %}
+                                    <strong>Most recent submitted date:&nbsp;</strong>{{ last_submission.report_id.fac_accepted_date }}
+                                {% endwith %}
+                            </p>
+                        </div>
+                    {% endif %}
                 </div>
+                
                 <div class="grid-col-12 tablet:grid-col-5 tablet:display-flex flex-column tablet:flex-justify-end">
+                    {% comment %} Resubmission Status Tag {% endcomment %}
+                    {% if resubmissions_list and include_private and general.resubmission_status %}
+                        {% with general.resubmission_status|resubmission_status_presentation as presentation %}
+                            <span class="usa-tag usa-tag--big radius-lg font-sans-xl {{ presentation.tag_color }}
+                                         flex-align-self-center margin-bottom-2 padding-y-1 padding-x-2">
+                                    {{ presentation.friendly_name }}
+                            </span>
+                        {% endwith %}
+                    {% endif %}
+
                     <div class="margin-0 flex-align-self-end margin-top-2">
+                        {% comment %} SF-SAC Download Button {% endcomment %}
                         <div class="display-flex flex-row">
                             <a class="usa-button display-flex flex-fill font-sans-xl margin-bottom-2"
                                 target="_blank"
@@ -65,6 +92,7 @@
                             {% endif %}
                         </div>
 
+                        {% comment %} PDF Download Button {% endcomment %}
                         {% if general.is_public or include_private %}
                             <a class="usa-button display-flex font-sans-xl"
                                 href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
@@ -83,6 +111,10 @@
             </div>
         </div>
     </div>
+
+    {% if resubmissions_list and include_private %}
+        {% include "summary/resubmissions-table.html" %}
+    {% endif %}
 
     {% comment %} The grey box of doom {% endcomment %}
     <div class="bg-base-lighter padding-bottom-10">

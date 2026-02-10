@@ -12,6 +12,7 @@ from dissemination.models import (
     FindingText,
     General,
     Note,
+    Resubmission,
     SecondaryAuditor,
 )
 
@@ -46,7 +47,6 @@ class AuditSummaryView(View):
 
         include_private = include_private_results(request)
         include_private_and_public = include_private or general_data["is_public"]
-        data = self._get_audit_content(report_id, include_private_and_public)
         is_sf_sac_downloadable = DisseminationCombined.objects.filter(
             report_id=report_id
         ).exists()
@@ -56,10 +56,11 @@ class AuditSummaryView(View):
             "report_id": report_id,
             "auditee_name": general_data["auditee_name"],
             "auditee_uei": general_data["auditee_uei"],
+            "data": self._get_audit_content(report_id, include_private_and_public),
             "general": general_data,
             "include_private": include_private,
-            "data": data,
             "is_sf_sac_downloadable": is_sf_sac_downloadable,
+            "resubmissions_list": self._get_resubmissions(report_id),
         }
 
         return render(request, "summary.html", context)
@@ -227,3 +228,45 @@ class AuditSummaryView(View):
             data["Additional EINs"] = [x for x in additional_eins.values()]
 
         return data
+
+    def _get_resubmissions(self, current_report_id=None):
+        """
+        Given a report_id, return a list containing all of the related Resubmission model objects.
+
+        1. Walk backwards, inserting each submission at the front of the list
+        2. Add the current submission
+        3. Walk forwards and append each submission to the end of the list
+
+        Ex. A submission that is number 3 out of 5 will proceed like:
+        1. Insert v2 at the front. Insert v1 at the front.      [v1, v2]
+        2. Append v3.                                           [v1, v2, v3]
+        3. Append v4. Append v5.                                [v1, v2, v3, v4, v5]
+        """
+        if not current_report_id:
+            return []
+
+        # First ensure this isn't a pre-resubmission record, and has existing data.
+        current_resub = Resubmission.objects.filter(report_id=current_report_id).first()
+        if not current_resub:
+            return []
+
+        # Begin building the list
+        resubs = []
+        previous_report_id = current_resub.previous_report_id
+        next_report_id = current_resub.next_report_id
+
+        while previous_report_id:  # 1
+            previous_resub = Resubmission.objects.get(report_id=previous_report_id)
+            resubs.insert(0, previous_resub)
+            previous_report_id = previous_resub.previous_report_id
+        resubs.append(current_resub)  # 2
+        while next_report_id:  # 3
+            next_resub = Resubmission.objects.get(report_id=next_report_id)
+            resubs.append(next_resub)
+            next_report_id = next_resub.next_report_id
+
+        # If there's only one object, there's no chain to show. So instead, we'll return none.
+        if len(resubs) == 1:
+            return []
+
+        return resubs
