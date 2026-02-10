@@ -50,7 +50,7 @@ def check_expenditure_threshold_met(
         return []
 
     abs_total = Decimal("0")
-    for award in federal_awards["federal_awards"]:
+    for award in federal_awards.get("federal_awards", []):
         amount = award["program"]["amount_expended"]
         abs_total += abs(_to_decimal(amount))
 

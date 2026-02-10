@@ -49,7 +49,7 @@ def build_resub_tag_map(rows: Iterable[General]) -> Mapping[str, Optional[str]]:
 
     for row in rows:
         v = _safe_int(getattr(row, "resubmission_version", None))
-        if v <= 1:
+        if v < 1:
             tag_map[row.report_id] = None
             continue
 
