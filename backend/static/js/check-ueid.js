@@ -212,6 +212,8 @@ if (formStatus === 'success' || formStatus === 'duplicate-submission') {
     e.preventDefault();
     e.stopPropagation();
 
+    document.querySelector('.uei-search-result')?.classList.remove('is-visible');
+
     window.setTimeout(() => {
       if (FORM.requestSubmit) {
         FORM.requestSubmit();
