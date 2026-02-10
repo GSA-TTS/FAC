@@ -22,18 +22,17 @@ export function testValidAuditeeInfo() {
   cy.get('#continue').should('not.be.disabled');
   cy.get('#continue').click();
 
+  // Wait for API + for modal to finish loading (this is why the button was display:none)
   cy.wait('@uei_check_success');
+  cy.get('.uei-search-result').should('be.visible');
+  cy.get('.uei-search-result').should('not.have.class', 'loading');
 
-  // Grab the modal primary button text safely, then click it in a new command
+  // Success modal primary is "Continue" (duplicates modal primary is "Yes, continue")
   cy.get('#uei-search-result .usa-modal__footer button.primary')
     .should('be.visible')
-    .then(($btn) => {
-      const label = $btn.text().trim();
-      expect(['Continue', 'Yes, continue']).to.include(label);
-    });
-
-  cy.get('#uei-search-result .usa-modal__footer button.primary').click();
-
+    .contains('Continue')
+    .click();
+    
   // and assert on the URL we end up at
   cy.url().should('match', /\/report_submission\/eligibility\/$/);
 }
