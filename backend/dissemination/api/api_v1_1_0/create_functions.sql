@@ -55,6 +55,17 @@ BEGIN
 END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION api_v1_1_0_functions.is_public_audit_or_authorized_user(is_public BOOLEAN)
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN (
+        is_public = true
+        OR
+        (is_public = false AND api_v1_1_0_functions.has_tribal_data_access())
+    );
+END;
+$$ LANGUAGE plpgsql STABLE;
+
 CREATE OR REPLACE FUNCTION api_v1_1_0.request_file_access(
     report_id TEXT
 ) RETURNS JSON LANGUAGE plpgsql AS

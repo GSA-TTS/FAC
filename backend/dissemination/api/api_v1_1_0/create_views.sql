@@ -16,9 +16,8 @@ create view api_v1_1_0.findings_text as
         dissemination_general gen
     where
         ft.report_id = gen.report_id
-         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        and
+        api_v1_1_0_functions.is_public_audit_or_authorized_user(gen.is_public)
     order by ft.id
 ;
 
@@ -122,8 +121,7 @@ create view api_v1_1_0.corrective_action_plans as
     where
         ct.report_id = gen.report_id
         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        api_v1_1_0_functions.is_public_audit_or_authorized_user(gen.is_public)
     order by ct.id
 ;
 
@@ -148,8 +146,7 @@ create view api_v1_1_0.notes_to_sefa as
     where
         note.report_id = gen.report_id
         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        api_v1_1_0_functions.is_public_audit_or_authorized_user(gen.is_public)
     order by note.id
 ;
 
