@@ -6,7 +6,13 @@ export function testLogoutGov() {
   // After clicking Sign out, we *might* be redirected to Login.gov for confirmation,
   // or we might stay on localhost depending on environment/session state.
   cy.location('href', { timeout: 30000 }).then((href) => {
-    const onLoginGov = href.includes('idp.int.identitysandbox.gov');
+    let onLoginGov = false;
+    try {
+      const urlObj = new URL(href);
+      onLoginGov = urlObj.hostname === 'idp.int.identitysandbox.gov';
+    } catch (e) {
+      onLoginGov = false;
+    }
 
     if (!onLoginGov) {
       // Already back on the app (or never left). Nothing else to do.
