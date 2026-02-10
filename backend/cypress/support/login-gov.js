@@ -51,7 +51,17 @@ export function testLoginGovLogin(
 
   // After OTP submit, Login.gov may show an interstitial OR redirect straight back to localhost.
   cy.location('href', { timeout: 30000 }).then((href) => {
-    if (!href.includes('identitysandbox.gov')) return;
+    let hostname;
+    try {
+      hostname = new URL(href).hostname;
+    } catch {
+      return;
+    }
+
+    const isIdentitySandboxHost =
+      hostname === 'identitysandbox.gov' || hostname.endsWith('.identitysandbox.gov');
+
+    if (!isIdentitySandboxHost) return;
     handleLoginGovInterstitialIfPresent();
   });
 
