@@ -1,0 +1,12 @@
+{
+  "valid": false,
+  "errors": ["duplicate-submission"],
+  "response": {
+    "auditee_uei": "LZGKJ22EF7B5",
+    "auditee_name": "Fire King International, LLC",
+    "duplicates": [
+      { "report_id": "2023-12-GSAFAC-0000000001" },
+      { "report_id": "2023-12-GSAFAC-0000000002" }
+    ]
+  }
+}

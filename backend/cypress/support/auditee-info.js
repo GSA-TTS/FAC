@@ -1,38 +1,82 @@
 // re-usable code for testing the Auditee Info form
 
+function fillAuditeeFields({ uei, start, end }) {
+  cy.get('#auditee_uei').clear();
+  cy.get('#auditee_uei').type(uei);
+  cy.get('#auditee_uei').blur();
+
+  cy.get('#auditee_fiscal_period_start').clear();
+  cy.get('#auditee_fiscal_period_start').type(start);
+  cy.get('#auditee_fiscal_period_start').blur();
+
+  cy.get('#auditee_fiscal_period_end').clear();
+  cy.get('#auditee_fiscal_period_end').type(end);
+  cy.get('#auditee_fiscal_period_end').blur();
+}
+
+function clickValidateUEI() {
+  cy.get('#continue').should('not.be.disabled');
+  cy.get('#continue').click();
+}
+
+function waitForUEIModalReady() {
+  cy.get('#uei-search-result').should('have.class', 'is-visible');
+  cy.get('#uei-search-result').should('not.have.class', 'loading');
+  cy.get('#uei-search-result .usa-modal__footer button.primary').should('be.visible');
+}
+
+function clickUEIModalPrimary() {
+  cy.get('#uei-search-result .usa-modal__footer button.primary').then(($btn) => {
+    const label = $btn.text().trim();
+    expect(['Continue', 'Yes, continue']).to.include(label);
+  });
+
+  cy.get('#uei-search-result .usa-modal__footer button.primary').click();
+}
+
 export function testValidAuditeeInfo() {
   cy.intercept('POST', '/api/sac/ueivalidation', {
     fixture: 'sam-gov-api-mock.json',
-  }).as('uei_check_success');
+  }).as('uei_check');
 
-  cy.visit('/report_submission/auditeeinfo/');
+  fillAuditeeFields({
+    uei: 'D7A4J33FUMJ1',
+    start: '01/01/2023',
+    end: '12/31/2023',
+  });
 
-  // Hard-coding some UEI which may eventually become unregistered 
-  // // This UEI needs to match up with the UEI in the workbooks.
-  cy.get('#auditee_uei').clear();
-  cy.get('#auditee_uei').type('D7A4J33FUMJ1');
+  clickValidateUEI();
+  cy.wait('@uei_check');
 
-  // Now fill in the audit dates
-  cy.get('#auditee_fiscal_period_start').clear();
-  cy.get('#auditee_fiscal_period_start').type('01/01/2023');
+  waitForUEIModalReady();
+  clickUEIModalPrimary();
 
-  cy.get('#auditee_fiscal_period_end').clear();
-  cy.get('#auditee_fiscal_period_end').type('12/31/2023');
+  cy.url().should('match', /\/report_submission\/eligibility\/$/);
+}
 
-  cy.get('#continue').should('not.be.disabled');
-  cy.get('#continue').click();
+export function testDuplicateAuditeeInfo() {
+  cy.intercept('POST', '/api/sac/ueivalidation', {
+    fixture: 'uei-duplicate.json',
+  }).as('uei_check_duplicate');
 
-  // Wait for API + for modal to finish loading (this is why the button was display:none)
-  cy.wait('@uei_check_success');
-  cy.get('.uei-search-result').should('be.visible');
-  cy.get('.uei-search-result').should('not.have.class', 'loading');
+  fillAuditeeFields({
+    uei: 'LZGKJ22EF7B5',
+    start: '01/01/2023',
+    end: '12/31/2023',
+  });
 
-  // Success modal primary is "Continue" (duplicates modal primary is "Yes, continue")
+  clickValidateUEI();
+  cy.wait('@uei_check_duplicate');
+
+  waitForUEIModalReady();
+
+  cy.contains('Are you sure you want to start a new submission?');
+  cy.contains('2023-12-GSAFAC-0000000001');
+  cy.contains('2023-12-GSAFAC-0000000002');
+
   cy.get('#uei-search-result .usa-modal__footer button.primary')
-    .should('be.visible')
-    .contains('Continue')
-    .click();
-    
-  // and assert on the URL we end up at
+    .should('have.text', 'Yes, continue');
+  cy.get('#uei-search-result .usa-modal__footer button.primary').click();
+
   cy.url().should('match', /\/report_submission\/eligibility\/$/);
 }
