@@ -41,7 +41,7 @@ class ResubmissionTagTests(TestCase):
         self.assertEqual(tag_map["1003"], "Most Recent")
         self.assertEqual(tag_map["1002"], "Resubmitted")
 
-    def test_version_le_1_should_not_tag(self):
+    def test_version_lt_1_should_not_tag(self):
         row_v1 = baker.make(
             General,
             report_id="1004",
@@ -58,7 +58,7 @@ class ResubmissionTagTests(TestCase):
         )
 
         tag_map = build_resub_tag_map([row_v1, row_v0])
-        self.assertIsNone(tag_map["1004"])
+        self.assertIsNotNone(tag_map["1004"])
         self.assertIsNone(tag_map["1005"])
 
     def test_tie_breaker_fac_accepted_date_then_report_id(self):
@@ -97,12 +97,20 @@ class ResubmissionTagTests(TestCase):
             report_id="3002",
             auditee_uei="UEI5",
             audit_year="2022",
-            resubmission_version=1,  # no tag
+            resubmission_version=1,
         )
-        rows = [row1, row2]
+        row3 = baker.make(
+            General,
+            report_id="3003",
+            auditee_uei="UEI5",
+            audit_year="2022",
+            resubmission_version=0,  # no tag (unknown version number)
+        )
+        rows = [row1, row2, row3]
 
         tag_map = build_resub_tag_map(rows)
         attach_resubmission_tags(rows, tag_map)
 
         self.assertEqual(row1.resubmission_tag, "Most Recent")
-        self.assertIsNone(row2.resubmission_tag)
+        self.assertEqual(row2.resubmission_tag, "Resubmitted")
+        self.assertIsNone(row3.resubmission_tag)
