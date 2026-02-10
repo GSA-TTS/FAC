@@ -39,8 +39,8 @@ function parseAuditYearFromFyStart() {
 function requiredFieldsFilled() {
   return Boolean(
     getTrimmedValue('auditee_uei') &&
-      getTrimmedValue('auditee_fiscal_period_start') &&
-      getTrimmedValue('auditee_fiscal_period_end')
+    getTrimmedValue('auditee_fiscal_period_start') &&
+    getTrimmedValue('auditee_fiscal_period_end')
   );
 }
 
