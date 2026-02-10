@@ -222,7 +222,7 @@ class UEIValidationViewTests(TestCase):
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["valid"], False)
-        
+
     def test_missing_audit_year_returns_invalid_year(self):
         client = APIClient()
         user = baker.make(User)
@@ -238,7 +238,6 @@ class UEIValidationViewTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(data["valid"], False)
             self.assertEqual(data["errors"], ["invalid-year"])
-
 
 
 class AuditeeInfoTests(TestCase):
