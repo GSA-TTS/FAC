@@ -109,7 +109,7 @@ services:
       ENABLE_DEBUG_TOOLBAR: false
     healthcheck:
       test: curl --fail -I http://localhost:8000/ || exit 1
-      interval: 60s
+      interval: 300s
       timeout: 5s
       retries: 10
 
