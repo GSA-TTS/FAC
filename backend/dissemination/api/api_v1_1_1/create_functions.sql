@@ -55,6 +55,17 @@ BEGIN
 END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(resubmission_status TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN (
+        resubmission_status = 'most_recent'
+        OR
+        api_v1_1_0_functions.has_tribal_data_access()
+    );
+END;
+$$ LANGUAGE plpgsql STABLE;
+
 CREATE OR REPLACE FUNCTION api_v1_1_0_functions.is_public_audit_or_authorized_user(is_public BOOLEAN)
 RETURNS BOOLEAN AS $$
 BEGIN
