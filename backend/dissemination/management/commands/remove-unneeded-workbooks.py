@@ -3,7 +3,6 @@ from dissemination.remove_workbook_artifacts import delete_workbooks
 
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 
