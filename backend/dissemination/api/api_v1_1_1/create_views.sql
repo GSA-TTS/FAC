@@ -18,9 +18,9 @@ create view api_v1_1_1.findings_text as
     where
         ft.report_id = gen.report_id
         and
-        api_v1_1_0_functions.is_public_audit_or_authorized_user(gen.is_public)
+        api_v1_1_1_functions.is_public_audit_or_authorized_user(gen.is_public)
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ft.id
 ;
 
@@ -41,7 +41,7 @@ create view api_v1_1_1.additional_ueis as
     where
         gen.report_id = uei.report_id
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by uei.id
 ;
 
@@ -71,7 +71,7 @@ create view api_v1_1_1.findings as
     where
         finding.report_id = gen.report_id
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by finding.id
 ;
 
@@ -110,7 +110,7 @@ create view api_v1_1_1.federal_awards as
     where
         award.report_id = gen.report_id
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by award.id
 ;
 
@@ -134,9 +134,9 @@ create view api_v1_1_1.corrective_action_plans as
     where
         ct.report_id = gen.report_id
         and
-        api_v1_1_0_functions.is_public_audit_or_authorized_user(gen.is_public)
+        api_v1_1_1_functions.is_public_audit_or_authorized_user(gen.is_public)
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ct.id
 ;
 
@@ -162,9 +162,9 @@ create view api_v1_1_1.notes_to_sefa as
     where
         note.report_id = gen.report_id
         and
-        api_v1_1_0_functions.is_public_audit_or_authorized_user(gen.is_public)
+        api_v1_1_1_functions.is_public_audit_or_authorized_user(gen.is_public)
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by note.id
 ;
 
@@ -187,7 +187,7 @@ create view api_v1_1_1.passthrough as
     where
         gen.report_id = pass.report_id
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by pass.id
 ;
 
@@ -276,7 +276,7 @@ create view api_v1_1_1.general as
     from
         dissemination_general gen
     where
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by gen.id
 ;
 
@@ -306,7 +306,7 @@ create view api_v1_1_1.secondary_auditors as
     where
         sa.report_id = gen.report_id
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by sa.id
 ;
 
@@ -327,7 +327,7 @@ create view api_v1_1_1.additional_eins as
     where
         gen.report_id = ein.report_id
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ein.id
 ;
 
@@ -454,9 +454,9 @@ create view api_v1_1_1.combined as
     from
         dissemination_combined combined
     where
-        api_v1_1_0_functions.is_public_audit_or_authorized_user(combined.is_public)
+        api_v1_1_1_functions.is_public_audit_or_authorized_user(combined.is_public)
         and
-        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(combined.resubmission_status)
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(combined.resubmission_status)
     order by combined.id
 ;
 
