@@ -50,4 +50,6 @@ class Resubmission(models.Model):
     # changed_fields. A TextField with a string of comma separated field names. i.e. "one_field, two_field, red_field, blue_field".
 
     def __str__(self):
-        return f"report_id:{self.report_id} Version:{self.resubmission_version}, Status:{self.resubmission_status}"
+        return (
+            f"report_id:{self.report_id} Version:{self.version}, Status:{self.status}"
+        )
