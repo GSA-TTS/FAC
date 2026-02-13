@@ -201,7 +201,7 @@ The `LOGIN_CLIENT_ID` environment variable is our unique application identifier 
 
 ---
 For local testing, you may need to specify a few other variables:
-* The clamav-rest service looks at port `9000` by default - which is already in use. You can change this to a different port if preferred by using `CLAMAV_PORT = {new port number}`.
+* The clamav-rest service looks at port `9000` by default - which is already in use. You can change this to a different port if preferred by using `export CLAMAV_PORT = {new port number}`.
 * Cypress variables for running local end-to-end tests. See the [testing docs](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md#end-to-end-testing) for more.
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
