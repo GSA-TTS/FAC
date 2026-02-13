@@ -271,9 +271,9 @@ dj-email-url==1.0.6 \
     --hash=sha256:55ffe3329e48f54f8a75aa36ece08f365e09d61f8a209773ef09a1d4760e699a \
     --hash=sha256:cbd08327fbb08b104eac160fb4703f375532e4c0243eb230f5b960daee7a96db
     # via environs
-django==5.2.3 \
-    --hash=sha256:335213277666ab2c5cac44a792a6d2f3d58eb79a80c14b6b160cd4afc3b75684 \
-    --hash=sha256:c517a6334e0fd940066aa9467b29401b93c37cec2e61365d663b80922542069d
+django==5.2.11 \
+    --hash=sha256:7f2d292ad8b9ee35e405d965fbbad293758b858c34bbf7f3df551aeeac6f02d3 \
+    --hash=sha256:e7130df33ada9ab5e5e929bc19346a20fe383f5454acb2cc004508f242ee92c0
     # via
     #   -r ./requirements/requirements.in
     #   dj-database-url
@@ -471,9 +471,9 @@ greenlet==3.1.1 \
     #   -r ./requirements/requirements.in
     #   gevent
     #   sqlalchemy
-gunicorn[gevent]==23.0.0 \
-    --hash=sha256:ec400d38950de4dfd418cff8328b2c8faed0edb0d517d3394e457c317908ca4d \
-    --hash=sha256:f014447a0101dc57e294f6c18ca6b40227a4c90e9bdb586042628030cba004ec
+gunicorn[gevent]==25.0.1 \
+    --hash=sha256:23cbe968c6ae3c8efc3d118c8353fa0763efc2102d89d0d3cea696cede7ff6b1 \
+    --hash=sha256:573e053aa950246e307ea908bd7ddce1870d41a40aec0c935938c586f0b9b946
     # via -r ./requirements/requirements.in
 idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
@@ -1393,17 +1393,10 @@ six==1.16.0 \
     #   orderedmultidict
     #   pyjwkest
     #   python-dateutil
-sling==1.4.2 \
-    --hash=sha256:37366d47a3249de8ac43db3b45b0a5c1785124b5554c9c7a36ca1d5547fd5c60 \
-    --hash=sha256:8df3dd51eb73b1509d01600c657393a1d32ec90744f0736dfbc264883af952c5 \
-    --hash=sha256:8f3f072f7984166715e876f4b311164596394f52733ba532187764d54e6fa689
+sling==1.5.6 \
+    --hash=sha256:038be78e00ef02b451d8bbfc2055dc8907d7668636f34bd5f13a10f0f87cde41 \
+    --hash=sha256:e7aa2068056141b8999e5702fa0b0a11496cd0ceb8deb3cab278961df8b3d327
     # via -r ./requirements/requirements.in
-sling-linux-amd64==1.4.2 \
-    --hash=sha256:4935332ccefa56abafccb89ead7b743ecaafaf6059b8f5d9ce9e9ca21b9b2b36 \
-    --hash=sha256:cf9a41e4eb2bb5028e69313188eeb8b6328e21aa4e9718a528d2e6a92ee7d617
-    # via
-    #   -r ./requirements/requirements.in
-    #   sling
 sqlalchemy==2.0.36 \
     --hash=sha256:03e08af7a5f9386a43919eda9de33ffda16b44eb11f3b313e6822243770e9763 \
     --hash=sha256:0572f4bd6f94752167adfd7c1bed84f4b240ee6203a95e05d1e208d488d0d436 \

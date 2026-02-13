@@ -47,10 +47,10 @@ jobs:
       # DEBUG: cypress:server:util:process_profiler
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
 
@@ -58,13 +58,13 @@ jobs:
         run: touch .env
 
       - name: Run Cypress full submission test
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           browser: chrome
           working-directory: ./backend
           spec: cypress/e2e/full-submission.cy.js
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         # add the line below to store screenshots only on failures
         if: failure()
         with:

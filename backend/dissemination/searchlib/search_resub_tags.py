@@ -1,31 +1,63 @@
-from typing import Dict, Iterable, Mapping, Optional
+from typing import Iterable, Mapping, Optional, Tuple
 from collections.abc import MutableMapping
+
 from dissemination.models import General
-from audit.models.constants import RESUBMISSION_STATUS
 
 
-def _tag_from_resubmission_fields(row: General) -> Optional[str]:
-    status = row.resubmission_status
-
-    if status == RESUBMISSION_STATUS.MOST_RECENT:
-        return "Most Recent"
-    elif status == RESUBMISSION_STATUS.DEPRECATED:
-        return "Resubmitted"
-
-    # Do not tag if status is missing or unknown
-    return None
+def _safe_int(v) -> int:
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return 0
 
 
-def build_resub_tag_map(rows: Iterable[General]) -> Dict[str, Optional[str]]:
+def build_resub_tag_map(rows: Iterable[General]) -> Mapping[str, Optional[str]]:
     """
-    Builds a mapping of report_id → tag using already-loaded data from general search results.
+    report_id -> tag
+
+    Since everything is marked MOST_RECENT in the DB, we treat "is part of a resub chain"
+    as: resubmission_version > 1.
+
+    Per (auditee_uei, audit_year):
+      - the row with the highest version => "Most Recent"
+      - all other rows with version > 1 => "Resubmitted"
+      - version <= 1 (or missing) => no tag
     """
-    tag_map: Dict[str, Optional[str]] = {}
+
+    # (uei, year) -> best score (version, accepted_date, report_id) for stable tie-breaking
+    best_score_by_group: dict[Tuple[str, str], tuple] = {}
+    winner_report_id_by_group: dict[Tuple[str, str], str] = {}
+
+    # 1) find the winner per group among rows where version > 1
+    for row in rows:
+        v = _safe_int(getattr(row, "resubmission_version", None))
+        if v <= 1:
+            continue
+
+        key = (row.auditee_uei, row.audit_year)
+
+        acc = getattr(row, "fac_accepted_date", None)
+        # if date is None, keep it low so real dates win ties
+        score = (v, acc or 0, row.report_id)
+
+        if key not in best_score_by_group or score > best_score_by_group[key]:
+            best_score_by_group[key] = score
+            winner_report_id_by_group[key] = row.report_id
+
+    # 2) assign tags
+    tag_map: dict[str, Optional[str]] = {}
 
     for row in rows:
-        tag = _tag_from_resubmission_fields(row)
-        if tag is not None:
-            tag_map[row.report_id] = tag
+        v = _safe_int(getattr(row, "resubmission_version", None))
+        if v < 1:
+            tag_map[row.report_id] = None
+            continue
+
+        key = (row.auditee_uei, row.audit_year)
+        if winner_report_id_by_group.get(key) == row.report_id:
+            tag_map[row.report_id] = "Most Recent"
+        else:
+            tag_map[row.report_id] = "Resubmitted"
 
     return tag_map
 
@@ -33,9 +65,7 @@ def build_resub_tag_map(rows: Iterable[General]) -> Dict[str, Optional[str]]:
 def attach_resubmission_tags(
     rows: Iterable[General], tag_map: Mapping[str, Optional[str]]
 ) -> None:
-    """
-    Injects .resubmission_tag or ['resubmission_tag'] into each row based on the tag_map.
-    """
+
     for row in rows:
         tag = tag_map.get(row.report_id)
         if isinstance(row, MutableMapping):
