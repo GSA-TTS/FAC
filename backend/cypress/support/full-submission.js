@@ -30,7 +30,6 @@ export function testFullSubmission(isTribal, isPublic, isResubmission=false) {
     cy.visit('/');
     cy.url().should('include', '/');
 
-    // Logs in with Login.gov'
     testLoginGovLogin();
 
     // Check the terms and conditions link and click "Accept and start..."
@@ -83,7 +82,7 @@ export function testFullSubmission(isTribal, isPublic, isResubmission=false) {
     cy.url().then(url => {
       const reportId = url.split('/').pop();
 
-      // Complete the tribal audit form as auditee - opt private
+      // Complete the tribal audit form as auditee
       testLogoutGov();
       testLoginGovLogin(
         LOGIN_TEST_EMAIL_AUDITEE,
@@ -106,7 +105,6 @@ export function testFullSubmission(isTribal, isPublic, isResubmission=false) {
     });
   };
 
-  // Complete the audit information form
   if(!isResubmission) {
     cy.get(".usa-link").contains("Audit Information form").click();
     testAuditInformationForm();
@@ -115,10 +113,8 @@ export function testFullSubmission(isTribal, isPublic, isResubmission=false) {
   cy.get(".usa-link").contains("Pre-submission validation").click();
   testCrossValidation();
 
-  // test unlock certification
   testUnlock();
 
-  // Auditor certification
   cy.get(".usa-link").contains("Auditor Certification").click();
   testAuditorCertification();
 
@@ -138,8 +134,6 @@ export function testFullSubmission(isTribal, isPublic, isResubmission=false) {
     );
 
     cy.visit(`/audit/submission-progress/${reportId}`);
-
-    // Auditee certification
     cy.get(".usa-link").contains("Auditee Certification").click();
     testAuditeeCertification();
 
@@ -156,7 +150,6 @@ export function testFullSubmission(isTribal, isPublic, isResubmission=false) {
     ).siblings().contains('td', reportId);
 
     testSubmissionAccess(reportId, isTribal, isPublic);
-
     testLogoutGov();
 
     return cy.wrap(reportId);
