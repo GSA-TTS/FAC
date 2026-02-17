@@ -20,7 +20,7 @@ module "metabase-app" {
 }
 
 module "metabasedb" {
-  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.3.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.5.0"
 
   cf_space_id   = var.cf_space.id
   name          = "metabase-db"
