@@ -23,7 +23,7 @@ resource "newrelic_alert_policy" "main" {
 resource "newrelic_nrql_alert_condition" "infected_file" {
   policy_id      = newrelic_alert_policy.main.id
   name           = "Infected File Found"
-  title_template = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template = "${upper(var.cf_space_name)}: {{conditionName}}"
   fill_option    = "static"
   fill_value     = 0
   runbook_url    = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
@@ -44,7 +44,7 @@ resource "newrelic_nrql_alert_condition" "broken_link" {
   count          = var.cf_space_name == "production" ? 1 : 0 // Only deploy to production
   policy_id      = newrelic_alert_policy.main.id
   name           = "Broken Link Detected"
-  title_template = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template = "${upper(var.cf_space_name)}: {{conditionName}}"
   runbook_url    = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
 
   critical {
@@ -62,7 +62,7 @@ resource "newrelic_nrql_alert_condition" "broken_link" {
 resource "newrelic_nrql_alert_condition" "error_rate" {
   policy_id          = newrelic_alert_policy.main.id
   name               = "Unusual Error Rate Detected"
-  title_template     = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template     = "${upper(var.cf_space_name)}: {{conditionName}}"
   type               = "baseline"
   baseline_direction = "upper_and_lower"
   runbook_url        = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
@@ -82,7 +82,7 @@ resource "newrelic_nrql_alert_condition" "error_rate" {
 resource "newrelic_nrql_alert_condition" "response_time" {
   policy_id          = newrelic_alert_policy.main.id
   name               = "Unusual Response Time Detected"
-  title_template     = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template     = "${upper(var.cf_space_name)}: {{conditionName}}"
   type               = "baseline"
   baseline_direction = "upper_and_lower"
   runbook_url        = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
@@ -102,7 +102,7 @@ resource "newrelic_nrql_alert_condition" "response_time" {
 resource "newrelic_nrql_alert_condition" "throughput" {
   policy_id          = newrelic_alert_policy.main.id
   name               = "Unusual Request Volume Detected"
-  title_template     = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template     = "${upper(var.cf_space_name)}: {{conditionName}}"
   type               = "baseline"
   baseline_direction = "upper_and_lower"
   runbook_url        = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
@@ -122,7 +122,7 @@ resource "newrelic_nrql_alert_condition" "throughput" {
 resource "newrelic_nrql_alert_condition" "slow_transactions" {
   policy_id      = newrelic_alert_policy.main.id
   name           = "Transaction Duration Exceeds Threshold"
-  title_template = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template = "${upper(var.cf_space_name)}: {{conditionName}}"
   runbook_url    = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
 
   nrql {
@@ -140,7 +140,7 @@ resource "newrelic_nrql_alert_condition" "slow_transactions" {
 resource "newrelic_nrql_alert_condition" "synth_uptime_check" {
   policy_id      = newrelic_alert_policy.main.id
   name           = "Ping of application failed"
-  title_template = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template = "${upper(var.cf_space_name)}: {{conditionName}}"
   runbook_url    = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
 
   critical {
@@ -158,7 +158,7 @@ resource "newrelic_nrql_alert_condition" "synth_uptime_check" {
 resource "newrelic_nrql_alert_condition" "db_slow_queries" {
   policy_id      = newrelic_alert_policy.main.id
   name           = "DB Statement Duration Exceeds Threshold"
-  title_template = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template = "${upper(var.cf_space_name)}: {{conditionName}}"
   runbook_url    = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
 
   critical {
@@ -177,7 +177,7 @@ resource "newrelic_nrql_alert_condition" "db_slow_queries" {
 resource "newrelic_nrql_alert_condition" "transaction_error" {
   policy_id      = newrelic_alert_policy.main.id
   name           = "Transaction Errors Occured"
-  title_template = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template = "${upper(var.cf_space_name)}: {{conditionName}}"
   runbook_url    = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
 
   critical {
@@ -195,7 +195,7 @@ resource "newrelic_nrql_alert_condition" "transaction_error" {
 resource "newrelic_nrql_alert_condition" "http_500_errors" {
   policy_id      = newrelic_alert_policy.main.id
   name           = "HTTP 500 Errors Detected"
-  title_template = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template = "${upper(var.cf_space_name)}: {{conditionName}}"
   runbook_url    = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
 
   warning {
@@ -213,7 +213,7 @@ resource "newrelic_nrql_alert_condition" "http_500_errors" {
 resource "newrelic_nrql_alert_condition" "http_499_errors" {
   policy_id      = newrelic_alert_policy.main.id
   name           = "HTTP 499 Errors Detected"
-  title_template = "(${upper(var.cf_space_name)}): {{conditionName}}"
+  title_template = "${upper(var.cf_space_name)}: {{conditionName}}"
   runbook_url    = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
 
   critical {
