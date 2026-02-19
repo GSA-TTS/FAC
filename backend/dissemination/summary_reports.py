@@ -4,7 +4,7 @@ import logging
 import uuid
 import time
 import openpyxl as pyxl
-
+from backend.audit.models.constants import RESUBMISSION_STATUS
 from django.conf import settings
 
 from openpyxl.workbook.defined_name import DefinedName
@@ -283,6 +283,15 @@ def get_tribal_report_ids(report_ids):
     t1 = time.time()
     return (objs, t1 - t0)
 
+def get_deprecated_report_ids(report_ids):
+    """
+    Filters the given report_ids to only ones that are deprecated (resubmitted/deprecated).
+    """
+    objects = General.objects.all().filter(
+        report_id__in=report_ids,
+        resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
+    )
+    return set(obj.report_id for obj in objects)
 
 def set_column_widths(worksheet):
     dims = {}
@@ -373,13 +382,14 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     names_in_dc = set(["general", "federalaward", "finding", "passthrough"])
     names_not_in_dc = all_names - names_in_dc
     data = initialize_data_structure(names_in_dc.union(names_not_in_dc))
+    deprecated_report_ids = get_deprecated_report_ids(report_ids)
 
     process_combined_results(
-        report_ids, names_in_dc, data, include_private, tribal_report_ids
+        report_ids, names_in_dc, data, include_private, tribal_report_ids, deprecated_report_ids
     )
 
     process_non_combined_results(
-        report_ids, names_not_in_dc, data, include_private, tribal_report_ids
+        report_ids, names_not_in_dc, data, include_private, tribal_report_ids, deprecated_report_ids
     )
 
     return (data, time.time() - t0)
@@ -396,7 +406,7 @@ def initialize_data_structure(names):
 
 
 def process_combined_results(
-    report_ids, names_in_dc, data, include_private, tribal_report_ids
+    report_ids, names_in_dc, data, include_private, tribal_report_ids, deprecated_report_ids
 ):
     # Grab all the rows from the combined table into a local structure.
     # We'll do this in memory. This table flattens general, federalaward, and findings
@@ -407,6 +417,12 @@ def process_combined_results(
     # Do all of the names in the DisseminationCombined at the same time.
     # That way, we only go through the results once.
     for obj in dc_results:
+        report_id = getattr(obj, "report_id")
+        
+        # Skip deprecated reports unless the user can access private/tribal submissions
+        if (not include_private) and (report_id in deprecated_report_ids):
+            continue
+        
         for model_name in names_in_dc:
             field_names = field_name_ordered[model_name]
             report_id = getattr(obj, "report_id")
@@ -465,7 +481,7 @@ def process_combined_results(
 
 
 def process_non_combined_results(
-    report_ids, names_not_in_dc, data, include_private, tribal_report_ids
+    report_ids, names_not_in_dc, data, include_private, tribal_report_ids, deprecated_report_ids
 ):
     for model_name in names_not_in_dc:
         model = _get_model_by_name(model_name)
@@ -475,6 +491,11 @@ def process_non_combined_results(
         # Walk the objects
         for obj in objects:
             report_id = _get_attribute_or_data(obj, "report_id")
+            
+            # Skip deprecated reports unless the user can access private/tribal submissions
+            if (not include_private) and (report_id in deprecated_report_ids):
+                continue
+            
             # Omit rows for private tribal data when the user doesn't have perms
             if (
                 model_name in restricted_model_names
