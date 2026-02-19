@@ -428,17 +428,19 @@ def process_combined_results(
     # Grab all the rows from the combined table into a local structure.
     # We'll do this in memory. This table flattens general, federalaward, and findings
     # so we can move much faster on those tables without extra lookups.
-    dc_results = DisseminationCombined.objects.all().filter(report_id__in=report_ids)
+    dc_results = DisseminationCombined.objects.filter(report_id__in=report_ids)
+
+    if not include_private:
+        dc_results = dc_results.exclude(
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED
+        )
+
     # Different tables want to be visited/filtered differently.
     visited = set()
     # Do all of the names in the DisseminationCombined at the same time.
     # That way, we only go through the results once.
     for obj in dc_results:
         report_id = getattr(obj, "report_id")
-
-        # Skip deprecated reports unless the user can access private/tribal submissions
-        if (not include_private) and (report_id in deprecated_report_ids):
-            continue
 
         for model_name in names_in_dc:
             field_names = field_name_ordered[model_name]
@@ -509,14 +511,16 @@ def process_non_combined_results(
         model = _get_model_by_name(model_name)
         print(model_name)
         field_names = field_name_ordered[model_name]
-        objects = model.objects.all().filter(report_id__in=report_ids)
+        objects = model.objects.filter(report_id__in=report_ids)
+
+        if not include_private:
+            objects = objects.exclude(
+                report_id__resubmission_status=RESUBMISSION_STATUS.DEPRECATED
+            )
+
         # Walk the objects
         for obj in objects:
             report_id = _get_attribute_or_data(obj, "report_id")
-
-            # Skip deprecated reports unless the user can access private/tribal submissions
-            if (not include_private) and (report_id in deprecated_report_ids):
-                continue
 
             # Omit rows for private tribal data when the user doesn't have perms
             if (
