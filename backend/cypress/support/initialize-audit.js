@@ -6,14 +6,10 @@ import { testWithUnprivilegedKey } from './dissemination-table.js';
 
 export function testInitializeAudit(isTribal=false, isResubmission=false) {
   if (!isResubmission) {
-    // Now the auditee info screen
     testValidAuditeeInfo();
   }
 
-  // Completes the eligibility screen
   testValidEligibility(isTribal);
-
-  // Now the accessandsubmission screen
   testValidAccess();
 
   // Report should not yet be in the dissemination table
@@ -24,6 +20,5 @@ export function testInitializeAudit(isTribal=false, isResubmission=false) {
     testWithUnprivilegedKey(reportId, 'general', 0);
   });
 
-  // Fill out the general info form
-  testValidGeneralInfo();
+  testValidGeneralInfo(isResubmission);
 };
