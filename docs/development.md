@@ -2,7 +2,7 @@
 
 We use either [Docker with `docker compose`](#docker) or [local development](#local-development) when working on issues and shipping pull requests.
 
-See [the pull request template](../.github/pull_request_template.md) for steps to follow when submitting or reviewing pull requests.
+See [the pull request checklist](./pull-request-checklist.md) for steps to follow when submitting or reviewing pull requests.
 
 ## Contents
 
@@ -13,8 +13,8 @@ See [the pull request template](../.github/pull_request_template.md) for steps t
   * [Docker](#docker)
   * [Local Development](#local-development)
 * [Development in principle](#development-in-principle)
-* [Python code quality tooling](#python-code-quality-tooling) 
-* [Frontend code quality tooling](#frontend-code-quality-tooling) 
+* [Python code quality tooling](#python-code-quality-tooling)
+* [Frontend code quality tooling](#frontend-code-quality-tooling)
 
 ## Tools
 
@@ -156,9 +156,9 @@ Add and define the following environment variables using the instructions below.
 ENV = 'LOCAL'
 DISABLE_AUTH = False
 SECRET_KEY = YourSecretKey
-SAM_API_KEY = 
-DJANGO_SECRET_LOGIN_KEY = 
-LOGIN_CLIENT_ID = 
+SAM_API_KEY =
+DJANGO_SECRET_LOGIN_KEY =
+LOGIN_CLIENT_ID =
 ```
 
 #### ENV
@@ -171,7 +171,7 @@ In GitHub Actions and our CI/CD pipeline, it is set to `TESTING`.  It will enabl
 While you **could** change this, you generally shouldn't need to.
 
 #### DISABLE_AUTH
-The `DISABLE_AUTH` variable tells Django to disable the Login.gov authorization. This should almost always be `False` unless you need to temporarily disable it for your local development. 
+The `DISABLE_AUTH` variable tells Django to disable the Login.gov authorization. This should almost always be `False` unless you need to temporarily disable it for your local development.
 
 In the Dev/Staging/Production environments, it will be set to `False` and require all users to go to Login.gov to log in.
 
@@ -284,7 +284,7 @@ docker compose run web python manage.py migrate
 
 #### Staticfiles
 
-Files that fall under the `/backend/static` directory need to be collected into the untracked directory `/backend/staticfiles`. This is done automatically when docker comes up, so you will 
+Files that fall under the `/backend/static` directory need to be collected into the untracked directory `/backend/staticfiles`. This is done automatically when docker comes up, so you will
 likely not need to do anything with these.
 
 However, if you edit any files in `/backend/static` you will need to either re-up docker or manually collect static. This is done via `python manage.py collectstatic`.
@@ -388,7 +388,7 @@ If you want to move past the test data, it is possible to download previous year
 
 Let's use this workflow to create a `superuser` in our development environment so we can access the Admin interface! However, you will need to first log in to the local environment using your sandbox login.gov account; if the user does not exist in the system, it cannot be promoted to a superuser or staff user.
 
-The best way to create a login.gov user is to run [http://localhost:8000](http://localhost:8000) click on the log in link from your app running locally. (It needs to be localhost and not http://0.0.0.0:8000 to work with how we configured our Login.gov test account.) 
+The best way to create a login.gov user is to run [http://localhost:8000](http://localhost:8000) click on the log in link from your app running locally. (It needs to be localhost and not http://0.0.0.0:8000 to work with how we configured our Login.gov test account.)
 
 Follow the instructions on the Login.gov test site to set up an account.
 
@@ -440,7 +440,7 @@ docker compose up
 ```
 
 ---
-**NOTE** - the above commands are also available through the Makefile: 
+**NOTE** - the above commands are also available through the Makefile:
 
 ```
 make docker-clean
@@ -505,7 +505,7 @@ Linting is checked as a GitHub action, configured in [.github/workflows/test.yml
 
 #### Additional linters
 We use `djlint` to lint html template files. When developing locally:
-* Use `djlint --reformat <path_to_html_files>` to format the files. 
+* Use `djlint --reformat <path_to_html_files>` to format the files.
 * Use the `--lint` option to get a list of linter errors.
 
 ---
@@ -546,7 +546,7 @@ These tools run automatically as a part of our CI workflow in GitHub actions, bu
 
 ## Local Development
 
-You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead ([here](#docker)). It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned! This method requires **PostgreSQL** and additional setup. See [local-development.md](local-development.md) for additional warnings and details. 
+You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead ([here](#docker)). It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned! This method requires **PostgreSQL** and additional setup. See [local-development.md](local-development.md) for additional warnings and details.
 
 ---
 ## Troubleshooting
@@ -595,5 +595,5 @@ If using Windows, ensure that WSL 2 integration is enabled in Docker Desktop > S
 #### **Error: Docker Daemon Not Running**
 
 - If using Docker Desktop, ensure it is running before executing any docker commands.
-  
+
 ---
