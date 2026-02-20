@@ -15,9 +15,7 @@ from dissemination.models import (
     CapText,
     Note,
     FindingText,
-    SecondaryAuditor,
 )
-from audit.models.constants import RESUBMISSION_STATUS
 from model_bakery import baker
 import openpyxl as pyxl
 
@@ -162,62 +160,6 @@ class SummaryReportTests(TestMaterializedViewBuilder):
     def test_gather_report_data_dissemination_include_private(self):
         """Summaries with tribal data and access"""
         self._test_gather_report_data_dissemination_helper(True)
-
-    def _test_deprecated_exclusion_helper(self, include_private: bool):
-        # non-deprecated public record
-        active_general = baker.make(General, is_public=True, resubmission_status=None)
-        baker.make(FederalAward, report_id=active_general)
-
-        # deprecated record (should be excluded when include_private=False)
-        deprecated_general = baker.make(
-            General,
-            is_public=True,
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
-        )
-        baker.make(FederalAward, report_id=deprecated_general)
-
-        self.refresh_materialized_view()
-
-        report_ids = [active_general.report_id, deprecated_general.report_id]
-        tribal_report_ids = []  # not relevant here
-
-        data, _ = gather_report_data_dissemination(
-            report_ids, tribal_report_ids, include_private
-        )
-
-        # "general" comes from DisseminationCombined
-        general_sheet = data["general"]
-        report_id_index = general_sheet["field_names"].index("report_id")
-        general_ids = {row[report_id_index] for row in general_sheet["entries"]}
-
-        self.assertIn(active_general.report_id, general_ids)
-        if include_private:
-            self.assertIn(deprecated_general.report_id, general_ids)
-        else:
-            self.assertNotIn(deprecated_general.report_id, general_ids)
-
-        # Also validate a non-combined model (e.g., secondaryauditor)
-        baker.make(SecondaryAuditor, report_id=active_general)
-        baker.make(SecondaryAuditor, report_id=deprecated_general)
-
-        data, _ = gather_report_data_dissemination(
-            report_ids, tribal_report_ids, include_private
-        )
-        sec_sheet = data["secondaryauditor"]
-        ridx = sec_sheet["field_names"].index("report_id")
-        sec_ids = {row[ridx] for row in sec_sheet["entries"]}
-
-        self.assertIn(active_general.report_id, sec_ids)
-        if include_private:
-            self.assertIn(deprecated_general.report_id, sec_ids)
-        else:
-            self.assertNotIn(deprecated_general.report_id, sec_ids)
-
-    def test_deprecated_excluded_when_public(self):
-        self._test_deprecated_exclusion_helper(include_private=False)
-
-    def test_deprecated_included_when_private(self):
-        self._test_deprecated_exclusion_helper(include_private=True)
 
 
 class SeparateNotesSingleFieldsFromArrayFields(SimpleTestCase):

@@ -4,7 +4,6 @@ import logging
 import uuid
 import time
 import openpyxl as pyxl
-from audit.models.constants import RESUBMISSION_STATUS
 from django.conf import settings
 
 from openpyxl.workbook.defined_name import DefinedName
@@ -374,22 +373,12 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     names_not_in_dc = all_names - names_in_dc
     data = initialize_data_structure(names_in_dc.union(names_not_in_dc))
 
-    deprecated_ids = set()
-    if not include_private:
-        deprecated_ids = set(
-            General.objects.filter(
-                report_id__in=report_ids,
-                resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
-            ).values_list("report_id", flat=True)
-        )
-
     process_combined_results(
         report_ids,
         names_in_dc,
         data,
         include_private,
         tribal_report_ids,
-        deprecated_ids,
     )
 
     process_non_combined_results(
@@ -398,7 +387,6 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
         data,
         include_private,
         tribal_report_ids,
-        deprecated_ids,
     )
 
     return (data, time.time() - t0)
@@ -449,15 +437,11 @@ def process_combined_results(
     data,
     include_private,
     tribal_report_ids,
-    deprecated_ids,
 ):
     # Grab all the rows from the combined table into a local structure.
     # We'll do this in memory. This table flattens general, federalaward, and findings
     # so we can move much faster on those tables without extra lookups.
     dc_results = DisseminationCombined.objects.filter(report_id__in=report_ids)
-
-    if not include_private and deprecated_ids:
-        dc_results = dc_results.exclude(report_id__in=deprecated_ids)
 
     # Different tables want to be visited/filtered differently.
     visited = set()
@@ -516,15 +500,11 @@ def process_non_combined_results(
     data,
     include_private,
     tribal_report_ids,
-    deprecated_ids,
 ):
     for model_name in names_not_in_dc:
         model = _get_model_by_name(model_name)
         field_names = field_name_ordered[model_name]
         objects = model.objects.filter(report_id__in=report_ids)
-
-        if not include_private and deprecated_ids:
-            objects = objects.exclude(report_id__in=deprecated_ids)
 
         # Walk the objects
         for obj in objects:
