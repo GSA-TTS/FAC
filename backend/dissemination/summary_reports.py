@@ -4,7 +4,7 @@ import logging
 import uuid
 import time
 import openpyxl as pyxl
-from backend.audit.models.constants import RESUBMISSION_STATUS
+from audit.models.constants import RESUBMISSION_STATUS
 from django.conf import settings
 
 from openpyxl.workbook.defined_name import DefinedName
