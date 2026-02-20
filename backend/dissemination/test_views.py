@@ -12,7 +12,7 @@ from audit.models import (
     generate_sac_report_id,
 )
 from audit.models.utils import get_next_sequence_id
-from audit.models.constants import SAC_SEQUENCE_ID
+from audit.models.constants import SAC_SEQUENCE_ID, RESUBMISSION_STATUS
 from audit.fixtures.excel import FORM_SECTIONS
 from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
@@ -1082,6 +1082,117 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
             )
 
             self.assertEqual(response.content, b"fake file content")
+
+    @patch("dissemination.download.generate_summary_report")
+    def test_multiple_summary_filters_deprecated_for_unauthorized(
+        self, mock_generate_summary_report
+    ):
+        """
+        When include_private=False, deprecated_via_resubmission records should be removed
+        before generating the workbook.
+        """
+        # active
+        active = self._make_general(
+            is_public=True,
+            report_id="2022-12-GSAFAC-0000000100",
+            resubmission_status=None,
+        )
+        baker.make(FederalAward, report_id=active)
+
+        # deprecated via resubmission (should be filtered out for anon)
+        deprecated = self._make_general(
+            is_public=True,
+            report_id="2022-12-GSAFAC-0000000200",
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+        )
+        baker.make(FederalAward, report_id=deprecated)
+
+        self.refresh_materialized_view()
+
+        # stub generator so we can inspect passed report_ids
+        mock_generate_summary_report.return_value = ("mock.xlsx", io.BytesIO(b"x"))
+
+        response = self.anon_client.post(self._summary_report_url(), {})
+        self.assertEqual(response.status_code, 200)
+
+        # generate_summary_report(report_ids, include_private)
+        called_report_ids = mock_generate_summary_report.call_args[0][0]
+        self.assertIn(active.report_id, called_report_ids)
+        self.assertNotIn(deprecated.report_id, called_report_ids)
+
+    @patch("dissemination.download.generate_summary_report")
+    def test_multiple_summary_does_not_filter_deprecated_for_authorized(
+        self, mock_generate_summary_report
+    ):
+        active = self._make_general(
+            is_public=True,
+            report_id="2022-12-GSAFAC-0000000300",
+            resubmission_status=None,
+        )
+        baker.make(FederalAward, report_id=active)
+
+        deprecated = self._make_general(
+            is_public=True,
+            report_id="2022-12-GSAFAC-0000000400",
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+        )
+        baker.make(FederalAward, report_id=deprecated)
+
+        self.refresh_materialized_view()
+
+        mock_generate_summary_report.return_value = ("mock.xlsx", io.BytesIO(b"x"))
+
+        response = self.perm_client.post(self._summary_report_url(), {})
+        self.assertEqual(response.status_code, 200)
+
+        called_report_ids = mock_generate_summary_report.call_args[0][0]
+        self.assertIn(active.report_id, called_report_ids)
+        self.assertIn(deprecated.report_id, called_report_ids)
+
+    @patch("dissemination.download.generate_summary_report")
+    def test_single_summary_deprecated_filtered_returns_404_for_unauthorized(
+        self, mock_generate_summary_report
+    ):
+        deprecated = self._make_general(
+            is_public=True,
+            report_id="2022-12-GSAFAC-0000000500",
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+        )
+        baker.make(FederalAward, report_id=deprecated)
+        self.refresh_materialized_view()
+
+        url = reverse(
+            "dissemination:SingleSummaryReportDownload",
+            kwargs={"report_id": deprecated.report_id},
+        )
+        response = self.anon_client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+        mock_generate_summary_report.assert_not_called()
+
+    @patch("dissemination.download.generate_summary_report")
+    def test_single_summary_deprecated_not_filtered_for_authorized(
+        self, mock_generate_summary_report
+    ):
+        deprecated = self._make_general(
+            is_public=True,
+            report_id="2022-12-GSAFAC-0000000600",
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+        )
+        baker.make(FederalAward, report_id=deprecated)
+        self.refresh_materialized_view()
+
+        mock_generate_summary_report.return_value = ("mock.xlsx", io.BytesIO(b"x"))
+
+        url = reverse(
+            "dissemination:SingleSummaryReportDownload",
+            kwargs={"report_id": deprecated.report_id},
+        )
+        response = self.perm_client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        called_report_ids = mock_generate_summary_report.call_args[0][0]
+        self.assertEqual(called_report_ids, [deprecated.report_id])
 
 
 class PageHandlingTests(TestCase):

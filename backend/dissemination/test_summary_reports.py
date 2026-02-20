@@ -9,8 +9,13 @@ from dissemination.summary_reports import (
     insert_dissem_coversheet,
     separate_notes_single_fields_from_array_fields,
 )
-from dissemination.models import FederalAward, General, CapText, Note, FindingText
-
+from dissemination.models import (
+    FederalAward,
+    General,
+    CapText,
+    Note,
+    FindingText,
+)
 from model_bakery import baker
 import openpyxl as pyxl
 
@@ -27,8 +32,8 @@ class SummaryReportTests(TestMaterializedViewBuilder):
 
         filename, _ = generate_summary_report(report_ids)
 
-        self.assertTrue(filename.startswith, "fac-summary-report-")
-        self.assertTrue(filename.endswith, ".xlsx")
+        self.assertTrue(filename.startswith("fac-summary-report-"))
+        self.assertTrue(filename.endswith(".xlsx"))
 
     def test_get_tribal_report_ids(self):
         """The report_ids returned should only belong to tribal audits"""
@@ -44,7 +49,7 @@ class SummaryReportTests(TestMaterializedViewBuilder):
 
         self.refresh_materialized_view()
 
-        (ls, _) = get_tribal_report_ids(public_report_ids + tribal_report_ids)
+        ls, _ = get_tribal_report_ids(public_report_ids + tribal_report_ids)
         self.assertEqual(
             len(ls),
             2,
@@ -60,7 +65,7 @@ class SummaryReportTests(TestMaterializedViewBuilder):
 
         self.refresh_materialized_view()
 
-        (ls, _) = get_tribal_report_ids(public_report_ids)
+        ls, _ = get_tribal_report_ids(public_report_ids)
         self.assertEqual(
             len(ls),
             0,
@@ -76,7 +81,7 @@ class SummaryReportTests(TestMaterializedViewBuilder):
 
         self.refresh_materialized_view()
 
-        (ls, _) = get_tribal_report_ids(tribal_report_ids)
+        ls, _ = get_tribal_report_ids(tribal_report_ids)
         # Somewhat misleadingly named - it asserts both count and content equivalence
         self.assertCountEqual(
             ls,
@@ -127,7 +132,7 @@ class SummaryReportTests(TestMaterializedViewBuilder):
         baker.make(FindingText, report_id=tribal_general)
 
         # Get the data that constitutes the summary workbook
-        (data, _) = gather_report_data_dissemination(
+        data, _ = gather_report_data_dissemination(
             public_report_ids + tribal_report_ids,
             tribal_report_ids,
             include_private,

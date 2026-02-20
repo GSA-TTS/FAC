@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.views.generic import View
 
 from audit.models import Audit
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from config.settings import (
     SUMMARY_REPORT_DOWNLOAD_LIMIT,
     FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
@@ -38,6 +38,24 @@ from dissemination.report_generation.findings_summary_report import (
 from dissemination.views.utils import include_private_results
 
 logger = logging.getLogger(__name__)
+
+
+def filter_deprecated_via_resubmission_for_public(report_ids, include_private: bool):
+    """
+    If the user does NOT have tribal access (include_private=False),
+    remove any reports deprecated via resubmission from the download set.
+    If they DO have access, do not filter.
+    """
+    if include_private:
+        return report_ids
+
+    deprecated_ids = set(
+        General.objects.filter(
+            report_id__in=report_ids,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+        ).values_list("report_id", flat=True)
+    )
+    return [rid for rid in report_ids if rid not in deprecated_ids]
 
 
 class PdfDownloadView(ReportAccessRequiredMixin, View):
@@ -174,10 +192,18 @@ class SingleSummaryReportDownloadView(View):
             get_object_or_404(General, report_id=report_id)
 
         include_private = include_private_results(request)
+
+        # If public/no-tribal-access, block deprecated-via-resubmission
+        filtered_report_ids = filter_deprecated_via_resubmission_for_public(
+            [report_id], include_private
+        )
+        if not filtered_report_ids:
+            raise Http404("Cannot generate summary report for this submission.")
+
         filename, workbook_bytes = (
-            generate_summary_report([report_id], include_private)
+            generate_summary_report(filtered_report_ids, include_private)
             if not use_audit
-            else generate_audit_summary_report([report_id], include_private)
+            else generate_audit_summary_report(filtered_report_ids, include_private)
         )
 
         # Create an HTTP response with the workbook file for download
@@ -217,6 +243,13 @@ class MultipleSummaryReportDownloadView(View):
             if len(results) == 0:
                 raise Http404("Cannot generate summary report. No results found.")
             report_ids = [result.report_id for result in results]
+
+            report_ids = filter_deprecated_via_resubmission_for_public(
+                report_ids, include_private
+            )
+            if len(report_ids) == 0:
+                raise Http404("Cannot generate summary report. No results found.")
+
             filename, workbook_bytes = (
                 generate_summary_report(report_ids, include_private)
                 if not use_audit
