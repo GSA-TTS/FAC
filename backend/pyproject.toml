@@ -2,7 +2,12 @@
 
 [tool.black]
 line-length=88
-exclude = "node_modules/"
+exclude = '''
+/(
+    node_modules
+  | \.venv
+)/
+'''
 
 [tool.mypy]
 ignore_missing_imports = true
