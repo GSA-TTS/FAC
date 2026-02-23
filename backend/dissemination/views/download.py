@@ -52,7 +52,7 @@ def filter_deprecated_via_resubmission_for_public(report_ids, include_private: b
     deprecated_ids = set(
         General.objects.filter(
             report_id__in=report_ids,
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         ).values_list("report_id", flat=True)
     )
     return [rid for rid in report_ids if rid not in deprecated_ids]
