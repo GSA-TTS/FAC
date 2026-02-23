@@ -189,49 +189,48 @@ class SearchViewTests(TestMaterializedViewBuilder):
         # If there are results, we'll see "results in x seconds" somewhere.
         self.assertNotContains(response, "results in")
 
-    def test_anonymous_returns_private_and_public(self):
-        """Anonymous users should see all reports (public and private included)."""
+    def test_anonymous_returns_public_only(self):
+        # Anonymous users should only see public reports.
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-        for p in public:
-            baker.make(FederalAward, report_id=p)
-        for p in private:
-            baker.make(FederalAward, report_id=p)
+
+        for g in public:
+            baker.make(FederalAward, report_id=g)
+        for g in private:
+            baker.make(FederalAward, report_id=g)
+
         self.refresh_materialized_view()
         response = self.anon_client.post(self._search_url(), {})
 
-        # 1-10 of <strong>10</strong> results in x seconds.
-        self.assertContains(response, "<strong>10</strong>")
+        # 5 public results (private filtered out)
+        self.assertContains(response, "<strong>5</strong>")
 
-        # all of the public reports should show up on the page
-        for p in public:
-            self.assertContains(response, p.report_id)
+        for g in public:
+            self.assertContains(response, g.report_id)
 
-        # all of the private reports should show up on the page
-        for p in private:
-            self.assertContains(response, p.report_id)
+        for g in private:
+            self.assertNotContains(response, g.report_id)
 
-    def test_non_permissioned_returns_private_and_public(self):
-        """Non-permissioned users should see all reports (public and private included)."""
+    def test_non_permissioned_returns_public_only(self):
+        # Authenticated but non-permissioned users should only see public reports.
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-        for p in public:
-            baker.make(FederalAward, report_id=p)
-        for p in private:
-            baker.make(FederalAward, report_id=p)
+
+        for g in public:
+            baker.make(FederalAward, report_id=g)
+        for g in private:
+            baker.make(FederalAward, report_id=g)
+
         self.refresh_materialized_view()
         response = self.auth_client.post(self._search_url(), {})
 
-        # 1-10 of <strong>10</strong> results in x seconds.
-        self.assertContains(response, "<strong>10</strong>")
+        self.assertContains(response, "<strong>5</strong>")
 
-        # all of the public reports should show up on the page
-        for p in public:
-            self.assertContains(response, p.report_id)
+        for g in public:
+            self.assertContains(response, g.report_id)
 
-        # all of the private reports should show up on the page
-        for p in private:
-            self.assertContains(response, p.report_id)
+        for g in private:
+            self.assertNotContains(response, g.report_id)
 
     def test_permissioned_returns_all(self):
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)

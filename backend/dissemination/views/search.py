@@ -110,7 +110,13 @@ class AdvancedSearch(View):
         # Generate results on valid user input.
         results = run_search(request, form_data)
 
-        # NEW: non-federal users should not see deprecated resubmissions at all
+        include_private = include_private_results(request)
+
+        # Non-federal users should only see public audits
+        if not include_private:
+            results = results.filter(is_public=True)
+
+        # Non-federal users should not see deprecated-via-resubmission at all
         if not is_federal_user(request.user):
             results = results.exclude(
                 resubmission_status=RESUBMISSION_STATUS.DEPRECATED
@@ -241,7 +247,13 @@ class Search(View):
         # Generate results on valid user input.
         results = run_search(request, form_data)
 
-        # NEW: non-federal users should not see deprecated resubmissions at all
+        include_private = include_private_results(request)
+
+        # Non-federal users should only see public audits
+        if not include_private:
+            results = results.filter(is_public=True)
+
+        # Non-federal users should not see deprecated-via-resubmission at all
         if not is_federal_user(request.user):
             results = results.exclude(
                 resubmission_status=RESUBMISSION_STATUS.DEPRECATED
@@ -375,7 +387,13 @@ class AuditSearch(View):
         # Generate results on valid user input.
         results = run_search(request, form_data, True)
 
-        # NEW: non-federal users should not see deprecated resubmissions at all
+        include_private = include_private_results(request)
+
+        # Non-federal users should only see public audits
+        if not include_private:
+            results = results.filter(is_public=True)
+
+        # Non-federal users should not see deprecated-via-resubmission at all
         if not is_federal_user(request.user):
             results = results.exclude(
                 resubmission_status=RESUBMISSION_STATUS.DEPRECATED
