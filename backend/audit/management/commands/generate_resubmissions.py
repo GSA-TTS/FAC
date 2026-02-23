@@ -19,6 +19,49 @@ User = get_user_model()
 
 
 #############################################
+# Utility Functions
+#############################################
+def get_placeholder_auditee_certification():
+    return {
+        "auditee_signature": {
+            "auditee_name": "Local Data - Auditee Name",
+            "auditee_title": "Local Data - Auditee Title",
+            "auditee_certification_date_signed": "2000-01-01",
+        },
+        "auditee_certification": {
+            "has_no_BII": True,
+            "has_no_PII": True,
+            "is_2CFR_compliant": True,
+            "is_FAC_releasable": True,
+            "has_engaged_auditor": True,
+            "is_issued_and_signed": True,
+            "is_complete_and_accurate": True,
+            "meets_2CFR_specifications": True,
+        },
+    }
+
+
+def get_placeholder_auditor_certification():
+    return {
+        "auditor_signature": {
+            "auditor_name": "Local Data - Auditor Name",
+            "auditor_title": "Local Data - Auditor Title",
+            "auditor_certification_date_signed": "2000-01-01",
+        },
+        "auditor_certification": {
+            "has_no_BII": True,
+            "has_no_PII": True,
+            "is_2CFR_compliant": True,
+            "is_FAC_releasable": True,
+            "has_engaged_auditor": True,
+            "is_issued_and_signed": True,
+            "is_complete_and_accurate": True,
+            "meets_2CFR_specifications": True,
+        },
+    }
+
+
+#############################################
 # modify_total_amount_expended
 #############################################
 def modify_total_amount_expended(sac, user_obj):
@@ -178,6 +221,8 @@ def complete_resubmission(
         event_user=USER_OBJ,
         event_type="bogus-event-generate-test-data",
     )
+    resubmitted_sac.auditee_certification = get_placeholder_auditee_certification()
+    resubmitted_sac.auditor_certification = get_placeholder_auditor_certification()
 
     # We need to add some metadata to the original record, pointing to the resubmitted record.
     new_version = resubmitted_sac.resubmission_meta["version"]
@@ -189,6 +234,8 @@ def complete_resubmission(
         "version": prev_version,
         "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
     }
+    source_sac.auditee_certification = get_placeholder_auditee_certification()
+    source_sac.auditor_certification = get_placeholder_auditor_certification()
 
     # The original SAC needs to have its status set to "RESUBMITTED"
     source_sac.transition_name.append(STATUS.RESUBMITTED)
