@@ -9,13 +9,8 @@ from dissemination.summary_reports import (
     insert_dissem_coversheet,
     separate_notes_single_fields_from_array_fields,
 )
-from dissemination.models import (
-    FederalAward,
-    General,
-    CapText,
-    Note,
-    FindingText,
-)
+from dissemination.models import FederalAward, General, CapText, Note, FindingText
+
 from model_bakery import baker
 import openpyxl as pyxl
 
@@ -32,8 +27,8 @@ class SummaryReportTests(TestMaterializedViewBuilder):
 
         filename, _ = generate_summary_report(report_ids)
 
-        self.assertTrue(filename.startswith("fac-summary-report-"))
-        self.assertTrue(filename.endswith(".xlsx"))
+        self.assertTrue(filename.startswith, "fac-summary-report-")
+        self.assertTrue(filename.endswith, ".xlsx")
 
     def test_get_tribal_report_ids(self):
         """The report_ids returned should only belong to tribal audits"""
