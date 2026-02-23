@@ -813,7 +813,7 @@ class SearchAdvancedFilterTests(TestMaterializedViewBuilder):
         self.assertEqual(len(results), 2)
 
         # A Fed, but excluding deprecated via filter
-        params = {"form.resubmissions": "exclude", "advanced_search_flag": True}
+        params = {"resubmissions": "exclude", "advanced_search_flag": True}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
 

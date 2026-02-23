@@ -255,6 +255,87 @@ class SearchViewTests(TestMaterializedViewBuilder):
         for p in private:
             self.assertContains(response, p.report_id)
 
+    def test_anonymous_does_not_show_deprecated_via_resubmission(self):
+        # Anonymous users should not see deprecated_via_resubmission records in the search results table.
+        deprecated = baker.make(
+            General,
+            is_public=True,
+            audit_year=2023,
+            report_id="2022-12-GSAFAC-0000000999",
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+        )
+        baker.make(FederalAward, report_id=deprecated)
+
+        active = baker.make(
+            General,
+            is_public=True,
+            audit_year=2023,
+            report_id="2022-12-GSAFAC-0000001000",
+            resubmission_status=None,
+        )
+        baker.make(FederalAward, report_id=active)
+
+        self.refresh_materialized_view()
+
+        response = self.anon_client.post(self._search_url(), {})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, active.report_id)
+        self.assertNotContains(response, deprecated.report_id)
+
+    def test_non_permissioned_does_not_show_deprecated_via_resubmission(self):
+        # Authenticated but non-permissioned users should not see deprecated_via_resubmission records in the search results table.
+        deprecated = baker.make(
+            General,
+            is_public=True,
+            audit_year=2023,
+            report_id="2022-12-GSAFAC-0000001999",
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+        )
+        baker.make(FederalAward, report_id=deprecated)
+
+        active = baker.make(
+            General,
+            is_public=True,
+            audit_year=2023,
+            report_id="2022-12-GSAFAC-0000002000",
+            resubmission_status=None,
+        )
+        baker.make(FederalAward, report_id=active)
+
+        self.refresh_materialized_view()
+
+        response = self.auth_client.post(self._search_url(), {})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, active.report_id)
+        self.assertNotContains(response, deprecated.report_id)
+
+    def test_permissioned_can_see_deprecated_via_resubmission(self):
+        # Permissioned (READ_TRIBAL) users should be able to see deprecated_via_resubmission records in the search results table.
+        deprecated = baker.make(
+            General,
+            is_public=True,
+            audit_year=2023,
+            report_id="2022-12-GSAFAC-0000002999",
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+        )
+        baker.make(FederalAward, report_id=deprecated)
+
+        active = baker.make(
+            General,
+            is_public=True,
+            audit_year=2023,
+            report_id="2022-12-GSAFAC-0000003000",
+            resubmission_status=None,
+        )
+        baker.make(FederalAward, report_id=active)
+
+        self.refresh_materialized_view()
+
+        response = self.perm_client.post(self._search_url(), {})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, active.report_id)
+        self.assertContains(response, deprecated.report_id)
+
 
 class PublicDataDownloadViewTests(TestCase):
     def setUp(self):
