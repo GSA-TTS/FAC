@@ -1163,7 +1163,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
 
             self.assertEqual(response.content, b"fake file content")
 
-    @patch("dissemination.download.generate_summary_report")
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
     def test_multiple_summary_filters_deprecated_for_unauthorized(
         self, mock_generate_summary_report
     ):
@@ -1200,7 +1200,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         self.assertIn(active.report_id, called_report_ids)
         self.assertNotIn(deprecated.report_id, called_report_ids)
 
-    @patch("dissemination.download.generate_summary_report")
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
     def test_multiple_summary_does_not_filter_deprecated_for_authorized(
         self, mock_generate_summary_report
     ):
@@ -1229,7 +1229,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         self.assertIn(active.report_id, called_report_ids)
         self.assertIn(deprecated.report_id, called_report_ids)
 
-    @patch("dissemination.download.generate_summary_report")
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
     def test_single_summary_deprecated_filtered_returns_404_for_unauthorized(
         self, mock_generate_summary_report
     ):
@@ -1250,7 +1250,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         self.assertEqual(response.status_code, 404)
         mock_generate_summary_report.assert_not_called()
 
-    @patch("dissemination.download.generate_summary_report")
+    @patch("dissemination.summary_reports.prepare_workbook_for_download")
     def test_single_summary_deprecated_not_filtered_for_authorized(
         self, mock_generate_summary_report
     ):
@@ -1309,6 +1309,7 @@ class PageHandlingTests(TestCase):
     @patch("dissemination.views.search.run_search")
     def test_advanced_search_post_page_zero(self, mock_run_search):
         """Ensure page resets to 1 when the requested page is zero"""
+        mock_run_search.return_value.count = 5
         mock_run_search.return_value.count.return_value = 5
 
         invalid_data = self.valid_post_data.copy()
@@ -1321,6 +1322,7 @@ class PageHandlingTests(TestCase):
     @patch("dissemination.views.search.run_search")
     def test_advanced_search_post_page_empty(self, mock_run_search):
         """Ensure page defaults to 1 when no page is provided"""
+        mock_run_search.return_value.count = 5
         mock_run_search.return_value.count.return_value = 5
 
         invalid_data = self.valid_post_data.copy()
@@ -1334,6 +1336,7 @@ class PageHandlingTests(TestCase):
     def test_advanced_search_post_valid_page(self, mock_run_search):
         """Ensure valid page number remains unchanged"""
         mock_run_search.return_value.count.return_value = 20  # Multiple pages exist
+        mock_run_search.return_value.count = 20
 
         valid_data = self.valid_post_data.copy()
         valid_data["page"] = "2"  # Valid page
