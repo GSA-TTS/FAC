@@ -1106,7 +1106,11 @@ class PageHandlingTests(TestCase):
         qs.filter.return_value = qs
         qs.exclude.return_value = qs
         qs.count.return_value = total_count
-        qs.__getitem__ = Mock(return_value=[])  # Paginator may slice
+        # Paginator might call len(object_list)
+        qs.__len__ = Mock(return_value=total_count)
+
+        # Paginator slices: object_list[bottom:top]
+        qs.__getitem__ = Mock(return_value=[])
         return qs
 
     def _form_mock(self, *, page, limit=10, order_by="name", order_direction="asc"):
@@ -1223,4 +1227,3 @@ class PageHandlingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 2)
         self.assertEqual(response.context["results"].number, 2)
-
