@@ -66,7 +66,7 @@ def process_workbook_set(workbook_set_path, is_gsa_migration=True):
         for file in wb_files:
             if re.search("xlsx$", str(file)) or re.search(r"json$", str(file)):
                 full_path = os.path.join(wb_path, file)
-                (extractor, validator) = map_file_to_extractor_validator(full_path)
+                extractor, validator = map_file_to_extractor_validator(full_path)
                 if extractor:
                     print(f"Extracting and validating {file}")
                     ir = extractor(full_path, is_gsa_migration)

@@ -6,7 +6,6 @@ from .exceptions import ExcelExtractionError
 from .constants import SECTION_NAME
 from django.core.exceptions import ValidationError
 
-
 logger = logging.getLogger(__name__)
 
 
