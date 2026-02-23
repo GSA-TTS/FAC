@@ -13,7 +13,6 @@ from botocore.client import ClientError, Config
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 
-
 logger = logging.getLogger(__name__)
 
 
