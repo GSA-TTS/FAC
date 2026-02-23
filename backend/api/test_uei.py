@@ -9,7 +9,6 @@ import requests
 from api.uei import get_uei_info_from_sam_gov, automatic_waiver_4xx_codes
 from audit.models import UeiValidationWaiver
 
-
 valid_uei_results_dict = {
     "totalRecords": 1,
     "entityData": [
