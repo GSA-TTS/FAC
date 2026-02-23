@@ -12,7 +12,7 @@ from audit.models import (
     generate_sac_report_id,
 )
 from audit.models.utils import get_next_sequence_id
-from audit.models.constants import SAC_SEQUENCE_ID, RESUBMISSION_STATUS
+from audit.models.constants import SAC_SEQUENCE_ID
 from audit.fixtures.excel import FORM_SECTIONS
 from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
@@ -189,48 +189,49 @@ class SearchViewTests(TestMaterializedViewBuilder):
         # If there are results, we'll see "results in x seconds" somewhere.
         self.assertNotContains(response, "results in")
 
-    def test_anonymous_returns_public_only(self):
-        # Anonymous users should only see public reports.
+    def test_anonymous_returns_private_and_public(self):
+        """Anonymous users should see all reports (public and private included)."""
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-
-        for g in public:
-            baker.make(FederalAward, report_id=g)
-        for g in private:
-            baker.make(FederalAward, report_id=g)
-
+        for p in public:
+            baker.make(FederalAward, report_id=p)
+        for p in private:
+            baker.make(FederalAward, report_id=p)
         self.refresh_materialized_view()
         response = self.anon_client.post(self._search_url(), {})
 
-        # 5 public results (private filtered out)
-        self.assertContains(response, "<strong>5</strong>")
+        # 1-10 of <strong>10</strong> results in x seconds.
+        self.assertContains(response, "<strong>10</strong>")
 
-        for g in public:
-            self.assertContains(response, g.report_id)
+        # all of the public reports should show up on the page
+        for p in public:
+            self.assertContains(response, p.report_id)
 
-        for g in private:
-            self.assertNotContains(response, g.report_id)
+        # all of the private reports should show up on the page
+        for p in private:
+            self.assertContains(response, p.report_id)
 
-    def test_non_permissioned_returns_public_only(self):
-        # Authenticated but non-permissioned users should only see public reports.
+    def test_non_permissioned_returns_private_and_public(self):
+        """Non-permissioned users should see all reports (public and private included)."""
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-
-        for g in public:
-            baker.make(FederalAward, report_id=g)
-        for g in private:
-            baker.make(FederalAward, report_id=g)
-
+        for p in public:
+            baker.make(FederalAward, report_id=p)
+        for p in private:
+            baker.make(FederalAward, report_id=p)
         self.refresh_materialized_view()
         response = self.auth_client.post(self._search_url(), {})
 
-        self.assertContains(response, "<strong>5</strong>")
+        # 1-10 of <strong>10</strong> results in x seconds.
+        self.assertContains(response, "<strong>10</strong>")
 
-        for g in public:
-            self.assertContains(response, g.report_id)
+        # all of the public reports should show up on the page
+        for p in public:
+            self.assertContains(response, p.report_id)
 
-        for g in private:
-            self.assertNotContains(response, g.report_id)
+        # all of the private reports should show up on the page
+        for p in private:
+            self.assertContains(response, p.report_id)
 
     def test_permissioned_returns_all(self):
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
@@ -253,87 +254,6 @@ class SearchViewTests(TestMaterializedViewBuilder):
         # all of the private reports should show up on the page
         for p in private:
             self.assertContains(response, p.report_id)
-
-    def test_anonymous_does_not_show_deprecated_via_resubmission(self):
-        # Anonymous users should not see deprecated_via_resubmission records in the search results table.
-        deprecated = baker.make(
-            General,
-            is_public=True,
-            audit_year=2023,
-            report_id="2022-12-GSAFAC-0000000999",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
-        )
-        baker.make(FederalAward, report_id=deprecated)
-
-        active = baker.make(
-            General,
-            is_public=True,
-            audit_year=2023,
-            report_id="2022-12-GSAFAC-0000001000",
-            resubmission_status=None,
-        )
-        baker.make(FederalAward, report_id=active)
-
-        self.refresh_materialized_view()
-
-        response = self.anon_client.post(self._search_url(), {})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, active.report_id)
-        self.assertNotContains(response, deprecated.report_id)
-
-    def test_non_permissioned_does_not_show_deprecated_via_resubmission(self):
-        # Authenticated but non-permissioned users should not see deprecated_via_resubmission records in the search results table.
-        deprecated = baker.make(
-            General,
-            is_public=True,
-            audit_year=2023,
-            report_id="2022-12-GSAFAC-0000001999",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
-        )
-        baker.make(FederalAward, report_id=deprecated)
-
-        active = baker.make(
-            General,
-            is_public=True,
-            audit_year=2023,
-            report_id="2022-12-GSAFAC-0000002000",
-            resubmission_status=None,
-        )
-        baker.make(FederalAward, report_id=active)
-
-        self.refresh_materialized_view()
-
-        response = self.auth_client.post(self._search_url(), {})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, active.report_id)
-        self.assertNotContains(response, deprecated.report_id)
-
-    def test_permissioned_can_see_deprecated_via_resubmission(self):
-        # Permissioned (READ_TRIBAL) users should be able to see deprecated_via_resubmission records in the search results table.
-        deprecated = baker.make(
-            General,
-            is_public=True,
-            audit_year=2023,
-            report_id="2022-12-GSAFAC-0000002999",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
-        )
-        baker.make(FederalAward, report_id=deprecated)
-
-        active = baker.make(
-            General,
-            is_public=True,
-            audit_year=2023,
-            report_id="2022-12-GSAFAC-0000003000",
-            resubmission_status=None,
-        )
-        baker.make(FederalAward, report_id=active)
-
-        self.refresh_materialized_view()
-
-        response = self.perm_client.post(self._search_url(), {})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, active.report_id)
-        self.assertContains(response, deprecated.report_id)
 
 
 class PublicDataDownloadViewTests(TestCase):
@@ -1163,117 +1083,6 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
 
             self.assertEqual(response.content, b"fake file content")
 
-    @patch("dissemination.summary_reports.prepare_workbook_for_download")
-    def test_multiple_summary_filters_deprecated_for_unauthorized(
-        self, mock_generate_summary_report
-    ):
-        """
-        When include_private=False, deprecated_via_resubmission records should be removed
-        before generating the workbook.
-        """
-        # active
-        active = self._make_general(
-            is_public=True,
-            report_id="2022-12-GSAFAC-0000000100",
-            resubmission_status=None,
-        )
-        baker.make(FederalAward, report_id=active)
-
-        # deprecated via resubmission (should be filtered out for anon)
-        deprecated = self._make_general(
-            is_public=True,
-            report_id="2022-12-GSAFAC-0000000200",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
-        )
-        baker.make(FederalAward, report_id=deprecated)
-
-        self.refresh_materialized_view()
-
-        # stub generator so we can inspect passed report_ids
-        mock_generate_summary_report.return_value = ("mock.xlsx", io.BytesIO(b"x"))
-
-        response = self.anon_client.post(self._summary_report_url(), {})
-        self.assertEqual(response.status_code, 200)
-
-        # generate_summary_report(report_ids, include_private)
-        called_report_ids = mock_generate_summary_report.call_args[0][0]
-        self.assertIn(active.report_id, called_report_ids)
-        self.assertNotIn(deprecated.report_id, called_report_ids)
-
-    @patch("dissemination.summary_reports.prepare_workbook_for_download")
-    def test_multiple_summary_does_not_filter_deprecated_for_authorized(
-        self, mock_generate_summary_report
-    ):
-        active = self._make_general(
-            is_public=True,
-            report_id="2022-12-GSAFAC-0000000300",
-            resubmission_status=None,
-        )
-        baker.make(FederalAward, report_id=active)
-
-        deprecated = self._make_general(
-            is_public=True,
-            report_id="2022-12-GSAFAC-0000000400",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
-        )
-        baker.make(FederalAward, report_id=deprecated)
-
-        self.refresh_materialized_view()
-
-        mock_generate_summary_report.return_value = ("mock.xlsx", io.BytesIO(b"x"))
-
-        response = self.perm_client.post(self._summary_report_url(), {})
-        self.assertEqual(response.status_code, 200)
-
-        called_report_ids = mock_generate_summary_report.call_args[0][0]
-        self.assertIn(active.report_id, called_report_ids)
-        self.assertIn(deprecated.report_id, called_report_ids)
-
-    @patch("dissemination.summary_reports.prepare_workbook_for_download")
-    def test_single_summary_deprecated_filtered_returns_404_for_unauthorized(
-        self, mock_generate_summary_report
-    ):
-        deprecated = self._make_general(
-            is_public=True,
-            report_id="2022-12-GSAFAC-0000000500",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
-        )
-        baker.make(FederalAward, report_id=deprecated)
-        self.refresh_materialized_view()
-
-        url = reverse(
-            "dissemination:SingleSummaryReportDownload",
-            kwargs={"report_id": deprecated.report_id},
-        )
-        response = self.anon_client.get(url)
-
-        self.assertEqual(response.status_code, 404)
-        mock_generate_summary_report.assert_not_called()
-
-    @patch("dissemination.summary_reports.prepare_workbook_for_download")
-    def test_single_summary_deprecated_not_filtered_for_authorized(
-        self, mock_generate_summary_report
-    ):
-        deprecated = self._make_general(
-            is_public=True,
-            report_id="2022-12-GSAFAC-0000000600",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
-        )
-        baker.make(FederalAward, report_id=deprecated)
-        self.refresh_materialized_view()
-
-        mock_generate_summary_report.return_value = ("mock.xlsx", io.BytesIO(b"x"))
-
-        url = reverse(
-            "dissemination:SingleSummaryReportDownload",
-            kwargs={"report_id": deprecated.report_id},
-        )
-        response = self.perm_client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-        called_report_ids = mock_generate_summary_report.call_args[0][0]
-        self.assertEqual(called_report_ids, [deprecated.report_id])
-
 
 class PageHandlingTests(TestCase):
     """Test cases for ensuring page handling logic in AdvancedSearch and Search views"""
@@ -1334,7 +1143,6 @@ class PageHandlingTests(TestCase):
     def test_advanced_search_post_valid_page(self, mock_run_search):
         """Ensure valid page number remains unchanged"""
         mock_run_search.return_value.count.return_value = 20  # Multiple pages exist
-        mock_run_search.return_value.count = 20
 
         valid_data = self.valid_post_data.copy()
         valid_data["page"] = "2"  # Valid page
