@@ -261,7 +261,7 @@ class SearchViewTests(TestMaterializedViewBuilder):
             is_public=True,
             audit_year=2023,
             report_id="2022-12-GSAFAC-0000000999",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         )
         baker.make(FederalAward, report_id=deprecated)
 
@@ -288,7 +288,7 @@ class SearchViewTests(TestMaterializedViewBuilder):
             is_public=True,
             audit_year=2023,
             report_id="2022-12-GSAFAC-0000001999",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         )
         baker.make(FederalAward, report_id=deprecated)
 
@@ -315,7 +315,7 @@ class SearchViewTests(TestMaterializedViewBuilder):
             is_public=True,
             audit_year=2023,
             report_id="2022-12-GSAFAC-0000002999",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         )
         baker.make(FederalAward, report_id=deprecated)
 
@@ -1183,7 +1183,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         deprecated = self._make_general(
             is_public=True,
             report_id="2022-12-GSAFAC-0000000200",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         )
         baker.make(FederalAward, report_id=deprecated)
 
@@ -1214,7 +1214,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         deprecated = self._make_general(
             is_public=True,
             report_id="2022-12-GSAFAC-0000000400",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         )
         baker.make(FederalAward, report_id=deprecated)
 
@@ -1236,7 +1236,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         deprecated = self._make_general(
             is_public=True,
             report_id="2022-12-GSAFAC-0000000500",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         )
         baker.make(FederalAward, report_id=deprecated)
         self.refresh_materialized_view()
@@ -1257,7 +1257,7 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         deprecated = self._make_general(
             is_public=True,
             report_id="2022-12-GSAFAC-0000000600",
-            resubmission_status=RESUBMISSION_STATUS.DEPRECATED_VIA_RESUBMISSION,
+            resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         )
         baker.make(FederalAward, report_id=deprecated)
         self.refresh_materialized_view()
@@ -1309,7 +1309,6 @@ class PageHandlingTests(TestCase):
     @patch("dissemination.views.search.run_search")
     def test_advanced_search_post_page_zero(self, mock_run_search):
         """Ensure page resets to 1 when the requested page is zero"""
-        mock_run_search.return_value.count = 5
         mock_run_search.return_value.count.return_value = 5
 
         invalid_data = self.valid_post_data.copy()
@@ -1322,7 +1321,6 @@ class PageHandlingTests(TestCase):
     @patch("dissemination.views.search.run_search")
     def test_advanced_search_post_page_empty(self, mock_run_search):
         """Ensure page defaults to 1 when no page is provided"""
-        mock_run_search.return_value.count = 5
         mock_run_search.return_value.count.return_value = 5
 
         invalid_data = self.valid_post_data.copy()
