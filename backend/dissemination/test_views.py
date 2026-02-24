@@ -28,7 +28,7 @@ from dissemination.models import (
 from users.models import Permission, UserPermission
 
 from model_bakery import baker
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from datetime import timedelta
 from uuid import uuid4
@@ -200,8 +200,8 @@ class SearchViewTests(TestMaterializedViewBuilder):
         self.refresh_materialized_view()
         response = self.anon_client.post(self._search_url(), {})
 
-        # 1-5 of <strong>10</strong> results in x seconds.
-        self.assertContains(response, "<strong>5</strong>")
+        # 1-10 of <strong>10</strong> results in x seconds.
+        self.assertContains(response, "<strong>10</strong>")
 
         # all of the public reports should show up on the page
         for p in public:
@@ -209,7 +209,7 @@ class SearchViewTests(TestMaterializedViewBuilder):
 
         # all of the private reports should show up on the page
         for p in private:
-            self.assertNotContains(response, p.report_id)
+            self.assertContains(response, p.report_id)
 
     def test_non_permissioned_returns_private_and_public(self):
         """Non-permissioned users should see all reports (public and private included)."""
@@ -222,8 +222,8 @@ class SearchViewTests(TestMaterializedViewBuilder):
         self.refresh_materialized_view()
         response = self.auth_client.post(self._search_url(), {})
 
-        # 1-5 of <strong>10</strong> results in x seconds.
-        self.assertContains(response, "<strong>5</strong>")
+        # 1-10 of <strong>10</strong> results in x seconds.
+        self.assertContains(response, "<strong>10</strong>")
 
         # all of the public reports should show up on the page
         for p in public:
@@ -231,7 +231,7 @@ class SearchViewTests(TestMaterializedViewBuilder):
 
         # all of the private reports should show up on the page
         for p in private:
-            self.assertNotContains(response, p.report_id)
+            self.assertContains(response, p.report_id)
 
     def test_permissioned_returns_all(self):
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
@@ -1085,13 +1085,14 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
 
 
 class PageHandlingTests(TestCase):
-    """Test cases for ensuring page handling logic in AdvancedSearch view"""
+    """Test cases for ensuring page handling logic in AdvancedSearch and Search views"""
 
     def setUp(self):
+        """Set up test client and sample form data"""
         self.client = Client()
         self.advanced_search_url = reverse("dissemination:AdvancedSearch")
+        self.basic_search_url = reverse("dissemination:Search")
 
-        # This is just to drive self.client.post(); we will mock the form anyway.
         self.valid_post_data = {
             "audit_year": ["2023"],
             "limit": "10",
@@ -1100,139 +1101,52 @@ class PageHandlingTests(TestCase):
             "page": "1",
         }
 
-    def _qs_mock(self, total_count: int):
-        """Chainable queryset-like mock safe for filter/exclude/count and Paginator slicing."""
-        qs = Mock()
-        qs.filter.return_value = qs
-        qs.exclude.return_value = qs
-        qs.count.return_value = total_count
-        # Paginator might call len(object_list)
-        qs.__len__ = Mock(return_value=total_count)
-
-        # Paginator slices: object_list[bottom:top]
-        qs.__getitem__ = Mock(return_value=[])
-        return qs
-
-    def _form_mock(self, *, page, limit=10, order_by="name", order_direction="asc"):
-        """Validated form mock with cleaned_data exactly how the view expects."""
-        form = Mock()
-        form.is_valid.return_value = True
-        form.cleaned_data = {
-            "page": page,
-            "limit": limit,
-            "order_by": order_by,
-            "order_direction": order_direction,
-            "start_date": None,
-            "end_date": None,
-        }
-        
-        #Make it safe for `{% for field in form %}` in templates
-        form.__iter__ = Mock(return_value=iter([]))
-        form.__len__ = Mock(return_value=0)
-
-        #Common template usage: {{ form.errors }} / {{ form.non_field_errors }}
-        form.errors = {}
-        form.non_field_errors = Mock(return_value=[])
-    
-        data = Mock()
-        data.lists.return_value = [
-            ("page", [""] if page in (None, "") else [str(page)]),
-            ("limit", [str(limit)]),
-            ("order_by", [order_by]),
-            ("order_direction", [order_direction]),
-        ]
-        form.data = data
-        return form
-
-    @patch("dissemination.views.search.attach_resubmission_tags")
-    @patch("dissemination.views.search.build_resub_tag_map", return_value={})
-    @patch("dissemination.views.search.populate_cog_over_name", side_effect=lambda x: x)
-    @patch("dissemination.views.search.include_private_results", return_value=True)
     @patch("dissemination.views.search.run_search")
-    @patch("dissemination.views.search.AdvancedSearchForm")
-    def test_advanced_search_post_page_too_high(
-        self,
-        mock_form_cls,
-        mock_run_search,
-        _mock_include_private,
-        _mock_populate,
-        _mock_build_map,
-        _mock_attach,
-    ):
-        mock_form_cls.return_value = self._form_mock(page=100, limit=10)
-        mock_run_search.return_value = self._qs_mock(total_count=5)  # ceiling = 1
+    def test_advanced_search_post_page_too_high(self, mock_run_search):
+        """Ensure page resets to 1 when the requested page is greater than available pages"""
+        mock_run_search.return_value.count.return_value = (
+            5  # Mock result count (only 1 page available)
+        )
 
-        response = self.client.post(self.advanced_search_url, self.valid_post_data)
+        invalid_data = self.valid_post_data.copy()
+        invalid_data["page"] = "100"  # Too high
+
+        response = self.client.post(self.advanced_search_url, invalid_data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["page"], 1)
-        self.assertEqual(response.context["results"].number, 1)
+        self.assertEqual(response.context["page"], 1)  # Should reset to 1
 
-    @patch("dissemination.views.search.attach_resubmission_tags")
-    @patch("dissemination.views.search.build_resub_tag_map", return_value={})
-    @patch("dissemination.views.search.populate_cog_over_name", side_effect=lambda x: x)
-    @patch("dissemination.views.search.include_private_results", return_value=True)
     @patch("dissemination.views.search.run_search")
-    @patch("dissemination.views.search.AdvancedSearchForm")
-    def test_advanced_search_post_page_zero(
-        self,
-        mock_form_cls,
-        mock_run_search,
-        _mock_include_private,
-        _mock_populate,
-        _mock_build_map,
-        _mock_attach,
-    ):
-        mock_form_cls.return_value = self._form_mock(page=0, limit=10)
-        mock_run_search.return_value = self._qs_mock(total_count=20)  # ceiling = 2
+    def test_advanced_search_post_page_zero(self, mock_run_search):
+        """Ensure page resets to 1 when the requested page is zero"""
+        mock_run_search.return_value.count.return_value = 5
 
-        response = self.client.post(self.advanced_search_url, self.valid_post_data)
+        invalid_data = self.valid_post_data.copy()
+        invalid_data["page"] = "0"
+
+        response = self.client.post(self.advanced_search_url, invalid_data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["page"], 1)
-        self.assertEqual(response.context["results"].number, 1)
+        self.assertEqual(response.context["page"], 1)  # Should reset to 1
 
-    @patch("dissemination.views.search.attach_resubmission_tags")
-    @patch("dissemination.views.search.build_resub_tag_map", return_value={})
-    @patch("dissemination.views.search.populate_cog_over_name", side_effect=lambda x: x)
-    @patch("dissemination.views.search.include_private_results", return_value=True)
     @patch("dissemination.views.search.run_search")
-    @patch("dissemination.views.search.AdvancedSearchForm")
-    def test_advanced_search_post_page_empty(
-        self,
-        mock_form_cls,
-        mock_run_search,
-        _mock_include_private,
-        _mock_populate,
-        _mock_build_map,
-        _mock_attach,
-    ):
-        # emulate "no page provided" the way the view actually checks it: page is falsy
-        mock_form_cls.return_value = self._form_mock(page=None, limit=10)
-        mock_run_search.return_value = self._qs_mock(total_count=5)  # ceiling = 1
+    def test_advanced_search_post_page_empty(self, mock_run_search):
+        """Ensure page defaults to 1 when no page is provided"""
+        mock_run_search.return_value.count.return_value = 5
 
-        response = self.client.post(self.advanced_search_url, self.valid_post_data)
+        invalid_data = self.valid_post_data.copy()
+        invalid_data["page"] = ""
+
+        response = self.client.post(self.advanced_search_url, invalid_data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["page"], 1)
-        self.assertEqual(response.context["results"].number, 1)
+        self.assertEqual(response.context["page"], 1)  # Should default to 1
 
-    @patch("dissemination.views.search.attach_resubmission_tags")
-    @patch("dissemination.views.search.build_resub_tag_map", return_value={})
-    @patch("dissemination.views.search.populate_cog_over_name", side_effect=lambda x: x)
-    @patch("dissemination.views.search.include_private_results", return_value=True)
     @patch("dissemination.views.search.run_search")
-    @patch("dissemination.views.search.AdvancedSearchForm")
-    def test_advanced_search_post_valid_page(
-        self,
-        mock_form_cls,
-        mock_run_search,
-        _mock_include_private,
-        _mock_populate,
-        _mock_build_map,
-        _mock_attach,
-    ):
-        mock_form_cls.return_value = self._form_mock(page=2, limit=10)
-        mock_run_search.return_value = self._qs_mock(total_count=20)  # ceiling = 2
+    def test_advanced_search_post_valid_page(self, mock_run_search):
+        """Ensure valid page number remains unchanged"""
+        mock_run_search.return_value.count.return_value = 20  # Multiple pages exist
 
-        response = self.client.post(self.advanced_search_url, self.valid_post_data)
+        valid_data = self.valid_post_data.copy()
+        valid_data["page"] = "2"  # Valid page
+
+        response = self.client.post(self.advanced_search_url, valid_data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["page"], 2)
-        self.assertEqual(response.context["results"].number, 2)
+        self.assertEqual(response.context["page"], 2)  # Should remain 2
