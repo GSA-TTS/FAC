@@ -1125,6 +1125,15 @@ class PageHandlingTests(TestCase):
             "start_date": None,
             "end_date": None,
         }
+        
+        #Make it safe for `{% for field in form %}` in templates
+        form.__iter__ = Mock(return_value=iter([]))
+        form.__len__ = Mock(return_value=0)
+
+        #Common template usage: {{ form.errors }} / {{ form.non_field_errors }}
+        form.errors = {}
+        form.non_field_errors = Mock(return_value=[])
+    
         data = Mock()
         data.lists.return_value = [
             ("page", [""] if page in (None, "") else [str(page)]),
