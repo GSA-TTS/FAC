@@ -44,26 +44,6 @@ describe('A11y Testing on Home Page', () => {
   // })
 });
 
-describe('A11y Testing on search pages', () => {
-  before(() => {
-    cy.visit('/dissemination/search/');
-    cy.get('label').contains('All years').click();
-    cy.get('[id="audit-search-form"]').submit();
-    cy.get('tbody > :nth-child(1) > td > a')
-      .invoke('attr', 'href')
-      .as('summary_url');
-  });
-
-  it(`Tests the summary page for all screen sizes`, () => {
-    cy.get('@summary_url').then((val) => {
-      check_a11y(val);
-    });
-  });
-
-  test_check_a11y('/dissemination/search/', 'basic search');
-  test_check_a11y('/dissemination/search/advanced/', 'advanced search');
-});
-
 describe('A11y Testing on pre-submission pages', () => {
   test_check_a11y('/audit/', 'audit submissions');
   test_check_a11y('/report_submission/eligibility/', 'eligibility');
@@ -149,3 +129,23 @@ describe('A11y tests on a fully submitted report', () => {
     });
   });
 });
+
+describe('A11y Testing on search pages', () => {
+    before(() => {
+      cy.visit('/dissemination/search/');
+      cy.get('label').contains('All years').click();
+      cy.get('[id="audit-search-form"]').submit();
+      cy.get('tbody > :nth-child(1) > td > a')
+        .invoke('attr', 'href')
+        .as('summary_url');
+    });
+
+    it(`Tests the summary page for all screen sizes`, () => {
+      cy.get('@summary_url').then((val) => {
+        check_a11y(val);
+      });
+    });
+
+    test_check_a11y('/dissemination/search/', 'basic search');
+    test_check_a11y('/dissemination/search/advanced/', 'advanced search');
+  });
