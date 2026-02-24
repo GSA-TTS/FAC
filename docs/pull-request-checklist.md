@@ -23,3 +23,15 @@
 -  Manually test out the changes locally.
 -  Check that the PR has appropriate tests. Look out for changes in HTML/JS/JSON Schema logic that may need to be captured in Python tests even though the logic isn’t in Python.
 -  Repeating testing is encouraged if the branch needs to be caught up with main before it can be merged.
+
+## Pre Merge Checklist
+
+- [ ]   Ensure that prior to approving, the terraform plan is what we expect it to be. 
+  - `resource "null_resource" "cors_header" ` should be destroying and recreating its self
+  -  The following resources might be updating the `sha256` resulting in an application redeployment along with updated routes and network policies 
+      - `resource "cloudfoundry_app" "clamav_api"`
+      - `resource "cloudfoundry_app" "scanner_app"`
+      - `resource "cloudfoundry_app" "egress_app"`
+      - `resource "cloudfoundry_app" "logshipper_app"`
+- [ ]   Ensure that the branch is up to date with `main`.
+- [ ]   Ensure that a terraform plan has been recently generated for the pull request.
