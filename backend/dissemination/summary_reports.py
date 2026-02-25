@@ -371,7 +371,7 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     # Make report IDs unique
     report_ids = set(report_ids)
     
-    # NEW: exclude deprecated submissions for public users
+    # exclude deprecated submissions for public users
     if not include_private:
         report_ids = set(
             General.objects.filter(report_id__in=report_ids)
