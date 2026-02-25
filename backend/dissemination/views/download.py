@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.core.exceptions import BadRequest, ValidationError
-from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views.generic import View
@@ -77,11 +77,7 @@ class XlsxDownloadView(ReportAccessRequiredMixin, View):
         # only allow xlsx downloads from disseminated submissions
         # TODO: Update Post SOC Launch
         # get_object_or_404(Audit, report_id=report_id, submission_status=STATUS.DISSEMINATED)
-        general = get_object_or_404(General, report_id=report_id)
-
-        # IMPORTANT: block unpermissioned access to private reports BEFORE file lookup
-        if not general.is_public and not include_private_results(request):
-            return HttpResponseForbidden()
+        get_object_or_404(General, report_id=report_id)
 
         # TODO SOT: Enable for testing
         # use_audit = request.GET.get("beta", "N") == "Y"
