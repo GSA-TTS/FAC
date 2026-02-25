@@ -161,7 +161,6 @@ describe('A11y Testing on search pages', () => {
     });
   });
 
-  // These were in your original file — add them back so the suite still tests the pages
   test_check_a11y('/dissemination/search/', 'basic search');
   test_check_a11y('/dissemination/search/advanced/', 'advanced search');
 });
