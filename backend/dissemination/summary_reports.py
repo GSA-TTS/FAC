@@ -370,7 +370,7 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     t0 = time.time()
     # Make report IDs unique
     report_ids = set(report_ids)
-    
+
     # exclude deprecated submissions for public users
     if not include_private:
         report_ids = set(
@@ -378,7 +378,7 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
             .exclude(resubmission_status=RESUBMISSION_STATUS.DEPRECATED)
             .values_list("report_id", flat=True)
         )
-    
+
     all_names = set(field_name_ordered.keys())
     names_in_dc = set(["general", "federalaward", "finding", "passthrough"])
     names_not_in_dc = all_names - names_in_dc
