@@ -109,19 +109,6 @@ class AdvancedSearch(View):
 
         # Generate results on valid user input.
         results = run_search(request, form_data)
-
-        include_private = include_private_results(request)
-
-        # Non-federal users should only see public audits
-        if not include_private:
-            results = results.filter(is_public=True)
-
-        # Non-federal users should not see deprecated-via-resubmission at all
-        if not is_federal_user(request.user):
-            results = results.exclude(
-                resubmission_status=RESUBMISSION_STATUS.DEPRECATED
-            )
-
         results_count = results.count()
 
         # Reset page number to one if the value already surpasses the number of feasible pages.

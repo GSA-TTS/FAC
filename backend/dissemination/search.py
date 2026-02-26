@@ -78,8 +78,8 @@ def search(request, params):
         results = search_general(General, params)
 
     results = _sort_results(results, params)
-    results = _make_distinct(results, params)
     results = search_resubmissions(request, results, params)
+    results = _make_distinct(results, params)
 
     t1 = time.time()
     report_timing("search", params, t0, t1)
