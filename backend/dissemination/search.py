@@ -77,8 +77,8 @@ def search(request, params):
         logger.info("search Searching `General`")
         results = search_general(General, params)
 
-    results = _sort_results(results, params)
     results = search_resubmissions(request, results, params)
+    results = _sort_results(results, params)
     results = _make_distinct(results, params)
 
     t1 = time.time()
