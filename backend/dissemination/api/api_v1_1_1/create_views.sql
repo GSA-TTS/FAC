@@ -1,7 +1,7 @@
 begin;
 
 ---------------------------------------
--- finding_text
+-- findings_text
 ---------------------------------------
 create view api_v1_1_1.findings_text as
     select
@@ -17,9 +17,10 @@ create view api_v1_1_1.findings_text as
         dissemination_general gen
     where
         ft.report_id = gen.report_id
-         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_1_functions.has_tribal_data_access()))
+        and
+        api_v1_1_1_functions.is_public_audit_or_authorized_user(gen.is_public)
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ft.id
 ;
 
@@ -39,11 +40,13 @@ create view api_v1_1_1.additional_ueis as
         dissemination_additionaluei uei
     where
         gen.report_id = uei.report_id
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by uei.id
 ;
 
 ---------------------------------------
--- finding
+-- findings
 ---------------------------------------
 create view api_v1_1_1.findings as
     select
@@ -67,11 +70,13 @@ create view api_v1_1_1.findings as
         dissemination_general gen
     where
         finding.report_id = gen.report_id
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by finding.id
 ;
 
 ---------------------------------------
--- federal award
+-- federal_awards
 ---------------------------------------
 create view api_v1_1_1.federal_awards as
     select
@@ -104,12 +109,14 @@ create view api_v1_1_1.federal_awards as
         dissemination_general gen
     where
         award.report_id = gen.report_id
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by award.id
 ;
 
 
 ---------------------------------------
--- corrective_action_plan
+-- corrective_action_plans
 ---------------------------------------
 create view api_v1_1_1.corrective_action_plans as
     select
@@ -127,8 +134,9 @@ create view api_v1_1_1.corrective_action_plans as
     where
         ct.report_id = gen.report_id
         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_1_functions.has_tribal_data_access()))
+        api_v1_1_1_functions.is_public_audit_or_authorized_user(gen.is_public)
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ct.id
 ;
 
@@ -154,8 +162,9 @@ create view api_v1_1_1.notes_to_sefa as
     where
         note.report_id = gen.report_id
         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_1_functions.has_tribal_data_access()))
+        api_v1_1_1_functions.is_public_audit_or_authorized_user(gen.is_public)
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by note.id
 ;
 
@@ -177,6 +186,8 @@ create view api_v1_1_1.passthrough as
         dissemination_passthrough as pass
     where
         gen.report_id = pass.report_id
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by pass.id
 ;
 
@@ -264,11 +275,13 @@ create view api_v1_1_1.general as
         END AS is_secondary_auditors
     from
         dissemination_general gen
+    where
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by gen.id
 ;
 
 ---------------------------------------
--- auditor (secondary auditor)
+-- secondary_auditors
 ---------------------------------------
 create view api_v1_1_1.secondary_auditors as
     select
@@ -292,11 +305,13 @@ create view api_v1_1_1.secondary_auditors as
         dissemination_SecondaryAuditor sa
     where
         sa.report_id = gen.report_id
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by sa.id
 ;
 
 ---------------------------------------
--- additional eins
+-- additional_eins
 ---------------------------------------
 create view api_v1_1_1.additional_eins as
     select
@@ -311,11 +326,13 @@ create view api_v1_1_1.additional_eins as
         dissemination_additionalein ein
     where
         gen.report_id = ein.report_id
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ein.id
 ;
 
 ---------------------------------------
--- resubmission metadata
+-- resubmission
 ---------------------------------------
 create view api_v1_1_1.resubmission as
     select
@@ -437,8 +454,9 @@ create view api_v1_1_1.combined as
     from
         dissemination_combined combined
     where
-        (combined.is_public = true
-        or (combined.is_public = false and api_v1_1_1_functions.has_tribal_data_access()))
+        api_v1_1_1_functions.is_public_audit_or_authorized_user(combined.is_public)
+        and
+        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(combined.resubmission_status)
     order by combined.id
 ;
 
