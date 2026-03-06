@@ -471,9 +471,9 @@ greenlet==3.1.1 \
     #   -r ./requirements/requirements.in
     #   gevent
     #   sqlalchemy
-gunicorn[gevent]==25.0.1 \
-    --hash=sha256:23cbe968c6ae3c8efc3d118c8353fa0763efc2102d89d0d3cea696cede7ff6b1 \
-    --hash=sha256:573e053aa950246e307ea908bd7ddce1870d41a40aec0c935938c586f0b9b946
+gunicorn[gevent]==22.0.0 \
+    --hash=sha256:350679f91b24062c86e386e198a15438d53a7a8207235a78ba1b53df4c4378d9 \
+    --hash=sha256:4a0b436239ff76fb33f11c07a16482c521a7e09c1ce3cc293c2330afe01bec63
     # via -r ./requirements/requirements.in
 idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
