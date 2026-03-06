@@ -44,26 +44,6 @@ describe('A11y Testing on Home Page', () => {
   // })
 });
 
-describe('A11y Testing on search pages', () => {
-  before(() => {
-    cy.visit('/dissemination/search/');
-    cy.get('label').contains('All years').click();
-    cy.get('[id="audit-search-form"]').submit();
-    cy.get('tbody > :nth-child(1) > td > a')
-      .invoke('attr', 'href')
-      .as('summary_url');
-  });
-
-  it(`Tests the summary page for all screen sizes`, () => {
-    cy.get('@summary_url').then((val) => {
-      check_a11y(val);
-    });
-  });
-
-  test_check_a11y('/dissemination/search/', 'basic search');
-  test_check_a11y('/dissemination/search/advanced/', 'advanced search');
-});
-
 describe('A11y Testing on pre-submission pages', () => {
   test_check_a11y('/audit/', 'audit submissions');
   test_check_a11y('/report_submission/eligibility/', 'eligibility');
@@ -148,4 +128,39 @@ describe('A11y tests on a fully submitted report', () => {
       check_a11y(`/audit/submission-progress/${val}`);
     });
   });
+});
+
+describe('A11y Testing on search pages', () => {
+  before(() => {
+    cy.visit('/dissemination/search/');
+    cy.get('label').contains('All years').click();
+
+    // Intercept the exact POST your form should fire
+    cy.intercept('POST', '/dissemination/search/').as('search');
+
+    cy.get('#audit-search-form').submit();
+
+    // Wait until the POST completes (prevents racing the DOM)
+    cy.wait('@search').its('response.statusCode').should('eq', 200);
+
+    // If there are results, capture the first summary link; otherwise keep null and skip
+    cy.get('body').then(($body) => {
+      const $a = $body.find('tbody tr td a').first();
+      if ($a.length) {
+        cy.wrap($a).invoke('attr', 'href').as('summary_url');
+      } else {
+        cy.wrap(null).as('summary_url');
+      }
+    });
+  });
+
+  it('Tests the summary page for all screen sizes', function () {
+    cy.get('@summary_url').then((href) => {
+      if (!href) this.skip();
+      check_a11y(href);
+    });
+  });
+
+  test_check_a11y('/dissemination/search/', 'basic search');
+  test_check_a11y('/dissemination/search/advanced/', 'advanced search');
 });

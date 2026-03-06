@@ -9,6 +9,7 @@ from django.conf import settings
 
 from openpyxl.workbook.defined_name import DefinedName
 from openpyxl.utils import quote_sheetname
+from audit.models.constants import RESUBMISSION_STATUS
 
 from dissemination.models import (
     AdditionalEin,
@@ -369,6 +370,15 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     t0 = time.time()
     # Make report IDs unique
     report_ids = set(report_ids)
+
+    # exclude deprecated submissions for public users
+    if not include_private:
+        report_ids = set(
+            General.objects.filter(report_id__in=report_ids)
+            .exclude(resubmission_status=RESUBMISSION_STATUS.DEPRECATED)
+            .values_list("report_id", flat=True)
+        )
+
     all_names = set(field_name_ordered.keys())
     names_in_dc = set(["general", "federalaward", "finding", "passthrough"])
     names_not_in_dc = all_names - names_in_dc
@@ -402,6 +412,7 @@ def process_combined_results(
     # We'll do this in memory. This table flattens general, federalaward, and findings
     # so we can move much faster on those tables without extra lookups.
     dc_results = DisseminationCombined.objects.all().filter(report_id__in=report_ids)
+
     # Different tables want to be visited/filtered differently.
     visited = set()
     # Do all of the names in the DisseminationCombined at the same time.
@@ -472,6 +483,7 @@ def process_non_combined_results(
         print(model_name)
         field_names = field_name_ordered[model_name]
         objects = model.objects.all().filter(report_id__in=report_ids)
+
         # Walk the objects
         for obj in objects:
             report_id = _get_attribute_or_data(obj, "report_id")
