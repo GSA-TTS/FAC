@@ -73,11 +73,11 @@ def search(request, params):
         results = search_major_program(results, params)
         results = search_passthrough_name(results, params)
         results = search_type_requirement(results, params)
-        results = search_resubmissions(request, results, params)
     else:
         logger.info("search Searching `General`")
         results = search_general(General, params)
 
+    results = search_resubmissions(request, results, params)
     results = _sort_results(results, params)
     results = _make_distinct(results, params)
 
