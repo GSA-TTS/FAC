@@ -45,15 +45,10 @@ function allResponsesValid() {
   return inputsWithErrors.length === 0;
 }
 
-function setValidateDisabled(shouldDisable) {
-  const btn = document.getElementById('continue'); // bottom "Validate UEI" button
-  if (btn) btn.disabled = Boolean(shouldDisable);
-}
-
 function updateValidateButtonState() {
-  // const nativeValid = FORM.checkValidity();
-  // setValidateDisabled(!(requiredFieldsFilled() && nativeValid && allResponsesValid()));
-  setValidateDisabled(!(requiredFieldsFilled() && allResponsesValid()));
+  const btn = document.getElementById('continue'); // bottom "Validate UEI" button
+  const shouldDisable = !(requiredFieldsFilled() && allResponsesValid());
+  if (btn) btn.disabled = Boolean(shouldDisable);
 }
 
 function validatorSupportsField(el) {
