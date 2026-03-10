@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from unittest.mock import patch
 
 from audit.models import (
     ExcelFile,
@@ -28,7 +29,6 @@ from dissemination.models import (
 from users.models import Permission, UserPermission
 
 from model_bakery import baker
-from unittest.mock import patch
 
 from datetime import timedelta
 from uuid import uuid4
@@ -189,71 +189,100 @@ class SearchViewTests(TestMaterializedViewBuilder):
         # If there are results, we'll see "results in x seconds" somewhere.
         self.assertNotContains(response, "results in")
 
-    def test_anonymous_returns_private_and_public(self):
-        """Anonymous users should see all reports (public and private included)."""
+    def _make_reports(self):
+        """
+        Create:
+          - 5 public reports
+          - 5 private reports
+          - 2 deprecated reports (1 public, 1 private)
+
+        Returns tuple: (public, private, deprecated)
+        """
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-        for p in public:
-            baker.make(FederalAward, report_id=p)
-        for p in private:
-            baker.make(FederalAward, report_id=p)
+
+        deprecated_public = baker.make(
+            General,
+            is_public=True,
+            audit_year=2023,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
+        deprecated_private = baker.make(
+            General,
+            is_public=False,
+            audit_year=2023,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
+
+        # Ensure they show up in the materialized view result set (your tests do this via FederalAward)
+        for g in public:
+            baker.make(FederalAward, report_id=g)
+        for g in private:
+            baker.make(FederalAward, report_id=g)
+
+        baker.make(FederalAward, report_id=deprecated_public)
+        baker.make(FederalAward, report_id=deprecated_private)
+
+        return public, private, [deprecated_public, deprecated_private]
+
+    def test_anonymous_returns_public_and_private_excludes_deprecated(self):
+        """
+        Anonymous users should see public + private reports, but NOT audits deprecated via resubmission.
+        """
+        public, private, deprecated = self._make_reports()
+
         self.refresh_materialized_view()
         response = self.anon_client.post(self._search_url(), {})
 
-        # 1-10 of <strong>10</strong> results in x seconds.
+        # Should include 10 results (public + private), excluding deprecated
         self.assertContains(response, "<strong>10</strong>")
 
-        # all of the public reports should show up on the page
-        for p in public:
-            self.assertContains(response, p.report_id)
+        for g in public:
+            self.assertContains(response, g.report_id)
+        for g in private:
+            self.assertContains(response, g.report_id)
+        for g in deprecated:
+            self.assertNotContains(response, g.report_id)
 
-        # all of the private reports should show up on the page
-        for p in private:
-            self.assertContains(response, p.report_id)
+    def test_non_permissioned_returns_public_and_private_excludes_deprecated(self):
+        """
+        Authenticated but non-permissioned users should see public + private reports,
+        but NOT audits deprecated via resubmission.
+        """
+        public, private, deprecated = self._make_reports()
 
-    def test_non_permissioned_returns_private_and_public(self):
-        """Non-permissioned users should see all reports (public and private included)."""
-        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-        for p in public:
-            baker.make(FederalAward, report_id=p)
-        for p in private:
-            baker.make(FederalAward, report_id=p)
         self.refresh_materialized_view()
         response = self.auth_client.post(self._search_url(), {})
 
-        # 1-10 of <strong>10</strong> results in x seconds.
         self.assertContains(response, "<strong>10</strong>")
 
-        # all of the public reports should show up on the page
-        for p in public:
-            self.assertContains(response, p.report_id)
+        for g in public:
+            self.assertContains(response, g.report_id)
+        for g in private:
+            self.assertContains(response, g.report_id)
+        for g in deprecated:
+            self.assertNotContains(response, g.report_id)
 
-        # all of the private reports should show up on the page
-        for p in private:
-            self.assertContains(response, p.report_id)
+    def test_permissioned_returns_public_and_private_excludes_deprecated(self):
+        """
+        Permissioned users should see public + private reports.
+        Deprecated-via-resubmission audits should not appear in results.
+        """
+        public, private, deprecated = self._make_reports()
 
-    def test_permissioned_returns_all(self):
-        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-        for p in public:
-            baker.make(FederalAward, report_id=p)
-        for p in private:
-            baker.make(FederalAward, report_id=p)
         self.refresh_materialized_view()
-
         response = self.perm_client.post(self._search_url(), {})
 
-        # 1-10 of <strong>10</strong> results in x seconds.
         self.assertContains(response, "<strong>10</strong>")
 
-        # all of the public reports should show up on the page
-        for p in public:
-            self.assertContains(response, p.report_id)
-
-        # all of the private reports should show up on the page
-        for p in private:
-            self.assertContains(response, p.report_id)
+        for g in public:
+            self.assertContains(response, g.report_id)
+        for g in private:
+            self.assertContains(response, g.report_id)
+        for g in deprecated:
+            self.assertNotContains(response, g.report_id)
 
 
 class PublicDataDownloadViewTests(TestCase):
