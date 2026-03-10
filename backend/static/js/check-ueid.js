@@ -17,16 +17,12 @@ function getTrimmedValue(id) {
   return getValue(id).trim();
 }
 
-// FY start is required, so we treat missing/invalid as invalid-year
-function parseAuditYearFromFyStart() {
-  const raw = getTrimmedValue('auditee_fiscal_period_start');
+// FY end is required, so we treat missing/invalid as invalid-year
+function parseAuditYearFromFyEnd() {
+  const raw = getTrimmedValue('auditee_fiscal_period_end');
   if (!raw) return undefined;
 
-  // USWDS date picker often produces MM/DD/YYYY in the visible input
-  // Some flows might still give YYYY-MM-DD.
-  const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-  if (iso) return Number(iso[1]);
-
+  // USWDS date picker produces MM/DD/YYYY
   const mdy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (mdy) return Number(mdy[3]);
 
@@ -45,7 +41,6 @@ function requiredFieldsFilled() {
 }
 
 function allResponsesValid() {
-  // Your validate.js toggles these classes; gating on any --error presence
   const inputsWithErrors = document.querySelectorAll('[class *="--error"]');
   return inputsWithErrors.length === 0;
 }
@@ -56,9 +51,9 @@ function setValidateDisabled(shouldDisable) {
 }
 
 function updateValidateButtonState() {
-  // Native required + your custom validation state
-  const nativeValid = FORM.checkValidity();
-  setValidateDisabled(!(requiredFieldsFilled() && nativeValid && allResponsesValid()));
+  // const nativeValid = FORM.checkValidity();
+  // setValidateDisabled(!(requiredFieldsFilled() && nativeValid && allResponsesValid()));
+  setValidateDisabled(!(requiredFieldsFilled() && allResponsesValid()));
 }
 
 function validatorSupportsField(el) {
@@ -102,7 +97,7 @@ function resetModal() {
 // 'connection-error' | 'not-found' | 'success' | 'duplicate-submission' | 'invalid-year'
 function populateModal(formStatus, auditeeName = '') {
   const auditeeUei = getTrimmedValue('auditee_uei');
-  const auditYear = parseAuditYearFromFyStart();
+  const auditYear = parseAuditYearFromFyEnd();
 
   const modalMain = document.querySelector('#uei-search-result .usa-modal__main');
   const headingEl = modalMain.querySelector('h2');
@@ -167,8 +162,8 @@ function populateModal(formStatus, auditeeName = '') {
     'invalid-year': {
       heading: 'Invalid year',
       description: `
-        <p>We can't proceed without a valid fiscal period start date (audit year).</p>
-        <p>Please enter a valid fiscal period start date and try again.</p>
+        <p>We can't proceed without a valid fiscal period end date (audit year).</p>
+        <p>Please enter a valid fiscal period end date and try again.</p>
       `,
       buttons: { primary: { text: 'Go back' } },
     },
@@ -212,9 +207,6 @@ if (formStatus === 'success' || formStatus === 'duplicate-submission') {
   primaryBtn.onclick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
-    // Optional: if you still want the old “hide UEI field and show uei-info” behavior:
-    // setupFormWithValidUei();
 
     // Trigger the real form submit (old Continue behavior)
     const submitter = document.getElementById('real-continue');
@@ -295,7 +287,7 @@ function validateUEID() {
   const auditee_uei = getTrimmedValue('auditee_uei').toUpperCase();
   document.getElementById('auditee_uei').value = auditee_uei;
 
-  const audit_year = parseAuditYearFromFyStart();
+  const audit_year = parseAuditYearFromFyEnd();
   if (!audit_year) {
     populateModal('invalid-year');
     document.querySelector('.uei-search-result').classList.remove('loading');
@@ -305,7 +297,7 @@ function validateUEID() {
   console.log('UEI validation payload', {
     auditee_uei,
     audit_year,
-    fy_start_raw: getTrimmedValue('auditee_fiscal_period_start'),
+    fy_end_raw: getTrimmedValue('auditee_fiscal_period_end'),
   });
 
   queryAPI(
@@ -316,17 +308,13 @@ function validateUEID() {
   );
 }
 
-/**
- * FY16 check (keep your existing behavior)
- */
-function validateFyStartDate(fyInput) {
+function validateFyEndDate(fyInput) {
   if (!fyInput.value) return;
 
   const fyFormGroup = document.querySelector('.usa-form-group.validate-fy');
   const fyErrorContainer = document.getElementById('fy-error-message');
 
-  // supports both YYYY-MM-DD and MM/DD/YYYY
-  const year = parseAuditYearFromFyStart();
+  const year = parseAuditYearFromFyEnd();
   fyErrorContainer.innerHTML = '';
 
   if (year && Number(year) < 2016) {
@@ -353,7 +341,7 @@ function attachValidateButtonHandler() {
     e.preventDefault();
 
     // guard (should already be disabled)
-    if (!(requiredFieldsFilled() && FORM.checkValidity() && allResponsesValid())) return;
+    if (!(requiredFieldsFilled() && allResponsesValid())) return;
 
     duplicateReportIds = [];
     validateUEID();
@@ -379,8 +367,8 @@ function wireFieldValidation() {
     el.addEventListener('change', (e) => {
       duplicateReportIds = [];
 
-      if (e.target.id === 'auditee_fiscal_period_start') {
-        validateFyStartDate(e.target);
+      if (e.target.id === 'auditee_fiscal_period_end') {
+        validateFyEndDate(e.target);
       }
 
       if (validatorSupportsField(e.target)) {
@@ -391,7 +379,6 @@ function wireFieldValidation() {
     });
   });
 }
-
 
 function init() {
   attachValidateButtonHandler();
