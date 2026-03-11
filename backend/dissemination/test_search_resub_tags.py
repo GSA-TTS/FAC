@@ -22,7 +22,7 @@ class ResubmissionTagTests(TestCase):
             )
         ]
         add_resub_tag_data(rows)
-        
+
         self.assertEqual(rows[0].resubmission_tag, None)
 
     def test_v1_no_tag(self):
