@@ -1,7 +1,6 @@
 from audit.models.constants import RESUBMISSION_STATUS, RESUBMISSION_TAGS
 
 
-
 def _safe_int(v) -> int:
     try:
         return int(v)
