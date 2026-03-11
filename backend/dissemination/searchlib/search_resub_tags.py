@@ -9,11 +9,16 @@ def add_resub_tag_data(rows):
     for row in rows:
         v = getattr(row, "resubmission_version", 0)
         resub_status = getattr(row, "resubmission_status", RESUBMISSION_STATUS.UNKNOWN)
+        tag = None
+        color = None
 
         if v >= 1:
             if resub_status == RESUBMISSION_STATUS.DEPRECATED:
-                setattr(row, "resubmission_tag", f"v{v} ({RESUBMISSION_TAGS.DEPRECATED})")
-                setattr(row, "tag_color", "bg-red")
-            if v > 1 and resub_status == RESUBMISSION_STATUS.MOST_RECENT:
-                setattr(row, "resubmission_tag", f"v{v} ({RESUBMISSION_TAGS.MOST_RECENT})")
-                setattr(row, "tag_color", "bg-green")
+                tag = f"v{v} ({RESUBMISSION_TAGS.DEPRECATED})"
+                color = "bg-red"
+            elif v > 1 and resub_status == RESUBMISSION_STATUS.MOST_RECENT:
+                tag = f"v{v} ({RESUBMISSION_TAGS.MOST_RECENT})"
+                color = "bg-green"
+
+        setattr(row, "resubmission_tag", tag)
+        setattr(row, "tag_color", color)
