@@ -162,7 +162,7 @@
                                         <th>
                                             {{ result.auditee_name }}
                                             {% if result.resubmission_tag%}
-                                                <span class="usa-tag {{result.tag_color}} margin-left-1">{{result.resubmission_tag}}</span>
+                                                <span class="usa-tag {{ result.tag_color }} margin-left-1">{{ result.resubmission_tag }}</span>
                                             {% endif %}
                                         </th>
                                         {% comment %} Display UEI. If it's "GSA_MIGRATION", use the EIN instead. If no EIN, just show "GSA_MIGRATION". {% endcomment %}
