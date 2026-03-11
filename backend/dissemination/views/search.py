@@ -250,15 +250,11 @@ class Search(View):
             form_user_input["end_date"] = form_data["end_date"].strftime("%Y-%m-%d")
 
         # If there are results, populate the agency name in cog/over field
-        if results_count > 0:
-            paginator_results = populate_cog_over_name(paginator_results)
-            resub_tag_map = build_resub_tag_map(paginator_results.object_list)
-        else:
-            resub_tag_map = {}
+        paginator_results = populate_cog_over_name(paginator_results)
 
         # Attach tag to each result so the template can use result.resubmission_tag
         if include_private_results(request):
-            attach_resubmission_tags(paginator_results.object_list, resub_tag_map)
+            add_resub_tag_data(paginator_results.object_list)
 
         context = context | {
             "form_user_input": form_user_input,
@@ -269,7 +265,6 @@ class Search(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
-            "resub_tag_map": resub_tag_map,
         }
 
         time_beginning_render = time.time()
