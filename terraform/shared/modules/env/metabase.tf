@@ -9,7 +9,6 @@ module "metabase-app" {
   app_memory    = "2048M"
   disk_quota    = "3072M"
   app_instances = 1
-  buildpacks    = ["https://github.com/cloudfoundry/java-buildpack.git"]
   environment_variables = {
     ENV = var.cf_space.name
   }
