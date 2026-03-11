@@ -22,6 +22,7 @@ class ResubmissionTagTests(TestCase):
             )
         ]
         add_resub_tag_data(rows)
+        
         self.assertEqual(rows[0].resubmission_tag, None)
 
     def test_v1_no_tag(self):
@@ -56,7 +57,7 @@ class ResubmissionTagTests(TestCase):
         ]
         add_resub_tag_data(rows)
 
-        self.assertEqual(rows[0].resubmission_tag, f"v2 ({RESUBMISSION_TAGS.MOST_RECENT})")
+        self.assertEqual(rows[0].resubmission_tag, f"V2 ({RESUBMISSION_TAGS.MOST_RECENT})")
 
     def test_v1_resub(self):
         """ v1 deprecated audits do get a tag """
@@ -73,7 +74,7 @@ class ResubmissionTagTests(TestCase):
         ]
         add_resub_tag_data(rows)
 
-        self.assertEqual(rows[0].resubmission_tag, f"v1 ({RESUBMISSION_TAGS.DEPRECATED})")
+        self.assertEqual(rows[0].resubmission_tag, f"V1 ({RESUBMISSION_TAGS.DEPRECATED})")
 
     def test_mixed(self):
         """ Simple case of audits that get different tags """
@@ -107,5 +108,5 @@ class ResubmissionTagTests(TestCase):
         add_resub_tag_data(rows)
 
         self.assertEqual(rows[0].resubmission_tag, None)
-        self.assertEqual(rows[1].resubmission_tag, f"v1 ({RESUBMISSION_TAGS.DEPRECATED})")
-        self.assertEqual(rows[2].resubmission_tag, f"v2 ({RESUBMISSION_TAGS.MOST_RECENT})")
+        self.assertEqual(rows[1].resubmission_tag, f"V1 ({RESUBMISSION_TAGS.DEPRECATED})")
+        self.assertEqual(rows[2].resubmission_tag, f"V2 ({RESUBMISSION_TAGS.MOST_RECENT})")
