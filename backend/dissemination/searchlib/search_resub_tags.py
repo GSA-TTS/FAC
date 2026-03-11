@@ -1,7 +1,7 @@
 from audit.models.constants import RESUBMISSION_STATUS, RESUBMISSION_TAGS
 
 
-def build_resub_tag_map(rows):
+def add_resub_tag_data(rows):
     """
     Adds resubmission data to given rows
     Only tag if it's deprecated OR if it's the most recent amongst resubmissions

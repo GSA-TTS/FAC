@@ -20,7 +20,7 @@ from dissemination.searchlib.search_utils import (
     run_search,
 )
 from dissemination.searchlib.search_resub_tags import (
-    build_resub_tag_map,
+    add_resub_tag_data,
 )
 from dissemination.views.utils import include_private_results
 from support.decorators import newrelic_timing_metric
@@ -135,7 +135,7 @@ class AdvancedSearch(View):
 
         # Attach tag to each result so the template can use result.resubmission_tag
         if include_private_results(request):
-            build_resub_tag_map(paginator_results.object_list)
+            add_resub_tag_data(paginator_results.object_list)
 
         context = context | {
             "form_user_input": form_user_input,
