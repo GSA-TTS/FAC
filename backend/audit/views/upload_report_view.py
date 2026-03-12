@@ -42,7 +42,7 @@ class PageInput:
 
 
 class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
-    def page_number_inputs(self) -> list[tuple]:
+    def page_number_inputs(self) -> list[PageInput]:
         """
         Build the input elements to be passed to the context for use in
         audit/templates/audit/upload-report.html

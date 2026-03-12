@@ -43,7 +43,7 @@ class ResubmissionStartViewTests(TestCase):
             General,
             report_id=self.valid_sibling_report_id,
             audit_year="2022",
-            auditee_uei="auditee_uei"   
+            auditee_uei="auditee_uei",
         )
 
         self.user = baker.make(User)
@@ -83,4 +83,8 @@ class ResubmissionStartViewTests(TestCase):
         self.client.force_login(user=self.user)
         response = self.client.post(self.path_name, {"report_id": self.valid_report_id})
 
-        self.assertRedirects(response, reverse("report_submission:eligibility"), fetch_redirect_response=False)
+        self.assertRedirects(
+            response,
+            reverse("report_submission:eligibility"),
+            fetch_redirect_response=False,
+        )
