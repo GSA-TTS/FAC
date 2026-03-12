@@ -1,6 +1,6 @@
 var FORM = document.getElementById('upload-report__form');
 
-const continue_button = document.getElementById(`continue`); // <button>
+const continueButton = document.getElementById(`continue`); // <button>
 const loader = document.getElementById(`loader`); // <div>
 const keepPreviousCheckbox = document.getElementById('keep-previous-report'); // <input> (may be null)
 
@@ -8,8 +8,8 @@ const keepPreviousCheckbox = document.getElementById('keep-previous-report'); //
 function attachUploadHandler() {
   FORM.addEventListener('submit', () => {
     loader.hidden = false;
-    continue_button.innerText = 'Validating...';
-    continue_button.disabled = true;
+    continueButton.innerText = 'Validating...';
+    continueButton.disabled = true;
   });
 }
 
