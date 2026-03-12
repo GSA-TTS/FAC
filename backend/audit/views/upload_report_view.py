@@ -16,6 +16,7 @@ from audit.models import (
 )
 from audit.forms import UploadReportForm
 from audit.models.constants import EventType
+from dissemination.file_downloads import copy_file
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
@@ -97,10 +98,15 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             sar = SingleAuditReportFile.objects.filter(sac_id=sac.id)
             if sar.exists():
                 sar = sar.latest("date_created")
-
             current_info = {
                 "cleaned_data": getattr(sar, "component_page_numbers", {}),
             }
+
+            previous_report_id = (
+                sac.resubmission_meta.get("previous_report_id")
+                if sac.resubmission_meta
+                else None
+            )
 
             context = {
                 "auditee_name": sac.auditee_name,
@@ -109,6 +115,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "page_number_inputs": self.page_number_inputs(),
                 "already_submitted": True if sar else False,
+                "is_resubmission": True if previous_report_id else False,
                 "form": current_info,
             }
 
@@ -130,6 +137,12 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             audit = Audit.objects.find_audit_or_none(report_id)
             form = UploadReportForm(request.POST, request.FILES)
 
+            previous_report_id = (
+                sac.resubmission_meta.get("previous_report_id")
+                if sac.resubmission_meta
+                else None
+            )
+
             # Standard context always needed on this page
             context = {
                 "auditee_name": sac.auditee_name,
@@ -137,43 +150,68 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "page_number_inputs": self.page_number_inputs(),
+                "is_resubmission": bool(previous_report_id),
             }
 
-            if form.is_valid():
-                file = request.FILES["upload_report"]
-                # SOT TODO: The audit.id, per comment above, MUST exist at this point.
-                # Pass the audit ID if we have one. Otherwise, None is valid. Revert to just `audit.id` after TODO.
-                sar_file = self.reformat_form_data(
-                    file, form, sac.id, audit.id if audit else None
-                )
-
-                # Try to save the formatted form data. If it fails on the file
-                # (encryption issues, file size issues), add and pass back the file errors.
-                # If it fails due to something else, re-raise it to be handled further below.
+            if not form.is_valid():
+                # Form is invalid, show the errors.
+                return render(request, "audit/upload-report.html", context | {"form": form})
+            
+            # Resubmissions - if the user is keeping their previously submitted report
+            if form.cleaned_data.get("keep_previous_report") and previous_report_id:
                 try:
-                    sar_file.full_clean()
-                    sar_file.save(
-                        event_user=request.user,
-                        event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
-                    )
-
-                    self._save_audit(
-                        report_id=report_id, sar_file=sar_file, request=request
-                    )
-                except ValidationError as err:
-                    for issue in err.error_dict.get("file"):
-                        form.add_error("upload_report", issue)
-                    return render(
-                        request, "audit/upload-report.html", context | {"form": form}
+                    self._copy_previous_report(
+                        previous_report_id=previous_report_id,
+                        current_sac=sac,
+                        current_audit=audit,
+                        request=request,
                     )
                 except Exception as err:
-                    raise err
+                    form.add_error(
+                        None,
+                        f"Unable to copy the previous report: {err}",
+                    )
+                    return render(
+                        request,
+                        "audit/upload-report.html",
+                        context | {"form": form},
+                    )
+                return redirect(
+                    reverse("audit:SubmissionProgress", args=[report_id])
+                )
 
-                # Form data saved, redirect to checklist.
-                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            # "Original" or new report submissions
+            file = request.FILES["upload_report"]
+            # SOT TODO: The audit.id, per comment above, MUST exist at this point.
+            # Pass the audit ID if we have one. Otherwise, None is valid. Revert to just `audit.id` after TODO.
+            sar_file = self.reformat_form_data(
+                file, form, sac.id, audit.id if audit else None
+            )
 
-            # form.is_valid() failed (standard Django issues). Show the errors.
-            return render(request, "audit/upload-report.html", context | {"form": form})
+            # Try to save the formatted form data. If it fails on the file
+            # (encryption issues, file size issues), add and pass back the file errors.
+            # If it fails due to something else, re-raise it to be handled further below.
+            try:
+                sar_file.full_clean()
+                sar_file.save(
+                    event_user=request.user,
+                    event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
+                )
+
+                self._save_audit(
+                    report_id=report_id, sar_file=sar_file, request=request
+                )
+            except ValidationError as err:
+                for issue in err.error_dict.get("file"):
+                    form.add_error("upload_report", issue)
+                return render(
+                    request, "audit/upload-report.html", context | {"form": form}
+                )
+            except Exception as err:
+                raise err
+
+            # Form data saved, redirect to checklist.
+            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
@@ -236,6 +274,50 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 }
             )
             audit.save(
+                event_user=request.user,
+                event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
+            )
+
+    @staticmethod
+    def _copy_previous_report(previous_report_id, current_sac, current_audit, request):
+        """
+        Copy the SingleAuditReportFile and the associated s3 object from the
+        previous submission to the current resubmission.
+        """
+        previous_sac = SingleAuditChecklist.objects.get(report_id=previous_report_id)
+        previous_sar = SingleAuditReportFile.objects.filter(sac=previous_sac).latest(
+            "date_created"
+        )
+
+        # Copy the S3 object
+        source_key = f"singleauditreport/{previous_sac.report_id}.pdf"
+        dest_key = f"singleauditreport/{current_sac.report_id}.pdf"
+        copy_file(source_key, dest_key)
+
+        # Copy the SingleAuditReportFile row
+        new_sar = SingleAuditReportFile(
+            file=dest_key,
+            filename=f"{current_sac.report_id}.pdf",
+            sac=current_sac,
+            audit=current_audit,
+            component_page_numbers=previous_sar.component_page_numbers,
+        )
+        new_sar.save(
+            event_user=request.user,
+            event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
+        )
+
+        # Mirror onto the Audit model if it exists
+        if current_audit:
+            current_audit.audit.update(
+                {
+                    "file_information": {
+                        "filename": new_sar.filename,
+                        "pages": new_sar.component_page_numbers,
+                    }
+                }
+            )
+            current_audit.save(
                 event_user=request.user,
                 event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
             )
