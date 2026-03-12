@@ -69,11 +69,6 @@ variable "service_bindings" {
   type        = map(string)
 }
 
-variable "buildpacks" {
-  description = "A list of buildpacks to add to the app resource."
-  type        = list(string)
-}
-
 variable "database_plan" {
   type        = string
   description = "name of the cloud.gov RDS service plan name to create"
