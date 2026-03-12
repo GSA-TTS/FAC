@@ -1,12 +1,13 @@
 import logging
 
-from django.core.files.uploadedfile import UploadedFile
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
+from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse
 
+from audit.forms import UploadReportForm
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
@@ -16,7 +17,6 @@ from audit.models import (
     SingleAuditReportFile,
     Audit,
 )
-from audit.forms import UploadReportForm
 from audit.models.constants import EventType
 from dissemination.file_downloads import copy_file
 
