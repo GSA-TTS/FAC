@@ -1,5 +1,6 @@
 import logging
 
+from django.core.files.uploadedfile import UploadedFile
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
@@ -41,7 +42,7 @@ class PageInput:
 
 
 class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
-    def page_number_inputs(self):
+    def page_number_inputs(self) -> list[tuple]:
         """
         Build the input elements to be passed to the context for use in
         audit/templates/audit/upload-report.html
@@ -164,7 +165,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     request, report_id, previous_report_id, form, context
                 )
 
-            return self._handle_new_report_upload(request, report_id, form, context)
+            return self._handle_new_report(request, report_id, form, context)
 
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
@@ -189,7 +190,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         audit = Audit.objects.find_audit_or_none(report_id)
 
         try:
-            self._copy_previous_report(
+            self.copy_previous_report_data(
                 previous_report_id=previous_report_id,
                 current_sac=sac,
                 current_audit=audit,
@@ -202,7 +203,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
         return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
-    def _handle_new_report_upload(
+    def _handle_new_report(
         self,
         request: HttpRequest,
         report_id: str,
@@ -234,7 +235,13 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
         return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
-    def reformat_form_data(self, file, form, sac_id, audit_id):
+    def reformat_form_data(
+        self,
+        file: UploadedFile,
+        form: UploadReportForm,
+        sac_id: int,
+        audit_id: int | None,
+    ) -> SingleAuditReportFile:
         """
         Given the file, form, and report_id, return the formatted SingleAuditReportFile.
         Maps cleaned form data into an object to be passed alongside the file, filename, and report id.
@@ -271,26 +278,13 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         )
         return sar_file
 
-    @staticmethod
-    def _save_audit(report_id, sar_file, request):
-        # TODO: Update Post SOC Launch : Delete and move done for linting complexity
-        audit = Audit.objects.find_audit_or_none(report_id=report_id)
-        if audit:
-            audit.audit.update(
-                {
-                    "file_information": {
-                        "filename": sar_file.filename,
-                        "pages": sar_file.component_page_numbers,
-                    }
-                }
-            )
-            audit.save(
-                event_user=request.user,
-                event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
-            )
-
-    @staticmethod
-    def _copy_previous_report(previous_report_id, current_sac, current_audit, request):
+    def copy_previous_report_data(
+        self,
+        previous_report_id: str,
+        current_sac: SingleAuditChecklist,
+        current_audit: Audit | None,
+        request: HttpRequest,
+    ) -> None:
         """
         Copy the SingleAuditReportFile and the associated s3 object from the
         previous submission to the current resubmission.
@@ -320,15 +314,28 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
         # Mirror onto the Audit model if it exists
         if current_audit:
-            current_audit.audit.update(
+            self._save_audit(
+                report_id=current_sac.report_id, sar_file=new_sar, request=request
+            )
+
+    @staticmethod
+    def _save_audit(
+        report_id: str,
+        sar_file: SingleAuditReportFile,
+        request: HttpRequest,
+    ) -> None:
+        # TODO: Update Post SOC Launch : Delete and move done for linting complexity
+        audit = Audit.objects.find_audit_or_none(report_id=report_id)
+        if audit:
+            audit.audit.update(
                 {
                     "file_information": {
-                        "filename": new_sar.filename,
-                        "pages": new_sar.component_page_numbers,
+                        "filename": sar_file.filename,
+                        "pages": sar_file.component_page_numbers,
                     }
                 }
             )
-            current_audit.save(
+            audit.save(
                 event_user=request.user,
                 event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
             )
