@@ -335,6 +335,41 @@ create view api_v1_1_1.additional_eins as
 -- resubmission
 ---------------------------------------
 create view api_v1_1_1.resubmission as
+    with recursive chain as (
+        -- Base case: start from each resubmission row
+        select
+            resub.report_id,
+            resub.previous_report_id,
+            resub.report_id as origin_report_id
+        from
+            dissemination_resubmission resub
+
+        union all
+
+        -- Recursive step: follow previous_report_id links
+        select
+            c.report_id,
+            prev.previous_report_id,
+            prev.report_id as origin_report_id
+        from
+            chain c
+            join dissemination_resubmission prev
+                on c.previous_report_id = prev.report_id
+        where
+            c.previous_report_id is not null
+    ),
+    -- Select only the final row in each chain (the original submission)
+    original as (
+        select
+            chain.report_id,
+            orig_gen.fac_accepted_date as original_submission_date
+        from
+            chain
+            join dissemination_general orig_gen
+                on chain.origin_report_id = orig_gen.report_id
+        where
+            chain.previous_report_id is null
+    )
     select
         gen.report_id,
         gen.auditee_uei,
@@ -344,10 +379,13 @@ create view api_v1_1_1.resubmission as
         resub.version,
         resub.status,
         resub.previous_report_id,
-        resub.next_report_id
+        resub.next_report_id,
+        original.original_submission_date
     from
         dissemination_general gen,
         dissemination_resubmission resub
+        left join original
+            on resub.report_id = original.report_id
     where
         gen.report_id = resub.report_id
     order by resub.id

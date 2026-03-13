@@ -34,7 +34,7 @@
                     {% if resubmissions_list and resubmissions_list|length > 1 %}
                         <div class="font-sans-lg margin-top-4">
                             <p class="margin-y-1">
-                                <strong>First FAC submitted date:&nbsp;</strong>{{ resubmissions_list.0.report_id.fac_accepted_date }}
+                                <strong>Original FAC submitted date:&nbsp;</strong>{{ resubmissions_list.0.report_id.fac_accepted_date }}
                             </p>
                             <p class="margin-y-1">
                                 {% with resubmissions_list|last as last_submission %}
