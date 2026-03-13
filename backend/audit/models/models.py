@@ -60,7 +60,6 @@ from dissemination.models import (
 )
 from django.utils.timezone import now
 
-
 User = get_user_model()
 
 logger = logging.getLogger(__name__)
@@ -329,11 +328,46 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         # If we get past that, we then can do the work of initializing a resubmission.
 
         with transaction.atomic():
+# <<<<<<< HEAD
             # We know what the resubmission metadata will be.
             # By default, this is version 1.
             # This means all resubmissions will be of at least version 2.
             if self.resubmission_meta:
                 old_version = self.resubmission_meta.get("version", 1)
+# =======
+#             if SingleAuditChecklist.objects.filter(
+#                 resubmission_meta__previous_report_id=self.report_id,
+#                 submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
+#             ).exists():
+#                 raise ValidationError(
+#                     f"A resubmission already exists for report_id {self.report_id}."
+#                 )
+
+#             # Clone the record, excluding certification data
+#             data = model_to_dict(
+#                 self, exclude=["auditee_certification", "auditor_certification"]
+#             )
+
+#             # Update individual fields
+#             data["general_information"]["auditee_uei"] = self.auditee_uei
+#             data["general_information"][
+#                 "auditee_fiscal_period_start"
+#             ] = self.auditee_fiscal_period_start
+#             data["general_information"][
+#                 "auditee_fiscal_period_end"
+#             ] = self.auditee_fiscal_period_end
+
+#             # Manually add back foreign key as instance
+#             data["submitted_by"] = self.submitted_by
+
+#             # We always need to update the data source on a resubmission.
+#             # It is GSAFAC.
+#             data["data_source"] = DATA_SOURCE_GSAFAC
+
+#             # By default, this is version 1. This means all resubmissions will be of at least version 2.
+#             if data.get("resubmission_meta"):
+#                 old_version = data.get("resubmission_meta").get("version", 1)
+# # >>>>>>> origin/main
             else:
                 old_version = 1
 

@@ -17,7 +17,6 @@ import openpyxl as pyxl
 
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 # Transformation Method Change Recording

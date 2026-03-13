@@ -41,7 +41,7 @@ def compute_cog_over(
     awards = federal_awards["FederalAwards"]
     total_amount_expended = awards.get("total_amount_expended")
     cognizant_agency = oversight_agency = None
-    (max_total_agency, max_da_agency) = calc_award_amounts(awards)
+    max_total_agency, max_da_agency = calc_award_amounts(awards)
 
     agency = determine_agency(
         total_amount_expended,
@@ -110,7 +110,7 @@ def determine_hist_agency(ein, uei, audit_year):
     if cog_agency:
         return cog_agency
 
-    (gen_count, total_amount_expended, report_id_base_year) = get_base_gen(
+    gen_count, total_amount_expended, report_id_base_year = get_base_gen(
         ein, uei, base_year
     )
     if gen_count != 1:
@@ -118,7 +118,7 @@ def determine_hist_agency(ein, uei, audit_year):
     cfdas = get_base_cfdas(report_id_base_year)
     if not cfdas:
         return None
-    (max_total_agency, max_da_agency) = calc_cfda_amounts(cfdas)
+    max_total_agency, max_da_agency = calc_cfda_amounts(cfdas)
     cognizant_agency = determine_agency(
         total_amount_expended,
         max_total_agency,

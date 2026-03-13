@@ -25,20 +25,22 @@ const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
-export function testFullSubmission(isTribal, isPublic) {
-  cy.visit('/');
-  cy.url().should('include', '/');
+export function testFullSubmission(isTribal, isPublic, isResubmission=false) {
+  if (!isResubmission) {
+    cy.visit('/');
+    cy.url().should('include', '/');
 
-  // Logs in with Login.gov'
-  testLoginGovLogin();
+    testLoginGovLogin();
 
-  // Check the terms and conditions link and click "Accept and start..."
-  cy.get('[id=button-new-audit-submission]').click();
-  cy.get('label[for=check_start_new_submission]').click();
-  cy.get('.usa-button').contains('Begin New Submission').click();
-  cy.url().should('match', /\/report_submission\/auditeeinfo\/$/);
+    // Check the terms and conditions link and click "Accept and start..."
+    cy.get('[id=button-new-audit-submission]').click();
+    cy.get('label[for=check_start_new_submission]').click();
+    cy.get('.usa-button').contains('Begin New Submission').click();
+    cy.url().should('match', /\/report_submission\/auditeeinfo\/$/);
 
-  testInitializeAudit(isTribal);
+  }
+
+  testInitializeAudit(isTribal, isResubmission);
 
   // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
   cy.get(".usa-link").contains("Federal Awards").click();
@@ -80,7 +82,7 @@ export function testFullSubmission(isTribal, isPublic) {
     cy.url().then(url => {
       const reportId = url.split('/').pop();
 
-      // Complete the tribal audit form as auditee - opt private
+      // Complete the tribal audit form as auditee
       testLogoutGov();
       testLoginGovLogin(
         LOGIN_TEST_EMAIL_AUDITEE,
@@ -103,23 +105,24 @@ export function testFullSubmission(isTribal, isPublic) {
     });
   };
 
-  // Complete the audit information form
-  cy.get(".usa-link").contains("Audit Information form").click();
-  testAuditInformationForm();
+  if(!isResubmission) {
+    cy.get(".usa-link").contains("Audit Information form").click();
+    testAuditInformationForm();
+  }
 
   cy.get(".usa-link").contains("Pre-submission validation").click();
   testCrossValidation();
 
-  // test unlock certification
   testUnlock();
 
-  // Auditor certification
   cy.get(".usa-link").contains("Auditor Certification").click();
   testAuditorCertification();
 
+  let reportId;
+
   // Grab the report ID from the URL
-  cy.url().then(url => {
-    const reportId = url.split('/').pop();
+  return cy.url().then(url => {
+    reportId = url.split('/').pop();
 
     testLogoutGov();
 
@@ -131,8 +134,6 @@ export function testFullSubmission(isTribal, isPublic) {
     );
 
     cy.visit(`/audit/submission-progress/${reportId}`);
-
-    // Auditee certification
     cy.get(".usa-link").contains("Auditee Certification").click();
     testAuditeeCertification();
 
@@ -149,7 +150,8 @@ export function testFullSubmission(isTribal, isPublic) {
     ).siblings().contains('td', reportId);
 
     testSubmissionAccess(reportId, isTribal, isPublic);
-  });
+    testLogoutGov();
 
-  testLogoutGov();
+    return cy.wrap(reportId);
+  });
 };

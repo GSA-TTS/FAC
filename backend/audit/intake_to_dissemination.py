@@ -20,7 +20,6 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -299,16 +298,15 @@ class IntakeToDissemination(object):
         Relatively simple, but used more than one place. Potentially updated in the future with more options.
 
         If there is a next report, this one is DEPRECATED.
-        If there is no next report, this one is ORIGINAL in version 1, and MOST_RECENT in higher versions.
+        If there is no next report, version >= 1 is MOST_RECENT
+        If there version == 0 is UNKNOWN
         """
-        if next_report_id:
+        if next_report_id is not None:
             return RESUBMISSION_STATUS.DEPRECATED
-        elif resubmission_version > 1:
-            return RESUBMISSION_STATUS.MOST_RECENT
-        elif resubmission_version == 1:
-            return RESUBMISSION_STATUS.ORIGINAL
         elif resubmission_version == 0:
             return RESUBMISSION_STATUS.UNKNOWN
+        elif resubmission_version >= 1:
+            return RESUBMISSION_STATUS.MOST_RECENT
         else:
             raise ValueError("This SAC has an invalid resubmission_version.")
 
@@ -538,7 +536,7 @@ class IntakeToDissemination(object):
         if not resubmission_meta:
             resubmission_meta = {
                 "version": 1,
-                "resubmission_status": RESUBMISSION_STATUS.ORIGINAL,
+                "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
             }
 
         resubmission_version = resubmission_meta.get("version", 1)

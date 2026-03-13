@@ -47,13 +47,12 @@ Here's a checklist to get you started and to make sure you've got access to :all
     ```
     - (Note this step could take a few days; humans handle these requests.)
   - [ ] Once you are added to the GSA-TTS org, ask [the person(s) with the "Maintainer" role to add you to the `FAC-team` team](https://github.com/orgs/GSA-TTS/teams/fac-team/members). This will grant you read/write access to our repositories.
-  - [ ] Have the team calendar owner (@jadudm) share the calendar invite link to our new team member.
+  - [ ] Have the team calendar owner (@marissahenderson) share the calendar invite link to our new team member.
 
 **For designers, also...**
 - [ ] Review the [design onboarding document](https://docs.google.com/document/d/1EILl0nZr59T4PFJJMtFbmnQDJPksgzIFPuoFDN0bk0g/edit#heading=h.bhu3dgydlbvr)
 - [ ] Visit https://touchpoints.digital.gov/ and set up a touchpoints account
 - [ ] If you don't already have a Figma license, request one from your supervisor.
-- [ ] If you don't already have a Mural ccount, follow the instructions to get one [here](https://handbook.tts.gsa.gov/tools/mural/).
 
 **For engineers, also...**
 - [ ] Familiarize yourself with Python, Django, Docker, Terraform and Cloud.gov—all tools used in this project.

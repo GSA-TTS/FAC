@@ -93,7 +93,7 @@ def generate_audit_indexes(audit):
         audit_year, fy_end_month, _ = "1900-01-01".split("-")
 
     cognizant_agency, oversight_agency = compute_cog_over(
-        audit.audit["federal_awards"],
+        audit.audit.get("federal_awards"),
         audit.submission_status,
         audit.auditee_ein,
         audit.auditee_uei,

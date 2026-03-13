@@ -12,6 +12,9 @@ We use [pip-tools](https://github.com/jazzband/pip-tools) to manage our python d
 2. We use `pip-compile` to generate a `requirements.txt` file with hashes
 3. We track both in version control
 4. We use `requirements.txt` to install dependencies locally as well as in deployed environments.
+5. To avoid architecture-related complications, it's recommended to first exec into a Docker container before running the compilation:
+  - `docker compose exec web /bin/bash`
+  - `python -m piptools compile --allow-unsafe --generate-hashes --output-file=requirements.txt ./requirements/requirements.in`
 
 ## Installing dependencies
 
