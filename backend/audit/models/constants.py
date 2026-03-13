@@ -51,6 +51,11 @@ class RESUBMISSION_STATUS:
     UNKNOWN = "unknown_resubmission_status"
 
 
+class RESUBMISSION_TAGS:
+    MOST_RECENT = "MOST RECENT"
+    DEPRECATED = "RESUBMITTED"
+
+
 RESUBMISSION_STATUS_CHOICES = (
     (RESUBMISSION_STATUS.MOST_RECENT, "Most Recent"),
     (RESUBMISSION_STATUS.DEPRECATED, "Deprecated via Resubmission"),
