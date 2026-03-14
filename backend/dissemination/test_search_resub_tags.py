@@ -1,116 +1,120 @@
-from datetime import date
-
 from django.test import TestCase
+from model_bakery import baker
+
 from dissemination.models import General
 from dissemination.searchlib.search_resub_tags import (
-    build_resub_tag_map,
-    attach_resubmission_tags,
+    add_resub_tag_data,
 )
-from model_bakery import baker
+from audit.models.constants import RESUBMISSION_STATUS, RESUBMISSION_TAGS
 
 
 class ResubmissionTagTests(TestCase):
-    def test_tag_most_recent_single_row_version_gt_1(self):
-        row = baker.make(
-            General,
-            report_id="1001",
-            auditee_uei="UEI1",
-            audit_year="2022",
-            resubmission_version=2,
-        )
-        tag_map = build_resub_tag_map([row])
-        self.assertEqual(tag_map["1001"], "Most Recent")
+    def test_v0_no_tag(self):
+        """v0 audits don't get a tag"""
+        rows = [
+            baker.make(
+                General,
+                report_id="1001",
+                auditee_uei="UEI1",
+                audit_year="2022",
+                resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
+                resubmission_version=0,
+            )
+        ]
+        add_resub_tag_data(rows)
 
-    def test_highest_version_wins_rest_resubmitted(self):
-        row_v2 = baker.make(
-            General,
-            report_id="1002",
-            auditee_uei="UEI2",
-            audit_year="2022",
-            resubmission_version=2,
-        )
-        row_v3 = baker.make(
-            General,
-            report_id="1003",
-            auditee_uei="UEI2",
-            audit_year="2022",
-            resubmission_version=3,
-        )
+        self.assertEqual(rows[0].resubmission_tag, None)
 
-        tag_map = build_resub_tag_map([row_v2, row_v3])
-        self.assertEqual(tag_map["1003"], "Most Recent")
-        self.assertEqual(tag_map["1002"], "Resubmitted")
+    def test_v1_no_tag(self):
+        """v1 most_recent audits don't get a tag"""
 
-    def test_version_lt_1_should_not_tag(self):
-        row_v1 = baker.make(
-            General,
-            report_id="1004",
-            auditee_uei="UEI3",
-            audit_year="2022",
-            resubmission_version=1,
-        )
-        row_v0 = baker.make(
-            General,
-            report_id="1005",
-            auditee_uei="UEI3",
-            audit_year="2023",
-            resubmission_version=0,  # use 0 instead of None (field is NOT NULL)
-        )
+        rows = [
+            baker.make(
+                General,
+                report_id="1001",
+                auditee_uei="UEI1",
+                audit_year="2022",
+                resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
+                resubmission_version=1,
+            )
+        ]
+        add_resub_tag_data(rows)
 
-        tag_map = build_resub_tag_map([row_v1, row_v0])
-        self.assertIsNotNone(tag_map["1004"])
-        self.assertIsNone(tag_map["1005"])
+        self.assertEqual(rows[0].resubmission_tag, None)
 
-    def test_tie_breaker_fac_accepted_date_then_report_id(self):
-        # same version -> later fac_accepted_date should win
-        row_earlier = baker.make(
-            General,
-            report_id="2001",
-            auditee_uei="UEI4",
-            audit_year="2022",
-            resubmission_version=2,
-            fac_accepted_date=date(2025, 1, 1),
-        )
-        row_later = baker.make(
-            General,
-            report_id="2002",
-            auditee_uei="UEI4",
-            audit_year="2022",
-            resubmission_version=2,
-            fac_accepted_date=date(2025, 2, 1),
+    def test_v2_most_recent(self):
+        """v2 most_recent audits do get a tag"""
+
+        rows = [
+            baker.make(
+                General,
+                report_id="1001",
+                auditee_uei="UEI1",
+                audit_year="2022",
+                resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
+                resubmission_version=2,
+            )
+        ]
+        add_resub_tag_data(rows)
+
+        self.assertEqual(
+            rows[0].resubmission_tag, f"V2 ({RESUBMISSION_TAGS.MOST_RECENT})"
         )
 
-        tag_map = build_resub_tag_map([row_earlier, row_later])
-        self.assertEqual(tag_map["2002"], "Most Recent")
-        self.assertEqual(tag_map["2001"], "Resubmitted")
+    def test_v1_resub(self):
+        """v1 deprecated audits do get a tag"""
 
-    def test_attach_resubmission_tags(self):
-        row1 = baker.make(
-            General,
-            report_id="3001",
-            auditee_uei="UEI5",
-            audit_year="2022",
-            resubmission_version=2,
-        )
-        row2 = baker.make(
-            General,
-            report_id="3002",
-            auditee_uei="UEI5",
-            audit_year="2022",
-            resubmission_version=1,
-        )
-        row3 = baker.make(
-            General,
-            report_id="3003",
-            auditee_uei="UEI5",
-            audit_year="2022",
-            resubmission_version=0,  # no tag (unknown version number)
-        )
-        rows = [row1, row2, row3]
+        rows = [
+            baker.make(
+                General,
+                report_id="1001",
+                auditee_uei="UEI1",
+                audit_year="2022",
+                resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
+                resubmission_version=1,
+            )
+        ]
+        add_resub_tag_data(rows)
 
-        tag_map = build_resub_tag_map(rows)
-        attach_resubmission_tags(rows, tag_map)
+        self.assertEqual(
+            rows[0].resubmission_tag, f"V1 ({RESUBMISSION_TAGS.DEPRECATED})"
+        )
 
-        self.assertEqual(row1.resubmission_tag, "Most Recent")
-        self.assertEqual(row2.resubmission_tag, "Resubmitted")
-        self.assertIsNone(row3.resubmission_tag)
+    def test_mixed(self):
+        """Simple case of audits that get different tags"""
+
+        rows = [
+            baker.make(
+                General,
+                report_id="1000",
+                auditee_uei="UEI1",
+                audit_year="2022",
+                resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
+                resubmission_version=1,
+            ),
+            baker.make(
+                General,
+                report_id="1001",
+                auditee_uei="UEI1",
+                audit_year="2022",
+                resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
+                resubmission_version=1,
+            ),
+            baker.make(
+                General,
+                report_id="1002",
+                auditee_uei="UEI1",
+                audit_year="2022",
+                resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
+                resubmission_version=2,
+            ),
+        ]
+        add_resub_tag_data(rows)
+
+        self.assertEqual(rows[0].resubmission_tag, None)
+        self.assertEqual(
+            rows[1].resubmission_tag, f"V1 ({RESUBMISSION_TAGS.DEPRECATED})"
+        )
+        self.assertEqual(
+            rows[2].resubmission_tag, f"V2 ({RESUBMISSION_TAGS.MOST_RECENT})"
+        )
