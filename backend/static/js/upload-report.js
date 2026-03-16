@@ -31,13 +31,24 @@ function attachKeepPreviousHandler() {
       };
     });
 
+    // USWDS styled file inputs are acted upon with JS on mount. This messes with the default disabled/enabled states.
+    // From the USWDS file input class, "dropZone" is the parent element on which classes should be added/revoked. In this case, it's a div.
+    // To change the disabled/enabled styling, we add or remove the appropriate top level class.
+    // Source: https://github.com/uswds/uswds/blob/develop/packages/usa-file-input/src/index.js
     const fileInput = FORM.querySelector('input[type="file"]');
     if (fileInput) {
-      fileInput.disabled = isChecked;
+      const dropZone = fileInput.closest('.usa-file-input');
       if (isChecked) {
+        fileInput.disabled = true;
         fileInput.removeAttribute('required');
+        if (dropZone) dropZone.classList.add('usa-file-input--disabled');
       } else {
+        fileInput.disabled = false;
         fileInput.setAttribute('required', 'true');
+        if (dropZone) {
+          dropZone.classList.remove('usa-file-input--disabled');
+          dropZone.removeAttribute('aria-disabled');
+        }
       }
     }
   });
