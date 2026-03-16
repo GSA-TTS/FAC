@@ -1,6 +1,6 @@
 export function testPdfAuditReport(isResubmission = false) {
   if (isResubmission) {
-    cy.get('[id_test="test-keep_previous_report"]').click();
+		cy.get('label[for=keep-previous-report]').click();
   } else {
     cy.get('[id_test="test-financial_statements"]').type(1);
     cy.get('[id_test="test-financial_statements_opinion"]').type(1);
