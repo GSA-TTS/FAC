@@ -118,6 +118,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "page_number_inputs": self.page_number_inputs(),
                 "already_submitted": True if sar else False,
                 "is_resubmission": True if previous_report_id else False,
+                "previous_report_id": previous_report_id,
                 "form": current_info,
             }
 
@@ -149,7 +150,8 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "page_number_inputs": self.page_number_inputs(),
-                "is_resubmission": bool(previous_report_id),
+                "is_resubmission": True if previous_report_id else False,
+                "previous_report_id": previous_report_id,
             }
 
             # Find form errors and return if any exist, then EITHER:
