@@ -51,12 +51,11 @@
                                         My report did not change. Keep the old report for this resubmission.
                                     </label>
                                 </div>
-
-                                {% if form.non_field_errors %}
-                                    <span class="usa-error-message">{{ form.non_field_errors|striptags }}</span>
-                                {% endif %}
                             </div>
                         </section>
+                    {% endif %}
+                    {% if form.non_field_errors %}
+                        <span class="usa-error-message">{{ form.non_field_errors|striptags }}</span>
                     {% endif %}
                 </fieldset>
 
