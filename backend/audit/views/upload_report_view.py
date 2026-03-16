@@ -101,7 +101,10 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             if sar.exists():
                 sar = sar.latest("date_created")
             current_info = {
-                "cleaned_data": getattr(sar, "component_page_numbers", {}),
+                "cleaned_data": getattr(sar, "component_page_numbers", {})
+                | {
+                    "keep_previous_report": getattr(sar, "keep_previous_report", False),
+                }
             }
 
             previous_report_id = (
@@ -272,6 +275,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         sar_file = SingleAuditReportFile(
             **{
                 "component_page_numbers": component_page_numbers,
+                "keep_previous_report": False,
                 "file": file,
                 "filename": file.name,
                 "sac_id": sac_id,
@@ -308,6 +312,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             sac=current_sac,
             audit=current_audit,
             component_page_numbers=previous_sar.component_page_numbers,
+            keep_previous_report=True,
         )
         new_sar.save(
             event_user=request.user,

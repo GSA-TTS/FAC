@@ -24,7 +24,11 @@ function attachKeepPreviousHandler() {
     const pageInputs = FORM.querySelectorAll('input[type="number"]');
     pageInputs.forEach((input) => {
       input.disabled = isChecked;
-      if (isChecked) input.removeAttribute('required');
+      if (isChecked) {
+        input.removeAttribute('required')
+      } else if (input.name != "CAP_page" && input.name != "schedule_prior_findings") {
+        input.setAttribute('required', 'true'); 
+      };
     });
 
     const fileInput = FORM.querySelector('input[type="file"]');
@@ -33,7 +37,7 @@ function attachKeepPreviousHandler() {
       if (isChecked) {
         fileInput.removeAttribute('required');
       } else {
-        fileInput.setAttribute('required', '');
+        fileInput.setAttribute('required', 'true');
       }
     }
   });

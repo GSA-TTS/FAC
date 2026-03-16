@@ -101,9 +101,10 @@
                                                name="{{ x.id }}"
                                                min="1"
                                                pattern="\d+"
-                                               {% if x.required %}required{% endif %}
+                                               {% if x.required and not form.cleaned_data.keep_previous_report %}required{% endif %}
                                                type="number"
-                                               value="{{ form.cleaned_data | get_attr:x.id }}" />
+                                               value="{{ form.cleaned_data | get_attr:x.id }}"
+                                               {% if form.cleaned_data.keep_previous_report %}disabled{% endif %} />
                                         <span class="usa-error-message tablet:grid-col-12">{{ form.errors | get_attr:x.id | striptags }}</span>
                                     </div>
                                 {% endfor %}
@@ -120,7 +121,7 @@
                                    name="upload_report"
                                    accept=".pdf,.PDF"
                                    aria-describedby="file_input_upload_report"
-                                   required
+                                   {% if form.cleaned_data.keep_previous_report %}disabled{% else %}required{% endif %}
                                    type="file" />
                             <span class="usa-error-message tablet:grid-col-12 margin-top-1">{{ form.errors.upload_report | striptags }}</span>
                         </li>
