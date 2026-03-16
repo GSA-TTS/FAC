@@ -2,7 +2,7 @@
 # FOUNDATION
 ###############################
 
-FROM python:3.12.11-slim-bookworm AS foundation
+FROM python:3.14.3-slim-bookworm AS foundation
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -21,7 +21,7 @@ RUN apt-get -yq update && \
         jq \
         # Make sure the client version
         # matchse the DB version, locally
-        # and in production. AWD RDS is v15 in 
+        # and in production. AWD RDS is v15 in
         # cloud.gov as of August 2025.
         postgresql-client-15 \
         sudo \
