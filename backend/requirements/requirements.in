@@ -16,7 +16,7 @@ environs[django]
 faker
 fs
 greenlet>=3.0rc3
-gunicorn[gevent]~=22.0.0
+gunicorn[gevent]==25.1.0
 jsonpath-ng
 jsonschema
 levenshtein
