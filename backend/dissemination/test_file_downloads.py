@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.conf import settings
 from django.http import Http404
@@ -23,7 +23,7 @@ class GetFilenameTests(TestCase):
         pass
 
     def _report_id(self, sequence, source):
-        today = datetime.utcnow().date().isoformat()
+        today = datetime.now(timezone.utc).date().isoformat()
         return generate_sac_report_id(sequence=sequence, end_date=today, source=source)
 
     def test_gsafac_no_singleauditchecklist(self):

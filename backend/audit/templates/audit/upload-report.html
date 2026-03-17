@@ -5,6 +5,9 @@
         <div class="grid-col grid-gap">
             <div>
                 <h1>Upload single audit report package</h1>
+                {% comment %} {% if previous_report_id %}
+                    {% include "includes/resubmission_banner.html" %}
+                {% endif %} {% endcomment %}
                 <p>
                     All components of the audit report package must be merged into a single PDF file and meet the uniform guidelines below. For more information on PDF formatting, please review our PDF guidelines. 
                     For those completing program-specific audits, please refer to 
@@ -23,6 +26,40 @@
                     enctype='multipart/form-data'
                     method="post">
                 {% csrf_token %}
+                <fieldset class="usa-fieldset margin-y-2">
+                    {% if is_resubmission %}
+                        <section class="usa-alert usa-alert--warning margin-top-0 margin-bottom-1"
+                                aria-label="Resubmission banner"
+                                id="resubmission-banner">
+                            <div class="usa-alert__body grid-container">
+                                <p class="usa-alert__text">
+                                    A resubmission is in progress. View the previous single audit report package 
+                                    <a class="usa-link" 
+                                        href="{% url 'dissemination:Summary' previous_report_id %}"
+                                        target="_blank"
+                                        noopener
+                                        noreferrer>here</a>.
+                                </p>
+                                    
+                                <div class="usa-checkbox bg-accent-warm-lighter margin-y-1">
+                                    <input class="usa-checkbox__input"
+                                            id="keep-previous-report"
+                                            id_test="test-keep_previous_report"
+                                            name="keep_previous_report"
+                                            type="checkbox" 
+                                            {% if form.cleaned_data.keep_previous_report %}checked{% endif %} />
+                                    <label class="usa-checkbox__label" for="keep-previous-report">
+                                        My report did not change. Keep the old report for this resubmission.
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+                    {% endif %}
+                    {% if form.non_field_errors %}
+                        <span class="usa-error-message">{{ form.non_field_errors|striptags }}</span>
+                    {% endif %}
+                </fieldset>
+
                 <fieldset class="usa-fieldset">
                     <ol class="usa-process-list">
                         <li class="usa-process-list__item">
@@ -65,9 +102,10 @@
                                                name="{{ x.id }}"
                                                min="1"
                                                pattern="\d+"
-                                               {% if x.required %}required{% endif %}
+                                               {% if x.required and not form.cleaned_data.keep_previous_report %}required{% endif %}
                                                type="number"
-                                               value="{{ form.cleaned_data | get_attr:x.id }}" />
+                                               value="{{ form.cleaned_data | get_attr:x.id }}"
+                                               {% if form.cleaned_data.keep_previous_report %}disabled{% endif %} />
                                         <span class="usa-error-message tablet:grid-col-12">{{ form.errors | get_attr:x.id | striptags }}</span>
                                     </div>
                                 {% endfor %}
@@ -84,7 +122,7 @@
                                    name="upload_report"
                                    accept=".pdf,.PDF"
                                    aria-describedby="file_input_upload_report"
-                                   required
+                                   {% if form.cleaned_data.keep_previous_report %}disabled{% else %}required{% endif %}
                                    type="file" />
                             <span class="usa-error-message tablet:grid-col-12 margin-top-1">{{ form.errors.upload_report | striptags }}</span>
                         </li>
