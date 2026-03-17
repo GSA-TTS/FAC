@@ -32,12 +32,12 @@ async def fetch_url(session, url, stop_event):
 
     return None
 
-async def run_load_test(url, total_requests):
+async def run_load_test(url, total_requests, api_key, jwt):
   stop_event = asyncio.Event()
 
   session_headers = {
-    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYXBpX2ZhY19nb3YiLCJjcmVhdGVkIjoiMjAyMy0wOS0xOVQxMDowMToxMi4zNTkzNTEifQ.uHOTzHp7sN_8tLftFYcva-5m6CQMrauY0DyIPAIZXpw',
-    'X-Api-Key': 'R7SYmSzraSfsF9OvgwxadjjmfSUg3TgdKZP7KbuI',
+    'Authorization': f'Bearer {jwt}',
+    'X-Api-Key': api_key,
     'Accept-Profile': 'api_v1_1_0',
   }
 
@@ -58,6 +58,10 @@ async def run_load_test(url, total_requests):
     print(f"Successful (200 OK): {success_count}")
 
 if __name__ == "__main__":
+  if len(sys.argv) != 5:
+    print("Usage: python dissemination/api/lib/load_test.py env total_requests api_key jwt")
+    sys.exit(1)
+
   allowed_envs = ["local", "preview", "dev", "staging"]
   env = sys.argv[1]
 
@@ -65,13 +69,16 @@ if __name__ == "__main__":
     print(f"Allowed envs are {allowed_envs}")
     sys.exit(1)
 
-  total_requests = int(sys.argv[2])
-
   if env == "local":
     target_url = "http://localhost:3000/general?report_id=eq.2026-06-GSAFAC-0000027412"
   else:
     target_url = f"https://api-{env}.fac.gov/general?report_id=eq.2026-06-GSAFAC-0000027412"
 
+
+  total_requests = int(sys.argv[2])
+  api_key = sys.argv[3]
+  jwt = sys.argv[4]
+
   print(f"Targeting {target_url} with {total_requests} requests")
 
-  asyncio.run(run_load_test(target_url, total_requests))
+  asyncio.run(run_load_test(target_url, total_requests, api_key, jwt))
