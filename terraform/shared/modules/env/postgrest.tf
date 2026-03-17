@@ -35,10 +35,8 @@ resource "cloudfoundry_app" "postgrest" {
 }
 
 # The following use the community provider as these have not been moved to the official provider.
-# In the event that test items do not get moved, the following will likely break
-# and need to be rebuilt in a different method. In the event the v2 api gets an extended depreciation,
-# these may continue to be used until the provider adds this functionality, in which case, should be
-# upgraded as soon as possible.
+# The community provider has upgraded to use the v3 API, however these resources should be moved to
+# the official provider once they are supported.
 resource "cloudfoundry_service_key" "postgrest" {
   provider         = cloudfoundry-community
   name             = "postgrest"
