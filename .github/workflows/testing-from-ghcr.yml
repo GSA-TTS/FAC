@@ -59,7 +59,7 @@ jobs:
           thresholds: '85'
 
       - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         if: github.event_name == 'pull_request'
         with:
           recreate: true
@@ -116,7 +116,7 @@ jobs:
           working-directory: ./backend
           spec: cypress/e2e/accessibility.cy.js
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         # add the line below to store screenshots only on failures
         if: failure()
         with:
