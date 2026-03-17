@@ -2,12 +2,12 @@ import aiohttp
 import asyncio
 import sys
 
-"""
-  Load testing for the FAC API
-"""
+
+# Load testing for the FAC API
+
 
 async def fetch_url(session, url, stop_event):
-  """ Does a single request; halts all on non-200 """
+  """ Does a single API request; halts all on non-200 """
   if stop_event.is_set():
     return None
 
@@ -31,6 +31,7 @@ async def fetch_url(session, url, stop_event):
       print(f"Request failed: {e}")
 
     return None
+
 
 async def run_load_test(url, total_requests, api_key, jwt):
   stop_event = asyncio.Event()
@@ -57,6 +58,7 @@ async def run_load_test(url, total_requests, api_key, jwt):
     success_count = len([r for r in results if r == 200])
     print(f"Successful (200 OK): {success_count}")
 
+
 if __name__ == "__main__":
   if len(sys.argv) != 5:
     print("Usage: python dissemination/api/lib/load_test.py env total_requests api_key jwt")
@@ -70,10 +72,9 @@ if __name__ == "__main__":
     sys.exit(1)
 
   if env == "local":
-    target_url = "http://localhost:3000/general?report_id=eq.2026-06-GSAFAC-0000027412"
+    target_url = "http://localhost:3000/general?audit_year=eq.2023"
   else:
-    target_url = f"https://api-{env}.fac.gov/general?report_id=eq.2026-06-GSAFAC-0000027412"
-
+    target_url = f"https://api-{env}.fac.gov/general?audit_year=2023"
 
   total_requests = int(sys.argv[2])
   api_key = sys.argv[3]
