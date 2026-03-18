@@ -1,8 +1,8 @@
 app_name: gsa-fac
-mem_amount: 6G
+mem_amount: 2G
 cf_env_name: STAGING
 env_name: staging
 service_name: staging
 endpoint: fac-staging.app.cloud.gov
-instances: 4
+instances: 1
 
