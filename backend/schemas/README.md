@@ -13,7 +13,8 @@
 3. Under "key word" search, choose simple and "any words" and then "active" listings.
 4. Click "Actions" on the upper-right and then "download" to get the CSV file of active listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/active-alns.csv`.
 5. Repeat the process, choosing "inactive" listings to get the CSV file for inactive ALN listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/inactive-alns.csv`. These have to be done separately due to a limit on the amount of records that can be downloaded into a CSV file.
-6. Perform the "Bumping workbook template version" steps below.
+6. Make sure the headings match this: "Assistance Listings Number","Title","Types of Assistance","Department/Ind. Agency","Sub-Tier","Related Federal Assistance","Last Date Modified","Date Published","Funded","POC Information"
+7. Perform the "Bumping workbook template version" steps below.
     * Note: Part of this process will merge the CSVs into `/schemas/source/data/cfda-lookup.csv`.
 
 # Bumping workbook template version
