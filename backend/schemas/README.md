@@ -2,7 +2,7 @@
 # Updating the Cluster Names
 
 1. Review the latest [OMB Compliance Supplement](https://www.fac.gov/compliance/) cluster listings usually in a table/matrix.
-2. Compare dataset with [existing Cluster Names](`backend/schemas/source/data/ClusterNames.json`)
+2. Compare dataset with [existing Cluster Names](`backend/schemas/source/data/cluster-names.csv`)
 3. Add any new cluster names (to add new ID number: max num+1; to add new Sort_Num: max num +5)
 4. See below to regenerate schemas and templates.
 
