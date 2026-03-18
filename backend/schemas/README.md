@@ -23,7 +23,15 @@ Follow these steps to version bump the workbook templates:
 1. `backend/schemas/source/excel/libs/Sheets.libsonnet`: Update the `WORKBOOKS_VERSION` variable.
 2. `backend/audit/intakelib/checks/check_version_number.py`: Update the `AUTHORIZED_VERSIONS` variable.
 3. The JSON files in `backend/schemas/source/sections/` require some modification. For each file, locate the version enum found in `Meta.properties.version.enum`. Append the PREVIOUS version to the end of this list, followed by `Sheets.WORKBOOKS_VERSION`.
-    * Note: Some of these files don't have version enums. These are non-workbook schemas and can be skipped.
+3. The `.jsonnet` files in `backend/schemas/source/sections/` require some modification. For each file, locate the version enum found in `Meta.properties.version.enum`. Append the PREVIOUS version to the end of this list, followed by `Sheets.WORKBOOKS_VERSION`. The files to modify are:
+* `AdditionalEINs.schema.jsonnet`
+* `AdditionalUEIs.schema.jsonnet`
+* `AuditFindingsText.schema.jsonnet`
+* `CorrectiveActionPlan.schema.jsonnet`
+* `FederalAwards.schema.jsonnet`
+* `FederalAwardsAuditFindings.schema.jsonnet`
+* `NotesToSefa.schema.jsonnet`
+* `SecondaryAuditors.schema.jsonnet`
 4. Activate your virtual env inside `backend/schemas` and run `make all`. This will generate new schemas and templates in `/schemas/output/`.
 5. Update the workbook template fixtures used in the Cypress tests, found in `backend/cypress/fixtures/test_workbooks`.
     * An easy (but tedious) way to do this is to modify the templates with the data used in the existing fixtures, then copy/overwrite all of those XLSXes into `test_workbooks`.
