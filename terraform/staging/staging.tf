@@ -15,7 +15,7 @@ module "staging" {
   swagger_instances     = 1
   https_proxy_instances = 1
   smtp_proxy_instances  = 1
-  clamav_instances      = 4
+  clamav_instances      = 1
   clamav_memory         = "2048M"
   clamav_fs_instances   = 1
   json_params = jsonencode(
