@@ -60,26 +60,28 @@ async def run_load_test(url, total_requests, api_key, jwt):
 
 
 if __name__ == "__main__":
-  if len(sys.argv) != 5:
-    print("Usage: python dissemination/api/lib/load_test.py jwt api_key env total_requests")
+  if len(sys.argv) != 6:
+    print("Usage: python dissemination/api/lib/load_test.py jwt api_key limit env total_requests")
     sys.exit(1)
 
   jwt = sys.argv[1]
   api_key = sys.argv[2]
+  limit = int(sys.argv[3])
 
   allowed_envs = ["local", "preview", "dev", "staging"]
-  env = sys.argv[3]
+  env = sys.argv[4]
 
   if env not in allowed_envs:
     print(f"Allowed envs are {allowed_envs}")
     sys.exit(1)
 
   if env == "local":
-    target_url = "http://localhost:3000/general?audit_year=eq.2023"
+    host = "http://localhost:3000"
   else:
-    target_url = f"https://api-{env}.fac.gov/general?audit_year=eq.2023"
+    host = f"https://api-{env}.fac.gov"
 
-  total_requests = int(sys.argv[4])
+  target_url = f"{host}/general?limit={limit}"
+  total_requests = int(sys.argv[5])
 
   print(f"Targeting {target_url} with {total_requests} requests")
 
