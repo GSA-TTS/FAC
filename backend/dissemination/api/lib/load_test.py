@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
 import sys
+import time
 
 
 # Load testing for the FAC API
@@ -85,4 +86,11 @@ if __name__ == "__main__":
 
   print(f"Targeting {target_url} with {total_requests} requests")
 
+  start_time = time.perf_counter()
+
   asyncio.run(run_load_test(target_url, total_requests, api_key, jwt))
+  
+  end_time = time.perf_counter()
+
+  elapsed_time = end_time - start_time
+  print(f"Execution time: {elapsed_time:.4f} seconds")
