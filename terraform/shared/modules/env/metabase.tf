@@ -19,8 +19,6 @@ module "metabase-app" {
 }
 
 module "metabasedb" {
-  count = var.cf_space.name == "dev" ? 1 : 0
-
   source        = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.5.0"
   cf_space_id   = var.cf_space.id
   name          = "metabase-db"
