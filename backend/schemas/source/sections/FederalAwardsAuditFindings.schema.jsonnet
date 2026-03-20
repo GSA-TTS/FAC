@@ -29,6 +29,7 @@ local Meta = Types.object {
         '1.1.4',
         '1.1.5',
         '1.1.6',
+        '1.1.7',
         Sheets.WORKBOOKS_VERSION,
       ],
     },
