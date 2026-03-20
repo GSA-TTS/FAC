@@ -1,6 +1,4 @@
 module "metabase-app" {
-  count = var.cf_space.name == "dev" ? 1 : 0
-
   source        = "../metabase"
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space.name
