@@ -70,6 +70,8 @@ CREATE OR REPLACE FUNCTION api_v1_1_0_functions.is_most_recent_audit_or_authoriz
 RETURNS BOOLEAN AS $$
 BEGIN
     RETURN (
+        resubmission_status is NULL
+        OR
         resubmission_status = 'most_recent'
         OR
         api_v1_1_0_functions.has_tribal_data_access()
