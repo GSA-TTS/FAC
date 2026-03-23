@@ -1,14 +1,15 @@
 import aiohttp
+import argparse
 import asyncio
 import time
-import argparse
+import yarl
 
 
 parser = argparse.ArgumentParser(description="Load testing for the FAC")
 
 
-async def fetch_url(url, body, session, stop_event):
-  """ Does a single API request; halts all on non-200 """
+async def fetch_url(url, body, headers, session, stop_event):
+  """ Does a single request; halts all on non-200 """
   if stop_event.is_set():
     return None
 
@@ -18,7 +19,8 @@ async def fetch_url(url, body, session, stop_event):
     method = session.get
 
   try:
-    async with method(url, json=body) as response:
+    async with method(url, headers=headers, json=body) as response:
+      # print(await response.text())
       status = response.status
 
       if status != 200:
@@ -32,21 +34,43 @@ async def fetch_url(url, body, session, stop_event):
 
       return status
   except Exception as e:
-    # Silently fail if we are already stopping
-    if not stop_event.is_set():
-      print(f"Request failed: {e}")
+    print(f"Request failed: {e}")
 
     return None
 
 
-async def run_load_test(url, body, total_requests, headers):
+async def run_load_test(url, body, total_requests, api_or_app):
   stop_event = asyncio.Event()
 
-  async with aiohttp.ClientSession(headers=headers) as session:
+  async with aiohttp.ClientSession() as session:
+    # Hit the page to get the CSRF cookie
+    async with session.get(url) as response:
+      await response.read()
+
+    csrf_token = session.cookie_jar.filter_cookies(yarl.URL(url)).get('csrftoken')
+
+    if not csrf_token:
+      print("Failed to retrieve CSRF token")
+      stop_event.set()
+      return
+
+    headers = {
+      'X-CSRFToken': csrf_token.value,
+      'Referer': url,
+    }
+
+    if api_or_app == "api":
+      headers = {
+        **headers,
+        'Authorization': f'Bearer {args.jwt}',
+        'X-Api-Key': args.api_key,
+        'Accept-Profile': 'api_v1_1_0',
+      }
+
     req_tasks = []
 
     for _ in range(total_requests):
-      req_tasks.append(fetch_url(url, body, session, stop_event))
+      req_tasks.append(fetch_url(url, body, headers, session, stop_event))
 
     results = await asyncio.gather(*req_tasks)
 
@@ -66,15 +90,11 @@ if __name__ == "__main__":
   parser.add_argument("--jwt", required=False, type=str, help="JWT (API only)")
   parser.add_argument("--api_key", required=False, type=str, help="API key (API only)")
   parser.add_argument("--limit", required=False, type=int, help="API query limit (API only)")
-  parser.add_argument("--year", required=False, type=int, help="Year to query (App only)")
+  parser.add_argument("--year", required=False, type=str, help="Year to query (App only)")
   args = parser.parse_args()
 
-  jwt = args.jwt
-  api_key = args.api_key
-  limit = args.limit
   api_or_app = args.api_or_app
   env = args.env
-  total_requests = args.total_requests
 
   if api_or_app == "api":
     if env == "local":
@@ -82,7 +102,7 @@ if __name__ == "__main__":
     else:
       host = f"https://api-{env}.fac.gov"
 
-    target_url = f"{host}/general?limit={limit}"
+    target_url = f"{host}/general?limit={args.limit}"
     body = {}
   else: # app
     if env == "local":
@@ -91,22 +111,13 @@ if __name__ == "__main__":
       host = f"https://fac-{env}.app.cloud.gov"
 
     url = f"{host}/dissemination/search"
-    body = { "audit_year": "2024" }
+    body = { "audit_year": args.year }
 
-  print(f"Targeting {url} with {total_requests} requests")
-
-  if api_or_app == "api":
-    headers = {
-      'Authorization': f'Bearer {jwt}',
-      'X-Api-Key': api_key,
-      'Accept-Profile': 'api_v1_1_0',
-    }
-  else:
-    headers = {}
+  print(f"Targeting {url} with {args.total_requests} requests")
 
   start_time = time.perf_counter()
 
-  asyncio.run(run_load_test(url, body, total_requests, headers))
+  asyncio.run(run_load_test(url, body, args.total_requests, api_or_app))
 
   end_time = time.perf_counter()
 
