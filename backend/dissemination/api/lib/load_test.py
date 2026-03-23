@@ -19,7 +19,7 @@ async def fetch_url(url, body, headers, session, stop_event):
     method = session.get
 
   try:
-    async with method(url, headers=headers, json=body) as response:
+    async with method(url, headers=headers, data=body) as response:
       # print(await response.text())
       status = response.status
 
@@ -39,7 +39,7 @@ async def fetch_url(url, body, headers, session, stop_event):
     return None
 
 
-async def run_load_test(url, body, total_requests, api_or_app):
+async def run_load_test(url, data, total_requests, api_or_app):
   stop_event = asyncio.Event()
 
   async with aiohttp.ClientSession() as session:
@@ -54,6 +54,7 @@ async def run_load_test(url, body, total_requests, api_or_app):
       stop_event.set()
       return
 
+    data.add_field('csrfmiddlewaretoken', csrf_token.value)
     headers = {
       'X-CSRFToken': csrf_token.value,
       'Referer': url,
@@ -70,7 +71,7 @@ async def run_load_test(url, body, total_requests, api_or_app):
     req_tasks = []
 
     for _ in range(total_requests):
-      req_tasks.append(fetch_url(url, body, headers, session, stop_event))
+      req_tasks.append(fetch_url(url, data, headers, session, stop_event))
 
     results = await asyncio.gather(*req_tasks)
 
@@ -95,6 +96,7 @@ if __name__ == "__main__":
 
   api_or_app = args.api_or_app
   env = args.env
+  data = aiohttp.FormData()
 
   if api_or_app == "api":
     if env == "local":
@@ -103,21 +105,20 @@ if __name__ == "__main__":
       host = f"https://api-{env}.fac.gov"
 
     target_url = f"{host}/general?limit={args.limit}"
-    body = {}
   else: # app
     if env == "local":
       host = "http://localhost:8000"
     else:
       host = f"https://fac-{env}.app.cloud.gov"
 
-    url = f"{host}/dissemination/search"
-    body = { "audit_year": args.year }
+    url = f"{host}/dissemination/search/"
+    data.add_field('audit_year', args.year)
 
   print(f"Targeting {url} with {args.total_requests} requests")
 
   start_time = time.perf_counter()
 
-  asyncio.run(run_load_test(url, body, args.total_requests, api_or_app))
+  asyncio.run(run_load_test(url, data, args.total_requests, api_or_app))
 
   end_time = time.perf_counter()
 
