@@ -10,15 +10,22 @@ class Resubmission(models.Model):
     """
     Resubmission metadata. Contains info on the specified record, and links to the previous
     and next versions, if they exist. No default values - all fields are assumed to be filled or NULL.
+
+    Invariants:
+    - One resubmission row per report_id
+    - A report can only directly supersede one previous report
+    - A previous report can only have one direct child
+    - A report cannot have the same previous and next report_id
     """
 
-    # Foreign key links to all the other parts of the record. Unique in this table.
-    report_id = models.ForeignKey(
+    # One metadata row per report record 
+    report_id = models.OneToOneField(
         "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
         on_delete=models.CASCADE,
         to_field="report_id",
         db_column="report_id",
+        related_name="resubmission"
     )
 
     # Required to be non-null.
@@ -33,17 +40,33 @@ class Resubmission(models.Model):
         # help_text=docs.resubmission_status,  # "The resubmission status of this record. Displays whether it is a singular most recent, a resubmission, or a previous version."
     )
 
-    # Allowed to be null
+    # Previous version in the chain. Allowed to be null/ first version 
+    # Unique when present so one report cannot have two direct children 
     previous_report_id = models.TextField(
         "Previous Report ID",
         # help_text=docs.previous_report_id,  # "The report_id of the previous version. Points back to a deprecated record."
         null=True,
+        blank=True,
+        unique=True,
     )
+    # Next version in the chain. Null for most recent version 
+    # Unique when present so one report cannot point to two different next records. 
     next_report_id = models.TextField(
         "Next Report ID",
         # help_text=docs.next_report_id,  # "The report_id of the next version. Points up the chain from a deprecated record."
         null=True,
+        blank=True,
+        unique=True,
     )
+    
+    class Meta: 
+        constraints = [
+            models.CheckConstraint(
+                check=~models.Q(previous_report_id=models.F("next_report_id")),
+                name="resubmission_previous_and_next_not_equal",
+            ),
+
+        ]
 
     # Eventually:
     # resubmission_justification. Either a TextField provided by the user, or a CharField with choices for predetermined justifications.
@@ -51,5 +74,5 @@ class Resubmission(models.Model):
 
     def __str__(self):
         return (
-            f"report_id:{self.report_id} Version:{self.version}, Status:{self.status}"
+            f"report_id:{self.report_id_id} Version:{self.version}, Status:{self.status}"
         )
