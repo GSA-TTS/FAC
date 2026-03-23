@@ -12,7 +12,7 @@ module "metabase-app" {
   }
   service_bindings = {
     "${module.database.database_name}"                        = ""
-    "${module.metabasedb[0].database_name}"                   = ""
+    "${module.metabasedb.database_name}"                      = ""
     "${cloudfoundry_service_instance.proxy_credentials.name}" = ""
   }
   depends_on = [module.metabasedb[0], module.database]
