@@ -1,19 +1,24 @@
 import aiohttp
 import asyncio
-import sys
 import time
+import argparse
 
 
-# Load testing for the FAC API
+parser = argparse.ArgumentParser(description="Load testing for the FAC")
 
 
-async def fetch_url(session, url, stop_event):
+async def fetch_url(url, body, session, stop_event):
   """ Does a single API request; halts all on non-200 """
   if stop_event.is_set():
     return None
 
+  if body:
+    method = session.post
+  else:
+    method = session.get
+
   try:
-    async with session.get(url) as response:
+    async with method(url, json=body) as response:
       status = response.status
 
       if status != 200:
@@ -34,20 +39,14 @@ async def fetch_url(session, url, stop_event):
     return None
 
 
-async def run_load_test(url, total_requests, api_key, jwt):
+async def run_load_test(url, body, total_requests, headers):
   stop_event = asyncio.Event()
 
-  session_headers = {
-    'Authorization': f'Bearer {jwt}',
-    'X-Api-Key': api_key,
-    'Accept-Profile': 'api_v1_1_0',
-  }
-
-  async with aiohttp.ClientSession(headers=session_headers) as session:
+  async with aiohttp.ClientSession(headers=headers) as session:
     req_tasks = []
 
     for _ in range(total_requests):
-      req_tasks.append(fetch_url(session, url, stop_event))
+      req_tasks.append(fetch_url(url, body, session, stop_event))
 
     results = await asyncio.gather(*req_tasks)
 
@@ -61,35 +60,54 @@ async def run_load_test(url, total_requests, api_key, jwt):
 
 
 if __name__ == "__main__":
-  if len(sys.argv) != 6:
-    print("Usage: python dissemination/api/lib/load_test.py jwt api_key limit env total_requests")
-    sys.exit(1)
+  parser.add_argument("--env", required=True, type=str, help="Environment", choices=["local", "preview", "dev", "staging"])
+  parser.add_argument("--api_or_app", required=True, type=str, help="API or App", choices=["api", "app"])
+  parser.add_argument("--total_requests", required=True, type=int, help="Number of requests to make")
+  parser.add_argument("--jwt", required=False, type=str, help="JWT (API only)")
+  parser.add_argument("--api_key", required=False, type=str, help="API key (API only)")
+  parser.add_argument("--limit", required=False, type=int, help="API query limit (API only)")
+  parser.add_argument("--year", required=False, type=int, help="Year to query (App only)")
+  args = parser.parse_args()
 
-  jwt = sys.argv[1]
-  api_key = sys.argv[2]
-  limit = int(sys.argv[3])
+  jwt = args.jwt
+  api_key = args.api_key
+  limit = args.limit
+  api_or_app = args.api_or_app
+  env = args.env
+  total_requests = args.total_requests
 
-  allowed_envs = ["local", "preview", "dev", "staging"]
-  env = sys.argv[4]
+  if api_or_app == "api":
+    if env == "local":
+      host = "http://localhost:3000"
+    else:
+      host = f"https://api-{env}.fac.gov"
 
-  if env not in allowed_envs:
-    print(f"Allowed envs are {allowed_envs}")
-    sys.exit(1)
+    target_url = f"{host}/general?limit={limit}"
+    body = {}
+  else: # app
+    if env == "local":
+      host = "http://localhost:8000"
+    else:
+      host = f"https://fac-{env}.app.cloud.gov"
 
-  if env == "local":
-    host = "http://localhost:3000"
+    url = f"{host}/dissemination/search"
+    body = { "audit_year": "2024" }
+
+  print(f"Targeting {url} with {total_requests} requests")
+
+  if api_or_app == "api":
+    headers = {
+      'Authorization': f'Bearer {jwt}',
+      'X-Api-Key': api_key,
+      'Accept-Profile': 'api_v1_1_0',
+    }
   else:
-    host = f"https://api-{env}.fac.gov"
-
-  target_url = f"{host}/general?limit={limit}"
-  total_requests = int(sys.argv[5])
-
-  print(f"Targeting {target_url} with {total_requests} requests")
+    headers = {}
 
   start_time = time.perf_counter()
 
-  asyncio.run(run_load_test(target_url, total_requests, api_key, jwt))
-  
+  asyncio.run(run_load_test(url, body, total_requests, headers))
+
   end_time = time.perf_counter()
 
   elapsed_time = end_time - start_time
