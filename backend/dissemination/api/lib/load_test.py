@@ -39,7 +39,7 @@ async def fetch_url(url, body, headers, session, stop_event):
     return None
 
 
-async def run_load_test(url, data, total_requests, api_or_app):
+async def run_load_test(url, data, total_requests, api_or_app, duration):
   stop_event = asyncio.Event()
 
   async with aiohttp.ClientSession() as session:
@@ -68,20 +68,29 @@ async def run_load_test(url, data, total_requests, api_or_app):
         'Accept-Profile': 'api_v1_1_0',
       }
 
-    req_tasks = []
+    start_time = time.perf_counter()
+    elapsed_time = 0
 
-    for _ in range(total_requests):
-      req_tasks.append(fetch_url(url, data, headers, session, stop_event))
+    while elapsed_time < duration and not stop_event.is_set():
+      req_tasks = []
 
-    results = await asyncio.gather(*req_tasks)
+      for _ in range(total_requests):
+        req_tasks.append(fetch_url(url, data, headers, session, stop_event))
 
-    if stop_event.is_set():
-      print("\n--- TEST ABORTED DUE TO ERROR ---")
-    else:
-      print("\n--- Load Test Complete ---")
+      results = await asyncio.gather(*req_tasks)
 
-    success_count = len([r for r in results if r == 200])
-    print(f"Successful (200 OK): {success_count}")
+      if stop_event.is_set():
+        print("\n--- TEST ABORTED DUE TO ERROR ---")
+      else:
+        print("\n--- Load Test Complete ---")
+
+      success_count = len([r for r in results if r == 200])
+      print(f"Successful (200 OK): {success_count}")
+
+      now = time.perf_counter()
+      elapsed_time = now - start_time
+
+      print(f"Elapsed time: {elapsed_time:.4f} seconds")
 
 
 if __name__ == "__main__":
@@ -92,6 +101,7 @@ if __name__ == "__main__":
   parser.add_argument("--api_key", required=False, type=str, help="API key (API only)")
   parser.add_argument("--limit", required=False, type=int, help="API query limit (API only)")
   parser.add_argument("--year", required=False, type=str, help="Year to query (App only)")
+  parser.add_argument("--duration", required=False, type=int, help="Duration to repeat requests (mins)")
   args = parser.parse_args()
 
   api_or_app = args.api_or_app
@@ -116,11 +126,4 @@ if __name__ == "__main__":
 
   print(f"Targeting {url} with {args.total_requests} requests")
 
-  start_time = time.perf_counter()
-
-  asyncio.run(run_load_test(url, data, args.total_requests, api_or_app))
-
-  end_time = time.perf_counter()
-
-  elapsed_time = end_time - start_time
-  print(f"Execution time: {elapsed_time:.4f} seconds")
+  asyncio.run(run_load_test(url, data, args.total_requests, api_or_app, args.duration))
