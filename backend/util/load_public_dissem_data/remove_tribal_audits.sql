@@ -132,6 +132,12 @@ WITH
       dissemination_secondaryauditor
     WHERE
       report_id IN (SELECT * FROM report_ids_to_delete)
+  ),
+  resub_deleted AS (
+    DELETE FROM
+      dissemination_resubmission
+    WHERE
+      report_id NOT IN (SELECT report_id FROM keepers)
   )
 DELETE FROM dissemination_general
 WHERE report_id IN (SELECT * from report_ids_to_delete);
