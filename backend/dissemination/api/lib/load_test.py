@@ -5,38 +5,9 @@ import time
 import yarl
 
 
+# Example usage:
+# python dissemination/api/lib/load_test.py --env preview --api_or_app app --year 2024 --total_requests 5 --duration 600
 parser = argparse.ArgumentParser(description="Load testing for the FAC")
-
-
-async def fetch_url(url, body, headers, session, stop_event):
-    """ Does a single request; halts all on non-200 """
-    if stop_event.is_set():
-        return None
-
-    if body:
-        method = session.post
-    else:
-        method = session.get
-
-    try:
-        async with method(url, headers=headers, data=body) as response:
-            # print(await response.text())
-            status = response.status
-
-            if status != 200:
-                print(f"Received {status}; stopping")
-                print(response)
-                stop_event.set()
-            else:
-                print('.', end="")
-
-            await response.release()
-
-            return status
-    except Exception as e:
-        print(f"Request failed: {e}")
-
-        return None
 
 
 async def run_load_test(url, data, total_requests, api_or_app, duration):
@@ -93,6 +64,37 @@ async def run_load_test(url, data, total_requests, api_or_app, duration):
             print(f"Elapsed time: {elapsed_time:.4f} seconds")
 
 
+async def fetch_url(url, body, headers, session, stop_event):
+    """ Does a single request; halts all on non-200 """
+    if stop_event.is_set():
+        return None
+
+    if body:
+        method = session.post
+    else:
+        method = session.get
+
+    try:
+        async with method(url, headers=headers, data=body) as response:
+            # print(await response.text())
+            status = response.status
+
+            if status != 200:
+                print(f"Received {status}; stopping")
+                print(response)
+                stop_event.set()
+            else:
+                print('.', end="")
+
+            await response.release()
+
+            return status
+    except Exception as e:
+        print(f"Request failed: {e}")
+
+        return None
+
+
 if __name__ == "__main__":
     parser.add_argument("--env", required=True, type=str, help="Environment", choices=["local", "preview", "dev", "staging"])
     parser.add_argument("--api_or_app", required=True, type=str, help="API or App", choices=["api", "app"])
@@ -100,7 +102,7 @@ if __name__ == "__main__":
     parser.add_argument("--jwt", required=False, type=str, help="JWT (API only)")
     parser.add_argument("--api_key", required=False, type=str, help="API key (API only)")
     parser.add_argument("--limit", required=False, type=int, help="API query limit (API only)")
-    parser.add_argument("--year", required=False, type=str, help="Year to query (App only)")
+    parser.add_argument("--year", required=False, type=str, help="Year to query, or 'all_years' (App only)")
     parser.add_argument("--duration", required=False, type=int, help="Duration to repeat requests (mins)")
     args = parser.parse_args()
 
