@@ -4,7 +4,6 @@ import asyncio
 import time
 import yarl
 
-
 # Example app usage:
 # python dissemination/api/lib/load_test.py --api_or_app app --env preview --year 2024 --total_requests 5 --duration 600
 # Example API usage:
