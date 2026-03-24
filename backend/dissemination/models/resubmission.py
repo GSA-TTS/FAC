@@ -18,7 +18,7 @@ class Resubmission(models.Model):
     - A report cannot have the same previous and next report_id
     """
 
-    # One metadata row per report record 
+    # One metadata row per report record
     report_id = models.OneToOneField(
         "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
@@ -40,8 +40,8 @@ class Resubmission(models.Model):
         # help_text=docs.resubmission_status,  # "The resubmission status of this record. Displays whether it is a singular most recent, a resubmission, or a previous version."
     )
 
-    # Previous version in the chain. Allowed to be null/ first version 
-    # Unique when present so one report cannot have two direct children 
+    # Previous version in the chain. Allowed to be null/ first version
+    # Unique when present so one report cannot have two direct children
     previous_report_id = models.TextField(
         "Previous Report ID",
         # help_text=docs.previous_report_id,  # "The report_id of the previous version. Points back to a deprecated record."
@@ -49,8 +49,8 @@ class Resubmission(models.Model):
         blank=True,
         unique=True,
     )
-    # Next version in the chain. Null for most recent version 
-    # Unique when present so one report cannot point to two different next records. 
+    # Next version in the chain. Null for most recent version
+    # Unique when present so one report cannot point to two different next records.
     next_report_id = models.TextField(
         "Next Report ID",
         # help_text=docs.next_report_id,  # "The report_id of the next version. Points up the chain from a deprecated record."
@@ -58,8 +58,8 @@ class Resubmission(models.Model):
         blank=True,
         unique=True,
     )
-    
-    class Meta: 
+
+    class Meta:
         constraints = [
             models.CheckConstraint(
                 check=~models.Q(previous_report_id=models.F("next_report_id")),

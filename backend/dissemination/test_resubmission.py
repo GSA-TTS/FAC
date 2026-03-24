@@ -74,7 +74,7 @@ def create_general(report_id, **overrides):
 
     defaults.update(overrides)
     return General.objects.create(**defaults)
-    
+
 class ResubmissionModelTests(TestCase):
     def test_second_resubmission_of_same_parent_is_blocked(self):
         """
@@ -167,7 +167,7 @@ class ResubmissionModelTests(TestCase):
             Resubmission.objects.filter(previous_report_id__isnull=True).count(),
             2,
         )
-    
+
     def test_multiple_null_next_report_ids_allowed(self):
         """
         Multiple most-recent records with null next_report_id should be allowed.
