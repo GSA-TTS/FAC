@@ -25,7 +25,7 @@ class Resubmission(models.Model):
         on_delete=models.CASCADE,
         to_field="report_id",
         db_column="report_id",
-        related_name="resubmission"
+        related_name="resubmission",
     )
 
     # Required to be non-null.
@@ -72,6 +72,4 @@ class Resubmission(models.Model):
     # changed_fields. A TextField with a string of comma separated field names. i.e. "one_field, two_field, red_field, blue_field".
 
     def __str__(self):
-        return (
-            f"report_id:{self.report_id_id} Version:{self.version}, Status:{self.status}"
-        )
+        return f"report_id:{self.report_id_id} Version:{self.version}, Status:{self.status}"
