@@ -4,7 +4,6 @@ import asyncio
 import time
 import yarl
 
-
 # Example usage:
 # python dissemination/api/lib/load_test.py --env preview --api_or_app app --year 2024 --total_requests 5 --duration 600
 parser = argparse.ArgumentParser(description="Load testing for the FAC")
@@ -19,23 +18,25 @@ async def run_load_test(url, data, total_requests, api_or_app, duration):
             async with session.get(url) as response:
                 await response.read()
 
-            csrf_token = session.cookie_jar.filter_cookies(yarl.URL(url)).get('csrftoken')
+            csrf_token = session.cookie_jar.filter_cookies(yarl.URL(url)).get(
+                "csrftoken"
+            )
 
             if not csrf_token:
                 print("Failed to retrieve CSRF token")
                 stop_event.set()
                 return
 
-            data.add_field('csrfmiddlewaretoken', csrf_token.value)
+            data.add_field("csrfmiddlewaretoken", csrf_token.value)
             headers = {
-                'X-CSRFToken': csrf_token.value,
-                'Referer': url,
+                "X-CSRFToken": csrf_token.value,
+                "Referer": url,
             }
         else:
             headers = {
-                'Authorization': f'Bearer {args.jwt}',
-                'X-Api-Key': args.api_key,
-                'Accept-Profile': 'api_v1_1_0',
+                "Authorization": f"Bearer {args.jwt}",
+                "X-Api-Key": args.api_key,
+                "Accept-Profile": "api_v1_1_0",
             }
 
         start_time = time.perf_counter()
@@ -64,7 +65,7 @@ async def run_load_test(url, data, total_requests, api_or_app, duration):
 
 
 async def fetch_url(url, data, headers, session, stop_event):
-    """ Does a single request; halts all on non-200 """
+    """Does a single request; halts all on non-200"""
     if stop_event.is_set():
         return None
 
@@ -83,7 +84,7 @@ async def fetch_url(url, data, headers, session, stop_event):
                 print(response)
                 stop_event.set()
             else:
-                print('.', end="")
+                print(".", end="")
 
             await response.release()
 
@@ -95,14 +96,39 @@ async def fetch_url(url, data, headers, session, stop_event):
 
 
 if __name__ == "__main__":
-    parser.add_argument("--env", required=True, type=str, help="Environment", choices=["local", "preview", "dev", "staging"])
-    parser.add_argument("--api_or_app", required=True, type=str, help="API or App", choices=["api", "app"])
-    parser.add_argument("--total_requests", required=True, type=int, help="Number of requests to make")
+    parser.add_argument(
+        "--env",
+        required=True,
+        type=str,
+        help="Environment",
+        choices=["local", "preview", "dev", "staging"],
+    )
+    parser.add_argument(
+        "--api_or_app",
+        required=True,
+        type=str,
+        help="API or App",
+        choices=["api", "app"],
+    )
+    parser.add_argument(
+        "--total_requests", required=True, type=int, help="Number of requests to make"
+    )
     parser.add_argument("--jwt", required=False, type=str, help="JWT (API only)")
-    parser.add_argument("--api_key", required=False, type=str, help="API key (API only)")
-    parser.add_argument("--limit", required=False, type=int, help="API query limit (API only)")
-    parser.add_argument("--year", required=False, type=str, help="Year to query, or 'all_years' (App only)")
-    parser.add_argument("--duration", required=True, type=int, help="Duration to repeat requests (secs)")
+    parser.add_argument(
+        "--api_key", required=False, type=str, help="API key (API only)"
+    )
+    parser.add_argument(
+        "--limit", required=False, type=int, help="API query limit (API only)"
+    )
+    parser.add_argument(
+        "--year",
+        required=False,
+        type=str,
+        help="Year to query, or 'all_years' (App only)",
+    )
+    parser.add_argument(
+        "--duration", required=True, type=int, help="Duration to repeat requests (secs)"
+    )
     args = parser.parse_args()
 
     api_or_app = args.api_or_app
@@ -127,8 +153,10 @@ if __name__ == "__main__":
             host = f"https://fac-{env}.app.cloud.gov"
 
         url = f"{host}/dissemination/search/"
-        data.add_field('audit_year', args.year)
+        data.add_field("audit_year", args.year)
 
     print(f"Targeting {url} with {args.total_requests} requests")
 
-    asyncio.run(run_load_test(url, data, args.total_requests, api_or_app, args.duration))
+    asyncio.run(
+        run_load_test(url, data, args.total_requests, api_or_app, args.duration)
+    )
