@@ -4,9 +4,11 @@ import asyncio
 import time
 import yarl
 
-# Example usage:
-# python dissemination/api/lib/load_test.py --env preview --api_or_app app --year 2024 --total_requests 5 --duration 600
-parser = argparse.ArgumentParser(description="Load testing for the FAC")
+
+# Example app usage:
+# python dissemination/api/lib/load_test.py --api_or_app app --env preview --year 2024 --total_requests 5 --duration 600
+# Example API usage:
+# python dissemination/api/lib/load_test.py --api_or_app api --jwt "your.jwt.here" --api_key yourAPIkey --env preview --limit 1000 --total_requests 5 --duration 10
 
 
 async def run_load_test(url, data, total_requests, api_or_app, duration):
@@ -95,6 +97,7 @@ async def fetch_url(url, data, headers, session, stop_event):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Load testing for the FAC")
     parser.add_argument(
         "--env",
         required=True,
