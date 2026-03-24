@@ -14,26 +14,25 @@ async def run_load_test(url, data, total_requests, api_or_app, duration):
     stop_event = asyncio.Event()
 
     async with aiohttp.ClientSession() as session:
-        # Hit the page to get the CSRF cookie
-        async with session.get(url) as response:
-            await response.read()
+        if api_or_app == "app":
+            # Hit the page to get the CSRF cookie
+            async with session.get(url) as response:
+                await response.read()
 
-        csrf_token = session.cookie_jar.filter_cookies(yarl.URL(url)).get('csrftoken')
+            csrf_token = session.cookie_jar.filter_cookies(yarl.URL(url)).get('csrftoken')
 
-        if not csrf_token:
-            print("Failed to retrieve CSRF token")
-            stop_event.set()
-            return
+            if not csrf_token:
+                print("Failed to retrieve CSRF token")
+                stop_event.set()
+                return
 
-        data.add_field('csrfmiddlewaretoken', csrf_token.value)
-        headers = {
-            'X-CSRFToken': csrf_token.value,
-            'Referer': url,
-        }
-
-        if api_or_app == "api":
+            data.add_field('csrfmiddlewaretoken', csrf_token.value)
             headers = {
-                **headers,
+                'X-CSRFToken': csrf_token.value,
+                'Referer': url,
+            }
+        else:
+            headers = {
                 'Authorization': f'Bearer {args.jwt}',
                 'X-Api-Key': args.api_key,
                 'Accept-Profile': 'api_v1_1_0',
@@ -64,18 +63,18 @@ async def run_load_test(url, data, total_requests, api_or_app, duration):
             print(f"Elapsed time: {elapsed_time:.4f} seconds")
 
 
-async def fetch_url(url, body, headers, session, stop_event):
+async def fetch_url(url, data, headers, session, stop_event):
     """ Does a single request; halts all on non-200 """
     if stop_event.is_set():
         return None
 
-    if body:
+    if data:
         method = session.post
     else:
         method = session.get
 
     try:
-        async with method(url, headers=headers, data=body) as response:
+        async with method(url, headers=headers, data=data) as response:
             # print(await response.text())
             status = response.status
 
@@ -103,12 +102,16 @@ if __name__ == "__main__":
     parser.add_argument("--api_key", required=False, type=str, help="API key (API only)")
     parser.add_argument("--limit", required=False, type=int, help="API query limit (API only)")
     parser.add_argument("--year", required=False, type=str, help="Year to query, or 'all_years' (App only)")
-    parser.add_argument("--duration", required=False, type=int, help="Duration to repeat requests (mins)")
+    parser.add_argument("--duration", required=True, type=int, help="Duration to repeat requests (secs)")
     args = parser.parse_args()
 
     api_or_app = args.api_or_app
     env = args.env
-    data = aiohttp.FormData()
+
+    if api_or_app == "app":
+        data = aiohttp.FormData()
+    else:
+        data = None
 
     if api_or_app == "api":
         if env == "local":
