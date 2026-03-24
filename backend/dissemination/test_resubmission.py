@@ -7,6 +7,7 @@ from django.utils import timezone
 from audit.models.constants import RESUBMISSION_STATUS
 from dissemination.models import General, Resubmission
 
+
 def create_general(report_id, **overrides):
     now = timezone.now()
 
@@ -74,6 +75,7 @@ def create_general(report_id, **overrides):
 
     defaults.update(overrides)
     return General.objects.create(**defaults)
+
 
 class ResubmissionModelTests(TestCase):
     def test_second_resubmission_of_same_parent_is_blocked(self):

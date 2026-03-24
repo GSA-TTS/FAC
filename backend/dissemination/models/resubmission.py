@@ -41,7 +41,7 @@ class Resubmission(models.Model):
     )
 
     # Previous version in the chain. Allowed to be null/ first version
-    # Unique when present so one report cannot have two direct children
+    # Unique when present so multiple reports cannot have the same parent record
     previous_report_id = models.TextField(
         "Previous Report ID",
         # help_text=docs.previous_report_id,  # "The report_id of the previous version. Points back to a deprecated record."
@@ -50,7 +50,7 @@ class Resubmission(models.Model):
         unique=True,
     )
     # Next version in the chain. Null for most recent version
-    # Unique when present so one report cannot point to two different next records.
+    # Unique when present so multiple reports cannot have the same child record
     next_report_id = models.TextField(
         "Next Report ID",
         # help_text=docs.next_report_id,  # "The report_id of the next version. Points up the chain from a deprecated record."
@@ -65,7 +65,6 @@ class Resubmission(models.Model):
                 check=~models.Q(previous_report_id=models.F("next_report_id")),
                 name="resubmission_previous_and_next_not_equal",
             ),
-
         ]
 
     # Eventually:
