@@ -27,7 +27,6 @@ async def run_load_test(url, data, total_requests, api_or_app, duration):
                 stop_event.set()
                 return
 
-            data.add_field("csrfmiddlewaretoken", csrf_token.value)
             headers = {
                 "X-CSRFToken": csrf_token.value,
                 "Referer": url,
@@ -133,7 +132,7 @@ if __name__ == "__main__":
 
     api_or_app = args.api_or_app
     env = args.env
-    data = aiohttp.FormData() if api_or_app == "app" else None
+    data = None
 
     if api_or_app == "api":
         if env == "local":
@@ -149,6 +148,7 @@ if __name__ == "__main__":
             host = f"https://fac-{env}.app.cloud.gov"
 
         url = f"{host}/dissemination/search/"
+        data = aiohttp.FormData()
         data.add_field("audit_year", args.year)
 
     print(f"Targeting {url} with {args.total_requests} requests")
