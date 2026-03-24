@@ -133,11 +133,7 @@ if __name__ == "__main__":
 
     api_or_app = args.api_or_app
     env = args.env
-
-    if api_or_app == "app":
-        data = aiohttp.FormData()
-    else:
-        data = None
+    data = aiohttp.FormData() if api_or_app == "app" else None
 
     if api_or_app == "api":
         if env == "local":
