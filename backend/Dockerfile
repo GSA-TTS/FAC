@@ -4,89 +4,69 @@
 
 FROM python:3.12.11-slim-bookworm AS foundation
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get -yq update && \
     apt install -y \
-        apt-transport-https \
         build-essential \
-        ca-certificates \
-        chromium \
         curl \
-        git \
-        gcc \
-        gnupg \
-        gnupg2 \
         jq \
-        # Make sure the client version
-        # matchse the DB version, locally
-        # and in production. AWD RDS is v15 in 
-        # cloud.gov as of August 2025.
-        postgresql-client-15 \
-        sudo \
-        unzip \
-        wget
-
-###############################
-# STORAGE
-###############################
-FROM foundation AS storage
-RUN apt-get install -yqq groff && \
-    apt-get install -yqq zip && \
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install
-    #curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
-    #unzip awscli-bundle.zip && \
-    #./awscli-bundle/install -b /usr/local/bin/aws
-RUN curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
-    chmod +x /usr/local/bin/mc
-
-###############################
-# CLOUD FOUNDRY API CLI
-###############################
-RUN wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key \
-  | gpg --dearmor -o /usr/share/keyrings/cli.cloudfoundry.org.gpg \
-  && echo "deb [signed-by=/usr/share/keyrings/cli.cloudfoundry.org.gpg] https://packages.cloudfoundry.org/debian stable main" \
-  | tee /etc/apt/sources.list.d/cloudfoundry-cli.list \
-  && apt update \
-  && apt install cf8-cli
+        groff \
+        zip && \
+        rm -rf /var/lib/apt/lists/*
 
 ###############################
 # PIP
 ###############################
-FROM storage AS pip
+FROM foundation AS pip
 COPY requirements.txt /tmp/requirements.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt
-RUN set -ex && \
-    pip install --upgrade pip && \
+RUN pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
     pip install -r /tmp/dev-requirements.txt && \
-    rm -rf /root/.cache/
-
+    rm -rf /root/.cache/ && \
+    rm -rf /tmp/requirements.txt /tmp/dev-requirements.txt
 
 ###############################
 # NODE
 ###############################
-FROM pip AS node
+FROM foundation AS node_build
 WORKDIR /src/
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 COPY package*.json /src/
-RUN npm ci && \
-    chown -R 1001:123 "/root/.npm"
-
+RUN npm ci 
 COPY . /src/
 
 RUN npm run build
 
 ###############################
-# DEV
+# FINAL
 ###############################
-FROM node AS dev
+FROM python:3.12.11-slim-bookworm AS final
+
+RUN apt-get -yq update && \
+    apt-get install -y \
+        ca-certificates \
+        chromium \
+        curl \
+        # Make sure the client version
+        # matches the DB version, locally
+        # and in production. AWD RDS is v15 in 
+        # cloud.gov as of August 2025.
+        postgresql-client-15 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy from pip stage
+COPY --from=pip /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=pip /usr/local/bin /usr/local/bin
+
+# Copy from node stage
+COPY --from=node_build /src/static/compiled /src/static/compiled
+
 WORKDIR /src/
-RUN python manage.py collectstatic
+COPY . /src/
 
-
+RUN python manage.py collectstatic --noinput

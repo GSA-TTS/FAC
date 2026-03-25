@@ -1,8 +1,34 @@
+# Python
 **/__pycache__
-*.pyc
-.*
-.coverage
-docker-compose.yml
-docker-compose-web.yml
+**/*.pyc
+.coveragerc
+
+
+# Node
+node_modules/
+eslint.config.mjs
+.prettierrc.json
+.stylelintrc.json
+.stylelintignore
+
+# Docker
+docker-compose*.yml
 Dockerfile
-staticfiles/
+.dockerignore
+
+# Cloud Foundry
+manifests/
+apt.yml
+.cfignore
+
+# Tools
+minio/
+
+# Tests
+cypress/
+cypress.config.mjs
+**/test_*.py
+**/tests.py
+
+# Git
+.git/
