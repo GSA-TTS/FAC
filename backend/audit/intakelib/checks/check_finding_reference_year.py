@@ -44,7 +44,9 @@ def finding_reference_year(ir, is_gsa_migration=False):
     audit_date = sac.general_information["auditee_fiscal_period_end"]
     audit_year = int(audit_date.split("-")[0])
     for index, reference in enumerate(references["values"]):
+        # check_finding_reference_pattern run before this ensures no ValueError
         year = int(reference.split("-")[0])
+        
         if audit_year != year:
             errors.append(
                 build_cell_error_tuple(

@@ -28,8 +28,10 @@ def finding_reference_pattern(ir, is_gsa_migration=False):
     for index, reference in enumerate(references["values"]):
         if (
             not appears_empty(reference)
-            and (reference == settings.GSA_MIGRATION and not is_gsa_migration)
-            and (not re.match(FINDING_REFERENCE_REGEX, str(reference)))
+            and (
+                (reference == settings.GSA_MIGRATION and not is_gsa_migration) or
+                (not re.match(FINDING_REFERENCE_REGEX, str(reference)))
+            )
         ):
             errors.append(
                 build_cell_error_tuple(
