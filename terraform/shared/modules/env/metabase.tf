@@ -1,6 +1,4 @@
 module "metabase-app" {
-  count = var.cf_space.name == "dev" ? 1 : 0
-
   source        = "../metabase"
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space.name
@@ -14,15 +12,13 @@ module "metabase-app" {
   }
   service_bindings = {
     "${module.database.database_name}"                        = ""
-    "${module.metabasedb[0].database_name}"                   = ""
+    "${module.metabasedb.database_name}"                      = ""
     "${cloudfoundry_service_instance.proxy_credentials.name}" = ""
   }
   depends_on = [module.metabasedb[0], module.database]
 }
 
 module "metabasedb" {
-  count = var.cf_space.name == "dev" ? 1 : 0
-
   source        = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.5.0"
   cf_space_id   = var.cf_space.id
   name          = "metabase-db"
