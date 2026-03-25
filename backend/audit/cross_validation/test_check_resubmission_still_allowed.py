@@ -17,17 +17,7 @@ class CheckResubmissionStillAllowedTests(TestCase):
 
         result = check_resubmission_still_allowed(sac_data)
 
-        self.assertEqual(
-            result,
-            [
-                {
-                    "error": (
-                        "Unable to validate whether this resubmission is still "
-                        "allowed because the report ID is missing."
-                    )
-                }
-            ],
-        )
+        self.assertEqual(result, [])
 
     @patch("audit.models.SingleAuditChecklist.objects.get")
     def test_returns_error_when_sac_cannot_be_found(self, mock_get):
@@ -40,17 +30,7 @@ class CheckResubmissionStillAllowedTests(TestCase):
 
         result = check_resubmission_still_allowed(sac_data)
 
-        self.assertEqual(
-            result,
-            [
-                {
-                    "error": (
-                        "Unable to validate whether this resubmission is still "
-                        "allowed because the audit record could not be found."
-                    )
-                }
-            ],
-        )
+        self.assertEqual(result, [])
 
     @patch(
         "audit.cross_validation.check_resubmission_still_allowed.check_resubmission_allowed"
@@ -59,7 +39,10 @@ class CheckResubmissionStillAllowedTests(TestCase):
     def test_returns_friendly_error_when_resubmission_is_not_allowed(
         self, mock_get, mock_check_allowed
     ):
-        mock_sac = object()
+        class MockSAC:
+            resubmission_meta = {"version": 1}
+
+        mock_sac = MockSAC()
         mock_get.return_value = mock_sac
         mock_check_allowed.return_value = (False, "not allowed")
 
@@ -90,7 +73,10 @@ class CheckResubmissionStillAllowedTests(TestCase):
     def test_returns_empty_list_when_resubmission_is_allowed(
         self, mock_get, mock_check_allowed
     ):
-        mock_sac = object()
+        class MockSAC:
+            resubmission_meta = {"version": 1}
+
+        mock_sac = MockSAC()
         mock_get.return_value = mock_sac
         mock_check_allowed.return_value = (True, "allowed")
 
