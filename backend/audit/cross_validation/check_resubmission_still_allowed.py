@@ -3,7 +3,7 @@ from audit.check_resubmission_allowed import (
 )
 
 
-def check_resubmission_still_allowed(sac_data):
+def check_resubmission_still_allowed(sac_data, **kwargs):
     """
     Confirm that the current SAC is still eligible to be submitted as a
     resubmission.
