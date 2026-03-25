@@ -1,6 +1,7 @@
 from audit.intakelib.checks.check_finding_reference_pattern import (
     finding_reference_pattern,
 )
+from audit.intakelib.common.error_messages import messages
 
 from django.conf import settings
 from django.test import SimpleTestCase
@@ -28,7 +29,7 @@ class TestFindingReferencePattern(SimpleTestCase):
                 2,
                 "Form",
                 {
-                    "text": "Finding references must be in the format <b>20##-###</b> where the first four digits are a year after 2010, for example, <b>2019-001, 2019-002</b>",
+                    "text": messages["check_finding_reference_invalid"],
                     "link": "Intake checks: no link defined",
                 },
             ),
