@@ -1,4 +1,6 @@
-from audit.intakelib.checks.check_finding_reference_pattern import finding_reference_pattern
+from audit.intakelib.checks.check_finding_reference_pattern import (
+    finding_reference_pattern,
+)
 
 from django.conf import settings
 from django.test import SimpleTestCase
@@ -22,23 +24,24 @@ class TestFindingReferencePattern(SimpleTestCase):
         ]
         self.expected_error = [
             (
-                'A',
+                "A",
                 2,
-                'Form',
+                "Form",
                 {
-                    'text': 'Finding references must be in the format <b>20##-###</b> where the first four digits are a year after 2010, for example, <b>2019-001, 2019-002</b>', 'link': 'Intake checks: no link defined',
+                    "text": "Finding references must be in the format <b>20##-###</b> where the first four digits are a year after 2010, for example, <b>2019-001, 2019-002</b>",
+                    "link": "Intake checks: no link defined",
                 },
             ),
         ]
 
     def test_success(self):
-        """ Standard valid reference passes """
+        """Standard valid reference passes"""
         errors = finding_reference_pattern(self.ir)
 
         self.assertEqual(errors, None)
 
     def test_bad_format(self):
-        """ Poorly formatted reference errors """
+        """Poorly formatted reference errors"""
         self.ir[0]["ranges"][0]["values"] = ["bad-format"]
 
         with self.assertRaises(ValidationError) as context:
@@ -50,7 +53,7 @@ class TestFindingReferencePattern(SimpleTestCase):
         )
 
     def test_empty(self):
-        """ Empty reference passes """
+        """Empty reference passes"""
         self.ir[0]["ranges"][0]["values"] = [""]
 
         errors = finding_reference_pattern(self.ir)
@@ -58,15 +61,15 @@ class TestFindingReferencePattern(SimpleTestCase):
         self.assertEqual(errors, None)
 
     def test_valid_gsa_migration(self):
-        """ Valid GSA migration passes """
+        """Valid GSA migration passes"""
         self.ir[0]["ranges"][0]["values"] = [settings.GSA_MIGRATION]
-        
+
         errors = finding_reference_pattern(self.ir, is_gsa_migration=True)
 
         self.assertEqual(errors, None)
 
     def test_invalid_gsa_migration(self):
-        """ Invalid GSA migration errors """
+        """Invalid GSA migration errors"""
         self.ir[0]["ranges"][0]["values"] = [settings.GSA_MIGRATION]
 
         with self.assertRaises(ValidationError) as context:

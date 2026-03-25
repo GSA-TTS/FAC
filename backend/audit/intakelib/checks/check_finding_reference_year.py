@@ -46,7 +46,7 @@ def finding_reference_year(ir, is_gsa_migration=False):
     for index, reference in enumerate(references["values"]):
         # check_finding_reference_pattern run before this ensures no ValueError
         year = int(reference.split("-")[0])
-        
+
         if audit_year != year:
             errors.append(
                 build_cell_error_tuple(
