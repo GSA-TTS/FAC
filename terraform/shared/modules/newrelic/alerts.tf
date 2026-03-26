@@ -160,6 +160,7 @@ resource "newrelic_nrql_alert_condition" "db_slow_queries" {
   name           = "DB Statement Duration Exceeds Threshold"
   title_template = "${upper(var.cf_space_name)}: {{conditionName}}"
   runbook_url    = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
+  enabled        = false # Disabled due to excessive alerting
 
   critical {
     operator              = "above"

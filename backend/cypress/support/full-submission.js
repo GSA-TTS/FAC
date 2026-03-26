@@ -52,7 +52,7 @@ export function testFullSubmission(isTribal, isPublic, isResubmission=false) {
   testWorkbookDownloadLinkExists("Notes to SEFA")
 
   cy.get(".usa-link").contains("Audit report PDF").click();
-  testPdfAuditReport(false);
+  testPdfAuditReport(isResubmission);
 
   cy.get(".usa-link").contains("Federal Awards Audit Findings").click();
   testWorkbookFindingsUniformGuidance(false);

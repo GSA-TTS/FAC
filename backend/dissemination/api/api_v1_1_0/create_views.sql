@@ -1,7 +1,7 @@
 begin;
 
 ---------------------------------------
--- finding_text
+-- findings_text
 ---------------------------------------
 create view api_v1_1_0.findings_text as
     select
@@ -17,9 +17,10 @@ create view api_v1_1_0.findings_text as
         dissemination_general gen
     where
         ft.report_id = gen.report_id
-         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        and
+        api_v1_1_0_functions.is_public_audit_or_authorized_user(gen.is_public)
+        and
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ft.id
 ;
 
@@ -39,11 +40,13 @@ create view api_v1_1_0.additional_ueis as
         dissemination_additionaluei uei
     where
         gen.report_id = uei.report_id
+        and
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by uei.id
 ;
 
 ---------------------------------------
--- finding
+-- findings
 ---------------------------------------
 create view api_v1_1_0.findings as
     select
@@ -67,11 +70,13 @@ create view api_v1_1_0.findings as
         dissemination_general gen
     where
         finding.report_id = gen.report_id
+        and
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by finding.id
 ;
 
 ---------------------------------------
--- federal award
+-- federal_awards
 ---------------------------------------
 create view api_v1_1_0.federal_awards as
     select
@@ -104,12 +109,14 @@ create view api_v1_1_0.federal_awards as
         dissemination_general gen
     where
         award.report_id = gen.report_id
+        and
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by award.id
 ;
 
 
 ---------------------------------------
--- corrective_action_plan
+-- corrective_action_plans
 ---------------------------------------
 create view api_v1_1_0.corrective_action_plans as
     select
@@ -127,8 +134,9 @@ create view api_v1_1_0.corrective_action_plans as
     where
         ct.report_id = gen.report_id
         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        api_v1_1_0_functions.is_public_audit_or_authorized_user(gen.is_public)
+        and
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ct.id
 ;
 
@@ -154,8 +162,9 @@ create view api_v1_1_0.notes_to_sefa as
     where
         note.report_id = gen.report_id
         and
-        (gen.is_public = true
-        or (gen.is_public = false and api_v1_1_0_functions.has_tribal_data_access()))
+        api_v1_1_0_functions.is_public_audit_or_authorized_user(gen.is_public)
+        and
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by note.id
 ;
 
@@ -177,6 +186,8 @@ create view api_v1_1_0.passthrough as
         dissemination_passthrough as pass
     where
         gen.report_id = pass.report_id
+        and
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by pass.id
 ;
 
@@ -264,11 +275,13 @@ create view api_v1_1_0.general as
         END AS is_secondary_auditors
     from
         dissemination_general gen
+    where
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by gen.id
 ;
 
 ---------------------------------------
--- auditor (secondary auditor)
+-- secondary_auditors
 ---------------------------------------
 create view api_v1_1_0.secondary_auditors as
     select
@@ -292,9 +305,14 @@ create view api_v1_1_0.secondary_auditors as
         dissemination_SecondaryAuditor sa
     where
         sa.report_id = gen.report_id
+        and
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by sa.id
 ;
 
+---------------------------------------
+-- additional_eins
+---------------------------------------
 create view api_v1_1_0.additional_eins as
     select
         gen.report_id,
@@ -308,10 +326,50 @@ create view api_v1_1_0.additional_eins as
         dissemination_additionalein ein
     where
         gen.report_id = ein.report_id
+        and
+        api_v1_1_0_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ein.id
 ;
 
+---------------------------------------
+-- resubmission
+---------------------------------------
 create view api_v1_1_0.resubmission as
+    with recursive chain as (
+        -- Base case: start from each resubmission row
+        select
+            resub.report_id,
+            resub.previous_report_id,
+            resub.report_id as origin_report_id
+        from
+            dissemination_resubmission resub
+
+        union all
+
+        -- Recursive step: follow previous_report_id links
+        select
+            c.report_id,
+            prev.previous_report_id,
+            prev.report_id as origin_report_id
+        from
+            chain c
+            join dissemination_resubmission prev
+                on c.previous_report_id = prev.report_id
+        where
+            c.previous_report_id is not null
+    ),
+    -- Select only the final row in each chain (the original submission)
+    original as (
+        select
+            chain.report_id,
+            orig_gen.fac_accepted_date as original_submission_date
+        from
+            chain
+            join dissemination_general orig_gen
+                on chain.origin_report_id = orig_gen.report_id
+        where
+            chain.previous_report_id is null
+    )
     select
         gen.report_id,
         gen.auditee_uei,
@@ -321,10 +379,13 @@ create view api_v1_1_0.resubmission as
         resub.version,
         resub.status,
         resub.previous_report_id,
-        resub.next_report_id
+        resub.next_report_id,
+        original.original_submission_date
     from
         dissemination_general gen,
         dissemination_resubmission resub
+        left join original
+            on resub.report_id = original.report_id
     where
         gen.report_id = resub.report_id
     order by resub.id

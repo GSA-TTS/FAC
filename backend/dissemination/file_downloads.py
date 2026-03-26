@@ -91,7 +91,7 @@ def file_exists(filename, show_warning=True):
         return True
     except ClientError:
         if show_warning:
-            logger.warn(f"Unable to locate file {filename} in S3!")
+            logger.warning(f"Unable to locate file {filename} in S3!")
         return False
 
 
@@ -125,3 +125,33 @@ def get_download_url(filename):
             raise Http404("File not found")
     except ClientError:
         raise Http404("File not found")
+
+
+def copy_file(source_key, dest_key):
+    """
+    Copy a file within the private S3 bucket from source_key to dest_key.
+    Returns True on success, raises Http404 if the source does not exist.
+    """
+    if not file_exists(source_key):
+        raise Http404(f"Unable to locate file {source_key} in S3!")
+
+    s3_client = boto3_client(
+        service_name="s3",
+        region_name=settings.AWS_S3_PRIVATE_REGION_NAME,
+        aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
+        endpoint_url=settings.AWS_S3_PRIVATE_INTERNAL_ENDPOINT,
+        config=Config(signature_version="s3v4"),
+    )
+
+    source_bucket = settings.AWS_PRIVATE_STORAGE_BUCKET_NAME
+    try:
+        s3_client.copy_object(
+            Bucket=source_bucket,
+            Key=dest_key,
+            CopySource={"Bucket": source_bucket, "Key": source_key},
+        )
+        return True
+    except ClientError as err:
+        logger.error(f"Failed to copy S3 object {source_key} -> {dest_key}: {err}")
+        raise Http404("Failed to copy file") from err

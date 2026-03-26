@@ -8,6 +8,7 @@
   $theme-type-scale-2xl: 13,
   $theme-color-success-lighter: #eef8eb,
   $theme-color-base-lighter: #efefef,
+  $theme-color-accent-warm-lighter: #faf3d1, // Override to match warning box background
 );
 @forward 'uswds';
 @use '_home';
