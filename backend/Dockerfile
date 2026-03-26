@@ -31,7 +31,7 @@ RUN pip install --upgrade pip && \
 ###############################
 # NODE
 ###############################
-FROM foundation AS node_build
+FROM pip AS node_build
 WORKDIR /src/
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
@@ -59,6 +59,9 @@ RUN apt-get -yq update && \
         postgresql-client-15 && \
     rm -rf /var/lib/apt/lists/*
 
+RUN curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
+    chmod +x /usr/local/bin/mc
+
 # Copy from pip stage
 COPY --from=pip /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=pip /usr/local/bin /usr/local/bin
@@ -69,4 +72,4 @@ COPY --from=node_build /src/static/compiled /src/static/compiled
 WORKDIR /src/
 COPY . /src/
 
-RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic
