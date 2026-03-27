@@ -33,7 +33,7 @@ class CheckResubmissionStillAllowedTests(TestCase):
         self.assertEqual(result, [])
 
     @patch(
-    "audit.cross_validation.check_resubmission_still_allowed.check_resubmission_allowed"
+        "audit.cross_validation.check_resubmission_still_allowed.check_resubmission_allowed"
     )
     @patch("audit.models.SingleAuditChecklist.objects.get")
     def test_returns_friendly_error_when_resubmission_is_not_allowed(
@@ -78,7 +78,7 @@ class CheckResubmissionStillAllowedTests(TestCase):
         )
 
     @patch(
-    "audit.cross_validation.check_resubmission_still_allowed.check_resubmission_allowed"
+        "audit.cross_validation.check_resubmission_still_allowed.check_resubmission_allowed"
     )
     @patch("audit.models.SingleAuditChecklist.objects.get")
     def test_returns_empty_list_when_resubmission_is_allowed(
@@ -110,4 +110,3 @@ class CheckResubmissionStillAllowedTests(TestCase):
         result = check_resubmission_still_allowed(sac_data)
 
         self.assertEqual(result, [])
-
