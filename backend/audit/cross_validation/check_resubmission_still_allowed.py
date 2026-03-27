@@ -1,16 +1,9 @@
-def check_parent_resubmission_conflict(sac_data, **kwargs):
-    """
-    Checks for conflicting resubmissions originating from the same parent record.
+from audit.check_resubmission_allowed import (
+    check_resubmission_allowed,
+)
 
-    Prevents race conditions where multiple resubmissions are created from the same
-    parent audit, which would result in a branching resubmission chain. R1 | R2 -> R3
 
-    This is a user-facing validation. Database constraints remain the final safeguard.
-
-    Returns:
-        [] when no competing resubmission exists
-        [{"error": "<message>"}] when a competing resubmission is found
-    """
+def check_resubmission_still_allowed(sac_data, **kwargs):
     from audit.models import SingleAuditChecklist
 
     sf_sac_meta = sac_data.get("sf_sac_meta", {})
@@ -31,17 +24,14 @@ def check_parent_resubmission_conflict(sac_data, **kwargs):
     if not parent_report_id:
         return []
 
-    sibling_candidates = SingleAuditChecklist.objects.exclude(
-        report_id=current_report_id
-    ).exclude(resubmission_meta__isnull=True)
+    try:
+        parent_sac = SingleAuditChecklist.objects.get(report_id=parent_report_id)
+    except SingleAuditChecklist.DoesNotExist:
+        return []
 
-    matching_siblings = [
-        sac
-        for sac in sibling_candidates
-        if (sac.resubmission_meta or {}).get("previous_report_id") == parent_report_id
-    ]
+    allowed, _message = check_resubmission_allowed(parent_sac)
 
-    if not matching_siblings:
+    if allowed:
         return []
 
     return [
