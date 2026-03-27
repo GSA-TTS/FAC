@@ -20,17 +20,15 @@ FINDING_REFERENCE_REGEX = r"^[1-2][0-9]{3}-[0-9]{3}(,\s*[1-2][0-9]{3}-[0-9]{3})*
 # DESCRIPTION
 # Finding references should be in 20##-### format where the first four
 # digits are a year >= 1900.
-# TESTED BY
-# has_bad_references.xlsx
 def finding_reference_pattern(ir, is_gsa_migration=False):
     references = get_range_by_name(ir, "reference_number")
     errors = []
     for index, reference in enumerate(references["values"]):
-        if (
-            not appears_empty(reference)
-            and (reference == settings.GSA_MIGRATION and not is_gsa_migration)
-            and (not re.match(FINDING_REFERENCE_REGEX, str(reference)))
-        ):
+        is_empty = appears_empty(reference)
+        is_valid_format = is_empty or re.match(FINDING_REFERENCE_REGEX, str(reference))
+        is_valid_migration = reference == settings.GSA_MIGRATION and is_gsa_migration
+
+        if not (is_valid_format or is_valid_migration):
             errors.append(
                 build_cell_error_tuple(
                     ir,
