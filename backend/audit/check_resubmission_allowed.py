@@ -1,11 +1,13 @@
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 from datetime import datetime, timezone as dt_timezone
 
 from django.utils import timezone
 
-from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from dissemination.models import General
+
+if TYPE_CHECKING:
+    from audit.models import SingleAuditChecklist
 
 
 def get_last_transition_date(sac):
@@ -19,7 +21,7 @@ def get_last_transition_date(sac):
 
 
 def check_resubmission_allowed(
-    sac: SingleAuditChecklist,
+    sac: "SingleAuditChecklist",
 ) -> Tuple[bool, str]:
     """
     Given a SingleAuditChecklist, determine if resubmitting the record should be allowed.
@@ -32,6 +34,8 @@ def check_resubmission_allowed(
     3. If it has already been deprecated by another resubmission.
     4. If we can reasonably assume that a sibling record is a more recent resubmission.
     """
+    from audit.models import SingleAuditChecklist
+
     # JSON from SAC
     meta = sac.resubmission_meta or {}
     gi = sac.general_information or {}
