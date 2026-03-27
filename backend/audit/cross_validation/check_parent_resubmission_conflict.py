@@ -3,7 +3,7 @@ def check_parent_resubmission_conflict(sac_data, **kwargs):
     Checks for conflicting resubmissions originating from the same parent record.
 
     Prevents race conditions where multiple resubmissions are created from the same
-    parent audit, which would result in a branching resubmission chain.
+    parent audit, which would result in a branching resubmission chain. R1 | R2 -> R3
 
     This is a user-facing validation. Database constraints remain the final safeguard.
 
