@@ -74,7 +74,7 @@ from .check_ref_number_in_cap import check_ref_number_in_cap
 from .check_ref_number_in_findings_text import check_ref_number_in_findings_text
 from .check_secondary_auditors import check_secondary_auditors
 from .check_expenditure_threshold_met import check_expenditure_threshold_met
-from .check_resubmission_still_allowed import check_resubmission_still_allowed
+from .check_parent_resubmission_conflict import check_parent_resubmission_conflict
 from .sac_validation_shape import sac_validation_shape  # noqa: F401
 from .submission_progress_check import submission_progress_check
 from .tribal_data_sharing_consent import tribal_data_sharing_consent
@@ -105,5 +105,5 @@ functions = [
     submission_progress_check,
     tribal_data_sharing_consent,
     validate_general_information,
-    check_resubmission_still_allowed,
+    check_parent_resubmission_conflict,
 ]
