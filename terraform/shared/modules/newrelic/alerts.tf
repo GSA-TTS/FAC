@@ -94,7 +94,7 @@ resource "newrelic_nrql_alert_condition" "response_time" {
   warning {
     operator              = "above"
     threshold             = 3
-    threshold_duration    = 300
+    threshold_duration    = 600
     threshold_occurrences = "all"
   }
 }
@@ -106,6 +106,7 @@ resource "newrelic_nrql_alert_condition" "throughput" {
   type               = "baseline"
   baseline_direction = "upper_and_lower"
   runbook_url        = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
+  enabled            = false # Disabled due to excessive alerting
 
   nrql {
     query = "SELECT rate(count(apm.service.transaction.duration), 1 minute) AS 'Throughput' FROM Metric WHERE entity.guid = '${data.newrelic_entity.gsa-fac.guid}'"
