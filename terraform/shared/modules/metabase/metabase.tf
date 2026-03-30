@@ -26,7 +26,7 @@ data "docker_registry_image" "metabase" {
 resource "cloudfoundry_route" "app_route" {
   space        = data.cloudfoundry_space.app_space.id
   domain       = data.cloudfoundry_domain.public.id
-  host         = "metabase-${replace(var.cf_space_name, ".", "-")}"
+  host         = var.cf_space_name == "production" ? "metabase" : "metabase-${replace(var.cf_space_name, ".", "-")}"
   destinations = [{ app_id = cloudfoundry_app.metabase.id }]
   # Yields something like: fac-sandbox.app.cloud.gov
 }
