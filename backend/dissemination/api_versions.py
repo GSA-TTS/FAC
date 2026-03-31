@@ -27,13 +27,22 @@ def get_conn_string():
     return conn_string
 
 
+# def exec_sql_at_path(dir, filename):
+#     conn = connection(get_conn_string())
+#     conn.autocommit = True
+#     path = os.path.join(dir, filename)
+#     with conn.cursor() as curs:
+#         logger.info(f"EXEC SQL {path}")
+#         sql = open(path, "r").read()
+#         curs.execute(sql)
+
+from django.db import connection as django_connection
+
 def exec_sql_at_path(dir, filename):
-    conn = connection(get_conn_string())
-    conn.autocommit = True
     path = os.path.join(dir, filename)
-    with conn.cursor() as curs:
-        logger.info(f"EXEC SQL {path}")
-        sql = open(path, "r").read()
+    logger.info(f"EXEC SQL {path}")
+    sql = open(path, "r").read()
+    with django_connection.cursor() as curs:
         curs.execute(sql)
 
 
