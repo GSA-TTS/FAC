@@ -20,9 +20,9 @@ def check_resubmission_still_allowed(sac_data, **kwargs):
     except SingleAuditChecklist.DoesNotExist:
         return []
 
-    allowed, _message = check_resubmission_allowed(parent_sac)
+    allowed, message = check_resubmission_allowed(parent_sac)
 
     if allowed:
         return []
 
-    return [{"error": ("Only the most recent version may initiate resubmission.")}]
+    return [{"error": (message)}]
