@@ -68,7 +68,10 @@ class CheckResubmissionStillAllowedTests(TestCase):
             }
 
         mock_get.return_value = MockParentSAC()
-        mock_check_allowed.return_value = (False, "not allowed")
+        mock_check_allowed.return_value = (
+            False,
+            "This audit has been deprecated and cannot be resubmitted.",
+        )
 
         sac_data = {
             "sf_sac_meta": {
@@ -85,7 +88,11 @@ class CheckResubmissionStillAllowedTests(TestCase):
 
         self.assertEqual(
             result,
-            [{"error": "Only the most recent version may initiate resubmission."}],
+            [
+                {
+                    "error": "This audit has been deprecated and cannot be resubmitted.",
+                }
+            ],
         )
         mock_get.assert_called_once_with(report_id="P1")
 
