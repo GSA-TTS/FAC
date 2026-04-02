@@ -17,9 +17,9 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - name: postgrest/postgrest:v12.2.12
-            short-name: postgrest
-          - name: ghcr.io/gsa-tts/clamav-rest/clamav:latest
+          # - name: postgrest/postgrest:v12.2.12
+          #   short-name: postgrest
+          - name: ghcr.io/gsa-tts/clamav-rest/clamav:20260406
             short-name: clamav
 
     steps:
@@ -51,13 +51,9 @@ jobs:
           timeout: 15m0s
           ignore-unfixed: true
 
-      # - name: Scan Image
-      #   run: docker run aquasec/trivy:latest image --db-repository public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db --java-db-repository public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}
-
       - name: Tag Image
         run: |
           date=$(date +%Y%m%d)
-          docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
           docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:$date
 
       - name: Login to GitHub Container Registry
