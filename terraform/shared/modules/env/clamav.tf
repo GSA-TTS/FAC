@@ -4,7 +4,7 @@ locals {
 }
 
 data "docker_registry_image" "clamav" {
-  name = "ghcr.io/gsa-tts/fac/clamav:latest"
+  name = "ghcr.io/gsa-tts/clamav-rest/clamav:20260402"
 }
 
 module "clamav" {
