@@ -1,27 +1,26 @@
 {% comment %} Audit metadata. Included at the bottom of several screens. {% endcomment %}
+{% comment %}
+The colons (":") that appear after the titles are inserted with CSS.
+The spacing can be stange if the `dt` tags are split between lines.
+TODO: Move that colon into HTML here, so it's not so ambiguous.
+{% endcomment %}
 <div class="audit-metadata">
     <div class="grid-container">
         <dl class="grid-row grid-gap">
             <div class="tablet:grid-col-6 padding-top-105">
-                <dt>
-                    Entity name
-                </dt>
+                <dt>Entity name</dt>
                 <dd>
                     {{ auditee_name | default_if_none:'' }}
                 </dd>
             </div>
             <div class="tablet:grid-col-6 padding-top-105">
-                <dt>
-                    Report ID
-                </dt>
+                <dt>Report ID</dt>
                 <dd>
                     #{{ report_id | default_if_none:'' }}
                 </dd>
             </div>
             <div class="tablet:grid-col-6 padding-top-105">
-                <dt>
-                    UEI
-                </dt>
+                <dt>UEI</dt>
                 <dd>
                     {{ auditee_uei | default_if_none:'' }}
                 </dd>
