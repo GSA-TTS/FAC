@@ -36,6 +36,7 @@ from .submissions import EditSubmission, MySubmissions, SubmissionView
 from .tribal_data_consent import TribalDataConsent
 from .upload_report_view import UploadReportView
 from .unlock_after_certification import UnlockAfterCertificationView
+from .compare_submissions_view import CompareSubmissionsView
 
 # In case we want to iterate through all the views for some reason:
 views_list = [
@@ -70,4 +71,5 @@ views_list = [
     TribalDataConsent,
     UnlockAfterCertificationView,
     UploadReportView,
+    CompareSubmissionsView,
 ]
