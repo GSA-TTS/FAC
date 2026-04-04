@@ -85,7 +85,7 @@ jobs:
 
       - name: Install Node dependencies
         working-directory: ./backend
-        run: npm ci
+        run: npm ci && npm run build
 
       - name: Create .env file
         working-directory: ./backend
@@ -118,6 +118,6 @@ jobs:
         # add the line below to store screenshots only on failures
         if: failure()
         with:
-          name: cypress-screenshots
+          name: cypress-screenshots-a11y
           path: backend/cypress/screenshots
           if-no-files-found: warn # 'warn' or 'error' are also available, defaults to `warn`

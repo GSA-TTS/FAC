@@ -47,7 +47,7 @@ jobs:
 
       - name: Install Node dependencies
         working-directory: ./backend
-        run: npm ci
+        run: npm ci && npm run build
 
       - name: Create .env
         working-directory: ./backend
