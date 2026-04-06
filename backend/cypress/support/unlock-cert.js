@@ -11,6 +11,7 @@ export function testUnlock() {
         cy.contains('td', `${reportId}`)
             .siblings()
             .contains('td', 'In Progress')
+            .find('a')
             .click()
         cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
         cy.then(() => {

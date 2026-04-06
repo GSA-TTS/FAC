@@ -20,7 +20,6 @@ import openpyxl as pyxl
 import re
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 mappings = [

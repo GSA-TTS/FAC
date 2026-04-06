@@ -76,10 +76,10 @@ But, Cypress also won't need any permissions or have to rely on Login.gov in any
 
 "Log in" once (visit the app) to ensure the test user exists in your local environment.
 
-Run the `load_fixtures` management command in your docker container, to ensure a submission of type "In Progress", "Ready for Certification", and "Accepted" exist for the test user. This will also load some dummy dissemination objects, so that at least one record will exist for search.
+Run the `load_fixtures` management command in your docker container, to ensure a submission of type "In Progress", "Ready for Certification", and "Accepted" exist for the test user. This will also load some dummy dissemination objects, so that at least one record will exist for search. By default, this will load objects for every user in your database. To limit it, name the test user(s) in the 'email_addresses' field. When running without auth, it is blank: `''`.
 ```shell
-docker compose exec web /bin/bash  # Enter the docker shell
-python manage.py load_fixtures     # Run the management command
+docker compose exec web /bin/bash                  # Enter the docker shell
+python manage.py load_fixtures {email_addresses}   # Run the management command
 ```
 
 Run `npm i` to ensure Cypress and its related dependencies are up-to-date.

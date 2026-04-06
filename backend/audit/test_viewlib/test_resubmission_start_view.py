@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS
-
+from dissemination.models import General
 
 User = get_user_model()
 
@@ -17,20 +17,40 @@ class ResubmissionStartViewTests(TestCase):
     invalid_report_id = "NOT-LONG-ENOUGH"
     nonexistent_report_id = "LONGENOUGHBUTDOESNOTEXIST"
     valid_report_id = "0123-01-SOURCE-0123456789"
+    valid_sibling_report_id = "3210-10-SOURCE-9876543210"
+    general_information = {
+        "auditee_uei": "auditee_uei",
+        "auditee_name": "auditee_name",
+        "auditee_fiscal_period_end": "2022-01-01",
+    }
 
     # Recreated per test
     def setUp(self):
-        """Setup user and client."""
+        """Setup prerequisite fake submissions, then add a user and client."""
         self.valid_sac = baker.make(
             SingleAuditChecklist,
             report_id=self.valid_report_id,
             submission_status=STATUS.DISSEMINATED,
+            general_information=self.general_information,
         )
+        self.sibling_sac = baker.make(
+            SingleAuditChecklist,
+            report_id=self.valid_sibling_report_id,
+            submission_status=STATUS.DISSEMINATED,
+            general_information=self.general_information,
+        )
+        self.sibling_general = baker.make(
+            General,
+            report_id=self.valid_sibling_report_id,
+            audit_year="2022",
+            auditee_uei="auditee_uei",
+        )
+
         self.user = baker.make(User)
         self.client = Client()
 
     def test_redirect_if_not_logged_in(self):
-        """Test that accessing resubmission start page redirects if the user is not logged in"""
+        """Test that accessing resubmission start page redirects if the user is not logged in."""
         response = self.client.get(self.path_name)
         self.assertAlmostEqual(response.status_code, 302)
 
@@ -63,4 +83,8 @@ class ResubmissionStartViewTests(TestCase):
         self.client.force_login(user=self.user)
         response = self.client.post(self.path_name, {"report_id": self.valid_report_id})
 
-        self.assertRedirects(response, reverse("report_submission:eligibility"))
+        self.assertRedirects(
+            response,
+            reverse("report_submission:eligibility"),
+            fetch_redirect_response=False,
+        )

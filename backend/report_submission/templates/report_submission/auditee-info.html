@@ -37,30 +37,29 @@
                             <label class="usa-sr-only" for="auditee_uei">Search</label>
                             <input class="usa-input"
                                 id="auditee_uei"
-                                type="search"
                                 name="auditee_uei"
                                 required
                                 data-validate-not-null=""
                                 data-validate-length="== 12"
                                 aria-autocomplete="inline"/>
-                            <button class="usa-button"
-                                id="auditee_uei-btn"
-                                type="submit"
-                                aria-controls="uei-search-result"
-                                data-open-modal>
-                                <span class="usa-search__submit-text">
-                                    <svg class="usa-icon usa-icon--size-3 margin-right-1" aria-hidden="true" focusable="false" role="img">
-                                        {% uswds_sprite "verified" %}
-                                    </svg>
-                                    <p class="margin-0 text-no-wrap">Validate UEI</p>
-                                </span>
-                            </button>
                         </div>
                         <ul class="usa-error-message" id="auditee_uei-error-message" role="alert">
                             <li id="auditee_uei-not-null" hidden>Can&#39;t be null</li>
                             <li id="auditee_uei-length" hidden>UEI is twelve characters long</li>
                         </ul>
                         <span class="usa-error-message margin-top-1">{{ form.auditee_uei.errors|striptags }}</span>
+                        {% if duplicate_report_ids %}
+                        <span class="usa-error-message margin-top-1">
+                            Report IDs of duplicate submissions:
+                            <ul>
+                                {% for x in duplicate_report_ids %}
+                                    <li>
+                                        <a class="usa-link" href="{% url 'dissemination:Summary' report_id=x.report_id %}">{{ x.report_id }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </span>
+                        {% endif %}
                     </div>
                     <div class="usa-form-group">
                         <label for="auditee_name" hidden>Auditee name</label>
@@ -134,10 +133,20 @@
                 </fieldset>
                 <ul class="usa-button-group">
                     <li class="usa-button-group__item">
-                        <button class="usa-button" id="continue">Continue</button>
+                        <button
+                        class="usa-button"
+                        id="continue"
+                        type="button"
+                        aria-controls="uei-search-result"
+                        data-open-modal
+                        disabled
+                        >
+                        Validate UEI
+                        </button>
                     </li>
                     <li class="usa-button-group__item margin-left-4">{% include "../cancel-button.html" %}</li>
                 </ul>
+                <button type="submit" id="real-continue" hidden></button>
             </form>
             <div class="ueid-explanation tablet:grid-col usa-prose font-sans-sm">
                 <p class="font-sans-lg text-bold">The FAC now uses the Unique Entity ID (UEI) instead of the DUNS number.</p>

@@ -147,8 +147,8 @@ class EligibilityViewTests(TestCase):
 
 class UEIValidationViewTests(TestCase):
     PATH = reverse("api-uei-validation")
-    SUCCESS = {"auditee_uei": "ZQGGHJH74DW7"}
-    INELIGIBLE = {"auditee_uei": "000000000OI*"}
+    SUCCESS = {"auditee_uei": "ZQGGHJH74DW7", "audit_year": 2021}
+    INELIGIBLE = {"auditee_uei": "000000000OI*", "audit_year": 2021}
 
     def test_auth_required(self):
         """
@@ -222,6 +222,24 @@ class UEIValidationViewTests(TestCase):
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["valid"], False)
+
+    def test_missing_audit_year_returns_invalid_year(self):
+        client = APIClient()
+        user = baker.make(User)
+        client.force_authenticate(user=user)
+
+        with patch("api.uei.SESSION.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            mock_get.return_value.json.return_value = json.loads(valid_uei_results)
+
+            response = client.post(
+                self.PATH, {"auditee_uei": "ZQGGHJH74DW7"}, format="json"
+            )
+            data = response.json()
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(data["valid"], False)
+            self.assertEqual(data["errors"], ["invalid-year"])
 
 
 class AuditeeInfoTests(TestCase):

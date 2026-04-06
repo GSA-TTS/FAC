@@ -22,6 +22,35 @@ class UploadReportForm(forms.Form):
     schedule_prior_findings = forms.IntegerField(initial=0, required=False, min_value=1)
     CAP_page = forms.IntegerField(initial=0, required=False, min_value=1)
     upload_report = forms.FileField()
+    keep_previous_report = forms.BooleanField(required=False)
+
+    def clean(self):
+        """
+        For 'Original' submissions, these fields do not really need cleaning - they're integers, so the default errors will do.
+        The view will handle erroneous report uploads.
+
+        For resubmissions, a user might upload an erroneous report and then indicate to keep their previous report.
+        Then, we want to clear all errors.
+        """
+        cleaned_data = super().clean()
+        if cleaned_data.get("keep_previous_report"):
+            for field in [
+                "financial_statements",
+                "financial_statements_opinion",
+                "schedule_expenditures",
+                "schedule_expenditures_opinion",
+                "uniform_guidance_control",
+                "uniform_guidance_compliance",
+                "GAS_control",
+                "GAS_compliance",
+                "schedule_findings",
+                "schedule_prior_findings",
+                "CAP_page",
+                "upload_report",
+            ]:
+                if field in self.errors:
+                    del self.errors[field]
+        return cleaned_data
 
 
 def _kvpair(info):
