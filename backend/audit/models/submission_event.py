@@ -46,6 +46,7 @@ class SubmissionEvent(models.Model):
         CANCEL_REMOVAL_FLAG = "cancel-removal-flag"
         FAC_ADMINISTRATIVE_UEI_REPLACEMENT = "fac-administrative-uei-replacement"
         FAC_ADMINISTRATIVE_EIN_REPLACEMENT = "fac-administrative-ein-replacement"
+        FAC_ADMINISTRATIVE_AUDITEE_NAME_REPLACEMENT = "fac-administrative-auditee-name-replacement"
         RESUBMISSION_STARTED = "resubmission-started"
         RESUBMISSION_INITIATED = "resubmission-initiated"
         FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE = (

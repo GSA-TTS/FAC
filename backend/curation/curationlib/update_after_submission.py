@@ -73,6 +73,16 @@ def get_sac_with_ein_to_update(options):
 
 
 # options hash -> Django queryset
+def get_sac_with_auditee_name_to_update(options):
+    # Does the old auditee_name exist?
+    crit1 = Q(report_id=options["report_id"])
+    crit2 = Q(general_information__auditee_name=options["old_auditee_name"])
+    crit3 = Q(submission_status="disseminated")
+    sac = SingleAuditChecklist.objects.get(crit1 & crit2 & crit3)
+    return sac
+
+
+# options hash -> Django queryset
 def get_sac_with_report_id(options):
     crit1 = Q(report_id=options["report_id"])
     crit2 = Q(submission_status="disseminated")
@@ -142,6 +152,21 @@ def update_ein(options):
     sac.general_information["ein"] = THE_NEW_EIN
 
     logger.info("Updating EIN for SAC: " + str(sac))
+    update_db(
+        sac,
+        THE_USER_OBJ,
+        SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
+    )
+
+
+def update_auditee_name(options):
+    THE_NEW_NAME = options["new_auditee_name"]
+    sac = get_sac_with_auditee_name_to_update(options)
+    THE_USER_OBJ = User.objects.get(email=options["email"])
+    sac.general_information["auditee_name"] = THE_NEW_NAME
+
+    logger.info("Updating auditee_name for SAC: " + str(sac))
+
     update_db(
         sac,
         THE_USER_OBJ,
