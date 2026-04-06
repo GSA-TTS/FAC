@@ -23,6 +23,7 @@ import re
 logger = logging.getLogger(__name__)
 UPDATABLE_FIELDS = ["uei", "ein", "auditee_name", "authorization"]
 
+
 def nonelike(v):
     return v is None or v == "" or v == {} or v == []
 
@@ -76,7 +77,9 @@ def validate_auditee_name_options(options):
         ok_old_auditee_name = options["old_auditee_name"] != ""
 
         if not ok_old_auditee_name:
-            logger.error(f"The old_auditee_name arg {options['old_auditee_name']} is empty.")
+            logger.error(
+                f"The old_auditee_name arg {options['old_auditee_name']} is empty."
+            )
     except Exception as e:
         logger.error(e)
         logger.error(f"could not fetch {options['report_id']}")
@@ -84,7 +87,9 @@ def validate_auditee_name_options(options):
 
     ok_new_auditee_name = options["new_auditee_name"] != ""
     if not ok_new_auditee_name:
-        logger.error(f"The new_auditee_name arg {options['new_auditee_name']} is empty.")
+        logger.error(
+            f"The new_auditee_name arg {options['new_auditee_name']} is empty."
+        )
 
     return ok_old_auditee_name, ok_new_auditee_name
 
@@ -145,7 +150,7 @@ def just_one_pair(flags, options):
     for flag in flags:
         pair_count += 1 if have_pair_of(flag, options) else 0
 
-    if pair_count == 0 :
+    if pair_count == 0:
         logger.error(f"You have no pairs of {UPDATABLE_FIELDS}. Exiting.")
         return False
     if pair_count != 1:
@@ -166,7 +171,9 @@ def validate_combos(options):
         ok_old_ein, ok_new_ein = validate_ein_options(options)
         return ok_old_ein and ok_new_ein
     elif have_pair_of("auditee_name", options):
-        ok_old_auditee_name, ok_new_auditee_name = validate_auditee_name_options(options)
+        ok_old_auditee_name, ok_new_auditee_name = validate_auditee_name_options(
+            options
+        )
         return ok_old_auditee_name and ok_new_auditee_name
     elif have_pair_of("authorization", options):
         ok_old_suppression, ok_new_suppression = validate_authorized_options(options)
@@ -295,7 +302,9 @@ class Command(BaseCommand):
                 get_sac_with_auditee_name_to_update,
                 SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
             )
-        elif not nonelike(options["old_auditee_name"]) and not nonelike(options["new_auditee_name"]):
+        elif not nonelike(options["old_auditee_name"]) and not nonelike(
+            options["new_auditee_name"]
+        ):
             update_simple_field(
                 options,
                 "auditee_name",
