@@ -1,7 +1,5 @@
-from django.core.management.base import BaseCommand
-
-from audit.models import SingleAuditChecklist
-import logging
+from audit.models import SingleAuditChecklist, SubmissionEvent
+from audit.validators import validate_uei
 from curation.curationlib.update_after_submission import (
     check_report_disseminated,
     get_sac_with_ein_to_update,
@@ -9,16 +7,17 @@ from curation.curationlib.update_after_submission import (
     get_sac_with_report_id,
     get_sac_with_uei,
     status_to_bool,
-    update_ein,
     update_authorized_public,
     update_uei,
-    update_auditee_name,
+    update_simple_field,
 )
-
-import sys
 from users.models import StaffUser
-from audit.validators import validate_uei
+
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.management.base import BaseCommand
+
+import logging
+import sys
 import re
 
 logger = logging.getLogger(__name__)
@@ -75,7 +74,7 @@ def validate_auditee_name_options(options):
     try:
         _ = get_sac_with_auditee_name_to_update(options)
         ok_old_auditee_name = options["old_auditee_name"] != ""
-        
+
         if not ok_old_auditee_name:
             logger.error(f"The old_auditee_name arg {options['old_auditee_name']} is empty.")
     except Exception as e:
@@ -285,11 +284,21 @@ class Command(BaseCommand):
 
         if not nonelike(options["old_uei"]) and not nonelike(options["new_uei"]):
             update_uei(options)
-        elif not nonelike(options["old_ein"]) and not nonelike(options["new_ein"]):
-            update_ein(options)
         elif not nonelike(options["old_authorization"]) and not nonelike(
             options["new_authorization"]
         ):
             update_authorized_public(options)
+        elif not nonelike(options["old_ein"]) and not nonelike(options["new_ein"]):
+            update_simple_field(
+                options,
+                "ein",
+                get_sac_with_auditee_name_to_update,
+                SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
+            )
         elif not nonelike(options["old_auditee_name"]) and not nonelike(options["new_auditee_name"]):
-            update_auditee_name(options)
+            update_simple_field(
+                options,
+                "auditee_name",
+                get_sac_with_auditee_name_to_update,
+                SubmissionEvent.EventType.FAC_ADMINISTRATIVE_AUDITEE_NAME_REPLACEMENT,
+            )

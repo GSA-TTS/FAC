@@ -1,13 +1,12 @@
 from audit.models import SingleAuditChecklist, User, SubmissionEvent
 from audit.models.viewflow import SingleAuditChecklistFlow
 from curation.curationlib.curation_audit_tracking import CurationTracking
+from dissemination.models import _dissemination_models
 
 import logging
 import sys
 from django.db.models import Q
 from django.db import transaction
-
-from dissemination.models import _dissemination_models
 
 logger = logging.getLogger(__name__)
 
@@ -139,38 +138,19 @@ def update_uei(options):
     )
 
 
-def update_ein(options):
-    # Now we need to pull the SAC, update the record, and
-    # save the new EIN.
-    THE_NEW_EIN = options["new_ein"]
+# Handles updates for simple string fields
+def update_simple_field(options, field_name, sac_getter, event_type):
+    new_value = options[f"new_{field_name}"]
+    sac = sac_getter(options)
+    user = User.objects.get(email=options["email"])
+    sac.general_information[field_name] = new_value
 
-    # The EIN is only in the general info.
-    sac = get_sac_with_ein_to_update(options)
-
-    THE_USER_OBJ = User.objects.get(email=options["email"])
-
-    sac.general_information["ein"] = THE_NEW_EIN
-
-    logger.info("Updating EIN for SAC: " + str(sac))
-    update_db(
-        sac,
-        THE_USER_OBJ,
-        SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
-    )
-
-
-def update_auditee_name(options):
-    THE_NEW_NAME = options["new_auditee_name"]
-    sac = get_sac_with_auditee_name_to_update(options)
-    THE_USER_OBJ = User.objects.get(email=options["email"])
-    sac.general_information["auditee_name"] = THE_NEW_NAME
-
-    logger.info("Updating auditee_name for SAC: " + str(sac))
+    logger.info(f"Updating {field_name} for SAC: " + str(sac))
 
     update_db(
         sac,
-        THE_USER_OBJ,
-        SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
+        user,
+        event_type,
     )
 
 
