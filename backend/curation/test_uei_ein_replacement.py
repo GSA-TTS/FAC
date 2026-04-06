@@ -167,7 +167,7 @@ class SimpleReplacementTests(TestCase):
         user.save()
 
         # Test on a single audit.
-        a = baker.make(
+        baker.make(
             SingleAuditChecklist,
             report_id=sac_01["report_id"],
             submission_status=sac_01["submission_status"],
