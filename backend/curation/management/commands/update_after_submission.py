@@ -1,4 +1,4 @@
-from audit.models import SingleAuditChecklist, SubmissionEvent
+from audit.models import SingleAuditChecklist
 from audit.validators import validate_uei
 from curation.curationlib.update_after_submission import (
     check_report_disseminated,
