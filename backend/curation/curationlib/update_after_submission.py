@@ -138,10 +138,22 @@ def update_uei(options):
     )
 
 
+SIMPLE_FIELDS = {
+    "auditee_name": {
+        "sac_getter": get_sac_with_auditee_name_to_update,
+        "event_type": SubmissionEvent.EventType.FAC_ADMINISTRATIVE_AUDITEE_NAME_REPLACEMENT,
+    },
+    "ein": {
+        "sac_getter": get_sac_with_ein_to_update,
+        "event_type": SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
+    },
+}
+
+
 # Handles updates for simple string fields
-def update_simple_field(options, field_name, sac_getter, event_type):
+def update_simple_field(options, field_name):
     new_value = options[f"new_{field_name}"]
-    sac = sac_getter(options)
+    sac = SIMPLE_FIELDS[field_name]["sac_getter"](options)
     user = User.objects.get(email=options["email"])
     sac.general_information[field_name] = new_value
 
@@ -150,7 +162,7 @@ def update_simple_field(options, field_name, sac_getter, event_type):
     update_db(
         sac,
         user,
-        event_type,
+        SIMPLE_FIELDS[field_name]["event_type"],
     )
 
 

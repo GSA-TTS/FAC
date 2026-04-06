@@ -296,18 +296,8 @@ class Command(BaseCommand):
         ):
             update_authorized_public(options)
         elif not nonelike(options["old_ein"]) and not nonelike(options["new_ein"]):
-            update_simple_field(
-                options,
-                "ein",
-                get_sac_with_auditee_name_to_update,
-                SubmissionEvent.EventType.FAC_ADMINISTRATIVE_EIN_REPLACEMENT,
-            )
+            update_simple_field(options, "ein")
         elif not nonelike(options["old_auditee_name"]) and not nonelike(
             options["new_auditee_name"]
         ):
-            update_simple_field(
-                options,
-                "auditee_name",
-                get_sac_with_auditee_name_to_update,
-                SubmissionEvent.EventType.FAC_ADMINISTRATIVE_AUDITEE_NAME_REPLACEMENT,
-            )
+            update_simple_field(options, "auditee_name")
