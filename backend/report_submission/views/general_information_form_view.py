@@ -1,10 +1,10 @@
 import logging
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import render
 from django.views import View
 
+from audit.mixins import SingleAuditChecklistAccessRequiredMixin
 from audit.models import (
     Access,
     SingleAuditChecklist,
@@ -23,7 +23,7 @@ from report_submission.views.utils import parse_hyphened_date, parse_slashed_dat
 logger = logging.getLogger(__name__)
 
 
-class GeneralInformationFormView(LoginRequiredMixin, View):
+class GeneralInformationFormView(SingleAuditChecklistAccessRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -31,10 +31,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             # TODO: Post SOT Launch -> Change this all to use Audit.
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
-
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
 
             sac_context = self._context_from_sac(sac)
             sac_context = self._dates_to_slashes(sac_context)
@@ -59,12 +55,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            # SOT TODO: When we are only `audit`, this has to change.
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
             form = GeneralInformationForm(request.POST)
 
             if not form.is_valid():
