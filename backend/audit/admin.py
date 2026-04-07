@@ -464,10 +464,25 @@ class SACAdmin(admin.ModelAdmin):
     search_fields = (
         "general_information__auditee_uei",
         "report_id",
-        "certifying_auditee_email",
-        "certifying_auditor_email",
     )
     actions = [revert_to_in_progress, flag_for_removal, delete_flagged_records]
+
+    def get_search_results(self, request, queryset, search_term):
+        """Extend default search to include certifying auditee/auditor emails."""
+        queryset, may_have_duplicates = super().get_search_results(
+            request, queryset, search_term
+        )
+        if search_term:
+            access_sac_ids = Access.objects.filter(
+                email__icontains=search_term,
+                role__in=[
+                    "certifying_auditee_contact",
+                    "certifying_auditor_contact",
+                ],
+            ).values_list("sac_id", flat=True)
+            queryset |= self.model.objects.filter(pk__in=access_sac_ids)
+            may_have_duplicates = True
+        return queryset, may_have_duplicates
 
     @admin.display(description="Latest transition")
     def latest_transition_date(self, obj):
