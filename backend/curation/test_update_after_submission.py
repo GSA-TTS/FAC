@@ -133,7 +133,7 @@ class UEIReplacementTests(TestCase):
         self.assertEqual(sac.general_information["auditee_uei"], ORIG_UEI)
 
 
-class SimpleReplacementTests(TestCase):
+class SimpleGenFieldReplacementTests(TestCase):
 
     def test_update_ein(self):
         user = baker.make(User)
