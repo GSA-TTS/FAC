@@ -151,7 +151,7 @@ SIMPLE_FIELDS = {
 
 
 # Handles updates for simple string fields
-def update_simple_field(options, field_name):
+def update_simple_gen_field(options, field_name):
     new_value = options[f"new_{field_name}"]
     sac = SIMPLE_FIELDS[field_name]["sac_getter"](options)
     user = User.objects.get(email=options["email"])

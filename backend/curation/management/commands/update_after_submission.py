@@ -9,7 +9,7 @@ from curation.curationlib.update_after_submission import (
     status_to_bool,
     update_authorized_public,
     update_uei,
-    update_simple_field,
+    update_simple_gen_field,
 )
 from users.models import StaffUser
 
@@ -296,8 +296,8 @@ class Command(BaseCommand):
         ):
             update_authorized_public(options)
         elif not nonelike(options["old_ein"]) and not nonelike(options["new_ein"]):
-            update_simple_field(options, "ein")
+            update_simple_gen_field(options, "ein")
         elif not nonelike(options["old_auditee_name"]) and not nonelike(
             options["new_auditee_name"]
         ):
-            update_simple_field(options, "auditee_name")
+            update_simple_gen_field(options, "auditee_name")

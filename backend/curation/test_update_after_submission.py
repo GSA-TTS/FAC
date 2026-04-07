@@ -1,7 +1,7 @@
 from curation.curationlib.update_after_submission import (
     update_uei,
     update_authorized_public,
-    update_simple_field,
+    update_simple_gen_field,
 )
 from model_bakery import baker
 from django.test import TestCase
@@ -156,7 +156,7 @@ class SimpleReplacementTests(TestCase):
         options["new_ein"] = NEW_EIN
         options["email"] = user.email
 
-        update_simple_field(options, "ein")
+        update_simple_gen_field(options, "ein")
 
         sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
         self.assertEqual(sac.general_information["ein"], NEW_EIN)
@@ -182,7 +182,7 @@ class SimpleReplacementTests(TestCase):
         options["new_auditee_name"] = "foo"
         options["email"] = user.email
 
-        update_simple_field(options, "auditee_name")
+        update_simple_gen_field(options, "auditee_name")
 
         sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
         self.assertEqual(sac.general_information["auditee_name"], "foo")
@@ -217,7 +217,7 @@ class SimpleReplacementTests(TestCase):
         options["new_ein"] = NEW_EIN
         options["email"] = user.email
 
-        update_simple_field(options, "ein")
+        update_simple_gen_field(options, "ein")
 
         # Make sure the first audit changed
         sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
@@ -266,7 +266,7 @@ class SimpleReplacementTests(TestCase):
         options["new_ein"] = NEW_EIN
         options["email"] = user.email
 
-        update_simple_field(options, "ein")
+        update_simple_gen_field(options, "ein")
         # Make sure the first audit changed
         sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
         # This record should have a new EIN
@@ -293,7 +293,7 @@ class SimpleReplacementTests(TestCase):
         options["email"] = "does not matter"
 
         try:
-            update_simple_field(options, "ein")
+            update_simple_gen_field(options, "ein")
             result = "succeeded"
         except:  # noqa: E722
             result = "failed"
