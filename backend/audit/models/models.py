@@ -324,7 +324,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             # Clone the record, including the top level audit type, all workbook data, and most form data.
             # Excludes the certifications, tribal consent form, and cog/over assignments.
             # PDF report form data is kept with the SingleAuditReportFile.
-            include_list=[
+            include_list = [
                 "audit_type",
                 "general_information",
                 "audit_information",
@@ -337,9 +337,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 "secondary_auditors",
                 "notes_to_sefa",
             ]
-            data = model_to_dict(
-                self, fields=include_list
-            )
+            data = model_to_dict(self, fields=include_list)
 
             # Update individual fields
             data["general_information"]["auditee_uei"] = self.auditee_uei

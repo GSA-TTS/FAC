@@ -6,7 +6,6 @@ from django.views import View
 
 from audit.mixins import SingleAuditChecklistAccessRequiredMixin
 from audit.models import (
-    Access,
     SingleAuditChecklist,
     LateChangeError,
     SubmissionEvent,
