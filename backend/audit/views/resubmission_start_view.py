@@ -20,10 +20,14 @@ class ResubmissionStartView(LoginRequiredMixin, View):
             return redirect(reverse("config:Home"))
 
         form = ResubmissionStartForm()
-        return render(request, self.template_name,{
-            "form": form,
-            "form_user_input": {},
-        },)
+        return render(
+            request,
+            self.template_name,
+            {
+                "form": form,
+                "form_user_input": {},
+            },
+        )
 
     def post(self, request):
         # Only run in non-production environments for now.
