@@ -12,7 +12,7 @@ applications:
       ENV: ((cf_env_name))
       DJANGO_BASE_URL: https://((endpoint))
       ALLOWED_HOSTS: ((endpoint)) fac-((env_name)).app.cloud.gov
-      AV_SCAN_URL: https://fac-av-((service_name)).apps.internal:61443/v2/scan
+      AV_SCAN_URL: https://fac-av-((service_name)).apps.internal:61443/scan
       # DISABLE_COLLECTSTATIC: true
     routes:
       - route: fac-((env_name)).app.cloud.gov

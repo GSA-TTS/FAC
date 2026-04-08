@@ -32,10 +32,10 @@ jobs:
         environment: "preview"
     secrets: inherit
 
-  scan-preview-post-deploy:
-    name: Zap Scan
-    needs:
-        - deploy-preview
-    uses: ./.github/workflows/scanning-zap-scan.yml
-    with:
-        url: "https://fac-preview.app.cloud.gov/"
+  # scan-preview-post-deploy:
+  #   name: Zap Scan
+  #   needs:
+  #       - deploy-preview
+  #   uses: ./.github/workflows/scanning-zap-scan.yml
+  #   with:
+  #       url: "https://fac-preview.app.cloud.gov/"

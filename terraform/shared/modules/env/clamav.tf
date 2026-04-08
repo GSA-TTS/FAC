@@ -4,7 +4,7 @@ locals {
 }
 
 data "docker_registry_image" "clamav" {
-  name = "ghcr.io/gsa-tts/clamav-rest/clamav:20260406"
+  name = "ghcr.io/gsa-tts/clamav-rest/clamav:fac-updates-test"
 }
 
 module "clamav" {
@@ -15,7 +15,7 @@ module "clamav" {
 
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space.name
-  clamav_image  = "ghcr.io/gsa-tts/clamav-rest/clamav:20260406"
+  clamav_image  = "ghcr.io/gsa-tts/clamav-rest/clamav:fac-updates-test"
   max_file_size = "30M"
   instances     = var.clamav_instances
   clamav_memory = var.clamav_memory
@@ -34,7 +34,7 @@ module "file_scanner_clamav" {
 
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space.name
-  clamav_image  = "ghcr.io/gsa-tts/clamav-rest/clamav:20260406"
+  clamav_image  = "ghcr.io/gsa-tts/clamav-rest/clamav:fac-updates-test"
   max_file_size = "30M"
   instances     = var.clamav_fs_instances
   clamav_memory = var.clamav_memory

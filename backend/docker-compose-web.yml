@@ -57,10 +57,6 @@ services:
       - ".env"
     ports:
       - "8000:8000"
-    volumes:
-      - .:/src
-      - /src/node_modules
-      - /src/staticfiles
     healthcheck:
       test: curl --fail -I http://localhost:8000/ || exit 1
       interval: 60s

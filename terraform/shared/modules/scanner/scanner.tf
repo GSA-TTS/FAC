@@ -1,13 +1,14 @@
-data "cloudfoundry_domain" "internal" {
-  name = "apps.internal"
+locals {
+  app_id   = cloudfoundry_app.scanner_app.id
+  scan_url = "https://fac-av-${var.cf_space.name}-fs.apps.internal:61443/v2/scan"
+  services = merge({
+    "${cloudfoundry_service_instance.clam_ups_fs.name}" = ""
+    "${module.quarantine.bucket_name}"                  = ""
+  }, var.service_bindings)
 }
 
-resource "cloudfoundry_route" "scanner_route" {
-  space        = var.cf_space.id
-  domain       = data.cloudfoundry_domain.internal.id
-  host         = "${var.name}-${replace(var.cf_space.name, ".", "-")}"
-  destinations = [{ app_id = cloudfoundry_app.scanner_app.id }]
-  # Yields something like: fac-file-scanner-spacename.apps.internal
+data "cloudfoundry_domain" "internal" {
+  name = "apps.internal"
 }
 
 data "external" "scannerzip" {
@@ -16,6 +17,14 @@ data "external" "scannerzip" {
   query = {
     gitref = var.gitref
   }
+}
+
+resource "cloudfoundry_route" "scanner_route" {
+  space        = var.cf_space.id
+  domain       = data.cloudfoundry_domain.internal.id
+  host         = "${var.name}-${replace(var.cf_space.name, ".", "-")}"
+  destinations = [{ app_id = cloudfoundry_app.scanner_app.id }]
+  # Yields something like: fac-file-scanner-spacename.apps.internal
 }
 
 resource "cloudfoundry_service_instance" "clam_ups_fs" {
@@ -35,16 +44,6 @@ module "quarantine" {
   s3_plan_name = "basic"
   tags         = ["s3"]
 }
-
-locals {
-  app_id   = cloudfoundry_app.scanner_app.id
-  scan_url = "https://fac-av-${var.cf_space.name}-fs.apps.internal:61443/v2/scan"
-  services = merge({
-    "${cloudfoundry_service_instance.clam_ups_fs.name}" = ""
-    "${module.quarantine.bucket_name}"                  = ""
-  }, var.service_bindings)
-}
-
 
 resource "cloudfoundry_app" "scanner_app" {
   name       = var.name
