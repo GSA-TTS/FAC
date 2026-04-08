@@ -3,7 +3,12 @@
          id="resubmission-banner">
     <div class="usa-alert__body grid-container">
       <p class="usa-alert__text">
-        Resubmission of <a class="usa-link" href="{% url 'audit:SubmissionProgress' previous_report_id %}">{{ previous_report_id }}</a> in progress.
+        Resubmission of <a class="usa-link" href="{% url 'audit:SubmissionProgress' previous_report_id %}">{{ previous_report_id }}</a>
+        {% if submission.completed %}
+          completed
+        {% else %}
+          in progress
+        {% endif %}.
       </p>
   </div>
 </section>

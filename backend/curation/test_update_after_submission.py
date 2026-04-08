@@ -1,7 +1,7 @@
 from curation.curationlib.update_after_submission import (
     update_uei,
-    update_ein,
     update_authorized_public,
+    update_simple_gen_field,
 )
 from model_bakery import baker
 from django.test import TestCase
@@ -133,7 +133,7 @@ class UEIReplacementTests(TestCase):
         self.assertEqual(sac.general_information["auditee_uei"], ORIG_UEI)
 
 
-class EINReplacementTests(TestCase):
+class SimpleGenFieldReplacementTests(TestCase):
 
     def test_update_ein(self):
         user = baker.make(User)
@@ -156,10 +156,36 @@ class EINReplacementTests(TestCase):
         options["new_ein"] = NEW_EIN
         options["email"] = user.email
 
-        update_ein(options)
+        update_simple_gen_field(options, "ein")
 
         sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
         self.assertEqual(sac.general_information["ein"], NEW_EIN)
+
+    def test_update_auditee_name(self):
+        user = baker.make(User)
+        user.email = "test@fac.gsa.gov"
+        user.save()
+
+        # Test on a single audit.
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+        )
+
+        options = dict()
+        options["report_id"] = "2022-42-MAGIC-0000000001"
+        options["old_auditee_name"] = "JACKSON TOWNSHIP VOLUNTEER FIRE COMPANY"
+        options["new_auditee_name"] = "foo"
+        options["email"] = user.email
+
+        update_simple_gen_field(options, "auditee_name")
+
+        sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
+        self.assertEqual(sac.general_information["auditee_name"], "foo")
 
     def test_update_one_record_ein_not_the_other(self):
         user = baker.make(User)
@@ -191,7 +217,7 @@ class EINReplacementTests(TestCase):
         options["new_ein"] = NEW_EIN
         options["email"] = user.email
 
-        update_ein(options)
+        update_simple_gen_field(options, "ein")
 
         # Make sure the first audit changed
         sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
@@ -240,7 +266,7 @@ class EINReplacementTests(TestCase):
         options["new_ein"] = NEW_EIN
         options["email"] = user.email
 
-        update_ein(options)
+        update_simple_gen_field(options, "ein")
         # Make sure the first audit changed
         sac = SingleAuditChecklist.objects.get(report_id="2022-42-MAGIC-0000000001")
         # This record should have a new EIN
@@ -267,7 +293,7 @@ class EINReplacementTests(TestCase):
         options["email"] = "does not matter"
 
         try:
-            update_uei(options)
+            update_simple_gen_field(options, "ein")
             result = "succeeded"
         except:  # noqa: E722
             result = "failed"

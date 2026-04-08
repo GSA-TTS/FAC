@@ -37,7 +37,7 @@ jobs:
       - name: Run Django test suite
         working-directory: ./backend
         run: |
-          docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=85 && coverage xml -o coverage.xml'
+          docker compose -f docker-compose-web.yml exec web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=85 && coverage xml -o coverage.xml'
 
       - name: Copy Coverage From Docker Container
         run: |
