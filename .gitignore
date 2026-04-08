@@ -185,3 +185,4 @@ terraform/shared/modules/cg-logshipper/logshipper.zip
 # XLSX ignores
 .~*#
 
+backend/package-lock.json
