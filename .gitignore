@@ -15,7 +15,6 @@ downloads/
 eggs/
 .eggs/
 lib/
-!backend/dissemination/api/lib
 lib64/
 parts/
 sdist/
@@ -185,4 +184,3 @@ terraform/shared/modules/cg-logshipper/logshipper.zip
 # XLSX ignores
 .~*#
 
-backend/package-lock.json
