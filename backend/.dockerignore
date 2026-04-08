@@ -1,7 +1,6 @@
 # Python
 **/__pycache__
 **/*.pyc
-.coveragerc
 staticfiles/
 
 
@@ -25,12 +24,6 @@ apt.yml
 
 # Tools
 minio/
-
-# Tests
-cypress/
-cypress.config.mjs
-**/test_*.py
-**/tests.py
 
 # Git
 .git/
