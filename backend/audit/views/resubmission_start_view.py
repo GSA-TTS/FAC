@@ -19,7 +19,11 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         if ENVIRONMENT == "PRODUCTION":
             return redirect(reverse("config:Home"))
 
-        return render(request, self.template_name)
+        form = ResubmissionStartForm()
+        return render(request, self.template_name,{
+            "form": form,
+            "form_user_input": {},
+        },)
 
     def post(self, request):
         # Only run in non-production environments for now.
@@ -33,17 +37,22 @@ class ResubmissionStartView(LoginRequiredMixin, View):
             return render(
                 request,
                 self.template_name,
-                {"form": form, "form_user_input": form.cleaned_data},
+                {
+                    "form": form,
+                    "form_user_input": request.POST,
+                },
             )
 
         # The form is valid. Populate previous_report_data and resubmission_meta, and store it to the user profile.
         previous_report_data = form.cleaned_data["previous_report_data"]
         resubmission_meta = form.cleaned_data["resubmission_meta"]
+        material_change_reasons = form.cleaned_data["material_change_reasons"]
 
         # Save the previous report data and resubmission metadata to the user profile. Overwrites other user profile data.
         profile_data = previous_report_data | {
             "is_resubmission": True,
             "resubmission_meta": resubmission_meta,
+            "material_change_reasons": material_change_reasons,
         }
         user = request.user
         user.profile.entry_form_data = profile_data

@@ -5,8 +5,31 @@ from audit.check_resubmission_allowed import check_resubmission_allowed
 from audit.models.constants import STATUS
 from audit.models import SingleAuditChecklist
 
+MATERIAL_CHANGE_CHOICES = [
+    ("audit_findings", "Material change to audit findings"),
+    ("corrective_action_plans", "Addition or revision of corrective action plans"),
+    ("missing_finding_elements", "Inclusion of missing finding elements (such as condition, criteria, cause, or effect)"),
+    ("questioned_costs", "Correction to questioned costs or compliance determination"),
+    ("major_program_or_low_risk", "Error in major program determination or low-risk auditee status"),
+    ("sefa_award_amounts", "Change to federal award amounts in the Schedule of Expenditures of Federal Awards (SEFA)"),
+    ("assistance_listing_number", "Correction to Assistance Listing Number"),
+    ("incomplete_audit_package", "Supplementing an incomplete Single Audit package (for example, missing financial statements or required reports)"),
+    ("auditor_report_elements", "Addition or correction to the required auditor report elements"),
+    ("auditor_report_revision", "Revision to the auditor's report"),
+]
 
 class ResubmissionStartForm(forms.Form):
+    material_change_reasons = forms.MultipleChoiceField(
+        required=True,
+        choices=MATERIAL_CHANGE_CHOICES,
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "usa-checkbox__input"}
+        ),
+        error_messages={
+            "required": "Select at least one reason for resubmission.",
+        },
+    )
+    
     report_id = forms.CharField(required=True)
 
     def clean_report_id(self):
