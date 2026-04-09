@@ -7,8 +7,9 @@ describe('Full audit resubmission', () => {
       testLoginGovLogin();
 
       cy.visit('/audit/resubmission-start');
-      cy.get('[id=report_id]').type(previous_report_id);
-      cy.get('[id=continue]').click();
+      cy.get('#id_material_change_reasons_0').check({ force: true });
+      cy.get('#report_id').type(previous_report_id);
+      cy.get('#continue').click();
       cy.url().should('include', '/report_submission/eligibility/');
 
       testFullSubmission(false, true, true);
