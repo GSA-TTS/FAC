@@ -9,11 +9,11 @@
 # Updating the ALN (formerly CFDA) listings
 
 1. Log in to Sam.gov with your GSA account and go to https://sam.gov/search/.
-2. Select "Assistance Listings" as domain.
+2. Select "Federal Assistance" and then "Assistance Listings" as domain.
 3. Under "key word" search, choose simple and "any words" and then "active" listings.
 4. Click "Actions" on the upper-right and then "download" to get the CSV file of active listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/active-alns.csv`.
 5. Repeat the process, choosing "inactive" listings to get the CSV file for inactive ALN listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/inactive-alns.csv`. These have to be done separately due to a limit on the amount of records that can be downloaded into a CSV file.
-6. Make sure the headings of first 2 columns match this: "Program Number", "Program Title"
+6. Make sure the headings of first 2 columns match this: "Program Number", "Program Title". If applicable, make sure that trailing zeroes are not dropped (In Excel, select the Program Number column, then format cell as number with 3 numbers after decimal).
 7. Perform the "Bumping workbook template version" steps below.
     * Note: Part of this process will merge the CSVs into `/schemas/source/data/cfda-lookup.csv`.
 
