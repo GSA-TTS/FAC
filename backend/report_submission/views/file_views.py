@@ -39,6 +39,11 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
         try:
             # TODO SOT: Update for `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            previous_report_id = (
+                sac.resubmission_meta.get("previous_report_id")
+                if sac.resubmission_meta
+                else None
+            )
 
             # Context for every upload page
             context = {
@@ -46,6 +51,7 @@ class UploadPageView(SingleAuditChecklistAccessRequiredMixin, View):
                 "report_id": report_id,
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
+                "is_resubmission": True if previous_report_id else False,
             }
             # Using the current URL, append page specific context
             path_name = request.path.split("/")[2]
@@ -123,11 +129,13 @@ class DeleteFileView(SingleAuditChecklistAccessRequiredMixin, View):
 
         try:
             # TODO: Update Post SOC Launch -> don't use sac.
-            SingleAuditChecklist.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            # Context for every upload page
+            # SAC metadata
             context = {
+                "auditee_name": sac.auditee_name,
                 "report_id": report_id,
+                "auditee_uei": sac.auditee_uei,
             }
             # Using the current URL, append page specific context
             path_name = request.path.split("/")[2]
@@ -166,7 +174,7 @@ class DeleteFileView(SingleAuditChecklistAccessRequiredMixin, View):
                 setattr(sac, section["field_name"], None)
                 sac.save()
 
-                if audit:
+                if audit and audit.audit.get(section["field_name"]):
                     del audit.audit[section["field_name"]]
                     audit.save(
                         event_type=section["event_type"],
