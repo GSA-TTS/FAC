@@ -15,7 +15,7 @@ downloads/
 eggs/
 .eggs/
 lib/
-backend/dissemination/api/lib
+!backend/dissemination/api/lib
 lib64/
 parts/
 sdist/
