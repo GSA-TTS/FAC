@@ -99,7 +99,7 @@ def check_resubmission_allowed(
         if sac.id != most_recent.id:
             return False, (
                 f"Multiple legacy audits found for this UEI and audit year. "
-                f"Only the most recent (ID={most_recent.id}) may initiate resubmission."
+                f"Only the most recent ({most_recent.report_id}) may initiate resubmission."
             )
 
         # Check timestamp clustering
