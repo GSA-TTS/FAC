@@ -23,13 +23,15 @@ endpoints=(
   "passthrough"
   "resubmission"
   "secondary_auditors"
-) 
+)
 
 ####################################################
 # Get the bucket variables for use with AWS CLI
 # These come out of VCAP_SERVICES if we are in the cloud.
 # If we are local, we need to set up our env vars differently.
 export AWSCLI="/tmp/aws-cli/v2/current/bin/aws"
+export AWS_PAGER="" # AWS complains because less isn't installed, so don't paginate output
+
 # Where we'll store the temporary CSVs
 export ROOT="/tmp/csv"
 
@@ -54,7 +56,7 @@ else
   export BUCKET=$(echo $VCAP_SERVICES |  jq -rc '.s3[] | select(.name | contains("fac-private-s3")) | .credentials.bucket')
   export AWS_REGION=$(echo $VCAP_SERVICES |  jq -rc '.s3[] | select(.name | contains("fac-private-s3")) | .credentials.region')
   export AWS_DEFAULT_REGION=${AWS_REGION}
-  
+
   export DAS_DB_HOST=$(echo $VCAP_SERVICES |  jq -rc '."aws-rds"[] | select(.name | contains("fac-db")) | .credentials.host')
   export DAS_DB_USER=$(echo $VCAP_SERVICES |  jq -rc '."aws-rds"[] | select(.name | contains("fac-db")) | .credentials.username')
   export DAS_DB_NAME=$(echo $VCAP_SERVICES |  jq -rc '."aws-rds"[] | select(.name | contains("fac-db")) | .credentials.db_name')
@@ -107,8 +109,7 @@ download_full_csv() {
     -h "${DAS_DB_HOST}" \
     -U "${DAS_DB_USER}" \
     -t -A \
-    -c "\COPY (SELECT * FROM ${API_VERSION}.${endpoint}) TO '${ROOT}/${endpoint}.csv' WITH (FORMAT CSV, HEADER, DELIMITER ',');" \
-    |& grep -v "has_tribal"
+    -c "\COPY (SELECT * FROM ${API_VERSION}.${endpoint}) TO '${ROOT}/${endpoint}.csv' WITH (FORMAT CSV, HEADER, DELIMITER ',');" |& grep -v "has_tribal"
 
   if [ $? -ne 0 ]; then
     echo "PSQL FAILED IN FULL TABLE DOWNLOAD"
