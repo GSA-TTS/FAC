@@ -20,7 +20,6 @@ from ..workbooklib.secondary_auditors import (
     generate_secondary_auditors,
 )
 
-
 sections_to_handlers = {
     FORM_SECTIONS.ADDITIONAL_EINS: generate_additional_eins,
     FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,

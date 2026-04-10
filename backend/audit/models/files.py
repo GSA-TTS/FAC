@@ -104,6 +104,11 @@ class SingleAuditReportFile(models.Model):
     component_page_numbers = models.JSONField(
         blank=True, null=True, validators=[validate_component_page_numbers]
     )
+    keep_previous_report = models.BooleanField(
+        "Keep Previous Single Audit Report File",
+        help_text="In resubmission, whether the user opted to bring forward their SAR from the previous report or not.",
+        default=False,
+    )
 
     def save(self, *args, **kwargs):
         report_id = self.sac.report_id

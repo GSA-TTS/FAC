@@ -4,7 +4,7 @@ title: "[API access]: "
 labels: ["api"]
 projects: ["GSA-TTS/11"]
 assignees:
-  - jadudm
+  - mogul
 body:
   - type: markdown
     attributes:
@@ -38,7 +38,7 @@ body:
         as part of a FISMA-Moderate system that has an active ATO. 
 
   - type: dropdown
-    id: accesstype
+    id: keytype
     attributes:
       label: Key type
       description: |

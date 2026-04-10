@@ -27,10 +27,6 @@ jobs:
     uses: ./.github/workflows/testing-from-ghcr.yml
     secrets: inherit
 
-  linting:
-    uses: ./.github/workflows/pull_request-linting.yml
-    secrets: inherit
-
   # deploy to Dev & Management spaces
   deploy-infrastructure-dev:
     name: Deploy infrastructure (development)

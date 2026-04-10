@@ -49,19 +49,34 @@
                                accept=".xlsx,.XLSX" />
                     </div>
 
+                    {% comment %} 
+                    When already_submitted:
+                      1. last_uploaded_by is set: there is uploader info to show, and download/remove links.
+                      2. is_resubmission without last_uploaded_by: there is no uploader info or download link to show. Remove is still available, since data was copied from the previous submission.
+                    {% endcomment %}
                     {% if already_submitted %}
                         <p class="text-green" id="already-submitted">
                             A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
                         </p>
-                        <p>Last uploaded by {{ last_uploaded_by }} at {{ last_uploaded_at }}
-                            <span class="display-flex">
-                                <a class="usa-link" href="{{ existing_workbook_url }}" target="_blank">Download current workbook</a>
+                        {% if last_uploaded_by %}
+                            <p>Last uploaded by {{ last_uploaded_by }} at {{ last_uploaded_at }}
+                                <span class="display-flex">
+                                    <a class="usa-link" href="{{ existing_workbook_url }}" target="_blank">Download current workbook</a>
+                                    {% if remove_existing_workbook %}
+                                        <span>&nbsp;|&nbsp;</span>
+                                        <a class="usa-link" id="remove-workbook-link" href="{{ remove_existing_workbook }}">Remove current workbook</a>
+                                    {% endif %}
+                                </span>
+                            </p>
+                        {% elif is_resubmission %}
+                            <p>Copied from the previous submission.
                                 {% if remove_existing_workbook %}
-                                    <span>&nbsp;|&nbsp;</span>
-                                    <a class="usa-link" id="remove-workbook-link" href="{{ remove_existing_workbook }}">Remove current workbook</a>
+                                    <span class="display-flex">
+                                        <a class="usa-link" id="remove-workbook-link" href="{{ remove_existing_workbook }}">Remove current workbook</a>
+                                    </span>
                                 {% endif %}
-                            </span>
-                        </p>
+                            </p>
+                        {% endif %}
                     {% endif %}
 
                     <div hidden id="info_box" class="grid-row margin-bottom-3 margin-top-3"></div>

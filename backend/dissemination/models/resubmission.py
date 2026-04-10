@@ -24,13 +24,13 @@ class Resubmission(models.Model):
     # Required to be non-null.
     version = models.BigIntegerField(
         "Resubmission Version",
-        # help_text=docs.resubmission_version,  # "Original submissions are version 1. Subsequent resubmissions increment the value."
+        # help_text=docs.resubmission_version,  # "Original submissions/most recent are version 1. Subsequent resubmissions increment the value."
     )
     status = models.CharField(
-        "Resubmission Status (Original, Deprecated, Resubmission)",
+        "Resubmission Status (Unknown, Deprecated, Resubmission)",
         max_length=30,
         choices=RESUBMISSION_STATUS_CHOICES,
-        # help_text=docs.resubmission_status,  # "The resubmission status of this record. Displays whether it is a singular original, a resubmission, or a previous version."
+        # help_text=docs.resubmission_status,  # "The resubmission status of this record. Displays whether it is a singular most recent, a resubmission, or a previous version."
     )
 
     # Allowed to be null
@@ -50,4 +50,6 @@ class Resubmission(models.Model):
     # changed_fields. A TextField with a string of comma separated field names. i.e. "one_field, two_field, red_field, blue_field".
 
     def __str__(self):
-        return f"report_id:{self.report_id} Version:{self.resubmission_version}, Status:{self.resubmission_status}"
+        return (
+            f"report_id:{self.report_id} Version:{self.version}, Status:{self.status}"
+        )

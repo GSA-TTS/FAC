@@ -1,0 +1,48 @@
+name: Django Migration Integrity Check
+
+# This check will fail if a model was changed but the resulting migration file
+# was not.
+
+permissions:
+  pull-requests: read
+
+on:
+  workflow_call:
+
+jobs:
+  validate-migrations:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12' # This should match our project version
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Migration Check
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        run: |
+          # --check: Exits with a non-zero status if migrations are missing
+          # --dry-run: Doesn't actually create the files
+          if ! python manage.py makemigrations --check --dry-run dissemination; then
+            echo "::error title=Missing Migrations Detected::It looks like you've changed the models in 'dissemination' but haven't added the corresponding migration file(s) that are generated. Look for newly created files with a path similar to 'backend/dissemination/migrations/####_foo.py'."
+            exit 1
+          fi
+
+          if ! python manage.py makemigrations --check --dry-run audit; then
+            echo "::error title=Missing Migrations Detected::It looks like you've changed the models in 'audit' but haven't added the corresponding migration file(s) that are generated. Look for newly created files with a path similar to 'backend/audit/migrations/####_foo.py'."
+            exit 1
+          fi

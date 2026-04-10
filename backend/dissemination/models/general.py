@@ -151,7 +151,7 @@ class General(models.Model):
         "Fiscal Year Start Date", help_text=docs.fy_start_date
     )
     audit_year = models.TextField(
-        "Audit year from fy_start_date.",
+        "Audit year from fy_end_date.",
         help_text=docs.audit_year_general,
     )
 

@@ -69,11 +69,9 @@ def check_resubmission_allowed(
             "Audit record is incomplete and cannot be evaluated for resubmission.",
         )
 
-    # ORIGINAL_SUBMISSION + version 1 can be resubmitted or MOST_RECENT + version > 1 can be resubmitted
-    if resub_status in [RESUBMISSION_STATUS.ORIGINAL, RESUBMISSION_STATUS.MOST_RECENT]:
-        if (resub_status == RESUBMISSION_STATUS.ORIGINAL and version == 1) or (
-            resub_status == RESUBMISSION_STATUS.MOST_RECENT and version > 1
-        ):
+    # MOST_RECENT + version > 1 can be resubmitted
+    if resub_status in [RESUBMISSION_STATUS.MOST_RECENT]:
+        if version >= 1:
             return True, "Audit is eligible for resubmission."
 
     # Legacy audit (meta = None) At this point, we assume data has been curated: valid submission_status, uei, year.

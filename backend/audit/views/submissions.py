@@ -8,7 +8,6 @@ from django.db.transaction import TransactionManagementError
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
-
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
 )
@@ -44,10 +43,18 @@ class MySubmissions(LoginRequiredMixin, generic.View):
 
         data = {"completed_audits": [], "in_progress_audits": []}
         for audit in submissions:
-            audit["submission_status"] = _friendly_status(audit["submission_status"])
-            if audit["submission_status"] in ["Submitted", "Disseminated"]:
+            raw_status = audit["submission_status"]
+            friendly = _friendly_status(raw_status)
+
+            is_resubmission = (audit.get("resubmission_version") or 0) > 1
+
+            if friendly in ["Submitted", "Disseminated"]:
+                audit["submission_status"] = friendly
                 data["completed_audits"].append(audit)
             else:
+                audit["submission_status"] = (
+                    "Resubmission in progress" if is_resubmission else friendly
+                )
                 data["in_progress_audits"].append(audit)
 
         context = {
@@ -108,6 +115,7 @@ class MySubmissions(LoginRequiredMixin, generic.View):
                 fiscal_year_end_date=F(
                     "general_information__auditee_fiscal_period_end"
                 ),
+                resubmission_version=F("resubmission_meta__version"),
             )
             return data
 
@@ -180,7 +188,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     old_sac = SingleAuditChecklist.objects.get(
                         report_id=previous_report_id
                     )
-                    old_sac.resubmission_meta = old_sac.resubmission_meta | {
+                    old_sac.resubmission_meta = old_sac.resubmission_meta or {
                         "next_report_id": sac.report_id,
                         "next_row_id": sac.id,
                     }

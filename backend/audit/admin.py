@@ -449,21 +449,60 @@ class SACAdmin(admin.ModelAdmin):
         return request.user.is_staff
 
     list_display = (
-        "id",
         "report_id",
-        "cognizant_agency",
-        "oversight_agency",
+        "auditee_uei",
         "submission_status",
+        "auditee_fiscal_period_end",
+        "latest_transition_date",
+        "certifying_auditee_email",
+        "certifying_auditor_email",
     )
     list_filter = [
-        "cognizant_agency",
-        "oversight_agency",
-        "oversight_agency",
         "submission_status",
     ]
     readonly_fields = ("submitted_by",)
-    search_fields = ("general_information__auditee_uei", "report_id")
+    search_fields = (
+        "general_information__auditee_uei",
+        "report_id",
+    )
     actions = [revert_to_in_progress, flag_for_removal, delete_flagged_records]
+
+    def get_search_results(self, request, queryset, search_term):
+        """Extend default search to include certifying auditee/auditor emails."""
+        queryset, may_have_duplicates = super().get_search_results(
+            request, queryset, search_term
+        )
+        if search_term:
+            access_sac_ids = Access.objects.filter(
+                email__icontains=search_term,
+                role__in=[
+                    "certifying_auditee_contact",
+                    "certifying_auditor_contact",
+                ],
+            ).values_list("sac_id", flat=True)
+            queryset |= self.model.objects.filter(pk__in=access_sac_ids)
+            may_have_duplicates = True
+        return queryset, may_have_duplicates
+
+    @admin.display(description="Latest transition")
+    def latest_transition_date(self, obj):
+        if obj.transition_date:
+            return obj.transition_date[-1]
+        return None
+
+    @admin.display(description="Auditee Email")
+    def certifying_auditee_email(self, obj):
+        access = Access.objects.filter(
+            sac=obj, role="certifying_auditee_contact"
+        ).first()
+        return access.email if access else None
+
+    @admin.display(description="Auditor Email")
+    def certifying_auditor_email(self, obj):
+        access = Access.objects.filter(
+            sac=obj, role="certifying_auditor_contact"
+        ).first()
+        return access.email if access else None
 
     def changelist_view(self, request, extra_context=None):
         """

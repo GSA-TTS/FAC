@@ -19,9 +19,9 @@ jobs:
       DISABLE_AUTH: False
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
 
@@ -57,7 +57,7 @@ jobs:
           thresholds: '85 90'
 
       - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         if: github.event_name == 'pull_request'
         with:
           recreate: true
@@ -76,16 +76,16 @@ jobs:
       DISABLE_AUTH: True
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
 
       - name: Install Node dependencies
         working-directory: ./backend
-        run: npm ci
+        run: npm ci && npm run build
 
       - name: Create .env file
         working-directory: ./backend
@@ -108,16 +108,16 @@ jobs:
         run: docker compose run web python manage.py materialized_views --create
 
       - name: Run A11y tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           browser: chrome
           working-directory: ./backend
           spec: cypress/e2e/accessibility.cy.js
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         # add the line below to store screenshots only on failures
         if: failure()
         with:
-          name: cypress-screenshots
+          name: cypress-screenshots-a11y
           path: backend/cypress/screenshots
           if-no-files-found: warn # 'warn' or 'error' are also available, defaults to `warn`

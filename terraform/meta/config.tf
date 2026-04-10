@@ -19,14 +19,12 @@ locals {
     # https://github.com/orgs/GSA-TTS/teams/fac-team/members
     # TODO: Automate updates via GitHub's GraphQL API
     "bret.mogilefsky@gsa.gov",
+    "candace.campbell@gsa.gov",
+    "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
-    "matthew.jadud@gsa.gov",
-    "hassandeme.mamasambo@gsa.gov",
-    "alexander.steel@gsa.gov",
-    "sudha.kumar@gsa.gov",
     "philip.dominguez@gsa.gov",
-    "robert.novak@gsa.gov",
     "ranye.mclendon@gsa.gov",
+    "annie.rodriguezdelacruz@gsa.gov"
   ]
 
   # All spaces have the same SpaceManagers for now
@@ -38,8 +36,9 @@ locals {
     # https://github.com/orgs/GSA-TTS/teams/fac-admins/members
     # TODO: Automate updates via GitHub's GraphQL API
     "bret.mogilefsky@gsa.gov",
-    "matthew.jadud@gsa.gov",
-    "alexander.steel@gsa.gov",
+    "daryll.pierre@gsa.gov",
+    "james.person@gsa.gov",
+    "philip.dominguez@gsa.gov"
   ]
 
   internal_asgs = [

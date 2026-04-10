@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from unittest.mock import patch
 
 from audit.models import (
     ExcelFile,
@@ -16,18 +17,18 @@ from audit.models.constants import SAC_SEQUENCE_ID
 from audit.fixtures.excel import FORM_SECTIONS
 from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
-    General,
+    CapText,
     FederalAward,
     Finding,
     FindingText,
-    CapText,
+    General,
     Note,
     OneTimeAccess,
+    Resubmission,
 )
 from users.models import Permission, UserPermission
 
 from model_bakery import baker
-from unittest.mock import patch
 
 from datetime import timedelta
 from uuid import uuid4
@@ -188,71 +189,100 @@ class SearchViewTests(TestMaterializedViewBuilder):
         # If there are results, we'll see "results in x seconds" somewhere.
         self.assertNotContains(response, "results in")
 
-    def test_anonymous_returns_private_and_public(self):
-        """Anonymous users should see all reports (public and private included)."""
+    def _make_reports(self):
+        """
+        Create:
+          - 5 public reports
+          - 5 private reports
+          - 2 deprecated reports (1 public, 1 private)
+
+        Returns tuple: (public, private, deprecated)
+        """
         public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-        for p in public:
-            baker.make(FederalAward, report_id=p)
-        for p in private:
-            baker.make(FederalAward, report_id=p)
+
+        deprecated_public = baker.make(
+            General,
+            is_public=True,
+            audit_year=2023,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
+        deprecated_private = baker.make(
+            General,
+            is_public=False,
+            audit_year=2023,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
+
+        # Ensure they show up in the materialized view result set (your tests do this via FederalAward)
+        for g in public:
+            baker.make(FederalAward, report_id=g)
+        for g in private:
+            baker.make(FederalAward, report_id=g)
+
+        baker.make(FederalAward, report_id=deprecated_public)
+        baker.make(FederalAward, report_id=deprecated_private)
+
+        return public, private, [deprecated_public, deprecated_private]
+
+    def test_anonymous_returns_public_and_private_excludes_deprecated(self):
+        """
+        Anonymous users should see public + private reports, but NOT audits deprecated via resubmission.
+        """
+        public, private, deprecated = self._make_reports()
+
         self.refresh_materialized_view()
         response = self.anon_client.post(self._search_url(), {})
 
-        # 1-10 of <strong>10</strong> results in x seconds.
+        # Should include 10 results (public + private), excluding deprecated
         self.assertContains(response, "<strong>10</strong>")
 
-        # all of the public reports should show up on the page
-        for p in public:
-            self.assertContains(response, p.report_id)
+        for g in public:
+            self.assertContains(response, g.report_id)
+        for g in private:
+            self.assertContains(response, g.report_id)
+        for g in deprecated:
+            self.assertNotContains(response, g.report_id)
 
-        # all of the private reports should show up on the page
-        for p in private:
-            self.assertContains(response, p.report_id)
+    def test_non_permissioned_returns_public_and_private_excludes_deprecated(self):
+        """
+        Authenticated but non-permissioned users should see public + private reports,
+        but NOT audits deprecated via resubmission.
+        """
+        public, private, deprecated = self._make_reports()
 
-    def test_non_permissioned_returns_private_and_public(self):
-        """Non-permissioned users should see all reports (public and private included)."""
-        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-        for p in public:
-            baker.make(FederalAward, report_id=p)
-        for p in private:
-            baker.make(FederalAward, report_id=p)
         self.refresh_materialized_view()
         response = self.auth_client.post(self._search_url(), {})
 
-        # 1-10 of <strong>10</strong> results in x seconds.
         self.assertContains(response, "<strong>10</strong>")
 
-        # all of the public reports should show up on the page
-        for p in public:
-            self.assertContains(response, p.report_id)
+        for g in public:
+            self.assertContains(response, g.report_id)
+        for g in private:
+            self.assertContains(response, g.report_id)
+        for g in deprecated:
+            self.assertNotContains(response, g.report_id)
 
-        # all of the private reports should show up on the page
-        for p in private:
-            self.assertContains(response, p.report_id)
+    def test_permissioned_returns_public_and_private_excludes_deprecated(self):
+        """
+        Permissioned users should see public + private reports.
+        Deprecated-via-resubmission audits should not appear in results.
+        """
+        public, private, deprecated = self._make_reports()
 
-    def test_permissioned_returns_all(self):
-        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
-        for p in public:
-            baker.make(FederalAward, report_id=p)
-        for p in private:
-            baker.make(FederalAward, report_id=p)
         self.refresh_materialized_view()
-
         response = self.perm_client.post(self._search_url(), {})
 
-        # 1-10 of <strong>10</strong> results in x seconds.
         self.assertContains(response, "<strong>10</strong>")
 
-        # all of the public reports should show up on the page
-        for p in public:
-            self.assertContains(response, p.report_id)
-
-        # all of the private reports should show up on the page
-        for p in private:
-            self.assertContains(response, p.report_id)
+        for g in public:
+            self.assertContains(response, g.report_id)
+        for g in private:
+            self.assertContains(response, g.report_id)
+        for g in deprecated:
+            self.assertNotContains(response, g.report_id)
 
 
 class PublicDataDownloadViewTests(TestCase):
@@ -578,6 +608,34 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         super().setUp()
         self.client = Client()
 
+    def create_resubmissions(self):
+        """
+        Creates two resubmissions, v1 and v2, with the appropriate connections.
+        """
+        gen_v1 = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000001",
+            is_public=True,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
+        gen_v2 = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000002",
+            is_public=True,
+            resubmission_status="most_recent",
+            resubmission_version=2,
+        )
+        baker.make(
+            Resubmission, report_id=gen_v1, version=1, next_report_id=gen_v2.report_id
+        )
+        baker.make(
+            Resubmission,
+            report_id=gen_v2,
+            version=2,
+            previous_report_id=gen_v1.report_id,
+        )
+
     def test_public_summary(self):
         """
         A public audit should have a viewable summary, and returns 200.
@@ -622,6 +680,7 @@ class SummaryViewTests(TestMaterializedViewBuilder):
     def test_summary_context(self):
         """
         The summary context should include the same data that is in the models.
+
         Create a bunch of fake DB data under the same report_id. Then, check a few
         fields in the context for the summary page to verify that the fake data persists.
         """
@@ -709,6 +768,75 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         self.assertEqual(len(reference_numbers), 2)  # all findings are returned
         self.assertIn("REF003", reference_numbers)
         self.assertIn("REF004", reference_numbers)
+
+    def test_resubmission_data_without_permissions(self):
+        """
+        When a user is not permissioned, resubmission data should not be visible.
+        """
+        self.create_resubmissions()
+        url = reverse(
+            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
+        )
+        response = self.client.get(url)
+
+        self.assertNotIn("Resubmission history", response.content.decode("utf-8"))
+
+    def test_resubmission_data_with_access(self):
+        """
+        When a user is permissioned, all resubmission data should be visible.
+        """
+        self.create_resubmissions()
+
+        user = baker.make(User)
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(
+            UserPermission,
+            email=user.email,
+            user=user,
+            permission=permission,
+        )
+        self.client.force_login(user)
+
+        url = reverse(
+            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
+        )
+        response = self.client.get(url)
+        page_content = response.content.decode("utf-8")
+
+        self.assertIn("Resubmission history", page_content)
+        self.assertIn("Most recent submitted date", page_content)
+
+    def test_record_with_no_resubmissions(self):
+        """
+        When a record has no resubmissions, resubmission data should not display.
+        """
+        gen_v1 = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000001",
+            is_public=True,
+            resubmission_status="most_recent",
+            resubmission_version=1,
+        )
+        baker.make(Resubmission, report_id=gen_v1, version=1)
+
+        user = baker.make(User)
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(
+            UserPermission,
+            email=user.email,
+            user=user,
+            permission=permission,
+        )
+        self.client.force_login(user)
+
+        url = reverse(
+            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
+        )
+        response = self.client.get(url)
+        page_content = response.content.decode("utf-8")
+
+        self.assertNotIn("Resubmission history", page_content)
+        self.assertNotIn("Most recent submitted date", page_content)
 
     def test_sac_download_available(self):
         """

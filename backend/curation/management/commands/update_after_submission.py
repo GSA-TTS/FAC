@@ -1,25 +1,27 @@
-from django.core.management.base import BaseCommand
-
 from audit.models import SingleAuditChecklist
-import logging
+from audit.validators import validate_uei
 from curation.curationlib.update_after_submission import (
     check_report_disseminated,
     get_sac_with_ein_to_update,
+    get_sac_with_auditee_name_to_update,
     get_sac_with_report_id,
     get_sac_with_uei,
     status_to_bool,
-    update_ein,
     update_authorized_public,
     update_uei,
+    update_simple_gen_field,
 )
-
-import sys
 from users.models import StaffUser
-from audit.validators import validate_uei
+
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.management.base import BaseCommand
+
+import logging
+import sys
 import re
 
 logger = logging.getLogger(__name__)
+UPDATABLE_FIELDS = ["uei", "ein", "auditee_name", "authorization"]
 
 
 def nonelike(v):
@@ -67,6 +69,29 @@ def validate_ein_options(options):
         logger.error("new_ein is not valid")
         ok_new_ein = False
     return ok_old_ein, ok_new_ein
+
+
+def validate_auditee_name_options(options):
+    try:
+        _ = get_sac_with_auditee_name_to_update(options)
+        ok_old_auditee_name = options["old_auditee_name"] != ""
+
+        if not ok_old_auditee_name:
+            logger.error(
+                f"The old_auditee_name arg {options['old_auditee_name']} is empty."
+            )
+    except Exception as e:
+        logger.error(e)
+        logger.error(f"could not fetch {options['report_id']}")
+        ok_old_auditee_name = False
+
+    ok_new_auditee_name = options["new_auditee_name"] != ""
+    if not ok_new_auditee_name:
+        logger.error(
+            f"The new_auditee_name arg {options['new_auditee_name']} is empty."
+        )
+
+    return ok_old_auditee_name, ok_new_auditee_name
 
 
 def validate_authorized_options(options):
@@ -124,6 +149,10 @@ def just_one_pair(flags, options):
     pair_count = 0
     for flag in flags:
         pair_count += 1 if have_pair_of(flag, options) else 0
+
+    if pair_count == 0:
+        logger.error(f"You have no pairs of {UPDATABLE_FIELDS}. Exiting.")
+        return False
     if pair_count != 1:
         logger.error("You have multiple pairs. Exiting.")
         return False
@@ -132,26 +161,23 @@ def just_one_pair(flags, options):
 
 def validate_combos(options):
     # We should only get one pair at a time.
-    if not just_one_pair(["uei", "ein", "authorization"], options):
+    if not just_one_pair(UPDATABLE_FIELDS, options):
         return False
 
-    # We either need a pair of UEIs, EINs, or authorizations.
-    # Do we have a pair of UEIs?
     if have_pair_of("uei", options):
         ok_old_uei, ok_new_uei = validate_uei_options(options)
         return ok_old_uei and ok_new_uei
-
-    # Do we have a pair of EINs?
     elif have_pair_of("ein", options):
         ok_old_ein, ok_new_ein = validate_ein_options(options)
         return ok_old_ein and ok_new_ein
-
-    # Or a pair of suppression flags?
+    elif have_pair_of("auditee_name", options):
+        ok_old_auditee_name, ok_new_auditee_name = validate_auditee_name_options(
+            options
+        )
+        return ok_old_auditee_name and ok_new_auditee_name
     elif have_pair_of("authorization", options):
         ok_old_suppression, ok_new_suppression = validate_authorized_options(options)
         return ok_old_suppression and ok_new_suppression
-
-    # Otherwise, let the user know this won't work.
     else:
         logger.error("You must provide an old/new pair")
         return False
@@ -202,6 +228,13 @@ class Command(BaseCommand):
             help="Report id that we will modify",
         )
 
+        parser.add_argument(
+            "--email",
+            type=str,
+            required=True,
+            help="The email of the FAC staff making this change",
+        )
+
         # Apparently I cannot build a mutex of groups?
         # https://github.com/python/cpython/issues/101337
         # So, I'll enforce the mutual exclusion in `validate_inputs`
@@ -227,21 +260,27 @@ class Command(BaseCommand):
             type=str,
             help="The new EIN for this report",
         )
-        parser.add_argument(
-            "--new_authorization",
-            type=str,
-            help="Current authorization to be public status (YES/NO)",
-        )
+
         parser.add_argument(
             "--old_authorization",
             type=str,
             help="Old authorization to be public status (YES/NO)",
         )
         parser.add_argument(
-            "--email",
+            "--new_authorization",
             type=str,
-            required=True,
-            help="The email of the FAC staff making this change",
+            help="Current authorization to be public status (YES/NO)",
+        )
+
+        parser.add_argument(
+            "--old_auditee_name",
+            type=str,
+            help="The entity name that is currenty in place",
+        )
+        parser.add_argument(
+            "--new_auditee_name",
+            type=str,
+            help="The new auditee name for this report",
         )
 
     def handle(self, *args, **options):
@@ -252,9 +291,13 @@ class Command(BaseCommand):
 
         if not nonelike(options["old_uei"]) and not nonelike(options["new_uei"]):
             update_uei(options)
-        elif not nonelike(options["old_ein"]) and not nonelike(options["new_ein"]):
-            update_ein(options)
         elif not nonelike(options["old_authorization"]) and not nonelike(
             options["new_authorization"]
         ):
             update_authorized_public(options)
+        elif not nonelike(options["old_ein"]) and not nonelike(options["new_ein"]):
+            update_simple_gen_field(options, "ein")
+        elif not nonelike(options["old_auditee_name"]) and not nonelike(
+            options["new_auditee_name"]
+        ):
+            update_simple_gen_field(options, "auditee_name")
