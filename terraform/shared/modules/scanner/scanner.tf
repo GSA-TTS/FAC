@@ -38,7 +38,7 @@ module "quarantine" {
 
 locals {
   app_id   = cloudfoundry_app.scanner_app.id
-  scan_url = "https://fac-av-${var.cf_space.name}-fs.apps.internal:61443/scan"
+  scan_url = "https://fac-av-${var.cf_space.name}-fs.apps.internal:61443/v2/scan"
   services = merge({
     "${cloudfoundry_service_instance.clam_ups_fs.name}" = ""
     "${module.quarantine.bucket_name}"                  = ""
