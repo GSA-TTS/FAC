@@ -37,7 +37,7 @@ WORKDIR /src/
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 COPY package*.json /src/
-RUN npm ci 
+RUN npm ci
 COPY . /src/
 
 RUN npm run build
@@ -52,9 +52,10 @@ RUN apt-get -yq update && \
         ca-certificates \
         chromium \
         curl \
+        unzip \
         # Make sure the client version
         # matches the DB version, locally
-        # and in production. AWD RDS is v15 in 
+        # and in production. AWD RDS is v15 in
         # cloud.gov as of August 2025.
         postgresql-client-15 && \
     rm -rf /var/lib/apt/lists/*
