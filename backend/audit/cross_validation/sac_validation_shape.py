@@ -79,6 +79,7 @@ def sac_validation_shape(sac):
             "transition_name": sac.transition_name,
             "transition_date": sac.transition_date,
             "data_source": sac.data_source,
+            "resubmission_meta": sac.resubmission_meta,
         },
     }
 
