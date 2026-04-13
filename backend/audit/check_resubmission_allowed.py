@@ -3,7 +3,6 @@ from datetime import datetime, timezone as dt_timezone
 
 from django.utils import timezone
 
-from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from dissemination.models import General
 
@@ -18,9 +17,9 @@ def get_last_transition_date(sac):
     return datetime.min.replace(tzinfo=dt_timezone.utc)
 
 
-def check_resubmission_allowed(
-    sac: SingleAuditChecklist,
-) -> Tuple[bool, str]:
+def check_resubmission_allowed(sac) -> Tuple[bool, str]:
+    from audit.models import SingleAuditChecklist
+
     """
     Given a SingleAuditChecklist, determine if resubmitting the record should be allowed.
     Return a Tuple(boolean, string), where the boolean determines if resubmission is allowed
