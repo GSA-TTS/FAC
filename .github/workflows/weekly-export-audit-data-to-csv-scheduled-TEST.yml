@@ -1,0 +1,30 @@
+---
+# Temporary workflow for testing the new CSV dumper https://github.com/GSA-TTS/FAC/pull/5227
+name: Export Audit Data to CSV on Schedule
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: The environment the workflow should run on.
+
+jobs:
+  scheduled-audit-data-export:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+    name: Run bulk data export on ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+    steps:
+      - name: Run bulk data export
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 4G -m 6G --name export_audit_data_to_csv_scheduled --command "./util/csv-export-to-s3/csv-export-to-s3.bash" --wait
