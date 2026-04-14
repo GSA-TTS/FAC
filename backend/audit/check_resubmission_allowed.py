@@ -3,7 +3,6 @@ from datetime import datetime, timezone as dt_timezone
 
 from django.utils import timezone
 
-from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from dissemination.models import General
 
@@ -18,9 +17,9 @@ def get_last_transition_date(sac):
     return datetime.min.replace(tzinfo=dt_timezone.utc)
 
 
-def check_resubmission_allowed(
-    sac: SingleAuditChecklist,
-) -> Tuple[bool, str]:
+def check_resubmission_allowed(sac) -> Tuple[bool, str]:
+    from audit.models import SingleAuditChecklist
+
     """
     Given a SingleAuditChecklist, determine if resubmitting the record should be allowed.
     Return a Tuple(boolean, string), where the boolean determines if resubmission is allowed
@@ -99,7 +98,7 @@ def check_resubmission_allowed(
         if sac.id != most_recent.id:
             return False, (
                 f"Multiple legacy audits found for this UEI and audit year. "
-                f"Only the most recent (ID={most_recent.id}) may initiate resubmission."
+                f"Only the most recent ({most_recent.report_id}) may initiate resubmission."
             )
 
         # Check timestamp clustering
