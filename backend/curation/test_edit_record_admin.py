@@ -8,54 +8,76 @@ from django.test import TestCase, RequestFactory
 
 from model_bakery import baker
 
+from backend.audit.models.constants import STATUS
+from backend.audit.models.models import SingleAuditChecklist
+from backend.audit.models.audit import Audit
+
 from .admin import EditRecordAdmin
-from .models import EditRecord  # update if EditRecord lives elsewhere
+from .models import EditRecord 
+from django.contrib.messages.storage.fallback import FallbackStorage
 
 REPORT_ID = "2024-01-GSAFAC-0000000001"
-DEFAULT_UEI = "UEIABCDE12345"
-DEFAULT_EIN = "123456789"
+
+OLD_UEI = "UEIABCDE12345"
+NEW_UEI = "UEIABCDE67890"
+
+OLD_EIN = "123456789"
+NEW_EIN = "987654321"
+
+class MockRequest:
+    def __init__(self, user):
+        self.user = user
+        self.session = {}
+        self._messages = FallbackStorage(self)
+
 
 class TestEditRecordAdmin(TestCase):
 
     def setUp(self):
+
+        self.user = User.objects.create_user(
+            username="staffuser", 
+            email="staff@example.com", 
+            password="12345", 
+            is_staff=True
+        )
+
+        self.audit = baker.make(Audit, 
+                                report_id=REPORT_ID, 
+                                auditee_uei = OLD_UEI, 
+                                auditee_ein=OLD_EIN, 
+                                version=0)
+        self.sac = baker.make(
+            SingleAuditChecklist,
+            report_id=self.audit.report_id,
+            submission_status=STATUS.DISSEMINATED,
+        )
+        self.sac.save()
+
+        # Create a request object
+        self.factory = RequestFactory()
+        self.request = self.factory.post("/admin/curation/editrecord/add/")
+        self.request.user = self.user
+
+        # # Add session and message middleware to the request
+        self.middleware_process(self.request)
+        
+        # Set up the Admin site and Admin class
         self.site = AdminSite()
         self.admin = EditRecordAdmin(EditRecord, self.site)
 
-        self.staff_user = User.objects.create_user(
-            username="staffuser",
-            email="staff@example.com",
-            password="12345",  # nosec
-            is_staff=True,
-        )
-        self.regular_user = User.objects.create_user(
-            username="regularuser",
-            email="regular@example.com",
-            password="12345",  # nosec
-            is_staff=False,
-        )
 
-        self.factory = RequestFactory()
 
-        self.edit_record = baker.make(
-            EditRecord,
-            report_id=REPORT_ID,
-            uei=DEFAULT_UEI,
-            ein=DEFAULT_EIN,
-        )
-
-    def _make_request(self, user, method="post"):
-        request = getattr(self.factory, method)("/admin/")
-        request.user = user
-        self._apply_middleware(request)
-        return request
-
-    def _apply_middleware(self, request):
+    def middleware_process(self, request):
+        """Apply middleware to the request object"""
+        # Create and apply session middleware
         session_middleware = SessionMiddleware(lambda req: None)
         session_middleware.process_request(request)
         request.session.save()
-
+        # Create and apply message middleware
         message_middleware = MessageMiddleware(lambda req: None)
         message_middleware.process_request(request)
+
 
     # -------------------------------------------------------------------------
     # Configuration tests
@@ -106,39 +128,45 @@ class TestEditRecordAdmin(TestCase):
     def test_ordering(self):
         self.assertEqual(self.admin.ordering, ["edit_timestamp"])
 
-
     # -------------------------------------------------------------------------
     # save_model tests
     # -------------------------------------------------------------------------
 
     def test_save_model_uei_field_saves_successfully(self):
         """save_model should store the old UEI on the record and the replacement in new_value."""
-        request = self._make_request(self.staff_user)
-        obj = baker.prepare(
+        self.assertEqual(self.audit.auditee_uei, OLD_UEI)
+
+        obj = baker.make(
             EditRecord,
             report_id = REPORT_ID,
             field_to_edit="uei",
-            uei=DEFAULT_UEI,
-            new_value="CNGNPY75HBU5",
+            uei=OLD_UEI,
+            new_value=NEW_UEI
         )
         form = MagicMock()
  
-        self.admin.save_model(request, obj, form, change=False)
+        self.admin.save_model(self.request, obj, form, change=False)
  
+        self.sac.refresh_from_db()
+
         obj.refresh_from_db()
+
+        # Get the SF_SAC from the db and assert the new uei is updated
+        self.assertEqual(self.audit.auditee_uei, NEW_UEI)
+
         self.assertEqual(obj.field_to_edit, "uei")
-        self.assertEqual(obj.uei, DEFAULT_UEI)
-        self.assertEqual(obj.new_value, "CNGNPY75HBU5")
+        self.assertEqual(obj.uei, OLD_UEI)
+        self.assertEqual(obj.new_value, NEW_UEI)
  
     def test_save_model_ein_field_saves_successfully(self):
         """save_model should store the old EIN on the record and the replacement in new_value."""
-        request = self._make_request(self.staff_user)
+        request = self._make_request(self.user)
         obj = baker.prepare(
             EditRecord,
             report_id = REPORT_ID,
             field_to_edit="ein",
             ein=DEFAULT_EIN,
-            new_value="521226027",
+            new_value=NEW_EIN,
         )
         form = MagicMock()
  
@@ -146,7 +174,7 @@ class TestEditRecordAdmin(TestCase):
  
         obj.refresh_from_db()
         self.assertEqual(obj.field_to_edit, "ein")
-        self.assertEqual(obj.ein, DEFAULT_EIN)
-        self.assertEqual(obj.new_value, "521226027")
+        self.assertEqual(obj.ein, OLD_EIN)
+        self.assertEqual(obj.new_value, NEW_EIN)
 
 
