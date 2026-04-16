@@ -65,10 +65,7 @@ class AuditeeInfoForm(forms.Form):
                     "Auditee fiscal period end date must be later than auditee fiscal period start date"
                 )
 
-            if (
-                start >= date.today()
-                or end >= date.today()
-            ):
+            if start >= date.today() or end >= date.today():
                 raise forms.ValidationError(
                     "Auditee fiscal period dates must be earlier than today"
                 )
