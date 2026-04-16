@@ -117,6 +117,11 @@ class TestPreliminaryViews(TestCase):
         "auditee_uei": "D7A4J33FUMJ1",
         "auditee_fiscal_period_start": "2022-01-01",
         "auditee_fiscal_period_end": "2023-01-01",
+        "auditee_name": "INCA COMMUNITY SERVICES, INC.",
+        "auditee_address_line_1": "202 S CAPITAL AVE",
+        "auditee_city": "TISHOMINGO",
+        "auditee_state": "OK",
+        "auditee_zip": "73460",
     }
 
     step2_data = {
@@ -183,6 +188,11 @@ class TestPreliminaryViews(TestCase):
         # Should have converted from MM/dd/YYYY
         self.assertEqual(saved["auditee_fiscal_period_start"], "2022-01-01")
         self.assertEqual(saved["auditee_fiscal_period_end"], "2023-01-01")
+        self.assertEqual(saved["auditee_name"], "INCA COMMUNITY SERVICES, INC.")
+        self.assertEqual(saved["auditee_address_line_1"], "202 S CAPITAL AVE")
+        self.assertEqual(saved["auditee_city"], "TISHOMINGO")
+        self.assertEqual(saved["auditee_state"], "OK")
+        self.assertEqual(saved["auditee_zip"], "73460")
 
     def test_step_two_eligibility_submission_fail(self):
         """
