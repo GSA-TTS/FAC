@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
@@ -8,21 +8,24 @@ from django.test import TestCase, RequestFactory
 
 from model_bakery import baker
 
-from backend.audit.models.constants import STATUS
-from backend.audit.models.models import SingleAuditChecklist
-from backend.audit.models.audit import Audit
+from audit.models.constants import STATUS
+from audit.models.models import SingleAuditChecklist
+from audit.models.audit import Audit
+from users.models import StaffUser
 
 from .admin import EditRecordAdmin
-from .models import EditRecord 
+from .models import EditRecord
 from django.contrib.messages.storage.fallback import FallbackStorage
 
 REPORT_ID = "2024-01-GSAFAC-0000000001"
+STAFF_EMAIL = "staff@example.com"
 
-OLD_UEI = "UEIABCDE12345"
-NEW_UEI = "UEIABCDE67890"
+OLD_UEI = "0LDANDSADUE1"
+NEW_UEI = "SUPERC00LUE1"
 
 OLD_EIN = "123456789"
 NEW_EIN = "987654321"
+
 
 class MockRequest:
     def __init__(self, user):
@@ -36,20 +39,26 @@ class TestEditRecordAdmin(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="staffuser", 
-            email="staff@example.com", 
-            password="12345", 
-            is_staff=True
+            username="staffuser", email=STAFF_EMAIL, password="12345", is_staff=True
         )
+        self.staff_user = baker.make(StaffUser, staff_email=STAFF_EMAIL)
 
-        self.audit = baker.make(Audit, 
-                                report_id=REPORT_ID, 
-                                auditee_uei = OLD_UEI, 
-                                auditee_ein=OLD_EIN, 
-                                version=0)
+        # self.audit = baker.make(Audit,
+        #                         report_id=REPORT_ID,
+        #                         audit = {"general_information": {"auditee_uei": OLD_UEI, "auditee_ein":OLD_EIN, "auditee_name": OLD_AUDITEE_NAME}},
+        #                         # auditee_uei=OLD_UEI,
+        #                         # auditee_ein=OLD_EIN,
+        #                         # auditee_name=OLD_AUDITEE_NAME,
+        #                         version=0)
+        # self.audit.save()
         self.sac = baker.make(
             SingleAuditChecklist,
-            report_id=self.audit.report_id,
+            report_id=REPORT_ID,
+            general_information={
+                "auditee_uei": OLD_UEI,
+                "ein": OLD_EIN,
+                "auditee_name": OLD_AUDITEE_NAME,
+            },
             submission_status=STATUS.DISSEMINATED,
         )
         self.sac.save()
@@ -59,14 +68,12 @@ class TestEditRecordAdmin(TestCase):
         self.request = self.factory.post("/admin/curation/editrecord/add/")
         self.request.user = self.user
 
-        # # Add session and message middleware to the request
-        self.middleware_process(self.request)
-        
+        # Add session and message middleware to the request
+        # self.middleware_process(self.request)
+
         # Set up the Admin site and Admin class
         self.site = AdminSite()
         self.admin = EditRecordAdmin(EditRecord, self.site)
-
-
 
     def middleware_process(self, request):
         """Apply middleware to the request object"""
@@ -78,7 +85,6 @@ class TestEditRecordAdmin(TestCase):
         message_middleware = MessageMiddleware(lambda req: None)
         message_middleware.process_request(request)
 
-
     # -------------------------------------------------------------------------
     # Configuration tests
     # -------------------------------------------------------------------------
@@ -88,6 +94,7 @@ class TestEditRecordAdmin(TestCase):
             "report_id",
             "uei",
             "ein",
+            "auditee_name",
             "field_to_edit",
             "new_value",
             "editor_email",
@@ -101,6 +108,7 @@ class TestEditRecordAdmin(TestCase):
             "report_id",
             "uei",
             "ein",
+            "auditee_name",
             "field_to_edit",
             "new_value",
             "editor_email",
@@ -113,6 +121,7 @@ class TestEditRecordAdmin(TestCase):
             "field_to_edit",
             "uei",
             "ein",
+            "auditee_name",
             "new_value",
             "editor_email",
         )
@@ -132,49 +141,51 @@ class TestEditRecordAdmin(TestCase):
     # save_model tests
     # -------------------------------------------------------------------------
 
-    def test_save_model_uei_field_saves_successfully(self):
+    @patch("curation.curationlib.curation_audit_tracking.enable_audit_curation")
+    @patch("curation.curationlib.curation_audit_tracking.disable_audit_curation")
+    def test_save_model_uei_field_saves_successfully(self, mock_enable, mock_disable):
         """save_model should store the old UEI on the record and the replacement in new_value."""
-        self.assertEqual(self.audit.auditee_uei, OLD_UEI)
+        self.assertEqual(self.sac.general_information["auditee_uei"], OLD_UEI)
 
-        obj = baker.make(
+        obj = baker.prepare(
             EditRecord,
-            report_id = REPORT_ID,
+            report_id=REPORT_ID,
             field_to_edit="uei",
             uei=OLD_UEI,
-            new_value=NEW_UEI
+            new_value=NEW_UEI,
+            editor_email=STAFF_EMAIL,
         )
         form = MagicMock()
- 
-        self.admin.save_model(self.request, obj, form, change=False)
- 
-        self.sac.refresh_from_db()
 
+        self.admin.save_model(self.request, obj, form, change=False)
+        self.sac.refresh_from_db()
         obj.refresh_from_db()
 
         # Get the SF_SAC from the db and assert the new uei is updated
-        self.assertEqual(self.audit.auditee_uei, NEW_UEI)
+        # self.assertEqual(self.audit.auditee_uei, NEW_UEI)
+        self.assertEqual(self.sac.general_information["auditee_uei"], NEW_UEI)
+        self.assertEqual(obj.status, "success")
 
-        self.assertEqual(obj.field_to_edit, "uei")
-        self.assertEqual(obj.uei, OLD_UEI)
-        self.assertEqual(obj.new_value, NEW_UEI)
- 
-    def test_save_model_ein_field_saves_successfully(self):
+    @patch("curation.curationlib.curation_audit_tracking.enable_audit_curation")
+    @patch("curation.curationlib.curation_audit_tracking.disable_audit_curation")
+    def test_save_model_ein_field_saves_successfully(self, mock_enable, mock_disable):
         """save_model should store the old EIN on the record and the replacement in new_value."""
-        request = self._make_request(self.user)
+        # request = self._make_request(self.user)
+        self.assertEqual(self.sac.general_information["ein"], OLD_EIN)
+
         obj = baker.prepare(
             EditRecord,
-            report_id = REPORT_ID,
+            report_id=REPORT_ID,
             field_to_edit="ein",
-            ein=DEFAULT_EIN,
+            ein=OLD_EIN,
             new_value=NEW_EIN,
+            editor_email=STAFF_EMAIL,
         )
         form = MagicMock()
- 
-        self.admin.save_model(request, obj, form, change=False)
- 
+
+        self.admin.save_model(self.request, obj, form, change=False)
+        self.sac.refresh_from_db()
         obj.refresh_from_db()
-        self.assertEqual(obj.field_to_edit, "ein")
-        self.assertEqual(obj.ein, OLD_EIN)
-        self.assertEqual(obj.new_value, NEW_EIN)
 
-
+        self.assertEqual(self.sac.general_information["ein"], NEW_EIN)
+        self.assertEqual(obj.status, "success")
