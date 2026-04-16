@@ -40,9 +40,9 @@ from django.db import connection as django_connection
 
 def exec_sql_at_path(dir, filename):
     path = os.path.join(dir, filename)
-    logger.info(f"EXEC SQL {path}")
     sql = open(path, "r").read()
     with django_connection.cursor() as curs:
+        logger.info(f"EXEC SQL {path}")
         curs.execute(sql)
 
 

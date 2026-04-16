@@ -2,21 +2,24 @@ from django.db import models
 from django.apps import apps
 from .curationlib.update_after_submission import (
     update_uei,
-    update_ein,
+    # update_ein,
+    update_simple_gen_field,
 )
 # from management.commands.update_after_submission import validate_inputs
 from curation.management.commands.update_after_submission import validate_inputs
 
 EDITABLE_FIELDS = (
     ('uei', 'UEI'), 
-    ('ein', 'EIN')
+    ('ein', 'EIN'),
+    ('auditee_name', 'Name')
 )
 
 class EditRecord(models.Model):
     report_id = models.CharField(verbose_name="Report ID")
     uei = models.CharField(verbose_name="Current UEI", null=True, blank=True)
     ein = models.CharField(verbose_name="Current EIN", null=True, blank=True)
-    field_to_edit = models.CharField(verbose_name="Field To Edit", choices=EDITABLE_FIELDS, default='uei')
+    auditee_name = models.CharField(verbose_name="Current name", null=True, blank=True)
+    field_to_edit = models.CharField(verbose_name="Field To Edit", choices=EDITABLE_FIELDS, default='auditee_uei')
     new_value = models.TextField(verbose_name="New Value", null=True, blank=True)
     
     editor_email = models.EmailField(verbose_name="Editor Email", null=True)  # Store the email of the user who made the edit
@@ -47,6 +50,8 @@ class EditRecord(models.Model):
             "new_uei": self.new_value if self.field_to_edit == "uei" else None,
             "old_ein": self.ein if self.field_to_edit == "ein" else None,
             "new_ein": self.new_value if self.field_to_edit == "ein" else None,
+            "old_auditee_name": self.auditee_name if self.field_to_edit == "auditee_name" else None,
+            "new_auditee_name": self.new_value if self.field_to_edit == "auditee_name" else None,
             "old_authorization": None,
             "new_authorization": None,
         }
@@ -75,17 +80,14 @@ class EditRecord(models.Model):
         # Now update_db can open transaction.atomic() + CurationTracking cleanly
         try:
             if self.field_to_edit == "uei":
-                print("calling update_uei")
                 update_uei(options)
-                print("update_uei done") 
             elif self.field_to_edit == "ein":
-                print("calling update_ein")
-                update_ein(options)
-                print("update_ein done")
+                update_simple_gen_field(options, "ein")
+            elif self.field_to_edit == "auditee_name":
+                update_simple_gen_field(options, "auditee_name")
             else:
                 raise ValueError("Invalid field_to_edit value")
             self.status = "success"
-            print("status set to success")
         except Exception as e:
             print(f"update failed — type: {type(e).__name__}, message: {e}")
             import traceback

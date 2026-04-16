@@ -22,6 +22,7 @@ class EditRecordAdmin(SupportAdmin):
         "report_id",
         "uei",
         "ein",
+        "auditee_name",
         "field_to_edit",
         "new_value",
         "editor_email",
@@ -32,6 +33,7 @@ class EditRecordAdmin(SupportAdmin):
             "report_id",
             "uei",
             "ein",
+            "auditee_name",
             "field_to_edit",
             "new_value",
             "editor_email",
@@ -42,6 +44,7 @@ class EditRecordAdmin(SupportAdmin):
         "field_to_edit",
         "uei",
         "ein",
+        "auditee_name",
         "new_value",
         "editor_email",
     )
@@ -56,13 +59,13 @@ class EditRecordAdmin(SupportAdmin):
         return request.user.is_staff
 
     def save_model(self, request, obj, form, change):
+        fields_to_edit = ["uei", "ein", "auditee_name"]
+        
         obj.editor_email = request.user.email
         print(f"Saving EditRecord: {request.user.email} Edited Report: {obj.report_id} for field: {obj.field_to_edit}")
-        if obj.field_to_edit == 'uei':
-            print(f"{obj.uei} -> {obj.new_value}")
-        elif obj.field_to_edit == 'ein':
-            print(f"{obj.ein} -> {obj.new_value}")
+        if obj.field_to_edit not in fields_to_edit:
+            raise ValueError(f"Invalid field_to_edit value: {obj.field_to_edit}")
         else:
-            raise ValueError("Invalid field_to_edit value")
+            print(f"{getattr(obj, obj.field_to_edit)} -> {obj.new_value}")
 
         super().save_model(request, obj, form, change)
