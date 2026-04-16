@@ -46,7 +46,7 @@ class AuditeeInfoForm(forms.Form):
     auditee_uei = forms.CharField(required=True)
     auditee_fiscal_period_start = forms.DateField(required=True)
     auditee_fiscal_period_end = forms.DateField(required=True)
-    sam_response = None # Used to populate some Gen Info fields
+    sam_response = None  # Used to populate some Gen Info fields
 
     def clean_auditee_uei(self):
         uei = self.cleaned_data.get("auditee_uei")
