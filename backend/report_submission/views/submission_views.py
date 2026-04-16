@@ -48,13 +48,20 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
             }
             return render(request, self.template_name, context)
 
+        sam_response = form.sam_response
+        core_data = sam_response.get("response", {}).get("coreData", {})
+        address = core_data.get("physicalAddress", {})
+        entity_reg = sam_response.get("response", {}).get("entityRegistration", {})
+        auditee_name = entity_reg.get("legalBusinessName", "")
+
         formatted_post = {
             "csrfmiddlewaretoken": request.POST.get("csrfmiddlewaretoken"),
             "auditee_uei": form.cleaned_data["auditee_uei"].upper(),
-            "auditee_address_line_1": request.POST.get("auditee_address_line_1"),
-            "auditee_city": request.POST.get("auditee_city"),
-            "auditee_state": request.POST.get("auditee_state"),
-            "auditee_zip": request.POST.get("auditee_zip"),
+            "auditee_name": auditee_name,
+            "auditee_address_line_1": address.get("addressLine1", ""),
+            "auditee_city": address.get("city", ""),
+            "auditee_state": address.get("stateOrProvinceCode", ""),
+            "auditee_zip": address.get("zipCode", ""),
             "auditee_fiscal_period_start": form.cleaned_data[
                 "auditee_fiscal_period_start"
             ].strftime("%Y-%m-%d"),

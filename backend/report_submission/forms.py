@@ -39,31 +39,39 @@ def validate_uei(value):
     if sam_response.get("errors"):
         raise forms.ValidationError(sam_response.get("errors"))
 
+    return sam_response
+
 
 class AuditeeInfoForm(forms.Form):
-    auditee_uei = forms.CharField(required=True, validators=[validate_uei])
+    auditee_uei = forms.CharField(required=True)
     auditee_fiscal_period_start = forms.DateField(required=True)
     auditee_fiscal_period_end = forms.DateField(required=True)
+    sam_response = None # Used to populate some Gen Info fields
+
+    def clean_auditee_uei(self):
+        uei = self.cleaned_data.get("auditee_uei")
+        self.sam_response = validate_uei(uei)
+
+        return uei
 
     def clean(self):
-        if self.is_valid():
-            cleaned_data = super().clean()
+        cleaned_data = super().clean()
 
-            auditee_fiscal_period_start = cleaned_data["auditee_fiscal_period_start"]
-            auditee_fiscal_period_end = cleaned_data["auditee_fiscal_period_end"]
+        auditee_fiscal_period_start = cleaned_data.get("auditee_fiscal_period_start")
+        auditee_fiscal_period_end = cleaned_data.get("auditee_fiscal_period_end")
 
-            if auditee_fiscal_period_start >= auditee_fiscal_period_end:
-                raise forms.ValidationError(
-                    "Auditee fiscal period end date must be later than auditee fiscal period start date"
-                )
+        if auditee_fiscal_period_start >= auditee_fiscal_period_end:
+            raise forms.ValidationError(
+                "Auditee fiscal period end date must be later than auditee fiscal period start date"
+            )
 
-            if (
-                auditee_fiscal_period_start >= date.today()
-                or auditee_fiscal_period_end >= date.today()
-            ):
-                raise forms.ValidationError(
-                    "Auditee fiscal period dates must be earlier than today"
-                )
+        if (
+            auditee_fiscal_period_start >= date.today()
+            or auditee_fiscal_period_end >= date.today()
+        ):
+            raise forms.ValidationError(
+                "Auditee fiscal period dates must be earlier than today"
+            )
 
 
 # The general information fields are currently specified in two places:
