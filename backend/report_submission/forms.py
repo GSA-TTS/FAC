@@ -56,22 +56,22 @@ class AuditeeInfoForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
+        start = cleaned_data.get("auditee_fiscal_period_start")
+        end = cleaned_data.get("auditee_fiscal_period_end")
 
-        auditee_fiscal_period_start = cleaned_data.get("auditee_fiscal_period_start")
-        auditee_fiscal_period_end = cleaned_data.get("auditee_fiscal_period_end")
+        if start and end:
+            if start >= end:
+                raise forms.ValidationError(
+                    "Auditee fiscal period end date must be later than auditee fiscal period start date"
+                )
 
-        if auditee_fiscal_period_start >= auditee_fiscal_period_end:
-            raise forms.ValidationError(
-                "Auditee fiscal period end date must be later than auditee fiscal period start date"
-            )
-
-        if (
-            auditee_fiscal_period_start >= date.today()
-            or auditee_fiscal_period_end >= date.today()
-        ):
-            raise forms.ValidationError(
-                "Auditee fiscal period dates must be earlier than today"
-            )
+            if (
+                start >= date.today()
+                or end >= date.today()
+            ):
+                raise forms.ValidationError(
+                    "Auditee fiscal period dates must be earlier than today"
+                )
 
 
 # The general information fields are currently specified in two places:
