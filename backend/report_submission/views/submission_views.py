@@ -50,7 +50,7 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
         sam_response = form.sam_response
         core_data = sam_response.get("response", {}).get("coreData", {})
-        address = core_data.get("physicalAddress", {})
+        address = core_data.get("mailingAddress", {})
         entity_reg = sam_response.get("response", {}).get("entityRegistration", {})
         auditee_name = entity_reg.get("legalBusinessName", "")
 
