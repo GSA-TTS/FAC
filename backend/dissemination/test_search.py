@@ -288,8 +288,12 @@ class SearchGeneralTests(TestCase):
         self.assertEqual(len(results), 6)
 
         for r in results:
-            self.assertGreaterEqual(r.fac_accepted_date, search_start_date)
-            self.assertLessEqual(r.fac_accepted_date, search_end_date)
+            if backwards:
+                self.assertGreaterEqual(r.fac_accepted_date, search_end_date)
+                self.assertLessEqual(r.fac_accepted_date, search_start_date)
+            else:
+                self.assertGreaterEqual(r.fac_accepted_date, search_start_date)
+                self.assertLessEqual(r.fac_accepted_date, search_end_date)
 
     def test_date_range(self):
         self._test_date_range_helper(backwards=False)
