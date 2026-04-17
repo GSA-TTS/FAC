@@ -254,11 +254,10 @@ class SearchGeneralTests(TestCase):
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
 
-    def test_date_range(self):
+    def _test_date_range_helper(self, backwards):
         """
         Given a start and end date, search_general should return only records inside the date range
         """
-
         # seed the database with one record for each day of June
         seed_start_date = datetime.date(2023, 6, 1)
         seed_end_date = datetime.date(2023, 6, 30)
@@ -269,8 +268,12 @@ class SearchGeneralTests(TestCase):
             d += datetime.timedelta(days=1)
 
         # search for records between June 10 and June 15
-        search_start_date = datetime.date(2023, 6, 10)
-        search_end_date = datetime.date(2023, 6, 15)
+        if backwards:
+            search_start_date = datetime.date(2023, 6, 15)
+            search_end_date = datetime.date(2023, 6, 10)
+        else:
+            search_start_date = datetime.date(2023, 6, 10)
+            search_end_date = datetime.date(2023, 6, 15)
 
         results = search_general(
             General,
@@ -282,12 +285,17 @@ class SearchGeneralTests(TestCase):
 
         assert_all_results_public(self, results)
 
-        # we should get 6 results, one for each day between June 10-15
         self.assertEqual(len(results), 6)
 
         for r in results:
             self.assertGreaterEqual(r.fac_accepted_date, search_start_date)
             self.assertLessEqual(r.fac_accepted_date, search_end_date)
+
+    def test_date_range(self):
+        self._test_date_range_helper(backwards=False)
+
+    def test_date_range_backwards(self):
+        self._test_date_range_helper(backwards=True)
 
     def test_audit_year(self):
         """
