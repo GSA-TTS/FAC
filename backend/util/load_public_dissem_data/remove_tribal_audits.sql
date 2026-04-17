@@ -1,8 +1,8 @@
--- This removes ALL tribal audits from a 
+-- This removes ALL tribal audits from a
 -- local data instance. You should never run this in production.
--- This was removed from the `prepare_dump` script because it is 
+-- This was removed from the `prepare_dump` script because it is
 -- too large and complex to embed directly.
-WITH 
+WITH
   report_ids_to_delete AS (
     -- Select all the reports where they explicitly said not to disseminate.
     SELECT report_id
@@ -10,7 +10,7 @@ WITH
       WHERE
         tribal_data_consent->>'is_tribal_information_authorized_to_be_public' = 'false'
     UNION
-    -- Union this with all the reports that are tribal and no attestation has 
+    -- Union this with all the reports that are tribal and no attestation has
     -- yet been made. These would be in-progress to some degree or another.
     SELECT report_id
       FROM audit_singleauditchecklist
@@ -32,32 +32,32 @@ WITH
         tribal_data_consent->>'is_tribal_information_authorized_to_be_public' IS NULL
   ),
   captext_deleted AS (
-    DELETE FROM 
+    DELETE FROM
       dissemination_captext
     WHERE
       report_id IN (SELECT * FROM report_ids_to_delete)
   ),
   findingtext_deleted AS (
-    DELETE FROM 
+    DELETE FROM
       dissemination_findingtext
     WHERE
       report_id IN (SELECT * FROM report_ids_to_delete)
   ),
   migrationinspectionrecord_deleted AS (
-    DELETE FROM 
+    DELETE FROM
       dissemination_migrationinspectionrecord
     WHERE
       report_id IN (SELECT * FROM report_ids_to_delete)
   ),
   note_deleted AS (
-    DELETE FROM 
+    DELETE FROM
       dissemination_note
     WHERE
       report_id IN (SELECT * FROM report_ids_to_delete)
   ),
   -- Now, the tables dependent on 'audit' and 'singleauditchecklist'
   access_deleted AS (
-    DELETE FROM audit_access WHERE sac_id IN (SELECT * FROM sac_ids_to_delete) 
+    DELETE FROM audit_access WHERE sac_id IN (SELECT * FROM sac_ids_to_delete)
   ),
   deletedaccess_deleted AS (
     DELETE FROM audit_deletedaccess WHERE sac_id IN (SELECT * FROM sac_ids_to_delete)
@@ -92,7 +92,7 @@ WITH
       report_id IN (SELECT * FROM report_ids_to_delete)
   ),
   invalid_deleted as (
-	  DELETE FROM 
+	  DELETE FROM
 	      dissemination_invalidauditrecord
 	    WHERE
 	      report_id IN (SELECT * FROM report_ids_to_delete)
@@ -137,7 +137,7 @@ WITH
     DELETE FROM
       dissemination_resubmission
     WHERE
-      report_id NOT IN (SELECT report_id FROM keepers)
+      report_id NOT IN (SELECT report_id FROM report_ids_to_delete)
   )
 DELETE FROM dissemination_general
 WHERE report_id IN (SELECT * from report_ids_to_delete);
