@@ -1,6 +1,6 @@
 # prepare_prod_data_for_local.bash
 
-The `prepare_prod_data_for_local` bash script is a menu-driven tool for repeatbly downloading data dumps from `production` and sanitizing them for local use. 
+The `prepare_prod_data_for_local` bash script is a menu-driven tool for repeatbly downloading data dumps from `production` and sanitizing them for local use.
 
 ## goal
 
@@ -28,9 +28,9 @@ Then, `docker compose up` on the local application stack. This only needs to be 
 
 These scripts are meant to be run from within the application container context. So, stand up the container, and exec in.
 
-## BLUF
+## quickstart guide
 
-To run the scripts that prepare local data for use, exec into the `web` container:
+To run the scripts that prepare local data for use, exec into the `web` container from `/backend`:
 
 ```
 docker compose exec -it web /bin/bash
@@ -48,9 +48,9 @@ Then, run this script:
 ./prepare_prod_data_for_local.bash YOUR_EMAIL
 ```
 
-The email address needs to be an active user in the FAC data dump.
+The email address needs to be an active user in the FAC data dump and will prompt you for a CF login. Do so, and select `3. gsa-tts-oros-fac` for org and `3. production` for space.
 
-Once you run the script, run steps 2, 3, 4, 5, 6, and 7 in order.
+Once logged in, you will be prompted with a selection menu. To create the dump, run steps 1 through 5 in order. To truncate your tables, run 6. To load a dump, run 7.
 
 If you are feeling bold, select the option for running everything straight through. This runs steps 2-7.
 
@@ -102,7 +102,7 @@ This step does the following:
 2. Search the `singleauditchecklist` table for the sac_ids of all audits where no consent to disseminate was given.
 3. Delete that data from all of the tables
 
-This is encoded as a single SQL file (`remove_tribal_audits.sql`), as we cannot do this iteratively. Specifically, `DELETE` cannot `CASCADE`; therefore, we have to delete from the tables in a specific order to avoid foreign key constraints. It is possible that the table list could be re-ordered so that it could be used *in reverse* to do this in a loop. However, the initial `SELECT` statements would still need to be used and somehow passed via `bash`. 
+This is encoded as a single SQL file (`remove_tribal_audits.sql`), as we cannot do this iteratively. Specifically, `DELETE` cannot `CASCADE`; therefore, we have to delete from the tables in a specific order to avoid foreign key constraints. It is possible that the table list could be re-ordered so that it could be used *in reverse* to do this in a loop. However, the initial `SELECT` statements would still need to be used and somehow passed via `bash`.
 
 In short: the SQL file is a script that, if maintained/used properly, deletes *all* suppressed Tribal data from the database.
 
@@ -127,16 +127,14 @@ Then, `pg_dump` is called `--data-only` on that filtered set of tables. This pro
 
 ### truncate_all_local_tables
 
-This runs a `TRUNCATE CASCADE` on every single table in the `tables.source` array. 
+This runs a `TRUNCATE CASCADE` on every single table in the `tables.source` array.
 
 Removing all local data is a necessary step for testing a local re-load of the local data that was just dumped.
 
 Before truncating, a `COUNT(*)` of every table is gathered. This is used for the next step.
 
-### test_sanitized_production_dump
+### reload_and_test_sanitized_production_dump
 
 The dumpfile that was just created wants to be tested, at least minimally.
 
-This command loads the file that was just dumped, and then gathers a count on every table that was loaded. Afterwards, the counts are compared against the values stored from the `truncate_all_local_tables` step. If all the counts are the same, it means all the tables in the array were reloaded and had the expected counts.
-
-This only works if the truncate/test happen on the same day, as it is hard-coded against the current date. 
+This command loads the file that you provide, and then gathers a count on every table that was loaded. Afterwards, the counts are compared against the values stored from the `truncate_all_local_tables` step. If all the counts are the same, it means all the tables in the array were reloaded and had the expected counts.
