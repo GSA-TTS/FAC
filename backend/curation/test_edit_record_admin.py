@@ -26,6 +26,8 @@ NEW_UEI = "SUPERC00LUE1"
 OLD_EIN = "123456789"
 NEW_EIN = "987654321"
 
+OLD_AUDITEE_NAME = "Old Auditee Name"
+NEW_AUDITEE_NAME = "New Auditee Name"
 
 class MockRequest:
     def __init__(self, user):
@@ -43,14 +45,6 @@ class TestEditRecordAdmin(TestCase):
         )
         self.staff_user = baker.make(StaffUser, staff_email=STAFF_EMAIL)
 
-        # self.audit = baker.make(Audit,
-        #                         report_id=REPORT_ID,
-        #                         audit = {"general_information": {"auditee_uei": OLD_UEI, "auditee_ein":OLD_EIN, "auditee_name": OLD_AUDITEE_NAME}},
-        #                         # auditee_uei=OLD_UEI,
-        #                         # auditee_ein=OLD_EIN,
-        #                         # auditee_name=OLD_AUDITEE_NAME,
-        #                         version=0)
-        # self.audit.save()
         self.sac = baker.make(
             SingleAuditChecklist,
             report_id=REPORT_ID,
@@ -162,7 +156,6 @@ class TestEditRecordAdmin(TestCase):
         obj.refresh_from_db()
 
         # Get the SF_SAC from the db and assert the new uei is updated
-        # self.assertEqual(self.audit.auditee_uei, NEW_UEI)
         self.assertEqual(self.sac.general_information["auditee_uei"], NEW_UEI)
         self.assertEqual(obj.status, "success")
 
@@ -188,4 +181,27 @@ class TestEditRecordAdmin(TestCase):
         obj.refresh_from_db()
 
         self.assertEqual(self.sac.general_information["ein"], NEW_EIN)
+        self.assertEqual(obj.status, "success")
+
+    @patch("curation.curationlib.curation_audit_tracking.enable_audit_curation")
+    @patch("curation.curationlib.curation_audit_tracking.disable_audit_curation")
+    def test_save_model_auditee_name_field_saves_successfully(self, mock_enable, mock_disable):
+        """save_model should store the old auditee_name on the record and the replacement in new_value."""
+        self.assertEqual(self.sac.general_information["auditee_name"], OLD_AUDITEE_NAME)
+
+        obj = baker.prepare(
+            EditRecord,
+            report_id=REPORT_ID,
+            field_to_edit="auditee_name",
+            auditee_name=OLD_AUDITEE_NAME,
+            new_value=NEW_AUDITEE_NAME,
+            editor_email=STAFF_EMAIL,
+        )
+        form = MagicMock()
+
+        self.admin.save_model(self.request, obj, form, change=False)
+        self.sac.refresh_from_db()
+        obj.refresh_from_db()
+
+        self.assertEqual(self.sac.general_information["auditee_name"], NEW_AUDITEE_NAME)
         self.assertEqual(obj.status, "success")
