@@ -11,7 +11,6 @@ RUN apt-get -yq update && \
     apt install -y \
         build-essential \
         curl \
-        jq \
         groff \
         zip && \
         rm -rf /var/lib/apt/lists/*
@@ -59,6 +58,26 @@ RUN apt-get -yq update && \
         # cloud.gov as of August 2025.
         postgresql-client-15 && \
     rm -rf /var/lib/apt/lists/*
+
+# Tools, Cloud Foundry API CLI, and AWS CLI for prepare_prod_data_for_local.bash
+RUN apt-get -yq update && \
+    apt-get install -y \
+        gpg \
+        jq \
+        wget
+
+RUN wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key \
+  | gpg --dearmor -o /usr/share/keyrings/cli.cloudfoundry.org.gpg \
+  && echo "deb [signed-by=/usr/share/keyrings/cli.cloudfoundry.org.gpg] https://packages.cloudfoundry.org/debian stable main" \
+  | tee /etc/apt/sources.list.d/cloudfoundry-cli.list \
+  && apt update \
+  && apt install cf8-cli
+
+RUN apt-get install -yqq groff && \
+    apt-get install -yqq zip && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
 
 RUN curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
     chmod +x /usr/local/bin/mc
