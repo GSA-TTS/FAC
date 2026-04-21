@@ -9,15 +9,15 @@ class CurationTracking:
     This guarantees that any DB writes within the block will be recorded.
     """
 
-    enabled = False
+    initialized = False
 
     # On first entry, initialize the curation indexes and functions. It should always be setup in
     # online environments, but it's not guaranteed. This also ensures a duplicate initialization
     # when redeploying online, to ensure any changes are brought through.
     def __enter__(self):
-        if not self.enabled:
+        if not self.initialized:
             init_audit_curation()
-            self.enabled = True
+            self.initialized = True
 
         enable_audit_curation()
         return None
