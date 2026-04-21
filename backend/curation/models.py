@@ -1,7 +1,6 @@
 import logging
 
 from django.db import models
-from django.apps import apps
 
 from curation.management.commands.update_after_submission import validate_inputs
 from .curationlib.update_after_submission import (
