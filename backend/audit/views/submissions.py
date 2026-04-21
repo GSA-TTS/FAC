@@ -196,7 +196,6 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                         "next_report_id": sac.report_id,
                         "next_row_id": sac.id,
                     }
-
                     old_sac.redisseminate()
 
                 if audit:
