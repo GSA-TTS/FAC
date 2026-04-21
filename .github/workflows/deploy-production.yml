@@ -4,40 +4,53 @@ on:
   push:
     tags:
       - v1.*
-
+      
+permissions:
+  contents: read
+  
 jobs:
-  # testing:
-  #   uses: ./.github/workflows/testing-from-ghcr.yml
-  #   secrets: inherit
+  check-for-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      terraform: ${{ steps.filter.outputs.terraform }}
+    steps:
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          base: 'prod'
+          filters: |
+            backend:
+              - './backend/**'
+            terraform:
+              - './terraform/**'
 
-  linting:
-    uses: ./.github/workflows/pull_request-linting.yml
-    secrets: inherit
-
-  deploy-infrastructure-production:
-    name: Deploy infrastructure (production)
-    # needs:
-    #   - testing
+  deploy-infrastructure:
+    name: Deploy infrastructure
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.terraform == 'true'
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "production"
       autoapprove: false
     secrets: inherit
 
-  new-relic-record:
-    name: Record deployment to New Relic
-    needs:
-      - deploy-infrastructure-production
-    uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
+  deploy-application:
+    name: Deploy application
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.backend == 'true'
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "production"
     secrets: inherit
 
-  deploy-production:
-    name: Deploy application
+  new-relic-record:
+    name: Record deployment to New Relic
     needs:
-      - deploy-infrastructure-production
-    uses: ./.github/workflows/deploy-application.yml
+      - deploy-application
+    uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
     with:
       environment: "production"
     secrets: inherit
@@ -45,7 +58,7 @@ jobs:
   scan-production-post-deploy:
     name: Zap Scan
     needs:
-      - deploy-production
+      - deploy-application
     uses: ./.github/workflows/scanning-zap-scan.yml
     with:
       url: "https://app.fac.gov/"
