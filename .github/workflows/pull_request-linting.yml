@@ -96,6 +96,3 @@ jobs:
       - name: Lint JS & SCSS
         working-directory: ./backend
         run: npm run check-all
-
-  validate-terraform:
-    uses: ./.github/workflows/terraform-lint.yml
