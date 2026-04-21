@@ -118,9 +118,7 @@ class TestEditRecordAdmin(TestCase):
     # save_model tests
     # -------------------------------------------------------------------------
 
-    @patch("curation.curationlib.curation_audit_tracking.enable_audit_curation")
-    @patch("curation.curationlib.curation_audit_tracking.disable_audit_curation")
-    def test_save_model_uei_field_saves_successfully(self, mock_enable, mock_disable):
+    def test_save_model_uei_field_saves_successfully(self):
         """save_model should store the old UEI on the record and the replacement in new_value."""
         self.assertEqual(self.sac.general_information["auditee_uei"], OLD_UEI)
 
@@ -141,9 +139,7 @@ class TestEditRecordAdmin(TestCase):
         self.assertEqual(self.sac.general_information["auditee_uei"], NEW_UEI)
         self.assertEqual(obj.status, "success")
 
-    @patch("curation.curationlib.curation_audit_tracking.enable_audit_curation")
-    @patch("curation.curationlib.curation_audit_tracking.disable_audit_curation")
-    def test_save_model_ein_field_saves_successfully(self, mock_enable, mock_disable):
+    def test_save_model_ein_field_saves_successfully(self):
         """save_model should store the old EIN on the record and the replacement in new_value."""
         # request = self._make_request(self.user)
         self.assertEqual(self.sac.general_information["ein"], OLD_EIN)
@@ -165,11 +161,7 @@ class TestEditRecordAdmin(TestCase):
         self.assertEqual(self.sac.general_information["ein"], NEW_EIN)
         self.assertEqual(obj.status, "success")
 
-    @patch("curation.curationlib.curation_audit_tracking.enable_audit_curation")
-    @patch("curation.curationlib.curation_audit_tracking.disable_audit_curation")
-    def test_save_model_auditee_name_field_saves_successfully(
-        self, mock_enable, mock_disable
-    ):
+    def test_save_model_auditee_name_field_saves_successfully(self):
         """save_model should store the old auditee_name on the record and the replacement in new_value."""
         self.assertEqual(self.sac.general_information["auditee_name"], OLD_AUDITEE_NAME)
 
