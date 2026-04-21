@@ -204,3 +204,4 @@ class TestEditRecordAdmin(TestCase):
 
         self.assertEqual(self.sac.general_information["auditee_name"], NEW_AUDITEE_NAME)
         self.assertEqual(obj.status, "success")
+
