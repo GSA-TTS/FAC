@@ -28,6 +28,7 @@ NEW_EIN = "987654321"
 OLD_AUDITEE_NAME = "Old Auditee Name"
 NEW_AUDITEE_NAME = "New Auditee Name"
 
+
 class MockRequest:
     def __init__(self, user):
         self.user = user
