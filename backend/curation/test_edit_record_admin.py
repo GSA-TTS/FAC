@@ -10,7 +10,6 @@ from model_bakery import baker
 
 from audit.models.constants import STATUS
 from audit.models.models import SingleAuditChecklist
-from audit.models.audit import Audit
 from users.models import StaffUser
 
 from .admin import EditRecordAdmin
