@@ -5,7 +5,6 @@ from django.db import models
 from curation.management.commands.update_after_submission import validate_inputs
 from .curationlib.update_after_submission import (
     update_uei,
-    # update_ein,
     update_simple_gen_field,
 )
 

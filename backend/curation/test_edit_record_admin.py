@@ -1,20 +1,16 @@
 from unittest.mock import MagicMock, patch
+from model_bakery import baker
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.test import TestCase, RequestFactory
 
-from model_bakery import baker
-
+from .admin import EditRecordAdmin
 from audit.models.constants import STATUS
 from audit.models.models import SingleAuditChecklist
-from users.models import StaffUser
-
-from .admin import EditRecordAdmin
 from .models import EditRecord
-from django.contrib.messages.storage.fallback import FallbackStorage
+from users.models import StaffUser
 
 REPORT_ID = "2024-01-GSAFAC-0000000001"
 STAFF_EMAIL = "staff@example.com"
@@ -62,22 +58,9 @@ class TestEditRecordAdmin(TestCase):
         self.request = self.factory.post("/admin/curation/editrecord/add/")
         self.request.user = self.user
 
-        # Add session and message middleware to the request
-        # self.middleware_process(self.request)
-
         # Set up the Admin site and Admin class
         self.site = AdminSite()
         self.admin = EditRecordAdmin(EditRecord, self.site)
-
-    def middleware_process(self, request):
-        """Apply middleware to the request object"""
-        # Create and apply session middleware
-        session_middleware = SessionMiddleware(lambda req: None)
-        session_middleware.process_request(request)
-        request.session.save()
-        # Create and apply message middleware
-        message_middleware = MessageMiddleware(lambda req: None)
-        message_middleware.process_request(request)
 
     # -------------------------------------------------------------------------
     # Configuration tests
@@ -155,7 +138,6 @@ class TestEditRecordAdmin(TestCase):
         self.sac.refresh_from_db()
         obj.refresh_from_db()
 
-        # Get the SF_SAC from the db and assert the new uei is updated
         self.assertEqual(self.sac.general_information["auditee_uei"], NEW_UEI)
         self.assertEqual(obj.status, "success")
 
