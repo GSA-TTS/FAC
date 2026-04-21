@@ -25,12 +25,6 @@ args=("$@")
 DESTINATION="data/"
 EMAIL=${args[0]}
 
-if [[ -z "${DESTINATION}" ]]; then
-  echo "Please pass a destination folder as the first argument."
-  echo "Exiting."
-  exit
-fi
-
 if [ -d "$DESTINATION" ]; then
   echo "Found destination '$DESTINATION'."
 else
@@ -75,9 +69,9 @@ fi
 echo -e "\n"
 
 # This can be changed via the menu.
-# Better, when a new backup is targeted, to 
+# Better, when a new backup is targeted, to
 # make the change and commit back to the repo.
-DESIRED_BACKUP="07-27-12"
+DESIRED_BACKUP="04-04-20"
 
 ############################################################
 # environment variables
@@ -86,7 +80,7 @@ DATABASE=postgres
 USERNAME=postgres
 HOST=db
 PORT=5432
-DATE=$(date '+%Y%m%d')
+TODAY=$(date '+%Y%m%d')
 
 # This gives us TARGET_TABLES
 source "tables.source"
@@ -113,7 +107,7 @@ download_dumpfiles () {
   # You need to do this yourself.
   # cf t -s production
   # Be careful when connecting to prod.
-  
+
   # We want the backups bucket
   BACKUP_SERVICE_INSTANCE_NAME=backups
 
@@ -145,7 +139,7 @@ download_dumpfiles () {
   export BUCKET_NAME=${BACKUP_BUCKET_NAME}
 
   # Download the tables.
-  for dump in ${TARGET_TABLES[@]}; 
+  for dump in ${TARGET_TABLES[@]};
   do
     SRC="s3://${BUCKET_NAME}/backups/scheduled/${DESIRED_BACKUP}/${dump}"
     DST="${DESTINATION}/${dump}"
@@ -154,13 +148,13 @@ download_dumpfiles () {
     rm -f "${DST}"
     # Download a fresh dumpfile
     aws s3 cp "${SRC}" "${DST}"
-    if [ $? -ne 0 ]; then 
+    if [ $? -ne 0 ]; then
       echo "DOWNLOAD FAILED."
       echo "Exiting."
       exit
     fi
   done
- 
+
   cf delete-service-key -f "${BACKUP_SERVICE_INSTANCE_NAME}" "${BACKUP_KEY_NAME}" || true
 
   # We automatically dump back to preview, just-in-case.
@@ -172,7 +166,7 @@ download_dumpfiles () {
 ############################################################
 load_raw_prod_dump () {
   echo "load_raw_prod_dump"
- 
+
   for ndx in ${!TARGET_TABLES[@]};
   do
     dump=${TARGET_TABLES[$ndx]}
@@ -226,7 +220,7 @@ load_raw_prod_dump () {
       -h ${HOST} \
       -v ON_ERROR_STOP=1 \
       -w < "${TEMPFILE}"
-    
+
     if [ $? -ne 0 ]; then
       echo "RESTORE FAILED: ${TABLENAME}"
       echo "Exiting."
@@ -235,7 +229,7 @@ load_raw_prod_dump () {
 
     # Then remove the tmpfile
     rm -f "${TEMPFILE}"
-    
+
   done
 }
 
@@ -280,10 +274,10 @@ export_sanitized_dump_for_reuse () {
   done
 
   # Make sure this isn't stale when we're done/if we fail.
-  rm -f "sanitized-${DATE}.dump"
+  rm -f "sanitized-${TODAY}.dump"
 
   cmd="pg_dump -d ${DATABASE} -h ${HOST} -p ${PORT} -U ${USERNAME} -w -F c --no-acl --no-owner --data-only ${table_flags} "
-  cmd="${cmd} -f ${DESTINATION}/sanitized-${DATE}.dump"
+  cmd="${cmd} -f ${DESTINATION}/sanitized-${TODAY}.dump"
   echo "${cmd}"
   eval "${cmd}"
 
@@ -314,7 +308,7 @@ truncate_all_local_tables () {
     suffix=".dump"
     TABLENAME=${dump/#$prefix}
     TABLENAME=${TABLENAME/%$suffix}
-  
+
   cmd="SELECT COUNT(*) FROM ${TABLENAME}"
   PRE_TRUNCATE_TABLE_COUNTS+=($(psql \
     -t \
@@ -329,7 +323,7 @@ truncate_all_local_tables () {
 
   echo "${cmd}: ${PRE_TRUNCATE_TABLE_COUNTS[$ndx]}"
 
-  # TRUNCATE is not guaranteed to be complete if we call a 
+  # TRUNCATE is not guaranteed to be complete if we call a
   # `pg_restore` immediately after. Wrap it in a transaction.
   # https://petereisentraut.blogspot.com/2010/03/running-sql-scripts-with-psql.html
   PGOPTIONS='--client-min-messages=warning' psql \
@@ -341,7 +335,7 @@ truncate_all_local_tables () {
     -v ON_ERROR_STOP=1 \
     -w \
     -c "BEGIN; TRUNCATE ${TABLENAME} CASCADE; COMMIT;"
-  
+
   if [ $? -ne 0 ]; then
     echo "Truncate failed: ${TABLENAME}"
     echo "Exiting."
@@ -353,18 +347,33 @@ truncate_all_local_tables () {
 
 
 ############################################################
-# test_sanitized_production_dump
+# reload_and_test_sanitized_production_dump
 ############################################################
 declare -a TEST_LOAD_TABLE_COUNTS
-test_sanitized_production_dump () {
-  echo "test_sanitized_production_dump"
+reload_and_test_sanitized_production_dump () {
+  echo "reload_and_test_sanitized_production_dump"
+
+  echo "Available dumps:"
+  ls ./data/sanitized*.dump
+
+  while [[ -z $dump_path ]]; do
+    read -p "Specify the dump path to use: " TARGET
+    dump_path=$TARGET
+
+    if [[ -z "${dump_path}" ]]; then
+      echo "Dump path not provided."
+    elif [[ ! -f "${dump_path}" ]]; then
+      echo "${dump_path} not found."
+      dump_path=""
+    fi
+  done
+
+  echo "Restoring data from ${dump_path}"
 
   # We must truncate everything before loading.
   truncate_all_local_tables
 
-  echo "Restoring data from sanitized-${DATE}.dump"
-
-  cat "${DESTINATION}/sanitized-${DATE}.dump" | \
+  cat "${dump_path}" | \
   pg_restore \
     --data-only \
     --no-privileges \
@@ -379,7 +388,7 @@ test_sanitized_production_dump () {
     -p ${PORT} \
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
-    -w    
+    -w
 
   if [ $? -ne 0 ]; then
     echo "pg_restore failed."
@@ -460,7 +469,7 @@ do
         truncate_all_local_tables
         ;;
       "Reload/test sanitized production dump")
-        test_sanitized_production_dump
+        reload_and_test_sanitized_production_dump
         ;;
       "Run everything straight through")
         download_dumpfiles
@@ -468,7 +477,7 @@ do
         remove_suppressed_tribal_audits
         export_sanitized_dump_for_reuse
         truncate_all_local_tables
-        test_sanitized_production_dump
+        reload_and_test_sanitized_production_dump
         ;;
       "Quit")
         break
