@@ -336,6 +336,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 "additional_eins",
                 "secondary_auditors",
                 "notes_to_sefa",
+                "resubmission_meta",
             ]
             data = model_to_dict(self, fields=include_list)
 
