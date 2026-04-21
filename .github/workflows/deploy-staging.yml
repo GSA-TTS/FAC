@@ -5,41 +5,59 @@ on:
     branches:
       - prod
 
+permissions:
+  contents: read
+
 jobs:
+  check-for-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      terraform: ${{ steps.filter.outputs.terraform }}
+    steps:
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          base: 'main'
+          filters: |
+            backend:
+              - './backend/**'
+            terraform:
+              - './terraform/**'
 
-  linting:
-    uses: ./.github/workflows/pull_request-linting.yml
-    secrets: inherit
-
-  deploy-infrastructure-staging:
-    name: Deploy infrastructure (staging)
+  deploy-infrastructure:
+    name: Deploy infrastructure
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.terraform == 'true'
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "staging"
       autoapprove: false
     secrets: inherit
 
-  new-relic-record:
-    name: Record deployment to New Relic
-    needs:
-      - deploy-infrastructure-staging
-    uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
+  deploy-application:
+    name: Deploy application
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.backend == 'true'
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "staging"
     secrets: inherit
 
-  deploy-staging:
-    name: Deploy application
+  new-relic-record:
+    name: Record deployment to New Relic
     needs:
-      - deploy-infrastructure-staging
-    uses: ./.github/workflows/deploy-application.yml
+      - deploy-application
+    uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
     with:
       environment: "staging"
     secrets: inherit
 
   scan-staging:
     needs:
-      - deploy-staging
+      - deploy-application
     name: Zap Scan
     uses: ./.github/workflows/scanning-zap-scan.yml
     with:
@@ -47,7 +65,7 @@ jobs:
 
   regression-test:
     needs:
-      - deploy-staging
+      - deploy-application
     name: Run Regression Tests
     uses: ./.github/workflows/testing-cypress-regression-tests.yml
     secrets: inherit
