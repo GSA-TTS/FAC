@@ -42,7 +42,7 @@ class TestEditRecordAdmin(TestCase):
 
         self.user = User.objects.create_user(
             username="staffuser", email=STAFF_EMAIL, password="12345", is_staff=True
-        )
+        )  # nosec
         self.staff_user = baker.make(StaffUser, staff_email=STAFF_EMAIL)
 
         self.sac = baker.make(
@@ -185,7 +185,9 @@ class TestEditRecordAdmin(TestCase):
 
     @patch("curation.curationlib.curation_audit_tracking.enable_audit_curation")
     @patch("curation.curationlib.curation_audit_tracking.disable_audit_curation")
-    def test_save_model_auditee_name_field_saves_successfully(self, mock_enable, mock_disable):
+    def test_save_model_auditee_name_field_saves_successfully(
+        self, mock_enable, mock_disable
+    ):
         """save_model should store the old auditee_name on the record and the replacement in new_value."""
         self.assertEqual(self.sac.general_information["auditee_name"], OLD_AUDITEE_NAME)
 
