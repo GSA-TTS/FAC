@@ -19,15 +19,24 @@ class SupportAdmin(admin.ModelAdmin):
 
 @admin.register(EditRecord)
 class EditRecordAdmin(SupportAdmin):
+
+    fieldsets = (
+        (None, {
+            'description': (
+                '<strong>Instructions:</strong> Please fill in all fields carefully. '
+                'The form can only edit an audit record that is disseminated. Please ensure the report ID is correct and the current value matches what is in the system.'
+            ),
+            'fields': ('report_id', 'field_to_edit', 'old_value', 'new_value'),
+        }),
+    )
+
     date_hierarchy = "edit_timestamp"
     ordering = ["edit_timestamp"]
 
     list_display = [
         "report_id",
-        "uei",
-        "ein",
-        "auditee_name",
         "field_to_edit",
+        "old_value",
         "new_value",
         "editor_email",
         "edit_timestamp",
@@ -35,10 +44,8 @@ class EditRecordAdmin(SupportAdmin):
     ]
     list_filter = [
         "report_id",
-        "uei",
-        "ein",
-        "auditee_name",
         "field_to_edit",
+        "old_value",
         "new_value",
         "editor_email",
     ]
@@ -46,9 +53,7 @@ class EditRecordAdmin(SupportAdmin):
     search_fields = (
         "report_id",
         "field_to_edit",
-        "uei",
-        "ein",
-        "auditee_name",
+        "old_value",
         "new_value",
         "editor_email",
     )

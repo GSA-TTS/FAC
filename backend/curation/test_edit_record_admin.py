@@ -69,10 +69,8 @@ class TestEditRecordAdmin(TestCase):
     def test_list_display(self):
         expected = [
             "report_id",
-            "uei",
-            "ein",
-            "auditee_name",
             "field_to_edit",
+            "old_value",
             "new_value",
             "editor_email",
             "edit_timestamp",
@@ -83,10 +81,8 @@ class TestEditRecordAdmin(TestCase):
     def test_list_filter(self):
         expected = [
             "report_id",
-            "uei",
-            "ein",
-            "auditee_name",
             "field_to_edit",
+            "old_value",
             "new_value",
             "editor_email",
         ]
@@ -96,9 +92,7 @@ class TestEditRecordAdmin(TestCase):
         expected = (
             "report_id",
             "field_to_edit",
-            "uei",
-            "ein",
-            "auditee_name",
+            "old_value",
             "new_value",
             "editor_email",
         )
@@ -126,7 +120,7 @@ class TestEditRecordAdmin(TestCase):
             EditRecord,
             report_id=REPORT_ID,
             field_to_edit="uei",
-            uei=OLD_UEI,
+            old_value=OLD_UEI,
             new_value=NEW_UEI,
             editor_email=STAFF_EMAIL,
         )
@@ -148,7 +142,7 @@ class TestEditRecordAdmin(TestCase):
             EditRecord,
             report_id=REPORT_ID,
             field_to_edit="ein",
-            ein=OLD_EIN,
+            old_value=OLD_EIN,
             new_value=NEW_EIN,
             editor_email=STAFF_EMAIL,
         )
@@ -169,7 +163,7 @@ class TestEditRecordAdmin(TestCase):
             EditRecord,
             report_id=REPORT_ID,
             field_to_edit="auditee_name",
-            auditee_name=OLD_AUDITEE_NAME,
+            old_value=OLD_AUDITEE_NAME,
             new_value=NEW_AUDITEE_NAME,
             editor_email=STAFF_EMAIL,
         )

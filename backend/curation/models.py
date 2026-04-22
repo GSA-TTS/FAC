@@ -10,25 +10,20 @@ from .curationlib.update_after_submission import (
 
 logger = logging.getLogger(__name__)
 
-EDITABLE_FIELDS = (("uei", "UEI"), ("ein", "EIN"), ("auditee_name", "Name"))
+EDITABLE_FIELDS = (("uei", "UEI"), ("ein", "EIN"), ("auditee_name", "Auditee Name"))
 
 
 class EditRecord(models.Model):
     report_id = models.CharField(verbose_name="Report ID")
-    uei = models.CharField(verbose_name="Current UEI", null=True, blank=True)
-    ein = models.CharField(verbose_name="Current EIN", null=True, blank=True)
-    auditee_name = models.CharField(verbose_name="Current name", null=True, blank=True)
     field_to_edit = models.CharField(
-        verbose_name="Field To Edit", choices=EDITABLE_FIELDS, default="auditee_uei"
+        verbose_name="Field To Edit", choices=EDITABLE_FIELDS, default="uei"
     )
+    old_value = models.CharField(verbose_name="Current Value To Change", null=True, blank=True)
     new_value = models.TextField(verbose_name="New Value", null=True, blank=True)
 
-    editor_email = models.EmailField(
-        verbose_name="Editor Email", null=True
-    )  # Store the email of the user who made the edit
-    edit_timestamp = models.DateTimeField(
-        auto_now_add=True, verbose_name="Edit Timestamp"
-    )
+    editor_email = models.EmailField(verbose_name="Editor Email", null=True) 
+    edit_timestamp = models.DateTimeField(auto_now_add=True, 
+                                          verbose_name="Edit Timestamp")
 
     status = models.CharField(
         default="pending",
@@ -48,21 +43,32 @@ class EditRecord(models.Model):
 
     def save(self, *args, **kwargs):
         options = {
-            "report_id": self.report_id,
-            "email": self.editor_email,
-            "old_uei": self.uei if self.field_to_edit == "uei" else None,
-            "new_uei": self.new_value if self.field_to_edit == "uei" else None,
-            "old_ein": self.ein if self.field_to_edit == "ein" else None,
-            "new_ein": self.new_value if self.field_to_edit == "ein" else None,
-            "old_auditee_name": (
-                self.auditee_name if self.field_to_edit == "auditee_name" else None
-            ),
-            "new_auditee_name": (
-                self.new_value if self.field_to_edit == "auditee_name" else None
-            ),
-            "old_authorization": None,
-            "new_authorization": None,
+                "report_id": self.report_id,
+                "email": self.editor_email,
+                "old_uei": None,
+                "new_uei": None,
+                "old_ein": None,
+                "new_ein": None,
+                "old_auditee_name": None,
+                "new_auditee_name": None,
+                "old_authorization": None,
+                "new_authorization": None,
         }
+        if self.field_to_edit == "uei":
+            options.update({
+                "old_uei": self.old_value,
+                "new_uei": self.new_value
+            })
+        elif self.field_to_edit == "ein":
+            options.update({
+                "old_ein": self.old_value,
+                "new_ein": self.new_value,
+            })
+        elif self.field_to_edit == "auditee_name":
+            options.update({
+                "old_auditee_name": self.old_value,
+                "new_auditee_name": self.new_value 
+                })
 
         try:
             if not validate_inputs(options):
