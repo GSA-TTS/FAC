@@ -192,14 +192,9 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                         getattr(old_sac, "resubmission_meta", {}) or {}
                     )
                     old_sac.resubmission_meta = {
+                        **old_resubmission_meta,
                         "version": old_resubmission_meta.get("version", 1),
                         "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
-                        "previous_report_id": old_resubmission_meta.get(
-                            "previous_report_id", None
-                        ),
-                        "previous_row_id": old_resubmission_meta.get(
-                            "previous_row_id", None
-                        ),
                         "next_report_id": sac.report_id,
                         "next_row_id": sac.id,
                     }
