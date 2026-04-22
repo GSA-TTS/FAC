@@ -44,7 +44,7 @@ class EditRecord(models.Model):
         for Report {self.report_id} \
         by {self.editor_email} on {self.edit_timestamp}"
 
-    def save(self, *args, **kwargs):
+    def create_options(self, *args, **kwargs):
         options = {
             "report_id": self.report_id,
             "email": self.editor_email,
@@ -74,7 +74,11 @@ class EditRecord(models.Model):
             logger.error(f"Invalid field_to_edit value: {self.field_to_edit}")
             self.status = "failed"
             super().save(*args, **kwargs)
-            return
+
+        return options
+
+    def save(self, *args, **kwargs):
+        options = self.create_options(*args, **kwargs)
 
         try:
             if not validate_inputs(options):
