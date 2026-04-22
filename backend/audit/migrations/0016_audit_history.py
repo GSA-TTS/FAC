@@ -18,7 +18,8 @@ class Migration(migrations.Migration):
 
     operations = [
         # This custom function is needed for the generated columns.
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
                     CREATE OR REPLACE FUNCTION json_array_to_text_array (data jsonb)
                         RETURNS text[]
                         AS $CODE$
@@ -30,7 +31,8 @@ class Migration(migrations.Migration):
                     $CODE$
                     LANGUAGE plpgsql
                     IMMUTABLE;
-            """),
+            """
+        ),
         migrations.CreateModel(
             name="Audit",
             fields=[

@@ -21,13 +21,16 @@ class SupportAdmin(admin.ModelAdmin):
 class EditRecordAdmin(SupportAdmin):
 
     fieldsets = (
-        (None, {
-            'description': (
-                '<strong>Instructions:</strong> Please fill in all fields carefully. '
-                'The form can only edit an audit record that is disseminated. Please ensure the report ID is correct and the current value matches what is in the system.'
-            ),
-            'fields': ('report_id', 'field_to_edit', 'old_value', 'new_value'),
-        }),
+        (
+            None,
+            {
+                "description": (
+                    "<strong>Instructions:</strong> Please fill in all fields carefully. "
+                    "The form can only edit an audit record that is disseminated. Please ensure the report ID is correct and the current value matches what is in the system."
+                ),
+                "fields": ("report_id", "field_to_edit", "old_value", "new_value"),
+            },
+        ),
     )
 
     date_hierarchy = "edit_timestamp"
