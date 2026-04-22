@@ -203,10 +203,15 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                         "next_report_id": sac.report_id,
                         "next_row_id": sac.id,
                     }
-                    old_audit = Audit.objects.find_audit_or_none(report_id=old_sac.report_id)
+                    old_audit = Audit.objects.find_audit_or_none(
+                        report_id=old_sac.report_id
+                    )
 
                     sac_transition(
-                        request, old_sac, audit=old_audit, transition_to=STATUS.RESUBMITTED
+                        request,
+                        old_sac,
+                        audit=old_audit,
+                        transition_to=STATUS.RESUBMITTED,
                     )
 
                     old_sac.save()
