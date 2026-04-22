@@ -16,7 +16,7 @@ from audit.models import (
     Audit,
     Access,
 )
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from audit.models.utils import generate_audit_indexes
 from audit.models.viewflow import sac_transition
 from audit.decorators import verify_status
@@ -192,16 +192,24 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                         getattr(old_sac, "resubmission_meta", {}) or {}
                     )
                     old_sac.resubmission_meta = {
+                        "version": old_resubmission_meta.get("version", 1),
+                        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
                         "previous_report_id": old_resubmission_meta.get(
                             "previous_report_id", None
                         ),
                         "previous_row_id": old_resubmission_meta.get(
                             "previous_row_id", None
                         ),
-                        "version": old_resubmission_meta.get("version", 1),
                         "next_report_id": sac.report_id,
                         "next_row_id": sac.id,
                     }
+                    old_audit = Audit.objects.find_audit_or_none(report_id=old_sac.report_id)
+
+                    sac_transition(
+                        request, old_sac, audit=old_audit, transition_to=STATUS.RESUBMITTED
+                    )
+
+                    old_sac.save()
                     old_sac.redisseminate()
 
                 if audit:
