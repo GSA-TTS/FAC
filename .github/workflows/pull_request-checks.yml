@@ -49,14 +49,14 @@ jobs:
   linting:
     needs: 
       - check-for-changes
-    if: ${{ needs.check-for-changes.outputs.backend == 'true' }}
+    if: needs.check-for-changes.outputs.backend == 'true' || github.base_ref == 'prod'
     uses: ./.github/workflows/pull_request-linting.yml
     secrets: inherit
 
   testing-from-build:
     needs: 
       - check-for-changes
-    if: ${{ needs.check-for-changes.outputs.backend == 'true' }}
+    if: needs.check-for-changes.outputs.backend == 'true' || github.base_ref == 'prod'
     permissions: write-all
     uses: ./.github/workflows/testing-from-build.yml
     secrets: inherit
@@ -64,7 +64,7 @@ jobs:
   cypress-from-container:
     needs: 
       - check-for-changes
-    if: ${{ needs.check-for-changes.outputs.backend == 'true' }}
+    if: needs.check-for-changes.outputs.backend == 'true' || github.base_ref == 'prod'
     uses: ./.github/workflows/testing-cypress-container.yml
     with:
       environment: testing
@@ -73,7 +73,7 @@ jobs:
   terraform-validate: 
     needs: 
       - check-for-changes
-    if: needs.check-for-changes.outputs.terraform == 'true'
+    if: needs.check-for-changes.outputs.terraform == 'true' || github.base_ref == 'prod'
     uses: ./.github/workflows/terraform-lint.yml
 
   # Generate Terraform Plans
@@ -96,9 +96,7 @@ jobs:
     secrets: inherit
 
   terraform-plan-staging:
-    needs: 
-      - check-for-changes
-    if: github.base_ref == 'prod' && needs.check-for-changes.outputs.terraform == 'true'
+    if: github.base_ref == 'prod'
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
       environment: staging
@@ -106,9 +104,7 @@ jobs:
 
 # uses tags "v1.*"
   terraform-plan-prod:
-    needs: 
-      - check-for-changes
-    if: github.base_ref == 'prod' && needs.check-for-changes.outputs.terraform == 'true'
+    if: github.base_ref == 'prod'
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
       environment: production
