@@ -1,7 +1,7 @@
 
 # Updating the Cluster Names
 
-1. Review the latest [OMB Compliance Supplement](https://www.fac.gov/compliance/) cluster listings usually in a table/matrix.
+1. Review the latest [OMB Compliance Supplement](https://www.fac.gov/compliance/) cluster listings, usually in a table/matrix.
 2. Compare dataset with [existing Cluster Names](`backend/schemas/source/data/cluster-names.csv`)
 3. Add any new cluster names
 4. See below to regenerate schemas and templates.
@@ -33,11 +33,7 @@ Follow these steps to version bump the workbook templates:
 * `NotesToSefa.schema.jsonnet`
 * `SecondaryAuditors.schema.jsonnet`
 4. Activate your virtual env inside `backend/schemas` and run `make all`. This will generate new schemas and templates in `/schemas/output/`.
-5. Update the workbook template fixtures used in the Cypress tests, found in `backend/cypress/fixtures/test_workbooks`.
-    * An easy (but tedious) way to do this is to modify the templates with the data used in the existing fixtures, then copy/overwrite all of those XLSXes into `test_workbooks`.
-        * If a cell has a selector, use that instead of copy-pasting.
-        * Don't forget to revert the templates afterwards!
-6. Once your PR is merged, don't forget to copy the new templates, found in `backend/schemas/output/excel/xlsx/`, into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
+5. Once your PR is merged, don't forget to copy the new templates, found in `backend/schemas/output/excel/xlsx/`, into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
 
 ## A note about generate_lookup_schemas.py
 `make all` executes `make source_data`, which, calls `generate_lookup_schemas.py`. This script can generate either cluster names or CFDA listings or agencies, depending on the args given (see docstring in the script). The format of the CSVs can change (and have), so changes to `generate_lookup_schemas.py` may be necessary in the future.
