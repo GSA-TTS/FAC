@@ -24,7 +24,7 @@
                "title": "This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.",
                "title_cell": "B1",
                "type": "meta_cell",
-               "width": 48
+               "width": 80
             }
          ],
          "name": "Coversheet",
@@ -66,15 +66,32 @@
                "width": 48
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#section_name",
+                  "text": "The workbook you tried to upload is for a different section."
+               },
+               "keep_locked": true,
+               "range_cell": "B4",
+               "range_name": "instructions_name",
+               "title": "Instructions",
+               "title_cell": "A4",
+               "type": "single_cell",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "value": "https://www.fac.gov/audit-resources/sf-sac/additional-eins-workbook/",
+               "width": 48
+            },
+            {
                "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
                },
-               "range_cell": "B4",
+               "range_cell": "B5",
                "range_name": "auditee_uei",
                "title": "Auditee UEI:",
-               "title_cell": "A4",
+               "title_cell": "A5",
                "type": "single_cell",
                "validation": {
                   "custom_error": "Expecting something with 12 characters",
