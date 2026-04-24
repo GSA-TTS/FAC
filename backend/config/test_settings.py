@@ -3,6 +3,7 @@ from django.conf import settings
 
 
 import boto3
+from botocore.config import Config
 
 from census_historical_migration.models import ELECAUDITHEADER as Gen
 from audit.models import SingleAuditChecklist
@@ -23,11 +24,16 @@ class SettingsTestCase(TestCase):
         from the associated storage bucket.
         """
         try:
+            s3_config = Config(
+                request_checksum_calculation="when_required",
+                response_checksum_validation="when_required",
+            )
             s3_client = boto3.client(
                 "s3",
                 aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
                 aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
                 endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+                config=s3_config
             )
             self.assertIsNotNone(s3_client)
             items = s3_client.list_objects(
