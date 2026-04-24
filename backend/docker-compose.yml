@@ -46,7 +46,7 @@ services:
       db2:
         condition: service_healthy
       minio:
-        condition: service_started
+        condition: service_healthy
       clamav-rest:
         condition: service_started
     environment:
