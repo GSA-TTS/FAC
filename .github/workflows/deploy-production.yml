@@ -9,8 +9,36 @@ permissions:
   contents: read
   
 jobs:
+  check-for-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      terraform: ${{ steps.filter.outputs.terraform }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # fetch all branches and tags
+      - name: Get previous tag
+        id: previous-tag
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
+          echo "prev_tag=$PREV_TAG" >> "$GITHUB_OUTPUT"
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          base: ${{ steps.previous-tag.outputs.prev_tag }}
+          filters: |
+            backend:
+              - './backend/**'
+            terraform:
+              - './terraform/**'
+
   deploy-infrastructure:
     name: Deploy infrastructure
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.terraform == 'true'
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "production"
@@ -19,6 +47,9 @@ jobs:
 
   deploy-application:
     name: Deploy application
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.backend == 'true'
     uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "production"
