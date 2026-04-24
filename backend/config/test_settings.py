@@ -33,7 +33,7 @@ class SettingsTestCase(TestCase):
                 aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
                 aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
                 endpoint_url=settings.AWS_S3_ENDPOINT_URL,
-                config=s3_config
+                config=s3_config,
             )
             self.assertIsNotNone(s3_client)
             items = s3_client.list_objects(
