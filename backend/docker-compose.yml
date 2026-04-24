@@ -96,7 +96,7 @@ services:
   #---------------------------------------------
   minio:
     container_name: "minio"
-    image: minio/minio
+    image: minio/minio@sha256:13582eff79c6605a2d315bdd0e70164142ea7e98fc8411e9e10d089502a6d883
     command: server /tmp/minio --console-address ":9002"
     ports:
       - "9001:9000"

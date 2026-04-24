@@ -1,13 +1,13 @@
 # See docs/dependency-management.md for compilation instructions
 
-boto3
+boto3==1.42.94
 cfenv
 django-cors-headers
 django-csp
 django-dbbackup
 django-filter
 django-fsm
-django-storages[boto3]==1.14.2
+django-storages[boto3]==1.14.6
 Django>=5.2.12
 djangorestframework>=3.15.2
 djangorestframework-simplejwt>=5.3.1
