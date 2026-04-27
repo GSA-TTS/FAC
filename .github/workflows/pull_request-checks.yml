@@ -15,6 +15,7 @@ on:
       - 'docs/bpmn-workflow-models/**'
       - '!.github/ISSUE_TEMPLATE/**'
 
+
 env:
   GH_TOKEN: ${{ github.token }}
 
