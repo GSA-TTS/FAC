@@ -48,7 +48,7 @@ services:
       minio:
         condition: service_healthy
       clamav-rest:
-        condition: service_started
+        condition: service_healthy
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
       POSTGREST_URL: http://api:3000
@@ -90,6 +90,11 @@ services:
       PORT: ${CLAMAV_PORT:-9000}
     ports:
       - ${CLAMAV_PORT:-9000}:${CLAMAV_PORT:-9000}
+    healthcheck:
+      test: curl --fail -I http://localhost:9000/ || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   #---------------------------------------------
   # Minio (S3 clone)
@@ -99,7 +104,7 @@ services:
     image: minio/minio@sha256:13582eff79c6605a2d315bdd0e70164142ea7e98fc8411e9e10d089502a6d883
     command: server /tmp/minio --console-address ":9002"
     healthcheck:
-      test: curl --fail -I http://localhost:9000/minio/health/cluster || exit 1
+      test: curl --fail -I http://localhost:9002/minio/health/cluster || exit 1
       interval: 10s
       timeout: 5s
       retries: 10
