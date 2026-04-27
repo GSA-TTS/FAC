@@ -31,7 +31,7 @@ jobs:
 
       - name: Start services
         working-directory: ./backend
-        run: docker compose -f docker-compose.yml up
+        run: docker compose -f docker-compose.yml up -d
 
       - name: Run Django test suite
         working-directory: ./backend
