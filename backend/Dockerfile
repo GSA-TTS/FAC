@@ -79,7 +79,7 @@ RUN apt-get install -yqq groff && \
     unzip awscliv2.zip && \
     ./aws/install
 
-RUN curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
+RUN curl --fail -L "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
     chmod +x /usr/local/bin/mc
 
 # Copy from pip stage
