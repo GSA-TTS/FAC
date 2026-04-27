@@ -5,6 +5,7 @@ permissions:
   pull-requests: write
   checks: write
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
