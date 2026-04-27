@@ -91,8 +91,8 @@ services:
     ports:
       - ${CLAMAV_PORT:-9000}:${CLAMAV_PORT:-9000}
     healthcheck:
-      test: curl --fail -I http://localhost:9000/ || exit 1
-      interval: 10s
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:9000/"]
+      interval: 30s
       timeout: 5s
       retries: 10
 
