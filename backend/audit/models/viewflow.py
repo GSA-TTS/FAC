@@ -237,6 +237,14 @@ def sac_transition(request, sac, **kwargs):
         )
         return True
 
+    elif target == STATUS.RESUBMITTED:
+        flow.transition_to_resubmitted()
+        sac.save(
+            event_user=user,
+            event_type=SubmissionEvent.EventType.RESUBMITTED,
+        )
+        return True
+
     return False
 
 
@@ -435,6 +443,14 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         changes have been made at that point.
         """
         self.sac.transition_name.append(STATUS.SUBMITTED)
+        self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
+
+    @state.transition(
+        source=STATUS.DISSEMINATED,
+        target=STATUS.RESUBMITTED,
+    )
+    def transition_to_resubmitted(self):
+        self.sac.transition_name.append(STATUS.RESUBMITTED)
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
 
 
