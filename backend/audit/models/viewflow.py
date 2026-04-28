@@ -120,7 +120,7 @@ def audit_flag_for_removal(audit, user):
 
 
 def _sac_transition_helper(user, sac, flow, audit, audit_flow, target):
-    """ Helper for sac_transition(...) """
+    """Helper for sac_transition(...)"""
     if target == STATUS.IN_PROGRESS:
         flow.transition_to_in_progress_again()
         sac.save(
