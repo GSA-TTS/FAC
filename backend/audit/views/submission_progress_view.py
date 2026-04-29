@@ -197,7 +197,11 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "is_user_auditee_certifier": is_user_auditee_certifier,
                 "is_tribal_data_consent_complete": is_tribal_data_consent_complete,
-                "previous_report_id": sac.resubmission_meta.get("previous_report_id", None),
+                "previous_report_id": (
+                    sac.resubmission_meta.get("previous_report_id", None)
+                    if sac.resubmission_meta
+                    else None
+                ),
             }
             context = context | subcheck
 
