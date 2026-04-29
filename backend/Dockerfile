@@ -4,55 +4,68 @@
 
 FROM python:3.12.11-slim-bookworm AS foundation
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-COPY ZscalerRootCA.pem /usr/local/share/ca-certificates/ZscalerRootCA.crt
-
-RUN chmod 644 /usr/local/share/ca-certificates/ZscalerRootCA.crt && \
-        update-ca-certificates
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get -yq update && \
     apt install -y \
-        apt-transport-https \
         build-essential \
+        curl \
+        groff \
+        zip && \
+        rm -rf /var/lib/apt/lists/*
+
+###############################
+# PIP
+###############################
+FROM foundation AS pip
+COPY requirements.txt /tmp/requirements.txt
+COPY dev-requirements.txt /tmp/dev-requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r /tmp/requirements.txt && \
+    pip install -r /tmp/dev-requirements.txt && \
+    rm -rf /root/.cache/ && \
+    rm -rf /tmp/requirements.txt /tmp/dev-requirements.txt
+
+###############################
+# NODE
+###############################
+FROM pip AS node_build
+WORKDIR /src/
+
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+COPY package*.json /src/
+RUN npm ci
+COPY . /src/
+
+RUN npm run build
+
+###############################
+# FINAL
+###############################
+FROM python:3.12.11-slim-bookworm AS final
+
+RUN apt-get -yq update && \
+    apt-get install -y \
         ca-certificates \
-        && update-ca-certificates
-RUN apt install -y \
         chromium \
         curl \
-        git \
-        gcc \
-        gnupg \
-        gnupg2 \
-        jq \
-        # Make sure the client version
-        # matchse the DB version, locally
-        # and in production. AWD RDS is v15 in 
-        # cloud.gov as of August 2025.
-        postgresql-client-15 \
-        sudo \
         unzip \
+        # Make sure the client version
+        # matches the DB version, locally
+        # and in production. AWD RDS is v15 in
+        # cloud.gov as of August 2025.
+        postgresql-client-15 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Tools, Cloud Foundry API CLI, and AWS CLI for prepare_prod_data_for_local.bash
+RUN apt-get -yq update && \
+    apt-get install -y \
+        gpg \
+        jq \
         wget
 
-###############################
-# STORAGE
-###############################
-FROM foundation AS storage
-RUN apt-get install -yqq groff && \
-    apt-get install -yqq zip && \
-    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install
-    #curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
-    #unzip awscli-bundle.zip && \
-    #./awscli-bundle/install -b /usr/local/bin/aws
-RUN curl -fsSL "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
-    chmod +x /usr/local/bin/mc
-
-###############################
-# CLOUD FOUNDRY API CLI
-###############################
 RUN wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key \
   | gpg --dearmor -o /usr/share/keyrings/cli.cloudfoundry.org.gpg \
   && echo "deb [signed-by=/usr/share/keyrings/cli.cloudfoundry.org.gpg] https://packages.cloudfoundry.org/debian stable main" \
@@ -60,40 +73,23 @@ RUN wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.k
   && apt update \
   && apt install cf8-cli
 
-###############################
-# PIP
-###############################
-FROM storage AS pip
-COPY requirements.txt /tmp/requirements.txt
-COPY dev-requirements.txt /tmp/dev-requirements.txt
-RUN set -ex && \
-    pip install --upgrade pip && \
-    pip install -r /tmp/requirements.txt && \
-    pip install -r /tmp/dev-requirements.txt && \
-    rm -rf /root/.cache/
+RUN apt-get install -yqq groff && \
+    apt-get install -yqq zip && \
+    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
 
-###############################
-# NODE
-###############################
-FROM pip AS node
+RUN curl -fsSL "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
+    chmod +x /usr/local/bin/mc
+
+# Copy from pip stage
+COPY --from=pip /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=pip /usr/local/bin /usr/local/bin
+
+# Copy from node stage
+COPY --from=node_build /src/static/compiled /src/static/compiled
+
 WORKDIR /src/
-
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs
-COPY package*.json /src/
-
-ENV NODE_EXTRA_CA_CERTS /usr/local/share/ca-certificates/ZscalerRootCA.crt
-
-RUN npm ci --loglevel verbose && \
-    chown -R 1001:123 "/root/.npm"
-
 COPY . /src/
 
-RUN npm run build
-
-###############################
-# DEV
-###############################
-FROM node AS dev
-WORKDIR /src/
 RUN python manage.py collectstatic
