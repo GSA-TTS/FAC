@@ -32,49 +32,6 @@ services:
       timeout: 5s
       retries: 10
 
-  db3:
-    image: "postgres:15"
-    hostname: db3
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: "trust"
-    volumes:
-      - postgres-data3:/var/lib/postgresql/data/
-    ports:
-      - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
-  #---------------------------------------------
-  # Metabase app
-  #---------------------------------------------
-  metabase:
-    image: metabase/metabase:latest
-    container_name: metabase
-    hostname: metabase
-    volumes:
-      - /dev/urandom:/dev/random:ro
-    ports:
-      - 4123:3000
-    environment:
-      MB_DB_TYPE: postgres
-      MB_DB_DBNAME: postgres
-      MB_DB_PORT: 5432
-      MB_DB_USER: postgres
-      MB_DB_PASS: postgres
-      MB_DB_HOST: db3
-      # This appears to be an open issue, and one that the community would like, though is not implemented https://github.com/metabase/metabase/issues/37836
-      # It would appear we are locked to public schema, and we will have to accept that the metabase tables will be with our tables.
-      #MB_DB_CONNECTION_URI: postgres://postgres@db/postgres?currentSchema=metabase
-      #MB_DB_CONNECTION_URI: jdbc:postgresql://localhost:5432/postgres?user=postgres&password=postgres&currentSchema=metabase
-    healthcheck:
-      test: curl --fail -I http://localhost:4123/api/health || exit 1
-      interval: 15s
-      timeout: 5s
-      retries: 5
-
   #---------------------------------------------
   # Django app
   #---------------------------------------------
@@ -89,9 +46,9 @@ services:
       db2:
         condition: service_healthy
       minio:
-        condition: service_started
+        condition: service_healthy
       clamav-rest:
-        condition: service_started
+        condition: service_healthy
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
       POSTGREST_URL: http://api:3000
@@ -133,6 +90,11 @@ services:
       PORT: ${CLAMAV_PORT:-9000}
     ports:
       - ${CLAMAV_PORT:-9000}:${CLAMAV_PORT:-9000}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:${CLAMAV_PORT:-9000}/"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
 
   #---------------------------------------------
   # Minio (S3 clone)
@@ -141,6 +103,11 @@ services:
     container_name: "minio"
     image: minio/minio
     command: server /tmp/minio --console-address ":9002"
+    healthcheck:
+      test: curl --fail -I http://localhost:9002/minio/health/cluster || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
     ports:
       - "9001:9000"
       - "9002:9002"
@@ -174,6 +141,4 @@ services:
 volumes:
   postgres-data:
   postgres-data2:
-  postgres-data3:
   minio-vol:
-  metabase:

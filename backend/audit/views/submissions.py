@@ -16,7 +16,7 @@ from audit.models import (
     Audit,
     Access,
 )
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from audit.models.utils import generate_audit_indexes
 from audit.models.viewflow import sac_transition
 from audit.decorators import verify_status
@@ -42,20 +42,19 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         submissions = MySubmissions.fetch_my_submissions(request.user, use_audit)
 
         data = {"completed_audits": [], "in_progress_audits": []}
-        for audit in submissions:
-            raw_status = audit["submission_status"]
+        for submission in submissions:
+            raw_status = submission["submission_status"]
             friendly = _friendly_status(raw_status)
+            is_resubmission = (submission.get("resubmission_version") or 0) > 1
 
-            is_resubmission = (audit.get("resubmission_version") or 0) > 1
-
-            if friendly in ["Submitted", "Disseminated"]:
-                audit["submission_status"] = friendly
-                data["completed_audits"].append(audit)
+            if friendly in ["Submitted", "Disseminated", "Resubmitted"]:
+                submission["submission_status"] = friendly
+                data["completed_audits"].append(submission)
             else:
-                audit["submission_status"] = (
+                submission["submission_status"] = (
                     "Resubmission in progress" if is_resubmission else friendly
                 )
-                data["in_progress_audits"].append(audit)
+                data["in_progress_audits"].append(submission)
 
         context = {
             "data": data,
@@ -188,10 +187,28 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                     old_sac = SingleAuditChecklist.objects.get(
                         report_id=previous_report_id
                     )
-                    old_sac.resubmission_meta = old_sac.resubmission_meta or {
+                    old_resubmission_meta = (
+                        getattr(old_sac, "resubmission_meta", {}) or {}
+                    )
+                    old_sac.resubmission_meta = {
+                        **old_resubmission_meta,
+                        "version": old_resubmission_meta.get("version", 1),
+                        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
                         "next_report_id": sac.report_id,
                         "next_row_id": sac.id,
                     }
+                    old_audit = Audit.objects.find_audit_or_none(
+                        report_id=old_sac.report_id
+                    )
+
+                    sac_transition(
+                        request,
+                        old_sac,
+                        audit=old_audit,
+                        transition_to=STATUS.RESUBMITTED,
+                    )
+
+                    old_sac.save()
                     old_sac.redisseminate()
 
                 if audit:

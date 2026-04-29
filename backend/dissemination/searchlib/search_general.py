@@ -39,9 +39,17 @@ def search_general(base_model, params=None):
 
     ##############
     # Start/end dates
-    q_start_date = _get_start_date_match_query(params.get("start_date", None))
+    start = params.get("start_date", None)
+    end = params.get("end_date", None)
+
+    # Unflip the dates if they're backwards
+    if start and end and start > end:
+        start = params.get("end_date", None)
+        end = params.get("start_date", None)
+
+    q_start_date = _get_start_date_match_query(start)
     r_start_date = base_model.objects.filter(q_start_date)
-    q_end_date = _get_end_date_match_query(params.get("end_date", None))
+    q_end_date = _get_end_date_match_query(end)
     r_end_date = base_model.objects.filter(q_end_date)
 
     ##############

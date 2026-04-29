@@ -92,8 +92,8 @@
                                             {% if x.required %}<abbr title="required" class="usa-hint usa-hint--required">*</abbr>{% endif %}
                                         </label>
                                         {% if x.hint %}
-                                            <label for="upload-report__page-number-{{ forloop.counter }}"
-                                                   class="tablet:grid-col-12 usa-hint">{{ x.hint }}</label>
+                                            <span for="upload-report__page-number-{{ forloop.counter }}"
+                                                   class="tablet:grid-col-12 usa-hint">{{ x.hint }}</span>
                                         {% endif %}
                                         <label class="margin-top-2 text-bold tablet:grid-col-2">Page #:</label>
                                         <input class="usa-input usa-input--medium tablet:grid-col-10"
@@ -117,6 +117,7 @@
                                 Select a compliant PDF to upload. <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </p>
                             <input class="usa-file-input"
+                                   aria-label="Upload Report File Input"
                                    id="upload_report"
                                    id_test="upload-report__file-input"
                                    name="upload_report"

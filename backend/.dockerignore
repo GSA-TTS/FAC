@@ -1,8 +1,29 @@
+# Python
 **/__pycache__
-*.pyc
-.*
-.coverage
-docker-compose.yml
-docker-compose-web.yml
-Dockerfile
+**/*.pyc
 staticfiles/
+
+
+# Node
+node_modules/
+eslint.config.mjs
+.prettierrc.json
+.stylelintrc.json
+.stylelintignore
+static/compiled
+
+# Docker
+docker-compose*.yml
+Dockerfile
+.dockerignore
+
+# Cloud Foundry
+manifests/
+apt.yml
+.cfignore
+
+# Tools
+minio/
+
+# Git
+.git/

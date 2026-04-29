@@ -8,9 +8,54 @@ on:
       - 'docs/**'
       - '.github/ISSUE_TEMPLATE/**'
 
+permissions:
+  contents: read
+
 jobs:
-  # ensure that every time a push to main occurs, the container is built and published to ghcr
-  build-container:
+  check-for-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      terraform: ${{ steps.filter.outputs.terraform }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            backend:
+              - './backend/**'
+            terraform:
+              - './terraform/**'
+
+  deploy-infrastructure-dev:
+    name: Deploy infrastructure (development)
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.terraform == 'true'
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "dev"
+      autoapprove: false
+    secrets: inherit
+
+  deploy-infastructure-meta:
+    name: Deploy infrastructure (meta)
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.terraform == 'true'
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "meta"
+      autoapprove: false
+    secrets: inherit
+
+  publish-image:
+    name: Build and push image
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.backend == 'true'
     uses: ./.github/workflows/containers-build-fac-container.yml
     secrets: inherit
     permissions:
@@ -22,50 +67,21 @@ jobs:
       repo-name: gsa-tts/fac
       work-dir: ./backend
 
-  testing:
-    needs: [build-container]
-    uses: ./.github/workflows/testing-from-ghcr.yml
-    secrets: inherit
-
-  linting:
-    uses: ./.github/workflows/pull_request-linting.yml
-    secrets: inherit
-
-  # deploy to Dev & Management spaces
-  deploy-infrastructure-dev:
-    name: Deploy infrastructure (development)
-    needs:
-      - testing
-    uses: ./.github/workflows/terraform-apply-env.yml
+  deploy-application:
+    name: Deploy application
+    needs: 
+      - check-for-changes
+    if: needs.check-for-changes.outputs.backend == 'true'
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "dev"
-      autoapprove: false
-    secrets: inherit
-
-  deploy-infastructure-meta:
-    name: Deploy infrastructure (meta)
-    needs:
-      - testing
-    uses: ./.github/workflows/terraform-apply-env.yml
-    with:
-      environment: "meta"
-      autoapprove: false
     secrets: inherit
 
   new-relic-record:
     name: Record deployment to New Relic
-    needs:
-      - deploy-infrastructure-dev
+    needs: 
+      - deploy-application
     uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
-    with:
-      environment: "dev"
-    secrets: inherit
-
-  deploy-dev:
-    name: Deploy application
-    needs:
-      - deploy-infrastructure-dev
-    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "dev"
     secrets: inherit
@@ -73,7 +89,7 @@ jobs:
   scan-dev-post-deploy:
     name: ZAP Scan
     needs:
-      - deploy-dev
+      - deploy-application
     uses: ./.github/workflows/scanning-zap-scan.yml
     with:
       url: "https://fac-dev.app.cloud.gov/"

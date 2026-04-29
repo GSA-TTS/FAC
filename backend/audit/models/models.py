@@ -321,10 +321,24 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                     f"A resubmission already exists for report_id {self.report_id}."
                 )
 
-            # Clone the record, excluding certification data
-            data = model_to_dict(
-                self, exclude=["auditee_certification", "auditor_certification"]
-            )
+            # Clone the record, including the top level audit type, all workbook data, and most form data.
+            # Excludes the certifications, tribal consent form, and cog/over assignments.
+            # PDF report form data is kept with the SingleAuditReportFile.
+            include_list = [
+                "audit_type",
+                "general_information",
+                "audit_information",
+                "federal_awards",
+                "corrective_action_plan",
+                "findings_text",
+                "findings_uniform_guidance",
+                "additional_ueis",
+                "additional_eins",
+                "secondary_auditors",
+                "notes_to_sefa",
+                "resubmission_meta",
+            ]
+            data = model_to_dict(self, fields=include_list)
 
             # Update individual fields
             data["general_information"]["auditee_uei"] = self.auditee_uei
@@ -342,7 +356,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             # It is GSAFAC.
             data["data_source"] = DATA_SOURCE_GSAFAC
 
-            # By default, this is version 1. This means all resubmissions will be of at least version 2.
+            # By default, the old version is 1. This means all resubmissions will be of at least version 2.
             if data.get("resubmission_meta"):
                 old_version = data.get("resubmission_meta").get("version", 1)
             else:

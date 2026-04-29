@@ -46,8 +46,12 @@ class SubmissionEvent(models.Model):
         CANCEL_REMOVAL_FLAG = "cancel-removal-flag"
         FAC_ADMINISTRATIVE_UEI_REPLACEMENT = "fac-administrative-uei-replacement"
         FAC_ADMINISTRATIVE_EIN_REPLACEMENT = "fac-administrative-ein-replacement"
+        FAC_ADMINISTRATIVE_AUDITEE_NAME_REPLACEMENT = (
+            "fac-administrative-auditee-name-replacement"
+        )
         RESUBMISSION_STARTED = "resubmission-started"
         RESUBMISSION_INITIATED = "resubmission-initiated"
+        RESUBMITTED = "resubmitted"
         FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE = (
             "fac-administrative-resubmission-linkage"
         )
@@ -129,6 +133,10 @@ class SubmissionEvent(models.Model):
         (
             EventType.RESUBMISSION_STARTED,
             _("This report was started as a resubmission of another report."),
+        ),
+        (
+            EventType.RESUBMITTED,
+            _("This report was resubmitted as another report."),
         ),
         (
             EventType.FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE,

@@ -7,11 +7,18 @@ FROM python:3.12.11-slim-bookworm AS foundation
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+COPY ZscalerRootCA.pem /usr/local/share/ca-certificates/ZscalerRootCA.crt
+
+RUN chmod 644 /usr/local/share/ca-certificates/ZscalerRootCA.crt && \
+        update-ca-certificates
+
 RUN apt-get -yq update && \
     apt install -y \
         apt-transport-https \
         build-essential \
         ca-certificates \
+        && update-ca-certificates
+RUN apt install -y \
         chromium \
         curl \
         git \
@@ -34,13 +41,13 @@ RUN apt-get -yq update && \
 FROM foundation AS storage
 RUN apt-get install -yqq groff && \
     apt-get install -yqq zip && \
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install
     #curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
     #unzip awscli-bundle.zip && \
     #./awscli-bundle/install -b /usr/local/bin/aws
-RUN curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
+RUN curl -fsSL "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
     chmod +x /usr/local/bin/mc
 
 ###############################
@@ -65,7 +72,6 @@ RUN set -ex && \
     pip install -r /tmp/dev-requirements.txt && \
     rm -rf /root/.cache/
 
-
 ###############################
 # NODE
 ###############################
@@ -75,7 +81,10 @@ WORKDIR /src/
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 COPY package*.json /src/
-RUN npm ci && \
+
+ENV NODE_EXTRA_CA_CERTS /usr/local/share/ca-certificates/ZscalerRootCA.crt
+
+RUN npm ci --loglevel verbose && \
     chown -R 1001:123 "/root/.npm"
 
 COPY . /src/
@@ -88,5 +97,3 @@ RUN npm run build
 FROM node AS dev
 WORKDIR /src/
 RUN python manage.py collectstatic
-
-

@@ -7,31 +7,31 @@
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large" id="legend-resubmission-start">Resubmitting an Audit</legend>
-                    <p><b>Resubmitting an audit should not be undertaken lightly.</b> A resubmission replaces the previously accepted audit and results in a new Federal Audit Clearinghouse (FAC) acceptance date. 
+                    <p><b>Resubmitting an audit should not be undertaken lightly.</b> A resubmission replaces the previously accepted audit and results in a new Federal Audit Clearinghouse (FAC) acceptance date.
                         <b>Because of this impact, resubmissions must be completed in coordination between the auditee and certifying officials.</b>
-                        A resubmission can never change the UEI or the audit year from the original submission. 
+                        A resubmission can never change the UEI or the audit year from the original submission.
                         <br><br>
 
-                        Before proceeding, review the guidance below to determine whether resubmission is appropriate. 
+                        Before proceeding, review the guidance below to determine whether resubmission is appropriate.
                         <b>A resubmission is generally appropriate when material changes are required, including but not limited to: </b></p>
                         <ul class="usa-list">
                             <li>Material change to audit findings</li>
-                            <li>Addition or revision of corrective action plans </li>
+                            <li>Addition or revision of corrective action plans</li>
                             <li>Inclusion of missing finding elements (such as condition, criteria, cause, or effect)</li>
                             <li>Correction to questioned costs or compliance determination</li>
                             <li>Error in major program determination or low-risk auditee status</li>
-                            <li>Change to federal award amounts in the Schedule of Expenditures of Federa Awards (SEFA)</li>
-                            <li>Correction to Assitance Listing Number </li>
-                            <li>Supplementing an incomplete Singe Audit package (for example, missing financial statements or required reports)</li>
+                            <li>Change to federal award amounts in the Schedule of Expenditures of Federal Awards (SEFA)</li>
+                            <li>Correction to Assistance Listing Number</li>
+                            <li>Supplementing an incomplete Single Audit package (for example, missing financial statements or required reports)</li>
                             <li>Addition or correction to the required auditor report elements</li>
                             <li>Revision to the auditor's report</li>
                         </ul>
                     <hr>
-                    <p> Do <b>not</b> resubmit an audit due to non-material changes, including:</p>
+                    <p>Do <b>not</b> resubmit an audit due to non-material changes, including:</p>
                         <ul class="usa-list">
                             <li>Minor typographical or formatting errors</li>
-                            <li>Minor numerical rounding differences without material impact </li>
-                            <li>Non-material errors that do not change audit opnions, findings, or compliance determinations</li>
+                            <li>Minor numerical rounding differences without material impact</li>
+                            <li>Non-material errors that do not change audit opinions, findings, or compliance determinations</li>
                             <li>Updates that do not change audit opinions, findings, or compliance determinations</li>
                             <li>Issues documented for resolution in a future audit</li>
                             <li>SF-SAC-only corrections where the audit report itself is unchanged</li>
@@ -39,11 +39,36 @@
                             <li>Clarifications to narrative text that do not alter meaning</li>
                         </ul>
                     <p>
-                        <b>If your update falls into one of these catagories, resubmission is not appropriate.</b> <br><br>
-                        Resubmission must be completed in coordination with certifying officials, and resubmision will change the acceptance date for your audit. 
+                        <b>If your update falls into one of these categories, resubmission is not appropriate.</b>
+                        <br><br>
+                        Resubmission must be completed in coordination with certifying officials, and resubmission will change the acceptance date for your audit.
                     </p>
 
-                    <label class="usa-label" id="report_id-label" for="report_id">Report ID of audit to resubmit:</label>
+                    <fieldset class="usa-fieldset margin-top-4" aria-describedby="material-change-hint">
+                        <legend class="usa-legend usa-label" id="material-change-label">
+                            Reason for resubmission
+                        </legend>
+                        <div class="usa-hint" id="material-change-hint">
+                            Select one or more material changes that apply. This field is required.
+                        </div>
+
+                        {% if form.material_change_reasons.errors %}
+                            <span class="usa-error-message margin-top-1" id="material-change-error">
+                                {{ form.material_change_reasons.errors|striptags }}
+                            </span>
+                        {% endif %}
+
+                        {% for checkbox in form.material_change_reasons %}
+                            <div class="usa-checkbox">
+                                {{ checkbox.tag }}
+                                <label class="usa-checkbox__label" for="{{ checkbox.id_for_label }}">
+                                    {{ checkbox.choice_label }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+
+                    <label class="usa-label margin-top-4" id="report_id-label" for="report_id">Report ID of audit to resubmit:</label>
                     <div class="usa-hint" id="report_id-hint">YYYY-MM-SOURCE-0123456789</div>
                     {% if form.report_id.errors %}
                         <span class="usa-error-message margin-top-1" id="error">{{ form.report_id.errors|striptags }}</span>

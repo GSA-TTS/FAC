@@ -5,46 +5,37 @@ on:
     branches:
       - prod
 
+permissions:
+  contents: read
+
 jobs:
-  # testing:
-  #   uses: ./.github/workflows/testing-from-ghcr.yml
-  #   secrets: inherit
-
-  linting:
-    uses: ./.github/workflows/pull_request-linting.yml
-    secrets: inherit
-
-  deploy-infrastructure-staging:
-    name: Deploy infrastructure (staging)
-    # needs:
-    #   - testing
+  deploy-infrastructure:
+    name: Deploy infrastructure
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "staging"
       autoapprove: false
     secrets: inherit
 
-  new-relic-record:
-    name: Record deployment to New Relic
-    needs:
-      - deploy-infrastructure-staging
-    uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
+  deploy-application:
+    name: Deploy application
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "staging"
     secrets: inherit
 
-  deploy-staging:
-    name: Deploy application
+  new-relic-record:
+    name: Record deployment to New Relic
     needs:
-      - deploy-infrastructure-staging
-    uses: ./.github/workflows/deploy-application.yml
+      - deploy-application
+    uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
     with:
       environment: "staging"
     secrets: inherit
 
   scan-staging:
     needs:
-      - deploy-staging
+      - deploy-application
     name: Zap Scan
     uses: ./.github/workflows/scanning-zap-scan.yml
     with:
@@ -52,7 +43,7 @@ jobs:
 
   regression-test:
     needs:
-      - deploy-staging
+      - deploy-application
     name: Run Regression Tests
     uses: ./.github/workflows/testing-cypress-regression-tests.yml
     secrets: inherit
