@@ -42,20 +42,19 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         submissions = MySubmissions.fetch_my_submissions(request.user, use_audit)
 
         data = {"completed_audits": [], "in_progress_audits": []}
-        for audit in submissions:
-            raw_status = audit["submission_status"]
+        for submission in submissions:
+            raw_status = submission["submission_status"]
             friendly = _friendly_status(raw_status)
+            is_resubmission = (submission.get("resubmission_version") or 0) > 1
 
-            is_resubmission = (audit.get("resubmission_version") or 0) > 1
-
-            if friendly in ["Submitted", "Disseminated"]:
-                audit["submission_status"] = friendly
-                data["completed_audits"].append(audit)
+            if friendly in ["Submitted", "Disseminated", "Resubmitted"]:
+                submission["submission_status"] = friendly
+                data["completed_audits"].append(submission)
             else:
-                audit["submission_status"] = (
+                submission["submission_status"] = (
                     "Resubmission in progress" if is_resubmission else friendly
                 )
-                data["in_progress_audits"].append(audit)
+                data["in_progress_audits"].append(submission)
 
         context = {
             "data": data,

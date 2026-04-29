@@ -159,6 +159,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                         STATUS.AUDITEE_CERTIFIED,
                         STATUS.SUBMITTED,
                         STATUS.DISSEMINATED,
+                        STATUS.RESUBMITTED,
                     ],
                     "completed_date": None,
                     "completed_by": None,
@@ -178,6 +179,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     in [
                         STATUS.SUBMITTED,
                         STATUS.DISSEMINATED,
+                        STATUS.RESUBMITTED,
                     ],
                     "completed_date": None,
                     "completed_by": None,
@@ -195,11 +197,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "is_user_auditee_certifier": is_user_auditee_certifier,
                 "is_tribal_data_consent_complete": is_tribal_data_consent_complete,
-                "previous_report_id": (
-                    sac.resubmission_meta["previous_report_id"]
-                    if sac.resubmission_meta
-                    else None
-                ),
+                "previous_report_id": sac.resubmission_meta.get("previous_report_id", None),
             }
             context = context | subcheck
 
