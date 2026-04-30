@@ -38,7 +38,6 @@ python-slugify
 pyyaml
 requests>=2.32.4
 sqlalchemy
-sling>=1.5.6
 sqlparse>=0.5.0
 sling-linux-amd64>=1.5.6
 sling-linux-arm64>=1.5.6
