@@ -12,7 +12,7 @@ else
               ${SYSTEM_PYTHON}))
 endif
 
-all: clean merge_aln_csvs source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json
+all: clean merge_aln_csvs source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json build_test_workbooks
 
 json: format_jsonnet build_templates build_templates build_audit_json
 
@@ -100,3 +100,7 @@ build_base_schemas:
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
 		jsonnet -o output/base/"$$base_name.json" "$$jsonnet_file"; \
 	done
+
+build_test_workbooks:
+	@echo "Building Cypress test workbooks..."
+	@${PYTHON} scripts/build_test_workbooks.py
