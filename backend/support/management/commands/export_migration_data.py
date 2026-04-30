@@ -1,3 +1,7 @@
+### DEPRECATION WARNING ###
+# Sling has been removed as a dependency as of 4/30/2026, so this command is
+# considered to be deprecated.
+
 ###
 # This management command exports data from dissemination_migrationinspectionrecord and dissemination_invalidauditrecord tables.
 # This command is for one-time-use only in Prod.

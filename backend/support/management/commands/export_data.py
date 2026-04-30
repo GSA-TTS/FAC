@@ -1,3 +1,7 @@
+### DEPRECATION WARNING ###
+# Sling has been removed as a dependency as of 4/30/2026, so this command is
+# considered to be deprecated.
+
 import os
 import logging
 
