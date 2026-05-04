@@ -1,5 +1,5 @@
 import json
-import sys
+import shutil
 from pathlib import Path
 
 from openpyxl import load_workbook
@@ -35,7 +35,8 @@ def apply_steps(workbook_path: Path, output_path: Path, steps: list[dict]) -> No
                 f"Available sheets: {wb.sheetnames}"
             )
 
-        wb[sheet_name][cell] = step["value"]
+        ws = wb[sheet_name]
+        ws[cell] = step["value"]
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     wb.save(output_path)
@@ -43,22 +44,19 @@ def apply_steps(workbook_path: Path, output_path: Path, steps: list[dict]) -> No
 
 def main() -> None:
     if not FIXTURES_FILE.exists():
-        print(f"Fixture file not found: {FIXTURES_FILE}", file=sys.stderr)
-        sys.exit(1)
+        raise FileNotFoundError(f"Fixture file not found: {FIXTURES_FILE}")
 
-    try:
-        with FIXTURES_FILE.open("r", encoding="utf-8") as f:
-            fixtures = json.load(f)
-    except Exception as e:
-        print(f"Error loading test workbook fixtures: {e}", file=sys.stderr)
-        sys.exit(1)
+    with FIXTURES_FILE.open("r", encoding="utf-8") as f:
+        fixtures = json.load(f)
 
     for workbook_name, steps in fixtures.items():
         source_workbook = INPUT_DIR / workbook_name
         output_workbook = OUTPUT_DIR / workbook_name
 
         if not source_workbook.exists():
-            raise FileNotFoundError(f"Generated workbook not found: {source_workbook}")
+            raise FileNotFoundError(
+                f"Generated workbook not found: {source_workbook}"
+            )
 
         if not isinstance(steps, list):
             raise ValueError(
@@ -75,7 +73,6 @@ def main() -> None:
 
     print("Test workbooks generated successfully.")
 
-
+    
 if __name__ == "__main__":
     main()
-    
