@@ -15,7 +15,7 @@ local meta_cells = [
   },
   Sheets.meta_cell {
     keep_locked: true,
-    width: 48,
+    width: 80,
     title: 'This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.',
     title_cell: 'B1',
     help: Help.unknown,
@@ -48,11 +48,22 @@ local single_cells = [
     validation: SV.NoValidation,
   },
   Sheets.single_cell {
-    title: 'Auditee UEI:',
-    range_name: 'auditee_uei',
+    keep_locked: true,
+    title: 'Instructions',
+    range_name: 'instructions_name',
     width: 48,
     title_cell: 'A4',
     range_cell: 'B4',
+    value: 'https://www.fac.gov/audit-resources/sf-sac/federal-awards-audit-findings-text/',
+    help: Help.wrong_workbook_template,
+    validation: SV.NoValidation,
+  },
+  Sheets.single_cell {
+    title: 'Auditee UEI:',
+    range_name: 'auditee_uei',
+    width: 48,
+    title_cell: 'A5',
+    range_cell: 'B5',
     format: 'text',
     validation: SV.StringOfLengthTwelve,
     help: Help.uei,
@@ -90,6 +101,96 @@ local open_ranges_defns = [
     'Did Text Contain a Chart or Table?',
     'contains_chart_or_table',
   ],
+  [
+    Sheets.open_range {
+      title_cell: 'D1',
+      width: 28,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Known Questioned Costs Dollars Amount (OPTIONAL)',
+    'known_qc_amount',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'E1',
+      width: 28,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Likely Questioned Costs Dollars Amount (OPTIONAL)',
+    'likely_qc_amount',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'F1',
+      width: 60,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Explanation If Questioned Costs Amount is Undetermined (OPTIONAL)',
+    'undetermined_qc_explanation',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'G1',
+      width: 48,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Criteria (OPTIONAL)',
+    'criteria',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'H1',
+      width: 48,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Condition (OPTIONAL)',
+    'condition',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'I1',
+      width: 48,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Cause (OPTIONAL)',
+    'cause',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'J1',
+      width: 48,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Effect (OPTIONAL)',
+    'effect',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'K1',
+      width: 48,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Recommendation (OPTIONAL)',
+    'recommendation',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'L1',
+      width: 48,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Response (OPTIONAL)',
+    'response',
+  ],
 ];
 
 local sheets = [
@@ -105,7 +206,7 @@ local sheets = [
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
     row_height: 36,
-    hide_col_from: 4,
+    hide_col_from: 13,
   },
 ];
 

@@ -2,6 +2,7 @@ import csv
 import os
 import sys
 from pathlib import Path
+
 import requests
 
 
@@ -12,11 +13,12 @@ SCHEMAS_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = SCHEMAS_DIR / "source" / "data" / "aln_csvs_to_be_merged"
 
 
-def fetch_all(api_key: str, status: str):
+def fetch_all(api_key: str, status: str) -> list[dict]:
     records = []
     page_number = 1
+    more_pages_to_read = True
 
-    while True:
+    while more_pages_to_read:
         params = {
             "api_key": api_key,
             "pageSize": PAGE_SIZE,
@@ -28,61 +30,69 @@ def fetch_all(api_key: str, status: str):
 
         if response.status_code != 200:
             raise RuntimeError(
-                f"SAM.gov API error for {status} page {page_number}: {response.status_code}"
+                f"SAM.gov API error for {status} page {page_number}: "
+                f"{response.status_code} - {response.text}"
             )
 
         data = response.json()
         page_records = data.get("assistanceListingsData", [])
+        total_pages = data.get("totalPages", page_number)
 
-        print(f"Fetched {status} page {page_number}: {len(page_records)} records")
+        print(
+            f"Fetched {status} page {page_number} of {total_pages}: "
+            f"{len(page_records)} records"
+        )
 
         records.extend(page_records)
 
-        total_pages = data.get("totalPages", page_number)
         if page_number >= total_pages:
-            break
-
-        page_number += 1
+            more_pages_to_read = False
+        else:
+            page_number += 1
 
     return records
 
 
-def write_csv(records, output_file: Path):
+def write_csv(records: list[dict], output_file: Path) -> None:
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
     rows = sorted(
         [
             {
-                "Program Title": (r.get("title") or "").strip(),
-                "Program Number": (r.get("assistanceListingId") or "").strip(),
+                "Program Title": (record.get("title") or "").strip(),
+                "Program Number": (record.get("assistanceListingId") or "").strip(),
             }
-            for r in records
-            if r.get("assistanceListingId") and r.get("title")
+            for record in records
+            if record.get("assistanceListingId") and record.get("title")
         ],
-        key=lambda x: x["Program Number"],
+        key=lambda row: row["Program Number"],
     )
 
-    with output_file.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["Program Title", "Program Number"])
+    with output_file.open("w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.DictWriter(
+            csvfile,
+            fieldnames=["Program Title", "Program Number"],
+        )
         writer.writeheader()
         writer.writerows(rows)
 
     print(f"Wrote {len(rows)} rows to {output_file}")
 
 
-def main():
+def main() -> None:
     api_key = os.getenv("SAM_API_KEY")
 
     if not api_key:
-        print("Missing SAM_API_KEY", file=sys.stderr)
+        print("Missing SAM_API_KEY environment variable.", file=sys.stderr)
         sys.exit(1)
 
-    active = fetch_all(api_key, "Active")
-    inactive = fetch_all(api_key, "Inactive")
+    active_records = fetch_all(api_key, "Active")
+    inactive_records = fetch_all(api_key, "Inactive")
 
-    write_csv(active, OUTPUT_DIR / "active-alns.csv")
-    write_csv(inactive, OUTPUT_DIR / "inactive-alns.csv")
+    write_csv(active_records, OUTPUT_DIR / "active-alns.csv")
+    write_csv(inactive_records, OUTPUT_DIR / "inactive-alns.csv")
 
 
 if __name__ == "__main__":
     main()
+    
