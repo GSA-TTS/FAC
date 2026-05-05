@@ -20,7 +20,6 @@ def fetch_all(api_key: str, status: str) -> list[dict]:
 
     # Create session ONCE (important)
     session = requests.Session()
-    session.trust_env = False
 
     while more_pages_to_read:
         params = {
