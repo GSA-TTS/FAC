@@ -17,7 +17,7 @@ local meta_cells = [
   },
   Sheets.meta_cell {
     keep_locked: true,
-    width: 48,
+    width: 80,
     title: 'This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.',
     title_cell: 'B1',
     help: Help.unknown,
@@ -50,11 +50,22 @@ local single_cells = [
     validation: SV.NoValidation,
   },
   Sheets.single_cell {
-    title: 'Auditee UEI:',
-    range_name: 'auditee_uei',
+    keep_locked: true,
+    title: 'Instructions',
+    range_name: 'instructions_name',
     width: 48,
     title_cell: 'A4',
     range_cell: 'B4',
+    value: 'https://www.fac.gov/audit-resources/sf-sac/federal-awards/',
+    help: Help.wrong_workbook_template,
+    validation: SV.NoValidation,
+  },
+  Sheets.single_cell {
+    title: 'Auditee UEI:',
+    range_name: 'auditee_uei',
+    width: 48,
+    title_cell: 'A5',
+    range_cell: 'B5',
     format: 'text',
     validation: SV.StringOfLengthTwelve,
     help: Help.uei,
@@ -181,6 +192,30 @@ local open_ranges_defns = [
     'prior_references',
   ],
   [
+    y_or_n_range_w12 {
+      help: Help.yorn,
+    },
+    SV.YoNValidation,
+    'Known Fraud (OPTIONAL)',
+    'known_fraud',
+  ],
+  [
+    y_or_n_range_w12 {
+      help: Help.yorn,
+    },
+    SV.YoNValidation,
+    'Likely Fraud (OPTIONAL)',
+    'likely_fraud',
+  ],
+  [
+    y_or_n_range_w16 {
+      help: Help.yorn,
+    },
+    SV.YoNValidation,
+    'Significant Instances of Abuse (OPTIONAL)',
+    'significant_abuse',
+  ],
+  [
     y_or_n_range_w16 {
       keep_locked: true,
       formula: '=IF(OR(D{0}="", E{0}="", F{0}="", G{0}="", H{0}=""), "", IF(OR(AND(D{0}="Y", E{0}="N", F{0}="N", G{0}="N", H{0}="N"), AND(D{0}="Y", E{0}="N", F{0}="Y", G{0}="N", H{0}="N"), AND(D{0}="Y", E{0}="N", F{0}="N", G{0}="Y", H{0}="N"), AND(D{0}="N", E{0}="Y", F{0}="N", G{0}="N", H{0}="N"), AND(D{0}="N", E{0}="Y", F{0}="Y", G{0}="N", H{0}="N"), AND(D{0}="N", E{0}="Y", F{0}="N", G{0}="Y", H{0}="N"), AND(D{0}="N", E{0}="N", F{0}="Y", G{0}="N", H{0}="N"), AND(D{0}="N", E{0}="N", F{0}="N", G{0}="Y", H{0}="N"), AND(D{0}="N", E{0}="N", F{0}="N", G{0}="N", H{0}="Y")), "Y", "N"))',
@@ -203,7 +238,7 @@ local sheets = [
   {
     name: findingSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
-    hide_col_from: 13,
+    hide_col_from: 16,
   },
   {
     name: complianceRequirementTypeSheet,
