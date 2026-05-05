@@ -18,6 +18,10 @@ def fetch_all(api_key: str, status: str) -> list[dict]:
     page_number = 1
     more_pages_to_read = True
 
+    # Create session ONCE (important)
+    session = requests.Session()
+    session.trust_env = False
+
     while more_pages_to_read:
         params = {
             "api_key": api_key,
@@ -26,7 +30,9 @@ def fetch_all(api_key: str, status: str) -> list[dict]:
             "status": status,
         }
 
-        response = requests.get(BASE_URL, params=params, timeout=60)
+        print(f"Requesting {status} page {page_number}...")
+
+        response = session.get(BASE_URL, params=params, timeout=(5, 20))
 
         if response.status_code != 200:
             raise RuntimeError(
