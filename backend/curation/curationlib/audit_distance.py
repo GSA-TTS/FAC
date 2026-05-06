@@ -45,8 +45,8 @@ def ay_dist(r1, r2, scale=11):
 def uei_dist(r1, r2, scale=8):
     return (
         edit_dist(
-            prep_string(uei1),
-            prep_string(uei2),
+            prep_string(r1.general_information["auditee_uei"]),
+            prep_string(r2.general_information["auditee_uei"]),
         )
         * scale
     )

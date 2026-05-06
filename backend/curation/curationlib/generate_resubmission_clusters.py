@@ -50,10 +50,10 @@ def generate_clusters_from_records_by_equivalence(records, noisy=False):
 
     # Insert non-migrated records first so their keys populate partial_index.
     for rndx, r in enumerate(recent_records):
-        key = r.key
-        partial = key[1:]  # (year, ein, name, email)
+        key = r.key  # key[0] is None
+        partial = key[1:]
         if noisy:
-            print(
+            logger.info(
                 f"[equivalence] normal {rndx}/{len(recent_records)}: "
                 f"{r.report_id}  key={key}"
             )
@@ -67,15 +67,15 @@ def generate_clusters_from_records_by_equivalence(records, noisy=False):
         key = r.key  # key[0] is None
         partial = key[1:]
         if noisy:
-            print(
+            logger.info(
                 f"[equivalence] migration {rndx}/{len(gsa_migration_records)}: "
                 f"{r.report_id}  partial={partial}"
             )
         if partial in partial_index:
-            # Absorb into the matching non-migration (or earlier migration) bucket.
+            # Absorb into the matching GSA_MIGRATION bucket.
             canonical_key = partial_index[partial]
         else:
-            # No peer found; create a migration-only bucket under the None key.
+            # No peer found - create a GSAFAC-only bucket under the None key.
             canonical_key = key
             buckets.setdefault(canonical_key, [])
             partial_index[partial] = canonical_key

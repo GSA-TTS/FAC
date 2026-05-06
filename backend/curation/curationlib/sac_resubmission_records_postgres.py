@@ -15,7 +15,7 @@ def fetch_sac_resubmission_records_postgres(AY, noisy=False):
         & Q(submission_status="disseminated")
     )
 
-    # Sort in Python rather than the ORM: transition_date is a JSON array
+    # Sort in Python rather than the ORM - transition_date is a JSON array
     # and ordering on array elements is awkward in the ORM.
     records = sorted(
         records, key=lambda r: r.transition_date[0].strftime("%Y-%m-%d %H:%M:%S")
