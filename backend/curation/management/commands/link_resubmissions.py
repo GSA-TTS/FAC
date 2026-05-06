@@ -1,3 +1,9 @@
+import logging
+import sys
+
+from django.db import transaction
+from django.core.management.base import BaseCommand
+
 from audit.models import (
     SingleAuditChecklist,
     SubmissionEvent,
@@ -6,22 +12,14 @@ from audit.models import (
 from audit.models.constants import RESUBMISSION_STATUS
 from users.models import StaffUser
 from audit.models.constants import STATUS
-from django.db import transaction
-
 from curation.curationlib.generate_resubmission_clusters import (
     generate_resbmission_clusters,
 )
 from curation.curationlib.export_resubmission_clusters import (
-    # export_sets_as_text_tables,
     export_sets_as_csv,
     export_sets_as_markdown,
     order_reports_key,
 )
-
-from django.core.management.base import BaseCommand
-import sys
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -190,7 +188,6 @@ class Command(BaseCommand):
         parser.set_defaults(annotate_old=False)
 
     def handle(self, *args, **options):
-
         # And, did they provide a staff user email?
         # (Note that they had to have privs in TF and be able to
         # enable SSH inproduction in order to get here.)
