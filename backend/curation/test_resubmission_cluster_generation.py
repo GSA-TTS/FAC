@@ -1,10 +1,14 @@
+from copy import deepcopy
+from model_bakery import baker
+
+from django.test import TestCase
+
+from audit.models import SingleAuditChecklist
+from config.settings import GSA_MIGRATION
 from curation.curationlib.generate_resubmission_clusters import (
     generate_resbmission_clusters,
+    generate_resbmission_clusters_by_distance,
 )
-from model_bakery import baker
-from django.test import TestCase
-from audit.models import SingleAuditChecklist
-from copy import deepcopy
 
 sac_01 = {
     "audit_year": "2022",
@@ -40,7 +44,7 @@ sac_01 = {
 }
 
 
-class ClusteringTests(TestCase):
+class DistanceClusteringTests(TestCase):
     def test_no_clusters(self):
         # Test on a single audit.
         baker.make(
@@ -51,7 +55,7 @@ class ClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=sac_01["general_information"],
         )
-        sorted_sets = generate_resbmission_clusters("2022")
+        sorted_sets = generate_resbmission_clusters_by_distance("2022")
         # No audits should be clustered. There is only one.
         self.assertEqual(len(sorted_sets), 0)
 
@@ -73,7 +77,7 @@ class ClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=sac_01["general_information"],
         )
-        sorted_sets = generate_resbmission_clusters("2022")
+        sorted_sets = generate_resbmission_clusters_by_distance("2022")
         # These audits should cluster, because they have the
         # same information in the critical fields.
         self.assertEqual(len(sorted_sets), 1)
@@ -103,7 +107,7 @@ class ClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=gi,
         )
-        sorted_sets = generate_resbmission_clusters("2022")
+        sorted_sets = generate_resbmission_clusters_by_distance("2022")
         # A single-character typo in the email should not prevent
         # clustering. Unlike entity names, we'll assume that email
         # addresses can be slightly inconsistent.
@@ -113,20 +117,21 @@ class ClusteringTests(TestCase):
         # Different states should force the audits
         # into different clusters for the same UEI.
         rid_count = 0
-        for state in ["PA", "ME"]:
-            rid_count += 1
-            gi = deepcopy(sac_01["general_information"])
-            gi["auditee_state"] = state
-            baker.make(
-                SingleAuditChecklist,
-                report_id=sac_01["report_id"][:-1] + f"{rid_count}",
-                submission_status=sac_01["submission_status"],
-                transition_name=sac_01["transition_name"],
-                transition_date=sac_01["transition_date"],
-                general_information=gi,
-            )
-        sorted_sets = generate_resbmission_clusters("2022")
-        # I expect each audit to be in its own cluster.
+        for _ in range(2):
+            for state in ["PA", "ME"]:
+                rid_count += 1
+                gi = deepcopy(sac_01["general_information"])
+                gi["auditee_state"] = state
+                baker.make(
+                    SingleAuditChecklist,
+                    report_id=sac_01["report_id"][:-1] + f"{rid_count}",
+                    submission_status=sac_01["submission_status"],
+                    transition_name=sac_01["transition_name"],
+                    transition_date=sac_01["transition_date"],
+                    general_information=gi,
+                )
+        sorted_sets = generate_resbmission_clusters_by_distance("2022")
+        # With four audits on two states, I expect two clusters.
         self.assertEqual(len(sorted_sets), 2)
 
     def test_four_audits_two_eins(self):
@@ -137,7 +142,7 @@ class ClusteringTests(TestCase):
         # RID4, UEI2, EIN2
         # Two clusters of size two.
         rid_count = 0
-        for i in range(2):
+        for _ in range(2):
             for ein in ["123456789", "123123123"]:
                 rid_count += 1
 
@@ -155,9 +160,147 @@ class ClusteringTests(TestCase):
                     general_information=gi,
                 )
 
-        sorted_sets = generate_resbmission_clusters("2022")
+        sorted_sets = generate_resbmission_clusters_by_distance("2022")
         # I expect two clusters, one for each UEI, and each
         # set to be of size two.
         self.assertEqual(len(sorted_sets), 2)
         for s in sorted_sets:
             self.assertEqual(len(s), 2)
+
+
+class EquivalenceClusteringTests(TestCase):
+    def test_no_clusters_single_record(self):
+        """A single record can never form a chain."""
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+        )
+        sorted_sets = generate_resbmission_clusters("2022")
+        self.assertEqual(len(sorted_sets), 0)
+
+    def test_one_cluster_identical_fields(self):
+        """Two records with identical equivalence fields form exactly one cluster."""
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+        )
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"][:-1] + "2",
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+        )
+        sorted_sets = generate_resbmission_clusters("2022")
+        self.assertEqual(len(sorted_sets), 1)
+        self.assertEqual(len(sorted_sets[0]), 2)
+
+    def test_email_difference_no_cluster(self):
+        """A single character difference in email does not form a cluster."""
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+        )
+        gi = deepcopy(sac_01["general_information"])
+        gi["auditee_email"] = gi["auditee_email"][:-1] + "x"
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"][:-1] + "2",
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=gi,
+        )
+        sorted_sets = generate_resbmission_clusters("2022")
+        # Exact-match: a changed email means no shared key, so no cluster.
+        self.assertEqual(len(sorted_sets), 0)
+
+    def test_four_audits_two_eins_two_clusters(self):
+        """Four audits split across two EINs should produce two clusters of two."""
+        rid_count = 0
+        for _ in range(2):
+            for ein in ["123456789", "123123123"]:
+                rid_count += 1
+                gi = deepcopy(sac_01["general_information"])
+                gi["ein"] = ein
+                baker.make(
+                    SingleAuditChecklist,
+                    report_id=sac_01["report_id"][:-1] + f"{rid_count}",
+                    submission_status=sac_01["submission_status"],
+                    transition_name=sac_01["transition_name"],
+                    transition_date=sac_01["transition_date"],
+                    general_information=gi,
+                )
+        sorted_sets = generate_resbmission_clusters("2022")
+        self.assertEqual(len(sorted_sets), 2)
+        for s in sorted_sets:
+            self.assertEqual(len(s), 2)
+
+    def test_gsa_migration_clusters_with_matching_partial_key(self):
+        """
+        A GSA_MIGRATION record should be absorbed into a bucket whose
+        partial key matches, regardless of UEI.
+        """
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=sac_01["general_information"],
+        )
+        gi_migration = deepcopy(sac_01["general_information"])
+        gi_migration["auditee_uei"] = GSA_MIGRATION
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"][:-1] + "2",
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=gi_migration,
+        )
+        sorted_sets = generate_resbmission_clusters("2022")
+
+        self.assertEqual(len(sorted_sets), 1)
+        self.assertEqual(len(sorted_sets[0]), 2)
+
+    def test_gsa_migration_only_records_cluster_together(self):
+        """
+        Two GSA_MIGRATION records with the same partial key
+        should form their own cluster even without a GSAFAC peer.
+        """
+        gi_migration = deepcopy(sac_01["general_information"])
+        gi_migration["auditee_uei"] = GSA_MIGRATION
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=gi_migration,
+        )
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"][:-1] + "2",
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=gi_migration,
+        )
+        sorted_sets = generate_resbmission_clusters("2022")
+
+        self.assertEqual(len(sorted_sets), 1)
+        self.assertEqual(len(sorted_sets[0]), 2)

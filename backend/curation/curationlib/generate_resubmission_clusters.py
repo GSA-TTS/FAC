@@ -22,6 +22,12 @@ def generate_resbmission_clusters(AY=None, noisy=False):
     return sorted_sets
 
 
+def generate_resbmission_clusters_by_distance(AY=None, noisy=False):
+    records = fetch_sac_resubmission_records_postgres(AY=AY, noisy=noisy)
+    sorted_sets = generate_clusters_from_records_by_distance(records, noisy=noisy)
+    return sorted_sets
+
+
 def generate_clusters_from_records_by_equivalence(records, noisy=False):
     """
     Group records into resubmission clusters using exact field equivalence.
@@ -81,7 +87,7 @@ def generate_clusters_from_records_by_equivalence(records, noisy=False):
             partial_index[partial] = canonical_key
         buckets[canonical_key].append(r)
 
-    # Discard buckets with one lonely record - no link is necessary.
+    # Discard buckets with one lonely record.
     clusters = [bucket for bucket in buckets.values() if len(bucket) > 1]
 
     # Sort by AY. Chances are, this command is being run by the AY. In which case, this sort is a no-op.
@@ -129,6 +135,9 @@ def generate_clusters_from_records_by_distance(records, noisy=False):
             r.order = 0
             new_s.append(r)
             sets.append(new_s)
+
+    # Discard clusters with one lonely record.
+    sets = [s for s in sets if len(s) > 1]
 
     sorted_sets = sorted(sets, key=lambda s: get_audit_year(s[0]))
     return sorted_sets
