@@ -4,7 +4,7 @@ import { queryAPI } from './api';
 const FORM = document.getElementById('check-eligibility');
 
 // modal-only state
-let duplicateReportIds = [];
+let duplicateSubmissions = [];
 
 /**
  * Helpers
@@ -148,6 +148,7 @@ function populateModal(formStatus, auditeeName = '') {
         <dl>
           <dt>UEI</dt>
           <dd>${auditeeUei}</dd>
+          ${auditeeName ? `<dt>Auditee name</dt><dd>${auditeeName}</dd>` : ''}
           ${auditYear ? `<dt>Audit year</dt><dd>${auditYear}</dd>` : ''}
         </dl>
       `,
@@ -171,11 +172,24 @@ function populateModal(formStatus, auditeeName = '') {
 
   // Duplicates list + resubmission nudge
   if (formStatus === 'duplicate-submission') {
-    if (duplicateReportIds.length > 0) {
+    if (duplicateSubmissions.length > 0) {
       descEl.innerHTML += `
         <p>These submissions match what you entered:</p>
         <ul>
-          ${duplicateReportIds.map((id) => `<li>${id}</li>`).join('')}
+          ${duplicateSubmissions
+            .map(
+              (duplicate) => `
+                <li>
+                  <strong>${duplicate.reportId}</strong>
+                  ${
+                    duplicate.auditeeName
+                      ? `<br><span>Auditee name: ${duplicate.auditeeName}</span>`
+                      : ''
+                  }
+                </li>
+              `
+            )
+            .join('')}
         </ul>
       `;
     }
@@ -236,13 +250,18 @@ if (formStatus === 'success' || formStatus === 'duplicate-submission') {
 function handleUEIDResponse({ valid, response, errors }) {
   // ✅ If backend returns duplicates even on "valid: true", treat as duplicate modal
   if (valid && Array.isArray(response?.duplicates) && response.duplicates.length > 0) {
-    duplicateReportIds = response.duplicates.map((d) => d.report_id).filter(Boolean);
+    duplicateSubmissions = response.duplicates
+      .map((d) => ({
+        reportId: d.report_id,
+        auditeeName: d.auditee_name,
+      }))
+      .filter((d) => d.reportId);
     populateModal('duplicate-submission', response?.auditee_name ?? '');
     return;
   }
 
   if (valid) {
-    duplicateReportIds = [];
+    duplicateSubmissions = [];
     document.getElementById('auditee_name').value = response.auditee_name;
     populateModal('success', response.auditee_name);
     return;
@@ -256,10 +275,15 @@ function handleUEIDResponse({ valid, response, errors }) {
 
   // duplicates: errors array includes 'duplicate-submission'
   if (Array.isArray(errors) && errors.includes('duplicate-submission')) {
-    duplicateReportIds = Array.isArray(response?.duplicates)
-      ? response.duplicates.map((d) => d.report_id).filter(Boolean)
+    duplicateSubmissions = Array.isArray(response?.duplicates)
+      ? response.duplicates
+          .map((d) => ({
+            reportId: d.report_id,
+            auditeeName: d.auditee_name,
+          }))
+          .filter((d) => d.reportId)
       : [];
-    populateModal('duplicate-submission');
+    populateModal('duplicate-submission', response?.auditee_name ?? '');
     return;
   }
 
@@ -338,7 +362,7 @@ function attachValidateButtonHandler() {
     // guard (should already be disabled)
     if (!(requiredFieldsFilled() && allResponsesValid())) return;
 
-    duplicateReportIds = [];
+    duplicateSubmissions = [];
     validateUEID();
   });
 }
@@ -355,12 +379,12 @@ function wireFieldValidation() {
     });
 
     el.addEventListener('input', () => {
-      duplicateReportIds = [];
+      duplicateSubmissions = [];
       updateValidateButtonState();
     });
 
     el.addEventListener('change', (e) => {
-      duplicateReportIds = [];
+      duplicateSubmissions = [];
 
       if (e.target.id === 'auditee_fiscal_period_end') {
         validateFyEndDate(e.target);
