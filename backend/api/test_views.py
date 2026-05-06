@@ -241,7 +241,7 @@ class UEIValidationViewTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(data["valid"], False)
             self.assertEqual(data["errors"], ["invalid-year"])
-    
+
     def test_duplicate_submission_returns_report_ids_and_auditee_names(self):
         client = APIClient()
         user = baker.make(User)
