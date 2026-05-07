@@ -35,9 +35,9 @@ def point_old_to_new(
     # is the older of the two audits.
 
     # If the first has no resubmission metadata, it must be the first in a chain.
-    # If it is of version 0 and status "unknown_resubmission_status", it must also be first in the chain.
+    # If it is of version 0 it must also be first in the chain.
     # This is like calling 'initiate_resubmission' on an audit.
-    if first.resubmission_meta is None or first.resubmission_version.get("version") == 0:
+    if first.resubmission_meta is None or first.resubmission_meta.get("version") == 0:
         logger.info(f"First in chain: {first.report_id} -> {second.report_id}")
         first.resubmission_meta = {
             "version": 1,
@@ -212,7 +212,6 @@ class Command(BaseCommand):
         )
 
         export_sets_as_csv(options["audit_year"], sorted_sets, noisy=options["noisy"])
-
 
         logger.info(f"Found {len(sorted_sets)} resubmission chains.")
         k = input("Review markdown/CSV and press `c` to continue...")
