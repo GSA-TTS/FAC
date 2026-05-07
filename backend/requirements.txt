@@ -1450,9 +1450,9 @@ sqlalchemy==2.0.36 \
     --hash=sha256:fddbe92b4760c6f5d48162aef14824add991aeda8ddadb3c31d56eb15ca69f8e \
     --hash=sha256:fdf3386a801ea5aba17c6410dd1dc8d39cf454ca2565541b5ac42a84e1e28f53
     # via -r ./requirements/requirements.in
-sqlparse==0.5.1 \
-    --hash=sha256:773dcbf9a5ab44a090f3441e2180efe2560220203dc2f8c0b0fa141e18b505e4 \
-    --hash=sha256:bb6b4df465655ef332548e24f08e205afc81b9ab86cb1c45657a7ff173a3a00e
+sqlparse==0.5.5 \
+    --hash=sha256:12a08b3bf3eec877c519589833aed092e2444e68240a3577e8e26148acc7b1ba \
+    --hash=sha256:e20d4a9b0b8585fdf63b10d30066c7c94c5d7a7ec47c889a2d83a3caa93ff28e
     # via
     #   -r ./requirements/requirements.in
     #   django

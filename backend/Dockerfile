@@ -2,7 +2,7 @@
 # FOUNDATION
 ###############################
 
-FROM python:3.12.11-slim-bookworm AS foundation
+FROM python:3.12.13-slim-bookworm AS foundation
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -44,7 +44,7 @@ RUN npm run build
 ###############################
 # FINAL
 ###############################
-FROM python:3.12.11-slim-bookworm AS final
+FROM python:3.12.13-slim-bookworm AS final
 
 RUN apt-get -yq update && \
     apt-get install -y \
