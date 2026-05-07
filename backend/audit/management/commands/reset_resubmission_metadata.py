@@ -92,7 +92,10 @@ class Command(BaseCommand):
         reset_count = 0
 
         for sac in records:
-            sac.resubmission_meta = None
+            sac.resubmission_meta = {
+                "version": 0,
+                "resubmission_status": "no_resubmission_data",
+            }
             sac.submission_status = STATUS.DISSEMINATED
 
             with transaction.atomic():
