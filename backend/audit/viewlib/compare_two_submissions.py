@@ -2,7 +2,6 @@ from audit.models import SingleAuditChecklist, SingleAuditReportFile
 from copy import deepcopy
 import logging
 import boto3
-import itertools
 from io import BytesIO
 from botocore.exceptions import ClientError
 from django.conf import settings

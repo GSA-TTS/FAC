@@ -1,4 +1,3 @@
-import unittest
 from django.test import TestCase
 from audit.viewlib.compare_two_submissions import (
     compare_report_ids,
@@ -372,8 +371,6 @@ class CompareSubmissionTests(TestCase):
 
         res = compare_lists_of_objects(d1, d2, ["b"], lambda o: o["value"])
 
-        print(f"res --> {res}")
-
         self.assertEqual(
             # res, {"status": "changed", "in_r1": ["2"], "in_r2": ["3"], "in_both": []}
             # res, {'status': 'changed', 'in_r1': [{'from': None, 'to': 2, 'key': 'b'}], 'in_r2': [{'from': None, 'to': 3, 'key': 'b'}], 'in_both': [{'from': 'Related to: name, value', 'to': '2 difference', 'key': 2}]}
@@ -390,7 +387,6 @@ class CompareSubmissionTests(TestCase):
         )
 
         res = compare_lists_of_objects(d1, d3, ["b"], lambda o: o["value"])
-        print(f"res --> {res}")
 
         self.assertEqual(
             # res, {"status": "changed", "in_r1": [], "in_r2": ["4"], "in_both": ["2"]}
