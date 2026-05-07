@@ -361,7 +361,6 @@ class CompareSubmissionTests(TestCase):
         self.assertEqual(deep_getattr(testObj, ["deep", "d", "g"], 8), 128)
         self.assertEqual(deep_getattr(testObj, ["deep", "d", "z"], 8), 8)
 
-    @unittest.skip("skip to pass merge tests for now!!!!")
     def test_compare_lists_of_objects(self):
         d1 = {"a": 1, "b": [{"name": "one", "value": 2}], "c": 3}
         d2 = {"a": 1, "b": [{"name": "two", "value": 3}], "d": 4}
@@ -370,13 +369,39 @@ class CompareSubmissionTests(TestCase):
             "b": [{"name": "one", "value": 2}, {"name": "three", "value": 4}],
             "e": 5,
         }
+
         res = compare_lists_of_objects(d1, d2, ["b"], lambda o: o["value"])
+
+        print(f"res --> {res}")
+
         self.assertEqual(
-            res, {"status": "changed", "in_r1": ["2"], "in_r2": ["3"], "in_both": []}
+            # res, {"status": "changed", "in_r1": ["2"], "in_r2": ["3"], "in_both": []}
+            # res, {'status': 'changed', 'in_r1': [{'from': None, 'to': 2, 'key': 'b'}], 'in_r2': [{'from': None, 'to': 3, 'key': 'b'}], 'in_both': [{'from': 'Related to: name, value', 'to': '2 difference', 'key': 2}]}
+            res,
+            {
+                "status": "changed",
+                "in_r1": [{"from": None, "to": 2, "key": "b"}],
+                "in_r2": [{"from": None, "to": 3, "key": "b"}],
+                "in_both": [
+                    {"from": 2, "to": 3, "key": "b"},
+                    {"from": "Related to: name, value", "to": "2 difference", "key": 2},
+                ],
+            },
         )
+
         res = compare_lists_of_objects(d1, d3, ["b"], lambda o: o["value"])
+        print(f"res --> {res}")
+
         self.assertEqual(
-            res, {"status": "changed", "in_r1": [], "in_r2": ["4"], "in_both": ["2"]}
+            # res, {"status": "changed", "in_r1": [], "in_r2": ["4"], "in_both": ["2"]}
+            # res, {'status': 'changed', 'in_r1': [], 'in_r2': [{'from': None, 'to': 4, 'key': 'b'}], 'in_both': []}
+            res,
+            {
+                "status": "changed",
+                "in_r1": [],
+                "in_r2": [{"from": None, "to": 4, "key": "b"}],
+                "in_both": [{"from": 2, "to": 2, "key": "b"}],
+            },
         )
 
     def test_identical_sacs(self):

@@ -2,6 +2,7 @@ from audit.models import SingleAuditChecklist, SingleAuditReportFile
 from copy import deepcopy
 import logging
 import boto3
+import itertools
 from io import BytesIO
 from botocore.exceptions import ClientError
 from django.conf import settings
@@ -113,6 +114,18 @@ def deep_getattr(o, lok, default=None):
 
 
 def _get_keysets(sac1, sac2, keys):
+    """
+    using SACs and their common keys we generate sets of hashed
+    keys and their accompanied maps so they can be used for comparison
+    """
+
+    # an interesting way to find diffs using set operations:
+    #   - 1. convert lists of objects into hashes
+    #   - 2. convert collection of hashes into sets
+    #   - 3. use standard python set operations against each set:
+    #     - symmetric difference (^)
+    #     - subtracton (-)
+
     # Use a list of keys to dive into an object.
     # Expect a list of objects to come back, in this case.
     # print(f"deep on {sac1}")
@@ -141,7 +154,9 @@ def _get_keysets(sac1, sac2, keys):
 
 
 def _only_in(ks1, ks2, map1, map2, extract_fun, keys):
-    in_r1 = in_r2 = list()
+    in_r1 = list()
+    in_r2 = list()
+
     # Keys only in ks1
     only_in_1 = ks1 - ks2
     # Keys only in ks2
@@ -163,10 +178,14 @@ def _filter_r1_r2(map1, map2, in_r1, in_r2, extract_fun, keys):
     # from one to the other. To do that, we need two lists of the values.
     ib_r1 = map1.values()
     ib_r2 = map2.values()
-    # Now, I want to highlight where something was in both, but changed. Thsi is a list of objects,
+
+    # are our number of overall values different ?
+    is_same_length = len(map1.values()) == len(map2.values())
+
+    # Now, I want to highlight where something was in both, but changed. This is a list of objects,
     # so the question is which *objects* changed.
     for obj1, obj2 in zip(ib_r1, ib_r2):
-        if obj1 == obj2:
+        if obj1 == obj2 and is_same_length:
             pass
         else:
             in_both.append(
@@ -191,10 +210,7 @@ def compare_lists_of_objects(
     sac1: SingleAuditChecklist,
     sac2: SingleAuditChecklist,
     keys: list,
-    extract_fun: Callable[
-        [dict],
-        Any,
-    ],
+    extract_fun: Callable[[dict], Any],
 ):
     ks1, ks2, map1, map2 = _get_keysets(sac1, sac2, keys)
 
@@ -207,7 +223,7 @@ def compare_lists_of_objects(
 
     # Now, a final mangling of "in_both".
     # This lets us present the data differently when something changes from one to the other and we're dealing with objects.
-    in_both = list()
+
     for obj1, obj2 in zip(map1.values(), map2.values()):
         if obj1 == obj2:
             pass

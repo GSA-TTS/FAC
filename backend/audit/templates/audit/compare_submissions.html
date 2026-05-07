@@ -3,7 +3,7 @@
 {% block content %}
 
 {% comment %} Perhaps only show the text at the top if this is a public/non-federal user? {% endcomment %}
-<div class="grid-container width-full">
+<div class="grid-container width-full margin-top-6 margin-bottom-6">
     <div class="grid-row">
       <div class="tablet:grid-col">
         <h1>Resubmission comparison</h1>
@@ -25,8 +25,7 @@
       </div>
     </div>
 
-    <hr/>
     {% comment %} FIXME: This could be a blue button on the right? Also, which should we redirect them to? {% endcomment %}
-    <a href="{% url 'audit:SubmissionProgress' r2 %}">Return to the submission checklist.</a>
+    <a class="usa-button margin-left-2" href="{% url 'audit:SubmissionProgress' r2 %}">Return to the submission checklist</a>
 </div>
 {% endblock content %}
