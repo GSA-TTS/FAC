@@ -1,16 +1,12 @@
+import json
 import re
 import sys
 from pathlib import Path
 
 
 SCHEMAS_DIR = Path(__file__).resolve().parent.parent
-BACKEND_DIR = SCHEMAS_DIR.parent
 
-SHEETS_FILE = SCHEMAS_DIR / "source" / "excel" / "libs" / "Sheets.libsonnet"
-CHECK_VERSION_FILE = (
-    BACKEND_DIR / "audit" / "intakelib" / "checks" / "check_version_number.py"
-)
-
+VERSION_FILE = SCHEMAS_DIR / "source" / "data" / "workbook_version.json"
 SECTION_SCHEMA_DIR = SCHEMAS_DIR / "source" / "sections"
 
 SECTION_SCHEMA_FILES = [
@@ -25,55 +21,38 @@ SECTION_SCHEMA_FILES = [
 ]
 
 
+def load_workbook_version_config() -> dict:
+    if not VERSION_FILE.exists():
+        raise RuntimeError(f"Could not find workbook version config: {VERSION_FILE}")
+
+    with VERSION_FILE.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+
 def get_current_workbook_version() -> str:
-    text = SHEETS_FILE.read_text(encoding="utf-8")
-    match = re.search(
-        r"local\s+WORKBOOKS_VERSION\s*=\s*['\"]([^'\"]+)['\"];",
-        text,
+    config = load_workbook_version_config()
+    return config["current_workbook_version"]
+
+
+def update_workbook_version_config(new_version: str) -> None:
+    VERSION_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    config = load_workbook_version_config()
+
+    authorized_versions = config.get("authorized_workbook_versions", [])
+
+    if new_version not in authorized_versions:
+        authorized_versions.append(new_version)
+
+    config["current_workbook_version"] = new_version
+    config["authorized_workbook_versions"] = authorized_versions
+
+    VERSION_FILE.write_text(
+        json.dumps(config, indent=2) + "\n",
+        encoding="utf-8",
     )
 
-    if not match:
-        raise RuntimeError("Could not find WORKBOOKS_VERSION")
-
-    return match.group(1)
-
-
-def update_sheets_version(new_version: str) -> None:
-    text = SHEETS_FILE.read_text(encoding="utf-8")
-
-    updated = re.sub(
-        r"local\s+WORKBOOKS_VERSION\s*=\s*['\"][^'\"]+['\"];",
-        f"local WORKBOOKS_VERSION = '{new_version}';",
-        text,
-        count=1,
-    )
-
-    if updated == text:
-        raise RuntimeError("Could not update WORKBOOKS_VERSION")
-
-    SHEETS_FILE.write_text(updated, encoding="utf-8")
-    print(f"Updated Sheets.libsonnet to {new_version}")
-
-
-def update_authorized_versions(new_version: str) -> None:
-    text = CHECK_VERSION_FILE.read_text(encoding="utf-8")
-
-    if f'"{new_version}"' in text:
-        print(f"AUTHORIZED_VERSIONS already contains {new_version}")
-        return
-
-    updated = re.sub(
-        r"(AUTHORIZED_VERSIONS\s*=\s*\{)",
-        rf'\1\n    "{new_version}",',
-        text,
-        count=1,
-    )
-
-    if updated == text:
-        raise RuntimeError("Could not update AUTHORIZED_VERSIONS")
-
-    CHECK_VERSION_FILE.write_text(updated, encoding="utf-8")
-    print(f"Added {new_version} to AUTHORIZED_VERSIONS")
+    print(f"Updated workbook version config to {new_version}")
 
 
 def update_section_schema_versions(previous_version: str) -> None:
@@ -113,12 +92,12 @@ def main() -> None:
     print(f"New version: {new_version}")
 
     if previous_version == new_version:
-        print("Version is already set. No version bump needed.")
+        update_workbook_version_config(new_version)
+        print("Version is already set. Updated config only.")
         return
 
     update_section_schema_versions(previous_version)
-    update_sheets_version(new_version)
-    update_authorized_versions(new_version)
+    update_workbook_version_config(new_version)
 
     print("Done!")
 

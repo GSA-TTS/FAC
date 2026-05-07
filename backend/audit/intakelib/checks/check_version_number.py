@@ -1,5 +1,8 @@
 from django.core.exceptions import ValidationError
+import json
 import logging
+from pathlib import Path
+
 from audit.intakelib.intermediate_representation import (
     get_range_by_name,
 )
@@ -7,23 +10,13 @@ from audit.intakelib.common import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 
-AUTHORIZED_VERSIONS = {
-    "1.0.0",
-    "1.0.1",
-    "1.0.2",
-    "1.0.3",
-    "1.0.4",
-    "1.0.5",
-    "1.1.0",
-    "1.1.1",
-    "1.1.2",
-    "1.1.3",
-    "1.1.4",
-    "1.1.5",
-    "1.1.6",
-    "1.1.7",
-    "1.1.8",
-}
+BACKEND_DIR = Path(__file__).resolve().parents[3]
+VERSION_FILE = BACKEND_DIR / "schemas" / "source" / "data" / "workbook_version.json"
+
+with VERSION_FILE.open("r", encoding="utf-8") as f:
+    workbook_version_config = json.load(f)
+
+AUTHORIZED_VERSIONS = set(workbook_version_config["authorized_workbook_versions"])
 
 
 # DESCRIPTION
@@ -31,8 +24,8 @@ AUTHORIZED_VERSIONS = {
 def validate_workbook_version(ir):
     version_range = get_range_by_name(ir, "version")
     errors = []
+
     for index, version in enumerate(version_range["values"]):
-        # Check if version is not in the set of valid versions
         if version not in AUTHORIZED_VERSIONS:
             errors.append(
                 build_cell_error_tuple(

@@ -19,25 +19,18 @@
 
 # Bumping workbook template version
 
+As of May 2026, workbook versioning is now driven by `backend/schemas/source/data/workbook_version.json`, which stores both the current workbook version and the list of authorized workbook versions accepted during validation.
+
 Follow these steps to version bump the workbook templates:
-1. `backend/schemas/source/excel/libs/Sheets.libsonnet`: Update the `WORKBOOKS_VERSION` variable.
-2. `backend/audit/intakelib/checks/check_version_number.py`: Update the `AUTHORIZED_VERSIONS` variable.
-3. The JSON files in `backend/schemas/source/sections/` require some modification. For each file, locate the version enum found in `Meta.properties.version.enum`. Append the PREVIOUS version to the end of this list, followed by `Sheets.WORKBOOKS_VERSION`.
-3. The `.jsonnet` files in `backend/schemas/source/sections/` require some modification. For each file, locate the version enum found in `Meta.properties.version.enum`. Append the PREVIOUS version to the end of this list, followed by `Sheets.WORKBOOKS_VERSION`. The files to modify are:
-* `AdditionalEINs.schema.jsonnet`
-* `AdditionalUEIs.schema.jsonnet`
-* `AuditFindingsText.schema.jsonnet`
-* `CorrectiveActionPlan.schema.jsonnet`
-* `FederalAwards.schema.jsonnet`
-* `FederalAwardsAuditFindings.schema.jsonnet`
-* `NotesToSefa.schema.jsonnet`
-* `SecondaryAuditors.schema.jsonnet`
-4. Activate your virtual env inside `backend/schemas` and run `make all`. This will generate new schemas and templates in `/schemas/output/`.
-5. Update the workbook template fixtures used in the Cypress tests, found in `backend/cypress/fixtures/test_workbooks`.
-    * An easy (but tedious) way to do this is to modify the templates with the data used in the existing fixtures, then copy/overwrite all of those XLSXes into `test_workbooks`.
-        * If a cell has a selector, use that instead of copy-pasting.
-        * Don't forget to revert the templates afterwards!
-6. Once your PR is merged, don't forget to copy the new templates, found in `backend/schemas/output/excel/xlsx/`, into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
+1. Activate your virtual env inside `backend/schemas`
+2. Run `make all WORKBOOK_VERSION=d.d.d` where d.d.d is the new workbook version. (NOTE: If reusing existing ALN data and skipping the SAM.gov fetch: run `make skip WORKBOOK_VERSION=d.d.d`)
+3. Verify:
+- workbook templates generated successfully in `backend/schemas/output/excel/xlsx/` and `backend/schemas/output/excel/json/`
+- section schemas regenerated successfully in `backend/schemas/output/sections/`
+- Cypress test workbooks regenerated successfully in `backend/cypress/fixtures/test_workbooks/`
+- workbook_version.json updated correctly with the new current_workbook_version and authorized_workbook_versions in `backend/schemas/source/data/workbook_version.json`
+- lookup schemas regenerated successfully in one or both (whatever is applicable): `backend/schemas/source/base/FederalProgramNames.json` (for ALNs) and `backend/schemas/source/base/ClusterNames.json` (for Cluster Names)
+4. Once your PR is merged, copy the updated workbook templates from `backend/schemas/output/excel/xlsx/` into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
 
 ## A note about generate_lookup_schemas.py
 `make all` executes `make source_data`, which, calls `generate_lookup_schemas.py`. This script can generate either cluster names or CFDA listings or agencies, depending on the args given (see docstring in the script). The format of the CSVs can change (and have), so changes to `generate_lookup_schemas.py` may be necessary in the future.
