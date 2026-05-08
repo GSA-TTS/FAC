@@ -14,7 +14,7 @@
 
             {% include "./title.html" with auditee_name=auditee_name %}
 
-            {% if previous_report_id %}
+            {% if previous_report_id or next_report_id %}
                 {% include "includes/resubmission_banner.html" %}
             {% endif %}
 
