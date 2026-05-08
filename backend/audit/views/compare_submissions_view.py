@@ -95,7 +95,7 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
         # does our SACs have any differences ?
         has_diffs = False
         for val in compared.values():
-            if val['status'] != "same":
+            if val["status"] != "same":
                 has_diffs = True
                 break
 
