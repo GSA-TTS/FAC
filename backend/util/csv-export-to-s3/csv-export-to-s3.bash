@@ -212,7 +212,7 @@ for endpoint in ${endpoints[@]}; do
     next_year=$(($year+1))
     end_date="${next_year}-09-30"
     download_date_range_csv ${endpoint} ${start_date} ${end_date}
-    copy_to_s3 ${endpoint} "public-data/gsa/federal-fiscal-year/${year}-ffy-${endpoint}.csv"
+    copy_to_s3 ${endpoint} "public-data/gsa/federal-fiscal-year/${next_year}-ffy-${endpoint}.csv"
     rm -f "${ROOT}/${endpoint}.csv"
   done
 done
