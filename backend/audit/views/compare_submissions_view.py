@@ -87,10 +87,19 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
         # We get here if we passed one of the above conditions.
         report_id_1, report_id_2, compared = compare_with_prev(sac_1)
         context = {"comparison": compared}
+
         nice_names = {}
         for k in compared.keys():
             nice_names[k] = k.replace("_", " ").title()
 
+        # does our SACs have any differences ?
+        has_diffs = False
+        for val in compared.values():
+            if val['status'] != "same":
+                has_diffs = True
+                break
+
+        context = context | {"has_diffs": has_diffs}
         context = context | {"nice_names": nice_names}
         context = context | {"r1": report_id_1}
         context = context | {"r2": report_id_2}
