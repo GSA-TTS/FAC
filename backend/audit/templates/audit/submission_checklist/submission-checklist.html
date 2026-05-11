@@ -14,7 +14,9 @@
 
             {% include "./title.html" with auditee_name=auditee_name %}
 
-            {% include "./resubmission_banner.html" %}
+            {% if previous_report_id %}
+                {% include "includes/resubmission_banner.html" %}
+            {% endif %}
 
             <div id="submission-checklist-content">
                 <ul class="usa-icon-list usa-icon-list--size-sm font-sans-md">

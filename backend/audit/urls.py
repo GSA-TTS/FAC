@@ -81,11 +81,6 @@ urlpatterns = [
         name="TribalAuditConsent",
     ),
     path(
-        "compare/<str:report_id>",
-        views.CompareSubmissionsView.as_view(),
-        name="CompareSubmissions",
-    ),
-    path(
         "cross-validation/<str:report_id>",
         views.CrossValidationView.as_view(),
         name="CrossValidation",
