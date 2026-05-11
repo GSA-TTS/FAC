@@ -26,7 +26,7 @@ lint:
 	@echo "Flake8:"
 	@flake8
 	@echo "black:"
-	@black --check .
+	@black --check --exclude '\.venv|node_modules' .
 	@echo "bandit:"
 	@bandit -c pyproject.toml -r .
 	@echo "mypy:"
@@ -77,7 +77,7 @@ docker-nctest:
 
 docker-lint:
 	docker compose build
-	docker compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
+	docker compose run web bash -c 'flake8 && black --check --exclude '\.venv|node_modules' . && bandit -c pyproject.toml -r . && mypy . && djlint .'
 
 ghcr-first-run:
 	docker compose -f docker-compose-web.yml run web python manage.py makemigrations
@@ -113,3 +113,9 @@ docker-full-clean:
 	docker volume rm $(docker volume ls -q)
 	docker system prune -f
 	docker volume prune -f
+
+# "Docker Fresh Start" - The Reset Button
+dfs:
+	make docker-clean
+	make docker-first-run
+	docker compose up

@@ -1,4 +1,4 @@
-from dissemination import api_versions
+from dissemination.api_versions import exec_sql_at_path
 
 SQL_PATH = "curation/sql"
 
@@ -9,7 +9,16 @@ class CurationTracking:
     This guarantees that any DB writes within the block will be recorded.
     """
 
+    initialized = False
+
+    # On first entry, initialize the curation indexes and functions. It should always be setup in
+    # online environments, but it's not guaranteed. This also ensures a duplicate initialization
+    # when redeploying online, to ensure any changes are brought through.
     def __enter__(self):
+        if not self.initialized:
+            init_audit_curation()
+            self.initialized = True
+
         enable_audit_curation()
         return None
 
@@ -18,12 +27,12 @@ class CurationTracking:
 
 
 def init_audit_curation():
-    api_versions.exec_sql_at_path(SQL_PATH, "init_curation_auditing.sql")
+    exec_sql_at_path(SQL_PATH, "init_curation_auditing.sql")
 
 
 def enable_audit_curation():
-    api_versions.exec_sql_at_path(SQL_PATH, "enable_curation_auditing.sql")
+    exec_sql_at_path(SQL_PATH, "enable_curation_auditing.sql")
 
 
 def disable_audit_curation():
-    api_versions.exec_sql_at_path(SQL_PATH, "disable_curation_auditing.sql")
+    exec_sql_at_path(SQL_PATH, "disable_curation_auditing.sql")

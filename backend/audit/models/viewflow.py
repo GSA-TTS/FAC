@@ -119,26 +119,8 @@ def audit_flag_for_removal(audit, user):
             )
 
 
-def sac_transition(request, sac, **kwargs):
-    """
-    Transitions the submission_state for a SingleAuditChecklist (sac).
-    """
-    audit = kwargs.get("audit", None)
-    user = None
-    # SOT TODO: This needs to use `audit`
-    flow = SingleAuditChecklistFlow(sac)
-    audit_flow = AuditFlow(audit)
-
-    target = kwargs.get("transition_to", None)
-
-    # optional - only needed when a user is involved.
-    if request:
-        user = request.user
-
-    # SAC must transition to a target state.
-    if target is None:
-        return False
-
+def _sac_transition_helper(user, sac, flow, audit, audit_flow, target):
+    """Helper for sac_transition(...)"""
     if target == STATUS.IN_PROGRESS:
         flow.transition_to_in_progress_again()
         sac.save(
@@ -237,7 +219,40 @@ def sac_transition(request, sac, **kwargs):
         )
         return True
 
-    return False
+    elif target == STATUS.RESUBMITTED:
+        flow.transition_to_resubmitted()
+        sac.save(
+            event_user=user,
+            event_type=SubmissionEvent.EventType.RESUBMITTED,
+        )
+        return True
+
+    else:
+        logger.error(f"Target {target} is not a valid SAC state")
+        return False
+
+
+def sac_transition(request, sac, **kwargs):
+    """
+    Transitions the submission_state for a SingleAuditChecklist (sac).
+    """
+    audit = kwargs.get("audit", None)
+    user = None
+    # SOT TODO: This needs to use `audit`
+    flow = SingleAuditChecklistFlow(sac)
+    audit_flow = AuditFlow(audit)
+
+    target = kwargs.get("transition_to", None)
+
+    # optional - only needed when a user is involved.
+    if request:
+        user = request.user
+
+    # SAC must transition to a target state.
+    if target is None:
+        return False
+
+    return _sac_transition_helper(user, sac, flow, audit, audit_flow, target)
 
 
 def _transition_audit(audit, user, submission_event, autoflow_action):
@@ -435,6 +450,14 @@ class SingleAuditChecklistFlow(SingleAuditChecklist):
         changes have been made at that point.
         """
         self.sac.transition_name.append(STATUS.SUBMITTED)
+        self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
+
+    @state.transition(
+        source=STATUS.DISSEMINATED,
+        target=STATUS.RESUBMITTED,
+    )
+    def transition_to_resubmitted(self):
+        self.sac.transition_name.append(STATUS.RESUBMITTED)
         self.sac.transition_date.append(datetime.datetime.now(datetime.timezone.utc))
 
 

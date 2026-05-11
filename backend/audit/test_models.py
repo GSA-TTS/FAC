@@ -115,6 +115,13 @@ class SingleAuditChecklistTests(TestCase):
                 STATUS.FLAGGED_FOR_REMOVAL,
                 "transition_to_flagged_for_removal",
             ),
+            (
+                [
+                    STATUS.DISSEMINATED,
+                ],
+                STATUS.RESUBMITTED,
+                "transition_to_resubmitted",
+            ),
         )
 
         now = datetime.now(timezone.utc)

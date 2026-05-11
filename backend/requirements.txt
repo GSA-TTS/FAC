@@ -1391,10 +1391,6 @@ six==1.16.0 \
     #   orderedmultidict
     #   pyjwkest
     #   python-dateutil
-sling==1.5.6 \
-    --hash=sha256:038be78e00ef02b451d8bbfc2055dc8907d7668636f34bd5f13a10f0f87cde41 \
-    --hash=sha256:e7aa2068056141b8999e5702fa0b0a11496cd0ceb8deb3cab278961df8b3d327
-    # via -r ./requirements/requirements.in
 sqlalchemy==2.0.36 \
     --hash=sha256:03e08af7a5f9386a43919eda9de33ffda16b44eb11f3b313e6822243770e9763 \
     --hash=sha256:0572f4bd6f94752167adfd7c1bed84f4b240ee6203a95e05d1e208d488d0d436 \
@@ -1454,9 +1450,9 @@ sqlalchemy==2.0.36 \
     --hash=sha256:fddbe92b4760c6f5d48162aef14824add991aeda8ddadb3c31d56eb15ca69f8e \
     --hash=sha256:fdf3386a801ea5aba17c6410dd1dc8d39cf454ca2565541b5ac42a84e1e28f53
     # via -r ./requirements/requirements.in
-sqlparse==0.5.1 \
-    --hash=sha256:773dcbf9a5ab44a090f3441e2180efe2560220203dc2f8c0b0fa141e18b505e4 \
-    --hash=sha256:bb6b4df465655ef332548e24f08e205afc81b9ab86cb1c45657a7ff173a3a00e
+sqlparse==0.5.5 \
+    --hash=sha256:12a08b3bf3eec877c519589833aed092e2444e68240a3577e8e26148acc7b1ba \
+    --hash=sha256:e20d4a9b0b8585fdf63b10d30066c7c94c5d7a7ec47c889a2d83a3caa93ff28e
     # via
     #   -r ./requirements/requirements.in
     #   django

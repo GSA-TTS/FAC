@@ -70,7 +70,7 @@ They should run in less than half a minute for baseline coverage.
 
 To run accessibility tests locally, do the following:
 
-Ensure `DISABLE_AUTH=True` in your local environment variables. This will mean the blank "test_user@test.test" will be used. 
+Ensure `DISABLE_AUTH=True` in your local environment variables. This will mean the blank "test_user@test.test" will be used.
 You will not have to log in, do not need permissions to access pages, and the username in the top right will display strangely. 
 But, Cypress also won't need any permissions or have to rely on Login.gov in any way.
 

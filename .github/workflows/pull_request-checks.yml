@@ -39,7 +39,10 @@ jobs:
               - './backend/requirements.txt'
             migration:
               - './backend/audit/models/**'
+              - './backend/census_historical_migration/models.py'
+              - './backend/curation/models.py'
               - './backend/dissemination/models/**'
+              - './backend/users/models.py'
             terraform:
               - './terraform/**'
 
