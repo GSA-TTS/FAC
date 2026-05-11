@@ -32,6 +32,7 @@ except KeyError as e:
         "Missing 'authorized_workbook_versions' in workbook version config"
     ) from e
 
+
 # DESCRIPTION
 # This checks if the uploaded workbook version is valid.
 def validate_workbook_version(ir):
