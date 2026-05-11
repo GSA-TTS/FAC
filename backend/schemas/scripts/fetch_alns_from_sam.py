@@ -21,7 +21,7 @@ def fetch_all(api_key: str, status: str) -> list[dict]:
     session = requests.Session()
 
     while more_pages_to_read:
-        params = {
+        params: dict[str, str | int] = {
             "api_key": api_key,
             "pageSize": PAGE_SIZE,
             "pageNumber": page_number,
