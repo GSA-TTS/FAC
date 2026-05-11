@@ -23,7 +23,7 @@ As of May 2026, workbook versioning is now driven by `backend/schemas/source/dat
 
 Follow these steps to version bump the workbook templates:
 1. Activate your virtual env inside `backend/schemas`
-2. Run `make all WORKBOOK_VERSION=d.d.d` where d.d.d is the new workbook version. (NOTE: If reusing existing ALN data and skipping the SAM.gov fetch: run `make skip WORKBOOK_VERSION=d.d.d`)
+2. Run `SAM_API_KEY=my-sam-key make all WORKBOOK_VERSION=d.d.d` where my-sam-key is your SAM API Key and d.d.d is the new workbook version. (NOTE: If reusing existing ALN data and skipping the SAM.gov fetch: run `SAM_API_KEY=my-sam-key make skip WORKBOOK_VERSION=d.d.d`)
 3. Verify:
 - workbook templates generated successfully in `backend/schemas/output/excel/xlsx/` and `backend/schemas/output/excel/json/`
 - section schemas regenerated successfully in `backend/schemas/output/sections/`

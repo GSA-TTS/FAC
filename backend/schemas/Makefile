@@ -12,9 +12,9 @@ else
               ${SYSTEM_PYTHON}))
 endif
 
+# Example with workbook version: SAM_API_KEY=my-sam-key make all WORKBOOK_VERSION=1.1.10
 all: maybe_bump_workbook_version clean fetch_alns merge_aln_csvs source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json build_test_workbooks
 
-# Example with workbook version: make skip WORKBOOK_VERSION=1.1.10
 skip:
 	@echo "Skipping ALN fetch and merge (using existing data)..."
 	@$(MAKE) maybe_bump_workbook_version clean source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json build_test_workbooks
@@ -119,5 +119,5 @@ ifdef WORKBOOK_VERSION
 	@echo "Setting workbook version to $(WORKBOOK_VERSION)..."
 	@${PYTHON} scripts/set_workbook_version.py $(WORKBOOK_VERSION)
 else
-	@echo "Using existing workbook version"
+	$(error WORKBOOK_VERSION is required. Example: SAM_API_KEY=my-sam-key make all WORKBOOK_VERSION=1.1.9)
 endif

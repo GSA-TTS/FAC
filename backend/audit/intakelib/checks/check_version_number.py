@@ -13,11 +13,24 @@ logger = logging.getLogger(__name__)
 BACKEND_DIR = Path(__file__).resolve().parents[3]
 VERSION_FILE = BACKEND_DIR / "schemas" / "source" / "data" / "workbook_version.json"
 
-with VERSION_FILE.open("r", encoding="utf-8") as f:
-    workbook_version_config = json.load(f)
+try:
+    with VERSION_FILE.open("r", encoding="utf-8") as f:
+        workbook_version_config = json.load(f)
 
-AUTHORIZED_VERSIONS = set(workbook_version_config["authorized_workbook_versions"])
+    AUTHORIZED_VERSIONS = set(workbook_version_config["authorized_workbook_versions"])
 
+except FileNotFoundError:
+    raise RuntimeError(f"Workbook version config file not found: {VERSION_FILE}")
+
+except json.JSONDecodeError as e:
+    raise RuntimeError(
+        f"Invalid JSON in workbook version config file: {VERSION_FILE}"
+    ) from e
+
+except KeyError as e:
+    raise RuntimeError(
+        "Missing 'authorized_workbook_versions' in workbook version config"
+    ) from e
 
 # DESCRIPTION
 # This checks if the uploaded workbook version is valid.
