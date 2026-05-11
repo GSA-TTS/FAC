@@ -122,7 +122,7 @@
       "kind": "dropdown"
     },
     { "cell": "Form!K2", "value": "N/A", "kind": "input" },
-    { "cell": "Form!O2", "value": "Y", "kind": "input" }
+    { "cell": "Form!L2", "value": "Y", "kind": "input" }
   ],
     "corrective-action-plan-workbook.xlsx": [
     { "cell": "Coversheet!B4", "value": "D7A4J33FUMJ1", "kind": "input" },
