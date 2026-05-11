@@ -5,7 +5,6 @@ from pathlib import Path
 
 import requests
 
-
 BASE_URL = "https://api.sam.gov/assistance-listings/v1/search"
 PAGE_SIZE = 100
 

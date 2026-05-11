@@ -3,7 +3,6 @@ import re
 import sys
 from pathlib import Path
 
-
 SCHEMAS_DIR = Path(__file__).resolve().parent.parent
 
 VERSION_FILE = SCHEMAS_DIR / "source" / "data" / "workbook_version.json"

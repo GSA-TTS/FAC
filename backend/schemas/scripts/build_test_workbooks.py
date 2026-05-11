@@ -4,7 +4,6 @@ from pathlib import Path
 
 from openpyxl import load_workbook
 
-
 SCHEMAS_DIR = Path(__file__).resolve().parent.parent
 INPUT_DIR = SCHEMAS_DIR / "output" / "excel" / "xlsx"
 OUTPUT_DIR = SCHEMAS_DIR.parent / "cypress" / "fixtures" / "test_workbooks"
