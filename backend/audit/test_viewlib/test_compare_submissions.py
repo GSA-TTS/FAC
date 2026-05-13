@@ -395,7 +395,7 @@ class CompareSubmissionTests(TestCase):
                 "status": "changed",
                 "in_r1": [],
                 "in_r2": [{"from": None, "to": 4, "key": "b"}],
-                "in_both": []
+                "in_both": [],
             },
         )
 
