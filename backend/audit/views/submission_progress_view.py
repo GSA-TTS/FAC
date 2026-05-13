@@ -203,6 +203,11 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     and "previous_report_id" in sac.resubmission_meta
                     else None
                 ),
+                "next_report_id": (
+                    sac.resubmission_meta.get("next_report_id", None)
+                    if sac.resubmission_meta
+                    else None
+                ),
             }
             context = context | subcheck
 
