@@ -28,7 +28,6 @@ local y_or_n_range = open_range {
   range_name: 'Example YorN range',
 };
 
-// TODO: import from audits.fixtures.excel. Ref: https://github.com/GSA-TTS/FAC/issues/1673
 local section_names = {
   CORRECTIVE_ACTION_PLAN: 'CorrectiveActionPlan',
   FEDERAL_AWARDS: 'FederalAwards',
@@ -42,8 +41,10 @@ local section_names = {
 };
 
 // All workbooks should get the same version number.
-// When bumping, also add the new version to AUTHORIZED_VERSIONS in check_version_number.py
-local WORKBOOKS_VERSION = '1.1.8';
+// Workbook versioning is managed in source/data/workbook_version.json.
+// The version bump script updates that shared config file.
+local workbookVersionConfig = import '../../data/workbook_version.json';
+local WORKBOOKS_VERSION = workbookVersionConfig.current_workbook_version;
 
 {
   single_cell: single_cell,

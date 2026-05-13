@@ -12,9 +12,14 @@ else
               ${SYSTEM_PYTHON}))
 endif
 
-all: clean merge_aln_csvs source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json
+# Example with workbook version: SAM_API_KEY=my-sam-key make all WORKBOOK_VERSION=1.1.10
+all: maybe_bump_workbook_version clean fetch_alns merge_aln_csvs source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json build_test_workbooks
 
-json: format_jsonnet build_templates build_templates build_audit_json
+skip:
+	@echo "Skipping ALN fetch and merge (using existing data)..."
+	@$(MAKE) maybe_bump_workbook_version clean source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json build_test_workbooks
+
+json: format_jsonnet build_templates build_audit_json
 
 template_specs = $(wildcard source/excel/templates/*.jsonnet)
 section_specs = $(wildcard source/sections/*.jsonnet)
@@ -23,6 +28,10 @@ base_specs = $(wildcard source/base/*.jsonnet)
 
 xlsx = $(wildcard output/excel/xlsx/*-workbook*.xlsx)
 json = $(wildcard output/excel/json/*.json)
+
+fetch_alns:
+	@echo "Fetching ALNs from SAM.gov..."
+	@${PYTHON} scripts/fetch_alns_from_sam.py
 
 merge_aln_csvs:
 	@echo "Merging and cleaning ALNs CSV files..."
@@ -100,3 +109,15 @@ build_base_schemas:
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
 		jsonnet -o output/base/"$$base_name.json" "$$jsonnet_file"; \
 	done
+
+build_test_workbooks:
+	@echo "Building Cypress test workbooks..."
+	@${PYTHON} scripts/build_test_workbooks.py
+
+maybe_bump_workbook_version:
+ifdef WORKBOOK_VERSION
+	@echo "Setting workbook version to $(WORKBOOK_VERSION)..."
+	@${PYTHON} scripts/set_workbook_version.py $(WORKBOOK_VERSION)
+else
+	$(error WORKBOOK_VERSION is required. Example: SAM_API_KEY=my-sam-key make all WORKBOOK_VERSION=1.1.9)
+endif
