@@ -222,6 +222,7 @@ def compare_lists_of_objects(
 
     # Now, a final mangling of "in_both".
     # This lets us present the data differently when something changes from one to the other and we're dealing with objects.
+    in_both = list()
 
     for obj1, obj2 in zip(map1.values(), map2.values()):
         if obj1 == obj2:
