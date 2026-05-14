@@ -15,7 +15,7 @@ from audit.models.constants import STATUS
 from curation.curationlib.generate_resubmission_clusters import (
     generate_resbmission_clusters,
 )
-from curation.curationlib.export_resubmission_clusters import (
+from backend.curation.curationlib.export_resubmission_chains import (
     export_sets_as_csv,
     export_sets_as_markdown,
     order_reports_key,
