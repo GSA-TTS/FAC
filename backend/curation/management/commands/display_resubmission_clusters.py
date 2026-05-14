@@ -32,7 +32,9 @@ class Command(BaseCommand):
         # export_sets_as_text_tables(
         #     options["audit_year"], sorted_sets, noisy=options["noisy"]
         # )
-        export_chains_as_csv(options["audit_year"], sorted_chains, noisy=options["noisy"])
+        export_chains_as_csv(
+            options["audit_year"], sorted_chains, noisy=options["noisy"]
+        )
         export_chains_as_markdown(
             options["audit_year"], sorted_chains, noisy=options["noisy"]
         )
