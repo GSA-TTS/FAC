@@ -66,7 +66,7 @@ def point_old_to_new(
                 event_user=u,
                 event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE,
             )
-            # Once we modify the records, we need to redisseminate
+            # Once we modify the SAC records, we need to redisseminate
             first.redisseminate()
             second.redisseminate()
 

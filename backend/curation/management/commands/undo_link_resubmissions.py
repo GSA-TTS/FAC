@@ -23,7 +23,7 @@ def _parse_meta(raw):
     """
     Pull the JSON resub metadata from the CSV.
 
-    Records whose prior_resubmission_meta is empty were NULL before linkage.
+    Submissions whose prior_resubmission_meta is empty were NULL before linkage.
     They must be restored to version 0 rather than NULL,
     because a NULL would be redisseminated as version 1.
     """
@@ -58,12 +58,12 @@ def _load_csv(csv_path):
     return rows
 
 
-def _restore_records(rows, user, noisy=False):
+def _restore_sacs(rows, user, noisy=False):
     """
     Restore submission_status and resubmission_meta for every row in the CSV.
 
-    Records are processed in reverse order so that a DEPRECATED record is never
-    left transiently pointing at a record that has already been reset.
+    SACs are processed in reverse order so that a DEPRECATED submission is never
+    left transiently pointing at a submission that has already been reset.
     """
     # Group rows by chain_index. They should come this way from the CSV, but just to be safe.
     chains = {}
@@ -83,7 +83,7 @@ def _restore_records(rows, user, noisy=False):
                 sac = SingleAuditChecklist.objects.get(report_id=report_id)
             except SingleAuditChecklist.DoesNotExist:
                 logger.error(
-                    f"Record not found: {report_id} — skipping. "
+                    f"SAC not found: {report_id} — skipping. "
                     "The database may have changed since this CSV was produced."
                 )
                 continue
@@ -112,7 +112,7 @@ class Command(BaseCommand):
     """
     Undo a prior run of link_resubmissions by restoring pre-linkage metadata.
 
-    Reads the CSV produced by link_resubmissions and writes those values back, then redisseminates each record.
+    Reads the CSV produced by link_resubmissions and writes those values back, then redisseminates each submission.
     """
 
     def add_arguments(self, parser):
@@ -144,9 +144,9 @@ class Command(BaseCommand):
 
         rows = _load_csv(options["csv"])
 
-        # Display a little summary of what will be undone before touching any records.
+        # Display a little summary of what will be undone before touching any submissions.
         report_ids = [r["report_id"] for r in rows]
-        logger.info(f"CSV contains {len(rows)} records.")
+        logger.info(f"CSV contains {len(rows)} submissions.")
         if options["noisy"]:
             for rid in report_ids:
                 logger.info(f"  {rid}")
@@ -158,8 +158,8 @@ class Command(BaseCommand):
 
         # Do the thing!
         ok_user = User.objects.get(email=options["email"])
-        _restore_records(rows, ok_user, noisy=options["noisy"])
+        _restore_sacs(rows, ok_user, noisy=options["noisy"])
 
         logger.info(
-            f"\nUndo complete. {len(rows)} records restored and redisseminated."
+            f"\nUndo complete. {len(rows)} submissions restored and redisseminated."
         )

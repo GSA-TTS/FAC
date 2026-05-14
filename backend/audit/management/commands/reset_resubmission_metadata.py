@@ -51,7 +51,7 @@ class Command(BaseCommand):
         # AY or a list of ID's. The report_id's will be run regardless of resubmission linkage - that specifically is dangerous.
         if options["audit_year"]:
             audit_year = options["audit_year"]
-            records = list(
+            sacs = list(
                 SingleAuditChecklist.objects.filter(
                     Q(
                         general_information__auditee_fiscal_period_end__startswith=audit_year
@@ -62,14 +62,14 @@ class Command(BaseCommand):
             label = f"AY{audit_year}"
         else:
             report_ids = options["report_ids"]
-            records = list(
+            sacs = list(
                 SingleAuditChecklist.objects.filter(
                     Q(report_id__in=report_ids) & Q(resubmission_meta__isnull=False)
                 )
             )
             label = f"report IDs: {', '.join(report_ids)}"
             # Warn about any IDs that were not found or had no metadata.
-            found_ids = {sac.report_id for sac in records}
+            found_ids = {sac.report_id for sac in sacs}
             missing = set(report_ids) - found_ids
             if missing:
                 logger.warning(
@@ -77,11 +77,11 @@ class Command(BaseCommand):
                     f"resubmission metadata and will be skipped: {missing}"
                 )
 
-        if not records:
-            logger.info(f"No records with resubmission metadata found for {label}.")
+        if not sacs:
+            logger.info(f"No submissions with resubmission metadata found for {label}.")
             sys.exit(0)
 
-        logger.info(f"Found {len(records)} records for {label}.")
+        logger.info(f"Found {len(sacs)} submissions for {label}.")
 
         k = input("\nPress `c` to continue...")
         if k != "c":
@@ -91,7 +91,7 @@ class Command(BaseCommand):
         ok_user = User.objects.get(email=options["email"])
         reset_count = 0
 
-        for sac in records:
+        for sac in sacs:
             sac.resubmission_meta = {
                 "version": 0,
                 "resubmission_status": "no_resubmission_data",
@@ -109,5 +109,5 @@ class Command(BaseCommand):
             reset_count += 1
 
         logger.info(
-            f"\nReset complete. {reset_count} records cleared and redisseminated."
+            f"\nReset complete. {reset_count} submissions cleared and redisseminated."
         )
