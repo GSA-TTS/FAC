@@ -12,8 +12,8 @@ from audit.models import (
 from audit.models.constants import RESUBMISSION_STATUS
 from users.models import StaffUser
 from audit.models.constants import STATUS
-from curation.curationlib.generate_resubmission_clusters import (
-    generate_resubmission_chains,
+from curation.curationlib.generate_resubmission_chains import (
+    get_and_generate_submission_chains_by_equivalence,
 )
 from curation.curationlib.export_resubmission_chains import (
     export_chains_as_csv,
@@ -202,7 +202,7 @@ class Command(BaseCommand):
 
         sorted_chains = lfilter(
             lambda chain: len(chain) > 1,
-            generate_resubmission_chains(
+            get_and_generate_submission_chains_by_equivalence(
                 options["audit_year"], noisy=options["noisy"]
             ),
         )
@@ -211,7 +211,9 @@ class Command(BaseCommand):
             options["audit_year"], sorted_chains, noisy=options["noisy"]
         )
 
-        export_chains_as_csv(options["audit_year"], sorted_chains, noisy=options["noisy"])
+        export_chains_as_csv(
+            options["audit_year"], sorted_chains, noisy=options["noisy"]
+        )
 
         logger.info(f"Found {len(sorted_chains)} resubmission chains.")
         k = input("Review markdown/CSV and press `c` to continue...")

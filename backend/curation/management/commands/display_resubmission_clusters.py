@@ -1,4 +1,4 @@
-from curation.curationlib.generate_resubmission_clusters import (
+from curation.curationlib.generate_resubmission_chains import (
     generate_resbmission_clusters,
 )
 from curation.curationlib.export_resubmission_chains import (

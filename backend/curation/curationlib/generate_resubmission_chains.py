@@ -16,19 +16,19 @@ class MinDist:
     pass
 
 
-def generate_resubmission_chains(AY=None, noisy=False):
+def get_and_generate_submission_chains_by_equivalence(AY=None, noisy=False):
     records = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
-    sorted_chains = generate_chains_from_records_by_equivalence(records, noisy=noisy)
+    sorted_chains = generate_submission_chains_by_equivalence(records, noisy=noisy)
     return sorted_chains
 
 
-def generate_resubmission_chains_by_distance(AY=None, noisy=False):
+def get_and_generate_submission_chains_by_distance(AY=None, noisy=False):
     records = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
-    sorted_chains = generate_chains_from_records_by_distance(records, noisy=noisy)
+    sorted_chains = generate_submission_chains_by_distance(records, noisy=noisy)
     return sorted_chains
 
 
-def generate_chains_from_records_by_equivalence(records, noisy=False):
+def generate_submission_chains_by_equivalence(records, noisy=False):
     """
     Group records into resubmission chains using exact field equivalence.
     We feel these fields are sufficient to avoid any false attribution.
@@ -97,7 +97,7 @@ def generate_chains_from_records_by_equivalence(records, noisy=False):
     return sorted_chains
 
 
-def generate_chains_from_records_by_distance(records, noisy=False):
+def generate_submission_chains_by_distance(records, noisy=False):
     """
     Levenshtein distance based chaining, kept for future curation actions.
 

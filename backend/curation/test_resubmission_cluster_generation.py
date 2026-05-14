@@ -5,9 +5,9 @@ from django.test import TestCase
 
 from audit.models import SingleAuditChecklist
 from config.settings import GSA_MIGRATION
-from curation.curationlib.generate_resubmission_clusters import (
-    generate_resubmission_chains,
-    generate_resubmission_chains_by_distance,
+from curation.curationlib.generate_resubmission_chains import (
+    get_and_generate_submission_chains_by_equivalence,
+    get_and_generate_submission_chains_by_distance,
 )
 
 sac_01 = {
@@ -55,7 +55,7 @@ class DistanceClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=sac_01["general_information"],
         )
-        sorted_chains = generate_resubmission_chains_by_distance("2022")
+        sorted_chains = get_and_generate_submission_chains_by_distance("2022")
         # No audits should be clustered. There is only one.
         self.assertEqual(len(sorted_chains), 0)
 
@@ -77,7 +77,7 @@ class DistanceClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=sac_01["general_information"],
         )
-        sorted_chains = generate_resubmission_chains_by_distance("2022")
+        sorted_chains = get_and_generate_submission_chains_by_distance("2022")
         # These audits should cluster, because they have the
         # same information in the critical fields.
         self.assertEqual(len(sorted_chains), 1)
@@ -107,7 +107,7 @@ class DistanceClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=gi,
         )
-        sorted_chains = generate_resubmission_chains_by_distance("2022")
+        sorted_chains = get_and_generate_submission_chains_by_distance("2022")
         # A single-character typo in the email should not prevent
         # clustering. Unlike entity names, we'll assume that email
         # addresses can be slightly inconsistent.
@@ -130,7 +130,7 @@ class DistanceClusteringTests(TestCase):
                     transition_date=sac_01["transition_date"],
                     general_information=gi,
                 )
-        sorted_chains = generate_resubmission_chains_by_distance("2022")
+        sorted_chains = get_and_generate_submission_chains_by_distance("2022")
         # With four audits on two states, I expect two clusters.
         self.assertEqual(len(sorted_chains), 2)
 
@@ -160,12 +160,12 @@ class DistanceClusteringTests(TestCase):
                     general_information=gi,
                 )
 
-        sorted_chains = generate_resubmission_chains_by_distance("2022")
+        sorted_chains = get_and_generate_submission_chains_by_distance("2022")
         # I expect two clusters, one for each UEI, and each
         # set to be of size two.
         self.assertEqual(len(sorted_chains), 2)
         for chain in sorted_chains:
-            self.assertEqual(len(s), 2)
+            self.assertEqual(len(chain), 2)
 
 
 class EquivalenceClusteringTests(TestCase):
@@ -179,7 +179,7 @@ class EquivalenceClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=sac_01["general_information"],
         )
-        sorted_chains = generate_resubmission_chains("2022")
+        sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
         self.assertEqual(len(sorted_chains), 0)
 
     def test_one_cluster_identical_fields(self):
@@ -200,7 +200,7 @@ class EquivalenceClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=sac_01["general_information"],
         )
-        sorted_chains = generate_resubmission_chains("2022")
+        sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
         self.assertEqual(len(sorted_chains), 1)
         self.assertEqual(len(sorted_chains[0]), 2)
 
@@ -224,7 +224,7 @@ class EquivalenceClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=gi,
         )
-        sorted_chains = generate_resubmission_chains("2022")
+        sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
         # Exact-match: a changed email means no shared key, so no cluster.
         self.assertEqual(len(sorted_chains), 0)
 
@@ -244,10 +244,10 @@ class EquivalenceClusteringTests(TestCase):
                     transition_date=sac_01["transition_date"],
                     general_information=gi,
                 )
-        sorted_chains = generate_resubmission_chains("2022")
+        sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
         self.assertEqual(len(sorted_chains), 2)
         for chain in sorted_chains:
-            self.assertEqual(len(s), 2)
+            self.assertEqual(len(chain), 2)
 
     def test_gsa_migration_clusters_with_matching_partial_key(self):
         """
@@ -272,7 +272,7 @@ class EquivalenceClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=gi_migration,
         )
-        sorted_chains = generate_resubmission_chains("2022")
+        sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
 
         self.assertEqual(len(sorted_chains), 1)
         self.assertEqual(len(sorted_chains[0]), 2)
@@ -300,7 +300,7 @@ class EquivalenceClusteringTests(TestCase):
             transition_date=sac_01["transition_date"],
             general_information=gi_migration,
         )
-        sorted_chains = generate_resubmission_chains("2022")
+        sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
 
         self.assertEqual(len(sorted_chains), 1)
         self.assertEqual(len(sorted_chains[0]), 2)

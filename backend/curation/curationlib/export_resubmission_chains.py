@@ -31,7 +31,9 @@ def order_reports_key(r):
 
 # Exports the same data in CSV format for analysis in a spreadsheet tool.
 def export_chains_as_csv(AY, chains, noisy=False):
-    with open(_data_path(f"{AY}-resubmission-chains-{len(chains)}.csv"), "w") as csv_file:
+    with open(
+        _data_path(f"{AY}-resubmission-chains-{len(chains)}.csv"), "w"
+    ) as csv_file:
         wr = csv.writer(csv_file)
         wr.writerow(
             [
