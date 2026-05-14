@@ -200,12 +200,13 @@ class Command(BaseCommand):
         if not ok_staff_user:
             sys.exit(-1)
 
-        sorted_chains = lfilter(
-            lambda chain: len(chain) > 1,
-            get_and_generate_submission_chains_by_equivalence(
+        sorted_chains = [
+            chain
+            for chain in get_and_generate_submission_chains_by_equivalence(
                 options["audit_year"], noisy=options["noisy"]
-            ),
-        )
+            )
+            if len(chain) > 1
+        ]
 
         export_chains_as_markdown(
             options["audit_year"], sorted_chains, noisy=options["noisy"]
