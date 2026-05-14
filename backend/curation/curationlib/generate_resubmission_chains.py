@@ -5,6 +5,7 @@ from curation.curationlib.audit_distance import (
     get_audit_year,
     set_distance,
 )
+from curation.curationlib.export_resubmission_chains import order_reports_key
 from curation.curationlib.sac_disseminated_records_postgres import (
     fetch_sac_disseminated_records_postgres,
 )
@@ -90,10 +91,11 @@ def generate_submission_chains_by_equivalence(records, noisy=False):
     # Discard chains with one lonely record.
     chains = [chain for chain in chains.values() if len(chain) > 1]
 
-    # Sort by AY. Chances are, this command is being run by the AY. In which case, this sort is a no-op.
-    # But, it lets us see any obviously wrong records and it is useful when many years are run at once.
-    # Each chain is sorted by submission date further down the line.
+    # Sort all chains by AY. Chances are, this command is being run by the AY. In which case, this sort is a no-op.
+    # But, it helps us see any obviously wrong submissions and it is useful when many years are run at once.
+    # Then, sort each chain by submission date so the oldest comes first.
     sorted_chains = sorted(chains, key=lambda chain: get_audit_year(chain[0]))
+    sorted_chains = [sorted(chain, key=order_reports_key) for chain in sorted_chains]
     return sorted_chains
 
 
@@ -140,4 +142,5 @@ def generate_submission_chains_by_distance(records, noisy=False):
     chains = [chain for chain in chains if len(chain) > 1]
 
     sorted_chains = sorted(chains, key=lambda chain: get_audit_year(chain[0]))
+    sorted_chains = [sorted(chain, key=order_reports_key) for chain in sorted_chains]
     return sorted_chains

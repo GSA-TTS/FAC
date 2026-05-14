@@ -18,7 +18,6 @@ from curation.curationlib.generate_resubmission_chains import (
 from curation.curationlib.export_resubmission_chains import (
     export_chains_as_csv,
     export_chains_as_markdown,
-    order_reports_key,
 )
 
 logger = logging.getLogger(__name__)
@@ -141,11 +140,8 @@ def annotate_old(options):
 def annotate_linked_reports(options, sorted_chains):
     u = User.objects.get(email=options["email"])
     for linked in sorted_chains:
-        # Order the chains internally by their first submitted transition.
-        # These are SAC records.
-        linked_sorted = sorted(linked, key=order_reports_key)
-        # Now, each element wants to link to the next and previous.
-        the_length = len(linked_sorted)
+        # Chains arrive sorted by submission date, oldest first.
+        the_length = len(linked)
         # range() is from [0, length) (inclusive, exclusive)
         for ndx in range(the_length - 1):
             # I want to link this to next, and visa-versa.
@@ -154,8 +150,8 @@ def annotate_linked_reports(options, sorted_chains):
             # Are they both less than the length? If so, they can be linked.
             if this_ndx < the_length and next_ndx <= the_length:
                 try:
-                    this_sac = linked_sorted[this_ndx]
-                    next_sac = linked_sorted[next_ndx]
+                    this_sac = linked[this_ndx]
+                    next_sac = linked[next_ndx]
                     point_old_to_new(this_sac, next_sac, u)
                 except IndexError:
                     # Should not get here.
