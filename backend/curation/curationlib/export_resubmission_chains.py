@@ -30,15 +30,15 @@ def order_reports_key(r):
 
 
 # Exports the same data in CSV format for analysis in a spreadsheet tool.
-def export_sets_as_csv(AY, sets, noisy=False):
-    with open(_data_path(f"{AY}-resubmission-sets-{len(sets)}.csv"), "w") as csv_file:
+def export_chains_as_csv(AY, chains, noisy=False):
+    with open(_data_path(f"{AY}-resubmission-chains-{len(chains)}.csv"), "w") as csv_file:
         wr = csv.writer(csv_file)
         wr.writerow(
             [
-                "set_index",
+                "chain_index",
                 # For distance-based matching. We may use this to catch more records in the future.
-                # "set_distance",
-                # "set_order",
+                # "distance",
+                # "order",
                 "report_id",
                 "audit_year",
                 "fac_accepted_date",
@@ -51,9 +51,9 @@ def export_sets_as_csv(AY, sets, noisy=False):
                 "prior_resubmission_meta",
             ]
         )
-        for ndx, s in enumerate(sets):
-            if len(s) > 1:
-                for r in sorted(s, key=order_reports_key):
+        for ndx, chain in enumerate(chains):
+            if len(chain) > 1:
+                for r in sorted(chain, key=order_reports_key):
                     wr.writerow(
                         [
                             ndx,
@@ -77,13 +77,13 @@ def export_sets_as_csv(AY, sets, noisy=False):
                     )
 
 
-def write_row(s, md, row_tag, key_fun):
+def write_row(chain, md, row_tag, key_fun):
     md.write(f"| {row_tag} ")
 
-    for ndx, r in enumerate(sorted(s, key=order_reports_key)):
+    for ndx, r in enumerate(sorted(chain, key=order_reports_key)):
         # Printing data is annoying.
         FIRST = ndx == 0
-        LAST = ndx == len(s) - 1
+        LAST = ndx == len(chain) - 1
 
         md.write("| ")
         md.write(key_fun(r))
@@ -93,18 +93,18 @@ def write_row(s, md, row_tag, key_fun):
     md.write(NEWLINE)
 
 
-# Exports the set data as Markdown for use on the WWW.
-def export_sets_as_markdown(AY, sets, noisy=False):
-    with open(_data_path(f"{AY}-resubmission-sets-{len(sets)}.md"), "w") as md:
+# Exports the chain data as Markdown for use on the WWW.
+def export_chains_as_markdown(AY, chains, noisy=False):
+    with open(_data_path(f"{AY}-resubmission-chains-{len(chains)}.md"), "w") as md:
 
         md.write(f"### Resubmissions for audit year {AY}" + NEWLINE + NEWLINE)
 
-        for ndx, s in enumerate(sets):
-            if len(s) > 1:
+        for ndx, chain in enumerate(chains):
+            if len(chain) > 1:
                 md.write(
-                    f"#### UEI {s[0].general_information['auditee_uei']}" + NEWLINE
+                    f"#### UEI {chain[0].general_information['auditee_uei']}" + NEWLINE
                 )
-                for ndx, _ in enumerate(s):
+                for ndx, _ in enumerate(chain):
                     if ndx in [0, 1]:
                         md.write("| ")
                     else:
@@ -112,38 +112,38 @@ def export_sets_as_markdown(AY, sets, noisy=False):
                 # We write a tag, and close. Hence extra pipes.
                 md.write(" | ... resubmitted as |" + NEWLINE)
 
-                for ndx, _ in enumerate(s):
+                for ndx, _ in enumerate(chain):
                     if ndx == 0:
                         md.write("| :-- ")
-                    if ndx == len(s) - 1:
+                    if ndx == len(chain) - 1:
                         md.write("| :-- |")
                     else:
                         md.write("| :-- ")
                 md.write(NEWLINE)
 
-                write_row(s, md, "Report ID", lambda r: r.report_id)
-                # write_row(s, md, "UEI", lambda r: r.general_information["auditee_uei"])
-                write_row(s, md, "EIN", lambda r: r.general_information["ein"])
+                write_row(chain, md, "Report ID", lambda r: r.report_id)
+                # write_row(chain, md, "UEI", lambda r: r.general_information["auditee_uei"])
+                write_row(chain, md, "EIN", lambda r: r.general_information["ein"])
                 write_row(
-                    s,
+                    chain,
                     md,
                     "Accepted",
                     lambda r: order_reports_key(r).strftime("%Y-%m-%d %H:%M:%S"),
                 )
                 write_row(
-                    s,
+                    chain,
                     md,
                     "Auditee name",
                     lambda r: r.general_information["auditee_name"],
                 )
                 write_row(
-                    s,
+                    chain,
                     md,
                     "Auditee email",
                     lambda r: r.general_information["auditee_email"],
                 )
                 write_row(
-                    s,
+                    chain,
                     md,
                     "Auditee state",
                     lambda r: r.general_information["auditee_state"],
@@ -160,8 +160,8 @@ def export_sets_as_markdown(AY, sets, noisy=False):
 # the record). This would spit out a CSV that we could use
 # for that purpose. More conversation needed, but for the moment,
 # lets leave this code here for reference.
-def export_mailmerge(AY, sets, noisy=False):
-    with open(_data_path(f"{AY}-mailmerge-{len(sets)}.csv"), "w") as csv_file:
+def export_mailmerge(AY, chains, noisy=False):
+    with open(_data_path(f"{AY}-mailmerge-{len(chains)}.csv"), "w") as csv_file:
         wr = csv.writer(csv_file)
         wr.writerow(
             [
@@ -179,11 +179,11 @@ def export_mailmerge(AY, sets, noisy=False):
                 "auditor_email",
             ]
         )
-        for ndx, s in enumerate(sets):
-            if len(s) > 1:
+        for ndx, chain in enumerate(chains):
+            if len(chain) > 1:
                 # Grab the last one. We've already decided they're
                 # essentially the same records.
-                r = sorted(s, key=order_reports_key)
+                r = sorted(chain, key=order_reports_key)
                 wr.writerow(
                     [
                         get_audit_year(r[0]),

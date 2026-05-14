@@ -65,16 +65,16 @@ def _restore_records(rows, user, noisy=False):
     Records are processed in reverse order so that a DEPRECATED record is never
     left transiently pointing at a record that has already been reset.
     """
-    # Group rows by set_index. They should come this way from the CSV, but just to be safe.
-    sets = {}
+    # Group rows by chain_index. They should come this way from the CSV, but just to be safe.
+    chains = {}
     for row in rows:
-        idx = int(row["set_index"])
-        sets.setdefault(idx, []).append(row)
+        idx = int(row["chain_index"])
+        chains.setdefault(idx, []).append(row)
 
-    # Iterate sets in descending order. Within each set, move in reverse order.
-    for set_index in sorted(sets.keys(), reverse=True):
-        set_rows = list(reversed(sets[set_index]))
-        for row in set_rows:
+    # Iterate chains in descending order. Within each chain, move in reverse order.
+    for chain_index in sorted(chains.keys(), reverse=True):
+        chain_rows = list(reversed(chains[chain_index]))
+        for row in chain_rows:
             report_id = row["report_id"]
             prior_status = row["prior_submission_status"]
             prior_meta = _parse_meta(row["prior_resubmission_meta"])

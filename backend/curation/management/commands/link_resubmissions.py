@@ -13,11 +13,11 @@ from audit.models.constants import RESUBMISSION_STATUS
 from users.models import StaffUser
 from audit.models.constants import STATUS
 from curation.curationlib.generate_resubmission_clusters import (
-    generate_resbmission_clusters,
+    generate_resubmission_chains,
 )
-from backend.curation.curationlib.export_resubmission_chains import (
-    export_sets_as_csv,
-    export_sets_as_markdown,
+from curation.curationlib.export_resubmission_chains import (
+    export_chains_as_csv,
+    export_chains_as_markdown,
     order_reports_key,
 )
 
@@ -138,10 +138,10 @@ def annotate_old(options):
         sac.redisseminate()
 
 
-def annotate_linked_reports(options, sorted_sets):
+def annotate_linked_reports(options, sorted_chains):
     u = User.objects.get(email=options["email"])
-    for linked in sorted_sets:
-        # Order the sets internally by their first submitted transition.
+    for linked in sorted_chains:
+        # Order the chains internally by their first submitted transition.
         # These are SAC records.
         linked_sorted = sorted(linked, key=order_reports_key)
         # Now, each element wants to link to the next and previous.
@@ -200,26 +200,26 @@ class Command(BaseCommand):
         if not ok_staff_user:
             sys.exit(-1)
 
-        sorted_sets = lfilter(
-            lambda s: len(s) > 1,
-            generate_resbmission_clusters(
+        sorted_chains = lfilter(
+            lambda chain: len(chain) > 1,
+            generate_resubmission_chains(
                 options["audit_year"], noisy=options["noisy"]
             ),
         )
 
-        export_sets_as_markdown(
-            options["audit_year"], sorted_sets, noisy=options["noisy"]
+        export_chains_as_markdown(
+            options["audit_year"], sorted_chains, noisy=options["noisy"]
         )
 
-        export_sets_as_csv(options["audit_year"], sorted_sets, noisy=options["noisy"])
+        export_chains_as_csv(options["audit_year"], sorted_chains, noisy=options["noisy"])
 
-        logger.info(f"Found {len(sorted_sets)} resubmission chains.")
+        logger.info(f"Found {len(sorted_chains)} resubmission chains.")
         k = input("Review markdown/CSV and press `c` to continue...")
         if k != "c":
             logger.error("Exiting.")
             sys.exit()
         else:
-            annotate_linked_reports(options, sorted_sets)
+            annotate_linked_reports(options, sorted_chains)
 
         if options["annotate_old"]:
             annotate_old(options)
