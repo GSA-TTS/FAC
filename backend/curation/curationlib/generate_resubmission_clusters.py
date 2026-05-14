@@ -5,8 +5,8 @@ from curation.curationlib.audit_distance import (
     get_audit_year,
     set_distance,
 )
-from curation.curationlib.sac_resubmission_records_postgres import (
-    fetch_sac_resubmission_records_postgres,
+from backend.curation.curationlib.sac_disseminated_records_postgres import (
+    fetch_sac_disseminated_records_postgres,
 )
 
 logger = logging.getLogger(__name__)
@@ -17,13 +17,13 @@ class MinDist:
 
 
 def generate_resbmission_clusters(AY=None, noisy=False):
-    records = fetch_sac_resubmission_records_postgres(AY=AY, noisy=noisy)
+    records = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
     sorted_sets = generate_clusters_from_records_by_equivalence(records, noisy=noisy)
     return sorted_sets
 
 
 def generate_resbmission_clusters_by_distance(AY=None, noisy=False):
-    records = fetch_sac_resubmission_records_postgres(AY=AY, noisy=noisy)
+    records = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
     sorted_sets = generate_clusters_from_records_by_distance(records, noisy=noisy)
     return sorted_sets
 

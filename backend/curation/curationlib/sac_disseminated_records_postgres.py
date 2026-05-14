@@ -3,7 +3,7 @@ from django.db.models import Q
 from audit.models import SingleAuditChecklist
 
 
-def fetch_sac_resubmission_records_postgres(AY, noisy=False):
+def fetch_sac_disseminated_records_postgres(AY, noisy=False):
     """
     Return all disseminated records for the given audit year.
 
