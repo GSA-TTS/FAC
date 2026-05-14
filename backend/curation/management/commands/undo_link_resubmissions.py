@@ -77,7 +77,14 @@ def _restore_sacs(rows, user, noisy=False):
         for row in chain_rows:
             report_id = row["report_id"]
             prior_status = row["prior_submission_status"]
-            prior_meta = _parse_meta(row["prior_resubmission_meta"])
+
+            try:
+                prior_meta = _parse_meta(row["prior_resubmission_meta"])
+            except json.JSONDecodeError:
+                logger.error(
+                    f"Invalid JSON in prior_resubmission_meta for SAC: {report_id} — skipping."
+                )
+                continue
 
             try:
                 sac = SingleAuditChecklist.objects.get(report_id=report_id)
