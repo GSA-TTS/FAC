@@ -21,7 +21,7 @@ def update_module_files(template_dir, dir, exclude_files, suffix="-managed"):
 
             print(f"Updated {dir}/{new_file}")
 
-environment_directory = ["sandbox", "preview", "dev", "staging", "production"]
+environment_directory = ["preview", "dev", "staging", "production"]
 excluded_templates = ["main.tf-template", "init.sh-template"]
 for dir in environment_directory:
     update_module_files("./bootstrap-env/templates/", dir, excluded_templates)
