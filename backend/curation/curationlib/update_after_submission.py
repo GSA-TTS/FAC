@@ -225,6 +225,7 @@ def update_authorized_public(options):
     )
     return True
 
+
 def update_tribal_entity_type(options):
     sac = get_sac_with_report_id(options)
     user = User.objects.filter(email=options["email"]).first()
@@ -248,7 +249,9 @@ def update_tribal_entity_type(options):
         certifying_email = options.get("certifying_auditee_email")
 
         if not certifying_email:
-            logger.error("certifying_auditee_email is required when switching to tribal.")
+            logger.error(
+                "certifying_auditee_email is required when switching to tribal."
+            )
             sys.exit(-1)
 
         sac.tribal_data_consent = {

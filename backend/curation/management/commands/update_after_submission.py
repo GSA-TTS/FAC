@@ -139,6 +139,7 @@ def validate_authorized_options(options):
 
     return ok_old_authorized, ok_new_authorized
 
+
 def validate_entity_type_options(options):
     old_entity_type = options["old_entity_type"]
     new_entity_type = options["new_entity_type"]
@@ -170,9 +171,7 @@ def validate_entity_type_options(options):
     if new_entity_type == "tribal" and nonelike(
         options.get("certifying_auditee_email")
     ):
-        logger.error(
-            "certifying_auditee_email is required when switching to tribal."
-        )
+        logger.error("certifying_auditee_email is required when switching to tribal.")
         return False, False
 
     return ok_old_entity_type, True
@@ -324,7 +323,7 @@ class Command(BaseCommand):
             type=str,
             help="The new auditee name for this report",
         )
-        
+
         parser.add_argument(
             "--old_entity_type",
             type=str,
