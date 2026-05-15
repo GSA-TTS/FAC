@@ -18,14 +18,14 @@ class MinDist:
 
 
 def get_and_generate_submission_chains_by_equivalence(AY=None, noisy=False):
-    records = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
-    sorted_chains = generate_submission_chains_by_equivalence(records, noisy=noisy)
+    sacs = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
+    sorted_chains = generate_submission_chains_by_equivalence(sacs, noisy=noisy)
     return sorted_chains
 
 
 def get_and_generate_submission_chains_by_distance(AY=None, noisy=False):
-    records = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
-    sorted_chains = generate_submission_chains_by_distance(records, noisy=noisy)
+    sacs = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
+    sorted_chains = generate_submission_chains_by_distance(sacs, noisy=noisy)
     return sorted_chains
 
 
