@@ -1,7 +1,7 @@
 from audit.models import SingleAuditChecklist, User, SubmissionEvent
 from audit.models.viewflow import SingleAuditChecklistFlow
 from curation.curationlib.curation_audit_tracking import CurationTracking
-from dissemination.models import _dissemination_models
+from dissemination.models import _dissemination_models, General
 
 import logging
 import sys
@@ -224,3 +224,53 @@ def update_authorized_public(options):
         SubmissionEvent.EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
     )
     return True
+
+def update_tribal_entity_type(options):
+    sac = get_sac_with_report_id(options)
+    user = User.objects.filter(email=options["email"]).first()
+
+    old_entity_type = options["old_entity_type"]
+    new_entity_type = options["new_entity_type"]
+
+    current_entity_type = sac.general_information.get("user_provided_organization_type")
+
+    if current_entity_type != old_entity_type:
+        logger.error(
+            f"Old entity type must match DB. DB: {current_entity_type} you: {old_entity_type}"
+        )
+        sys.exit(-1)
+
+    sac.general_information["user_provided_organization_type"] = new_entity_type
+
+    general = General.objects.get(report_id=sac.report_id)
+
+    if new_entity_type == "tribal":
+        certifying_email = options.get("certifying_auditee_email")
+
+        if not certifying_email:
+            logger.error("certifying_auditee_email is required when switching to tribal.")
+            sys.exit(-1)
+
+        sac.tribal_data_consent = {
+            "is_tribal_information_authorized_to_be_public": False,
+            "tribal_authorization_certifying_official_name": certifying_email,
+            "tribal_authorization_certifying_official_title": "FAC administrative correction",
+        }
+
+        general.is_public = False
+
+    else:
+        sac.tribal_data_consent = None
+        general.is_public = True
+
+    general.save()
+
+    logger.info(
+        f"Updating entity type for SAC {sac.report_id}: {old_entity_type} -> {new_entity_type}"
+    )
+
+    update_db(
+        sac,
+        user,
+        SubmissionEvent.EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
+    )
