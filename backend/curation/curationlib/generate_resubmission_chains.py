@@ -6,8 +6,8 @@ from curation.curationlib.audit_distance import (
     set_distance,
 )
 from curation.curationlib.export_resubmission_chains import order_reports_key
-from curation.curationlib.sac_disseminated_records_postgres import (
-    fetch_sac_disseminated_records_postgres,
+from curation.curationlib.fetch_sacs import (
+    fetch_disseminated_sacs_for_ay,
 )
 
 logger = logging.getLogger(__name__)
@@ -18,50 +18,50 @@ class MinDist:
 
 
 def get_and_generate_submission_chains_by_equivalence(AY=None, noisy=False):
-    sacs = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
+    sacs = fetch_disseminated_sacs_for_ay(AY=AY, noisy=noisy)
     sorted_chains = generate_submission_chains_by_equivalence(sacs, noisy=noisy)
     return sorted_chains
 
 
 def get_and_generate_submission_chains_by_distance(AY=None, noisy=False):
-    sacs = fetch_sac_disseminated_records_postgres(AY=AY, noisy=noisy)
+    sacs = fetch_disseminated_sacs_for_ay(AY=AY, noisy=noisy)
     sorted_chains = generate_submission_chains_by_distance(sacs, noisy=noisy)
     return sorted_chains
 
 
-def generate_submission_chains_by_equivalence(records, noisy=False):
+def generate_submission_chains_by_equivalence(sacs, noisy=False):
     """
-    Group records into resubmission chains using exact field equivalence.
+    Group submissions into resubmission chains using exact field equivalence.
     We feel these fields are sufficient to avoid any false attribution.
 
-    Two records belong to the same chain when they share identical values for
+    Two submissions belong to the same chain when they share identical values for
     `auditee_uei`, `audit_year`, `ein`, `auditee_name`, and `auditee_email`.
-    Records whose UEI is GSA_MIGRATION treat it as None. Those are matched on all the other fields instead.
-    GSA_MIGRATION records have a "partial" key, since the UEI is missing. We put these in buckets first.
-    When the non-migrated records are added, we try to match the "partial" part of their key with the GSA_MIGRATION records first.
+    Submissions whose UEI is GSA_MIGRATION treat it as None. Those are matched on all the other fields instead.
+    GSA_MIGRATION submissions have a "partial" key, since the UEI is missing. We put these in buckets first.
+    When the non-migrated submissions are added, we try to match the "partial" part of their key with the GSA_MIGRATION submissions first.
 
-    All chains with only one record are dropped. The final result is sorted by AY, but the buckets themselves are unsorted.
+    All chains with only one SAC are dropped. The final result is sorted by AY, but the buckets themselves are unsorted.
     """
     chains = {}
     partial_index = {}
 
-    recent_records = []
-    gsa_migration_records = []
+    recent_sacs = []
+    gsa_migration_sacs = []
 
-    for r in records:
+    for r in sacs:
         r.key = audit_equivalence_key(r)
         if r.key[0] is None:
-            gsa_migration_records.append(r)
+            gsa_migration_sacs.append(r)
         else:
-            recent_records.append(r)
+            recent_sacs.append(r)
 
-    # Insert non-migrated records first so their keys populate partial_index.
-    for rndx, r in enumerate(recent_records):
+    # Insert non-migrated submissions first so their keys populate partial_index.
+    for rndx, r in enumerate(recent_sacs):
         key = r.key  # key[0] is None
         partial = key[1:]
         if noisy:
             logger.info(
-                f"[equivalence] normal {rndx}/{len(recent_records)}: "
+                f"[equivalence] normal {rndx}/{len(recent_sacs)}: "
                 f"{r.report_id}  key={key}"
             )
         if key not in chains:
@@ -69,13 +69,13 @@ def generate_submission_chains_by_equivalence(records, noisy=False):
             partial_index[partial] = key
         chains[key].append(r)
 
-    # Now insert GSA migrated records, matching on the partial key.
-    for rndx, r in enumerate(gsa_migration_records):
+    # Now insert GSA migrated submissions, matching on the partial key.
+    for rndx, r in enumerate(gsa_migration_sacs):
         key = r.key  # key[0] is None
         partial = key[1:]
         if noisy:
             logger.info(
-                f"[equivalence] migration {rndx}/{len(gsa_migration_records)}: "
+                f"[equivalence] migration {rndx}/{len(gsa_migration_sacs)}: "
                 f"{r.report_id}  partial={partial}"
             )
         if partial in partial_index:
@@ -88,7 +88,7 @@ def generate_submission_chains_by_equivalence(records, noisy=False):
             partial_index[partial] = canonical_key
         chains[canonical_key].append(r)
 
-    # Discard chains with one lonely record.
+    # Discard chains with one lonely SAC.
     chains = [chain for chain in chains.values() if len(chain) > 1]
 
     # Sort all chains by AY. Chances are, this command is being run by the AY. In which case, this sort is a no-op.
@@ -99,21 +99,21 @@ def generate_submission_chains_by_equivalence(records, noisy=False):
     return sorted_chains
 
 
-def generate_submission_chains_by_distance(records, noisy=False):
+def generate_submission_chains_by_distance(sacs, noisy=False):
     """
     Levenshtein distance based chaining, kept for future curation actions.
 
-    For each record, compute its distance to the existing chains.
+    For each submission, compute its distance to the existing chains.
     If it is below the threshold, insert it into an existing chain.
     Otherwise, insert into a new chain.
     """
     chains = []
     THRESHOLD = 3
 
-    for rndx, r in enumerate(records):
+    for rndx, r in enumerate(sacs):
         if noisy:
             print(
-                f"Processing {rndx} of {len(records)}: {r.report_id} chains: {len(chains)}"
+                f"Processing {rndx} of {len(sacs)}: {r.report_id} chains: {len(chains)}"
             )
         # Start infinitely far apart
         md = MinDist()
@@ -138,7 +138,7 @@ def generate_submission_chains_by_distance(records, noisy=False):
             new_chain.append(r)
             chains.append(new_chain)
 
-    # Discard chains with one lonely record.
+    # Discard chains with one lonely SAC.
     chains = [chain for chain in chains if len(chain) > 1]
 
     sorted_chains = sorted(chains, key=lambda chain: get_audit_year(chain[0]))
