@@ -10,8 +10,6 @@ NOTE: The deploying account must have the OrgManager role in the target organiza
 In order to update the providers.tf across all environments, we do not want to update them manually in each. Inside `terraform/meta/bootstrap-env/templates/` we have a list of files that serve as the common templates. Update those according to your changes, and then navigate to `terraform/meta/` and run `python update-managed-files.py`. This will update the shared files across all environments like so:
 ```
 $ python update-managed-files.py
-Updated sandbox/providers-managed.tf
-Updated sandbox/variables-managed.tf
 Updated preview/providers-managed.tf
 Updated preview/variables-managed.tf
 Updated dev/providers-managed.tf

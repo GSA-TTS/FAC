@@ -116,233 +116,205 @@ Each environment has its own module, which relies on a shared module for everyth
 
 ```bash
 # ./FAC/terraform/
-├── README.md
 ├── dev
-│   ├── dev.tf
-│   ├── dev.tf-example
-│   ├── dev.tfplan
-│   ├── imports.tf
-│   ├── init.sh
-│   ├── providers-managed.tf
-│   ├── secrets.auto.tfvars
-│   ├── variables-managed.tf
-│   └── variables.tf
+│   ├── dev.tf
+│   ├── dev.tf-example
+│   ├── imports.tf
+│   ├── init.sh
+│   ├── providers-managed.tf
+│   ├── variables-managed.tf
+│   └── variables.tf
 ├── meta
-│   ├── README.md
-│   ├── bootstrap
-│   │   ├── import.sh
-│   │   ├── main.tf
-│   │   ├── providers.tf
-│   │   ├── run.sh
-│   │   ├── secrets.auto.tfvars
-│   │   ├── teardown_creds.sh
-│   │   └── variables.tf
-│   ├── bootstrap-env
-│   │   ├── deployer.tf
-│   │   ├── environment.tf
-│   │   ├── modulefiles.tf
-│   │   ├── providers.tf
-│   │   ├── space.tf
-│   │   ├── templates
-│   │   │   ├── init.sh-template
-│   │   │   ├── main.tf-template
-│   │   │   ├── providers.tf-template
-│   │   │   └── variables.tf-template
-│   │   └── variables.tf
-│   ├── config.tf
-│   ├── imports.tf
-│   ├── init.sh
-│   ├── meta.tf
-│   ├── providers.tf
-│   ├── secrets.auto.tfvars
-│   └── variables.tf
-├── out.txt
+│   ├── bootstrap
+│   │   ├── import.sh
+│   │   ├── main.tf
+│   │   ├── providers.tf
+│   │   ├── run.sh
+│   │   ├── teardown_creds.sh
+│   │   └── variables.tf
+│   ├── bootstrap-env
+│   │   ├── deployer.tf
+│   │   ├── environment.tf
+│   │   ├── providers.tf
+│   │   ├── space.tf
+│   │   ├── templates
+│   │   │   ├── init.sh-template
+│   │   │   ├── main.tf-template
+│   │   │   ├── providers.tf-template
+│   │   │   └── variables.tf-template
+│   │   └── variables.tf
+│   ├── config.tf
+│   ├── imports.tf
+│   ├── init.sh
+│   ├── meta.tf
+│   ├── providers.tf
+│   ├── README.md
+│   ├── update-managed-files.py
+│   └── variables.tf
+├── metabase-config
+│   └── config
+│       ├── backend.tfvars
+│       └── preview.tfvars
 ├── preview
-│   ├── imports.tf
-│   ├── init.sh
-│   ├── preview.tf
-│   ├── preview.tf-example
-│   ├── preview.tfplan
-│   ├── providers-managed.tf
-│   ├── secrets.auto.tfvars
-│   ├── variables-managed.tf
-│   └── variables.tf
+│   ├── imports.tf
+│   ├── init.sh
+│   ├── preview.tf
+│   ├── preview.tf-example
+│   ├── providers-managed.tf
+│   ├── variables-managed.tf
+│   └── variables.tf
 ├── production
-│   ├── imports.tf
-│   ├── init.sh
-│   ├── production.tf
-│   ├── production.tf-example
-│   ├── production.tfplan
-│   ├── providers-managed.tf
-│   ├── secrets.auto.tfvars
-│   ├── variables-managed.tf
-│   └── variables.tf
-├── sandbox
-│   ├── README.md
-│   ├── helper_scripts
-│   │   ├── apply.sh
-│   │   ├── create_tfvars.sh
-│   │   ├── destroy.sh
-│   │   ├── init.sh
-│   │   └── plan.sh
-│   ├── imports.tf
-│   ├── providers.tf
-│   ├── sandbox.tf
-│   ├── sandbox.tfplan
-│   ├── secrets.auto.tfvars
-│   └── variables.tf
+│   ├── imports.tf
+│   ├── init.sh
+│   ├── production.tf
+│   ├── production.tf-example
+│   ├── providers-managed.tf
+│   ├── variables-managed.tf
+│   └── variables.tf
+├── README.md
 ├── shared
-│   ├── config
-│   │   ├── backend.tfvars
-|   |   ├── sandbox-backend.tfvars
-│   │   ├── dev.tfvars
-│   │   ├── preview.tfvars
-│   │   ├── production.tfvars
-│   │   ├── sandbox.tfvars
-│   │   └── staging.tfvars
-│   └── modules
-│       ├── app
-│       │   ├── app.tf
-│       │   ├── app.zip
-│       │   ├── outputs.tf
-│       │   ├── prepare_app.sh
-│       │   ├── providers.tf
-│       │   └── variables.tf
-│       ├── archived_modules
-│       │   ├── https-proxy
-│       │   │   ├── README.md
-│       │   │   ├── acl.tftpl
-│       │   │   ├── https-proxy.tf
-│       │   │   ├── outputs.tf
-│       │   │   ├── prepare-proxy.sh
-│       │   │   ├── providers.tf
-│       │   │   ├── proxy.zip
-│       │   │   ├── test
-│       │   │   │   ├── README.md
-│       │   │   │   ├── https-proxy-test.tf
-│       │   │   │   ├── index.html
-│       │   │   │   ├── prepare-client.sh
-│       │   │   │   ├── terraform.tfvars-template
-│       │   │   │   └── validate.sh
-│       │   │   └── variables.tf
-│       │   └── sandbox-proxy
-│       │       ├── README.md
-│       │       ├── acl.tftpl
-│       │       ├── https-proxy.tf
-│       │       ├── outputs.tf
-│       │       ├── prepare-proxy.sh
-│       │       ├── providers.tf
-│       │       ├── proxy.zip
-│       │       ├── test
-│       │       │   ├── README.md
-│       │       │   ├── https-proxy-test.tf
-│       │       │   ├── index.html
-│       │       │   ├── prepare-client.sh
-│       │       │   ├── terraform.tfvars-template
-│       │       │   └── validate.sh
-│       │       └── variables.tf
-│       ├── cg-logshipper
-│       │   ├── cg-logshipper.tf
-│       │   ├── fluentbit_config
-│       │   │   └── fluentbit.conf
-│       │   ├── logshipper.zip
-│       │   ├── outputs.tf
-│       │   ├── prepare-logshipper.sh
-│       │   ├── providers.tf
-│       │   ├── readme.md
-│       │   └── variables.tf
-│       ├── cors
-│       │   ├── cors-script.sh
-│       │   ├── cors.tf
-│       │   ├── dev-cors.json
-│       │   ├── preview-cors.json
-│       │   ├── production-cors.json
-│       │   ├── sandbox-cors.json
-│       │   ├── staging-cors.json
-│       │   └── variables.tf
-│       ├── env
-│       │   ├── clamav.tf
-│       │   ├── cors.tf
-│       │   ├── env.tf
-│       │   ├── https-proxy.tf
-│       │   ├── logshipper.tf
-│       │   ├── newrelic.tf
-│       │   ├── policies.tf
-│       │   ├── postgrest.tf
-│       │   ├── providers.tf
-│       │   ├── scanner.tf
-│       │   ├── smtp-proxy.tf
-│       │   └── variables.tf
-│       ├── newrelic
-│       │   ├── alerts.tf
-│       │   ├── dashboards.tf
-│       │   ├── high_level_page.json.tftpl
-│       │   ├── logreview.tf
-│       │   ├── management_widgets.json.tftpl
-│       │   ├── monitoring.tf
-│       │   ├── monitoring_dashboard.json.tftpl
-│       │   ├── providers.tf
-│       │   ├── variables.tf
-│       │   └── widgets.json.tftpl
-│       ├── sandbox
-│       │   ├── app.tf
-│       │   ├── clamav.tf
-│       │   ├── env.tf
-│       │   ├── https-proxy.tf
-│       │   ├── logshipper.tf
-│       │   ├── newrelic.tf
-│       │   ├── policies.tf
-│       │   ├── postgrest.tf
-│       │   ├── providers.tf
-│       │   ├── scanner.tf
-│       │   └── variables.tf
-│       ├── scanner
-│       │   ├── outputs.tf
-│       │   ├── prepare-scanner.sh
-│       │   ├── providers.tf
-│       │   ├── readme.md
-│       │   ├── scanner.tf
-│       │   ├── scanner.zip
-│       │   └── variables.tf
-│       └── stream-proxy
-│           ├── README.md
-│           ├── app
-│           │   └── nginx.conf
-│           ├── outputs.tf
-│           ├── prepare-proxy.sh
-│           ├── providers.tf
-│           ├── proxy.zip
-│           ├── stream-proxy.tf
-│           ├── testconfig.sh
-│           ├── tests
-│           │   └── default
-│           │       ├── README.md
-│           │       ├── app
-│           │       │   └── index.html
-│           │       ├── prepare-client.sh
-│           │       ├── stream-proxy-test.tf
-│           │       ├── terraform.tfvars-template
-│           │       └── validate.sh
-│           └── variables.tf
+│   ├── config
+│   │   ├── backend.tfvars
+│   │   ├── dev.tfvars
+│   │   ├── preview.tfvars
+│   │   ├── production.tfvars
+│   │   └── staging.tfvars
+│   └── modules
+│       ├── app
+│       │   ├── app.tf
+│       │   ├── outputs.tf
+│       │   ├── prepare_app.sh
+│       │   ├── providers.tf
+│       │   ├── readme.md
+│       │   └── variables.tf
+│       ├── archived_modules
+│       │   ├── https-proxy
+│       │   │   ├── acl.tftpl
+│       │   │   ├── https-proxy.tf
+│       │   │   ├── outputs.tf
+│       │   │   ├── prepare-proxy.sh
+│       │   │   ├── providers.tf
+│       │   │   ├── proxy.zip
+│       │   │   ├── README.md
+│       │   │   ├── test
+│       │   │   │   ├── https-proxy-test.tf
+│       │   │   │   ├── index.html
+│       │   │   │   ├── prepare-client.sh
+│       │   │   │   ├── README.md
+│       │   │   │   ├── terraform.tfvars-template
+│       │   │   │   └── validate.sh
+│       │   │   └── variables.tf
+│       │   └── sandbox-proxy
+│       │       ├── acl.tftpl
+│       │       ├── https-proxy.tf
+│       │       ├── outputs.tf
+│       │       ├── prepare-proxy.sh
+│       │       ├── providers.tf
+│       │       ├── proxy.zip
+│       │       ├── README.md
+│       │       ├── test
+│       │       │   ├── https-proxy-test.tf
+│       │       │   ├── index.html
+│       │       │   ├── prepare-client.sh
+│       │       │   ├── README.md
+│       │       │   ├── terraform.tfvars-template
+│       │       │   └── validate.sh
+│       │       └── variables.tf
+│       ├── cg-logshipper
+│       │   ├── cg-logshipper.tf
+│       │   ├── fluentbit_config
+│       │   │   └── fluentbit.conf
+│       │   ├── logshipper.zip
+│       │   ├── outputs.tf
+│       │   ├── prepare-logshipper.sh
+│       │   ├── providers.tf
+│       │   ├── readme.md
+│       │   └── variables.tf
+│       ├── cors
+│       │   ├── cors-script.sh
+│       │   ├── cors.tf
+│       │   ├── dev-cors.json
+│       │   ├── preview-cors.json
+│       │   ├── production-cors.json
+│       │   ├── staging-cors.json
+│       │   └── variables.tf
+│       ├── env
+│       │   ├── clamav.tf
+│       │   ├── cors.tf
+│       │   ├── env.tf
+│       │   ├── https-proxy.tf
+│       │   ├── logshipper.tf
+│       │   ├── metabase.tf
+│       │   ├── newrelic.tf
+│       │   ├── policies.tf
+│       │   ├── postgrest.tf
+│       │   ├── providers.tf
+│       │   ├── scanner.tf
+│       │   ├── smtp-proxy.tf
+│       │   └── variables.tf
+│       ├── metabase
+│       │   ├── metabase.tf
+│       │   ├── outputs.tf
+│       │   ├── providers.tf
+│       │   ├── readme.md
+│       │   └── variables.tf
+│       ├── newrelic
+│       │   ├── alerts.tf
+│       │   ├── dashboards.tf
+│       │   ├── high_level_page.json.tftpl
+│       │   ├── logreview.tf
+│       │   ├── management_widgets.json.tftpl
+│       │   ├── monitoring_dashboard.json.tftpl
+│       │   ├── monitoring.tf
+│       │   ├── providers.tf
+│       │   ├── readme.md
+│       │   ├── variables.tf
+│       │   └── widgets.json.tftpl
+│       ├── scanner
+│       │   ├── outputs.tf
+│       │   ├── prepare-scanner.sh
+│       │   ├── providers.tf
+│       │   ├── readme.md
+│       │   ├── scanner.tf
+│       │   ├── scanner.zip
+│       │   └── variables.tf
+│       └── stream-proxy
+│           ├── app
+│           │   └── nginx.conf
+│           ├── outputs.tf
+│           ├── prepare-proxy.sh
+│           ├── providers.tf
+│           ├── proxy.zip
+│           ├── README.md
+│           ├── stream-proxy.tf
+│           ├── testconfig.sh
+│           ├── tests
+│           │   └── default
+│           │       ├── app
+│           │       │   └── index.html
+│           │       ├── prepare-client.sh
+│           │       ├── README.md
+│           │       ├── stream-proxy-test.tf
+│           │       ├── terraform.tfvars-template
+│           │       └── validate.sh
+│           └── variables.tf
 └── staging
     ├── imports.tf
     ├── init.sh
     ├── providers-managed.tf
-    ├── secrets.auto.tfvars
     ├── staging.tf
     ├── staging.tf-example
-    ├── staging.tfplan
     ├── variables-managed.tf
     └── variables.tf
 ```
 
-In the shared `base` module:
-- `base.tf` sets up the common resources for all environments
+In the shared `terraform/shared/modules/env` module:
+- `env.tf` sets up the common resources for all environments
 - `variables.tf` lists the per-env-configurable variables, and the production defaults
 
 In the environment-specific modules:
 - `providers.tf` lists the required providers
-- `main.tf` calls the shared Terraform `base` module, but this is also a place where you can add any other services, resources, etc, which you would like to set up for that environment
+- `main.tf` calls the shared Terraform `env` module, but this is also a place where you can add any other services, resources, etc, which you would like to set up for that environment
 - `variables.tf` lists the variables that will be needed, either to pass through to the child module or for use in this module
 - `deployer-creds.auto.tfvars` is a file which contains the information about the service-key and other secrets that should not be shared
 
