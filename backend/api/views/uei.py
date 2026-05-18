@@ -29,21 +29,21 @@ class UEIValidationFormView(APIView):
             auditee_uei = data["auditee_uei"]
 
             # General.audit_year is a TextField, so compare as string
-            dup_ids = list(
+            duplicates = list(
                 General.objects.filter(
                     auditee_uei=auditee_uei,
                     audit_year=str(audit_year),
-                ).values_list("report_id", flat=True)
+                ).values("report_id", "auditee_name")
             )
 
-            if dup_ids:
+            if duplicates:
                 return Response(
                     {
                         "valid": False,
                         "errors": ["duplicate-submission"],
                         "response": {
                             **sam_payload,
-                            "duplicates": [{"report_id": rid} for rid in dup_ids],
+                            "duplicates": duplicates,
                         },
                     }
                 )
