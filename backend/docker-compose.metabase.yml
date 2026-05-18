@@ -1,3 +1,9 @@
+# =============================================================
+# docker-compose.metabase.yml
+# Runs the Metabase services.
+# Usage: docker compose -f docker-compose.metabase.yml up
+# To run with the app: docker compose -f docker-compose.yml -f docker-compose.metabase.yml up
+# =============================================================
 services:
   #---------------------------------------------
   # Metabase app
