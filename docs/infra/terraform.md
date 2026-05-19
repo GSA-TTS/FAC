@@ -3,7 +3,7 @@
 ### Introduction
 We use a variety of modules, custom or shared in order to handle our underlying infrastructure components. They are broken apart into environments, with a `shared` folder that handles the components that are not unique and will be applied to each environment.
 
-### Using terraform at the FAC
+### Using Terraform at the FAC
 The majority of documentation can be found in the [Folder Readme](../../terraform/README.md) which details specific installation instructions. Some steps may be dependent on OS(Mac, WSL2, Linux) particularly for installing the terraform binary and setting it in your $PATH.
 
 Each custom module has their own readme which includes a small overview, diagram (if applicable) and usage parameters.
@@ -16,9 +16,7 @@ Detailed below is a reference to, with a description of, each of our various mod
 * [Staging](../../terraform/staging/staging.tf)
 * [Production](../../terraform/production/production.tf)
 * [Preview](../../terraform/preview/preview.tf)
-* [Sandbox](../../terraform/sandbox/sandbox.tf)
 * [Meta](../../terraform/meta/meta.tf)
-    * Each of these module files details their respective parameters that are passed when using the `cloudfoundry/cloudfoundry` provider. Each module has a `source = "../shared/modules/env"` with the exception of sandbox which has a source of `source = "../shared/modules/sandbox"`. The two folders are relatively the same, and hold the components that go into the environments. The `env/` folder exclusively references components for Dev, Staging, Production & Preview, where the `sandbox/` folder exclusively references the components for Sandbox. Meta is an exception here, but more information is available below.
 
 **Meta and the Environment Bootstrap:**
 * [Meta - Config](../../terraform/meta/config.tf)
@@ -40,7 +38,7 @@ Detailed below is a reference to, with a description of, each of our various mod
 * [Fac File Scanner](../../terraform/shared/modules/scanner/readme.md)
     * A lightweight flask application that periodically scans a targeted folder in the live s3 bucket for viruses and malware, post submission. This is done as an ATO requirement to retroactively perform scans. We also perform scans when the file gets submitted through the UI of the application.
 * [Application](../../terraform/shared/modules/app/readme.md)
-    * A module responsible for deploying the core application to the Sandbox environment.
+    * A module responsible for deploying the core application. This is not currently used in any of the environments
 * [Metabase](../../terraform/shared/modules/metabase/readme.md)
     * A module for deploying the metabase service to any environment. This is used for dashboarding purposes.
 
@@ -65,10 +63,3 @@ Detailed below is a reference to, with a description of, each of our various mod
     * Configuration file for the File Scanner module.
 * [SMTP Proxy](../../terraform/shared/modules/env/smtp-proxy.tf)
     * Largely OBE'd. A configuration file for the SMTP Proxy.
-
-**Sandbox Components that aren't shared across all environments:**
-* [Application](../../terraform/shared/modules/sandbox/app.tf)
-    * Configuration file for deploying the FAC Application.
-* [Metabase](../../terraform/shared/modules/sandbox/metabase.tf)
-    * Configuration file for deploying the Metabase Application.
-
