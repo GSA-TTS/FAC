@@ -157,7 +157,7 @@ class Command(BaseCommand):
 
         # We should have bailed earlier if the CSV is empty. In case the parsing went wrong, exit when no report_ids are found.
         if len(report_ids) == 0:
-            logger.info(f"Exiting.")
+            logger.info("Exiting.")
             sys.exit(0)
 
         if options["noisy"]:

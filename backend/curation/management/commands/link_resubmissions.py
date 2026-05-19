@@ -217,7 +217,7 @@ class Command(BaseCommand):
         len_sorted_chains = len(sorted_chains)
         logger.info(f"Found {len_sorted_chains} resubmission chains.")
         if len_sorted_chains == 0:
-            logger.info(f"Exiting.")
+            logger.info("Exiting.")
             sys.exit(0)
 
         k = input("Review markdown/CSV and enter `c` to continue:")

@@ -101,7 +101,11 @@ class Command(BaseCommand):
         for sac in sacs:
             sac.resubmission_meta = {
                 "version": 1 if options["set_most_recent"] else 0,
-                "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT if options["set_most_recent"] else RESUBMISSION_STATUS.UNKNOWN,
+                "resubmission_status": (
+                    RESUBMISSION_STATUS.MOST_RECENT
+                    if options["set_most_recent"]
+                    else RESUBMISSION_STATUS.UNKNOWN
+                ),
             }
             sac.submission_status = STATUS.DISSEMINATED
 
