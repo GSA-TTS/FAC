@@ -1,6 +1,13 @@
 from django.contrib import admin
 from .models import EditRecord
 
+from curation.curationlib.update_after_submission import (
+    update_uei,
+    update_authorized_public,
+    update_simple_gen_field,
+    update_tribal_entity_type,
+)
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -71,7 +78,10 @@ class EditRecordAdmin(SupportAdmin):
 
     def save_model(self, request, obj, form, change):
         obj.editor_email = request.user.email
+
         logger.info(
-            f"EditRecord saved: {request.user.email} edited report {obj.report_id}, field: {obj.field_to_edit}"
+            f"EditRecord saved: {request.user.email} edited report {obj.report_id}, "
+            f"field: {obj.field_to_edit}"
         )
+
         super().save_model(request, obj, form, change)

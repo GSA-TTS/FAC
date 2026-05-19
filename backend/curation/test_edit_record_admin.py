@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from model_bakery import baker
 
 from django.contrib.admin.sites import AdminSite
@@ -113,8 +113,7 @@ class TestEditRecordAdmin(TestCase):
     # -------------------------------------------------------------------------
 
     def test_save_model_uei_field_saves_successfully(self):
-        """save_model should store the old UEI on the record and the replacement in new_value."""
-        self.assertEqual(self.sac.general_information["auditee_uei"], OLD_UEI)
+        """save_model should dispatch UEI updates successfully."""
 
         obj = baker.prepare(
             EditRecord,
@@ -126,17 +125,31 @@ class TestEditRecordAdmin(TestCase):
         )
         form = MagicMock()
 
-        self.admin.save_model(self.request, obj, form, change=False)
-        self.sac.refresh_from_db()
-        obj.refresh_from_db()
+        with patch("curation.models.validate_inputs", return_value=True), patch(
+            "curation.models.update_uei"
+        ) as mock_update:
+            self.admin.save_model(self.request, obj, form, change=False)
 
-        self.assertEqual(self.sac.general_information["auditee_uei"], NEW_UEI)
+        mock_update.assert_called_once_with(
+            {
+                "report_id": REPORT_ID,
+                "email": self.user.email,
+                "old_uei": OLD_UEI,
+                "new_uei": NEW_UEI,
+                "old_ein": None,
+                "new_ein": None,
+                "old_auditee_name": None,
+                "new_auditee_name": None,
+                "old_authorization": None,
+                "new_authorization": None,
+            }
+        )
+
+        obj.refresh_from_db()
         self.assertEqual(obj.status, "success")
 
     def test_save_model_ein_field_saves_successfully(self):
-        """save_model should store the old EIN on the record and the replacement in new_value."""
-        # request = self._make_request(self.user)
-        self.assertEqual(self.sac.general_information["ein"], OLD_EIN)
+        """save_model should dispatch EIN updates successfully."""
 
         obj = baker.prepare(
             EditRecord,
@@ -148,16 +161,32 @@ class TestEditRecordAdmin(TestCase):
         )
         form = MagicMock()
 
-        self.admin.save_model(self.request, obj, form, change=False)
-        self.sac.refresh_from_db()
-        obj.refresh_from_db()
+        with patch("curation.models.validate_inputs", return_value=True), patch(
+            "curation.models.update_simple_gen_field"
+        ) as mock_update:
+            self.admin.save_model(self.request, obj, form, change=False)
 
-        self.assertEqual(self.sac.general_information["ein"], NEW_EIN)
+        mock_update.assert_called_once_with(
+            {
+                "report_id": REPORT_ID,
+                "email": self.user.email,
+                "old_uei": None,
+                "new_uei": None,
+                "old_ein": OLD_EIN,
+                "new_ein": NEW_EIN,
+                "old_auditee_name": None,
+                "new_auditee_name": None,
+                "old_authorization": None,
+                "new_authorization": None,
+            },
+            "ein",
+        )
+
+        obj.refresh_from_db()
         self.assertEqual(obj.status, "success")
 
     def test_save_model_auditee_name_field_saves_successfully(self):
-        """save_model should store the old auditee_name on the record and the replacement in new_value."""
-        self.assertEqual(self.sac.general_information["auditee_name"], OLD_AUDITEE_NAME)
+        """save_model should dispatch auditee name updates successfully."""
 
         obj = baker.prepare(
             EditRecord,
@@ -169,9 +198,27 @@ class TestEditRecordAdmin(TestCase):
         )
         form = MagicMock()
 
-        self.admin.save_model(self.request, obj, form, change=False)
-        self.sac.refresh_from_db()
-        obj.refresh_from_db()
+        with patch("curation.models.validate_inputs", return_value=True), patch(
+            "curation.models.update_simple_gen_field"
+        ) as mock_update:
+            self.admin.save_model(self.request, obj, form, change=False)
 
-        self.assertEqual(self.sac.general_information["auditee_name"], NEW_AUDITEE_NAME)
+        mock_update.assert_called_once_with(
+            {
+                "report_id": REPORT_ID,
+                "email": self.user.email,
+                "old_uei": None,
+                "new_uei": None,
+                "old_ein": None,
+                "new_ein": None,
+                "old_auditee_name": OLD_AUDITEE_NAME,
+                "new_auditee_name": NEW_AUDITEE_NAME,
+                "old_authorization": None,
+                "new_authorization": None,
+            },
+            "auditee_name",
+        )
+
+        obj.refresh_from_db()
         self.assertEqual(obj.status, "success")
+
