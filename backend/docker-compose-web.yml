@@ -5,7 +5,6 @@
 # Usage: docker compose -f docker-compose-web.yml up
 # =============================================================
 
-
 services:
   db:
     image: "postgres:15"
