@@ -232,6 +232,7 @@ def update_tribal_entity_type(options):
 
     old_entity_type = options["old_entity_type"]
     new_entity_type = options["new_entity_type"]
+    make_private = status_to_bool(options.get("make_private", "true"))
 
     current_entity_type = sac.general_information.get("user_provided_organization_type")
 
@@ -255,12 +256,12 @@ def update_tribal_entity_type(options):
             sys.exit(-1)
 
         sac.tribal_data_consent = {
-            "is_tribal_information_authorized_to_be_public": False,
+            "is_tribal_information_authorized_to_be_public": not make_private,
             "tribal_authorization_certifying_official_name": certifying_email,
             "tribal_authorization_certifying_official_title": "FAC administrative correction",
         }
 
-        general.is_public = False
+        general.is_public = not make_private
 
     else:
         sac.tribal_data_consent = None

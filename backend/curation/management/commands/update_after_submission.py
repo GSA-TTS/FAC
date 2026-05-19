@@ -342,6 +342,14 @@ class Command(BaseCommand):
             help="The certifying auditee email required when switching to tribal",
         )
 
+        parser.add_argument(
+            "--make_private",
+            type=str,
+            choices=["true", "false"],
+            default="true",
+            help="Whether to make the dissemination record non-public when updating entity type.",
+        )
+
     def handle(self, *args, **options):
         valid_inputs = validate_inputs(options)
         if not valid_inputs:

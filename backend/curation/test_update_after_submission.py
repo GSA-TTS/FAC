@@ -436,6 +436,7 @@ class UpdateTribalEntityTypeTests(TestCase):
             "old_entity_type": "non-profit",
             "new_entity_type": "tribal",
             "certifying_auditee_email": CERTIFYING_AUDITEE_EMAIL,
+            "make_private": "true",
         }
 
         with patch(
@@ -499,6 +500,7 @@ class UpdateTribalEntityTypeTests(TestCase):
             "old_entity_type": "tribal",
             "new_entity_type": "non-profit",
             "certifying_auditee_email": None,
+            "make_private": "true",
         }
 
         with patch(
@@ -519,4 +521,60 @@ class UpdateTribalEntityTypeTests(TestCase):
             "non-profit",
         )
         self.assertIsNone(sac.tribal_data_consent)
+        self.assertEqual(general.is_public, True)
+
+    def test_update_non_tribal_to_public_tribal(self):
+        user = baker.make(User)
+        user.email = "test@fac.gsa.gov"
+        user.save()
+
+        general_information = sac_01["general_information"].copy()
+        general_information["user_provided_organization_type"] = "non-profit"
+
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=general_information,
+            tribal_data_consent=None,
+        )
+
+        baker.make(
+            General,
+            report_id=sac_01["report_id"],
+            is_public=True,
+        )
+
+        options = {
+            "report_id": sac_01["report_id"],
+            "email": user.email,
+            "old_entity_type": "non-profit",
+            "new_entity_type": "tribal",
+            "certifying_auditee_email": CERTIFYING_AUDITEE_EMAIL,
+            "make_private": "false",
+        }
+
+        with patch(
+            "curation.curationlib.update_after_submission.update_db"
+        ) as mock_update_db:
+            mock_update_db.side_effect = lambda sac, user, event_type: sac.save(
+                administrative_override=True,
+                event_user=user,
+                event_type=event_type,
+            )
+            update_tribal_entity_type(options)
+
+        sac = SingleAuditChecklist.objects.get(report_id=sac_01["report_id"])
+        general = General.objects.get(report_id=sac_01["report_id"])
+
+        self.assertEqual(
+            sac.general_information["user_provided_organization_type"],
+            "tribal",
+        )
+        self.assertEqual(
+            sac.tribal_data_consent["is_tribal_information_authorized_to_be_public"],
+            True,
+        )
         self.assertEqual(general.is_public, True)
