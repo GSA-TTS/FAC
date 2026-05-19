@@ -30,15 +30,15 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
 
         # First, find out if we should bother.
         # FIXME: Can we pass more information back? The 403 does not answer "why."
-        if sac_1.resubmission_meta is None:
-            raise PermissionDenied("There is no prior submission for this audit.")
         # We will accept the "next" audit, because compare_with_prev can figure out
         # which audit to compare to which, in order to be more forgiving.
-        if (
+        if sac_1.resubmission_meta is None or (
             "previous_report_id" not in sac_1.resubmission_meta
             and "next_report_id" not in sac_1.resubmission_meta
         ):
-            raise PermissionDenied("There is nothing to compare this audit with.")
+            raise PermissionDenied(
+                "The audit provided does not have any associated audits to compare with."
+            )
 
         #############################################
         # We are doing the permissions checking here instead of a mixin.
