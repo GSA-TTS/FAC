@@ -31,9 +31,8 @@ def order_reports_key(r):
 
 # Exports the same data in CSV format for analysis in a spreadsheet tool.
 def export_chains_as_csv(AY, chains, noisy=False):
-    with open(
-        _data_path(f"{AY}-resubmission-chains-{len(chains)}.csv"), "w"
-    ) as csv_file:
+    filename = _data_path(f"{AY}-resubmission-chains-{len(chains)}.csv")
+    with open(filename, "w") as csv_file:
         wr = csv.writer(csv_file)
         wr.writerow(
             [
@@ -77,6 +76,7 @@ def export_chains_as_csv(AY, chains, noisy=False):
                             ),
                         ]
                     )
+    return filename
 
 
 def write_row(chain, md, row_tag, key_fun):
@@ -95,9 +95,14 @@ def write_row(chain, md, row_tag, key_fun):
     md.write(NEWLINE)
 
 
-# Exports the chain data as Markdown for use on the WWW.
 def export_chains_as_markdown(AY, chains, noisy=False):
-    with open(_data_path(f"{AY}-resubmission-chains-{len(chains)}.md"), "w") as md:
+    """
+    Exports the chain data as Markdown for use on the WWW.
+
+    Returns the path to the file.
+    """
+    filename = _data_path(f"{AY}-resubmission-chains-{len(chains)}.md")
+    with open(filename, "w") as md:
 
         md.write(f"### Resubmissions for audit year {AY}" + NEWLINE + NEWLINE)
 
@@ -153,6 +158,7 @@ def export_chains_as_markdown(AY, chains, noisy=False):
 
                 md.write(NEWLINE)
                 md.write(NEWLINE)
+    return filename
 
 
 # export_mailmerge

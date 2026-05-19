@@ -154,11 +154,17 @@ class Command(BaseCommand):
         # Display a little summary of what will be undone before touching any submissions.
         report_ids = [r["report_id"] for r in rows]
         logger.info(f"CSV contains {len(rows)} submissions.")
+
+        # We should have bailed earlier if the CSV is empty. In case the parsing went wrong, exit when no report_ids are found.
+        if len(report_ids) == 0:
+            logger.info(f"Exiting.")
+            sys.exit(0)
+
         if options["noisy"]:
             for rid in report_ids:
                 logger.info(f"  {rid}")
 
-        k = input("\nPress `c` to continue...")
+        k = input("\nPress `c` to continue:")
         if k != "c":
             logger.error("Exiting.")
             sys.exit()

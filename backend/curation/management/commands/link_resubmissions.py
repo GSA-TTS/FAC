@@ -204,16 +204,23 @@ class Command(BaseCommand):
             if len(chain) > 1
         ]
 
-        export_chains_as_markdown(
+        filename_markdown = export_chains_as_markdown(
             options["audit_year"], sorted_chains, noisy=options["noisy"]
         )
+        logger.info(f"Submission chains markdown exported to {filename_markdown}.")
 
-        export_chains_as_csv(
+        filename_csv = export_chains_as_csv(
             options["audit_year"], sorted_chains, noisy=options["noisy"]
         )
+        logger.info(f"Submission chain CSV exported to {filename_csv}.")
 
-        logger.info(f"Found {len(sorted_chains)} resubmission chains.")
-        k = input("Review markdown/CSV and press `c` to continue...")
+        len_sorted_chains = len(sorted_chains)
+        logger.info(f"Found {len_sorted_chains} resubmission chains.")
+        if len_sorted_chains == 0:
+            logger.info(f"Exiting.")
+            sys.exit(0)
+
+        k = input("Review markdown/CSV and enter `c` to continue:")
         if k != "c":
             logger.error("Exiting.")
             sys.exit()

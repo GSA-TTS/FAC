@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.db import transaction
 
 from audit.models import SingleAuditChecklist, SubmissionEvent, User
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from users.models import StaffUser
 
 logger = logging.getLogger(__name__)
@@ -32,11 +32,18 @@ class Command(BaseCommand):
             help="One or more specific report IDs to reset",
         )
         parser.add_argument(
+            "--set_most_recent",
+            type=bool,
+            required=False,
+            help="Whether to set affected records as status 'Most Recent'. Otherwise, they will have 'Unknown' status.",
+        )
+        parser.add_argument(
             "--email",
             type=str,
             required=True,
             help="The email of the FAC staff running this command",
         )
+        parser.set_defaults(set_most_recent=False)
 
     def handle(self, *args, **options):
         # Verify staff user. Note that it's VERY hard to get here without already being staff.
@@ -83,7 +90,7 @@ class Command(BaseCommand):
 
         logger.info(f"Found {len(sacs)} submissions for {label}.")
 
-        k = input("\nPress `c` to continue...")
+        k = input("\nEnter `c` to continue:")
         if k != "c":
             logger.error("Exiting.")
             sys.exit()
@@ -93,8 +100,8 @@ class Command(BaseCommand):
 
         for sac in sacs:
             sac.resubmission_meta = {
-                "version": 0,
-                "resubmission_status": "no_resubmission_data",
+                "version": 1 if options["set_most_recent"] else 0,
+                "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT if options["set_most_recent"] else RESUBMISSION_STATUS.UNKNOWN,
             }
             sac.submission_status = STATUS.DISSEMINATED
 
