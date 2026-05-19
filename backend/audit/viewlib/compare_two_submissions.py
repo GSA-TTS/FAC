@@ -142,6 +142,7 @@ def _get_keysets(sac1, sac2, keys):
     map1 = {}
     for h, o in zip(loh1, ls1):
         map1[h] = o
+
     map2 = {}
     for h, o in zip(loh2, ls2):
         map2[h] = o
@@ -153,8 +154,15 @@ def _get_keysets(sac1, sac2, keys):
 
 
 def _only_in(ks1, ks2, map1, map2, extract_fun, keys):
+    """
+    using keysets to perform set operations
+
+    """
     in_r1 = list()
     in_r2 = list()
+
+    # we subtract one set from another to determine what elements
+    # only exist in that particular set
 
     # Keys only in ks1
     only_in_1 = ks1 - ks2
@@ -320,9 +328,13 @@ def compare_single_audit_reports(
                     {
                         "from": f"{sha1[0:4]}...{sha1[-4:]}",
                         "to": f"{sha2[0:4]}...{sha2[-4:]}",
-                        "key": "SHA256",
+                        "key": "preview",
                     },
-                    {"from": len(pdf1_bytes), "to": len(pdf2_bytes), "key": "length"},
+                    {
+                        "from": f"{len(pdf1_bytes)} bytes",
+                        "to": f"{len(pdf2_bytes)} bytes",
+                        "key": "file length",
+                    },
                 ],
             }
     elif not pdf1 and not pdf2:
@@ -361,8 +373,6 @@ def are_two_sacs_identical(sac1, sac2):
     fields = [
         "submission_status",
         "data_source",
-        # "transition_name",
-        # "transition_date",
         "report_id",
         "audit_type",
         "general_information",
@@ -393,8 +403,8 @@ def are_two_sacs_identical(sac1, sac2):
 #    "general": { "status": "same" }
 #    "federal_awards": {
 #       "status": "changed",
-#       "r1_minus_r2": [...], # What is in (or changed in) r1 that is not in r2?
-#       "r2_minus_r1": [...]  # What is in (or changed in) r2 that is not in r1?
+#       "in_r1": [...], # What is in (or changed in) r1 that is not in r2?
+#       "in_r2": [...]  # What is in (or changed in) r2 that is not in r1?
 # }
 #
 # Consider using deepdiff
@@ -549,5 +559,5 @@ def compare_with_prev(rid):
             report_id_as_string(rid),
             compare_report_ids(prev, rid),
         )
-
-    return {"status": "error", "message": "No resubmission_meta in sac."}
+    else:
+        return {"status": "error", "message": "No resubmission_meta in sac."}

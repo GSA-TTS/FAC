@@ -16,15 +16,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# http://localhost:8000/audit/compare/2023-06-GSAFAC-0000000697
-# http://localhost:8000/audit/compare/2023-06-GSAFAC-0000002166
-# http://localhost:8000/audit/compare/2022-12-GSAFAC-0000001787
-# http://localhost:8000/audit/compare/2023-06-GSAFAC-0000002901
-# http://localhost:8000/audit/compare/2023-06-GSAFAC-0000013043
-# http://localhost:8000/audit/compare/2023-06-GSAFAC-0000005147
-# http://localhost:8000/audit/compare/2023-06-GSAFAC-0000001699
-# http://localhost:8000/audit/compare/2022-12-GSAFAC-0000007921
-
 
 class CompareSubmissionsView(LoginRequiredMixin, generic.View):
 

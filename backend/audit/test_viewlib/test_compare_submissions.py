@@ -9,6 +9,7 @@ from audit.viewlib.compare_two_submissions import (
     deep_getattr,
     compare_lists_of_objects,
     are_two_sacs_identical,
+    _get_keysets,
 )
 from audit.models import SingleAuditChecklist
 from model_bakery import baker
@@ -398,6 +399,36 @@ class CompareSubmissionTests(TestCase):
                 "in_both": [],
             },
         )
+
+    def test_get_keysets(self):
+        d1 = {
+            "a": 1,
+            "b": [{"name": "one", "value": 2}, {"name": "three", "value": 5}],
+            "c": 5,
+        }
+        d2 = {
+            "a": 1,
+            "b": [{"name": "one", "value": 2}, {"name": "three", "value": 4}],
+            "c": 3,
+        }
+
+        ks1, ks2, map1, map2 = _get_keysets(d1, d2, ["b"])
+
+        # Keys only in ks1
+        only_in_1 = ks1 - ks2
+        # Keys only in ks2
+        only_in_2 = ks2 - ks1
+
+        in_r1 = list()
+        in_r2 = list()
+
+        for k in only_in_1:
+            in_r1.append(map1[k])
+        for k in only_in_2:
+            in_r2.append(map2[k])
+
+        self.assertEqual(in_r1, [{"name": "three", "value": 5}])
+        self.assertEqual(in_r2, [{"name": "three", "value": 4}])
 
     def test_identical_sacs(self):
         setup_mock_db()

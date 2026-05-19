@@ -35,8 +35,8 @@
           <thead>
             <tr>
               <th scope="col">Element</th>
-              <th scope="col">{{ r1 | slice:"15:" }}</th>
-              <th scope="col">{{ r2 | slice:"15:" }}</th>
+              <th scope="col">Old value</th>
+              <th scope="col">New value</th>
             </tr>
           </thead>
           {% for d in changed.in_r1|dictsort:"key" %}
@@ -72,8 +72,8 @@
           <thead>
             <tr>
               <th scope="col">Element</th>
-              <th scope="col">{{ r1 | slice:"15:" }}</th>
-              <th scope="col">{{ r2 | slice:"15:" }}</th>
+              <th scope="col">Old value</th>
+              <th scope="col">New value</th>
             </tr>
           </thead>
           {% for d in changed.in_r2|dictsort:"key" %}
@@ -109,8 +109,8 @@
           <thead>
             <tr>
               <th scope="col">Element</th>
-              <th scope="col">{{ r1 | slice:"15:" }}</th>
-              <th scope="col">{{ r2 | slice:"15:" }}</th>
+              <th scope="col">Old value</th>
+              <th scope="col">New value</th>
             </tr>
           </thead>
           {% for d in changed.in_both|dictsort:"key" %}
@@ -121,6 +121,8 @@
               <td>
                 {% if d.from is None %}
                   No value
+                {% elif section == "single_audit_report" and d.key == "preview" %}
+                   <a href="{% url 'audit:PredisseminationPdfDownload' r1 %}" target="_blank">{{ r1 }}</a>
                 {% else %}
                   {{ d.from }}
                 {% endif %}
@@ -128,6 +130,8 @@
               <td>
                 {% if d.to is None %}
                   No value
+                {% elif section == "single_audit_report" and d.key == "preview" %}
+                   <a href="{% url 'audit:PredisseminationPdfDownload' r2 %}" target="_blank">{{ r2 }}</a>
                 {% else %}
                   {{ d.to }}
                 {% endif %}
