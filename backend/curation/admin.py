@@ -1,13 +1,6 @@
 from django.contrib import admin
 from .models import EditRecord
 
-from curation.curationlib.update_after_submission import (
-    update_uei,
-    update_authorized_public,
-    update_simple_gen_field,
-    update_tribal_entity_type,
-)
-
 import logging
 
 logger = logging.getLogger(__name__)

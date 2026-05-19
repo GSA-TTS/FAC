@@ -221,4 +221,3 @@ class TestEditRecordAdmin(TestCase):
 
         obj.refresh_from_db()
         self.assertEqual(obj.status, "success")
-
