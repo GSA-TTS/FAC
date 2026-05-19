@@ -155,7 +155,18 @@ def _get_keysets(sac1, sac2, keys):
 
 def _only_in(ks1, ks2, map1, map2, extract_fun, keys):
     """
-    using keysets to perform set operations
+    using substractive set operations we can remove duplicates between
+    sets and report differences between them (set1 vs set2)
+
+    Args:
+        ks1: set of hashed keys pulled from map1
+        ks2: set of hashed keys pulled from map2
+        map1: map consisting of (hashed key, object)
+        map2: map consisting of (hashed key, object)
+
+    Returns:
+        in_r1: list of items in set1 but not in set2
+        in_r2: list of items in set2 but not in set1
 
     """
     in_r1 = list()
