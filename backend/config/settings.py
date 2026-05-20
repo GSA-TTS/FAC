@@ -560,7 +560,7 @@ STATIC_SITE_URL = "https://fac.gov/"
 
 # OMB-assigned values. Number doesn't change, date does.
 OMB_NUMBER = "3090-0330"
-OMB_EXP_DATE = "09/30/2026"
+OMB_EXP_DATE = "04/30/2029"
 
 # APP-level constants
 CENSUS_DATA_SOURCE = "CENSUS"
