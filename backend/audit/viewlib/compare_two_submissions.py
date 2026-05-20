@@ -96,7 +96,26 @@ def getattr_default(obj, key, default=None):
 
 
 def deep_getattr(o, lok, default=None):
+    """
+    1. makes a 'deep copy of a SAC object'
+    2. then uses the list of keys to parse out the attributes we want
+    3. we walk the object tree of the copied object by resetting it to
+       a new copy of what was retreived by the key!
+    4. returns results of the final key (which is an array of dicts)
+
+    Args:
+        o: SAC python object
+        lok: list of keys - used to parse our SAC python object
+        default: default to using the 'None' object
+
+    Returns:
+        oprime: the final array of items
+    """
     oprime = deepcopy(o)
+
+    # walking down the object tree to get the keys we want
+    # we update 'oprime' as we get to a branch and continue to walk
+    # down the tree
     for ndx, key in enumerate(lok):
         # print(f"{ndx+1} of {len(lok)} getting {key} in {oprime} {type(oprime)}")
         if oprime is None:
