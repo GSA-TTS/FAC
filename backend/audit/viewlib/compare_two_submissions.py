@@ -303,24 +303,35 @@ def get_s3_object(client, bucket_name, key):
     return file
 
 
-def compare_single_audit_reports(
+def compare_single_audit_reports(  # noqa: C901
     sac1: SingleAuditChecklist, sac2: SingleAuditChecklist
 ):
-    # I don't think we've ever grabbed PDFs from within an app/command before.
-    # FIXME: Should these be ordered, if there is more than one?
     sar1 = SingleAuditReportFile.objects.filter(sac=sac1)
     sar2 = SingleAuditReportFile.objects.filter(sac=sac2)
 
+    # seems there can be multiple copies !
     # Make sure they both exist/have PDFs associated with them.
     if len(sar1) == 0:
         return {"status": f"no single audit report found for {sac1.report_id}"}
     if len(sar2) == 0:
         return {"status": f"no single audit report found for {sac2.report_id}"}
 
-    # Use the first. Why? Why are there possibly multiple?
-    # I think there shouldn't be.
-    sar1 = sar1.first()
-    sar2 = sar2.first()
+    # return the lastest version, else revert to the first version!
+    try:
+        sar1 = sar1.latest("date_created")
+    except SingleAuditReportFile.DoesNotExist:
+        logger.error(
+            f"could not retrieve latest single audit report for {sar1.filename}"
+        )
+        sar1 = sar1.first()
+
+    try:
+        sar2 = sar2.latest("date_created")
+    except SingleAuditReportFile.DoesNotExist:
+        logger.error(
+            f"could not retrieve latest single audit report for {sar2.filename}"
+        )
+        sar2 = sar2.first()
 
     client = boto3.client(
         "s3",
