@@ -111,6 +111,8 @@ def deep_getattr(o, lok, default=None):
     Returns:
         oprime: the final array of items
     """
+
+    # make a deep copy of an object we plan to 'walk'
     oprime = deepcopy(o)
 
     # walking down the object tree to get the keys we want
