@@ -95,7 +95,7 @@ def getattr_default(obj, key, default=None):
         return default
 
 
-def deep_getattr(o, lok, default=None):
+def deep_getattr(obj, key_path, default=None):
     """
     1. makes a 'deep copy of a SAC object'
     2. then uses the list of keys to parse out the attributes we want
@@ -104,33 +104,33 @@ def deep_getattr(o, lok, default=None):
     4. returns results of the final key (which is an array of dicts)
 
     Args:
-        o: SAC python object
-        lok: list of keys - used to parse our SAC python object
+        obj: SAC python object
+        key_path: list of keys - used to parse our SAC python object
         default: default to using the 'None' object
 
     Returns:
-        oprime: the final array of items
+        current: the final array of items
     """
 
     # make a deep copy of an object we plan to 'walk'
-    oprime = deepcopy(o)
+    current = deepcopy(obj)
 
     # walking down the object tree to get the keys we want
-    # we update 'oprime' as we get to a branch and continue to walk
+    # we update 'current' as we get to a branch and continue to walk
     # down the tree
-    for ndx, key in enumerate(lok):
-        # print(f"{ndx+1} of {len(lok)} getting {key} in {oprime} {type(oprime)}")
-        if oprime is None:
+    for ndx, key in enumerate(key_path):
+        # print(f"{ndx+1} of {len(key_path)} getting {key} in {current} {type(current)}")
+        if current is None:
             return default
         else:
-            if isinstance(oprime, dict):
-                oprime = oprime.get(key, default)
+            if isinstance(current, dict):
+                current = current.get(key, default)
             else:
                 try:
-                    oprime = getattr(oprime, key)
+                    current = getattr(current, key)
                 except AttributeError:
-                    oprime = default
-    return oprime
+                    current = default
+    return current
 
 
 def _get_keysets(sac1, sac2, keys):
