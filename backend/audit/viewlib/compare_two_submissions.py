@@ -129,7 +129,7 @@ def deep_getattr(obj, key_path, default=None):
                 try:
                     current = getattr(current, key)
                 except AttributeError:
-                    current = default
+                    return default
     return current
 
 
