@@ -124,7 +124,9 @@ def deep_getattr(obj, key_path, default=None):
             return default
         else:
             if isinstance(current, dict):
-                current = current.get(key, default)
+                if key not in current:
+                    return default
+                current = current[key]
             else:
                 try:
                     current = getattr(current, key)
