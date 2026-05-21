@@ -1,4 +1,10 @@
----
+# =============================================================
+# docker-compose-web.yml
+# Pulls the app image from the container registry.
+# Primarily used in CI workflows for executing tests.
+# Usage: docker compose -f docker-compose-web.yml up
+# =============================================================
+
 services:
   db:
     image: "postgres:15"
