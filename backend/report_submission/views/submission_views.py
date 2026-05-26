@@ -76,12 +76,16 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
         info_check = api.views.auditee_info_check(request.user, formatted_post_with_sam)
         if not info_check.get("info_check_passed"):
-            logger.error(f"SAM auditee metadata failed to validate for {auditee_uei}; discarding")
+            logger.error(
+                f"SAM auditee metadata failed to validate for {auditee_uei}; discarding"
+            )
             logger.error(info_check["errors"])
 
             info_check = api.views.auditee_info_check(request.user, formatted_post)
             if not info_check.get("info_check_passed"):
-                logger.error(f"Auditee metadata failed to validate for {auditee_uei}; returning to auditee info page")
+                logger.error(
+                    f"Auditee metadata failed to validate for {auditee_uei}; returning to auditee info page"
+                )
                 logger.error(info_check["errors"])
 
                 return redirect(reverse("report_submission:auditeeinfo"))
