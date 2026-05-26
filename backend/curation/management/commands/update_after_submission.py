@@ -174,6 +174,14 @@ def validate_entity_type_options(options):
         logger.error("certifying_auditee_email is required when switching to tribal.")
         return False, False
 
+    if new_entity_type == "tribal" and nonelike(options.get("make_private")):
+        logger.error("make_private is required when switching to tribal.")
+        return False, False
+
+    if old_entity_type == "tribal" and nonelike(options.get("make_private")):
+        logger.error("make_private is required when switching from tribal.")
+        return False, False
+
     return ok_old_entity_type, True
 
 
@@ -346,7 +354,6 @@ class Command(BaseCommand):
             "--make_private",
             type=str,
             choices=["true", "false"],
-            default="true",
             help="Whether to make the dissemination record non-public when updating entity type.",
         )
 
@@ -371,4 +378,19 @@ class Command(BaseCommand):
         elif not nonelike(options["old_entity_type"]) and not nonelike(
             options["new_entity_type"]
         ):
+            if (
+                options["old_entity_type"] == "tribal"
+                and status_to_bool(options["make_private"]) is False
+            ):
+                confirmation = input(
+                    "WARNING: You are switching a tribal record and setting make_private=false. "
+                    "This may make the record public. Type y to continue: "
+                )
+
+                if confirmation.lower() != "y":
+                    logger.error(
+                        "User did not confirm unprivating tribal record. Exiting."
+                    )
+                    sys.exit(-1)
+
             update_tribal_entity_type(options)

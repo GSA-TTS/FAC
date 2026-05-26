@@ -232,7 +232,7 @@ def update_tribal_entity_type(options):
 
     old_entity_type = options["old_entity_type"]
     new_entity_type = options["new_entity_type"]
-    make_private = status_to_bool(options.get("make_private", "true"))
+    make_private = status_to_bool(options["make_private"])
 
     current_entity_type = sac.general_information.get("user_provided_organization_type")
 
@@ -265,9 +265,7 @@ def update_tribal_entity_type(options):
 
     else:
         sac.tribal_data_consent = None
-        general.is_public = True
-
-    general.save()
+        general.is_public = not make_private
 
     logger.info(
         f"Updating entity type for SAC {sac.report_id}: {old_entity_type} -> {new_entity_type}"
@@ -278,3 +276,8 @@ def update_tribal_entity_type(options):
         user,
         SubmissionEvent.EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
     )
+
+    # Re-fetch dissemination row after redissemination
+    general = General.objects.get(report_id=sac.report_id)
+    general.is_public = not make_private
+    general.save()

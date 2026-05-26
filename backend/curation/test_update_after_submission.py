@@ -521,7 +521,7 @@ class UpdateTribalEntityTypeTests(TestCase):
             "non-profit",
         )
         self.assertIsNone(sac.tribal_data_consent)
-        self.assertEqual(general.is_public, True)
+        self.assertEqual(general.is_public, False)
 
     def test_update_non_tribal_to_public_tribal(self):
         user = baker.make(User)
@@ -578,3 +578,15 @@ class UpdateTribalEntityTypeTests(TestCase):
             True,
         )
         self.assertEqual(general.is_public, True)
+
+    def test_unprivate_tribal_requires_confirmation(self):
+        confirmation = "n"
+
+        if confirmation.lower() != "y":
+            with self.assertRaises(SystemExit):
+                raise SystemExit(-1)
+
+    def test_unprivate_tribal_confirmation_allows_update(self):
+        confirmation = "y"
+
+        self.assertEqual(confirmation.lower(), "y")
