@@ -1,3 +1,10 @@
+# =============================================================
+# docker-compose.yml
+# Builds the app image from source and is used for local development.
+# Used in CI workflows for PR checks
+# Usage: docker compose up
+# =============================================================
+
 services:
   #---------------------------------------------
   # Postgres DB
