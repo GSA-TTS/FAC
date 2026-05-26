@@ -83,7 +83,7 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
             if not info_check.get("info_check_passed"):
                 logger.error(f"Auditee metadata failed to validate for {auditee_uei}; returning to auditee info page")
                 logger.error(info_check["errors"])
-                
+
                 return redirect(reverse("report_submission:auditeeinfo"))
 
         return redirect(reverse("report_submission:eligibility"))
