@@ -95,7 +95,7 @@ def getattr_default(obj, key, default=None):
         return default
 
 
-def deep_getattr(obj, key_path, default=None):
+def deep_getattr(obj, path_keys, default=None):
     """
     1. makes a 'deep copy of a SAC object'
     2. then uses the list of keys to parse out the attributes we want
@@ -105,7 +105,7 @@ def deep_getattr(obj, key_path, default=None):
 
     Args:
         obj: SAC python object
-        key_path: list of keys - used to parse our SAC python object
+        path_keys: list of keys - used to parse our SAC python object
         default: default to using the 'None' object
 
     Returns:
@@ -118,8 +118,8 @@ def deep_getattr(obj, key_path, default=None):
     # walking down the object tree to get the keys we want
     # we update 'current' as we get to a branch and continue to walk
     # down the tree
-    for ndx, key in enumerate(key_path):
-        # print(f"{ndx+1} of {len(key_path)} getting {key} in {current} {type(current)}")
+    for ndx, key in enumerate(path_keys):
+        # print(f"{ndx+1} of {len(path_keys)} getting {key} in {current} {type(current)}")
         if current is None:
             return default
         else:
@@ -250,17 +250,19 @@ def _filter_r1_r2(map1, map2, in_r1, in_r2, extract_fun, keys):
 def compare_lists_of_objects(
     sac1: SingleAuditChecklist,
     sac2: SingleAuditChecklist,
-    keys: list,
+    path_keys: list,
     extract_fun: Callable[[dict], Any],
 ):
-    ks1, ks2, map1, map2 = _get_keysets(sac1, sac2, keys)
+    ks1, ks2, map1, map2 = _get_keysets(sac1, sac2, path_keys)
 
     # If the maps are identical, we can just return now.
     if map1 == map2:
         return {"status": "same"}
 
-    in_r1, in_r2, res = _only_in(ks1, ks2, map1, map2, extract_fun, keys)
-    in_r1, in_r2, in_both = _filter_r1_r2(map1, map2, in_r1, in_r2, extract_fun, keys)
+    in_r1, in_r2, res = _only_in(ks1, ks2, map1, map2, extract_fun, path_keys)
+    in_r1, in_r2, in_both = _filter_r1_r2(
+        map1, map2, in_r1, in_r2, extract_fun, path_keys
+    )
 
     # Now, a final mangling of "in_both".
     # This lets us present the data differently when something changes from one to the other and we're dealing with objects.
@@ -442,6 +444,13 @@ def are_two_sacs_identical(sac1, sac2):
     return they_are_the_same
 
 
+class WorkbookAccessor:
+    def __init__(self, path_keys, extract_fun):
+        self.path_keys = path_keys
+        self.extract_fun = extract_fun
+        self.start_key = path_keys[0]
+
+
 # We want to take two report IDs, and return something that looks like
 #
 # {
@@ -469,7 +478,10 @@ def compare_report_ids(rid_1, rid_2):
 
     # Do an early check, and bail if the same.
     if are_two_sacs_identical(sac_r1, sac_r2):
-        return {"status": "identical"}
+        return {
+            "status": "identical",
+            "message": "The Single Audit Checklists are the same.",
+        }
 
     summary = {}
     ###############
@@ -483,76 +495,114 @@ def compare_report_ids(rid_1, rid_2):
     summary["audit_information"] = res
 
     ###############
-    # all the forms that have lists of things.
-    accessors = [
-        [
-            ["federal_awards", "FederalAwards", "federal_awards"],
-            lambda entry: entry["award_reference"],
-        ],
-        [
-            [
-                "corrective_action_plan",
-                "CorrectiveActionPlan",
-                "corrective_action_plan_entries",
-            ],
-            lambda entry: entry["reference_number"],
-        ],
-        [
-            [
-                "findings_text",
-                "FindingsText",
-                "findings_text_entries",
-            ],
-            lambda entry: entry["reference_number"],
-        ],
-        [
-            [
-                "findings_uniform_guidance",
-                "FindingsUniformGuidance",
-                "findings_uniform_guidance_entries",
-            ],
-            lambda entry: entry["program"]["award_reference"]
-            + "/"
-            + entry["findings"]["reference_number"],
-        ],
-        [
-            [
-                "additional_ueis",
-                "AdditionalUeis",
-                "additional_ueis_entries",
-            ],
-            lambda entry: entry["additional_uei"],
-        ],
-        [
-            [
-                "additional_eins",
-                "AdditionalEINs",
-                "additional_eins_entries",
-            ],
-            lambda entry: entry["additional_ein"],
-        ],
-        [
-            [
-                "secondary_auditors",
-                "SecondaryAuditors",
-                "secondary_auditors_entries",
-            ],
-            lambda entry: entry["secondary_auditor_name"],
-        ],
-        [
-            [
-                "notes_to_sefa",
-                "NotesToSefa",
-                "notes_to_sefa_entries",
-            ],
-            lambda entry: str(entry["seq_number"]) + ": " + entry["note_title"],
-        ],
-    ]
+    # federal_award
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        ["federal_awards", "FederalAwards", "federal_awards"],
+        lambda entry: entry["award_reference"],
+    )
+    summary["federal_awards"] = res
 
-    for ls in accessors:
-        # logger.info(f"{ls[0][0]}")
-        res = compare_lists_of_objects(sac_r1, sac_r2, ls[0], ls[1])
-        summary[ls[0][0]] = res
+    ###############
+    # corrective_action_plan
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "corrective_action_plan",
+            "CorrectiveActionPlan",
+            "corrective_action_plan_entries",
+        ],
+        lambda entry: entry["reference_number"],
+    )
+    summary["corrective_action_plan"] = res
+
+    ###############
+    # findings_text
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "findings_text",
+            "FindingsText",
+            "findings_text_entries",
+        ],
+        lambda entry: entry["reference_number"],
+    )
+    summary["findings_text"] = res
+
+    ###############
+    # findings_uniform_guidance
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "findings_uniform_guidance",
+            "FindingsUniformGuidance",
+            "findings_uniform_guidance_entries",
+        ],
+        lambda entry: entry["program"]["award_reference"]
+        + "/"
+        + entry["findings"]["reference_number"],
+    )
+    summary["findings_uniform_guidance"] = res
+
+    ###############
+    # additional_ueis
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "additional_ueis",
+            "AdditionalUeis",
+            "additional_ueis_entries",
+        ],
+        lambda entry: entry["additional_uei"],
+    )
+    summary["additional_ueis"] = res
+
+    ###############
+    # additional_eins
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "additional_eins",
+            "AdditionalEINs",
+            "additional_eins_entries",
+        ],
+        lambda entry: entry["additional_ein"],
+    )
+    summary["additional_eins"] = res
+
+    ###############
+    # secondary_auditors
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "secondary_auditors",
+            "SecondaryAuditors",
+            "secondary_auditors_entries",
+        ],
+        lambda entry: entry["secondary_auditor_name"],
+    )
+    summary["secondary_auditors"] = res
+
+    ###############
+    # notes_to_sefa
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "notes_to_sefa",
+            "NotesToSefa",
+            "notes_to_sefa_entries",
+        ],
+        lambda entry: str(entry["seq_number"]) + ": " + entry["note_title"],
+    )
+    summary["notes_to_sefa"] = res
 
     ###############
     # tribal_data_consent
@@ -605,4 +655,7 @@ def compare_with_prev(rid):
             compare_report_ids(prev, rid),
         )
     else:
-        return {"status": "error", "message": "No resubmission_meta in sac."}
+        return {
+            "status": "error",
+            "message": "There's no resubmission info for {rid}. If this seems to be an error, contact the FAC helpdesk.",
+        }

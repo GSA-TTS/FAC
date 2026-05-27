@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class CompareSubmissionsView(LoginRequiredMixin, generic.View):
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: C901
         report_id = kwargs["report_id"]
         current_user = request.user
 
@@ -83,14 +83,23 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
         for k in compared.keys():
             nice_names[k] = k.replace("_", " ").title()
 
-        # does our SACs have any differences ?
         has_diffs = False
+        has_error = False
+
         for val in compared.values():
+            if val == "error":
+                has_error = True
+                break
+            if val == "identical":
+                break
+            if val["status"] == "error":
+                break
             if val["status"] != "same":
                 has_diffs = True
                 break
 
         context = context | {"has_diffs": has_diffs}
+        context = context | {"has_error": has_error}
         context = context | {"nice_names": nice_names}
         context = context | {"r1": report_id_1}
         context = context | {"r2": report_id_2}

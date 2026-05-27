@@ -4,24 +4,33 @@
   this is broken out so that it can be embedded in a Federal view without the trappings, 
     if we decide that is desirable/necessary.
 {% endcomment %}
-{% if not has_diffs %}
-  <div class="grid-row width-full">
-    <div class="tablet:grid-col">
-      <h2>There are no changes between Single Audit Reports</h2>
+
+{% if has_error %}
+  {%if comparison.status == "error" %}
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col">
+        <h2>{{ comparison.message }}</h2>
+      </div>
     </div>
-  </div>
+  {% endif %}
+{% else %}
+  {% if not has_diffs %}
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col">
+        <h2>There are no changes between Single Audit Reports</h2>
+      </div>
+    </div>
+  {% endif %}
 {% endif %}
 {% for section, changed in comparison.items %}
-  {% if changed.status == "same" %}
-    <!-- <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div> -->
-  {% elif changed.status == "error" %}
+  {% if changed.status == "error" %}
     <div class="grid-row width-full">
       <div class="tablet:grid-col">
         <h2>Changes in {{ nice_names | KV:section }}</h2>
       </div>
     </div>
     <div class="grid-row"><div class="tablet:grid-col"><p>Error: {{ changed.message }} </p></div></div>
-  {% else %}
+  {% elif changed.status == "changed" %}
     <div class="grid-row width-full">
       <div class="tablet:grid-col">
         <h2>Changes in {{ nice_names | KV:section }}</h2>
@@ -142,5 +151,8 @@
       </div>
     </div>
     {% endif %}
+  {% else %}
+    <!-- same or identical -->
+    <!-- <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div> -->    
   {% endif %} <!-- for the big is changed/same -->
 {% endfor %} <!-- end section loop -->
