@@ -6,7 +6,7 @@
 {% endcomment %}
 
 {% if has_error %}
-  {%if comparison.status == "error" %}
+  {% if comparison.status == "error" %}
     <div class="grid-row width-full">
       <div class="tablet:grid-col">
         <h2>{{ comparison.message }}</h2>
