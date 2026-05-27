@@ -158,6 +158,7 @@ def validate_entity_type_options(options):
                 f"Old entity type must match DB. "
                 f"DB: {current_entity_type} you: {old_entity_type}"
             )
+            return False, False
 
     except ObjectDoesNotExist as e:
         logger.error(e)
