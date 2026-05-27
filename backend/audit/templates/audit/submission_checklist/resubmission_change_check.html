@@ -7,7 +7,9 @@
   </div>
   <div>
     <p class="text-bold margin-0">
-      <a href="{% url 'audit:CompareSubmissions' report_id %}">Review changes in this resubmission</a>
+      <a class="usa-link" href="{% url 'audit:CompareSubmissions' report_id %}">
+        Review changes in this resubmission
+      </a>
     </p>
     <p class="margin-top-2">
       Compare this resubmission with <a class="usa-link" href="{% url 'audit:SubmissionProgress' previous_report_id %}">{{ previous_report_id }}</a>.
