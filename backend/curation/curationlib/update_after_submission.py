@@ -274,11 +274,8 @@ def update_tribal_entity_type(options):
             "tribal_authorization_certifying_official_title": "FAC administrative correction",
         }
 
-        general.is_public = not make_private
-
     else:
         sac.tribal_data_consent = None
-        general.is_public = not make_private
 
     logger.info(
         f"Updating entity type for SAC {sac.report_id}: {old_entity_type} -> {new_entity_type}"
