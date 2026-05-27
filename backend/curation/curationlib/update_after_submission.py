@@ -234,14 +234,6 @@ def update_tribal_entity_type(options):
     new_entity_type = options["new_entity_type"]
     make_private = status_to_bool(options["make_private"])
 
-    current_entity_type = sac.general_information.get("user_provided_organization_type")
-
-    if current_entity_type != old_entity_type:
-        logger.error(
-            f"Old entity type must match DB. DB: {current_entity_type} you: {old_entity_type}"
-        )
-        sys.exit(-1)
-
     sac.general_information["user_provided_organization_type"] = new_entity_type
 
     general = General.objects.get(report_id=sac.report_id)
