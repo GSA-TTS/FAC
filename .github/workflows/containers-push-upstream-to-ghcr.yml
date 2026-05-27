@@ -51,9 +51,6 @@ jobs:
           timeout: 15m0s
           ignore-unfixed: true
 
-      # - name: Scan Image
-      #   run: docker run aquasec/trivy:latest image --db-repository public.ecr.aws/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db --java-db-repository public.ecr.aws/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}
-
       - name: Tag Image
         run: |
           date=$(date +%Y%m%d)
