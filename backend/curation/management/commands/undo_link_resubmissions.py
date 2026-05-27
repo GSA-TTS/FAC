@@ -11,6 +11,7 @@ from audit.models import (
     SubmissionEvent,
     User,
 )
+from audit.models.constants import RESUBMISSION_STATUS
 from users.models import StaffUser
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ def _parse_meta(raw):
     if raw == "" or raw is None:
         return {
             "version": 0,
-            "resubmission_status": "no_resubmission_data",
+            "resubmission_status": RESUBMISSION_STATUS.UNKNOWN,
         }
     return json.loads(raw)
 
