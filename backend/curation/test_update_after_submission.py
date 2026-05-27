@@ -406,6 +406,26 @@ class UpdatePublicAuthorizationForTribalAudits(TestCase):
 
 class UpdateTribalEntityTypeTests(TestCase):
 
+    def mock_update_db_side_effect(self, sac, user, event_type):
+        sac.save(
+            administrative_override=True,
+            event_user=user,
+            event_type=event_type,
+        )
+
+        general = General.objects.get(report_id=sac.report_id)
+
+        authorization = (sac.tribal_data_consent or {}).get(
+            "is_tribal_information_authorized_to_be_public"
+        )
+
+        if authorization is not None:
+            general.is_public = authorization
+        else:
+            general.is_public = True
+
+        general.save()
+
     def test_update_non_tribal_to_tribal(self):
         user = baker.make(User)
         user.email = "test@fac.gsa.gov"
@@ -442,11 +462,8 @@ class UpdateTribalEntityTypeTests(TestCase):
         with patch(
             "curation.curationlib.update_after_submission.update_db"
         ) as mock_update_db:
-            mock_update_db.side_effect = lambda sac, user, event_type: sac.save(
-                administrative_override=True,
-                event_user=user,
-                event_type=event_type,
-            )
+            mock_update_db.side_effect = self.mock_update_db_side_effect
+
             update_tribal_entity_type(options)
 
         sac = SingleAuditChecklist.objects.get(report_id=sac_01["report_id"])
@@ -506,11 +523,8 @@ class UpdateTribalEntityTypeTests(TestCase):
         with patch(
             "curation.curationlib.update_after_submission.update_db"
         ) as mock_update_db:
-            mock_update_db.side_effect = lambda sac, user, event_type: sac.save(
-                administrative_override=True,
-                event_user=user,
-                event_type=event_type,
-            )
+            mock_update_db.side_effect = self.mock_update_db_side_effect
+
             update_tribal_entity_type(options)
 
         sac = SingleAuditChecklist.objects.get(report_id=sac_01["report_id"])
@@ -521,7 +535,7 @@ class UpdateTribalEntityTypeTests(TestCase):
             "non-profit",
         )
         self.assertIsNone(sac.tribal_data_consent)
-        self.assertEqual(general.is_public, False)
+        self.assertEqual(general.is_public, True)
 
     def test_update_non_tribal_to_public_tribal(self):
         user = baker.make(User)
@@ -559,11 +573,8 @@ class UpdateTribalEntityTypeTests(TestCase):
         with patch(
             "curation.curationlib.update_after_submission.update_db"
         ) as mock_update_db:
-            mock_update_db.side_effect = lambda sac, user, event_type: sac.save(
-                administrative_override=True,
-                event_user=user,
-                event_type=event_type,
-            )
+            mock_update_db.side_effect = self.mock_update_db_side_effect
+
             update_tribal_entity_type(options)
 
         sac = SingleAuditChecklist.objects.get(report_id=sac_01["report_id"])
