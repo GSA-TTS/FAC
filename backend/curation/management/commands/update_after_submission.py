@@ -378,19 +378,4 @@ class Command(BaseCommand):
         elif not nonelike(options["old_entity_type"]) and not nonelike(
             options["new_entity_type"]
         ):
-            if (
-                options["old_entity_type"] == "tribal"
-                and status_to_bool(options["make_private"]) is False
-            ):
-                confirmation = input(
-                    "WARNING: You are switching a tribal record and setting make_private=false. "
-                    "This may make the record public. Type y to continue: "
-                )
-
-                if confirmation.lower() != "y":
-                    logger.error(
-                        "User did not confirm unprivating tribal record. Exiting."
-                    )
-                    sys.exit(-1)
-
             update_tribal_entity_type(options)

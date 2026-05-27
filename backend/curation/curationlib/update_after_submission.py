@@ -246,6 +246,19 @@ def update_tribal_entity_type(options):
 
     general = General.objects.get(report_id=sac.report_id)
 
+    was_private = not general.is_public
+    will_be_public = not make_private
+
+    if was_private and will_be_public:
+        confirmation = input(
+            "WARNING: This update will make a currently private record public. "
+            "Type y to continue: "
+        )
+
+        if confirmation.lower() != "y":
+            logger.error("User did not confirm public exposure. Exiting.")
+            sys.exit(-1)
+
     if new_entity_type == "tribal":
         certifying_email = options.get("certifying_auditee_email")
 
@@ -276,8 +289,3 @@ def update_tribal_entity_type(options):
         user,
         SubmissionEvent.EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
     )
-
-    # Re-fetch dissemination row after redissemination
-    general = General.objects.get(report_id=sac.report_id)
-    general.is_public = not make_private
-    general.save()
