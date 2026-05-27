@@ -53,15 +53,11 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
         address = core_data.get("mailingAddress", {})
         entity_reg = sam_response.get("response", {}).get("entityRegistration", {})
         auditee_name = entity_reg.get("legalBusinessName", "")
+        auditee_uei = form.cleaned_data["auditee_uei"].upper()
 
         formatted_post = {
             "csrfmiddlewaretoken": request.POST.get("csrfmiddlewaretoken"),
-            "auditee_uei": form.cleaned_data["auditee_uei"].upper(),
-            "auditee_name": auditee_name,
-            "auditee_address_line_1": address.get("addressLine1", ""),
-            "auditee_city": address.get("city", ""),
-            "auditee_state": address.get("stateOrProvinceCode", ""),
-            "auditee_zip": address.get("zipCode", ""),
+            "auditee_uei": auditee_uei,
             "auditee_fiscal_period_start": form.cleaned_data[
                 "auditee_fiscal_period_start"
             ].strftime("%Y-%m-%d"),
@@ -69,10 +65,30 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
                 "auditee_fiscal_period_end"
             ].strftime("%Y-%m-%d"),
         }
+        formatted_post_with_sam = {
+            **formatted_post,
+            "auditee_name": auditee_name,
+            "auditee_address_line_1": address.get("addressLine1", ""),
+            "auditee_city": address.get("city", ""),
+            "auditee_state": address.get("stateOrProvinceCode", ""),
+            "auditee_zip": address.get("zipCode", ""),
+        }
 
-        info_check = api.views.auditee_info_check(request.user, formatted_post)
+        info_check = api.views.auditee_info_check(request.user, formatted_post_with_sam)
         if not info_check.get("info_check_passed"):
-            return redirect(reverse("report_submission:auditeeinfo"))
+            logger.error(
+                f"SAM auditee metadata failed to validate for {auditee_uei}; discarding"
+            )
+            logger.error(info_check["errors"])
+
+            info_check = api.views.auditee_info_check(request.user, formatted_post)
+            if not info_check.get("info_check_passed"):
+                logger.error(
+                    f"Auditee metadata failed to validate for {auditee_uei}; returning to auditee info page"
+                )
+                logger.error(info_check["errors"])
+
+                return redirect(reverse("report_submission:auditeeinfo"))
 
         return redirect(reverse("report_submission:eligibility"))
 
