@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class CompareSubmissionsView(LoginRequiredMixin, generic.View):
 
-    def get(self, request, *args, **kwargs):  # noqa: C901
+    def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
         current_user = request.user
 
@@ -76,32 +76,39 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this comparison page.")
 
         # We get here if we passed one of the above conditions.
-        report_id_1, report_id_2, compared = compare_with_prev(sac_1)
-        context = {"comparison": compared}
-
-        nice_names = {}
-        for k in compared.keys():
-            nice_names[k] = k.replace("_", " ").title()
-
-        has_diffs = False
-        has_error = False
-
-        for val in compared.values():
-            if val == "error":
-                has_error = True
-                break
-            if val == "identical":
-                break
-            if val["status"] == "error":
-                break
-            if val["status"] != "same":
-                has_diffs = True
-                break
-
-        context = context | {"has_diffs": has_diffs}
-        context = context | {"has_error": has_error}
-        context = context | {"nice_names": nice_names}
-        context = context | {"r1": report_id_1}
-        context = context | {"r2": report_id_2}
+        context = _compare_sac(sac_1)
 
         return render(request, "audit/compare_submissions.html", context)
+
+
+def _compare_sac(sac):
+    """Compare our sac and return context."""
+    has_diffs = False
+    has_error = False
+
+    report_id_1, report_id_2, compared = compare_with_prev(sac)
+    context = {"comparison": compared}
+
+    nice_names = {}
+    for k in compared.keys():
+        nice_names[k] = k.replace("_", " ").title()
+
+    for val in compared.values():
+        if val == "error":
+            has_error = True
+            break
+        if val == "identical":
+            break
+        if val["status"] == "error":
+            break
+        if val["status"] != "same":
+            has_diffs = True
+            break
+
+    context = context | {"has_diffs": has_diffs}
+    context = context | {"has_error": has_error}
+    context = context | {"nice_names": nice_names}
+    context = context | {"r1": report_id_1}
+    context = context | {"r2": report_id_2}
+
+    return context

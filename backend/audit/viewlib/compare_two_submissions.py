@@ -444,13 +444,6 @@ def are_two_sacs_identical(sac1, sac2):
     return they_are_the_same
 
 
-class WorkbookAccessor:
-    def __init__(self, path_keys, extract_fun):
-        self.path_keys = path_keys
-        self.extract_fun = extract_fun
-        self.start_key = path_keys[0]
-
-
 # We want to take two report IDs, and return something that looks like
 #
 # {
@@ -467,6 +460,7 @@ class WorkbookAccessor:
 def compare_report_ids(rid_1, rid_2):
     sac_r1 = report_id_to_sac(rid_1)
     sac_r2 = report_id_to_sac(rid_2)
+
     if sac_r1 is None or sac_r2 is None:
         logger.error(
             f"compare_report_ids expects two report ID strings or two SAC objects, given {sac_r1} and {sac_r2}"
