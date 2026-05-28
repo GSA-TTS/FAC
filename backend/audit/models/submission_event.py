@@ -58,6 +58,7 @@ class SubmissionEvent(models.Model):
         FAC_ADMINISTRATIVE_RESUBMISSION_ANNOTATION = (
             "fac-administrative-resubmission-annotation"
         )
+        FAC_ADMINISTRATIVE_RESUBMISSION_UNDO = "fac-administrative-resubmission-undo"
         FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE = "fac-administrative-suppression-change"
 
     EVENT_TYPES = (
@@ -147,6 +148,12 @@ class SubmissionEvent(models.Model):
         (
             EventType.FAC_ADMINISTRATIVE_RESUBMISSION_ANNOTATION,
             _("Administratively annotating a report's resubmission metadata."),
+        ),
+        (
+            EventType.FAC_ADMINISTRATIVE_RESUBMISSION_UNDO,
+            _(
+                "Administratively undoing a prior resubmission linkage, restoring the original metadata."
+            ),
         ),
         (
             EventType.FAC_ADMINISTRATIVE_SUPPRESSION_CHANGE,
