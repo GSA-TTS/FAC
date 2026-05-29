@@ -2,7 +2,7 @@ from curation.curationlib.update_after_submission import (
     update_uei,
     update_authorized_public,
     update_simple_gen_field,
-    update_tribal_entity_type,
+    update_entity_type,
 )
 from dissemination.models import General
 from unittest.mock import patch
@@ -464,7 +464,7 @@ class UpdateTribalEntityTypeTests(TestCase):
         ) as mock_update_db:
             mock_update_db.side_effect = self.mock_update_db_side_effect
 
-            update_tribal_entity_type(options)
+            update_entity_type(options)
 
         sac = SingleAuditChecklist.objects.get(report_id=sac_01["report_id"])
         general = General.objects.get(report_id=sac_01["report_id"])
@@ -525,7 +525,7 @@ class UpdateTribalEntityTypeTests(TestCase):
         ) as mock_update_db:
             mock_update_db.side_effect = self.mock_update_db_side_effect
 
-            update_tribal_entity_type(options)
+            update_entity_type(options)
 
         sac = SingleAuditChecklist.objects.get(report_id=sac_01["report_id"])
         general = General.objects.get(report_id=sac_01["report_id"])
@@ -575,7 +575,7 @@ class UpdateTribalEntityTypeTests(TestCase):
         ) as mock_update_db:
             mock_update_db.side_effect = self.mock_update_db_side_effect
 
-            update_tribal_entity_type(options)
+            update_entity_type(options)
 
         sac = SingleAuditChecklist.objects.get(report_id=sac_01["report_id"])
         general = General.objects.get(report_id=sac_01["report_id"])
