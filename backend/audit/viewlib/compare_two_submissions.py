@@ -316,9 +316,15 @@ def compare_single_audit_reports(  # noqa: C901
     # seems there can be multiple copies !
     # Make sure they both exist/have PDFs associated with them.
     if len(sar1) == 0:
-        return {"status": f"no single audit report found for {sac1.report_id}"}
+        return {
+            "status": "error",
+            "message": f"no single audit report found for {sac1.report_id}",
+        }
     if len(sar2) == 0:
-        return {"status": f"no single audit report found for {sac2.report_id}"}
+        return {
+            "status": "error",
+            "message": f"no single audit report found for {sac2.report_id}",
+        }
 
     # return the lastest version, else revert to the first version!
     try:
