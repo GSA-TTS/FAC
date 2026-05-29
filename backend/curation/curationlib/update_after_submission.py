@@ -226,7 +226,7 @@ def update_authorized_public(options):
     return True
 
 
-def update_tribal_entity_type(options):
+def update_entity_type(options):
     sac = get_sac_with_report_id(options)
     user = User.objects.filter(email=options["email"]).first()
 

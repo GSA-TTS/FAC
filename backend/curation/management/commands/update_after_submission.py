@@ -10,7 +10,7 @@ from curation.curationlib.update_after_submission import (
     update_authorized_public,
     update_uei,
     update_simple_gen_field,
-    update_tribal_entity_type,
+    update_entity_type,
 )
 from users.models import StaffUser
 
@@ -379,4 +379,4 @@ class Command(BaseCommand):
         elif not nonelike(options["old_entity_type"]) and not nonelike(
             options["new_entity_type"]
         ):
-            update_tribal_entity_type(options)
+            update_entity_type(options)
