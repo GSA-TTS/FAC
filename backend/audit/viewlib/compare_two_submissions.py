@@ -318,12 +318,12 @@ def compare_single_audit_reports(  # noqa: C901
     if len(sar1) == 0:
         return {
             "status": "error",
-            "message": f"no single audit report found for {sac1.report_id}",
+            "message": f"No single audit report found for {sac1.report_id}",
         }
     if len(sar2) == 0:
         return {
             "status": "error",
-            "message": f"no single audit report found for {sac2.report_id}",
+            "message": f"No single audit report found for {sac2.report_id}",
         }
 
     # return the lastest version, else revert to the first version!
