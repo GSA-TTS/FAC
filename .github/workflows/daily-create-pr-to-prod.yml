@@ -1,7 +1,9 @@
 ---
-name: Create Pull Request To Staging
+name: Scheduled Pull Request To Prod Branch
 on:
-  workflow_call:
+  schedule:
+    # Invoke every Mon-Sat
+    - cron: '0 10 * * 1-6'
   workflow_dispatch:
 
 env:
