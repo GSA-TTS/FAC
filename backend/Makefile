@@ -33,7 +33,7 @@ lint:
 	@mypy .
 	@echo "djlint:"
 	@djlint .
-	@echo eslint
+	@echo "eslint:"
 	@npx eslint
 
 # Run Django tests:
