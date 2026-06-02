@@ -590,14 +590,125 @@ class UpdateTribalEntityTypeTests(TestCase):
         )
         self.assertEqual(general.is_public, True)
 
-    def test_unprivate_tribal_requires_confirmation(self):
-        confirmation = "n"
+    def test_private_to_non_tribal_requires_confirmation(self):
+        user = baker.make(User)
+        user.email = "test@fac.gsa.gov"
+        user.save()
 
-        if confirmation.lower() != "y":
+        general_information = sac_01["general_information"].copy()
+        general_information["user_provided_organization_type"] = "tribal"
+
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=general_information,
+            tribal_data_consent=sac_01["tribal_data_consent"],
+        )
+
+        baker.make(
+            General,
+            report_id=sac_01["report_id"],
+            is_public=False,
+        )
+
+        options = {
+            "report_id": sac_01["report_id"],
+            "email": user.email,
+            "old_entity_type": "tribal",
+            "new_entity_type": "non-profit",
+            "certifying_auditee_email": None,
+            "make_private": "true",
+        }
+
+        with patch("builtins.input", return_value="n"):
             with self.assertRaises(SystemExit):
-                raise SystemExit(-1)
+                update_entity_type(options)
 
-    def test_unprivate_tribal_confirmation_allows_update(self):
-        confirmation = "y"
+    def test_private_to_non_tribal_confirmation_allows_update(self):
+        user = baker.make(User)
+        user.email = "test@fac.gsa.gov"
+        user.save()
 
-        self.assertEqual(confirmation.lower(), "y")
+        general_information = sac_01["general_information"].copy()
+        general_information["user_provided_organization_type"] = "tribal"
+
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=general_information,
+            tribal_data_consent=sac_01["tribal_data_consent"],
+        )
+
+        baker.make(
+            General,
+            report_id=sac_01["report_id"],
+            is_public=False,
+        )
+
+        options = {
+            "report_id": sac_01["report_id"],
+            "email": user.email,
+            "old_entity_type": "tribal",
+            "new_entity_type": "non-profit",
+            "certifying_auditee_email": None,
+            "make_private": "true",
+        }
+
+        with patch("builtins.input", return_value="y"), patch(
+            "curation.curationlib.update_after_submission.update_db"
+        ) as mock_update_db:
+            mock_update_db.side_effect = self.mock_update_db_side_effect
+            update_entity_type(options)
+
+        sac = SingleAuditChecklist.objects.get(report_id=sac_01["report_id"])
+        general = General.objects.get(report_id=sac_01["report_id"])
+
+        self.assertEqual(
+            sac.general_information["user_provided_organization_type"],
+            "non-profit",
+        )
+        self.assertIsNone(sac.tribal_data_consent)
+        self.assertEqual(general.is_public, True)
+
+    def test_private_to_non_tribal_public_requires_confirmation(self):
+        user = baker.make(User)
+        user.email = "test@fac.gsa.gov"
+        user.save()
+
+        general_information = sac_01["general_information"].copy()
+        general_information["user_provided_organization_type"] = "tribal"
+
+        baker.make(
+            SingleAuditChecklist,
+            report_id=sac_01["report_id"],
+            submission_status=sac_01["submission_status"],
+            transition_name=sac_01["transition_name"],
+            transition_date=sac_01["transition_date"],
+            general_information=general_information,
+            tribal_data_consent=sac_01["tribal_data_consent"],
+        )
+
+        baker.make(
+            General,
+            report_id=sac_01["report_id"],
+            is_public=False,
+        )
+
+        options = {
+            "report_id": sac_01["report_id"],
+            "email": user.email,
+            "old_entity_type": "tribal",
+            "new_entity_type": "non-profit",
+            "certifying_auditee_email": None,
+            "make_private": "false",
+        }
+
+        with patch("builtins.input", return_value="n"):
+            with self.assertRaises(SystemExit):
+                update_entity_type(options)
