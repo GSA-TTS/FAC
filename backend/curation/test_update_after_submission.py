@@ -525,7 +525,8 @@ class UpdateTribalEntityTypeTests(TestCase):
         ) as mock_update_db:
             mock_update_db.side_effect = self.mock_update_db_side_effect
 
-            update_entity_type(options)
+            with patch("builtins.input", return_value="y"):
+                update_entity_type(options)
 
         sac = SingleAuditChecklist.objects.get(report_id=sac_01["report_id"])
         general = General.objects.get(report_id=sac_01["report_id"])
