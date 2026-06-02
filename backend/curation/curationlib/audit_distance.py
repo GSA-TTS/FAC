@@ -14,15 +14,10 @@ those records.
 """
 
 from Levenshtein import distance
+from config.settings import GSA_MIGRATION
 
 
-def edit_dist(junk, a, b):
-    # This does *sequences*. That means big changes can have a
-    # distance of 2.
-    # seq = SequenceMatcher(isjunk=junk, a=a, b=b)
-    # # Equal strings have one opcode. So, subtract one.
-    # # [('equal', 0, 12, 0, 12)]
-    # return len(seq.get_opcodes()) - 1
+def edit_dist(a, b) -> int:
     return distance(a, b)
 
 
@@ -50,7 +45,6 @@ def ay_dist(r1, r2, scale=11):
 def uei_dist(r1, r2, scale=8):
     return (
         edit_dist(
-            None,
             prep_string(r1.general_information["auditee_uei"]),
             prep_string(r2.general_information["auditee_uei"]),
         )
@@ -62,7 +56,6 @@ def uei_dist(r1, r2, scale=8):
 def ein_dist(r1, r2, scale=3):
     return (
         edit_dist(
-            None,
             prep_string(r1.general_information["ein"]),
             prep_string(r2.general_information["ein"]),
         )
@@ -74,7 +67,6 @@ def ein_dist(r1, r2, scale=3):
 def auditee_email_dist(r1, r2, scale=1):
     return (
         edit_dist(
-            None,
             prep_string(r1.general_information["auditee_email"]),
             prep_string(r2.general_information["auditee_email"]),
         )
@@ -86,7 +78,6 @@ def auditee_email_dist(r1, r2, scale=1):
 def auditee_name_dist(r1, r2, scale=3):
     return (
         edit_dist(
-            None,
             prep_string(r1.general_information["auditee_name"]),
             prep_string(r2.general_information["auditee_name"]),
         )
@@ -114,7 +105,6 @@ def audit_distance(r1, r2):
         auditee_name_dist,
         auditee_state_dist,
     ]:
-        # print("\t", dist_fun, dist_fun(r1, r2))
         d = d + dist_fun(r1, r2)
     return d
 
@@ -126,3 +116,20 @@ def set_distance(r1, s):
     for r2 in s:
         dist += audit_distance(r1, r2)
     return dist
+
+
+def audit_equivalence_key(r):
+    """
+    Returns a normalized tuple of fields used to determine whether two records
+    belong to the same resubmission chain.
+    """
+    gen_info = r.general_information
+    auditee_uei = gen_info["auditee_uei"]
+    year = get_audit_year(r)
+    ein = gen_info["ein"]
+    auditee_name = gen_info["auditee_name"].upper()
+    auditee_email = gen_info["auditee_email"].lower()
+    # Treat GSA_MIGRATION as a wildcard. Store it as "None" so we can do partial matching later.
+    normalized_uei = None if auditee_uei == GSA_MIGRATION else auditee_uei
+
+    return (normalized_uei, year, ein, auditee_name, auditee_email)

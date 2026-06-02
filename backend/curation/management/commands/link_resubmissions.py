@@ -1,3 +1,9 @@
+import logging
+import sys
+
+from django.db import transaction
+from django.core.management.base import BaseCommand
+
 from audit.models import (
     SingleAuditChecklist,
     SubmissionEvent,
@@ -6,22 +12,13 @@ from audit.models import (
 from audit.models.constants import RESUBMISSION_STATUS
 from users.models import StaffUser
 from audit.models.constants import STATUS
-from django.db import transaction
-
-from curation.curationlib.generate_resubmission_clusters import (
-    generate_resbmission_clusters,
+from curation.curationlib.generate_resubmission_chains import (
+    get_and_generate_submission_chains_by_equivalence,
 )
-from curation.curationlib.export_resubmission_clusters import (
-    # export_sets_as_text_tables,
-    export_sets_as_csv,
-    export_sets_as_markdown,
-    order_reports_key,
+from curation.curationlib.export_resubmission_chains import (
+    export_chains_as_csv,
+    export_chains_as_markdown,
 )
-
-from django.core.management.base import BaseCommand
-import sys
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +34,9 @@ def point_old_to_new(
     # is the older of the two audits.
 
     # If the first has no resubmission metadata, it must be the first in a chain.
+    # If it is of version 0 it must also be first in the chain.
     # This is like calling 'initiate_resubmission' on an audit.
-    if first.resubmission_meta is None:
+    if first.resubmission_meta is None or first.resubmission_meta.get("version") == 0:
         logger.info(f"First in chain: {first.report_id} -> {second.report_id}")
         first.resubmission_meta = {
             "version": 1,
@@ -67,7 +65,7 @@ def point_old_to_new(
                 event_user=u,
                 event_type=SubmissionEvent.EventType.FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE,
             )
-            # Once we modify the records, we need to redisseminate
+            # Once we modify the SAC records, we need to redisseminate
             first.redisseminate()
             second.redisseminate()
 
@@ -139,14 +137,11 @@ def annotate_old(options):
         sac.redisseminate()
 
 
-def annotate_linked_reports(options, sorted_sets):
+def annotate_linked_reports(options, sorted_chains):
     u = User.objects.get(email=options["email"])
-    for linked in sorted_sets:
-        # Order the sets internally by their first submitted transition.
-        # These are SAC records.
-        linked_sorted = sorted(linked, key=order_reports_key)
-        # Now, each element wants to link to the next and previous.
-        the_length = len(linked_sorted)
+    for linked in sorted_chains:
+        # Chains arrive sorted by submission date, oldest first.
+        the_length = len(linked)
         # range() is from [0, length) (inclusive, exclusive)
         for ndx in range(the_length - 1):
             # I want to link this to next, and visa-versa.
@@ -155,8 +150,8 @@ def annotate_linked_reports(options, sorted_sets):
             # Are they both less than the length? If so, they can be linked.
             if this_ndx < the_length and next_ndx <= the_length:
                 try:
-                    this_sac = linked_sorted[this_ndx]
-                    next_sac = linked_sorted[next_ndx]
+                    this_sac = linked[this_ndx]
+                    next_sac = linked[next_ndx]
                     point_old_to_new(this_sac, next_sac, u)
                 except IndexError:
                     # Should not get here.
@@ -190,7 +185,6 @@ class Command(BaseCommand):
         parser.set_defaults(annotate_old=False)
 
     def handle(self, *args, **options):
-
         # And, did they provide a staff user email?
         # (Note that they had to have privs in TF and be able to
         # enable SSH inproduction in order to get here.)
@@ -202,25 +196,36 @@ class Command(BaseCommand):
         if not ok_staff_user:
             sys.exit(-1)
 
-        sorted_sets = lfilter(
-            lambda s: len(s) > 1,
-            generate_resbmission_clusters(
+        sorted_chains = [
+            chain
+            for chain in get_and_generate_submission_chains_by_equivalence(
                 options["audit_year"], noisy=options["noisy"]
-            ),
+            )
+            if len(chain) > 1
+        ]
+
+        filename_markdown = export_chains_as_markdown(
+            options["audit_year"], sorted_chains, noisy=options["noisy"]
         )
+        logger.info(f"Submission chains markdown exported to {filename_markdown}.")
 
-        export_sets_as_markdown(
-            options["audit_year"], sorted_sets, noisy=options["noisy"]
+        filename_csv = export_chains_as_csv(
+            options["audit_year"], sorted_chains, noisy=options["noisy"]
         )
+        logger.info(f"Submission chain CSV exported to {filename_csv}.")
 
-        export_sets_as_csv(options["audit_year"], sorted_sets, noisy=options["noisy"])
+        len_sorted_chains = len(sorted_chains)
+        logger.info(f"Found {len_sorted_chains} resubmission chains.")
+        if len_sorted_chains == 0:
+            logger.info("Exiting.")
+            sys.exit(0)
 
-        k = input("Review markdown and press `c` to continue...")
+        k = input("Review markdown/CSV and enter `c` to continue:")
         if k != "c":
             logger.error("Exiting.")
             sys.exit()
         else:
-            annotate_linked_reports(options, sorted_sets)
+            annotate_linked_reports(options, sorted_chains)
 
         if options["annotate_old"]:
             annotate_old(options)
