@@ -239,7 +239,13 @@ def update_entity_type(options):
     general = General.objects.get(report_id=sac.report_id)
 
     was_private = not general.is_public
-    will_be_public = not make_private
+
+    if new_entity_type == "tribal":
+        will_be_public = not make_private
+    else:
+        # Current dissemination behavior makes non-tribal records public,
+        # regardless of the make_private flag.
+        will_be_public = True
 
     if was_private and will_be_public:
         confirmation = input(
