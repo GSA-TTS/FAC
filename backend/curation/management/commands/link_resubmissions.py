@@ -200,7 +200,7 @@ class Command(BaseCommand):
         """
         Exits if given user is not staff.
         Note that they had to have privs in TF and be able to enable SSH
-        inproduction in order to get here.
+        in production in order to get here.
         """
         try:
             ok_staff_user = StaffUser.objects.get(staff_email=email)
@@ -224,7 +224,15 @@ class Command(BaseCommand):
             logger.error("One of --audit_year and --report_ids must be provided.")
             sys.exit()
 
-        if report_ids:
+        if audit_year:
+            sorted_chains = [
+                chain
+                for chain in get_and_generate_submission_chains_by_equivalence(
+                    audit_year, noisy=noisy,
+                )
+                if len(chain) > 1
+            ]
+        else: # report_ids
             len_report_ids = len(report_ids)
             if len_report_ids <= 1:
                 logger.info(f"At least two report IDs are required to form a chain. Exiting.")
@@ -238,14 +246,6 @@ class Command(BaseCommand):
             if len_chain != len_report_ids:
                 logger.info(f"Only found {len_chain} of {len_report_ids} submissions. Exiting.")
                 sys.exit(-1)
-        else: # audit_year
-            sorted_chains = [
-                chain
-                for chain in get_and_generate_submission_chains_by_equivalence(
-                    audit_year, noisy=noisy,
-                )
-                if len(chain) > 1
-            ]
 
         len_sorted_chains = len(sorted_chains)
         logger.info(f"Found {len_sorted_chains} resubmission chains.")
