@@ -200,7 +200,6 @@ class Command(BaseCommand):
 
     def exit_if_not_staff_user(self, email):
         """
-        Exits if given user is not staff.
         Note that they had to have privs in TF and be able to enable SSH
         in production in order to get here.
         """
@@ -225,15 +224,28 @@ class Command(BaseCommand):
 
         audit_years = set()
         ueis = set()
+        report_ids_already_linked =  []
+        should_exit = False
 
         for sac in sorted_chain:
             audit_years.add(get_audit_year(sac))
             ueis.add(sac.general_information["auditee_uei"])
 
+            if sac.resubmission_meta["version"] != 0:
+                report_ids_already_linked.append(sac.report_id)
+
+        if report_ids_already_linked:
+            logger.error(f"Some submissions are already part of a submission chain. You must first run undo_link_submissions to unlink them.")
+            logger.error(f"Report IDs: {report_ids_already_linked}")
+            should_exit = True
+
         if len(audit_years) != 1 or len(ueis) != 1:
             logger.error(f"All submissions must have a common AY and UEI.")
             logger.error(f"AYs: {audit_years}")
             logger.error(f"UEIs: {ueis}")
+            should_exit = True
+
+        if should_exit:
             logger.error("Exiting.")
             sys.exit(-1)
 
