@@ -10,6 +10,7 @@ from curation.curationlib.update_after_submission import (
     update_authorized_public,
     update_uei,
     update_simple_gen_field,
+    update_entity_type,
 )
 from users.models import StaffUser
 
@@ -21,7 +22,7 @@ import sys
 import re
 
 logger = logging.getLogger(__name__)
-UPDATABLE_FIELDS = ["uei", "ein", "auditee_name", "authorization"]
+UPDATABLE_FIELDS = ["uei", "ein", "auditee_name", "authorization", "entity_type"]
 
 
 def nonelike(v):
@@ -139,6 +140,52 @@ def validate_authorized_options(options):
     return ok_old_authorized, ok_new_authorized
 
 
+def validate_entity_type_options(options):
+    old_entity_type = options["old_entity_type"]
+    new_entity_type = options["new_entity_type"]
+
+    try:
+        sac = get_sac_with_report_id(options)
+
+        current_entity_type = sac.general_information.get(
+            "user_provided_organization_type"
+        )
+
+        ok_old_entity_type = current_entity_type == old_entity_type
+
+        if not ok_old_entity_type:
+            logger.error(
+                f"Old entity type must match DB. "
+                f"DB: {current_entity_type} you: {old_entity_type}"
+            )
+            return False, False
+
+    except ObjectDoesNotExist as e:
+        logger.error(e)
+        logger.error(f"could not fetch {options['report_id']}")
+        return False, False
+
+    if old_entity_type == new_entity_type:
+        logger.error("Entity type must change.")
+        return False, False
+
+    if new_entity_type == "tribal" and nonelike(
+        options.get("certifying_auditee_email")
+    ):
+        logger.error("certifying_auditee_email is required when switching to tribal.")
+        return False, False
+
+    if new_entity_type == "tribal" and nonelike(options.get("make_private")):
+        logger.error("make_private is required when switching to tribal.")
+        return False, False
+
+    if old_entity_type == "tribal" and nonelike(options.get("make_private")):
+        logger.error("make_private is required when switching from tribal.")
+        return False, False
+
+    return ok_old_entity_type, True
+
+
 def have_pair_of(flag, options):
     old_flag = f"old_{flag}"
     new_flag = f"new_{flag}"
@@ -178,6 +225,9 @@ def validate_combos(options):
     elif have_pair_of("authorization", options):
         ok_old_suppression, ok_new_suppression = validate_authorized_options(options)
         return ok_old_suppression and ok_new_suppression
+    elif have_pair_of("entity_type", options):
+        ok_old_entity_type, ok_new_entity_type = validate_entity_type_options(options)
+        return ok_old_entity_type and ok_new_entity_type
     else:
         logger.error("You must provide an old/new pair")
         return False
@@ -283,6 +333,31 @@ class Command(BaseCommand):
             help="The new auditee name for this report",
         )
 
+        parser.add_argument(
+            "--old_entity_type",
+            type=str,
+            help="The entity type that is currently in place",
+        )
+
+        parser.add_argument(
+            "--new_entity_type",
+            type=str,
+            help="The new entity type for this report",
+        )
+
+        parser.add_argument(
+            "--certifying_auditee_email",
+            type=str,
+            help="The certifying auditee email required when switching to tribal",
+        )
+
+        parser.add_argument(
+            "--make_private",
+            type=str,
+            choices=["true", "false"],
+            help="Whether to make the dissemination record non-public when updating entity type.",
+        )
+
     def handle(self, *args, **options):
         valid_inputs = validate_inputs(options)
         if not valid_inputs:
@@ -301,3 +376,7 @@ class Command(BaseCommand):
             options["new_auditee_name"]
         ):
             update_simple_gen_field(options, "auditee_name")
+        elif not nonelike(options["old_entity_type"]) and not nonelike(
+            options["new_entity_type"]
+        ):
+            update_entity_type(options)
