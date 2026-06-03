@@ -31,7 +31,46 @@ def get_and_generate_submission_chains_by_distance(AY=None, noisy=False):
 
 
 def get_and_generate_submission_chain_by_report_ids(report_ids=None, noisy=False):
-    return fetch_disseminated_sacs_for_report_ids(report_ids=report_ids, noisy=noisy)
+    sacs = fetch_disseminated_sacs_for_report_ids(report_ids=report_ids, noisy=noisy)
+    sorted_chains = generate_submission_chains_by_report_ids(sacs, report_ids)
+    return sorted_chains
+
+
+def generate_submission_chains_by_report_ids(sacs, report_ids):
+    len_report_ids = len(report_ids)
+    if len_report_ids <= 1:
+        logger.error(f"At least two report IDs are required to form a chain.")
+        return []
+
+    len_chain = len(sacs)
+    if len_chain != len_report_ids:
+        logger.error(f"Only found {len_chain} of {len_report_ids} submissions.")
+        return []
+
+    audit_years = set()
+    ueis = set()
+    report_ids_already_linked =  []
+
+    for sac in sacs:
+        audit_years.add(get_audit_year(sac))
+        ueis.add(sac.general_information["auditee_uei"])
+
+        if sac.resubmission_meta.get("version", 0) != 0:
+            report_ids_already_linked.append(sac.report_id)
+
+    if report_ids_already_linked:
+        logger.error(f"Some submissions are already part of a submission chain. You must first run undo_link_submissions to unlink them.")
+        logger.error(f"Report IDs: {report_ids_already_linked}")
+        return []
+
+    if len(audit_years) != 1 or len(ueis) != 1:
+        logger.error(f"All submissions must have a common AY and UEI.")
+        logger.error(f"AYs: {audit_years}")
+        logger.error(f"UEIs: {ueis}")
+
+        return []
+
+    return [sacs]
 
 
 def generate_submission_chains_by_equivalence(sacs, noisy=False):

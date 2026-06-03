@@ -8,6 +8,7 @@ from config.settings import GSA_MIGRATION
 from curation.curationlib.generate_resubmission_chains import (
     get_and_generate_submission_chains_by_equivalence,
     get_and_generate_submission_chains_by_distance,
+    get_and_generate_submission_chain_by_report_ids,
 )
 
 sac_01 = {
@@ -41,11 +42,14 @@ sac_01 = {
         "auditee_state": "PA",
         "auditee_fiscal_period_end": "2022-12-31",
     },
+    "resubmission_meta": {
+        "version": 0,
+    },
 }
 
 
-class DistanceClusteringTests(TestCase):
-    def test_no_clusters(self):
+class DistanceChainingTests(TestCase):
+    def test_no_chains(self):
         # Test on a single audit.
         baker.make(
             SingleAuditChecklist,
@@ -56,11 +60,11 @@ class DistanceClusteringTests(TestCase):
             general_information=sac_01["general_information"],
         )
         sorted_chains = get_and_generate_submission_chains_by_distance("2022")
-        # No audits should be clustered. There is only one.
+        # No audits should be chained. There is only one.
         self.assertEqual(len(sorted_chains), 0)
 
-    def test_one_cluster(self):
-        # Two identical audits should yield a cluster
+    def test_one_chain(self):
+        # Two identical audits should yield a chain
         baker.make(
             SingleAuditChecklist,
             report_id=sac_01["report_id"],
@@ -78,13 +82,13 @@ class DistanceClusteringTests(TestCase):
             general_information=sac_01["general_information"],
         )
         sorted_chains = get_and_generate_submission_chains_by_distance("2022")
-        # These audits should cluster, because they have the
+        # These audits should chain, because they have the
         # same information in the critical fields.
         self.assertEqual(len(sorted_chains), 1)
 
     def test_email_difference(self):
         # A single-character difference in the email
-        # should yield a single cluster.
+        # should yield a single chain.
         baker.make(
             SingleAuditChecklist,
             report_id=sac_01["report_id"],
@@ -95,7 +99,7 @@ class DistanceClusteringTests(TestCase):
         )
 
         # Add a single character typo to the email address.
-        # We should still get a cluster.
+        # We should still get a chain.
         gi = deepcopy(sac_01["general_information"])
         gi["auditee_email"] = gi["auditee_email"][:-1] + "x"
 
@@ -109,13 +113,13 @@ class DistanceClusteringTests(TestCase):
         )
         sorted_chains = get_and_generate_submission_chains_by_distance("2022")
         # A single-character typo in the email should not prevent
-        # clustering. Unlike entity names, we'll assume that email
+        # chaining. Unlike entity names, we'll assume that email
         # addresses can be slightly inconsistent.
         self.assertEqual(len(sorted_chains), 1)
 
     def test_different_state(self):
         # Different states should force the audits
-        # into different clusters for the same UEI.
+        # into different chains for the same UEI.
         rid_count = 0
         for _ in range(2):
             for state in ["PA", "ME"]:
@@ -131,7 +135,7 @@ class DistanceClusteringTests(TestCase):
                     general_information=gi,
                 )
         sorted_chains = get_and_generate_submission_chains_by_distance("2022")
-        # With four audits on two states, I expect two clusters.
+        # With four audits on two states, I expect two chains.
         self.assertEqual(len(sorted_chains), 2)
 
     def test_four_audits_two_eins(self):
@@ -140,7 +144,7 @@ class DistanceClusteringTests(TestCase):
         # RID2, UEI1, EIN1
         # RID3, UEI2, EIN2
         # RID4, UEI2, EIN2
-        # Two clusters of size two.
+        # Two chains of size two.
         rid_count = 0
         for _ in range(2):
             for ein in ["123456789", "123123123"]:
@@ -161,15 +165,15 @@ class DistanceClusteringTests(TestCase):
                 )
 
         sorted_chains = get_and_generate_submission_chains_by_distance("2022")
-        # I expect two clusters, one for each UEI, and each
+        # I expect two chains, one for each UEI, and each
         # set to be of size two.
         self.assertEqual(len(sorted_chains), 2)
         for chain in sorted_chains:
             self.assertEqual(len(chain), 2)
 
 
-class EquivalenceClusteringTests(TestCase):
-    def test_no_clusters_single_record(self):
+class EquivalenceChainingTests(TestCase):
+    def test_no_chains_single_record(self):
         """A single record can never form a chain."""
         baker.make(
             SingleAuditChecklist,
@@ -182,8 +186,8 @@ class EquivalenceClusteringTests(TestCase):
         sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
         self.assertEqual(len(sorted_chains), 0)
 
-    def test_one_cluster_identical_fields(self):
-        """Two records with identical equivalence fields form exactly one cluster."""
+    def test_one_chain_identical_fields(self):
+        """Two records with identical equivalence fields form exactly one chain."""
         baker.make(
             SingleAuditChecklist,
             report_id=sac_01["report_id"],
@@ -204,8 +208,8 @@ class EquivalenceClusteringTests(TestCase):
         self.assertEqual(len(sorted_chains), 1)
         self.assertEqual(len(sorted_chains[0]), 2)
 
-    def test_email_difference_no_cluster(self):
-        """A single character difference in email does not form a cluster."""
+    def test_email_difference_no_chain(self):
+        """A single character difference in email does not form a chain."""
         baker.make(
             SingleAuditChecklist,
             report_id=sac_01["report_id"],
@@ -225,11 +229,11 @@ class EquivalenceClusteringTests(TestCase):
             general_information=gi,
         )
         sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
-        # Exact-match: a changed email means no shared key, so no cluster.
+        # Exact-match: a changed email means no shared key, so no chain.
         self.assertEqual(len(sorted_chains), 0)
 
-    def test_four_audits_two_eins_two_clusters(self):
-        """Four audits split across two EINs should produce two clusters of two."""
+    def test_four_audits_two_eins_two_chains(self):
+        """Four audits split across two EINs should produce two chains of two."""
         rid_count = 0
         for _ in range(2):
             for ein in ["123456789", "123123123"]:
@@ -249,7 +253,7 @@ class EquivalenceClusteringTests(TestCase):
         for chain in sorted_chains:
             self.assertEqual(len(chain), 2)
 
-    def test_gsa_migration_clusters_with_matching_partial_key(self):
+    def test_gsa_migration_chains_with_matching_partial_key(self):
         """
         A GSA_MIGRATION record should be absorbed into a bucket whose
         partial key matches, regardless of UEI.
@@ -277,10 +281,10 @@ class EquivalenceClusteringTests(TestCase):
         self.assertEqual(len(sorted_chains), 1)
         self.assertEqual(len(sorted_chains[0]), 2)
 
-    def test_gsa_migration_only_records_cluster_together(self):
+    def test_gsa_migration_only_records_chain_together(self):
         """
         Two GSA_MIGRATION records with the same partial key
-        should form their own cluster even without a GSAFAC peer.
+        should form their own chain even without a GSAFAC peer.
         """
         gi_migration = deepcopy(sac_01["general_information"])
         gi_migration["auditee_uei"] = GSA_MIGRATION
