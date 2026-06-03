@@ -8,6 +8,7 @@ from curation.curationlib.audit_distance import (
 from curation.curationlib.export_resubmission_chains import order_reports_key
 from curation.curationlib.fetch_sacs import (
     fetch_disseminated_sacs_for_ay,
+    fetch_disseminated_sacs_for_report_ids,
 )
 
 logger = logging.getLogger(__name__)
@@ -27,6 +28,10 @@ def get_and_generate_submission_chains_by_distance(AY=None, noisy=False):
     sacs = fetch_disseminated_sacs_for_ay(AY=AY, noisy=noisy)
     sorted_chains = generate_submission_chains_by_distance(sacs, noisy=noisy)
     return sorted_chains
+
+
+def get_and_generate_submission_chains_by_report_ids(report_ids=None, noisy=False):
+    return [fetch_disseminated_sacs_for_report_ids(report_ids=report_ids, noisy=noisy)]
 
 
 def generate_submission_chains_by_equivalence(sacs, noisy=False):
