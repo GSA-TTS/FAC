@@ -195,20 +195,13 @@ class Command(BaseCommand):
         parser.add_argument("--annotate_old", action="store_true")
         parser.set_defaults(annotate_old=False)
 
-    def handle(self, *args, **options):
-        audit_year = options["audit_year"]
-        report_ids = options["report_ids"]
-        noisy = options["noisy"]
-        email = options["email"]
-        annotate_old = options["annotate_old"]
 
-        if (audit_year and report_ids) or not (audit_year or report_ids):
-            logger.error("One of --audit_year and --report_ids must be provided.")
-            sys.exit()
-
-        # And, did they provide a staff user email?
-        # (Note that they had to have privs in TF and be able to
-        # enable SSH inproduction in order to get here.)
+    def exit_if_not_staff_user(self, email):
+        """
+        Exits if given user is not staff.
+        Note that they had to have privs in TF and be able to enable SSH
+        inproduction in order to get here.
+        """
         try:
             ok_staff_user = StaffUser.objects.get(staff_email=email)
         except StaffUser.DoesNotExist:
@@ -216,6 +209,20 @@ class Command(BaseCommand):
             ok_staff_user = False
         if not ok_staff_user:
             sys.exit(-1)
+
+
+    def handle(self, *args, **options):
+        audit_year = options["audit_year"]
+        report_ids = options["report_ids"]
+        noisy = options["noisy"]
+        email = options["email"]
+        annotate_old = options["annotate_old"]
+
+        self.exit_if_not_staff_user(email)
+
+        if (audit_year and report_ids) or not (audit_year or report_ids):
+            logger.error("One of --audit_year and --report_ids must be provided.")
+            sys.exit()
 
         if report_ids:
             len_report_ids = len(report_ids)
@@ -226,8 +233,8 @@ class Command(BaseCommand):
             sorted_chains = get_and_generate_submission_chains_by_report_ids(
                 report_ids, noisy=noisy
             )
-            len_chain = len(sorted_chains[0])
 
+            len_chain = len(sorted_chains[0])
             if len_chain != len_report_ids:
                 logger.info(f"Only found {len_chain} of {len_report_ids} submissions. Exiting.")
                 sys.exit(-1)
