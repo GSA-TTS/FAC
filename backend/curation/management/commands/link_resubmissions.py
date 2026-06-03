@@ -226,9 +226,7 @@ class Command(BaseCommand):
             sorted_chains = get_and_generate_submission_chains_by_report_ids(
                 report_ids, noisy=noisy
             )
-            len_sorted_chains = 1
             len_chain = len(sorted_chains[0])
-            prompt = f"Linking 1 chain of {len_chain} submissions. Enter `c` to continue: "
 
             if len_chain != len_report_ids:
                 logger.info(f"Only found {len_chain} of {len_report_ids} submissions. Exiting.")
@@ -237,31 +235,29 @@ class Command(BaseCommand):
             sorted_chains = [
                 chain
                 for chain in get_and_generate_submission_chains_by_equivalence(
-                    audit_year, noisy=noisy
+                    audit_year, noisy=noisy,
                 )
                 if len(chain) > 1
             ]
 
-            filename_markdown = export_chains_as_markdown(
-                audit_year, sorted_chains, noisy=noisy
-            )
-            logger.info(f"Submission chains markdown exported to {filename_markdown}.")
+        len_sorted_chains = len(sorted_chains)
+        logger.info(f"Found {len_sorted_chains} resubmission chains.")
 
-            filename_csv = export_chains_as_csv(
-                audit_year, sorted_chains, noisy=noisy
-            )
-            logger.info(f"Submission chain CSV exported to {filename_csv}.")
+        if len_sorted_chains == 0:
+            logger.info("Exiting.")
+            sys.exit(0)
 
-            len_sorted_chains = len(sorted_chains)
-            logger.info(f"Found {len_sorted_chains} resubmission chains.")
+        filename_markdown = export_chains_as_markdown(
+            sorted_chains, AY=audit_year, report_ids=report_ids,
+        )
+        logger.info(f"Submission chains markdown exported to {filename_markdown}.")
 
-            prompt = f"Review markdown/CSV and enter `c` to continue: "
+        filename_csv = export_chains_as_csv(
+            sorted_chains, AY=audit_year, report_ids=report_ids,
+        )
+        logger.info(f"Submission chain CSV exported to {filename_csv}.")
 
-            if len_sorted_chains == 0:
-                logger.info("Exiting.")
-                sys.exit(0)
-
-        k = input(prompt)
+        k = input("Review markdown/CSV and enter `c` to continue: ")
         if k != "c":
             logger.error("Exiting.")
             sys.exit()

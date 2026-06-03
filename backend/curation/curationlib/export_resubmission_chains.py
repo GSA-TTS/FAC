@@ -30,8 +30,9 @@ def order_reports_key(r):
 
 
 # Exports the same data in CSV format for analysis in a spreadsheet tool.
-def export_chains_as_csv(AY, chains, noisy=False):
-    filename = _data_path(f"{AY}-resubmission-chains-{len(chains)}.csv")
+def export_chains_as_csv(chains, AY=None, report_ids=None, noisy=False):
+    filename = _data_path(f"{AY or report_ids[0]}-resubmission-chains-{len(chains)}.csv")
+
     with open(filename, "w") as csv_file:
         wr = csv.writer(csv_file)
         wr.writerow(
@@ -95,16 +96,17 @@ def write_row(chain, md, row_tag, key_fun):
     md.write(NEWLINE)
 
 
-def export_chains_as_markdown(AY, chains, noisy=False):
+def export_chains_as_markdown(chains, AY=None, report_ids=None):
     """
     Exports the chain data as Markdown for use on the WWW.
 
     Returns the path to the file.
     """
-    filename = _data_path(f"{AY}-resubmission-chains-{len(chains)}.md")
-    with open(filename, "w") as md:
+    filename = _data_path(f"{AY or report_ids[0]}-resubmission-chains-{len(chains)}.md")
+    title = f"### Resubmissions for {f"audit year {AY}" if AY else report_ids[0]}" + NEWLINE + NEWLINE
 
-        md.write(f"### Resubmissions for audit year {AY}" + NEWLINE + NEWLINE)
+    with open(filename, "w") as md:
+        md.write(title)
 
         for ndx, chain in enumerate(chains):
             if len(chain) > 1:
@@ -158,6 +160,7 @@ def export_chains_as_markdown(AY, chains, noisy=False):
 
                 md.write(NEWLINE)
                 md.write(NEWLINE)
+
     return filename
 
 
