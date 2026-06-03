@@ -30,8 +30,8 @@ def get_and_generate_submission_chains_by_distance(AY=None, noisy=False):
     return sorted_chains
 
 
-def get_and_generate_submission_chains_by_report_ids(report_ids=None, noisy=False):
-    return [fetch_disseminated_sacs_for_report_ids(report_ids=report_ids, noisy=noisy)]
+def get_and_generate_submission_chain_by_report_ids(report_ids=None, noisy=False):
+    return fetch_disseminated_sacs_for_report_ids(report_ids=report_ids, noisy=noisy)
 
 
 def generate_submission_chains_by_equivalence(sacs, noisy=False):

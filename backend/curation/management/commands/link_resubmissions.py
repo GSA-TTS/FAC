@@ -12,9 +12,12 @@ from audit.models import (
 from audit.models.constants import RESUBMISSION_STATUS
 from users.models import StaffUser
 from audit.models.constants import STATUS
+from curation.curationlib.audit_distance import (
+    get_audit_year,
+)
 from curation.curationlib.generate_resubmission_chains import (
     get_and_generate_submission_chains_by_equivalence,
-    get_and_generate_submission_chains_by_report_ids,
+    get_and_generate_submission_chain_by_report_ids,
 )
 from curation.curationlib.export_resubmission_chains import (
     export_chains_as_csv,
@@ -195,7 +198,6 @@ class Command(BaseCommand):
         parser.add_argument("--annotate_old", action="store_true")
         parser.set_defaults(annotate_old=False)
 
-
     def exit_if_not_staff_user(self, email):
         """
         Exits if given user is not staff.
@@ -210,6 +212,30 @@ class Command(BaseCommand):
         if not ok_staff_user:
             sys.exit(-1)
 
+    def exit_if_invalid_report_id_chain(self, sorted_chain, report_ids):
+        len_report_ids = len(report_ids)
+        if len_report_ids <= 1:
+            logger.error(f"At least two report IDs are required to form a chain. Exiting.")
+            sys.exit(-1)
+
+        len_chain = len(sorted_chain)
+        if len_chain != len_report_ids:
+            logger.error(f"Only found {len_chain} of {len_report_ids} submissions. Exiting.")
+            sys.exit(-1)
+
+        audit_years = set()
+        ueis = set()
+
+        for sac in sorted_chain:
+            audit_years.add(get_audit_year(sac))
+            ueis.add(sac.general_information["auditee_uei"])
+
+        if len(audit_years) != 1 or len(ueis) != 1:
+            logger.error(f"All submissions must have a common AY and UEI.")
+            logger.error(f"AYs: {audit_years}")
+            logger.error(f"UEIs: {ueis}")
+            logger.error("Exiting.")
+            sys.exit(-1)
 
     def handle(self, *args, **options):
         audit_year = options["audit_year"]
@@ -233,19 +259,11 @@ class Command(BaseCommand):
                 if len(chain) > 1
             ]
         else: # report_ids
-            len_report_ids = len(report_ids)
-            if len_report_ids <= 1:
-                logger.info(f"At least two report IDs are required to form a chain. Exiting.")
-                sys.exit(-1)
-
-            sorted_chains = get_and_generate_submission_chains_by_report_ids(
+            sorted_chain = get_and_generate_submission_chain_by_report_ids(
                 report_ids, noisy=noisy
             )
-
-            len_chain = len(sorted_chains[0])
-            if len_chain != len_report_ids:
-                logger.info(f"Only found {len_chain} of {len_report_ids} submissions. Exiting.")
-                sys.exit(-1)
+            self.exit_if_invalid_report_id_chain(sorted_chain, report_ids)
+            sorted_chains = [sorted_chain]
 
         len_sorted_chains = len(sorted_chains)
         logger.info(f"Found {len_sorted_chains} resubmission chains.")
@@ -266,7 +284,7 @@ class Command(BaseCommand):
 
         k = input("Review markdown/CSV and enter `c` to continue: ")
         if k != "c":
-            logger.error("Exiting.")
+            logger.info("Exiting.")
             sys.exit()
         else:
             annotate_linked_reports(options, sorted_chains)
