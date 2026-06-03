@@ -198,57 +198,6 @@ class Command(BaseCommand):
         parser.add_argument("--annotate_old", action="store_true")
         parser.set_defaults(annotate_old=False)
 
-    def exit_if_not_staff_user(self, email):
-        """
-        Note that they had to have privs in TF and be able to enable SSH
-        in production in order to get here.
-        """
-        try:
-            ok_staff_user = StaffUser.objects.get(staff_email=email)
-        except StaffUser.DoesNotExist:
-            logger.error(f'Staff user {email} does not exist')
-            ok_staff_user = False
-        if not ok_staff_user:
-            sys.exit(-1)
-
-    def exit_if_invalid_report_id_chain(self, sorted_chain, report_ids):
-        len_report_ids = len(report_ids)
-        if len_report_ids <= 1:
-            logger.error(f"At least two report IDs are required to form a chain. Exiting.")
-            sys.exit(-1)
-
-        len_chain = len(sorted_chain)
-        if len_chain != len_report_ids:
-            logger.error(f"Only found {len_chain} of {len_report_ids} submissions. Exiting.")
-            sys.exit(-1)
-
-        audit_years = set()
-        ueis = set()
-        report_ids_already_linked =  []
-        should_exit = False
-
-        for sac in sorted_chain:
-            audit_years.add(get_audit_year(sac))
-            ueis.add(sac.general_information["auditee_uei"])
-
-            if sac.resubmission_meta["version"] != 0:
-                report_ids_already_linked.append(sac.report_id)
-
-        if report_ids_already_linked:
-            logger.error(f"Some submissions are already part of a submission chain. You must first run undo_link_submissions to unlink them.")
-            logger.error(f"Report IDs: {report_ids_already_linked}")
-            should_exit = True
-
-        if len(audit_years) != 1 or len(ueis) != 1:
-            logger.error(f"All submissions must have a common AY and UEI.")
-            logger.error(f"AYs: {audit_years}")
-            logger.error(f"UEIs: {ueis}")
-            should_exit = True
-
-        if should_exit:
-            logger.error("Exiting.")
-            sys.exit(-1)
-
     def handle(self, *args, **options):
         audit_year = options["audit_year"]
         report_ids = options["report_ids"]
@@ -303,3 +252,54 @@ class Command(BaseCommand):
 
         if annotate_old:
             annotate_old(options)
+
+    def exit_if_not_staff_user(self, email):
+        """
+        Note that they had to have privs in TF and be able to enable SSH
+        in production in order to get here.
+        """
+        try:
+            ok_staff_user = StaffUser.objects.get(staff_email=email)
+        except StaffUser.DoesNotExist:
+            logger.error(f'Staff user {email} does not exist')
+            ok_staff_user = False
+        if not ok_staff_user:
+            sys.exit(-1)
+
+    def exit_if_invalid_report_id_chain(self, sorted_chain, report_ids):
+        len_report_ids = len(report_ids)
+        if len_report_ids <= 1:
+            logger.error(f"At least two report IDs are required to form a chain. Exiting.")
+            sys.exit(-1)
+
+        len_chain = len(sorted_chain)
+        if len_chain != len_report_ids:
+            logger.error(f"Only found {len_chain} of {len_report_ids} submissions. Exiting.")
+            sys.exit(-1)
+
+        audit_years = set()
+        ueis = set()
+        report_ids_already_linked =  []
+        should_exit = False
+
+        for sac in sorted_chain:
+            audit_years.add(get_audit_year(sac))
+            ueis.add(sac.general_information["auditee_uei"])
+
+            if sac.resubmission_meta.get("version", 0) != 0:
+                report_ids_already_linked.append(sac.report_id)
+
+        if report_ids_already_linked:
+            logger.error(f"Some submissions are already part of a submission chain. You must first run undo_link_submissions to unlink them.")
+            logger.error(f"Report IDs: {report_ids_already_linked}")
+            should_exit = True
+
+        if len(audit_years) != 1 or len(ueis) != 1:
+            logger.error(f"All submissions must have a common AY and UEI.")
+            logger.error(f"AYs: {audit_years}")
+            logger.error(f"UEIs: {ueis}")
+            should_exit = True
+
+        if should_exit:
+            logger.error("Exiting.")
+            sys.exit(-1)
