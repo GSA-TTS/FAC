@@ -12,9 +12,6 @@ from audit.models import (
 from audit.models.constants import RESUBMISSION_STATUS
 from users.models import StaffUser
 from audit.models.constants import STATUS
-from curation.curationlib.audit_distance import (
-    get_audit_year,
-)
 from curation.curationlib.generate_resubmission_chains import (
     get_and_generate_submission_chains_by_equivalence,
     get_and_generate_submission_chain_by_report_ids,

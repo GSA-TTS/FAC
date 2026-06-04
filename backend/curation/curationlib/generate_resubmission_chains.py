@@ -39,7 +39,7 @@ def get_and_generate_submission_chain_by_report_ids(report_ids=None, noisy=False
 def generate_submission_chains_by_report_ids(sacs, report_ids):
     len_report_ids = len(report_ids)
     if len_report_ids <= 1:
-        logger.error(f"At least two report IDs are required to form a chain.")
+        logger.error("At least two report IDs are required to form a chain.")
         return []
 
     len_chain = len(sacs)
@@ -60,13 +60,13 @@ def generate_submission_chains_by_report_ids(sacs, report_ids):
 
     if report_ids_already_chained:
         logger.error(
-            f"Some submissions are already part of a submission chain. You must first run undo_link_submissions to unchain them."
+            "Some submissions are already part of a submission chain. You must first run undo_link_submissions to unchain them."
         )
         logger.error(f"Report IDs: {report_ids_already_chained}")
         return []
 
     if len(audit_years) != 1 or len(ueis) != 1:
-        logger.error(f"All submissions must have a common AY and UEI.")
+        logger.error("All submissions must have a common AY and UEI.")
         logger.error(f"AYs: {audit_years}")
         logger.error(f"UEIs: {ueis}")
 
