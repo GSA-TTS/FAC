@@ -120,6 +120,5 @@ functions = [
     validate_general_information,
     check_resubmission_still_allowed,
     # "Warnings", or validations that would just inform a user of a potential issue.
-    check_test_warning,
     check_auditee_auditor_ein_match,
 ]
