@@ -45,14 +45,15 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
         try:
             # SOT TODO: Switch to `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            errors = sac.validate_full()
+            errors, warnings = sac.validate_full()
+            logger.info(f"what, {errors}, {warnings}")
 
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
             if audit:
                 audit_errors = audit.validate()
                 _compare_errors(errors, audit_errors)
 
-            context = {"report_id": report_id, "errors": errors}
+            context = {"report_id": report_id, "errors": errors, "warnings": warnings}
 
             return render(
                 request, "audit/cross-validation/cross-validation-results.html", context

@@ -397,12 +397,17 @@ class Command(BaseCommand):
 
         # Make sure we created a valid SAC entry.
         # If not, error out.
-        errors = new_sac.validate_full()
+        errors, warnings = new_sac.validate_full()
         if errors:
             logger.error(
-                f"Unable to disseminate report with validation errors: {new_sac.report_id}."
+                f"Unable to generate resubmission for a report with validation errors: {new_sac.report_id}."
             )
             logger.info(errors["errors"])
+        # Warnings are okay, but we'll log it.
+        if warnings:
+            logger.warning(
+                f"Generating a resubmission for a report with validation warnings: {new_sac.report_id}."
+            )
 
         # If we're here, we make sure the new SAC (which is a resubmission)
         # has all the right data/fields to be used for resubmission testing.

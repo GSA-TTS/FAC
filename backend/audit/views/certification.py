@@ -48,7 +48,7 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             # TODO: Update Post SOC Launch
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
-            errors = sac.validate_full()
+            errors, warnings = sac.validate_full()
 
             if audit:
                 audit_errors = audit.validate()
