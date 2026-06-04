@@ -46,7 +46,6 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
             # SOT TODO: Switch to `audit`
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             errors, warnings = sac.validate_full()
-            logger.info(f"what, {errors}, {warnings}")
 
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
             if audit:
