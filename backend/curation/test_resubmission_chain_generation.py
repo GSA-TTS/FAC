@@ -308,6 +308,7 @@ class EquivalenceChainingTests(TestCase):
         self.assertEqual(len(sorted_chains), 1)
         self.assertEqual(len(sorted_chains[0]), 2)
 
+
 class ReportIdChainingTests(TestCase):
     rid_1 = sac["report_id"]
     sac_1 = {
@@ -363,7 +364,7 @@ class ReportIdChainingTests(TestCase):
                     **self.sac_2["general_information"],
                     "auditee_uei": "FOOBARUEI",
                 },
-            }
+            },
         )
 
         sorted_chains = get_and_generate_submission_chain_by_report_ids(
@@ -385,7 +386,7 @@ class ReportIdChainingTests(TestCase):
                     **self.sac_2["general_information"],
                     "auditee_fiscal_period_end": "2077-12-31",
                 },
-            }
+            },
         )
 
         sorted_chains = get_and_generate_submission_chain_by_report_ids(
@@ -416,9 +417,9 @@ class ReportIdChainingTests(TestCase):
                 **self.sac_2,
                 "resubmission_meta": {
                     **self.sac_2["resubmission_meta"],
-                    "version": 1, # Anything truthy
+                    "version": 1,  # Anything truthy
                 },
-            }
+            },
         )
 
         sorted_chains = get_and_generate_submission_chain_by_report_ids(

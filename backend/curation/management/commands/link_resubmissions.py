@@ -166,7 +166,7 @@ def annotate_linked_reports(options, sorted_chains):
 
 
 def comma_separated_list(string):
-    return string.split(',')
+    return string.split(",")
 
 
 class Command(BaseCommand):
@@ -215,11 +215,12 @@ class Command(BaseCommand):
             sorted_chains = [
                 chain
                 for chain in get_and_generate_submission_chains_by_equivalence(
-                    audit_year, noisy=noisy,
+                    audit_year,
+                    noisy=noisy,
                 )
                 if len(chain) > 1
             ]
-        else: # report_ids
+        else:  # report_ids
             sorted_chains = get_and_generate_submission_chain_by_report_ids(
                 report_ids, noisy=noisy
             )
@@ -232,12 +233,16 @@ class Command(BaseCommand):
             sys.exit(0)
 
         filename_markdown = export_chains_as_markdown(
-            sorted_chains, AY=audit_year, report_ids=report_ids,
+            sorted_chains,
+            AY=audit_year,
+            report_ids=report_ids,
         )
         logger.info(f"Submission chains markdown exported to {filename_markdown}.")
 
         filename_csv = export_chains_as_csv(
-            sorted_chains, AY=audit_year, report_ids=report_ids,
+            sorted_chains,
+            AY=audit_year,
+            report_ids=report_ids,
         )
         logger.info(f"Submission chain CSV exported to {filename_csv}.")
 
@@ -259,7 +264,7 @@ class Command(BaseCommand):
         try:
             ok_staff_user = StaffUser.objects.get(staff_email=email)
         except StaffUser.DoesNotExist:
-            logger.error(f'Staff user {email} does not exist')
+            logger.error(f"Staff user {email} does not exist")
             ok_staff_user = False
         if not ok_staff_user:
             sys.exit(-1)

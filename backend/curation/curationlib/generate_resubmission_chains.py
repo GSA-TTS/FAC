@@ -49,7 +49,7 @@ def generate_submission_chains_by_report_ids(sacs, report_ids):
 
     audit_years = set()
     ueis = set()
-    report_ids_already_chained =  []
+    report_ids_already_chained = []
 
     for sac in sacs:
         audit_years.add(get_audit_year(sac))
@@ -59,7 +59,9 @@ def generate_submission_chains_by_report_ids(sacs, report_ids):
             report_ids_already_chained.append(sac.report_id)
 
     if report_ids_already_chained:
-        logger.error(f"Some submissions are already part of a submission chain. You must first run undo_link_submissions to unchain them.")
+        logger.error(
+            f"Some submissions are already part of a submission chain. You must first run undo_link_submissions to unchain them."
+        )
         logger.error(f"Report IDs: {report_ids_already_chained}")
         return []
 

@@ -28,8 +28,7 @@ def fetch_disseminated_sacs_for_report_ids(report_ids, noisy=False):
 
 def _fetch_disseminated_sacs(query, noisy=False):
     sacs = SingleAuditChecklist.objects.filter(
-        query
-        & Q(submission_status="disseminated")
+        query & Q(submission_status="disseminated")
     )
 
     # Sort in Python rather than the ORM - transition_date is a JSON array

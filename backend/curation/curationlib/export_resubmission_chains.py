@@ -31,7 +31,9 @@ def order_reports_key(r):
 
 # Exports the same data in CSV format for analysis in a spreadsheet tool.
 def export_chains_as_csv(chains, AY=None, report_ids=None, noisy=False):
-    filename = _data_path(f"{AY or report_ids[0]}-resubmission-chains-{len(chains)}.csv")
+    filename = _data_path(
+        f"{AY or report_ids[0]}-resubmission-chains-{len(chains)}.csv"
+    )
 
     with open(filename, "w") as csv_file:
         wr = csv.writer(csv_file)
@@ -103,7 +105,11 @@ def export_chains_as_markdown(chains, AY=None, report_ids=None):
     Returns the path to the file.
     """
     filename = _data_path(f"{AY or report_ids[0]}-resubmission-chains-{len(chains)}.md")
-    title = f"### Resubmissions for {f"audit year {AY}" if AY else report_ids[0]}" + NEWLINE + NEWLINE
+    title = (
+        f"### Resubmissions for {f"audit year {AY}" if AY else report_ids[0]}"
+        + NEWLINE
+        + NEWLINE
+    )
 
     with open(filename, "w") as md:
         md.write(title)
