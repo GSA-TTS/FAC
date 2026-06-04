@@ -651,12 +651,14 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             )
         except SingleAuditReportFile.DoesNotExist:
             sar = None
+
         validation_functions = audit.cross_validation.functions
         results = list(
             chain.from_iterable(
                 [func(shaped_sac, sar=sar) for func in validation_functions]
             )
         )
+
         errors = [r for r in results if "error" in r]
         warnings = [r for r in results if "warning" in r]
         result = {}
