@@ -332,7 +332,9 @@ class ReportIdChainingTests(TestCase):
             **self.sac_2,
         )
 
-        sorted_chains = get_and_generate_submission_chain_by_report_ids([self.rid_1, self.rid_2])
+        sorted_chains = get_and_generate_submission_chain_by_report_ids(
+            [self.rid_1, self.rid_2],
+        )
         self.assertEqual(len(sorted_chains), 1)
         self.assertEqual(len(sorted_chains[0]), 2)
 
@@ -342,7 +344,9 @@ class ReportIdChainingTests(TestCase):
             SingleAuditChecklist,
             **sac,
         )
-        sorted_chains = get_and_generate_submission_chain_by_report_ids([sac["report_id"]])
+        sorted_chains = get_and_generate_submission_chain_by_report_ids(
+            [sac["report_id"]],
+        )
         self.assertEqual(len(sorted_chains), 0)
 
     def test_no_chains_different_ueis(self):
@@ -362,7 +366,9 @@ class ReportIdChainingTests(TestCase):
             }
         )
 
-        sorted_chains = get_and_generate_submission_chain_by_report_ids([self.rid_1, self.rid_2])
+        sorted_chains = get_and_generate_submission_chain_by_report_ids(
+            [self.rid_1, self.rid_2],
+        )
         self.assertEqual(len(sorted_chains), 0)
 
     def test_no_chains_different_ays(self):
@@ -382,5 +388,40 @@ class ReportIdChainingTests(TestCase):
             }
         )
 
-        sorted_chains = get_and_generate_submission_chain_by_report_ids([self.rid_1, self.rid_2])
+        sorted_chains = get_and_generate_submission_chain_by_report_ids(
+            [self.rid_1, self.rid_2],
+        )
+        self.assertEqual(len(sorted_chains), 0)
+
+    def test_no_chains_missing_sac(self):
+        """A SAC that can't be found can never form a chain."""
+        baker.make(
+            SingleAuditChecklist,
+            **sac,
+        )
+        sorted_chains = get_and_generate_submission_chain_by_report_ids(
+            [self.sac_1["report_id"], self.sac_2["report_id"], "some-fake-rid"],
+        )
+        self.assertEqual(len(sorted_chains), 0)
+
+    def test_no_chains_already_chained(self):
+        """A SAC that is already chained can never form a chain."""
+        baker.make(
+            SingleAuditChecklist,
+            **self.sac_1,
+        )
+        baker.make(
+            SingleAuditChecklist,
+            **{
+                **self.sac_2,
+                "resubmission_meta": {
+                    **self.sac_2["resubmission_meta"],
+                    "version": 1, # Anything truthy
+                },
+            }
+        )
+
+        sorted_chains = get_and_generate_submission_chain_by_report_ids(
+            [self.rid_1, self.rid_2],
+        )
         self.assertEqual(len(sorted_chains), 0)
