@@ -12,7 +12,6 @@ from curation.curationlib.generate_resubmission_chains import (
 )
 
 sac = {
-    "audit_year": "2022",
     "report_id": "2022-42-MAGIC-0000000001",
     "submission_status": "disseminated",
     "transition_name": [
@@ -310,24 +309,15 @@ class EquivalenceChainingTests(TestCase):
         self.assertEqual(len(sorted_chains[0]), 2)
 
 class ReportIdChainingTests(TestCase):
-    sub = {
-        "report_id": sac["report_id"],
-        "submission_status": sac["submission_status"],
-        "transition_name": sac["transition_name"],
-        "transition_date": sac["transition_date"],
-        "general_information": sac["general_information"],
-        "resubmission_meta": sac["resubmission_meta"],
-    }
-
     rid_1 = sac["report_id"]
-    sub_1 = {
-        **sub,
+    sac_1 = {
+        **sac,
         "report_id": rid_1,
     }
 
     rid_2 = sac["report_id"][:-1] + "2"
-    sub_2 = {
-        **sub,
+    sac_2 = {
+        **sac,
         "report_id": rid_2,
     }
 
@@ -335,11 +325,11 @@ class ReportIdChainingTests(TestCase):
         """Two records with identical UEI and AY form exactly one chain."""
         baker.make(
             SingleAuditChecklist,
-            **self.sub_1,
+            **self.sac_1,
         )
         baker.make(
             SingleAuditChecklist,
-            **self.sub_2,
+            **self.sac_2,
         )
 
         sorted_chains = get_and_generate_submission_chain_by_report_ids([self.rid_1, self.rid_2])
@@ -350,7 +340,7 @@ class ReportIdChainingTests(TestCase):
         """A single record can never form a chain."""
         baker.make(
             SingleAuditChecklist,
-            **self.sub,
+            **sac,
         )
         sorted_chains = get_and_generate_submission_chain_by_report_ids([sac["report_id"]])
         self.assertEqual(len(sorted_chains), 0)
@@ -359,14 +349,14 @@ class ReportIdChainingTests(TestCase):
         """Two records with different UEIs can never form a chain."""
         baker.make(
             SingleAuditChecklist,
-            **self.sub_1,
+            **self.sac_1,
         )
         baker.make(
             SingleAuditChecklist,
             **{
-                **self.sub_2,
+                **self.sac_2,
                 "general_information": {
-                    **self.sub_2["general_information"],
+                    **self.sac_2["general_information"],
                     "auditee_uei": "FOOBARUEI",
                 },
             }
@@ -379,14 +369,14 @@ class ReportIdChainingTests(TestCase):
         """Two records with different UEIs can never form a chain."""
         baker.make(
             SingleAuditChecklist,
-            **self.sub_1,
+            **self.sac_1,
         )
         baker.make(
             SingleAuditChecklist,
             **{
-                **self.sub_2,
+                **self.sac_2,
                 "general_information": {
-                    **self.sub_2["general_information"],
+                    **self.sac_2["general_information"],
                     "auditee_fiscal_period_end": "2077-12-31",
                 },
             }
