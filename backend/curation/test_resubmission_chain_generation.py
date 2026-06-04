@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Any, Dict
 from model_bakery import baker
 
 from django.test import TestCase
@@ -11,7 +12,7 @@ from curation.curationlib.generate_resubmission_chains import (
     get_and_generate_submission_chain_by_report_ids,
 )
 
-sac = {
+sac: Dict[str, Any] = {
     "report_id": "2022-42-MAGIC-0000000001",
     "submission_status": "disseminated",
     "transition_name": [
