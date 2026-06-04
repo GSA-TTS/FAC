@@ -51,7 +51,7 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
             errors, warnings = sac.validate_full()
 
             if audit:
-                audit_errors = audit.validate()
+                audit_errors, audit_warnings = audit.validate()
                 _compare_errors(errors, audit_errors)
 
             if not errors:

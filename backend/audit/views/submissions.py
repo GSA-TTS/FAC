@@ -159,7 +159,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # TODO: Update Post SOC Launch
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
             if audit:
-                audit_errors = audit.validate()
+                audit_errors, audit_warnings = audit.validate()
                 _compare_errors(errors, audit_errors)
 
             if errors:

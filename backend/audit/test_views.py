@@ -401,7 +401,7 @@ class SubmissionViewTests(TestCase):
     ):
         """Test that a valid submission transitions SAC to a disseminated state"""
         mock_validate_sac.return_value = ({}, {})
-        mock_validate_audit.return_value = []
+        mock_validate_audit.return_value = ({}, {})
         mock_disseminate.return_value = None
         response = self.client.post(self.url)
 
@@ -434,7 +434,7 @@ class SubmissionViewTests(TestCase):
         self, mock_disseminate, mock_transition, mock_validate_audit, mock_validate_sac
     ):
         """Test that validation errors are displayed if submission is invalid"""
-        mock_validate_audit.return_value = ["Error 1", "Error 2"]
+        mock_validate_audit.return_value = (["Error 1", "Error 2"], {})
         mock_validate_sac.return_value = (["Error 1", "Error 2"], {})
         self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
         self.sac.save()
@@ -467,7 +467,7 @@ class SubmissionViewTests(TestCase):
         self.audit.submission_status = STATUS.AUDITEE_CERTIFIED
         self.audit.save()
 
-        mock_validate_audit.return_value = []
+        mock_validate_audit.return_value = ({}, {})
         mock_validate_sac.return_value = ({}, {})
         mock_general_get.return_value = True
 
