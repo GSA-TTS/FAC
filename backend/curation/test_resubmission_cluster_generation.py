@@ -11,7 +11,7 @@ from curation.curationlib.generate_resubmission_chains import (
     get_and_generate_submission_chain_by_report_ids,
 )
 
-sac_01 = {
+sac = {
     "audit_year": "2022",
     "report_id": "2022-42-MAGIC-0000000001",
     "submission_status": "disseminated",
@@ -53,11 +53,11 @@ class DistanceChainingTests(TestCase):
         # Test on a single audit.
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"],
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
-            general_information=sac_01["general_information"],
+            report_id=sac["report_id"],
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
+            general_information=sac["general_information"],
         )
         sorted_chains = get_and_generate_submission_chains_by_distance("2022")
         # No audits should be chained. There is only one.
@@ -67,19 +67,19 @@ class DistanceChainingTests(TestCase):
         # Two identical audits should yield a chain
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"],
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
-            general_information=sac_01["general_information"],
+            report_id=sac["report_id"],
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
+            general_information=sac["general_information"],
         )
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"][:-1] + "2",
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
-            general_information=sac_01["general_information"],
+            report_id=sac["report_id"][:-1] + "2",
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
+            general_information=sac["general_information"],
         )
         sorted_chains = get_and_generate_submission_chains_by_distance("2022")
         # These audits should chain, because they have the
@@ -91,24 +91,24 @@ class DistanceChainingTests(TestCase):
         # should yield a single chain.
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"],
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
-            general_information=sac_01["general_information"],
+            report_id=sac["report_id"],
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
+            general_information=sac["general_information"],
         )
 
         # Add a single character typo to the email address.
         # We should still get a chain.
-        gi = deepcopy(sac_01["general_information"])
+        gi = deepcopy(sac["general_information"])
         gi["auditee_email"] = gi["auditee_email"][:-1] + "x"
 
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"][:-1] + "2",
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
+            report_id=sac["report_id"][:-1] + "2",
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
             general_information=gi,
         )
         sorted_chains = get_and_generate_submission_chains_by_distance("2022")
@@ -124,14 +124,14 @@ class DistanceChainingTests(TestCase):
         for _ in range(2):
             for state in ["PA", "ME"]:
                 rid_count += 1
-                gi = deepcopy(sac_01["general_information"])
+                gi = deepcopy(sac["general_information"])
                 gi["auditee_state"] = state
                 baker.make(
                     SingleAuditChecklist,
-                    report_id=sac_01["report_id"][:-1] + f"{rid_count}",
-                    submission_status=sac_01["submission_status"],
-                    transition_name=sac_01["transition_name"],
-                    transition_date=sac_01["transition_date"],
+                    report_id=sac["report_id"][:-1] + f"{rid_count}",
+                    submission_status=sac["submission_status"],
+                    transition_name=sac["transition_name"],
+                    transition_date=sac["transition_date"],
                     general_information=gi,
                 )
         sorted_chains = get_and_generate_submission_chains_by_distance("2022")
@@ -150,17 +150,17 @@ class DistanceChainingTests(TestCase):
             for ein in ["123456789", "123123123"]:
                 rid_count += 1
 
-                gi = deepcopy(sac_01["general_information"])
+                gi = deepcopy(sac["general_information"])
                 gi["ein"] = ein
 
-                rid = sac_01["report_id"][:-1] + f"{rid_count}"
+                rid = sac["report_id"][:-1] + f"{rid_count}"
 
                 baker.make(
                     SingleAuditChecklist,
                     report_id=rid,
-                    submission_status=sac_01["submission_status"],
-                    transition_name=sac_01["transition_name"],
-                    transition_date=sac_01["transition_date"],
+                    submission_status=sac["submission_status"],
+                    transition_name=sac["transition_name"],
+                    transition_date=sac["transition_date"],
                     general_information=gi,
                 )
 
@@ -177,11 +177,11 @@ class EquivalenceChainingTests(TestCase):
         """A single record can never form a chain."""
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"],
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
-            general_information=sac_01["general_information"],
+            report_id=sac["report_id"],
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
+            general_information=sac["general_information"],
         )
         sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
         self.assertEqual(len(sorted_chains), 0)
@@ -190,19 +190,19 @@ class EquivalenceChainingTests(TestCase):
         """Two records with identical equivalence fields form exactly one chain."""
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"],
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
-            general_information=sac_01["general_information"],
+            report_id=sac["report_id"],
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
+            general_information=sac["general_information"],
         )
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"][:-1] + "2",
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
-            general_information=sac_01["general_information"],
+            report_id=sac["report_id"][:-1] + "2",
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
+            general_information=sac["general_information"],
         )
         sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
         self.assertEqual(len(sorted_chains), 1)
@@ -212,20 +212,20 @@ class EquivalenceChainingTests(TestCase):
         """A single character difference in email does not form a chain."""
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"],
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
-            general_information=sac_01["general_information"],
+            report_id=sac["report_id"],
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
+            general_information=sac["general_information"],
         )
-        gi = deepcopy(sac_01["general_information"])
+        gi = deepcopy(sac["general_information"])
         gi["auditee_email"] = gi["auditee_email"][:-1] + "x"
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"][:-1] + "2",
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
+            report_id=sac["report_id"][:-1] + "2",
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
             general_information=gi,
         )
         sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
@@ -238,14 +238,14 @@ class EquivalenceChainingTests(TestCase):
         for _ in range(2):
             for ein in ["123456789", "123123123"]:
                 rid_count += 1
-                gi = deepcopy(sac_01["general_information"])
+                gi = deepcopy(sac["general_information"])
                 gi["ein"] = ein
                 baker.make(
                     SingleAuditChecklist,
-                    report_id=sac_01["report_id"][:-1] + f"{rid_count}",
-                    submission_status=sac_01["submission_status"],
-                    transition_name=sac_01["transition_name"],
-                    transition_date=sac_01["transition_date"],
+                    report_id=sac["report_id"][:-1] + f"{rid_count}",
+                    submission_status=sac["submission_status"],
+                    transition_name=sac["transition_name"],
+                    transition_date=sac["transition_date"],
                     general_information=gi,
                 )
         sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
@@ -260,20 +260,20 @@ class EquivalenceChainingTests(TestCase):
         """
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"],
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
-            general_information=sac_01["general_information"],
+            report_id=sac["report_id"],
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
+            general_information=sac["general_information"],
         )
-        gi_migration = deepcopy(sac_01["general_information"])
+        gi_migration = deepcopy(sac["general_information"])
         gi_migration["auditee_uei"] = GSA_MIGRATION
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"][:-1] + "2",
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
+            report_id=sac["report_id"][:-1] + "2",
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
             general_information=gi_migration,
         )
         sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
@@ -286,22 +286,22 @@ class EquivalenceChainingTests(TestCase):
         Two GSA_MIGRATION records with the same partial key
         should form their own chain even without a GSAFAC peer.
         """
-        gi_migration = deepcopy(sac_01["general_information"])
+        gi_migration = deepcopy(sac["general_information"])
         gi_migration["auditee_uei"] = GSA_MIGRATION
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"],
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
+            report_id=sac["report_id"],
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
             general_information=gi_migration,
         )
         baker.make(
             SingleAuditChecklist,
-            report_id=sac_01["report_id"][:-1] + "2",
-            submission_status=sac_01["submission_status"],
-            transition_name=sac_01["transition_name"],
-            transition_date=sac_01["transition_date"],
+            report_id=sac["report_id"][:-1] + "2",
+            submission_status=sac["submission_status"],
+            transition_name=sac["transition_name"],
+            transition_date=sac["transition_date"],
             general_information=gi_migration,
         )
         sorted_chains = get_and_generate_submission_chains_by_equivalence("2022")
@@ -311,21 +311,21 @@ class EquivalenceChainingTests(TestCase):
 
 class ReportIdChainingTests(TestCase):
     sub = {
-        "report_id": sac_01["report_id"],
-        "submission_status": sac_01["submission_status"],
-        "transition_name": sac_01["transition_name"],
-        "transition_date": sac_01["transition_date"],
-        "general_information": sac_01["general_information"],
-        "resubmission_meta": sac_01["resubmission_meta"],
+        "report_id": sac["report_id"],
+        "submission_status": sac["submission_status"],
+        "transition_name": sac["transition_name"],
+        "transition_date": sac["transition_date"],
+        "general_information": sac["general_information"],
+        "resubmission_meta": sac["resubmission_meta"],
     }
 
-    rid_1 = sac_01["report_id"]
+    rid_1 = sac["report_id"]
     sub_1 = {
         **sub,
         "report_id": rid_1,
     }
 
-    rid_2 = sac_01["report_id"][:-1] + "2"
+    rid_2 = sac["report_id"][:-1] + "2"
     sub_2 = {
         **sub,
         "report_id": rid_2,
@@ -352,7 +352,7 @@ class ReportIdChainingTests(TestCase):
             SingleAuditChecklist,
             **self.sub,
         )
-        sorted_chains = get_and_generate_submission_chain_by_report_ids([sac_01["report_id"]])
+        sorted_chains = get_and_generate_submission_chain_by_report_ids([sac["report_id"]])
         self.assertEqual(len(sorted_chains), 0)
 
     def test_no_chains_different_ueis(self):
