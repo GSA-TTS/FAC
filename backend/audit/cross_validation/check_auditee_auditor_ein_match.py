@@ -5,7 +5,7 @@ def check_auditee_auditor_ein_match(sac_dict, *_args, **_kwargs):
     """
     Warns if the auditee EIN and auditor EIN are identical.
 
-    If either or both EINs are absent, no warning is raised.
+    If either or both EINs are absent, no warning is raised. The "required fields" individual check will get those.
     """
     all_sections = sac_dict["sf_sac_sections"]
     general_information = all_sections.get("general_information", {})
