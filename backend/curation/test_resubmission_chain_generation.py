@@ -374,7 +374,7 @@ class ReportIdChainingTests(TestCase):
         self.assertEqual(len(sorted_chains), 0)
 
     def test_no_chains_different_ays(self):
-        """Two records with different UEIs can never form a chain."""
+        """Two records with different AYs can never form a chain."""
         baker.make(
             SingleAuditChecklist,
             **self.sac_1,
