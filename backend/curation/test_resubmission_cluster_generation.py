@@ -308,3 +308,89 @@ class EquivalenceChainingTests(TestCase):
 
         self.assertEqual(len(sorted_chains), 1)
         self.assertEqual(len(sorted_chains[0]), 2)
+
+class ReportIdChainingTests(TestCase):
+    sub = {
+        "report_id": sac_01["report_id"],
+        "submission_status": sac_01["submission_status"],
+        "transition_name": sac_01["transition_name"],
+        "transition_date": sac_01["transition_date"],
+        "general_information": sac_01["general_information"],
+        "resubmission_meta": sac_01["resubmission_meta"],
+    }
+
+    rid_1 = sac_01["report_id"]
+    sub_1 = {
+        **sub,
+        "report_id": rid_1,
+    }
+
+    rid_2 = sac_01["report_id"][:-1] + "2"
+    sub_2 = {
+        **sub,
+        "report_id": rid_2,
+    }
+
+    def test_one_chain_identical_fields(self):
+        """Two records with identical UEI and AY form exactly one chain."""
+        baker.make(
+            SingleAuditChecklist,
+            **self.sub_1,
+        )
+        baker.make(
+            SingleAuditChecklist,
+            **self.sub_2,
+        )
+
+        sorted_chains = get_and_generate_submission_chain_by_report_ids([self.rid_1, self.rid_2])
+        self.assertEqual(len(sorted_chains), 1)
+        self.assertEqual(len(sorted_chains[0]), 2)
+
+    def test_no_chains_single_record(self):
+        """A single record can never form a chain."""
+        baker.make(
+            SingleAuditChecklist,
+            **self.sub,
+        )
+        sorted_chains = get_and_generate_submission_chain_by_report_ids([sac_01["report_id"]])
+        self.assertEqual(len(sorted_chains), 0)
+
+    def test_no_chains_different_ueis(self):
+        """Two records with different UEIs can never form a chain."""
+        baker.make(
+            SingleAuditChecklist,
+            **self.sub_1,
+        )
+        baker.make(
+            SingleAuditChecklist,
+            **{
+                **self.sub_2,
+                "general_information": {
+                    **self.sub_2["general_information"],
+                    "auditee_uei": "FOOBARUEI",
+                },
+            }
+        )
+
+        sorted_chains = get_and_generate_submission_chain_by_report_ids([self.rid_1, self.rid_2])
+        self.assertEqual(len(sorted_chains), 0)
+
+    def test_no_chains_different_ays(self):
+        """Two records with different UEIs can never form a chain."""
+        baker.make(
+            SingleAuditChecklist,
+            **self.sub_1,
+        )
+        baker.make(
+            SingleAuditChecklist,
+            **{
+                **self.sub_2,
+                "general_information": {
+                    **self.sub_2["general_information"],
+                    "auditee_fiscal_period_end": "2077-12-31",
+                },
+            }
+        )
+
+        sorted_chains = get_and_generate_submission_chain_by_report_ids([self.rid_1, self.rid_2])
+        self.assertEqual(len(sorted_chains), 0)
