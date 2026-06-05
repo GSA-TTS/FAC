@@ -2,25 +2,25 @@
 
 -c ../requirements.txt
 
-aiohttp
-asyncio
-bandit
-black>=26.3.1
-coverage
-django-debug-toolbar
-djlint
-faker
-flake8
-gitpython>=3.1.41
-jsonnet
-model_bakery
-mypy
-pandas
-pip-tools>=7.4.1
-tblib
-toml
-types-python-slugify
-types-pytz
-types-requests
-whitenoise
-xkcdpass
+aiohttp==3.13.3
+asyncio==4.0.0
+bandit==1.7.10
+black==26.3.1
+coverage==7.6.3
+django-debug-toolbar==4.4.6
+djlint==1.35.2
+faker==30.5.0
+flake8==7.1.1
+gitpython==3.1.43
+jsonnet==0.20.0
+model-bakery==1.20.0
+mypy==1.12.0
+pandas==2.2.3
+pip-tools==7.4.1
+tblib==3.0.0
+toml==0.10.2
+types-python-slugify==8.0.2.20240310
+types-pytz==2024.2.0.20241003
+types-requests==2.32.0.20241016
+whitenoise==6.7.0
+xkcdpass==1.19.9
