@@ -14,6 +14,7 @@ from users.models import StaffUser
 from audit.models.constants import STATUS
 from curation.curationlib.generate_resubmission_chains import (
     get_and_generate_submission_chains_by_equivalence,
+    get_and_generate_submission_chain_by_report_ids,
 )
 from curation.curationlib.export_resubmission_chains import (
     export_chains_as_csv,
@@ -161,6 +162,10 @@ def annotate_linked_reports(options, sorted_chains):
                     pass
 
 
+def comma_separated_list(string):
+    return string.split(",")
+
+
 class Command(BaseCommand):
     """Link resubmissions, annotating with `resubmission_meta` data."""
 
@@ -168,8 +173,14 @@ class Command(BaseCommand):
         parser.add_argument(
             "--audit_year",
             type=str,
-            required=True,
+            required=False,
             help="Audit year to process",
+        )
+        parser.add_argument(
+            "--report_ids",
+            type=comma_separated_list,
+            required=False,
+            help="Report IDs to process",
         )
         parser.add_argument(
             "--email",
@@ -185,47 +196,72 @@ class Command(BaseCommand):
         parser.set_defaults(annotate_old=False)
 
     def handle(self, *args, **options):
-        # And, did they provide a staff user email?
-        # (Note that they had to have privs in TF and be able to
-        # enable SSH inproduction in order to get here.)
-        try:
-            ok_staff_user = StaffUser.objects.get(staff_email=options["email"])
-        except StaffUser.DoesNotExist:
-            logger.error(f'Staff user {options["email"]} does not exist')
-            ok_staff_user = False
-        if not ok_staff_user:
-            sys.exit(-1)
+        audit_year = options["audit_year"]
+        report_ids = options["report_ids"]
+        noisy = options["noisy"]
+        email = options["email"]
+        annotate_old = options["annotate_old"]
 
-        sorted_chains = [
-            chain
-            for chain in get_and_generate_submission_chains_by_equivalence(
-                options["audit_year"], noisy=options["noisy"]
+        self.exit_if_not_staff_user(email)
+
+        if (audit_year and report_ids) or not (audit_year or report_ids):
+            logger.error("One of --audit_year and --report_ids must be provided.")
+            sys.exit()
+
+        if audit_year:
+            sorted_chains = [
+                chain
+                for chain in get_and_generate_submission_chains_by_equivalence(
+                    audit_year,
+                    noisy=noisy,
+                )
+                if len(chain) > 1
+            ]
+        else:  # report_ids
+            sorted_chains = get_and_generate_submission_chain_by_report_ids(
+                report_ids, noisy=noisy
             )
-            if len(chain) > 1
-        ]
-
-        filename_markdown = export_chains_as_markdown(
-            options["audit_year"], sorted_chains, noisy=options["noisy"]
-        )
-        logger.info(f"Submission chains markdown exported to {filename_markdown}.")
-
-        filename_csv = export_chains_as_csv(
-            options["audit_year"], sorted_chains, noisy=options["noisy"]
-        )
-        logger.info(f"Submission chain CSV exported to {filename_csv}.")
 
         len_sorted_chains = len(sorted_chains)
         logger.info(f"Found {len_sorted_chains} resubmission chains.")
+
         if len_sorted_chains == 0:
             logger.info("Exiting.")
             sys.exit(0)
 
-        k = input("Review markdown/CSV and enter `c` to continue:")
+        filename_markdown = export_chains_as_markdown(
+            sorted_chains,
+            AY=audit_year,
+            report_ids=report_ids,
+        )
+        logger.info(f"Submission chains markdown exported to {filename_markdown}.")
+
+        filename_csv = export_chains_as_csv(
+            sorted_chains,
+            AY=audit_year,
+            report_ids=report_ids,
+        )
+        logger.info(f"Submission chain CSV exported to {filename_csv}.")
+
+        k = input("Review markdown/CSV and enter `c` to continue: ")
         if k != "c":
-            logger.error("Exiting.")
+            logger.info("Exiting.")
             sys.exit()
         else:
             annotate_linked_reports(options, sorted_chains)
 
-        if options["annotate_old"]:
+        if annotate_old:
             annotate_old(options)
+
+    def exit_if_not_staff_user(self, email):
+        """
+        Note that they had to have privs in TF and be able to enable SSH
+        in production in order to get here.
+        """
+        try:
+            ok_staff_user = StaffUser.objects.get(staff_email=email)
+        except StaffUser.DoesNotExist:
+            logger.error(f"Staff user {email} does not exist")
+            ok_staff_user = False
+        if not ok_staff_user:
+            sys.exit(-1)
