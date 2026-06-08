@@ -248,9 +248,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         ETL.
         """
         try:
-            # This will force a re-disseminated record to regenerate the cog/over. Perhaps we should do this always?
-            self.cognizant_agency = None
-            self.oversight_agency = None
             if not self.cognizant_agency and not self.oversight_agency:
                 self.assign_cog_over()
             intake_to_dissem = IntakeToDissemination(self)
