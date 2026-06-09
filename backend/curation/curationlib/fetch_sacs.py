@@ -10,9 +10,25 @@ def fetch_disseminated_sacs_for_ay(AY, noisy=False):
     Equivalence or distance-based clustering will decide which submissions actually form resubmission chains.
     We just need the full population of disseminated submissions for the year.
     """
+    return _fetch_disseminated_sacs(
+        Q(general_information__auditee_fiscal_period_end__startswith=AY),
+        noisy,
+    )
+
+
+def fetch_disseminated_sacs_for_report_ids(report_ids, noisy=False):
+    """
+    Return all disseminated SACs for the given report IDs.
+    """
+    return _fetch_disseminated_sacs(
+        Q(report_id__in=report_ids),
+        noisy,
+    )
+
+
+def _fetch_disseminated_sacs(query, noisy=False):
     sacs = SingleAuditChecklist.objects.filter(
-        Q(general_information__auditee_fiscal_period_end__startswith=AY)
-        & Q(submission_status="disseminated")
+        query & Q(submission_status="disseminated")
     )
 
     # Sort in Python rather than the ORM - transition_date is a JSON array
@@ -23,6 +39,6 @@ def fetch_disseminated_sacs_for_ay(AY, noisy=False):
 
     if noisy:
         print("\n-=-=-=-=-=-=-=-=-=-")
-        print(f"AY{AY}: {len(sacs)} disseminated submissions fetched")
+        print(f"{len(sacs)} disseminated submissions fetched")
 
     return sacs
