@@ -43,11 +43,23 @@ def _parse_meta(row):
 
     try:
         return None, json.loads(raw)
-    except json.JSONDecodeError as e:
+    except json.JSONDecodeError as err:
         logger.error(
             f"Invalid JSON in prior_resubmission_meta for SAC: {row["report_id"]} — skipping submission."
         )
-        return e, None
+        return err, None
+
+
+def _safe_sac_getter(report_id):
+    """
+    Returns the SAC object for the given report_id. Logs and returns an error
+    upon failure.
+    """
+    try:
+        return None, SingleAuditChecklist.objects.get(report_id=report_id)
+    except SingleAuditChecklist.DoesNotExist as err:
+        logger.error(f"SAC not found: {report_id} — skipping submission.")
+        err, None
 
 
 def _load_report_ids(report_ids):
@@ -83,12 +95,7 @@ def _get_ordered_sac_chain(report_ids):
     """Returns a list of SACs ordered by version"""
     sacs_by_version = {}
     for report_id in report_ids:
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        except SingleAuditChecklist.DoesNotExist:
-            logger.error(f"SAC not found: {report_id} — exiting. ")
-            sys.exit(-1)
-
+        _, sac = _safe_sac_getter(report_id)
         sacs_by_version[sac.resubmission_meta["version"]] = sac
 
     len_sacs = len(sacs_by_version)
@@ -198,10 +205,8 @@ def _restore_sacs(rows, user, noisy=False):
             if err:
                 continue
 
-            try:
-                sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            except SingleAuditChecklist.DoesNotExist:
-                logger.error(f"SAC not found: {report_id} — skipping submission. ")
+            err, sac = _safe_sac_getter(report_id)
+            if err:
                 continue
 
             if noisy:
