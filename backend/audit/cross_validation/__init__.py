@@ -38,15 +38,15 @@ SingleAuditChecklist instance and convert it into a dictionary with the above
 structure.
 
 Each validator function should return either an empty list if there are no
-errors or a list of dicts where each dict has a single field, "error", that
-has a string describing the error as its value.
+errors/warnings, or a list of dicts where each dict has a single field, "error"/"warning", that
+has a string describing the error/warning as its value.
 This value is intended to be shown to the user.
 
-So, the no-errors return value is:
+So, the no-errors and no-warnings return value is:
 
     []
 
-And an example with-errors return value is:
+An example with-errors return value is:
 
     [
         {
@@ -54,6 +54,16 @@ And an example with-errors return value is:
         }
     ]
 
+An example with-warnings return value is:
+
+    [
+        {
+            "warning": "It's an older code, sir, but it checks out."
+        }
+    ]
+
+A single validator may return a mix of error and warning dicts if needed.
+We should try not to, in the interest of keeping each validation function simple and readable.
 """
 
 from .auditee_ueis_match import auditee_ueis_match
@@ -79,8 +89,11 @@ from .sac_validation_shape import sac_validation_shape  # noqa: F401
 from .submission_progress_check import submission_progress_check
 from .tribal_data_sharing_consent import tribal_data_sharing_consent
 from .validate_general_information import validate_general_information
+from .check_auditee_auditor_ein_match import check_auditee_auditor_ein_match
+from .check_name_fields_not_unique import check_name_fields_not_unique
 
 functions = [
+    # "Errors", or validations that would prevent a submission upon failure.
     auditee_ueis_match,
     check_additional_ueis,
     check_additional_eins,
@@ -106,4 +119,7 @@ functions = [
     tribal_data_sharing_consent,
     validate_general_information,
     check_resubmission_still_allowed,
+    # "Warnings", or validations that would just inform a user of a potential issue.
+    check_auditee_auditor_ein_match,
+    check_name_fields_not_unique,
 ]

@@ -571,8 +571,6 @@ class IntakeToDisseminationTests(TestCase):
         self.intake_to_dissemination.load_secondary_auditor()
         self.intake_to_dissemination.save_dissemination_objects()
         sec_auditor = SecondaryAuditor.objects.first()
-        print(self.sac.report_id)
-        print(sec_auditor.report_id)
         self.assertEqual(self.sac.report_id, sec_auditor.report_id.report_id)
 
     def test_load_additional_ueis(self):

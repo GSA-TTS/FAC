@@ -68,13 +68,13 @@ def process_workbook_set(workbook_set_path, is_gsa_migration=True):
                 full_path = os.path.join(wb_path, file)
                 extractor, validator = map_file_to_extractor_validator(full_path)
                 if extractor:
-                    print(f"Extracting and validating {file}")
+                    # print(f"Extracting and validating {file}")
                     ir = extractor(full_path, is_gsa_migration)
                     validator(ir)
                 else:
                     msg = f"No extractor found for [{file}]"
-                    print(msg)
-                    raise Exception(msg)
+                    # print(msg)
+                    raise ModuleNotFoundError(msg)
 
 
 class PassingWorkbooks(TestCase):
@@ -86,5 +86,5 @@ class PassingWorkbooks(TestCase):
         with set_sac_to_context(sac):
             for dirpath, dirnames, _ in os.walk(workbook_sets):
                 for workbook_set in dirnames:
-                    print("Walking ", workbook_set)
+                    # print("Walking ", workbook_set)
                     process_workbook_set(os.path.join(dirpath, workbook_set))
