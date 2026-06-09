@@ -133,3 +133,10 @@ def audit_equivalence_key(r):
     normalized_uei = None if auditee_uei == GSA_MIGRATION else auditee_uei
 
     return (normalized_uei, year, ein, auditee_name, auditee_email)
+
+
+def order_reports_key(r):
+    for ndx, tn in enumerate(list(reversed(r.transition_name))):
+        if tn == "submitted":
+            break
+    return list(reversed(r.transition_date))[ndx]

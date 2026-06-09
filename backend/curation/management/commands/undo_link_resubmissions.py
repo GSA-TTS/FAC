@@ -11,13 +11,22 @@ from audit.models import (
     SubmissionEvent,
     User,
 )
-from audit.models.constants import RESUBMISSION_STATUS
+from audit.models.constants import RESUBMISSION_STATUS, STATUS
 from users.models import StaffUser
+from curation.curationlib.audit_distance import (
+    prep_string,
+    get_audit_year,
+    order_reports_key,
+)
 
 logger = logging.getLogger(__name__)
 
 # Columns that must be present in the CSV produced by link_resubmissions.
 REQUIRED_COLUMNS = {"report_id", "prior_submission_status", "prior_resubmission_meta"}
+UNLINKED_RESUB_STATUS = {
+    "version": 0,
+    "resubmission_status": RESUBMISSION_STATUS.UNKNOWN,
+}
 
 
 def _parse_meta(raw):
@@ -29,11 +38,65 @@ def _parse_meta(raw):
     because a NULL would be redisseminated as version 1.
     """
     if raw == "" or raw is None:
-        return {
-            "version": 0,
-            "resubmission_status": RESUBMISSION_STATUS.UNKNOWN,
-        }
+        return UNLINKED_RESUB_STATUS
+
     return json.loads(raw)
+
+
+def _load_report_ids(report_ids):
+    """
+    Read the report_ids and return a list of row dicts.
+    """
+    ordered_sac_chain = _get_ordered_sac_chain(report_ids)
+    rows = []
+
+    for sac in ordered_sac_chain:
+        rows.append(
+            {
+                "chain_index": 0,
+                "report_id": sac.report_id,
+                "audit_year": get_audit_year(sac),
+                "fac_accepted_date": order_reports_key(sac).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                ),
+                "auditee_uei": sac.general_information["auditee_uei"],
+                "auditee_ein": sac.general_information["ein"],
+                "auditee_email": prep_string(sac.general_information["auditee_email"]),
+                "auditee_name": prep_string(sac.general_information["auditee_name"]),
+                "auditee_state": prep_string(sac.general_information["auditee_state"]),
+                "prior_submission_status": STATUS.DISSEMINATED,
+                "prior_resubmission_meta": (json.dumps(UNLINKED_RESUB_STATUS)),
+            },
+        )
+
+    return rows
+
+
+def _get_ordered_sac_chain(report_ids):
+    """Returns a list of SACs ordered by version"""
+    sacs_by_version = {}
+    for report_id in report_ids:
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except SingleAuditChecklist.DoesNotExist:
+            logger.error(f"SAC not found: {report_id} — exiting. ")
+            sys.exit(-1)
+
+        sacs_by_version[sac.resubmission_meta["version"]] = sac
+
+    len_sacs = len(sacs_by_version)
+    len_report_ids = len(report_ids)
+    if len_sacs != len_report_ids:
+        logger.error(f"Only found {len_sacs} of {len_report_ids} submissions. Exiting.")
+        sys.exit(-1)
+
+    ordered_sacs = []
+    all_versions = sacs_by_version.keys()
+
+    for v in sorted(all_versions):
+        ordered_sacs.append(sacs_by_version[v])
+
+    return ordered_sacs
 
 
 def _load_csv(csv_path):
@@ -116,19 +179,30 @@ def _restore_sacs(rows, user, noisy=False):
                 sac.redisseminate()
 
 
+def _comma_separated_list(string):
+    return string.split(",")
+
+
 class Command(BaseCommand):
     """
     Undo a prior run of link_resubmissions by restoring pre-linkage metadata.
 
     Reads the CSV produced by link_resubmissions and writes those values back, then redisseminates each submission.
+    Alternatively, a list of report_ids can be provided.
     """
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--csv",
             type=str,
-            required=True,
+            required=False,
             help="Path to the CSV file produced by a prior run of link_resubmissions",
+        )
+        parser.add_argument(
+            "--report_ids",
+            type=_comma_separated_list,
+            required=False,
+            help="Report IDs to process",
         )
         parser.add_argument(
             "--email",
@@ -141,38 +215,49 @@ class Command(BaseCommand):
         parser.set_defaults(noisy=False)
 
     def handle(self, *args, **options):
+        csv = options["csv"]
+        report_ids = options["report_ids"]
+        noisy = options["noisy"]
+        email = options["email"]
+
         # Verify staff user. Note that it's VERY hard to get here without already being staff.
         try:
-            ok_staff_user = StaffUser.objects.get(staff_email=options["email"])
+            ok_staff_user = StaffUser.objects.get(staff_email=email)
         except StaffUser.DoesNotExist:
-            logger.error(f'Staff user {options["email"]} does not exist')
+            logger.error(f"Staff user {email} does not exist")
             ok_staff_user = False
         if not ok_staff_user:
             sys.exit(-1)
 
-        rows = _load_csv(options["csv"])
+        if csv and report_ids:
+            logger.error("Only one of --csv and --report_ids must be provided.")
+            sys.exit(-1)
+        if report_ids:
+            rows = _load_report_ids(report_ids)
+        elif csv:
+            rows = _load_csv(csv)
 
-        # Display a little summary of what will be undone before touching any submissions.
-        report_ids = [r["report_id"] for r in rows]
-        logger.info(f"CSV contains {len(rows)} submissions.")
+            # Display a little summary of what will be undone before touching any submissions.
+            logger.info(f"CSV contains {len(rows)} submissions.")
 
-        # We should have bailed earlier if the CSV is empty. In case the parsing went wrong, exit when no report_ids are found.
+            report_ids = [r["report_id"] for r in rows]
+
         if len(report_ids) == 0:
             logger.info("Exiting.")
             sys.exit(0)
 
-        if options["noisy"]:
+        if noisy:
             for rid in report_ids:
                 logger.info(f"  {rid}")
 
-        k = input("\nPress `c` to continue:")
+        k = input("\nPress `c` to continue: ")
         if k != "c":
             logger.error("Exiting.")
             sys.exit()
 
         # Do the thing!
-        ok_user = User.objects.get(email=options["email"])
-        _restore_sacs(rows, ok_user, noisy=options["noisy"])
+        ok_user = User.objects.get(email=email)
+        _restore_sacs(rows, ok_user, noisy=noisy)
 
         logger.info(
             f"\nUndo complete. {len(rows)} submissions restored and redisseminated."
