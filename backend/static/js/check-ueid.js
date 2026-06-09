@@ -48,12 +48,12 @@ function allResponsesValid() {
 function updateValidateButtonState() {
   const btn = document.getElementById('continue');
 
-  console.log('BUTTON CHECK', {
-    filled: requiredFieldsFilled(),
-    valid: allResponsesValid(),
-    start: getTrimmedValue('auditee_fiscal_period_start'),
-    end: getTrimmedValue('auditee_fiscal_period_end'),
-  });
+  // console.log('BUTTON CHECK', {
+  //   filled: requiredFieldsFilled(),
+  //   valid: allResponsesValid(),
+  //   start: getTrimmedValue('auditee_fiscal_period_start'),
+  //   end: getTrimmedValue('auditee_fiscal_period_end'),
+  // });
 
   const shouldDisable = !(requiredFieldsFilled() && allResponsesValid());
 
