@@ -139,9 +139,12 @@ def _load_csv(csv_path):
 def _chain_creates_orphan(chain_rows):
     """Returns true if unlinking the chain's latest creates an orphan"""
     latest_report_id = chain_rows[-1]["report_id"]
-    sac = SingleAuditChecklist.objects.get(report_id=latest_report_id)
-    orphaned_report_id = sac.resubmission_meta.get("next_report_id", None)
 
+    err, sac = _safe_sac_getter(latest_report_id)
+    if err:
+        return True
+
+    orphaned_report_id = sac.resubmission_meta.get("next_report_id", None)
     if orphaned_report_id:
         logger.error(
             f"Unlinking newest report_id given ({latest_report_id}) would orphan {orphaned_report_id} - skipping chain.",
@@ -196,8 +199,7 @@ def _restore_sacs(rows, user, noisy=False):
         if _chain_contains_version_skip(chain_rows):
             continue
 
-        r_chain_rows = reversed(chains[chain_index])
-        for row in r_chain_rows:
+        for row in reversed(chain_rows):
             report_id = row["report_id"]
             prior_status = row["prior_submission_status"]
 
