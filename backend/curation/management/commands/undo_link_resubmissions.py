@@ -122,9 +122,42 @@ def _load_csv(csv_path):
     return rows
 
 
+def _chain_creates_orphan(chain_rows):
+    """Returns true if unlinking the chain's latest creates an orphan"""
+    latest_report_id = chain_rows[-1]["report_id"]
+    sac = SingleAuditChecklist.objects.get(report_id=latest_report_id)
+    orphaned_report_id = sac.resubmission_meta.get("next_report_id", None)
+
+    if orphaned_report_id:
+        logger.error(
+            f"Unlinking newest report_id given ({latest_report_id}) would orphan {orphaned_report_id} - skipping chain.",
+        )
+        return True
+
+    return False
+
+
+def _chain_contains_version_skip(chain_rows):
+    """Returns true if the given chain contains a version skip"""
+    cur_ver = last_ver = None
+
+    for row in chain_rows:
+        cur_ver = json.loads(row["prior_resubmission_meta"])["version"]
+
+        if last_ver and last_ver - cur_ver != 1:
+            logger.error(
+                f"Submission chain contains a {last_ver} to {cur_ver} version skip for {row["report_id"]} - skipping chain.",
+            )
+            return True
+        else:
+            last_ver = cur_ver
+
+    return False
+
+
 def _restore_sacs(rows, user, noisy=False):
     """
-    Restore submission_status and resubmission_meta for every row in the CSV.
+    Restore submission_status and resubmission_meta for every row given.
 
     SACs are processed in reverse order so that a DEPRECATED submission is never
     left transiently pointing at a submission that has already been reset.
@@ -137,8 +170,16 @@ def _restore_sacs(rows, user, noisy=False):
 
     # Iterate chains in descending order. Within each chain, move in reverse order.
     for chain_index in sorted(chains.keys(), reverse=True):
-        chain_rows = list(reversed(chains[chain_index]))
-        for row in chain_rows:
+        chain_rows = chains[chain_index]
+
+        if _chain_creates_orphan(chain_rows):
+            continue
+
+        if _chain_contains_version_skip(chain_rows):
+            continue
+
+        r_chain_rows = reversed(chains[chain_index])
+        for row in r_chain_rows:
             report_id = row["report_id"]
             prior_status = row["prior_submission_status"]
 
@@ -146,7 +187,7 @@ def _restore_sacs(rows, user, noisy=False):
                 prior_meta = _parse_meta(row["prior_resubmission_meta"])
             except json.JSONDecodeError:
                 logger.error(
-                    f"Invalid JSON in prior_resubmission_meta for SAC: {report_id} — skipping."
+                    f"Invalid JSON in prior_resubmission_meta for SAC: {report_id} — skipping submission."
                 )
                 continue
 
@@ -154,7 +195,7 @@ def _restore_sacs(rows, user, noisy=False):
                 sac = SingleAuditChecklist.objects.get(report_id=report_id)
             except SingleAuditChecklist.DoesNotExist:
                 logger.error(
-                    f"SAC not found: {report_id} — skipping. "
+                    f"SAC not found: {report_id} — skipping submission. "
                     "The database may have changed since this CSV was produced."
                 )
                 continue
