@@ -194,10 +194,7 @@ def _restore_sacs(rows, user, noisy=False):
             try:
                 sac = SingleAuditChecklist.objects.get(report_id=report_id)
             except SingleAuditChecklist.DoesNotExist:
-                logger.error(
-                    f"SAC not found: {report_id} — skipping submission. "
-                    "The database may have changed since this CSV was produced."
-                )
+                logger.error(f"SAC not found: {report_id} — skipping submission. ")
                 continue
 
             if noisy:
@@ -277,15 +274,14 @@ class Command(BaseCommand):
             rows = _load_report_ids(report_ids)
         elif csv:
             rows = _load_csv(csv)
-
-            # Display a little summary of what will be undone before touching any submissions.
-            logger.info(f"CSV contains {len(rows)} submissions.")
-
             report_ids = [r["report_id"] for r in rows]
 
-        if len(report_ids) == 0:
+        len_report_ids = len(report_ids)
+        if len_report_ids == 0:
             logger.info("Exiting.")
             sys.exit(0)
+        else:
+            logger.info(f"Unlinking {len_report_ids} submissions.")
 
         if noisy:
             for rid in report_ids:
