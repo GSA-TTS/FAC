@@ -29,18 +29,25 @@ UNLINKED_RESUB_STATUS = {
 }
 
 
-def _parse_meta(raw):
+def _parse_meta(row):
     """
-    Pull the JSON resub metadata from the CSV.
+    Pull the JSON resub metadata from the row.
 
     Submissions whose prior_resubmission_meta is empty were NULL before linkage.
     They must be restored to version 0 rather than NULL,
     because a NULL would be redisseminated as version 1.
     """
+    raw = row["prior_resubmission_meta"]
     if raw == "" or raw is None:
         return UNLINKED_RESUB_STATUS
 
-    return json.loads(raw)
+    try:
+        return None, json.loads(raw)
+    except json.JSONDecodeError as e:
+        logger.error(
+            f"Invalid JSON in prior_resubmission_meta for SAC: {row["report_id"]} — skipping submission."
+        )
+        return e, None
 
 
 def _load_report_ids(report_ids):
@@ -142,7 +149,11 @@ def _chain_contains_version_skip(chain_rows):
     cur_ver = last_ver = None
 
     for row in chain_rows:
-        cur_ver = json.loads(row["prior_resubmission_meta"])["version"]
+        err, prior_meta = _parse_meta(row)
+        if err:
+            return True
+
+        cur_ver = prior_meta["version"]
 
         if last_ver and last_ver - cur_ver != 1:
             logger.error(
@@ -183,12 +194,8 @@ def _restore_sacs(rows, user, noisy=False):
             report_id = row["report_id"]
             prior_status = row["prior_submission_status"]
 
-            try:
-                prior_meta = _parse_meta(row["prior_resubmission_meta"])
-            except json.JSONDecodeError:
-                logger.error(
-                    f"Invalid JSON in prior_resubmission_meta for SAC: {report_id} — skipping submission."
-                )
+            err, prior_meta = _parse_meta(row)
+            if err:
                 continue
 
             try:
