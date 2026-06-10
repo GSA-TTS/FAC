@@ -8,6 +8,7 @@ from audit.models import SingleAuditChecklist
 from config.settings import GSA_MIGRATION
 from curation.management.commands.undo_link_resubmissions import (
     _get_ordered_sac_chain,
+    _load_report_ids,
 )
 
 sac: Dict[str, Any] = {
@@ -106,3 +107,20 @@ class GetOrderedSacChainTests(TestCase):
 
         with self.assertRaises(RuntimeError):
             _get_ordered_sac_chain([rid_3, rid_1, rid_2])
+
+class LoadReportIdsTests(TestCase):
+    def test_load_report_ids(self):
+        """Standard case"""
+        baker.make(
+            SingleAuditChecklist,
+            **sac_1,
+        )
+        baker.make(
+            SingleAuditChecklist,
+            **sac_2,
+        )
+
+        rows = _load_report_ids([rid_1, rid_2])
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["report_id"], rid_1)
+        self.assertEqual(rows[1]["report_id"], rid_2)
