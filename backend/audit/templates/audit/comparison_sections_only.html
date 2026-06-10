@@ -1,0 +1,158 @@
+{% comment %}
+  each key is a section, mapped to what changed
+  each section contains a tag "status" (same, changed) and "in_r1", "in_r2" as lists
+  this is broken out so that it can be embedded in a Federal view without the trappings, 
+    if we decide that is desirable/necessary.
+{% endcomment %}
+
+{% if has_error %}
+  {% if comparison.status == "error" %}
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col">
+        <h2>{{ comparison.message }}</h2>
+      </div>
+    </div>
+  {% endif %}
+{% else %}
+  {% if not has_diffs %}
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col">
+        <h2>There are no changes between Single Audit Reports</h2>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+{% for section, changed in comparison.items %}
+  {% if changed.status == "error" %}
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col">
+        <h2>Changes in {{ nice_names | KV:section }}</h2>
+      </div>
+    </div>
+    <div class="grid-row"><div class="tablet:grid-col"><p>Error: {{ changed.message }} </p></div></div>
+  {% elif changed.status == "changed" %}
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col">
+        <h2>Changes in {{ nice_names | KV:section }}</h2>
+      </div>
+    </div>
+    {% if changed.in_r1|length > 0 %}
+    <div class="grid-row">
+      <div class="tablet:grid-col">
+        <table class="usa-table width-full">
+          <caption>Changes only in {{ r1 }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Field</th>
+              <th scope="col">Old value</th>
+              <th scope="col">New value</th>
+            </tr>
+          </thead>
+          {% for d in changed.in_r1|dictsort:"key" %}
+            <tr>
+              <td>
+                {{ d.key|repl:"_| "|title }}
+              </td>
+              <td>
+                {% if d.from is None %}
+                  No value
+                {% else %}
+                  {{ d.from }}
+                {% endif %}
+              </td>
+              <td>
+                {% if d.to is None %}
+                  No value
+                {% else %}
+                  {{ d.to }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+    {% endif %}
+    {% if changed.in_r2|length > 0 %}
+    <div class="grid-row">
+      <div class="tablet:grid-col">
+        <table class="usa-table usa-table--borderless">
+          <caption>Changes only in {{ r2 }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Field</th>
+              <th scope="col">Old value</th>
+              <th scope="col">New value</th>
+            </tr>
+          </thead>
+          {% for d in changed.in_r2|dictsort:"key" %}
+            <tr>
+              <th scope="row">
+                {{ d.key|repl:"_| "|title }}
+              </th>
+              <td>
+                {% if d.from is None %}
+                  No value
+                {% else %}
+                  {{ d.from }}
+                {% endif %}
+              </td>
+              <td>
+                {% if d.to is None %}
+                  No value
+                {% else %}
+                  {{ d.to }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+    {% endif %}
+    {% if changed.in_both|length > 0 %}
+    <div class="grid-row">
+      <div class="tablet:grid-col">
+        <table class="usa-table usa-table--borderless">
+          <caption>Changes from {{ r1 }} to {{ r2 }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Field</th>
+              <th scope="col">Old value</th>
+              <th scope="col">New value</th>
+            </tr>
+          </thead>
+          {% for d in changed.in_both|dictsort:"key" %}
+          <tr>
+              <th scope="row">
+                {{ d.key|repl:"_| "|title }}
+              </th>
+              <td>
+                {% if d.from is None %}
+                  No value
+                {% elif section == "single_audit_report" and d.key == "preview" %}
+                   <a href="{% url 'audit:PredisseminationPdfDownload' r1 %}" target="_blank">{{ r1 }}</a>
+                {% else %}
+                  {{ d.from }}
+                {% endif %}
+              </td>
+              <td>
+                {% if d.to is None %}
+                  No value
+                {% elif section == "single_audit_report" and d.key == "preview" %}
+                   <a href="{% url 'audit:PredisseminationPdfDownload' r2 %}" target="_blank">{{ r2 }}</a>
+                {% else %}
+                  {{ d.to }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  {% else %}
+    <!-- same or identical -->
+    <!-- <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div> -->    
+  {% endif %} <!-- for the big is changed/same -->
+{% endfor %} <!-- end section loop -->

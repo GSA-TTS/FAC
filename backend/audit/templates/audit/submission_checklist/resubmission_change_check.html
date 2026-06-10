@@ -1,0 +1,22 @@
+{% if previous_report_id %}
+<li class="usa-icon-list__item padding-bottom-105" id="secondary-auditors">
+<div class="usa-icon-list__icon text-disabled-dark">
+    <svg class="usa-icon margin-right-3" aria-hidden="true" role="img">
+      
+    </svg>
+  </div>
+  <div>
+    <p class="text-bold margin-0">
+      <a class="usa-link" href="{% url 'audit:CompareSubmissions' report_id %}">
+        Review changes in this resubmission
+      </a>
+    </p>
+    <p class="margin-top-2">
+      Compare this resubmission with <a class="usa-link" href="{% url 'audit:SubmissionProgress' previous_report_id %}">{{ previous_report_id }}</a>.
+    </p>
+    <p class="usa-alert__text">
+      This resubmission comparison does not absolve the auditor or auditee from their responsibility to verify and assert the correctness of their submission to the FAC.
+    </p>
+    </div>
+  </li>
+{% endif %}

@@ -67,7 +67,7 @@ class FailingWorkbooks(SimpleTestCase):
         failure_count = 0
         for dirpath, dirnames, _ in os.walk(workbook_sets):
             for workbook_set in dirnames:
-                print("Walking ", workbook_set)
+                # print("Walking ", workbook_set)
                 for wb_path, _, wb_files in os.walk(
                     os.path.join(dirpath, workbook_set)
                 ):
@@ -80,17 +80,19 @@ class FailingWorkbooks(SimpleTestCase):
                                 full_path
                             )
                             if extractor:
-                                print(
-                                    f"Expecting failure(s) in {file} via {validator.__name__}"
-                                )
+                                # print(
+                                #     f"Expecting failure(s) in {file} via {validator.__name__}"
+                                # )
                                 workbook_count += 1
                                 try:
                                     ir = extractor(full_path)
                                     validator(ir)
-                                    print(f"=== Did not fail on workbook {file} ===")
+                                    # print(f"=== Did not fail on workbook {file} ===")
                                 except ValidationError:
                                     failure_count += 1
                             else:
-                                print(f"No extractor found for [{file}]")
+                                msg = f"No extractor found for [{file}]"
+                                # print(msg)
+                                raise ModuleNotFoundError(msg)
 
         self.assertEqual(workbook_count, failure_count)

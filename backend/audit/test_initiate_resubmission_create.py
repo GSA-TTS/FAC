@@ -12,14 +12,15 @@ User = get_user_model()
 class ResubmissionTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="resubuser")
-        self.general_info = {
+        general_information = {
+            "auditee_fiscal_period_start": "2024-01-01",
             "auditee_fiscal_period_end": "2024-12-31",
-            "uei": "TESTUEI999999",
+            "auditee_uei": "TESTUEI999999",
         }
         self.orig = SingleAuditChecklist.objects.create(
             submitted_by=self.user,
             submission_status=STATUS.IN_PROGRESS,
-            general_information=self.general_info,
+            general_information=general_information,
         )
 
     def test_resubmission_is_created_atomically_and_correctly(self):
