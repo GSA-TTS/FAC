@@ -9,10 +9,13 @@ from config.settings import GSA_MIGRATION
 from curation.management.commands.undo_link_resubmissions import (
     _get_ordered_sac_chain,
     _load_report_ids,
+    _parse_meta,
     _safe_sac_getter,
 )
+from audit.models.constants import RESUBMISSION_STATUS, STATUS
 
-sac: Dict[str, Any] = {
+
+SAC: Dict[str, Any] = {
     "report_id": "2022-42-MAGIC-0000000001",
     "submission_status": "disseminated",
     "transition_name": [
@@ -43,32 +46,40 @@ sac: Dict[str, Any] = {
         "auditee_fiscal_period_end": "2022-12-31",
     },
     "resubmission_meta": {
+        "resubmission_status": RESUBMISSION_STATUS.UNKNOWN,
         "version": 1,
     },
 }
 
-rid_1 = sac["report_id"]
+rid_1 = SAC["report_id"]
 sac_1 = {
-    **sac,
+    **SAC,
     "report_id": rid_1,
+    "resubmission_meta": {
+        **SAC["resubmission_meta"],
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
+        "version": 1,
+    },
 }
 
-rid_2 = sac["report_id"][:-1] + "2"
+rid_2 = SAC["report_id"][:-1] + "2"
 sac_2 = {
     **sac_1,
     "report_id": rid_2,
     "resubmission_meta": {
         **sac_1["resubmission_meta"],
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
         "version": 2,
     },
 }
 
-rid_3 = sac["report_id"][:-1] + "3"
+rid_3 = SAC["report_id"][:-1] + "3"
 sac_3 = {
     **sac_1,
     "report_id": rid_3,
     "resubmission_meta": {
         **sac_1["resubmission_meta"],
+        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
         "version": 3,
     },
 }
@@ -106,6 +117,7 @@ class LoadReportIdsTests(TestCase):
         _bake_sacs([sac_1, sac_2])
 
         rows = _load_report_ids([rid_1, rid_2])
+
         self.assertEqual(len(rows), 2)
         self.assertEqual(rows[0]["report_id"], rid_1)
         self.assertEqual(rows[1]["report_id"], rid_2)
@@ -116,11 +128,27 @@ class SafeSacGetterTests(TestCase):
         _bake_sacs([sac_1])
 
         err, sac = _safe_sac_getter(rid_1)
+
         self.assertIsNone(err)
         self.assertEqual(sac.report_id, rid_1)
 
-    def test_safe_sac_getter(self):
+    def test_report_id_not_found(self):
         """report_id is not found"""
         err, sac = _safe_sac_getter(rid_1)
+
         self.assertIsInstance(err, SingleAuditChecklist.DoesNotExist)
         self.assertIsNone(sac)
+
+class ParseMetaTests(TestCase):
+    def test_parse_meta_report_ids(self):
+        """Standard case from loading report_ids"""
+        _bake_sacs([sac_1])
+        row = _load_report_ids([rid_1])[0]
+
+        err, meta = _parse_meta(row)
+
+        self.assertIsNone(err)
+        self.assertEqual(
+            meta,
+            {'version': 0, 'resubmission_status': RESUBMISSION_STATUS.UNKNOWN},
+        )
