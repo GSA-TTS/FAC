@@ -72,23 +72,21 @@ sac_3 = {
     },
 }
 
+def _bake_sacs(sacs):
+    for sac in sacs:
+        baker.make(
+            SingleAuditChecklist,
+            **sac,
+        )
+
 class GetOrderedSacChainTests(TestCase):
     def test_get_ordered_sac_chain(self):
         """Standard case"""
-        baker.make(
-            SingleAuditChecklist,
-            **sac_1,
-        )
-        baker.make(
-            SingleAuditChecklist,
-            **sac_2,
-        )
-        baker.make(
-            SingleAuditChecklist,
-            **sac_3,
-        )
+        _bake_sacs([sac_1, sac_2, sac_3])
 
+        # report_ids out of order
         sac_chain = _get_ordered_sac_chain([rid_3, rid_1, rid_2])
+
         self.assertEqual(len(sac_chain), 3)
         sac_chain[0].report_id = rid_1
         sac_chain[1].report_id = rid_2
@@ -96,14 +94,7 @@ class GetOrderedSacChainTests(TestCase):
 
     def test_missing_sac(self):
         """Raises an exception when it can't find SACs for all report_ids"""
-        baker.make(
-            SingleAuditChecklist,
-            **sac_1,
-        )
-        baker.make(
-            SingleAuditChecklist,
-            **sac_2,
-        )
+        _bake_sacs([sac_1, sac_2]) # sac_3 missing
 
         with self.assertRaises(RuntimeError):
             _get_ordered_sac_chain([rid_3, rid_1, rid_2])
@@ -111,14 +102,7 @@ class GetOrderedSacChainTests(TestCase):
 class LoadReportIdsTests(TestCase):
     def test_load_report_ids(self):
         """Standard case"""
-        baker.make(
-            SingleAuditChecklist,
-            **sac_1,
-        )
-        baker.make(
-            SingleAuditChecklist,
-            **sac_2,
-        )
+        _bake_sacs([sac_1, sac_2])
 
         rows = _load_report_ids([rid_1, rid_2])
         self.assertEqual(len(rows), 2)
