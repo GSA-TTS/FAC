@@ -9,6 +9,7 @@ from config.settings import GSA_MIGRATION
 from curation.management.commands.undo_link_resubmissions import (
     _get_ordered_sac_chain,
     _load_report_ids,
+    _safe_sac_getter,
 )
 
 sac: Dict[str, Any] = {
@@ -108,3 +109,18 @@ class LoadReportIdsTests(TestCase):
         self.assertEqual(len(rows), 2)
         self.assertEqual(rows[0]["report_id"], rid_1)
         self.assertEqual(rows[1]["report_id"], rid_2)
+
+class SafeSacGetterTests(TestCase):
+    def test_safe_sac_getter(self):
+        """Standard case"""
+        _bake_sacs([sac_1])
+
+        err, sac = _safe_sac_getter(rid_1)
+        self.assertIsNone(err)
+        self.assertEqual(sac.report_id, rid_1)
+
+    def test_safe_sac_getter(self):
+        """report_id is not found"""
+        err, sac = _safe_sac_getter(rid_1)
+        self.assertIsInstance(err, SingleAuditChecklist.DoesNotExist)
+        self.assertIsNone(sac)
