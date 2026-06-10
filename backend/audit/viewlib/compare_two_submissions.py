@@ -1,0 +1,661 @@
+from audit.models import SingleAuditChecklist, SingleAuditReportFile
+from copy import deepcopy
+import logging
+import boto3
+from io import BytesIO
+from botocore.exceptions import ClientError
+from django.conf import settings
+from hashlib import sha256
+from typing import Callable, Any, Union
+
+logger = logging.getLogger(__name__)
+
+#########################################
+# The first set of functions compare dictionary-based
+# fields from the SAC. This would be general_info and
+# audit_info, for example.
+
+
+# s1 ^ s2 is roughly (s1 - s2) U (s2 - s1) if needed.
+def in_first_not_second(d1: dict, d2: dict):
+    differences = []
+    d1 = d1 or {}
+    d2 = d2 or {}
+    for k, v in d1.items():
+        if k in d2:
+            continue
+        else:  # k not in d2:
+            differences.append({"key": k, "from": v, "to": None})
+    return differences
+
+
+def in_second_not_first(d1: dict, d2: dict):
+    differences = []
+    d1 = d1 or {}
+    d2 = d2 or {}
+    for k, v in d2.items():
+        if k in d1:
+            continue
+        else:  # k not in d1
+            differences.append({"key": k, "from": v, "to": None})
+    return differences
+
+
+def in_both(d1: dict, d2: dict):
+    both = []
+    d1 = d1 or {}
+    d2 = d2 or {}
+    for k in d1.keys():
+        if k in d2 and d1.get(k, None) == d2.get(k, None):
+            # Unchanged; skip
+            continue
+        elif k in d2 and d1.get(k, None) != d2.get(k, None):
+            both.append({"key": k, "from": d1[k], "to": d2[k]})
+        else:
+            continue
+    return both
+
+
+# These are dictionaries
+def analyze_pair(d1, d2):
+    # First, we find what is in one or the other.
+    fns = in_first_not_second(d1, d2)
+    snf = in_second_not_first(d1, d2)
+    both = in_both(d1, d2)
+    if fns == {} and snf == {} and both == {}:
+        return {"status": "same"}
+    return {
+        "status": "changed",
+        "in_r1": sorted(fns, key=lambda d: d["key"]),
+        "in_r2": sorted(snf, key=lambda d: d["key"]),
+        "in_both": sorted(both, key=lambda d: d["key"]),
+    }
+
+
+# Compare a given JSON field in the SAC object.
+def compare_dictionary_fields(
+    sac1: SingleAuditChecklist,
+    sac2: SingleAuditChecklist,
+    column: str,
+):
+    if getattr(sac1, column) == getattr(sac2, column):
+        return {"status": "same"}
+    else:
+        res = analyze_pair(
+            getattr_default(sac1, column, {}), getattr_default(sac2, column, {})
+        )
+        return res
+
+
+def getattr_default(obj, key, default=None):
+    try:
+        res = getattr(obj, key)
+        return res
+    except AttributeError:
+        return default
+
+
+def deep_getattr(obj, path_keys, default=None):
+    """
+    1. makes a 'deep copy of a SAC object'
+    2. then uses the list of keys to parse out the attributes we want
+    3. we walk the object tree of the copied object by resetting it to
+       a new copy of what was retreived by the key!
+    4. returns results of the final key (which is an array of dicts)
+
+    Args:
+        obj: SAC python object
+        path_keys: list of keys - used to parse our SAC python object
+        default: default to using the 'None' object
+
+    Returns:
+        current: the final array of items
+    """
+
+    # make a deep copy of an object we plan to 'walk'
+    current = deepcopy(obj)
+
+    # walking down the object tree to get the keys we want
+    # we update 'current' as we get to a branch and continue to walk
+    # down the tree
+    for ndx, key in enumerate(path_keys):
+        # print(f"{ndx+1} of {len(path_keys)} getting {key} in {current} {type(current)}")
+        if current is None:
+            return default
+        else:
+            if isinstance(current, dict):
+                if key not in current:
+                    return default
+                current = current[key]
+            else:
+                try:
+                    current = getattr(current, key)
+                except AttributeError:
+                    return default
+    return current
+
+
+def _get_keysets(sac1, sac2, keys):
+    """
+    using SACs and their common keys we generate sets of hashed
+    keys and their accompanied maps so they can be used for comparison
+    """
+
+    # an interesting way to find diffs using set operations:
+    #   - 1. convert lists of objects into hashes
+    #   - 2. convert collection of hashes into sets
+    #   - 3. use standard python set operations against each set:
+    #     - symmetric difference (^)
+    #     - subtracton (-)
+
+    # Use a list of keys to dive into an object.
+    # Expect a list of objects to come back, in this case.
+    # print(f"deep on {sac1}")
+    ls1 = deep_getattr(sac1, keys, [])
+    # print(f"deep on {sac2}")
+    ls2 = deep_getattr(sac2, keys, [])
+
+    # Hash the objects.
+    # Key order will matter. Here's to hoping
+    # our system is very consistent.
+    loh1 = map(lambda o: hash(str(o)), ls1)
+    loh2 = map(lambda o: hash(str(o)), ls2)
+
+    # Build a dict map of hashes to objects
+    map1 = {}
+    for h, o in zip(loh1, ls1):
+        map1[h] = o
+
+    map2 = {}
+    for h, o in zip(loh2, ls2):
+        map2[h] = o
+
+    # The keys can be sets
+    ks1 = set(map1.keys())
+    ks2 = set(map2.keys())
+    return ks1, ks2, map1, map2
+
+
+def _only_in(ks1, ks2, map1, map2, extract_fun, keys):
+    """
+    using substractive set operations we can remove duplicates between
+    sets and report differences between them (set1 vs set2)
+
+    Args:
+        ks1: set of hashed keys pulled from map1
+        ks2: set of hashed keys pulled from map2
+        map1: map consisting of (hashed key, object)
+        map2: map consisting of (hashed key, object)
+
+    Returns:
+        in_r1: list of items in set1 but not in set2
+        in_r2: list of items in set2 but not in set1
+
+    """
+    in_r1 = list()
+    in_r2 = list()
+
+    # we subtract one set from another to determine what elements
+    # only exist in that particular set
+
+    # Keys only in ks1
+    only_in_1 = ks1 - ks2
+    # Keys only in ks2
+    only_in_2 = ks2 - ks1
+
+    res: dict[str, Union[str, list]] = {"status": "changed"}
+
+    for k in only_in_1:
+        in_r1.append({"from": None, "to": extract_fun(map1[k]), "key": keys[0]})
+    for k in only_in_2:
+        in_r2.append({"from": None, "to": extract_fun(map2[k]), "key": keys[0]})
+    return in_r1, in_r2, res
+
+
+def _filter_r1_r2(map1, map2, in_r1, in_r2, extract_fun, keys):
+    in_both = list()
+
+    # Finally, to find everything "in both", that means we need to find the things that changed
+    # from one to the other. To do that, we need two lists of the values.
+    ib_r1 = map1.values()
+    ib_r2 = map2.values()
+
+    # are our number of overall values different ?
+    is_same_length = len(map1.values()) == len(map2.values())
+
+    # Now, I want to highlight where something was in both, but changed. This is a list of objects,
+    # so the question is which *objects* changed.
+    for obj1, obj2 in zip(ib_r1, ib_r2):
+        if obj1 == obj2 and is_same_length:
+            pass
+        else:
+            in_both.append(
+                {"from": extract_fun(obj1), "to": extract_fun(obj2), "key": keys[0]}
+            )
+
+    # At this point, if an object changed, we're going to have it in R1, R2, and in both.
+    # look for situations where the "to" value is the same in all three, and remove it from R1/R2
+    filter_out = list()
+    for v in in_both:
+        if v["to"] in map(lambda o: o["to"], in_r1) and v["to"] in map(
+            lambda o: o["to"], in_r1
+        ):
+            filter_out.append(v["to"])
+
+    in_r1 = list(filter(lambda v: v["to"] not in filter_out, in_r1))
+    in_r2 = list(filter(lambda v: v["to"] not in filter_out, in_r2))
+    return in_r1, in_r2, in_both
+
+
+def compare_lists_of_objects(
+    sac1: SingleAuditChecklist,
+    sac2: SingleAuditChecklist,
+    path_keys: list,
+    extract_fun: Callable[[dict], Any],
+):
+    ks1, ks2, map1, map2 = _get_keysets(sac1, sac2, path_keys)
+
+    # If the maps are identical, we can just return now.
+    if map1 == map2:
+        return {"status": "same"}
+
+    in_r1, in_r2, res = _only_in(ks1, ks2, map1, map2, extract_fun, path_keys)
+    in_r1, in_r2, in_both = _filter_r1_r2(
+        map1, map2, in_r1, in_r2, extract_fun, path_keys
+    )
+
+    # Now, a final mangling of "in_both".
+    # This lets us present the data differently when something changes from one to the other and we're dealing with objects.
+    in_both = list()
+
+    for obj1, obj2 in zip(map1.values(), map2.values()):
+        if obj1 == obj2:
+            pass
+        else:
+            fields_different = list()
+            difference_count = 0
+            for k, v in obj1.items():
+                if obj1.get(k, 0) != obj2.get(k, 1):
+                    difference_count += 1
+                    fields_different.append(k)
+            in_both.append(
+                {
+                    "from": "Related to: " + ", ".join(fields_different),
+                    "to": (
+                        f"{difference_count} difference"
+                        if difference_count == 1
+                        else f"{difference_count} difference"
+                    ),
+                    "key": extract_fun(obj1),
+                }
+            )
+
+    res["in_r1"] = in_r1
+    res["in_r2"] = in_r2
+    res["in_both"] = in_both
+
+    return res
+
+
+def get_s3_object(client, bucket_name, key):
+    file = BytesIO()
+    try:
+        client.download_fileobj(Bucket=bucket_name, Key=key, Fileobj=file)
+    except ClientError:
+        logger.error("Could not download {}".format(key))
+        return None
+    return file
+
+
+def compare_single_audit_reports(  # noqa: C901
+    sac1: SingleAuditChecklist, sac2: SingleAuditChecklist
+):
+    sar1 = SingleAuditReportFile.objects.filter(sac=sac1)
+    sar2 = SingleAuditReportFile.objects.filter(sac=sac2)
+
+    # seems there can be multiple copies !
+    # Make sure they both exist/have PDFs associated with them.
+    if len(sar1) == 0:
+        return {
+            "status": "error",
+            "message": f"No single audit report found for {sac1.report_id}",
+        }
+    if len(sar2) == 0:
+        return {
+            "status": "error",
+            "message": f"No single audit report found for {sac2.report_id}",
+        }
+
+    # return the lastest version, else revert to the first version!
+    try:
+        sar1 = sar1.latest("date_created")
+    except SingleAuditReportFile.DoesNotExist:
+        logger.error(
+            f"could not retrieve latest single audit report for {sar1.filename}"
+        )
+        sar1 = sar1.first()
+
+    try:
+        sar2 = sar2.latest("date_created")
+    except SingleAuditReportFile.DoesNotExist:
+        logger.error(
+            f"could not retrieve latest single audit report for {sar2.filename}"
+        )
+        sar2 = sar2.first()
+
+    client = boto3.client(
+        "s3",
+        aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
+        endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+    )
+
+    # logger.info(f"FETCHING PDF: {sar1.filename}")
+    pdf1 = get_s3_object(
+        client,
+        settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
+        f"singleauditreport/{sar1.filename}",
+    )
+
+    # logger.info(f"FETCHING PDF: {sar2.filename}")
+    pdf2 = get_s3_object(
+        client,
+        settings.AWS_PRIVATE_STORAGE_BUCKET_NAME,
+        f"singleauditreport/{sar2.filename}",
+    )
+
+    if pdf1 and pdf2:
+        pdf1_bytes = pdf1.getvalue()
+        pdf2_bytes = pdf2.getvalue()
+        sha1 = sha256(pdf1_bytes).hexdigest()
+        sha2 = sha256(pdf2_bytes).hexdigest()
+        # logger.info(f"SHA1: {sha1}:{len(pdf1_bytes)} SHA2: {sha2}:{len(pdf2_bytes)}")
+        if sha1 == sha2:
+            return {"status": "same"}
+        else:
+            return {
+                "status": "changed",
+                "in_r1": list(),
+                "in_r2": list(),
+                "in_both": [
+                    {
+                        "from": f"{sha1[0:4]}...{sha1[-4:]}",
+                        "to": f"{sha2[0:4]}...{sha2[-4:]}",
+                        "key": "preview",
+                    },
+                    {
+                        "from": f"{len(pdf1_bytes)} bytes",
+                        "to": f"{len(pdf2_bytes)} bytes",
+                        "key": "file length",
+                    },
+                ],
+            }
+    elif not pdf1 and not pdf2:
+        return {
+            "status": "error",
+            "message": f"Could not retrieve report for {sac1.report_id} or {sac2.report_id}. Possibly contact the FAC helpdesk.",
+        }
+    elif not pdf1:
+        return {
+            "status": "error",
+            "message": f"Could not retrieve report for {sac1.report_id}. Possibly contact the FAC helpdesk.",
+        }
+    elif not pdf2:
+        return {
+            "status": "error",
+            "message": f"Could not retrieve report for {sac2.report_id}. Possibly contact the FAC helpdesk.",
+        }
+
+    return {
+        "status": "error",
+        "message": "Uknown error comparing PDF objects. Please contact the FAC helpdesk.",
+    }
+
+
+def report_id_to_sac(rid):
+    if isinstance(rid, str):
+        return SingleAuditChecklist.objects.get(report_id=rid)
+    elif isinstance(rid, SingleAuditChecklist):
+        return rid
+    else:
+        logger.error(f"{rid} is not a report_id string")
+        return None
+
+
+def are_two_sacs_identical(sac1, sac2):
+    fields = [
+        "submission_status",
+        "data_source",
+        "report_id",
+        "audit_type",
+        "general_information",
+        "audit_information",
+        "federal_awards",
+        "corrective_action_plan",
+        "findings_text",
+        "findings_uniform_guidance",
+        "additional_ueis",
+        "additional_eins",
+        "secondary_auditors",
+        "notes_to_sefa",
+        "tribal_data_consent",
+        "cognizant_agency",
+        "oversight_agency",
+    ]
+    they_are_the_same = True
+    for field in fields:
+        if getattr_default(sac1, field, None) != getattr_default(sac2, field, None):
+            they_are_the_same = False
+            break
+    return they_are_the_same
+
+
+# We want to take two report IDs, and return something that looks like
+#
+# {
+#    "general": { "status": "same" }
+#    "federal_awards": {
+#       "status": "changed",
+#       "in_r1": [...], # What is in (or changed in) r1 that is not in r2?
+#       "in_r2": [...]  # What is in (or changed in) r2 that is not in r1?
+# }
+#
+# Consider using deepdiff
+# https://miguendes.me/the-best-way-to-compare-two-dictionaries-in-python
+# This walks a JSON tree and finds the differences, and nicely spells them out.
+def compare_report_ids(rid_1, rid_2):
+    sac_r1 = report_id_to_sac(rid_1)
+    sac_r2 = report_id_to_sac(rid_2)
+
+    if sac_r1 is None or sac_r2 is None:
+        logger.error(
+            f"compare_report_ids expects two report ID strings or two SAC objects, given {sac_r1} and {sac_r2}"
+        )
+        return {
+            "status": "error",
+            "message": f"Could not compare {sac_r1} and {sac_r2} as given. Contact the FAC helpdesk.",
+        }
+
+    # Do an early check, and bail if the same.
+    if are_two_sacs_identical(sac_r1, sac_r2):
+        return {
+            "status": "identical",
+            "message": "The Single Audit Checklists are the same.",
+        }
+
+    summary = {}
+    ###############
+    # general_information
+    res = compare_dictionary_fields(sac_r1, sac_r2, "general_information")
+    summary["general_information"] = res
+
+    ###############
+    # audit_information
+    res = compare_dictionary_fields(sac_r1, sac_r2, "audit_information")
+    summary["audit_information"] = res
+
+    ###############
+    # federal_award
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        ["federal_awards", "FederalAwards", "federal_awards"],
+        lambda entry: entry["award_reference"],
+    )
+    summary["federal_awards"] = res
+
+    ###############
+    # corrective_action_plan
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "corrective_action_plan",
+            "CorrectiveActionPlan",
+            "corrective_action_plan_entries",
+        ],
+        lambda entry: entry["reference_number"],
+    )
+    summary["corrective_action_plan"] = res
+
+    ###############
+    # findings_text
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "findings_text",
+            "FindingsText",
+            "findings_text_entries",
+        ],
+        lambda entry: entry["reference_number"],
+    )
+    summary["findings_text"] = res
+
+    ###############
+    # findings_uniform_guidance
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "findings_uniform_guidance",
+            "FindingsUniformGuidance",
+            "findings_uniform_guidance_entries",
+        ],
+        lambda entry: entry["program"]["award_reference"]
+        + "/"
+        + entry["findings"]["reference_number"],
+    )
+    summary["findings_uniform_guidance"] = res
+
+    ###############
+    # additional_ueis
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "additional_ueis",
+            "AdditionalUeis",
+            "additional_ueis_entries",
+        ],
+        lambda entry: entry["additional_uei"],
+    )
+    summary["additional_ueis"] = res
+
+    ###############
+    # additional_eins
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "additional_eins",
+            "AdditionalEINs",
+            "additional_eins_entries",
+        ],
+        lambda entry: entry["additional_ein"],
+    )
+    summary["additional_eins"] = res
+
+    ###############
+    # secondary_auditors
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "secondary_auditors",
+            "SecondaryAuditors",
+            "secondary_auditors_entries",
+        ],
+        lambda entry: entry["secondary_auditor_name"],
+    )
+    summary["secondary_auditors"] = res
+
+    ###############
+    # notes_to_sefa
+    res = compare_lists_of_objects(
+        sac_r1,
+        sac_r2,
+        [
+            "notes_to_sefa",
+            "NotesToSefa",
+            "notes_to_sefa_entries",
+        ],
+        lambda entry: str(entry["seq_number"]) + ": " + entry["note_title"],
+    )
+    summary["notes_to_sefa"] = res
+
+    ###############
+    # tribal_data_consent
+    res = compare_dictionary_fields(sac_r1, sac_r2, "tribal_data_consent")
+    summary["tribal_data_consent"] = res
+
+    ###############
+    # the SAR (single audit report, or PDF)
+    res = compare_single_audit_reports(sac_r1, sac_r2)
+    summary["single_audit_report"] = res
+
+    return summary
+
+
+def report_id_as_string(o):
+    if isinstance(o, SingleAuditChecklist):
+        return o.report_id
+    else:
+        return o
+
+
+def compare_with_prev(rid):
+    if isinstance(rid, str):
+        sac = SingleAuditChecklist.objects.get(report_id=rid)
+    elif isinstance(rid, SingleAuditChecklist):
+        sac = rid
+    else:
+        logger.error(f"{rid} is not a report ID or SAC object")
+        return {
+            "status": "error",
+            "message": f"It seems {rid} is not a report; if you think this is an error, please contact the FAC helpdesk.",
+        }
+
+    if sac.resubmission_meta:
+        if "previous_report_id" in sac.resubmission_meta:
+            prev = sac.resubmission_meta["previous_report_id"]
+        elif "next_report_id" in sac.resubmission_meta:
+            prev = sac.report_id
+            rid = sac.resubmission_meta["next_report_id"]
+        else:
+            logger.error(f"No previous report ID for {rid}")
+            return {
+                "status": "error",
+                "message": f"No previous report for {rid}. If this seems to be an error, contact the FAC helpdesk.",
+            }
+        logger.info(f"[DIFF] {prev} <-> {rid}")
+        return (
+            report_id_as_string(prev),
+            report_id_as_string(rid),
+            compare_report_ids(prev, rid),
+        )
+    else:
+        return {
+            "status": "error",
+            "message": "There's no resubmission info for {rid}. If this seems to be an error, contact the FAC helpdesk.",
+        }
