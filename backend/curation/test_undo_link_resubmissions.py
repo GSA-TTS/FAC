@@ -7,6 +7,7 @@ from django.test import TestCase
 from audit.models import SingleAuditChecklist
 from config.settings import GSA_MIGRATION
 from curation.management.commands.undo_link_resubmissions import (
+    _chain_contains_version_skip,
     _chain_creates_orphan,
     _get_ordered_sac_chain,
     _load_report_ids,
@@ -71,7 +72,7 @@ sac_2 = {
     **sac_1,
     "report_id": rid_2,
     "resubmission_meta": {
-        **sac_1["resubmission_meta"],
+        **SAC["resubmission_meta"],
         "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
         "version": 2,
         "next_report_id": rid_3,
@@ -82,7 +83,7 @@ sac_3 = {
     **sac_1,
     "report_id": rid_3,
     "resubmission_meta": {
-        **sac_1["resubmission_meta"],
+        **SAC["resubmission_meta"],
         "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
         "version": 3,
     },
@@ -159,7 +160,7 @@ class ParseMetaTests(TestCase):
 
 class ChainCreatesOrphanTests(TestCase):
     def test_chain_creates_orphan(self):
-        """Orphan detected"""
+        """Detects an orphan"""
         _bake_sacs([sac_1, sac_2])
 
         # Orphans sac_2
@@ -168,10 +169,9 @@ class ChainCreatesOrphanTests(TestCase):
         self.assertTrue(_chain_creates_orphan(rows))
 
     def test_chain_no_orphan(self):
-        """No orphan detected"""
-        _bake_sacs([sac_1, sac_2])
+        """Detects no orphan"""
+        _bake_sacs([sac_1, sac_2, sac_3])
 
-        rows = _load_report_ids([rid_1, rid_2])
+        rows = _load_report_ids([rid_1, rid_2, rid_3])
 
         self.assertFalse(_chain_creates_orphan(rows))
-
