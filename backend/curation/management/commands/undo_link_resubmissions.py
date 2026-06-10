@@ -62,7 +62,7 @@ def _safe_sac_getter(report_id):
         return None, SingleAuditChecklist.objects.get(report_id=report_id)
     except SingleAuditChecklist.DoesNotExist as err:
         logger.error(f"SAC not found: {report_id} — skipping submission.")
-        err, None
+        return err, None
 
 
 def _load_report_ids(report_ids):
@@ -97,15 +97,23 @@ def _load_report_ids(report_ids):
 def _get_ordered_sac_chain(report_ids):
     """Returns a list of SACs ordered by version"""
     sacs_by_version = {}
-    for report_id in report_ids:
-        _, sac = _safe_sac_getter(report_id)
-        sacs_by_version[sac.resubmission_meta["version"]] = sac
+    missing_sacs = []
 
-    len_sacs = len(sacs_by_version)
-    len_report_ids = len(report_ids)
-    if len_sacs != len_report_ids:
-        logger.error(f"Only found {len_sacs} of {len_report_ids} submissions. Exiting.")
-        sys.exit(-1)
+    for report_id in report_ids:
+        err, sac = _safe_sac_getter(report_id)
+        if err:
+            missing_sacs.append(report_id)
+        else:
+            v = sac.resubmission_meta["version"]
+            sacs_by_version[v] = sac
+
+    if missing_sacs:
+        len_sacs = len(sacs_by_version)
+        len_report_ids = len(report_ids)
+
+        raise RuntimeError(
+            f"Only found {len_sacs} of {len_report_ids} submissions. Missing {missing_sacs}.",
+        )
 
     ordered_sacs = []
     all_versions = sacs_by_version.keys()
