@@ -33,6 +33,11 @@ MATERIAL_CHANGE_CHOICES = [
     ("auditor_report_revision", "Revision to the auditor's report"),
 ]
 
+RESUBMISSION_ACTION_CHOICES = [
+    ("audit_pdf", "I need to upload or edit the audit PDF package."),
+    ("sfsac_only", "I only need to modify SF-SAC Data Collection Form information."),
+]
+
 
 class ResubmissionStartForm(forms.Form):
     material_change_reasons = forms.MultipleChoiceField(
@@ -45,6 +50,15 @@ class ResubmissionStartForm(forms.Form):
     )
 
     report_id = forms.CharField(required=True)
+
+    resubmission_action = forms.ChoiceField(
+        choices=RESUBMISSION_ACTION_CHOICES,
+        widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
+        required=True,
+        error_messages={
+            "required": "Select the type of change you need to make.",
+        },
+    )
 
     def clean_report_id(self):
         """
