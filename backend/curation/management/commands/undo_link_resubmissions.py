@@ -18,6 +18,9 @@ from curation.curationlib.audit_distance import (
     get_audit_year,
     order_reports_key,
 )
+from curation.curationlib.util import (
+  exit_if_not_staff_user,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -272,14 +275,7 @@ class Command(BaseCommand):
         noisy = options["noisy"]
         email = options["email"]
 
-        # Verify staff user. Note that it's VERY hard to get here without already being staff.
-        try:
-            ok_staff_user = StaffUser.objects.get(staff_email=email)
-        except StaffUser.DoesNotExist:
-            logger.error(f"Staff user {email} does not exist")
-            ok_staff_user = False
-        if not ok_staff_user:
-            sys.exit(-1)
+        exit_if_not_staff_user(email)
 
         if csv and report_ids:
             logger.error("Only one of --csv and --report_ids must be provided.")
