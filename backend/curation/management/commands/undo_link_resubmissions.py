@@ -224,10 +224,10 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
 
 def _unlink_sacs(rows, user, noisy=False):
     """
-    Restore submission_status and resubmission_meta for every row given.
+    Unlink submission_status and resubmission_meta for every row given.
 
     SACs are processed in reverse order so that a DEPRECATED submission is never
-    left transiently pointing at a submission that has already been reset.
+    left transiently pointing at a submission that has already been unlinked.
     """
     # Group rows by chain_index. They should come this way from the CSV, but just to be safe.
     chains = {}
@@ -256,7 +256,7 @@ def _unlink_sacs(rows, user, noisy=False):
 
             if noisy:
                 logger.info(
-                    f"Restoring {report_id}: "
+                    f"Unlinking {report_id}: "
                     f"status {sac.submission_status!r} -> {prior_status!r}, "
                     f"meta {sac.resubmission_meta} -> {prior_meta}"
                 )
@@ -349,5 +349,5 @@ class Command(BaseCommand):
         _unlink_sacs(rows, ok_user, noisy=noisy)
 
         logger.info(
-            f"\nUndo complete. {len(rows)} submissions restored and redisseminated."
+            f"\nUndo complete. {len(rows)} submissions unlinked and redisseminated."
         )
