@@ -4,6 +4,7 @@ from model_bakery import baker
 from copy import deepcopy
 
 from django.test import TestCase
+from django.contrib.auth.models import User
 
 from audit.models import SingleAuditChecklist
 from config.settings import GSA_MIGRATION
@@ -12,9 +13,10 @@ from curation.management.commands.undo_link_resubmissions import (
     _get_ordered_sac_chain,
     _load_report_ids,
     _parse_meta,
+    _restore_sacs,
     _safe_sac_getter,
 )
-from audit.models.constants import RESUBMISSION_STATUS, STATUS
+from audit.models.constants import RESUBMISSION_STATUS
 
 
 SAC: Dict[str, Any] = {
@@ -222,3 +224,32 @@ class ChainCreatesOrphanTests(TestCase):
         rows = _load_report_ids([rid_1, rid_2, rid_3])
 
         self.assertFalse(_chain_creates_orphan(rows, init_len=len(rows)))
+
+class RestoreSacsTests(TestCase):
+    def test_restore_sacs(self):
+        """Standard case"""
+        _bake_sacs([sac_1, sac_2, sac_3])
+        rids = [rid_1, rid_2, rid_3]
+        rows = _load_report_ids(rids)
+
+        user = baker.make(User, is_staff=True)
+        _restore_sacs(rows, user)
+
+        sacs = SingleAuditChecklist.objects.filter(report_id__in=rids)
+        for sac in sacs:
+            self.assertEqual(sac.resubmission_meta["resubmission_status"], RESUBMISSION_STATUS.UNKNOWN)
+            self.assertEqual(sac.resubmission_meta["version"], 0)
+
+    def test_restore_sacs_orphan(self):
+        """Doesn't link due to orphan detected"""
+        _bake_sacs([sac_1, sac_2, sac_3])
+        rids = [rid_1, rid_2] # sac_3 missing
+        rows = _load_report_ids(rids)
+
+        user = baker.make(User, is_staff=True)
+        _restore_sacs(rows, user)
+
+        sacs = SingleAuditChecklist.objects.filter(report_id__in=rids)
+        for sac in sacs:
+            self.assertNotEqual(sac.resubmission_meta["resubmission_status"], RESUBMISSION_STATUS.UNKNOWN)
+            self.assertNotEqual(sac.resubmission_meta["version"], 0)
