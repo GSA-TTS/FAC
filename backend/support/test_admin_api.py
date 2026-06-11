@@ -103,7 +103,6 @@ class TestAdminAPI(TestCase):
             timeout=10,
             json={"email": "not.a.test.user@fac.gsa.gov"},
         )
-        print("response", response.text)
         self.assertEqual(response.text, "false")
         self.assertEqual(response.status_code, 200)
 

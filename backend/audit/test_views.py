@@ -396,16 +396,16 @@ class SubmissionViewTests(TestCase):
         mock_disseminate,
         mock_remove,
         mock_transition,
-        mock_validate,
         mock_validate_audit,
+        mock_validate_sac,
     ):
         """Test that a valid submission transitions SAC to a disseminated state"""
-        mock_validate.return_value = []
-        mock_validate_audit.return_value = []
+        mock_validate_sac.return_value = ({}, {})
+        mock_validate_audit.return_value = ({}, {})
         mock_disseminate.return_value = None
         response = self.client.post(self.url)
 
-        mock_validate.assert_called_once()
+        mock_validate_sac.assert_called_once()
         mock_validate_audit.assert_called_once()
         mock_disseminate.assert_called_once()
         mock_transition.assert_called_with(
@@ -431,11 +431,11 @@ class SubmissionViewTests(TestCase):
     @patch("audit.views.submissions.sac_transition")
     @patch("audit.views.submissions.SingleAuditChecklist.disseminate")
     def test_post_validation_errors(
-        self, mock_disseminate, mock_transition, mock_validate, mock_validate_audit
+        self, mock_disseminate, mock_transition, mock_validate_audit, mock_validate_sac
     ):
         """Test that validation errors are displayed if submission is invalid"""
-        mock_validate.return_value = ["Error 1", "Error 2"]
-        mock_validate_audit.return_value = ["Error 1", "Error 2"]
+        mock_validate_audit.return_value = (["Error 1", "Error 2"], {})
+        mock_validate_sac.return_value = (["Error 1", "Error 2"], {})
         self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
         self.sac.save()
 
@@ -454,7 +454,7 @@ class SubmissionViewTests(TestCase):
     @patch("audit.views.submissions.SingleAuditChecklist.validate_full")
     @patch("audit.models.Audit.validate")
     def test_post_transaction_error(
-        self, mock_validate, mock_validate_audit, mock_general_get
+        self, mock_validate_audit, mock_validate_sac, mock_general_get
     ):
         """Test that a transaction error during a submission is handled properly"""
         self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
@@ -467,8 +467,8 @@ class SubmissionViewTests(TestCase):
         self.audit.submission_status = STATUS.AUDITEE_CERTIFIED
         self.audit.save()
 
-        mock_validate.return_value = []
-        mock_validate_audit.return_value = []
+        mock_validate_audit.return_value = ({}, {})
+        mock_validate_sac.return_value = ({}, {})
         mock_general_get.return_value = True
 
         response = self.client.post(self.url)
@@ -2170,7 +2170,10 @@ class CrossValidationViewTests(TestCase):
     @patch("audit.models.SingleAuditChecklist.validate_full")
     def test_post_view_renders_results_template(self, mock_validate_full):
         """Test that POST with validation errors renders template with errors"""
-        mock_validate_full.return_value = {"errors": ["Error 1", "Error 2"], "data": {}}
+        mock_validate_full.return_value = (
+            {"errors": ["Error 1", "Error 2"], "data": {}},
+            {},
+        )
 
         response = self.client.post(self.url)
 

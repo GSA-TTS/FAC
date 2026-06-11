@@ -154,12 +154,12 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             resubmission_meta = sac.resubmission_meta or {}
             previous_report_id = resubmission_meta.get("previous_report_id")
-            errors = sac.validate_full()
+            errors, warnings = sac.validate_full()
 
             # TODO: Update Post SOC Launch
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
             if audit:
-                audit_errors = audit.validate()
+                audit_errors, audit_warnings = audit.validate()
                 _compare_errors(errors, audit_errors)
 
             if errors:
