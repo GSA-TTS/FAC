@@ -12,7 +12,6 @@ from audit.models import (
     User,
 )
 from audit.models.constants import RESUBMISSION_STATUS, STATUS
-from users.models import StaffUser
 from curation.curationlib.audit_distance import (
     prep_string,
     get_audit_year,

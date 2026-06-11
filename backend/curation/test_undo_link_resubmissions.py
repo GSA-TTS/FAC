@@ -1,13 +1,11 @@
 from copy import deepcopy
 from typing import Any, Dict
 from model_bakery import baker
-from copy import deepcopy
 
 from django.test import TestCase
 from django.contrib.auth.models import User
 
 from audit.models import SingleAuditChecklist
-from config.settings import GSA_MIGRATION
 from curation.management.commands.undo_link_resubmissions import (
     _chain_creates_orphan,
     _get_ordered_sac_chain,
