@@ -161,7 +161,9 @@ def _chain_creates_orphan(chain_rows):
 
         # Validate next/previous_report_ids only exist where they should be
         if is_first and prev_rid:
-            logger.error(f"Submission {rid} is first but has previous_report_id {prev_rid}.")
+            logger.error(
+                f"Submission {rid} is first but has previous_report_id {prev_rid}."
+            )
             return True
         if not is_first and not prev_rid:
             logger.error(f"Submission {rid} isn't first but has no previous_report_id.")
@@ -176,13 +178,19 @@ def _chain_creates_orphan(chain_rows):
         # Validate next/previous_report_ids match what's in the chain
         if not is_first:
             prev_chain_rid = chain_rows[i - 1]["report_id"]
-            expected_current_rid = chain_rows[i - 1]["resubmission_meta"].get("next_report_id")
+            expected_current_rid = chain_rows[i - 1]["resubmission_meta"].get(
+                "next_report_id"
+            )
 
             if prev_rid != prev_chain_rid:
-                logger.error(f"Submission {rid} prev_id {prev_rid} doesn't match expected {prev_chain_rid}.")
+                logger.error(
+                    f"Submission {rid} prev_id {prev_rid} doesn't match expected {prev_chain_rid}."
+                )
                 return True
             if rid != expected_current_rid:
-                logger.error(f"Submission {prev_chain_rid} next_id {expected_current_rid} doesn't match {rid}.")
+                logger.error(
+                    f"Submission {prev_chain_rid} next_id {expected_current_rid} doesn't match {rid}."
+                )
                 return True
 
     return False
