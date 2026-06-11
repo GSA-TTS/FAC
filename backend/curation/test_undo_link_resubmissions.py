@@ -173,7 +173,7 @@ class ChainCreatesOrphanTests(TestCase):
         # Orphans sac_1
         rows = _load_report_ids([rid_2, rid_3])
 
-        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+        self.assertTrue(_chain_creates_orphan(rows))
 
     def test_chain_creates_orphan_middle(self):
         """Detects an orphan in the middle of the chain"""
@@ -182,7 +182,7 @@ class ChainCreatesOrphanTests(TestCase):
         # Orphans sac_2
         rows = _load_report_ids([rid_1, rid_3])
 
-        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+        self.assertTrue(_chain_creates_orphan(rows))
 
     def test_chain_creates_orphan_end(self):
         """Detects an orphan at the end of the chain"""
@@ -191,7 +191,7 @@ class ChainCreatesOrphanTests(TestCase):
         # Orphans sac_3
         rows = _load_report_ids([rid_1, rid_2])
 
-        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+        self.assertTrue(_chain_creates_orphan(rows))
 
     def test_chain_creates_orphan_missing_prev_rid(self):
         """Detects a missing previous_report_id"""
@@ -200,7 +200,7 @@ class ChainCreatesOrphanTests(TestCase):
         _bake_sacs([sac_1, bad_sac_2, sac_3])
         rows = _load_report_ids([rid_1, rid_2, rid_3])
 
-        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+        self.assertTrue(_chain_creates_orphan(rows))
 
     def test_chain_creates_orphan_missing_next_rid(self):
         """Detects a missing next_report_id"""
@@ -209,7 +209,7 @@ class ChainCreatesOrphanTests(TestCase):
         _bake_sacs([sac_1, bad_sac_2, sac_3])
         rows = _load_report_ids([rid_1, rid_2, rid_3])
 
-        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+        self.assertTrue(_chain_creates_orphan(rows))
 
     def test_chain_creates_orphan_unordered(self):
         """Detects chain ordering doesn't match previous/next_report_id in resub metas"""
@@ -219,14 +219,14 @@ class ChainCreatesOrphanTests(TestCase):
         rows = _load_report_ids([rid_1, rid_2, rid_3])
         unordered_rows = [rows[0], rows[2], rows[1]]
 
-        self.assertTrue(_chain_creates_orphan(unordered_rows, init_len=len(rows)))
+        self.assertTrue(_chain_creates_orphan(unordered_rows))
 
     def test_chain_no_orphan(self):
         """Detects no orphan"""
         _bake_sacs([sac_1, sac_2, sac_3])
         rows = _load_report_ids([rid_1, rid_2, rid_3])
 
-        self.assertFalse(_chain_creates_orphan(rows, init_len=len(rows)))
+        self.assertFalse(_chain_creates_orphan(rows))
 
 
 class RestoreSacsTests(TestCase):
