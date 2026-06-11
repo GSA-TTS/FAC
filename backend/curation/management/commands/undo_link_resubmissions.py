@@ -86,6 +86,7 @@ def _load_report_ids(report_ids):
                 "auditee_email": prep_string(sac.general_information["auditee_email"]),
                 "auditee_name": prep_string(sac.general_information["auditee_name"]),
                 "auditee_state": prep_string(sac.general_information["auditee_state"]),
+                "resubmission_meta": sac.resubmission_meta,
                 "prior_submission_status": STATUS.DISSEMINATED,
                 "prior_resubmission_meta": (json.dumps(UNLINKED_RESUB_STATUS)),
             },
@@ -161,15 +162,13 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
     if len(chain_rows) == 0:
         return False
 
-    rid = chain_rows[0]["report_id"]
-    err, sac = _safe_sac_getter(rid)
-    if err:
-        return True
-
+    row = chain_rows[0]
+    rid = row["report_id"]
+    resubmission_meta = row["resubmission_meta"]
     is_first = len_chain_rows == init_len
     is_last = len_chain_rows == 1
-    prev_rid = sac.resubmission_meta.get("previous_report_id")
-    next_rid = sac.resubmission_meta.get("next_report_id")
+    prev_rid = resubmission_meta.get("previous_report_id")
+    next_rid = resubmission_meta.get("next_report_id")
 
     if is_first: # Start of chain
         if prev_rid:
@@ -221,6 +220,7 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
             return True
 
     return _chain_creates_orphan(chain_rows[1:], init_len, prev_rid_in_chain=rid, old_next_rid=next_rid)
+
 
 def _unlink_sacs(rows, user, noisy=False):
     """
