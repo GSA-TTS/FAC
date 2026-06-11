@@ -1,6 +1,7 @@
 from copy import deepcopy
 from typing import Any, Dict
 from model_bakery import baker
+from copy import deepcopy
 
 from django.test import TestCase
 
@@ -68,7 +69,7 @@ sac_1 = {
 }
 
 sac_2 = {
-    **sac_1,
+    **SAC,
     "report_id": rid_2,
     "resubmission_meta": {
         **SAC["resubmission_meta"],
@@ -80,7 +81,7 @@ sac_2 = {
 }
 
 sac_3 = {
-    **sac_1,
+    **SAC,
     "report_id": rid_3,
     "resubmission_meta": {
         **SAC["resubmission_meta"],
@@ -187,6 +188,24 @@ class ChainCreatesOrphanTests(TestCase):
 
         self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
 
+    def test_chain_creates_orphan_missing_prev_rid(self):
+        """Detects a missing previous_report_id"""
+        bad_sac_2 = deepcopy(sac_2)
+        bad_sac_2["resubmission_meta"]["previous_report_id"] = None
+        _bake_sacs([sac_1, bad_sac_2, sac_3])
+        rows = _load_report_ids([rid_1, rid_2, rid_3])
+
+        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+
+    def test_chain_creates_orphan_missing_next_rid(self):
+        """Detects a missing next_report_id"""
+        bad_sac_2 = deepcopy(sac_2)
+        bad_sac_2["resubmission_meta"]["next_report_id"] = None
+        _bake_sacs([sac_1, bad_sac_2, sac_3])
+        rows = _load_report_ids([rid_1, rid_2, rid_3])
+
+        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+
     def test_chain_creates_orphan_unordered(self):
         """Detects chain ordering doesn't match previous/next_report_id in resub metas"""
         _bake_sacs([sac_1, sac_2, sac_3])
@@ -200,7 +219,6 @@ class ChainCreatesOrphanTests(TestCase):
     def test_chain_no_orphan(self):
         """Detects no orphan"""
         _bake_sacs([sac_1, sac_2, sac_3])
-
         rows = _load_report_ids([rid_1, rid_2, rid_3])
 
         self.assertFalse(_chain_creates_orphan(rows, init_len=len(rows)))

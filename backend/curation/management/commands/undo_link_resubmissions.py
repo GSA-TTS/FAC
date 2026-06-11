@@ -151,7 +151,7 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
     """
     Returns true if unlinking the chain would create an orphan.
     WARNING: This is recursive.
-    
+
     chain_rows - Chain rows to be validated
     init_len - The starting length of chain_rows
     prev_rid_in_chain - The report_id of the previous iteration's submission
@@ -167,37 +167,58 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
         return True
 
     is_first = len_chain_rows == init_len
-    if rid != old_next_rid and not is_first:
-        logger.error(
-            f"Submission {prev_rid_in_chain} has a next_report_id {old_next_rid} that doesn't match the next submission {rid} in the chain - skipping chain.",
-        )
-        return True
-
-    prev_rid = sac.resubmission_meta.get("previous_report_id")
-    if not prev_rid and not is_first:
-        print(
-            f"Submission {rid} isn't first in the chain but has no previous_report_id - skipping chain.",
-        )
-        return True
-    elif prev_rid != prev_rid_in_chain:
-        logger.error(
-            f"Submission {rid} has a previous_report_id {prev_rid} that doesn't match the previous submission {prev_rid_in_chain} in the chain - skipping chain.",
-        )
-        return True
-
-    next_rid = sac.resubmission_meta.get("next_report_id")
     is_last = len_chain_rows == 1
+    prev_rid = sac.resubmission_meta.get("previous_report_id")
+    next_rid = sac.resubmission_meta.get("next_report_id")
 
-    if next_rid and is_last:
-        logger.error(
-            f"Submission {rid} is last in the chain but has next_report_id {next_rid} - skipping chain.",
-        )
-        return True
-    if not next_rid and not is_last:
-        logger.error(
-            f"Submission {rid} isn't last in the chain but has no next_report_id - skipping chain.",
-        )
-        return True
+    if is_first: # Start of chain
+        if prev_rid:
+            logger.error(
+                f"Submission {rid} is first in the chain but has previous_report_id {prev_rid} - skipping chain.",
+            )
+            return True
+        elif not next_rid:
+            logger.error(
+                f"Submission {rid} isn't last in the chain but has no next_report_id - skipping chain.",
+            )
+            return True
+    elif not is_first and not is_last: # Anywhere middle of chain
+        if not prev_rid:
+            logger.error(
+                f"Submission {rid} isn't first in the chain but has no previous_report_id - skipping chain.",
+            )
+            return True
+        elif prev_rid != prev_rid_in_chain:
+            logger.error(
+                f"Submission {rid} has a previous_report_id {prev_rid} that doesn't match the previous submission {prev_rid_in_chain} in the chain - skipping chain.",
+            )
+            return True
+        elif rid != old_next_rid:
+            logger.error(
+                f"Submission {prev_rid_in_chain} has a next_report_id {old_next_rid} that doesn't match the next submission {rid} in the chain - skipping chain.",
+            )
+            return True
+        elif not next_rid:
+            logger.error(
+                f"Submission {rid} isn't last in the chain but has no next_report_id - skipping chain.",
+            )
+            return True
+    elif is_last: # End of chain
+        if not prev_rid:
+            logger.error(
+                f"Submission {rid} isn't first in the chain but has no previous_report_id - skipping chain.",
+            )
+            return True
+        elif prev_rid != prev_rid_in_chain:
+            logger.error(
+                f"Submission {rid} has a previous_report_id {prev_rid} that doesn't match the previous submission {prev_rid_in_chain} in the chain - skipping chain.",
+            )
+            return True
+        elif next_rid:
+            logger.error(
+                f"Submission {rid} is last in the chain but has next_report_id {next_rid} - skipping chain.",
+            )
+            return True
 
     return _chain_creates_orphan(chain_rows[1:], init_len, prev_rid_in_chain=rid, old_next_rid=next_rid)
 
