@@ -229,8 +229,8 @@ class ChainCreatesOrphanTests(TestCase):
         self.assertFalse(_chain_creates_orphan(rows))
 
 
-class RestoreSacsTests(TestCase):
-    def test_restore_sacs(self):
+class UnlinkSacsTests(TestCase):
+    def test_unlink_sacs(self):
         """Standard case"""
         _bake_sacs([sac_1, sac_2, sac_3])
         rids = [rid_1, rid_2, rid_3]
