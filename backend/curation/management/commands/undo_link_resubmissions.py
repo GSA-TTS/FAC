@@ -15,10 +15,10 @@ from audit.models.constants import RESUBMISSION_STATUS, STATUS
 from curation.curationlib.audit_distance import (
     prep_string,
     get_audit_year,
-    order_reports_key,
 )
 from curation.curationlib.util import (
     exit_if_not_staff_user,
+    order_reports_key,
 )
 
 logger = logging.getLogger(__name__)

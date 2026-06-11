@@ -5,6 +5,8 @@ import os
 from curation.curationlib.audit_distance import (
     prep_string,
     get_audit_year,
+)
+from curation.curationlib.util import (
     order_reports_key,
 )
 
