@@ -18,7 +18,6 @@ from curation.management.commands.undo_link_resubmissions import (
 )
 from audit.models.constants import RESUBMISSION_STATUS
 
-
 SAC: Dict[str, Any] = {
     "report_id": "2022-42-MAGIC-0000000001",
     "submission_status": "disseminated",
@@ -93,12 +92,14 @@ sac_3 = {
     },
 }
 
+
 def _bake_sacs(sacs):
     for sac in sacs:
         baker.make(
             SingleAuditChecklist,
             **sac,
         )
+
 
 class GetOrderedSacChainTests(TestCase):
     def test_get_ordered_sac_chain(self):
@@ -115,10 +116,11 @@ class GetOrderedSacChainTests(TestCase):
 
     def test_missing_sac(self):
         """Raises an exception when it can't find SACs for all report_ids"""
-        _bake_sacs([sac_1, sac_2]) # sac_3 missing
+        _bake_sacs([sac_1, sac_2])  # sac_3 missing
 
         with self.assertRaises(RuntimeError):
             _get_ordered_sac_chain([rid_3, rid_1, rid_2])
+
 
 class LoadReportIdsTests(TestCase):
     def test_load_report_ids(self):
@@ -130,6 +132,7 @@ class LoadReportIdsTests(TestCase):
         self.assertEqual(len(rows), 2)
         self.assertEqual(rows[0]["report_id"], rid_1)
         self.assertEqual(rows[1]["report_id"], rid_2)
+
 
 class SafeSacGetterTests(TestCase):
     def test_safe_sac_getter(self):
@@ -148,6 +151,7 @@ class SafeSacGetterTests(TestCase):
         self.assertIsInstance(err, SingleAuditChecklist.DoesNotExist)
         self.assertIsNone(sac)
 
+
 class ParseMetaTests(TestCase):
     def test_parse_meta_report_ids(self):
         """Standard case from loading report_ids"""
@@ -159,8 +163,9 @@ class ParseMetaTests(TestCase):
         self.assertIsNone(err)
         self.assertEqual(
             meta,
-            {'version': 0, 'resubmission_status': RESUBMISSION_STATUS.UNKNOWN},
+            {"version": 0, "resubmission_status": RESUBMISSION_STATUS.UNKNOWN},
         )
+
 
 class ChainCreatesOrphanTests(TestCase):
     def test_chain_creates_orphan_start(self):
@@ -225,6 +230,7 @@ class ChainCreatesOrphanTests(TestCase):
 
         self.assertFalse(_chain_creates_orphan(rows, init_len=len(rows)))
 
+
 class RestoreSacsTests(TestCase):
     def test_restore_sacs(self):
         """Standard case"""
@@ -237,13 +243,16 @@ class RestoreSacsTests(TestCase):
 
         sacs = SingleAuditChecklist.objects.filter(report_id__in=rids)
         for sac in sacs:
-            self.assertEqual(sac.resubmission_meta["resubmission_status"], RESUBMISSION_STATUS.UNKNOWN)
+            self.assertEqual(
+                sac.resubmission_meta["resubmission_status"],
+                RESUBMISSION_STATUS.UNKNOWN,
+            )
             self.assertEqual(sac.resubmission_meta["version"], 0)
 
     def test_unlink_sacs_orphan(self):
         """Doesn't link due to orphan detected"""
         _bake_sacs([sac_1, sac_2, sac_3])
-        rids = [rid_1, rid_2] # sac_3 missing
+        rids = [rid_1, rid_2]  # sac_3 missing
         rows = _load_report_ids(rids)
 
         user = baker.make(User, is_staff=True)
@@ -251,5 +260,8 @@ class RestoreSacsTests(TestCase):
 
         sacs = SingleAuditChecklist.objects.filter(report_id__in=rids)
         for sac in sacs:
-            self.assertNotEqual(sac.resubmission_meta["resubmission_status"], RESUBMISSION_STATUS.UNKNOWN)
+            self.assertNotEqual(
+                sac.resubmission_meta["resubmission_status"],
+                RESUBMISSION_STATUS.UNKNOWN,
+            )
             self.assertNotEqual(sac.resubmission_meta["version"], 0)

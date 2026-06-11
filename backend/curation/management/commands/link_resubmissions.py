@@ -16,7 +16,7 @@ from curation.curationlib.generate_resubmission_chains import (
     get_and_generate_submission_chain_by_report_ids,
 )
 from curation.curationlib.util import (
-  exit_if_not_staff_user,
+    exit_if_not_staff_user,
 )
 from curation.curationlib.export_resubmission_chains import (
     export_chains_as_csv,

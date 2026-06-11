@@ -19,7 +19,7 @@ from curation.curationlib.audit_distance import (
     order_reports_key,
 )
 from curation.curationlib.util import (
-  exit_if_not_staff_user,
+    exit_if_not_staff_user,
 )
 
 logger = logging.getLogger(__name__)
@@ -148,7 +148,9 @@ def _load_csv(csv_path):
     return rows
 
 
-def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next_rid=None):
+def _chain_creates_orphan(
+    chain_rows, init_len, prev_rid_in_chain=None, old_next_rid=None
+):
     """
     Returns true if unlinking the chain would create an orphan.
     WARNING: This is recursive.
@@ -170,7 +172,7 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
     prev_rid = resubmission_meta.get("previous_report_id")
     next_rid = resubmission_meta.get("next_report_id")
 
-    if is_first: # Start of chain
+    if is_first:  # Start of chain
         if prev_rid:
             logger.error(
                 f"Submission {rid} is first in the chain but has previous_report_id {prev_rid} - skipping chain.",
@@ -181,7 +183,7 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
                 f"Submission {rid} isn't last in the chain but has no next_report_id - skipping chain.",
             )
             return True
-    elif not is_first and not is_last: # Anywhere middle of chain
+    elif not is_first and not is_last:  # Anywhere middle of chain
         if not prev_rid:
             logger.error(
                 f"Submission {rid} isn't first in the chain but has no previous_report_id - skipping chain.",
@@ -202,7 +204,7 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
                 f"Submission {rid} isn't last in the chain but has no next_report_id - skipping chain.",
             )
             return True
-    elif is_last: # End of chain
+    elif is_last:  # End of chain
         if not prev_rid:
             logger.error(
                 f"Submission {rid} isn't first in the chain but has no previous_report_id - skipping chain.",
@@ -219,7 +221,9 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
             )
             return True
 
-    return _chain_creates_orphan(chain_rows[1:], init_len, prev_rid_in_chain=rid, old_next_rid=next_rid)
+    return _chain_creates_orphan(
+        chain_rows[1:], init_len, prev_rid_in_chain=rid, old_next_rid=next_rid
+    )
 
 
 def _unlink_sacs(rows, user, noisy=False):

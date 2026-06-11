@@ -5,6 +5,7 @@ from users.models import StaffUser
 
 logger = logging.getLogger(__name__)
 
+
 def exit_if_not_staff_user(email):
     """
     Exits if the given email doesn't belong to a staff member
