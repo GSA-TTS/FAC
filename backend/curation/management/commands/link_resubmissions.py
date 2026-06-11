@@ -10,11 +10,13 @@ from audit.models import (
     User,
 )
 from audit.models.constants import RESUBMISSION_STATUS
-from users.models import StaffUser
 from audit.models.constants import STATUS
 from curation.curationlib.generate_resubmission_chains import (
     get_and_generate_submission_chains_by_equivalence,
     get_and_generate_submission_chain_by_report_ids,
+)
+from curation.curationlib.util import (
+    exit_if_not_staff_user,
 )
 from curation.curationlib.export_resubmission_chains import (
     export_chains_as_csv,
@@ -202,7 +204,7 @@ class Command(BaseCommand):
         email = options["email"]
         annotate_old = options["annotate_old"]
 
-        self.exit_if_not_staff_user(email)
+        exit_if_not_staff_user(email)
 
         if (audit_year and report_ids) or not (audit_year or report_ids):
             logger.error("One of --audit_year and --report_ids must be provided.")
@@ -252,16 +254,3 @@ class Command(BaseCommand):
 
         if annotate_old:
             annotate_old(options)
-
-    def exit_if_not_staff_user(self, email):
-        """
-        Note that they had to have privs in TF and be able to enable SSH
-        in production in order to get here.
-        """
-        try:
-            ok_staff_user = StaffUser.objects.get(staff_email=email)
-        except StaffUser.DoesNotExist:
-            logger.error(f"Staff user {email} does not exist")
-            ok_staff_user = False
-        if not ok_staff_user:
-            sys.exit(-1)
