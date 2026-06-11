@@ -13,8 +13,8 @@ from curation.management.commands.undo_link_resubmissions import (
     _get_ordered_sac_chain,
     _load_report_ids,
     _parse_meta,
-    _restore_sacs,
     _safe_sac_getter,
+    _unlink_sacs,
 )
 from audit.models.constants import RESUBMISSION_STATUS
 
@@ -233,21 +233,21 @@ class RestoreSacsTests(TestCase):
         rows = _load_report_ids(rids)
 
         user = baker.make(User, is_staff=True)
-        _restore_sacs(rows, user)
+        _unlink_sacs(rows, user)
 
         sacs = SingleAuditChecklist.objects.filter(report_id__in=rids)
         for sac in sacs:
             self.assertEqual(sac.resubmission_meta["resubmission_status"], RESUBMISSION_STATUS.UNKNOWN)
             self.assertEqual(sac.resubmission_meta["version"], 0)
 
-    def test_restore_sacs_orphan(self):
+    def test_unlink_sacs_orphan(self):
         """Doesn't link due to orphan detected"""
         _bake_sacs([sac_1, sac_2, sac_3])
         rids = [rid_1, rid_2] # sac_3 missing
         rows = _load_report_ids(rids)
 
         user = baker.make(User, is_staff=True)
-        _restore_sacs(rows, user)
+        _unlink_sacs(rows, user)
 
         sacs = SingleAuditChecklist.objects.filter(report_id__in=rids)
         for sac in sacs:

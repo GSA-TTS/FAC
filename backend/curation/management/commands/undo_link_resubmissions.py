@@ -222,7 +222,7 @@ def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next
 
     return _chain_creates_orphan(chain_rows[1:], init_len, prev_rid_in_chain=rid, old_next_rid=next_rid)
 
-def _restore_sacs(rows, user, noisy=False):
+def _unlink_sacs(rows, user, noisy=False):
     """
     Restore submission_status and resubmission_meta for every row given.
 
@@ -346,7 +346,7 @@ class Command(BaseCommand):
 
         # Do the thing!
         ok_user = User.objects.get(email=email)
-        _restore_sacs(rows, ok_user, noisy=noisy)
+        _unlink_sacs(rows, ok_user, noisy=noisy)
 
         logger.info(
             f"\nUndo complete. {len(rows)} submissions restored and redisseminated."
