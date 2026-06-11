@@ -147,45 +147,59 @@ def _load_csv(csv_path):
     return rows
 
 
-def _chain_creates_orphan(chain_rows):
-    """Returns true if unlinking the chain's latest creates an orphan"""
-    latest_report_id = chain_rows[-1]["report_id"]
+def _chain_creates_orphan(chain_rows, init_len, prev_rid_in_chain=None, old_next_rid=None):
+    """
+    Returns true if unlinking the chain would create an orphan.
+    WARNING: This is recursive.
+    
+    chain_rows - Chain rows to be validated
+    init_len - The starting length of chain_rows
+    prev_rid_in_chain - The report_id of the previous iteration's submission
+    old_next_rid - The resubmission_meta.report_id of the previous iteration's submission
+    """
+    len_chain_rows = len(chain_rows)
+    if len(chain_rows) == 0:
+        return False
 
-    err, sac = _safe_sac_getter(latest_report_id)
+    rid = chain_rows[0]["report_id"]
+    err, sac = _safe_sac_getter(rid)
     if err:
         return True
 
-    orphaned_report_id = sac.resubmission_meta.get("next_report_id", None)
-    if orphaned_report_id:
+    is_first = len_chain_rows == init_len
+    if rid != old_next_rid and not is_first:
         logger.error(
-            f"Unlinking newest report_id given ({latest_report_id}) would orphan {orphaned_report_id} - skipping chain.",
+            f"Submission {prev_rid_in_chain} has a next_report_id {old_next_rid} that doesn't match the next submission {rid} in the chain - skipping chain.",
         )
         return True
 
-    return False
+    prev_rid = sac.resubmission_meta.get("previous_report_id")
+    if not prev_rid and not is_first:
+        print(
+            f"Submission {rid} isn't first in the chain but has no previous_report_id - skipping chain.",
+        )
+        return True
+    elif prev_rid != prev_rid_in_chain:
+        logger.error(
+            f"Submission {rid} has a previous_report_id {prev_rid} that doesn't match the previous submission {prev_rid_in_chain} in the chain - skipping chain.",
+        )
+        return True
 
+    next_rid = sac.resubmission_meta.get("next_report_id")
+    is_last = len_chain_rows == 1
 
-def _chain_contains_version_skip(chain_rows):
-    """Returns true if the given chain contains a version skip"""
-    cur_ver = last_ver = None
+    if next_rid and is_last:
+        logger.error(
+            f"Submission {rid} is last in the chain but has next_report_id {next_rid} - skipping chain.",
+        )
+        return True
+    if not next_rid and not is_last:
+        logger.error(
+            f"Submission {rid} isn't last in the chain but has no next_report_id - skipping chain.",
+        )
+        return True
 
-    for row in chain_rows:
-        err, prior_meta = _parse_meta(row)
-        if err:
-            return True
-
-        cur_ver = prior_meta["version"]
-
-        if last_ver and last_ver - cur_ver != 1:
-            logger.error(
-                f"Submission chain contains a {last_ver} to {cur_ver} version skip for {row["report_id"]} - skipping chain.",
-            )
-            return True
-        else:
-            last_ver = cur_ver
-
-    return False
-
+    return _chain_creates_orphan(chain_rows[1:], init_len, prev_rid_in_chain=rid, old_next_rid=next_rid)
 
 def _restore_sacs(rows, user, noisy=False):
     """
@@ -204,10 +218,7 @@ def _restore_sacs(rows, user, noisy=False):
     for chain_index in sorted(chains.keys(), reverse=True):
         chain_rows = chains[chain_index]
 
-        if _chain_creates_orphan(chain_rows):
-            continue
-
-        if _chain_contains_version_skip(chain_rows):
+        if _chain_creates_orphan(chain_rows, init_len=len(chain_rows)):
             continue
 
         for row in reversed(chain_rows):
@@ -250,8 +261,10 @@ class Command(BaseCommand):
     """
     Undo a prior run of link_resubmissions by restoring pre-linkage metadata.
 
-    Reads the CSV produced by link_resubmissions and writes those values back, then redisseminates each submission.
-    Alternatively, a list of report_ids can be provided.
+    Reads the CSV produced by link_resubmissions and writes those values back,
+    then redisseminates each submission. Alternatively, a list of report_ids
+    can be provided. ALL report_ids within a chain must be provided; chains
+    CANNOT be partially unlinked.
     """
 
     def add_arguments(self, parser):

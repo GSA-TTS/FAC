@@ -7,7 +7,6 @@ from django.test import TestCase
 from audit.models import SingleAuditChecklist
 from config.settings import GSA_MIGRATION
 from curation.management.commands.undo_link_resubmissions import (
-    _chain_contains_version_skip,
     _chain_creates_orphan,
     _get_ordered_sac_chain,
     _load_report_ids,
@@ -75,6 +74,7 @@ sac_2 = {
         **SAC["resubmission_meta"],
         "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
         "version": 2,
+        "previous_report_id": rid_1,
         "next_report_id": rid_3,
     },
 }
@@ -86,6 +86,7 @@ sac_3 = {
         **SAC["resubmission_meta"],
         "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
         "version": 3,
+        "previous_report_id": rid_2,
     },
 }
 
@@ -159,14 +160,42 @@ class ParseMetaTests(TestCase):
         )
 
 class ChainCreatesOrphanTests(TestCase):
-    def test_chain_creates_orphan(self):
-        """Detects an orphan"""
-        _bake_sacs([sac_1, sac_2])
+    def test_chain_creates_orphan_start(self):
+        """Detects an orphan at the start of the chain"""
+        _bake_sacs([sac_1, sac_2, sac_3])
+
+        # Orphans sac_1
+        rows = _load_report_ids([rid_2, rid_3])
+
+        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+
+    def test_chain_creates_orphan_middle(self):
+        """Detects an orphan in the middle of the chain"""
+        _bake_sacs([sac_1, sac_2, sac_3])
 
         # Orphans sac_2
-        rows = _load_report_ids([rid_1])
+        rows = _load_report_ids([rid_1, rid_3])
 
-        self.assertTrue(_chain_creates_orphan(rows))
+        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+
+    def test_chain_creates_orphan_end(self):
+        """Detects an orphan at the end of the chain"""
+        _bake_sacs([sac_1, sac_2, sac_3])
+
+        # Orphans sac_3
+        rows = _load_report_ids([rid_1, rid_2])
+
+        self.assertTrue(_chain_creates_orphan(rows, init_len=len(rows)))
+
+    def test_chain_creates_orphan_unordered(self):
+        """Detects chain ordering doesn't match previous/next_report_id in resub metas"""
+        _bake_sacs([sac_1, sac_2, sac_3])
+
+        # _load_report_ids auto-sorts by version, so undo that
+        rows = _load_report_ids([rid_1, rid_2, rid_3])
+        unordered_rows = [rows[0], rows[2], rows[1]]
+
+        self.assertTrue(_chain_creates_orphan(unordered_rows, init_len=len(rows)))
 
     def test_chain_no_orphan(self):
         """Detects no orphan"""
@@ -174,4 +203,4 @@ class ChainCreatesOrphanTests(TestCase):
 
         rows = _load_report_ids([rid_1, rid_2, rid_3])
 
-        self.assertFalse(_chain_creates_orphan(rows))
+        self.assertFalse(_chain_creates_orphan(rows, init_len=len(rows)))
