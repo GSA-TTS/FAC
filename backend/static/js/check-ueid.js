@@ -41,13 +41,22 @@ function requiredFieldsFilled() {
 }
 
 function allResponsesValid() {
-  const inputsWithErrors = document.querySelectorAll('[class *="--error"]');
+  const inputsWithErrors = FORM.querySelectorAll('input[class*="--error"]');
   return inputsWithErrors.length === 0;
 }
 
 function updateValidateButtonState() {
-  const btn = document.getElementById('continue'); // bottom "Validate UEI" button
+  const btn = document.getElementById('continue');
+
+  // console.log('BUTTON CHECK', {
+  //   filled: requiredFieldsFilled(),
+  //   valid: allResponsesValid(),
+  //   start: getTrimmedValue('auditee_fiscal_period_start'),
+  //   end: getTrimmedValue('auditee_fiscal_period_end'),
+  // });
+
   const shouldDisable = !(requiredFieldsFilled() && allResponsesValid());
+
   if (btn) btn.disabled = Boolean(shouldDisable);
 }
 
@@ -59,7 +68,7 @@ function validatorSupportsField(el) {
 
   // Must have validate-* attributes
   const hasValidateDataset = Object.keys(el.dataset || {}).some((k) =>
-    k.toLowerCase().includes('validate')
+   String(k).toLowerCase().includes('validate')
   );
   if (!hasValidateDataset) return false;
 
@@ -402,7 +411,17 @@ function wireFieldValidation() {
 function init() {
   attachValidateButtonHandler();
   wireFieldValidation();
-  updateValidateButtonState(); // initial disabled state
+
+  document.addEventListener('input', updateValidateButtonState, true);
+  document.addEventListener('change', updateValidateButtonState, true);
+  document.addEventListener('blur', updateValidateButtonState, true);
+  document.addEventListener('usa-date-picker:change', () => setTimeout(updateValidateButtonState, 50));
+
+  document.addEventListener('click', () => {
+    setTimeout(updateValidateButtonState, 50);
+  });
+
+  updateValidateButtonState();
 }
 
 init();
