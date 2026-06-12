@@ -631,10 +631,14 @@ def compare_with_prev(rid):
         sac = rid
     else:
         logger.error(f"{rid} is not a report ID or SAC object")
-        return {
-            "status": "error",
-            "message": f"It seems {rid} is not a report; if you think this is an error, please contact the FAC helpdesk.",
-        }
+        return (
+            None,
+            None,
+            {
+                "status": "error",
+                "message": f"It seems {rid} is not a report; if you think this is an error, please contact the FAC helpdesk.",
+            },
+        )
 
     if sac.resubmission_meta:
         if "previous_report_id" in sac.resubmission_meta:
@@ -644,10 +648,14 @@ def compare_with_prev(rid):
             rid = sac.resubmission_meta["next_report_id"]
         else:
             logger.error(f"No previous report ID for {rid}")
-            return {
-                "status": "error",
-                "message": f"No previous report for {rid}. If this seems to be an error, contact the FAC helpdesk.",
-            }
+            return (
+                None,
+                None,
+                {
+                    "status": "error",
+                    "message": f"No previous report for {rid}. If this seems to be an error, contact the FAC helpdesk.",
+                },
+            )
         logger.info(f"[DIFF] {prev} <-> {rid}")
         return (
             report_id_as_string(prev),
@@ -655,7 +663,11 @@ def compare_with_prev(rid):
             compare_report_ids(prev, rid),
         )
     else:
-        return {
-            "status": "error",
-            "message": "There's no resubmission info for {rid}. If this seems to be an error, contact the FAC helpdesk.",
-        }
+        return (
+            None,
+            None,
+            {
+                "status": "error",
+                "message": "There's no resubmission info for {rid}. If this seems to be an error, contact the FAC helpdesk.",
+            },
+        )
