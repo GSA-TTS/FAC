@@ -1,10 +1,11 @@
 from django.test import TestCase
+
 from audit.models import SingleAuditChecklist
 from .check_resubmission_has_changes import (
     check_resubmission_has_changes,
 )
-from .sac_validation_shape import sac_validation_shape
 from .errors import err_identical_resubmissions
+from .sac_validation_shape import sac_validation_shape
 
 from model_bakery import baker
 from unittest.mock import patch
@@ -36,6 +37,7 @@ class CheckResubmissionHasChangesTest(TestCase):
             errors, [{"error": err_identical_resubmissions(orig.report_id)}]
         )
 
+    # Here we can also simulate compare_single_audit_reports detecting changes
     @patch("audit.viewlib.compare_two_submissions.compare_single_audit_reports")
     def test_has_changes(self, mock_sar_compare):
         """When there are changes, we should not have an error"""
