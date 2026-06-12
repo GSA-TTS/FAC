@@ -3,11 +3,11 @@ terraform {
   required_providers {
     cloudfoundry = {
       source  = "cloudfoundry/cloudfoundry"
-      version = ">=1.6.0"
+      version = ">=1.15.0"
     }
     docker = {
       source  = "kreuzwerker/docker"
-      version = "~>3.0.2"
+      version = "~>4.4.0"
     }
   }
 }
