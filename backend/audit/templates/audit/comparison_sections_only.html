@@ -1,7 +1,7 @@
 {% comment %}
   each key is a section, mapped to what changed
   each section contains a tag "status" (same, changed) and "in_r1", "in_r2" as lists
-  this is broken out so that it can be embedded in a Federal view without the trappings, 
+  this is broken out so that it can be embedded in a Federal view without the trappings,
     if we decide that is desirable/necessary.
 {% endcomment %}
 
@@ -18,6 +18,7 @@
     <div class="grid-row width-full">
       <div class="tablet:grid-col">
         <h2>There are no changes between Single Audit Reports</h2>
+        <p>Note that identical resubmissions are not permitted, so pre-submission validation will fail in its current state.</p>
       </div>
     </div>
   {% endif %}
@@ -153,6 +154,6 @@
     {% endif %}
   {% else %}
     <!-- same or identical -->
-    <!-- <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div> -->    
+    <!-- <div class="grid-row"><div class="tablet:grid-col"><p>No differences detected.</p></div></div> -->
   {% endif %} <!-- for the big is changed/same -->
 {% endfor %} <!-- end section loop -->
