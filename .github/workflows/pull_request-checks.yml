@@ -102,14 +102,6 @@ jobs:
       environment: staging
     secrets: inherit
 
-# uses tags "v1.*"
-  terraform-plan-prod:
-    if: github.base_ref == 'prod'
-    uses: ./.github/workflows/terraform-plan-env.yml
-    with:
-      environment: production
-    secrets: inherit
-
   repo-event:
     if: ${{ github.base_ref == 'prod' && always() }}
     name: Set Repository Event
