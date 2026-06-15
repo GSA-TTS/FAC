@@ -1,11 +1,12 @@
 import logging
 import pytz
+
+from django.forms import model_to_dict
 from django.db import IntegrityError
 
 from audit.intakelib.transforms.xform_resize_award_references import _format_reference
 from audit.models.constants import RESUBMISSION_STATUS
 from audit.utils import Util
-
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -18,6 +19,7 @@ from dissemination.models import (
     Passthrough,
     Resubmission,
     SecondaryAuditor,
+    Unified,
 )
 
 logger = logging.getLogger(__name__)
@@ -65,6 +67,9 @@ class IntakeToDissemination(object):
                 )
                 logger.warning(error)
                 self.errors.append(error)
+
+        self.load_unified()
+
         return self.loaded_objects
 
     def get_dissemination_objects(self):
@@ -557,3 +562,34 @@ class IntakeToDissemination(object):
         )
         self.loaded_objects["Resubmissions"] = [resubmission]
         return [resubmission]
+
+    def load_unified(self):
+        gen = self.loaded_objects["Generals"][0]
+        unifieds = []
+
+        for fed in self.loaded_objects["FederalAwards"]:
+            for fin in self.loaded_objects["Findings"]:
+                # Passthroughs may not exist
+                passes = self.loaded_objects["Passthroughs"]
+                if passes:
+                    for pas in passes:
+                        params = {
+                            **model_to_dict(gen),
+                            **model_to_dict(fed),
+                            **model_to_dict(fin),
+                            **model_to_dict(pas),
+                        }
+                        unified = Unified(**params)
+                        unifieds.append(unified)
+                else:
+                    params = {
+                        **model_to_dict(gen),
+                        **model_to_dict(fed),
+                        **model_to_dict(fin),
+                    }
+                    unified = Unified(**params)
+                    unifieds.append(unified)
+
+        self.loaded_objects["Unifieds"] = unifieds
+
+        return unifieds
