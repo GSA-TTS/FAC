@@ -12,6 +12,11 @@ User = get_user_model()
 class ResubmissionTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="resubuser")
+        self.user.profile.entry_form_data = {
+            "is_usa_based": True,
+            "met_spending_threshold": True,
+            "user_provided_organization_type": "non-profit"
+        }
         general_information = {
             "auditee_fiscal_period_start": "2024-01-01",
             "auditee_fiscal_period_end": "2024-12-31",
