@@ -179,3 +179,7 @@ def err_total_amount_expended(amount_expended):
         "for that year. "
         f"The amount expended is ${pretty_amount_expended}. "
     )
+
+
+def err_identical_resubmissions(report_id):
+    return f"This resubmission appears identical to the previous version ({report_id}). A resubmission that is identical to the original submission is not permitted."
