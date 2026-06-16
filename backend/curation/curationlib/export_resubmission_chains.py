@@ -106,7 +106,8 @@ def export_chains_as_markdown(chains, AY=None, report_ids=None):
     """
     filename = _data_path(f"{AY or report_ids[0]}-resubmission-chains-{len(chains)}.md")
     title = (
-        f"### Resubmissions for {f"audit year {AY}" if AY else report_ids[0]}"
+        "### Resubmissions for "
+        + {f"audit year {AY}" if AY else report_ids[0]}
         + NEWLINE
         + NEWLINE
     )
