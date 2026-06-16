@@ -1,0 +1,144 @@
+name: Production - Terraform Deploy
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  ARTIFACT_FOLDER: "${{ github.sha }}-${{ github.run_id }}"
+  TF_PLAN_FILE: "tf-plan"
+
+jobs:
+  plan:
+    environment: production
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform/${{ inputs.environment }}
+    env:
+      TF_VAR_cf_user: ${{ secrets.CF_USERNAME }}
+      TF_VAR_cf_password: ${{ secrets.CF_PASSWORD }}
+      TF_VAR_new_relic_license_key: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+      TF_VAR_new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+      TF_VAR_new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
+      TF_VAR_pgrst_jwt_secret: ${{ secrets.PGRST_JWT_SECRET }}
+      KEY: "terraform.tfstate.${{ inputs.environment }}"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.TERRAFORM_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TERRAFORM_AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.TERRAFORM_REGION }}
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install CF CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip python3
+
+          curl -k -O -L https://github.com/cloudfoundry/cli/releases/download/v8.8.0/cf8-cli-installer_8.8.0_x86-64.deb
+          sudo apt-get install --assume-yes ./cf8-cli-installer_8.8.0_x86-64.deb
+
+          cf api api.fr.cloud.gov
+          cf auth ${{ secrets.CF_USERNAME }} ${{ secrets.CF_PASSWORD }}
+      - uses: hashicorp/setup-terraform@v4
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.terraform_BUCKET }}" \
+            -backend-config="key=$KEY" \
+      - name: Terraform Plan
+        run: |
+          terraform plan -out=${{ env.TF_PLAN_FILE }}
+      - name: Upload to S3
+        run: |
+          aws s3 cp ${{ env.TF_PLAN_FILE }} s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }}/${{ env.TF_PLAN_FILE }}
+
+          ## Zip files for egress proxy, scanner and logshipper applications are generated during terraform plan
+          ## but are not regenerated when applying from a saved plan file. These zips must be uploaded to S3
+          ## so the apply job has access to them. Zips are stored in two locations depending on whether the
+          ## module is external (downloaded by terraform init into .terraform/modules/) or local (in ../shared/modules/).
+
+          aws s3 cp .terraform/modules/ s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }}/terraform/modules/ \
+            --recursive \
+            --exclude "*" \
+            --include "*.zip"
+
+          aws s3 cp ../shared/modules/ s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }}/shared/modules/ \
+            --recursive \
+            --exclude "*" \
+            --include "*.zip"
+      - name: Runner Cleanup
+        if: always()
+        run: rm -f ${{ env.TF_PLAN_FILE }}
+      - name: S3 Cleanup
+        if: failure()
+        run: |
+          aws s3 rm s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }} \
+            --recursive
+
+  apply:
+    environment: production-deploy
+    needs: plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform/${{ inputs.environment }}
+    env:
+      TF_VAR_cf_user: ${{ secrets.CF_USERNAME }}
+      TF_VAR_cf_password: ${{ secrets.CF_PASSWORD }}
+      TF_VAR_new_relic_license_key: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+      TF_VAR_new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+      TF_VAR_new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
+      TF_VAR_pgrst_jwt_secret: ${{ secrets.PGRST_JWT_SECRET }}
+      KEY: "terraform.tfstate.${{ inputs.environment }}"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.TERRAFORM_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TERRAFORM_AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.TERRAFORM_REGION }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install CF CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip python3
+          
+          curl -k -O -L https://github.com/cloudfoundry/cli/releases/download/v8.8.0/cf8-cli-installer_8.8.0_x86-64.deb
+          sudo apt-get install --assume-yes ./cf8-cli-installer_8.8.0_x86-64.deb
+
+          cf api api.fr.cloud.gov
+          cf auth ${{ secrets.CF_USERNAME }} ${{ secrets.CF_PASSWORD }}
+      - uses: hashicorp/setup-terraform@v4
+      - name: Terraform Init
+        run: |
+          terraform init \
+            --backend-config="bucket=${{ secrets.terraform_BUCKET }}" \
+            --backend-config="key=$KEY"
+      - name: Download From S3
+        run: |
+          aws s3 cp s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }}/${{ env.TF_PLAN_FILE }} .
+          
+          aws s3 cp \
+            s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }}/terraform/modules/ \
+            .terraform/modules/ \
+            --recursive
+
+          aws s3 cp \
+            s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }}/shared/modules/ \
+            ../shared/modules/ \
+            --recursive
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve ${{ env.TF_PLAN_FILE }}
+      - name: Runner Cleanup
+        if: always()
+        run: rm -f ${{ env.TF_PLAN_FILE}}
+      - name: S3 Cleanup
+        if: always()
+        run: |
+          aws s3 rm s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }} \
+            --recursive
