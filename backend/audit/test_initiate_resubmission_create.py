@@ -15,7 +15,7 @@ class ResubmissionTest(TestCase):
         self.user.profile.entry_form_data = {
             "is_usa_based": True,
             "met_spending_threshold": True,
-            "user_provided_organization_type": "non-profit"
+            "user_provided_organization_type": "non-profit",
         }
         general_information = {
             "auditee_fiscal_period_start": "2024-01-01",
