@@ -572,6 +572,8 @@ class IntakeToDissemination(object):
                 if fed.award_reference != fin.award_reference:
                     continue
 
+                aln = f"{fed.federal_agency_prefix}.{fed.federal_award_extension}"
+
                 passes = self.loaded_objects["Passthroughs"]
                 if passes:
                     for pas in passes:
@@ -579,6 +581,7 @@ class IntakeToDissemination(object):
                             continue
 
                         params = {
+                            "aln": aln,
                             **model_to_dict(gen),
                             **model_to_dict(fed),
                             **model_to_dict(fin),
@@ -588,6 +591,7 @@ class IntakeToDissemination(object):
                         unifieds.append(unified)
                 else:
                     params = {
+                        "aln": aln,
                         **model_to_dict(gen),
                         **model_to_dict(fed),
                         **model_to_dict(fin),
