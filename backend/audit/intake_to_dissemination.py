@@ -569,10 +569,15 @@ class IntakeToDissemination(object):
 
         for fed in self.loaded_objects["FederalAwards"]:
             for fin in self.loaded_objects["Findings"]:
-                # Passthroughs may not exist
+                if fed.award_reference != fin.award_reference:
+                    continue
+
                 passes = self.loaded_objects["Passthroughs"]
                 if passes:
                     for pas in passes:
+                        if fed.award_reference != pas.award_reference:
+                            continue
+
                         params = {
                             **model_to_dict(gen),
                             **model_to_dict(fed),
@@ -586,6 +591,7 @@ class IntakeToDissemination(object):
                         **model_to_dict(gen),
                         **model_to_dict(fed),
                         **model_to_dict(fin),
+                        # No passthroughs
                     }
                     unified = Unified(**params)
                     unifieds.append(unified)
