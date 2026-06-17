@@ -133,6 +133,7 @@ class Unified(models.Model):
     This is a selective-JOINing of federal general info, awards, findings, and
     passthroughs.
     """
+
     report_id = models.ForeignKey(
         "General",
         help_text=REPORT_ID_FK_HELP_TEXT,

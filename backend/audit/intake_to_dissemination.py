@@ -597,7 +597,7 @@ class IntakeToDissemination(object):
                     }
 
                 # Remove the raw string ID from the dict so it doesn't try to overwrite anything
-                params.pop('report_id', None)
+                params.pop("report_id", None)
 
                 # Assign the 'gen' instance directly to your field name
                 unified = Unified(report_id=gen, **params)
