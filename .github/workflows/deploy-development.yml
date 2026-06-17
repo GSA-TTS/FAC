@@ -35,6 +35,9 @@ jobs:
       - check-for-changes
     if: needs.check-for-changes.outputs.terraform == 'true'
     uses: ./.github/workflows/terraform-apply-env.yml
+    permissions:
+      contents: read
+      pull-requests: write
     with:
       environment: "dev"
       autoapprove: false
