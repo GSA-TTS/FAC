@@ -2,6 +2,7 @@ import copy
 
 from django.db import models
 
+from .constants import REPORT_ID_FK_HELP_TEXT
 from dissemination.models import (
     General,
     FederalAward,
@@ -14,7 +15,6 @@ fields_to_import = [
     (
         General,
         [
-            "report_id",
             "auditee_certify_name",
             "auditee_certify_title",
             "auditor_certify_name",
@@ -133,7 +133,13 @@ class Unified(models.Model):
     This is a selective-JOINing of federal general info, awards, findings, and
     passthroughs.
     """
-
+    report_id = models.ForeignKey(
+        "General",
+        help_text=REPORT_ID_FK_HELP_TEXT,
+        on_delete=models.CASCADE,
+        to_field="report_id",
+        db_column="report_id",
+    )
     aln = models.TextField(
         "2-char agency code concatenated to 3-digit program extn",
     )

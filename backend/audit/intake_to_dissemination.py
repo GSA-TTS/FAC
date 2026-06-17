@@ -587,8 +587,6 @@ class IntakeToDissemination(object):
                             **model_to_dict(fin),
                             **model_to_dict(pas),
                         }
-                        unified = Unified(**params)
-                        unifieds.append(unified)
                 else:
                     params = {
                         "aln": aln,
@@ -597,8 +595,13 @@ class IntakeToDissemination(object):
                         **model_to_dict(fin),
                         # No passthroughs
                     }
-                    unified = Unified(**params)
-                    unifieds.append(unified)
+
+                # Remove the raw string ID from the dict so it doesn't try to overwrite anything
+                params.pop('report_id', None)
+
+                # Assign the 'gen' instance directly to your field name
+                unified = Unified(report_id=gen, **params)
+                unifieds.append(unified)
 
         self.loaded_objects["Unifieds"] = unifieds
 
