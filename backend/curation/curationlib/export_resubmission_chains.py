@@ -2,7 +2,13 @@ import csv
 import json
 import os
 
-from curation.curationlib.audit_distance import prep_string, get_audit_year
+from curation.curationlib.audit_distance import (
+    prep_string,
+    get_audit_year,
+)
+from curation.curationlib.util import (
+    order_reports_key,
+)
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
@@ -20,13 +26,6 @@ def _data_path(filename):
 # code for inspection/analysis post-facto.
 
 NEWLINE = "\n"
-
-
-def order_reports_key(r):
-    for ndx, tn in enumerate(list(reversed(r.transition_name))):
-        if tn == "submitted":
-            break
-    return list(reversed(r.transition_date))[ndx]
 
 
 # Exports the same data in CSV format for analysis in a spreadsheet tool.
