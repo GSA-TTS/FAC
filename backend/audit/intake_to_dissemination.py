@@ -572,37 +572,31 @@ class IntakeToDissemination(object):
                 if fed.award_reference != fin.award_reference:
                     continue
 
-                aln = f"{fed.federal_agency_prefix}.{fed.federal_award_extension}"
-
                 passes = self.loaded_objects["Passthroughs"]
                 if passes:
                     for pas in passes:
-                        if fed.award_reference != pas.award_reference:
-                            continue
-
-                        params = {
-                            "aln": aln,
-                            **model_to_dict(gen),
-                            **model_to_dict(fed),
-                            **model_to_dict(fin),
-                            **model_to_dict(pas),
-                        }
+                        if fed.award_reference == pas.award_reference:
+                            unifieds.append(
+                                self._load_unified_helper(gen, fed, fin, pas)
+                            )
                 else:
-                    params = {
-                        "aln": aln,
-                        **model_to_dict(gen),
-                        **model_to_dict(fed),
-                        **model_to_dict(fin),
-                        # No passthroughs
-                    }
-
-                # Remove the raw string ID from the dict so it doesn't try to overwrite anything
-                params.pop("report_id", None)
-
-                # Assign the 'gen' instance directly to your field name
-                unified = Unified(report_id=gen, **params)
-                unifieds.append(unified)
+                    unifieds.append(self._load_unified_helper(gen, fed, fin, None))
 
         self.loaded_objects["Unifieds"] = unifieds
 
         return unifieds
+
+    def _load_unified_helper(self, gen, fed, fin, pas):
+        aln = f"{fed.federal_agency_prefix}.{fed.federal_award_extension}"
+        params = {
+            "aln": aln,
+            **model_to_dict(gen),
+            **model_to_dict(fed),
+            **model_to_dict(fin),
+            **(model_to_dict(pas) if pas else {}),
+        }
+
+        # Since report_id is a FK, the model needs an instance of General, not a string
+        params.pop("report_id", None)
+
+        return Unified(report_id=gen, **params)
