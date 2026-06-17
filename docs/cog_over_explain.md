@@ -75,17 +75,18 @@ For the sake of simplicity; the recipent is awarded and has expended the followi
 - HHS awards $20M "directly" and another $80M "indirectly".
 - EPA grants $30M "directly" and another $10M "indirectly".
 
-The totals of all the money received is $400M. Although, Treasury Dept granted the most direct money at $50M it won't be the cognizant because the total is less than 25% of the total money awarded.  HUD would be the cognizant since it awarded the most total money "directly" and "indirectly".  
+The total of all the money received is $400M, and Treasury Dept has granted the most direct money at $50M. It won't be the cognizant, however, because it contributed less than 25% of the total money awarded.  Instead, HUD would be the cognizant since it awarded the most total money "directly" and "indirectly".  
+
 The following table illustrates the example:
 
-| Agency             | Direct award | Indirect award | Total from Agency |
-|--------------------|:------------:|:--------------:|:-----------------:|
-| Treasury Dept.     |     $50M     |                |       $50M        |
-| GSA                |     $30M     |      $70M      |       $100M       |
-| HUD                |     $30M     |      $80M      |       $110M       |
-| HHS                |     $20M     |      $80M      |       $100M       |
-| EPA                |     $30M     |      $10M      |       $40M        |
-| **Total Received** |              |                |     **$400M**     |
+| Agency             | Direct award (% of $400M) | Indirect award | Total from Agency |
+|--------------------|:-------------------------:|:--------------:|:-----------------:|
+| Treasury Dept.     |       $50M (12.5%)        |                |       $50M        |
+| GSA                |        $30M (7.5%)        |      $70M      |       $100M       |
+| HUD                |        $30M (7.5%)        |      $80M      |       $110M       |
+| HHS                |        $20M (5.0%)        |      $80M      |       $100M       |
+| EPA                |        $30M (7.5%)        |      $10M      |       $40M        |
+| **Total Received** |                           |                |     **$400M**     |
 
 
 ## **Decision Workflow**
