@@ -1,6 +1,7 @@
 import copy
 
 from django.db import models
+from typing import List, Tuple, Type
 
 from .constants import REPORT_ID_FK_HELP_TEXT
 from dissemination.models import (
@@ -11,7 +12,7 @@ from dissemination.models import (
 )
 
 # Used to import fields from other models to reduce code duplication
-fields_to_import = [
+fields_to_import: List[Tuple[Type[models.Model], List[str]]] = [
     (
         General,
         [
