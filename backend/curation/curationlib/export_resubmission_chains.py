@@ -2,7 +2,13 @@ import csv
 import json
 import os
 
-from curation.curationlib.audit_distance import prep_string, get_audit_year
+from curation.curationlib.audit_distance import (
+    prep_string,
+    get_audit_year,
+)
+from curation.curationlib.util import (
+    order_reports_key,
+)
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
@@ -20,13 +26,6 @@ def _data_path(filename):
 # code for inspection/analysis post-facto.
 
 NEWLINE = "\n"
-
-
-def order_reports_key(r):
-    for ndx, tn in enumerate(list(reversed(r.transition_name))):
-        if tn == "submitted":
-            break
-    return list(reversed(r.transition_date))[ndx]
 
 
 # Exports the same data in CSV format for analysis in a spreadsheet tool.
@@ -106,7 +105,8 @@ def export_chains_as_markdown(chains, AY=None, report_ids=None):
     """
     filename = _data_path(f"{AY or report_ids[0]}-resubmission-chains-{len(chains)}.md")
     title = (
-        f"### Resubmissions for {f"audit year {AY}" if AY else report_ids[0]}"
+        "### Resubmissions for "
+        + {f"audit year {AY}" if AY else report_ids[0]}
         + NEWLINE
         + NEWLINE
     )

@@ -5,7 +5,9 @@ from curation.curationlib.audit_distance import (
     get_audit_year,
     set_distance,
 )
-from curation.curationlib.export_resubmission_chains import order_reports_key
+from curation.curationlib.util import (
+    order_reports_key,
+)
 from curation.curationlib.fetch_sacs import (
     fetch_disseminated_sacs_for_ay,
     fetch_disseminated_sacs_for_report_ids,

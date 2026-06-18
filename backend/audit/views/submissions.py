@@ -1,5 +1,6 @@
 import logging
 
+from config.settings import DOLLAR_THRESHOLDS
 from django.views import generic
 from django.shortcuts import render, redirect
 from django.db import transaction
@@ -62,6 +63,9 @@ class MySubmissions(LoginRequiredMixin, generic.View):
             "edit_link": edit_link,
             "is_beta": use_audit,
             "non_beta_url": "audit:MySubmissions",
+            "dollar_thresholds": [
+                dict_item["message"] for dict_item in DOLLAR_THRESHOLDS
+            ],
         }
         return render(request, self.template_name, context)
 

@@ -5,15 +5,18 @@ export function testValidGeneralInfo(isResubmission=false) {
 	//cy.get('#auditee_fiscal_period_start').type('05/08/2023');
 	//cy.get('#auditee_fiscal_period_end').type('05/08/2024');
 
-	if (!isResubmission) {
+	if (isResubmission) {
+		// This allows us to pass the check_resubmission_has_changes
+		const randomPhone = String(Math.floor(1000000000 + Math.random() * 9000000000));
+		cy.get('#auditee_phone').clear();
+		cy.get('#auditee_phone').type(randomPhone);
+	}	else {
 		// Audit Type
 		cy.get('label[for=single-audit]').click();
 		cy.get('label[for=audit-period-annual]').click();
 
 		// Auditee information
 		cy.get('#auditee_name').type('Audit McAuditee')
-		// clear()s are needed for resubmission tests, which pre-fills some fields.
-		cy.get('#ein').clear();
 		cy.get('#ein').type('546000173');
 		cy.get('label[for=ein_not_an_ssn_attestation]').click();
 		cy.get('label[for=multiple-eins-yes]').click();
@@ -30,13 +33,10 @@ export function testValidGeneralInfo(isResubmission=false) {
 		// Auditee contact information
 		cy.get('#auditee_contact_name').type('John Doe');
 		cy.get('#auditee_contact_title').type('Keymaster');
-		cy.get('#auditee_phone').clear();
 		cy.get('#auditee_phone').type('5558675309');
-		cy.get('#auditee_email').clear();
 		cy.get('#auditee_email').type('va@test.com');
 
 		// Auditor information
-		cy.get('#auditor_ein').clear();
 		cy.get('#auditor_ein').type('987654321');
 		cy.get('label[for=auditor_ein_not_an_ssn_attestation]').click();
 		cy.get('#auditor_firm_name').type('House of Auditor');
@@ -45,15 +45,12 @@ export function testValidGeneralInfo(isResubmission=false) {
 		cy.get('#auditor_address_line_1').type('123 Around the corner');
 		cy.get('#auditor_city').type('Centreville');
 		cy.get('#auditor_state').type('VA{enter}');
-		cy.get('#auditor_zip').clear();
 		cy.get('#auditor_zip').type('20121');
 
 		// Auditor contact information
 		cy.get('#auditor_contact_name').type('Jane Doe');
 		cy.get('#auditor_contact_title').type('Auditor');
-		cy.get('#auditor_phone').clear();
 		cy.get('#auditor_phone').type('5555555555');
-		cy.get('#auditor_email').clear();
 		cy.get('#auditor_email').type('qualified.human.accountant@auditor.com');
 
 		cy.get('label[for=secondary_auditors-yes]').click();

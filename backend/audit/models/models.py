@@ -340,14 +340,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             ]
             data = model_to_dict(self, fields=include_list)
 
-            # Update individual fields
-            data["general_information"]["auditee_uei"] = self.auditee_uei
-            data["general_information"][
-                "auditee_fiscal_period_start"
-            ] = self.auditee_fiscal_period_start
-            data["general_information"][
-                "auditee_fiscal_period_end"
-            ] = self.auditee_fiscal_period_end
+            # These are the fields that are pulled fresh from the pre-submission eligibility steps.
+            # UEI and fiscal period are also from pre-submission eligibility, but we can rely on them being copied from the previous record - they were validated then.
+            # "met_spending_threshold" and "is_usa_based" are always true. We store them as an user attestation, so we'll continue to do that and use the new values.
+            user_form_data = user.profile.entry_form_data
+            data["general_information"]["user_provided_organization_type"] = (
+                user_form_data["user_provided_organization_type"]
+            )
+            data["general_information"]["met_spending_threshold"] = user_form_data[
+                "met_spending_threshold"
+            ]
+            data["general_information"]["is_usa_based"] = user_form_data["is_usa_based"]
 
             # Manually add back foreign key as instance
             data["submitted_by"] = self.submitted_by

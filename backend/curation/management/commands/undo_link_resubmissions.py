@@ -11,29 +11,117 @@ from audit.models import (
     SubmissionEvent,
     User,
 )
-from audit.models.constants import RESUBMISSION_STATUS
-from users.models import StaffUser
+from audit.models.constants import RESUBMISSION_STATUS, STATUS
+from curation.curationlib.audit_distance import (
+    prep_string,
+    get_audit_year,
+)
+from curation.curationlib.util import (
+    exit_if_not_staff_user,
+    order_reports_key,
+)
 
 logger = logging.getLogger(__name__)
 
 # Columns that must be present in the CSV produced by link_resubmissions.
 REQUIRED_COLUMNS = {"report_id", "prior_submission_status", "prior_resubmission_meta"}
+UNLINKED_RESUB_STATUS = {
+    "version": 0,
+    "resubmission_status": RESUBMISSION_STATUS.UNKNOWN,
+}
 
 
-def _parse_meta(raw):
+def _parse_meta(row):
     """
-    Pull the JSON resub metadata from the CSV.
+    Pull the JSON resub metadata from the row.
 
     Submissions whose prior_resubmission_meta is empty were NULL before linkage.
     They must be restored to version 0 rather than NULL,
     because a NULL would be redisseminated as version 1.
     """
+    raw = row["prior_resubmission_meta"]
     if raw == "" or raw is None:
-        return {
-            "version": 0,
-            "resubmission_status": RESUBMISSION_STATUS.UNKNOWN,
-        }
-    return json.loads(raw)
+        return UNLINKED_RESUB_STATUS
+
+    try:
+        return None, json.loads(raw)
+    except json.JSONDecodeError as err:
+        logger.error(
+            f"Invalid JSON in prior_resubmission_meta for SAC: {row["report_id"]} — skipping submission."
+        )
+        return err, None
+
+
+def _safe_sac_getter(report_id):
+    """
+    Returns the SAC object for the given report_id. Logs and returns an error
+    upon failure.
+    """
+    try:
+        return None, SingleAuditChecklist.objects.get(report_id=report_id)
+    except SingleAuditChecklist.DoesNotExist as err:
+        logger.error(f"SAC not found: {report_id} — skipping submission.")
+        return err, None
+
+
+def _load_report_ids(report_ids):
+    """
+    Read the report_ids and return a list of row dicts.
+    """
+    ordered_sac_chain = _get_ordered_sac_chain(report_ids)
+    rows = []
+
+    for sac in ordered_sac_chain:
+        rows.append(
+            {
+                "chain_index": 0,
+                "report_id": sac.report_id,
+                "audit_year": get_audit_year(sac),
+                "fac_accepted_date": order_reports_key(sac).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                ),
+                "auditee_uei": sac.general_information["auditee_uei"],
+                "auditee_ein": sac.general_information["ein"],
+                "auditee_email": prep_string(sac.general_information["auditee_email"]),
+                "auditee_name": prep_string(sac.general_information["auditee_name"]),
+                "auditee_state": prep_string(sac.general_information["auditee_state"]),
+                "resubmission_meta": sac.resubmission_meta,
+                "prior_submission_status": STATUS.DISSEMINATED,
+                "prior_resubmission_meta": (json.dumps(UNLINKED_RESUB_STATUS)),
+            },
+        )
+
+    return rows
+
+
+def _get_ordered_sac_chain(report_ids):
+    """Returns a list of SACs ordered by version"""
+    sacs_by_version = {}
+    missing_sacs = []
+
+    for report_id in report_ids:
+        err, sac = _safe_sac_getter(report_id)
+        if err:
+            missing_sacs.append(report_id)
+        else:
+            v = sac.resubmission_meta["version"]
+            sacs_by_version[v] = sac
+
+    if missing_sacs:
+        len_sacs = len(sacs_by_version)
+        len_report_ids = len(report_ids)
+
+        raise RuntimeError(
+            f"Only found {len_sacs} of {len_report_ids} submissions. Missing {missing_sacs}.",
+        )
+
+    ordered_sacs = []
+    all_versions = sacs_by_version.keys()
+
+    for v in sorted(all_versions):
+        ordered_sacs.append(sacs_by_version[v])
+
+    return ordered_sacs
 
 
 def _load_csv(csv_path):
@@ -59,12 +147,61 @@ def _load_csv(csv_path):
     return rows
 
 
-def _restore_sacs(rows, user, noisy=False):
+def _chain_creates_orphan(chain_rows):
+    """Returns true if unlinking the chain would create an orphan."""
+    total_rows = len(chain_rows)
+
+    for i, row in enumerate(chain_rows):
+        rid = row["report_id"]
+        resubmission_meta = row["resubmission_meta"]
+        prev_rid = resubmission_meta.get("previous_report_id")
+        next_rid = resubmission_meta.get("next_report_id")
+        is_first = i == 0
+        is_last = i == total_rows - 1
+
+        # Validate next/previous_report_ids only exist where they should be
+        if is_first and prev_rid:
+            logger.error(
+                f"Submission {rid} is first but has previous_report_id {prev_rid}."
+            )
+            return True
+        if not is_first and not prev_rid:
+            logger.error(f"Submission {rid} isn't first but has no previous_report_id.")
+            return True
+        if is_last and next_rid:
+            logger.error(f"Submission {rid} is last but has next_report_id {next_rid}.")
+            return True
+        if not is_last and not next_rid:
+            logger.error(f"Submission {rid} isn't last but has no next_report_id.")
+            return True
+
+        # Validate next/previous_report_ids match what's in the chain
+        if not is_first:
+            prev_chain_rid = chain_rows[i - 1]["report_id"]
+            expected_current_rid = chain_rows[i - 1]["resubmission_meta"].get(
+                "next_report_id"
+            )
+
+            if prev_rid != prev_chain_rid:
+                logger.error(
+                    f"Submission {rid} prev_id {prev_rid} doesn't match expected {prev_chain_rid}."
+                )
+                return True
+            if rid != expected_current_rid:
+                logger.error(
+                    f"Submission {prev_chain_rid} next_id {expected_current_rid} doesn't match {rid}."
+                )
+                return True
+
+    return False
+
+
+def _unlink_sacs(rows, user, noisy=False):
     """
-    Restore submission_status and resubmission_meta for every row in the CSV.
+    Unlink submission_status and resubmission_meta for every row given.
 
     SACs are processed in reverse order so that a DEPRECATED submission is never
-    left transiently pointing at a submission that has already been reset.
+    left transiently pointing at a submission that has already been unlinked.
     """
     # Group rows by chain_index. They should come this way from the CSV, but just to be safe.
     chains = {}
@@ -74,31 +211,26 @@ def _restore_sacs(rows, user, noisy=False):
 
     # Iterate chains in descending order. Within each chain, move in reverse order.
     for chain_index in sorted(chains.keys(), reverse=True):
-        chain_rows = list(reversed(chains[chain_index]))
-        for row in chain_rows:
+        chain_rows = chains[chain_index]
+
+        if _chain_creates_orphan(chain_rows):
+            continue
+
+        for row in reversed(chain_rows):
             report_id = row["report_id"]
             prior_status = row["prior_submission_status"]
 
-            try:
-                prior_meta = _parse_meta(row["prior_resubmission_meta"])
-            except json.JSONDecodeError:
-                logger.error(
-                    f"Invalid JSON in prior_resubmission_meta for SAC: {report_id} — skipping."
-                )
+            err, prior_meta = _parse_meta(row)
+            if err:
                 continue
 
-            try:
-                sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            except SingleAuditChecklist.DoesNotExist:
-                logger.error(
-                    f"SAC not found: {report_id} — skipping. "
-                    "The database may have changed since this CSV was produced."
-                )
+            err, sac = _safe_sac_getter(report_id)
+            if err:
                 continue
 
             if noisy:
                 logger.info(
-                    f"Restoring {report_id}: "
+                    f"Unlinking {report_id}: "
                     f"status {sac.submission_status!r} -> {prior_status!r}, "
                     f"meta {sac.resubmission_meta} -> {prior_meta}"
                 )
@@ -116,19 +248,32 @@ def _restore_sacs(rows, user, noisy=False):
                 sac.redisseminate()
 
 
+def _comma_separated_list(string):
+    return string.split(",")
+
+
 class Command(BaseCommand):
     """
     Undo a prior run of link_resubmissions by restoring pre-linkage metadata.
 
-    Reads the CSV produced by link_resubmissions and writes those values back, then redisseminates each submission.
+    Reads the CSV produced by link_resubmissions and writes those values back,
+    then redisseminates each submission. Alternatively, a list of report_ids
+    can be provided. ALL report_ids within a chain must be provided; chains
+    CANNOT be partially unlinked.
     """
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--csv",
             type=str,
-            required=True,
+            required=False,
             help="Path to the CSV file produced by a prior run of link_resubmissions",
+        )
+        parser.add_argument(
+            "--report_ids",
+            type=_comma_separated_list,
+            required=False,
+            help="Report IDs to process",
         )
         parser.add_argument(
             "--email",
@@ -141,39 +286,42 @@ class Command(BaseCommand):
         parser.set_defaults(noisy=False)
 
     def handle(self, *args, **options):
-        # Verify staff user. Note that it's VERY hard to get here without already being staff.
-        try:
-            ok_staff_user = StaffUser.objects.get(staff_email=options["email"])
-        except StaffUser.DoesNotExist:
-            logger.error(f'Staff user {options["email"]} does not exist')
-            ok_staff_user = False
-        if not ok_staff_user:
+        csv = options["csv"]
+        report_ids = options["report_ids"]
+        noisy = options["noisy"]
+        email = options["email"]
+
+        exit_if_not_staff_user(email)
+
+        if csv and report_ids:
+            logger.error("Only one of --csv and --report_ids must be provided.")
             sys.exit(-1)
+        if report_ids:
+            rows = _load_report_ids(report_ids)
+        elif csv:
+            rows = _load_csv(csv)
+            report_ids = [r["report_id"] for r in rows]
 
-        rows = _load_csv(options["csv"])
-
-        # Display a little summary of what will be undone before touching any submissions.
-        report_ids = [r["report_id"] for r in rows]
-        logger.info(f"CSV contains {len(rows)} submissions.")
-
-        # We should have bailed earlier if the CSV is empty. In case the parsing went wrong, exit when no report_ids are found.
-        if len(report_ids) == 0:
+        len_report_ids = len(report_ids)
+        if len_report_ids == 0:
             logger.info("Exiting.")
             sys.exit(0)
+        else:
+            logger.info(f"Unlinking {len_report_ids} submissions.")
 
-        if options["noisy"]:
+        if noisy:
             for rid in report_ids:
                 logger.info(f"  {rid}")
 
-        k = input("\nPress `c` to continue:")
+        k = input("\nPress `c` to continue: ")
         if k != "c":
             logger.error("Exiting.")
             sys.exit()
 
         # Do the thing!
-        ok_user = User.objects.get(email=options["email"])
-        _restore_sacs(rows, ok_user, noisy=options["noisy"])
+        ok_user = User.objects.get(email=email)
+        _unlink_sacs(rows, ok_user, noisy=noisy)
 
         logger.info(
-            f"\nUndo complete. {len(rows)} submissions restored and redisseminated."
+            f"\nUndo complete. {len(rows)} submissions unlinked and redisseminated."
         )
