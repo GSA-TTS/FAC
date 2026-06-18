@@ -112,8 +112,8 @@
                     {% comment %} Submit to the FAC for processing {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-3"
                         id="submit-audit">
-                        {% if submission.accepted %}
-                            {% include "./icon-list-icon.html" with completed=submission.accepted %}
+                        {% if submission.completed %}
+                            {% include "./icon-list-icon.html" with completed=submission.completed %}
                             <div class="text-success-darker">
                                 <p class="text-bold text-underline margin-0">
                                     Submit to the FAC for processing (Complete)
@@ -123,7 +123,7 @@
                                 </p>
                             </div>
                         {% elif submission.enabled %}
-                            {% include "./icon-list-icon.html" with completed=submission.accepted %}
+                            {% include "./icon-list-icon.html" with completed=submission.completed %}
                             <div>
                                 <p class="text-bold margin-0">
                                     <a class="usa-link"
@@ -134,7 +134,7 @@
                                 </p>
                             </div>
                         {% else %}
-                            {% include "./icon-list-icon.html" with completed=submission.accepted %}
+                            {% include "./icon-list-icon.html" with completed=submission.completed %}
                             <div>
                                 <p class="text-bold margin-0">
                                     Submit to the FAC for processing
