@@ -71,9 +71,12 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "Uniform Guidance Report on Compliance 2 CFR 200.515(c)",
                 "uniform_guidance_compliance",
             ),
-            PageInput("GAS Report on Internal Control 2 CFR 200.515(b)", "GAS_control"),
             PageInput(
-                "GAS Report on Internal Compliance 2 CFR 200.515(b)", "GAS_compliance"
+                "GAGAS Report on Internal Control 2 CFR 200.515(b)", "GAS_control"
+            ),
+            PageInput(
+                "GAGAS Report on Internal Compliance 2 CFR 200.515(b)",
+                "GAS_compliance",
             ),
             PageInput(
                 "Schedule of Findings and Questioned Costs 2 CFR 200.515(d)",
