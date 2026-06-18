@@ -38,6 +38,15 @@ RESUBMISSION_ACTION_CHOICES = [
     ("sfsac_only", "I only need to modify SF-SAC Data Collection Form information."),
 ]
 
+class ResubmissionActionForm(forms.Form):
+    resubmission_action = forms.ChoiceField(
+        choices=RESUBMISSION_ACTION_CHOICES,
+        widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
+        required=True,
+        error_messages={
+            "required": "Select the type of change you need to make.",
+        },
+    )
 
 class ResubmissionStartForm(forms.Form):
     material_change_reasons = forms.MultipleChoiceField(
