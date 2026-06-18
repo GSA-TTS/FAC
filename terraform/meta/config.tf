@@ -18,7 +18,6 @@ locals {
     # Mirrors @GSA-TTS/FAC-team (developers)
     # https://github.com/orgs/GSA-TTS/teams/fac-team/members
     # TODO: Automate updates via GitHub's GraphQL API
-    "bret.mogilefsky@gsa.gov",
     "candace.campbell@gsa.gov",
     "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
@@ -35,7 +34,6 @@ locals {
     # Mirrors @GSA-TTS/FAC-admins
     # https://github.com/orgs/GSA-TTS/teams/fac-admins/members
     # TODO: Automate updates via GitHub's GraphQL API
-    "bret.mogilefsky@gsa.gov",
     "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
     "philip.dominguez@gsa.gov",
