@@ -34,7 +34,7 @@ jobs:
       AWS_DEFAULT_REGION: ${{ secrets.TERRAFORM_REGION }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install CF CLI
         run: |
           sudo apt-get update
@@ -101,7 +101,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.TERRAFORM_AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ secrets.TERRAFORM_REGION }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install CF CLI
         run: |
           sudo apt-get update
