@@ -56,28 +56,26 @@ RUN apt-get -yq update && \
         # matches the DB version, locally
         # and in production. AWD RDS is v15 in
         # cloud.gov as of August 2025.
-        postgresql-client-15 && \
-    rm -rf /var/lib/apt/lists/*
-
-# Tools, Cloud Foundry API CLI, and AWS CLI for prepare_prod_data_for_local.bash
-RUN apt-get -yq update && \
-    apt-get install -y \
+        postgresql-client-15 \
+        # tools needed for prepare_prod_data_for_local.bash
         gpg \
         jq \
-        wget
+        wget \
+        groff \
+        zip && \
+    wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key \
+        | gpg --dearmor -o /usr/share/keyrings/cli.cloudfoundry.org.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/cli.cloudfoundry.org.gpg] https://packages.cloudfoundry.org/debian stable main" \
+        | tee /etc/apt/sources.list.d/cloudfoundry-cli.list && \
+    apt update && \
+    apt install cf8-cli && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key \
-  | gpg --dearmor -o /usr/share/keyrings/cli.cloudfoundry.org.gpg \
-  && echo "deb [signed-by=/usr/share/keyrings/cli.cloudfoundry.org.gpg] https://packages.cloudfoundry.org/debian stable main" \
-  | tee /etc/apt/sources.list.d/cloudfoundry-cli.list \
-  && apt update \
-  && apt install cf8-cli
-
-RUN apt-get install -yqq groff && \
-    apt-get install -yqq zip && \
-    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+RUN curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
-    ./aws/install
+    ./aws/install && \
+    rm -f awscliv2.zip && \
+    rm -rf aws/
 
 RUN curl -fsSL "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
     chmod +x /usr/local/bin/mc
