@@ -126,41 +126,41 @@
                     </li>
 
                     {% comment %} Submit to the FAC for processing {% endcomment %}
-                    {% if submission.enabled %}
-                    <li class="padding-bottom-3" id="submit-audit">
-                        <div class="usa-summary-box font-sans-md bg-success-lighter"
-                             role="region"
-                             aria-label="summary-box-submission">
-                            <div class="usa-summary-box__body">
-                                <div class="usa-summary-box__text">
-                                    <p class="text-bold margin-0">
-                                        <a class="usa-link" href="{% url 'audit:Submission' report_id %}">Submit to the FAC for processing</a>
-                                    </p>
-                                    <p class="margin-0">
-                                        This is the last step and must be completed by the <span class="text-underline">certifying auditee</span>. <strong>Once the audit has been submitted, it cannot be undone.</strong>
-                                    </p>
-                                </div>
+                    <li class="usa-icon-list__item padding-bottom-3"
+                        id="submit-audit">
+                        {% if submission.completed %}
+                            {% include "./icon-list-icon.html" with completed=submission.completed %}
+                            <div class="text-success-darker">
+                                <p class="text-bold text-underline margin-0">
+                                    Submit to the FAC for processing (Complete)
+                                </p>
+                                <p class="margin-0">
+                                    This is the last step and must be completed by the <span class="text-underline">certifying auditee</span>. <strong>Once the audit has been submitted, it cannot be undone.</strong>
+                                </p>
                             </div>
-                        </div>
-                    </li>
-                    {% else %}
-                    <li class="padding-bottom-3" id="submit-audit">
-                        <div class="usa-summary-box font-sans-md bg-success-lighter"
-                             role="region"
-                             aria-label="summary-box-submission">
-                            <div class="usa-summary-box__body">
-                                <div class="usa-summary-box__text">
-                                    <p class="text-bold margin-0">
-                                        Submit to the FAC for processing
-                                    </p>
-                                    <p class="margin-0">
-                                        This is the last step and must be completed by the <span class="text-underline">certifying auditee</span>. <strong>Once the audit has been submitted, it cannot be undone.</strong>
-                                    </p>
-                                </div>
+                        {% elif submission.enabled %}
+                            {% include "./icon-list-icon.html" with completed=submission.completed %}
+                            <div>
+                                <p class="text-bold margin-0">
+                                    <a class="usa-link"
+                                       href="{% url 'audit:Submission' report_id %}">Submit to the FAC for processing</a>
+                                </p>
+                                <p class="margin-0">
+                                    This is the last step and must be completed by the <span class="text-underline">certifying auditee</span>. <strong>Once the audit has been submitted, it cannot be undone.</strong>
+                                </p>
                             </div>
-                        </div>
+                        {% else %}
+                            {% include "./icon-list-icon.html" with completed=submission.completed %}
+                            <div>
+                                <p class="text-bold margin-0">
+                                    Submit to the FAC for processing
+                                </p>
+                                <p class="margin-0">
+                                    This is the last step and must be completed by the <span class="text-underline">certifying auditee</span>. <strong>Once the audit has been submitted, it cannot be undone.</strong>
+                                </p>
+                            </div>
+                        {% endif %}
                     </li>
-                    {% endif %}
                 </ul>
             </div>
         </div>
