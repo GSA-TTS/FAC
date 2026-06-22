@@ -43,7 +43,7 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
                 "resubmission_action": resubmission_action,
             },
         )
-        
+
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
