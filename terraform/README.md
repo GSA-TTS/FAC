@@ -324,4 +324,4 @@ In the bootstrap module:
 - `variables.tf` lists the variables that will be needed. Most values are hard-coded in this module
 - `run.sh` Helper script to set up a space deployer and run terraform. The terraform action (`show`/`plan`/`apply`/`destroy`) is passed as an argument
 - `teardown_creds.sh` Helper script to remove the space deployer setup as part of `run.sh`
-- `import.sh` Helper script to create a new local state file in case terraform changes are needed
+- `import.sh` Helper script to create a new local state file in case terraform changes are needed 
