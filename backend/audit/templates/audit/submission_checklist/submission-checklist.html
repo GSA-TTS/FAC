@@ -36,22 +36,7 @@
                         {% section_block report_id additional_eins %}
                         {% include "./key-info-pre-validation.html" %}
                         {% include "./resubmission_change_check.html" %}
-                        {% if is_resubmission and resubmission_action_url %}
-                            <li class="usa-icon-list__item padding-bottom-105">
-                                {% include "./icon-list-icon.html" with completed=False %}
-                                <div>
-                                    <p class="text-bold margin-0">
-                                        <a class="usa-link"
-                                        href="{{ resubmission_action_url }}">
-                                            Edit resubmission type
-                                        </a>
-                                    </p>
-                                    <p class="margin-0">
-                                        Change whether this is a full audit PDF resubmission or an SF-SAC Data Collection Form only modification.
-                                    </p>
-                                </div>
-                            </li>
-                        {% endif %}
+                        {% include "./resubmission_action.html" %}
                         {% include "./tribal-data-release.html" %}
                         {% include "./validation.html" %}
                     {% else %}
