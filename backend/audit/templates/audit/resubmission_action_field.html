@@ -1,0 +1,26 @@
+<fieldset class="usa-fieldset margin-top-4"
+          aria-describedby="resubmission-action-hint">
+    <legend class="usa-legend usa-label"
+            id="resubmission-action-label">
+        What type of change are you making?
+    </legend>
+
+    <div class="usa-hint" id="resubmission-action-hint">
+        Select whether you need to change the audit PDF package or only the SF-SAC Data Collection Form.
+    </div>
+
+    {% if form.resubmission_action.errors %}
+        <span class="usa-error-message margin-top-1">
+            {{ form.resubmission_action.errors|striptags }}
+        </span>
+    {% endif %}
+
+    {% for radio in form.resubmission_action %}
+        <div class="usa-radio">
+            {{ radio.tag }}
+            <label class="usa-radio__label" for="{{ radio.id_for_label }}">
+                {{ radio.choice_label }}
+            </label>
+        </div>
+    {% endfor %}
+</fieldset>
