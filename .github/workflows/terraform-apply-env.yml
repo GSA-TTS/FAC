@@ -28,7 +28,9 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       TERRAFORM_PRE_RUN: |
           apt-get update
-          apt-get install -y zip python
+          apt-get install -y zip python3
+
+          ln -s /usr/bin/python3 /usr/bin/python
 
           # Install CF CLI
           curl -k -O -L https://github.com/cloudfoundry/cli/releases/download/v8.8.0/cf8-cli-installer_8.8.0_x86-64.deb
@@ -44,7 +46,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Apply ${{ inputs.environment }}
-        uses: dflook/terraform-apply@v1
+        uses: dflook/terraform-apply@v2.2.3
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
