@@ -40,7 +40,7 @@ jobs:
       pull-requests: write
     with:
       environment: "dev"
-      autoapprove: false
+      autoapprove: true
     secrets: inherit
 
   deploy-infastructure-meta:
@@ -51,7 +51,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "meta"
-      autoapprove: false
+      autoapprove: true
     secrets: inherit
 
   publish-image:
