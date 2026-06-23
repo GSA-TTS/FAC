@@ -17,12 +17,13 @@ class ResubmissionStartViewTests(TestCase):
     nonexistent_report_id = "LONGENOUGHBUTDOESNOTEXIST"
     valid_report_id = "0123-01-SOURCE-0123456789"
     valid_sibling_report_id = "3210-10-SOURCE-9876543210"
-    valid_material_change_reasons = ["audit_findings"]
+    valid_material_change_reasons = ["findings"]
     valid_resubmission_action = "audit_pdf"
 
     general_information = {
         "auditee_uei": "auditee_uei",
         "auditee_name": "auditee_name",
+        "auditee_fiscal_period_start": "2021-01-01",
         "auditee_fiscal_period_end": "2022-01-01",
     }
 
