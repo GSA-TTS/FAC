@@ -13,26 +13,18 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        entry_form_data = request.user.profile.entry_form_data or {}
 
-        resubmission_action = None
-
-        if sac.resubmission_meta:
-            resubmission_action = sac.resubmission_meta.get("resubmission_action")
-
-        if not resubmission_action:
-            resubmission_action = entry_form_data.get("resubmission_action")
-
-        if resubmission_action:
-            sac.resubmission_meta = sac.resubmission_meta or {}
-            sac.resubmission_meta["resubmission_action"] = resubmission_action
-            sac.save()
+        resubmission_action = (
+            sac.resubmission_meta.get("resubmission_action")
+            if sac.resubmission_meta
+            else None
+        )
 
         form = ResubmissionActionForm(
-            initial={
-                "resubmission_action": resubmission_action,
-            }
-        )
+        initial={
+            "resubmission_action": resubmission_action,
+        }
+    )
 
         return render(
             request,
@@ -40,7 +32,6 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
             {
                 "form": form,
                 "report_id": report_id,
-                "resubmission_action": resubmission_action,
             },
         )
 
@@ -56,7 +47,6 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
                 {
                     "form": form,
                     "report_id": report_id,
-                    "resubmission_action": request.POST.get("resubmission_action"),
                 },
             )
 
@@ -65,11 +55,6 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
         sac.resubmission_meta = sac.resubmission_meta or {}
         sac.resubmission_meta["resubmission_action"] = resubmission_action
         sac.save()
-
-        entry_form_data = request.user.profile.entry_form_data or {}
-        entry_form_data["resubmission_action"] = resubmission_action
-        request.user.profile.entry_form_data = entry_form_data
-        request.user.profile.save()
 
         return redirect(
             reverse("audit:SubmissionProgress", kwargs={"report_id": report_id})

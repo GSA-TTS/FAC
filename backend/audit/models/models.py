@@ -365,7 +365,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             else:
                 old_version = 1
 
-            resubmission_action = user_form_data.get("resubmission_action")
+            resubmission_action = (
+                user_form_data.get("resubmission_meta", {})
+                .get("resubmission_action")
+            )
 
             # Add/override fields
             data.update(

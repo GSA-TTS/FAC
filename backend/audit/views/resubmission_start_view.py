@@ -60,7 +60,6 @@ class ResubmissionStartView(LoginRequiredMixin, View):
             "is_resubmission": True,
             "resubmission_meta": resubmission_meta,
             "material_change_reasons": material_change_reasons,
-            "resubmission_action": resubmission_action,
         }
         user = request.user
         user.profile.entry_form_data = profile_data
