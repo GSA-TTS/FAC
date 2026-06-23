@@ -17,7 +17,7 @@ jobs:
       pull-requests: write
     with:
       environment: "staging"
-      autoapprove: false
+      autoapprove: true
     secrets: inherit
 
   deploy-application:
