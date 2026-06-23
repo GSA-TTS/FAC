@@ -44,6 +44,7 @@ class ResubmissionActionForm(forms.Form):
         choices=RESUBMISSION_ACTION_CHOICES,
         widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
         required=True,
+        initial="audit_pdf",
         error_messages={
             "required": "Select the type of change you need to make.",
         },
@@ -66,6 +67,7 @@ class ResubmissionStartForm(forms.Form):
         choices=RESUBMISSION_ACTION_CHOICES,
         widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
         required=True,
+        initial="audit_pdf",
         error_messages={
             "required": "Select the type of change you need to make.",
         },

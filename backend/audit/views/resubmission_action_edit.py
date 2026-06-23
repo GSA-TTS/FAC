@@ -21,10 +21,10 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
         )
 
         form = ResubmissionActionForm(
-        initial={
-            "resubmission_action": resubmission_action,
-        }
-    )
+            initial={
+                "resubmission_action": resubmission_action,
+            }
+        )
 
         return render(
             request,
