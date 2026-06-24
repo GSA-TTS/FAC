@@ -47,7 +47,7 @@ def _parse_meta(row):
         return None, json.loads(raw)
     except json.JSONDecodeError as err:
         logger.error(
-            f"Invalid JSON in prior_resubmission_meta for SAC: {row["report_id"]} — skipping submission."
+            f'Invalid JSON in prior_resubmission_meta for SAC: {row["report_id"]} — skipping submission.'
         )
         return err, None
 
