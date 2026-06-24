@@ -202,8 +202,10 @@ function populateModal(formStatus, auditeeName = '') {
         </ul>
       `;
     }
-    descEl.innerHTML += `
-      <p><strong>Are you sure?</strong> If you meant to correct an already submitted or accepted audit, you may need to resubmit instead.</p>
+    descEl.innerHTML += 
+    // <p><strong>Are you sure?</strong></p> If you meant to correct an already submitted or accepted audit, you may need to resubmit instead
+    `
+      <p><strong>Are you sure?</strong></p>
     `;
   }
 
