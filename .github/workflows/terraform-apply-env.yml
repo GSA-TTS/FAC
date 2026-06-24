@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Apply ${{ inputs.environment }}
         uses: dflook/terraform-apply@v2.2.3

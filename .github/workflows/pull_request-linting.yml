@@ -11,7 +11,7 @@ jobs:
       SECRET_KEY: secrets.SECRET_KEY
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Restore npm cache
         uses: actions/cache@v5
@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Restore npm cache
         uses: actions/cache@v5
