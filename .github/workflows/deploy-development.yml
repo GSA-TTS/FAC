@@ -19,7 +19,7 @@ jobs:
       terraform: ${{ steps.filter.outputs.terraform }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: filter
         with:
@@ -31,7 +31,7 @@ jobs:
 
   deploy-infrastructure-dev:
     name: Deploy infrastructure (development)
-    needs: 
+    needs:
       - check-for-changes
     if: needs.check-for-changes.outputs.terraform == 'true'
     uses: ./.github/workflows/terraform-apply-env.yml
@@ -45,7 +45,7 @@ jobs:
 
   deploy-infastructure-meta:
     name: Deploy infrastructure (meta)
-    needs: 
+    needs:
       - check-for-changes
     if: needs.check-for-changes.outputs.terraform == 'true'
     uses: ./.github/workflows/terraform-apply-env.yml
@@ -56,7 +56,7 @@ jobs:
 
   publish-image:
     name: Build and push image
-    needs: 
+    needs:
       - check-for-changes
     if: needs.check-for-changes.outputs.backend == 'true'
     uses: ./.github/workflows/containers-build-fac-container.yml
@@ -72,7 +72,7 @@ jobs:
 
   deploy-application:
     name: Deploy application
-    needs: 
+    needs:
       - check-for-changes
     if: needs.check-for-changes.outputs.backend == 'true'
     uses: ./.github/workflows/deploy-application.yml
@@ -82,7 +82,7 @@ jobs:
 
   new-relic-record:
     name: Record deployment to New Relic
-    needs: 
+    needs:
       - deploy-application
     uses: ./.github/workflows/deploy-record-newrelic-deployment.yml
     with:

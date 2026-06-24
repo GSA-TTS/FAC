@@ -365,6 +365,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             else:
                 old_version = 1
 
+            resubmission_action = user_form_data.get("resubmission_meta", {}).get(
+                "resubmission_action"
+            )
+
             # Add/override fields
             data.update(
                 {
@@ -374,6 +378,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                         "previous_row_id": self.id,
                         "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
                         "version": old_version + 1,
+                        "resubmission_action": resubmission_action,
                     },
                     "transition_name": [STATUS.IN_PROGRESS],
                     "transition_date": [now()],

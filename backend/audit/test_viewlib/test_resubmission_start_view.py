@@ -17,11 +17,13 @@ class ResubmissionStartViewTests(TestCase):
     nonexistent_report_id = "LONGENOUGHBUTDOESNOTEXIST"
     valid_report_id = "0123-01-SOURCE-0123456789"
     valid_sibling_report_id = "3210-10-SOURCE-9876543210"
-    valid_material_change_reasons = ["audit_findings"]
+    valid_material_change_reasons = ["findings"]
+    valid_resubmission_action = "audit_pdf"
 
     general_information = {
         "auditee_uei": "auditee_uei",
         "auditee_name": "auditee_name",
+        "auditee_fiscal_period_start": "2021-01-01",
         "auditee_fiscal_period_end": "2022-01-01",
     }
 
@@ -62,6 +64,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.invalid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
+                "resubmission_action": self.valid_resubmission_action,
             },
         )
 
@@ -78,6 +81,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.nonexistent_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
+                "resubmission_action": self.valid_resubmission_action,
             },
         )
 
@@ -94,6 +98,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
+                "resubmission_action": self.valid_resubmission_action,
             },
         )
 
@@ -110,6 +115,7 @@ class ResubmissionStartViewTests(TestCase):
             self.path_name,
             {
                 "report_id": self.valid_report_id,
+                "resubmission_action": self.valid_resubmission_action,
             },
         )
 
@@ -119,4 +125,49 @@ class ResubmissionStartViewTests(TestCase):
         self.assertIn(
             "Select at least one reason for resubmission.",
             str(response.context["form"].errors),
+        )
+
+    def test_resubmission_action_required(self):
+        """Test that a resubmission action must be selected."""
+        self.client.force_login(user=self.user)
+        response = self.client.post(
+            self.path_name,
+            {
+                "report_id": self.valid_report_id,
+                "material_change_reasons": self.valid_material_change_reasons,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "audit/resubmission_start_form.html")
+        self.assertIn("form", response.context)
+        self.assertIn(
+            "Select the type of change you need to make.",
+            str(response.context["form"].errors),
+        )
+
+    def test_resubmission_action_saved_to_profile(self):
+        """Test that the selected resubmission action is saved to the user profile."""
+        self.client.force_login(user=self.user)
+        response = self.client.post(
+            self.path_name,
+            {
+                "report_id": self.valid_report_id,
+                "material_change_reasons": self.valid_material_change_reasons,
+                "resubmission_action": "sfsac_only",
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("report_submission:eligibility"),
+            fetch_redirect_response=False,
+        )
+
+        self.user.profile.refresh_from_db()
+        self.assertEqual(
+            self.user.profile.entry_form_data["resubmission_meta"][
+                "resubmission_action"
+            ],
+            "sfsac_only",
         )
