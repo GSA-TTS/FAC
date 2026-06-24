@@ -19,6 +19,11 @@ urlpatterns = [
         views.ResubmissionStartView.as_view(),
         name="ResubmissionStart",
     ),
+    path(
+        "resubmission-action/<str:report_id>",
+        views.ResubmissionActionEditView.as_view(),
+        name="ResubmissionActionEdit",
+    ),
     path("<str:report_id>", views.EditSubmission.as_view(), name="EditSubmission"),
     path(
         "single-audit-report/<str:report_id>",

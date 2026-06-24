@@ -3,6 +3,7 @@ import logging
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.views import generic
+from django.urls import reverse
 from audit.cross_validation import (
     naming,
     sac_validation_shape,
@@ -205,6 +206,15 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 ),
                 "next_report_id": (
                     sac.resubmission_meta.get("next_report_id", None)
+                    if sac.resubmission_meta
+                    else None
+                ),
+                "is_resubmission": bool(sac.resubmission_meta),
+                "resubmission_action_url": (
+                    reverse(
+                        "audit:ResubmissionActionEdit",
+                        kwargs={"report_id": report_id},
+                    )
                     if sac.resubmission_meta
                     else None
                 ),
