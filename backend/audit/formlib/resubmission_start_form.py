@@ -6,32 +6,49 @@ from audit.models.constants import STATUS
 from audit.models import SingleAuditChecklist
 
 MATERIAL_CHANGE_CHOICES = [
-    ("audit_findings", "Material change to audit findings"),
-    ("corrective_action_plans", "Addition or revision of corrective action plans"),
+    ("auditor_report", "Auditor's Report Corrections or Additions"),
     (
-        "missing_finding_elements",
-        "Inclusion of missing finding elements (such as condition, criteria, cause, or effect)",
+        "awards",
+        "Awards Corrections or Additions (such as ALN, federal program name, cluster name, etc.)",
     ),
-    ("questioned_costs", "Correction to questioned costs or compliance determination"),
+    ("corrective_action_plans", "Corrective Action Plan Corrections or Additions"),
+    ("direct_passthrough", "Direct vs. Pass-through Funding Corrections"),
+    ("financial_statements", "Financial Statements Corrections or Additions"),
     (
-        "major_program_or_low_risk",
-        "Error in major program determination or low-risk auditee status",
+        "findings",
+        "Findings Corrections or Additions (such as condition, criteria, cause, effect, "
+        "material weakness, significant deficiency, etc.)",
     ),
+    ("internal_control", "Internal Control and Compliance Corrections or Additions"),
+    ("major_program", "Major Program Determination Corrections"),
     (
-        "sefa_award_amounts",
-        "Change to federal award amounts in the Schedule of Expenditures of Federal Awards (SEFA)",
+        "auditor_professional_requirements",
+        "Previous Audit Performed by an Auditor Not Meeting Professional Requirements",
     ),
-    ("assistance_listing_number", "Correction to Assistance Listing Number"),
-    (
-        "incomplete_audit_package",
-        "Supplementing an incomplete Single Audit package (for example, missing financial statements or required reports)",
-    ),
-    (
-        "auditor_report_elements",
-        "Addition or correction to the required auditor report elements",
-    ),
-    ("auditor_report_revision", "Revision to the auditor's report"),
+    ("prior_findings", "Prior Findings Corrections or Additions"),
+    ("questioned_costs", "Questioned Costs Corrections or Additions"),
+    ("risk", "Risk Determination Correction"),
+    ("incomplete_audit_package", "Single Audit Package Completion"),
+    ("sefa_award_amounts", "SEFA Reporting Corrections or Additions"),
+    ("sf_sac", "SF-SAC Materially Incomplete or Inconsistent with Audit Report"),
 ]
+
+RESUBMISSION_ACTION_CHOICES = [
+    ("audit_pdf", "I need to upload or edit the audit PDF package."),
+    ("sfsac_only", "I only need to modify SF-SAC Data Collection Form information."),
+]
+
+
+class ResubmissionActionForm(forms.Form):
+    resubmission_action = forms.ChoiceField(
+        choices=RESUBMISSION_ACTION_CHOICES,
+        widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
+        required=True,
+        initial="audit_pdf",
+        error_messages={
+            "required": "Select the type of change you need to make.",
+        },
+    )
 
 
 class ResubmissionStartForm(forms.Form):
@@ -45,6 +62,16 @@ class ResubmissionStartForm(forms.Form):
     )
 
     report_id = forms.CharField(required=True)
+
+    resubmission_action = forms.ChoiceField(
+        choices=RESUBMISSION_ACTION_CHOICES,
+        widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
+        required=True,
+        initial="audit_pdf",
+        error_messages={
+            "required": "Select the type of change you need to make.",
+        },
+    )
 
     def clean_report_id(self):
         """
