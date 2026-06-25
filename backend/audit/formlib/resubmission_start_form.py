@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from audit.check_resubmission_allowed import check_resubmission_allowed
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, RESUBMISSION_ACTION
 from audit.models import SingleAuditChecklist
 
 MATERIAL_CHANGE_CHOICES = [
@@ -34,8 +34,11 @@ MATERIAL_CHANGE_CHOICES = [
 ]
 
 RESUBMISSION_ACTION_CHOICES = [
-    ("audit_pdf", "I need to upload or edit the audit PDF package."),
-    ("sfsac_only", "I only need to modify SF-SAC Data Collection Form information."),
+    (RESUBMISSION_ACTION.AUDIT_PDF, "I need to upload or edit the audit PDF package."),
+    (
+        RESUBMISSION_ACTION.SFSAC_ONLY,
+        "I only need to modify SF-SAC Data Collection Form information.",
+    ),
 ]
 
 
