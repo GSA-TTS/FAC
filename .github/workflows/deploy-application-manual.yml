@@ -3,11 +3,6 @@ name: Deploy Application Manual Trigger
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        description: Branch or commit to deploy to the FAC application
-        type: string
-        default: main
-        required: true
       environment:
         required: true
         type: choice
@@ -26,9 +21,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-            ref: ${{ inputs.ref }}
-            fetch-depth: 0 # So we can get tags
       - name: Restore npm cache
         uses: actions/cache@v6
         id: cache-npm

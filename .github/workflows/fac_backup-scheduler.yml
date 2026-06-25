@@ -8,17 +8,10 @@ on:
 
 jobs:
   backup-environment:
-    strategy:
-      fail-fast: false
-      matrix:
-        environment:
-          - name: dev
-          - name: staging
-          - name: production
     uses: ./.github/workflows/fac_backup-util-scheduled.yml
     secrets: inherit
     with:
-      environment: ${{ matrix.environment.name }}
+      environment: production
       util_version: "v0.1.11"
       backup_operation: "scheduled_backup"
 
