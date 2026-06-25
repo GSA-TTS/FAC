@@ -9,8 +9,8 @@
                     {% include "includes/resubmission_banner.html" %}
                 {% endif %} {% endcomment %}
                 <p>
-                    All components of the audit report package must be merged into a single PDF file and meet the uniform guidelines below. For more information on PDF formatting, please review our PDF guidelines. 
-                    For those completing program-specific audits, please refer to 
+                    All components of the audit report package must be merged into a single PDF file and meet the uniform guidelines below. For more information on PDF formatting, please review our PDF guidelines.
+                    For those completing program-specific audits, please refer to
                     <a class="usa-link"
                        href="https://support.fac.gov/hc/en-us/articles/32700168226445-Program-specific-audits-how-to-upload-the-Audit-report-PDF"
                        target="_blank"
@@ -33,20 +33,20 @@
                                 id="resubmission-banner">
                             <div class="usa-alert__body grid-container">
                                 <p class="usa-alert__text">
-                                    A resubmission is in progress. View the previous single audit report package 
-                                    <a class="usa-link" 
+                                    A resubmission is in progress. View the previous single audit report package
+                                    <a class="usa-link"
                                         href="{% url 'dissemination:Summary' previous_report_id %}"
                                         target="_blank"
                                         noopener
                                         noreferrer>here</a>.
                                 </p>
-                                    
+
                                 <div class="usa-checkbox bg-accent-warm-lighter margin-y-1">
                                     <input class="usa-checkbox__input"
                                             id="keep-previous-report"
                                             id_test="test-keep_previous_report"
                                             name="keep_previous_report"
-                                            type="checkbox" 
+                                            type="checkbox"
                                             {% if form.cleaned_data.keep_previous_report %}checked{% endif %} />
                                     <label class="usa-checkbox__label" for="keep-previous-report">
                                         My report did not change. Keep the old report for this resubmission.
@@ -86,11 +86,15 @@
                             <div class="usa-form usa-form--large">
                                 {% for x in page_number_inputs %}
                                     <div class="grid-row margin-top-4">
-                                        <label for="upload-report__page-number-{{ forloop.counter }}"
-                                               class="tablet:grid-col-12">
-                                            {{ x.text }}
-                                            {% if x.required %}<abbr title="required" class="usa-hint usa-hint--required">*</abbr>{% endif %}
-                                        </label>
+                                            <label for="upload-report__page-number-{{ forloop.counter }}"
+                                                class="tablet:grid-col-12">
+                                                {{ x.text }}
+                                            <a class="usa-link"
+                                                href="{{ x.url }}"
+                                                target="_blank"
+                                                rel="noopener noreferrer">{{ x.cfr }}</a>
+                                                {% if x.required %}<abbr title="required" class="usa-hint usa-hint--required">*</abbr>{% endif %}
+                                            </label>
                                         {% if x.hint %}
                                             <span for="upload-report__page-number-{{ forloop.counter }}"
                                                    class="tablet:grid-col-12 usa-hint">{{ x.hint }}</span>

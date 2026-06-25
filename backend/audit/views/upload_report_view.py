@@ -34,8 +34,10 @@ class PageInput:
     Used in audit/templates/audit/upload-report.html
     """
 
-    def __init__(self, text="", id="", required=True, hint=None):
+    def __init__(self, text, cfr, url, id, required=True, hint=None):
         self.text = text
+        self.cfr = cfr
+        self.url = url
         self.id = id
         self.required = required
         self.hint = hint
@@ -49,44 +51,71 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         """
         return [
             PageInput(
-                "Financial Statement(s) 2 CFR 200.510(a)", "financial_statements"
+                "Financial Statement(s) 2",
+                "CFR 200.510(a)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.510#p-200.510(a)",
+                "financial_statements",
             ),
             PageInput(
-                "Opinion on Financial Statements 2 CFR 200.515(a)",
+                "Opinion on Financial Statements 2",
+                "CFR 200.515(a)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.515#p-200.515(a)",
                 "financial_statements_opinion",
             ),
             PageInput(
-                "Schedule of Expenditures of Federal Awards 2 CFR 200.510(b)",
+                "Schedule of Expenditures of Federal Awards 2",
+                "CFR 200.510(b)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.510#p-200.510(b)",
                 "schedule_expenditures",
             ),
             PageInput(
-                "Opinion or Disclaimer of Opinion on Schedule of Federal Awards 2 CFR 200.515(a)",
+                "Opinion or Disclaimer of Opinion on Schedule of Federal Awards 2",
+                "CFR 200.515(a)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.515#p-200.515(a)",
                 "schedule_expenditures_opinion",
             ),
             PageInput(
-                "Uniform Guidance Report on Internal Control 2 CFR 200.515(b)",
+                "Uniform Guidance Report on Internal Control 2",
+                "CFR 200.515(b)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.515#p-200.515(b)",
                 "uniform_guidance_control",
             ),
             PageInput(
-                "Uniform Guidance Report on Compliance 2 CFR 200.515(c)",
+                "Uniform Guidance Report on Compliance 2",
+                "CFR 200.515(c)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.515#p-200.515(c)",
                 "uniform_guidance_compliance",
             ),
-            PageInput("GAS Report on Internal Control 2 CFR 200.515(b)", "GAS_control"),
             PageInput(
-                "GAS Report on Internal Compliance 2 CFR 200.515(b)", "GAS_compliance"
+                "GAS Report on Internal Control 2",
+                "CFR 200.515(b)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.515#p-200.515(b)",
+                "GAS_control",
             ),
             PageInput(
-                "Schedule of Findings and Questioned Costs 2 CFR 200.515(d)",
+                "GAS Report on Internal Compliance 2",
+                "CFR 200.515(b)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.515#p-200.515(b)",
+                "GAS_compliance",
+            ),
+            PageInput(
+                "Schedule of Findings and Questioned Costs 2",
+                "CFR 200.515(d)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.515#p-200.515(d)",
                 "schedule_findings",
             ),
             PageInput(
-                "Summary Schedule of Prior Audit Findings 2 CFR 200.511(b)",
+                "Summary Schedule of Prior Audit Findings 2",
+                "CFR 200.511(b)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.511#p-200.511(b)",
                 "schedule_prior_findings",
                 required=False,
                 hint="Only required if prior audit findings exist",
             ),
             PageInput(
-                "Corrective Action Plan (if findings) 2 CFR 200.511(c)",
+                "Corrective Action Plan (if findings) 2",
+                "CFR 200.511(c)",
+                "https://www.ecfr.gov/current/title-2/part-200/section-200.511#p-200.511(c)",
                 "CAP_page",
                 required=False,
                 hint="Only required if findings exist",
