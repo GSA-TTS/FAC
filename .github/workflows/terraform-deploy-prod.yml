@@ -34,7 +34,7 @@ jobs:
       AWS_DEFAULT_REGION: ${{ secrets.TERRAFORM_REGION }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install CF CLI
         run: |
           sudo apt-get update
@@ -101,12 +101,12 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.TERRAFORM_AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ secrets.TERRAFORM_REGION }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install CF CLI
         run: |
           sudo apt-get update
           sudo apt-get install -y zip python3
-          
+
           curl -k -O -L https://github.com/cloudfoundry/cli/releases/download/v8.8.0/cf8-cli-installer_8.8.0_x86-64.deb
           sudo apt-get install --assume-yes ./cf8-cli-installer_8.8.0_x86-64.deb
 
@@ -121,7 +121,7 @@ jobs:
       - name: Download From S3
         run: |
           aws s3 cp s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }}/${{ env.TF_PLAN_FILE }} .
-          
+
           aws s3 cp \
             s3://${{ secrets.terraform_BUCKET }}/${{ inputs.environment }}/${{ env.ARTIFACT_FOLDER }}/terraform/modules/ \
             .terraform/modules/ \
