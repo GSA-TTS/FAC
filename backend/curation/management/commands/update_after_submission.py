@@ -189,7 +189,11 @@ def validate_entity_type_options(options):
 def have_pair_of(flag, options):
     old_flag = f"old_{flag}"
     new_flag = f"new_{flag}"
-    return not nonelike(options[old_flag]) and not nonelike(options[new_flag])
+
+    return (
+        not nonelike(options.get(old_flag))
+        and not nonelike(options.get(new_flag))
+    )
 
 
 def just_one_pair(flags, options):
