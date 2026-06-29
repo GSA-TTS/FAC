@@ -452,7 +452,9 @@ class IntakeToDisseminationTests(TestCase):
         parent = baker.make(General, submitted_date="2020-02-02")
 
         resub_sac = self._create_sac(
-            resubmission_meta=self._fake_resubmission(previous_report_id=parent.report_id)
+            resubmission_meta=self._fake_resubmission(
+                previous_report_id=parent.report_id
+            )
         )
         self._run_state_transition(resub_sac)
         resub_intake = IntakeToDissemination(resub_sac)
@@ -460,7 +462,9 @@ class IntakeToDisseminationTests(TestCase):
         resub_intake.save_dissemination_objects()
         resub = General.objects.filter(report_id=resub_sac.report_id).first()
 
-        self.assertEqual(resub.submitted_date.strftime("%Y-%m-%d"), parent.submitted_date)
+        self.assertEqual(
+            resub.submitted_date.strftime("%Y-%m-%d"), parent.submitted_date
+        )
 
     def test_load_general_race_condition_logging(self):
         self.intake_to_dissemination.load_general()
