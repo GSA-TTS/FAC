@@ -56,6 +56,8 @@ class EditRecord(models.Model):
             "new_auditee_name": None,
             "old_authorization": None,
             "new_authorization": None,
+            "old_entity_type": None,
+            "new_entity_type": None,
         }
         if self.field_to_edit == "uei":
             options.update({"old_uei": self.old_value, "new_uei": self.new_value})
