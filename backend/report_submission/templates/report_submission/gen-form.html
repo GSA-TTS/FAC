@@ -266,13 +266,15 @@
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_uei">Auditee UEI</label>
                                 <strong class="margin-0">{{ auditee_uei }}</strong>
-                                <input class="usa-input"
+                                {% comment %}
+                                    The UEI is a given from the previous steps. In a world where we allow users to change the UEI in this form,
+                                    enable it here and in the Django form with accompanying validations.
+                                {% endcomment %}
+                                {% comment %} <input class="usa-input"
                                        id="auditee_uei"
                                        name="auditee_uei"
                                        aria-required="false"
-                                       hidden
-                                       value="{{ auditee_uei | default_if_none:'' }}" />
-                                {% comment %} The UEI is a given from the previous steps, no error message necessary {% endcomment %}
+                                       value="{{ auditee_uei | default_if_none:'' }}" /> {% endcomment %}
                             </div>
                             <fieldset class="usa-fieldset radio">
                                 <legend class="usa-legend">Does this audit represent multiple entities with their own UEIs? (e.g., a statewide audit that covers many departments, each of which may have its own UEI)</legend>
