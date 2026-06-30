@@ -84,7 +84,8 @@ resource "newrelic_nrql_alert_condition" "response_time" {
   name               = "Unusual Response Time Detected"
   title_template     = "${upper(var.cf_space_name)}: {{conditionName}}"
   type               = "baseline"
-  baseline_direction = "upper_and_lower"
+  baseline_direction = "upper_only"
+  aggregation_window = 300
   runbook_url        = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
 
   nrql {
@@ -133,8 +134,8 @@ resource "newrelic_nrql_alert_condition" "slow_transactions" {
   warning {
     operator              = "above"
     threshold             = 10
-    threshold_duration    = 120
-    threshold_occurrences = "at_least_once"
+    threshold_duration    = 180
+    threshold_occurrences = "all"
   }
 }
 
