@@ -142,6 +142,8 @@ class TestEditRecordAdmin(TestCase):
                 "new_auditee_name": None,
                 "old_authorization": None,
                 "new_authorization": None,
+                "old_entity_type": None,
+                "new_entity_type": None,
             }
         )
 
@@ -178,6 +180,8 @@ class TestEditRecordAdmin(TestCase):
                 "new_auditee_name": None,
                 "old_authorization": None,
                 "new_authorization": None,
+                "old_entity_type": None,
+                "new_entity_type": None,
             },
             "ein",
         )
@@ -215,6 +219,8 @@ class TestEditRecordAdmin(TestCase):
                 "new_auditee_name": NEW_AUDITEE_NAME,
                 "old_authorization": None,
                 "new_authorization": None,
+                "old_entity_type": None,
+                "new_entity_type": None,
             },
             "auditee_name",
         )
