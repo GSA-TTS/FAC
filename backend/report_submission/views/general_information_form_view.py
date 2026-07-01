@@ -24,6 +24,8 @@ logger = logging.getLogger(__name__)
 
 
 class GeneralInformationFormView(LoginRequiredMixin, View):
+    template_name = "report_submission/gen-form.html"
+
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -46,7 +48,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             # SOT TODO What happens here when SOT is the only thing?
             # Does this become audit_context?
-            return render(request, "report_submission/gen-form.html", sac_context)
+            return render(request, self.template_name, sac_context)
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
 
@@ -77,7 +79,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 for field, errors in form.errors.items():
                     message = f"{message}\n {field}: {errors}"
                     logger.warning(f"Error {field}: {errors}")
-                return render(request, "report_submission/gen-form.html", context)
+                return render(request, self.template_name, context)
 
             # The form is valid.
 
@@ -117,7 +119,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "state_abbrevs": STATE_ABBREVS,
                 "unexpected_errors": True,
             }
-            return render(request, "report_submission/gen-form.html", context)
+            return render(request, self.template_name, context)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
         except Exception as err:
