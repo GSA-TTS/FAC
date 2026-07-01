@@ -677,6 +677,7 @@ class IntakeToDisseminationTests(TestCase):
             "AdditionalUEIs",
             "AdditionalEINs",
             "Resubmissions",
+            "Unifieds",
         ]
 
         for k, v in objs.items():
