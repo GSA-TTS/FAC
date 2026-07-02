@@ -5,7 +5,7 @@ from django.forms import model_to_dict
 from django.db import IntegrityError
 
 from audit.intakelib.transforms.xform_resize_award_references import _format_reference
-from audit.models.constants import RESUBMISSION_STATUS
+from audit.models.constants import RESUBMISSION_STATUS, RESUBMISSION_ACTION
 from audit.utils import Util
 from dissemination.models import (
     AdditionalEin,
@@ -333,10 +333,26 @@ class IntakeToDissemination(object):
         dates_by_status = self._get_most_recent_dates_from_sac()
         status = self.single_audit_checklist.get_statuses()
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
+
         if self.mode == IntakeToDissemination.DISSEMINATION:
-            submitted_date = self._convert_utc_to_american_samoa_zone(
-                self._get_first_date_by_status_from_sac(status.SUBMITTED)
-            )
+            # Non-material resubmissions keep the previous submission's submission date
+            if (
+                resubmission_meta
+                and resubmission_meta.get("resubmission_action")
+                == RESUBMISSION_ACTION.SFSAC_ONLY
+            ):
+                previous_report_id = resubmission_meta.get("previous_report_id", "")
+                previous = General.objects.filter(report_id=previous_report_id).first()
+
+                if not previous:
+                    return {"Unable to find previous submission"}
+
+                submitted_date = previous.submitted_date
+            else:
+                submitted_date = self._convert_utc_to_american_samoa_zone(
+                    self._get_first_date_by_status_from_sac(status.SUBMITTED)
+                )
+
             fac_accepted_date = submitted_date
             auditee_certify_name = auditee_certification["auditee_signature"][
                 "auditee_name"
