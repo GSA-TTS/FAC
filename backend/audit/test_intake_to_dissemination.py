@@ -7,7 +7,7 @@ from model_bakery import baker
 from faker import Faker
 
 from audit.models import SingleAuditChecklist, User
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, RESUBMISSION_ACTION
 from audit.intake_to_dissemination import IntakeToDissemination
 from audit.test_views import AUDIT_JSON_FIXTURES, _load_json
 from audit.utils import Util
@@ -82,6 +82,7 @@ class IntakeToDisseminationTests(TestCase):
         cognizant_agency=None,
         oversight_agency=None,
         privacy_flag=None,
+        resubmission_meta={},
     ):
         if reference_number:
             findings_text_data = self._fake_findings_text(
@@ -114,7 +115,7 @@ class IntakeToDisseminationTests(TestCase):
             tribal_data_consent=self._fake_tribal_data_consent(privacy_flag),
             cognizant_agency=cognizant_agency,
             oversight_agency=oversight_agency,
-            resubmission_meta=self._fake_resubmission(),
+            resubmission_meta=resubmission_meta,
         )
         return sac
 
@@ -419,14 +420,15 @@ class IntakeToDisseminationTests(TestCase):
         }
 
     @staticmethod
-    def _fake_resubmission():
+    def _fake_resubmission(previous_report_id="2024-06-GSAFAC-0008675308"):
         return {
             "version": 2,
             "resubmission_status": "deprecated_via_resubmission",
             "next_row_id": 8675310,
             "next_report_id": "2024-06-GSAFAC-0008675310",
             "previous_row_id": 8675308,
-            "previous_report_id": "2024-06-GSAFAC-0008675308",
+            "previous_report_id": previous_report_id,
+            "resubmission_action": RESUBMISSION_ACTION.SFSAC_ONLY,
         }
 
     def test_load_general(self):
@@ -443,6 +445,25 @@ class IntakeToDisseminationTests(TestCase):
         self.assertEqual(
             Util.json_array_to_str(self.sac.audit_information["gaap_results"]),
             general.gaap_results,
+        )
+
+    def test_load_general_sfsac_only(self):
+        """Resubmissions should use their parent's submitted_date"""
+        parent = baker.make(General, submitted_date="2020-02-02")
+
+        resub_sac = self._create_sac(
+            resubmission_meta=self._fake_resubmission(
+                previous_report_id=parent.report_id
+            )
+        )
+        self._run_state_transition(resub_sac)
+        resub_intake = IntakeToDissemination(resub_sac)
+        resub_intake.load_all()
+        resub_intake.save_dissemination_objects()
+        resub = General.objects.filter(report_id=resub_sac.report_id).first()
+
+        self.assertEqual(
+            resub.submitted_date.strftime("%Y-%m-%d"), parent.submitted_date
         )
 
     def test_load_general_race_condition_logging(self):

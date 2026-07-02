@@ -226,3 +226,8 @@ FINDINGS_FIELD_TO_BITMASK = [
 
 SAC_SEQUENCE_ID = "public.audit_singleauditchecklist_id_seq"
 AUDIT_SEQUENCE_ID = "public.audit_audit_id_seq"
+
+
+class RESUBMISSION_ACTION:
+    AUDIT_PDF = "audit_pdf"
+    SFSAC_ONLY = "sfsac_only"
