@@ -77,3 +77,14 @@ daily-mm-dd
 # DB to DB table dump (fac-snapshot-db -> fac-db) [Truncate target table before dump]
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
+
+### Retention
+To optimize on cost, the S3 buckets where backups are stored have a lifecycle policy that deletes objects older than 60 days.
+
+You can verify this policy is in place by running:
+
+```bash
+aws s3api get-bucket-lifecycle-configuration --bucket <bucket-name>
+```
+
+We do not have sufficient IAM permissions to add, update, or remove lifecycle policies on these buckets ourselves since they are provisioned through the cloud.gov service broker. Any changes to the retention policy must be requested from the cloud.gov team.
