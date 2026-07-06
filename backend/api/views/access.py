@@ -78,7 +78,7 @@ def access_and_submission_check(user, data):
                 report_id=previous_report_id
             )
             sac = previous_sac.initiate_resubmission(user=user)
-            
+
             sac.resubmission_meta = {
                 **(sac.resubmission_meta or {}),
                 **resubmission_meta,

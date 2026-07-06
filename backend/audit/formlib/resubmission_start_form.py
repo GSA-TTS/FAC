@@ -34,14 +34,29 @@ MATERIAL_CHANGE_CHOICES = [
 ]
 
 NON_MATERIAL_CHANGE_CHOICES = [
-    ("aln_where_sefa_accurate", "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate"),
+    (
+        "aln_where_sefa_accurate",
+        "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate",
+    ),
     ("data_entry", "Data Entry Corrections not Affecting Audit Conclusions"),
-    ("direct_passthrough_where_sefa_accurate", "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate"),
+    (
+        "direct_passthrough_where_sefa_accurate",
+        "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate",
+    ),
     ("ein", "Employer Identification Number (EIN) Corrections or Additions"),
-    ("presentation", "Labelling or Presentation Corrections Not Impacting Reporting, Compliance, or Audit Conclusions"),
-    ("rounding", "Minor Numerical Rounding Corrections with No Material Affect on Expenditures, Major Program Determinations, Findings, or Compliance"),
+    (
+        "presentation",
+        "Labelling or Presentation Corrections Not Impacting Reporting, Compliance, or Audit Conclusions",
+    ),
+    (
+        "rounding",
+        "Minor Numerical Rounding Corrections with No Material Affect on Expenditures, Major Program Determinations, Findings, or Compliance",
+    ),
     ("spelling", "Spelling and Typographical Corrections"),
-    ("questioned_costs_where_report_accurate", "Questioned Costs Corrections Where Audit Report and Findings are Accurate"),
+    (
+        "questioned_costs_where_report_accurate",
+        "Questioned Costs Corrections Where Audit Report and Findings are Accurate",
+    ),
 ]
 
 RESUBMISSION_ACTION_CHOICES = [
@@ -131,7 +146,7 @@ class ResubmissionStartForm(forms.Form):
         choices=NON_MATERIAL_CHANGE_CHOICES,
         widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
     )
-    
+
     resubmission_requester = forms.MultipleChoiceField(
         required=False,
         choices=RESUBMISSION_REQUESTER_CHOICES,

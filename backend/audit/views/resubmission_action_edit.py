@@ -21,7 +21,9 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
                 "resubmission_action": meta.get("resubmission_action"),
                 "resubmission_requester": meta.get("resubmission_requester", []),
                 "material_change_reasons": meta.get("material_change_reasons", []),
-                "non_material_change_reasons": meta.get("non_material_change_reasons", []),
+                "non_material_change_reasons": meta.get(
+                    "non_material_change_reasons", []
+                ),
             }
         )
 
@@ -51,10 +53,18 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
 
         sac.resubmission_meta = sac.resubmission_meta or {}
 
-        sac.resubmission_meta["resubmission_action"] = form.cleaned_data["resubmission_action"]
-        sac.resubmission_meta["resubmission_requester"] = form.cleaned_data["resubmission_requester"]
-        sac.resubmission_meta["material_change_reasons"] = form.cleaned_data["material_change_reasons"]
-        sac.resubmission_meta["non_material_change_reasons"] = form.cleaned_data["non_material_change_reasons"]
+        sac.resubmission_meta["resubmission_action"] = form.cleaned_data[
+            "resubmission_action"
+        ]
+        sac.resubmission_meta["resubmission_requester"] = form.cleaned_data[
+            "resubmission_requester"
+        ]
+        sac.resubmission_meta["material_change_reasons"] = form.cleaned_data[
+            "material_change_reasons"
+        ]
+        sac.resubmission_meta["non_material_change_reasons"] = form.cleaned_data[
+            "non_material_change_reasons"
+        ]
 
         sac.save()
 
