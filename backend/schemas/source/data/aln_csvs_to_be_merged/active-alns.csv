@@ -448,6 +448,7 @@ Emergency Livestock Relief Program 2023 and 2024 Flood and Wildfire,10.987
 Supplemental Disaster Relief Program,10.988
 On-Farm Stored Commodity Loss Program,10.989
 Farmer Bridge Assistance Program,10.990
+Assistance for Specialty Crop Farmers,10.991
 2025 Sugar Processor Block Grants,10.992
 Rural Development Policy Public Service and Leadership Development Program,10.996
 U.S. Codex Office Support for International Activities,10.997
@@ -504,9 +505,13 @@ High Performance Building Systems,11.070
 The Communications Technology Grant Program,11.075
 NIST Center for Neutron Research Comprehensive Neutron Program,11.076
 NIST Center for Neutron Research Grant Program,11.077
+Forensic Science Grant Program,11.078
 Standards Coordination Office (SCO) Grant Program,11.087
+Standards Development Organization Grants for Forensic Science Standards Program (SDO GFSS),11.089
 Growing Advanced Manufacturing Ecosystems,11.090
-Measurement Science and Engineering (MSE) Research Grant Program,11.092
+Science and Technology Fellowship Program,11.091
+CHIPS Measurement Science and Engineering (MSE) Research Grant Program,11.092
+Joint Center for Quantum and Information Sciences (QuICS),11.093
 Market Development Cooperator Program,11.112
 Investments for Public Works and Economic Development Facilities,11.300
 Economic Development Support for Planning Organizations,11.302
@@ -592,6 +597,7 @@ Defense Community Infrastructure Program,12.027
 Community Noise Mitigation Program,12.029
 "National Guard Morale, Welfare, and Recreation Program",12.030
 Improvement of Navy Ship Repair or Alterations Capability,12.031
+Department of War Cyber Academic Engagement Office,12.032
 Deployed Warfighter Protection (DWFP) Program FY26,12.033
 Community Economic Adjustment Assistance for Defense Modernization Priorities,12.034
 State Memorandum of Agreement Program for the Reimbursement of Technical Services,12.113
@@ -650,7 +656,7 @@ GenCyber Grants Program,12.903
 CyberSecurity Core Curriculum,12.905
 Research and Technology Development,12.910
 Upper San Pedro Partnership Support,12.987
-Green and Resilient Retrofit Program,14.021
+GRRP,14.021
 Housing Counseling Program Homeownership Initiative,14.022
 Community Development Block Grant- PRO Housing Competition,14.023
 Community Development Block Grant- PRICE Competition,14.024
@@ -843,6 +849,7 @@ Land Acquisition Funding Program,15.164
 Tribal Electrification Program,15.165
 Tiwahe Demonstration Project-Social Services,15.166
 Tiwahe Demonstration Project-Tribal Court,15.170
+Indian Youth Service Corps,15.171
 Non-Sale Disposals of Mineral Material,15.214
 Cooperative Inspection Agreements with States and Tribes,15.222
 Cultural and Paleontological Resources Management,15.224
@@ -858,7 +865,7 @@ Environmental Quality and Protection,15.236
 Rangeland Resource Management,15.237
 Management Initiatives,15.239
 "Indian Self-Determination Act Contracts, Grants and Cooperative Agreements",15.241
-Youth Conservation Opportunities on Public Lands,15.243
+Youth Corps,15.243
 Aquatics Resources Management,15.244
 Plant Conservation and Restoration Management,15.245
 Threatened and Endangered Species,15.246
@@ -1291,6 +1298,8 @@ Strategic Global Priorities,19.041
 Migration Management,19.042
 Study of International Parental Child Abduction,19.043
 Refugee Resettlement,19.044
+International Disaster and Humanitarian Response,19.045
+Global Health Security and Transition of Life-saving Services,19.046
 International Fisheries Commissions,19.087
 Bureau of South and Central Asian Affairs,19.108
 Conflict and Stabilization Operations,19.121
@@ -1376,6 +1385,8 @@ Fueling Aviation’s Sustainable Transition via Sustainable Aviation Fuels (FAST
 Airport Improvement Program,20.116
 Airport Infrastructure Grants,20.117
 Airport Terminal Program,20.118
+Competitive Type 3 Highway Bridge Program,20.198
+Stopping Threats On Pedestrian Competitive Grant Program (The Bollards Program),20.199
 Highway Research and Development Program,20.200
 Highway Planning and Construction,20.205
 Highway Training and Education,20.215
@@ -1632,6 +1643,7 @@ National Endowment for the Humanities: Media Projects,45.036
 National Endowment for the Humanities: Collections Stewardship,45.037
 National Endowment for the Humanities: Curriculum Development,45.038
 National Endowment for the Humanities: Institutes and Landmarks of American History and Culture,45.039
+National Endowment for the Humanities: Scholarly Editions and Translations,45.040
 Promotion of the Humanities Federal/State Partnership,45.129
 Promotion of the Humanities Challenge Grants,45.130
 Promotion of the Humanities Division of Preservation and Access,45.149
@@ -1713,7 +1725,6 @@ Staff Sergeant Parker Gordon Fox Suicide Prevention Grant Program,64.055
 Legal Services for Homeless Veterans and Veterans At-Risk for Homelessness Grant Program,64.056
 Suicide Mortality Review Cooperative Agreements,64.057
 Veteran and Spouse Transitional Assistance Grant Program (VSTAGP),64.058
-Legal Services for Veterans - Legal Assistance for Access to VA Programs (LSV-A) Grant Program,64.060
 Automobiles and Adaptive Equipment for Certain Disabled Veterans and Members of the Armed Forces,64.100
 Burial Expenses Allowance for Veterans,64.101
 Pension for Non-Service-Connected Disability for Veterans,64.104
@@ -1867,6 +1878,7 @@ U.S. Nuclear Regulatory Commission Office of Research Financial Assistance Progr
 Molybdenum-99 Program,81.009
 "Office of Technology Transitions (OTT)-Technology Deployment, Demonstration and Commercialization",81.010
 Artificial Intelligence and Technology Office Financial Assistance Program,81.012
+Pantex Agreement-In-Principle (AIP) with the Texas State Energy Conservation Office (SECO),81.013
 State Energy Program,81.041
 Weatherization Assistance for Low-Income Persons,81.042
 Office of Science Financial Assistance Program,81.049
@@ -2025,6 +2037,7 @@ Education Stabilization Fund,84.425
 Randolph-Sheppard – Financial Relief and Restoration Payments,84.426
 Augustus F. Hawkins Centers of Excellence—Teacher Preparation and Development,84.428
 Education Evaluation and Technical Assistance Grants,84.429
+Gallaudet University,84.910
 Howard University - Direct Appropriation,84.915
 MCC Foreign Assistance for Overseas Programs,85.002
 Barry M. Goldwater Scholarship Program,85.200
@@ -2153,7 +2166,7 @@ Indian Health Service Educational Loan Repayment,93.164
 Grants to States for Loan Repayment,93.165
 Human Genome Research,93.172
 Research Related to Deafness and Communication Disorders,93.173
-Nursing Workforce Diversity,93.178
+Nursing Workforce Development,93.178
 Disabilities Prevention,93.184
 "Immunization Research, Demonstration, Public Information and Education Training and Clinical Skills Improvement Projects",93.185
 National Research Service Award in Primary Care Medicine,93.186
@@ -2218,6 +2231,10 @@ Discovery and Applied Research for Technological Innovations to Improve Human He
 National Health Service Corps Scholarship Program,93.288
 Surplus Property Utilization,93.291
 Teenage Pregnancy Prevention Program,93.297
+NIMHD-Improving Native American Cancer Outcomes,93.2NC
+NIMHD- Native Hawaiian & Pacific Islander Health Research,93.2NP
+NIMHD- Research Centers in Minority Institutions (RCMI),93.2RC
+NIMHD Research Endowment Program,93.2RE
 National Center for Health Workforce Analysis,93.300
 Small Rural Hospital Improvement Grant Program,93.301
 Nurse Corps Scholarship,93.303
@@ -2585,8 +2602,6 @@ National Institute on Aging Training Individual Projects,93.AG4
 National Institute on Aging Training Inst Projects,93.AG5
 National Institute on Aging Construction Projects,93.AG6
 National Institute on Aging Small Business Projects,93.AG7
-National Institute on Aging Contract Projects,93.AG8
-National Institute on Aging Intramural Programs,93.AG9
 National Institute on Aging Centers Projects,93.AGC
 National Institute on Aging Research Projects,93.AGR
 Accelerating Access to Critical Therapies for Amyotrophic Lateral Sclerosis Act,93.ALS
@@ -2624,8 +2639,6 @@ Oral Diseases and Disorders Research - Other Research,93.DE3
 "Oral Diseases and Disorders Research - Training, Institutional",93.DE4
 "Oral Diseases and Disorders Research - Training, Individual",93.DE5
 Oral Diseases and Disorders Research - SBIR/STTR,93.DE6
-Oral Diseases and Disorders Research - R & D Contracts,93.DE7
-Oral Diseases and Disorders Research - Intramural Research,93.DE8
 NIH Office of Data Science Strategy (ODSS),93.DSS
 "Bioengineering, Biomedical Imaging, and Technology Development - Research Projects",93.EB1
 "Bioengineering, Biomedical Imaging, and Technology Development - SBIR/STTR",93.EB2
@@ -2822,6 +2835,7 @@ Cybersecurity Workforce Development and Training for Underserved Communities Pro
 Tribal Cybersecurity Grant Program,97.156
 Intercity Passenger Rail Program,97.157
 Fiscal Year 2025 Detention Support Grant Program,97.158
+State Border Security Reinforcement Fund,97.159
 Fédération Internationale de Football Association World Cup Grant Program,97.160
 Counter-Unmanned Aircraft Systems (C-UAS) Grant Program,97.161
 USAID Foreign Assistance for Programs Overseas,98.001
