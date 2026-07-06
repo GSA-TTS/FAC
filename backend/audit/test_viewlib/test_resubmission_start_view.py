@@ -19,6 +19,8 @@ class ResubmissionStartViewTests(TestCase):
     valid_sibling_report_id = "3210-10-SOURCE-9876543210"
     valid_material_change_reasons = ["findings"]
     valid_resubmission_action = "audit_pdf"
+    valid_non_material_change_reasons = ["spelling"]
+    valid_resubmission_requester = ["auditee"]
 
     general_information = {
         "auditee_uei": "auditee_uei",
@@ -65,6 +67,7 @@ class ResubmissionStartViewTests(TestCase):
                 "report_id": self.invalid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
                 "resubmission_action": self.valid_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
             },
         )
 
@@ -82,6 +85,7 @@ class ResubmissionStartViewTests(TestCase):
                 "report_id": self.nonexistent_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
                 "resubmission_action": self.valid_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
             },
         )
 
@@ -99,6 +103,7 @@ class ResubmissionStartViewTests(TestCase):
                 "report_id": self.valid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
                 "resubmission_action": self.valid_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
             },
         )
 
@@ -116,6 +121,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "resubmission_action": self.valid_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
             },
         )
 
@@ -123,7 +129,7 @@ class ResubmissionStartViewTests(TestCase):
         self.assertTemplateUsed(response, "audit/resubmission_start_form.html")
         self.assertIn("form", response.context)
         self.assertIn(
-            "Select at least one reason for resubmission.",
+            "Select at least one material change.",
             str(response.context["form"].errors),
         )
 
@@ -135,6 +141,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
+                "resubmission_requester": self.valid_resubmission_requester,
             },
         )
 
@@ -153,8 +160,9 @@ class ResubmissionStartViewTests(TestCase):
             self.path_name,
             {
                 "report_id": self.valid_report_id,
-                "material_change_reasons": self.valid_material_change_reasons,
+                "non_material_change_reasons": self.valid_non_material_change_reasons,
                 "resubmission_action": "sfsac_only",
+                "resubmission_requester": self.valid_resubmission_requester,
             },
         )
 
