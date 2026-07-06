@@ -1,6 +1,7 @@
 import copy
 
 from django.db import models
+from django.db.models.functions import Lower
 from typing import List, Tuple, Type
 
 from .constants import REPORT_ID_FK_HELP_TEXT
@@ -141,10 +142,43 @@ class Unified(models.Model):
         on_delete=models.CASCADE,
         to_field="report_id",
         db_column="report_id",
+        db_index=True,
     )
     aln = models.TextField(
         "2-char agency code concatenated to 3-digit program extn",
+        db_index=True,
     )
+
+    class Meta:
+        db_table = "dissemination_unified"
+
+        indexes = [
+            models.Index(
+                Lower("auditee_certify_name"), name="du_auditee_certify_name_idx"
+            ),
+            models.Index(Lower("auditee_name"), name="du_auditee_name_idx"),
+            models.Index(
+                Lower("auditor_certify_name"), name="du_auditor_certify_name_idx"
+            ),
+            models.Index(
+                Lower("auditor_contact_name"), name="du_auditor_contact_name_idx"
+            ),
+            models.Index(Lower("auditor_firm_name"), name="du_auditor_firm_name_idx"),
+            models.Index(Lower("auditee_email"), name="du_auditee_email_idx"),
+            models.Index(Lower("auditor_email"), name="du_auditor_email_idx"),
+            models.Index(fields=["fy_start_date"], name="du_fy_start_date_idx"),
+            models.Index(fields=["fy_end_date"], name="du_fy_end_date_idx"),
+            models.Index(fields=["auditee_uei"], name="du_auditee_uei_idx"),
+            models.Index(fields=["auditee_ein"], name="du_auditee_ein_idx"),
+            models.Index(
+                fields=["federal_agency_prefix"], name="du_federal_agency_prefix_idx"
+            ),
+            models.Index(
+                fields=["federal_award_extension"],
+                name="du_federal_award_extension_idx",
+            ),
+            models.Index(fields=["audit_year"], name="du_audit_year_idx"),
+        ]
 
 
 # Adds fields we need from other models
