@@ -34,6 +34,19 @@ module "domain" {
   host_name     = "app"
 }
 
+# Lifecycle policy (60 day object expiration) has been added to this resource
+# and is managed by the cloud.gov team, as we lack sufficient IAM privileges to add it ourselves. 
+# See docs/retention.md for details on verifying or requesting changes to this policy.
+module "production-backups-bucket" {
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
+
+  cf_space_id  = data.cloudfoundry_space.space.id
+  name         = "backups"
+  s3_plan_name = "basic"
+  tags         = ["s3"]
+}
+
+
 data "cloudfoundry_org" "org" {
   name = var.cf_org_name
 }
