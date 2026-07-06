@@ -8,7 +8,7 @@
 
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large">
-                        Edit resubmission type
+                        Resubmission Type
                     </legend>
 
                     <p>
@@ -16,6 +16,7 @@
                     </p>
 
                     {% include "audit/resubmission_action_field.html" %}
+                    {% include "audit/resubmission_reason_fields.html" %}
 
                     <button class="usa-button margin-y-2" id="continue">
                         Save and continue
@@ -29,4 +30,40 @@
             </form>
         </div>
     </div>
+    <script>
+        function toggleReasonSections() {
+            const selectedAction = document.querySelector(
+                'input[name="resubmission_action"]:checked'
+            );
+
+            const requesterSection = document.getElementById("requester-section");
+            const materialSection = document.getElementById("material-change-section");
+            const nonMaterialSection = document.getElementById("non-material-change-section");
+
+            if (!selectedAction) {
+                requesterSection.hidden = true;
+                materialSection.hidden = true;
+                nonMaterialSection.hidden = true;
+                return;
+            }
+
+            requesterSection.hidden = false;
+
+            if (selectedAction.value === "audit_pdf") {
+                materialSection.hidden = false;
+                nonMaterialSection.hidden = true;
+            } else if (selectedAction.value === "sfsac_only") {
+                materialSection.hidden = true;
+                nonMaterialSection.hidden = false;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('input[name="resubmission_action"]').forEach((radio) => {
+                radio.addEventListener("change", toggleReasonSections);
+            });
+
+            toggleReasonSections();
+        });
+    </script>
 {% endblock content %}

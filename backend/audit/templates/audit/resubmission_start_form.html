@@ -47,11 +47,38 @@
                     <hr>
 
                     {% include "audit/resubmission_action_field.html" %}
+                    <div id="requester-section" hidden>
+                        <fieldset class="usa-fieldset margin-top-4"
+                                aria-describedby="resubmission-requester-hint">
 
+                            <legend class="usa-legend usa-label" id="requester-title">
+                                Reason for resubmission
+                            </legend>
+
+                            <div class="usa-hint" id="requester-hint">
+                                Choose one or more of the following statements. This field is required.
+                            </div>
+
+                            {% if form.resubmission_requester.errors %}
+                                <span class="usa-error-message margin-top-1">
+                                    {{ form.resubmission_requester.errors|striptags }}
+                                </span>
+                            {% endif %}
+
+                            {% for checkbox in form.resubmission_requester %}
+                                <div class="usa-checkbox">
+                                    {{ checkbox.tag }}
+                                    <label class="usa-checkbox__label"
+                                        for="{{ checkbox.id_for_label }}">
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+
+                <div id="material-change-section" hidden>
                     <fieldset class="usa-fieldset margin-top-4" aria-describedby="material-change-hint">
-                        <legend class="usa-legend usa-label" id="material-change-label">
-                            Reason for resubmission
-                        </legend>
                         <div class="usa-hint" id="material-change-hint">
                             Select one or more material changes that apply. This field is required.
                         </div>
@@ -71,6 +98,31 @@
                             </div>
                         {% endfor %}
                     </fieldset>
+                </div>
+
+                    <div id="non-material-change-section" hidden>
+                        <fieldset class="usa-fieldset margin-top-4" aria-describedby="non-material-change-hint">
+
+                            <div class="usa-hint" id="non-material-change-hint">
+                                Select one or more non-material changes that apply. This field is required.
+                            </div>
+
+                            {% if form.non_material_change_reasons.errors %}
+                                <span class="usa-error-message margin-top-1">
+                                    {{ form.non_material_change_reasons.errors|striptags }}
+                                </span>
+                            {% endif %}
+
+                            {% for checkbox in form.non_material_change_reasons %}
+                                <div class="usa-checkbox">
+                                    {{ checkbox.tag }}
+                                    <label class="usa-checkbox__label" for="{{ checkbox.id_for_label }}">
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
 
                     <label class="usa-label margin-top-4" id="report_id-label" for="report_id">Report ID of audit to resubmit:</label>
                     <div class="usa-hint" id="report_id-hint">YYYY-MM-SOURCE-0123456789</div>
@@ -94,5 +146,44 @@
             </form>
         </div>
     </div>
+
     <script src="{% static 'compiled/js/util.js' %}"></script>
+    <script>
+        function toggleReasonSections() {
+            const selectedAction = document.querySelector(
+                'input[name="resubmission_action"]:checked'
+            );
+
+            const requesterSection = document.getElementById("requester-section");
+            const materialSection = document.getElementById("material-change-section");
+            const nonMaterialSection = document.getElementById("non-material-change-section");
+
+            if (!selectedAction) {
+                requesterSection.hidden = true;
+                materialSection.hidden = true;
+                nonMaterialSection.hidden = true;
+                return;
+            }
+
+            // Always show requester after a radio is selected
+            requesterSection.hidden = false;
+
+            if (selectedAction.value === "audit_pdf") {
+                materialSection.hidden = false;
+                nonMaterialSection.hidden = true;
+            } else if (selectedAction.value === "sfsac_only") {
+                materialSection.hidden = true;
+                nonMaterialSection.hidden = false;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('input[name="resubmission_action"]').forEach((radio) => {
+                radio.addEventListener("change", toggleReasonSections);
+            });
+
+            toggleReasonSections();
+        });
+    </script>
+
 {% endblock content %}

@@ -33,12 +33,32 @@ MATERIAL_CHANGE_CHOICES = [
     ("sf_sac", "SF-SAC Materially Incomplete or Inconsistent with Audit Report"),
 ]
 
+NON_MATERIAL_CHANGE_CHOICES = [
+    ("aln_where_sefa_accurate", "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate"),
+    ("data_entry", "Data Entry Corrections not Affecting Audit Conclusions"),
+    ("direct_passthrough_where_sefa_accurate", "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate"),
+    ("ein", "Employer Identification Number (EIN) Corrections or Additions"),
+    ("presentation", "Labelling or Presentation Corrections Not Impacting Reporting, Compliance, or Audit Conclusions"),
+    ("rounding", "Minor Numerical Rounding Corrections with No Material Affect on Expenditures, Major Program Determinations, Findings, or Compliance"),
+    ("spelling", "Spelling and Typographical Corrections"),
+    ("questioned_costs_where_report_accurate", "Questioned Costs Corrections Where Audit Report and Findings are Accurate"),
+]
+
 RESUBMISSION_ACTION_CHOICES = [
-    (RESUBMISSION_ACTION.AUDIT_PDF, "I need to upload or edit the audit PDF package."),
+    (
+        RESUBMISSION_ACTION.AUDIT_PDF,
+        "I need to upload or edit the audit PDF package (with the option to also edit the SF-SAC data collection forms). I understand that this option will result in a new acceptance date for the submission.",
+    ),
     (
         RESUBMISSION_ACTION.SFSAC_ONLY,
-        "I only need to modify SF-SAC Data Collection Form information.",
+        "I only need to modify SF-SAC Data Collection Form information. I understand that the submission's acceptance date will not change.",
     ),
+]
+
+RESUBMISSION_REQUESTER_CHOICES = [
+    ("auditee", "The Auditee is requesting this resubmission."),
+    ("auditor", "The Auditor is requesting this resubmission."),
+    ("oversight_official", "An Oversight Official is requesting this resubmission."),
 ]
 
 
@@ -47,21 +67,75 @@ class ResubmissionActionForm(forms.Form):
         choices=RESUBMISSION_ACTION_CHOICES,
         widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
         required=True,
-        initial="audit_pdf",
         error_messages={
             "required": "Select the type of change you need to make.",
         },
     )
 
+    resubmission_requester = forms.MultipleChoiceField(
+        required=False,
+        choices=RESUBMISSION_REQUESTER_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+    )
+
+    material_change_reasons = forms.MultipleChoiceField(
+        required=False,
+        choices=MATERIAL_CHANGE_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+    )
+
+    non_material_change_reasons = forms.MultipleChoiceField(
+        required=False,
+        choices=NON_MATERIAL_CHANGE_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        action = cleaned_data.get("resubmission_action")
+        requester = cleaned_data.get("resubmission_requester")
+        material = cleaned_data.get("material_change_reasons")
+        non_material = cleaned_data.get("non_material_change_reasons")
+
+        if not requester:
+            self.add_error(
+                "resubmission_requester",
+                "Select at least one requester.",
+            )
+
+        if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
+            self.add_error(
+                "material_change_reasons",
+                "Select at least one material change.",
+            )
+
+        if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
+            self.add_error(
+                "non_material_change_reasons",
+                "Select at least one non-material change.",
+            )
+
+        return cleaned_data
+
 
 class ResubmissionStartForm(forms.Form):
     material_change_reasons = forms.MultipleChoiceField(
-        required=True,
+        required=False,
         choices=MATERIAL_CHANGE_CHOICES,
         widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
-        error_messages={
-            "required": "Select at least one reason for resubmission.",
-        },
+    )
+
+    non_material_change_reasons = forms.MultipleChoiceField(
+        required=False,
+        choices=NON_MATERIAL_CHANGE_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+    )
+    
+    resubmission_requester = forms.MultipleChoiceField(
+        required=False,
+        choices=RESUBMISSION_REQUESTER_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
     )
 
     report_id = forms.CharField(required=True)
@@ -70,35 +144,53 @@ class ResubmissionStartForm(forms.Form):
         choices=RESUBMISSION_ACTION_CHOICES,
         widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
         required=True,
-        initial="audit_pdf",
         error_messages={
             "required": "Select the type of change you need to make.",
         },
     )
 
     def clean_report_id(self):
-        """
-        Cleans the report_id text that comes in from the user.
-
-        Ensures the report_id points to an existing record that is eligible for resubmission.
-        """
-        # 1. Remove all whitespace
         text_input = self.cleaned_data["report_id"]
         report_id = "".join(text_input.split())
 
-        # 2. Field validations
         if len(report_id) > 25:
             raise ValidationError("The given report ID is too long!")
         elif len(report_id) < 25:
             raise ValidationError("The given report ID is too short!")
 
-        # 3. Try to find the specified report. Add SAC data to the form data.
         sac = _validate_report_id_for_resubmission(report_id)
         self.cleaned_data["previous_report_data"] = _gather_previous_report_data(sac)
         self.cleaned_data["resubmission_meta"] = _gather_resubmission_metadata(sac)
 
-        # The field is clean, return it by default.
         return report_id
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        action = cleaned_data.get("resubmission_action")
+        requester = cleaned_data.get("resubmission_requester")
+        material = cleaned_data.get("material_change_reasons")
+        non_material = cleaned_data.get("non_material_change_reasons")
+
+        if action and not requester:
+            self.add_error(
+                "resubmission_requester",
+                "Select at least one requester.",
+            )
+
+        if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
+            self.add_error(
+                "material_change_reasons",
+                "Select at least one material change.",
+            )
+
+        if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
+            self.add_error(
+                "non_material_change_reasons",
+                "Select at least one non-material change.",
+            )
+
+        return cleaned_data
 
 
 def _validate_report_id_for_resubmission(report_id):
