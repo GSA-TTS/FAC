@@ -7,6 +7,7 @@
 4. See below to regenerate schemas and templates.
 
 # Updating the ALN (formerly CFDA) listings
+Please follow all steps carefully and in order. 
 
 1. Log in to Sam.gov with your GSA account and go to https://sam.gov/search/.
 2. Select "Federal Assistance" and then "Assistance Listings" as domain.
@@ -19,7 +20,7 @@
 
 # Bumping workbook template version
 
-As of May 2026, workbook versioning is now driven by `backend/schemas/source/data/workbook_version.json`, which stores both the current workbook version and the list of authorized workbook versions accepted during validation.
+As of May 2026, workbook versioning is now driven by `backend/schemas/source/data/workbook_version.json`, which stores both the current workbook version and the list of authorized workbook versions accepted during validation. The automation of the workbook creation is done by the make all command in step 2, it will take some time to complete.
 
 Follow these steps to version bump the workbook templates:
 1. Activate your virtual env inside `backend/schemas`
@@ -34,3 +35,14 @@ Follow these steps to version bump the workbook templates:
 
 ## A note about generate_lookup_schemas.py
 `make all` executes `make source_data`, which, calls `generate_lookup_schemas.py`. This script can generate either cluster names or CFDA listings or agencies, depending on the args given (see docstring in the script). The format of the CSVs can change (and have), so changes to `generate_lookup_schemas.py` may be necessary in the future.
+
+
+#### Workbooks Affected
+- additional-eins-workbook
+- additional-ueis-workbook
+- audit-findings-text-workbook 
+- corrective-action-plan-workbook 
+- federal-awards-audit-findings-workbook 
+- federal-awards-workbook 
+- notes-to-sefa-workbook 
+- secondary-auditors-workbook

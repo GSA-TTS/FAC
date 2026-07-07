@@ -25,6 +25,9 @@ module "staging" {
   )
 }
 
+# Lifecycle policy (60 day object expiration) has been added to this resource
+# and is managed by the cloud.gov team, as we lack sufficient IAM privileges to add it ourselves. 
+# See docs/retention.md for details on verifying or requesting changes to this policy.
 module "staging-backups-bucket" {
   source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
 
