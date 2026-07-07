@@ -1,14 +1,19 @@
 {% if is_resubmission and resubmission_action_url %}
     <li class="usa-icon-list__item padding-bottom-105">
-        {% include "./icon-list-icon.html" with completed=False %}
-        <div>
-            <p class="text-bold margin-0">
-                <a class="usa-link" href="{{ resubmission_action_url }}">
-                    Resubmission Form
-                </a>
+        {% include "./icon-list-icon.html" with completed=True %}
+        <div class="text-success-darker">
+            <p class="text-bold text-underline margin-0">
+                Resubmission Form (Complete)
             </p>
+
             <p class="margin-0">
                 Change whether this is a full audit PDF resubmission or an SF-SAC Data Collection Form only modification.
+            </p>
+
+            <p class="margin-top-1">
+                <a class="usa-link" href="{{ resubmission_action_url }}">
+                    Edit the Resubmission Form
+                </a>
             </p>
         </div>
     </li>
