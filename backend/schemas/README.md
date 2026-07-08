@@ -6,25 +6,15 @@
 3. Add any new cluster names
 4. See below to regenerate schemas and templates.
 
-# Updating the ALN (formerly CFDA) listings
-Please follow all steps carefully and in order. 
-
-1. Log in to Sam.gov with your GSA account and go to https://sam.gov/search/.
-2. Select "Federal Assistance" and then "Assistance Listings" as domain.
-3. Under "key word" search, choose simple and "any words" and then "active" listings.
-4. Click "Actions" on the upper-right and then "download" to get the CSV file of active listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/active-alns.csv`.
-5. Repeat the process, choosing "inactive" listings to get the CSV file for inactive ALN listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/inactive-alns.csv`. These have to be done separately due to a limit on the amount of records that can be downloaded into a CSV file.
-6. Make sure the headings of first 2 columns match this: "Program Number", "Program Title". If applicable, make sure that trailing zeroes are not dropped (In Excel, select the Program Number column, then format cell as number with 3 numbers after decimal).
-7. Perform the "Bumping workbook template version" steps below.
-    * Note: Part of this process will merge the CSVs into `/schemas/source/data/cfda-lookup.csv`.
-
-# Bumping workbook template version
+#  Updating the ALN (formerly CFDA) listings and bumping workbook template version
+Perform these steps below to update the ALN workbooks. Please follow all steps carefully and in order. 
 
 As of May 2026, workbook versioning is now driven by `backend/schemas/source/data/workbook_version.json`, which stores both the current workbook version and the list of authorized workbook versions accepted during validation. The automation of the workbook creation is done by the make all command in step 2, it will take some time to complete.
 
-Follow these steps to version bump the workbook templates:
-1. Activate your virtual env inside `backend/schemas`
-2. Run `SAM_API_KEY=my-sam-key make all WORKBOOK_VERSION=d.d.d` where my-sam-key is your SAM API Key and d.d.d is the new workbook version. (NOTE: If reusing existing ALN data and skipping the SAM.gov fetch: run `SAM_API_KEY=my-sam-key make skip WORKBOOK_VERSION=d.d.d`)
+Follow these steps to update the aln listing and version bump the workbook templates:
+1. Activate your virtual env and change current directory to inside `backend/schemas`
+2. Run `SAM_API_KEY=my-sam-key make all WORKBOOK_VERSION=d.d.d` where my-sam-key is your SAM API Key and d.d.d is the new workbook version. 
+    - (NOTE: If reusing existing ALN data and skipping the SAM.gov fetch: run `SAM_API_KEY=my-sam-key make skip WORKBOOK_VERSION=d.d.d`)
 3. Verify:
 - workbook templates generated successfully in `backend/schemas/output/excel/xlsx/` and `backend/schemas/output/excel/json/`
 - section schemas regenerated successfully in `backend/schemas/output/sections/`
@@ -46,3 +36,16 @@ Follow these steps to version bump the workbook templates:
 - federal-awards-workbook 
 - notes-to-sefa-workbook 
 - secondary-auditors-workbook
+
+
+# Deprecated : Updating the ALN (formerly CFDA) listings
+These steps do not need to be followed due to the above directions doing the work programmatically. 
+
+1. Log in to Sam.gov with your GSA account and go to https://sam.gov/search/.
+2. Select "Federal Assistance" and then "Assistance Listings" as domain.
+3. Under "key word" search, choose simple and "any words" and then "active" listings.
+4. Click "Actions" on the upper-right and then "download" to get the CSV file of active listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/active-alns.csv`.
+5. Repeat the process, choosing "inactive" listings to get the CSV file for inactive ALN listings. Save this as `/schemas/source/data/aln_csvs_to_be_merged/inactive-alns.csv`. These have to be done separately due to a limit on the amount of records that can be downloaded into a CSV file.
+6. Make sure the headings of first 2 columns match this: "Program Number", "Program Title". If applicable, make sure that trailing zeroes are not dropped (In Excel, select the Program Number column, then format cell as number with 3 numbers after decimal).
+7. Perform the "Bumping workbook template version" steps below.
+    * Note: Part of this process will merge the CSVs into `/schemas/source/data/cfda-lookup.csv`.
