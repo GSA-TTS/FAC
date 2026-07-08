@@ -9,15 +9,16 @@ module "staging" {
   new_relic_api_key     = var.new_relic_api_key
   pgrst_jwt_secret      = var.pgrst_jwt_secret
 
-  database_plan         = "medium-gp-psql"
-  postgrest_instances   = 1
-  postgrest_memory      = "512M"
-  swagger_instances     = 1
-  https_proxy_instances = 1
-  smtp_proxy_instances  = 1
-  clamav_instances      = 1
-  clamav_memory         = "2048M"
-  clamav_fs_instances   = 1
+  database_plan          = "medium-gp-psql"
+  snapshot_database_plan = "medium-gp-psql"
+  postgrest_instances    = 1
+  postgrest_memory       = "512M"
+  swagger_instances      = 1
+  https_proxy_instances  = 1
+  smtp_proxy_instances   = 1
+  clamav_instances       = 1
+  clamav_memory          = "2048M"
+  clamav_fs_instances    = 1
   json_params = jsonencode(
     {
       "storage" : 50,
@@ -25,6 +26,9 @@ module "staging" {
   )
 }
 
+# Lifecycle policy (60 day object expiration) has been added to this resource
+# and is managed by the cloud.gov team, as we lack sufficient IAM privileges to add it ourselves. 
+# See docs/retention.md for details on verifying or requesting changes to this policy.
 module "staging-backups-bucket" {
   source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
 
