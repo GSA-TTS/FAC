@@ -30,6 +30,7 @@ on:
           - 'initial_backup'
           - 'deploy_backup'
           - 'on_demand_backup'
+          
 jobs:
   fac-backup:
     name: Perform Database Backup
