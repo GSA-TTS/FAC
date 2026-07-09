@@ -71,7 +71,6 @@ elif [ "$run_option" == "on_demand_backup" ]; then
     gonogo "row_count"
     RDSToS3Dump "$db_name" "$backup_s3_name" "on-demand/$backup_date"
     gonogo "db_to_s3"
-    RDSToRDS "$db_name" "$backup_db_name" "backup"
     gonogo "db_to_db"
     AWSS3Sync "$s3_name" "$backup_s3_name"
     gonogo "s3_sync"
