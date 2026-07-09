@@ -1,5 +1,9 @@
 # API Development
 
+## API Change Procedure
+
+Any change to the API itself requires a version bump. When making a minor or major version change to the API or changing the default schema, we are required to inform users well ahead of time so that they can make any necessary migrations. See the public documentation for more details about our versioning practices. Also, see our [API Change User Communication Guide](https://github.com/GSA-TTS/fac-team/blob/main/docs/api-change-user-communication-guide.md) to see how we keep users informed of API updates.
+
 ## Versions
 
 Each version lives in its own folder. The API is a PostgREST server that stands up after our other main services and relies on our DB having certain elements applied to it already. On our main application startup the scripts within `api_standup.sh` will tear down and rebuild those elements (schemas, functions, and views). The "live" versions are determined in `api_versions.py`.

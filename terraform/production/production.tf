@@ -4,14 +4,15 @@ module "production" {
     id   = data.cloudfoundry_space.space.id
     name = "production"
   }
-  new_relic_license_key = var.new_relic_license_key
-  new_relic_account_id  = var.new_relic_account_id
-  new_relic_api_key     = var.new_relic_api_key
-  pgrst_jwt_secret      = var.pgrst_jwt_secret
-  clamav_instances      = 2
-  clamav_fs_instances   = 1
-  database_plan         = "xlarge-gp-psql-redundant"
-  postgrest_instances   = 2
+  new_relic_license_key  = var.new_relic_license_key
+  new_relic_account_id   = var.new_relic_account_id
+  new_relic_api_key      = var.new_relic_api_key
+  pgrst_jwt_secret       = var.pgrst_jwt_secret
+  clamav_instances       = 2
+  clamav_fs_instances    = 1
+  database_plan          = "xlarge-gp-psql-redundant"
+  snapshot_database_plan = "xlarge-gp-psql"
+  postgrest_instances    = 2
   json_params = jsonencode(
     {
       "storage" : 75,

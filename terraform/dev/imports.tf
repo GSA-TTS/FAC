@@ -4,11 +4,6 @@ import {
 }
 
 import {
-  to = module.dev.module.snapshot-database.cloudfoundry_service_instance.rds
-  id = "86a11021-7922-411b-b0ca-4341b7a0b911"
-}
-
-import {
   to = module.dev.module.s3-public.cloudfoundry_service_instance.bucket
   id = "07cc1c42-1b73-44bd-a4f6-8f4392f657f3"
 }
