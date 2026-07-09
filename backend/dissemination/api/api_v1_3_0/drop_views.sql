@@ -11,6 +11,7 @@ begin;
     drop view if exists api_v1_3_0.passthrough;
     drop view if exists api_v1_3_0.secondary_auditors;
     drop view if exists api_v1_3_0.additional_eins;
+    drop view if exists api_v1_3_0.unified;
 commit;
 
 notify pgrst,

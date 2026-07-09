@@ -391,8 +391,115 @@ create view api_v1_3_0.resubmission as
     order by resub.id
 ;
 
+---------------------------------------
+-- unified
+---------------------------------------
+create view api_v1_3_0.unified as
+    select
+        unified.report_id,
+        unified.award_reference,
+        unified.reference_number,
+        unified.aln,
+        unified.agencies_with_prior_findings,
+        unified.audit_period_covered,
+        unified.audit_type,
+        unified.audit_year,
+        unified.auditee_address_line_1,
+        unified.auditee_certified_date,
+        unified.auditee_certify_name,
+        unified.auditee_certify_title,
+        unified.auditee_city,
+        unified.auditee_contact_name,
+        unified.auditee_contact_title,
+        unified.auditee_ein,
+        unified.auditee_email,
+        unified.auditee_name,
+        unified.auditee_phone,
+        unified.auditee_state,
+        unified.auditee_uei,
+        unified.auditee_zip,
+        unified.auditor_address_line_1,
+        unified.auditor_certified_date,
+        unified.auditor_certify_name,
+        unified.auditor_certify_title,
+        unified.auditor_city,
+        unified.auditor_contact_name,
+        unified.auditor_contact_title,
+        unified.auditor_country,
+        unified.auditor_ein,
+        unified.auditor_email,
+        unified.auditor_firm_name,
+        unified.auditor_foreign_address,
+        unified.auditor_phone,
+        unified.auditor_state,
+        unified.auditor_zip,
+        unified.resubmission_version,
+        unified.resubmission_status,
+        unified.cognizant_agency,
+        unified.data_source,
+        unified.date_created,
+        unified.dollar_threshold,
+        unified.entity_type,
+        unified.fac_accepted_date,
+        unified.fy_end_date,
+        unified.fy_start_date,
+        unified.gaap_results,
+        unified.is_additional_ueis,
+        unified.is_aicpa_audit_guide_included,
+        unified.is_going_concern_included,
+        unified.is_internal_control_deficiency_disclosed,
+        unified.is_internal_control_material_weakness_disclosed,
+        unified.is_low_risk_auditee,
+        unified.is_material_noncompliance_disclosed,
+        unified.is_public,
+        unified.is_sp_framework_required,
+        unified.number_months,
+        unified.oversight_agency,
+        unified.ready_for_certification_date,
+        unified.sp_framework_basis,
+        unified.sp_framework_opinions,
+        unified.submitted_date,
+        unified.total_amount_expended,
+        unified.type_audit_code,
+        unified.additional_award_identification,
+        unified.amount_expended,
+        unified.cluster_name,
+        unified.cluster_total,
+        unified.federal_agency_prefix,
+        unified.federal_award_extension,
+        unified.federal_program_name,
+        unified.federal_program_total,
+        unified.findings_count,
+        unified.is_direct,
+        unified.is_loan,
+        unified.is_major,
+        unified.is_passthrough_award,
+        unified.loan_balance,
+        unified.audit_report_type,
+        unified.other_cluster_name,
+        unified.passthrough_amount,
+        unified.state_cluster_name,
+        unified.is_material_weakness,
+        unified.is_modified_opinion,
+        unified.is_other_findings,
+        unified.is_other_matters,
+        unified.is_questioned_costs,
+        unified.is_repeat_finding,
+        unified.is_significant_deficiency,
+        unified.prior_finding_ref_numbers,
+        unified.type_requirement,
+        unified.passthrough_name,
+        unified.passthrough_id
+    from
+        dissemination_unified unified
+    where
+        api_v1_3_0_functions.is_public_audit_or_authorized_user(unified.is_public)
+        and
+        api_v1_3_0_functions.is_most_recent_audit_or_authorized_user(unified.resubmission_status)
+    order by unified.id
+;
+
 commit;
 
 notify pgrst,
        'reload schema';
-
