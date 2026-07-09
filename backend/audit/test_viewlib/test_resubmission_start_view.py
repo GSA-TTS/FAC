@@ -72,7 +72,7 @@ class ResubmissionStartViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "audit/resubmission_start_form.html")
+        self.assertTemplateUsed(response, "audit/resubmission_forms.html")
         self.assertIn("form", response.context)
         self.assertIn("too short", str(response.context["form"].errors))
 
@@ -90,7 +90,7 @@ class ResubmissionStartViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "audit/resubmission_start_form.html")
+        self.assertTemplateUsed(response, "audit/resubmission_forms.html")
         self.assertIn("form", response.context)
         self.assertIn("not found", str(response.context["form"].errors))
 
@@ -126,7 +126,7 @@ class ResubmissionStartViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "audit/resubmission_start_form.html")
+        self.assertTemplateUsed(response, "audit/resubmission_forms.html")
         self.assertIn("form", response.context)
         self.assertIn(
             "Select at least one material change.",
@@ -146,7 +146,7 @@ class ResubmissionStartViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "audit/resubmission_start_form.html")
+        self.assertTemplateUsed(response, "audit/resubmission_forms.html")
         self.assertIn("form", response.context)
         self.assertIn(
             "Select the type of change you need to make.",

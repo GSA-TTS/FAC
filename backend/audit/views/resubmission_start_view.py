@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import View
 
-from audit.formlib import ResubmissionStartForm
+from audit.formlib import ResubmissionForm
 from config.settings import ENVIRONMENT
 
 
@@ -12,14 +12,14 @@ class ResubmissionStartView(LoginRequiredMixin, View):
     A form submission for beginning a resubmission.
     """
 
-    template_name = "audit/resubmission_start_form.html"
+    template_name = "audit/resubmission_forms.html"
 
     def get(self, request, *args, **kwargs):
         # Only run in non-production environments for now.
         if ENVIRONMENT == "PRODUCTION":
             return redirect(reverse("config:Home"))
 
-        form = ResubmissionStartForm()
+        form = ResubmissionForm()
         return render(
             request,
             self.template_name,
@@ -34,7 +34,7 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         if ENVIRONMENT == "PRODUCTION":
             return redirect(reverse("config:Home"))
 
-        form = ResubmissionStartForm(request.POST)
+        form = ResubmissionForm(request.POST)
 
         # If the form is not valid, reload to display the errors
         if not form.is_valid():

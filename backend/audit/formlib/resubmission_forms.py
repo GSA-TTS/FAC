@@ -77,6 +77,35 @@ RESUBMISSION_REQUESTER_CHOICES = [
 ]
 
 
+def _clean_resubmission_form(form):
+    cleaned_data = form.cleaned_data
+
+    action = cleaned_data.get("resubmission_action")
+    requester = cleaned_data.get("resubmission_requester")
+    material = cleaned_data.get("material_change_reasons")
+    non_material = cleaned_data.get("non_material_change_reasons")
+
+    if not requester:
+        form.add_error(
+            "resubmission_requester",
+            "Select at least one requester.",
+        )
+
+    if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
+        form.add_error(
+            "material_change_reasons",
+            "Select at least one material change.",
+        )
+
+    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
+        form.add_error(
+            "non_material_change_reasons",
+            "Select at least one non-material change.",
+        )
+
+    return cleaned_data
+
+
 class ResubmissionActionForm(forms.Form):
     resubmission_action = forms.ChoiceField(
         choices=RESUBMISSION_ACTION_CHOICES,
@@ -106,35 +135,11 @@ class ResubmissionActionForm(forms.Form):
     )
 
     def clean(self):
-        cleaned_data = super().clean()
-
-        action = cleaned_data.get("resubmission_action")
-        requester = cleaned_data.get("resubmission_requester")
-        material = cleaned_data.get("material_change_reasons")
-        non_material = cleaned_data.get("non_material_change_reasons")
-
-        if not requester:
-            self.add_error(
-                "resubmission_requester",
-                "Select at least one requester.",
-            )
-
-        if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
-            self.add_error(
-                "material_change_reasons",
-                "Select at least one material change.",
-            )
-
-        if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
-            self.add_error(
-                "non_material_change_reasons",
-                "Select at least one non-material change.",
-            )
-
-        return cleaned_data
+        super().clean()
+        return _clean_resubmission_form(self)
 
 
-class ResubmissionStartForm(forms.Form):
+class ResubmissionForm(forms.Form):
     material_change_reasons = forms.MultipleChoiceField(
         required=False,
         choices=MATERIAL_CHANGE_CHOICES,
@@ -180,32 +185,8 @@ class ResubmissionStartForm(forms.Form):
         return report_id
 
     def clean(self):
-        cleaned_data = super().clean()
-
-        action = cleaned_data.get("resubmission_action")
-        requester = cleaned_data.get("resubmission_requester")
-        material = cleaned_data.get("material_change_reasons")
-        non_material = cleaned_data.get("non_material_change_reasons")
-
-        if action and not requester:
-            self.add_error(
-                "resubmission_requester",
-                "Select at least one requester.",
-            )
-
-        if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
-            self.add_error(
-                "material_change_reasons",
-                "Select at least one material change.",
-            )
-
-        if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
-            self.add_error(
-                "non_material_change_reasons",
-                "Select at least one non-material change.",
-            )
-
-        return cleaned_data
+        super().clean()
+        return _clean_resubmission_form(self)
 
 
 def _validate_report_id_for_resubmission(report_id):
