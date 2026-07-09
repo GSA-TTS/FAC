@@ -12,7 +12,7 @@ class ResubmissionStartView(LoginRequiredMixin, View):
     A form submission for beginning a resubmission.
     """
 
-    template_name = "audit/resubmission_forms.html"
+    template_name = "audit/resubmission_start_form.html"
 
     def get(self, request, *args, **kwargs):
         # Only run in non-production environments for now.
