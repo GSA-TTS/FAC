@@ -4,11 +4,6 @@ import {
 }
 
 import {
-  to = module.staging.module.snapshot-database.cloudfoundry_service_instance.rds
-  id = "2916eb7d-5222-4347-97d4-b43aa4130e56"
-}
-
-import {
   to = module.staging.module.s3-public.cloudfoundry_service_instance.bucket
   id = "cc1dff78-87ee-4d2e-8774-681e397d9dd3"
 }
