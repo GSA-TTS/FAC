@@ -22,6 +22,7 @@ Follow these steps to update the aln listing and version bump the workbook templ
 - workbook_version.json updated correctly with the new current_workbook_version and authorized_workbook_versions in `backend/schemas/source/data/workbook_version.json`
 - lookup schemas regenerated successfully in one or both (whatever is applicable): `backend/schemas/source/base/FederalProgramNames.json` (for ALNs) and `backend/schemas/source/base/ClusterNames.json` (for Cluster Names)
 4. Once your PR is merged, copy the updated workbook templates from `backend/schemas/output/excel/xlsx/` into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
+5. Once completed please share the update to the oros-fac-dev channel to inform the team.
 
 ## A note about generate_lookup_schemas.py
 `make all` executes `make source_data`, which, calls `generate_lookup_schemas.py`. This script can generate either cluster names or CFDA listings or agencies, depending on the args given (see docstring in the script). The format of the CSVs can change (and have), so changes to `generate_lookup_schemas.py` may be necessary in the future.
@@ -39,7 +40,7 @@ Follow these steps to update the aln listing and version bump the workbook templ
 
 
 # Deprecated : Updating the ALN (formerly CFDA) listings
-These steps do not need to be followed due to the above directions doing the work programmatically. 
+These steps are no longer necessary because the script now calls the API and automatically downloads the required files.
 
 1. Log in to Sam.gov with your GSA account and go to https://sam.gov/search/.
 2. Select "Federal Assistance" and then "Assistance Listings" as domain.
