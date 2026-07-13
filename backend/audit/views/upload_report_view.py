@@ -87,13 +87,13 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "uniform_guidance_compliance",
             ),
             PageInput(
-                "GAS Report on Internal Control 2",
+                "GAGAS Report on Internal Control 2",
                 "CFR 200.515(b)",
                 "https://www.ecfr.gov/current/title-2/part-200/section-200.515#p-200.515(b)",
                 "GAS_control",
             ),
             PageInput(
-                "GAS Report on Internal Compliance 2",
+                "GAGAS Report on Internal Compliance 2",
                 "CFR 200.515(b)",
                 "https://www.ecfr.gov/current/title-2/part-200/section-200.515#p-200.515(b)",
                 "GAS_compliance",
