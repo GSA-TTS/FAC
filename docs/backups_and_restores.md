@@ -1,38 +1,18 @@
-### Preperation steps
-```sh
-cf t -o <org> -s <env>
-```
+# Backup and Restore
 
-Bind the backups bucket to the application
-```sh
-cf bind-service gsa-fac backups
-```
+## Description
 
-Restart the app so changes occur and wait for the instance to come back up
-```sh
-cf restart gsa-fac --strategy rolling
-```
+Data persisted using the cloud.gov RDS service is backed up daily as part of the service offering, as described in the [official documentation](https://docs.cloud.gov/platform/services/relational-database/#backups-and-recovery). These backups can be used to restore the service to a previous state upon request to the cloud.gov team.
 
-Unbind the existing fac-private-s3 bucket from the app
-```sh
-cf unbind-service gsa-fac fac-private-s3
-```
+However, the FAC team has additional processes in place to recover from data loss or corruption faster and more efficiently than the request-based mechanism offered by cloud.gov. To that end, the team maintains a custom backup and restore tool that takes scheduled and on-demand database backups which allows the team to restore the database to a known state directly, without opening a support request or waiting on an external team.
 
-Rebind the fac-private-s3 bucket with the backups bucket as an additional instance
-```sh
-cf bind-service gsa-fac fac-private-s3 -c '{"additional_instances": ["backups"]}'
-```
-
-Restart the app so changes occur and wait for the instance to come back up
-```sh
-cf restart gsa-fac --strategy rolling
-```
-
-### Database Backups
+## Backups
 
 Information regarding the fac-backup-utility can be found [at the repository](https://github.com/GSA-TTS/fac-backup-utility).
-Database backups occur in the following ways:
-1. An initial backup, where a backup has not been run in the target environment. This input of `initial_backup` is important, as when it does a the `db_to_db` command, it will not truncate the target table, as the table does not exist in the destination database.
+
+Database backups are facilitated via the [`fac-backup-util.sh`](../backend/fac-backup-util.sh) script, which supports the following backup types:
+
+1. **`initial_backup`** - used when a backup has not yet been run in the target environment. This input of `initial_backup` is important because when it runs the `db_to_db` command, it will not truncate the target table, as the table does not exist in the destination database.
 ```bash
 ./fac-backup-util.sh v0.1.11 initial_backup
 # Curl the utility
@@ -42,7 +22,7 @@ Database backups occur in the following ways:
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 
-2. A deploy backup, where the `db_to_db` function is not called. This is a standard backup strategy before the application deploys, to ensure the s3 contents of the primary s3 are sync'd to the backups bucket, and a table dump is stored in the backups bucket.
+2. **`deploy_backup`** - runs before a production deployment to ensure S3 contents are synced to the backups bucket and a fresh table dump is stored there.
 ```bash
 ./fac-backup-util.sh v0.1.11 deploy_backup
 # Curl the utility
@@ -51,13 +31,23 @@ Database backups occur in the following ways:
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 
-3. A scheduled backup is run every two hours, across each environment, ensuring that we have a clean backup in s3, rds, and the bucket contents are in sync.
+3. **`scheduled_backup`** - runs automatically via GH Actions scheduled workflow every two hours in the production environment to ensure that a clean backup exists in S3 and the bucket contents are in sync.
+
 ```bash
 ./fac-backup-util.sh v0.1.11 scheduled_backup
 # Curl the utility
 # Install AWS
 # DB to S3 table dump (fac-db -> backups)
-# DB to DB table dump (fac-db -> fac-snapshot-db) [Truncate target table before dump]
+# AWS S3 sync (fac-private-s3 -> backups)
+```
+
+4. **`on_demand_backup`** - can be triggered manually via GH Actions workflow at any time on any environment.
+```bash
+./fac-backup-util.sh v0.1.11 on_demand_backup
+# Curl the utility
+# Install AWS
+# DB to S3 table dump (fac-db -> backups)
+# DB to DB  table dump (fac-db -> fac-snapshot-db)
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
 
@@ -87,3 +77,14 @@ daily-mm-dd
 # DB to DB table dump (fac-snapshot-db -> fac-db) [Truncate target table before dump]
 # AWS S3 sync (fac-private-s3 -> backups)
 ```
+
+### Retention
+To optimize on cost, the S3 buckets where backups are stored have a lifecycle policy that deletes objects older than 60 days.
+
+You can verify this policy is in place by running:
+
+```bash
+aws s3api get-bucket-lifecycle-configuration --bucket <bucket-name>
+```
+
+We do not have sufficient IAM permissions to add, update, or remove lifecycle policies on these buckets ourselves since they are provisioned through the cloud.gov service broker. Any changes to the retention policy must be requested from the cloud.gov team.

@@ -100,7 +100,9 @@ class GeneralInformationForm(forms.Form):
     )
     ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     multiple_eins_covered = forms.BooleanField(required=False)
-    auditee_uei = forms.CharField(required=False)
+    # The UEI is not allowed to be changed after the initial validations. In a world where we allow users to
+    # change the UEI in this form, add this field back and include SAM validation to the field cleanup function(s).
+    # auditee_uei = forms.CharField(required=False)
     multiple_ueis_covered = forms.BooleanField(required=False)
     auditee_name = forms.CharField(
         min_length=CHARACTER_LIMITS_GENERAL["auditee_name"]["min"],

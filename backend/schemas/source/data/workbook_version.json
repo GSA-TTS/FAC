@@ -1,5 +1,5 @@
 {
-  "current_workbook_version": "1.1.9",
+  "current_workbook_version": "1.1.10",
   "authorized_workbook_versions": [
     "1.0.0",
     "1.0.1",
@@ -16,6 +16,7 @@
     "1.1.6",
     "1.1.7",
     "1.1.8",
-    "1.1.9"
+    "1.1.9",
+    "1.1.10"
   ]
 }

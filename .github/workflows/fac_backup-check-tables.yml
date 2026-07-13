@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: Environement Selection
+        description: Environment Selection
         required: true
         type: choice
         options:

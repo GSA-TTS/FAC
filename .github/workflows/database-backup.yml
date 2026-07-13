@@ -1,9 +1,11 @@
----
-name: Backup the database with fac-backup-utility
+name: Database Backup
 ### Common Commands:
 # ./fac-backup-util.sh v0.1.11 initial_backup
 # ./fac-backup-util.sh v0.1.11 deploy_backup
 on:
+  schedule:
+    # Invoke every 2 hours from 12UTC-22UTC
+    - cron: '0 12-22/2 * * *'
   workflow_dispatch:
     inputs:
       environment:
@@ -19,6 +21,7 @@ on:
         description: Version for fac backup utility to use (ex. vX.Y.Z)
         required: true
         type: string
+        default: 'v0.1.11'
       backup_operation:
         description: Operation for fac-backup-utility
         required: true
@@ -27,13 +30,16 @@ on:
           - 'initial_backup'
           - 'deploy_backup'
           - 'on_demand_backup'
+          
 jobs:
   fac-backup:
     name: Perform Database Backup
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: ${{ inputs.environment || 'production' }}
     env:
-      space: ${{ inputs.environment }}
+      SPACE: ${{ inputs.environment || 'production' }}
+      UTIL_VERSION: ${{ inputs.util_version || 'v0.1.11' }}
+      BACKUPS_OPERATION: ${{ inputs.backup_operation || 'scheduled_backup' }}
     steps:
       - name: Backup FAC Database and Sync Media
         uses: cloud-gov/cg-cli-tools@main
@@ -41,5 +47,5 @@ jobs:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
-          cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 7G -m 3G --name deploy_backup_util --command "./fac-backup-util.sh ${{ inputs.util_version }} ${{ inputs.backup_operation }}" --wait
+          cf_space: ${{ env.SPACE }}
+          command: cf run-task gsa-fac -k 7G -m 3G --name backup_database --command "./fac-backup-util.sh ${{ env.UTIL_VERSION }} ${{ env.BACKUPS_OPERATION }}" --wait

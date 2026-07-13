@@ -38,6 +38,13 @@ variable "database_plan" {
   default = "medium-gp-psql-redundant"
 }
 
+variable "snapshot_database_plan" {
+  type        = string
+  description = "name of the cloud.gov secondary RDS service plan name to create"
+  # See https://cloud.gov/docs/services/relational-database/#plans
+  default = "medium-gp-psql-redundant"
+}
+
 variable "postgrest_instances" {
   type        = number
   description = "the number of instances of the postgrest application to run (default: 2)"
