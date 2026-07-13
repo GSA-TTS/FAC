@@ -24,6 +24,7 @@
                     {% if not pre_submission_validation.completed %}
                         {% include "./key-info-preliminary.html" %}
                         {% section_block report_id general_information %}
+                        {% include "./resubmission_action.html" %}
                         {% section_block report_id audit_information %}
                         {% section_block report_id single_audit_report %}
                         {% section_block report_id federal_awards %}
@@ -36,7 +37,6 @@
                         {% section_block report_id additional_eins %}
                         {% include "./key-info-pre-validation.html" %}
                         {% include "./resubmission_change_check.html" %}
-                        {% include "./resubmission_action.html" %}
                         {% include "./tribal-data-release.html" %}
                         {% include "./validation.html" %}
                     {% else %}

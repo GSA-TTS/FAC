@@ -14,15 +14,16 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-        resubmission_action = (
-            sac.resubmission_meta.get("resubmission_action")
-            if sac.resubmission_meta
-            else None
-        )
+        meta = sac.resubmission_meta or {}
 
         form = ResubmissionActionForm(
             initial={
-                "resubmission_action": resubmission_action,
+                "resubmission_action": meta.get("resubmission_action"),
+                "resubmission_requester": meta.get("resubmission_requester", []),
+                "material_change_reasons": meta.get("material_change_reasons", []),
+                "non_material_change_reasons": meta.get(
+                    "non_material_change_reasons", []
+                ),
             }
         )
 
@@ -50,10 +51,21 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
                 },
             )
 
-        resubmission_action = form.cleaned_data["resubmission_action"]
-
         sac.resubmission_meta = sac.resubmission_meta or {}
-        sac.resubmission_meta["resubmission_action"] = resubmission_action
+
+        sac.resubmission_meta["resubmission_action"] = form.cleaned_data[
+            "resubmission_action"
+        ]
+        sac.resubmission_meta["resubmission_requester"] = form.cleaned_data[
+            "resubmission_requester"
+        ]
+        sac.resubmission_meta["material_change_reasons"] = form.cleaned_data[
+            "material_change_reasons"
+        ]
+        sac.resubmission_meta["non_material_change_reasons"] = form.cleaned_data[
+            "non_material_change_reasons"
+        ]
+
         sac.save()
 
         return redirect(

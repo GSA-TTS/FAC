@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import View
 
-from audit.formlib import ResubmissionStartForm
+from audit.formlib import ResubmissionForm
 from config.settings import ENVIRONMENT
 
 
@@ -19,7 +19,7 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         if ENVIRONMENT == "PRODUCTION":
             return redirect(reverse("config:Home"))
 
-        form = ResubmissionStartForm()
+        form = ResubmissionForm()
         return render(
             request,
             self.template_name,
@@ -34,7 +34,7 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         if ENVIRONMENT == "PRODUCTION":
             return redirect(reverse("config:Home"))
 
-        form = ResubmissionStartForm(request.POST)
+        form = ResubmissionForm(request.POST)
 
         # If the form is not valid, reload to display the errors
         if not form.is_valid():
@@ -51,15 +51,19 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         previous_report_data = form.cleaned_data["previous_report_data"]
         resubmission_meta = form.cleaned_data["resubmission_meta"]
         material_change_reasons = form.cleaned_data["material_change_reasons"]
+        non_material_change_reasons = form.cleaned_data["non_material_change_reasons"]
         resubmission_action = form.cleaned_data["resubmission_action"]
+        resubmission_requester = form.cleaned_data["resubmission_requester"]
 
         resubmission_meta["resubmission_action"] = resubmission_action
+        resubmission_meta["resubmission_requester"] = resubmission_requester
+        resubmission_meta["material_change_reasons"] = material_change_reasons
+        resubmission_meta["non_material_change_reasons"] = non_material_change_reasons
 
         # Save the previous report data and resubmission metadata to the user profile. Overwrites other user profile data.
         profile_data = previous_report_data | {
             "is_resubmission": True,
             "resubmission_meta": resubmission_meta,
-            "material_change_reasons": material_change_reasons,
         }
         user = request.user
         user.profile.entry_form_data = profile_data
