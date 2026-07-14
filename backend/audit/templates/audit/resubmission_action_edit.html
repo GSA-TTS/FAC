@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
     <div class="grid-container margin-y-6">
@@ -8,7 +9,7 @@
 
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large">
-                        Edit resubmission type
+                        Resubmission Type
                     </legend>
 
                     <p>
@@ -16,6 +17,7 @@
                     </p>
 
                     {% include "audit/resubmission_action_field.html" %}
+                    {% include "audit/resubmission_reason_fields.html" %}
 
                     <button class="usa-button margin-y-2" id="continue">
                         Save and continue
@@ -29,4 +31,5 @@
             </form>
         </div>
     </div>
+    <script src="{% static 'js/resubmission-reasons.js' %}"></script>
 {% endblock content %}

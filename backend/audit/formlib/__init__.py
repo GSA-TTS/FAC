@@ -1,10 +1,10 @@
-from .resubmission_start_form import (
+from .resubmission_forms import (
     ResubmissionActionForm,
-    ResubmissionStartForm,
+    ResubmissionForm,
 )
 
 # In case we want to iterate on these. For tests, perhaps?
 _forms = [
     ResubmissionActionForm,
-    ResubmissionStartForm,
+    ResubmissionForm,
 ]
