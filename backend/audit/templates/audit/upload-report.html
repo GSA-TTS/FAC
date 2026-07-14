@@ -89,10 +89,12 @@
                                             <label for="upload-report__page-number-{{ forloop.counter }}"
                                                 class="tablet:grid-col-12">
                                                 {{ x.text }}
-                                            <a class="usa-link"
-                                                href="{{ x.url }}"
-                                                target="_blank"
-                                                rel="noopener noreferrer">{{ x.cfr }}</a>
+                                                -
+                                                <a class="usa-link"
+                                                    href="{{ x.url }}"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer">{{ x.cfr }}
+                                                </a>
                                                 {% if x.required %}<abbr title="required" class="usa-hint usa-hint--required">*</abbr>{% endif %}
                                             </label>
                                         {% if x.hint %}
