@@ -37,13 +37,13 @@ jobs:
           ref: ${{ steps.pr.outputs.sha }}
  
       # 3. Check out FAC-transition-site so we can copy files into it and open a PR there.
-      #    FAC_TRANSITION_SITE_PAT must be a PAT (classic or fine-grained) with write access
+      #    STATIC_SITE_DEPLOY_KEY must be a PAT (classic or fine-grained) with write access
       #    to FAC-transition-site, stored as a secret in FAC's settings.
       - name: Checkout FAC-transition-site
         uses: actions/checkout@v4
         with:
           repository: GSA-TTS/FAC-transition-site
-          token: ${{ secrets.FAC_TRANSITION_SITE_PAT }}
+          token: ${{ secrets.STATIC_SITE_DEPLOY_KEY }}
           path: fac-transition-site
 
 
@@ -80,7 +80,7 @@ jobs:
       - name: Create pull request in FAC-transition-site
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.FAC_TRANSITION_SITE_PAT }}
+          token: ${{ secrets.STATIC_SITE_DEPLOY_KEY }}
           path: fac-transition-site
           commit-message: "Sync files from FAC PR #${{ github.event.inputs.pr_number }}"
           branch: sync/fac-pr-${{ github.event.inputs.pr_number }}
