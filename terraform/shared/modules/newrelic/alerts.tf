@@ -87,6 +87,7 @@ resource "newrelic_nrql_alert_condition" "response_time" {
   baseline_direction = "upper_only"
   aggregation_window = 300
   runbook_url        = "https://github.com/GSA-TTS/fac-team/blob/main/troubleshooting/new-relic-queries.md"
+  enabled            = false # Disabled due to excessive alerting
 
   nrql {
     query = "SELECT average(apm.service.transaction.duration) * 1000 AS 'Response time (ms)' FROM Metric WHERE entity.guid = '${data.newrelic_entity.gsa-fac.guid}'"
