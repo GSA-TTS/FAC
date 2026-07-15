@@ -9,7 +9,6 @@ from audit.mixins import SingleAuditChecklistAccessRequiredMixin
 from audit.models import Audit, SingleAuditChecklist
 from audit.models.constants import RESUBMISSION_ACTION, STATUS
 
-
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )
@@ -34,9 +33,7 @@ def _validate_resubmission_metadata(sac):
         errors.append({"error": "Resubmission type is required."})
 
     if not requester:
-        errors.append(
-            {"error": "At least one resubmission requester is required."}
-        )
+        errors.append({"error": "At least one resubmission requester is required."})
 
     if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
         errors.append(
@@ -143,6 +140,5 @@ def _compare_errors(sac_errors, audit_errors):
 
     if (sac and not audit) or (audit and not sac) or sac != audit:
         logger.error(
-            f"<SOT ERROR> Cross Validation does not match: "
-            f"SAC {sac}, Audit {audit}"
+            f"<SOT ERROR> Cross Validation does not match: " f"SAC {sac}, Audit {audit}"
         )
