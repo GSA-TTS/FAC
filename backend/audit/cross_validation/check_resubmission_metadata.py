@@ -1,11 +1,10 @@
 from audit.models.constants import RESUBMISSION_ACTION
 
 
-def check_resubmission_metadata(data):
+def check_resubmission_metadata(data, sar=None):
     sf_sac_meta = data.get("sf_sac_meta", {})
     resubmission_meta = sf_sac_meta.get("resubmission_meta") or {}
 
-    # Only validate actual resubmissions.
     if not resubmission_meta.get("previous_report_id"):
         return []
 
