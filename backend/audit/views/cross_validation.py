@@ -7,55 +7,12 @@ from django.views import generic
 from audit.decorators import verify_status
 from audit.mixins import SingleAuditChecklistAccessRequiredMixin
 from audit.models import Audit, SingleAuditChecklist
-from audit.models.constants import RESUBMISSION_ACTION, STATUS
+from audit.models.constants import STATUS
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )
 logger = logging.getLogger(__name__)
-
-
-def _validate_resubmission_metadata(sac):
-    meta = sac.resubmission_meta or {}
-
-    # Only validate actual resubmissions.
-    if not meta.get("previous_report_id"):
-        return []
-
-    errors = []
-
-    action = meta.get("resubmission_action")
-    requester = meta.get("resubmission_requester")
-    material = meta.get("material_change_reasons")
-    non_material = meta.get("non_material_change_reasons")
-
-    if not action:
-        errors.append({"error": "Resubmission type is required."})
-
-    if not requester:
-        errors.append({"error": "At least one resubmission requester is required."})
-
-    if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
-        errors.append(
-            {
-                "error": (
-                    "At least one material change is required for an "
-                    "audit PDF resubmission."
-                )
-            }
-        )
-
-    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
-        errors.append(
-            {
-                "error": (
-                    "At least one non-material change is required for an "
-                    "SF-SAC-only modification."
-                )
-            }
-        )
-
-    return errors
 
 
 class CrossValidationView(
@@ -95,12 +52,6 @@ class CrossValidationView(
             if audit:
                 audit_errors, _ = audit.validate()
                 _compare_errors(errors, audit_errors)
-
-            resubmission_errors = _validate_resubmission_metadata(sac)
-
-            if resubmission_errors:
-                errors = errors or {}
-                errors.setdefault("errors", []).extend(resubmission_errors)
 
             context = {
                 "report_id": report_id,
