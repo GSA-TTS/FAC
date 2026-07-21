@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Apply ${{ inputs.environment }}
-        uses: dflook/terraform-apply@v2.2.3
+        uses: dflook/terraform-apply@v3.0.0
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
