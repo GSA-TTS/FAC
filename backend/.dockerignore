@@ -22,8 +22,5 @@ manifests/
 apt.yml
 .cfignore
 
-# Tools
-minio/
-
 # Git
 .git/

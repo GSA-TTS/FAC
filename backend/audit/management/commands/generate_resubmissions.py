@@ -199,7 +199,7 @@ def APNE(a, b, loc=None):
 #############################################
 # This uploads the orig to the old sac, and the second
 # to the new sac. We need to stuff real PDFs into the
-# S3/Minio bucket in order to compare them.
+# S3/RustFS bucket in order to compare them.
 def upload_pdfs(orig_pdf, revised_pdf):
     def _fun(old_sac, new_sac, user_obj):
         logger.info("MODIFIER: upload_pdfs")
