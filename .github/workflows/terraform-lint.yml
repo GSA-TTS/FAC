@@ -17,7 +17,7 @@ jobs:
           path: ./terraform
 
       - name: Terraform Validate
-        uses: dflook/terraform-validate@v2.2.3
+        uses: dflook/terraform-validate@v3.0.0
         with:
           path: ./terraform
 
