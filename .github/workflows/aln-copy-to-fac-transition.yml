@@ -33,7 +33,7 @@ jobs:
       - name: Checkout FAC
         uses: actions/checkout@v4
         with:
-          path: fac
+          path: FAC
           ref: ${{ steps.pr.outputs.sha }}
  
       # 3. Check out FAC-transition-site so we can copy files into it and open a PR there.
@@ -44,7 +44,7 @@ jobs:
         with:
           repository: GSA-TTS/FAC-transition-site
           token: ${{ secrets.STATIC_SITE_DEPLOY_KEY }}
-          path: fac-transition-site
+          path: FAC-transition-site
 
 
       # 4. Copy the specific list of files/folders from FAC into FAC-transition-site.
@@ -81,7 +81,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.STATIC_SITE_DEPLOY_KEY }}
-          path: fac-transition-site
+          path: FAC-transition-site
           commit-message: "Sync files from FAC PR #${{ github.event.inputs.pr_number }}"
           branch: sync/fac-pr-${{ github.event.inputs.pr_number }}
           title: "Sync files from FAC PR #${{ github.event.inputs.pr_number }}: ${{ steps.pr.outputs.title }}"
