@@ -41,8 +41,8 @@ services:
         condition: service_healthy
       db2:
         condition: service_healthy
-      minio:
-        condition: service_started
+      rustfs:
+        condition: service_healthy
       clamav-rest:
         condition: service_started
     environment:
@@ -76,15 +76,16 @@ services:
       SIGNATURE_CHECKS: 1
     ports:
       - "9000:9000"
-  minio:
-    container_name: "minio"
-    image: minio/minio
-    command: server /tmp/minio --console-address ":9002"
+  rustfs:
+    container_name: rustfs
+    image: rustfs/rustfs
+    healthcheck:
+      test: curl --fail -I http://localhost:9001/health
     ports:
-      - "9001:9000"
-      - "9002:9002"
+      - "9002:9000" # using port 9002 since 9000 is already in use
+      - "9001:9001"
     volumes:
-      - "minio-vol:/tmp/minio"
+     - rustfs:/data
   api:
     image: ghcr.io/gsa-tts/fac/postgrest:latest
     ports:
@@ -108,4 +109,4 @@ services:
 volumes:
   postgres-data:
   postgres-data2:
-  minio-vol:
+  rustfs:
