@@ -267,14 +267,16 @@ if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTI
         "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
     )
 
-    # MinIO only matters for local development and GitHub action environments.
+    # RustFS only matters for local development and GitHub action environments.
     # These should match what we're setting in backend/run.sh
-    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "longtest")
+    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get(
+        "AWS_PRIVATE_ACCESS_KEY_ID", "localdevkey"
+    )
     AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
-        "AWS_PRIVATE_SECRET_ACCESS_KEY", "longtest"
+        "AWS_PRIVATE_SECRET_ACCESS_KEY", "localdevsecret"
     )
     AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
-        "AWS_S3_PRIVATE_ENDPOINT", "http://minio:9000"
+        "AWS_S3_PRIVATE_ENDPOINT", "http://rustfs:9000"
     )
     AWS_PRIVATE_DEFAULT_ACL = "private"
 

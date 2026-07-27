@@ -77,8 +77,12 @@ RUN curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "aw
     rm -f awscliv2.zip && \
     rm -rf aws/
 
-RUN curl -fsSL "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
-    chmod +x /usr/local/bin/mc
+RUN curl -LOf https://github.com/rustfs/cli/releases/download/v0.1.28/rustfs-cli-linux-amd64-v0.1.28.tar.gz && \
+ tar -xvf rustfs-cli-linux-amd64-v0.1.28.tar.gz && \
+ mv rc /usr/local/bin/rc && \
+ chmod +x /usr/local/bin/rc && \
+ rm rustfs-cli-linux-amd64-v0.1.28.tar.gz
+
 
 # Copy from pip stage
 COPY --from=pip /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
