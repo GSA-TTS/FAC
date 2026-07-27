@@ -1,3 +1,10 @@
+from audit.cross_validation.errors import (
+    err_material_change_required,
+    err_non_material_change_required,
+    err_resubmission_requester_required,
+    err_resubmission_type_required,
+)
+
 from audit.models.constants import RESUBMISSION_ACTION
 
 
@@ -16,29 +23,15 @@ def check_resubmission_metadata(data, sar=None):
     non_material = resubmission_meta.get("non_material_change_reasons")
 
     if not action:
-        errors.append({"error": "Resubmission type is required."})
+        errors.append({"error": err_resubmission_type_required()})
 
     if not requester:
-        errors.append({"error": "At least one resubmission requester is required."})
+        errors.append({"error": err_resubmission_requester_required()})
 
     if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
-        errors.append(
-            {
-                "error": (
-                    "At least one material change is required for an "
-                    "audit PDF resubmission."
-                )
-            }
-        )
+        errors.append({"error": err_material_change_required()})
 
     if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
-        errors.append(
-            {
-                "error": (
-                    "At least one non-material change is required for an "
-                    "SF-SAC-only modification."
-                )
-            }
-        )
+        errors.append({"error": err_non_material_change_required()})
 
     return errors

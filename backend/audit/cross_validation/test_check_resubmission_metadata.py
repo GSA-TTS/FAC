@@ -3,6 +3,13 @@ from django.test import SimpleTestCase
 from audit.cross_validation.check_resubmission_metadata import (
     check_resubmission_metadata,
 )
+
+from audit.cross_validation.errors import (
+    err_material_change_required,
+    err_non_material_change_required,
+    err_resubmission_requester_required,
+)
+
 from audit.models.constants import RESUBMISSION_ACTION
 
 
@@ -59,7 +66,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         )
 
         self.assertIn(
-            {"error": "At least one resubmission requester is required."},
+            {"error": err_resubmission_requester_required()},
             check_resubmission_metadata(data),
         )
 
@@ -75,12 +82,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         )
 
         self.assertIn(
-            {
-                "error": (
-                    "At least one material change is required for an "
-                    "audit PDF resubmission."
-                )
-            },
+            {"error": err_material_change_required()},
             check_resubmission_metadata(data),
         )
 
@@ -96,11 +98,6 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         )
 
         self.assertIn(
-            {
-                "error": (
-                    "At least one non-material change is required for an "
-                    "SF-SAC-only modification."
-                )
-            },
+            {"error": err_non_material_change_required()},
             check_resubmission_metadata(data),
         )
