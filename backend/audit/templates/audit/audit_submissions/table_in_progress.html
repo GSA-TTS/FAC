@@ -1,4 +1,4 @@
-{% comment %} 
+{% comment %}
 Table component. Lists all unsubmitted records. Contains Links to each record, as well as modals and their triggers for audit deletion.
 {% endcomment %}
 {% load sprite_helper %}
@@ -28,8 +28,7 @@ Table component. Lists all unsubmitted records. Contains Links to each record, a
                             data-open-modal>UEI</button>
                 </th>
                 <th data-sortable scope="col" role="columnheader">Fiscal period end date</th>
-                <th scope="col" role="columnheader">User Access</th>
-                <th scope="col" role="columnheader">Delete</th>
+                <th scope="col" role="columnheader">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -44,34 +43,34 @@ Table component. Lists all unsubmitted records. Contains Links to each record, a
                             {% endif %}
                         </a>
 
-                        {% if item.submission_status == "Ready for Certification" or item.submission_status == "Auditor Certified" or item.submission_status == "Auditee Certified" %}
-                            <p class="margin-0">
-                            <a class="usa-link" href="{% url 'audit:UnlockAfterCertification' item.report_id %}">
-                                (Unlock)
-                            </a>
-                            </p>
-                        {% endif %}
                     </td>
                     <td>{{ item.auditee_name }}</td>
                     <td>{{ item.report_id }}</td>
                     <td>{{ item.auditee_uei }}</td>
                     <td>{{ item.fiscal_year_end_date }}</td>
                     <td class="text-center">
-                        <a href="{% url 'audit:ManageSubmission' report_id=item.report_id %}" title="Manage report access">
-                            <svg class="usa-icon usa-icon--size-3 text-blue" aria-hidden="true" focusable="false" role="img">
-                                {% uswds_sprite "person_add" %}
-                            </svg>
-                        </a>
-                    </td>
-                    <td class="text-center">
-                        <button class="usa-button usa-button--unstyled"
-                                aria-controls="modal-delete-submission-{{ item.report_id }}"
-                                data-open-modal
-                                title="Delete audit">
-                            <svg class="usa-icon usa-icon--size-3 text-red" aria-hidden="true" focusable="false" role="img">
-                                {% uswds_sprite "delete" %}
-                            </svg>
-                        </button>
+                        <div class="display-inline-flex">
+                            {% if item.submission_status == "Ready for Certification" or item.submission_status == "Auditor Certified" or item.submission_status == "Auditee Certified" %}
+                            <a href="{% url 'audit:UnlockAfterCertification' item.report_id %}" title="Unlock">
+                                <svg class="usa-icon usa-icon--size-3 text-blue margin-top-1" aria-hidden="true" focusable="false" role="img">
+                                    {% uswds_sprite "lock_open" %}
+                                </svg>
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'audit:ManageSubmission' report_id=item.report_id %}" title="Manage report access">
+                                <svg class="usa-icon usa-icon--size-3 text-blue margin-top-1" aria-hidden="true" focusable="false" role="img">
+                                    {% uswds_sprite "person" %}
+                                </svg>
+                            </a>
+                            <button class="usa-button usa-button--unstyled"
+                                    aria-controls="modal-delete-submission-{{ item.report_id }}"
+                                    data-open-modal
+                                    title="Delete audit">
+                                <svg class="usa-icon usa-icon--size-3 text-red" aria-hidden="true" focusable="false" role="img">
+                                    {% uswds_sprite "delete" %}
+                                </svg>
+                            </button>
+                        </div>
                         {% include "../modal_confirm_deletion.html" with submission_status=item.submission_status auditee_name=item.auditee_name report_id=item.report_id auditee_uei=item.auditee_uei fiscal_year_end_date=item.fiscal_year_end_date %}
                     </td>
                 </tr>

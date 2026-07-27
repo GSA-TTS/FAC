@@ -12,7 +12,7 @@ Perform these steps below to update the ALN workbooks. Please follow all steps c
 As of May 2026, workbook versioning is now driven by `backend/schemas/source/data/workbook_version.json`, which stores both the current workbook version and the list of authorized workbook versions accepted during validation. The automation of the workbook creation is done by the make all command in step 2, it will take some time to complete.
 
 Follow these steps to update the aln listing and version bump the workbook templates:
-1. Activate your virtual env and change current directory to inside `backend/schemas`
+1. Activate your virtual env and change current directory to inside `backend/schemas`. Create a new branch to contain the incoming changes. 
 2. Run `SAM_API_KEY=my-sam-key make all WORKBOOK_VERSION=d.d.d` where my-sam-key is your SAM API Key and d.d.d is the new workbook version. 
     - (NOTE: If reusing existing ALN data and skipping the SAM.gov fetch: run `SAM_API_KEY=my-sam-key make skip WORKBOOK_VERSION=d.d.d`)
 3. Verify:
@@ -21,8 +21,10 @@ Follow these steps to update the aln listing and version bump the workbook templ
 - Cypress test workbooks regenerated successfully in `backend/cypress/fixtures/test_workbooks/`
 - workbook_version.json updated correctly with the new current_workbook_version and authorized_workbook_versions in `backend/schemas/source/data/workbook_version.json`
 - lookup schemas regenerated successfully in one or both (whatever is applicable): `backend/schemas/source/base/FederalProgramNames.json` (for ALNs) and `backend/schemas/source/base/ClusterNames.json` (for Cluster Names)
-4. Once your PR is merged, copy the updated workbook templates from `backend/schemas/output/excel/xlsx/` into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
-5. Once completed please share the update to the oros-fac-dev channel to inform the team.
+4. Git add, commit and push the changed files. Create a pull request on the updated branch.
+5. After your PR is created, on the Github FAC repo you can go to Actions, scroll to the "Sync updated aln workbook files to FAC-transition-site" workflow, and Run workflow. The workflow entry box takes the Pull Request number containing the files you want to update.
+- What the workflow does is copy the updated workbook templates from `backend/schemas/output/excel/xlsx/` into `assets/workbooks/` of the [static site repo](https://github.com/GSA-TTS/FAC-transition-site).
+6. Once your PR is merged, please share the update to the oros-fac-dev channel to inform the team.
 
 ## A note about generate_lookup_schemas.py
 `make all` executes `make source_data`, which, calls `generate_lookup_schemas.py`. This script can generate either cluster names or CFDA listings or agencies, depending on the args given (see docstring in the script). The format of the CSVs can change (and have), so changes to `generate_lookup_schemas.py` may be necessary in the future.
