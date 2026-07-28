@@ -68,9 +68,7 @@ def run_search(request, form_data):
     search_parameters["advanced_search_flag"] = form_data.get(
         "advanced_search_flag", True
     )
-    search_parameters["beta_search_flag"] = form_data.get(
-        "beta_search_flag", True
-    )
+    search_parameters["beta_search_flag"] = form_data.get("beta_search_flag", True)
     if search_parameters["advanced_search_flag"]:
         advanced_parameters = {
             "agency_name": form_data["agency_name"],
