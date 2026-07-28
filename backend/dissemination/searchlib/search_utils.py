@@ -68,6 +68,9 @@ def run_search(request, form_data, use_beta=False):
     search_parameters["advanced_search_flag"] = form_data.get(
         "advanced_search_flag", True
     )
+    search_parameters["beta_search_flag"] = form_data.get(
+        "beta_search_flag", True
+    )
     if search_parameters["advanced_search_flag"]:
         advanced_parameters = {
             "agency_name": form_data["agency_name"],
@@ -85,7 +88,7 @@ def run_search(request, form_data, use_beta=False):
 
     _add_search_params_to_newrelic(search_parameters)
 
-    return search_sac(request, search_parameters, use_beta=use_beta)
+    return search_sac(request, search_parameters)
 
 
 # TODO: Update Post SOC Launch -> This can go

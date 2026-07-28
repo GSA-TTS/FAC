@@ -47,7 +47,14 @@ def is_advanced_search(params_dict):
     return params_dict.get("advanced_search_flag", False)
 
 
-def search(request, params, use_beta=False):
+def is_beta_search(params_dict):
+    """
+    Returns True if the 'beta_search_flag' param is True.
+    """
+    return params_dict.get("beta_search_flag", False)
+
+
+def search(request, params):
     """
     Given any (or no) search fields, build and execute a query on the General table and return the results.
     Empty searches return everything.
@@ -63,7 +70,7 @@ def search(request, params, use_beta=False):
     # GENERAL
 
     if is_advanced_search(params):
-        if use_beta:
+        if is_beta_search(params):
             logger.info("search Searching `Unified`")
             results = search_general(Unified, params)
         else:
