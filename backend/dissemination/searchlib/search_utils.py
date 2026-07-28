@@ -44,7 +44,7 @@ def _add_search_params_to_newrelic(search_parameters):
     )
 
 
-def run_search(request, form_data, use_beta=False):
+def run_search(request, form_data):
     """
     Given cleaned form data, run the search.
     Returns the results QuerySet.
