@@ -106,7 +106,7 @@ class AdvancedSearch(View):
         logger.info(f"Advanced searching on fields: {form_data}")
 
         # Generate results on valid user input.
-        results = run_search(request, form_data, use_beta=request.path=="search/beta/")
+        results = run_search(request, form_data, use_beta=request.path=="/dissemination/search/beta/")
         results_count = results.count()
 
         # Reset page number to one if the value already surpasses the number of feasible pages.
