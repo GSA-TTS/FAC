@@ -44,8 +44,7 @@ def _add_search_params_to_newrelic(search_parameters):
     )
 
 
-# TODO: Update Post SOC Launch -> Clean up to ignore basic/advanced
-def run_search(request, form_data, is_soc=False):
+def run_search(request, form_data, use_beta=False):
     """
     Given cleaned form data, run the search.
     Returns the results QuerySet.
@@ -86,11 +85,7 @@ def run_search(request, form_data, is_soc=False):
 
     _add_search_params_to_newrelic(search_parameters)
 
-    return (
-        _compare_searches(search_parameters)
-        if is_soc
-        else search_sac(request, search_parameters)
-    )
+    return search_sac(request, search_parameters, use_beta=use_beta)
 
 
 # TODO: Update Post SOC Launch -> This can go

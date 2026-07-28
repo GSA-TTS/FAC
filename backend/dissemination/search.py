@@ -12,7 +12,7 @@ from .searchlib.search_major_program import search_major_program
 from .searchlib.search_passthrough_name import search_passthrough_name
 from .searchlib.search_type_requirement import search_type_requirement
 from .searchlib.search_resubmissions import search_resubmissions
-from dissemination.models import DisseminationCombined, General
+from dissemination.models import DisseminationCombined, Unified, General
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ def is_advanced_search(params_dict):
     return params_dict.get("advanced_search_flag", False)
 
 
-def search(request, params):
+def search(request, params, use_beta=False):
     """
     Given any (or no) search fields, build and execute a query on the General table and return the results.
     Empty searches return everything.
@@ -63,8 +63,13 @@ def search(request, params):
     # GENERAL
 
     if is_advanced_search(params):
-        logger.info("search Searching `DisseminationCombined`")
-        results = search_general(DisseminationCombined, params)
+        if use_beta:
+            logger.info("search Searching `Unified`")
+            results = search_general(Unified, params)
+        else:
+            logger.info("search Searching `DisseminationCombined`")
+            results = search_general(DisseminationCombined, params)
+
         results = search_alns(results, params)
         results = search_cog_or_oversight(results, params)
         results = search_federal_program_name(results, params)
