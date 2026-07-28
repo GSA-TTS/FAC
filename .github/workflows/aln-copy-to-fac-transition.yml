@@ -78,7 +78,7 @@ jobs:
       # 5. Open (or update) a PR in FAC-transition-site with the copied changes.
       #    If nothing changed, this action is a no-op.
       - name: Create pull request in FAC-transition-site
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.STATIC_SITE_DEPLOY_KEY }}
           path: FAC-transition-site
