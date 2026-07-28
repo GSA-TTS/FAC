@@ -44,6 +44,7 @@ def _add_search_params_to_newrelic(search_parameters):
     )
 
 
+# TODO: Update Post SOC Launch -> Clean up to ignore basic/advanced
 def run_search(request, form_data, is_soc=False):
     """
     Given cleaned form data, run the search.
@@ -63,7 +64,7 @@ def run_search(request, form_data, is_soc=False):
         "order_by": form_data["order_by"],
         "order_direction": form_data["order_direction"],
     }
-    
+
     search_parameters = basic_parameters.copy()
     search_parameters["advanced_search_flag"] = form_data.get(
         "advanced_search_flag", True
@@ -92,6 +93,7 @@ def run_search(request, form_data, is_soc=False):
         if is_soc
         else search_sac(request, search_parameters)
     )
+
 
 # TODO: Update Post SOC Launch -> This can go
 def populate_cog_over_name(results):
