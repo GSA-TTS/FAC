@@ -44,7 +44,7 @@ def _add_search_params_to_newrelic(search_parameters):
     )
 
 
-def run_search(request, form_data):
+def run_search(request, form_data, is_soc=False):
     """
     Given cleaned form data, run the search.
     Returns the results QuerySet.
@@ -63,12 +63,13 @@ def run_search(request, form_data):
         "order_by": form_data["order_by"],
         "order_direction": form_data["order_direction"],
     }
+    
     search_parameters = basic_parameters.copy()
-
     search_parameters["advanced_search_flag"] = form_data.get(
         "advanced_search_flag", True
     )
-    search_parameters["beta_search_flag"] = form_data.get("beta_search_flag", True)
+    search_parameters["beta_search_flag"] = form_data.get("beta_search_flag", False)
+
     if search_parameters["advanced_search_flag"]:
         advanced_parameters = {
             "agency_name": form_data["agency_name"],
@@ -86,8 +87,11 @@ def run_search(request, form_data):
 
     _add_search_params_to_newrelic(search_parameters)
 
-    return search_sac(request, search_parameters)
-
+    return (
+        _compare_searches(search_parameters)
+        if is_soc
+        else search_sac(request, search_parameters)
+    )
 
 # TODO: Update Post SOC Launch -> This can go
 def populate_cog_over_name(results):
