@@ -9,9 +9,8 @@ django-dbbackup==4.2.1
 django-filter==24.3
 django-fsm==3.0.0
 django-storages[boto3]==1.14.2
-django==5.2.13
+django==5.2.16
 djangorestframework==3.15.2
-djangorestframework-simplejwt==5.3.1
 django-viewflow==2.2.8
 environs[django]==11.0.0
 faker==30.5.0
@@ -22,6 +21,7 @@ jsonpath-ng==1.7.0
 jsonschema==4.23.0
 levenshtein==0.27.1
 mako==1.3.12
+marshmallow==3.26.2
 newrelic==10.9.0
 oic==1.7.0
 openpyxl==3.1.5
@@ -32,13 +32,13 @@ psycopg2-binary==2.9.10
 pycryptodome==3.21.0
 pycryptodomex==3.21.0
 pydash==8.0.3
-pyjwt==2.12.1
-pypdf==5.0.1
+pyjwt==2.13.0
+pypdf==6.14.2
 python-dateutil==2.9.0.post0
 python-json-logger==2.0.7
 python-slugify==8.0.4
 pyyaml==6.0.2
-requests==2.32.4
+requests==2.34.2
 setuptools==83.0.0
 sqlalchemy==2.0.36
 sqlparse==0.5.5
