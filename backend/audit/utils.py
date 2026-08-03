@@ -93,8 +93,54 @@ class Util:
             return redirect("/")
 
     @staticmethod
+    def get_previous_ein_mismatch(auditee_uei, current_ein):
+        """
+        Return the most recent accepted EIN for the UEI when it differs
+        from the current EIN. Otherwise, return None.
+        """
+        from dissemination.models import General
+
+        if not auditee_uei or not current_ein:
+            return None
+
+        previous_submission = (
+            General.objects.filter(
+                auditee_uei=auditee_uei,
+            )
+            .order_by("-fy_end_date")
+            .first()
+        )
+
+        if not previous_submission:
+            return None
+
+        previous_ein = previous_submission.auditee_ein
+
+        if not previous_ein or previous_ein == current_ein:
+            return None
+
+        return previous_ein
+
+    @staticmethod
     def format_date(date):
         return date.strftime("%Y-%m-%d")
+
+    @staticmethod
+    def get_previous_ein_warning(auditee_uei, current_ein):
+        previous_ein = Util.get_previous_ein_mismatch(
+            auditee_uei,
+            current_ein,
+        )
+
+        if not previous_ein:
+            return None
+
+        return (
+            f"The EIN entered for this submission ({current_ein}) "
+            f"does not match the EIN used in a previously accepted "
+            f"submission ({previous_ein}) for this UEI. "
+            "If this change is intentional, you may continue submitting."
+        )
 
 
 class ExcelExtractionError(Exception):

@@ -16,6 +16,7 @@ from audit.validators import validate_general_information_json
 
 from audit.utils import Util
 from config.settings import STATE_ABBREVS
+from django.http import JsonResponse
 
 from report_submission.forms import GeneralInformationForm
 from report_submission.views.utils import parse_hyphened_date, parse_slashed_date
@@ -45,6 +46,11 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             audit_context = self._dates_to_slashes(audit_context)
 
             self._compare_contexts(sac_context, audit_context)
+
+            sac_context["auditee_ein_warning"] = self._get_auditee_ein_warning(
+                sac_context.get("auditee_uei"),
+                sac_context.get("ein"),
+            )
 
             # SOT TODO What happens here when SOT is the only thing?
             # Does this become audit_context?
@@ -126,6 +132,13 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             message = f"Unexpected error in GeneralInformationFormView post. Report ID {report_id}"
             logger.error(message)
             raise err
+
+    @staticmethod
+    def _get_auditee_ein_warning(auditee_uei, current_ein):
+        return Util.get_previous_ein_warning(
+            auditee_uei,
+            current_ein,
+        )
 
     @staticmethod
     def _dates_to_slashes(data):
@@ -354,3 +367,27 @@ def _update_audit(report_id, general_information, request):
             event_user=request.user,
             event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
         )
+
+
+class AuditeeEinWarningView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+        current_ein = request.GET.get("ein", "").strip()
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except SingleAuditChecklist.DoesNotExist as err:
+            raise PermissionDenied("You do not have access to this audit.") from err
+
+        if not Access.objects.filter(
+            sac=sac,
+            user=request.user,
+        ).exists():
+            raise PermissionDenied("You do not have access to this audit.")
+
+        warning = GeneralInformationFormView._get_auditee_ein_warning(
+            sac.auditee_uei,
+            current_ein,
+        )
+
+        return JsonResponse({"warning": warning})
