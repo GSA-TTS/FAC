@@ -8,6 +8,7 @@ from config.settings import CHARACTER_LIMITS_GENERAL, STATE_ABBREVS
 from audit.models.constants import (
     USER_PROVIDED_ORGANIZATION_TYPE_CODE,
 )
+
 # Regex for words, includes non-[A-Z] ASCII characters like ñ and ī.
 # \A and \Z start and terminate the string.
 # [^\W\d] - matches values _not_ in W (non-word characters) or d (digits), which is all alphas, including diacritics.
@@ -99,7 +100,7 @@ class GeneralInformationForm(forms.Form):
     user_provided_organization_type = forms.ChoiceField(
         choices=USER_PROVIDED_ORGANIZATION_TYPE_CODE,
         error_messages={
-            'invalid_choice': 'We only accept submissions from state and local governments, Indian tribes or tribal organizations, institutions of higher education (IHEs), and nonprofits.'
+            "invalid_choice": "We only accept submissions from state and local governments, Indian tribes or tribal organizations, institutions of higher education (IHEs), and nonprofits."
         },
         required=True,
     )
