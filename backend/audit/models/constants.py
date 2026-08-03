@@ -231,3 +231,13 @@ AUDIT_SEQUENCE_ID = "public.audit_audit_id_seq"
 class RESUBMISSION_ACTION:
     AUDIT_PDF = "audit_pdf"
     SFSAC_ONLY = "sfsac_only"
+
+
+USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
+    ("state", _("State")),
+    ("local", _("Local Government")),
+    ("tribal", _("Indian Tribe or Tribal Organization")),
+    ("higher-ed", _("Institution of higher education (IHE)")),
+    ("non-profit", _("Non-profit")),
+    ("unknown", _("Unknown")),
+)

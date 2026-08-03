@@ -1,0 +1,89 @@
+                <fieldset class="usa-fieldset question">
+                    <legend class="usa-legend">
+                        Which organizational type best describes this entity?
+                        <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <div class="usa-radio">
+                        <input class="usa-radio__input"
+                               id="entity-state"
+                               name="user_provided_organization_type"
+                               value="state"
+                               type="radio"
+                               aria-required="true"
+                               required
+                               {% if user_provided_organization_type == "state" %}checked{% endif %} />
+                        <label class="usa-radio__label" for="entity-state">State</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input class="usa-radio__input"
+                               id="entity-local"
+                               name="user_provided_organization_type"
+                               value="local"
+                               type="radio"
+                               aria-required="true"
+                               required
+                               {% if user_provided_organization_type == "local" %}checked{% endif %} />
+                        <label class="usa-radio__label" for="entity-local">Local Government</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input class="usa-radio__input"
+                               id="entity-tribe"
+                               name="user_provided_organization_type"
+                               value="tribal"
+                               type="radio"
+                               aria-required="true"
+                               required
+                               {% if user_provided_organization_type == "tribal" %}checked{% endif %} />
+                        <label class="usa-radio__label" for="entity-tribe">Indian tribe or tribal organization</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input class="usa-radio__input"
+                               id="entity-ihe"
+                               name="user_provided_organization_type"
+                               value="higher-ed"
+                               type="radio"
+                               aria-required="true"
+                               required
+                               {% if user_provided_organization_type == "higher-ed" %}checked{% endif %} />
+                        <label class="usa-radio__label" for="entity-ihe">Institution of Higher Education (IHE)</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input class="usa-radio__input"
+                               id="entity-nonprofit"
+                               name="user_provided_organization_type"
+                               value="non-profit"
+                               type="radio"
+                               aria-required="true"
+                               required
+                               {% if user_provided_organization_type == "non-profit" %}checked{% endif %} />
+                        <label class="usa-radio__label" for="entity-nonprofit">Non-profit</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input class="usa-radio__input"
+                               id="entity-unknown"
+                               name="user_provided_organization_type"
+                               value="unknown"
+                               type="radio"
+                               aria-required="true"
+                               required
+                               {% if user_provided_organization_type == "unknown" %}checked{% endif %} />
+                        <label class="usa-radio__label" for="entity-unknown">Unknown</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input class="usa-radio__input"
+                               id="entity-none"
+                               name="user_provided_organization_type"
+                               value="none"
+                               type="radio"
+                               aria-required="true"
+                               required
+                               {% if user_provided_organization_type == "none" %}checked{% endif %} />
+                        <label class="usa-radio__label" for="entity-none">
+                            None of the these (for example,
+                            for-profit)
+                        </label>
+                        <span class="usa-error-message">We only accept submissions from state and local governments, Indian
+                        tribes or tribal organizations, institutions of higher education (IHEs), and nonprofits.</span>
+                    </div>
+                    <span class="usa-error-message" id="user-provided-organization-type-error-message" role="alert">{{ errors.user_provided_organization_type }}</span>
+                </fieldset>

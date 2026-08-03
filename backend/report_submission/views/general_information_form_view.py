@@ -304,6 +304,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             "auditee_fiscal_period_start": sac.auditee_fiscal_period_start,
             "audit_period_covered": sac.audit_period_covered,
             "audit_period_other_months": sac.audit_period_other_months,
+            "user_provided_organization_type": sac.user_provided_organization_type,
             "ein": sac.ein,
             "ein_not_an_ssn_attestation": sac.ein_not_an_ssn_attestation,
             "multiple_eins_covered": sac.multiple_eins_covered,
