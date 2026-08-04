@@ -162,12 +162,30 @@
                             <legend class="usa-legend">Auditee Employer Identification Number (EIN)</legend>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="ein">What is your Auditee EIN?</label>
+
                                 <input class="usa-input"
-                                       id="ein"
-                                       name="ein"
-                                       aria-required="false"
-                                       value="{{ ein | default_if_none:'' }}" />
-                                <span class="usa-error-message" id="ein-error-message" role="alert">{{ errors.ein|space_before_striptags }}</span>
+                                    id="ein"
+                                    name="ein"
+                                    aria-required="false"
+                                    data-warning-url="{% url 'report_submission:auditee_ein_warning' report_id %}"
+                                    value="{{ ein | default_if_none:'' }}" />
+
+                                <span class="usa-error-message"
+                                    id="ein-error-message"
+                                    role="alert">
+                                    {{ errors.ein|space_before_striptags }}
+                                </span>
+
+                                <div id="auditee-ein-warning"
+                                    class="usa-alert usa-alert--warning margin-top-2"
+                                    role="alert"
+                                    {% if not auditee_ein_warning %}hidden{% endif %}>
+                                    <div class="usa-alert__body">
+                                        <p class="usa-alert__text" id="auditee-ein-warning-text">
+                                            {{ auditee_ein_warning }}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                             <div class="usa-checkbox">
                                 <input class="usa-checkbox__input"

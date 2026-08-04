@@ -1,5 +1,8 @@
 from django.urls import path
 from . import views
+from report_submission.views.general_information_form_view import (
+    AuditeeEinWarningView,
+)
 
 app_name = "report_submission"
 
@@ -54,6 +57,11 @@ urlpatterns = [
         "general-information/<str:report_id>",
         views.GeneralInformationFormView.as_view(),
         name="general_information",
+    ),
+    path(
+        "general-information/<str:report_id>/auditee-ein-warning",
+        AuditeeEinWarningView.as_view(),
+        name="auditee_ein_warning",
     ),
 ]
 
