@@ -33,6 +33,7 @@ from audit.validators import (
     validate_notes_to_sefa_json,
     validate_secondary_auditors_json,
 )
+from dissemination.models import General
 
 
 class Util:
@@ -95,11 +96,9 @@ class Util:
     @staticmethod
     def get_previous_ein_mismatch(auditee_uei, current_ein):
         """
-        Return the most recent accepted EIN for the UEI when it differs
-        from the current EIN. Otherwise, return None.
+        Return the most recent accepted submission for the UEI when its EIN
+        differs from the current EIN. Otherwise, return None.
         """
-        from dissemination.models import General
-
         if not auditee_uei or not current_ein:
             return None
 
@@ -119,27 +118,25 @@ class Util:
         if not previous_ein or previous_ein == current_ein:
             return None
 
-        return previous_ein
-
-    @staticmethod
-    def format_date(date):
-        return date.strftime("%Y-%m-%d")
+        return previous_submission
 
     @staticmethod
     def get_previous_ein_warning(auditee_uei, current_ein):
-        previous_ein = Util.get_previous_ein_mismatch(
+        previous_submission = Util.get_previous_ein_mismatch(
             auditee_uei,
             current_ein,
         )
 
-        if not previous_ein:
+        if not previous_submission:
             return None
 
         return (
             f"The EIN entered for this submission ({current_ein}) "
-            f"does not match the EIN used in a previously accepted "
-            f"submission ({previous_ein}) for this UEI. "
-            "If this change is intentional, you may continue submitting."
+            f"does not match the EIN used in the previously accepted "
+            f"submission ({previous_submission.report_id}), "
+            f"which used EIN ({previous_submission.auditee_ein}) "
+            "for this UEI. If this change is intentional, "
+            "you may continue submitting."
         )
 
 
