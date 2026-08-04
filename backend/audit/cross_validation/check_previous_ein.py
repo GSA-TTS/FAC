@@ -4,7 +4,7 @@ from audit.utils import Util
 def check_previous_ein(sac, sar=None):
     """
     Warn when the EIN for a new submission does not match the EIN
-    from a previous fully accepted dissemination record with the same UEI.
+    from the previous fully accepted dissemination record with the same UEI.
     """
     general_information = sac["sf_sac_sections"].get(
         "general_information",
