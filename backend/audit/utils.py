@@ -33,6 +33,7 @@ from audit.validators import (
     validate_notes_to_sefa_json,
     validate_secondary_auditors_json,
 )
+from dissemination.models import General
 
 
 class Util:
@@ -93,8 +94,50 @@ class Util:
             return redirect("/")
 
     @staticmethod
-    def format_date(date):
-        return date.strftime("%Y-%m-%d")
+    def get_previous_ein_mismatch(auditee_uei, current_ein):
+        """
+        Return the most recent accepted submission for the UEI when its EIN
+        differs from the current EIN. Otherwise, return None.
+        """
+        if not auditee_uei or not current_ein:
+            return None
+
+        previous_submission = (
+            General.objects.filter(
+                auditee_uei=auditee_uei,
+            )
+            .order_by("-fy_end_date")
+            .first()
+        )
+
+        if not previous_submission:
+            return None
+
+        previous_ein = previous_submission.auditee_ein
+
+        if not previous_ein or previous_ein == current_ein:
+            return None
+
+        return previous_submission
+
+    @staticmethod
+    def get_previous_ein_warning(auditee_uei, current_ein):
+        previous_submission = Util.get_previous_ein_mismatch(
+            auditee_uei,
+            current_ein,
+        )
+
+        if not previous_submission:
+            return None
+
+        return (
+            f"The EIN entered for this submission ({current_ein}) "
+            f"does not match the EIN used in the previously accepted "
+            f"submission ({previous_submission.report_id}), "
+            f"which used EIN ({previous_submission.auditee_ein}) "
+            "for this UEI. If this change is intentional, "
+            "you may continue submitting."
+        )
 
 
 class ExcelExtractionError(Exception):
