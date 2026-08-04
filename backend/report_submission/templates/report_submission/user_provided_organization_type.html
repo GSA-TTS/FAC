@@ -1,7 +1,9 @@
                 <fieldset class="usa-fieldset question">
                     <legend class="usa-legend">
                         Which organizational type best describes this entity?
+                        {% if not report_id %}
                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        {% endif %}
                     </legend>
                     <div class="usa-radio">
                         <input class="usa-radio__input"
