@@ -40,6 +40,9 @@ class AdvancedSearch(View):
     def dispatch(self, *args, **kwargs):
         return super(AdvancedSearch, self).dispatch(*args, **kwargs)
 
+    def _is_beta_search(self, request):
+        return request.path == "/dissemination/search/beta/"
+
     def get(self, request, *args, **kwargs):
         """
         When accessing the search page through get, return the blank search page.
@@ -51,6 +54,7 @@ class AdvancedSearch(View):
             "search.html",
             {
                 "advanced_search_flag": True,
+                "beta_search_flag": self._is_beta_search(request),
                 "form": form,
                 "form_user_input": {"audit_year": default_checked_audit_years},
                 "state_abbrevs": STATE_ABBREVS,
@@ -69,12 +73,14 @@ class AdvancedSearch(View):
 
         form = AdvancedSearchForm(request.POST)
         advanced_search_flag = True
+        beta_search_flag = self._is_beta_search(request)
         paginator_results = None
         results_count = None
         page = 1
         results = []
         context = {
             "advanced_search_flag": advanced_search_flag,  # Render advanced search filters
+            "beta_search_flag": beta_search_flag,
             "include_private": include_private_results(request),
             "state_abbrevs": STATE_ABBREVS,
             "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
@@ -86,6 +92,7 @@ class AdvancedSearch(View):
         form.is_valid()  # Runs default cleaning functions AND "clean_*" functions in forms.py
         form_data = form.cleaned_data
         form_data["advanced_search_flag"] = advanced_search_flag
+        form_data["beta_search_flag"] = beta_search_flag
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
 
         # The form contains an error list. Gather custom error messages for certain fields.
