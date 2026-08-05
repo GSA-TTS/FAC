@@ -10,7 +10,7 @@ module "fac-file-scanner" {
     id   = var.cf_space.id
     name = var.cf_space.name
   }
-  https_proxy       = module.https-proxy.https_proxy
+  https_proxy       = module.https-proxy.https_proxy["fac"]
   scanner_instances = 1
   scanner_memory    = "512M"
   disk_quota        = "512M"

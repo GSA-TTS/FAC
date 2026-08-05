@@ -5,6 +5,11 @@ const countrySelect = document.querySelector('#auditor_country');
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('continue');
+
+  if (!continueBtn) {
+    return;
+  }
+
   continueBtn.disabled = shouldDisable;
 }
 
@@ -72,16 +77,20 @@ function attachEventHandlers() {
   const monthsInput = document.querySelector('#audit_period_other_months');
   rbInputs.forEach((input) => {
     input.addEventListener('change', () => {
-      if (input.id == 'audit-period-other') {
+      if (!monthsInput) {
+        return;
+      }
+
+      if (input.id === 'audit-period-other') {
         monthsInput.removeAttribute('disabled');
       } else {
         monthsInput.setAttribute('disabled', true);
       }
     });
   });
-  countrySelect.addEventListener('change', () => {
-    setupAddress();
-  });
+  if (countrySelect) {
+    countrySelect.addEventListener('change', setupAddress);
+  }
 
   window.addEventListener('scroll', highlightActiveNavSection);
 }
@@ -89,10 +98,15 @@ function attachEventHandlers() {
 const foreignFields = document.querySelectorAll('[name="foreign_address"]');
 const domesticFields = document.querySelectorAll('[name="domestic_address"]');
 function setupAddress() {
-  if (countrySelect.value == 'USA') {
+  if (!countrySelect) {
+    return;
+  }
+
+  if (countrySelect.value === 'USA') {
     foreignFields.forEach((input) => {
       input.setAttribute('hidden', true);
     });
+
     domesticFields.forEach((input) => {
       input.removeAttribute('hidden');
     });
@@ -100,15 +114,106 @@ function setupAddress() {
     foreignFields.forEach((input) => {
       input.removeAttribute('hidden');
     });
+
     domesticFields.forEach((input) => {
       input.setAttribute('hidden', true);
     });
   }
 }
 
+function setupAuditeeEinWarning() {
+  const auditeeEinInput = document.getElementById('ein');
+  const auditeeEinWarning = document.getElementById(
+    'auditee-ein-warning'
+  );
+  const auditeeEinWarningText = document.getElementById(
+    'auditee-ein-warning-text'
+  );
+
+  if (
+    !auditeeEinInput ||
+    !auditeeEinWarning ||
+    !auditeeEinWarningText
+  ) {
+    return;
+  }
+
+  let timer;
+  let abortController;
+
+  const hideWarning = () => {
+    auditeeEinWarning.hidden = true;
+    auditeeEinWarningText.textContent = '';
+  };
+
+  const checkEin = async () => {
+    const currentEin = auditeeEinInput.value.trim();
+    const warningUrl = auditeeEinInput.dataset.warningUrl;
+
+    // Remove any dashes or other non-numeric characters
+    const normalizedEin = currentEin.replace(/\D/g, '');
+
+    // Only check once a full 9-digit EIN has been entered
+    if (normalizedEin.length !== 9 || !warningUrl) {
+      hideWarning();
+      return;
+    }
+
+    if (abortController) {
+      abortController.abort();
+    }
+
+    abortController = new AbortController();
+
+    const url = new URL(warningUrl, window.location.origin);
+    url.searchParams.set('ein', normalizedEin);
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        signal: abortController.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `EIN warning request failed: ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+
+      if (data.warning) {
+        auditeeEinWarningText.textContent = data.warning;
+        auditeeEinWarning.hidden = false;
+      } else {
+        hideWarning();
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error(error);
+        hideWarning();
+      }
+    }
+  };
+
+  auditeeEinInput.addEventListener('input', () => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(checkEin, 400);
+  });
+}
+
 function init() {
-  attachEventHandlers();
-  setupAddress();
+  setupAuditeeEinWarning();
+
+  if (FORM) {
+    attachEventHandlers();
+  }
+
+  if (countrySelect) {
+    setupAddress();
+  }
 }
 
 init();

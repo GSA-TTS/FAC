@@ -93,6 +93,7 @@ from .check_auditee_auditor_ein_match import check_auditee_auditor_ein_match
 from .check_name_fields_not_unique import check_name_fields_not_unique
 from .check_resubmission_has_changes import check_resubmission_has_changes
 from .check_resubmission_metadata import check_resubmission_metadata
+from .check_previous_ein import check_previous_ein
 
 functions = [
     # "Errors", or validations that would prevent a submission upon failure.
@@ -126,4 +127,5 @@ functions = [
     check_auditee_auditor_ein_match,
     check_name_fields_not_unique,
     check_resubmission_has_changes,
+    check_previous_ein,
 ]

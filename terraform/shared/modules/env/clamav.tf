@@ -22,8 +22,9 @@ module "clamav" {
 
   proxy_server   = "https://${module.https-proxy.domain}" # freshclam needs the https:// prefix to identify the proxy type
   proxy_port     = module.https-proxy.https_port
-  proxy_username = module.https-proxy.username
-  proxy_password = module.https-proxy.password
+  proxy_username = module.https-proxy.username["fac"]
+  proxy_password = module.https-proxy.password["fac"]
+
 }
 
 module "file_scanner_clamav" {
@@ -41,8 +42,8 @@ module "file_scanner_clamav" {
 
   proxy_server   = "https://${module.https-proxy.domain}" # freshclam needs the https:// prefix to identify the proxy type
   proxy_port     = module.https-proxy.https_port
-  proxy_username = module.https-proxy.username
-  proxy_password = module.https-proxy.password
+  proxy_username = module.https-proxy.username["fac"]
+  proxy_password = module.https-proxy.password["fac"]
 
   depends_on = [module.fac-file-scanner.id]
 }
