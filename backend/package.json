@@ -43,15 +43,16 @@
   "dependencies": {
     "@uswds/uswds": "3.11.0",
     "autoprefixer": "10.4.20",
-    "esbuild": "0.27.7",
+    "esbuild": "0.28.1",
     "esbuild-sass-plugin": "3.7.0",
-    "glob": "13.0.0",
+    "glob": "13.0.6",
     "npm-run-all2": "9.0.2",
     "plotly.js-strict-dist": "3.0.1",
     "postcss": "8.5.3",
     "postcss-cli": "11.0.0"
   },
   "overrides": {
-    "cross-spawn": "7.0.6"
+    "cross-spawn": "7.0.6",
+    "picomatch": "2.3.2"
   }
 }
