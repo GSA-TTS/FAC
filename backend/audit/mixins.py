@@ -62,9 +62,9 @@ def is_sac_in_valid_state(sac):
     return sac.submission_status != STATUS.FLAGGED_FOR_REMOVAL
 
 
-def is_audit_in_valid_state(sac):
+def is_audit_in_valid_state(audit):
     """Is the audit in a valid state?"""
-    return sac.submission_status != STATUS.FLAGGED_FOR_REMOVAL
+    return audit.submission_status != STATUS.FLAGGED_FOR_REMOVAL if audit else True
 
 
 ACCESS_ROLE_ERROR_MESSAGES = {
